@@ -1,0 +1,8 @@
+*iir
+#butter, 'Butterworth'
+cheby1, 'Chebychev I'
+cheby2, 'Chebychev II'
+#ellip, 'Elliptic'
+
+*fir
+equiripple, 'Equiripple'
