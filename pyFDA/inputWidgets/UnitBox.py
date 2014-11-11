@@ -1,18 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 19 12:19:33 2013
-
-@author: beike
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Mon Nov 18 13:36:39 2013
 
-@author: beike
-"""
-"""
-Auswahl von DesignTyp,FilterMethode 
+xxx
+
 @author: Julia Beike
 Datum:14.11.2013
 """
@@ -20,7 +11,7 @@ import sys
 from PyQt4 import QtGui,QtCore
 from PyQt4.QtCore import SIGNAL
 
-class Unit_Box(QtGui.QWidget):
+class UnitBox(QtGui.QWidget):
     
     def __init__(self, unit=[],lab=[] ,default=[],name=""):
         
@@ -31,7 +22,7 @@ class Unit_Box(QtGui.QWidget):
         default: Dazugehörige Werte
         lab und default müssen immer gleiche länge sein!!! Überprüfung muss noch gemacht werden
         """
-        super(Unit_Box, self).__init__()   
+        super(UnitBox, self).__init__()   
         self.lab_namen=lab
         self.labels= []
         self.name=name
@@ -158,14 +149,14 @@ class Unit_Box(QtGui.QWidget):
         print dic
         return dic
          
- 
+#------------------------------------------------------------------------------ 
     
 if __name__ == '__main__':
     unit=['bf','bf','bf',]
     lab=['a','b','c',]
     default=[4,5,6]
     app = QtGui.QApplication(sys.argv)
-    form=Unit_Box(unit,lab,default,"TEST")
+    form=UnitBox(unit,lab,default,"TEST")
     form.Load_txt(['a','b','c','d'],[1,2,3,10])
     form.Load_txt(['d','b','a'],[1,2,3])
     i=form.get()

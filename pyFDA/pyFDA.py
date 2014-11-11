@@ -3,12 +3,14 @@
 Created on Tue Nov 26 10:57:30 2013
 
 @author: Julia Beike, Christian Muenker
+
+Main file for the pyFDA app, initializes UI
 """
 
 
 import sys
 from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import SIGNAL
+#from PyQt4.QtCore import SIGNAL
 import scipy.io
 import numpy
 
@@ -28,13 +30,14 @@ class pyFDA(QtGui.QWidget):
     def initUI(self): 
         """
         Intitialize the main GUI, consisting of
-        - Subwindow with parameter selection [ChooseParams]
-        - Filter Design button 
-        - Plot Window [plotterHf]
+        - Subwindow for parameter selection [-> ChooseParams.ChooseParams()]
+        - Filter Design button [-> self.startDesignFilt] 
+        - Plot Window [-> plotAll.plotAll(a,b)]
         """
 
-        self.coeffs = (1,1) # initialize filter coefficients
-        self.widgetPara = ChooseParams.ChooseParams()
+        self.coeffs = ([1,0.5],[-1,1]) # initialize filter coefficients a, b
+        # widget / subwindow for parameter selection
+        self.widgetPara = ChooseParams.ChooseParams() 
 #        self.widgetPara.setMaximumWidth(250)
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.butExportML = QtGui.QPushButton("Export -> ML", self)
@@ -59,13 +62,10 @@ class pyFDA(QtGui.QWidget):
         self.setLayout(hbox)
 #        self.setLayout(self.layout)
         # ============== Signals & Slots ================================
-        self.connect(self.butDesignFilt, SIGNAL('clicked()'),
-                     self.startDesignFilt)
-        self.connect(self.butExportML, SIGNAL('clicked()'),
-                     self.exportML)
-        self.connect(self.butExportCSV, SIGNAL('clicked()'),
-                     self.exportCSV)
-        
+
+        self.butDesignFilt.clicked.connect(self.startDesignFilt)
+        self.butExportML.clicked.connect(self.exportML)
+        self.butExportCSV.clicked.connect(self.exportCSV)        
 
     def startDesignFilt(self):
         """
@@ -96,7 +96,9 @@ class pyFDA(QtGui.QWidget):
         Matlab workspace
         """
         
-        scipy.io.savemat('d:/Daten/filt_coeffs.mat', mdict={'filt_coeffs': self.coeffs})
+        scipy.io.savemat('d:/Daten/filt_coeffs.mat', 
+                         mdict={'filt_coeffs': self.coeffs})
+        print("exportML: Matlab workspace exported!")
         
     def exportCSV(self):
         """
@@ -104,8 +106,8 @@ class pyFDA(QtGui.QWidget):
         """
         
         numpy.savetxt('d:/Daten/filt_coeffs.csv', self.coeffs)
-
-
+        print("exportCSV: CSV - File exported!")
+#------------------------------------------------------------------------------
    
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

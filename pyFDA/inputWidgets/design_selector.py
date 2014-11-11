@@ -2,6 +2,8 @@
 """
 Created on Wed Dec 04 08:04:59 2013
 
+Automatische Konvertierung von Frequenzen zwischen Hz, kHz, ...
+
 @author: Christian Muenker
 """
 

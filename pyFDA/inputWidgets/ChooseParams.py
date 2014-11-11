@@ -5,7 +5,7 @@ MAINWINDOW
 
 @author: beike
 """
-import Design_Method, ResponseType, widgetFilterOrder, Unit_Box, Txt_Box
+import DesignMethod, ResponseType, widgetFilterOrder, UnitBox, NumBox
 import sys 
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import SIGNAL
@@ -63,18 +63,20 @@ class ChooseParams(QtGui.QWidget):
             unt : unit 
 
         """ 
-        self.rt = ResponseType.ResponseType()
-        self.dm = Design_Method.Design_Method()
+
+        self.dm = DesignMethod.DesignMethod()
+        self.rt = ResponseType.ResponseType(["Lowpass","Highpass",
+                                             "Bandpass","Bandstop"])
         self.fo = widgetFilterOrder.widgetFilterOrder()
-        self.fs = Unit_Box.Unit_Box(
+        self.fs = UnitBox.UnitBox(
                     ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
                     ['Fs', 'Fpass', 'Fstop'], [48000,9600,12000], "Frequenz")
        
         self.ms_txt = QtGui.QLabel(self)
         self.ms_txt.setText("Enter a weight value for each band below")
         self.ms_txt.setWordWrap(True)
-        self.ms_unt = Unit_Box.Unit_Box(["dB","Squared"],["Apass","Astop"],[1,80],"Magnitude")
-        self.ms_val = Txt_Box.Txt_Box("Enter a weight value for each band below",["Wpass","Wstop"],[1,1])
+        self.ms_unt = UnitBox.UnitBox(["dB","Squared"],["Apass","Astop"],[1,80],"Magnitude")
+        self.ms_val = NumBox.NumBox("Enter a weight value for each band below",["Wpass","Wstop"],[1,1])
         self.ms_last = "val"
         # Magnitude Widgets, that are not needed at the moment are made 
         # invisible but are always present!
@@ -85,8 +87,8 @@ class ChooseParams(QtGui.QWidget):
         LAYOUT      
         """
         self.layout=QtGui.QGridLayout()
-        self.layout.addWidget(self.rt,0,0)  # Response Type (LP, HP, ...)
-        self.layout.addWidget(self.dm,1,0)  # Design Method (IIR - ellip, ...)
+        self.layout.addWidget(self.dm,0,0)  # Design Method (IIR - ellip, ...)
+        self.layout.addWidget(self.rt,1,0)  # Response Type (LP, HP, ...)
         self.layout.addWidget(self.fo,2,0)  # Filter Order
         self.layout.addWidget(self.fs,3,0)  # Freq. Specifications
         self.layout.addWidget(self.ms_txt,4,0)  # Mag. Spec. - text
@@ -99,20 +101,21 @@ class ChooseParams(QtGui.QWidget):
         """
         # Call chooseDesignMethod every time filter design method or 
         # filter type is changed 
-        self.connect(self.dm.combo_FilterMethod, SIGNAL('activated(QString)'),
+        self.connect(self.dm.comboDesignMethod, SIGNAL('activated(QString)'),
                      self.chooseDesignMethod)
-        self.connect(self.dm.combo_Filtertyp, SIGNAL('activated(QString)'),
+        self.connect(self.dm.comboFilterType, SIGNAL('activated(QString)'),
                      self.chooseDesignMethod)
         
     def chooseDesignMethod(self):
         """
-        je nach Filtermethode und Frequenz werden die Werte der Widgets do,ds  neu gesetzt bzw bei ms auch noch die Sichtbarkeit verändert
+        je nach DesignMethode und Frequenz werden die Werte der Widgets do,ds 
+        neu gesetzt bzw bei ms auch noch die Sichtbarkeit verändert
         """
         #print "-----------------------------------------"
         a=self.rt.get()
         resp_type=a["Response Type"]
        
-        filtname=self.dm.combo_FilterMethod.currentText()
+        filtname=self.dm.comboDesignMethod.currentText()
         j=i=0
         while i==0:
            # print self.choose_design_list[j][0]+":"+self.choose_design_list[j][1]

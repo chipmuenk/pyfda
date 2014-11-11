@@ -1,45 +1,38 @@
 # -*- coding: utf-8 -*-
 """
-Auswahl von DesignTyp,FilterMethode und Window 
+Auswahl des Response Types (Lowpass, Highpass, ...)
 @author: juliabeike
 Datum:12.11.2013
 """
 
 import sys
 from PyQt4 import QtGui
-from PyQt4.QtCore import SIGNAL
+#from PyQt4.QtCore import SIGNAL
 
 class ResponseType(QtGui.QWidget):
     
-    def __init__(self):
+    def __init__(self,rt, debug = False):
         super(ResponseType, self).__init__()        
-        self.initUI()
+        self.initUI(rt)
         
         
-    def initUI(self): 
-        
-
-
-
+    def initUI(self,rt, debug = False): 
         """
-        Radio Buttons zur Auswahl des REsponse Type        
+        Combo Box zur Auswahl des Response Types        
         """
-
-
        # self.group.exclusive(True)
         self.combo=QtGui.QComboBox(self)
-        self.combo.addItems(["Lowpass","Highpass","Bandpass","Bandstop"])
+#        self.combo.addItems(["Lowpass","Highpass","Bandpass","Bandstop"])
+        self.combo.addItems(rt)
 
         """
         LAYOUT      
-        """
-        
+        """       
         layout=QtGui.QGridLayout()
-        layout.addWidget( self.combo,0,0)
+        layout.addWidget(self.combo,0,0)
 
         self.setLayout(layout)
         
-
          
     def  get(self):
         """
@@ -56,7 +49,7 @@ class ResponseType(QtGui.QWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = ResponseType()
+    form = ResponseType(["Lowpass","Highpass","Bandpass","Bandstop"])
     form.show()
     a=form.get()
     print a

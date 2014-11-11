@@ -19,6 +19,7 @@ class iir_cheby1():
     
     def LP(self, params):
 
-        b,a = sig.cheby1(self.N, self.rp, self.wn, btype ='low', analog = False, output = 'ba')
+        b,a = sig.cheby1(self.N, self.rp, self.wn, btype ='low', 
+                         analog = False, output = 'ba')
         
         return b, a
