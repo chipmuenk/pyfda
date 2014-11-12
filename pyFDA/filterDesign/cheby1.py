@@ -16,35 +16,40 @@ import scipy.signal as sig
 
 # TODO: worauf bezieht sich "self" - auf cheby1 oder auf cheby1.LP ?
 # TODO: Funktioniert "Vererben" LP -> HP etc.?
-# TODO: elllip etc. verbinden?
+# TODO: Für den 'Min'-Fall könnte man cheby1, elllip etc. verbinden mit der 
+# iirdesign - Funktion verbinden. Ist das sinnvoll?
 
 class cheby1(object):
     def __init__(self):
         self.coeff = (1, 1)
+        self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
+        Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im PB \
+        und über die kritische(n) Frequenz(en) bei denen die Verstärkung unter \
+        den spezifizierten Wert fällt."
 
     def has(self):
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'),
                     'ord' : 'N'}
 
     def LP(self, specs):
-        self.needs = ('N', 'A_pass', 'F_pass', 'F_stop')
-        self.coeff = sig.cheby1(specs['N'], specs['A_pass'],
-                        [specs['F_pass'], specs['F_stop']], btype='lowpass')
+        self.needs = ('Order', 'A_pass', 'F_pass')
+        self.coeff = sig.cheby1(specs['Order'], specs['A_pass'],
+                        specs['F_pass'], btype='low')
 
     def HP(self, specs):
-        self.needs = ('N', 'A_pass', 'F_pass', 'F_stop')
+        self.needs = ('Order', 'A_pass', 'F_pass')
         self.coeff = sig.cheby1(specs['N'], specs['A_pass'],
-                        [specs['F_pass'], specs['F_stop']], btype='highpass')
+                        specs['F_pass'], btype='highpass')
     # For BP and BS, A_pass, F_pass and F_stop have two elements each
     def BP(self, specs):
-        self.needs = ('N', 'A_pass', 'F_pass', 'F_stop')
+        self.needs = ('Order', 'A_pass', 'F_pass1', 'F_pass2')
         self.coeff = sig.cheby1(specs['N'], specs['A_pass'],
-                        [specs['F_pass'], specs['F_stop']], btype='bandpass')
+                        [specs['F_pass1'], specs['F_pass2']], btype='bandpass')
 
     def BS(self, specs):
-        self.needs = ('N', 'A_pass', 'F_pass', 'F_stop')
+        self.needs = ('Order', 'A_pass', 'F_pass1', 'F_pass2')
         self.coeff = sig.cheby1(specs['N'], specs['A_pass'],
-                        [specs['F_pass'], specs['F_stop']], btype='bandstop')
+                        [specs['F_pass1'], specs['F_pass2']], btype='bandstop')
 
 class cheby1_min(object):
     def __init__(self):
