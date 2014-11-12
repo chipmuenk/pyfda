@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 """
 Auswahl des Response Types (Lowpass, Highpass, ...)
+
 @author: juliabeike
 Datum:12.11.2013
 """
 
 import sys
 from PyQt4 import QtGui
-#from PyQt4.QtCore import SIGNAL
 
 class ResponseType(QtGui.QWidget):
+"""
+Widget for entering the filter response type (lowpass, highpass, ...)
+"""
     
     def __init__(self,rt, debug = False):
         super(ResponseType, self).__init__()        
@@ -22,7 +25,6 @@ class ResponseType(QtGui.QWidget):
         """
        # self.group.exclusive(True)
         self.combo=QtGui.QComboBox(self)
-#        self.combo.addItems(["Lowpass","Highpass","Bandpass","Bandstop"])
         self.combo.addItems(rt)
 
         """
@@ -44,9 +46,8 @@ class ResponseType(QtGui.QWidget):
         a=dic[str(n)]
         return{"Response Type":a}
           
-            
+#------------------------------------------------------------------------------            
    
-    
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = ResponseType(["Lowpass","Highpass","Bandpass","Bandstop"])
