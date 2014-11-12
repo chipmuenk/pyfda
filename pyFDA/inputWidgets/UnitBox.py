@@ -63,7 +63,7 @@ class UnitBox(QtGui.QWidget):
  
         self.setLayout(self.layout)
         
-    def Load_txt(self,lab=[] ,default=[])  :
+    def set(self,lab=[] ,default=[])  :
         """
         Zum Ändern der Parameter(Anz Labels, Inhalt der Labels ...)
         """
@@ -82,10 +82,10 @@ class UnitBox(QtGui.QWidget):
              # wenn keine elemente mehr in lab dann lösche restlichen Eingabefelder
             if (i>(len(lab)-1)):
              
-                self.Loesche_elm(len(lab))
+                self.delElement(len(lab))
             # wenn in lab noch elemnete aber keine mehr in lab_namen =>Einfügen    
             elif (i>(len(self.lab_namen)-1)):
-                self.add_elm(i,lab[i],default[i])
+                self.addElement(i,lab[i],default[i])
 
             else:
                 #wenn sich der Name des Labels ändert, defäult wert in Line Edit
@@ -105,7 +105,7 @@ class UnitBox(QtGui.QWidget):
         self.setLayout(self.layout)
        # print "------------------------------------" 
         
-    def Loesche_elm(self,i):
+    def delElement(self,i):
         
         """
         elm an pos i wird gelöscht (in labels und textfield)
@@ -119,7 +119,7 @@ class UnitBox(QtGui.QWidget):
         self.textfield[i].deleteLater()
         del self.textfield[i]  
         
-    def add_elm(self,i,lab_name,defaultw)  : 
+    def addElement(self,i,lab_name,defaultw)  : 
         
         """
         elm an pos i wird angefügt (in labels und textfield)
@@ -157,8 +157,8 @@ if __name__ == '__main__':
     default=[4,5,6]
     app = QtGui.QApplication(sys.argv)
     form=UnitBox(unit,lab,default,"TEST")
-    form.Load_txt(['a','b','c','d'],[1,2,3,10])
-    form.Load_txt(['d','b','a'],[1,2,3])
+    form.set(['a','b','c','d'],[1,2,3,10])
+    form.set(['d','b','a'],[1,2,3])
     i=form.get()
     print i
     form.show()
