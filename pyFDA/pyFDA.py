@@ -37,7 +37,7 @@ class pyFDA(QtGui.QWidget):
 
         self.coeffs = ([1,0.5],[-1,1]) # initialize filter coefficients a, b
         # widget / subwindow for parameter selection
-        self.widgetPara = ChooseParams.ChooseParams() 
+        self.widgetParams = ChooseParams.ChooseParams() 
 #        self.widgetPara.setMaximumWidth(250)
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.butExportML = QtGui.QPushButton("Export -> ML", self)
@@ -45,7 +45,7 @@ class pyFDA(QtGui.QWidget):
         self.pltAll = plotAll.plotAll((1,1)) # instantiate tabbed plot widgets        
         # ============== UI Layout =====================================
         self.grLayout = QtGui.QGridLayout()
-        self.grLayout.addWidget(self.widgetPara,0,0) # parameter entry widget
+        self.grLayout.addWidget(self.widgetParams,0,0) # parameter select widget
         self.grLayout.addWidget(self.butDesignFilt,1,0) # filter design button
         self.grLayout.addWidget(self.butExportML,2,0) # filter export button
         self.grLayout.addWidget(self.butExportCSV,3,0) # filter export button
@@ -72,7 +72,7 @@ class pyFDA(QtGui.QWidget):
         Design Filter
         """
 
-        a = self.widgetPara.get()
+        a = self.widgetParams.get()
         print "-------------------------"
         print "-------------------------"
         print a
