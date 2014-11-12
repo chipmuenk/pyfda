@@ -12,7 +12,7 @@ from PyQt4.QtCore import SIGNAL, SLOT
 
 import matplotlib as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
 import numpy as np
@@ -25,7 +25,7 @@ N_FFT = 2048 # FFT length for freqz
         
 class plotHf(QtGui.QWidget):
 
-    def __init__(self, coeffs = ((1,1,1),(3,0,0))):        
+    def __init__(self, coeffs = ([1,1,1],[3,0,0])):        
         parent = super(plotHf, self).__init__() 
 #    def __init__(self, parent=None):      
         QtGui.QMainWindow.__init__(self, parent)
