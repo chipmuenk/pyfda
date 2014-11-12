@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Auswahl von DesignTyp,FilterMethode und Window 
+Widget for selecting / entering manual or minimum filter order
+
 @author: juliabeike
 Datum:12.11.2013
 """
