@@ -19,14 +19,14 @@ class ChooseParams(QtGui.QWidget):
         self.initUI()
         # "Properties" of all filter types:
         self.choose_design_list=(
-                               ['Least-squares','LP',['Fs','Fpass','Fstop'],[48000,9600,12000],False,True,"tb",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
-                               ['Least-squares','HP',['Fs','Fpass','Fstop'],[48000,9600,12000],False,True,"tb",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
-                               ['Least-squares','BP',['Fs','Fstop1','Fpass1','Fstop2','Fpass2'],[48000,7200,9600,12000,14400],False,True,"tb",["Enter a weight value for each band below",["Wstop1","Wpass","Wstop2"],[1,1,1]]],
-                               ['Least-squares','BS',['Fs','Fpass1','Fstop1','Fpass2','Fstop2'],[48000,7200,9600,12000,14400],False,True,"tb",["Enter a weight value for each band below",["Wpass1","Wstop","Wpass2"],[1,1,1]]],
-                               ['Equiripple','LP',['Fs','Fpass','Fstop'],[48000,9600,12000],True,True,"tb",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
-                               ['Equiripple','HP',['Fs','Fpass','Fstop'],[48000,9600,12000],True,True,"tb",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
-                               ['Equiripple','BP',['Fs','Fstop1','Fpass1','Fstop2','Fpass2'],[48000,7200,9600,12000,14400],True,True,"tb",["Enter a weight value for each band below",["Wstop1","Wpass","Wstop2"],[1,1,1]]],
-                               ['Equiripple','BS',['Fs','Fpass1','Fstop1','Fpass2','Fstop2'],[48000,7200,9600,12000,14400],True,True,"tb",["Enter a weight value for each band below",["Wpass1","Wstop","Wpass2"],[1,1,1]]],      
+                               ['Least-squares','LP',['Fs','F_pass','F_stop'],[48000,9600,12000],False,True,"val",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
+                               ['Least-squares','HP',['Fs','F_pass','F_stop'],[48000,9600,12000],False,True,"val",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
+                               ['Least-squares','BP',['Fs','F_stop1','F_pass1','F_stop2','F_pass2'],[48000,7200,9600,12000,14400],False,True,"val",["Enter a weight value for each band below",["Wstop1","Wpass","Wstop2"],[1,1,1]]],
+                               ['Least-squares','BS',['Fs','F_pass1','F_stop1','F_pass2','F_stop2'],[48000,7200,9600,12000,14400],False,True,"val",["Enter a weight value for each band below",["Wpass1","Wstop","Wpass2"],[1,1,1]]],
+                               ['Equiripple','LP',['Fs','F_pass','F_stop'],[48000,9600,12000],True,True,"val",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
+                               ['Equiripple','HP',['Fs','F_pass','F_stop'],[48000,9600,12000],True,True,"val",["Enter a weight value for each band below",["Wpass","Wstop"],[1,1]]],
+                               ['Equiripple','BP',['Fs','F_stop1','F_pass1','F_stop2','F_pass2'],[48000,7200,9600,12000,14400],True,True,"val",["Enter a weight value for each band below",["Wstop1","Wpass","Wstop2"],[1,1,1]]],
+                               ['Equiripple','BS',['Fs','F_pass1','F_stop1','F_pass2','F_stop2'],[48000,7200,9600,12000,14400],True,True,"val",["Enter a weight value for each band below",["Wpass1","Wstop","Wpass2"],[1,1,1]]],      
                                ['Window','LP',['Fs','Fc'],[48000,10800],False,True,"txt","The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
                                ['Window','HP',['Fs','Fc'],[48000,10800],False,True,"txt","The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
                                ['Window','BP',['Fs','Fc1','Fc2'],[48000,8400,13200],False,True,"txt","The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
@@ -35,20 +35,38 @@ class ChooseParams(QtGui.QWidget):
                                ['Butterworth','HP',['Fs','Fc'],[48000,10800],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
                                ['Butterworth','BP',['Fs','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
                                ['Butterworth','BS',['Fs','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
-                               ['Elliptic','LP',['Fs','Fpass'],[48000,9600],True,True,"ub",[["dB","Squared"],["Apass","Astop"],[1,80]]],
-                               ['Elliptic','HP',['Fs','Fpass'],[48000,14400],True,True,"ub",[["dB","Squared"],["Apass","Astop"],[1,80]]],
-                               ['Elliptic','BP',['Fs','Fpass1','Fpass2'],[48000,9600,12000],True,True,"ub",[["dB","Squared"],["Astopp1","Apass","Astop2"],[60,1,80]]],
-                               ['Elliptic','BS',['Fs','Fpass1','Fpass2'],[48000,9600,12000],True,True,"ub",[["dB","Squared"],["Apass1","Astop","Apass2"],[5,60,1]]],
-                               ['Chebychev 1','LP',['Fs','Fpass'],[48000,9600],True,True,"ub",[["dB","Squared"],["Apass","Astop"],[1,80]]],
-                               ['Chebychev 1','HP',['Fs','Fpass'],[48000,14400],True,True,"ub",[["dB","Squared"],["Apass","Astop"],[1,80]]],
-                               ['Chebychev 1','BP',['Fs','Fpass1','Fpass2'],[48000,9600,12000],True,True,"ub",[["dB","Squared"],["Astopp1","Apass","Astop2"],[60,1,80]]],
-                               ['Chebychev 1','BS',['Fs','Fpass1','Fpass2'],[48000,9600,12000],True,True,"ub",[["dB","Squared"],["Apass1","Astop","Apass2"],[5,60,1]]],
-                               ['Chebychev 2','LP',['Fs','Fpass'],[48000,9600],True,True,"ub",[["dB","Squared"],["Apass","Astop"],[1,80]]],
-                               ['Chebychev 2','HP',['Fs','Fpass'],[48000,14400],True,True,"ub",[["dB","Squared"],["Apass","Astop"],[1,80]]],
-                               ['Chebychev 2','BP',['Fs','Fpass1','Fpass2'],[48000,9600,12000],True,True,"ub",[["dB","Squared"],["Astopp1","Apass","Astop2"],[60,1,80]]],
-                               ['Chebychev 2','BS',['Fs','Fpass1','Fpass2'],[48000,9600,12000],True,True,"ub",[["dB","Squared"],["Apass1","Astop","Apass2"],[5,60,1]]]
+                               ['Elliptic','LP',['Fs','F_pass'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['Elliptic','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['Elliptic','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_stop1","A_pass","A_stop2"],[60,1,80]]],
+                               ['Elliptic','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass1","A_stop","A_pass2"],[5,60,1]]],
+                               ['Chebychev 1','LP',['Fs','F_pass'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
+                               ['Chebychev 1','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
+                               ['Chebychev 1','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
+                               ['Chebychev 1','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
+                               ['Chebychev 2','LP',['Fs','F_pass'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['Chebychev 2','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['Chebychev 2','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_stop1","A_pass","A_stop2"],[60,1,80]]],
+                               ['Chebychev 2','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass1","A_stop","A_pass2"],[5,60,1]]]
                                 )                                               
-        
+        """
+        choose_design_list[0]: Label / Design Method (string)
+        choose_design_list[1]: Response Type ('rt', string)
+        -- Frequency Specifications         
+        choose_design_list[2]: Label Frequencies (list of strings)
+        choose_design_list[3]: Frequencies (list of numbers) 
+        choose_design_list[4]: Flag, Enable Min (???) (Boolean)
+        choose_design_list[5]: Flag, Check Manual Order (Boolean)
+        -- Amplitude / Weight Specifications        
+        choose_design_list[6]: Selector (string):
+            'txt' -> 
+                choose_design_list[7]: Text-Info (string)
+             'unt' -> 
+                choose_design_list[7]: List of lists for Gains containing
+                                            [Units, Labels, Defaultvalues]
+             'val' -> 
+                choose_design_list[7]: List of lists for Weights containing
+                                            [Infostring, Labels, Defaultvalues]
+        """
         
     def initUI(self): 
         """
@@ -58,9 +76,9 @@ class ChooseParams(QtGui.QWidget):
         fo : Filter Order (numeric or 'min')
         fs : Frequency Specifications 
         ms : Magnitude Specifications with the subwidgets
-            txt : text field for comments / instruction
-            val : value
-            unt : unit 
+            txt : only text field for comments / instruction
+            val : infostring (title), Label, value
+            unt : unit, label, value
 
         """ 
 
@@ -70,12 +88,12 @@ class ChooseParams(QtGui.QWidget):
         self.fo = widgetFilterOrder.widgetFilterOrder()
         self.fs = UnitBox.UnitBox(
                     ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
-                    ['Fs', 'Fpass', 'Fstop'], [48000,9600,12000], "Frequenz")
+                    ['Fs', 'F_pass', 'F_stop'], [48000,9600,12000], "Frequenz")
        
         self.ms_txt = QtGui.QLabel(self)
         self.ms_txt.setText("Enter a weight value for each band below")
         self.ms_txt.setWordWrap(True)
-        self.ms_unt = UnitBox.UnitBox(["dB","Squared"],["Apass","Astop"],[1,80],"Magnitude")
+        self.ms_unt = UnitBox.UnitBox(["dB","Squared"],["A_pass","A_stop"],[1,80],"Magnitude")
         self.ms_val = NumBox.NumBox("Enter a weight value for each band below",["Wpass","Wstop"],[1,1])
         self.ms_last = "val"
         # Magnitude Widgets, that are not needed at the moment are made 
@@ -133,7 +151,7 @@ class ChooseParams(QtGui.QWidget):
         """
         Hilfsfunktion zur Aktualisierung des Frequenz-Widget und der FilterOrdnung
         """
-        self.fs.Load_txt(liste, default)
+        self.fs.set(liste, default)
         self.fo.chkMin.setEnabled(enMin)
         self.fo.chkManual.setChecked(checkMan)
         
@@ -145,20 +163,20 @@ class ChooseParams(QtGui.QWidget):
        # print liste
        # print string
        # print"_________________________"
-        if string == "txt":
+        if string == "txt":  # only Info-Text
             self.ms_txt.setText(liste)
             self.ms_txt.setVisible(True)
             self.ms_unt.setVisible(False)
             self.ms_val.setVisible(False)
             self.ms_last="txt"
-        if string == "unt" :
-            self.ms_unt.Load_txt(liste[1],liste[2])
+        if string == "unt" : # create subwidget with unit + label
+            self.ms_unt.set(liste[1],liste[2])
             self.ms_unt.setVisible(True)
             self.ms_val.setVisible(False)
             self.ms_txt.setVisible(False)
             self.ms_last="unt"
-        if string == "val" :
-            self.ms_val.Load_txt(liste[0],liste[1],liste[2])
+        if string == "val" :  # create subwidget with title, unit + label
+            self.ms_val.set(liste[0],liste[1],liste[2])
             self.ms_val.setVisible(True)
             self.ms_txt.setVisible(False)
             self.ms_unt.setVisible(False)
