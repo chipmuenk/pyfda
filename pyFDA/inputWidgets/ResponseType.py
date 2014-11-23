@@ -10,9 +10,9 @@ import sys
 from PyQt4 import QtGui
 
 class ResponseType(QtGui.QWidget):
-"""
-Widget for entering the filter response type (lowpass, highpass, ...)
-"""
+    """
+    Widget for entering the filter response type (lowpass, highpass, ...)
+    """
     
     def __init__(self,rt, debug = False):
         super(ResponseType, self).__init__()        
