@@ -9,6 +9,8 @@ Datum:12.11.2013
 import sys
 from PyQt4 import QtGui
 
+DEBUG = True
+
 class ResponseType(QtGui.QWidget):
     """
     Widget for entering the filter response type (lowpass, highpass, ...)
@@ -41,9 +43,13 @@ class ResponseType(QtGui.QWidget):
         Rückgabe des aktuellen Filtertyps
         """
         dic={"Lowpass":"LP","Highpass":"HP","Bandpass":"BP","Bandstop":"BS"}
-        n=self.combo.currentText()
-        print n
-        a=dic[str(n)]
+        curText = self.combo.currentText()
+        a=dic[str(curText)]
+        if DEBUG:
+            print("-------------------------")
+            print("ResponseType.py: ") 
+            print("-------------------------")
+            print("FilterTyp:" ,curText)
         return{"Response Type":a}
           
 #------------------------------------------------------------------------------            

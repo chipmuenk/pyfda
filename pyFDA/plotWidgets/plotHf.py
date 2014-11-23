@@ -18,10 +18,11 @@ from matplotlib.figure import Figure
 import numpy as np
 import scipy.signal as sig
 
-import plotAll
+#import plotAll
 
 N_FFT = 2048 # FFT length for freqz
-       
+ 
+DEBUG = True      
         
 class plotHf(QtGui.QWidget):
 
@@ -30,7 +31,6 @@ class plotHf(QtGui.QWidget):
 #    def __init__(self, parent=None):      
         QtGui.QMainWindow.__init__(self, parent)
         self.setWindowTitle('Plot H(f)')
-        print 'plotter_Hf.__init__()'
         self.A_SB = 60   # min. Sperrdämpfung im Stoppband in dB (= min. y-Wert des Plots)
 #        plotAll.createMPLCanvas(parent)   
         self.myCanv = plotHf.createMPLCanvas(self)   
@@ -91,11 +91,15 @@ class plotHf(QtGui.QWidget):
     def update(self, coeffs = (1,1)):
         """ Re-calculates |H(f)| and updates the figure
         """
-        print coeffs
         self.bb = coeffs[0]
         self.aa = coeffs[1]
         [W,H] = sig.freqz(self.bb, self.aa, N_FFT) # calculate H(W) for W = 0 ... pi
-        print 'redraw.plotted!', self.bb
+        print 
+        if DEBUG:
+            print("-------------------------")
+            print("plotHf.update() ") 
+            print("-------------------------")
+            print("b,a = ", coeffs)
         F = W / (2 * np.pi)
 
         # clear the axes and redraw the plot

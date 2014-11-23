@@ -7,17 +7,17 @@ Created on Tue Nov 26 10:57:30 2013
 Main file for the pyFDA app, initializes UI
 """
 
-
 import sys
 from PyQt4 import QtGui, QtCore
 #from PyQt4.QtCore import SIGNAL
 import scipy.io
-import numpy
+import numpy as np
 
-from inputWidgets import ChooseParams, design_selector
-from filterDesign import cheby1
+from inputWidgets import ChooseParams
+from filterDesign import cheby1, design_selector
 from plotWidgets import plotAll
 
+DEBUG = True
 
 class pyFDA(QtGui.QWidget):
     PLT_SAME_WINDOW =  True
@@ -26,7 +26,9 @@ class pyFDA(QtGui.QWidget):
     """
     def __init__(self):
         super(pyFDA, self).__init__()
-        self.coeffs = ([1,-1],[2,0]) # initialize filter coefficients a, b
+        self.zpk = ([1], 0, 0.5)
+        self.coeffs = [self.zpk[2]*np.poly(self.zpk[0]), np.poly(self.zpk[1])]
+#        self.coeffs = ([1,-1],[2,0]) # initialize filter coefficients b, a        
         self.myFilter = cheby1.cheby1()
         self.initUI()     
         
@@ -37,8 +39,6 @@ class pyFDA(QtGui.QWidget):
         - Filter Design button [-> self.startDesignFilt] 
         - Plot Window [-> plotAll.plotAll(a,b)]
         """
-
-
         # widget / subwindow for parameter selection
         self.widgetParams = ChooseParams.ChooseParams() 
 #        self.widgetPara.setMaximumWidth(250)
@@ -52,7 +52,6 @@ class pyFDA(QtGui.QWidget):
         self.grLayout.addWidget(self.butDesignFilt,1,0) # filter design button
         self.grLayout.addWidget(self.butExportML,2,0) # filter export button
         self.grLayout.addWidget(self.butExportCSV,3,0) # filter export button
-
 
         hbox = QtGui.QHBoxLayout()
         hbox.addLayout(self.grLayout)
@@ -74,18 +73,18 @@ class pyFDA(QtGui.QWidget):
         """
         Design Filter
         """
-
         params = self.widgetParams.get()
-        print "-------------------------"
-        print "-------------------------"
-        print params
-        print "-------------------------"
-        print "-------------------------"
         
-        self.myFilter.LP(params) # design filter
-        self.coeffs = self.myFilter.coeff # and read back coefficients
+        self.myFilter.LP(params) # design filter,
+        self.zpk = self.myFilter.zpk # read poles / zeroes
+        self.coeffs = self.myFilter.coeffs # and filter coefficients
 
-        print self.coeffs
+        if DEBUG:
+            print("-------------------------")
+            print("pyFDA.py: Filter Parameters") 
+            print("-------------------------")
+            print("zpk:" ,self.zpk)
+            print("b,a = ", self.coeffs)
 
         if self.PLT_SAME_WINDOW:       
             self.pltAll.update(self.coeffs)
@@ -110,11 +109,12 @@ class pyFDA(QtGui.QWidget):
         Export filter coefficients to a CSV-file 
         """
         
-        numpy.savetxt('d:/Daten/filt_coeffs.csv', self.coeffs)
+        np.savetxt('d:/Daten/filt_coeffs.csv', self.coeffs)
         print("exportCSV: CSV - File exported!")
 #------------------------------------------------------------------------------
    
 if __name__ == '__main__':
+
     app = QtGui.QApplication(sys.argv)
     form = pyFDA()
     form.show()

@@ -12,6 +12,9 @@ from PyQt4.QtCore import SIGNAL
 """
 Zur Eingabe aller Parameter und Einstellungen
 """
+
+DEBUG = False
+
 class ChooseParams(QtGui.QWidget):
     
     def __init__(self):
@@ -96,7 +99,7 @@ class ChooseParams(QtGui.QWidget):
         self.ms_unt = UnitBox.UnitBox(["dB","Squared"],["A_pass","A_stop"],[1,80],"Magnitude")
         self.ms_val = NumBox.NumBox("Enter a weight value for each band below",["Wpass","Wstop"],[1,1])
         self.ms_last = "val"
-        # Magnitude Widgets, that are not needed at the moment are made 
+        # Magnitude Widgets not needed at the moment are made 
         # invisible but are always present!
         self.ms_txt.setVisible(False)
         self.ms_val.setVisible(True)
@@ -186,14 +189,17 @@ class ChooseParams(QtGui.QWidget):
         """
         Return a dict with the currently selected filter specifications 
         """
-        
         ret={}
         ret.update(self.rt.get())
-        print ret
+        if DEBUG: 
+            print("-------------------------")
+            print("ChooseParams.get(): Filter Parameters") 
+            print("-------------------------")            
+            print(ret)
         ret.update(self.dm.get())
-        print ret
+        if DEBUG: print(ret)
         ret.update(self.fo.get())
-        print ret
+        if DEBUG: print(ret)
         ret.update(self.fs.get())
          
 
@@ -201,7 +207,7 @@ class ChooseParams(QtGui.QWidget):
             ret.update( self.ms_unt.get())
         if self.ms_last=="val" :
             ret.update( self.ms_val.get())
-        print ret
+        if DEBUG: print(ret)
         return ret  
         
    
