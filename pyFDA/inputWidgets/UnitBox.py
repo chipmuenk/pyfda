@@ -9,7 +9,8 @@ Datum:14.11.2013
 """
 import sys
 from PyQt4 import QtGui,QtCore
-from PyQt4.QtCore import SIGNAL
+
+DEBUG = True
 
 class UnitBox(QtGui.QWidget):
     
@@ -26,14 +27,11 @@ class UnitBox(QtGui.QWidget):
         self.lab_namen=lab
         self.labels= []
         self.name=name
-       
         
         self.unit=[str(i) for i in unit]
         self.default_werte=default
         self.textfield=[]
-        #print self.default_werte
-        self.initUI()
-       
+        self.initUI()     
         
     def initUI(self): 
         anz=len(self.lab_namen)
@@ -47,7 +45,7 @@ class UnitBox(QtGui.QWidget):
         self.layout.addWidget(self.lab_units,0,0)
         self.layout.addWidget(self.combo_units,0,1)
         """
-        Anzahl der Eingeabefelder(Label+LineEdit) hängt von der bei der Initialisierung übergebenen Parametern ab
+        Anzahl der Eingabefelder(Label+LineEdit) hängt von der bei der Initialisierung übergebenen Parametern ab
         alle labels werden in einer Liste gespeichert, alle TextFelder werden in einer Liste gespeichert
         """
         while (i<anz):
@@ -97,13 +95,9 @@ class UnitBox(QtGui.QWidget):
                     self.textfield[i].setText(str(default[i]))
                     #wenn sich name des Labels nicht ändert, mache nichts
                    # print self.labels[i+1].text() + self.textfield[i+1].text()
-            i=i+1
-            
-       
-       # print self.lab_namen
+            i=i+1       
 
         self.setLayout(self.layout)
-       # print "------------------------------------" 
         
     def delElement(self,i):
         
@@ -140,13 +134,17 @@ class UnitBox(QtGui.QWidget):
         dic={"Einheit"+self.name:str(self.combo_units.currentText())}
         #namen=[]
         #data=[]
+        if DEBUG:
+            print("-------------------------")
+            print("UnitBox.get() ") 
+            print("-------------------------")
         i=0
         while (i<len(self.lab_namen)):
             dic.update({self.lab_namen[i]:float(self.textfield[i].text())})
             #namen.append(self.lab_namen[i])
             #data.append(float(self.textfield[i].text()))
             i=i+1
-        print dic
+        if DEBUG: print(dic)
         return dic
          
 #------------------------------------------------------------------------------ 
