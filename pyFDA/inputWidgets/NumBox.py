@@ -12,7 +12,6 @@ Datum:14.11.2013
 """
 import sys
 from PyQt4 import QtGui,QtCore
-#from PyQt4.QtCore import SIGNAL
 
 class NumBox(QtGui.QWidget):
     
