@@ -6,7 +6,6 @@ Edited by Christian Münker, 2013
 import sys
 # import EITHER PyQt4 OR PySide, depending on your system
 from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import SIGNAL, SLOT  
 #from PySide.QtCore import *
 #from PySide.QtGui import *
 
@@ -55,7 +54,7 @@ class plotHf(QtGui.QWidget):
         # SIGNAL & SLOTS
         # 
         self.butDraw = QtGui.QPushButton("&Draw")
-        self.connect(self.butDraw, SIGNAL('clicked()'), self.update)
+        self.butDraw.clicked.connect(self.update)
 
         self.cboxGrid = QtGui.QCheckBox("Show &Grid")
         self.cboxGrid.setChecked(True)  
