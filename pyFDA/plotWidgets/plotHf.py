@@ -55,6 +55,7 @@ class plotHf(QtGui.QWidget):
         # 
         self.butDraw = QtGui.QPushButton("&Draw")
         self.butDraw.clicked.connect(self.update)
+        #dies ist ein Test
 
         self.cboxGrid = QtGui.QCheckBox("Show &Grid")
         self.cboxGrid.setChecked(True)  
