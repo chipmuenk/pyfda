@@ -24,11 +24,12 @@ N_FFT = 2048 # FFT length for freqz
 #
 
 class plotAll(QtGui.QWidget):
-    def __init__(self, coeffs = ([1,1,1],[3,0,2])):
+    def __init__(self):
         QtGui.QWidget.__init__(self)
         tab_widget = QtGui.QTabWidget()
-        self.pltPhi = plotHf.plotHf(coeffs)
-        self.pltHf = plotHf.plotHf(coeffs)
+        self.coeffs = ([1,1,1],[3,0,2])
+        self.pltPhi = plotHf.plotHf()
+        self.pltHf = plotHf.plotHf()
         tab_widget.addTab(self.pltHf, '|H(f)|')
         tab_widget.addTab(self.pltPhi, 'phi(f)')
         
@@ -37,9 +38,11 @@ class plotAll(QtGui.QWidget):
         
         self.setLayout(vbox)
         
-    def update(self, coeffs = (1,1)):
-        self.pltHf.update(coeffs)
-        self.pltPhi.update(coeffs)        
+    def update(self, coeffs):
+        """ Update all subplots with new coefficients"""
+        self.coeffs = coeffs
+        self.pltHf.update(self.coeffs)
+        self.pltPhi.update(self.coeffs)        
 
 class createMPLCanvas(QtGui.QWidget):
     def __init__(self):

@@ -25,15 +25,18 @@ DEBUG = True
         
 class plotHf(QtGui.QWidget):
 
-    def __init__(self, coeffs = ([1,1,1],[3,0,0])):        
+    def __init__(self):        
         parent = super(plotHf, self).__init__() 
+        
+        self.coeffs = ([1,1,1],[3,0,0]) # dummy definition for notch filter
+        
 #    def __init__(self, parent=None):      
         QtGui.QMainWindow.__init__(self, parent)
         self.setWindowTitle('Plot H(f)')
         self.A_SB = 60   # min. Sperrdämpfung im Stoppband in dB (= min. y-Wert des Plots)
 #        plotAll.createMPLCanvas(parent)   
         self.myCanv = plotHf.createMPLCanvas(self)   
-        self.update(coeffs)
+        self.update(self.coeffs)
 
     def createMPLCanvas(self):
    
@@ -53,25 +56,21 @@ class plotHf(QtGui.QWidget):
         
         # SIGNAL & SLOTS
         # 
-        self.butDraw = QtGui.QPushButton("&Draw")
-        self.butDraw.clicked.connect(self.update)
-        #dies ist ein Test
+        self.butDraw = QtGui.QPushButton("&Redraw")
+        self.butDraw.clicked.connect(lambda: self.update(self.coeffs))
 
         self.cboxGrid = QtGui.QCheckBox("Show &Grid")
         self.cboxGrid.setChecked(True)  
-#        self.connect(self.cboxGrid, SIGNAL('stateChanged(int)'), self.redraw)
-        # self.cb_grid.clicked.connect(self.redraw) 
-        # passes unwanted clicked bool argument, use following
-        self.cboxGrid.clicked.connect(lambda: self.redraw())
+        # Attention: passes unwanted clicked bool argument:
+        self.cboxGrid.clicked.connect(self.redraw)
         
         lblLw = QtGui.QLabel('Line width:')
         self.sldLw = QtGui.QSlider(QtCore.Qt.Horizontal)
-        self.sldLw.setRange(1, 5)
-        self.sldLw.setValue(2)
+        self.sldLw.setRange(1, 10)
+        self.sldLw.setValue(5)
         self.sldLw.setTracking(True)
         self.sldLw.setTickPosition(QtGui.QSlider.NoTicks)
-#        self.connect(self.sldLw, SIGNAL('valueChanged(int)'), self.redraw)
-        self.sldLw.valueChanged.connect(lambda: self.redraw())       
+        self.sldLw.valueChanged.connect(self.redraw)  
 
         #=============================================
         # Layout with box sizers
@@ -88,18 +87,20 @@ class plotHf(QtGui.QWidget):
         vbox.addLayout(hbox1)         
         self.setLayout(vbox)
             
-    def update(self, coeffs = (1,1)):
-        """ Re-calculates |H(f)| and updates the figure
+    def update(self, coeffs):
+        """ 
+        Re-calculate |H(f)| and update the figure
         """
-        self.bb = coeffs[0]
-        self.aa = coeffs[1]
+        self.coeffs = coeffs
+        self.bb = self.coeffs[0]
+        self.aa = self.coeffs[1]
         [W,H] = sig.freqz(self.bb, self.aa, N_FFT) # calculate H(W) for W = 0 ... pi
         print 
         if DEBUG:
             print("-------------------------")
             print("plotHf.update() ") 
             print("-------------------------")
-            print("b,a = ", coeffs)
+            print("b,a = ", self.bb, self.aa)
         F = W / (2 * np.pi)
 
         # clear the axes and redraw the plot
@@ -119,10 +120,11 @@ class plotHf(QtGui.QWidget):
         Redraw the figure with new properties (grid, linewidth)
         """
         self.pltAxes.grid(self.cboxGrid.isChecked())
-        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value())
+        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
         self.pltFig.tight_layout()
         self.pltCanv.draw()
-  
+
+#------------------------------------------------------------------------------  
     
 def main():
     app = QtGui.QApplication(sys.argv)
