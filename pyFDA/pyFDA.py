@@ -45,7 +45,7 @@ class pyFDA(QtGui.QWidget):
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.butExportML = QtGui.QPushButton("Export -> ML", self)
         self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
-        self.pltAll = plotAll.plotAll(self.coeffs) # instantiate tabbed plot widgets        
+        self.pltAll = plotAll.plotAll() # instantiate tabbed plot widgets        
         # ============== UI Layout =====================================
         self.grLayout = QtGui.QGridLayout()
         self.grLayout.addWidget(self.widgetParams,0,0) # parameter select widget
