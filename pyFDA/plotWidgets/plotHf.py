@@ -16,17 +16,20 @@ from matplotlib.figure import Figure
 
 import numpy as np
 import scipy.signal as sig
+import plotAll
+#import _plotUtils
 
-#import plotAll
+import plotAll
 
 N_FFT = 2048 # FFT length for freqz
  
 DEBUG = True      
         
-class plotHf(QtGui.QWidget):
+class PlotHf(QtGui.QWidget):
+#class plotHf(plotAll.plotAll):
 
     def __init__(self):        
-        parent = super(plotHf, self).__init__() 
+        parent = super(PlotHf, self).__init__() 
         
         self.coeffs = ([1,1,1],[3,0,0]) # dummy definition for notch filter
         
@@ -35,7 +38,8 @@ class plotHf(QtGui.QWidget):
         self.setWindowTitle('Plot H(f)')
         self.A_SB = 60   # min. Sperrdämpfung im Stoppband in dB (= min. y-Wert des Plots)
 #        plotAll.createMPLCanvas(parent)   
-        self.myCanv = plotHf.createMPLCanvas(self)   
+        self.myCanv = PlotHf.createMPLCanvas(self)  
+#        self.myCanv = _plotUtils.createMPLCanvas()           
         self.update(self.coeffs)
 
     def createMPLCanvas(self):
@@ -57,9 +61,10 @@ class plotHf(QtGui.QWidget):
         # SIGNAL & SLOTS
         # 
         self.butDraw = QtGui.QPushButton("&Redraw")
-        self.butDraw.clicked.connect(lambda: self.update(self.coeffs))
+        self.butDraw.clicked.connect(self.redraw)
+        
 
-        self.cboxGrid = QtGui.QCheckBox("Show &Grid")
+        self.cboxGrid = QtGui.QCheckBox("&Grid")
         self.cboxGrid.setChecked(True)  
         # Attention: passes unwanted clicked bool argument:
         self.cboxGrid.clicked.connect(self.redraw)
@@ -128,7 +133,7 @@ class plotHf(QtGui.QWidget):
     
 def main():
     app = QtGui.QApplication(sys.argv)
-    form = plotHf()
+    form = PlotHf()
     form.show()
     app.exec_()
 
