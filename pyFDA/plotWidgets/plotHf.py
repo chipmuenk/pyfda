@@ -16,17 +16,17 @@ from matplotlib.figure import Figure
 
 import numpy as np
 import scipy.signal as sig
-import plotAll
+#import plotAll.plotAll
 #import _plotUtils
 
-import plotAll
+#from plotAll import plotAll
 
 N_FFT = 2048 # FFT length for freqz
  
 DEBUG = True      
         
 class PlotHf(QtGui.QWidget):
-#class plotHf(plotAll.plotAll):
+#class PlotHf(plotAll):
 
     def __init__(self):        
         parent = super(PlotHf, self).__init__() 
