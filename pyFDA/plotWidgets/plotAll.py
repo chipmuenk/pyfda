@@ -55,7 +55,7 @@ class plotAll(QtGui.QWidget):
         self.coeffs = coeffs
         self.pltHf.update(self.coeffs)
         self.pltPhi.update(self.coeffs)
-        self.redrawAll()
+#        self.redrawAll()
 
     def redrawAll(self):
         """ Redraw all subplots"""
