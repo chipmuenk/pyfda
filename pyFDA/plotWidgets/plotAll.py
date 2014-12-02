@@ -9,10 +9,6 @@ from PyQt4 import QtGui, QtCore
 #from PySide.QtCore import *
 #from PySide.QtGui import *
 
-#import matplotlib
-#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-#from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
-#from matplotlib.figure import Figure
 
 #import numpy as np
 #import scipy.signal as sig
@@ -38,8 +34,8 @@ class plotAll(QtGui.QWidget):
         tab_widget.addTab(self.pltHf, '|H(f)|')
         tab_widget.addTab(self.pltPhi, 'phi(f)')
         
-        butDraw = QtGui.QPushButton("&Redraw All")
-        butDraw.clicked.connect(self.redrawAll)
+        butDraw = QtGui.QPushButton("&No Function")
+#        butDraw.clicked.connect(self.redrawAll)
         
         hbox = QtGui.QHBoxLayout()
         hbox.addWidget(butDraw)
@@ -53,14 +49,14 @@ class plotAll(QtGui.QWidget):
     def update(self, coeffs):
         """ Update and redraw all subplots with new coefficients"""
         self.coeffs = coeffs
-        self.pltHf.update(self.coeffs)
-        self.pltPhi.update(self.coeffs)
+        self.pltHf.draw(self.coeffs)
+        self.pltPhi.draw(self.coeffs)
 #        self.redrawAll()
 
-    def redrawAll(self):
-        """ Redraw all subplots"""
-        self.pltHf.redraw()
-        self.pltPhi.redraw()             
+#    def redrawAll(self):
+#        """ Redraw all subplots"""
+#        self.pltHf.redraw()
+#        self.pltPhi.redraw()             
 
 #------------------------------------------------------------------------
     
