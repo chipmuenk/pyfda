@@ -44,7 +44,8 @@ class cheby1(object):
         den spezifizierten Wert fällt."
 
     def has(self):
-        self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'),
+        self.has = {
+                    'rt' : ('LP', 'HP', 'BP', 'BS'),
                     'ord' : 'N'}
 
     def LP(self, specs):

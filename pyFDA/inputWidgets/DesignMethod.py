@@ -10,8 +10,9 @@ from PyQt4 import QtGui
 
 class DesignMethod(QtGui.QWidget):
     """
-    Construct Comboboxes for FilterType (IIR, FIR) and DesignMethod (Equiripple,
-    Butterworth etc.). When IIR / FIR is triggered, reconstruct comboDesignMethod
+    Construct Comboboxes for FilterType (IIR, FIR, ...) and DesignMethod 
+    (Equiripple, Butterworth etc.). When comboFilterType is triggered, 
+    reconstruct comboDesignMethod
     """
     
     def __init__(self):
@@ -24,31 +25,33 @@ class DesignMethod(QtGui.QWidget):
 #        self.designFilter =""
       
         # TODO: read this lists from a file instead of hard coding it
-        self.list_DesignMethod_IIR=["Butterworth","Chebychev 1", 
-        "Chebychev 2", "Elliptic"]
-        self.list_DesignMethod_FIR=['Equiripple','Least-squares','Window']     
+        self.dict_FilterTypeDesignMethod = \
+        {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
+         "FIR": ['Equiripple','Least-squares','Window']}
 
         """
-        Erzeuge ComboBox zur Auswahl des Filtertyps (IIR / FIR)       
+        Erzeuge ComboBox zur Auswahl des Filtertyps (IIR, FIR, ...)       
         """
         self.comboFilterType=QtGui.QComboBox(self)
-        self.comboFilterType.addItems(["IIR","FIR"])
+#        self.comboFilterType.addItems(["IIR","FIR"])
+        for dm in self.dict_FilterTypeDesignMethod:
+                    self.comboFilterType.addItem(dm)
         
         """
-        Erzeuge Combobox zur Auswahl der Filtermethode (beim Start: für IIR)       
+        Create Combobox for the DesignMethode and populate it via
+        set_FilterType()    
         """
         self.comboDesignMethod=QtGui.QComboBox(self)
-        self.comboDesignMethod.addItems(self.list_DesignMethod_IIR)
+        self.set_FilterType()
 
 
-        """
-        SIGNALE       
-        """
-        # Auswahl IIR / FIR: Rufe sel_FilterType auf, um die Combobox für
+
+        #------------------------------------------------------------
+        # Signals & Slots       
+        #
+        # Auswahl IIR / FIR: Rufe set_FilterType auf, um die Combobox für
         # die FilterDesignMethode neu zu generieren
         
-#        self.connect(self.combo_FilterType,SIGNAL('activated(QString)'),
-#                     self.sel_FilterType)
         self.comboFilterType.activated.connect(self.set_FilterType)
         # TODO: Bei Auswahl einer DesignMethod muss die Liste der 
         # Responsetypen (HP, TP, ...) neu generiert werden:
@@ -67,24 +70,21 @@ class DesignMethod(QtGui.QWidget):
         
     def set_FilterType(self):
         """
-        Set FilterType (IIR / FIR) and reconstruct combo box for
-        DesignMethod (Equiripple, Butterworth, ...)
+        Triggered when comboFilterType (IIR, FIR, ...) is changed: Reconstruct 
+        comboDesignMethod (Equiripple, Butterworth, ...)
         """
-        if  str(self.comboFilterType.currentText())=="IIR":
-            self.comboDesignMethod.clear()
-            self.comboDesignMethod.addItems(self.list_DesignMethod_IIR)
-        else:
-            self.comboDesignMethod.clear()
-            self.comboDesignMethod.addItems(self.list_DesignMethod_FIR)
+        self.comboDesignMethod.clear()            
+        curDM = str(self.comboFilterType.currentText())
+        self.comboDesignMethod.addItems(self.dict_FilterTypeDesignMethod[curDM])
 
         
     def get(self):
         """
         Return the currently selected filterType and designMethod
         """
-        f=self.comboFilterType.currentText()
-        a=self.comboDesignMethod.currentText()
-        return{"Filtertyp":f,"Design_Methode": a}  
+        ft = self.comboFilterType.currentText()
+        dm = self.comboDesignMethod.currentText()
+        return{"Filtertyp":ft,"Design_Methode": dm}  
 
 #------------------------------------------------------------------------------ 
     
