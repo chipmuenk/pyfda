@@ -5,7 +5,7 @@ Edited by Christian Münker, 2013
 """
 import sys
 # import EITHER PyQt4 OR PySide, depending on your system:
-from PyQt4 import QtGui, QtCore  
+from PyQt4 import QtGui #, QtCore  
 #from PySide.QtCore import *
 #from PySide.QtGui import *
 
@@ -21,8 +21,7 @@ class plotAll(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
 
         self.coeffs = ([1,1,1],[3,0,2])
-        self.N_FFT = 2048 # FFT length for freqz
-        
+         
         self.pltPhi = plotHf.PlotHf()
         self.pltHf = plotHf.PlotHf()
         
@@ -49,8 +48,8 @@ class plotAll(QtGui.QWidget):
     def update(self, coeffs):
         """ Update and redraw all subplots with new coefficients"""
         self.coeffs = coeffs
-        self.pltHf.draw(self.coeffs)
-        self.pltPhi.draw(self.coeffs)
+        self.pltHf.draw()#self.coeffs)
+        self.pltPhi.draw()#self.coeffs)
 #        self.redrawAll()
 
 #    def redrawAll(self):

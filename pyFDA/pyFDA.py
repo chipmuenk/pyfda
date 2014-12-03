@@ -8,13 +8,14 @@ Main file for the pyFDA app, initializes UI
 """
 
 import sys
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui #, QtCore
 #from PyQt4.QtCore import SIGNAL
 import scipy.io
 import numpy as np
 
+import databroker as db
 from inputWidgets import ChooseParams
-from filterDesign import cheby1, design_selector
+from filterDesign import cheby1 #, design_selector
 from plotWidgets import plotAll
 
 DEBUG = True
@@ -26,9 +27,12 @@ class pyFDA(QtGui.QWidget):
     """
     def __init__(self):
         super(pyFDA, self).__init__()
-        self.zpk = ([1], 0, 0.5)
-        self.coeffs = [self.zpk[2]*np.poly(self.zpk[0]), np.poly(self.zpk[1])]
-#        self.coeffs = ([1,-1],[2,0]) # initialize filter coefficients b, a        
+        db.init()
+        db.gD['zpk'] = ([1], 0, 0.5)
+        # initialize filter coefficients b, a :
+        db.gD['coeffs'] = [db.gD['zpk'][2]*np.poly(db.gD['zpk'][0]), 
+                                       np.poly(db.gD['zpk'][1])]      
+       
         self.myFilter = cheby1.cheby1()
         self.initUI()     
         
@@ -76,21 +80,21 @@ class pyFDA(QtGui.QWidget):
         params = self.widgetParams.get()
         
         self.myFilter.LP(params) # design filter,
-        self.zpk = self.myFilter.zpk # read poles / zeroes
-        self.coeffs = self.myFilter.coeffs # and filter coefficients
+        db.gD['zpk'] = self.myFilter.zpk # read poles / zeroes
+        db.gD['coeffs'] = self.myFilter.coeffs # and filter coefficients
 
         if DEBUG:
             print("-------------------------")
             print("pyFDA.py: Filter Parameters") 
             print("-------------------------")
-            print("zpk:" ,self.zpk)
-            print("b,a = ", self.coeffs)
+            print("zpk:" , db.gD['zpk'])
+            print("b,a = ", db.gD['coeffs'])
 
         if self.PLT_SAME_WINDOW:       
-            self.pltAll.update(self.coeffs)
+            self.pltAll.update(db.gD['coeffs'])
         else:
             # Separate window for plots:
-            self.pltAll.update(self.coeffs)
+            self.pltAll.update(db.gD['coeffs'])
             self.pltAll.show()
 
         
@@ -101,7 +105,7 @@ class pyFDA(QtGui.QWidget):
         """
         
         scipy.io.savemat('d:/Daten/filt_coeffs.mat', 
-                         mdict={'filt_coeffs': self.coeffs})
+                         mdict={'filt_coeffs': db.gD['coeffs']})
         print("exportML: Matlab workspace exported!")
         
     def exportCSV(self):
@@ -109,7 +113,7 @@ class pyFDA(QtGui.QWidget):
         Export filter coefficients to a CSV-file 
         """
         
-        np.savetxt('d:/Daten/filt_coeffs.csv', self.coeffs)
+        np.savetxt('d:/Daten/filt_coeffs.csv', db.gD['coeffs'])
         print("exportCSV: CSV - File exported!")
 #------------------------------------------------------------------------------
    

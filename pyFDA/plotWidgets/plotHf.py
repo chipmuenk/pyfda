@@ -19,6 +19,8 @@ from PyQt4.QtCore import QSize
 
 import numpy as np
 import scipy.signal as sig
+
+import databroker as db
 from plotUtils import MplCanvas, MplWidget
 
 
@@ -41,7 +43,6 @@ class PlotHf(QtGui.QMainWindow):
         super(PlotHf, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
         
-        self.coeffs = ([1,1,1],[3,0,0]) # dummy definition for notch filter
         self.A_SB = 60   # min. Sperrdämpfung im Stoppband in dB (= min. y-Wert des Plots)    
  
         self.mplwidget = MplWidget()
@@ -50,19 +51,19 @@ class PlotHf(QtGui.QMainWindow):
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
         
-        self.draw(self.coeffs)
+        self.draw()
         
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================          
 #        self.mplCanv.butDraw.clicked.connect(lambda: self.draw(self.coeffs))
-        self.mplwidget.sldLw.valueChanged.connect(lambda:self.draw(self.coeffs))  
+        self.mplwidget.sldLw.valueChanged.connect(lambda:self.draw())  
             
-    def draw(self, coeffs):
+    def draw(self):
         """ 
         Re-calculate |H(f)| and draw the figure
         """
-        self.coeffs = coeffs
+        self.coeffs = db.gD['coeffs']# coeffs
         self.bb = self.coeffs[0]
         self.aa = self.coeffs[1]
         [W,H] = sig.freqz(self.bb, self.aa, N_FFT) # calculate H(W) for W = 0 ... pi
