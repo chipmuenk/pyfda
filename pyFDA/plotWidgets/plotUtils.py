@@ -21,15 +21,15 @@ from matplotlib import rcParams
 rcParams['font.size'] = 12
 
 import os
-import numpy as np
-import scipy.signal as sig
+#import numpy as np
+# import scipy.signal as sig
 
 N_FFT = 2048 # FFT length for freqz
  
-DEBUG = True      
+DEBUG = True
 
 #------------------------------------------------------------------------------
-class MplWidget(QtGui.QWidget):
+class MplWidgetBut(QtGui.QWidget):
     """
     Construct a subwidget with Matplotlib canvas, NavigationToolbar
     and some buttons
@@ -75,7 +75,7 @@ class MplWidget(QtGui.QWidget):
 #        self.sldLw.valueChanged.connect(self.redraw)  
 
         #=============================================
-        # Widget layout with box sizers
+        # Widget layout with QHBox / QVBox
         #=============================================
           
         self.hbox1 = QtGui.QHBoxLayout()            
@@ -87,6 +87,67 @@ class MplWidget(QtGui.QWidget):
         self.vbox.addWidget(self.mpl_toolbar)
         self.vbox.addWidget(self.pltCanv)
         self.vbox.addLayout(self.hbox1)         
+        self.setLayout(self.vbox)
+        
+    def redraw(self):
+        """
+        Redraw the figure with new properties (grid, linewidth)
+        """
+        self.ax.grid(self.cboxGrid.isChecked())
+#        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
+        self.fig.tight_layout(pad = 0.5)
+        self.pltCanv.draw()
+        self.pltCanv.updateGeometry()
+      
+
+#------------------------------------------------------------------------------
+class MplWidget(QtGui.QWidget):
+    """
+    Construct a subwidget with Matplotlib canvas and NavigationToolbar
+    """
+
+    def __init__(self, parent = None):
+        super(MplWidget, self).__init__() # initialize QWidget Base Class
+        # Create the mpl figure and subplot (5x4 inches, 100 dots-per-inch).
+        # Construct the canvas with the figure
+        #
+        self.dpi = 100
+        self.fig = Figure((5.0, 4.0), dpi=self.dpi,facecolor = '#FFFFFF')
+        self.ax = self.fig.add_subplot(111)
+        
+        self.pltCanv = FigureCanvas(self.fig)
+        
+        
+        #self.pltCanv.setSizePolicy(QSizePolicy.Expanding, 
+        #                           QSizePolicy.Expanding)
+        #self.pltCanv.updateGeometry()
+                
+        # Create the navigation toolbar, tied to the canvas
+        #
+        self.mpl_toolbar = NavigationToolbar(self.pltCanv, self)
+        
+        self.butDraw = QtGui.QPushButton("&Redraw")
+        self.butDraw.clicked.connect(self.redraw)
+
+        self.cboxGrid = QtGui.QCheckBox("&Grid")
+        self.cboxGrid.setChecked(True)  
+        # Attention: passes unwanted clicked bool argument:
+        self.cboxGrid.clicked.connect(self.redraw)
+
+        #=============================================
+        # Widget layout with QHBox / QVBox
+        #=============================================
+          
+        self.hbox1 = QtGui.QHBoxLayout()
+            
+        for w in [self.mpl_toolbar, self.butDraw, self.cboxGrid]:
+            self.hbox1.addWidget(w)
+            self.hbox1.setAlignment(w, QtCore.Qt.AlignVCenter)
+            
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addLayout(self.hbox1)  
+        self.vbox.addWidget(self.pltCanv)
+       
         self.setLayout(self.vbox)
         
     def redraw(self):
