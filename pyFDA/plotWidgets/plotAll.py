@@ -3,7 +3,7 @@
 
 Edited by Christian Münker, 2013
 """
-import sys
+import sys, os
 # import EITHER PyQt4 OR PySide, depending on your system:
 from PyQt4 import QtGui #, QtCore  
 #from PySide.QtCore import *
@@ -12,18 +12,18 @@ from PyQt4 import QtGui #, QtCore
 
 #import numpy as np
 #import scipy.signal as sig
-
-import plotHf
+if __name__ == "__main__": # relative import if this file is run as __main__
+    cwd=os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(cwd + '/..')
+import plotHf, plotPhi
 
 
 class plotAll(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
-        self.coeffs = ([1,1,1],[3,0,2])
-         
-        self.pltPhi = plotHf.PlotHf()
         self.pltHf = plotHf.PlotHf()
+        self.pltPhi = plotPhi.PlotPhi()
         
         self.initUI()
         
@@ -45,11 +45,10 @@ class plotAll(QtGui.QWidget):
         
         self.setLayout(vbox)
         
-    def update(self, coeffs):
+    def update(self):
         """ Update and redraw all subplots with new coefficients"""
-        self.coeffs = coeffs
-        self.pltHf.draw()#self.coeffs)
-        self.pltPhi.draw()#self.coeffs)
+        self.pltHf.draw()
+        self.pltPhi.draw()
 #        self.redrawAll()
 
 #    def redrawAll(self):
