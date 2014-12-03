@@ -11,17 +11,29 @@ http://pymotw.com/2/articles/data_persistence.html
 @author: Christian Muenker
 """
 
+# importing databroker runs the module once, defining all globals and variables
+global gD
+gD = {}
+gD['rc'] = {'lw':1.5}
+gD['N_FFT'] = 2048
+gD['coeffs'] = ([1,1,1],[3,0,2])
+gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+            [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1)
+gD['specs'] = {'Order':10, 
+            'A_pass1':1., 'A_pass2': 1, 'F_pass1':0.1, 'F_pass2':0.4,
+            'A_stop1':60., 'A_stop2': 60, 'F_stop1':0.2, 'F_stop2':0.3}
 
-def init():
-    """
-    Initialize global dictionary gD for data exchange between modules
-    The module is executed upon import anyway, but providing a dedicated
-    init() functions prevents other modules from accidentally modifying 
-    the dictionary (?)
-    """
-    global gD
-    gD = {}
-    gD['N_FFT'] = 2048
+#def init():
+#    """
+#    Initialize global dictionary gD for data exchange between modules
+#    The module is executed upon import anyway, but providing a dedicated
+#    init() functions prevents other modules from accidentally modifying 
+#    the dictionary (?)
+#    """
+#    global gD
+#    gD = {}
+#    gD['N_FFT'] = 2048
+#    gD['coeffs'] = ([1,1,1],[3,0,2]) # notch @ F = 1/3
     
 
 

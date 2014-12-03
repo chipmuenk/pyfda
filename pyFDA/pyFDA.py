@@ -13,7 +13,7 @@ from PyQt4 import QtGui #, QtCore
 import scipy.io
 import numpy as np
 
-import databroker as db
+import databroker as db # importing databroker initializes all its globals
 from inputWidgets import ChooseParams
 from filterDesign import cheby1 #, design_selector
 from plotWidgets import plotAll
@@ -27,7 +27,6 @@ class pyFDA(QtGui.QWidget):
     """
     def __init__(self):
         super(pyFDA, self).__init__()
-        db.init()
         db.gD['zpk'] = ([1], 0, 0.5)
         # initialize filter coefficients b, a :
         db.gD['coeffs'] = [db.gD['zpk'][2]*np.poly(db.gD['zpk'][0]), 
@@ -91,10 +90,10 @@ class pyFDA(QtGui.QWidget):
             print("b,a = ", db.gD['coeffs'])
 
         if self.PLT_SAME_WINDOW:       
-            self.pltAll.update(db.gD['coeffs'])
+            self.pltAll.update()
         else:
             # Separate window for plots:
-            self.pltAll.update(db.gD['coeffs'])
+            self.pltAll.update()
             self.pltAll.show()
 
         
