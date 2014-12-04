@@ -19,10 +19,35 @@ gD['N_FFT'] = 2048
 gD['coeffs'] = ([1,1,1],[3,0,2])
 gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
             [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1)
+            
+# Dictionary containing current filter specifications
+# TODO: This has to be created automatically !!!  
 gD['specs'] = {'Order':10, 
             'A_pass1':1., 'A_pass2': 1, 'F_pass1':0.1, 'F_pass2':0.4,
             'A_stop1':60., 'A_stop2': 60, 'F_stop1':0.2, 'F_stop2':0.3}
 
+# Dictionary describing the available combinations of response types (rt), 
+# filter types (ft) and design methods (dm)
+# TODO: This has to be created automatically !!!
+gD['params'] = {\
+    "LP":\
+        {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
+         "FIR": ['Equiripple','Least-squares','Window']},
+    "HP":\
+        {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
+         "FIR": ['Equiripple','Least-squares','Window']},
+    "HIL":\
+        {"FIR": ['Equiripple']}
+         }
+gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "HIL":"Hilbert"}
+gD['dmNames'] = {"butter":"Butterworth", "cheby1":"Chebychev 1", 
+                  "cheby2":"Chebychev 2",  "ellip":"Elliptic",
+                  # FIR:                  
+                  "equiripple":"Equiripple", "firls":"Least-Square",
+                  "window":"Windowed"}
+
+# Store current filter selection                 
+gD['paramsCur'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
 #def init():
 #    """
 #    Initialize global dictionary gD for data exchange between modules
