@@ -19,10 +19,11 @@ from PyQt4.QtCore import QSize
 
 import numpy as np
 import scipy.signal as sig
-
-if __name__ == "__main__": # relative import if this file is run as __main__
-    cwd=os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(cwd + '/..')
+# import databroker from one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__": 
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(__cwd__ + '/..')
 
 import databroker as db
 
