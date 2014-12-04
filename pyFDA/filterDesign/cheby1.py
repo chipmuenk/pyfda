@@ -47,6 +47,13 @@ class cheby1(object):
         self.has = {
                     'rt' : ('LP', 'HP', 'BP', 'BS'),
                     'ord' : 'N'}
+                    
+    def info():
+      """
+      usage: print(cheby1.info())
+      """
+      return {'rt' : ('LP', 'HP', 'BP', 'BS'),
+                    'ord' : 'N'}
 
     def LP(self, specs):
         self.needs = ('Order', 'A_pass', 'F_pass')
