@@ -41,7 +41,7 @@ class MplWidgetBut(QtGui.QWidget):
         # Construct the canvas with the figure
         #
         self.dpi = 100
-        self.fig = Figure((5.0, 4.0), dpi=self.dpi,facecolor = '#FFFFFF')
+        self.fig = Figure(dpi=self.dpi,facecolor = '#FFFFFF')
         self.ax = self.fig.add_subplot(111)
         
         self.pltCanv = FigureCanvas(self.fig)
@@ -112,15 +112,13 @@ class MplWidget(QtGui.QWidget):
         # Construct the canvas with the figure
         #
         self.dpi = 100
-        self.fig = Figure((5.0, 4.0), dpi=self.dpi,facecolor = '#FFFFFF')
+        self.fig = Figure(dpi=self.dpi,facecolor = '#FFFFFF')
         self.ax = self.fig.add_subplot(111)
         
         self.pltCanv = FigureCanvas(self.fig)
-        
-        
-        #self.pltCanv.setSizePolicy(QSizePolicy.Expanding, 
-        #                           QSizePolicy.Expanding)
-        #self.pltCanv.updateGeometry()
+        self.pltCanv.setSizePolicy(QSizePolicy.Expanding, 
+                                   QSizePolicy.Expanding)
+        self.pltCanv.updateGeometry()
                 
         # Create the navigation toolbar, tied to the canvas
         #
@@ -138,15 +136,17 @@ class MplWidget(QtGui.QWidget):
         # Widget layout with QHBox / QVBox
         #=============================================
           
-        self.hbox1 = QtGui.QHBoxLayout()
+        self.hbox = QtGui.QHBoxLayout()
             
         for w in [self.mpl_toolbar, self.butDraw, self.cboxGrid]:
-            self.hbox1.addWidget(w)
-            self.hbox1.setAlignment(w, QtCore.Qt.AlignVCenter)
+            self.hbox.addWidget(w)
+            self.hbox.setAlignment(w, QtCore.Qt.AlignVCenter)
+        self.hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
             
         self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addLayout(self.hbox1)  
+        self.vbox.addLayout(self.hbox)  
         self.vbox.addWidget(self.pltCanv)
+ 
        
         self.setLayout(self.vbox)
         

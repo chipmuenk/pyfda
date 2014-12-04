@@ -38,12 +38,14 @@ class plotAll(QtGui.QWidget):
         
         hbox = QtGui.QHBoxLayout()
         hbox.addWidget(butDraw)
+        hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(tab_widget)
         vbox.addLayout(hbox)
         
         self.setLayout(vbox)
+
         
     def update(self):
         """ Update and redraw all subplots with new coefficients"""
