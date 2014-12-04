@@ -39,8 +39,8 @@ class pyFDA(QtGui.QWidget):
         """
         Intitialize the main GUI, consisting of
         - Subwindow for parameter selection [-> ChooseParams.ChooseParams()]
-        - Filter Design button [-> self.startDesignFilt] 
-        - Plot Window [-> plotAll.plotAll(a,b)]
+        - Filter Design button [-> self.startDesignFilt()] 
+        - Plot Window [-> plotAll.plotAll()]
         """
         # widget / subwindow for parameter selection
         self.widgetParams = ChooseParams.ChooseParams() 
