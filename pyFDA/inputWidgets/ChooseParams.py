@@ -140,12 +140,13 @@ class ChooseParams(QtGui.QWidget):
         as well.
         """
 
-        j=i=0
-        while i==0:
+        j=0
+        found = False
+        while not found:
            # print self.choose_design_list[j][0]+":"+self.choose_design_list[j][1]
             if self.choose_design_list[j][0]==db.gD["paramsCur"]["dm"] \
             and self.choose_design_list[j][1] == db.gD["paramsCur"]["rt"]:
-                i=1
+                found = True
                 choosen=self.choose_design_list[j][2:]
             j=j+1
         #print "-----------------------------------------"   
@@ -194,7 +195,6 @@ class ChooseParams(QtGui.QWidget):
         Return a dict with the currently selected filter specifications 
         """
         ret = db.gD["paramsCur"] # return selected filter design
-        if DEBUG: print(ret)
         ret.update(self.fo.get())
         if DEBUG: print(ret)
         ret.update(self.fs.get())
