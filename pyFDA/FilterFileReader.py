@@ -4,22 +4,18 @@ Created on Mon Nov 24 10:00:14 2014
 
 @author: Michael Winkler
 """
+import os
+
+import databroker as db
 
 class FilterFileReader(object):
     
 #==============================================================================
-#Klassen Globals
+# Class Globals
 #==============================================================================
-    DEBUG = False
-    
+
     _Imports = []   #Speicherort für die Importierten Module
     _ImportNames = [] #Speicherort für die FilterNamen der Importierten Module
-    
-    
-    
-    initFileName = ""
-    subDirectory = ""
-    commentChar = ''
       
 #==============================================================================
 #Funktion __init__    
@@ -31,26 +27,31 @@ class FilterFileReader(object):
         Objekt dieser Files zurück.
         WICHTIG: die PythonFiles müssen eine Klasse haben, die gleich dem
         Dateinamen ist (nat. ohne Suffix .py)
-        
+       
         Parameters
         ----------
-        FileName:
-            der Name des Initialisierungs-Files
-        Directory:
-            der Name des Unterverzeichnisses, in dem die zu Importierenden Python-Files
-            sind.
-        commentCh:
-            das Kommentarzeichen, welches den beginn einer Kommentarzeile in dem Init-File
-            einleitet.
-        Debug:
-            True/False, jenachdem ob erweiterte Debugnachrichten ausgegeben werden sollen.
-        """
 
-        self.initFileName = FileName
+        Directory:
+            Name of the subdirectory containing the init-file and the 
+            Python files to be read
+            
+        FileName:
+            Name of the init file
+            
+        commentCh:
+            comment character at the beginning of a comment line
+            
+        Debug:
+            True/False, for printing verbose debug messages
+        """
         self.subDirectory = Directory
+        self.initFileName = Directory + "/" + FileName  
         self.commentChar = commentCh
         self.DEBUG = Debug
-            
+        self.cwd = os.path.dirname(os.path.abspath(__file__))
+        
+        self.GiveAllFilterObjects()
+           
 #==============================================================================
 #Funktion GiveAllFilterObjects
 #==============================================================================
@@ -61,9 +62,10 @@ class FilterFileReader(object):
         somit können Filter.py Files "on the flight" ausgetauscht/erweitert werden.
         """
         i = 0
-        FilterObjects = []
+        db.gD["filterObjects"] = []
         
-        Zeilen, Kommentarzeilen = self.Read_FilterInitFile(self.initFileName, self.commentChar)
+        Zeilen, Kommentarzeilen = self.Read_FilterInitFile(self.initFileName, 
+                                                           self.commentChar)
         self.dynamicImport(subDirectory, Zeilen)
         
         
@@ -72,43 +74,15 @@ class FilterFileReader(object):
                 
                 temp = self.ObjectWizzard(Zeilen[i].replace(".py", ""))
                 if(temp != None):
-                    FilterObjects.append(temp)
-                
+                    db.gD["filterObjects"].append(temp)   
                 
             i = i + 1
             
-        print(FilterObjects)
-        return FilterObjects
+        print(db.gD["filterObjects"])
+        return db.gD["filterObjects"]
         
         
-#==============================================================================
-#Funktion setFilterFileReader   
-#==============================================================================
-    def setFilterFileReader(self, FileName, Directory, commentCh, Debug):
-        """
-        setFilterFileReader ermöglicht es die Parameter
-        "initFileName" (Name des InitialisierungsFiles),
-        "subDirectory" (Unterverzeichniss) und "commentChar" (Kommentarzeichen)
-        auszutauschen.
-        
-        Parameters
-        ----------
-        FileName:
-            der Name des Initialisierungs-Files
-        Directory:
-            der Name des Unterverzeichnisses, in dem die zu Importierenden Python-Files
-            sind.
-        commentCh:
-            das Kommentarzeichen, welches den beginn einer Kommentarzeile in dem Init-File
-            einleitet.      
-        Debug:
-            True/False, jenachdem ob erweiterte Debugnachrichten ausgegeben werden sollen.
-        """
-        self.initFileName = FileName
-        self.subDirectory = Directory
-        self.commentChar = commentCh
-        self.DEBUG = Debug
-              
+
 #==============================================================================
 #Funktion Read_FilterInitFile
 #==============================================================================
@@ -145,8 +119,9 @@ class FilterFileReader(object):
         try:
             #Öffnet das InitFile "NAME", 'Zugriffsmods = Nur lesen',
             #Buffering = Systemdefault
-            fp = open(FileName,'r',-1)
+            fp = open(self.cwd + "/" + FileName,'r',-1)
         except IOError as e:
+            print(self.cwd + "/" + FileName)
             self.Debug_Msg( "I/O error({0}): {1}".format(e.errno, e.strerror))
             self.Debug_Msg("Das File Namens {0} konnte nicht gefunden werden.".format( FileName))
             del Lines
@@ -193,8 +168,8 @@ class FilterFileReader(object):
         dynamicImport importiert aus dem übergegebenen "subDirectory" alle in
         "Files" spezifizierten Python-Files.
         
-        Sollte der Import funktioniert haben, wird der Klassenname(Selber wie Filename)
-        in "_ImportNames" abgelegt. Der eigentliche Import wir in der Files "_Imports"
+        Sollte der Import funktioniert haben, wird der Klassenname(= Filename)
+        in "_ImportNames" abgelegt. Der eigentliche Import wird in der Files "_Imports"
         abgespeichert,
         
         Parameters
@@ -221,22 +196,21 @@ class FilterFileReader(object):
  
         """
         
-        i = 0
-        for x in Files:
-            temp = Files[i]
+        for temp in Files:
+            print(temp)
             if(temp.find(".py",0,len(temp)) > 0 ):                
                 try:
-                    #Hier wird versucht das File zu Importieren
-                    self._Imports.append(__import__("{0}.{1}".format(subDirectory, temp.replace(".py", "")), fromlist=['']))
+                    # Try to import the file
+                    self._Imports.append(__import__("{0}.{1}".format(subDirectory,
+                                    temp.replace(".py", "")), fromlist=['']))
                     
-                    #wenn es geklappt hat, wird der Filename ohne den Suffix ".py"
-                    #der Liste _ImportNames hinzugefügt.
+                    # when successful, add the filename without suffix .py to
+                    # the list _ImportNames .
                     self._ImportNames.append(temp.replace(".py", ""))
                     
                 except ImportError:
                     self.Debug_Msg("Fehler: Datei %s.py konnte nicht Importiert werden. Klasse: FilterFileReader Funktion: dynamicImport\n" %temp[0:-3])
                     
-            i = i + 1
                 
 #==============================================================================
 #Funktion ObjectWizzard
@@ -265,36 +239,41 @@ class FilterFileReader(object):
         if (temp != None):
             return temp()
         else:
-            self.Debug_Msg("Es konnte kein {0}-Objekt erstellt werden,".format(ObjectTyp))
-            self.Debug_Msg("da der Objektname unbekannt ist. Klasse: FilterFileReader Funktion: ObjectWizzard\n")
+            if self.DEBUG: 
+                print("Es konnte kein {0}-Objekt erstellt werden,".format(ObjectTyp))
+                print("da der Objektname unbekannt ist. Klasse: FilterFileReader Funktion: ObjectWizzard\n")
        
-#==============================================================================
-#Funktion DebugMsg                
-#==============================================================================
-    def Debug_Msg(self, DebugMsg):
-        """
-        Debug_Msg ist eine Hilfsfunktion welche Debuginformationen zur verfügung
-        stellt.
-        Debuginformationen werden nur bei gesetztem DEBUG-Define angezeigt.
-                
-        Parameters
-        ----------
-        
-        self : 
-        
-        DebugMsg: String welcher die Debugnachricht enthällt und 
-        DEBUG == True ausgegeben wird.
-        """
-        if(self.DEBUG):
-            print(DebugMsg)
+##==============================================================================
+##Funktion DebugMsg                
+##==============================================================================
+#    def Debug_Msg(self, DebugMsg):
+#        """
+#        Debug_Msg ist eine Hilfsfunktion welche Debuginformationen zur verfügung
+#        stellt.
+#        Debuginformationen werden nur bei gesetztem DEBUG-Define angezeigt.
+#                
+#        Parameters
+#        ----------
+#        
+#        self : 
+#        
+#        DebugMsg: String welcher die Debugnachricht enthällt und 
+#        DEBUG == True ausgegeben wird.
+#        """
+#        if(self.DEBUG):
+#            print(DebugMsg)
            
 #==============================================================================
 #Debug Main
 #==============================================================================
 if __name__ == "__main__":
-    #Für das auslesen des InitFiles essentielle Angaben!
+    #Für das Auslesen des InitFiles essentielle Angaben!
+
+    import databroker as db
+    
     initFileName = "Init.txt"
-    subDirectory = "FilterTools"
+    subDirectory = "filterDesign"
+ #   subDirectory = "."
     commentChar  = '#'  
     Debug = True
     
@@ -309,7 +288,7 @@ if __name__ == "__main__":
     
     #Erstellen eines neuen FilterFileReader Objektes
     MyFilterReader = FilterFileReader(initFileName, subDirectory, commentChar, Debug)
-    FilterObjects = MyFilterReader.GiveAllFilterObjects()
+    FilterObjects = db.gD["filterObjects"]# MyFilterReader.GiveAllFilterObjects()
     
     for elements in FilterObjects:
         print(FilterObjects)
