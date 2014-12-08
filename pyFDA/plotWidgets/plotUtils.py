@@ -263,7 +263,10 @@ class MyMplToolbar(NavigationToolbar):
 #        (None, None, None, None),
 #        ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
 #        ('Save', 'Save the figure', 'filesave', 'save_figure'),
-#      ) 
+#      )
+
+#        print (self.toolitems)
+ 
         # HOME:
         a = self.addAction(QtGui.QIcon('images/icons/home.svg'), \
                            'Home', self.home)
@@ -320,7 +323,7 @@ class MyMplToolbar(NavigationToolbar):
         # reference holder for subplots_adjust window
         self.adj_window = None
         
-        print (self.toolitems)
+
         
     def toggle_grid(self):
         self.grid = not self.grid
