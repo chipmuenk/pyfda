@@ -29,7 +29,7 @@ class pyFDA(QtGui.QWidget):
     def __init__(self):
         super(pyFDA, self).__init__()
         # read directory with filterDesigns and construct filter Tree from it
-        FilterFileReader('Init.txt', 'filterDesign', commentCh = '#', Debug = True) # 
+        FilterFileReader('Init.txt', 'filterDesign', commentCh = '#', DEBUG = True) # 
         
         db.gD['zpk'] = ([1], 0, 0.5)
         # initialize filter coefficients b, a :
@@ -42,7 +42,7 @@ class pyFDA(QtGui.QWidget):
         
     def initUI(self): 
         """
-        Intitialize the main GUI, consisting of
+        Intitialize the main GUI, consisting of:
         - Subwindow for parameter selection [-> ChooseParams.ChooseParams()]
         - Filter Design button [-> self.startDesignFilt()] 
         - Plot Window [-> plotAll.plotAll()]
