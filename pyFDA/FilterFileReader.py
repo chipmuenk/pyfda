@@ -10,17 +10,11 @@ import databroker as db
 
 class FilterFileReader(object):
     
-#==============================================================================
-# Class Globals
-#==============================================================================
 
-    _Imports = []   #Speicherort für die Importierten Module
-    _ImportNames = [] #Speicherort für die FilterNamen der Importierten Module
-      
 #==============================================================================
 #Funktion __init__    
 #==============================================================================
-    def __init__(self, FileName, Directory, commentCh, Debug):
+    def __init__(self, FileName, Directory, commentCh = '#', Debug = False):
         """
         FilterFileReader liest das Init.txt File des pyFDA-tools aus,
         importiert die in dem InitFile stehenden PythonFiles und gibt jeweils ein
@@ -44,126 +38,107 @@ class FilterFileReader(object):
         Debug:
             True/False, for printing verbose debug messages
         """
+        db.gD['imports'] = []
+        db.gD['importNames'] = [] # names of imported modules
         self.subDirectory = Directory
         self.initFileName = Directory + "/" + FileName  
         self.commentChar = commentCh
         self.DEBUG = Debug
         self.cwd = os.path.dirname(os.path.abspath(__file__))
         
-        self.GiveAllFilterObjects()
+        self.readAllFilterObjects()
            
 #==============================================================================
-#Funktion GiveAllFilterObjects
+# Method readAllFilterObjects
 #==============================================================================
-    def GiveAllFilterObjects(self):
+    def readAllFilterObjects(self):
         """
-        GiveAllFilterObjects liefert alle verfügbaren FilterObjekte zurück.
-        Wichtig: GiveAllFilterObjects wertet erneut das Init.txt File aus,
-        somit können Filter.py Files "on the flight" ausgetauscht/erweitert werden.
+        readAllFilterObjects liefert alle verfügbaren FilterObjekte zurück.
+        Wichtig: readAllFilterObjects wertet beim Aufruf das Init.txt File aus,
+        somit können Filter.py Files "on the flight" ohne Neustart 
+        ausgetauscht/erweitert werden.
         """
-        i = 0
+
         db.gD["filterObjects"] = []
-        
-        Zeilen, Kommentarzeilen = self.Read_FilterInitFile(self.initFileName, 
-                                                           self.commentChar)
-        self.dynamicImport(subDirectory, Zeilen)
-        
-        
-        for elements in Zeilen:
-            if(Zeilen[i].find(".py",0,len(Zeilen[i])) > 0 ): 
-                
-                temp = self.ObjectWizzard(Zeilen[i].replace(".py", ""))
-                if(temp != None):
-                    db.gD["filterObjects"].append(temp)   
-                
-            i = i + 1
-            
-        print(db.gD["filterObjects"])
-        return db.gD["filterObjects"]
-        
-        
+        # parse the initFile.py, giving back one list with the lines containing
+        # python files and one with comment lines:  
+        lines, commentLines = self.readInitFile(self.initFileName, 
+                                                self.commentChar)
+                                                
+        self.dynamicImport(self.subDirectory, lines)
+
+        for line in lines:                
+                db.gD["filterObjects"].append(self.ObjectWizzard(line.replace(".py", "")))
+
+        print("filterObjects", db.gD["filterObjects"])
 
 #==============================================================================
-#Funktion Read_FilterInitFile
+# Method readInitFile
 #==============================================================================
-    def Read_FilterInitFile(self,FileName,KommChar):
+    def readInitFile(self, initFileName, commentCh):
         """
-        Read_FilterInitFile öffnet die in FileName referenzierte Datei und liest diese aus.
-        Dabei wird unterschieden zwischen Kommentarzeilen im File (beginnend mit 'KommChar'
-        und normalen Zeilen.
-        Kommentarzeilen, sowie normale Zeilen werden ohne "NewLine" bzw. KommChar
-        in dafür vorgesehene Listen abgespeichert.
-        
-        Die Funktion gibt 2 Listen zurück.
-        Die erste Liste enthällt alle Zeilen, welche nicht als Kommentarzeile
-        identifiziert wurden.
-        Die 2. Liste enthällt alle restlichen zeilen
-        
+        Read_FilterInitFile opens the file initFileName and reads all lines:
+        - Lines that don't begin with commentCh are stripped of the Newline 
+          character and passed back as a list.
+        - Lines starting with commentCh are passed back without Newline and 
+          commentCh as a second list.
+
         Parameters
         ----------
-        FileName :String mit dem Filenamen
+        initFileName: String containing name of init file
         
-        KommChar :Das Kommentarzeichen auf das geprüft wird
+        commentCh: Character defining a comment line
         
         Returns
         -------
-        1.Liste: Nicht Kommentarzeilen
+        1. list: Non-comment lines
         
-        2.Liste: Kommentarzeilen
+        2. list: Comment lines
         """
         fp = None
-        Lines = []
-        InfoLines = []
-        
+        lines = []
+        commentLines = []
+        initFileNameCwd = self.cwd + "/" + initFileName
         
         try:
-            #Öffnet das InitFile "NAME", 'Zugriffsmods = Nur lesen',
-            #Buffering = Systemdefault
-            fp = open(self.cwd + "/" + FileName,'r',-1)
-        except IOError as e:
-            print(self.cwd + "/" + FileName)
-            self.Debug_Msg( "I/O error({0}): {1}".format(e.errno, e.strerror))
-            self.Debug_Msg("Das File Namens {0} konnte nicht gefunden werden.".format( FileName))
-            del Lines
-            del InfoLines
-            Lines = InfoLines = "InitFile nicht gefunden!"
-    
-        #Hier nur weiter machen, wenn das File geöffnet werden konnte.
-        if(fp != None):
-            while(fp != None):
-                currentLine = fp.readline()
-                
-                #wenn die gelesene Zeile leer ist, haben wir EoF (End of File) erreicht
-                if(currentLine == ''):
-                    fp = None
-                else:            
-                    #beginnt die gelesene Zeile mit einem Kommentarzeichen?
-                    if(currentLine[0] == KommChar):
-                        
-                        #ist das letzte Zeichen der Zeile ein NewLine '\n'?
-                        if(currentLine[len(currentLine)-1] == '\n'):
-                            
-                        #wenn Ja schneide das 1. u. letzte Element ab ('#' und \n)
-                            InfoLines.append((currentLine[1:-1]))
-                        #wenn Nein, schneide nur das 1. Element ab ('#')
-                        else:
-                            InfoLines.append((currentLine[1:0]))
-                            
-                    #Es handelt sich um keine Kommentarzeile
+            # Try to open the initFile in read mode
+            fp = open(initFileNameCwd,'r',-1)
+            curLine = fp.readline()
+            
+            while curLine: # read until currentLine is empty (EOF reached)
+                # remove white space and Newline characters at beginning and end:
+                curLine = curLine.strip(' \n')
+                # Only process line if it is longer than 1 character
+                if len(curLine) > 1:
+                    # does the line begin with the comment character?
+                    if(curLine[0] == commentCh): 
+                        # yes, remove it and append line to commentLines:
+                        commentLines.append((curLine[1:])) 
+                    # No, this is not a comment line
                     else:
-                        #ist das letzte Zeichen der Zeile ein NewLine '\n'?
-                        if(currentLine[len(currentLine)-1] == '\n'):
-                            #wenn Ja schneide das letzte Element ab
-                            Lines.append(currentLine[0:-1])
-                        else:
-                            Lines.append(currentLine)
-                            
-        return Lines, InfoLines
+                        # Position of '.py' in curLine:
+                        suffixPos = curLine.find(".py") 
+                        if(suffixPos > 0):
+                            # Strip .py and any further characters
+                            lines.append(curLine[0:suffixPos+3])
+                        
+                curLine = fp.readline()
+            
+        except IOError as e:
+            print("File named {0} could not be found.".format(initFileNameCwd))
+            if self.DEBUG: print("I/O error({0}): {1}".format(e.errno, e.strerror))
+
+            del lines
+            del commentLines
+            lines = commentLines = "InitFile not found!"
+    
+        return lines, commentLines
+            
         
 #==============================================================================
-#Funktion dynamicImport
+# Method dynamicImport
 #==============================================================================
-    def dynamicImport(self,subDirectory, Files):
+    def dynamicImport(self, subDirectory, Files):
         """
         dynamicImport importiert aus dem übergegebenen "subDirectory" alle in
         "Files" spezifizierten Python-Files.
@@ -176,9 +151,8 @@ class FilterFileReader(object):
         ----------
         
         subDirectory:
-            Das Unterverzeichniss, in dem die zu Importierenden PythonFiles sind.
-            WICHTIG: das subDirectory muss vorher mit einem __init__.py File
-            initiieren werden.
+            Das Unterverzeichnis mit den zu importierenden Python-Files.
+            WICHTIG: das subDirectory muss einen __init__.py File enthalten
             
         Files:
             In "Files" steht der Dateiname des zu importierenden Python-Files.
@@ -187,30 +161,35 @@ class FilterFileReader(object):
         Returns
         -------
         
-        Keine:
-            dynamicImport editiert die globelen Klassenvariablen von ChooseParams.
+        None:
+            dynamicImport creates the following lists in databroker.py
             
-            Diese sind:
-                _Imports[] --> enthällt den eigentlichen Import
-                _ImportNames[] --> enthällt den FileNamen (hier OHNE den Suffix .py)
+            db.gD['imports']     : contains the actual imports
+            db.gD['importNames'] : contains the class names = file names without .py 
  
         """
         
         for temp in Files:
             print(temp)
-            if(temp.find(".py",0,len(temp)) > 0 ):                
+            if(temp.find(".py",0) > 0):                
                 try:
                     # Try to import the file
-                    self._Imports.append(__import__("{0}.{1}".format(subDirectory,
+                    db.gD['imports'].append(__import__("{0}.{1}".format(subDirectory,
                                     temp.replace(".py", "")), fromlist=['']))
-                    
+#                    db.gD['imports'].append(__import__("{0}.{1}".format(subDirectory,
+#                                    temp.replace(".py", "")), fromlist=['']))                    
                     # when successful, add the filename without suffix .py to
                     # the list _ImportNames .
-                    self._ImportNames.append(temp.replace(".py", ""))
+                    db.gD['importNames'].append(temp.replace(".py", ""))
                     
                 except ImportError:
-                    self.Debug_Msg("Fehler: Datei %s.py konnte nicht Importiert werden. Klasse: FilterFileReader Funktion: dynamicImport\n" %temp[0:-3])
-                    
+                    if self.DEBUG: 
+                        print("Error in 'FilterFileReader.dynamicImport()':" )
+                        print("File %s.py could not be imported."%temp[0:-3])
+
+        print("_Imports", db.gD['imports'])
+        print("_ImportNames", db.gD['importNames'])                    
+            
                 
 #==============================================================================
 #Funktion ObjectWizzard
@@ -218,7 +197,7 @@ class FilterFileReader(object):
     def ObjectWizzard(self, ObjectTyp):
         """
         ObjectWizzard versucht ein Objekt des Typs "ObjectTyp" zu erstellen.
-        ObjectWizzard kann nur Objekte ertellen, welche durch die Funktion dynamicImport
+        ObjectWizzard kann nur Objekte erstellen, welche durch die Funktion dynamicImport
         eingebunden wurden. Für das pyFDA-Tool sind dies z.B. die Filter-Files.
         
         Parameters
@@ -230,11 +209,12 @@ class FilterFileReader(object):
         i = 0
         temp = None
         
-        for elements in self._ImportNames:
-            if(self._ImportNames[i] == ObjectTyp):
-                temp = getattr(self._Imports[i], self._ImportNames[i])
-            else:
-                i = i + 1
+        for element in db.gD['importNames']:
+            if element == ObjectTyp:
+ #           if(db.gD['importNames'][i] == ObjectTyp):
+                temp = getattr(db.gD['imports'][i], db.gD['importNames'][i])
+#            else:
+#                i = i + 1
 
         if (temp != None):
             return temp()
@@ -269,7 +249,7 @@ class FilterFileReader(object):
 if __name__ == "__main__":
     #Für das Auslesen des InitFiles essentielle Angaben!
 
-    import databroker as db
+#    import databroker as db
     
     initFileName = "Init.txt"
     subDirectory = "filterDesign"

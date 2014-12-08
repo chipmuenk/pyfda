@@ -4,3 +4,7 @@
 
 cheby1.py
 equiripple.py
+.py
+a.py
+#
+ 

@@ -16,6 +16,12 @@ global gD
 gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048
+
+# Lists for dynamic imports from filterdesign subdirectory
+gD['imports'] = []
+gD['importNames'] = ['cheby2', 'equiripple'] # names of filter classes
+
+
 gD['coeffs'] = ([1,1,1],[3,0,2])
 gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
             [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1)

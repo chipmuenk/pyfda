@@ -8,12 +8,13 @@ Main file for the pyFDA app, initializes UI
 """
 
 import sys
-from PyQt4 import QtGui #, QtCore
+from PyQt4 import QtGui
 #from PyQt4.QtCore import SIGNAL
 import scipy.io
 import numpy as np
 
 import databroker as db # importing databroker initializes all its globals
+from FilterFileReader import FilterFileReader
 from inputWidgets import ChooseParams
 from filterDesign import cheby1 #, design_selector
 from plotWidgets import plotAll
@@ -27,10 +28,14 @@ class pyFDA(QtGui.QWidget):
     """
     def __init__(self):
         super(pyFDA, self).__init__()
+        # read directory with filterDesigns and construct filter Tree from it
+        FilterFileReader('Init.txt', 'filterDesign', commentCh = '#', Debug = True) # 
+        
         db.gD['zpk'] = ([1], 0, 0.5)
         # initialize filter coefficients b, a :
         db.gD['coeffs'] = [db.gD['zpk'][2]*np.poly(db.gD['zpk'][0]), 
-                                       np.poly(db.gD['zpk'][1])]      
+                                       np.poly(db.gD['zpk'][1])]
+        #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
        
         self.myFilter = cheby1.cheby1()
         self.initUI()     
@@ -43,18 +48,21 @@ class pyFDA(QtGui.QWidget):
         - Plot Window [-> plotAll.plotAll()]
         """
         # widget / subwindow for parameter selection
-        self.widgetParams = ChooseParams.ChooseParams() 
-#        self.widgetPara.setMaximumWidth(250)
+        self.widgetChooseParams = ChooseParams.ChooseParams() 
+        self.widgetChooseParams.setMaximumWidth(250)
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.butExportML = QtGui.QPushButton("Export -> ML", self)
         self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
         self.pltAll = plotAll.plotAll() # instantiate tabbed plot widgets        
         # ============== UI Layout =====================================
         self.grLayout = QtGui.QGridLayout()
-        self.grLayout.addWidget(self.widgetParams,0,0) # parameter select widget
+        self.grLayout.addWidget(self.widgetChooseParams,0,0) # parameter select widget
         self.grLayout.addWidget(self.butDesignFilt,1,0) # filter design button
         self.grLayout.addWidget(self.butExportML,2,0) # filter export button
         self.grLayout.addWidget(self.butExportCSV,3,0) # filter export button
+       #print(self.grLayout.columnMinimumWidth(0))# .setSizePolicy(QtGui.QSizePolicy.Expanding, 
+#                                   QtGui.QSizePolicy.Expanding)
+#        self.grLayout.updateGeometry()
 
         hbox = QtGui.QHBoxLayout()
         hbox.addLayout(self.grLayout)
@@ -76,7 +84,7 @@ class pyFDA(QtGui.QWidget):
         """
         Design Filter
         """
-        params = self.widgetParams.get()
+        params = self.widgetChooseParams.get()
         
         self.myFilter.LP(params) # design filter,
         db.gD['zpk'] = self.myFilter.zpk # read poles / zeroes
