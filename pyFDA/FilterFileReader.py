@@ -2,10 +2,9 @@
 """
 Created on Mon Nov 24 10:00:14 2014
 
-@author: Michael Winkler
+@author: Michael Winkler, Christian Münker
 """
 import os
-
 import databroker as db
 
 class FilterFileReader(object):
@@ -95,7 +94,6 @@ class FilterFileReader(object):
           gD["initFileNames"][]
           gD["initFileComments"][]
         """
-#        fp = None
 
         db.gD['initFileComments'] = [] # comment lines from initFile
         db.gD['initFileNames'] = [] # Filenames found in initFile without .py
@@ -134,8 +132,7 @@ class FilterFileReader(object):
             if self.DEBUG: 
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
-            db.gD['initFileComments'] = db.gD['initFileNames'] = []
-           
+            db.gD['initFileComments'] = db.gD['initFileNames'] = []           
 
 #==============================================================================
     def dynamicImport(self, pyPackage, pyNames):

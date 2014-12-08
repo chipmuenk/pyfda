@@ -29,15 +29,16 @@ class pyFDA(QtGui.QWidget):
     def __init__(self):
         super(pyFDA, self).__init__()
         # read directory with filterDesigns and construct filter Tree from it
-        FilterFileReader('Init.txt', 'filterDesign', commentCh = '#', DEBUG = True) # 
+        fr = FilterFileReader('Init.txt', 'filterDesign', commentCh = '#', DEBUG = True) # 
         
         db.gD['zpk'] = ([1], 0, 0.5)
         # initialize filter coefficients b, a :
         db.gD['coeffs'] = [db.gD['zpk'][2]*np.poly(db.gD['zpk'][0]), 
                                        np.poly(db.gD['zpk'][1])]
         #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
-       
-        self.myFilter = cheby1.cheby1()
+
+        # create instance of filter object, e.g. cheby1.cheby1() 
+        self.myFilter = fr.objectWizzard('cheby1')
         self.initUI()     
         
     def initUI(self): 
