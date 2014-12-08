@@ -17,9 +17,13 @@ gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048
 
-# Lists for dynamic imports from filterdesign subdirectory
-gD['imports'] = []
-gD['importNames'] = ['cheby2', 'equiripple'] # names of filter classes
+# Lists for dynamic imports from filter design subdirectory
+gD['initFileComments'] = [] # comment lines from initFile
+gD['initFileNames'] = [] # Python file names found in initFile (without .py)
+gD['importModules'] = [] 
+# the actual modules for import, e.g. "<module 'filterDesign.cheby1' from 
+#'D:\Daten\design\python\git\pyFDA\pyFDA\filterDesign\cheby1.pyc'>
+gD['importNames'] = ['cheby2', 'equiripple'] # names of filter files / classes
 
 
 gD['coeffs'] = ([1,1,1],[3,0,2])
