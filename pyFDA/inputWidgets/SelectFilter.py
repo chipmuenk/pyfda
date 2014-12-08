@@ -94,7 +94,7 @@ class SelectFilter(QtGui.QWidget):
         Copy selection to self.rt and db.gD and reconstruct filter type combo
         """          
         self.rt = str(self.comboResponseType.currentText())
-        db.gD["paramsCur"]["rt"] = self.rt # abbreviation
+        db.gD["curParams"]["rt"] = self.rt # abbreviation
         rt=db.gD["rtNames"][self.rt] # full text
 #        print(db.gD["params"][self.rt].keys())
         self.comboFilterType.clear()  
@@ -111,7 +111,7 @@ class SelectFilter(QtGui.QWidget):
         self.comboDesignMethod.clear()  
         self.comboDesignMethod.addItems(
             db.gD["params"][self.rt][self.ft])
-        db.gD['paramsCur']["ft"] = self.ft
+        db.gD['curParams']["ft"] = self.ft
         self.setDesignMethod()
             
     def setDesignMethod(self):
@@ -120,7 +120,7 @@ class SelectFilter(QtGui.QWidget):
         Copy selected setting to self.dm # TODO: really needed? 
         """
         self.dm = str(self.comboDesignMethod.currentText())
-        db.gD["paramsCur"]["dm"] = self.dm          
+        db.gD["curParams"]["dm"] = self.dm          
 
 #------------------------------------------------------------------------------ 
     

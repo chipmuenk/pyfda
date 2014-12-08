@@ -14,17 +14,13 @@ http://pymotw.com/2/articles/data_persistence.html
 # importing databroker runs the module once, defining all globals and variables
 global gD
 gD = {}
-gD['rc'] = {'lw':1.5}
+gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048
 gD['coeffs'] = ([1,1,1],[3,0,2])
 gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
             [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1)
             
-# Dictionary containing current filter specifications
-# TODO: This has to be created automatically !!!  
-gD['specs'] = {'Order':10, 
-            'A_pass1':1., 'A_pass2': 1, 'F_pass1':0.1, 'F_pass2':0.4,
-            'A_stop1':60., 'A_stop2': 60, 'F_stop1':0.2, 'F_stop2':0.3}
+
 
 # Dictionary describing the available combinations of response types (rt), 
 # filter types (ft) and design methods (dm)
@@ -39,6 +35,7 @@ gD['params'] = {\
     "HIL":\
         {"FIR": ['Equiripple']}
          }
+# Dictionaries for translating short forms to real names
 gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "HIL":"Hilbert"}
 gD['dmNames'] = {"butter":"Butterworth", "cheby1":"Chebychev 1", 
                   "cheby2":"Chebychev 2",  "ellip":"Elliptic",
@@ -46,8 +43,15 @@ gD['dmNames'] = {"butter":"Butterworth", "cheby1":"Chebychev 1",
                   "equiripple":"Equiripple", "firls":"Least-Square",
                   "window":"Windowed"}
 
-# Store current filter selection                 
-gD['paramsCur'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
+# Dictionary containing current specifications and selections
+# TODO: This has to be created automatically !!! 
+#-------------------------------------- 
+# Current filter selection                 
+gD['curParams'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
+# Current filter specifications
+gD['curSpecs'] = {'Order':10, 
+            'A_pass1':1., 'A_pass2': 1, 'F_pass1':0.1, 'F_pass2':0.4,
+            'A_stop1':60., 'A_stop2': 60, 'F_stop1':0.2, 'F_stop2':0.3}
 #def init():
 #    """
 #    Initialize global dictionary gD for data exchange between modules

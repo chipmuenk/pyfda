@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
 import databroker as db
 
-from plotUtils import MplWidget#, MplCanvas 
+from plotUtils import MplWidget#, MyMplToolbar, MplCanvas 
 
 DEBUG = True   
 
@@ -80,8 +80,8 @@ class PlotHf(QtGui.QMainWindow):
         mpl = self.mplwidget.ax
         mpl.clear()
         mpl.plot(F,20*np.log10(abs(H)), lw = db.gD['rc']['lw'])
-        mpl.axis([0, 0.5, -db.gD['specs']['A_stop1']-10, 
-                  db.gD['specs']['A_pass1']+1] )
+        mpl.axis([0, 0.5, -db.gD['curSpecs']['A_stop1']-10, 
+                  db.gD['curSpecs']['A_pass1']+1] )
         mpl.set_title(r'Betragsfrequenzgang')
         mpl.set_xlabel(r'$F\; \rightarrow $')    
         mpl.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|\; \rightarrow $')    
