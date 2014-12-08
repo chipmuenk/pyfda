@@ -7,7 +7,6 @@ MAINWINDOW
 """
 import sys, os 
 from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import SIGNAL
 
 # import databroker from one level above if this file is run as __main__
 # for test purposes
@@ -144,8 +143,8 @@ class ChooseParams(QtGui.QWidget):
         found = False
         while not found:
            # print self.choose_design_list[j][0]+":"+self.choose_design_list[j][1]
-            if self.choose_design_list[j][0]==db.gD["paramsCur"]["dm"] \
-            and self.choose_design_list[j][1] == db.gD["paramsCur"]["rt"]:
+            if self.choose_design_list[j][0]==db.gD["curParams"]["dm"] \
+            and self.choose_design_list[j][1] == db.gD["curParams"]["rt"]:
                 found = True
                 choosen=self.choose_design_list[j][2:]
             j=j+1
@@ -194,7 +193,7 @@ class ChooseParams(QtGui.QWidget):
         """
         Return a dict with the currently selected filter specifications 
         """
-        ret = db.gD["paramsCur"] # return selected filter design
+        ret = db.gD["curParams"] # return selected filter design
         ret.update(self.fo.get())
         if DEBUG: print(ret)
         ret.update(self.fs.get())

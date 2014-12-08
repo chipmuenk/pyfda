@@ -36,7 +36,7 @@ class SelectFilter(QtGui.QWidget):
         
     def initUI(self): 
         """
-        Initialize UI for selecting filter
+        Initialize UI with comboboxes for selecting filter
         """
 #-----------------------------------------------------------------------------
 #        Example for structure and content of "params" dictionary:
@@ -62,7 +62,7 @@ class SelectFilter(QtGui.QWidget):
         self.comboResponseType=QtGui.QComboBox(self)
         for rt in db.gD["params"]:
                     self.comboResponseType.addItem(rt)
-        self.comboResponseType.setCurrentIndex(2) # set initiall index
+        self.comboResponseType.setCurrentIndex(2) # set initial index
 
         self.comboFilterType=QtGui.QComboBox(self)
         self.comboDesignMethod=QtGui.QComboBox(self)
@@ -97,7 +97,8 @@ class SelectFilter(QtGui.QWidget):
         db.gD["curParams"]["rt"] = self.rt # abbreviation
         rt=db.gD["rtNames"][self.rt] # full text
 #        print(db.gD["params"][self.rt].keys())
-        self.comboFilterType.clear()  
+        # 
+        self.comboFilterType.clear() 
         self.comboFilterType.addItems(
             db.gD["params"][self.rt].keys())
         self.setFilterType()
