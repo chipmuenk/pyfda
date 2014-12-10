@@ -201,7 +201,7 @@ class FilterFileReader(object):
             
         Returns
         -------
-        The object
+        The instance
         
         """
         temp = None
@@ -212,15 +212,17 @@ class FilterFileReader(object):
         # iterate over both lists at the same time by "zipping" the lists           
         for name, module in zip(db.gD['importNames'], db.gD['importModules']):
             if name == objectType:
-                temp = getattr(module, name)
+                # create object instance by getting a named attribute <name> 
+                # from the object given in module
+                temp = getattr(module, name) # = module.<name>
                 print(temp)
             
-        if (temp != None):
+        if (temp != None):# yes, the attribute exists, return the instance
             return temp()
         else:
             if self.DEBUG: 
-                print("Es konnte kein {0}-Objekt erstellt werden,".format(objectType))
-                print("da der Objektname unbekannt ist. Klasse: FilterFileReader Funktion: ObjectWizzard\n")
+                print("Unknown object '{0}', could not be created,".format(objectType))
+                print("Class: FilterFileReader.objectWizzard\n")
       
            
 #==============================================================================

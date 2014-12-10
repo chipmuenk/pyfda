@@ -66,13 +66,13 @@ class PlotHf(QtGui.QMainWindow):
 #        self.coeffs = db.gD['coeffs']# coeffs
         self.bb = db.gD['coeffs'][0]
         self.aa = db.gD['coeffs'][1]
-        [W,H] = sig.freqz(self.bb, self.aa, db.gD['N_FFT']) # calculate H(W) for W = 0 ... pi
 
         if DEBUG:
-            print("-------------------------")
-            print("plotHf.draw() ") 
-            print("-------------------------")
-            print("b,a = ", self.bb, self.aa)
+            print("--- plotHf.draw() --- ") 
+            print("b, a = ", self.bb, self.aa)
+
+        [W,H] = sig.freqz(self.bb, self.aa, worN = db.gD['N_FFT']) # calculate H(W) for W = 0 ... pi
+
         F = W / (2 * np.pi)
 
         # clear the axes and (re)draw the plot

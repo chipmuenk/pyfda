@@ -37,17 +37,19 @@ gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
 # TODO: This has to be created automatically !!!
 gD['params'] = {\
     "LP":\
-        {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
-         "FIR": ['Equiripple','Least-squares','Window']},
+        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
+         "FIR": ["equiripple", "firls", "window"]},
     "HP":\
-        {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
-         "FIR": ['Equiripple','Least-squares','Window']},
+        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
+         "FIR": ["equiripple", "firls", "window"]},
     "HIL":\
-        {"FIR": ['Equiripple']}
+        {"FIR": ["equiripple"]}
          }
-# Dictionaries for translating short forms to real names
-gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "HIL":"Hilbert"}
-gD['dmNames'] = {"butter":"Butterworth", "cheby1":"Chebychev 1", 
+# Dictionaries for translating short (initernal) names to full names
+gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
+                 "BS":"Bandstop","HIL":"Hilbert"}
+gD['dmNames'] = {#IIR
+                  "butter":"Butterworth", "cheby1":"Chebychev 1", 
                   "cheby2":"Chebychev 2",  "ellip":"Elliptic",
                   # FIR:                  
                   "equiripple":"Equiripple", "firls":"Least-Square",
@@ -57,7 +59,7 @@ gD['dmNames'] = {"butter":"Butterworth", "cheby1":"Chebychev 1",
 # TODO: This has to be created automatically !!! 
 #-------------------------------------- 
 # Current filter selection                 
-gD['curParams'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
+gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
 # Current filter specifications
 gD['curSpecs'] = {'Order':10, 
             'A_pass1':1., 'A_pass2': 1, 'F_pass1':0.1, 'F_pass2':0.4,

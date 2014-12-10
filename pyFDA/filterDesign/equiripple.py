@@ -29,7 +29,7 @@ import numpy as np
 class equiripple(object):
     def __init__(self):
         self.zpk = [1, 0, 1]
-        self.coeff = [1, 1]
+        self.coeffs = [1, 1]
         self.info = "Equiripple-Filter haben im Passband und im Stopband \
         jeweils konstanten Ripple, sie nutzen das vorgegebene Toleranzband \
         jeweils voll aus."
@@ -40,31 +40,32 @@ class equiripple(object):
 
     def LP(self, specs):
         self.needs = ('Order', 'F_pass', 'F_stop', 'W_pass', 'W_stop')
-        self.coeff = sig.remez(specs['N'],[0, specs['F_pass'], specs['F_stop'], 
+        self.coeffs = sig.remez(specs['Order'],[0, specs['F_pass'], specs['F_stop'], 
                 0.5],[1, 0], weight = [specs['W_pass'],specs['W_stop']], Hz = 1)
-        self.zpk = [np.roots(self.coeff), np.zeros(specs['N']), 1]
+        self.zpk = [np.roots(self.coeffs), np.zeros(specs['Order']), 1]
+
 
     def HP(self, specs):
         self.needs = ('Order', 'F_pass', 'F_stop', 'W_pass', 'W_stop')
-        self.coeff = sig.remez(specs['N'],[0, specs['F_stop'], specs['F_pass'], 
+        self.coeffs = sig.remez(specs['Order'],[0, specs['F_stop'], specs['F_pass'], 
                 0.5],[0, 1], weight = [specs['W_stop'],specs['W_pass']], Hz = 1)
-        self.zpk = [np.roots(self.coeff), np.zeros(specs['N']), 1]
+        self.zpk = [np.roots(self.coeffs), np.zeros(specs['Order']), 1]
     # For BP and BS, A_pass, F_pass and F_stop have two elements each
     def BP(self, specs):
         self.needs = ('Order', 'F_pass1', 'F_pass2', 'F_stop1', 'F_stop1',
         'W_pass', 'W_stop1', 'W_stop2' )
-        self.coeff = sig.remez(specs['N'],[0, specs['F_stop1'], specs['F_pass1'], 
+        self.coeffs = sig.remez(specs['Order'],[0, specs['F_stop1'], specs['F_pass1'], 
                 specs['F_pass2'], specs['F_stop2'], 0.5],[0, 1, 0], 
                 weight = [specs['W_stop1'],specs['W_pass'], specs['W_stop2']], Hz = 1)
-        self.zpk = [np.roots(self.coeff), np.zeros(2*specs['N']), 1]
+        self.zpk = [np.roots(self.coeffs), np.zeros(2*specs['Order']), 1]
 
     def BS(self, specs):
         self.needs = ('Order', 'F_pass1', 'F_pass2', 'F_stop1', 'F_stop1',
         'W_pass1', 'W_pass2', 'W_stop')
-        self.coeff = sig.remez(specs['N'],[0, specs['F_pass1'], specs['F_stop1'], 
+        self.coeffs = sig.remez(specs['Order'],[0, specs['F_pass1'], specs['F_stop1'], 
                 specs['F_stop2'], specs['F_pass2'], 0.5],[1, 0, 1], 
                 weight = [specs['W_pass1'],specs['W_stop'], specs['W_pass2']], Hz = 1)
-        self.zpk = [np.roots(self.coeff), np.zeros(2*specs['N']), 1]
+        self.zpk = [np.roots(self.coeffs), np.zeros(2*specs['Order']), 1]
 
 
         

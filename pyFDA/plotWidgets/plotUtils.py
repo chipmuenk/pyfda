@@ -125,14 +125,6 @@ class MplWidget(QtGui.QWidget):
         # self.mpl_toolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MyMplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
-        
-#        self.butDraw = QtGui.QPushButton("&Redraw")
-#        self.butDraw.clicked.connect(self.redraw)
-
-#        self.cboxGrid = QtGui.QCheckBox("&Grid")
-#        self.cboxGrid.setChecked(True)  
-        # Attention: passes unwanted clicked bool argument:
-#        self.cboxGrid.clicked.connect(self.redraw)
 
         #=============================================
         # Widget layout with QHBox / QVBox
@@ -162,6 +154,11 @@ class MplWidget(QtGui.QWidget):
         self.fig.tight_layout(pad = 0.5)
         self.pltCanv.draw()
         self.pltCanv.updateGeometry()
+        
+    def pltFullView(self):
+        self.ax.autoscale()
+#        self.ax.set_xlim([-1,1])
+        self.redraw()
 
 #-----------------------------------------------------------------------------        
 
@@ -236,7 +233,8 @@ class MyMplToolbar(NavigationToolbar):
  
  
     def _init_toolbar(self):
-#        self.basedir = os.path.join(mpl.rcParams[ 'datapath' ], 'images/icons')
+#        self.basedir = os.path.join(rcParams[ 'datapath' ], 'images/icons')
+        iconDir = os.path.dirname(os.path.abspath(__file__)) + '/../images/icons/' 
     # https://useiconic.com/open/
     
 # TODO: clicking pan or zoom gives the following error:
@@ -268,40 +266,48 @@ class MyMplToolbar(NavigationToolbar):
 #        print (self.toolitems)
  
         # HOME:
-        a = self.addAction(QtGui.QIcon('images/icons/home.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'home.svg'), \
                            'Home', self.home)
         a.setToolTip('Reset original view')
         # BACK:
-        a = self.addAction(QtGui.QIcon('images/icons/action-undo.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'action-undo.svg'), \
                            'Back', self.back)
         a.setToolTip('Back to previous view')
         # FORWARD:
-        a = self.addAction(QtGui.QIcon('images/icons/action-redo.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'action-redo.svg'), \
                            'Forward', self.forward)
         a.setToolTip('Forward to next view')
+
+        self.addSeparator() #---------------------------------------------
+        
         # PAN:
-        self.addSeparator()
-        a = self.addAction(QtGui.QIcon('images/icons/move.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
                            'Pan', self.pan)
 #                           'Pan', self.pan('self.move','self.pan')) # nearly works ...
         a.setToolTip('Pan axes with left mouse, zoom with right')
         # ZOOM:
-        a = self.addAction(QtGui.QIcon('images/icons/magnifying-glass.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
                            'Zoom', self.zoom)
         a.setToolTip('Zoom to rectangle')
+        # Fulll View:
+        a = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
+            'Full View', self.parent.pltFullView)
+        a.setToolTip('Full view')
+
+        self.addSeparator() #---------------------------------------------
+
         # SAVE:
-        self.addSeparator()
-        a = self.addAction(QtGui.QIcon('images/icons/file.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
                            'Save', self.save_figure)
         a.setToolTip('Save the figure')
         
         # GRID:
         self.addSeparator()
-        a = self.addAction(QtGui.QIcon('images/icons/grid-four-up.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
                            'Grid', self.toggle_grid)
         a.setToolTip('Toggle Grid')
         # REDRAW:
-        a = self.addAction(QtGui.QIcon('images/icons/brush.svg'), \
+        a = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
                            'Redraw', self.parent.redraw)
         a.setToolTip('Redraw Plot')
          
@@ -322,8 +328,6 @@ class MyMplToolbar(NavigationToolbar):
  
         # reference holder for subplots_adjust window
         self.adj_window = None
-        
-
         
     def toggle_grid(self):
         self.grid = not self.grid
