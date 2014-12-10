@@ -57,16 +57,15 @@ class SelectFilter(QtGui.QWidget):
         # - comboResponseType for selecting response type rt (LP, HP, ...)
 		# - comboFilterType for selection of filter type (IIR, FIR, ...)
 		# - comboDesignMethod for selection of design method (Chebychev, ...)
-		# and populate them from the "params" dict either directly or by :
-		# by calling setResponseType() :
+		# and populate them from the "params" dict either directly or by
+		# calling setResponseType() :
         self.comboResponseType=QtGui.QComboBox(self)
-        for rt in db.gD["params"]:
-                    self.comboResponseType.addItem(rt)
-        self.comboResponseType.setCurrentIndex(2) # set initial index
-
         self.comboFilterType=QtGui.QComboBox(self)
         self.comboDesignMethod=QtGui.QComboBox(self)
-
+        
+        for rt in db.gD["params"]:
+            self.comboResponseType.addItem(db.gD["rtNames"][rt], rt)
+        self.comboResponseType.setCurrentIndex(2) # set initial index
         self.setResponseType()
 
         #------------------------------------------------------------
@@ -92,10 +91,13 @@ class SelectFilter(QtGui.QWidget):
         """
         Triggered when comboResponseType (LP, HP, ...) is changed:
         Copy selection to self.rt and db.gD and reconstruct filter type combo
-        """          
-        self.rt = str(self.comboResponseType.currentText())
-        db.gD["curParams"]["rt"] = self.rt # abbreviation
-        rt=db.gD["rtNames"][self.rt] # full text
+        """ 
+        self.rtIdx =self.comboResponseType.currentIndex()       
+        self.rt = str(self.comboResponseType.itemData(self.rtIdx))
+         
+#        self.rt = str(self.comboResponseType.currentText())
+        db.gD["curFilter"]["rt"] = self.rt # abbreviation
+#        rt=db.gD["rtNames"][self.rt] # full text
 #        print(db.gD["params"][self.rt].keys())
         # 
         self.comboFilterType.clear() 
@@ -106,13 +108,16 @@ class SelectFilter(QtGui.QWidget):
     def setFilterType(self):
         """"
         Triggered when comboFilterType (IIR, FIR, ...) is changed: 
-        Copy selected setting to self.ft and reconstruct design method combo
+        Copy selected setting to self.ft and (re)construct design method combo, 
+        adding displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
         self.ft = str(self.comboFilterType.currentText())
         self.comboDesignMethod.clear()  
-        self.comboDesignMethod.addItems(
-            db.gD["params"][self.rt][self.ft])
-        db.gD['curParams']["ft"] = self.ft
+
+        for dm in db.gD["params"][self.rt][self.ft]:
+            self.comboDesignMethod.addItem(db.gD["dmNames"][dm], dm)
+
+        db.gD['curFilter']["ft"] = self.ft
         self.setDesignMethod()
             
     def setDesignMethod(self):
@@ -120,8 +125,11 @@ class SelectFilter(QtGui.QWidget):
         Triggered when comboDesignMethod (cheby1, ...) is changed: 
         Copy selected setting to self.dm # TODO: really needed? 
         """
-        self.dm = str(self.comboDesignMethod.currentText())
-        db.gD["curParams"]["dm"] = self.dm          
+        self.dmIdx = self.comboDesignMethod.currentIndex()
+        self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
+        db.gD["curFilter"]["dm"] = self.dm  
+        # reverse dictionary lookup
+        #key = [key for key,value in dict.items() if value=='value' ][0]        
 
 #------------------------------------------------------------------------------ 
     
