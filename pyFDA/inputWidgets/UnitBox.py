@@ -4,17 +4,16 @@ Created on Mon Nov 18 13:36:39 2013
 
 xxx
 
-@author: Julia Beike
-Datum:14.11.2013
+@author: Julia Beike, Christian Münker
+Created on 18.11.2013
+Updated on Thur Dec 11 2014
 """
 import sys
-from PyQt4 import QtGui,QtCore
-
-DEBUG = True
+from PyQt4 import QtGui
 
 class UnitBox(QtGui.QWidget):
     
-    def __init__(self, unit=[],lab=[] ,default=[],name=""):
+    def __init__(self, unit=[], labels=[], defaults=[], name="", DEBUG = True):
         
         """
         Initialisierung
@@ -24,18 +23,17 @@ class UnitBox(QtGui.QWidget):
         lab und default müssen immer gleiche länge sein!!! Überprüfung muss noch gemacht werden
         """
         super(UnitBox, self).__init__()   
-        self.lab_namen=lab
-        self.labels= []
-        self.name=name
-        
+        self.DEBUG = DEBUG
+        self.labels = labels # list with combobox labels 
+        self.qlabels = [] # list with QLabels instances (pointers)
+        self.default_werte = defaults
+        self.textfield = []
+
+        self.name = name        
         self.unit=[str(i) for i in unit]
-        self.default_werte=default
-        self.textfield=[]
         self.initUI()     
         
     def initUI(self): 
-        anz=len(self.lab_namen)
-        i=0
         
         self.layout=QtGui.QGridLayout()
         self.lab_units=QtGui.QLabel(self)
@@ -48,104 +46,100 @@ class UnitBox(QtGui.QWidget):
         Anzahl der Eingabefelder(Label+LineEdit) hängt von der bei der Initialisierung übergebenen Parametern ab
         alle labels werden in einer Liste gespeichert, alle TextFelder werden in einer Liste gespeichert
         """
-        while (i<anz):
+        for i in range(len(self.labels)):  # iterate over number of labels         
            
-            self.labels.append(QtGui.QLabel(self))
+            self.qlabels.append(QtGui.QLabel(self))
             self.textfield.append(QtGui.QLineEdit(str(self.default_werte[i])))
-            self.labels[i].setText(self.lab_namen[i])
+            self.qlabels[i].setText(self.labels[i])
 
-            self.layout.addWidget(self.labels[i],(i+1),0)
+            self.layout.addWidget(self.qlabels[i],(i+1),0)
             self.layout.addWidget(self.textfield[i],(i+1),1)
-            i=i+1
- 
  
         self.setLayout(self.layout)
         
-    def set(self,lab=[] ,default=[])  :
+#-------------------------------------------------------------        
+    def set(self, labels=[], default=[])  :
         """
-        Zum Ändern der Parameter(Anz Labels, Inhalt der Labels ...)
+        Set labels, defaults - when number of elements changes, the 
+        layout has to be rebuilt
         """
-        i=0;
-        """
-        Wird ein Eingabefeld hinzugefügt oder nicht?
-        """
-        if (len(self.lab_namen)>len(lab)):
-            maximal=len(self.lab_namen)# hinzufügen
-            #minimal=len(lab)
-        else:
-            maximal=len(lab)# nichts hinzufügen viell. löschen
-            #minimal=len(self.lab_namen)
-       # print maximal    
-        while (i<maximal):
+
+        maximal = max(len(self.labels), len(labels))
+    
+        # Wird ein Eingabefeld hinzugefügt oder nicht?
+        for i in range(maximal):
              # wenn keine elemente mehr in lab dann lösche restlichen Eingabefelder
-            if (i>(len(lab)-1)):
-             
-                self.delElement(len(lab))
-            # wenn in lab noch elemnete aber keine mehr in lab_namen =>Einfügen    
-            elif (i>(len(self.lab_namen)-1)):
-                self.addElement(i,lab[i],default[i])
+            if (i > (len(labels)-1)):
+                self.delElement(len(labels))
+
+            # wenn in lab noch elemnete aber keine mehr in labels =>Einfügen    
+            elif (i > (len(self.labels)-1)):
+                self.addElement(i,labels[i],default[i])
 
             else:
                 #wenn sich der Name des Labels ändert, defäult wert in Line Edit
-                if (self.lab_namen[i]!=lab[i]):  
+                if (self.labels[i]!=labels[i]):  
                     
-                    self.labels[i].setText(lab[i])
-                    self.lab_namen[i]=lab[i]
+                    self.qlabels[i].setText(labels[i])
+                    self.labels[i]=labels[i]
                     self.default_werte[i]=default[i]
                     self.textfield[i].setText(str(default[i]))
                     #wenn sich name des Labels nicht ändert, mache nichts
-                   # print self.labels[i+1].text() + self.textfield[i+1].text()
-            i=i+1       
-
+    
         self.setLayout(self.layout)
         
     def delElement(self,i):
-        
         """
-        elm an pos i wird gelöscht (in labels und textfield)
+        Element with position i is deleted (qlabel and textfield)
         """
-        self.layout.removeWidget(self.labels[i])
+        self.layout.removeWidget(self.qlabels[i])
         self.layout.removeWidget(self.textfield[i])
-        self.labels[i].deleteLater()
-        del self.lab_namen[i]
-        del self.default_werte[i]
+        self.qlabels[i].deleteLater()
         del self.labels[i]
+        del self.default_werte[i]
+        del self.qlabels[i]
         self.textfield[i].deleteLater()
         del self.textfield[i]  
         
-    def addElement(self,i,lab_name,defaultw)  : 
-        
+    def addElement(self, i, new_label, new_default): 
         """
-        elm an pos i wird angefügt (in labels und textfield)
+        Element with position i is appended (qlabel und textfield)
         """
-        self.labels.append(QtGui.QLabel(self))
-        self.lab_namen.append(lab_name)
-        self.default_werte.append(defaultw)
-        self.textfield.append(QtGui.QLineEdit(str (defaultw)))
-        self.labels[i].setText(lab_name)
-        # print str(i)+":"+self.labels[i].text()+":"+self.textfield[i].text()
-        self.layout.addWidget(self.labels[i],(i+1),0)
+        self.qlabels.append(QtGui.QLabel(self))
+        self.labels.append(new_label)
+        self.default_werte.append(new_default)
+        self.textfield.append(QtGui.QLineEdit(str (new_default)))
+        self.qlabels[i].setText(new_label)
+        self.layout.addWidget(self.qlabels[i],(i+1),0)
         self.layout.addWidget(self.textfield[i],(i+1),1)
       
     def get(self):
         """
-        Rückgabe der Parameter
+        Return parameters as dict
         """
         dic={"Einheit"+self.name:str(self.combo_units.currentText())}
-        #namen=[]
-        #data=[]
-        if DEBUG:
-            print("-------------------------")
-            print("UnitBox.get() ") 
-            print("-------------------------")
         i=0
-        while (i<len(self.lab_namen)):
-            dic.update({self.lab_namen[i]:float(self.textfield[i].text())})
-            #namen.append(self.lab_namen[i])
-            #data.append(float(self.textfield[i].text()))
+        while (i<len(self.labels)):
+            dic.update({self.labels[i]:float(self.textfield[i].text())})
             i=i+1
-        if DEBUG: print(dic)
+
+        if self.DEBUG: 
+            print("--- UnitBox.get() ---b") 
+            print(dic)
         return dic
+ #------------------------------------------------------
+#        
+#    def get(self):
+#        """
+#        Return labels and parameters as dict
+#        """
+#        dic={}
+#        i=0
+#        while (i < len(self.labels)):
+#            dic.update({self.labels[i]:float(self.textfield[i].text())})
+#            i=i+1
+#        return dic
+        
          
 #------------------------------------------------------------------------------ 
     
