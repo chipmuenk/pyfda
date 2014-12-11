@@ -16,18 +16,17 @@ if __name__ == "__main__":
 
 import databroker as db
     
-import SelectFilter, widgetFilterOrder, UnitBox, NumBox # ResponseType, 
+import SelectFilter, filterOrder, UnitBox, NumBox # ResponseType, 
 
 
 """
 Zur Eingabe aller Parameter und Einstellungen
 """
 
-DEBUG = True
 
 class ChooseParams(QtGui.QWidget):
     
-    def __init__(self):
+    def __init__(self, DEBUG = True):
         super(ChooseParams, self).__init__()        
         # "Properties" of all filter types:
         self.choose_design_list=(
@@ -60,7 +59,8 @@ class ChooseParams(QtGui.QWidget):
                                ['cheby2','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
                                ['cheby2','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_stop1","A_pass","A_stop2"],[60,1,80]]],
                                ['cheby2','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass1","A_stop","A_pass2"],[5,60,1]]]
-                                )                                               
+                                )
+        self.DEBUG = DEBUG                                              
         self.initUI()
         """
         choose_design_list[0]: Label / Design Method (string)
@@ -86,8 +86,8 @@ class ChooseParams(QtGui.QWidget):
         """
         Create all widgets:
 
-        sf : Select Filter with response type (LP, ...), filter type (IIR, ...), 
-              and design method (cheby1, ...)
+        sf : Select Filter with response type rt (LP, ...), 
+              filter type ft (IIR, ...), and design method dm (cheby1, ...)
         fo : Filter Order (numeric or 'min')
         fs : Frequency Specifications 
         ms : Magnitude Specifications with the subwidgets
@@ -98,7 +98,7 @@ class ChooseParams(QtGui.QWidget):
         """ 
 
         self.sf = SelectFilter.SelectFilter()
-        self.fo = widgetFilterOrder.widgetFilterOrder()
+        self.fo = filterOrder.FilterOrder()
         self.fs = UnitBox.UnitBox(
                     ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
                     ['Fs', 'F_pass', 'F_stop'], [48000,9600,12000], "Frequenz")
@@ -106,8 +106,11 @@ class ChooseParams(QtGui.QWidget):
         self.ms_txt = QtGui.QLabel(self)
         self.ms_txt.setText("Enter a weight value for each band below")
         self.ms_txt.setWordWrap(True)
+        
         self.ms_unt = UnitBox.UnitBox(["dB","Squared"],["A_pass","A_stop"],[1,80],"Magnitude")
-        self.ms_val = NumBox.NumBox("Enter a weight value for each band below",["W_pass","W_stop"],[1,1])
+        self.ms_val = NumBox.NumBox(
+                "Enter a weight value for each band below",
+                ["W_pass","W_stop"],[1,1])
         self.ms_last = "val"
         # Magnitude Widgets not needed at the moment are made 
         # invisible but are always present!
@@ -132,6 +135,8 @@ class ChooseParams(QtGui.QWidget):
         self.sf.comboResponseType.activated.connect(self.chooseDesignMethod)
         self.sf.comboFilterType.activated.connect(self.chooseDesignMethod)
         self.sf.comboDesignMethod.activated.connect(self.chooseDesignMethod)
+
+        self.chooseDesignMethod() # first time initialization
         
     def chooseDesignMethod(self):
         """
@@ -140,19 +145,19 @@ class ChooseParams(QtGui.QWidget):
         as well.
         """
 
+        if self.DEBUG: 
+            print(db.gD["curFilter"])
+
         j=0
-        found = False
-        print(db.gD["curFilter"])#["dm"])
-#        print(db.gD["curFilter"]["rt"])
-        
+        found = False        
         while not found:
            # print self.choose_design_list[j][0]+":"+self.choose_design_list[j][1]
             if self.choose_design_list[j][0]== db.gD["curFilter"]["dm"] \
             and self.choose_design_list[j][1] == db.gD["curFilter"]["rt"]:
                 found = True
                 choosen=self.choose_design_list[j][2:]
-            j=j+1
-        #print "-----------------------------------------"   
+            j += 1
+  
         self.rebuildFrequFiltOrd(choosen[0],choosen[1],choosen[2],choosen[3])
         self.rebuildMag(choosen[4],choosen[5])
         self.setLayout(self.layout)
@@ -197,17 +202,16 @@ class ChooseParams(QtGui.QWidget):
         """
         Return a dict with the currently selected filter specifications 
         """
-        # TODO: should this be db.gD["curSpecs"] ?
-        ret = db.gD["curFilter"] # return selected filter design
-        ret.update(self.fo.get())
-        if DEBUG: print(ret)
-        ret.update(self.fs.get())
+#        ret = db.gD["curFilter"] # return selected filter design
+        ret = {}
+        ret.update(self.fo.get()) # collect data from filter order widget
+        ret.update(self.fs.get()) # collect data from frequ. spec. widget
 
         if self.ms_last=="unt":
-            ret.update( self.ms_unt.get())
+            ret.update( self.ms_unt.get()) # magnitude specs with unit
         if self.ms_last=="val" :
-            ret.update( self.ms_val.get())
-        if DEBUG: print(ret)
+            ret.update( self.ms_val.get()) # magnitude specs with "all"
+        if self.DEBUG: print(ret)
         return ret  
         
 #------------------------------------------------------------------------------ 
