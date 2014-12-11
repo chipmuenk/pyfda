@@ -16,6 +16,7 @@ import numpy as np
 import databroker as db # importing databroker initializes all its globals
 from FilterFileReader import FilterFileReader
 from inputWidgets import ChooseParams
+#from filterDesign import cheby1 #, design_selector
 from plotWidgets import plotAll
 
 DEBUG = True
@@ -86,7 +87,7 @@ class pyFDA(QtGui.QWidget):
         Design Filter
         """
         params = self.widgetChooseParams.get() 
-        if DEBUG: print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm']):
+        if DEBUG: print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm'])
             
         self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
         # Now design the filter by passing params to the filter instance ...
