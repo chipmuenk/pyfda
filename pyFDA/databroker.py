@@ -36,6 +36,12 @@ gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
 # filter types (ft) and design methods (dm)
 # TODO: This has to be created automatically !!!
 gD['params'] = {\
+    "BP":\
+        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
+         "FIR": ["equiripple", "firls", "window"]},
+    "BS":\
+        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
+         "FIR": ["equiripple", "firls", "window"]},
     "LP":\
         {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
          "FIR": ["equiripple", "firls", "window"]},
