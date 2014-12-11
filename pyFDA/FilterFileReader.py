@@ -73,7 +73,7 @@ class FilterFileReader(object):
 #==============================================================================
     def readInitFile(self, initFile, commentCh):
         """
-        Reads all lines from initFile:
+        Try to extract all file names = class names from initFile:
         - Lines that don't begin with commentCh are stripped from Newline 
           character, whitespace, '.py' and everything after it and written
           to gD["initFileNames"][].
@@ -190,9 +190,10 @@ class FilterFileReader(object):
 #==============================================================================
     def objectWizzard(self, objectType):
         """
-        ObjectWizzard versucht ein Objekt vom Typ "objectType" zu erstellen.
+        Try to create an object of type "objectType". 
         ObjectWizzard kann nur Objekte erstellen, welche durch die Funktion dynamicImport
         eingebunden wurden. Für das pyFDA-Tool sind dies z.B. die Filter-Files.
+        E.g.  self.myFilter = fr.objectWizzard('cheby1')
         
         Parameters
         ----------

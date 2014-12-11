@@ -234,7 +234,8 @@ class MyMplToolbar(NavigationToolbar):
  
     def _init_toolbar(self):
 #        self.basedir = os.path.join(rcParams[ 'datapath' ], 'images/icons')
-        iconDir = os.path.dirname(os.path.abspath(__file__)) + '/../images/icons/' 
+        iconDir = os.path.dirname(os.path.abspath(__file__))+'/../images/icons/' 
+     
     # https://useiconic.com/open/
     
 # TODO: clicking pan or zoom gives the following error:

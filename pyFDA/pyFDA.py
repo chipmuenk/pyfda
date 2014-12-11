@@ -16,7 +16,6 @@ import numpy as np
 import databroker as db # importing databroker initializes all its globals
 from FilterFileReader import FilterFileReader
 from inputWidgets import ChooseParams
-#from filterDesign import cheby1 #, design_selector
 from plotWidgets import plotAll
 
 DEBUG = True
@@ -28,8 +27,9 @@ class pyFDA(QtGui.QWidget):
     """
     def __init__(self):
         super(pyFDA, self).__init__()
-        # read directory with filterDesigns and construct filter Tree from it
-        self.ffr = FilterFileReader('Init.txt', 'filterDesign', commentCh = '#', DEBUG = True) # 
+        # read directory with filterDesigns and construct filter tree from it
+        self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
+                                    commentCh = '#', DEBUG = True) # 
         
 #        db.gD['zpk'] = ([1], 0, 0.5)
         # initialize filter coefficients b, a :
@@ -38,7 +38,7 @@ class pyFDA(QtGui.QWidget):
         #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
 
 #        self.myFilter = cheby1.cheby1()
-        self.myFilter = fr.objectWizzard('cheby1')
+#        self.myFilter = fr.objectWizzard('cheby1')
         self.initUI()     
         
     def initUI(self): 
@@ -86,19 +86,17 @@ class pyFDA(QtGui.QWidget):
         Design Filter
         """
         params = self.widgetChooseParams.get() 
-        if DEBUG: print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm'])
+        if DEBUG: print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm']):
+            
         self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
         # Now design the filter by passing params to the filter instance ...
         myFilt = getattr(self.myFilter, db.gD['curFilter']['rt'])(params)
         # ... and reading back filter coefficients and (zeroes, poles, k):
-        db.gD['zpk'] = self.myFilter.zpk # read (zeroes, poles, k)
-        print('ndim coeffs:', np.ndim(self.myFilter.coeffs))
+        db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
         if np.ndim(self.myFilter.coeffs) == 1: # FIR-Filter - only b coeffs
-            db.gD['coeffs'] = (self.myFilter.coeffs, [1]) # and filter coefficients
-            print('FIR!')
+            db.gD['coeffs'] = (self.myFilter.coeffs, [1]) # add a = [1]
         else:                                 # IIR-Filter - [b, a]
-            db.gD['coeffs'] = self.myFilter.coeffs # and filter coefficients
-            print('IIR!')
+            db.gD['coeffs'] = self.myFilter.coeffs 
         if DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print("zpk:" , db.gD['zpk'])

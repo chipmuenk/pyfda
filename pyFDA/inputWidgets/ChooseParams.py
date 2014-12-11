@@ -13,6 +13,7 @@ from PyQt4 import QtGui
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
+
 import databroker as db
     
 import SelectFilter, widgetFilterOrder, UnitBox, NumBox # ResponseType, 
