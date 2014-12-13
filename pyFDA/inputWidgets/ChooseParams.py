@@ -24,10 +24,13 @@ Zur Eingabe aller Parameter und Einstellungen
 """
 
 
-class ChooseParams(QtGui.QWidget):
+class ChooseParams(QtGui.QFrame):
     
     def __init__(self, DEBUG = True):
-        super(ChooseParams, self).__init__()        
+        super(ChooseParams, self).__init__() 
+#        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
+#        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
+
         # "Properties" of all filter types:
         self.choose_design_list=(
                                ['firls','LP',['Fs','F_pass','F_stop'],[48000,9600,12000],False,True,"val",["Enter a weight value for each band below",["W_pass","W_stop"],[1,1]]],
@@ -47,18 +50,18 @@ class ChooseParams(QtGui.QWidget):
                                ['butter','HP',['Fs','Fc'],[48000,10800],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
                                ['butter','BP',['Fs','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
                                ['butter','BS',['Fs','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
-                               ['ellip','LP',['Fs','F_pass'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
-                               ['ellip','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
-                               ['ellip','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_stop1","A_pass","A_stop2"],[60,1,80]]],
-                               ['ellip','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass1","A_stop","A_pass2"],[5,60,1]]],
-                               ['cheby1','LP',['Fs','F_pass'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
-                               ['cheby1','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
-                               ['cheby1','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
-                               ['cheby1','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
-                               ['cheby2','LP',['Fs','F_pass'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
-                               ['cheby2','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
-                               ['cheby2','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_stop1","A_pass","A_stop2"],[60,1,80]]],
-                               ['cheby2','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass1","A_stop","A_pass2"],[5,60,1]]]
+                               ['ellip','LP',['Fs','F_pass'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['ellip','HP',['Fs','F_pass'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['ellip','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_stop1","A_pass","A_stop2"],[60,1,80]]],
+                               ['ellip','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pass1","A_stop","A_pass2"],[5,60,1]]],
+                               ['cheby1','LP',['Fs','F_pass'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pass"],[1]]],
+                               ['cheby1','HP',['Fs','F_pass'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pass"],[1]]],
+                               ['cheby1','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pass"],[1]]],
+                               ['cheby1','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pass"],[1]]],
+                               ['cheby2','LP',['Fs','F_pass'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['cheby2','HP',['Fs','F_pass'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pass","A_stop"],[1,80]]],
+                               ['cheby2','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_stop1","A_pass","A_stop2"],[60,1,80]]],
+                               ['cheby2','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pass1","A_stop","A_pass2"],[5,60,1]]]
                                 )
         self.DEBUG = DEBUG                                              
         self.initUI()
@@ -100,17 +103,21 @@ class ChooseParams(QtGui.QWidget):
         self.sf = SelectFilter.SelectFilter()
         self.fo = filterOrder.FilterOrder()
         self.fs = UnitBox.UnitBox(
-                    ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
-                    ['Fs', 'F_pass', 'F_stop'], [48000,9600,12000], "Frequenz")
+                    units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
+                    labels = ['Fs', 'F_pass', 'F_stop'], 
+                    defaults = [48000,9600,12000], name = "Frequenz")
        
         self.ms_txt = QtGui.QLabel(self)
         self.ms_txt.setText("Enter a weight value for each band below")
         self.ms_txt.setWordWrap(True)
         
-        self.ms_unt = UnitBox.UnitBox(["dB","Squared"],["A_pass","A_stop"],[1,80],"Magnitude")
+        self.ms_unt = UnitBox.UnitBox(units = ["dB","Squared"],
+                                      labels = ["A_pass","A_stop"],
+                                      defaults = [1,80], name = "Magnitude")
+                                      
         self.ms_val = NumBox.NumBox(
-                "Enter a weight value for each band below",
-                ["W_pass","W_stop"],[1,1])
+                title = "Enter a weight value for each band below",
+                labels = ["W_pass","W_stop"],defaults = [1,1])
         self.ms_last = "val"
         # Magnitude Widgets not needed at the moment are made 
         # invisible but are always present!
@@ -131,7 +138,9 @@ class ChooseParams(QtGui.QWidget):
         self.setLayout(self.layout)
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
-        # Call chooseDesignMethod every time filter selection is changed:      
+        # Call chooseDesignMethod every time filter selection is changed: 
+#        self.fo.chkManual.clicked.connect(self.chooseDesignMethod)
+        self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
         self.sf.comboResponseType.activated.connect(self.chooseDesignMethod)
         self.sf.comboFilterType.activated.connect(self.chooseDesignMethod)
         self.sf.comboDesignMethod.activated.connect(self.chooseDesignMethod)
@@ -156,43 +165,47 @@ class ChooseParams(QtGui.QWidget):
             and self.choose_design_list[j][1] == db.gD["curFilter"]["rt"]:
                 found = True
                 choosen=self.choose_design_list[j][2:]
+                choosen[0] = freqLabels = self.choose_design_list[j][2]
+                choosen[1] = freqSpecs = self.choose_design_list[j][3]
+                choosen[2] = enableMin = self.choose_design_list[j][4]  
+                choosen[3] = manOrder = self.choose_design_list[j][5]
+                choosen[4] = typeTxtbox = self.choose_design_list[j][6]                
+                choosen[5] = lstA_W_T = self.choose_design_list[j][7]
             j += 1
   
-        self.rebuildFrequFiltOrd(choosen[0],choosen[1],choosen[2],choosen[3])
-        self.rebuildMag(choosen[4],choosen[5])
+        self.rebuildFrequFiltOrd(freqLabels, freqSpecs, 
+                                 enMin = enableMin, checkMan = manOrder)
+        self.rebuildMag(typeTxtbox, lstA_W_T)
         self.setLayout(self.layout)
         
         
-    def rebuildFrequFiltOrd(self,liste=[],default=[],enMin=True,checkMan=True):
+    def rebuildFrequFiltOrd(self,liste=[],defaults=[],enMin=True,checkMan=True):
         """
         Hilfsfunktion zur Aktualisierung des Frequenz-Widget und der FilterOrdnung
         """
-        self.fs.set(liste, default)
+        self.fs.set(labels = liste, defaults = defaults)
         self.fo.chkMin.setEnabled(enMin)
-        self.fo.chkManual.setChecked(checkMan)
+#        self.fo.chkManual.setChecked(checkMan)
         
-    def rebuildMag(self,string,liste=[]):
+    def rebuildMag(self,string,lstA_W_T=[]):
         """
         Hilfsfunktion zur Aktualisierung der Magnitude Specifications
         """
-        #print "_________________________"
-       # print liste
-       # print string
-       # print"_________________________"
+
         if string == "txt":  # only Info-Text
-            self.ms_txt.setText(liste)
+            self.ms_txt.setText(lstA_W_T)
             self.ms_txt.setVisible(True)
             self.ms_unt.setVisible(False)
             self.ms_val.setVisible(False)
             self.ms_last="txt"
-        if string == "unt" : # create subwidget with unit + label
-            self.ms_unt.set(liste[1],liste[2])
+        if string == "unit" : # create subwidget with unit + label
+            self.ms_unt.set(labels = lstA_W_T[1], defaults = lstA_W_T[2])
             self.ms_unt.setVisible(True)
             self.ms_val.setVisible(False)
             self.ms_txt.setVisible(False)
-            self.ms_last="unt"
+            self.ms_last="unit"
         if string == "val" :  # create subwidget with title, unit + label
-            self.ms_val.set(liste[0],liste[1],liste[2])
+            self.ms_val.set(title = lstA_W_T[0],labels = lstA_W_T[1], defaults = lstA_W_T[2])
             self.ms_val.setVisible(True)
             self.ms_txt.setVisible(False)
             self.ms_unt.setVisible(False)
@@ -207,7 +220,7 @@ class ChooseParams(QtGui.QWidget):
         ret.update(self.fo.get()) # collect data from filter order widget
         ret.update(self.fs.get()) # collect data from frequ. spec. widget
 
-        if self.ms_last=="unt":
+        if self.ms_last=="unit":
             ret.update( self.ms_unt.get()) # magnitude specs with unit
         if self.ms_last=="val" :
             ret.update( self.ms_val.get()) # magnitude specs with "all"
