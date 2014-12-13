@@ -105,7 +105,7 @@ class ChooseParams(QtGui.QFrame):
         self.fs = UnitBox.UnitBox(
                     units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
                     labels = ['Fs', 'F_pass', 'F_stop'], 
-                    defaults = [48000,9600,12000], name = "Frequenz")
+                    defaults = [48000,9600,12000], spec = "Frequenz")
        
         self.ms_txt = QtGui.QLabel(self)
         self.ms_txt.setText("Enter a weight value for each band below")
@@ -113,7 +113,7 @@ class ChooseParams(QtGui.QFrame):
         
         self.ms_unt = UnitBox.UnitBox(units = ["dB","Squared"],
                                       labels = ["A_pass","A_stop"],
-                                      defaults = [1,80], name = "Magnitude")
+                                      defaults = [1,80], spec = "Magnitude")
                                       
         self.ms_val = NumBox.NumBox(
                 title = "Enter a weight value for each band below",
