@@ -50,7 +50,7 @@ class NumBox(QtGui.QWidget):
         # qlineedit contains references to the QLineEdit widgets
 
         self.layout = QtGui.QGridLayout() # layout for input fields
-        self.layout.addWidget(self.qtitle, 0, 0, 2, 1) # span two columns
+#        self.layout.addWidget(self.qtitle, 0, 0, 2, 2) # span two columns
         for i in range(len(self.labels)):  # iterate over number of labels         
             self.qlabel.append(QtGui.QLabel(self))
             self.qlabel[i].setText(self.labels[i])
