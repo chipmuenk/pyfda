@@ -13,7 +13,7 @@ from PyQt4 import QtGui
 
 class UnitBox(QtGui.QWidget):
     
-    def __init__(self, title = "", units=[], labels=[], defaults=[], name="", DEBUG = True):
+    def __init__(self, title = "", units=[], labels=[], defaults=[], spec="", DEBUG = True):
         
         """
         Initialisierung
@@ -29,7 +29,7 @@ class UnitBox(QtGui.QWidget):
         self.default_werte = defaults
         self.textfield = []
 
-        self.name = name        
+        self.spec = spec        
         self.unit=[str(i) for i in units]
         self.initUI()     
         
@@ -117,7 +117,7 @@ class UnitBox(QtGui.QWidget):
         """
         Return parameters as dict
         """
-        dic={"Einheit"+self.name:str(self.combo_units.currentText())}
+        dic={"Einheit"+self.spec:str(self.combo_units.currentText())}
         i=0
         while (i<len(self.labels)):
             dic.update({self.labels[i]:float(self.textfield[i].text())})
