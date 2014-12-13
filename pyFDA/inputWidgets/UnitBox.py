@@ -13,7 +13,7 @@ from PyQt4 import QtGui
 
 class UnitBox(QtGui.QWidget):
     
-    def __init__(self, unit=[], labels=[], defaults=[], name="", DEBUG = True):
+    def __init__(self, title = "", units=[], labels=[], defaults=[], name="", DEBUG = True):
         
         """
         Initialisierung
@@ -30,7 +30,7 @@ class UnitBox(QtGui.QWidget):
         self.textfield = []
 
         self.name = name        
-        self.unit=[str(i) for i in unit]
+        self.unit=[str(i) for i in units]
         self.initUI()     
         
     def initUI(self): 
@@ -58,7 +58,7 @@ class UnitBox(QtGui.QWidget):
         self.setLayout(self.layout)
         
 #-------------------------------------------------------------        
-    def set(self, labels=[], default=[])  :
+    def set(self, title = "", labels=[], defaults=[])  :
         """
         Set labels, defaults - when number of elements changes, the 
         layout has to be rebuilt
@@ -74,7 +74,7 @@ class UnitBox(QtGui.QWidget):
 
             # wenn in lab noch elemnete aber keine mehr in labels =>Einfügen    
             elif (i > (len(self.labels)-1)):
-                self.addElement(i,labels[i],default[i])
+                self.addElement(i,labels[i],defaults[i])
 
             else:
                 #wenn sich der Name des Labels ändert, defäult wert in Line Edit
@@ -82,8 +82,8 @@ class UnitBox(QtGui.QWidget):
                     
                     self.qlabels[i].setText(labels[i])
                     self.labels[i]=labels[i]
-                    self.default_werte[i]=default[i]
-                    self.textfield[i].setText(str(default[i]))
+                    self.default_werte[i]=defaults[i]
+                    self.textfield[i].setText(str(defaults[i]))
                     #wenn sich name des Labels nicht ändert, mache nichts
     
         self.setLayout(self.layout)
@@ -124,7 +124,7 @@ class UnitBox(QtGui.QWidget):
             i=i+1
 
         if self.DEBUG: 
-            print("--- UnitBox.get() ---b") 
+            print("--- UnitBox.get() ---") 
             print(dic)
         return dic
  #------------------------------------------------------
