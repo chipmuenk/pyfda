@@ -13,7 +13,7 @@ class FilterFileReader(object):
 #==============================================================================
 #Funktion __init__    
 #==============================================================================
-    def __init__(self, fileName, directory, commentCh = '#', DEBUG = False):
+    def __init__(self, initFile, directory, commentCh = '#', DEBUG = False):
         """
         FilterFileReader liest das Init.txt File des pyFDA-tools aus,
         importiert die in dem InitFile stehenden PythonFiles und gibt jeweils ein
@@ -39,41 +39,21 @@ class FilterFileReader(object):
         """
         
         self.subDirectory = directory #(= package, needs to have __init__.py)
-        self.initFile = directory + "/" + fileName  
+        self.initDirFile = directory + "/" + initFile  
         self.commentChar = commentCh
         self.DEBUG = DEBUG
         self.cwd = os.path.dirname(os.path.abspath(__file__))
         
+        db.gD['initFileNames'] = self.readInitFile(self.initDirFile, commentCh)
+        
+#        print("!!!", db.gD['initFileNames'])
+        
         self.readAllFilterObjects()
-           
-#==============================================================================
-# Method readAllFilterObjects
-#==============================================================================
-    def readAllFilterObjects(self):
-        """
-        readAllFilterObjects liefert alle verfügbaren FilterObjekte zurück.
-        Wichtig: readAllFilterObjects wertet beim Aufruf das Init.txt File aus,
-        somit können Filter.py Files "on the flight" ohne Neustart 
-        ausgetauscht/erweitert werden.
-        """
-
-        db.gD["filterObjects"] = []
-        # parse the initFile.py, giving back one list with the lines containing
-        # python files and one with comment lines:  
-
-        self.readInitFile(self.initFile, self.commentChar)
-                                                
-        self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
-
-        for line in db.gD['importNames']:                
-                db.gD["filterObjects"].append(self.objectWizzard(line))
-
-        print("filterObjects:", db.gD["filterObjects"])
-
+        
 #==============================================================================
     def readInitFile(self, initFile, commentCh):
         """
-        Try to extract all file names = class names from initFile:
+        Extract all file names = class names from initFile:
         - Lines that don't begin with commentCh are stripped from Newline 
           character, whitespace, '.py' and everything after it and written
           to gD["initFileNames"][].
@@ -89,14 +69,11 @@ class FilterFileReader(object):
         
         Returns
         -------
-        None
-        
-          gD["initFileNames"][]
-          gD["initFileComments"][]
+        initFileNames : List with Filenames (without .py) found in initFile
         """
 
-        db.gD['initFileComments'] = [] # comment lines from initFile
-        db.gD['initFileNames'] = [] # Filenames found in initFile without .py
+        initFileComments = [] # comment lines from initFile
+        initFileNames = [] # Filenames found in initFile without .py
 
  
         initFileCwd = self.cwd + "/" + initFile
@@ -113,8 +90,8 @@ class FilterFileReader(object):
                 if len(curLine) > 1:
                     # Does current line begin with the comment character?
                     if(curLine[0] == commentCh): 
-                        # yes, remove it and append line to commentLines:
-                            db.gD['initFileComments'].append((curLine[1:])) 
+                        # yes, append line to list initFileComments :
+                            initFileComments.append((curLine[1:])) 
                     # No, this is not a comment line
                     else:
                         # Is '.py' contained in curLine?
@@ -123,7 +100,7 @@ class FilterFileReader(object):
                             # Yes, strip '.py' and all characters after, 
                             # append the file name to the lines list, 
                             # otherwise discard the line
-                            db.gD['initFileNames'].append(curLine[0:suffixPos])
+                            initFileNames.append(curLine[0:suffixPos])
                         
                 curLine = fp.readline() # read next line
             
@@ -132,7 +109,30 @@ class FilterFileReader(object):
             if self.DEBUG: 
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
-            db.gD['initFileComments'] = db.gD['initFileNames'] = []           
+            initFileComments = initFileNames = []
+            
+        return initFileNames
+
+#==============================================================================
+    def readAllFilterObjects(self):
+        """
+        readAllFilterObjects liefert alle verfügbaren FilterObjekte zurück.
+        Wichtig: readAllFilterObjects wertet beim Aufruf das Init.txt File aus,
+        somit können Filter.py Files "on the flight" ohne Neustart 
+        ausgetauscht/erweitert werden.
+        """
+
+        db.gD["filterObjects"] = []
+        # parse the initFile.py, giving back one list with the lines containing
+        # python files and one with comment lines:  
+                                                
+        self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
+
+        for line in db.gD['importNames']:                
+                db.gD["filterObjects"].append(self.objectWizzard(line))
+
+        print("filterObjects:", db.gD["filterObjects"])
+
 
 #==============================================================================
     def dynamicImport(self, pyPackage, pyNames):
@@ -205,7 +205,7 @@ class FilterFileReader(object):
         The instance
         
         """
-        temp = None
+        inst = None
         if self.DEBUG:
             print('--- ObjectWizzard ---')
             print('importNames:', db.gD['importNames'])
@@ -215,11 +215,11 @@ class FilterFileReader(object):
             if name == objectType:
                 # create object instance by getting a named attribute <name> 
                 # from the object given in module
-                temp = getattr(module, name) # = module.<name>
-                print(temp)
+                inst = getattr(module, name) # = module.<name>
+                print(inst)
             
-        if (temp != None):# yes, the attribute exists, return the instance
-            return temp()
+        if (inst != None):# yes, the attribute exists, return the instance
+            return inst()
         else:
             if self.DEBUG: 
                 print("Unknown object '{0}', could not be created,".format(objectType))

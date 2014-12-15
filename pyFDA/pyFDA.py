@@ -89,10 +89,11 @@ class pyFDA(QtGui.QWidget):
             print("--- pyFDA.py : startDesignFilter ---")
             print('Params:', params)
             print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm'])
-            
+        # create filter object (base class)    
         self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
         # Now design the filter by passing params to the filter instance ...
-        myFilt = getattr(self.myFilter, db.gD['curFilter']['rt'])(params)
+        getattr(self.myFilter, db.gD['curFilter']['rt'])(params)
+        
         # ... and reading back filter coefficients and (zeroes, poles, k):
         db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
         if np.ndim(self.myFilter.coeffs) == 1:  # FIR filter: only b coeffs

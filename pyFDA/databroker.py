@@ -67,20 +67,11 @@ gD['dmNames'] = {#IIR
 # Current filter selection                 
 gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
 # Current filter specifications
-gD['curSpecs'] = {'Order':10, 
-            'A_pass1':1., 'A_pass2': 1, 'F_pass1':0.1, 'F_pass2':0.4,
-            'A_stop1':60., 'A_stop2': 60, 'F_stop1':0.2, 'F_stop2':0.3}
-#def init():
-#    """
-#    Initialize global dictionary gD for data exchange between modules
-#    The module is executed upon import anyway, but providing a dedicated
-#    init() functions prevents other modules from accidentally modifying 
-#    the dictionary (?)
-#    """
-#    global gD
-#    gD = {}
-#    gD['N_FFT'] = 2048
-#    gD['coeffs'] = ([1,1,1],[3,0,2]) # notch @ F = 1/3
+gD['curSpecs'] = {'ord':10, 
+            'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,
+            'A_sb':60., 'A_sb2': 60, 'F_sb':0.2, 'F_sb2':0.3,
+            'W_pb':1, 'W_sb':1}
+
     
 
 

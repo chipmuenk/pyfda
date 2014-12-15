@@ -16,13 +16,12 @@ import scipy.signal as sig
 import numpy as np
 # import numpy as np
 
-#   ['Chebychev 1','LP',['Fs','F_pass'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
-#   ['Chebychev 1','HP',['Fs','F_pass'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
-#   ['Chebychev 1','BP',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
-#   ['Chebychev 1','BS',['Fs','F_pass1','F_pass2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
+#   ['Chebychev 1','LP',['Fs','F_pb'],[48000,9600],True,True,"unt",[["dB","Squared"],["A_p"],[1]]],
+#   ['Chebychev 1','HP',['Fs','F_pb'],[48000,14400],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
+#   ['Chebychev 1','BP',['Fs','F_pb1','F_pb2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
+#   ['Chebychev 1','BS',['Fs','F_pb1','F_pb2'],[48000,9600,12000],True,True,"unt",[["dB","Squared"],["A_pass"],[1]]],
 
 
-# TODO: worauf bezieht sich "self" - auf cheby1 oder auf cheby1.LP ?
 # TODO: Funktioniert "Vererben" LP -> HP etc.?
 # TODO: Für den 'Min'-Fall könnte man cheby1, elllip etc. verbinden mit der 
 # iirdesign - Funktion verbinden. Ist das sinnvoll?
@@ -36,55 +35,52 @@ def zpk2ba(zpk):
 
 class cheby1(object):
     
-
     
     def __init__(self):
 
-        self.zpk = [1, 0, 1]
-        self.coeffs = [1, 1]
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'ord' : 'N'}
         self.prop = {'name':'Chebychev 1', 'ft':'IIR'}
+        self.filt = {\
+          "BP": {"ord":['N', 'A_pb', 'F_pb', 'F_pb2'],
+                 "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},
+          "BS": {"ord":['A_pb','F_pb','F_pb2'],
+                 "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2'] },
+          "LP": {"ord":['N', 'A_pb', 'F_pb'],
+                 "min":['A_pb','A_sb','F_pb','F_sb']},
+          "HP": {"ord":['N', 'A_pb', 'F_pb'],
+                 "min":['A_pb','A_sb','F_pb','F_sb']},           
+                   }
+        print(self.filt["LP"]["ord"])
+
         self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
         Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im PB \
         und über die kritische(n) Frequenz(en) bei denen die Verstärkung unter \
         den spezifizierten Wert fällt."
 
-    def has(self):
-        self.has = {
-                    'rt' : ('LP', 'HP', 'BP', 'BS'),
-                    'ord' : 'N'}
-                    
-#    def info():
-#      """
-#      usage: print(cheby1.info())
-#      """
-#      return {'rt' : ('LP', 'HP', 'BP', 'BS'),
-#                    'ord' : 'N'}
-
     def LP(self, specs):
-        self.needs = ('Order', 'A_pass', 'F_pass')
-        self.zpk = sig.cheby1(specs['Order'], specs['A_pass'], specs['F_pass'],
+        self.needs = ('N', 'A_pb', 'F_pb')
+        self.zpk = sig.cheby1(specs['N'], specs['A_pb'], specs['F_pb'],
                               btype='low', analog = False, output = 'zpk')
         self.coeffs = zpk2ba(self.zpk)
 
     def HP(self, specs):
-        self.needs = ('Order', 'A_pass', 'F_pass')
-        self.zpk = sig.cheby1(specs['Order'], specs['A_pass'], specs['F_pass'], 
+        self.needs = ('N', 'A_pb', 'F_pb')
+        self.zpk = sig.cheby1(specs['N'], specs['A_pb'], specs['F_pb'], 
                               btype='highpass', analog = False, output = 'zpk')
         self.coeffs = zpk2ba(self.zpk)
         
-    # For BP and BS, A_pass, F_pass and F_stop have two elements each
+    # For BP and BS, A_pb, F_pb and F_stop have two elements each
     def BP(self, specs):
-        self.needs = ('Order', 'A_pass', 'F_pass1', 'F_pass2')
-        self.zpk = sig.cheby1(specs['Order'], specs['A_pass'],
-                        [specs['F_pass1'], specs['F_pass2']], btype='bandpass',
+        self.needs = ('N', 'A_pb', 'F_pb', 'F_pb2')
+        self.zpk = sig.cheby1(specs['N'], specs['A_pb'],
+                        [specs['F_pb'], specs['F_pb2']], btype='bandpass',
                         analog = False, output = 'zpk')
         self.coeffs = zpk2ba(self.zpk)
         
     def BS(self, specs):
-        self.needs = ('Order', 'A_pass', 'F_pass1', 'F_pass2')
-        self.zpk = sig.cheby1(specs['Order'], specs['A_pass'],
-                [specs['F_pass1'], specs['F_pass2']], btype='bandstop', 
+        self.needs = ('N', 'A_pb', 'F_pb', 'F_pb2')
+        self.zpk = sig.cheby1(specs['N'], specs['A_pb'],
+                [specs['F_pb'], specs['F_pb2']], btype='bandstop', 
                 analog = False, output = 'zpk')
         self.coeffs = zpk2ba(self.zpk)
         
@@ -97,26 +93,26 @@ class cheby1_min(object):
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'),
                     'ord' : 'min'}
 
-    # LP: F_pass < F_stop
+    # LP: F_pb < F_stop
     def LP(self, specs):
-        self.needs = ('N', 'A_pass', 'F_pass', 'F_stop')
-        self.zpk = sig.iirdesign(specs['F_pass'], specs['F_stop'], 
-                                   specs['A_pass'], specs['A_stop'],
+        self.needs = ('N', 'A_pb', 'F_pb', 'F_sb')
+        self.zpk = sig.iirdesign(specs['F_pb'], specs['F_stop'], 
+                                   specs['A_pb'], specs['A_stop'],
                              analog=False, ftype='cheby1', output='zpk')
         self.coeffs = zpk2ba(self.zpk)
 
         
-    # HP: F_stop < F_pass                          
+    # HP: F_stop < F_pb                          
     def HP(self, specs):
         self.zpk = self.LP(self, specs)
         self.coeffs = zpk2ba(self.zpk)
         
-    # BP: F_stop[0] < F_pass[0], F_stop[1] > F_pass[1]    
+    # BP: F_stop[0] < F_pb[0], F_stop[1] > F_pb[1]    
     def BP(self, specs):
         self.zpk = self.LP(self, specs)
         self.coeffs = zpk2ba(self.zpk)
 
-    # BS: F_stop[0] > F_pass[0], F_stop[1] < F_pass[1]            
+    # BS: F_stop[0] > F_pb[0], F_stop[1] < F_pb[1]            
     def BS(self, specs):
         self.zpk = self.LP(self, specs)
         self.coeffs = zpk2ba(self.zpk)      

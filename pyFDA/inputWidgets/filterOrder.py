@@ -77,13 +77,13 @@ class FilterOrder(QtGui.QFrame):
    
     def get(self):
          """
-         Return either the entered filter order or 'min'
+         Return either the entered filter order or 'min' as dict
          """
          if self.chkMin.isChecked() == True:
              ordn = "min"
          else:
              ordn = int(self.txtManual.text())
-         return {"Order": ordn}
+         return {"N": ordn}
          
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
