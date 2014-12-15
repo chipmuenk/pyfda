@@ -21,28 +21,32 @@ class NumBox(QtGui.QWidget):
         Parameters:
         
         title: Text above the input fields
-        labels: list with names for the input fields
+        labels: list with names for the input fields (combobox)
         defaults: list with corresponding default values
         labels and defaults need to have same length!
         """
         super(NumBox, self).__init__()   
         self.DEBUG = DEBUG
         self.labels = labels
-        self.default_werte = defaults
+        self.defaults = defaults
+        self.title = title
+        
         self.qlabel = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
-        self.title = title
         self.initUI()    
         
-    def initUI(self): 
-        
-        self.qtitle = QtGui.QLabel(self) # field for widget title
-        self.qtitle.setText(str(self.title))
-        self.qtitle.setWordWrap(True)
-        
-        self.WVLayout=QtGui.QVBoxLayout() # Widget layout
-        self.WVLayout.addWidget(self.qtitle)
+    def initUI(self):
+        self.WVLayout=QtGui.QVBoxLayout() # Widget layout        
+        if self.title != "":
+            bfont = QtGui.QFont()
+            bfont.setBold(True)
+#            bfont.setWeight(75)
+            self.qtitle = QtGui.QLabel(self) # field for widget title
+            
+            self.qtitle.setText(str(self.title))
+            self.qtitle.setWordWrap(True)
+            self.WVLayout.addWidget(self.qtitle)
         
         # Create a gridLayout consisting of Labels and LineEdit fields
         # The number of created lines depends on the number of labels
@@ -50,11 +54,11 @@ class NumBox(QtGui.QWidget):
         # qlineedit contains references to the QLineEdit widgets
 
         self.layout = QtGui.QGridLayout() # layout for input fields
-#        self.layout.addWidget(self.qtitle, 0, 0, 2, 2) # span two columns
+        
         for i in range(len(self.labels)):  # iterate over number of labels         
             self.qlabel.append(QtGui.QLabel(self))
             self.qlabel[i].setText(self.labels[i])
-            self.qlineedit.append(QtGui.QLineEdit(str(self.default_werte[i])))
+            self.qlineedit.append(QtGui.QLineEdit(str(self.defaults[i])))
 
             self.layout.addWidget(self.qlabel[i], i, 0)
             self.layout.addWidget(self.qlineedit[i], i, 1)
@@ -63,39 +67,67 @@ class NumBox(QtGui.QWidget):
         self.setLayout(self.WVLayout)
 
 #-------------------------------------------------------------                
-    def set(self, title ="", labels = [], defaults = []):
+    def set(self, title = "", newLabels = [], newDefaults = []):
         """
         Set title, labels, defaults - when number of elements changes, the 
         layout has to be rebuilt
         """
+
+        if title != "":
+            self.qtitle.setText(title) # new title
+        maxLength = max(len(self.labels), len(newLabels))
     
+        # Check whether the number of entries has changed
+        for i in range(maxLength):
+             # wenn keine elemente mehr in lab dann lösche restlichen Eingabefelder
+            if (i > (len(newLabels)-1)):
+                self.delElement(len(newLabels))
 
-        self.qtitle.setText(title) # new title
-        maximal = max(len(self.labels), len(labels))
-#        minimal = min(len(self.labels), len(labels))
-
-        # Wird ein Eingabefeld hinzugefügt oder nicht?
-        for i in range(maximal):
-            # wenn keine elemente mehr in labels dann lösche restliche Eingabefelder
-            if (i > (len(labels)-1)):
-                self.delElement(len(labels))
-
-            # wenn in lab noch elemente aber keine mehr in self.labels => Einfügen    
-            elif (i > (len(self.labels)-1)):   
-                self.addElement(i,labels[i],defaults[i])   
+            # wenn in lab noch elemnete aber keine mehr in labels =>Einfügen    
+            elif (i > (len(self.labels)-1)):
+                self.addElement(i,newLabels[i],newDefaults[i])
 
             else:
-                #wenn sich der Name des Labels ändert, default wert in Line Edit
-                if (self.labels[i]!=labels[i]):  
-                    
-                    self.qlabel[i].setText(labels[i])
-                    self.labels[i]=labels[i]
-                    self.default_werte[i]=defaults[i]
-                    self.qlineedit[i].setText(str(defaults[i]))
-                #wenn sich name des Labels nicht ändert, mache nichts
-                              
-        self.setLayout(self.WVLayout)
-        
+                # when label has changed, update it and the default value
+                if (self.labels[i]!=newLabels[i]):     
+                    self.qlabel[i].setText(newLabels[i])
+                    self.labels[i] = newLabels[i]
+                    self.defaults[i] = newDefaults[i]
+                    self.qlineedit[i].setText(str(newDefaults[i]))
+    
+        self.setLayout(self.WVLayout) # needed?
+
+#    def set(self, labels = [], defaults = []):
+#        """
+#        Set title, labels, defaults - when number of elements changes, the 
+#        layout has to be rebuilt
+#        """
+#
+##        if self.title != "":
+##            self.qtitle.setText(title) # new title
+#        maxLength = max(len(self.labels), len(labels))
+#
+#        # Check whether the number of entries has changed
+#        for i in range(maxLength):
+#            # wenn keine elemente mehr in labels dann lösche restliche Eingabefelder
+#            if (i > (len(labels)-1)):
+#                self.delElement(len(labels))
+#
+#            # wenn in lab noch elemente aber keine mehr in self.labels => Einfügen    
+#            elif (i > (len(self.labels)-1)):   
+#                self.addElement(i,labels[i],defaults[i])   
+#
+#            else:
+#                # when label has changed, update it and the default value
+#                if (self.labels[i]!=labels[i]):  
+#                    self.qlabel[i].setText(labels[i])
+#                    self.labels[i]=labels[i]
+#                    self.defaults[i]=defaults[i]
+#                    self.qlineedit[i].setText(str(defaults[i]))
+#                              
+#        self.setLayout(self.WVLayout) # needed?
+
+#-------------------------------------------------------------         
     def delElement(self,i):
         """
         Element with position i is deleted (qlabel and qlineedit)
@@ -104,7 +136,7 @@ class NumBox(QtGui.QWidget):
         self.layout.removeWidget(self.qlineedit[i])
         self.qlabel[i].deleteLater()
         del self.labels[i]
-        del self.default_werte[i]
+        del self.defaults[i]
         del self.qlabel[i]
         self.qlineedit[i].deleteLater()
         del self.qlineedit[i]  
@@ -116,7 +148,7 @@ class NumBox(QtGui.QWidget):
         self.qlabel.append(QtGui.QLabel(self))
         self.labels.append(new_label)
         
-        self.default_werte.append(new_default)
+        self.defaults.append(new_default)
         self.qlineedit.append(QtGui.QLineEdit(str(new_default)))
         self.qlabel[i].setText(new_label)
         self.layout.addWidget(self.qlabel[i],(i+1),0)
@@ -144,18 +176,18 @@ if __name__ == '__main__':
     labels = ['a','b','c',]
     defaults = [4, 5, 6]
     app = QtGui.QApplication(sys.argv)
-    form = NumBox(title, labels, defaults)
+    form = NumBox(title = title, labels = labels, defaults = defaults)
     
     form.show()
     time.sleep(2)
     txt = form.get()
     print"____________ 1 _________________"
     print txt
-    form.set("Hallo",['a','a','a','a'],[1,1,1,1]) # dict with same labels
+    form.set(newLabels = ['a','a','a','a'], newDefaults = [1,1,1,1]) # dict with same labels
     txt = form.get()
     print"____________ 2 _________________"
     print txt
-    form.set(title,['a','s'],[1,5])
+    form.set(newLabels = ['a','s'], newDefaults = [1,5])
     txt=form.get()
     print"____________ 3 _________________"
     print txt

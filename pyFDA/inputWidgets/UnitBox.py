@@ -24,104 +24,123 @@ class UnitBox(QtGui.QWidget):
         """
         super(UnitBox, self).__init__()   
         self.DEBUG = DEBUG
-        self.labels = labels # list with combobox labels 
-        self.qlabels = [] # list with QLabels instances (pointers)
-        self.default_werte = defaults
-        self.textfield = []
-
+        self.labels = labels # list with labels for combobox
+        self.defaults = defaults
+        self.title = title
+        
         self.spec = spec        
-        self.unit=[str(i) for i in units]
+        self.units = [str(u) for u in units]
+        
+        self.qlabel = [] # list with references to QLabel widgets
+        self.qlineedit = [] # list with references to QLineEdit widgets
+
         self.initUI()     
         
     def initUI(self): 
+        self.WVLayout = QtGui.QVBoxLayout() # Widget layout   
+        self.layout   = QtGui.QGridLayout()
         
-        self.layout=QtGui.QGridLayout()
-        self.lab_units=QtGui.QLabel(self)
-        self.lab_units.setText("Units")
-        self.combo_units=QtGui.QComboBox(self)
-        self.combo_units.addItems(self.unit)
-        self.layout.addWidget(self.lab_units,0,0)
-        self.layout.addWidget(self.combo_units,0,1)
-        """
-        Anzahl der Eingabefelder(Label+LineEdit) hängt von der bei der Initialisierung übergebenen Parametern ab
-        alle labels werden in einer Liste gespeichert, alle TextFelder werden in einer Liste gespeichert
-        """
+        if self.title != "":
+            bfont = QtGui.QFont()
+            bfont.setBold(True)
+#            bfont.setWeight(75)
+            self.qtitle = QtGui.QLabel(self) # field for widget title
+            self.qtitle.setText(str(self.title))
+            self.qtitle.setFont(bfont)
+            self.qtitle.setWordWrap(True)
+            self.WVLayout.addWidget(self.qtitle)
+        
+        if self.units != []:
+            self.lab_units=QtGui.QLabel(self)
+            self.lab_units.setText("Units")
+            self.combo_units=QtGui.QComboBox(self)
+            self.combo_units.addItems(self.units)
+            self.layout.addWidget(self.lab_units,0,0)
+            self.layout.addWidget(self.combo_units,0,1)
+        #self.layout.addWidget(self.qtitle, 0, 0, 2, 1) # span two columns
+
+        # Create a gridLayout consisting of Labels and LineEdit fields
+        # The number of created lines depends on the number of labels
+        # qlabels is a list with references to the QLabel widgets, 
+        # qlineedit contains references to the QLineEdit widgets
+        
         for i in range(len(self.labels)):  # iterate over number of labels         
            
-            self.qlabels.append(QtGui.QLabel(self))
-            self.textfield.append(QtGui.QLineEdit(str(self.default_werte[i])))
-            self.qlabels[i].setText(self.labels[i])
+            self.qlabel.append(QtGui.QLabel(self))
+            self.qlineedit.append(QtGui.QLineEdit(str(self.defaults[i])))
+            self.qlabel[i].setText(self.labels[i])
 
-            self.layout.addWidget(self.qlabels[i],(i+1),0)
-            self.layout.addWidget(self.textfield[i],(i+1),1)
+            self.layout.addWidget(self.qlabel[i],(i+1),0)
+            self.layout.addWidget(self.qlineedit[i],(i+1),1)
  
-        self.setLayout(self.layout)
-        
+        self.WVLayout.addLayout(self.layout)
+        self.setLayout(self.WVLayout)
 #-------------------------------------------------------------        
-    def set(self, title = "", labels=[], defaults=[])  :
+    def set(self, title = "", newLabels = [], newDefaults = []):
         """
-        Set labels, defaults - when number of elements changes, the 
+        Set title, labels, defaults - when number of elements changes, the 
         layout has to be rebuilt
         """
-
-        maximal = max(len(self.labels), len(labels))
+        print("Titel:",self.title)
+        if title != "":
+            print("Titel:",title)
+            self.qtitle.setText(title) # new title
+        maxLength = max(len(self.labels), len(newLabels))
     
-        # Wird ein Eingabefeld hinzugefügt oder nicht?
-        for i in range(maximal):
+        # Check whether the number of entries has changed
+        for i in range(maxLength):
              # wenn keine elemente mehr in lab dann lösche restlichen Eingabefelder
-            if (i > (len(labels)-1)):
-                self.delElement(len(labels))
+            if (i > (len(newLabels)-1)):
+                self.delElement(len(newLabels))
 
             # wenn in lab noch elemnete aber keine mehr in labels =>Einfügen    
             elif (i > (len(self.labels)-1)):
-                self.addElement(i,labels[i],defaults[i])
+                self.addElement(i,newLabels[i],newDefaults[i])
 
             else:
-                #wenn sich der Name des Labels ändert, defäult wert in Line Edit
-                if (self.labels[i]!=labels[i]):  
-                    
-                    self.qlabels[i].setText(labels[i])
-                    self.labels[i]=labels[i]
-                    self.default_werte[i]=defaults[i]
-                    self.textfield[i].setText(str(defaults[i]))
-                    #wenn sich name des Labels nicht ändert, mache nichts
+                # when label has changed, update it and the default value
+                if (self.labels[i]!=newLabels[i]):     
+                    self.qlabel[i].setText(newLabels[i])
+                    self.labels[i] = newLabels[i]
+                    self.defaults[i] = newDefaults[i]
+                    self.qlineedit[i].setText(str(newDefaults[i]))
     
-        self.setLayout(self.layout)
+        self.setLayout(self.WVLayout) # needed?
         
     def delElement(self,i):
         """
-        Element with position i is deleted (qlabel and textfield)
+        Element with position i is deleted (qlabel and qlineedit)
         """
-        self.layout.removeWidget(self.qlabels[i])
-        self.layout.removeWidget(self.textfield[i])
-        self.qlabels[i].deleteLater()
+        self.layout.removeWidget(self.qlabel[i])
+        self.layout.removeWidget(self.qlineedit[i])
+        self.qlabel[i].deleteLater()
         del self.labels[i]
-        del self.default_werte[i]
-        del self.qlabels[i]
-        self.textfield[i].deleteLater()
-        del self.textfield[i]  
+        del self.defaults[i]
+        del self.qlabel[i]
+        self.qlineedit[i].deleteLater()
+        del self.qlineedit[i]  
         
     def addElement(self, i, new_label, new_default): 
         """
-        Element with position i is appended (qlabel und textfield)
+        Element with position i is appended (qlabel und qlineedit)
         """
-        self.qlabels.append(QtGui.QLabel(self))
+        self.qlabel.append(QtGui.QLabel(self))
         self.labels.append(new_label)
-        self.default_werte.append(new_default)
-        self.textfield.append(QtGui.QLineEdit(str (new_default)))
-        self.qlabels[i].setText(new_label)
-        self.layout.addWidget(self.qlabels[i],(i+1),0)
-        self.layout.addWidget(self.textfield[i],(i+1),1)
+        self.defaults.append(new_default)
+        self.qlineedit.append(QtGui.QLineEdit(str (new_default)))
+        self.qlabel[i].setText(new_label)
+        self.layout.addWidget(self.qlabel[i],(i+1),0)
+        self.layout.addWidget(self.qlineedit[i],(i+1),1)
       
     def get(self):
         """
         Return parameters as dict
         """
-        dic={"Einheit"+self.spec:str(self.combo_units.currentText())}
+
+        dic = {}
         i=0
-        while (i<len(self.labels)):
-            dic.update({self.labels[i]:float(self.textfield[i].text())})
-            i=i+1
+        for i in range(len(self.labels)):
+            dic.update({self.labels[i]:float(self.qlineedit[i].text())})
 
         if self.DEBUG: 
             print("--- UnitBox.get() ---") 
@@ -136,7 +155,7 @@ class UnitBox(QtGui.QWidget):
 #        dic={}
 #        i=0
 #        while (i < len(self.labels)):
-#            dic.update({self.labels[i]:float(self.textfield[i].text())})
+#            dic.update({self.labels[i]:float(self.qlineedit[i].text())})
 #            i=i+1
 #        return dic
         
@@ -144,15 +163,16 @@ class UnitBox(QtGui.QWidget):
 #------------------------------------------------------------------------------ 
     
 if __name__ == '__main__':
-    unit=['bf','bf','bf',]
+    units=['ab','cd','ef',]
     lab=['a','b','c',]
-    default=[4,5,6]
+    defaults=[4,5,6]
     app = QtGui.QApplication(sys.argv)
-    form=UnitBox(unit,lab,default,"TEST")
-    form.set(['a','b','c','d'],[1,2,3,10])
-    form.set(['d','b','a'],[1,2,3])
-    i=form.get()
-    print i
+    form=UnitBox(title = "hallo", units = units, labels = lab, defaults=defaults)#, spec="TEST")
+
+    form.set(title = "Hallo", newLabels = ['a','b','c','d'], newDefaults = [1,2,3,10])
+    form.set(newLabels = ['d','b','a'], newDefaults = [1,2,3])
+
+    print form.get()
     form.show()
    
     app.exec_()
