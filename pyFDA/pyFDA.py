@@ -6,7 +6,7 @@ Created on Tue Nov 26 10:57:30 2013
 
 Main file for the pyFDA app, initializes UI
 """
-
+from __future__ import print_function, division
 import sys
 from PyQt4 import QtGui
 #from PyQt4.QtCore import SIGNAL
@@ -31,10 +31,7 @@ class pyFDA(QtGui.QWidget):
         self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
                                     commentCh = '#', DEBUG = DEBUG) # 
         
-#        db.gD['zpk'] = ([1], 0, 0.5)
         # initialize filter coefficients b, a :
-#        db.gD['coeffs'] = [db.gD['zpk'][2]*np.poly(db.gD['zpk'][0]), 
-#                                       np.poly(db.gD['zpk'][1])]
         #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
 
 #        self.myFilter = cheby1.cheby1()
@@ -74,8 +71,8 @@ class pyFDA(QtGui.QWidget):
             hbox.addWidget(self.pltAll) 
         self.setLayout(hbox)
 #        self.setLayout(self.layout1)
+        
         # ============== Signals & Slots ================================
-
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.butExportML.clicked.connect(self.exportML)
         self.butExportCSV.clicked.connect(self.exportCSV)        
@@ -89,12 +86,14 @@ class pyFDA(QtGui.QWidget):
             print("--- pyFDA.py : startDesignFilter ---")
             print('Params:', params)
             print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm'])
-        # create filter object (base class)    
+        # create filter object instance from design method (e.g. 'cheby1'):   
         self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
-        # Now design the filter by passing params to the filter instance ...
+        # Now transform the response type (e.g. 'LP') into the instance method
+        # (e.g. cheby1.LP) and
+        # design the filter by passing params to the method:
         getattr(self.myFilter, db.gD['curFilter']['rt'])(params)
         
-        # ... and reading back filter coefficients and (zeroes, poles, k):
+        # Read back filter coefficients and (zeroes, poles, k):
         db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
         if np.ndim(self.myFilter.coeffs) == 1:  # FIR filter: only b coeffs
             db.gD['coeffs'] = (self.myFilter.coeffs, [1]) # add dummy a = [1]

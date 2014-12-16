@@ -4,6 +4,7 @@ Created on Mon Nov 24 10:00:14 2014
 
 @author: Michael Winkler, Christian Münker
 """
+from __future__ import print_function, division
 import os
 import databroker as db
 
@@ -44,28 +45,26 @@ class FilterFileReader(object):
         self.DEBUG = DEBUG
         self.cwd = os.path.dirname(os.path.abspath(__file__))
         
-        db.gD['initFileNames'] = self.readInitFile(self.initDirFile, commentCh)
-        
-#        print("!!!", db.gD['initFileNames'])
-        
+        db.gD['initFileNames'] = self.readInitFile()
+        # Import all available filter modules
+#        self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
+
         self.readAllFilterObjects()
         
 #==============================================================================
-    def readInitFile(self, initFile, commentCh):
+    def readInitFile(self):
         """
-        Extract all file names = class names from initFile:
+        Extract all file names = class names from self.initDirFile:
         - Lines that don't begin with commentCh are stripped from Newline 
-          character, whitespace, '.py' and everything after it and written
-          to gD["initFileNames"][].
-        - Lines starting with commentCh are stripped off of Newline, 
-          whitespace and commentCh and written to gD["initFileComments"][]
+          character, whitespace, '.py' and everything after it and returned as
+          a list.
+        - Lines starting with self.commentChar are stripped of newline, 
+          whitespace and comment chars and written to list 'initFileComments'
         - All other lines are discarded (for now)
 
         Parameters
         ----------
-        initFile: String containing name of init file
-        
-        commentCh: Character defining a comment line
+        None
         
         Returns
         -------
@@ -74,13 +73,10 @@ class FilterFileReader(object):
 
         initFileComments = [] # comment lines from initFile
         initFileNames = [] # Filenames found in initFile without .py
-
- 
-        initFileCwd = self.cwd + "/" + initFile
         
         try:
-            # Try to open the initFile in read mode
-            fp = open(initFileCwd,'r', 1) # 1 = line buffered
+            # Try to open the initFile in read mode:
+            fp = open(self.initDirFile,'r', 1) # 1 = line buffered
             curLine = fp.readline()
             
             while curLine: # read until currentLine is empty (EOF reached)
@@ -89,12 +85,12 @@ class FilterFileReader(object):
                 # Only process line if it is longer than 1 character
                 if len(curLine) > 1:
                     # Does current line begin with the comment character?
-                    if(curLine[0] == commentCh): 
+                    if(curLine[0] == self.commentChar): 
                         # yes, append line to list initFileComments :
                             initFileComments.append((curLine[1:])) 
                     # No, this is not a comment line
                     else:
-                        # Is '.py' contained in curLine?
+                        # Is '.py' contained in curLine? Starting at which pos?
                         suffixPos = curLine.find(".py")
                         if(suffixPos > 0):
                             # Yes, strip '.py' and all characters after, 
@@ -105,7 +101,7 @@ class FilterFileReader(object):
                 curLine = fp.readline() # read next line
             
         except IOError as e:
-            print("Init file named\n{0} could not be found.".format(initFileCwd))
+            print("Init file\n{0} could not be found.".format(self.initDirFile))
             if self.DEBUG: 
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
@@ -123,26 +119,28 @@ class FilterFileReader(object):
         """
 
         db.gD["filterObjects"] = []
-        # parse the initFile.py, giving back one list with the lines containing
-        # python files and one with comment lines:  
-                                                
+                    
         self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
 
-        for line in db.gD['importNames']:                
+        for line in db.gD['importedFiles']:                
                 db.gD["filterObjects"].append(self.objectWizzard(line))
 
-        print("filterObjects:", db.gD["filterObjects"])
+        if self.DEBUG:
+            print("--- FilterFileReader.readAllFilterObjects ---")
+            print("filterObjects:", db.gD["filterObjects"])
 
 
 #==============================================================================
     def dynamicImport(self, pyPackage, pyNames):
         """
-        dynamicImport tries to import all modules / classes given in 'pyNames'
-        from python files in 'package' (= subdirectory with __init__.py).
+        Tries to import all modules / classes in 'pyNames' from 
+        'pyPackage' (= subdirectory with __init__.py).
         
-        Hat der Import funktioniert, wird der Klassenname(= Filename) in
-        db.gD["importNames"] abgelegt. Das Modul mit vollständigem Namen 
-        (e.g. ' filterDesign.cheby1') wird in  db.gD["importModules"] abgespeichert,
+        The class name (= file name without .py) is appended to        
+        db.gD["importedFiles"] for each successful import. The module with full
+        name (e.g. ' filterDesign.cheby1') is appended to 
+        db.gD["importedModules"].
+        
         
         Parameters
         ----------
@@ -159,14 +157,15 @@ class FilterFileReader(object):
         -------
         
         None:
-            dynamicImport creates the following lists in databroker.py
+            dynamicImport creates the following lists in databroker.py, 
+            containing after SUCCESSFUL imports 
             
-            db.gD['importModules'] : contains actual imported Modules
-            db.gD['importNames'] : contains class names = file names without .py 
+            db.gD['importedModules'] : full module names
+            db.gD['importedFiles'] :  file names without .py (= class names)
  
         """
-        db.gD['importNames'] = [] # names of imported files (without .py)
-        db.gD['importModules'] = [] # actual imported modules (with path)
+        db.gD['importedFiles'] = [] 
+        db.gD['importedModules'] = [] 
 
         if self.DEBUG:
             print('--- dynamicImport ---')
@@ -175,12 +174,12 @@ class FilterFileReader(object):
         for pyName in pyNames:
             try:
                 # Try to import the module from the subDirectory (= package)
-                db.gD['importModules'].append(__import__
+                db.gD['importedModules'].append(__import__
                                     (pyPackage + '.' + pyName, fromlist=['']))
   
                 # when successful, add the filename without '.py' to
-                # the list importNames:
-                db.gD['importNames'].append(pyName)
+                # the list importedFiles:
+                db.gD['importedFiles'].append(pyName)
                 
             except ImportError:
                 if self.DEBUG: 
@@ -208,10 +207,10 @@ class FilterFileReader(object):
         inst = None
         if self.DEBUG:
             print('--- ObjectWizzard ---')
-            print('importNames:', db.gD['importNames'])
-            print('importModules:', db.gD['importModules'])
+            print('importedFiles:', db.gD['importedFiles'])
+            print('importedModules:', db.gD['importedModules'])
         # iterate over both lists at the same time by "zipping" the lists           
-        for name, module in zip(db.gD['importNames'], db.gD['importModules']):
+        for name, module in zip(db.gD['importedFiles'], db.gD['importedModules']):
             if name == objectType:
                 # create object instance by getting a named attribute <name> 
                 # from the object given in module
