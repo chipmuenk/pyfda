@@ -40,17 +40,17 @@ class cheby1(object):
 
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'ord' : 'N'}
         self.prop = {'name':'Chebychev 1', 'ft':'IIR'}
-        self.filt = {\
+        self.rt = {
           "BP": {"ord":['N', 'A_pb', 'F_pb', 'F_pb2'],
                  "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},
           "BS": {"ord":['A_pb','F_pb','F_pb2'],
-                 "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2'] },
+                 "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},
           "LP": {"ord":['N', 'A_pb', 'F_pb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']},
           "HP": {"ord":['N', 'A_pb', 'F_pb'],
-                 "min":['A_pb','A_sb','F_pb','F_sb']},           
-                   }
-        print(self.filt["LP"]["ord"])
+                 "min":['A_pb','A_sb','F_pb','F_sb']}
+                 }
+        print(self.rt["LP"]["ord"])
 
         self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
         Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im PB \
