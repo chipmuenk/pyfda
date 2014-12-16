@@ -17,7 +17,7 @@ class FilterFileReader(object):
 #==============================================================================
 #Funktion __init__    
 #==============================================================================
-    def __init__(self, initFile, directory, commentCh = '#', DEBUG = False):
+    def __init__(self, initFile, directory, commentChar = '#', DEBUG = False):
         """
         FilterFileReader liest das Init.txt File des pyFDA-tools aus,
         importiert die in dem InitFile stehenden PythonFiles und gibt jeweils ein
@@ -28,35 +28,34 @@ class FilterFileReader(object):
         Parameters
         ----------
 
-        Directory:
+        directory:
             Name of the subdirectory containing the init-file and the 
-            Python files to be read
+            Python files to be read, needs to have __init__.py)
             
-        FileName:
+        fileName:
             Name of the init file
             
-        commentCh:
+        commentChar: char
             comment character at the beginning of a comment line
             
-        Debug:
+        DEBUG: Boolean
             True/False, for printing verbose debug messages
         """
-        
-        self.subDirectory = directory #(= package, needs to have __init__.py)
-        self.initDirFile = directory + "/" + initFile  
-        self.commentChar = commentCh
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        self.initDirFile = os.path.abspath(cwd+'/'+directory+"/"+ initFile)
+        print(self.initDirFile)
         self.DEBUG = DEBUG
-        self.cwd = os.path.dirname(os.path.abspath(__file__))
+
 
         # Scan initFile for python file names and extract them
-        db.gD['initFileNames'] = self.readInitFile()
+        db.gD['initFileNames'] = self.readInitFile(commentChar)
         # Try to import all filter modules in initFileNames:
-        self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
+        self.dynamicImport(directory, db.gD['initFileNames'])
         self.buildDesignTree()
 
         
 #==============================================================================
-    def readInitFile(self):
+    def readInitFile(self, commentChar = '#'):
         """
         Extract all file names = class names from self.initDirFile:
         - Lines that don't begin with commentCh are stripped from Newline 
@@ -89,7 +88,7 @@ class FilterFileReader(object):
                 # Only process line if it is longer than 1 character
                 if len(curLine) > 1:
                     # Does current line begin with the comment character?
-                    if(curLine[0] == self.commentChar): 
+                    if(curLine[0] == commentChar): 
                         # yes, append line to list initFileComments :
                             initFileComments.append((curLine[1:])) 
                     # No, this is not a comment line
@@ -105,7 +104,8 @@ class FilterFileReader(object):
                 curLine = fp.readline() # read next line
             
         except IOError as e:
-            print("Init file\n{0} could not be found.".format(self.initDirFile))
+            print('--- FilterFileReader.readInitFile ---')
+            print("Init file {0} could not be found.".format(self.initDirFile))
             if self.DEBUG: 
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
@@ -232,7 +232,8 @@ class FilterFileReader(object):
         designTree = {}
         for name in db.gD['importedFiles']:
             myFilter = self.objectWizzard(name)
-        designTree = myFilter.prop
+            designTree.update({name:myFilter.rt})
+        print("designTree = ", designTree)
             
             
             
