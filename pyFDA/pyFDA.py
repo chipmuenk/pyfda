@@ -29,7 +29,7 @@ class pyFDA(QtGui.QWidget):
         super(pyFDA, self).__init__()
         # read directory with filterDesigns and construct filter tree from it
         self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
-                                    commentCh = '#', DEBUG = DEBUG) # 
+                                    commentChar = '#', DEBUG = DEBUG) # 
         
         # initialize filter coefficients b, a :
         #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
