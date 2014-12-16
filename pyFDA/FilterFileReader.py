@@ -5,12 +5,15 @@ Created on Mon Nov 24 10:00:14 2014
 @author: Michael Winkler, Christian Münker
 """
 from __future__ import print_function, division
-import os
+import os, sys
 import databroker as db
+
+
+# TODO: extract module name in dynamicImport via dict lookup, not iteration
+# TODO: need to delete unused imports from memory? 
 
 class FilterFileReader(object):
     
-
 #==============================================================================
 #Funktion __init__    
 #==============================================================================
@@ -44,12 +47,13 @@ class FilterFileReader(object):
         self.commentChar = commentCh
         self.DEBUG = DEBUG
         self.cwd = os.path.dirname(os.path.abspath(__file__))
-        
-        db.gD['initFileNames'] = self.readInitFile()
-        # Import all available filter modules
-#        self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
 
-        self.readAllFilterObjects()
+        # Scan initFile for python file names and extract them
+        db.gD['initFileNames'] = self.readInitFile()
+        # Try to import all filter modules in initFileNames:
+        self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
+        self.buildDesignTree()
+
         
 #==============================================================================
     def readInitFile(self):
@@ -110,30 +114,9 @@ class FilterFileReader(object):
         return initFileNames
 
 #==============================================================================
-    def readAllFilterObjects(self):
-        """
-        readAllFilterObjects liefert alle verfügbaren FilterObjekte zurück.
-        Wichtig: readAllFilterObjects wertet beim Aufruf das Init.txt File aus,
-        somit können Filter.py Files "on the flight" ohne Neustart 
-        ausgetauscht/erweitert werden.
-        """
-
-        db.gD["filterObjects"] = []
-                    
-        self.dynamicImport(self.subDirectory, db.gD['initFileNames'])
-
-        for line in db.gD['importedFiles']:                
-                db.gD["filterObjects"].append(self.objectWizzard(line))
-
-        if self.DEBUG:
-            print("--- FilterFileReader.readAllFilterObjects ---")
-            print("filterObjects:", db.gD["filterObjects"])
-
-
-#==============================================================================
     def dynamicImport(self, pyPackage, pyNames):
         """
-        Tries to import all modules / classes in 'pyNames' from 
+        Try to import all modules / classes in 'pyNames' from 
         'pyPackage' (= subdirectory with __init__.py).
         
         The class name (= file name without .py) is appended to        
@@ -158,17 +141,20 @@ class FilterFileReader(object):
         
         None:
             dynamicImport creates the following lists in databroker.py, 
-            containing after SUCCESSFUL imports 
-            
-            db.gD['importedModules'] : full module names
-            db.gD['importedFiles'] :  file names without .py (= class names)
- 
+            containing - for SUCCESSFUL imports -
+
+            - file names without .py (= class names), e.g. 'cheby1' in
+                db.gD['importedFiles']
+                
+            - full module names <module 'filterDesign.cheby1'> with path name in
+                db.gD['importedModules']
+
         """
         db.gD['importedFiles'] = [] 
         db.gD['importedModules'] = [] 
 
         if self.DEBUG:
-            print('--- dynamicImport ---')
+            print('--- FilterFileReader.dynamicImport ---')
             print('pyNames:', pyNames)      
         
         for pyName in pyNames:
@@ -181,17 +167,30 @@ class FilterFileReader(object):
                 # the list importedFiles:
                 db.gD['importedFiles'].append(pyName)
                 
+              #  Now, modules should be deleted from memory (?)
+#                setattr(pyPackage, pyName, None)
+#                del sys.modules[pyPackage.pyName]
+#                del pyName
+                
             except ImportError:
                 if self.DEBUG: 
                     print("Error in 'FilterFileReader.dynamicImport()':" )
                     print("Module '%s' could not be imported."%pyName) 
+                    
+#        db.gD["filterObjects"] = []
+#        for line in db.gD['importedFiles']:                
+#                db.gD["filterObjects"].append(self.objectWizzard(line))
+#
+#        if self.DEBUG:
+#            print("filterObjects:", db.gD["filterObjects"])
    
 #==============================================================================
     def objectWizzard(self, objectType):
         """
-        Try to create an object of type "objectType". 
-        ObjectWizzard kann nur Objekte erstellen, welche durch die Funktion dynamicImport
-        eingebunden wurden. Für das pyFDA-Tool sind dies z.B. die Filter-Files.
+        Try to create an instance of type "objectType". This is only possible 
+        when the corresponding module has been imported already, e.g. using
+        the function dynamicImport.
+
         E.g.  self.myFilter = fr.objectWizzard('cheby1')
         
         Parameters
@@ -223,10 +222,23 @@ class FilterFileReader(object):
             if self.DEBUG: 
                 print("Unknown object '{0}', could not be created,".format(objectType))
                 print("Class: FilterFileReader.objectWizzard\n")
-      
-           
+ 
 #==============================================================================
-#Debug Main
+    def buildDesignTree(self):
+        """
+        Read the info attribute from all filter objects and build a tree of 
+        all possible filter options from it
+        """
+        designTree = {}
+        for name in db.gD['importedFiles']:
+            myFilter = self.objectWizzard(name)
+        designTree = myFilter.prop
+            
+            
+            
+
+     
+
 #==============================================================================
 if __name__ == "__main__":
     #Für das Auslesen des InitFiles essentielle Angaben!
