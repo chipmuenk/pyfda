@@ -17,13 +17,11 @@ gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048
 
+#------------------------------------------------------------------------------
+# The following entries are created dynamically by FilterFileReader.__init__()
 # Lists for dynamic imports from filter design subdirectory
-gD['initFileComments'] = [] # comment lines from initFile
 gD['initFileNames'] = [] # Python file names found in initFile (without .py)
-gD['importModules'] = [] 
-# the actual modules for import, e.g. "<module 'filterDesign.cheby1' from 
-#'D:\Daten\design\python\git\pyFDA\pyFDA\filterDesign\cheby1.pyc'>
-gD['importNames'] = ['cheby2', 'equiripple'] # names of filter files / classes
+gD['imports'] = {} # dict with filter files / classes
 
 
 gD['coeffs'] = ([1,1,1],[3,0,2])
@@ -33,9 +31,10 @@ gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
 
 
 # Dictionary describing the available combinations of response types (rt), 
-# filter types (ft) and design methods (dm)
-# TODO: This has to be created automatically !!!
-gD['params'] = {\
+# filter types (ft) and design methods (dm). This dict is overwritten by 
+# FilterFileReader.buildFilterTree() !
+
+gD['filterTree'] = {\
     "BP":\
         {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
          "FIR": ["equiripple", "firls", "window"]},
