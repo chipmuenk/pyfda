@@ -39,9 +39,9 @@ class SelectFilter(QtGui.QWidget):
         Initialize UI with comboboxes for selecting filter
         """
 #-----------------------------------------------------------------------------
-#        Example for structure and content of "params" dictionary:
+#        Example for structure and content of "filterTree" dictionary:
 #-----------------------------------------------------------------------------
-#        gD['params'] = {\
+#        gD['filterTree'] = {\
 #        "LP":\
 #            {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
 #             "FIR": ['Equiripple','Least-squares','Window']},
@@ -57,13 +57,13 @@ class SelectFilter(QtGui.QWidget):
         # - comboResponseType for selecting response type rt (LP, HP, ...)
 		# - comboFilterType for selection of filter type (IIR, FIR, ...)
 		# - comboDesignMethod for selection of design method (Chebychev, ...)
-		# and populate them from the "params" dict either directly or by
+		# and populate them from the "filterTree" dict either directly or by
 		# calling setResponseType() :
         self.comboResponseType=QtGui.QComboBox(self)
         self.comboFilterType=QtGui.QComboBox(self)
         self.comboDesignMethod=QtGui.QComboBox(self)
         
-        for rt in db.gD["params"]:
+        for rt in db.gD["filterTree"]:
             self.comboResponseType.addItem(db.gD["rtNames"][rt], rt)
         self.comboResponseType.setCurrentIndex(2) # set initial index
         self.setResponseType()
@@ -98,11 +98,11 @@ class SelectFilter(QtGui.QWidget):
 #        self.rt = str(self.comboResponseType.currentText())
         db.gD["curFilter"]["rt"] = self.rt # abbreviation
 #        rt=db.gD["rtNames"][self.rt] # full text
-#        print(db.gD["params"][self.rt].keys())
+#        print(db.gD["filterTree"][self.rt].keys())
         # 
         self.comboFilterType.clear() 
         self.comboFilterType.addItems(
-            db.gD["params"][self.rt].keys())
+            db.gD["filterTree"][self.rt].keys())
         self.setFilterType()
         
     def setFilterType(self):
@@ -114,7 +114,7 @@ class SelectFilter(QtGui.QWidget):
         self.ft = str(self.comboFilterType.currentText())
         self.comboDesignMethod.clear()  
 
-        for dm in db.gD["params"][self.rt][self.ft]:
+        for dm in db.gD["filterTree"][self.rt][self.ft]:
             self.comboDesignMethod.addItem(db.gD["dmNames"][dm], dm)
 
         db.gD['curFilter']["ft"] = self.ft
