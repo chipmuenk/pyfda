@@ -58,10 +58,10 @@ class ChooseParams(QtGui.QFrame):
            ['cheby1','HP',['Fs','F_pb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
            ['cheby1','BP',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
            ['cheby1','BS',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
-           ['cheby2','LP',['Fs','F_pb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pb","A_sb"],[1,80]], ""],
-           ['cheby2','HP',['Fs','F_pb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pb","A_sb"],[1,80]], ""],
-           ['cheby2','BP',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb","A_pb","A_sb2"],[60,1,80]], ""],
-           ['cheby2','BS',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb1","A_sb","A_pb2"],[5,60,1]], ""]
+           ['cheby2','LP',['Fs','F_sb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
+           ['cheby2','HP',['Fs','F_sb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
+           ['cheby2','BP',['Fs','F_sb','F_sb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
+           ['cheby2','BS',['Fs','F_sb','F_sb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""]
                                 )
         self.DEBUG = DEBUG                                              
         self.initUI()
