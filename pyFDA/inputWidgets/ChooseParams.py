@@ -102,18 +102,16 @@ class ChooseParams(QtGui.QFrame):
         self.fo = filterOrder.FilterOrder()
         self.fs = UnitBox.UnitBox(title = "Frequency Specifications",
                     units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
-                    labels = ['Fs', 'F_pb', 'F_sb'], 
-                    defaults = [48000,9600,12000])
+                    labels = ['Fs', 'F_pb', 'F_sb'])
         
         self.ms_amp = UnitBox.UnitBox(title = "Amplitude Specifications",
                                       units = ["dB","Squared"],
-                                      labels = ["A_pb","A_sb"],
-                                      defaults = [1,80])
+                                      labels = ["A_pb","A_sb"])
                                       
         self.ms_wgt = UnitBox.UnitBox(
                 title = "Weight Specifications",
                 units = "",
-                labels = ["W_pb","W_sb"], defaults = [1,1])
+                labels = ["W_pb","W_sb"])
         self.ms_last = "unit"
         
         self.ms_txt = QtGui.QLabel(self)
@@ -181,7 +179,7 @@ class ChooseParams(QtGui.QFrame):
         """
         Hilfsfunktion zur Aktualisierung des Frequenz-Widget und der FilterOrdnung
         """
-        self.fs.set(newLabels = liste, newDefaults = defaults)
+        self.fs.set(newLabels = liste)#, newDefaults = defaults)
         self.fo.chkMin.setEnabled(enMin)
 #        self.fo.chkManual.setChecked(checkMan)
         
@@ -196,7 +194,7 @@ class ChooseParams(QtGui.QFrame):
             self.ms_txt.setText(self.infoText)
             self.ms_txt.setVisible(True)
         if string == "unit" : # create subwidget with unit + label
-            self.ms_amp.set(newLabels = lstA_W_T[1], newDefaults = lstA_W_T[2])
+            self.ms_amp.set(newLabels = lstA_W_T[1])#, newDefaults = lstA_W_T[2])
             self.ms_amp.setVisible(True)
             self.ms_wgt.setVisible(False)
             self.ms_txt.setVisible(False)
