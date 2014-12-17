@@ -4,6 +4,7 @@
 
 cheby1.py
 equiripple.py
+cheby2.py
 .py
 a.py
 bla bla blubb ohne py
