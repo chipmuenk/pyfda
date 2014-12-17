@@ -39,7 +39,8 @@ class cheby1(object):
     def __init__(self):
 
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'ord' : 'N'}
-        self.prop = {'name':'Chebychev 1', 'ft':'IIR'}
+        self.name = {'cheby1':'Chebychev 1'}
+        self.ft = 'IIR'
         self.rt = {
           "BP": {"ord":['N', 'A_pb', 'F_pb', 'F_pb2'],
                  "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},

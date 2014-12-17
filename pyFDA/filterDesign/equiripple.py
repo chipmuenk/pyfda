@@ -31,7 +31,8 @@ class equiripple(object):
         self.zpk = [1, 0, 1]
         self.coeffs = [1, 1]
         
-        self.prop = {'name':'Equiripple', 'ft':'FIR'}
+        self.name = {'equiripple':'Equiripple'}
+        self.ft = 'FIR'
         self.rt = {
           "BP": {"ord":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
                         'W_pb', 'W_sb', 'W_sb2']},
@@ -45,8 +46,7 @@ class equiripple(object):
         self.info = "Equiripple-Filter haben im Passband und im Stopband \
         jeweils konstanten Ripple, sie nutzen das vorgegebene Toleranzband \
         jeweils voll aus."
-
-    def has(self):
+        
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS', 'DIFF', 'HIL'),
                     'ord' : 'N'}
 
