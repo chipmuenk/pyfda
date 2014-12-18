@@ -69,7 +69,7 @@ class UnitBox(QtGui.QWidget):
         # qlabels is a list with references to the QLabel widgets, 
         # qlineedit contains references to the QLineEdit widgets
 
-        # iterate over number of labels and fill         
+        # iterate over number of labels and fill in values        
         for i in range(len(self.labels)):        
            
             self.qlabel.append(QtGui.QLabel(self))
@@ -82,6 +82,7 @@ class UnitBox(QtGui.QWidget):
  
         self.WVLayout.addLayout(self.layout)
         self.setLayout(self.WVLayout)
+
 #-------------------------------------------------------------        
     def set(self, title = "", newLabels = []):
         """
@@ -135,18 +136,18 @@ class UnitBox(QtGui.QWidget):
         self.layout.addWidget(self.qlabel[i],(i+1),0)
         self.layout.addWidget(self.qlineedit[i],(i+1),1)
       
-    def get(self):
+    def update(self):
         """
-        Return parameters as dict
+        Update specification entries in dict db.gD["curSpecs"]
         """
-        dic = {}
         for i in range(len(self.labels)):
-            dic.update({self.labels[i]:float(self.qlineedit[i].text())})
+            db.gD["curSpecs"].update(
+                            {self.labels[i]:float(self.qlineedit[i].text())})
 
-        if self.DEBUG: 
-            print("--- UnitBox.get() ---") 
-            print(dic)
-        return dic
+#        if self.DEBUG: 
+#            print("--- UnitBox.get() ---") 
+#            print(dic)
+#        return dic
     
 #------------------------------------------------------------------------------ 
     

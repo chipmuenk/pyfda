@@ -99,7 +99,7 @@ class ChooseParams(QtGui.QFrame):
         """ 
 
         self.sf = SelectFilter.SelectFilter()
-        self.fo = filterOrder.FilterOrder()
+        self.fo = filterOrder.FilterOrder(defaults = db.gD["curSpecs"])
         self.fs = UnitBox.UnitBox(title = "Frequency Specifications",
                     units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
                     labels = ['Fs', 'F_pb', 'F_sb'])
@@ -127,17 +127,17 @@ class ChooseParams(QtGui.QFrame):
         """
         self.layout=QtGui.QGridLayout()
         self.layout.addWidget(self.sf,0,0)  # Design Method (IIR - ellip, ...)
-        self.layout.addWidget(self.fo,2,0)  # Filter Order
-        self.layout.addWidget(self.fs,3,0)  # Freq. Specifications
-        self.layout.addWidget(self.ms_wgt,4,0)   #       - value
-        self.layout.addWidget(self.ms_amp,5,0)   #       - amplitudes
-        self.layout.addWidget(self.ms_txt,6,0)  # Mag. Spec. - text
+        self.layout.addWidget(self.fo,1,0)  # Filter Order
+        self.layout.addWidget(self.fs,2,0)  # Freq. Specifications
+        self.layout.addWidget(self.ms_wgt,3,0)   #       - value
+        self.layout.addWidget(self.ms_amp,4,0)   #       - amplitudes
+        self.layout.addWidget(self.ms_txt,5,0)  # Mag. Spec. - text
         
         self.setLayout(self.layout)
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
         # Call chooseDesignMethod every time filter selection is changed: 
-        self.fo.chkMin.clicked.connect(self.rebuildMag)
+        self.fo.chkMin.clicked.connect(self.chooseDesignMethod)#rebuildMag)
         self.sf.comboResponseType.activated.connect(self.chooseDesignMethod)
         self.sf.comboFilterType.activated.connect(self.chooseDesignMethod)
         self.sf.comboDesignMethod.activated.connect(self.chooseDesignMethod)
@@ -196,27 +196,25 @@ class ChooseParams(QtGui.QFrame):
         if string == "unit" : # create subwidget with unit + label
             self.ms_amp.set(newLabels = lstA_W_T[1])#, newDefaults = lstA_W_T[2])
             self.ms_amp.setVisible(True)
-            self.ms_wgt.setVisible(False)
+            self.ms_wgt.setVisible(True)
             self.ms_txt.setVisible(False)
-#        if string == "val" :  # create subwidget with title, unit + label
-#            self.ms_val.set(title = lstA_W_T[0], newLabels = lstA_W_T[1], newDefaults = lstA_W_T[2])
-#            self.ms_val.setVisible(True)
-#            self.ms_txt.setVisible(False)
-#            self.ms_amp.setVisible(False)
-#            self.ms_last="val"
             
     def get(self):
         """
         Return a dict with the currently selected filter specifications 
         """
-        ret = {}
-        ret.update(self.fo.get()) # collect data from filter order widget
-        ret.update(self.fs.get()) # collect data from frequ. spec. widget
-        ret.update(self.ms_amp.get()) # magnitude specs with unit
-        ret.update(self.ms_wgt.get()) # magnitude specs with "all"
+#        ret = {}
+        db.gD["curSpecs"].update(self.fo.get()) # collect data from filter order widget
+#        db.gD["curSpecs"].update(self.fs.get()) # collect data from frequ. spec. widget
+#        db.gD["curSpecs"].update(self.ms_amp.get()) # magnitude specs with unit
+#        db.gD["curSpecs"].update(self.ms_wgt.get()) # weight specs
+        self.fs.update() # collect data from frequ. spec. widget
+        self.ms_amp.update() # magnitude specs with unit
+        self.ms_wgt.update() # weight specs
+        
             
-        if self.DEBUG: print(ret)
-        return ret  
+        if self.DEBUG: print(db.gD["curSpecs"])
+#        return self.params  
         
 #------------------------------------------------------------------------------ 
    
