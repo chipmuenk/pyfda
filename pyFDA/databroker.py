@@ -60,13 +60,13 @@ gD['dmNames'] = {#IIR
                   "equiripple":"Equiripple", "firls":"Least-Square",
                   "window":"Windowed"}
 
-# Dictionary containing current specifications and selections
-# TODO: This has to be created automatically !!! 
+# Dictionaries containing current filter selections specifications, they are
+# automatically overwritten by 
 #-------------------------------------- 
 # Current filter selection                 
 gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
 # Current filter specifications
-gD['curSpecs'] = {'N':10, 'Fs': 48000,
+gD['curSpecs'] = {'ord':'man','N':10, 'Fs': 48000,
             'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,
             'A_sb':60., 'A_sb2': 60, 'F_sb':0.2, 'F_sb2':0.3,
             'W_pb':1, 'W_pb2':1, 'W_sb':1, 'W_sb2':1}
