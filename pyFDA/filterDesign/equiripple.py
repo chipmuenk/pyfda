@@ -34,13 +34,13 @@ class equiripple(object):
         self.name = {'equiripple':'Equiripple'}
         self.ft = 'FIR'
         self.rt = {
-          "BP": {"ord":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
+          "BP": {"man":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
                         'W_pb', 'W_sb', 'W_sb2']},
-          "BS": {"ord":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
+          "BS": {"man":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
                         'W_pb', 'W_pb2', 'W_sb']},
-          "LP": {"ord":['N', 'A_pb', 'F_pb'],
+          "LP": {"man":['N', 'A_pb', 'F_pb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']},
-          "HP": {"ord":['N', 'A_pb', 'F_pb'],
+          "HP": {"man":['N', 'A_pb', 'F_pb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']},           
                    }
         self.info = "Equiripple-Filter haben im Passband und im Stopband \
@@ -48,7 +48,7 @@ class equiripple(object):
         jeweils voll aus."
         
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS', 'DIFF', 'HIL'),
-                    'ord' : 'N'}
+                    'ord' : 'man'}
 
     def LP(self, specs):
         self.needs = ('N', 'F_pb', 'F_sb', 'W_pb', 'W_sb')

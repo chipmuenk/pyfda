@@ -37,20 +37,20 @@ class cheby2(object):
     
     def __init__(self):
 
-        self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'ord' : 'N'}
+        self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'man' : 'N'}
         self.name = {'cheby2':'Chebychev 2'}
         self.ft = 'IIR'
         self.rt = {
-          "BP": {"ord":['N', 'A_sb', 'F_sb', 'F_sb2'],
+          "BP": {"man":['N', 'A_sb', 'F_sb', 'F_sb2'],
                  "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},
-          "BS": {"ord":['A_sb','F_sb','F_sb2'],
+          "BS": {"man":['A_sb','F_sb','F_sb2'],
                  "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},
-          "LP": {"ord":['N', 'A_sb', 'F_sb'],
+          "LP": {"man":['N', 'A_sb', 'F_sb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']},
-          "HP": {"ord":['N', 'A_sb', 'F_sb'],
+          "HP": {"man":['N', 'A_sb', 'F_sb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']}
                  }
-        print(self.rt["LP"]["ord"])
+        print(self.rt["LP"]["man"])
 
         self.info = "Chebychev Typ 2 Filter haben nur im Stopband Ripple. \
         Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im SB \

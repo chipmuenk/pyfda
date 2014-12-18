@@ -37,21 +37,20 @@ class cheby1(object):
     
     
     def __init__(self):
-
-        self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'ord' : 'N'}
+#        self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'man' : 'N'}
         self.name = {'cheby1':'Chebychev 1'}
         self.ft = 'IIR'
         self.rt = {
-          "BP": {"ord":['N', 'A_pb', 'F_pb', 'F_pb2'],
+          "BP": {"man":['N', 'A_pb', 'F_pb', 'F_pb2'],
                  "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},
-          "BS": {"ord":['A_pb','F_pb','F_pb2'],
+          "BS": {"man":['A_pb','F_pb','F_pb2'],
                  "min":['A_pb','A_sb','F_pb','F_pb2','F_sb','F_sb2']},
-          "LP": {"ord":['N', 'A_pb', 'F_pb'],
+          "LP": {"man":['N', 'A_pb', 'F_pb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']},
-          "HP": {"ord":['N', 'A_pb', 'F_pb'],
+          "HP": {"man":['N', 'A_pb', 'F_pb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']}
                  }
-        print(self.rt["LP"]["ord"])
+        print(self.rt["LP"]["man"])
 
         self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
         Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im PB \
@@ -59,13 +58,13 @@ class cheby1(object):
         den spezifizierten Wert fällt."
 
     def LP(self, specs):
-        self.needs = ('N', 'A_pb', 'F_pb')
+#        self.needs = ('N', 'A_pb', 'F_pb')
         self.zpk = sig.cheby1(specs['N'], specs['A_pb'], specs['F_pb'],
                               btype='low', analog = False, output = 'zpk')
         self.coeffs = zpk2ba(self.zpk)
 
     def HP(self, specs):
-        self.needs = ('N', 'A_pb', 'F_pb')
+#        self.needs = ('N', 'A_pb', 'F_pb')
         self.zpk = sig.cheby1(specs['N'], specs['A_pb'], specs['F_pb'], 
                               btype='highpass', analog = False, output = 'zpk')
         self.coeffs = zpk2ba(self.zpk)
@@ -79,7 +78,7 @@ class cheby1(object):
         self.coeffs = zpk2ba(self.zpk)
         
     def BS(self, specs):
-        self.needs = ('N', 'A_pb', 'F_pb', 'F_pb2')
+#        self.needs = ('N', 'A_pb', 'F_pb', 'F_pb2')
         self.zpk = sig.cheby1(specs['N'], specs['A_pb'],
                 [specs['F_pb'], specs['F_pb2']], btype='bandstop', 
                 analog = False, output = 'zpk')
@@ -87,12 +86,13 @@ class cheby1(object):
         
 class cheby1_min(object):
     def __init__(self):
-        self.zpk = [1, 0, 1]
-        self.coeffs = [1, 1]
+        pass
+#        self.zpk = [1, 0, 1]
+#        self.coeffs = [1, 1]
 
     def has(self):
         self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'),
-                    'ord' : 'min'}
+                    'man' : 'min'}
 
     # LP: F_pb < F_stop
     def LP(self, specs):
