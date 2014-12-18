@@ -47,7 +47,7 @@ class pyFDA(QtGui.QWidget):
         """
         # widget / subwindow for parameter selection
         self.widgetChooseParams = ChooseParams.ChooseParams() 
-        self.widgetChooseParams.setMaximumWidth(250)
+        self.widgetChooseParams.setMaximumWidth(280)
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.butExportML = QtGui.QPushButton("Export -> ML", self)
         self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
@@ -81,17 +81,17 @@ class pyFDA(QtGui.QWidget):
         """
         Design Filter
         """
-        params = self.widgetChooseParams.get() 
+        self.widgetChooseParams.get() # -> db.gD["curSpecs"] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
-            print('Params:', params)
+            print('Specs:', db.gD["curSpecs"])#params)
             print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm'])
         # create filter object instance from design method (e.g. 'cheby1'):   
         self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
         # Now transform the response type (e.g. 'LP') into the instance method
         # (e.g. cheby1.LP) and
-        # design the filter by passing params to the method:
-        getattr(self.myFilter, db.gD['curFilter']['rt'])(params)
+        # design the filter by passing current specs to the method:
+        getattr(self.myFilter, db.gD['curFilter']['rt'])(db.gD["curSpecs"])
         
         # Read back filter coefficients and (zeroes, poles, k):
         db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
