@@ -218,13 +218,14 @@ class FilterFileReader(object):
         filterTree = {}
         for dm in db.gD['imports']:           # iterate over designMethods 
             myFilter = self.objectWizzard(dm) # instantiate filter class
-            ft = myFilter.ft                  # extract filter type ('FIR')
+            ft = myFilter.ft                  # get filter type ('FIR')
             for rt in myFilter.rt:            # iterate over response types
                 if rt not in filterTree:      # is rt in dict already?
                     filterTree.update({rt:{}}) # no, create it
                 if ft not in filterTree[rt]:  # is ft already in dict[rt]?
-                    filterTree[rt].update({ft:[]}) # no, create it
-                filterTree[rt][ft].append(dm) # append dm to list dict[rt][ft]
+                    filterTree[rt].update({ft:{}}) # no, create it
+                filterTree[rt][ft].update({dm:{}}) # append dm to list dict[rt][ft]
+                filterTree[rt][ft][dm].update(myFilter.rt[rt]) # append fo dict
 
         if self.DEBUG: print("filterTree = ", filterTree)
         
@@ -234,6 +235,7 @@ class FilterFileReader(object):
 if __name__ == "__main__":
 
 #    import databroker as db
+    print("===== Initialize FilterReader ====")
     
     initFileName = "Init.txt"
     subDirectory = "filterDesign"
@@ -242,11 +244,11 @@ if __name__ == "__main__":
     
     # Create a new FilterFileReader instance & initialize it
     myFilterReader = FilterFileReader(initFileName, subDirectory, commentChar, Debug)
-    
-    for name in db.gD['importedFiles']:
+
+    print("\n===== Start Test ====")    
+    for name in db.gD['imports']:
         myFilter = myFilterReader.objectWizzard(name)
-        print(myFilter)
-        print("\n")
+        print('myFilter', myFilter)
     myFilterTree = myFilterReader.buildFilterTree()
     print('myFilterTree = ', myFilterTree)
     print(db.gD['imports'])
