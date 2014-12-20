@@ -151,9 +151,17 @@ class ChooseParams(QtGui.QFrame):
         as well.
         """
 
-        if self.DEBUG: 
-            print(db.gD["curFilter"])
-
+        if self.DEBUG:
+            print("=== chooseParams.chooseDesignMethod ===")
+            print("curFilter:", db.gD["curFilter"])
+        rt = db.gD["curFilter"]["rt"]
+        ft = db.gD["curFilter"]["ft"]
+        dm = db.gD["curFilter"]["dm"]
+        fo = db.gD["curFilter"]["fo"]
+        
+#        myFilt = db.gD['curFilter']['rt']
+        myLabels = db.gD['filterTree'][rt][ft][dm]#[fo]
+        print('myLabels:', myLabels)
         j=0
         found = False        
         while not found:

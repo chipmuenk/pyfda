@@ -126,8 +126,11 @@ class SelectFilter(QtGui.QWidget):
         Copy selected setting to self.dm # TODO: really needed? 
         """
         self.dmIdx = self.comboDesignMethod.currentIndex()
-        self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
-        db.gD["curFilter"]["dm"] = self.dm  
+        dm = str(self.comboDesignMethod.itemData(self.dmIdx))
+        db.gD["curFilter"]["dm"] = dm
+        db.gD["curFilter"].update({"fo":{}})
+        db.gD["curFilter"]["fo"] = db.gD["filterTree"][self.rt][self.ft][dm].keys()
+        print("curFilter:", db.gD["curFilter"])
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]        
 
