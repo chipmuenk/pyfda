@@ -17,40 +17,7 @@ gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048
 
-#------------------------------------------------------------------------------
-# The following entries are created dynamically by FilterFileReader.__init__()
-# Lists for dynamic imports from filter design subdirectory
-gD['initFileNames'] = [] # Python file names found in initFile (without .py)
-gD['imports'] = {} # dict with filter files / classes
-
-
-gD['coeffs'] = ([1,1,1],[3,0,2])
-gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
-            [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1)
-            
-
-
-# Dictionary describing the available combinations of response types (rt), 
-# filter types (ft) and design methods (dm). This dict is overwritten by 
-# FilterFileReader.buildFilterTree() !
-
-gD['filterTree'] = {\
-    "BP":\
-        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
-         "FIR": ["equiripple", "firls", "window"]},
-    "BS":\
-        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
-         "FIR": ["equiripple", "firls", "window"]},
-    "LP":\
-        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
-         "FIR": ["equiripple", "firls", "window"]},
-    "HP":\
-        {"IIR": ["butter", "cheby1", "cheby2", "ellip"],
-         "FIR": ["equiripple", "firls", "window"]},
-    "HIL":\
-        {"FIR": ["equiripple"]}
-         }
-# Dictionaries for translating short (initernal) names to full names
+# Dictionaries for translating short (internal) names to full (displayed) names
 gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
                  "BS":"Bandstop","HIL":"Hilbert"}
 gD['dmNames'] = {#IIR
@@ -60,16 +27,76 @@ gD['dmNames'] = {#IIR
                   "equiripple":"Equiripple", "firls":"Least-Square",
                   "window":"Windowed"}
 
+#==============================================================================
+# The following entries are created and updated dynamically during program 
+# execution. The entries only demonstrate the structure of the dicts and lists
+# or are used as initial / default entries.
+
+
+#  -----FilterFileReader.__init__() ------
+
+# Lists for dynamic imports from filter design subdirectory
+gD['initFileNames'] = [] # Python file names found in initFile (without .py)
+gD['imports'] = {} # dict with filter files / classes
+
+# Dictionary describing the available combinations of response types (rt), 
+# filter types (ft), design methods (dm) and filter order (fo). 
+# This dict is overwritten by FilterFileReader.buildFilterTree() !
+
+         
+gD['filterTree'] = {
+    'HP': 
+        {'FIR': 
+            {'equiripple': 
+                {'man': ['N', 'A_pb', 'F_pb'], 
+                 'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
+         'IIR':
+             {'cheby1': 
+                 {'man': ['N', 'A_pb', 'F_pb'], 
+                  'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}, 
+              'cheby2': 
+                  {'man': ['N', 'A_sb', 'F_sb'],
+                   'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}, 
+    'BP': 
+        {'FIR': 
+            {'equiripple': 
+                {'man': ['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2', 'W_pb', 'W_sb', 'W_sb2']}}, 
+         'IIR': 
+             {'cheby1': {'man': ['N', 'A_pb', 'F_pb', 'F_pb2'], 
+                         'min': ['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}, 
+              'cheby2': {'man': ['N', 'A_sb', 'F_sb', 'F_sb2'], 
+                         'min': ['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}}}, 
+    'LP': 
+        {'FIR': 
+            {'equiripple': 
+                {'man': ['N', 'A_pb', 'F_pb'], 
+                 'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
+         'IIR': 
+             {'cheby1': 
+                 {'man': ['N', 'A_pb', 'F_pb'], 
+                  'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}, 
+             'cheby2': {'man': ['N', 'A_sb', 'F_sb'], 
+                        'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}},
+    }
+
+
+
 # Dictionaries containing current filter selections specifications, they are
-# automatically overwritten by 
+# automatically overwritten 
 #-------------------------------------- 
 # Current filter selection                 
-gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple"}
+gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":["man","min"]}
 # Current filter specifications
 gD['curSpecs'] = {'ord':'man','N':10, 'Fs': 48000,
             'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,
             'A_sb':60., 'A_sb2': 60, 'F_sb':0.2, 'F_sb2':0.3,
             'W_pb':1, 'W_pb2':1, 'W_sb':1, 'W_sb2':1}
+
+gD['coeffs'] = ([1,1,1],[3,0,2])
+gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+            [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1)
+            
+
 
     
 
