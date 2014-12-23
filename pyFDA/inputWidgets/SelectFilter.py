@@ -30,8 +30,9 @@ class SelectFilter(QtGui.QWidget):
       - DesignMethod (Butterworth, ...)
     """
     
-    def __init__(self):
-        super(SelectFilter, self).__init__()        
+    def __init__(self, DEBUG = False):
+        super(SelectFilter, self).__init__()
+        self.DEBUG = DEBUG
         self.initUI()
         
         
@@ -40,18 +41,8 @@ class SelectFilter(QtGui.QWidget):
         Initialize UI with comboboxes for selecting filter
         """
 #-----------------------------------------------------------------------------
-#        Example for structure and content of "filterTree" dictionary:
+#        see filterBroker.py for structure and content of "filterTree" dict
 #-----------------------------------------------------------------------------
-#        gD['filterTree'] = {\
-#        "LP":\
-#            {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
-#             "FIR": ['Equiripple','Least-squares','Window']},
-#        "HP":\
-#            {"IIR": ["Butterworth","Chebychev 1", "Chebychev 2", "Elliptic"],
-#             "FIR": ['Equiripple','Least-squares','Window']},
-#        "HIL":\
-#            {"FIR": ['Equiripple']}
-#         }
 
         #----------------------------------------------------------------------
         # Create combo boxes 
@@ -96,7 +87,6 @@ class SelectFilter(QtGui.QWidget):
         self.rtIdx =self.comboResponseType.currentIndex()       
         self.rt = str(self.comboResponseType.itemData(self.rtIdx))
          
-#        self.rt = str(self.comboResponseType.currentText())
         db.gD["curFilter"]["rt"] = self.rt # abbreviation
 #        rt=db.gD["rtNames"][self.rt] # full text
 #        print(db.gD["filterTree"][self.rt].keys())
@@ -127,11 +117,19 @@ class SelectFilter(QtGui.QWidget):
         Copy selected setting to self.dm # TODO: really needed? 
         """
         self.dmIdx = self.comboDesignMethod.currentIndex()
-        dm = str(self.comboDesignMethod.itemData(self.dmIdx))
-        db.gD["curFilter"]["dm"] = dm
-        db.gD["curFilter"].update({"fo":{}})
-        db.gD["curFilter"]["fo"] = db.gD["filterTree"][self.rt][self.ft][dm].keys()
-        print("curFilter:", db.gD["curFilter"])
+        self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
+        db.gD["curFilter"]["dm"] = self.dm
+
+        # Check whether new design method also provides the old filter order 
+        # method. If yes, don't change curFilter, else set first available 
+        # filter method
+        if db.gD["curFilter"]["fo"] not in \
+                        db.gD["filterTree"][self.rt][self.ft][self.dm].keys():
+            db.gD["curFilter"].update({"fo":{}})
+            db.gD["curFilter"]["fo"] \
+                = db.gD["filterTree"][self.rt][self.ft][self.dm].keys()[0]
+        if self.DEBUG: print("curFilter:", db.gD["curFilter"])
+
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]        
 

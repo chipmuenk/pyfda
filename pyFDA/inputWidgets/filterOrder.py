@@ -6,8 +6,16 @@ Widget for selecting / entering manual or minimum filter order
 Datum:12.11.2013
 """
 from __future__ import print_function, division, unicode_literals
-import sys
+import sys, os
 from PyQt4 import QtGui
+
+# import databroker from one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__": 
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(__cwd__ + '/..')
+
+import databroker as db
 
 class FilterOrder(QtGui.QFrame):
     """
@@ -16,9 +24,8 @@ class FilterOrder(QtGui.QFrame):
     - minimum ('min') filter order
     """
     
-    def __init__(self, defaults = {'N':8, 'ord':'man'}):
+    def __init__(self, DEBUG = False):
         super(FilterOrder, self).__init__()        
-        self.defaults = defaults
         self.initUI()
 
         
@@ -30,16 +37,15 @@ class FilterOrder(QtGui.QFrame):
         bfont.setWeight(75)
         ifont.setItalic(True)
      
-#        self.chkManual = QtGui.QRadioButton("Specify Order",self)
         self.titleLabel = QtGui.QLabel("Filter Order")
         self.titleLabel.setFont(bfont)
         self.chkMin = QtGui.QRadioButton("Minimum",self)
-        self.chkMin.setChecked(self.defaults['ord']=='min') 
+        self.chkMin.setChecked(db.gD["curFilter"]['fo']=='min') 
         self.spacer = QtGui.QSpacerItem(40,0,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.txtLabel = QtGui.QLabel("N = ")
         self.txtLabel.setFont(ifont)
         
-        self.txtManual=QtGui.QLineEdit(str(self.defaults['N']),self)
+        self.txtManual=QtGui.QLineEdit(str(db.gD["curSpecs"]['N']),self)
  #       self.txtManual.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
 
         """
@@ -60,44 +66,38 @@ class FilterOrder(QtGui.QFrame):
         SIGNALS & SLOTs
         """
 #        self.chkManual.clicked.connect(self.enableTxt)
-        self.chkMin.clicked.connect(self.enableTxt)
-        self.txtManual.textChanged.connect(self.get)
+        self.chkMin.clicked.connect(self.update)
+        self.txtManual.textEdited.connect(self.update)
         
-        self.enableTxt() # initialize with default settings
+        self.update() # initialize with default settings
         
-    def enableTxt(self):
+    def update(self):
         """
         Text input is only possible wenn "Min" is unchecked
         """
-
+        ordn = int(self.txtManual.text())
+        db.gD["curSpecs"].update({"N" : ordn})
         if self.chkMin.isChecked() == True:
             self.txtManual.setEnabled(False)
             self.txtLabel.setEnabled(False)
+            db.gD["curFilter"].update({"fo" : "min"})
         else:
             self.txtManual.setEnabled(True)
             self.txtLabel.setEnabled(True)
+            db.gD["curFilter"].update({"fo" : "man"})
    
-    def get(self):
-         """
-         Return either the entered filter order and 'min'/'man' as dict
-         """
-         ordn = int(self.txtManual.text())
-         if self.chkMin.isChecked():
-             return {"ord" : "min", "N" : ordn}       
-         else:
-             return {"ord": "man", "N": ordn}
-
 #------------------------------------------------------------------------------        
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = FilterOrder()
     form.show()
-#    form.chkMin.setChecked(True)
-    t=form.get()
-    print(t)
-#    form.chkMin.setChecked(False)
-    t=form.get()
-    print(t)
+    form.chkMin.setChecked(True)
+    form.update()
+    print(db.gD["curFilter"]["fo"])
+    form.chkMin.setChecked(False)
+    form.update()
+    print(db.gD["curFilter"]["fo"])
+
     app.exec_()
 
 

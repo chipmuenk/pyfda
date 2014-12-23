@@ -99,8 +99,8 @@ class ChooseParams(QtGui.QFrame):
 
         """ 
 
-        self.sf = SelectFilter.SelectFilter()
-        self.fo = filterOrder.FilterOrder(defaults = db.gD["curSpecs"])
+        self.sf = SelectFilter.SelectFilter(DEBUG = True)
+        self.fo = filterOrder.FilterOrder(DEBUG = False)
         self.fs = UnitBox.UnitBox(title = "Frequency Specifications",
                     units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
                     labels = ['fS', 'F_pb', 'F_sb'])
@@ -158,8 +158,7 @@ class ChooseParams(QtGui.QFrame):
         rt = db.gD["curFilter"]["rt"]
         ft = db.gD["curFilter"]["ft"]
         dm = db.gD["curFilter"]["dm"]
-        fo = db.gD["curFilter"]["fo"][1]
-#        print('fo:',fo)
+        fo = db.gD["curFilter"]["fo"]
         
 #        myFilt = db.gD['curFilter']['rt']
         myLabels = db.gD['filterTree'][rt][ft][dm][fo]
@@ -218,7 +217,7 @@ class ChooseParams(QtGui.QFrame):
         Return a dict with the currently selected filter specifications 
         """
 #        ret = {}
-        db.gD["curSpecs"].update(self.fo.get()) # collect data from filter order widget
+        db.gD["curFilter"]["fo"] # collect data from filter order widget
 #        db.gD["curSpecs"].update(self.fs.get()) # collect data from frequ. spec. widget
 #        db.gD["curSpecs"].update(self.ms_amp.get()) # magnitude specs with unit
 #        db.gD["curSpecs"].update(self.ms_wgt.get()) # weight specs
