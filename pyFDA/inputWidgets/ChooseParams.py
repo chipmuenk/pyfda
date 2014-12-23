@@ -5,6 +5,7 @@ Main Widget for entering filter specifications
 
 @author: beike, Christian Münker
 """
+from __future__ import print_function, division, unicode_literals
 import sys, os 
 from PyQt4 import QtGui
 
@@ -126,9 +127,9 @@ class ChooseParams(QtGui.QFrame):
         LAYOUT      
         """
         self.layout=QtGui.QGridLayout()
-        self.layout.addWidget(self.sf,0,0)  # Design Method (IIR - ellip, ...)
-        self.layout.addWidget(self.fo,1,0)  # Filter Order
-        self.layout.addWidget(self.fs,2,0)  # Freq. Specifications
+        self.layout.addWidget(self.sf,0,0)  # Design method (IIR - ellip, ...)
+        self.layout.addWidget(self.fo,1,0)  # Filter order
+        self.layout.addWidget(self.fs,2,0)  # Freq. specifications
         self.layout.addWidget(self.ms_wgt,3,0)   #       - value
         self.layout.addWidget(self.ms_amp,4,0)   #       - amplitudes
         self.layout.addWidget(self.ms_txt,5,0)  # Mag. Spec. - text
@@ -157,11 +158,16 @@ class ChooseParams(QtGui.QFrame):
         rt = db.gD["curFilter"]["rt"]
         ft = db.gD["curFilter"]["ft"]
         dm = db.gD["curFilter"]["dm"]
-        fo = db.gD["curFilter"]["fo"]
+        fo = db.gD["curFilter"]["fo"][1]
+#        print('fo:',fo)
         
 #        myFilt = db.gD['curFilter']['rt']
-        myLabels = db.gD['filterTree'][rt][ft][dm]#[fo]
+        myLabels = db.gD['filterTree'][rt][ft][dm][fo]
         print('myLabels:', myLabels)
+        freqLabels = [l for l in myLabels if l[0] == 'F']
+        ampLabels = [l for l in myLabels if l[0] == 'A']
+        weightLabels = [l for l in myLabels if l[0] == 'W']
+        
         j=0
         found = False        
         while not found:
@@ -185,15 +191,15 @@ class ChooseParams(QtGui.QFrame):
         
     def rebuildFrequFiltOrd(self,liste=[],defaults=[],enMin=True,checkMan=True):
         """
-        Hilfsfunktion zur Aktualisierung des Frequenz-Widget und der FilterOrdnung
+        Auxiliary function for updating frequency specifications and the 
+        frequency order widget
         """
         self.fs.set(newLabels = liste)#, newDefaults = defaults)
         self.fo.chkMin.setEnabled(enMin)
-#        self.fo.chkManual.setChecked(checkMan)
         
     def rebuildMag(self,string,lstA_W_T=[]):
         """
-        Hilfsfunktion zur Aktualisierung der Magnitude Specifications
+        Auxiliary function for updating magnitude specifications
         """
 
         if string == "txt":  # only Info-Text

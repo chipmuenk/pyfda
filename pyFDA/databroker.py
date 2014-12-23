@@ -10,7 +10,7 @@ http://pymotw.com/2/articles/data_persistence.html
 
 @author: Christian Muenker
 """
-
+from __future__ import print_function, division, unicode_literals
 # importing databroker runs the module once, defining all globals and variables
 global gD
 gD = {}
@@ -85,7 +85,7 @@ gD['filterTree'] = {
 # automatically overwritten 
 #-------------------------------------- 
 # Current filter selection                 
-gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":["man","min"]}
+gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man"}
 # Current filter specifications
 gD['curSpecs'] = {'ord':'man','N':10, 'fS': 48000,
             'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,
