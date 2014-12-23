@@ -3,6 +3,7 @@
 
 Edited by Christian Münker, 2013
 """
+from __future__ import print_function, division, unicode_literals 
 import sys, os
 # import EITHER PyQt4 OR PySide, depending on your system:
 from PyQt4 import QtGui #, QtCore  
@@ -33,17 +34,16 @@ class plotAll(QtGui.QWidget):
         tab_widget.addTab(self.pltHf, '|H(f)|')
         tab_widget.addTab(self.pltPhi, 'phi(f)')
         
-        butDraw = QtGui.QPushButton("&No Function")
+#        butDraw = QtGui.QPushButton("&No Function")
 #        butDraw.clicked.connect(self.redrawAll)
         
-        hbox = QtGui.QHBoxLayout()
-        hbox.addWidget(butDraw)
-        hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+#        hbox = QtGui.QHBoxLayout()
+#        hbox.addWidget(butDraw)
+#        hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(tab_widget)
-        vbox.addLayout(hbox)
-        
+#        
         self.setLayout(vbox)
 
         
