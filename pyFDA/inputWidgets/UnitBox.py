@@ -8,6 +8,7 @@ xxx
 Created on 18.11.2013
 Updated on Thur Dec 11 2014
 """
+from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
 
@@ -161,7 +162,7 @@ if __name__ == '__main__':
     form.set(title = "Hallo", newLabels = ['a','b','c','d'], newDefaults = [1,2,3,10])
     form.set(newLabels = ['d','b','a'], newDefaults = [1,2,3])
 
-    print form.get()
+    print(form.get())
     form.show()
    
     app.exec_()

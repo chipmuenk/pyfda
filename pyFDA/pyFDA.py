@@ -6,7 +6,7 @@ Created on Tue Nov 26 10:57:30 2013
 
 Main file for the pyFDA app, initializes UI
 """
-from __future__ import print_function, division
+from __future__ import print_function, division, unicode_literals
 import sys
 from PyQt4 import QtGui
 #from PyQt4.QtCore import SIGNAL

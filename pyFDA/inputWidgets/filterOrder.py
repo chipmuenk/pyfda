@@ -5,6 +5,7 @@ Widget for selecting / entering manual or minimum filter order
 @author: juliabeike
 Datum:12.11.2013
 """
+from __future__ import print_function, division, unicode_literals
 import sys
 from PyQt4 import QtGui
 
@@ -85,17 +86,18 @@ class FilterOrder(QtGui.QFrame):
              return {"ord" : "min", "N" : ordn}       
          else:
              return {"ord": "man", "N": ordn}
-         
+
+#------------------------------------------------------------------------------        
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = FilterOrder()
     form.show()
 #    form.chkMin.setChecked(True)
     t=form.get()
-    print t
+    print(t)
 #    form.chkMin.setChecked(False)
     t=form.get()
-    print t
+    print(t)
     app.exec_()
 
 

@@ -11,7 +11,7 @@ Zu erwartende Änderungen in scipy 0.15:
 https://github.com/scipy/scipy/pull/3717
 https://github.com/scipy/scipy/issues/2444
 """
-from __future__ import print_function, division
+from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 import numpy as np
 # import numpy as np

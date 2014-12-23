@@ -11,8 +11,11 @@ the labels and values,
 Created on 18.11.2013
 Updated on Mon Nov 10 2014
 """
+from __future__ import print_function, division, unicode_literals
 import sys
 from PyQt4 import QtGui
+
+Don't use - this file has been replaced by unitBox !
 
 class NumBox(QtGui.QWidget):
     

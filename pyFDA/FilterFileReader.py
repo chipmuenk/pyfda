@@ -4,8 +4,9 @@ Created on Mon Nov 24 10:00:14 2014
 
 @author: Michael Winkler, Christian Münker
 """
-from __future__ import print_function, division
+from __future__ import print_function, division#, unicode_literals
 import os, sys
+import codecs
 import databroker as db
 
 # TODO: need to delete unused imports from memory? 
@@ -80,11 +81,13 @@ class FilterFileReader(object):
         
         try:
             # Try to open the initFile in read mode:
-            fp = open(self.initDirFile,'r', 1) # 1 = line buffered
+ #           fp = open(self.initDirFile,'rU', 1) # 1 = line buffered
+            fp = codecs.open(self.initDirFile,'rU', encoding='utf-8')
             curLine = fp.readline()
             
             while curLine: # read until currentLine is empty (EOF reached)
                 # remove white space and Newline characters at beginning and end:
+#                curLine = curLine.encode('UTF-8')
                 curLine = curLine.strip(' \n')
                 # Only process line if it is longer than 1 character
                 if len(curLine) > 1:

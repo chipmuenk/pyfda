@@ -10,6 +10,7 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 @author: Julia Beike, Christian Münker
 Datum: 4.12.2014
 """
+from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
 
