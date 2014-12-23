@@ -102,7 +102,8 @@ class PlotHf(QtGui.QMainWindow):
                 A_DB_max = self.A_pb # 20*log10(1+del_DB)
             else: # IIR log
                 A_DB_max = 0
-            A_DB_min = -self.A_pb # 20*log10(1-del_DB)
+            A_DB_min = -self.A_pb
+            A_DB_minx = A_DB_min - 10# 20*log10(1-del_DB)
             A_sb = -self.A_sb
             A_sbx = A_sb - 10
         else:
@@ -111,6 +112,7 @@ class PlotHf(QtGui.QMainWindow):
             else:
                 A_DB_max = 1
             A_DB_min = 10**(-self.A_pb/20) #1 - del_DB
+            A_DB_minx = A_DB_min / 2
             A_sb = 10**(-self.A_sb/20)
             A_sbx = A_sb / 5
         
@@ -133,7 +135,7 @@ class PlotHf(QtGui.QMainWindow):
         if db.gD["curFilter"]["rt"] in {'LP', 'HP', 'BS'}:
             ax.plot([F_0, F_1],[A_DB_min, A_DB_min], 'b--') # PB
             ax.plot([F_0, F_2],[A_DB_max, A_DB_max], 'b--') # PB
-            ax.plot([F_1, F_1],[A_DB_min, A_DB_min-10],'b--')# PB limit
+            ax.plot([F_1, F_1],[A_DB_min, A_DB_minx],'b--')# PB limit
             ax.plot([F_2, F_2],[A_DB_max, A_sb],'b--') # SB limit
             
             if db.gD["curFilter"]["rt"] in {"LP", "HP"}:
@@ -143,12 +145,12 @@ class PlotHf(QtGui.QMainWindow):
                 ax.plot([F_3, F_3],[A_DB_max, A_sb],'b--') # limit SB
                 ax.plot([F_3, F_5],[A_DB_max, A_DB_max], 'b--') # PB  
                 ax.plot([F_4, F_5],[A_DB_min, A_DB_min], 'b--') # PB
-                ax.plot([F_4, F_4],[A_DB_min, A_DB_min-10],'b--')# lim. PB
+                ax.plot([F_4, F_4],[A_DB_min, A_DB_minx],'b--')# lim. PB
 
         if db.gD["curFilter"]["rt"] == "BP":
             ax.plot([0, F_1],[A_sb, A_sb], 'b--') # SB
             ax.plot([F_1, F_1],[A_sb, A_DB_max], 'b--') # SB
-            ax.plot([F_2, F_2],[A_sb-10, A_DB_min],'b--')# PB-limit
+            ax.plot([F_2, F_2],[A_sbx, A_DB_min],'b--')# PB-limit
             ax.plot([F_2, F_3],[A_DB_min, A_DB_min],'b--') # PB
             ax.plot([F_1, F_4],[A_DB_max, A_DB_max],'b--') # PB
             ax.plot([F_3, F_3],[A_sbx, A_DB_min],'b--') # PB
@@ -195,8 +197,8 @@ class PlotHf(QtGui.QMainWindow):
         if self.log:
             ax.plot(F,20*np.log10(abs(H)), lw = db.gD['rc']['lw'])
 
-            ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})| \;$'+
-                        r'$\mathrm{[dB]} \; \rightarrow $')
+            ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'+ ' in dB ' +
+                        r'$\rightarrow$')
 
         else: #  'lin'
             ax.plot(F,abs(H), lw = db.gD['rc']['lw'])
@@ -230,8 +232,8 @@ class PlotHf(QtGui.QMainWindow):
 
         else:
             try:
-                for ax in fig.axes:
-                    print(ax.label)
+#                for ax in fig.axes:
+#                    fig.delaxes(ax)
                 fig.delaxes(ax1)
             except UnboundLocalError:
                 pass
