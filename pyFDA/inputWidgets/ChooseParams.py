@@ -33,35 +33,35 @@ class ChooseParams(QtGui.QFrame):
 
         # "Properties" of all filter types:
         self.choose_design_list=(
-           ['firls','LP',['Fs','F_pb','F_sb'],[48000,9600,12000],False,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
-           ['firls','HP',['Fs','F_pb','F_sb'],[48000,9600,12000],False,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
-           ['firls','BP',['Fs','F_sb','F_pb','F_sb2','F_pb2'],[48000,7200,9600,12000,14400],False,True,"unit",[[], ["W_sb","W_pb","W_sb2"],[1,1,1]],"Enter a weight value for each band below"],
-           ['firls','BS',['Fs','F_pb','F_sb','F_pb2','F_sb2'],[48000,7200,9600,12000,14400],False,True,"unit",[[], ["W_pb","W_sb","W_pb2"],[1,1,1]], "Enter a weight value for each band below"],
-           ['equiripple','LP',['Fs','F_pb','F_sb'],[48000,9600,12000],True,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
-           ['equiripple','HIL',['Fs','F_pb','F_sb'],[48000,9600,12000],True,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
-           ['equiripple','HP',['Fs','F_pb','F_sb'],[48000,9600,12000],True,True,"unit",[[], ["W_pb","W_sb"],[1,1]], "Enter a weight value for each band below"],
-           ['equiripple','BP',['Fs','F_sb','F_pb','F_sb2','F_pb2'],[48000,7200,9600,12000,14400],True,True,"unit",[[], ["W_sb","W_pb","W_sb2"],[1,1,1]], "Enter a weight value for each band below"],
-           ['equiripple','BS',['Fs','F_pb','F_sb','F_pb2','F_sb2'],[48000,7200,9600,12000,14400],True,True,"unit",[[], ["W_pb","W_sb","W_pb2"],[1,1,1]], "Enter a weight value for each band below"],     
-           ['window','LP',['Fs','Fc'],[48000,10800],False,True,"txt","The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
-           ['window','HP',['Fs','Fc'],[48000,10800],False,True,"txt","The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
-           ['window','BP',['Fs','Fc1','Fc2'],[48000,8400,13200],False,True, "txt",[], "The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
-           ['window','BS',['Fs','Fc1','Fc2'],[48000,8400,13200],False,True,"txt", [], "The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"], 
-           ['butter','LP',['Fs','Fc'],[48000,10800],True,True,"txt",[], "The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
-           ['butter','HP',['Fs','Fc'],[48000,10800],True,True,"txt",[], "The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
-           ['butter','BP',['Fs','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
-           ['butter','BS',['Fs','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
-           ['ellip','LP',['Fs','F_pb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pb","A_sb"],[1,80]], ""],
-           ['ellip','HP',['Fs','F_pb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pb","A_sb"],[1,80]], ""],
-           ['ellip','BP',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb","A_pb","A_sb2"],[60,1,80]], ""],
-           ['ellip','BS',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb1","A_sb","A_pb2"],[5,60,1]], ""],
-           ['cheby1','LP',['Fs','F_pb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
-           ['cheby1','HP',['Fs','F_pb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
-           ['cheby1','BP',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
-           ['cheby1','BS',['Fs','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
-           ['cheby2','LP',['Fs','F_sb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
-           ['cheby2','HP',['Fs','F_sb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
-           ['cheby2','BP',['Fs','F_sb','F_sb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
-           ['cheby2','BS',['Fs','F_sb','F_sb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""]
+           ['firls','LP',['fS','F_pb','F_sb'],[48000,9600,12000],False,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
+           ['firls','HP',['fS','F_pb','F_sb'],[48000,9600,12000],False,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
+           ['firls','BP',['fS','F_sb','F_pb','F_sb2','F_pb2'],[48000,7200,9600,12000,14400],False,True,"unit",[[], ["W_sb","W_pb","W_sb2"],[1,1,1]],"Enter a weight value for each band below"],
+           ['firls','BS',['fS','F_pb','F_sb','F_pb2','F_sb2'],[48000,7200,9600,12000,14400],False,True,"unit",[[], ["W_pb","W_sb","W_pb2"],[1,1,1]], "Enter a weight value for each band below"],
+           ['equiripple','LP',['fS','F_pb','F_sb'],[48000,9600,12000],True,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
+           ['equiripple','HIL',['fS','F_pb','F_sb'],[48000,9600,12000],True,True,"unit",[[], ["W_pb","W_sb"],[1,1]],"Enter a weight value for each band below"],
+           ['equiripple','HP',['fS','F_pb','F_sb'],[48000,9600,12000],True,True,"unit",[[], ["W_pb","W_sb"],[1,1]], "Enter a weight value for each band below"],
+           ['equiripple','BP',['fS','F_sb','F_pb','F_sb2','F_pb2'],[48000,7200,9600,12000,14400],True,True,"unit",[[], ["W_sb","W_pb","W_sb2"],[1,1,1]], "Enter a weight value for each band below"],
+           ['equiripple','BS',['fS','F_pb','F_sb','F_pb2','F_sb2'],[48000,7200,9600,12000,14400],True,True,"unit",[[], ["W_pb","W_sb","W_pb2"],[1,1,1]], "Enter a weight value for each band below"],     
+           ['window','LP',['fS','Fc'],[48000,10800],False,True,"txt","The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
+           ['window','HP',['fS','Fc'],[48000,10800],False,True,"txt","The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
+           ['window','BP',['fS','Fc1','Fc2'],[48000,8400,13200],False,True, "txt",[], "The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"],
+           ['window','BS',['fS','Fc1','Fc2'],[48000,8400,13200],False,True,"txt", [], "The attenuation at cutoff frequencies is fixed at 6 dB (half the passband gain)"], 
+           ['butter','LP',['fS','Fc'],[48000,10800],True,True,"txt",[], "The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
+           ['butter','HP',['fS','Fc'],[48000,10800],True,True,"txt",[], "The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
+           ['butter','BP',['fS','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
+           ['butter','BS',['fS','Fc1','Fc2'],[48000,8400,13200],True,True,"txt","The attenuation at cutoff frequencies is fixed at 3 dB (half the passband power)"],
+           ['ellip','LP',['fS','F_pb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pb","A_sb"],[1,80]], ""],
+           ['ellip','HP',['fS','F_pb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pb","A_sb"],[1,80]], ""],
+           ['ellip','BP',['fS','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb","A_pb","A_sb2"],[60,1,80]], ""],
+           ['ellip','BS',['fS','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb1","A_sb","A_pb2"],[5,60,1]], ""],
+           ['cheby1','LP',['fS','F_pb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
+           ['cheby1','HP',['fS','F_pb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
+           ['cheby1','BP',['fS','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
+           ['cheby1','BS',['fS','F_pb','F_pb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_pb"],[1]], ""],
+           ['cheby2','LP',['fS','F_sb'],[48000,9600],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
+           ['cheby2','HP',['fS','F_sb'],[48000,14400],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
+           ['cheby2','BP',['fS','F_sb','F_sb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""],
+           ['cheby2','BS',['fS','F_sb','F_sb2'],[48000,9600,12000],True,True,"unit",[["dB","Squared"],["A_sb"],[60]], ""]
                                 )
         self.DEBUG = DEBUG                                              
         self.initUI()
@@ -102,7 +102,7 @@ class ChooseParams(QtGui.QFrame):
         self.fo = filterOrder.FilterOrder(defaults = db.gD["curSpecs"])
         self.fs = UnitBox.UnitBox(title = "Frequency Specifications",
                     units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
-                    labels = ['Fs', 'F_pb', 'F_sb'])
+                    labels = ['fS', 'F_pb', 'F_sb'])
         
         self.ms_amp = UnitBox.UnitBox(title = "Amplitude Specifications",
                                       units = ["dB","Squared"],
