@@ -113,7 +113,7 @@ class MplWidget(QtGui.QWidget):
         #
         self.dpi = 100
         self.fig = Figure(dpi=self.dpi,facecolor = '#FFFFFF')
-        self.ax = self.fig.add_subplot(111)
+        self.ax = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])# 
         
         self.pltCanv = FigureCanvas(self.fig)
         self.pltCanv.setSizePolicy(QSizePolicy.Expanding, 
@@ -149,7 +149,9 @@ class MplWidget(QtGui.QWidget):
         """
         Redraw the figure with new properties (grid, linewidth)
         """
-        self.ax.grid(self.mplToolbar.grid)
+#        self.ax.grid(self.mplToolbar.grid)
+        for ax in self.fig.axes:
+            ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
         self.fig.tight_layout(pad = 0.5)
         self.pltCanv.draw()
