@@ -19,13 +19,14 @@ import databroker as db
 
 class FilterOrder(QtGui.QFrame):
     """
-    Widget for selecting either 
+    Build and update widget for selecting either 
     - manual filter order, specified by an integer 
     - minimum ('min') filter order
     """
     
     def __init__(self, DEBUG = False):
-        super(FilterOrder, self).__init__()        
+        super(FilterOrder, self).__init__()
+        self.DEBUG = DEBUG        
         self.initUI()
 
         
@@ -36,21 +37,20 @@ class FilterOrder(QtGui.QFrame):
         bfont.setBold(True)
         bfont.setWeight(75)
         ifont.setItalic(True)
-     
+        # Print subwidget title
         self.titleLabel = QtGui.QLabel("Filter Order")
         self.titleLabel.setFont(bfont)
-        self.chkMin = QtGui.QRadioButton("Minimum",self)
-        self.chkMin.setChecked(db.gD["curFilter"]['fo']=='min') 
+
+        self.chkMin = QtGui.QRadioButton("Minimum",self)          
         self.spacer = QtGui.QSpacerItem(40,0,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.txtLabel = QtGui.QLabel("N = ")
         self.txtLabel.setFont(ifont)
-        
         self.txtManual=QtGui.QLineEdit(str(db.gD["curSpecs"]['N']),self)
  #       self.txtManual.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
 
-        """
-        LAYOUT 
-        """
+        #----------------------------------------------------------------------
+        # Construct widget layout
+
         vbox = QtGui.QHBoxLayout()
         vbox.addWidget(self.chkMin)
         vbox.addItem(self.spacer)
@@ -62,29 +62,57 @@ class FilterOrder(QtGui.QFrame):
         layout.addItem(vbox)
         self.setLayout(layout)
 
-        """
-        SIGNALS & SLOTs
-        """
-#        self.chkManual.clicked.connect(self.enableTxt)
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+
         self.chkMin.clicked.connect(self.update)
-        self.txtManual.textEdited.connect(self.update)
+        self.txtManual.editingFinished.connect(self.update)
         
         self.update() # initialize with default settings
         
     def update(self):
-        """
-        Text input is only possible wenn "Min" is unchecked
-        """
+        # read list of available filter order methods from filterTree:
+        foList = db.gD['filterTree'][db.gD['curFilter']['rt']]\
+                [db.gD['curFilter']['ft']][db.gD['curFilter']['dm']].keys()
+        if self.DEBUG: 
+            print("=== filterOrder.update() ===")            
+            print("foList", foList)
+
+        if db.gD["curFilter"]['fo'] in foList:
+            fo = db.gD["curFilter"]['fo'] # keep current setting
+        else:
+            fo = foList[0] # use first list entry from filterTree
+            db.gD["curFilter"]['fo'] = fo # and update "curFilter"
+
+        # Determine which subwidgets are __visible__
+        self.txtLabel.setVisible("man" in foList)
+        self.txtManual.setVisible("man" in foList)  
+        self.chkMin.setVisible("min" in foList)            
+
+        if self.DEBUG: print("fo[curFilt] =", fo)   
+
+        # Determine which subwidgets are enabled
+        if "min" in foList:
+            if self.chkMin.isChecked() == True:
+                # update if N has been changed outside this class
+                self.txtManual.setText(str(db.gD["curSpecs"]["N"])) 
+                self.txtManual.setEnabled(False)
+                self.txtLabel.setEnabled(False)
+                db.gD["curFilter"].update({"fo" : "min"})
+            else:
+                self.txtManual.setEnabled(True)
+                self.txtLabel.setEnabled(True)
+                db.gD["curFilter"].update({"fo" : "man"})
+        else:
+            self.txtLabel.setEnabled(fo == 'man')
+            self.txtManual.setEnabled(fo == 'man')
+
+#            self.chkMin.setVisible(True)
+#        else:
+#            self.chkMin.setVisible(False)
+
         ordn = int(self.txtManual.text())
         db.gD["curSpecs"].update({"N" : ordn})
-        if self.chkMin.isChecked() == True:
-            self.txtManual.setEnabled(False)
-            self.txtLabel.setEnabled(False)
-            db.gD["curFilter"].update({"fo" : "min"})
-        else:
-            self.txtManual.setEnabled(True)
-            self.txtLabel.setEnabled(True)
-            db.gD["curFilter"].update({"fo" : "man"})
    
 #------------------------------------------------------------------------------        
 if __name__ == '__main__':
