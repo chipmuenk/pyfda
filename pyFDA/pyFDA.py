@@ -88,8 +88,8 @@ class pyFDA(QtGui.QWidget):
             print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm'])
         # create filter object instance from design method (e.g. 'cheby1'):   
         self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
-        # Now transform the response type (e.g. 'LP') into the instance method
-        # (e.g. cheby1.LP) and
+        # Now construct the instance method from the response type (e.g.
+        # 'LP' -> cheby1.LP) and
         # design the filter by passing current specs to the method:
         getattr(self.myFilter, db.gD['curFilter']['rt'])(db.gD["curSpecs"])
         
