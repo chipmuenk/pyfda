@@ -35,7 +35,7 @@ class UnitBox(QtGui.QWidget):
         self.title = title
         
         self.spec = spec        
-        self.units = [str(u) for u in units]
+        self.units = [str(u) for u in units] # collect unit strings in list
         
         self.qlabel = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -90,9 +90,8 @@ class UnitBox(QtGui.QWidget):
         Set title, labels, defaults - when number of elements changes, the 
         layout has to be rebuilt
         """
-        print("Titel:",self.title)
+        if self.DEBUG: print("UnitBox.Titel:",self.title)
         if title != "":
-            print("Titel:",title)
             self.qtitle.setText(title) # new title
     
         # Check whether the number of entries has changed
@@ -157,7 +156,7 @@ if __name__ == '__main__':
     lab=['a','b','c',]
     defaults=[4,5,6]
     app = QtGui.QApplication(sys.argv)
-    form=UnitBox(title = "hallo", units = units, labels = lab, defaults=defaults)#, spec="TEST")
+    form=UnitBox(title = "hallo", units = units, labels = lab)#, spec="TEST")
 
     form.set(title = "Hallo", newLabels = ['a','b','c','d'], newDefaults = [1,2,3,10])
     form.set(newLabels = ['d','b','a'], newDefaults = [1,2,3])

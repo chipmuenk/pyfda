@@ -57,7 +57,7 @@ class SelectFilter(QtGui.QWidget):
         
         for rt in db.gD["filterTree"]:
             self.comboResponseType.addItem(db.gD["rtNames"][rt], rt)
-        self.comboResponseType.setCurrentIndex(2) # set initial index
+        self.comboResponseType.setCurrentIndex(0) # set initial index
         self.setResponseType()
 
         #------------------------------------------------------------
@@ -128,7 +128,9 @@ class SelectFilter(QtGui.QWidget):
             db.gD["curFilter"].update({"fo":{}})
             db.gD["curFilter"]["fo"] \
                 = db.gD["filterTree"][self.rt][self.ft][self.dm].keys()[0]
-        if self.DEBUG: print("curFilter:", db.gD["curFilter"])
+        if self.DEBUG: 
+            print("curFilter:", db.gD["curFilter"])
+            print("filterTree[dm]= ", db.gD["filterTree"][self.rt][self.ft][self.dm].keys())
 
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]        
@@ -137,7 +139,7 @@ class SelectFilter(QtGui.QWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = SelectFilter()
+    form = SelectFilter(DEBUG = True)
     form.show()
    
     app.exec_()
