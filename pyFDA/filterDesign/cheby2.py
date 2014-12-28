@@ -50,8 +50,8 @@ class cheby2(object):
           "HP": {"man":['N', 'A_sb', 'F_sb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']}
                  }
-        print(self.rt["LP"]["man"])
 
+        self.msg = ""
         self.info = "Chebychev Typ 2 Filter haben nur im Stopband Ripple. \
         Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im SB \
         und über die kritische(n) Frequenz(en) bei denen die Verstärkung zuerst\

@@ -39,6 +39,7 @@ class cheby1(object):
     def __init__(self):
 #        self.has = {'rt' : ('LP', 'HP', 'BP', 'BS'), 'man' : 'N'}
         self.name = {'cheby1':'Chebychev 1'}
+        self.msg = ""
         self.ft = 'IIR'
         self.rt = {
           "BP": {"man":['N', 'A_pb', 'F_pb', 'F_pb2'],
@@ -50,7 +51,6 @@ class cheby1(object):
           "HP": {"man":['N', 'A_pb', 'F_pb'],
                  "min":['A_pb','A_sb','F_pb','F_sb']}
                  }
-        print(self.rt["LP"]["man"])
 
         self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
         Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im PB \

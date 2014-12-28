@@ -32,6 +32,8 @@ class equiripple(object):
         self.coeffs = [1, 1]
         
         self.name = {'equiripple':'Equiripple'}
+        self.msg = "Enter a weight value for each band below"
+        
         self.ft = 'FIR'
         self.rt = {
           "BP": {"man":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
@@ -51,31 +53,30 @@ class equiripple(object):
                     'ord' : 'man'}
 
     def LP(self, specs):
-        self.needs = ('N', 'F_pb', 'F_sb', 'W_pb', 'W_sb')
+#        self.needs = ('N', 'F_pb', 'F_sb', 'W_pb', 'W_sb')
         self.coeffs = sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
                 0.5],[1, 0], weight = [specs['W_pb'],specs['W_sb']], Hz = 1)
         self.zpk = [np.roots(self.coeffs), np.zeros(specs['N']), 1]
         print(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
                 0.5],[1, 0], [specs['W_pb'],specs['W_sb']])
 
-
     def HP(self, specs):
-        self.needs = ('N', 'F_pb', 'F_sb', 'W_pb', 'W_sb')
+#        self.needs = ('N', 'F_pb', 'F_sb', 'W_pb', 'W_sb')
         self.coeffs = sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
                 0.5],[0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1)
         self.zpk = [np.roots(self.coeffs), np.zeros(specs['N']), 1]
     # For BP and BS, F_pb and F_sb have two elements each
     def BP(self, specs):
-        self.needs = ('N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
-        'W_pb', 'W_sb', 'W_sb2' )
+#        self.needs = ('N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
+#        'W_pb', 'W_sb', 'W_sb2' )
         self.coeffs = sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
                 specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
                 weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1)
         self.zpk = [np.roots(self.coeffs), np.zeros(2*specs['N']), 1]
 
     def BS(self, specs):
-        self.needs = ('N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb',
-        'W_pb', 'W_pb2', 'W_sb')
+#        self.needs = ('N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb',
+#        'W_pb', 'W_pb2', 'W_sb')
         self.coeffs = sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
                 specs['F_sb2'], specs['F_pb2'], 0.5],[1, 0, 1], 
                 weight = [specs['W_pb'],specs['W_sb'], specs['W_pb2']], Hz = 1)
