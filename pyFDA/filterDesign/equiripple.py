@@ -13,74 +13,67 @@ https://github.com/scipy/scipy/issues/2444
 from __future__ import print_function, division
 import scipy.signal as sig
 import numpy as np
-# import numpy as np
 
-# ['Equiripple','LP',['Fs','F_pb','F_sb'],[48000,9600,12000],True,True,"val",["Enter a weight value for each band below",["W_pb","W_sb"],[1,1]]],
-# ['Equiripple','HP',['Fs','F_pb','F_sb'],[48000,9600,12000],True,True,"val",["Enter a weight value for each band below",["W_pb","W_sb"],[1,1]]],
-# ['Equiripple','BP',['Fs','F_sb','F_pb','F_sb2','F_pb2'],[48000,7200,9600,12000,14400],True,True,"val",["Enter a weight value for each band below",["W_sb","W_pb","W_sb2"],[1,1,1]]],
-# ['Equiripple','BS',['Fs','F_pb','F_sb','F_pb2','F_sb2'],[48000,7200,9600,12000,14400],True,True,"val",["Enter a weight value for each band below",["W_pb","W_sb","W_pass2"],[1,1,1]]],      
+# TODO: HP, BS do not work correctly
+# TODO: Add remezord
 
-
-# TODO: worauf bezieht sich "self" - auf cheby1 oder auf cheby1.LP ?
-# TODO: Funktioniert "Vererben" LP -> HP etc.?
-# TODO: Für den 'Min'-Fall könnte man cheby1, elllip etc. verbinden mit der 
-# iirdesign - Funktion verbinden. Ist das sinnvoll?
+zpkba = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+             # currently, only 'ba' is supported for equiripple routines
 
 class equiripple(object):
+    
     def __init__(self):
-        self.zpk = [1, 0, 1]
-        self.coeffs = [1, 1]
-        
         self.name = {'equiripple':'Equiripple'}
-        self.msg = "Enter a weight value for each band below"
+        self.msg_man = "Enter a weight value for each band below"
         
         self.ft = 'FIR'
         self.rt = {
-          "BP": {"man":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
-                        'W_pb', 'W_sb', 'W_sb2']},
-          "BS": {"man":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
-                        'W_pb', 'W_pb2', 'W_sb']},
-          "LP": {"man":['N', 'A_pb', 'F_pb'],
-                 "min":['A_pb','A_sb','F_pb','F_sb']},
-          "HP": {"man":['N', 'A_pb', 'F_pb'],
-                 "min":['A_pb','A_sb','F_pb','F_sb']},           
+            "LP": {"man":{"par":['N', 'W_pb', 'W_sb', 'F_pb', 'F_sb']}},
+#                 "min":{"par":['A_pb','A_sb','F_pb','F_sb']}},
+            "HP": {"man":{"par":['N', 'W_sb', 'W_pb', 'F_sb','F_pb']}},
+            "BP": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
+                        'W_sb', 'W_pb', 'W_sb2']}},
+            "BS": {"man":{"par":['N', 'F_pb', 'F_sb', 'F_sb2', 'F_pb2',
+                        'W_pb', 'W_sb', 'W_pb2']}}
+          #"HIL":
+            #"DIFF"
                    }
         self.info = "Equiripple-Filter haben im Passband und im Stopband \
         jeweils konstanten Ripple, sie nutzen das vorgegebene Toleranzband \
         jeweils voll aus."
+
+    def zpk2ba(self, arg):
+        """ 
+        Convert poles / zeros / gain to filter coefficients (polynomes) and the
+        other way round
+        """
+        if zpkba == 'zpk': # arg = zpk
+            self.coeffs = [arg[2] * np.poly(arg[0]), np.poly(arg[1])]
+            self.zpk = arg
+        else: # arg = [b,a]
+            self.zpk = [np.roots(arg), np.zeros(len(arg)),1]
+            self.coeffs = arg
+        print("zpk :", self.zpk,"\nba :", self.coeffs)
+      
+
+    def LPman(self, specs):
+        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
+                0.5],[1, 0], weight = [specs['W_pb'],specs['W_sb']], Hz = 1))
+
+    def HPman(self, specs):
+        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
+                0.5],[0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1))
         
-        self.has = {'rt' : ('LP', 'HP', 'BP', 'BS', 'DIFF', 'HIL'),
-                    'ord' : 'man'}
-
-    def LP(self, specs):
-#        self.needs = ('N', 'F_pb', 'F_sb', 'W_pb', 'W_sb')
-        self.coeffs = sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
-                0.5],[1, 0], weight = [specs['W_pb'],specs['W_sb']], Hz = 1)
-        self.zpk = [np.roots(self.coeffs), np.zeros(specs['N']), 1]
-        print(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
-                0.5],[1, 0], [specs['W_pb'],specs['W_sb']])
-
-    def HP(self, specs):
-#        self.needs = ('N', 'F_pb', 'F_sb', 'W_pb', 'W_sb')
-        self.coeffs = sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
-                0.5],[0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1)
-        self.zpk = [np.roots(self.coeffs), np.zeros(specs['N']), 1]
     # For BP and BS, F_pb and F_sb have two elements each
-    def BP(self, specs):
-#        self.needs = ('N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2',
-#        'W_pb', 'W_sb', 'W_sb2' )
-        self.coeffs = sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
+    def BPman(self, specs):
+        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
                 specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
-                weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1)
-        self.zpk = [np.roots(self.coeffs), np.zeros(2*specs['N']), 1]
+                weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1))
 
-    def BS(self, specs):
-#        self.needs = ('N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb',
-#        'W_pb', 'W_pb2', 'W_sb')
-        self.coeffs = sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
+    def BSman(self, specs):
+        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
                 specs['F_sb2'], specs['F_pb2'], 0.5],[1, 0, 1], 
-                weight = [specs['W_pb'],specs['W_sb'], specs['W_pb2']], Hz = 1)
-        self.zpk = [np.roots(self.coeffs), np.zeros(2*specs['N']), 1]
+                weight = [specs['W_pb'],specs['W_sb'], specs['W_pb2']], Hz = 1))
 
 
         

@@ -48,35 +48,35 @@ gD['filterTree'] = {
     'HP': 
         {'FIR': 
             {'equiripple': 
-                {'man': ['N', 'A_pb', 'F_pb'], 
-                 'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
+                {'man': {"par":['N', 'A_pb', 'F_pb']}, 
+                 'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}, 
          'IIR':
              {'cheby1': 
-                 {'man': ['N', 'A_pb', 'F_pb'], 
-                  'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}, 
+                 {'man': {"par":['N', 'A_pb', 'F_pb']}, 
+                  'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
               'cheby2': 
-                  {'man': ['N', 'A_sb', 'F_sb'],
-                   'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}, 
+                  {'man': {"par":['N', 'A_sb', 'F_sb']},
+                   'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}}, 
     'BP': 
         {'FIR': 
             {'equiripple': 
-                {'man': ['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2', 'W_pb', 'W_sb', 'W_sb2']}}, 
+                {'man': {"par":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2', 'W_pb', 'W_sb', 'W_sb2']}}}, 
          'IIR': 
-             {'cheby1': {'man': ['N', 'A_pb', 'F_pb', 'F_pb2'], 
-                         'min': ['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}, 
-              'cheby2': {'man': ['N', 'A_sb', 'F_sb', 'F_sb2'], 
-                         'min': ['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}}}, 
+             {'cheby1': {'man': {"par":['N', 'A_pb', 'F_pb', 'F_pb2']}, 
+                         'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}}, 
+              'cheby2': {'man': {"par":['N', 'A_sb', 'F_sb', 'F_sb2']}, 
+                         'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}}}}, 
     'LP': 
         {'FIR': 
             {'equiripple': 
-                {'man': ['N', 'A_pb', 'F_pb'], 
-                 'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
+                {'man': {"par":['N', 'A_pb', 'F_pb']}, 
+                 'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}, 
          'IIR': 
              {'cheby1': 
-                 {'man': ['N', 'A_pb', 'F_pb'], 
-                  'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}, 
-             'cheby2': {'man': ['N', 'A_sb', 'F_sb'], 
-                        'min': ['A_pb', 'A_sb', 'F_pb', 'F_sb']}}},
+                 {'man': {"par":['N', 'A_pb', 'F_pb']}, 
+                  'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
+             'cheby2': {'man': {"par":['N', 'A_sb', 'F_sb']}, 
+                        'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}},
     }
 
 
@@ -84,7 +84,7 @@ gD['filterTree'] = {
 # Dictionaries containing current filter selections specifications, they are
 # automatically overwritten 
 #-------------------------------------- 
-# Current filter selection                 
+# Current filter selection and parameters                
 gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man"}
 # Current filter specifications
 gD['curSpecs'] = {'N':10, 'fS': 48000,
