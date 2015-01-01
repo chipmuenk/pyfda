@@ -85,13 +85,14 @@ class pyFDA(QtGui.QWidget):
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print('Specs:', db.gD["curSpecs"])#params)
-            print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm'])
+            print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm']+"."+
+                  db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])
         # create filter object instance from design method (e.g. 'cheby1'):   
         self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
         # Now construct the instance method from the response type (e.g.
         # 'LP' -> cheby1.LP) and
         # design the filter by passing current specs to the method:
-        getattr(self.myFilter, db.gD['curFilter']['rt'])(db.gD["curSpecs"])
+        getattr(self.myFilter, db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])(db.gD["curSpecs"])
         
         # Read back filter coefficients and (zeroes, poles, k):
         db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
@@ -101,7 +102,7 @@ class pyFDA(QtGui.QWidget):
         else:                                   # IIR filter: [b, a] coeffs
             db.gD['coeffs'] = self.myFilter.coeffs 
         if self.DEBUG:
-            print("--- pyFDA.py : startDesignFilter ---")
+            print("=== pyFDA.py : startDesignFilter ===")
             print("zpk:" , db.gD['zpk'])
             print('ndim gD:', np.ndim(db.gD['coeffs']))
             print("b,a = ", db.gD['coeffs'])

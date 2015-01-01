@@ -114,28 +114,28 @@ class ChooseParams(QtGui.QFrame):
         ft = db.gD["curFilter"]["ft"]
         dm = db.gD["curFilter"]["dm"]
         fo = db.gD["curFilter"]["fo"]  
-        myLabels = db.gD['filterTree'][rt][ft][dm][fo]
+        myParams = db.gD['filterTree'][rt][ft][dm][fo]['par']
 
-        # build separate label lists according to the first letter
-        self.freqLabels = [l for l in myLabels if l[0] == 'F']
-        self.ampLabels = [l for l in myLabels if l[0] == 'A']
-        self.weightLabels = [l for l in myLabels if l[0] == 'W']
+        # build separate parameter lists according to the first letter
+        self.freqParams = [l for l in myParams if l[0] == 'F']
+        self.ampParams = [l for l in myParams if l[0] == 'A']
+        self.weightParams = [l for l in myParams if l[0] == 'W']
         if self.DEBUG:
             print("=== chooseParams.chooseDesignMethod ===")
             print("curFilter:", db.gD["curFilter"])
-            print('myLabels:', myLabels)
-            print('ampLabels:', self.ampLabels)
-            print('freqLabels:', self.freqLabels)
-            print('weightLabels:', self.weightLabels)
+            print('myLabels:', myParams)
+            print('ampLabels:', self.ampParams)
+            print('freqLabels:', self.freqParams)
+            print('weightLabels:', self.weightParams)
 
         # pass new labels to widgets
         # disable (grey out) amp / weight labels if list is empty
         self.fo.update()
-        self.fspec.set(newLabels = self.freqLabels) # update frequency spec labels
-        self.aspec.setDisabled(self.ampLabels == [])
-        self.aspec.set(newLabels = self.ampLabels)
-        self.wspec.setDisabled(self.weightLabels == []) 
-        self.wspec.set(newLabels = self.weightLabels)
+        self.fspec.set(newLabels = self.freqParams) # update frequency spec labels
+        self.aspec.setDisabled(self.ampParams == [])
+        self.aspec.set(newLabels = self.ampParams)
+        self.wspec.setDisabled(self.weightParams == []) 
+        self.wspec.set(newLabels = self.weightParams)
 
         self.setLayout(self.layout)
         
