@@ -107,10 +107,6 @@ class FilterOrder(QtGui.QFrame):
             self.txtLabel.setEnabled(fo == 'man')
             self.txtManual.setEnabled(fo == 'man')
 
-#            self.chkMin.setVisible(True)
-#        else:
-#            self.chkMin.setVisible(False)
-
         ordn = int(self.txtManual.text())
         db.gD["curSpecs"].update({"N" : ordn})
    

@@ -42,10 +42,12 @@ more preferably, QDialog
     
 class PlotPhi(QtGui.QMainWindow):
 
-    def __init__(self, parent = None): # default parent = None -> top Window 
+    def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window 
         super(PlotPhi, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
         
+        self.DEBUG = DEBUG        
+
         self.mplwidget = MplWidget()
 #        self.mplwidget.setParent(self)
         self.mplwidget.setFocus()
@@ -65,7 +67,7 @@ class PlotPhi(QtGui.QMainWindow):
         """
         self.bb = db.gD['coeffs'][0]
         self.aa = db.gD['coeffs'][1]
-        if DEBUG:
+        if self.DEBUG:
             print("--- plotPhi.draw() ---") 
             print("b,a = ", self.bb, self.aa)
         [W,H] = sig.freqz(self.bb, self.aa, worN = db.gD['N_FFT']) # calculate H(W) for W = 0 ... pi

@@ -30,7 +30,6 @@ import databroker as db
 
 from plotUtils import MplWidget#, MyMplToolbar, MplCanvas 
 
-DEBUG = True   
 
 """
 QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
@@ -43,10 +42,11 @@ more preferably, QDialog
     
 class PlotHf(QtGui.QMainWindow):
 
-    def __init__(self, parent = None): # default parent = None -> top Window 
+    def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window 
         super(PlotHf, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
-        
+
+        self.DEBUG = DEBUG        
 
         self.lblLog = QtGui.QLabel("Log. y-scale")        
         self.btnLog = QtGui.QCheckBox()
@@ -178,7 +178,7 @@ class PlotHf(QtGui.QMainWindow):
         self.A_sb = db.gD['curSpecs']['A_sb']
 
 
-        if DEBUG:
+        if self.DEBUG:
             print("--- plotHf.draw() --- ") 
             print("b, a = ", self.bb, self.aa)
 

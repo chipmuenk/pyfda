@@ -121,7 +121,7 @@ class SelectFilter(QtGui.QWidget):
         db.gD["curFilter"]["dm"] = self.dm
 
         # Check whether new design method also provides the old filter order 
-        # method. If yes, don't change curFilter, else set first available 
+        # method. If yes, don't change it, else set first available 
         # filter method
         if db.gD["curFilter"]["fo"] not in \
                         db.gD["filterTree"][self.rt][self.ft][self.dm].keys():
@@ -130,7 +130,8 @@ class SelectFilter(QtGui.QWidget):
                 = db.gD["filterTree"][self.rt][self.ft][self.dm].keys()[0]
         if self.DEBUG: 
             print("curFilter:", db.gD["curFilter"])
-            print("filterTree[dm]= ", db.gD["filterTree"][self.rt][self.ft][self.dm].keys())
+            print("filterTree[dm]= ", db.gD["filterTree"][self.rt][self.ft]\
+                                                            [self.dm].keys())
 
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]        
