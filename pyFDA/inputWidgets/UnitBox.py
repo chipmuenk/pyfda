@@ -83,6 +83,11 @@ class UnitBox(QtGui.QWidget):
  
         self.WVLayout.addLayout(self.layout)
         self.setLayout(self.WVLayout)
+        
+        # SIGNALS & SLOTS
+        # TODO: not working yet
+        # Call update every time a field is edited: 
+#        self.qlineedit.editingFinished.connect(self.update)
 
 #-------------------------------------------------------------        
     def set(self, title = "", newLabels = []):
