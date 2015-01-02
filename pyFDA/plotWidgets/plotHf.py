@@ -95,67 +95,86 @@ class PlotHf(QtGui.QMainWindow):
         Plot the corners of the filter specifications when the corresponding
         check box is selected.
         """
+        fc = (0.8,0.8,0.8) # color for shaded areas
         ax = specAxes
+        ymax = ax.get_ylim()[1]
         F_max = self.f_S/2
         if specLog:
             if db.gD["curFilter"]["ft"] == "FIR":
-                A_DB_max = self.A_pb # 20*log10(1+del_DB)
+                A_pb_max = self.A_pb # 20*log10(1+del_DB)
             else: # IIR log
-                A_DB_max = 0
-            A_DB_min = -self.A_pb
-            A_DB_minx = A_DB_min - 10# 20*log10(1-del_DB)
+                A_pb_max = 0
+            A_pb_min = -self.A_pb
+            A_pb_minx = A_pb_min - 10# 20*log10(1-del_DB)
             A_sb = -self.A_sb
             A_sbx = A_sb - 10
         else:
             if db.gD["curFilter"]["ft"] == 'FIR':
-                A_DB_max = 10**(self.A_pb/20)# 1 + del_DB 
+                A_pb_max = 10**(self.A_pb/20)# 1 + del_DB 
             else:
-                A_DB_max = 1
-            A_DB_min = 10**(-self.A_pb/20) #1 - del_DB
-            A_DB_minx = A_DB_min / 2
+                A_pb_max = 1
+            A_pb_min = 10**(-self.A_pb/20) #1 - del_DB
+            A_pb_minx = A_pb_min / 2
             A_sb = 10**(-self.A_sb/20)
             A_sbx = A_sb / 5
         
-        if db.gD["curFilter"]["rt"] == "LP" or db.gD["curFilter"]["rt"] == "BS":
-            F_0 = 0
-            F_1 = db.gD['curSpecs']['F_pb'] / self.f_S
-            F_2 = db.gD['curSpecs']['F_sb'] / self.f_S
-            F_3 = db.gD['curSpecs']['F_sb2'] / self.f_S
-            F_4 = db.gD['curSpecs']['F_pb2'] / self.f_S
-            F_5 = F_max
+        F_pb = self.F_pb
+        F_sb = db.gD['curSpecs']['F_sb'] / self.f_S
+        F_sb2 = db.gD['curSpecs']['F_sb2'] / self.f_S
+        F_pb2 = db.gD['curSpecs']['F_pb2'] / self.f_S
 
-        elif db.gD["curFilter"]["rt"] in {"HP", "BP"}:
-            F_0 = F_max
-            F_1 = db.gD['curSpecs']['F_sb'] / self.f_S
-            F_2 = db.gD['curSpecs']['F_pb'] / self.f_S
-            F_3 = db.gD['curSpecs']['F_pb2'] / self.f_S
-            F_4 = db.gD['curSpecs']['F_sb2'] / self.f_S
-            F_5 = 0
-
-        if db.gD["curFilter"]["rt"] in {'LP', 'HP', 'BS'}:
-            ax.plot([F_0, F_1],[A_DB_min, A_DB_min], 'b--') # PB
-            ax.plot([F_0, F_2],[A_DB_max, A_DB_max], 'b--') # PB
-            ax.plot([F_1, F_1],[A_DB_min, A_DB_minx],'b--')# PB limit
-            ax.plot([F_2, F_2],[A_DB_max, A_sb],'b--') # SB limit
+        if db.gD["curFilter"]["rt"] == 'LP':
+            # upper limits:            
+            ax.plot([0, F_sb, F_sb, F_max],
+                    [A_pb_max, A_pb_max, A_sb, A_sb], 'b--')
+            ax.fill_between([0, F_sb, F_sb, F_max], ymax,
+                    [A_pb_max, A_pb_max, A_sb, A_sb], facecolor=fc)                    
+            # lower limits:
+            ax.plot([0, F_pb, F_pb],[A_pb_min, A_pb_min, A_pb_minx], 'b--')
+            ax.fill_between([0, F_pb, F_pb], A_sbx,
+                            [A_pb_min, A_pb_min, A_pb_minx], facecolor=fc)
+       
+        if db.gD["curFilter"]["rt"] == 'HP':
+            # upper limits:
+            ax.plot([0, F_sb, F_sb, F_max],
+                    [A_sb, A_sb, A_pb_max, A_pb_max], 'b--')
+            ax.fill_between([0, F_sb, F_sb, F_max], 10,
+                    [A_sb, A_sb, A_pb_max, A_pb_max], facecolor=fc)
+            # lower limits:
+            ax.plot([F_pb, F_pb, F_max],[A_pb_minx, A_pb_min, A_pb_min], 'b--')
+            ax.fill_between([F_pb, F_pb, F_max], A_sbx,
+                            [A_pb_minx, A_pb_min, A_pb_min], facecolor=fc)
             
-            if db.gD["curFilter"]["rt"] in {"LP", "HP"}:
-                ax.plot([F_2, F_5],[A_sb, A_sb],'b--') # SB
-            else: # "BS"
-                ax.plot([F_2, F_3],[A_sb, A_sb],'b--') # SB
-                ax.plot([F_3, F_3],[A_DB_max, A_sb],'b--') # limit SB
-                ax.plot([F_3, F_5],[A_DB_max, A_DB_max], 'b--') # PB  
-                ax.plot([F_4, F_5],[A_DB_min, A_DB_min], 'b--') # PB
-                ax.plot([F_4, F_4],[A_DB_min, A_DB_minx],'b--')# lim. PB
+        if db.gD["curFilter"]["rt"] == 'BS':
+            # lower limits left:            
+            ax.plot([0, F_pb, F_pb],[A_pb_min, A_pb_min, A_pb_minx], 'b--')
+            ax.fill_between([0, F_pb, F_pb], A_sbx,
+                            [A_pb_min, A_pb_min, A_pb_minx], facecolor=fc)
+
+            # upper limits:            
+            ax.plot([0, F_sb, F_sb, F_sb2, F_sb2, F_max],
+                    [A_pb_max, A_pb_max, A_sb, A_sb, A_pb_max, A_pb_max], 'b--')
+            ax.fill_between([0, F_sb, F_sb, F_sb2, F_sb2, F_max], 10,
+                    [A_pb_max, A_pb_max, A_sb, A_sb, A_pb_max, A_pb_max], 
+                        facecolor = fc)
+
+            # lower limits right:            
+            ax.plot([F_pb2, F_pb2, F_max],[A_pb_minx, A_pb_min, A_pb_min],'b--')    
+            ax.fill_between([F_pb2, F_pb2, F_max], A_sbx,
+                            [A_pb_minx, A_pb_min, A_pb_min],facecolor = fc)    
+            
 
         if db.gD["curFilter"]["rt"] == "BP":
-            ax.plot([0, F_1],[A_sb, A_sb], 'b--') # SB
-            ax.plot([F_1, F_1],[A_sb, A_DB_max], 'b--') # SB
-            ax.plot([F_2, F_2],[A_sbx, A_DB_min],'b--')# PB-limit
-            ax.plot([F_2, F_3],[A_DB_min, A_DB_min],'b--') # PB
-            ax.plot([F_1, F_4],[A_DB_max, A_DB_max],'b--') # PB
-            ax.plot([F_3, F_3],[A_sbx, A_DB_min],'b--') # PB
-            ax.plot([F_4, F_4],[A_sb, A_DB_max],'b--') # PB           
-            ax.plot([F_4, F_max],[A_sb, A_sb], 'b--') # lower PB-limit  
+            # upper limits:
+            ax.plot([0,    F_sb,  F_sb,      F_sb2,      F_sb2,  F_max],
+                    [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb], 'b--')
+            ax.fill_between([0, F_sb, F_sb, F_sb2, F_sb2, F_max], 10,
+                    [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb], facecolor=fc)
+            # lower limits:
+            ax.plot([F_pb, F_pb, F_pb2, F_pb2], 
+                    [A_sbx, A_pb_min, A_pb_min, A_sbx], 'b--' )
+            ax.fill_between([F_pb, F_pb, F_pb2, F_pb2], A_sbx,
+                    [A_sbx, A_pb_min, A_pb_min, A_sbx], facecolor = fc)       
             
     def draw(self):
         """ 
