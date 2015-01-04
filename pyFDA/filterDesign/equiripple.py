@@ -31,7 +31,8 @@ class equiripple(object):
         self.rt = {
             "LP": {"man":{"par":['N', 'W_pb', 'W_sb', 'F_pb', 'F_sb']},
                    "min":{"par":['A_pb','A_sb','F_pb','F_sb']}},
-            "HP": {"man":{"par":['N', 'W_sb', 'W_pb', 'F_sb','F_pb']}},
+            "HP": {"man":{"par":['N', 'W_sb', 'W_pb', 'F_sb','F_pb']},
+                   "min":{"par":['A_pb','A_sb','F_sb','F_pb']}},
             "BP": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
                         'W_sb', 'W_pb', 'W_sb2']}},
             "BS": {"man":{"par":['N', 'F_pb', 'F_sb', 'F_sb2', 'F_pb2',
@@ -60,7 +61,8 @@ class equiripple(object):
                 0.5],[1, 0], weight = [specs['W_pb'],specs['W_sb']], Hz = 1))
 
     def HPman(self, specs):
-        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
+        N = self.oddround(specs['N']) # enforce odd order 
+        self.zpk2ba(sig.remez(N,[0, specs['F_sb'], specs['F_pb'], 
                 0.5],[0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1))
         
     # For BP and BS, F_pb and F_sb have two elements each
@@ -81,6 +83,18 @@ class equiripple(object):
             [A_PB_lin, 10.**(-specs['A_sb']/20)], Hz = 1, alg = 'ichige')
         self.zpk2ba(sig.remez(L, [0, specs['F_pb'], specs['F_sb'], 
                 0.5],[1, 0], weight = W, Hz = 1))
+                
+    def HPmin(self, specs):
+        A_PB_lin = (10**(specs['A_pb']/20.0)-1) / (10**(specs['A_pb']/20.0)+1)*2
+        print(A_PB_lin)
+        (L, F, A, W) = self.remezord([specs['F_sb'], specs['F_pb']], [0, 1], 
+            [np.sqrt(2)*10.**(-specs['A_sb']/20), A_PB_lin], Hz = 1, alg = 'ichige')
+        N = self.oddround(L)  # enforce odd order 
+
+        self.zpk2ba(sig.remez(N, [0, specs['F_sb'], specs['F_pb'], 
+                0.5],[0, 1], weight = W, Hz = 1, type = 'bandpass'))
+                
+                
 
 
                 
