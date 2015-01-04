@@ -13,26 +13,29 @@ https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
-import numpy as np
+#import numpy as np
 
-zpkba = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+zpkba = 'zpk' # set output format of filter design routines to 'zpk' or 'ba'
 
 class cheby1(object):
     
     def __init__(self):
         self.name = {'cheby1':'Chebychev 1'}
-        self.msg_man = ""
-        self.msg_min = ""
+        self.msg_man = "Enter the filter order $N$, the maximum ripple $A_pb$ \
+        allowed below unity gain in the passband and the frequency or \
+        frequencies $F_pb$ where the gain first drops below $-A_pb$."
+        self.msg_min = "Enter the desired pass band ripple and minimum stop \
+        band attenuation and the corresponding corner frequencies."
         self.ft = 'IIR'
         self.rt = {
-          "BP": {"man":{"par":['N', 'A_pb', 'F_pb', 'F_pb2']},
-                 "min":{"par":['A_pb','A_sb','F_sb','F_pb','F_pb2','F_sb2']}},
-          "BS": {"man":{"par":['A_pb','F_pb','F_pb2']},
-                 "min":{"par":['A_pb','A_sb','F_pb','F_sb','F_sb2','F_pb2']}},
           "LP": {"man":{"par":['N', 'A_pb', 'F_pb']},
                  "min":{"par":['A_pb','A_sb','F_pb','F_sb']}},
           "HP": {"man":{"par":['N', 'A_pb', 'F_pb']},
-                 "min":{"par":['A_pb','A_sb','F_sb','F_pb']}}
+                 "min":{"par":['A_pb','A_sb','F_sb','F_pb']}},
+          "BP": {"man":{"par":['N', 'A_pb', 'F_pb', 'F_pb2']},
+                 "min":{"par":['A_pb','A_sb','F_sb','F_pb','F_pb2','F_sb2']}},
+          "BS": {"man":{"par":['A_pb','F_pb','F_pb2']},
+                 "min":{"par":['A_pb','A_sb','F_pb','F_sb','F_sb2','F_pb2']}}
                  }
 
         self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
@@ -45,14 +48,13 @@ class cheby1(object):
         Convert poles / zeros / gain to filter coefficients (polynomes) and the
         other way round
         """
-        if zpkba == 'zpk': # arg = zpk
-            self.coeffs = [arg[2] * np.poly(arg[0]), np.poly(arg[1])]
+        if zpkba == 'zpk': # arg = [z,p,k]
+            self.coeffs = sig.zpk2tf(arg[0], arg[1], arg[2])
             self.zpk = arg
 
         else: # arg = [b,a]
-            self.zpk = [np.roots(arg[0]), np.roots(arg[1]),1]
+            self.zpk = sig.tf2zpk(arg[0], arg[1])
             self.coeffs = arg
-        print("zpk :", self.zpk,"\nba :", self.coeffs)
 
     def LPman(self, specs):
         self.zpk2ba(sig.cheby1(specs['N'], specs['A_pb'], specs['F_pb'],
