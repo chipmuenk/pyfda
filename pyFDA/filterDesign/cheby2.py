@@ -48,14 +48,13 @@ class cheby2(object):
         Convert poles / zeros / gain to filter coefficients (polynomes) and the
         other way round
         """
-        if zpkba == 'zpk': # arg = zpk
-            self.coeffs = [arg[2] * np.poly(arg[0]), np.poly(arg[1])]
+        if zpkba == 'zpk': # arg = [z,p,k]
+            self.coeffs = sig.zpk2tf(arg[0], arg[1], arg[2])
             self.zpk = arg
 
         else: # arg = [b,a]
-            self.zpk = [np.roots(arg[0]), np.roots(arg[1]),1]
+            self.zpk = sig.tf2zpk(arg[0], arg[1])
             self.coeffs = arg
-        print("zpk :", self.zpk,"\nba :", self.coeffs)
 
     def LPman(self, specs):
         self.zpk2ba(sig.cheby2(specs['N'], specs['A_sb'], specs['F_sb'],

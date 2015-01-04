@@ -90,10 +90,9 @@ class PlotHf(QtGui.QMainWindow):
         self.btnInset.clicked.connect(lambda:self.draw())
         self.btnSpecs.clicked.connect(lambda:self.draw())
 
-    def plotSpecs(self, specAxes, specLog):
+    def plotSpecLimits(self, specAxes, specLog):
         """
-        Plot the corners of the filter specifications when the corresponding
-        check box is selected.
+        Plot the specifications limits 
         """
         fc = (0.8,0.8,0.8) # color for shaded areas
         ax = specAxes
@@ -225,7 +224,7 @@ class PlotHf(QtGui.QMainWindow):
             ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})| \;$'+
                         r'$\rightarrow $')
 
-        if self.specs: self.plotSpecs(specAxes = ax, specLog = self.log)
+        if self.specs: self.plotSpecLimits(specAxes = ax, specLog = self.log)
             
         if self.log:
             ax.axis([0, 0.5, -self.A_sb -10, self.A_pb +1] )
