@@ -7,7 +7,10 @@ Main Widget for entering filter specifications
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os 
+import numpy as np
 from PyQt4 import QtGui
+
+
 
 # import databroker from one level above if this file is run as __main__
 # for test purposes
@@ -16,8 +19,10 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import databroker as db
+from FilterFileReader import FilterFileReader
     
 import SelectFilter, filterOrder, UnitBox
+from plotWidgets import plotAll
 
 
 """
@@ -32,7 +37,9 @@ class ChooseParams(QtGui.QFrame):
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
-        self.DEBUG = DEBUG                                              
+        self.DEBUG = DEBUG  
+        self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
+                                    commentChar = '#', DEBUG = DEBUG) #                                             
         self.initUI()
         """
         
@@ -76,6 +83,9 @@ class ChooseParams(QtGui.QFrame):
         self.msg.setVisible(True)
         self.wspec.setVisible(True)
         self.aspec.setVisible(True)
+        
+        self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
+        self.pltAll = plotAll.plotAll() # instantiate tabbed plot widgets 
         """
         LAYOUT      
         """
@@ -86,6 +96,7 @@ class ChooseParams(QtGui.QFrame):
         self.layout.addWidget(self.msg,3,0,1,2)  # Text message
         self.layout.addWidget(self.aspec,4,0)   # Amplitude specs
         self.layout.addWidget(self.wspec,4,1)   # Weight specs
+        self.layout.addWidget(self.butDesignFilt,5,0,1,2)   # Design Filter!
 
         self.setLayout(self.layout)
         #----------------------------------------------------------------------
@@ -96,6 +107,7 @@ class ChooseParams(QtGui.QFrame):
         self.sf.comboResponseType.activated.connect(self.chooseDesignMethod)
         self.sf.comboFilterType.activated.connect(self.chooseDesignMethod)
         self.sf.comboDesignMethod.activated.connect(self.chooseDesignMethod)
+        self.butDesignFilt.clicked.connect(self.startDesignFilt)   
 
         self.chooseDesignMethod() # first time initialization
         
@@ -175,7 +187,8 @@ class ChooseParams(QtGui.QFrame):
             
     def get(self):
         """
-        Update global dict db.gD["curSpecs"] with currently selected filter specs 
+        Update global dict db.gD["curSpecs"] with currently selected filter 
+        specs, using the update methods of the classes
         """
     
 #        ret = {}
@@ -184,15 +197,44 @@ class ChooseParams(QtGui.QFrame):
 #        db.gD["curSpecs"].update(self.aspec.get()) # magnitude specs with unit
 #        db.gD["curSpecs"].update(self.wspec.get()) # weight specs
         self.fo.update() # collect data from frequ. spec. widget
-#        db.gD["curSpecs"] = {}
         self.fspec.update() # collect data from frequ. spec. widget
         self.aspec.update() # magnitude specs with unit
-        self.wspec.update() # weight specs
-        
+        self.wspec.update() # weight specs  
             
         if self.DEBUG: print(db.gD["curSpecs"])
-#        return self.params  
+  
+    def startDesignFilt(self):
+        """
+        Design Filter
+        """
+        self.get() # -> db.gD["curSpecs"] 
+        if self.DEBUG:
+            print("--- pyFDA.py : startDesignFilter ---")
+            print('Specs:', db.gD["curSpecs"])#params)
+            print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm']+"."+
+                  db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])
+        # create filter object instance from design method (e.g. 'cheby1'):   
+        self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
+        # Now construct the instance method from the response type (e.g.
+        # 'LP' -> cheby1.LP) and
+        # design the filter by passing current specs to the method:
+        getattr(self.myFilter, db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])(db.gD["curSpecs"])
         
+        # Read back filter coefficients and (zeroes, poles, k):
+        db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
+        if np.ndim(self.myFilter.coeffs) == 1:  # FIR filter: only b coeffs
+            db.gD['coeffs'] = (self.myFilter.coeffs, [1]) # add dummy a = [1]
+            # This still has ndim == 1? 
+        else:                                   # IIR filter: [b, a] coeffs
+            db.gD['coeffs'] = self.myFilter.coeffs 
+        if self.DEBUG:
+            print("=== pyFDA.py : startDesignFilter ===")
+            print("zpk:" , db.gD['zpk'])
+            print('ndim gD:', np.ndim(db.gD['coeffs']))
+            print("b,a = ", db.gD['coeffs'])
+     
+#        self.pltAll.update() is executed from pyFDA.py!
+  
 #------------------------------------------------------------------------------ 
    
 if __name__ == '__main__':

@@ -1,0 +1,93 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Nov 26 10:57:30 2013
+
+@author: Christian Muenker
+
+Tab-Widget for exporting / importing and saving / loading data
+"""
+from __future__ import print_function, division, unicode_literals
+import sys, os
+from PyQt4 import QtGui
+#from PyQt4.QtCore import SIGNAL
+import scipy.io
+import numpy as np
+
+# import databroker from one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__": 
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(__cwd__ + '/..')
+
+import databroker as db # importing databroker initializes all its globals
+
+
+class inputFiles(QtGui.QWidget):
+    """
+    Create the window for entering exporting / importing and saving / loading data
+    """
+    def __init__(self, DEBUG = True):
+        self.DEBUG = DEBUG
+        super(inputFiles, self).__init__()
+
+        self.initUI()     
+        
+    def initUI(self): 
+        """
+        Intitialize the main GUI, consisting of:
+        - Buttons for Exporting and Saving
+        - 
+        """
+        # widget / subwindow for parameter selection
+        self.butExportML = QtGui.QPushButton("Export -> ML", self)
+        self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
+        
+        # ============== UI Layout =====================================
+        self.grLayout = QtGui.QGridLayout()
+        self.grLayout.addWidget(self.butExportML,1,0) # filter export button
+        self.grLayout.addWidget(self.butExportCSV,2,0) # filter export button
+
+
+        hbox = QtGui.QHBoxLayout()
+        hbox.addLayout(self.grLayout)
+        self.setLayout(hbox)
+        
+        # ============== Signals & Slots ================================
+        self.butExportML.clicked.connect(self.exportML)
+        self.butExportCSV.clicked.connect(self.exportCSV)        
+
+        
+    def exportML(self):
+        """
+        Export filter coefficients to a file that can be imported into 
+        Matlab workspace - see also Summerfield p. 192 ff
+        """
+#        myMLfile = QtGui.QFileDialog.setNameFilter('.mat')
+#        myMLfile.getOpenFileName()
+        formats = ["*.mat", "*.csv"]
+        dlg=QtGui.QFileDialog( self )
+
+
+        myMLfile = dlg.getSaveFileName(filter="Workspace / csv (*.mat *.csv)\nAll files(*.*)", directory="D:/Daten", 
+                caption = "Save filter coefficients as")
+       
+        scipy.io.savemat(myMLfile, 
+                         mdict={'filt_coeffs': db.gD['coeffs']})
+        print("exportML: Matlab workspace exported to %s!" %myMLfile)
+        
+    def exportCSV(self):
+        """
+        Export filter coefficients to a CSV-file 
+        """
+        
+        np.savetxt('d:/Daten/filt_coeffs.csv', db.gD['coeffs'])
+        print("exportCSV: CSV - File exported!")
+#------------------------------------------------------------------------------
+   
+if __name__ == '__main__':
+
+    app = QtGui.QApplication(sys.argv)
+    form = inputFiles()
+    form.show()
+   
+    app.exec_()
