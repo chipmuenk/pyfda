@@ -92,9 +92,9 @@ class PlotPhi(QtGui.QMainWindow):
         mpl = self.mplwidget.ax
         mpl.clear()
         if self.btnWrap.isChecked():
-            mpl.plot(F, np.unwrap(np.angle(H)), lw = db.gD['rc']['lw'])            
+            mpl.plot(F, np.angle(H), lw = db.gD['rc']['lw'])          
         else:
-            mpl.plot(F, np.angle(H), lw = db.gD['rc']['lw'])
+            mpl.plot(F, np.unwrap(np.angle(H)), lw = db.gD['rc']['lw'])
 #        mpl.axis([0, 0.5, -db.gD['specs']['A_stop1']-10, 
 #                  db.gD['specs']['A_pass1']+1] )
         mpl.set_title(r'Phase transfer function')
