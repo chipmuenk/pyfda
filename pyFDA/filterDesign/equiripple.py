@@ -15,8 +15,8 @@ import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
 
-# TODO: HP, BS do not work correctly
-# TODO: Add remezord
+# TODO: BS does not work correctly (-> odd order!)
+# TODO: Try HP with even order & type = Hilbert
 
 zpkba = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
@@ -26,10 +26,12 @@ class equiripple(object):
     def __init__(self):
         self.name = {'equiripple':'Equiripple'}
         self.msg_man = "Enter a weight value for each band below"
+        self.msg_min = ""
         
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":['N', 'W_pb', 'W_sb', 'F_pb', 'F_sb']},
+            "LP": {"man":{"par":['N', 'W_pb', 'W_sb', 'F_pb', 'F_sb'],
+                          "vis":['fo','fs', 'Ws']},
                    "min":{"par":['A_pb','A_sb','F_pb','F_sb']}},
             "HP": {"man":{"par":['N', 'W_sb', 'W_pb', 'F_sb','F_pb']},
                    "min":{"par":['A_pb','A_sb','F_sb','F_pb']}},
@@ -93,10 +95,8 @@ class equiripple(object):
 
         self.zpk2ba(sig.remez(N, [0, specs['F_sb'], specs['F_pb'], 
                 0.5],[0, 1], weight = W, Hz = 1, type = 'bandpass'))
+        
                 
-                
-
-
                 
     #========================================================
     """Supplies remezord method according to Scipy Ticket #475
