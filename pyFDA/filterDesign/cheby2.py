@@ -15,7 +15,7 @@ from __future__ import print_function, division
 import scipy.signal as sig
 import numpy as np
 
-zpkba = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
 
 class cheby2(object):    
     
@@ -43,12 +43,12 @@ class cheby2(object):
         und über die kritische(n) Frequenz(en) bei denen die Verstärkung zuerst\
         den spezifizierten Wert A_sb erreicht."
         
-    def zpk2ba(self, arg):
+    def save(self, arg):
         """ 
         Convert poles / zeros / gain to filter coefficients (polynomes) and the
         other way round
         """
-        if zpkba == 'zpk': # arg = [z,p,k]
+        if output == 'zpk': # arg = [z,p,k]
             self.coeffs = sig.zpk2tf(arg[0], arg[1], arg[2])
             self.zpk = arg
 
@@ -57,45 +57,44 @@ class cheby2(object):
             self.coeffs = arg
 
     def LPman(self, specs):
-        self.zpk2ba(sig.cheby2(specs['N'], specs['A_sb'], specs['F_sb'],
-                              btype='low', analog = False, output = zpkba))
+        self.save(sig.cheby2(specs['N'], specs['A_sb'], specs['F_sb'],
+                              btype='low', analog = False, output = output))
 
     def HPman(self, specs):
-        self.zpk2ba(sig.cheby2(specs['N'], specs['A_sb'], specs['F_sb'], 
-                             btype='highpass', analog = False, output = zpkba))
+        self.save(sig.cheby2(specs['N'], specs['A_sb'], specs['F_sb'], 
+                             btype='highpass', analog = False, output = output))
         
     # For BP and BS, A_pb, A_sb, F_pb and F_sb have two elements each
     def BPman(self, specs):
-        self.zpk2ba(sig.cheby2(specs['N'], specs['A_sb'],
+        self.save(sig.cheby2(specs['N'], specs['A_sb'],
                         [specs['F_sb'], specs['F_sb2']], btype='bandpass',
-                        analog = False, output = zpkba))
+                        analog = False, output = output))
         
     def BSman(self, specs):
-        self.zpkba(sig.cheby2(specs['N'], specs['A_sb'],
+        self.output(sig.cheby2(specs['N'], specs['A_sb'],
                 [specs['F_sb'], specs['F_sb2']], btype='bandstop', 
-                analog = False, output = zpkba))
+                analog = False, output = output))
         
     # LP: F_pb < F_sb
     def LPmin(self, specs):
-#        self.LPmin_ = ['A_pb', 'A_sb', 'F_pb', 'F_sb']
-        self.zpk2ba(sig.iirdesign(specs['F_pb'], specs['F_sb'], 
+        self.save(sig.iirdesign(specs['F_pb'], specs['F_sb'], 
                                    specs['A_pb'], specs['A_sb'],
-                             analog=False, ftype='cheby2', output=zpkba))
+                             analog=False, ftype='cheby2', output=output))
 
     # HP: F_sb < F_pb                          
     def HPmin(self, specs):
-        self.zpk2ba(sig.iirdesign(specs['F_pb'], specs['F_sb'], 
+        self.save(sig.iirdesign(specs['F_pb'], specs['F_sb'], 
                                    specs['A_pb'], specs['A_sb'],
-                             analog=False, ftype='cheby2', output=zpkba))
+                             analog=False, ftype='cheby2', output=output))
         
     # BP: F_sb[0] < F_pb[0], F_sb[1] > F_pb[1]    
     def BPmin(self, specs):
-        self.zpk2ba(sig.iirdesign([specs['F_pb'],specs['F_pb2']], 
+        self.save(sig.iirdesign([specs['F_pb'],specs['F_pb2']], 
                 [specs['F_sb'], specs['F_sb2']], specs['A_pb'], specs['A_sb'],
-                             analog=False, ftype='cheby2', output=zpkba))
+                             analog=False, ftype='cheby2', output=output))
 
     # BS: F_sb[0] > F_pb[0], F_sb[1] < F_pb[1]            
     def BSmin(self, specs):
-        self.zpk2ba(sig.iirdesign([specs['F_pb'],specs['F_pb2']], 
+        self.save(sig.iirdesign([specs['F_pb'],specs['F_pb2']], 
                 [specs['F_sb'], specs['F_sb2']], specs['A_pb'], specs['A_sb'],
-                            analog=False, ftype='cheby2', output=zpkba)) 
+                            analog=False, ftype='cheby2', output=output)) 
