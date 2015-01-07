@@ -15,17 +15,25 @@ import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
 
+# TODO: save results in gD.dB
 # TODO: BS does not work correctly (-> odd order!)
 # TODO: Try HP with even order & type = Hilbert
+# TODO: Hilbert not working correctly yet
+# TODO: Introduce new dict entry "vis" for visibility of entries
 
-zpkba = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
+
+def dB2lin(AdB):
+    return (10**(AdB/20.0)-1) / (10**(AdB/20.0)+1)*2
 
 class equiripple(object):
     
     def __init__(self):
         self.name = {'equiripple':'Equiripple'}
-        self.msg_man = "Enter a weight value for each band below"
+        self.msg_man = "Enter desired order, corner frequencies and a weight \
+        value for each band below. Note: Order needs to be odd for high-pass \
+        and band-pass filters (type II FIR filters)."
         self.msg_min = ""
         
         self.ft = 'FIR'
@@ -36,55 +44,58 @@ class equiripple(object):
             "HP": {"man":{"par":['N', 'W_sb', 'W_pb', 'F_sb','F_pb']},
                    "min":{"par":['A_pb','A_sb','F_sb','F_pb']}},
             "BP": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
-                        'W_sb', 'W_pb', 'W_sb2']}},
+                                 'W_sb', 'W_pb', 'W_sb2']}},
             "BS": {"man":{"par":['N', 'F_pb', 'F_sb', 'F_sb2', 'F_pb2',
-                        'W_pb', 'W_sb', 'W_pb2']}}
-          #"HIL":
+                                 'W_pb', 'W_sb', 'W_pb2']},
+                   "min":{"par":['A_pb','A_sb', 'A_pb2', 
+                                 'F_pb','F_sb', 'F_sb2', 'F_pb2']}},
+            "HIL": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
+                                 'W_sb', 'W_pb', 'W_sb2']}}
           #"DIFF":
                    }
         self.info = "Equiripple-Filter haben im Passband und im Stopband \
         jeweils konstanten Ripple, sie nutzen das vorgegebene Toleranzband \
         jeweils voll aus."
 
-    def zpk2ba(self, arg):
+    def save(self, arg):
         """ 
-        Convert poles / zeros / gain to filter coefficients (polynomes) and the
-        other way round
+        Convert between poles / zeros / gain, filter coefficients (polynomes) 
+        and second-order sections and store all available formats in the global
+        database.
         """
-        if zpkba == 'zpk': # arg = [z,p,k]
+        
+        if output == 'zpk': # arg = [z,p,k]
             self.coeffs = sig.zpk2tf(arg[0], arg[1], arg[2])        
             self.zpk = arg
         else: # arg = [b,a]
             self.zpk = sig.tf2zpk(arg[0], arg[1])#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
             self.coeffs = arg   
 
+
     def LPman(self, specs):
-        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
-                0.5],[1, 0], weight = [specs['W_pb'],specs['W_sb']], Hz = 1))
+        self.save(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 0.5],
+               [1, 0], weight = [specs['W_pb'],specs['W_sb']], Hz = 1))
 
     def HPman(self, specs):
         N = self.oddround(specs['N']) # enforce odd order 
-        self.zpk2ba(sig.remez(N,[0, specs['F_sb'], specs['F_pb'], 
-                0.5],[0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1))
+        self.save(sig.remez(N,[0, specs['F_sb'], specs['F_pb'], 0.5],
+                [0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1))
         
     # For BP and BS, F_pb and F_sb have two elements each
     def BPman(self, specs):
-        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
+        self.save(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
                 specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
                 weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1))
 
     def BSman(self, specs):
-        self.zpk2ba(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
+        self.save(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
                 specs['F_sb2'], specs['F_pb2'], 0.5],[1, 0, 1], 
                 weight = [specs['W_pb'],specs['W_sb'], specs['W_pb2']], Hz = 1))
                 
     def LPmin(self, specs):
-        A_PB_lin = (10**(specs['A_pb']/20.0)-1) / (10**(specs['A_pb']/20.0)+1)*2
-        print(A_PB_lin)
         (L, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb']], [1, 0], 
-            [A_PB_lin, 10.**(-specs['A_sb']/20)], Hz = 1, alg = 'ichige')
-        self.zpk2ba(sig.remez(L, [0, specs['F_pb'], specs['F_sb'], 
-                0.5],[1, 0], weight = W, Hz = 1))
+            [dB2lin(specs['A_pb']), 10.**(-specs['A_sb']/20)], Hz = 1, alg = 'ichige')
+        self.save(sig.remez(L, F, [1, 0], weight = W, Hz = 1))
                 
     def HPmin(self, specs):
         A_PB_lin = (10**(specs['A_pb']/20.0)-1) / (10**(specs['A_pb']/20.0)+1)*2
@@ -93,8 +104,20 @@ class equiripple(object):
             [np.sqrt(2)*10.**(-specs['A_sb']/20), A_PB_lin], Hz = 1, alg = 'ichige')
         N = self.oddround(L)  # enforce odd order 
 
-        self.zpk2ba(sig.remez(N, [0, specs['F_sb'], specs['F_pb'], 
-                0.5],[0, 1], weight = W, Hz = 1, type = 'bandpass'))
+        self.save(sig.remez(N, F,[0, 1], weight = W, Hz = 1, type = 'bandpass'))
+
+    def BSmin(self, specs):
+        (N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb'], 
+                                specs['F_sb2'], specs['F_pb2']], [1, 0, 1], 
+            [dB2lin(specs['A_pb']), np.sqrt(2)*10.**(-specs['A_sb']/20), 
+             dB2lin(specs['A_pb2'])], Hz = 1, alg = 'ichige')
+        self.save(sig.remez(N,F,[1, 0, 1], weight = W, Hz = 1))
+
+    def HILman(self, specs):
+        self.save(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
+                specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
+                weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1,
+                type = 'hilbert'))
         
                 
                 
