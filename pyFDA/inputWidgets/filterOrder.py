@@ -60,7 +60,21 @@ class FilterOrder(QtGui.QFrame):
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.titleLabel)
         layout.addItem(vbox)
-        self.setLayout(layout)
+        
+        foFrame = QtGui.QFrame()
+        foFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        foFrame.setLayout(layout)
+        foFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                 QtGui.QSizePolicy.Minimum)
+        
+        mainLayout = QtGui.QHBoxLayout()
+        mainLayout.addWidget(foFrame)
+        self.setLayout(mainLayout)
+        
+        
+#        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+        
+#        self.setLayout(layout)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs

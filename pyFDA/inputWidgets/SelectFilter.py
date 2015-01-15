@@ -72,12 +72,20 @@ class SelectFilter(QtGui.QWidget):
         """
         LAYOUT      
         """
-        layout=QtGui.QGridLayout()
+        # see Summerfield p. 278
+        layout = QtGui.QGridLayout()
         layout.addWidget(self.comboResponseType,0,0)
         layout.addWidget(self.comboFilterType,0,1)
         layout.addWidget(self.comboDesignMethod,0,2)
-
-        self.setLayout(layout)
+        
+        sfFrame = QtGui.QFrame()
+        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        sfFrame.setLayout(layout)
+        
+        mainLayout = QtGui.QHBoxLayout()
+        mainLayout.addWidget(sfFrame)
+        self.setLayout(mainLayout)
+#        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
     def setResponseType(self):
         """

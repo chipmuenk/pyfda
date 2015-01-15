@@ -46,7 +46,8 @@ class pyFDA(QtGui.QWidget):
 
         self.inputAll = inputAll.inputAll()
         self.pltAll = plotAll.plotAll() # instantiate tabbed plot widgets  
-        self.inputAll.setMaximumWidth(280)
+#        self.inputAll.setMaximumWidth(280)
+
         # ============== UI Layout =====================================
 #        self.grLayout = QtGui.QGridLayout()
 #        self.grLayout.addWidget(self.widgetInputParams,0,0) # parameter select widget

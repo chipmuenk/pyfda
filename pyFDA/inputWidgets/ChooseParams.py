@@ -30,7 +30,7 @@ Zur Eingabe aller Parameter und Einstellungen
 """
 
 
-class ChooseParams(QtGui.QFrame):
+class ChooseParams(QtGui.QWidget):
     
     def __init__(self, DEBUG = True):
         super(ChooseParams, self).__init__() 
@@ -96,9 +96,17 @@ class ChooseParams(QtGui.QFrame):
         self.layout.addWidget(self.msg,3,0,1,2)  # Text message
         self.layout.addWidget(self.aspec,4,0)   # Amplitude specs
         self.layout.addWidget(self.wspec,4,1)   # Weight specs
-        self.layout.addWidget(self.butDesignFilt,5,0,1,2)   # Design Filter!
+#        addWidget(self.butDesignFilt,5,0,1,2)   # Design Filter!
+        
 
-        self.setLayout(self.layout)
+
+#        self.setLayout(self.layout)
+        
+        mainLayout = QtGui.QVBoxLayout(self)
+        mainLayout.addLayout(self.layout)
+        mainLayout.addStretch()
+        mainLayout.addWidget(self.butDesignFilt)   # Design Filter!
+        self.setLayout(mainLayout)
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
         # Call chooseDesignMethod every time filter selection is changed: 
@@ -149,7 +157,7 @@ class ChooseParams(QtGui.QFrame):
         self.wspec.setDisabled(self.weightParams == []) 
         self.wspec.set(newLabels = self.weightParams)
 
-        self.setLayout(self.layout)
+#        self.setLayout(self.layout)
         
         
 #    def rebuildFrequFiltOrd(self,enMin=True):

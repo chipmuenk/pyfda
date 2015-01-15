@@ -8,7 +8,7 @@ Tabbed container for input widgets
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 #from PyQt4.QtCore import SIGNAL
 import scipy.io
 import numpy as np
@@ -51,6 +51,9 @@ class inputAll(QtGui.QWidget):
         vbox.addWidget(tab_widget)
 #        
         self.setLayout(vbox)
+#        vbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+        tab_widget.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                 QtGui.QSizePolicy.Expanding)
 
         
 #    def update(self):
