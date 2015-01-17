@@ -21,11 +21,17 @@ class cheby1(object):
     
     def __init__(self):
         self.name = {'cheby1':'Chebychev 1'}
-        self.msg_man = "Enter the filter order $N$, the maximum ripple $A_pb$ \
+        msg_man = "Enter the filter order $N$, the maximum ripple $A_pb$ \
         allowed below unity gain in the passband and the frequency or \
         frequencies $F_pb$ where the gain first drops below $-A_pb$."
-        self.msg_min = "Enter the desired pass band ripple and minimum stop \
+        msg_min = "Enter the desired pass band ripple and minimum stop \
         band attenuation and the corresponding corner frequencies."
+        # enabled widgets and common messages for man. / min. filt. order        
+        enb_man = ['fo','fspec','aspec'] # enabled widget for man. filt. order
+        enb_min = ['fo','fspec','aspec'] # enabled widget for min. filt. order
+        self.com = {"man":{"enb":enb_man, "msg":msg_man},
+                    "min":{"enb":enb_min, "msg":msg_min}}
+
         self.ft = 'IIR'
         self.rt = {
           "LP": {"man":{"par":['N', 'A_pb', 'F_pb']},

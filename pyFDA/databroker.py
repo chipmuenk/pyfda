@@ -15,11 +15,12 @@ from __future__ import print_function, division, unicode_literals
 global gD
 gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
-gD['N_FFT'] = 2048
+gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
 
 # Dictionaries for translating short (internal) names to full (displayed) names
 gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
-                 "BS":"Bandstop","HIL":"Hilbert"}
+                 "BS":"Bandstop","AP":"Allpass", 
+                 "HIL":"Hilbert","DIFF":"Differentiator"}
 gD['dmNames'] = {#IIR
                   "butter":"Butterworth", "cheby1":"Chebychev 1", 
                   "cheby2":"Chebychev 2",  "ellip":"Elliptic",
@@ -31,9 +32,8 @@ gD['dmNames'] = {#IIR
 # The following entries are created and updated dynamically during program 
 # execution. The entries only demonstrate the structure of the dicts and lists
 # or are used as initial / default entries.
-
-
-#  -----FilterFileReader.__init__() ------
+# -----------------------------------------------------------------------------
+# -----FilterFileReader.__init__() ------
 
 # Lists for dynamic imports from filter design subdirectory
 gD['initFileNames'] = [] # Python file names found in initFile (without .py)
@@ -41,8 +41,7 @@ gD['imports'] = {} # dict with filter files / classes
 
 # Dictionary describing the available combinations of response types (rt), 
 # filter types (ft), design methods (dm) and filter order (fo). 
-# This dict is overwritten by FilterFileReader.buildFilterTree() !
-
+# This dict is built + overwritten by FilterFileReader.buildFilterTree() !
          
 gD['filterTree'] = {
     'HP': 
@@ -80,7 +79,7 @@ gD['filterTree'] = {
     }
 
 
-
+# -----------------------------------------------------------------------------
 # Dictionaries containing current filter selections specifications, they are
 # automatically overwritten 
 #-------------------------------------- 

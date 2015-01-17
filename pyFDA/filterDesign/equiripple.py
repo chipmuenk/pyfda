@@ -17,6 +17,7 @@ from numpy import log10, pi, arctan
 
 # TODO: save results in gD.dB
 # TODO: BS does not work correctly (-> odd order!)
+# TODO: BPmin missing
 # TODO: Try HP with even order & type = Hilbert
 # TODO: Hilbert not working correctly yet
 # TODO: Introduce new dict entry "vis" for visibility of entries
@@ -31,26 +32,34 @@ class equiripple(object):
     
     def __init__(self):
         self.name = {'equiripple':'Equiripple'}
-        self.msg_man = "Enter desired order, corner frequencies and a weight \
+        msg_man = "Enter desired order, corner frequencies and a weight \
         value for each band below. Note: Order needs to be odd for high-pass \
         and band-pass filters (type II FIR filters)."
-        self.msg_min = ""
+        msg_min = ""
         
+        enb_man = ['fo','fspec','wspec'] # enabled widget for man. filt. order
+        enb_min = ['fo','fspec','aspec'] # enabled widget for min. filt. order
+        self.com = {"man":{"enb":enb_man, "msg":msg_man},
+                    "min":{"enb":enb_min, "msg":msg_min}}
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":['N', 'W_pb', 'W_sb', 'F_pb', 'F_sb'],
-                          "vis":['fo','fs', 'Ws']},
-                   "min":{"par":['A_pb','A_sb','F_pb','F_sb']}},
-            "HP": {"man":{"par":['N', 'W_sb', 'W_pb', 'F_sb','F_pb']},
-                   "min":{"par":['A_pb','A_sb','F_sb','F_pb']}},
+            "LP": {"man":{"par":['N','W_pb','W_sb','F_pb','F_sb','A_pb','A_sb']},
+                   "min":{"par":['A_pb','A_sb','F_pb','F_sb','W_pb','W_sb']}},
+            "HP": {"man":{"par":['N','W_sb','W_pb','F_sb','F_pb','A_sb','A_pb']},
+                   "min":{"par":['A_sb','A_pb','F_sb','F_pb','W_sb','W_pb']}},
             "BP": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
-                                 'W_sb', 'W_pb', 'W_sb2']}},
+                                 'W_sb','W_pb','W_sb2','A_sb','A_pb','A_sb2']},
+#                   "min":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
+#                                 'W_sb', 'W_pb', 'W_sb2'],
+#                          "enb":enb_min}
+                          },                                 
             "BS": {"man":{"par":['N', 'F_pb', 'F_sb', 'F_sb2', 'F_pb2',
-                                 'W_pb', 'W_sb', 'W_pb2']},
-                   "min":{"par":['A_pb','A_sb', 'A_pb2', 
-                                 'F_pb','F_sb', 'F_sb2', 'F_pb2']}},
+                                 'W_pb', 'W_sb', 'W_pb2','A_pb','A_sb','A_pb2']},
+                   "min":{"par":['A_pb','A_sb','A_pb2','W_pb','W_sb','W_pb2', 
+                                 'F_pb','F_sb','F_sb2','F_pb2']}},
             "HIL": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
-                                 'W_sb', 'W_pb', 'W_sb2']}}
+                                 'W_sb', 'W_pb', 'W_sb2','A_sb','A_pb','A_sb2']
+                                 }}
           #"DIFF":
                    }
         self.info = "Equiripple-Filter haben im Passband und im Stopband \

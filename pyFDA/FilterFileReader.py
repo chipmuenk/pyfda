@@ -229,6 +229,11 @@ class FilterFileReader(object):
                     filterTree[rt].update({ft:{}}) # no, create it
                 filterTree[rt][ft].update({dm:{}}) # append dm to list dict[rt][ft]
                 filterTree[rt][ft][dm].update(myFilter.rt[rt]) # append fo dict
+                for com in myFilter.com:
+                    print(myFilter.com[com])
+                    if com not in filterTree[rt][ft][dm]:
+                        filterTree[rt][ft][dm].update({com:{}})
+                    filterTree[rt][ft][dm][com].update(myFilter.com[com])
 
         if self.DEBUG: print("filterTree = ", filterTree)
         

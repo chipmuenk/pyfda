@@ -10,7 +10,7 @@ Updated on Thur Dec 11 2014
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
 # import databroker from one level above if this file is run as __main__
 # for test purposes
@@ -43,8 +43,8 @@ class UnitBox(QtGui.QWidget):
         self.initUI()     
         
     def initUI(self): 
-        self.WVLayout = QtGui.QVBoxLayout() # Widget layout   
-        self.layout   = QtGui.QGridLayout()
+        self.WVLayout = QtGui.QVBoxLayout() # Widget vertical layout  
+        self.layout   = QtGui.QGridLayout() # sublayout for spec fields
         
         if self.title != "":
             bfont = QtGui.QFont()
@@ -59,10 +59,13 @@ class UnitBox(QtGui.QWidget):
         if self.units != []:
             self.lab_units=QtGui.QLabel(self)
             self.lab_units.setText("Units")
+
             self.combo_units=QtGui.QComboBox(self)
             self.combo_units.addItems(self.units)
+
             self.layout.addWidget(self.lab_units,0,0)
-            self.layout.addWidget(self.combo_units,0,1)
+            self.layout.addWidget(self.combo_units,0,1, QtCore.Qt.AlignLeft)
+
         #self.layout.addWidget(self.qtitle, 0, 0, 2, 1) # span two columns
 
         # Create a gridLayout consisting of Labels and LineEdit fields
@@ -81,8 +84,20 @@ class UnitBox(QtGui.QWidget):
             self.layout.addWidget(self.qlabel[i],(i+1),0)
             self.layout.addWidget(self.qlineedit[i],(i+1),1)
  
-        self.WVLayout.addLayout(self.layout)
+
+        
+        sfFrame = QtGui.QFrame()
+        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        sfFrame.setLayout(self.layout)
+        
+        self.WVLayout.addWidget(sfFrame)
+#        self.WVLayout.addLayout(self.layout)
+
         self.setLayout(self.WVLayout)
+#        
+#        mainLayout = QtGui.QHBoxLayout()
+#        mainLayout.addWidget(sfFrame)
+#        self.setLayout(mainLayout)
         
         # SIGNALS & SLOTS
         # TODO: not working yet
@@ -90,7 +105,7 @@ class UnitBox(QtGui.QWidget):
 #        self.qlineedit.editingFinished.connect(self.update)
 
 #-------------------------------------------------------------        
-    def set(self, title = "", newLabels = []):
+    def setElements(self, title = "", newLabels = []):
         """
         Set title, labels, defaults - when number of elements changes, the 
         layout has to be rebuilt
@@ -116,7 +131,7 @@ class UnitBox(QtGui.QWidget):
                     self.labels[i] = newLabels[i]
                     self.qlineedit[i].setText(str(db.gD['curSpecs'][newLabels[i]]))
     
-        self.setLayout(self.WVLayout) # needed?
+ #       self.setLayout(self.WVLayout) # needed?
         
     def delElement(self,i):
         """
@@ -157,16 +172,15 @@ class UnitBox(QtGui.QWidget):
 #------------------------------------------------------------------------------ 
     
 if __name__ == '__main__':
-    units=['ab','cd','ef',]
-    lab=['a','b','c',]
-    defaults=[4,5,6]
+    units=['dB','V','W',]
+    lab=['A_sb','A_sb','A_sb2',]
     app = QtGui.QApplication(sys.argv)
-    form=UnitBox(title = "hallo", units = units, labels = lab)#, spec="TEST")
+    form=UnitBox(title = "Amplitudes", units = units, labels = lab)#, spec="TEST")
 
-    form.set(title = "Hallo", newLabels = ['a','b','c','d'], newDefaults = [1,2,3,10])
-    form.set(newLabels = ['d','b','a'], newDefaults = [1,2,3])
+    form.setElements(title = "Gewichte", newLabels = ['W_sb','W_sb2','W_pb','W_pb2'])
+    form.setElements(newLabels = ['W_pb','W_pb2'])
 
-    print(form.get())
+    print(form.update())
     form.show()
    
     app.exec_()

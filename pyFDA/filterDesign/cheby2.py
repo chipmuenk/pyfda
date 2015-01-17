@@ -22,16 +22,24 @@ class cheby2(object):
     def __init__(self):
 
         self.name = {'cheby2':'Chebychev 2'}
+        msg_man = "Enter the filter order $N$, the maximum ripple $A_pb$ \
+        allowed below unity gain in the passband and the frequency or \
+        frequencies $F_pb$ where the gain first drops below $-A_pb$."
+        msg_min = "Enter the desired pass band ripple and minimum stop \
+        band attenuation and the corresponding corner frequencies."
+
+
+ # enabled widgets and common messages for man. / min. filt. order
+        self.com = {"man":{"enb":['fo','fspec','aspec'], "msg":msg_man},
+                    "min":{"enb":['fo','fspec','aspec'], "msg":msg_min}}
+
         self.ft = 'IIR'
-        pBP = ['N', 'A_sb', 'F_sb', 'F_sb2']
-        pBPmin = ['A_pb', 'A_sb', 'F_pb', 'F_pb2','F_sb', 'F_sb2']
-        pLP = ['N', 'A_sb', 'F_sb']
         self.rt = {
-          "BP": {"man":{"par":pBP},
-                 "min":{"par":pBPmin}},
+          "BP": {"man":{"par":['N','A_sb','F_sb','F_sb2']},
+                 "min":{"par":['A_pb','A_sb','F_sb','F_pb','F_pb2','F_sb2']}},
           "BS": {"man":{"par":['A_sb','F_sb','F_sb2']},
                  "min":{"par":['A_pb','A_sb','F_pb','F_sb','F_sb2','F_pb2']}},
-          "LP": {"man":{"par":pLP},
+          "LP": {"man":{"par":['N', 'A_sb', 'F_sb']},
                  "min":{"par":['A_pb','A_sb','F_pb','F_sb']}},
           "HP": {"man":{"par":['N', 'A_sb', 'F_sb']},
                  "min":{"par":['A_pb','A_sb','F_sb','F_pb']}}

@@ -96,16 +96,11 @@ class ChooseParams(QtGui.QWidget):
         self.layout.addWidget(self.msg,3,0,1,2)  # Text message
         self.layout.addWidget(self.aspec,4,0)   # Amplitude specs
         self.layout.addWidget(self.wspec,4,1)   # Weight specs
-#        addWidget(self.butDesignFilt,5,0,1,2)   # Design Filter!
-        
 
-
-#        self.setLayout(self.layout)
-        
         mainLayout = QtGui.QVBoxLayout(self)
         mainLayout.addLayout(self.layout)
         mainLayout.addStretch()
-        mainLayout.addWidget(self.butDesignFilt)   # Design Filter!
+        mainLayout.addWidget(self.butDesignFilt, )   # Design Filter!
         self.setLayout(mainLayout)
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
@@ -135,6 +130,7 @@ class ChooseParams(QtGui.QWidget):
         dm = db.gD["curFilter"]["dm"]
         fo = db.gD["curFilter"]["fo"]  
         myParams = db.gD['filterTree'][rt][ft][dm][fo]['par']
+        myEnbWdg = db.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
 
         # build separate parameter lists according to the first letter
         self.freqParams = [l for l in myParams if l[0] == 'F']
@@ -149,13 +145,15 @@ class ChooseParams(QtGui.QWidget):
             print('weightLabels:', self.weightParams)
 
         # pass new labels to widgets
-        # disable (grey out) amp / weight labels if list is empty
+        # set invisible widgets if param list is empty
         self.fo.update()
-        self.fspec.set(newLabels = self.freqParams) # update frequency spec labels
-        self.aspec.setDisabled(self.ampParams == [])
-        self.aspec.set(newLabels = self.ampParams)
-        self.wspec.setDisabled(self.weightParams == []) 
-        self.wspec.set(newLabels = self.weightParams)
+        self.fspec.setElements(newLabels = self.freqParams) # update frequency spec labels
+        self.aspec.setVisible(self.ampParams != [])
+        self.aspec.setEnabled("aspec" in myEnbWdg)
+        self.aspec.setElements(newLabels = self.ampParams)
+        self.wspec.setVisible(self.weightParams != []) 
+        self.wspec.setEnabled("wspec" in myEnbWdg)
+        self.wspec.setElements(newLabels = self.weightParams)
 
 #        self.setLayout(self.layout)
         

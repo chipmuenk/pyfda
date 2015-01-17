@@ -12,7 +12,7 @@ Datum: 4.12.2014
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
 # import databroker from one level above if this file is run as __main__
 # for test purposes
@@ -55,6 +55,8 @@ class SelectFilter(QtGui.QWidget):
         self.comboFilterType=QtGui.QComboBox(self)
         self.comboDesignMethod=QtGui.QComboBox(self)
         
+        # Translate short response type ("LP") to displayed names ("Lowpass")
+        # (correspondence is defined in databroker.py) and populate combo box:
         for rt in db.gD["filterTree"]:
             self.comboResponseType.addItem(db.gD["rtNames"][rt], rt)
         self.comboResponseType.setCurrentIndex(0) # set initial index
@@ -72,11 +74,11 @@ class SelectFilter(QtGui.QWidget):
         """
         LAYOUT      
         """
-        # see Summerfield p. 278
-        layout = QtGui.QGridLayout()
-        layout.addWidget(self.comboResponseType,0,0)
-        layout.addWidget(self.comboFilterType,0,1)
-        layout.addWidget(self.comboDesignMethod,0,2)
+        # see Summerfield p. 278       
+        layout = QtGui.QHBoxLayout()
+        layout.addWidget(self.comboResponseType)# QtCore.Qt.AlignLeft)
+        layout.addWidget(self.comboFilterType)
+        layout.addWidget(self.comboDesignMethod)
         
         sfFrame = QtGui.QFrame()
         sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
