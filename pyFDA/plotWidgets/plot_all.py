@@ -16,15 +16,15 @@ from PyQt4 import QtGui #, QtCore
 if __name__ == "__main__": # relative import if this file is run as __main__
     cwd=os.path.dirname(os.path.abspath(__file__))
     sys.path.append(cwd + '/..')
-import plotHf, plotPhi
+import plot_hf, plot_phi
 
 
 class plotAll(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
-        self.pltHf = plotHf.PlotHf()
-        self.pltPhi = plotPhi.PlotPhi()
+        self.pltHf = plot_hf.PlotHf()
+        self.pltPhi = plot_phi.PlotPhi()
         
         self.initUI()
         

@@ -99,7 +99,7 @@ class PlotHf(QtGui.QMainWindow):
         ymax = ax.get_ylim()[1]
         F_max = self.f_S/2
         if specLog:
-            if db.gD["curFilter"]["ft"] == "FIR":
+            if db.gD['selFilter']['ft'] == "FIR":
                 A_pb_max = self.A_pb # 20*log10(1+del_DB)
             else: # IIR log
                 A_pb_max = 0
@@ -108,7 +108,7 @@ class PlotHf(QtGui.QMainWindow):
             A_sb = -self.A_sb
             A_sbx = A_sb - 10
         else:
-            if db.gD["curFilter"]["ft"] == 'FIR':
+            if db.gD['selFilter']['ft'] == 'FIR':
                 A_pb_max = 10**(self.A_pb/20)# 1 + del_DB 
             else:
                 A_pb_max = 1
@@ -122,7 +122,7 @@ class PlotHf(QtGui.QMainWindow):
         F_sb2 = db.gD['curSpecs']['F_sb2'] / self.f_S
         F_pb2 = db.gD['curSpecs']['F_pb2'] / self.f_S
 
-        if db.gD["curFilter"]["rt"] == 'LP':
+        if db.gD["'selFilter"]['rt'] == 'LP':
             # upper limits:            
             ax.plot([0, F_sb, F_sb, F_max],
                     [A_pb_max, A_pb_max, A_sb, A_sb], 'b--')
@@ -133,7 +133,7 @@ class PlotHf(QtGui.QMainWindow):
             ax.fill_between([0, F_pb, F_pb], A_sbx,
                             [A_pb_min, A_pb_min, A_pb_minx], facecolor=fc)
        
-        if db.gD["curFilter"]["rt"] == 'HP':
+        if db.gD['selFilter']['rt'] == 'HP':
             # upper limits:
             ax.plot([0, F_sb, F_sb, F_max],
                     [A_sb, A_sb, A_pb_max, A_pb_max], 'b--')
@@ -144,7 +144,7 @@ class PlotHf(QtGui.QMainWindow):
             ax.fill_between([F_pb, F_pb, F_max], A_sbx,
                             [A_pb_minx, A_pb_min, A_pb_min], facecolor=fc)
             
-        if db.gD["curFilter"]["rt"] == 'BS':
+        if db.gD['selFilter']['rt'] == 'BS':
             # lower limits left:            
             ax.plot([0, F_pb, F_pb],[A_pb_min, A_pb_min, A_pb_minx], 'b--')
             ax.fill_between([0, F_pb, F_pb], A_sbx,
@@ -163,7 +163,7 @@ class PlotHf(QtGui.QMainWindow):
                             [A_pb_minx, A_pb_min, A_pb_min],facecolor = fc)    
             
 
-        if db.gD["curFilter"]["rt"] == "BP":
+        if db.gD['selFilter']['rt'] == "BP":
             # upper limits:
             ax.plot([0,    F_sb,  F_sb,      F_sb2,      F_sb2,  F_max],
                     [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb], 'b--')

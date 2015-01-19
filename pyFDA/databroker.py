@@ -84,7 +84,7 @@ gD['filterTree'] = {
 # automatically overwritten 
 #-------------------------------------- 
 # Current filter selection and parameters                
-gD['curFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man"}
+gD['selFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man"}
 # Current filter specifications
 gD['curSpecs'] = {'N':10, 'fS': 48000,
             'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,

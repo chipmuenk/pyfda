@@ -116,7 +116,7 @@ class ChooseParams(QtGui.QWidget):
         
     def chooseDesignMethod(self):
         """
-        Reads:  db.gD["curFilter"] (currently selected filter), extracting info
+        Reads:  db.gD['selFilter'] (currently selected filter), extracting info
                 from db.gD['filterTree']
         Writes:
         Depending on SelectFilter and frequency specs, the values of the 
@@ -125,10 +125,10 @@ class ChooseParams(QtGui.QWidget):
         """
 
         # Read freq / amp / weight labels for current filter design
-        rt = db.gD["curFilter"]["rt"]
-        ft = db.gD["curFilter"]["ft"]
-        dm = db.gD["curFilter"]["dm"]
-        fo = db.gD["curFilter"]["fo"]  
+        rt = db.gD['selFilter']["rt"]
+        ft = db.gD['selFilter']["ft"]
+        dm = db.gD['selFilter']["dm"]
+        fo = db.gD['selFilter']["fo"]  
         myParams = db.gD['filterTree'][rt][ft][dm][fo]['par']
         myEnbWdg = db.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
 
@@ -138,7 +138,7 @@ class ChooseParams(QtGui.QWidget):
         self.weightParams = [l for l in myParams if l[0] == 'W']
         if self.DEBUG:
             print("=== chooseParams.chooseDesignMethod ===")
-            print("curFilter:", db.gD["curFilter"])
+            print("curFilter:", db.gD['selFilter'])
             print('myLabels:', myParams)
             print('ampLabels:', self.ampParams)
             print('freqLabels:', self.freqParams)
@@ -198,7 +198,7 @@ class ChooseParams(QtGui.QWidget):
         """
     
 #        ret = {}
-#        db.gD["curFilter"]["fo"] # collect data from filter order widget
+#        db.gD['selFilter']["fo"] # collect data from filter order widget
 #        db.gD["curSpecs"].update(self.fspec.get()) # collect data from frequ. spec. widget
 #        db.gD["curSpecs"].update(self.aspec.get()) # magnitude specs with unit
 #        db.gD["curSpecs"].update(self.wspec.get()) # weight specs
@@ -217,14 +217,14 @@ class ChooseParams(QtGui.QWidget):
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print('Specs:', db.gD["curSpecs"])#params)
-            print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm']+"."+
-                  db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])
+            print("db.gD['selFilter']['dm']", db.gD['selFilter']['dm']+"."+
+                  db.gD['selFilter']['rt']+db.gD['selFilter']['fo'])
         # create filter object instance from design method (e.g. 'cheby1'):   
-        self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
+        self.myFilter = self.ffr.objectWizzard(db.gD['selFilter']['dm'])
         # Now construct the instance method from the response type (e.g.
         # 'LP' -> cheby1.LP) and
         # design the filter by passing current specs to the method:
-        getattr(self.myFilter, db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])(db.gD["curSpecs"])
+        getattr(self.myFilter, db.gD['selFilter']['rt']+db.gD['selFilter']['fo'])(db.gD["curSpecs"])
         
         # Read back filter coefficients and (zeroes, poles, k):
         db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)

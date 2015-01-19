@@ -97,7 +97,7 @@ class SelectFilter(QtGui.QWidget):
         self.rtIdx =self.comboResponseType.currentIndex()       
         self.rt = str(self.comboResponseType.itemData(self.rtIdx))
          
-        db.gD["curFilter"]["rt"] = self.rt # abbreviation
+        db.gD['selFilter']["rt"] = self.rt # abbreviation
 #        rt=db.gD["rtNames"][self.rt] # full text
 #        print(db.gD["filterTree"][self.rt].keys())
         # 
@@ -118,7 +118,7 @@ class SelectFilter(QtGui.QWidget):
         for dm in db.gD["filterTree"][self.rt][self.ft]:
             self.comboDesignMethod.addItem(db.gD["dmNames"][dm], dm)
 
-        db.gD['curFilter']["ft"] = self.ft
+        db.gD['selFilter']["ft"] = self.ft
         self.setDesignMethod()
             
     def setDesignMethod(self):
@@ -128,18 +128,18 @@ class SelectFilter(QtGui.QWidget):
         """
         self.dmIdx = self.comboDesignMethod.currentIndex()
         self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
-        db.gD["curFilter"]["dm"] = self.dm
+        db.gD['selFilter']["dm"] = self.dm
 
         # Check whether new design method also provides the old filter order 
         # method. If yes, don't change it, else set first available 
         # filter method
-        if db.gD["curFilter"]["fo"] not in \
+        if db.gD['selFilter']["fo"] not in \
                         db.gD["filterTree"][self.rt][self.ft][self.dm].keys():
-            db.gD["curFilter"].update({"fo":{}})
-            db.gD["curFilter"]["fo"] \
+            db.gD['selFilter'].update({"fo":{}})
+            db.gD['selFilter']["fo"] \
                 = db.gD["filterTree"][self.rt][self.ft][self.dm].keys()[0]
         if self.DEBUG: 
-            print("curFilter:", db.gD["curFilter"])
+            print("curFilter:", db.gD['selFilter'])
             print("filterTree[dm]= ", db.gD["filterTree"][self.rt][self.ft]\
                                                             [self.dm].keys())
 

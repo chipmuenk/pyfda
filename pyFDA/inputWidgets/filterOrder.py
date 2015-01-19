@@ -86,17 +86,17 @@ class FilterOrder(QtGui.QFrame):
         
     def update(self):
         # read list of available filter order methods from filterTree:
-        foList = db.gD['filterTree'][db.gD['curFilter']['rt']]\
-                [db.gD['curFilter']['ft']][db.gD['curFilter']['dm']].keys()
+        foList = db.gD['filterTree'][db.gD['selFilter']['rt']]\
+                [db.gD['selFilter']['ft']][db.gD['selFilter']['dm']].keys()
         if self.DEBUG: 
             print("=== filterOrder.update() ===")            
             print("foList", foList)
 
-        if db.gD["curFilter"]['fo'] in foList:
-            fo = db.gD["curFilter"]['fo'] # keep current setting
+        if db.gD['selFilter']['fo'] in foList:
+            fo = db.gD['selFilter']['fo'] # keep current setting
         else:
             fo = foList[0] # use first list entry from filterTree
-            db.gD["curFilter"]['fo'] = fo # and update "curFilter"
+            db.gD['selFilter']['fo'] = fo # and update 'selFilter'
 
         # Determine which subwidgets are __visible__
         self.txtLabel.setVisible("man" in foList)
@@ -112,11 +112,11 @@ class FilterOrder(QtGui.QFrame):
                 self.txtManual.setText(str(db.gD["curSpecs"]["N"])) 
                 self.txtManual.setEnabled(False)
                 self.txtLabel.setEnabled(False)
-                db.gD["curFilter"].update({"fo" : "min"})
+                db.gD['selFilter'].update({"fo" : "min"})
             else:
                 self.txtManual.setEnabled(True)
                 self.txtLabel.setEnabled(True)
-                db.gD["curFilter"].update({"fo" : "man"})
+                db.gD['selFilter'].update({"fo" : "man"})
         else:
             self.txtLabel.setEnabled(fo == 'man')
             self.txtManual.setEnabled(fo == 'man')
@@ -131,10 +131,10 @@ if __name__ == '__main__':
     form.show()
     form.chkMin.setChecked(True)
     form.update()
-    print(db.gD["curFilter"]["fo"])
+    print(db.gD['selFilter']["fo"])
     form.chkMin.setChecked(False)
     form.update()
-    print(db.gD["curFilter"]["fo"])
+    print(db.gD['selFilter']["fo"])
 
     app.exec_()
 

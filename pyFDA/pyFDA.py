@@ -14,7 +14,7 @@ import numpy as np
 import databroker as db # importing databroker initializes all its globals
 #from FilterFileReader import FilterFileReader
 from inputWidgets import inputAll
-from plotWidgets import plotAll
+from plotWidgets import plot_all
 
 
 class pyFDA(QtGui.QWidget):
@@ -45,7 +45,7 @@ class pyFDA(QtGui.QWidget):
 #        self.widgetInputParams = ChooseParams.ChooseParams() 
 
         self.inputAll = inputAll.inputAll()
-        self.pltAll = plotAll.plotAll() # instantiate tabbed plot widgets  
+        self.pltAll = plot_all.plotAll() # instantiate tabbed plot widgets  
 #        self.inputAll.setMaximumWidth(280)
 
         # ============== UI Layout =====================================
@@ -77,14 +77,14 @@ class pyFDA(QtGui.QWidget):
 #        if self.DEBUG:
 #            print("--- pyFDA.py : startDesignFilter ---")
 #            print('Specs:', db.gD["curSpecs"])#params)
-#            print("db.gD['curFilter']['dm']", db.gD['curFilter']['dm']+"."+
-#                  db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])
+#            print("db.gD['selFilter']['dm']", db.gD['selFilter']['dm']+"."+
+#                  db.gD['selFilter']['rt']+db.gD['selFilter']['fo'])
 #        # create filter object instance from design method (e.g. 'cheby1'):   
-#        self.myFilter = self.ffr.objectWizzard(db.gD['curFilter']['dm'])
+#        self.myFilter = self.ffr.objectWizzard(db.gD['selFilter']['dm'])
 #        # Now construct the instance method from the response type (e.g.
 #        # 'LP' -> cheby1.LP) and
 #        # design the filter by passing current specs to the method:
-#        getattr(self.myFilter, db.gD['curFilter']['rt']+db.gD['curFilter']['fo'])(db.gD["curSpecs"])
+#        getattr(self.myFilter, db.gD['selFilter']['rt']+db.gD['selFilter']['fo'])(db.gD["curSpecs"])
 #        
 #        # Read back filter coefficients and (zeroes, poles, k):
 #        db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
