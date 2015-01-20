@@ -12,15 +12,15 @@ from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui, QtCore
 
-# import databroker from one level above if this file is run as __main__
+# import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import databroker as db
+import filterbroker as fb
 
-class UnitBox(QtGui.QWidget):
+class InputUnits(QtGui.QWidget):
     
     def __init__(self, title = "", units=[], labels=[], spec="", DEBUG = True):
         
@@ -29,7 +29,7 @@ class UnitBox(QtGui.QWidget):
         units: sind die Einheiten die in der Combobox stehen sollen
         lab: Namen der Labels in einer Liste
         """
-        super(UnitBox, self).__init__()   
+        super(InputUnits, self).__init__()   
         self.DEBUG = DEBUG
         self.labels = labels # list with labels for combobox
         self.title = title
@@ -79,7 +79,7 @@ class UnitBox(QtGui.QWidget):
             self.qlabel.append(QtGui.QLabel(self))
             self.qlabel[i].setText(self.labels[i])
             self.qlineedit.append(QtGui.QLineEdit(str(
-                                        db.gD['curSpecs'][self.labels[i]])))
+                                        fb.gD['selFilter'][self.labels[i]])))
 
             self.layout.addWidget(self.qlabel[i],(i+1),0)
             self.layout.addWidget(self.qlineedit[i],(i+1),1)
@@ -129,9 +129,32 @@ class UnitBox(QtGui.QWidget):
                 if (self.labels[i]!=newLabels[i]):     
                     self.qlabel[i].setText(newLabels[i])
                     self.labels[i] = newLabels[i]
-                    self.qlineedit[i].setText(str(db.gD['curSpecs'][newLabels[i]]))
-    
- #       self.setLayout(self.WVLayout) # needed?
+                    self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
+                    
+#    def updateElements(self, title = "", newLabels = []):
+#        """
+#        Reread elements from global filterbroker
+#        """
+#        if self.DEBUG: print("UnitBox.Titel:",self.title)
+#        if title != "":
+#            self.qtitle.setText(title) # new title
+#    
+#        # Check whether the number of entries has changed
+#        for i in range(max(len(self.labels), len(newLabels))):
+#             # newLabels is shorter than labels -> delete the difference
+#            if (i > (len(newLabels)-1)):
+#                self.delElement(len(newLabels))
+#
+#            # newLabels is longer than existing labels -> create new ones!   
+#            elif (i > (len(self.labels)-1)):
+#                self.addElement(i,newLabels[i])
+#
+#            else:
+#                # when label has changed, update it and the default value
+#                if (self.labels[i]!=newLabels[i]):     
+#                    self.qlabel[i].setText(newLabels[i])
+#                    self.labels[i] = newLabels[i]
+#                    self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
         
     def delElement(self,i):
         """
@@ -151,17 +174,17 @@ class UnitBox(QtGui.QWidget):
         """
         self.qlabel.append(QtGui.QLabel(self))
         self.labels.append(newLabel)
-        self.qlineedit.append(QtGui.QLineEdit(str(db.gD['curSpecs'][newLabel])))
+        self.qlineedit.append(QtGui.QLineEdit(str(fb.gD['selFilter'][newLabel])))
         self.qlabel[i].setText(newLabel)
         self.layout.addWidget(self.qlabel[i],(i+1),0)
         self.layout.addWidget(self.qlineedit[i],(i+1),1)
       
     def update(self):
         """
-        Update specification entries in dict db.gD["curSpecs"]
+        Update specification entries in dict fb.gD['selFilter']
         """
         for i in range(len(self.labels)):
-            db.gD["curSpecs"].update(
+            fb.gD['selFilter'].update(
                             {self.labels[i]:float(self.qlineedit[i].text())})
 
 #        if self.DEBUG: 
@@ -172,10 +195,10 @@ class UnitBox(QtGui.QWidget):
 #------------------------------------------------------------------------------ 
     
 if __name__ == '__main__':
-    units=['dB','V','W',]
-    lab=['A_sb','A_sb','A_sb2',]
+    units = ['dB','V','W',]
+    lab = ['A_sb','A_sb','A_sb2',]
     app = QtGui.QApplication(sys.argv)
-    form=UnitBox(title = "Amplitudes", units = units, labels = lab)#, spec="TEST")
+    form = InputUnits(title = "Amplitudes", units = units, labels = lab)#, spec="TEST")
 
     form.setElements(title = "Gewichte", newLabels = ['W_sb','W_sb2','W_pb','W_pb2'])
     form.setElements(newLabels = ['W_pb','W_pb2'])

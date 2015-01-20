@@ -13,13 +13,13 @@ from PyQt4 import QtGui
 import scipy.io
 import numpy as np
 
-# import databroker from one level above if this file is run as __main__
+# import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import databroker as db # importing databroker initializes all its globals
+import filterbroker as fb # importing filterbroker initializes all its globals
 
 
 class inputFiles(QtGui.QWidget):
@@ -72,7 +72,7 @@ class inputFiles(QtGui.QWidget):
                 caption = "Save filter coefficients as")
        
         scipy.io.savemat(myMLfile, 
-                         mdict={'filt_coeffs': db.gD['coeffs']})
+                         mdict={'filt_coeffs': fb.gD['coeffs']})
         print("exportML: Matlab workspace exported to %s!" %myMLfile)
         
     def exportCSV(self):
@@ -80,7 +80,7 @@ class inputFiles(QtGui.QWidget):
         Export filter coefficients to a CSV-file 
         """
         
-        np.savetxt('d:/Daten/filt_coeffs.csv', db.gD['coeffs'])
+        np.savetxt('d:/Daten/filt_coeffs.csv', fb.gD['coeffs'])
         print("exportCSV: CSV - File exported!")
 #------------------------------------------------------------------------------
    

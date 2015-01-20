@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-databroker.py
+filterbroker.py
 
 Created on Wed Dec 03 06:13:50 2014
 
@@ -11,7 +11,7 @@ http://pymotw.com/2/articles/data_persistence.html
 @author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
-# importing databroker runs the module once, defining all globals and variables
+# importing filterbroker runs the module once, defining all globals and variables
 global gD
 gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
@@ -83,13 +83,12 @@ gD['filterTree'] = {
 # Dictionaries containing current filter selections specifications, they are
 # automatically overwritten 
 #-------------------------------------- 
-# Current filter selection and parameters                
-gD['selFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man"}
-# Current filter specifications
-gD['curSpecs'] = {'N':10, 'fS': 48000,
-            'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,
-            'A_sb':60., 'A_sb2': 60, 'F_sb':0.2, 'F_sb2':0.3,
-            'W_pb':1, 'W_pb2':1, 'W_sb':1, 'W_sb2':1}
+# Current filter selection, parameters and specifications              
+gD['selFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man",
+                'N':10, 'fS': 48000,
+                'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,
+                'A_sb':60., 'A_sb2': 60, 'F_sb':0.2, 'F_sb2':0.3,
+                'W_pb':1, 'W_pb2':1, 'W_sb':1, 'W_sb2':1}
 
 gD['coeffs'] = ([1,1,1],[3,0,2])
 gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
@@ -108,15 +107,15 @@ Alternative: Use the shelve module
 import shelve
 
 ### write to database:
-s = shelve.open('test_shelf.db')
+s = shelve.open('test_shelf.fb')
 try:
     s['key1'] = { 'int': 10, 'float':9.5, 'string':'Sample data' }
 finally:
     s.close()
 
 ### read from database:   
-s = shelve.open('test_shelf.db')
-# s = shelve.open('test_shelf.db', flag='r') # read-only
+s = shelve.open('test_shelf.fb')
+# s = shelve.open('test_shelf.fb', flag='r') # read-only
 try:
     existing = s['key1']
 finally:
@@ -125,7 +124,7 @@ finally:
 print(existing)
 
 ### catch changes to objects, store in in-memory cache and write-back upon close
-s = shelve.open('test_shelf.db', writeback=True)
+s = shelve.open('test_shelf.fb', writeback=True)
 try:
     print s['key1']
     s['key1']['new_value'] = 'this was not here before'

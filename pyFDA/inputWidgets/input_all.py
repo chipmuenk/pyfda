@@ -8,34 +8,28 @@ Tabbed container for input widgets
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui, QtCore
-#from PyQt4.QtCore import SIGNAL
-import scipy.io
-import numpy as np
+from PyQt4 import QtGui
 
-# import databroker from one level above if this file is run as __main__
+# add main directory from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import databroker as db # importing databroker initializes all its globals
-from inputWidgets import ChooseParams, inputFiles#, inputParams
-from plotWidgets import plotAll
+import input_params, input_files
 
-
-class inputAll(QtGui.QWidget):
+class InputAll(QtGui.QWidget):
     """
     Create the tabbed window for various input widgets
     """
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
-        super(inputAll, self).__init__()
+        super(InputAll, self).__init__()
 
 
 #        self.inputParams = inputParams.inputParams()
-        self.inputParams = ChooseParams.ChooseParams()        
-        self.inputFiles = inputFiles.inputFiles()
+        self.inputParams = input_params.InputParams()        
+        self.inputFiles = input_files.inputFiles()
         
         self.initUI()     
 
@@ -68,7 +62,7 @@ class inputAll(QtGui.QWidget):
     
 def main():
     app = QtGui.QApplication(sys.argv)
-    form = inputAll()
+    form = InputAll()
     form.show()
     app.exec_()
 

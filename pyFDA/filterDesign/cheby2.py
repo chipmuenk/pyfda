@@ -7,7 +7,7 @@ the filter design in zeros, poles, gain (zpk) format
 
 @author: Christian Muenker
 
-Zu erwartende Änderungen in scipy 0.15:
+Expected changes in scipy 0.16:
 https://github.com/scipy/scipy/pull/3717
 https://github.com/scipy/scipy/issues/2444
 """

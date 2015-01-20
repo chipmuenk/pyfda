@@ -5,30 +5,25 @@ Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals 
 import sys, os
-# import EITHER PyQt4 OR PySide, depending on your system
-from PyQt4 import QtGui, QtCore
 
+from PyQt4 import QtGui
 from PyQt4.QtGui import QSizePolicy
 from PyQt4.QtCore import QSize
-#from PySide.QtCore import *
-#from PySide.QtGui import *
 
 #import matplotlib as plt
-#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-#from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 #from matplotlib.figure import Figure
 
 import numpy as np
 import scipy.signal as sig
-# import databroker from one level above if this file is run as __main__
+# import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import databroker as db
+import filterbroker as fb
 
-from plotUtils import MplWidget#, MyMplToolbar, MplCanvas 
+from plot_utils import MplWidget#, MyMplToolbar, MplCanvas 
 
 
 """
@@ -55,6 +50,8 @@ class PlotHf(QtGui.QMainWindow):
         self.btnInset = QtGui.QCheckBox()
         self.lblSpecs = QtGui.QLabel("Show Specs")
         self.btnSpecs = QtGui.QCheckBox()
+        self.lblPhase = QtGui.QLabel("Show Phase")
+        self.btnPhase = QtGui.QCheckBox()
         self.btnSpecs.setChecked(False)
 
         self.hbox = QtGui.QHBoxLayout()
@@ -67,6 +64,9 @@ class PlotHf(QtGui.QMainWindow):
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.lblSpecs)
         self.hbox.addWidget(self.btnSpecs)
+        self.hbox.addStretch(1)
+        self.hbox.addWidget(self.lblPhase)
+        self.hbox.addWidget(self.btnPhase)
         self.hbox.addStretch(10)
     
         self.mplwidget = MplWidget()
@@ -89,17 +89,19 @@ class PlotHf(QtGui.QMainWindow):
         self.btnLog.clicked.connect(lambda:self.draw())
         self.btnInset.clicked.connect(lambda:self.draw())
         self.btnSpecs.clicked.connect(lambda:self.draw())
+        self.btnPhase.clicked.connect(lambda:self.draw())
 
     def plotSpecLimits(self, specAxes, specLog):
         """
         Plot the specifications limits 
         """
-        fc = (0.8,0.8,0.8) # color for shaded areas
+#        fc = (0.8,0.8,0.8) # color for shaded areas
+        fill_params = {"color":"none","hatch":"/", "edgecolor":"k", "lw":0.0}
         ax = specAxes
         ymax = ax.get_ylim()[1]
         F_max = self.f_S/2
         if specLog:
-            if db.gD['selFilter']['ft'] == "FIR":
+            if fb.gD['selFilter']['ft'] == "FIR":
                 A_pb_max = self.A_pb # 20*log10(1+del_DB)
             else: # IIR log
                 A_pb_max = 0
@@ -108,7 +110,7 @@ class PlotHf(QtGui.QMainWindow):
             A_sb = -self.A_sb
             A_sbx = A_sb - 10
         else:
-            if db.gD['selFilter']['ft'] == 'FIR':
+            if fb.gD['selFilter']['ft'] == 'FIR':
                 A_pb_max = 10**(self.A_pb/20)# 1 + del_DB 
             else:
                 A_pb_max = 1
@@ -118,62 +120,62 @@ class PlotHf(QtGui.QMainWindow):
             A_sbx = A_sb / 5
         
         F_pb = self.F_pb
-        F_sb = db.gD['curSpecs']['F_sb'] / self.f_S
-        F_sb2 = db.gD['curSpecs']['F_sb2'] / self.f_S
-        F_pb2 = db.gD['curSpecs']['F_pb2'] / self.f_S
+        F_sb = fb.gD['selFilter']['F_sb'] / self.f_S
+        F_sb2 = fb.gD['selFilter']['F_sb2'] / self.f_S
+        F_pb2 = fb.gD['selFilter']['F_pb2'] / self.f_S
 
-        if db.gD["'selFilter"]['rt'] == 'LP':
+        if fb.gD['selFilter']['rt'] == 'LP':
             # upper limits:            
             ax.plot([0, F_sb, F_sb, F_max],
                     [A_pb_max, A_pb_max, A_sb, A_sb], 'b--')
             ax.fill_between([0, F_sb, F_sb, F_max], ymax,
-                    [A_pb_max, A_pb_max, A_sb, A_sb], facecolor=fc)                    
+                    [A_pb_max, A_pb_max, A_sb, A_sb], **fill_params)                    
             # lower limits:
             ax.plot([0, F_pb, F_pb],[A_pb_min, A_pb_min, A_pb_minx], 'b--')
-            ax.fill_between([0, F_pb, F_pb], A_sbx,
-                            [A_pb_min, A_pb_min, A_pb_minx], facecolor=fc)
+            ax.fill_between([0, F_pb, F_pb], A_pb_minx,
+                            [A_pb_min, A_pb_min, A_pb_minx], **fill_params)
        
-        if db.gD['selFilter']['rt'] == 'HP':
+        if fb.gD['selFilter']['rt'] == 'HP':
             # upper limits:
             ax.plot([0, F_sb, F_sb, F_max],
                     [A_sb, A_sb, A_pb_max, A_pb_max], 'b--')
             ax.fill_between([0, F_sb, F_sb, F_max], 10,
-                    [A_sb, A_sb, A_pb_max, A_pb_max], facecolor=fc)
+                    [A_sb, A_sb, A_pb_max, A_pb_max], **fill_params)
             # lower limits:
             ax.plot([F_pb, F_pb, F_max],[A_pb_minx, A_pb_min, A_pb_min], 'b--')
-            ax.fill_between([F_pb, F_pb, F_max], A_sbx,
-                            [A_pb_minx, A_pb_min, A_pb_min], facecolor=fc)
+            ax.fill_between([F_pb, F_pb, F_max], A_pb_minx,
+                            [A_pb_minx, A_pb_min, A_pb_min], **fill_params)
             
-        if db.gD['selFilter']['rt'] == 'BS':
+        if fb.gD['selFilter']['rt'] == 'BS':
             # lower limits left:            
             ax.plot([0, F_pb, F_pb],[A_pb_min, A_pb_min, A_pb_minx], 'b--')
-            ax.fill_between([0, F_pb, F_pb], A_sbx,
-                            [A_pb_min, A_pb_min, A_pb_minx], facecolor=fc)
+            ax.fill_between([0, F_pb, F_pb], A_pb_minx,
+                            [A_pb_min, A_pb_min, A_pb_minx], **fill_params)
 
             # upper limits:            
             ax.plot([0, F_sb, F_sb, F_sb2, F_sb2, F_max],
                     [A_pb_max, A_pb_max, A_sb, A_sb, A_pb_max, A_pb_max], 'b--')
             ax.fill_between([0, F_sb, F_sb, F_sb2, F_sb2, F_max], 10,
                     [A_pb_max, A_pb_max, A_sb, A_sb, A_pb_max, A_pb_max], 
-                        facecolor = fc)
+                        **fill_params)
 
             # lower limits right:            
             ax.plot([F_pb2, F_pb2, F_max],[A_pb_minx, A_pb_min, A_pb_min],'b--')    
-            ax.fill_between([F_pb2, F_pb2, F_max], A_sbx,
-                            [A_pb_minx, A_pb_min, A_pb_min],facecolor = fc)    
+            ax.fill_between([F_pb2, F_pb2, F_max], A_pb_minx,
+                            [A_pb_minx, A_pb_min, A_pb_min], **fill_params)    
             
 
-        if db.gD['selFilter']['rt'] == "BP":
+        if fb.gD['selFilter']['rt'] == "BP":
             # upper limits:
             ax.plot([0,    F_sb,  F_sb,      F_sb2,      F_sb2,  F_max],
                     [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb], 'b--')
             ax.fill_between([0, F_sb, F_sb, F_sb2, F_sb2, F_max], 10,
-                    [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb], facecolor=fc)
+                    [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb],**fill_params)
             # lower limits:
             ax.plot([F_pb, F_pb, F_pb2, F_pb2], 
-                    [A_sbx, A_pb_min, A_pb_min, A_sbx], 'b--' )
-            ax.fill_between([F_pb, F_pb, F_pb2, F_pb2], A_sbx,
-                    [A_sbx, A_pb_min, A_pb_min, A_sbx], facecolor = fc)       
+                    [A_pb_minx, A_pb_min, A_pb_min, A_pb_minx], 'b--' )
+            ax.fill_between([F_pb, F_pb, F_pb2, F_pb2], A_pb_minx,
+                    [A_pb_minx, A_pb_min, A_pb_min, A_pb_minx], **fill_params)       
             
     def draw(self):
         """ 
@@ -182,18 +184,19 @@ class PlotHf(QtGui.QMainWindow):
         self.log = self.btnLog.isChecked()
         self.specs = self.btnSpecs.isChecked()
         self.inset = self.btnInset.isChecked()
+        self.phase = self.btnPhase.isChecked()
         
-#        self.coeffs = db.gD['coeffs']# coeffs
-        self.bb = db.gD['coeffs'][0]
-        self.aa = db.gD['coeffs'][1]
+#        self.coeffs = fb.gD['coeffs']# coeffs
+        self.bb = fb.gD['coeffs'][0]
+        self.aa = fb.gD['coeffs'][1]
         
-        self.f_S = db.gD['curSpecs']['fS']
+        self.f_S = fb.gD['selFilter']['fS']
         self.f_S = 1
-        self.F_pb = db.gD['curSpecs']['F_pb'] / self.f_S
-        self.F_sb = db.gD['curSpecs']['F_sb'] / self.f_S
+        self.F_pb = fb.gD['selFilter']['F_pb'] / self.f_S
+        self.F_sb = fb.gD['selFilter']['F_sb'] / self.f_S
         
-        self.A_pb = db.gD['curSpecs']['A_pb']
-        self.A_sb = db.gD['curSpecs']['A_sb']
+        self.A_pb = fb.gD['selFilter']['A_pb']
+        self.A_sb = fb.gD['selFilter']['A_sb']
 
 
         if self.DEBUG:
@@ -201,25 +204,26 @@ class PlotHf(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate |H(W)| for W = 0 ... pi:
-        [W,H] = sig.freqz(self.bb, self.aa, worN = db.gD['N_FFT'])
+        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'])
         F = W / (2 * np.pi)
 
         # clear the axes and (re)draw the plot
         #
         fig = self.mplwidget.fig
         ax = self.mplwidget.ax# fig.add_axes([.1,.1,.8,.8])#  ax = fig.add_axes([.1,.1,.8,.8])
+#        ax2= self.mplwidget.ax2
         ax.clear()
         
         #================ Main Plotting Routine =========================
         
         if self.log:
-            ax.plot(F,20*np.log10(abs(H)), lw = db.gD['rc']['lw'])
+            ax.plot(F,20*np.log10(abs(H)), lw = fb.gD['rc']['lw'])
 
             ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'+ ' in dB ' +
                         r'$\rightarrow$')
 
         else: #  'lin'
-            ax.plot(F,abs(H), lw = db.gD['rc']['lw'])
+            ax.plot(F,abs(H), lw = fb.gD['rc']['lw'])
 
             ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})| \;$'+
                         r'$\rightarrow $')
@@ -230,20 +234,23 @@ class PlotHf(QtGui.QMainWindow):
             ax.axis([0, 0.5, -self.A_sb -10, self.A_pb +1] )
         else:
             ax.axis([0, 0.5, 10**((-self.A_sb-10)/20), 10**((self.A_pb+1)/20)])
+        if self.phase:
+            ax.plot(F,np.angle(H), lw = fb.gD['rc']['lw'])
+            pass
  
-        ax.set_title(r'Betragsfrequenzgang')
+        ax.set_title(r'Magnitude Frequency Response')
         ax.set_xlabel(r'$F\; \rightarrow $') 
         
         # ---------- Inset Plot -------------------------------------------
         if self.inset:
-            ax1 = fig.add_axes([0.65, 0.61, .3, .3]);  # x,y,dx,dy
+            ax_i = fig.add_axes([0.65, 0.61, .3, .3]);  # x,y,dx,dy
 #            ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
-            ax1.clear() # clear old plot and specs
-            if self.specs: self.plotSpecs(specAxes = ax1, specLog = self.log)
+            ax_i.clear() # clear old plot and specs
+            if self.specs: self.plotSpecs(specAxes = ax_i, specLog = self.log)
             if self.log:
-                ax1.plot(F,20*np.log10(abs(H)), lw = db.gD['rc']['lw'])
+                ax_i.plot(F,20*np.log10(abs(H)), lw = fb.gD['rc']['lw'])
             else:
-                ax1.plot(F,abs(H), lw = db.gD['rc']['lw'])
+                ax_i.plot(F,abs(H), lw = fb.gD['rc']['lw'])
 #            ax1.set_xlim(0, self.F_pb)
 #            ax1.set_ylim(-self.A_pb, self.A_pb) 
 
@@ -252,7 +259,7 @@ class PlotHf(QtGui.QMainWindow):
             try:
 #                for ax in fig.axes:
 #                    fig.delaxes(ax)
-                fig.delaxes(ax1)
+                fig.delaxes(ax_i)
             except UnboundLocalError:
                 pass
             

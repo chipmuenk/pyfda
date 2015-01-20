@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SelectFilter.py
+input_filter.py
 ---------------
 Subwidget for selecting the filter, consisting of combo boxes for:
 - Response Type (LP, HP, Hilbert, ...)
@@ -12,15 +12,15 @@ Datum: 4.12.2014
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
-# import databroker from one level above if this file is run as __main__
+# import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import databroker as db
+import filterbroker as fb
 
 class SelectFilter(QtGui.QWidget):
     """
@@ -30,7 +30,7 @@ class SelectFilter(QtGui.QWidget):
       - DesignMethod (Butterworth, ...)
     """
     
-    def __init__(self, DEBUG = False):
+    def __init__(self, DEBUG = True):
         super(SelectFilter, self).__init__()
         self.DEBUG = DEBUG
         self.initUI()
@@ -56,9 +56,9 @@ class SelectFilter(QtGui.QWidget):
         self.comboDesignMethod=QtGui.QComboBox(self)
         
         # Translate short response type ("LP") to displayed names ("Lowpass")
-        # (correspondence is defined in databroker.py) and populate combo box:
-        for rt in db.gD["filterTree"]:
-            self.comboResponseType.addItem(db.gD["rtNames"][rt], rt)
+        # (correspondence is defined in filterbroker.py) and populate combo box:
+        for rt in fb.gD['filterTree']:
+            self.comboResponseType.addItem(fb.gD['rtNames'][rt], rt)
         self.comboResponseType.setCurrentIndex(0) # set initial index
         self.setResponseType()
 
@@ -92,18 +92,18 @@ class SelectFilter(QtGui.QWidget):
     def setResponseType(self):
         """
         Triggered when comboResponseType (LP, HP, ...) is changed:
-        Copy selection to self.rt and db.gD and reconstruct filter type combo
+        Copy selection to self.rt and fb.gD and reconstruct filter type combo
         """ 
         self.rtIdx =self.comboResponseType.currentIndex()       
         self.rt = str(self.comboResponseType.itemData(self.rtIdx))
          
-        db.gD['selFilter']["rt"] = self.rt # abbreviation
-#        rt=db.gD["rtNames"][self.rt] # full text
-#        print(db.gD["filterTree"][self.rt].keys())
+        fb.gD['selFilter']['rt'] = self.rt # abbreviation
+#        rt=fb.gD["rtNames"][self.rt] # full text
+#        print(fb.gD['filterTree'][self.rt].keys())
         # 
         self.comboFilterType.clear() 
         self.comboFilterType.addItems(
-            db.gD["filterTree"][self.rt].keys())
+            fb.gD['filterTree'][self.rt].keys())
         self.setFilterType()
         
     def setFilterType(self):
@@ -115,10 +115,10 @@ class SelectFilter(QtGui.QWidget):
         self.ft = str(self.comboFilterType.currentText())
         self.comboDesignMethod.clear()  
 
-        for dm in db.gD["filterTree"][self.rt][self.ft]:
-            self.comboDesignMethod.addItem(db.gD["dmNames"][dm], dm)
+        for dm in fb.gD['filterTree'][self.rt][self.ft]:
+            self.comboDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
 
-        db.gD['selFilter']["ft"] = self.ft
+        fb.gD['selFilter']['ft'] = self.ft
         self.setDesignMethod()
             
     def setDesignMethod(self):
@@ -128,19 +128,22 @@ class SelectFilter(QtGui.QWidget):
         """
         self.dmIdx = self.comboDesignMethod.currentIndex()
         self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
-        db.gD['selFilter']["dm"] = self.dm
+        fb.gD['selFilter']['dm'] = self.dm
 
         # Check whether new design method also provides the old filter order 
         # method. If yes, don't change it, else set first available 
         # filter method
-        if db.gD['selFilter']["fo"] not in \
-                        db.gD["filterTree"][self.rt][self.ft][self.dm].keys():
-            db.gD['selFilter'].update({"fo":{}})
-            db.gD['selFilter']["fo"] \
-                = db.gD["filterTree"][self.rt][self.ft][self.dm].keys()[0]
-        if self.DEBUG: 
-            print("curFilter:", db.gD['selFilter'])
-            print("filterTree[dm]= ", db.gD["filterTree"][self.rt][self.ft]\
+        if fb.gD['selFilter']['fo'] not in \
+                        fb.gD['filterTree'][self.rt][self.ft][self.dm].keys():
+            fb.gD['selFilter'].update({'fo':{}})
+            fb.gD['selFilter']['fo'] \
+                = fb.gD['filterTree'][self.rt][self.ft][self.dm].keys()[0]
+        if self.DEBUG:
+            print("=== InputFilter.setDesignMethod ===")
+            print("selFilter:", fb.gD['selFilter'])
+            print("filterTree[dm] = ", fb.gD['filterTree'][self.rt][self.ft]\
+                                                            [self.dm])
+            print("filterTree[dm].keys() = ", fb.gD['filterTree'][self.rt][self.ft]\
                                                             [self.dm].keys())
 
         # reverse dictionary lookup

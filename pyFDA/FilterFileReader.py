@@ -7,7 +7,7 @@ Created on Mon Nov 24 10:00:14 2014
 from __future__ import print_function, division, unicode_literals
 import os, sys
 import codecs
-import databroker as db
+import filterbroker as fb
 
 # TODO: need to delete unused imports from memory? 
 # TODO: replace __import__ by importlib.import_module()
@@ -46,15 +46,15 @@ class FilterFileReader(object):
 
 
         # Scan initFile for python file names and extract them
-        db.gD['initFileNames'] = self.readInitFile(commentChar)
+        fb.gD['initFileNames'] = self.readInitFile(commentChar)
         
         # Try to import all filter modules in initFileNames, store names and 
         # modules in a dict {filterName:filterModule}:
-        db.gD['imports'] = self.dynamicImport(directory,db.gD['initFileNames'])
+        fb.gD['imports'] = self.dynamicImport(directory,fb.gD['initFileNames'])
         
         # Build a hierarchical dict with all found filter designs and 
         # response types:
-        db.gD['filterTree'] = self.buildFilterTree()
+        fb.gD['filterTree'] = self.buildFilterTree()
 
 #==============================================================================
     def readInitFile(self, commentChar = '#'):
@@ -199,7 +199,7 @@ class FilterFileReader(object):
         
         """
 
-        inst = getattr(db.gD['imports'][objectName], objectName)
+        inst = getattr(fb.gD['imports'][objectName], objectName)
             
         if (inst != None):# yes, the attribute exists, return the instance
             return inst()
@@ -219,7 +219,7 @@ class FilterFileReader(object):
         - design method (dm): 'cheby1', 'equiripple', ...
         """
         filterTree = {}
-        for dm in db.gD['imports']:           # iterate over designMethods 
+        for dm in fb.gD['imports']:           # iterate over designMethods 
             myFilter = self.objectWizzard(dm) # instantiate filter class
             ft = myFilter.ft                  # get filter type ('FIR')
             for rt in myFilter.rt:            # iterate over response types
@@ -229,11 +229,13 @@ class FilterFileReader(object):
                     filterTree[rt].update({ft:{}}) # no, create it
                 filterTree[rt][ft].update({dm:{}}) # append dm to list dict[rt][ft]
                 filterTree[rt][ft][dm].update(myFilter.rt[rt]) # append fo dict
-                for com in myFilter.com:
-                    print(myFilter.com[com])
-                    if com not in filterTree[rt][ft][dm]:
-                        filterTree[rt][ft][dm].update({com:{}})
-                    filterTree[rt][ft][dm][com].update(myFilter.com[com])
+
+                for com in myFilter.com: # read common info for 'man', 'min'
+                    if self.DEBUG:
+                        print("myFilter.com[com]",myFilter.com[com])
+                        # add info only when 'man' and / or 'min' exists
+                    if com in filterTree[rt][ft][dm]: 
+                        filterTree[rt][ft][dm][com].update(myFilter.com[com])
 
         if self.DEBUG: print("filterTree = ", filterTree)
         
@@ -242,7 +244,7 @@ class FilterFileReader(object):
 #==============================================================================
 if __name__ == "__main__":
 
-#    import databroker as db
+#    import filterbroker as fb
     print("===== Initialize FilterReader ====")
     
     initFileName = "Init.txt"
@@ -254,10 +256,10 @@ if __name__ == "__main__":
     myFilterReader = FilterFileReader(initFileName, subDirectory, commentChar, Debug)
 
     print("\n===== Start Test ====")    
-    for name in db.gD['imports']:
+    for name in fb.gD['imports']:
         myFilter = myFilterReader.objectWizzard(name)
         print('myFilter', myFilter)
     myFilterTree = myFilterReader.buildFilterTree()
     print('myFilterTree = ', myFilterTree)
-    print(db.gD['imports'])
+    print(fb.gD['imports'])
     

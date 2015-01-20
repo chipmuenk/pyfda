@@ -9,7 +9,9 @@ from __future__ import print_function, division, unicode_literals
 import sys, os 
 import numpy as np
 from PyQt4 import QtGui
-
+"""
+Subwidget for entering filter type and parameter
+"""
 
 
 # import databroker from one level above if this file is run as __main__
@@ -18,22 +20,17 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import databroker as db
+import filterbroker as fb
 from FilterFileReader import FilterFileReader
     
-import SelectFilter, filterOrder, UnitBox
-from plotWidgets import plotAll
+import input_filter, input_order, input_units
+from plotWidgets import plot_all
 
 
-"""
-Zur Eingabe aller Parameter und Einstellungen
-"""
-
-
-class ChooseParams(QtGui.QWidget):
+class InputParams(QtGui.QWidget):
     
     def __init__(self, DEBUG = True):
-        super(ChooseParams, self).__init__() 
+        super(InputParams, self).__init__() 
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
@@ -41,9 +38,7 @@ class ChooseParams(QtGui.QWidget):
         self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
                                     commentChar = '#', DEBUG = DEBUG) #                                             
         self.initUI()
-        """
-        
-        """        
+      
     def initUI(self): 
         """
         Create all widgets:
@@ -59,19 +54,19 @@ class ChooseParams(QtGui.QWidget):
 
         """ 
 
-        self.sf = SelectFilter.SelectFilter(DEBUG = False)
-        self.fo = filterOrder.FilterOrder(DEBUG = True)
+        self.sf = input_filter.SelectFilter(DEBUG = True)
+        self.fo = input_order.InputOrder(DEBUG = True)
         # subwidget for Frequency Specs
-        self.fspec = UnitBox.UnitBox(title = "Frequency Specifications",
+        self.fspec = input_units.InputUnits(title = "Frequency Specifications",
                     units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
                     labels = ['fS', 'F_pb', 'F_sb'],
                     DEBUG = False)
         # subwidget for Amplitude Specs        
-        self.aspec = UnitBox.UnitBox(title = "Amplitude Specifications",
+        self.aspec = input_units.InputUnits(title = "Amplitude Specifications",
                     units = ["dB","Squared"], labels = ["A_pb","A_sb"],
                     DEBUG = False)
         # subwidget for Weight Specs                                           
-        self.wspec = UnitBox.UnitBox(
+        self.wspec = input_units.InputUnits(
                     title = "Weight Specifications",
                     units = "", labels = ["W_pb","W_sb"],
                     DEBUG = False)
@@ -85,7 +80,7 @@ class ChooseParams(QtGui.QWidget):
         self.aspec.setVisible(True)
         
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
-        self.pltAll = plotAll.plotAll() # instantiate tabbed plot widgets 
+        self.pltAll = plot_all.plotAll() # instantiate tabbed plot widgets 
         """
         LAYOUT      
         """
@@ -106,18 +101,18 @@ class ChooseParams(QtGui.QWidget):
         # SIGNALS & SLOTS
         # Call chooseDesignMethod every time filter selection is changed: 
         self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
-        self.fo.txtManual.editingFinished.connect(self.update)
         self.sf.comboResponseType.activated.connect(self.chooseDesignMethod)
         self.sf.comboFilterType.activated.connect(self.chooseDesignMethod)
         self.sf.comboDesignMethod.activated.connect(self.chooseDesignMethod)
+        self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
         self.butDesignFilt.clicked.connect(self.startDesignFilt)   
 
         self.chooseDesignMethod() # first time initialization
         
     def chooseDesignMethod(self):
         """
-        Reads:  db.gD['selFilter'] (currently selected filter), extracting info
-                from db.gD['filterTree']
+        Reads:  fb.gD['selFilter'] (currently selected filter), extracting info
+                from fb.gD['filterTree']
         Writes:
         Depending on SelectFilter and frequency specs, the values of the 
         widgets fo, fspec are recreated. For widget ms, the visibility is changed
@@ -125,20 +120,20 @@ class ChooseParams(QtGui.QWidget):
         """
 
         # Read freq / amp / weight labels for current filter design
-        rt = db.gD['selFilter']["rt"]
-        ft = db.gD['selFilter']["ft"]
-        dm = db.gD['selFilter']["dm"]
-        fo = db.gD['selFilter']["fo"]  
-        myParams = db.gD['filterTree'][rt][ft][dm][fo]['par']
-        myEnbWdg = db.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
+        rt = fb.gD['selFilter']['rt']
+        ft = fb.gD['selFilter']['ft']
+        dm = fb.gD['selFilter']['dm']
+        fo = fb.gD['selFilter']['fo']  
+        myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
+        myEnbWdg = fb.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
 
         # build separate parameter lists according to the first letter
         self.freqParams = [l for l in myParams if l[0] == 'F']
         self.ampParams = [l for l in myParams if l[0] == 'A']
         self.weightParams = [l for l in myParams if l[0] == 'W']
         if self.DEBUG:
-            print("=== chooseParams.chooseDesignMethod ===")
-            print("curFilter:", db.gD['selFilter'])
+            print("=== InputParams.chooseDesignMethod ===")
+            print("selFilter:", fb.gD['selFilter'])
             print('myLabels:', myParams)
             print('ampLabels:', self.ampParams)
             print('freqLabels:', self.freqParams)
@@ -154,90 +149,52 @@ class ChooseParams(QtGui.QWidget):
         self.wspec.setVisible(self.weightParams != []) 
         self.wspec.setEnabled("wspec" in myEnbWdg)
         self.wspec.setElements(newLabels = self.weightParams)
-
-#        self.setLayout(self.layout)
-        
-        
-#    def rebuildFrequFiltOrd(self,enMin=True):
-#        """
-#        Auxiliary function for updating frequency specifications and the 
-#        frequency order widget
-#        """
-#        self.fspec.set(newLabels = self.freqLabels)
-#        self.fo.chkMin.setEnabled(enMin)
-        
-#    def rebuildMag(self,string,lstA_W_T=[]):
-#        """
-#        Auxiliary function for updating magnitude specifications
-#        """
-        
-#        if self.ampLabels == []:
-#            self.aspec.setEnabled(False)
-  
-#        if self.weightLabels ==[]:
-#            self.wspec.setEnabled(False)
-#        if self.textField == "":
-#            self.ms_txt.setVisible(False)
-            
-
-#        if string == "txt":  # only Info-Text
-#            self.aspec.setVisible(False)
-#            self.wspec.setVisible(False)
-#            self.ms_txt.setText(self.infoText)
-#            self.ms_txt.setVisible(True)
-#        if string == "unit" : # create subwidget with unit + label
-#            self.aspec.set(newLabels = self.ampLabels)#lstA_W_T[1])#, newDefaults = lstA_W_T[2])
-#            self.aspec.setVisible(True)
-#            self.wspec.setVisible(True)
-#            self.ms_txt.setVisible(True)
             
     def get(self):
         """
-        Update global dict db.gD["curSpecs"] with currently selected filter 
+        Update global dict fb.gD['selFilter'] with currently selected filter 
         specs, using the update methods of the classes
         """
-    
-#        ret = {}
-#        db.gD['selFilter']["fo"] # collect data from filter order widget
-#        db.gD["curSpecs"].update(self.fspec.get()) # collect data from frequ. spec. widget
-#        db.gD["curSpecs"].update(self.aspec.get()) # magnitude specs with unit
-#        db.gD["curSpecs"].update(self.wspec.get()) # weight specs
+
         self.fo.update() # collect data from frequ. spec. widget
         self.fspec.update() # collect data from frequ. spec. widget
         self.aspec.update() # magnitude specs with unit
         self.wspec.update() # weight specs  
             
-        if self.DEBUG: print(db.gD["curSpecs"])
+        if self.DEBUG: print(fb.gD['selFilter'])
   
     def startDesignFilt(self):
         """
         Design Filter
         """
-        self.get() # -> db.gD["curSpecs"] 
+        self.get() # -> fb.gD['selFilter'] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
-            print('Specs:', db.gD["curSpecs"])#params)
-            print("db.gD['selFilter']['dm']", db.gD['selFilter']['dm']+"."+
-                  db.gD['selFilter']['rt']+db.gD['selFilter']['fo'])
+            print('Specs:', fb.gD['selFilter'])#params)
+            print("fb.gD['selFilter']['dm']", fb.gD['selFilter']['dm']+"."+
+                  fb.gD['selFilter']['rt']+fb.gD['selFilter']['fo'])
         # create filter object instance from design method (e.g. 'cheby1'):   
-        self.myFilter = self.ffr.objectWizzard(db.gD['selFilter']['dm'])
+        self.myFilter = self.ffr.objectWizzard(fb.gD['selFilter']['dm'])
         # Now construct the instance method from the response type (e.g.
         # 'LP' -> cheby1.LP) and
         # design the filter by passing current specs to the method:
-        getattr(self.myFilter, db.gD['selFilter']['rt']+db.gD['selFilter']['fo'])(db.gD["curSpecs"])
+        getattr(self.myFilter, fb.gD['selFilter']['rt'] +
+                                fb.gD['selFilter']['fo'])(fb.gD['selFilter'])
+        self.fo.update()
+#        self.wspec.update()
         
         # Read back filter coefficients and (zeroes, poles, k):
-        db.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
+        fb.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
         if np.ndim(self.myFilter.coeffs) == 1:  # FIR filter: only b coeffs
-            db.gD['coeffs'] = (self.myFilter.coeffs, [1]) # add dummy a = [1]
+            fb.gD['coeffs'] = (self.myFilter.coeffs, [1]) # add dummy a = [1]
             # This still has ndim == 1? 
         else:                                   # IIR filter: [b, a] coeffs
-            db.gD['coeffs'] = self.myFilter.coeffs 
+            fb.gD['coeffs'] = self.myFilter.coeffs 
         if self.DEBUG:
             print("=== pyFDA.py : startDesignFilter ===")
-            print("zpk:" , db.gD['zpk'])
-            print('ndim gD:', np.ndim(db.gD['coeffs']))
-            print("b,a = ", db.gD['coeffs'])
+            print("zpk:" , fb.gD['zpk'])
+            print('ndim gD:', np.ndim(fb.gD['coeffs']))
+            print("b,a = ", fb.gD['coeffs'])
      
 #        self.pltAll.update() is executed from pyFDA.py!
   
@@ -245,7 +202,7 @@ class ChooseParams(QtGui.QWidget):
    
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = ChooseParams()
+    form = InputParams()
     form.show()
     form.get()
    

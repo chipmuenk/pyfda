@@ -10,12 +10,8 @@ from PyQt4 import QtGui, QtCore
 
 from PyQt4.QtGui import QSizePolicy
 from PyQt4.QtCore import QSize
-#from PySide.QtCore import *
-#from PySide.QtGui import *
 
 #import matplotlib as plt
-#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-#from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 #from matplotlib.figure import Figure
 
 import numpy as np
@@ -25,9 +21,9 @@ if __name__ == "__main__": # relative import if this file is run as __main__
     cwd=os.path.dirname(os.path.abspath(__file__))
     sys.path.append(cwd + '/..')
 
-import databroker as db
+import filterbroker as fb
 
-from plotUtils import MplWidget#, MplCanvas 
+from plot_utils import MplWidget#, MplCanvas 
 
 DEBUG = True   
 
@@ -78,12 +74,12 @@ class PlotPhi(QtGui.QMainWindow):
         """ 
         Re-calculate |H(f)| and draw the figure
         """
-        self.bb = db.gD['coeffs'][0]
-        self.aa = db.gD['coeffs'][1]
+        self.bb = fb.gD['coeffs'][0]
+        self.aa = fb.gD['coeffs'][1]
         if self.DEBUG:
             print("--- plotPhi.draw() ---") 
             print("b,a = ", self.bb, self.aa)
-        [W,H] = sig.freqz(self.bb, self.aa, worN = db.gD['N_FFT']) # calculate H(W) for W = 0 ... pi
+        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT']) # calculate H(W) for W = 0 ... pi
 
         F = W / (2 * np.pi)
 
@@ -92,12 +88,12 @@ class PlotPhi(QtGui.QMainWindow):
         mpl = self.mplwidget.ax
         mpl.clear()
         if self.btnWrap.isChecked():
-            mpl.plot(F, np.angle(H), lw = db.gD['rc']['lw'])          
+            mpl.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])          
         else:
-            mpl.plot(F, np.unwrap(np.angle(H)), lw = db.gD['rc']['lw'])
-#        mpl.axis([0, 0.5, -db.gD['specs']['A_stop1']-10, 
-#                  db.gD['specs']['A_pass1']+1] )
-        mpl.set_title(r'Phase transfer function')
+            mpl.plot(F, np.unwrap(np.angle(H)), lw = fb.gD['rc']['lw'])
+#        mpl.axis([0, 0.5, -fb.gD['specs']['A_stop1']-10, 
+#                  fb.gD['specs']['A_pass1']+1] )
+        mpl.set_title(r'Phase Frequency Response')
         mpl.set_xlabel(r'$F\; \rightarrow $')    
         mpl.set_ylabel(r'$\phi(\mathrm{e}^{\mathrm{j} \Omega})|\; \rightarrow $')    
  
