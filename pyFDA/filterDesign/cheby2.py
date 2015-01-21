@@ -13,7 +13,7 @@ https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division
 import scipy.signal as sig
-import numpy as np
+#import numpy as np
 
 output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
 
@@ -79,7 +79,7 @@ class cheby2(object):
                         analog = False, output = output))
         
     def BSman(self, specs):
-        self.output(sig.cheby2(specs['N'], specs['A_sb'],
+        self.save(sig.cheby2(specs['N'], specs['A_sb'],
                 [specs['F_sb'], specs['F_sb2']], btype='bandstop', 
                 analog = False, output = output))
         
