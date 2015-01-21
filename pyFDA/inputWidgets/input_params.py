@@ -59,7 +59,7 @@ class InputParams(QtGui.QWidget):
         # subwidget for Frequency Specs
         self.fspec = input_units.InputUnits(title = "Frequency Specifications",
                     units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
-                    labels = ['fS', 'F_pb', 'F_sb'],
+                    labels = ['f_S', 'F_pb', 'F_sb'],
                     DEBUG = False)
         # subwidget for Amplitude Specs        
         self.aspec = input_units.InputUnits(title = "Amplitude Specifications",
@@ -150,16 +150,16 @@ class InputParams(QtGui.QWidget):
         self.wspec.setEnabled("wspec" in myEnbWdg)
         self.wspec.setElements(newLabels = self.weightParams)
             
-    def get(self):
+    def writeAll(self):
         """
         Update global dict fb.gD['selFilter'] with currently selected filter 
-        specs, using the update methods of the classes
+        parameters, using the update methods of the classes
         """
-
-        self.fo.update() # collect data from frequ. spec. widget
-        self.fspec.update() # collect data from frequ. spec. widget
+        # collect data from widgets and write to fb.gD['selFilter']
+        self.fo.update()    # filter order widget
+        self.fspec.update() # frequency specification widget
         self.aspec.update() # magnitude specs with unit
-        self.wspec.update() # weight specs  
+        self.wspec.update() # weight specification  
             
         if self.DEBUG: print(fb.gD['selFilter'])
   
@@ -167,7 +167,7 @@ class InputParams(QtGui.QWidget):
         """
         Design Filter
         """
-        self.get() # -> fb.gD['selFilter'] 
+        self.writeAll() # input widgets -> fb.gD['selFilter'] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print('Specs:', fb.gD['selFilter'])#params)
@@ -181,7 +181,7 @@ class InputParams(QtGui.QWidget):
         getattr(self.myFilter, fb.gD['selFilter']['rt'] +
                                 fb.gD['selFilter']['fo'])(fb.gD['selFilter'])
         self.fo.update()
-#        self.wspec.update()
+        self.wspec.updateElements()
         
         # Read back filter coefficients and (zeroes, poles, k):
         fb.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
@@ -204,7 +204,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputParams()
     form.show()
-    form.get()
+    form.writeAll()
    
     app.exec_()
 
