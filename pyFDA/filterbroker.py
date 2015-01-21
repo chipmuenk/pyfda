@@ -85,10 +85,13 @@ gD['filterTree'] = {
 #-------------------------------------- 
 # Current filter selection, parameters and specifications              
 gD['selFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man",
-                'N':10, 'fS': 48000,
-                'A_pb':1., 'A_pb2': 1, 'F_pb':0.1, 'F_pb2':0.4,
-                'A_sb':60., 'A_sb2': 60, 'F_sb':0.2, 'F_sb2':0.3,
-                'W_pb':1, 'W_pb2':1, 'W_sb':1, 'W_sb2':1}
+                'N':10, 'f_S':1,
+                'A_pb':1., 'A_pb2': 1., 'F_pb':0.1, 'F_pb2':0.4,
+                'A_sb':60., 'A_sb2': 60., 'F_sb':0.2, 'F_sb2':0.3,
+                'W_pb':1., 'W_pb2':1., 'W_sb':1., 'W_sb2':1.,
+                'coeffs':([1,1,1],[3,0,2]), 
+                'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+                       [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1)}
 
 gD['coeffs'] = ([1,1,1],[3,0,2])
 gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
