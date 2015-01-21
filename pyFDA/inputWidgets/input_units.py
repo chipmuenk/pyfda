@@ -131,30 +131,13 @@ class InputUnits(QtGui.QWidget):
                     self.labels[i] = newLabels[i]
                     self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
                     
-#    def updateElements(self, title = "", newLabels = []):
-#        """
-#        Reread elements from global filterbroker
-#        """
-#        if self.DEBUG: print("UnitBox.Titel:",self.title)
-#        if title != "":
-#            self.qtitle.setText(title) # new title
-#    
-#        # Check whether the number of entries has changed
-#        for i in range(max(len(self.labels), len(newLabels))):
-#             # newLabels is shorter than labels -> delete the difference
-#            if (i > (len(newLabels)-1)):
-#                self.delElement(len(newLabels))
-#
-#            # newLabels is longer than existing labels -> create new ones!   
-#            elif (i > (len(self.labels)-1)):
-#                self.addElement(i,newLabels[i])
-#
-#            else:
-#                # when label has changed, update it and the default value
-#                if (self.labels[i]!=newLabels[i]):     
-#                    self.qlabel[i].setText(newLabels[i])
-#                    self.labels[i] = newLabels[i]
-#                    self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
+    def updateElements(self):
+        """
+        Reload textfields from global dictionary to update changed weight
+        settings etc.
+        """
+        for i in range(len(self.labels)):
+            self.qlineedit[i].setText(str(fb.gD['selFilter'][self.labels[i]]))
         
     def delElement(self,i):
         """
