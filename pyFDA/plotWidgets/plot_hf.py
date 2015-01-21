@@ -190,7 +190,7 @@ class PlotHf(QtGui.QMainWindow):
         self.bb = fb.gD['coeffs'][0]
         self.aa = fb.gD['coeffs'][1]
         
-        self.f_S = fb.gD['selFilter']['fS']
+        self.f_S = fb.gD['selFilter']['f_S']
         self.f_S = 1
         self.F_pb = fb.gD['selFilter']['F_pb'] / self.f_S
         self.F_sb = fb.gD['selFilter']['F_sb'] / self.f_S
