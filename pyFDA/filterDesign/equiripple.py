@@ -15,20 +15,22 @@ import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
 
-import filterbroker as fb
+#import filterbroker as fb
 
 # TODO: save results in gD.dB
-# TODO: BS does not work correctly (-> odd order!)
-# TODO: BPmin missing
 # TODO: Try HP with even order & type = Hilbert
 # TODO: Hilbert not working correctly yet
-# TODO: Introduce new dict entry "vis" for visibility of entries
 
 output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
 
-def dB2lin(AdB):
-    return (10**(AdB/20.0)-1) / (10**(AdB/20.0)+1)*2
+def dBpb2lin(AdB):
+    """ Convert log PASSBAND magnitude specifications to linear specs"""
+    return (10.**(AdB/20.)-1) / (10**(AdB/20.)+1)*2
+    
+def dBsb2lin(AdB):
+    """ Convert log STOPBAND magnitude specifications to linear specs"""
+    return 10.**(-AdB/20.) # np.sqrt(2)
 
 class equiripple(object):
     
@@ -51,10 +53,8 @@ class equiripple(object):
                    "min":{"par":['A_sb','A_pb','F_sb','F_pb','W_sb','W_pb']}},
             "BP": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
                                  'W_sb','W_pb','W_sb2','A_sb','A_pb','A_sb2']},
-#                   "min":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
-#                                 'W_sb', 'W_pb', 'W_sb2'],
-#                          "enb":enb_min}
-                          },                                 
+                   "min":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2', 
+                                 'W_sb', 'W_pb', 'W_sb2','A_sb','A_pb','A_sb2']}},                                 
             "BS": {"man":{"par":['N', 'F_pb', 'F_sb', 'F_sb2', 'F_pb2',
                                  'W_pb', 'W_sb', 'W_pb2','A_pb','A_sb','A_pb2']},
                    "min":{"par":['A_pb','A_sb','A_pb2','W_pb','W_sb','W_pb2', 
@@ -68,11 +68,11 @@ class equiripple(object):
         jeweils konstanten Ripple, sie nutzen das vorgegebene Toleranzband \
         jeweils voll aus."
 
-    def save(self, arg):
+    def save(self, specs, arg):
         """ 
         Convert between poles / zeros / gain, filter coefficients (polynomes) 
-        and second-order sections and store all available formats in the global
-        database.
+        and second-order sections and store all available formats in the passed
+        dictionary 'specs'.
         """
         
         if output == 'zpk': # arg = [z,p,k]
@@ -81,64 +81,77 @@ class equiripple(object):
         else: # arg = [b,a]
             self.zpk = sig.tf2zpk(arg[0], arg[1])#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
             self.coeffs = arg  
-        fb.gD["coeffs"] = self.coeffs
-        print("=== Equiripple ===")
-        try:
-            fb.gD['selFilter']['N'] = self.N
-            print("N =", self.N)
+        specs["coeffs"] = self.coeffs
+        specs["zpk"] = self.zpk
+        try: # has the order been calculated by a "min" filter design?
+            specs['N'] = self.N # yes, update filterbroker
         except AttributeError:
             pass
 
 
     def LPman(self, specs):
-        self.save(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 0.5],
-               [1, 0], weight = [specs['W_pb'],specs['W_sb']], Hz = 1))
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 0.5],
+               [1, 0], weight = [specs['W_pb'],specs['W_sb']],Hz = specs['f_S']))
 
+    def LPmin(self, specs):
+        (self.N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb']], [1, 0], 
+            [dBpb2lin(specs['A_pb']), dBsb2lin(specs['A_sb'])],
+             Hz = specs['f_S'], alg = 'ichige')     
+        specs['W_pb'] = W[0]
+        specs['W_sb'] = W[1]
+        self.save(specs, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1))
+                
     def HPman(self, specs):
         N = self.oddround(specs['N']) # enforce odd order 
-        self.save(sig.remez(N,[0, specs['F_sb'], specs['F_pb'], 0.5],
+        self.save(specs, sig.remez(N,[0, specs['F_sb'], specs['F_pb'], 0.5],
                 [0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1))
         
+    def HPmin(self, specs):
+        (L, F, A, W) = self.remezord([specs['F_sb'], specs['F_pb']], [0, 1], 
+            [np.sqrt(2)*10.**(-specs['A_sb']/20), dBpb2lin(specs['A_pb'])], 
+             Hz = 1, alg = 'ichige')
+        self.N = self.oddround(L)  # enforce odd order
+        specs['W_sb'] = W[0]
+        specs['W_pb'] = W[1]
+        self.save(specs, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, type = 'bandpass'))
+
     # For BP and BS, F_pb and F_sb have two elements each
     def BPman(self, specs):
-        self.save(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
                 specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
                 weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1))
 
-    def BSman(self, specs):
-        self.save(sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
-                specs['F_sb2'], specs['F_pb2'], 0.5],[1, 0, 1], 
-                weight = [specs['W_pb'],specs['W_sb'], specs['W_pb2']], Hz = 1))
-                
-    def LPmin(self, specs):
-        (self.N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb']], [1, 0], 
-            [dB2lin(specs['A_pb']), 10.**(-specs['A_sb']/20)], Hz = 1, alg = 'ichige')     
-        fb.gD['selFilter']['W_pb'] = W[0]
-        fb.gD['selFilter']['W_sb'] = W[1]        
-        self.save(sig.remez(self.N, F, [1, 0], weight = W, Hz = 1))
-                
-    def HPmin(self, specs):
-        A_PB_lin = (10**(specs['A_pb']/20.0)-1) / (10**(specs['A_pb']/20.0)+1)*2
-        print(A_PB_lin)
-        (L, F, A, W) = self.remezord([specs['F_sb'], specs['F_pb']], [0, 1], 
-            [np.sqrt(2)*10.**(-specs['A_sb']/20), A_PB_lin], Hz = 1, alg = 'ichige')
-        self.N = self.oddround(L)  # enforce odd order 
-        self.save(sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, type = 'bandpass'))
+    def BPmin(self, specs):
+        (self.N, F, A, W) = self.remezord([specs['F_sb'], specs['F_pb'], 
+                                specs['F_pb2'], specs['F_sb2']], [0, 1, 0], 
+            [dBsb2lin(specs['A_sb']), dBpb2lin(specs['A_pb']), 
+             dBsb2lin(specs['A_sb2'])], Hz = 1, alg = 'ichige')
+        specs['W_sb']  = W[0]
+        specs['W_pb']  = W[1]
+        specs['W_sb2'] = W[2]   
+        self.save(specs, sig.remez(self.N,F,[0, 1, 0], weight = W, Hz = 1))
 
+    def BSman(self, specs):
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
+                specs['F_sb2'], specs['F_pb2'], 0.5],[1, 0, 1], 
+                weight = [specs['W_pb'],specs['W_sb'], specs['W_pb2']],Hz = 1))
+                
     def BSmin(self, specs):
-        (self.N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb'], 
+        (N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb'], 
                                 specs['F_sb2'], specs['F_pb2']], [1, 0, 1], 
-            [dB2lin(specs['A_pb']), np.sqrt(2)*10.**(-specs['A_sb']/20), 
-             dB2lin(specs['A_pb2'])], Hz = 1, alg = 'ichige')
-        self.save(sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1))
+            [dBpb2lin(specs['A_pb']), np.sqrt(2)*10.**(-specs['A_sb']/20), 
+             dBpb2lin(specs['A_pb2'])], Hz = 1, alg = 'ichige')
+        self.N = self.oddround(N)  # enforce odd order
+        specs['W_pb']  = W[0]
+        specs['W_sb']  = W[1]
+        specs['W_pb2'] = W[2]   
+        self.save(specs, sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1))
 
     def HILman(self, specs):
-        self.save(sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
                 specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
                 weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1,
                 type = 'hilbert'))
-        
-                
                 
     #========================================================
     """Supplies remezord method according to Scipy Ticket #475
