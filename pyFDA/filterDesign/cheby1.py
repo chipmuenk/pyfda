@@ -15,7 +15,7 @@ from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 #import numpy as np
 
-import filterbroker as fb
+#import filterbroker as fb
 
 output = 'zpk' # set output format of filter design routines to 'zpk' or 'ba'
 
@@ -23,27 +23,38 @@ class cheby1(object):
     
     def __init__(self):
         self.name = {'cheby1':'Chebychev 1'}
-        msg_man = "Enter the filter order $N$, the maximum ripple $A_pb$ \
-        allowed below unity gain in the passband and the frequency or \
-        frequencies $F_pb$ where the gain first drops below $-A_pb$."
-        msg_min = "Enter the desired pass band ripple and minimum stop \
-        band attenuation and the corresponding corner frequencies."
-        # enabled widgets and common messages for man. / min. filt. order        
+        
+        # common messages for all man. / min. filter order response types:            
+        msg_man = ("Enter the filter order $N$, the maximum ripple $A_pb$ "
+            "allowed below unity gain in the passband and the frequency or "
+            "frequencies $F_pb$ where the gain first drops below $-A_pb$.")
+        msg_min = ("Enter the desired pass band ripple and minimum stop "
+            "band attenuation and the corresponding corner frequencies.")
+
+        # enabled widgets for all man. / min. filter order response types:    
         enb_man = ['fo','fspec','aspec'] # enabled widget for man. filt. order
         enb_min = ['fo','fspec','aspec'] # enabled widget for min. filt. order
-        self.com = {"man":{"enb":enb_man, "msg":msg_man}, # "par":['N', 'f_S']},
-                    "min":{"enb":enb_min, "msg":msg_min}} #, "par":['f_S']}}
+        
+        # parameters for all man. / min. filter order response types:    
+        par_man = ['N', 'f_S', 'F_pb', 'A_pb'] # enabled widget for man. filt. order
+        par_min = ['f_S', 'A_pb', 'A_sb'] # enabled widget for min. filt. order
+
+        # Common data for all man. / min. filter order response types:
+        # This data is merged with the entries for individual response types 
+        # (common data comes first):
+        self.com = {"man":{"enb":enb_man, "msg":msg_man, "par":par_man},
+                    "min":{"enb":enb_min, "msg":msg_min, "par":par_min}}
 
         self.ft = 'IIR'
         self.rt = {
-          "LP": {"man":{"par":['N', 'A_pb', 'F_pb']},
-                 "min":{"par":['A_pb','A_sb','F_pb','F_sb']}},
-          "HP": {"man":{"par":['N', 'A_pb', 'F_pb']},
-                 "min":{"par":['A_pb','A_sb','F_sb','F_pb']}},
-          "BP": {"man":{"par":['N', 'A_pb', 'F_pb', 'F_pb2']},
-                 "min":{"par":['A_pb','A_sb','F_sb','F_pb','F_pb2','F_sb2']}},
-          "BS": {"man":{"par":['N','A_pb','F_pb','F_pb2']},
-                 "min":{"par":['A_pb','A_sb','F_pb','F_sb','F_sb2','F_pb2']}}
+          "LP": {"man":{"par":[]},
+                 "min":{"par":['F_pb','F_sb']}},
+          "HP": {"man":{"par":[]},
+                 "min":{"par":['F_sb','F_pb']}},
+          "BP": {"man":{"par":['F_pb2']},
+                 "min":{"par":['F_sb','F_pb','F_pb2','F_sb2']}},
+          "BS": {"man":{"par":['F_pb2']},
+                 "min":{"par":['F_pb','F_sb','F_sb2','F_pb2']}}
                  }
 
         self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
@@ -82,6 +93,10 @@ class cheby1(object):
 
         specs['coeffs'] = self.coeffs
         specs['zpk'] = self.zpk
+        try: # has the order been calculated by a "min" filter design?
+            specs['N'] = self.N # yes, update filterbroker
+        except AttributeError:
+            pass
 
 
     def LPman(self, specs):

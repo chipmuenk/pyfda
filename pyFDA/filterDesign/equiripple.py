@@ -36,30 +36,42 @@ class equiripple(object):
     
     def __init__(self):
         self.name = {'equiripple':'Equiripple'}
-        msg_man = "Enter desired order, corner frequencies and a weight \
-        value for each band below. Note: Order needs to be odd for high-pass \
-        and band-pass filters (type II FIR filters)."
-        msg_min = ""
-        
+
+        # common messages for all man. / min. filter order response types:            
+        msg_man = ("Enter desired order, corner frequencies and a weight "
+            "value for each band.")
+        msg_min = ("Enter the maximum pass band ripple and minimum stop band "
+                    "attenuation and the corresponding corner frequencies.")
+
+        # enabled widgets for all man. / min. filter order response types:     
         enb_man = ['fo','fspec','wspec'] # enabled widget for man. filt. order
         enb_min = ['fo','fspec','aspec'] # enabled widget for min. filt. order
-        self.com = {"man":{"enb":enb_man, "msg":msg_man},
-                    "min":{"enb":enb_min, "msg":msg_min}}
+
+        # common parameters for all man. / min. filter order response types:    
+        par_man = ['N', 'f_S'] # enabled widget for man. filt. order
+        par_min = ['f_S', 'A_pb', 'A_sb'] # enabled widget for min. filt. order
+
+        # Common data for all man. / min. filter order response types:
+        # This data is merged with the entries for individual response types 
+        # (common data comes first):
+        self.com = {"man":{"enb":enb_man, "msg":msg_man, "par": par_man},
+                    "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":['N','W_pb','W_sb','F_pb','F_sb','A_pb','A_sb']},
-                   "min":{"par":['A_pb','A_sb','F_pb','F_sb','W_pb','W_sb']}},
-            "HP": {"man":{"par":['N','W_sb','W_pb','F_sb','F_pb','A_sb','A_pb']},
-                   "min":{"par":['A_sb','A_pb','F_sb','F_pb','W_sb','W_pb']}},
-            "BP": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
+            "LP": {"man":{"par":['W_pb','W_sb','F_pb','F_sb','A_pb','A_sb']},
+                   "min":{"par":['F_pb','F_sb','W_pb','W_sb']}},
+            "HP": {"man":{"par":['W_sb','W_pb','F_sb','F_pb','A_sb','A_pb'],
+                          "msg":"\nNote: Order needs to be odd (type II FIR filters)"},
+                   "min":{"par":['F_sb','F_pb','W_sb','W_pb']}},
+            "BP": {"man":{"par":['F_sb', 'F_pb', 'F_pb2', 'F_sb2',
                                  'W_sb','W_pb','W_sb2','A_sb','A_pb','A_sb2']},
-                   "min":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2', 
-                                 'W_sb', 'W_pb', 'W_sb2','A_sb','A_pb','A_sb2']}},                                 
-            "BS": {"man":{"par":['N', 'F_pb', 'F_sb', 'F_sb2', 'F_pb2',
+                   "min":{"par":['F_sb', 'F_pb', 'F_pb2', 'F_sb2', 
+                                 'W_sb', 'W_pb','W_sb2','A_sb2']}},                                 
+            "BS": {"man":{"par":['F_pb', 'F_sb', 'F_sb2', 'F_pb2',
                                  'W_pb', 'W_sb', 'W_pb2','A_pb','A_sb','A_pb2']},
-                   "min":{"par":['A_pb','A_sb','A_pb2','W_pb','W_sb','W_pb2', 
+                   "min":{"par":['A_pb2','W_pb','W_sb','W_pb2', 
                                  'F_pb','F_sb','F_sb2','F_pb2']}},
-            "HIL": {"man":{"par":['N', 'F_sb', 'F_pb', 'F_pb2', 'F_sb2',
+            "HIL": {"man":{"par":['F_sb', 'F_pb', 'F_pb2', 'F_sb2',
                                  'W_sb', 'W_pb', 'W_sb2','A_sb','A_pb','A_sb2']
                                  }}
           #"DIFF":
