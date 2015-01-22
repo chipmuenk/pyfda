@@ -12,7 +12,7 @@ import filterbroker as fb
 # TODO: need to delete unused imports from memory? 
 # TODO: replace __import__ by importlib.import_module()
 
-class FilterFileReader(object):
+class FilterTreeBuilder(object):
     
     def __init__(self, initFile, directory, commentChar = '#', DEBUG = False):
         """
@@ -230,12 +230,35 @@ class FilterFileReader(object):
                 filterTree[rt][ft].update({dm:{}}) # append dm to list dict[rt][ft]
                 filterTree[rt][ft][dm].update(myFilter.rt[rt]) # append fo dict
 
-                for com in myFilter.com: # read common info for 'man', 'min'
+        # combine common info com = {'man':{...}, 'min':{...}}
+        # with individual info under e.g. {..., 'LP':{'man':{...}, 'min':{...}} 
+# TODO: calculate cut set first?
+                for minman in myFilter.com:# and filterTree[rt][ft][dm]): cut set?
                     if self.DEBUG:
-                        print("myFilter.com[com]",myFilter.com[com])
-                        # add info only when 'man' and / or 'min' exists
-                    if com in filterTree[rt][ft][dm]: 
-                        filterTree[rt][ft][dm][com].update(myFilter.com[com])
+                        print("myFilter.com[com]",myFilter.com[minman])
+                        try:
+                            print("myFilter.com[minman]['PAR']",
+                                  myFilter.com[minman]['par'] )
+                        except KeyError:
+                            pass
+                    # add info only when 'man' / 'min' exists in filterTree
+                    if minman in filterTree[rt][ft][dm]: 
+                        for i in myFilter.com[minman]:
+                            # Test whether entry exists in filterTree:
+                            if i in filterTree[rt][ft][dm][minman]:
+                                # yes, prepend common data
+                                filterTree[rt][ft][dm][minman][i] =\
+                                myFilter.com[minman][i] + filterTree[rt][ft][dm][minman][i]
+                            else:
+                                # no, create new entry
+                                filterTree[rt][ft][dm][minman].update(\
+                                                {i:myFilter.com[minman][i]})
+
+                            print(dm, minman, i)
+                            print("filterTree[minman][i]:",filterTree[rt][ft][dm][minman][i])
+                            print("myFilter.com[minman][i]",
+                                  myFilter.com[minman][i] )
+                            
 
         if self.DEBUG: print("filterTree = ", filterTree)
         
@@ -253,13 +276,13 @@ if __name__ == "__main__":
     Debug = True
     
     # Create a new FilterFileReader instance & initialize it
-    myFilterReader = FilterFileReader(initFileName, subDirectory, commentChar, Debug)
+    myTreeBuilder = FilterTreeBuilder(initFileName, subDirectory, commentChar, Debug)
 
     print("\n===== Start Test ====")    
     for name in fb.gD['imports']:
-        myFilter = myFilterReader.objectWizzard(name)
+        myFilter = myTreeBuilder.objectWizzard(name)
         print('myFilter', myFilter)
-    myFilterTree = myFilterReader.buildFilterTree()
+    myFilterTree = myTreeBuilder.buildFilterTree()
     print('myFilterTree = ', myFilterTree)
     print(fb.gD['imports'])
     
