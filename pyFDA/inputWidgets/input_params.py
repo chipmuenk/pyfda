@@ -21,7 +21,7 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb
-from FilterFileReader import FilterFileReader
+from FilterFileReader import FilterTreeBuilder
     
 import input_filter, input_order, input_units
 from plotWidgets import plot_all
@@ -35,7 +35,7 @@ class InputParams(QtGui.QWidget):
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
         self.DEBUG = DEBUG  
-        self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
+        self.ftb = FilterTreeBuilder('Init.txt', 'filterDesign', 
                                     commentChar = '#', DEBUG = DEBUG) #                                             
         self.initUI()
       
@@ -72,7 +72,7 @@ class InputParams(QtGui.QWidget):
                     DEBUG = False)
         
         self.msg = QtGui.QLabel(self)
-        self.msg.setText("Enter a weight value for each band below")
+        self.msg.setText("Just click it!")
         self.msg.setWordWrap(True)
 
         self.msg.setVisible(True)
@@ -88,9 +88,10 @@ class InputParams(QtGui.QWidget):
         self.layout.addWidget(self.sf,0,0,1,2)  # Design method (IIR - ellip, ...)
         self.layout.addWidget(self.fo,1,0,1,2)  # Filter order
         self.layout.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
-        self.layout.addWidget(self.msg,3,0,1,2)  # Text message
-        self.layout.addWidget(self.aspec,4,0)   # Amplitude specs
-        self.layout.addWidget(self.wspec,4,1)   # Weight specs
+        self.layout.addWidget(self.aspec,3,0)   # Amplitude specs
+        self.layout.addWidget(self.wspec,3,1)   # Weight specs
+        self.layout.addWidget(self.msg,4,0,1,2)  # Text message
+
 
         mainLayout = QtGui.QVBoxLayout(self)
         mainLayout.addLayout(self.layout)
@@ -126,6 +127,7 @@ class InputParams(QtGui.QWidget):
         fo = fb.gD['selFilter']['fo']  
         myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
         myEnbWdg = fb.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
+        myMsg    = fb.gD['filterTree'][rt][ft][dm][fo]['msg'] # message
 
         # build separate parameter lists according to the first letter
         self.freqParams = [l for l in myParams if l[0] == 'F']
@@ -149,6 +151,7 @@ class InputParams(QtGui.QWidget):
         self.wspec.setVisible(self.weightParams != []) 
         self.wspec.setEnabled("wspec" in myEnbWdg)
         self.wspec.setElements(newLabels = self.weightParams)
+        self.msg.setText(myMsg)
             
     def writeAll(self):
         """
@@ -174,7 +177,7 @@ class InputParams(QtGui.QWidget):
             print("fb.gD['selFilter']['dm']", fb.gD['selFilter']['dm']+"."+
                   fb.gD['selFilter']['rt']+fb.gD['selFilter']['fo'])
         # create filter object instance from design method (e.g. 'cheby1'):   
-        self.myFilter = self.ffr.objectWizzard(fb.gD['selFilter']['dm'])
+        self.myFilter = self.ftb.objectWizzard(fb.gD['selFilter']['dm'])
         # Now construct the instance method from the response type (e.g.
         # 'LP' -> cheby1.LP) and
         # design the filter by passing current specs to the method:
