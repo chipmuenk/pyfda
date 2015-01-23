@@ -20,9 +20,10 @@ if __name__ == "__main__":
 
 import filterbroker as fb
 
-class InputUnits(QtGui.QWidget):
+
+class InputUnits(QtGui.QWidget): #QtGui.QWidget, 
     
-    def __init__(self, title = "", units=[], labels=[], spec="", DEBUG = True):
+    def __init__(self, title = "", units=[], labels=[], DEBUG = True):
         
         """
         Initialisierung
@@ -33,8 +34,7 @@ class InputUnits(QtGui.QWidget):
         self.DEBUG = DEBUG
         self.labels = labels # list with labels for combobox
         self.title = title
-        
-        self.spec = spec        
+            
         self.units = [str(u) for u in units] # collect unit strings in list
         
         self.qlabel = [] # list with references to QLabel widgets
@@ -83,8 +83,6 @@ class InputUnits(QtGui.QWidget):
 
             self.layout.addWidget(self.qlabel[i],(i+1),0)
             self.layout.addWidget(self.qlineedit[i],(i+1),1)
- 
-
         
         sfFrame = QtGui.QFrame()
         sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -105,7 +103,7 @@ class InputUnits(QtGui.QWidget):
 #        self.qlineedit.editingFinished.connect(self.update)
 
 #-------------------------------------------------------------        
-    def setElements(self, title = "", newLabels = []):
+    def setEntries(self, title = "", newLabels = []):
         """
         Set title, labels, defaults - when number of elements changes, the 
         layout has to be rebuilt
@@ -118,11 +116,11 @@ class InputUnits(QtGui.QWidget):
         for i in range(max(len(self.labels), len(newLabels))):
              # newLabels is shorter than labels -> delete the difference
             if (i > (len(newLabels)-1)):
-                self.delElement(len(newLabels))
+                self._delEntry(len(newLabels))
 
             # newLabels is longer than existing labels -> create new ones!   
             elif (i > (len(self.labels)-1)):
-                self.addElement(i,newLabels[i])
+                self._addEntry(i,newLabels[i])
 
             else:
                 # when label has changed, update it and the default value
@@ -130,16 +128,8 @@ class InputUnits(QtGui.QWidget):
                     self.qlabel[i].setText(newLabels[i])
                     self.labels[i] = newLabels[i]
                     self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
-                    
-    def updateElements(self):
-        """
-        Reload textfields from global dictionary to update changed weight
-        settings etc.
-        """
-        for i in range(len(self.labels)):
-            self.qlineedit[i].setText(str(fb.gD['selFilter'][self.labels[i]]))
-        
-    def delElement(self,i):
+                            
+    def _delEntry(self,i):
         """
         Element with position i is deleted (qlabel and qlineedit)
         """
@@ -151,7 +141,7 @@ class InputUnits(QtGui.QWidget):
         self.qlineedit[i].deleteLater()
         del self.qlineedit[i]  
         
-    def addElement(self, i, newLabel): 
+    def _addEntry(self, i, newLabel): 
         """
         Element with position i is appended (qlabel und qlineedit)
         """
@@ -162,18 +152,22 @@ class InputUnits(QtGui.QWidget):
         self.layout.addWidget(self.qlabel[i],(i+1),0)
         self.layout.addWidget(self.qlineedit[i],(i+1),1)
       
-    def update(self):
+    def loadEntries(self):
         """
-        Update specification entries in dict fb.gD['selFilter']
+        Reload textfields from global dictionary to update changed weight
+        settings etc.
+        """
+        for i in range(len(self.labels)):
+            self.qlineedit[i].setText(str(fb.gD['selFilter'][self.labels[i]]))
+
+
+    def storeEntries(self):
+        """
+        Store specification entries in dict fb.gD['selFilter']
         """
         for i in range(len(self.labels)):
             fb.gD['selFilter'].update(
                             {self.labels[i]:float(self.qlineedit[i].text())})
-
-#        if self.DEBUG: 
-#            print("--- UnitBox.get() ---") 
-#            print(dic)
-#        return dic
     
 #------------------------------------------------------------------------------ 
     
@@ -183,10 +177,9 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputUnits(title = "Amplitudes", units = units, labels = lab)#, spec="TEST")
 
-    form.setElements(title = "Gewichte", newLabels = ['W_sb','W_sb2','W_pb','W_pb2'])
-    form.setElements(newLabels = ['W_pb','W_pb2'])
+    form.setEntries(title = "Gewichte", newLabels = ['W_sb','W_sb2','W_pb','W_pb2'])
+    form.setEntries(newLabels = ['W_pb','W_pb2'])
 
-    print(form.update())
     form.show()
    
     app.exec_()

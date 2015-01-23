@@ -9,12 +9,8 @@ from __future__ import print_function, division, unicode_literals
 import sys, os 
 import numpy as np
 from PyQt4 import QtGui
-"""
-Subwidget for entering filter type and parameter
-"""
 
-
-# import databroker from one level above if this file is run as __main__
+# import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +19,7 @@ if __name__ == "__main__":
 import filterbroker as fb
 from FilterFileReader import FilterTreeBuilder
     
-import input_filter, input_order, input_units
+import input_filter, input_order, input_units, input_weights
 from plotWidgets import plot_all
 
 
@@ -66,9 +62,9 @@ class InputParams(QtGui.QWidget):
                     units = ["dB","Squared"], labels = ["A_pb","A_sb"],
                     DEBUG = False)
         # subwidget for Weight Specs                                           
-        self.wspec = input_units.InputUnits(
+        self.wspec = input_weights.InputWeights(
                     title = "Weight Specifications",
-                    units = "", labels = ["W_pb","W_sb"],
+                    labels = ["W_pb","W_sb"],
                     DEBUG = False)
         
         self.msg = QtGui.QLabel(self)
@@ -144,25 +140,25 @@ class InputParams(QtGui.QWidget):
         # pass new labels to widgets
         # set invisible widgets if param list is empty
         self.fo.update()
-        self.fspec.setElements(newLabels = self.freqParams) # update frequency spec labels
+        self.fspec.setEntries(newLabels = self.freqParams) # update frequency spec labels
         self.aspec.setVisible(self.ampParams != [])
         self.aspec.setEnabled("aspec" in myEnbWdg)
-        self.aspec.setElements(newLabels = self.ampParams)
+        self.aspec.setEntries(newLabels = self.ampParams)
         self.wspec.setVisible(self.weightParams != []) 
         self.wspec.setEnabled("wspec" in myEnbWdg)
-        self.wspec.setElements(newLabels = self.weightParams)
+        self.wspec.setEntries(newLabels = self.weightParams)
         self.msg.setText(myMsg)
             
-    def writeAll(self):
+    def storeAll(self):
         """
         Update global dict fb.gD['selFilter'] with currently selected filter 
         parameters, using the update methods of the classes
         """
         # collect data from widgets and write to fb.gD['selFilter']
-        self.fo.update()    # filter order widget
-        self.fspec.update() # frequency specification widget
-        self.aspec.update() # magnitude specs with unit
-        self.wspec.update() # weight specification  
+        self.fo.updateEntries()    # filter order widget
+        self.fspec.storeEntries() # frequency specification widget
+        self.aspec.storeEntries() # magnitude specs with unit
+        self.wspec.storeEntries() # weight specification  
             
         if self.DEBUG: print(fb.gD['selFilter'])
   
@@ -170,7 +166,7 @@ class InputParams(QtGui.QWidget):
         """
         Design Filter
         """
-        self.writeAll() # input widgets -> fb.gD['selFilter'] 
+        self.storeAll() # input widgets -> fb.gD['selFilter'] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print('Specs:', fb.gD['selFilter'])#params)
@@ -183,8 +179,9 @@ class InputParams(QtGui.QWidget):
         # design the filter by passing current specs to the method:
         getattr(self.myFilter, fb.gD['selFilter']['rt'] +
                                 fb.gD['selFilter']['fo'])(fb.gD['selFilter'])
-        self.fo.update()
-        self.wspec.updateElements()
+        # Update filter order and weights in case they have been changed
+        self.fo.updateEntries()
+        self.wspec.loadEntries()
         
         # Read back filter coefficients and (zeroes, poles, k):
         fb.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
@@ -207,7 +204,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputParams()
     form.show()
-    form.writeAll()
+    form.storeAll()
    
     app.exec_()
 

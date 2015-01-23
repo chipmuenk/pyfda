@@ -76,12 +76,15 @@ class InputOrder(QtGui.QFrame):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
 
-        self.chkMin.clicked.connect(self.update)
-        self.txtManual.editingFinished.connect(self.update)
+        self.chkMin.clicked.connect(self.updateEntries)
+        self.txtManual.editingFinished.connect(self.updateEntries)
         
-        self.update() # initialize with default settings
+        self.updateEntries() # initialize with default settings
         
-    def update(self):
+    def updateEntries(self):
+        """
+        Read / write text entries and checkbutton for filter order
+        """
         # read list of available filter order methods from filterTree:
         foList = fb.gD['filterTree'][fb.gD['selFilter']['rt']]\
                 [fb.gD['selFilter']['ft']][fb.gD['selFilter']['dm']].keys()
@@ -102,10 +105,10 @@ class InputOrder(QtGui.QFrame):
 
         if self.DEBUG: print("fo[selFilter] =", fo)   
 
-        # Determine which subwidgets are enabled
+        # Determine which subwidgets are _enabled_
         if 'min' in foList:
             if self.chkMin.isChecked() == True:
-                # update if N has been changed outside this class
+                # update in case N has been changed outside this class
                 self.txtManual.setText(str(fb.gD['selFilter']['N'])) 
                 self.txtManual.setEnabled(False)
                 self.txtLabel.setEnabled(False)
