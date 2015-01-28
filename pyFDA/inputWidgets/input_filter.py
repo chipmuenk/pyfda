@@ -52,8 +52,11 @@ class SelectFilter(QtGui.QWidget):
 		# and populate them from the "filterTree" dict either directly or by
 		# calling setResponseType() :
         self.comboResponseType=QtGui.QComboBox(self)
+        self.comboResponseType.setToolTip("Select filter response type.")
         self.comboFilterType=QtGui.QComboBox(self)
+        self.comboFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
         self.comboDesignMethod=QtGui.QComboBox(self)
+        self.comboFilterType.setToolTip("Select the actual filter design method.")        
         
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in filterbroker.py) and populate combo box:
