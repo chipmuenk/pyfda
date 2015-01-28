@@ -19,7 +19,7 @@ if __name__ == "__main__":
 import filterbroker as fb
 from FilterFileReader import FilterTreeBuilder
     
-import input_filter, input_order, input_units, input_weights
+import input_filter, input_order, input_units, input_freqs, input_weights
 from plotWidgets import plot_all
 
 
@@ -53,9 +53,7 @@ class InputParams(QtGui.QWidget):
         self.sf = input_filter.SelectFilter(DEBUG = True)
         self.fo = input_order.InputOrder(DEBUG = True)
         # subwidget for Frequency Specs
-        self.fspec = input_units.InputUnits(title = "Frequency Specifications",
-                    units = ["Hz", "Normalize 0 to 1", "kHz", "MHz", "GHz"],
-                    labels = ['f_S', 'F_pb', 'F_sb'],
+        self.fspec = input_freqs.InputFreqs(specs = fb.gD['selFilter'],
                     DEBUG = False)
         # subwidget for Amplitude Specs        
         self.aspec = input_units.InputUnits(title = "Amplitude Specifications",
@@ -68,9 +66,20 @@ class InputParams(QtGui.QWidget):
                     DEBUG = False)
         
         self.msg = QtGui.QLabel(self)
+#        self.msg = QtGui.QTextEdit(self)
         self.msg.setText("Just click it!")
         self.msg.setWordWrap(True)
-
+#        self.msg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        
+        msgLayout = QtGui.QVBoxLayout()
+        msgLayout.addWidget(self.msg)
+        
+        msgFrame = QtGui.QFrame()
+        msgFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        msgFrame.setLayout(msgLayout)
+        msgFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                 QtGui.QSizePolicy.Minimum)
+        
         self.msg.setVisible(True)
         self.wspec.setVisible(True)
         self.aspec.setVisible(True)
@@ -86,8 +95,7 @@ class InputParams(QtGui.QWidget):
         self.layout.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
         self.layout.addWidget(self.aspec,3,0)   # Amplitude specs
         self.layout.addWidget(self.wspec,3,1)   # Weight specs
-        self.layout.addWidget(self.msg,4,0,1,2)  # Text message
-
+        self.layout.addWidget(msgFrame,4,0,1,2)  # Text message
 
         mainLayout = QtGui.QVBoxLayout(self)
         mainLayout.addLayout(self.layout)
@@ -204,6 +212,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputParams()
     form.show()
+#    form.setEnt
     form.storeAll()
    
     app.exec_()
