@@ -57,7 +57,7 @@ class InputWeights(QtGui.QWidget): #QtGui.QWidget,
 #            self.WVLayout.addWidget(self.butReset)
         
 
-        self.layout.addWidget(self.butReset, 0, 0, 2, 2) # span two columns
+        self.layout.addWidget(self.butReset, 1, 1) # span two columns
 
         # Create a gridLayout consisting of Labels and LineEdit fields
         # The number of created lines depends on the number of labels
@@ -112,7 +112,7 @@ class InputWeights(QtGui.QWidget): #QtGui.QWidget,
 
             # newLabels is longer than existing labels -> create new ones!   
             elif (i > (len(self.labels)-1)):
-                self._addEntry(i,newLabels[i])
+                self._addEntry(i, newLabels[i])
 
             else:
                 # when label has changed, update it and the default value
@@ -141,8 +141,8 @@ class InputWeights(QtGui.QWidget): #QtGui.QWidget,
         self.labels.append(newLabel)
         self.qlineedit.append(QtGui.QLineEdit(str(fb.gD['selFilter'][newLabel])))
         self.qlabel[i].setText(newLabel)
-        self.layout.addWidget(self.qlabel[i],(i+1),0)
-        self.layout.addWidget(self.qlineedit[i],(i+1),1)
+        self.layout.addWidget(self.qlabel[i],(i+2),0)
+        self.layout.addWidget(self.qlineedit[i],(i+2),1)
         
     def _resetWeights(self):
         for i in range(len(self.labels)):
