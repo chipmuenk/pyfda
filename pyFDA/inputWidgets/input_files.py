@@ -22,13 +22,13 @@ if __name__ == "__main__":
 import filterbroker as fb # importing filterbroker initializes all its globals
 
 
-class inputFiles(QtGui.QWidget):
+class InputFiles(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
-        super(inputFiles, self).__init__()
+        super(InputFiles, self).__init__()
 
         self.initUI()     
         
@@ -87,7 +87,7 @@ class inputFiles(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = inputFiles()
+    form = InputFiles()
     form.show()
    
     app.exec_()

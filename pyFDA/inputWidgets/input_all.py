@@ -29,7 +29,7 @@ class InputAll(QtGui.QWidget):
 
 #        self.inputParams = inputParams.inputParams()
         self.inputParams = input_params.InputParams()        
-        self.inputFiles = input_files.inputFiles()
+        self.inputFiles = input_files.InputFiles()
         
         self.initUI()     
 
