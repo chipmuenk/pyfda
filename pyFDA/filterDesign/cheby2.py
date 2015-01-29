@@ -68,10 +68,10 @@ class cheby2(object):
         """
         f_S = specs['f_S'] 
         self.N     = specs['N']
-        self.F_pb  = specs['F_pb']/f_S * 2
-        self.F_sb  = specs['F_sb']/f_S * 2
-        self.F_pb2 = specs['F_pb2']/f_S * 2
-        self.F_sb2 = specs['F_sb2']/f_S * 2 
+        self.F_pb  = specs['F_pb'] * 2
+        self.F_sb  = specs['F_sb'] * 2
+        self.F_pb2 = specs['F_pb2'] * 2
+        self.F_sb2 = specs['F_sb2'] * 2 
         self.A_pb  = specs['A_pb']
         self.A_sb  = specs['A_sb']
         self.A_pb2 = specs['A_pb2']

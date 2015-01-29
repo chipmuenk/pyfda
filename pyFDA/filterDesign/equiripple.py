@@ -103,12 +103,12 @@ class equiripple(object):
 
     def LPman(self, specs):
         self.save(specs, sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 0.5],
-               [1, 0], weight = [specs['W_pb'],specs['W_sb']],Hz = specs['f_S']))
+               [1, 0], weight = [specs['W_pb'],specs['W_sb']],Hz = 1))
 
     def LPmin(self, specs):
         (self.N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb']], [1, 0], 
             [dBpb2lin(specs['A_pb']), dBsb2lin(specs['A_sb'])],
-             Hz = specs['f_S'], alg = 'ichige')     
+             Hz = 1, alg = 'ichige')     
         specs['W_pb'] = W[0]
         specs['W_sb'] = W[1]
         self.save(specs, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1))
