@@ -15,6 +15,7 @@ from inputWidgets import input_all
 from plotWidgets import plot_all
 
 
+#class pyFDA(QtGui.QMainWindow):
 class pyFDA(QtGui.QWidget):
     PLT_SAME_WINDOW =  True
     """
@@ -57,6 +58,9 @@ class pyFDA(QtGui.QWidget):
         # ============== Signals & Slots ================================
 #        self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.inputAll.inputParams.butDesignFilt.clicked.connect(self.pltAll.update)
+
+#        self.statusBar().showMessage("Application is initialized.")
+
 
 #------------------------------------------------------------------------------
    
