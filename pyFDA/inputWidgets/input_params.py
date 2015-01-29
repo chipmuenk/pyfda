@@ -146,7 +146,7 @@ class InputParams(QtGui.QWidget):
             print('weightLabels:', self.weightParams)
 
         # pass new labels to widgets
-        # set invisible widgets if param list is empty
+        # set widgets invisible if param list is empty
         self.fo.update()
         self.fspec.setEntries(newLabels = self.freqParams) # update frequency spec labels
         self.aspec.setVisible(self.ampParams != [])
@@ -163,7 +163,7 @@ class InputParams(QtGui.QWidget):
         parameters, using the update methods of the classes
         """
         # collect data from widgets and write to fb.gD['selFilter']
-        self.fo.updateEntries()    # filter order widget
+        self.fo.updateEntries()   # filter order widget
         self.fspec.storeEntries() # frequency specification widget
         self.aspec.storeEntries() # magnitude specs with unit
         self.wspec.storeEntries() # weight specification  
