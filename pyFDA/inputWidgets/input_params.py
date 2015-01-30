@@ -187,9 +187,10 @@ class InputParams(QtGui.QWidget):
         # design the filter by passing current specs to the method:
         getattr(self.myFilter, fb.gD['selFilter']['rt'] +
                                 fb.gD['selFilter']['fo'])(fb.gD['selFilter'])
-        # Update filter order and weights in case they have been changed
+        # Update filter order. weights and freqs in case they have been changed
         self.fo.updateEntries()
         self.wspec.loadEntries()
+        self.fspec.loadEntries()
         
         # Read back filter coefficients and (zeroes, poles, k):
         fb.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
