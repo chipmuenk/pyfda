@@ -15,14 +15,14 @@ from inputWidgets import input_all
 from plotWidgets import plot_all
 
 
-#class pyFDA(QtGui.QMainWindow):
-class pyFDA(QtGui.QWidget):
+class pyFDA(QtGui.QMainWindow):
+#class pyFDA(QtGui.QWidget):
     PLT_SAME_WINDOW =  True
     """
     Create the main window for entering the filter specifications
     """
-    def __init__(self, DEBUG = True):
-        self.DEBUG = DEBUG
+    def __init__(self):
+        self.DEBUG = True
         super(pyFDA, self).__init__()
         # read directory with filterDesigns and construct filter tree from it
 #        self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
@@ -40,26 +40,26 @@ class pyFDA(QtGui.QWidget):
         - Plot Window [-> plotAll.plotAll()]
         """
 
-        self.inputAll = input_all.InputAll()
-        self.pltAll = plot_all.plotAll() # instantiate tabbed plot widgets  
+        # Instantiate widget groups
+        self.inputAll = input_all.InputAll() # input widgets
+        self.pltAll = plot_all.plotAll() # plot widgets 
 #        self.inputAll.setMaximumWidth(280)
 
         # ============== UI Layout =====================================
+        _widget = QtGui.QWidget() # this widget contains all subwidget groups
+        hbox = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
+        hbox.addWidget(self.inputAll)
+        hbox.addWidget(self.pltAll)
 
-        hbox = QtGui.QHBoxLayout()
+        self.setCentralWidget(_widget)
 
-        if self.PLT_SAME_WINDOW:
-            # Plot window docked in same window:
-            hbox.addWidget(self.inputAll)
-            hbox.addWidget(self.pltAll)
-
-        self.setLayout(hbox)
+        self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
         
         # ============== Signals & Slots ================================
 #        self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.inputAll.inputParams.butDesignFilt.clicked.connect(self.pltAll.update)
 
-#        self.statusBar().showMessage("Application is initialized.")
+        self.statusBar().showMessage("Application is initialized.")
 
 
 #------------------------------------------------------------------------------
@@ -67,7 +67,9 @@ class pyFDA(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = pyFDA()
-    form.show()
+    main = pyFDA()
+    main.show()
    
     app.exec_()
+    
+    #sys.exit(app.exec_()) ?
