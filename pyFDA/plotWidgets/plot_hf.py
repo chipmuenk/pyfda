@@ -120,9 +120,9 @@ class PlotHf(QtGui.QMainWindow):
             A_sbx = A_sb / 5
         
         F_pb = self.F_pb
-        F_sb = fb.gD['selFilter']['F_sb'] / self.f_S
-        F_sb2 = fb.gD['selFilter']['F_sb2'] / self.f_S
-        F_pb2 = fb.gD['selFilter']['F_pb2'] / self.f_S
+        F_sb = fb.gD['selFilter']['F_sb'] * self.f_S
+        F_sb2 = fb.gD['selFilter']['F_sb2'] * self.f_S
+        F_pb2 = fb.gD['selFilter']['F_pb2'] * self.f_S
 
         if fb.gD['selFilter']['rt'] == 'LP':
             # upper limits:            
@@ -191,9 +191,9 @@ class PlotHf(QtGui.QMainWindow):
         self.aa = fb.gD['coeffs'][1]
         
         self.f_S = fb.gD['selFilter']['f_S']
-        self.f_S = 1
-        self.F_pb = fb.gD['selFilter']['F_pb'] / self.f_S
-        self.F_sb = fb.gD['selFilter']['F_sb'] / self.f_S
+#        self.f_S = 1
+        self.F_pb = fb.gD['selFilter']['F_pb'] * self.f_S
+        self.F_sb = fb.gD['selFilter']['F_sb'] * self.f_S
         
         self.A_pb = fb.gD['selFilter']['A_pb']
         self.A_sb = fb.gD['selFilter']['A_sb']
@@ -205,7 +205,7 @@ class PlotHf(QtGui.QMainWindow):
 
         # calculate |H(W)| for W = 0 ... pi:
         [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'])
-        F = W / (2 * np.pi)
+        F = W / (2 * np.pi) * self.f_S
 
         # clear the axes and (re)draw the plot
         #
@@ -231,15 +231,16 @@ class PlotHf(QtGui.QMainWindow):
         if self.specs: self.plotSpecLimits(specAxes = ax, specLog = self.log)
             
         if self.log:
-            ax.axis([0, 0.5, -self.A_sb -10, self.A_pb +1] )
+            ax.axis([0, self.f_S/2., -self.A_sb -10, self.A_pb +1] )
         else:
-            ax.axis([0, 0.5, 10**((-self.A_sb-10)/20), 10**((self.A_pb+1)/20)])
+            ax.axis([0, self.f_S/2., 10**((-self.A_sb-10)/20), 10**((self.A_pb+1)/20)])
         if self.phase:
             ax.plot(F,np.angle(H), lw = fb.gD['rc']['lw'])
             pass
  
         ax.set_title(r'Magnitude Frequency Response')
-        ax.set_xlabel(r'$F\; \rightarrow $') 
+#        ax.set_xlabel(r'$F\; \rightarrow $') 
+        ax.set_xlabel(fb.gD['selFilter']['plt_fLabel']) 
         
         # ---------- Inset Plot -------------------------------------------
         if self.inset:
