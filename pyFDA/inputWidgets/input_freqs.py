@@ -20,10 +20,8 @@ if __name__ == "__main__":
     
 # TODO: When changing between response types / minMax with different number of
 # frequency spec entries, the frequency values become jumbled, i.e. are
-# scaled with different factors 
+# scaled with different factors - check f_S scaling in loadEntries !
     
-# TODO: Introduce rich text - access ID of QLineEdits for addressing dict!
-
 class InputFreqs(QtGui.QWidget):
     """
     Build and update widget for entering the frequency 
@@ -41,7 +39,7 @@ class InputFreqs(QtGui.QWidget):
         self.DEBUG = DEBUG
         self.specs = specs  # dictionary containing _all_ specifications of the
                             # currently selected filter
-        self.qlabel = []    # list with references to QLabel widgets
+        self.qlabels = []    # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
         self.initUI()     
@@ -158,7 +156,7 @@ class InputFreqs(QtGui.QWidget):
         if senderName == "f_S" and self.f_S != 0:
             # f_S has been edited -> change values of freq. specs
             self.specs['f_S'] = self.f_S
-            for i in range(len(self.qlabel)):
+            for i in range(len(self.qlabels)):
                 f = self.specs[self.qlineedit[i].objectName()]
                 self.qlineedit[i].setText(str(f * self.f_S))
 
@@ -169,7 +167,7 @@ class InputFreqs(QtGui.QWidget):
             
             if self.idxOld == 1: # was: normalized to f_S/2,
                 # remove scaling factor 2 from spec entries
-                for i in range(len(self.qlabel)):
+                for i in range(len(self.qlabels)):
                     f = self.specs[self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f / 2.))
 
@@ -185,7 +183,7 @@ class InputFreqs(QtGui.QWidget):
                 self.editF_S.setText(str(self.f_S)) # update textedit
                 
                 # recalculate displayed freq spec values but do not store them:
-                for i in range(len(self.qlabel)):
+                for i in range(len(self.qlabels)):
                     f = self.specs[self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f * self.f_S))
             else: # Hz, kHz, ...
@@ -201,26 +199,33 @@ class InputFreqs(QtGui.QWidget):
         self.idxOld = idx # remember setting of comboBox
         
     
+    def rtLabel(self, label):
+        """
+        Richt text labels: Format labels with HTML tags
+        """
+        htmlLabel = "<b><i>"+label+"</i></b>"
+        return htmlLabel
+    
     def setEntries(self, newLabels = []):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
         """ 
         # Check whether the number of entries has changed
-        for i in range(max(len(self.qlabel), len(newLabels))):
-             # newLabels is shorter than qlabel -> delete the difference
+        for i in range(max(len(self.qlabels), len(newLabels))):
+             # newLabels is shorter than qlabels -> delete the difference
             if (i > (len(newLabels)-1)):
                 self._delEntry(len(newLabels))
 
             # newLabels is longer than existing qlabels -> create new ones!   
-            elif (i > (len(self.qlabel)-1)):   
+            elif (i > (len(self.qlabels)-1)):   
              self._addEntry(i,newLabels[i])
 
             else:
                 # when entry has changed, update label and corresponding value
-                if self.qlabel[i].text() != newLabels[i]:     
-#                    self.qlabel[i].setText("<b><i>{0}</i></b>".format(newLabels[i])) # update label
-                    self.qlabel[i].setText(newLabels[i]) # update label
+                if self.qlineedit[i].objectName() != newLabels[i]:     
+                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))#"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+#                    self.qlabels[i].setText(newLabels[i]) # update label
                     
                     self.qlineedit[i].setText(str(self.specs[newLabels[i]]*self.f_S))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID     
@@ -229,11 +234,11 @@ class InputFreqs(QtGui.QWidget):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit)
         """
-        self.layout.removeWidget(self.qlabel[i])
+        self.layout.removeWidget(self.qlabels[i])
         self.layout.removeWidget(self.qlineedit[i])
 
-        self.qlabel[i].deleteLater()
-        del self.qlabel[i]
+        self.qlabels[i].deleteLater()
+        del self.qlabels[i]
         self.qlineedit[i].deleteLater()
         del self.qlineedit[i]  
         
@@ -242,15 +247,15 @@ class InputFreqs(QtGui.QWidget):
         """
         Append entry number i to subwidget (QLabel und QLineEdit)
         """
-        self.qlabel.append(QtGui.QLabel(self))
-#        self.qlabel[i].setText("<b><i>{0}</i></b>".format(newLabel))
-        self.qlabel[i].setText(newLabel)
+        self.qlabels.append(QtGui.QLabel(self))
+        self.qlabels[i].setText(self.rtLabel(newLabel))
+#        self.qlabels[i].setText(newLabel)
         
         self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel])))
         self.qlineedit[i].editingFinished.connect(self.freqUnits)
         self.qlineedit[i].setObjectName(newLabel) # update ID
 
-        self.layout.addWidget(self.qlabel[i],(i+2),0)
+        self.layout.addWidget(self.qlabels[i],(i+2),0)
         self.layout.addWidget(self.qlineedit[i],(i+2),1)
         
     def _sortEntries(self): 
@@ -274,7 +279,8 @@ class InputFreqs(QtGui.QWidget):
         Reload textfields from filter dictionary to update changed settings 
         """
         for i in range(len(self.qlineedit)): 
-            self.qlineedit[i].setText(str(self.specs[self.qlabel[i].text()]))
+            self.qlineedit[i].setText(
+                str(self.specs[self.qlineedit[i].objectName()] * self.f_S))#text()]))
 
     def storeEntries(self):
         """
@@ -283,9 +289,9 @@ class InputFreqs(QtGui.QWidget):
         The scale factor (khz, ...) is contained neither in f_S nor the specs
         hence, it cancels out.
         """
-        for i in range(len(self.qlabel)): 
+        for i in range(len(self.qlabels)): 
             self.specs.update(
-                {self.qlabel[i].text():float(self.qlineedit[i].text())/self.f_S})
+                {self.qlineedit[i].objectName():float(self.qlineedit[i].text())/self.f_S})
 
     
 #------------------------------------------------------------------------------ 
