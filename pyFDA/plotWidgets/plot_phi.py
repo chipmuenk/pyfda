@@ -46,7 +46,8 @@ class PlotPhi(QtGui.QMainWindow):
         
         self.lblWrap = QtGui.QLabel("Wrapped Phase")        
         self.btnWrap = QtGui.QCheckBox()
-        self.btnWrap.setChecked(True)
+        self.btnWrap.setChecked(False)
+        self.btnWrap.setToolTip("Plot phase wrapped to +/- pi")
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addStretch(10)
         self.hbox.addWidget(self.lblWrap)

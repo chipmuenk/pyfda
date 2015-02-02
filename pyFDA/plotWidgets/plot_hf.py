@@ -46,13 +46,20 @@ class PlotHf(QtGui.QMainWindow):
         self.lblLog = QtGui.QLabel("Log. y-scale")        
         self.btnLog = QtGui.QCheckBox()
         self.btnLog.setChecked(True)
-        self.lblInset = QtGui.QLabel("Show Inset")
+        
+        self.lblInset = QtGui.QLabel("Inset")
         self.btnInset = QtGui.QCheckBox()
+        self.btnInset.setToolTip("Display second zoomed plot")
+        
         self.lblSpecs = QtGui.QLabel("Show Specs")
         self.btnSpecs = QtGui.QCheckBox()
-        self.lblPhase = QtGui.QLabel("Show Phase")
-        self.btnPhase = QtGui.QCheckBox()
         self.btnSpecs.setChecked(False)
+        self.btnSpecs.setToolTip("Display filter specs as hatched regions")
+        
+        self.lblPhase = QtGui.QLabel("Phase")
+        self.btnPhase = QtGui.QCheckBox()
+        self.btnPhase.setToolTip("Overlay phase")
+
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addStretch(10)

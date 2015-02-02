@@ -52,7 +52,8 @@ class InputWeights(QtGui.QWidget): #QtGui.QWidget,
             self.qtitle.setText(str(self.title))
             self.qtitle.setFont(bfont)
             self.qtitle.setWordWrap(True)
-            self.butReset = QtGui.QPushButton("Reset Weights", self)
+            self.butReset = QtGui.QPushButton("Reset", self)
+            self.butReset.setToolTip("Reset weights to 1")
             self.WVLayout.addWidget(self.qtitle)
 #            self.WVLayout.addWidget(self.butReset)
         
