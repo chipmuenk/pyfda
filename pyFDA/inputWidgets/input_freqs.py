@@ -19,8 +19,8 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
     
 # TODO: When changing between response types / minMax with different number of
-# frequency spec entries, the frequency values become jumbled, i.e. are
-# scaled with different factors - check f_S scaling in loadEntries !
+# frequency spec entries and f_S != 1 , the frequency values (only display?)
+# become jumbled, i.e. are scaled with different factors - check f_S scaling in loadEntries !
     
 class InputFreqs(QtGui.QWidget):
     """
@@ -77,7 +77,7 @@ class InputFreqs(QtGui.QWidget):
         self.editF_S.setObjectName("f_S")
 
         self.labelF_S = QtGui.QLabel(self)
-        self.labelF_S.setText("<b><i>f<sub>S</sub></i></b>")
+        self.labelF_S.setText(self.rtLabel("f<sub>S</sub>"))
 
         self.comboUnits = QtGui.QComboBox(self)
         self.comboUnits.setObjectName("comboUnits")
@@ -139,13 +139,14 @@ class InputFreqs(QtGui.QWidget):
     def freqUnits(self):
         """
         Transform the frequency spec input fields according to the Units 
-        setting. Spec entries are stored in normalized form in the dictionary 
-        and hence NOT updated when f_S or the unit are changed!
-        Called during init and every time a widget sends a signal
+        setting. Spec entries are always stored normalized w.r.t. f_S in the 
+        dictionary; when f_S or the unit are changed, only the displayed values
+        of the frequency entries are updated, not the dictionary!
+
+        freqUnits is called during init and every time a widget sends a signal.
         """        
-        idx = self.comboUnits.currentIndex()
-#        freqSpecs = [l for l in self.specs if l[0] == 'F'] # list with freq. specs
-        self.f_S = float(self.editF_S.text()) # sampling frequency
+        idx = self.comboUnits.currentIndex()  # read index of units combobox
+        self.f_S = float(self.editF_S.text()) # read sampling frequency
 
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName() 
@@ -154,14 +155,15 @@ class InputFreqs(QtGui.QWidget):
             senderName = "comboUnits"
 
         if senderName == "f_S" and self.f_S != 0:
-            # f_S has been edited -> change values of freq. specs
+            # f_S has been edited -> change display of frequency entries and
+            # dictionary entry for f_S
             self.specs['f_S'] = self.f_S
             for i in range(len(self.qlabels)):
                 f = self.specs[self.qlineedit[i].objectName()]
                 self.qlineedit[i].setText(str(f * self.f_S))
 
         elif senderName == "comboUnits" and idx != self.idxOld:
-            # unit has changed -> change frequency labels
+            # combo unit has changed -> change display of frequency entries
             self.editF_S.setVisible(idx > 1)  # only visible when 
             self.labelF_S.setVisible(idx > 1) # not normalized
             
@@ -169,7 +171,8 @@ class InputFreqs(QtGui.QWidget):
                 # remove scaling factor 2 from spec entries
                 for i in range(len(self.qlabels)):
                     f = self.specs[self.qlineedit[i].objectName()]
-                    self.qlineedit[i].setText(str(f / 2.))
+                    self.qlineedit[i].setText(str(f))
+                self.f_S = 1.
 
             if idx < 2: # normalized frequency
                 if idx == 0: # normalized to f_S
@@ -179,7 +182,6 @@ class InputFreqs(QtGui.QWidget):
                     self.f_S = 2. 
                     fLabel = r"$F = 2f/f_S \; \rightarrow$"
 
-                self.specs['f_S'] = self.f_S # store f_S and 
                 self.editF_S.setText(str(self.f_S)) # update textedit
                 
                 # recalculate displayed freq spec values but do not store them:
@@ -191,12 +193,15 @@ class InputFreqs(QtGui.QWidget):
                 fLabel = r"$f$ in " + unit + r"$\; \rightarrow$"
 
             self.specs.update({"plt_fLabel":fLabel}) # label for freq. axis
+            self.specs['f_S'] = self.f_S # store f_S in dictionary
+            self.editF_S.setText(str(self.f_S))
 
         else: # freq. spec textfield has been changed
             self.storeEntries()
 
-#        print(idx, self.f_S, freqSpecs)
+#        print(idx, self.f_S, self.qlineedit[0].text(), self.specs["F_pb"])
         self.idxOld = idx # remember setting of comboBox
+        self.f_S_old = self.f_S # and f_S (not used yet)
         
     
     def rtLabel(self, label):
