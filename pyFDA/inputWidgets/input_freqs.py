@@ -206,8 +206,13 @@ class InputFreqs(QtGui.QWidget):
     
     def rtLabel(self, label):
         """
-        Richt text labels: Format labels with HTML tags
+        Rich text labels: Format labels with HTML tags, replacing '_' by 
+        HTML subscript tags
         """
+        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+        if "_" in label:
+            label = label.replace('_', '<sub>') 
+            label += "</sub>"
         htmlLabel = "<b><i>"+label+"</i></b>"
         return htmlLabel
     
@@ -229,7 +234,7 @@ class InputFreqs(QtGui.QWidget):
             else:
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:     
-                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))#"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))
 #                    self.qlabels[i].setText(newLabels[i]) # update label
                     
                     self.qlineedit[i].setText(str(self.specs[newLabels[i]]*self.f_S))
@@ -256,7 +261,7 @@ class InputFreqs(QtGui.QWidget):
         self.qlabels[i].setText(self.rtLabel(newLabel))
 #        self.qlabels[i].setText(newLabel)
         
-        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel])))
+        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel]*self.f_S)))
         self.qlineedit[i].editingFinished.connect(self.freqUnits)
         self.qlineedit[i].setObjectName(newLabel) # update ID
 
@@ -266,11 +271,8 @@ class InputFreqs(QtGui.QWidget):
     def _sortEntries(self): 
         """
         Sort spec entries with ascending frequency and store in filter dict.
-        """
-        fSpecs = []
-        for i in range(len(self.qlineedit)):
-            fSpecs.append(self.qlineedit[i].text())
-#        fSpecs = [f for f in self.qlineedit.text()]        
+        """ 
+        fSpecs = [self.qlineedit[i].text() for i in range(len(self.qlineedit))]
         
         fSpecs.sort()
         
@@ -306,8 +308,8 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputFreqs(specs = fb.gD["selFilter"])#, spec="TEST")
 
-    form.setEntries(newLabels = ['F_sb','F_sb2','F_pb','F_pb2'])
-    form.setEntries(newLabels = ['F_pb','F_pb2'])
+    form.setEntries(newLabels = ['F_SB','F_SB2','F_PB','F_PB2'])
+    form.setEntries(newLabels = ['F_PB','F_PB2'])
 
     form.show()
    
