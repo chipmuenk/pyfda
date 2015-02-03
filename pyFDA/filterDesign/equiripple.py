@@ -17,7 +17,7 @@ from numpy import log10, pi, arctan
 
 #import filterbroker as fb
 
-# TODO: save results in gD.dB
+# TODO: Order of A_XX is incorrect e.g. for BP
 # TODO: Try HP with even order & type = Hilbert
 # TODO: Hilbert not working correctly yet
 
