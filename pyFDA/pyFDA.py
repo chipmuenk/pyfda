@@ -4,7 +4,7 @@ Created on Tue Nov 26 10:57:30 2013
 
 @author: Julia Beike, Christian Muenker
 
-Main file for the pyFDA app, initializes UI
+Mainwindow  for the pyFDA app, initializes UI
 """
 from __future__ import print_function, division, unicode_literals
 import sys
@@ -14,10 +14,7 @@ from PyQt4 import QtGui
 from inputWidgets import input_all
 from plotWidgets import plot_all
 
-
 class pyFDA(QtGui.QMainWindow):
-#class pyFDA(QtGui.QWidget):
-    PLT_SAME_WINDOW =  True
     """
     Create the main window for entering the filter specifications
     """
@@ -60,7 +57,6 @@ class pyFDA(QtGui.QMainWindow):
         self.inputAll.inputParams.butDesignFilt.clicked.connect(self.pltAll.update)
 
         self.statusBar().showMessage("Application is initialized.")
-
 
 #------------------------------------------------------------------------------
    
