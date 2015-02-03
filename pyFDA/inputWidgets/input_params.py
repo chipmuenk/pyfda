@@ -60,13 +60,10 @@ class InputParams(QtGui.QWidget):
                     units = ["dB","Squared"], labels = ["A_PB","A_SB"],
                     DEBUG = False)
         # subwidget for Weight Specs                                           
-        self.wspec = input_weights.InputWeights(
-                    title = "Weight Specifications",
-                    labels = ["W_PB","W_SB"],
+        self.wspec = input_weights.InputWeights(specs = fb.gD['selFilter'],
                     DEBUG = False)
         
         self.msg = QtGui.QLabel(self)
-#        self.msg = QtGui.QTextEdit(self)
         self.msg.setText("Just click it!")
         self.msg.setWordWrap(True)
 #        self.msg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)

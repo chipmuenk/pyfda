@@ -10,7 +10,7 @@ Updated on Thur Dec 11 2014
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -18,24 +18,25 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import filterbroker as fb
 
-
-class InputWeights(QtGui.QWidget): #QtGui.QWidget, 
-    
-    def __init__(self, title = "", labels=[], DEBUG = True):
+class InputWeights(QtGui.QWidget): 
+    """
+    Build and update widget for entering the weight
+    specifications like W_SB, W_PB etc.
+    """
+     
+    def __init__(self, specs, DEBUG = True):
+        """
+        Initialize
+        specs: A dictionary containing all the specs
+        """
         
-        """
-        Initialisierung
-        units: sind die Einheiten die in der Combobox stehen sollen
-        lab: Namen der Labels in einer Liste
-        """
         super(InputWeights, self).__init__()   
         self.DEBUG = DEBUG
-        self.labels = labels # list with labels for combobox
-        self.title = title
+        self.specs = specs  # dictionary containing _all_ specifications of the
+                            # currently selected filter
         
-        self.qlabel = [] # list with references to QLabel widgets
+        self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
         self.initUI()     
@@ -44,38 +45,26 @@ class InputWeights(QtGui.QWidget): #QtGui.QWidget,
         self.WVLayout = QtGui.QVBoxLayout() # Widget vertical layout  
         self.layout   = QtGui.QGridLayout() # sublayout for spec fields
         
-        if self.title != "":
-            bfont = QtGui.QFont()
-            bfont.setBold(True)
+        title = "Weight Specifications"    
+        bfont = QtGui.QFont()
+        bfont.setBold(True)
 #            bfont.setWeight(75)
-            self.qtitle = QtGui.QLabel(self) # field for widget title
-            self.qtitle.setText(str(self.title))
-            self.qtitle.setFont(bfont)
-            self.qtitle.setWordWrap(True)
-            self.butReset = QtGui.QPushButton("Reset", self)
-            self.butReset.setToolTip("Reset weights to 1")
-            self.WVLayout.addWidget(self.qtitle)
-#            self.WVLayout.addWidget(self.butReset)
-        
+        self.qtitle = QtGui.QLabel(self) # field for widget title
+        self.qtitle.setText(str(title))
+        self.qtitle.setFont(bfont)
+        self.qtitle.setWordWrap(True)
+        self.butReset = QtGui.QPushButton("Reset", self)
+        self.butReset.setToolTip("Reset weights to 1")
+        self.WVLayout.addWidget(self.qtitle)
 
         self.layout.addWidget(self.butReset, 1, 1) # span two columns
 
-        # Create a gridLayout consisting of Labels and LineEdit fields
-        # The number of created lines depends on the number of labels
-        # qlabels is a list with references to the QLabel widgets, 
-        # qlineedit contains references to the QLineEdit widgets
-
-        # iterate over number of labels and fill in values        
-        for i in range(len(self.labels)):        
-           
-            self.qlabel.append(QtGui.QLabel(self))
-            self.qlabel[i].setText(self.labels[i])
-            self.qlineedit.append(QtGui.QLineEdit(str(
-                                        fb.gD['selFilter'][self.labels[i]])))
-
-            self.layout.addWidget(self.qlabel[i],(i+2),0)
-            self.layout.addWidget(self.qlineedit[i],(i+2),1)
-        
+        # - Build a list from all entries in the specs dictionary starting 
+        #   with "W" (= weight specifications of the current filter)
+        # - Pass the list to setEntries which recreates the widget        
+        newLabels = [l for l in self.specs if l[0] == 'W']
+        self.setEntries(newLabels = newLabels)
+       
         sfFrame = QtGui.QFrame()
         sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
         sfFrame.setLayout(self.layout)
@@ -84,99 +73,105 @@ class InputWeights(QtGui.QWidget): #QtGui.QWidget,
 #        self.WVLayout.addLayout(self.layout)
 
         self.setLayout(self.WVLayout)
-#        
-#        mainLayout = QtGui.QHBoxLayout()
-#        mainLayout.addWidget(sfFrame)
-#        self.setLayout(mainLayout)
-        
+
         # SIGNALS & SLOTS
-        # TODO: not working yet
-        # Call update every time a field is edited: 
-#        self.qlineedit.editingFinished.connect(self.storeEntries)
         self.butReset.clicked.connect(self._resetWeights)
 
 #-------------------------------------------------------------        
-    def setEntries(self, title = "", newLabels = []):
+    def rtLabel(self, label):
         """
-        Set title, labels, defaults - when number of elements changes, the 
-        layout has to be rebuilt
+        Rich text labels: Format labels with HTML tags, replacing '_' by 
+        HTML subscript tags
         """
-        if self.DEBUG: print("UnitBox.Titel:",self.title)
-        if title != "":
-            self.qtitle.setText(title) # new title
-    
+        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+        if "_" in label:
+            label = label.replace('_', '<sub>') 
+            label += "</sub>"
+        htmlLabel = "<b><i>"+label+"</i></b>"
+        return htmlLabel
+
+#-------------------------------------------------------------        
+    def setEntries(self, newLabels = []):
+        """
+        Set labels and get corresponding values from filter dictionary.
+        When number of elements changes, the layout of subwidget is rebuilt.
+        """ 
         # Check whether the number of entries has changed
-        for i in range(max(len(self.labels), len(newLabels))):
-             # newLabels is shorter than labels -> delete the difference
+        for i in range(max(len(self.qlabels), len(newLabels))):
+             # newLabels is shorter than qlabels -> delete the difference
             if (i > (len(newLabels)-1)):
                 self._delEntry(len(newLabels))
 
-            # newLabels is longer than existing labels -> create new ones!   
-            elif (i > (len(self.labels)-1)):
-                self._addEntry(i, newLabels[i])
+            # newLabels is longer than existing qlabels -> create new ones!   
+            elif (i > (len(self.qlabels)-1)):   
+             self._addEntry(i,newLabels[i])
 
             else:
-                # when label has changed, update it and the default value
-                if (self.labels[i]!=newLabels[i]):     
-                    self.qlabel[i].setText(newLabels[i])
-                    self.labels[i] = newLabels[i]
-                    self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
+                # when entry has changed, update label and corresponding value
+                if self.qlineedit[i].objectName() != newLabels[i]:     
+                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))                   
+                    self.qlineedit[i].setText(str(self.specs[newLabels[i]]))
+                    self.qlineedit[i].setObjectName(newLabels[i])  # update ID     
                             
     def _delEntry(self,i):
         """
-        Element with position i is deleted (qlabel and qlineedit)
+        Delete entry number i from subwidget (QLabel and QLineEdit)
         """
-        self.layout.removeWidget(self.qlabel[i])
+        self.layout.removeWidget(self.qlabels[i])
         self.layout.removeWidget(self.qlineedit[i])
-        self.qlabel[i].deleteLater()
-        del self.labels[i]
-        del self.qlabel[i]
+
+        self.qlabels[i].deleteLater()
+        del self.qlabels[i]
         self.qlineedit[i].deleteLater()
         del self.qlineedit[i]  
         
+
     def _addEntry(self, i, newLabel): 
         """
-        Element with position i is appended (qlabel und qlineedit)
+        Append entry number i to subwidget (QLabel und QLineEdit)
         """
-        self.qlabel.append(QtGui.QLabel(self))
-        self.labels.append(newLabel)
-        self.qlineedit.append(QtGui.QLineEdit(str(fb.gD['selFilter'][newLabel])))
-        self.qlabel[i].setText(newLabel)
-        self.layout.addWidget(self.qlabel[i],(i+2),0)
+        self.qlabels.append(QtGui.QLabel(self))
+        self.qlabels[i].setText(self.rtLabel(newLabel))
+        
+        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel])))
+        self.qlineedit[i].editingFinished.connect(self.storeEntries)
+        self.qlineedit[i].setObjectName(newLabel) # update ID
+
+        self.layout.addWidget(self.qlabels[i],(i+2),0)
         self.layout.addWidget(self.qlineedit[i],(i+2),1)
         
     def _resetWeights(self):
-        for i in range(len(self.labels)):
+        for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText("1.0")
         self.storeEntries()
         
-      
     def loadEntries(self):
         """
-        Reload textfields from global dictionary to update changed weight
-        settings etc.
+        Reload textfields from filter dictionary to update changed settings 
         """
-        for i in range(len(self.labels)):
-            self.qlineedit[i].setText(str(fb.gD['selFilter'][self.labels[i]]))
-
+        for i in range(len(self.qlineedit)): 
+            self.qlineedit[i].setText(
+                str(self.specs[self.qlineedit[i].objectName()]))      
 
     def storeEntries(self):
         """
-        Store specification entries in dict fb.gD['selFilter']
+        Store specification entries in filter dictionary
         """
-        for i in range(len(self.labels)):
-            fb.gD['selFilter'].update(
-                            {self.labels[i]:float(self.qlineedit[i].text())})
-    
+        for i in range(len(self.qlabels)): 
+            self.specs.update(
+                {self.qlineedit[i].objectName():float(self.qlineedit[i].text())})
+
 #------------------------------------------------------------------------------ 
     
 if __name__ == '__main__':
-    lab = ['A_sb','A_sb','A_sb2',]
-    app = QtGui.QApplication(sys.argv)
-    form = InputWeights(title = "Amplitudes", labels = lab)#, spec="TEST")
+    
+    import filterbroker as fb
 
-    form.setEntries(title = "Gewichte", newLabels = ['W_sb','W_sb2','W_pb','W_pb2'])
-    form.setEntries(newLabels = ['W_pb','W_pb2'])
+    app = QtGui.QApplication(sys.argv)
+    form = InputWeights(specs = fb.gD["selFilter"])
+
+    form.setEntries(newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
+    form.setEntries(newLabels = ['W_PB','W_PB2'])
 
     form.show()
    
