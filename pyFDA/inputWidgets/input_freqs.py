@@ -9,8 +9,7 @@ Created on 23.1.2015
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from collections import OrderedDict
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
 # add main directory from one level above if this file is run as __main__
 # for test purposes
@@ -48,14 +47,9 @@ class InputFreqs(QtGui.QWidget):
         self.WVLayout = QtGui.QVBoxLayout() # Widget vertical layout  
 
         title = "Frequency Specifications"      
-        self.unitsf = OrderedDict([
-        ('Normalized to f_S', 1),
-        ('Normalized to f_S/2', 2),
-        ('Hz', 1.),
-        ('kHz', 1000.),
-        ('MHz', 1.e6),
-        ('GHz', 1.e9)
-        ])
+        
+        self.unitsf = ['Normalized to f_S', 'Normalized to f_S/2', 
+                       'Hz', 'kHz', 'MHz', 'GHz']
         
         self.idxOld = -1 # index of comboUnits before last change
 
@@ -81,7 +75,7 @@ class InputFreqs(QtGui.QWidget):
 
         self.comboUnits = QtGui.QComboBox(self)
         self.comboUnits.setObjectName("comboUnits")
-        self.comboUnits.addItems(self.unitsf.keys())
+        self.comboUnits.addItems(self.unitsf)
         self.comboUnits.setCurrentIndex(0)
         
         self.butSort = QtGui.QPushButton(self)
@@ -234,9 +228,7 @@ class InputFreqs(QtGui.QWidget):
             else:
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:     
-                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))
-#                    self.qlabels[i].setText(newLabels[i]) # update label
-                    
+                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))                   
                     self.qlineedit[i].setText(str(self.specs[newLabels[i]]*self.f_S))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID     
                      
@@ -259,7 +251,6 @@ class InputFreqs(QtGui.QWidget):
         """
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self.rtLabel(newLabel))
-#        self.qlabels[i].setText(newLabel)
         
         self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel]*self.f_S)))
         self.qlineedit[i].editingFinished.connect(self.freqUnits)
@@ -299,14 +290,13 @@ class InputFreqs(QtGui.QWidget):
         for i in range(len(self.qlabels)): 
             self.specs.update(
                 {self.qlineedit[i].objectName():float(self.qlineedit[i].text())/self.f_S})
-
     
 #------------------------------------------------------------------------------ 
     
 if __name__ == '__main__':
     import filterbroker as fb
     app = QtGui.QApplication(sys.argv)
-    form = InputFreqs(specs = fb.gD["selFilter"])#, spec="TEST")
+    form = InputFreqs(specs = fb.gD["selFilter"])
 
     form.setEntries(newLabels = ['F_SB','F_SB2','F_PB','F_PB2'])
     form.setEntries(newLabels = ['F_PB','F_PB2'])
