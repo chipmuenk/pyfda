@@ -109,80 +109,80 @@ class PlotHf(QtGui.QMainWindow):
         F_max = self.f_S/2
         if specLog:
             if fb.gD['selFilter']['ft'] == "FIR":
-                A_pb_max = self.A_pb # 20*log10(1+del_DB)
+                A_PB_max = self.A_PB # 20*log10(1+del_DB)
             else: # IIR log
-                A_pb_max = 0
-            A_pb_min = -self.A_pb
-            A_pb_minx = A_pb_min - 10# 20*log10(1-del_DB)
-            A_sb = -self.A_sb
-            A_sbx = A_sb - 10
+                A_PB_max = 0
+            A_PB_min = -self.A_PB
+            A_PB_minx = A_PB_min - 10# 20*log10(1-del_DB)
+            A_SB = -self.A_SB
+            A_SBx = A_SB - 10
         else:
             if fb.gD['selFilter']['ft'] == 'FIR':
-                A_pb_max = 10**(self.A_pb/20)# 1 + del_DB 
+                A_PB_max = 10**(self.A_PB/20)# 1 + del_DB 
             else:
-                A_pb_max = 1
-            A_pb_min = 10**(-self.A_pb/20) #1 - del_DB
-            A_pb_minx = A_pb_min / 2
-            A_sb = 10**(-self.A_sb/20)
-            A_sbx = A_sb / 5
+                A_PB_max = 1
+            A_PB_min = 10**(-self.A_PB/20) #1 - del_DB
+            A_PB_minx = A_PB_min / 2
+            A_SB = 10**(-self.A_SB/20)
+            A_SBx = A_SB / 5
         
-        F_pb = self.F_pb
-        F_sb = fb.gD['selFilter']['F_sb'] * self.f_S
-        F_sb2 = fb.gD['selFilter']['F_sb2'] * self.f_S
-        F_pb2 = fb.gD['selFilter']['F_pb2'] * self.f_S
+        F_PB = self.F_PB
+        F_SB = fb.gD['selFilter']['F_SB'] * self.f_S
+        F_SB2 = fb.gD['selFilter']['F_SB2'] * self.f_S
+        F_PB2 = fb.gD['selFilter']['F_PB2'] * self.f_S
 
         if fb.gD['selFilter']['rt'] == 'LP':
             # upper limits:            
-            ax.plot([0, F_sb, F_sb, F_max],
-                    [A_pb_max, A_pb_max, A_sb, A_sb], 'b--')
-            ax.fill_between([0, F_sb, F_sb, F_max], ymax,
-                    [A_pb_max, A_pb_max, A_sb, A_sb], **fill_params)                    
+            ax.plot([0, F_SB, F_SB, F_max],
+                    [A_PB_max, A_PB_max, A_SB, A_SB], 'b--')
+            ax.fill_between([0, F_SB, F_SB, F_max], ymax,
+                    [A_PB_max, A_PB_max, A_SB, A_SB], **fill_params)                    
             # lower limits:
-            ax.plot([0, F_pb, F_pb],[A_pb_min, A_pb_min, A_pb_minx], 'b--')
-            ax.fill_between([0, F_pb, F_pb], A_pb_minx,
-                            [A_pb_min, A_pb_min, A_pb_minx], **fill_params)
+            ax.plot([0, F_PB, F_PB],[A_PB_min, A_PB_min, A_PB_minx], 'b--')
+            ax.fill_between([0, F_PB, F_PB], A_PB_minx,
+                            [A_PB_min, A_PB_min, A_PB_minx], **fill_params)
        
         if fb.gD['selFilter']['rt'] == 'HP':
             # upper limits:
-            ax.plot([0, F_sb, F_sb, F_max],
-                    [A_sb, A_sb, A_pb_max, A_pb_max], 'b--')
-            ax.fill_between([0, F_sb, F_sb, F_max], 10,
-                    [A_sb, A_sb, A_pb_max, A_pb_max], **fill_params)
+            ax.plot([0, F_SB, F_SB, F_max],
+                    [A_SB, A_SB, A_PB_max, A_PB_max], 'b--')
+            ax.fill_between([0, F_SB, F_SB, F_max], 10,
+                    [A_SB, A_SB, A_PB_max, A_PB_max], **fill_params)
             # lower limits:
-            ax.plot([F_pb, F_pb, F_max],[A_pb_minx, A_pb_min, A_pb_min], 'b--')
-            ax.fill_between([F_pb, F_pb, F_max], A_pb_minx,
-                            [A_pb_minx, A_pb_min, A_pb_min], **fill_params)
+            ax.plot([F_PB, F_PB, F_max],[A_PB_minx, A_PB_min, A_PB_min], 'b--')
+            ax.fill_between([F_PB, F_PB, F_max], A_PB_minx,
+                            [A_PB_minx, A_PB_min, A_PB_min], **fill_params)
             
         if fb.gD['selFilter']['rt'] == 'BS':
             # lower limits left:            
-            ax.plot([0, F_pb, F_pb],[A_pb_min, A_pb_min, A_pb_minx], 'b--')
-            ax.fill_between([0, F_pb, F_pb], A_pb_minx,
-                            [A_pb_min, A_pb_min, A_pb_minx], **fill_params)
+            ax.plot([0, F_PB, F_PB],[A_PB_min, A_PB_min, A_PB_minx], 'b--')
+            ax.fill_between([0, F_PB, F_PB], A_PB_minx,
+                            [A_PB_min, A_PB_min, A_PB_minx], **fill_params)
 
             # upper limits:            
-            ax.plot([0, F_sb, F_sb, F_sb2, F_sb2, F_max],
-                    [A_pb_max, A_pb_max, A_sb, A_sb, A_pb_max, A_pb_max], 'b--')
-            ax.fill_between([0, F_sb, F_sb, F_sb2, F_sb2, F_max], 10,
-                    [A_pb_max, A_pb_max, A_sb, A_sb, A_pb_max, A_pb_max], 
+            ax.plot([0, F_SB, F_SB, F_SB2, F_SB2, F_max],
+                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB_max, A_PB_max], 'b--')
+            ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
+                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB_max, A_PB_max], 
                         **fill_params)
 
             # lower limits right:            
-            ax.plot([F_pb2, F_pb2, F_max],[A_pb_minx, A_pb_min, A_pb_min],'b--')    
-            ax.fill_between([F_pb2, F_pb2, F_max], A_pb_minx,
-                            [A_pb_minx, A_pb_min, A_pb_min], **fill_params)    
+            ax.plot([F_PB2, F_PB2, F_max],[A_PB_minx, A_PB_min, A_PB_min],'b--')    
+            ax.fill_between([F_PB2, F_PB2, F_max], A_PB_minx,
+                            [A_PB_minx, A_PB_min, A_PB_min], **fill_params)    
             
 
         if fb.gD['selFilter']['rt'] == "BP":
             # upper limits:
-            ax.plot([0,    F_sb,  F_sb,      F_sb2,      F_sb2,  F_max],
-                    [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb], 'b--')
-            ax.fill_between([0, F_sb, F_sb, F_sb2, F_sb2, F_max], 10,
-                    [A_sb, A_sb, A_pb_max, A_pb_max, A_sb, A_sb],**fill_params)
+            ax.plot([0,    F_SB,  F_SB,      F_SB2,      F_SB2,  F_max],
+                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB, A_SB], 'b--')
+            ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
+                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB, A_SB],**fill_params)
             # lower limits:
-            ax.plot([F_pb, F_pb, F_pb2, F_pb2], 
-                    [A_pb_minx, A_pb_min, A_pb_min, A_pb_minx], 'b--' )
-            ax.fill_between([F_pb, F_pb, F_pb2, F_pb2], A_pb_minx,
-                    [A_pb_minx, A_pb_min, A_pb_min, A_pb_minx], **fill_params)       
+            ax.plot([F_PB, F_PB, F_PB2, F_PB2], 
+                    [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx], 'b--' )
+            ax.fill_between([F_PB, F_PB, F_PB2, F_PB2], A_PB_minx,
+                    [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx], **fill_params)       
             
     def draw(self):
         """ 
@@ -199,11 +199,11 @@ class PlotHf(QtGui.QMainWindow):
         
         self.f_S = fb.gD['selFilter']['f_S']
 #        self.f_S = 1
-        self.F_pb = fb.gD['selFilter']['F_pb'] * self.f_S
-        self.F_sb = fb.gD['selFilter']['F_sb'] * self.f_S
+        self.F_PB = fb.gD['selFilter']['F_PB'] * self.f_S
+        self.F_SB = fb.gD['selFilter']['F_SB'] * self.f_S
         
-        self.A_pb = fb.gD['selFilter']['A_pb']
-        self.A_sb = fb.gD['selFilter']['A_sb']
+        self.A_PB = fb.gD['selFilter']['A_PB']
+        self.A_SB = fb.gD['selFilter']['A_SB']
 
 
         if self.DEBUG:
@@ -238,9 +238,9 @@ class PlotHf(QtGui.QMainWindow):
         if self.specs: self.plotSpecLimits(specAxes = ax, specLog = self.log)
             
         if self.log:
-            ax.axis([0, self.f_S/2., -self.A_sb -10, self.A_pb +1] )
+            ax.axis([0, self.f_S/2., -self.A_SB -10, self.A_PB +1] )
         else:
-            ax.axis([0, self.f_S/2., 10**((-self.A_sb-10)/20), 10**((self.A_pb+1)/20)])
+            ax.axis([0, self.f_S/2., 10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)])
         if self.phase:
             ax.plot(F,np.angle(H), lw = fb.gD['rc']['lw'])
             pass
@@ -259,8 +259,8 @@ class PlotHf(QtGui.QMainWindow):
                 ax_i.plot(F,20*np.log10(abs(H)), lw = fb.gD['rc']['lw'])
             else:
                 ax_i.plot(F,abs(H), lw = fb.gD['rc']['lw'])
-#            ax1.set_xlim(0, self.F_pb)
-#            ax1.set_ylim(-self.A_pb, self.A_pb) 
+#            ax1.set_xlim(0, self.F_PB)
+#            ax1.set_ylim(-self.A_PB, self.A_PB) 
 
 
         else:

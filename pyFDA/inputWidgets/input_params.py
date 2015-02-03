@@ -57,12 +57,12 @@ class InputParams(QtGui.QWidget):
                     DEBUG = False)
         # subwidget for Amplitude Specs        
         self.aspec = input_units.InputUnits(title = "Amplitude Specifications",
-                    units = ["dB","Squared"], labels = ["A_pb","A_sb"],
+                    units = ["dB","Squared"], labels = ["A_PB","A_SB"],
                     DEBUG = False)
         # subwidget for Weight Specs                                           
         self.wspec = input_weights.InputWeights(
                     title = "Weight Specifications",
-                    labels = ["W_pb","W_sb"],
+                    labels = ["W_PB","W_SB"],
                     DEBUG = False)
         
         self.msg = QtGui.QLabel(self)

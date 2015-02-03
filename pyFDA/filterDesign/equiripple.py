@@ -49,7 +49,7 @@ class equiripple(object):
 
         # common parameters for all man. / min. filter order response types:    
         par_man = ['N', 'f_S'] # enabled widget for man. filt. order
-        par_min = ['f_S', 'A_pb', 'A_sb'] # enabled widget for min. filt. order
+        par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
 
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types 
@@ -58,22 +58,22 @@ class equiripple(object):
                     "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":['W_pb','W_sb','F_pb','F_sb','A_pb','A_sb']},
-                   "min":{"par":['F_pb','F_sb','W_pb','W_sb']}},
-            "HP": {"man":{"par":['W_sb','W_pb','F_sb','F_pb','A_sb','A_pb'],
+            "LP": {"man":{"par":['W_PB','W_SB','F_PB','F_SB','A_PB','A_SB']},
+                   "min":{"par":['F_PB','F_SB','W_PB','W_SB']}},
+            "HP": {"man":{"par":['W_SB','W_PB','F_SB','F_PB','A_SB','A_PB'],
                           "msg":"\nNote: Order needs to be odd (type II FIR filters)"},
-                   "min":{"par":['F_sb','F_pb','W_sb','W_pb']}},
-            "BP": {"man":{"par":['F_sb', 'F_pb', 'F_pb2', 'F_sb2',
-                                 'W_sb','W_pb','W_sb2','A_sb','A_pb','A_sb2']},
-                   "min":{"par":['F_sb', 'F_pb', 'F_pb2', 'F_sb2', 
-                                 'W_sb', 'W_pb','W_sb2','A_sb2']}},                                 
-            "BS": {"man":{"par":['F_pb', 'F_sb', 'F_sb2', 'F_pb2',
-                                 'W_pb', 'W_sb', 'W_pb2','A_pb','A_sb','A_pb2'],
+                   "min":{"par":['F_SB','F_PB','W_SB','W_PB']}},
+            "BP": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+                                 'W_SB','W_PB','W_SB2','A_SB','A_PB','A_SB2']},
+                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 
+                                 'W_SB', 'W_PB','W_SB2','A_SB2']}},                                 
+            "BS": {"man":{"par":['F_PB', 'F_SB', 'F_SB2', 'F_PB2',
+                                 'W_PB', 'W_SB', 'W_PB2','A_PB','A_SB','A_PB2'],
                       "msg":"\nNote: Order needs to be odd (type II FIR filters)"},
-                   "min":{"par":['A_pb2','W_pb','W_sb','W_pb2', 
-                                 'F_pb','F_sb','F_sb2','F_pb2']}},
-            "HIL": {"man":{"par":['F_sb', 'F_pb', 'F_pb2', 'F_sb2',
-                                 'W_sb', 'W_pb', 'W_sb2','A_sb','A_pb','A_sb2']
+                   "min":{"par":['A_PB2','W_PB','W_SB','W_PB2', 
+                                 'F_PB','F_SB','F_SB2','F_PB2']}},
+            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+                                 'W_SB', 'W_PB', 'W_SB2','A_SB','A_PB','A_SB2']
                                  }}
           #"DIFF":
                    }
@@ -103,67 +103,67 @@ class equiripple(object):
 
 
     def LPman(self, specs):
-        self.save(specs, sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 0.5],
-               [1, 0], weight = [specs['W_pb'],specs['W_sb']],Hz = 1))
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_PB'], specs['F_SB'], 0.5],
+               [1, 0], weight = [specs['W_PB'],specs['W_SB']],Hz = 1))
 
     def LPmin(self, specs):
-        (self.N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb']], [1, 0], 
-            [dBpb2lin(specs['A_pb']), dBsb2lin(specs['A_sb'])],
+        (self.N, F, A, W) = self.remezord([specs['F_PB'], specs['F_SB']], [1, 0], 
+            [dBpb2lin(specs['A_PB']), dBsb2lin(specs['A_SB'])],
              Hz = 1, alg = 'ichige')     
-        specs['W_pb'] = W[0]
-        specs['W_sb'] = W[1]
+        specs['W_PB'] = W[0]
+        specs['W_SB'] = W[1]
         self.save(specs, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1))
                 
     def HPman(self, specs):
         N = self.oddround(specs['N']) # enforce odd order 
-        self.save(specs, sig.remez(N,[0, specs['F_sb'], specs['F_pb'], 0.5],
-                [0, 1], weight = [specs['W_sb'],specs['W_pb']], Hz = 1))
+        self.save(specs, sig.remez(N,[0, specs['F_SB'], specs['F_PB'], 0.5],
+                [0, 1], weight = [specs['W_SB'],specs['W_PB']], Hz = 1))
         
     def HPmin(self, specs):
-        (L, F, A, W) = self.remezord([specs['F_sb'], specs['F_pb']], [0, 1], 
-            [np.sqrt(2)*10.**(-specs['A_sb']/20), dBpb2lin(specs['A_pb'])], 
+        (L, F, A, W) = self.remezord([specs['F_SB'], specs['F_PB']], [0, 1], 
+            [np.sqrt(2)*10.**(-specs['A_SB']/20), dBpb2lin(specs['A_PB'])], 
              Hz = 1, alg = 'ichige')
         self.N = self.oddround(L)  # enforce odd order
-        specs['W_sb'] = W[0]
-        specs['W_pb'] = W[1]
+        specs['W_SB'] = W[0]
+        specs['W_PB'] = W[1]
         self.save(specs, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, type = 'bandpass'))
 
-    # For BP and BS, F_pb and F_sb have two elements each
+    # For BP and BS, F_PB and F_SB have two elements each
     def BPman(self, specs):
-        self.save(specs, sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
-                specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
-                weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1))
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_SB'], specs['F_PB'], 
+                specs['F_PB2'], specs['F_SB2'], 0.5],[0, 1, 0], 
+                weight = [specs['W_SB'],specs['W_PB'], specs['W_SB2']], Hz = 1))
 
     def BPmin(self, specs):
-        (self.N, F, A, W) = self.remezord([specs['F_sb'], specs['F_pb'], 
-                                specs['F_pb2'], specs['F_sb2']], [0, 1, 0], 
-            [dBsb2lin(specs['A_sb']), dBpb2lin(specs['A_pb']), 
-             dBsb2lin(specs['A_sb2'])], Hz = 1, alg = 'ichige')
-        specs['W_sb']  = W[0]
-        specs['W_pb']  = W[1]
-        specs['W_sb2'] = W[2]   
+        (self.N, F, A, W) = self.remezord([specs['F_SB'], specs['F_PB'], 
+                                specs['F_PB2'], specs['F_SB2']], [0, 1, 0], 
+            [dBsb2lin(specs['A_SB']), dBpb2lin(specs['A_PB']), 
+             dBsb2lin(specs['A_SB2'])], Hz = 1, alg = 'ichige')
+        specs['W_SB']  = W[0]
+        specs['W_PB']  = W[1]
+        specs['W_SB2'] = W[2]   
         self.save(specs, sig.remez(self.N,F,[0, 1, 0], weight = W, Hz = 1))
 
     def BSman(self, specs):
-        self.save(specs, sig.remez(specs['N'],[0, specs['F_pb'], specs['F_sb'], 
-                specs['F_sb2'], specs['F_pb2'], 0.5],[1, 0, 1], 
-                weight = [specs['W_pb'],specs['W_sb'], specs['W_pb2']],Hz = 1))
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_PB'], specs['F_SB'], 
+                specs['F_SB2'], specs['F_PB2'], 0.5],[1, 0, 1], 
+                weight = [specs['W_PB'],specs['W_SB'], specs['W_PB2']],Hz = 1))
                 
     def BSmin(self, specs):
-        (N, F, A, W) = self.remezord([specs['F_pb'], specs['F_sb'], 
-                                specs['F_sb2'], specs['F_pb2']], [1, 0, 1], 
-            [dBpb2lin(specs['A_pb']), np.sqrt(2)*10.**(-specs['A_sb']/20), 
-             dBpb2lin(specs['A_pb2'])], Hz = 1, alg = 'ichige')
+        (N, F, A, W) = self.remezord([specs['F_PB'], specs['F_SB'], 
+                                specs['F_SB2'], specs['F_PB2']], [1, 0, 1], 
+            [dBpb2lin(specs['A_PB']), np.sqrt(2)*10.**(-specs['A_SB']/20), 
+             dBpb2lin(specs['A_PB2'])], Hz = 1, alg = 'ichige')
         self.N = self.oddround(N)  # enforce odd order
-        specs['W_pb']  = W[0]
-        specs['W_sb']  = W[1]
-        specs['W_pb2'] = W[2]   
+        specs['W_PB']  = W[0]
+        specs['W_SB']  = W[1]
+        specs['W_PB2'] = W[2]   
         self.save(specs, sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1))
 
     def HILman(self, specs):
-        self.save(specs, sig.remez(specs['N'],[0, specs['F_sb'], specs['F_pb'], 
-                specs['F_pb2'], specs['F_sb2'], 0.5],[0, 1, 0], 
-                weight = [specs['W_sb'],specs['W_pb'], specs['W_sb2']], Hz = 1,
+        self.save(specs, sig.remez(specs['N'],[0, specs['F_SB'], specs['F_PB'], 
+                specs['F_PB2'], specs['F_SB2'], 0.5],[0, 1, 0], 
+                weight = [specs['W_SB'],specs['W_PB'], specs['W_SB2']], Hz = 1,
                 type = 'hilbert'))
                 
     #========================================================

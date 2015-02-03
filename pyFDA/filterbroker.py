@@ -47,35 +47,35 @@ gD['filterTree'] = {
     'HP': 
         {'FIR': 
             {'equiripple': 
-                {'man': {"par":['N', 'A_pb', 'F_pb']}, 
-                 'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}, 
+                {'man': {"par":['N', 'A_PB', 'F_PB']}, 
+                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}, 
          'IIR':
              {'cheby1': 
-                 {'man': {"par":['N', 'A_pb', 'F_pb']}, 
-                  'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
+                 {'man': {"par":['N', 'A_PB', 'F_PB']}, 
+                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}, 
               'cheby2': 
-                  {'man': {"par":['N', 'A_sb', 'F_sb']},
-                   'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}}, 
+                  {'man': {"par":['N', 'A_SB', 'F_SB']},
+                   'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}}, 
     'BP': 
         {'FIR': 
             {'equiripple': 
-                {'man': {"par":['N', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2', 'W_pb', 'W_sb', 'W_sb2']}}}, 
+                {'man': {"par":['N', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2']}}}, 
          'IIR': 
-             {'cheby1': {'man': {"par":['N', 'A_pb', 'F_pb', 'F_pb2']}, 
-                         'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}}, 
-              'cheby2': {'man': {"par":['N', 'A_sb', 'F_sb', 'F_sb2']}, 
-                         'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_pb2', 'F_sb', 'F_sb2']}}}}, 
+             {'cheby1': {'man': {"par":['N', 'A_PB', 'F_PB', 'F_PB2']}, 
+                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2']}}, 
+              'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB', 'F_SB2']}, 
+                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2']}}}}, 
     'LP': 
         {'FIR': 
             {'equiripple': 
-                {'man': {"par":['N', 'A_pb', 'F_pb']}, 
-                 'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}, 
+                {'man': {"par":['N', 'A_PB', 'F_PB']}, 
+                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}, 
          'IIR': 
              {'cheby1': 
-                 {'man': {"par":['N', 'A_pb', 'F_pb']}, 
-                  'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}, 
-             'cheby2': {'man': {"par":['N', 'A_sb', 'F_sb']}, 
-                        'min': {"par":['A_pb', 'A_sb', 'F_pb', 'F_sb']}}}},
+                 {'man': {"par":['N', 'A_PB', 'F_PB']}, 
+                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}, 
+             'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB']}, 
+                        'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}},
     }
 
 
@@ -86,9 +86,9 @@ gD['filterTree'] = {
 # Current filter selection, parameters and specifications              
 gD['selFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man",
                 'N':10, 'f_S':1,
-                'A_pb':1., 'A_pb2': 1., 'F_pb':0.1, 'F_pb2':0.4,
-                'A_sb':60., 'A_sb2': 60., 'F_sb':0.2, 'F_sb2':0.3,
-                'W_pb':1., 'W_pb2':1., 'W_sb':1., 'W_sb2':1.,
+                'A_PB':1., 'A_PB2': 1., 'F_PB':0.1, 'F_PB2':0.4,
+                'A_SB':60., 'A_SB2': 60., 'F_SB':0.2, 'F_SB2':0.3,
+                'W_PB':1., 'W_PB2':1., 'W_SB':1., 'W_SB2':1.,
                 'coeffs':([1,1,1],[3,0,2]), 
                 'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                        [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
