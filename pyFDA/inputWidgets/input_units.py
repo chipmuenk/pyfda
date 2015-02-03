@@ -102,6 +102,18 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
         # Call update every time a field is edited: 
 #        self.qlineedit.editingFinished.connect(self.update)
 
+    
+    def rtLabel(self, label):
+        """
+        Rich text labels: Format labels with HTML tags, replacing '_' by 
+        HTML subscript tags
+        """
+        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+        if "_" in label:
+            label = label.replace('_', '<sub>') 
+            label += "</sub>"
+        htmlLabel = "<b><i>"+label+"</i></b>"
+        return htmlLabel
 #-------------------------------------------------------------        
     def setEntries(self, title = "", newLabels = []):
         """
@@ -125,7 +137,7 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
             else:
                 # when label has changed, update it and the default value
                 if (self.labels[i]!=newLabels[i]):     
-                    self.qlabel[i].setText(newLabels[i])
+                    self.qlabel[i].setText(self.rtLabel(newLabels[i]))
                     self.labels[i] = newLabels[i]
                     self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
                             
@@ -148,7 +160,7 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
         self.qlabel.append(QtGui.QLabel(self))
         self.labels.append(newLabel)
         self.qlineedit.append(QtGui.QLineEdit(str(fb.gD['selFilter'][newLabel])))
-        self.qlabel[i].setText(newLabel)
+        self.qlabel[i].setText(self.rtLabel(newLabel))
         self.layout.addWidget(self.qlabel[i],(i+1),0)
         self.layout.addWidget(self.qlineedit[i],(i+1),1)
       
