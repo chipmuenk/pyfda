@@ -2,7 +2,7 @@
 """
 Created on Mon Nov 18 13:36:39 2013
 
-input_utils.py
+input_freqs.py
 
 @author: Christian Münker
 Created on 23.1.2015
@@ -16,11 +16,7 @@ from PyQt4 import QtGui
 if __name__ == "__main__": 
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
-    
-# TODO: When changing between response types / minMax with different number of
-# frequency spec entries and f_S != 1 , the frequency values (only display?)
-# become jumbled, i.e. are scaled with different factors - check f_S scaling in loadEntries !
-    
+        
 class InputFreqs(QtGui.QWidget):
     """
     Build and update widget for entering the frequency 
