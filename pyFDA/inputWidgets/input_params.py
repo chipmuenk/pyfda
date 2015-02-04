@@ -120,6 +120,10 @@ class InputParams(QtGui.QWidget):
         widgets fo, fspec are recreated. For widget ms, the visibility is changed
         as well.
         """
+        
+        # create filter object instance from design method (e.g. 'cheby1'):   
+        self.myFilter = self.ftb.objectWizzard(fb.gD['selFilter']['dm'])
+        fb.gD['selFilter']['inst'] = self.myFilter
 
         # Read freq / amp / weight labels for current filter design
         rt = fb.gD['selFilter']['rt']
@@ -177,8 +181,7 @@ class InputParams(QtGui.QWidget):
             print('Specs:', fb.gD['selFilter'])#params)
             print("fb.gD['selFilter']['dm']", fb.gD['selFilter']['dm']+"."+
                   fb.gD['selFilter']['rt']+fb.gD['selFilter']['fo'])
-        # create filter object instance from design method (e.g. 'cheby1'):   
-        self.myFilter = self.ftb.objectWizzard(fb.gD['selFilter']['dm'])
+
         # Now construct the instance method from the response type (e.g.
         # 'LP' -> cheby1.LP) and
         # design the filter by passing current specs to the method:
