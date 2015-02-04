@@ -18,24 +18,22 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import filterbroker as fb
 
-
-class InputUnits(QtGui.QWidget): #QtGui.QWidget, 
+class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget, 
     
-    def __init__(self, title = "", units=[], labels=[], DEBUG = True):
+    def __init__(self, specs, labels=[], DEBUG = True):
         
         """
         Initialisierung
         units: sind die Einheiten die in der Combobox stehen sollen
         lab: Namen der Labels in einer Liste
         """
-        super(InputUnits, self).__init__()   
+        super(InputAmpSpecs, self).__init__()   
         self.DEBUG = DEBUG
+        self.specs = specs  # dictionary containing _all_ specifications of the
+                            # currently selected filter
+
         self.labels = labels # list with labels for combobox
-        self.title = title
-            
-        self.units = [str(u) for u in units] # collect unit strings in list
         
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -45,26 +43,27 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
     def initUI(self): 
         self.WVLayout = QtGui.QVBoxLayout() # Widget vertical layout  
         self.layout   = QtGui.QGridLayout() # sublayout for spec fields
-        
-        if self.title != "":
-            bfont = QtGui.QFont()
-            bfont.setBold(True)
+        title = "Amplitude Specifications"
+        units = ["dB", "Squared"] 
+       
+        bfont = QtGui.QFont()
+        bfont.setBold(True)
 #            bfont.setWeight(75)
-            self.qtitle = QtGui.QLabel(self) # field for widget title
-            self.qtitle.setText(str(self.title))
-            self.qtitle.setFont(bfont)
-            self.qtitle.setWordWrap(True)
-            self.WVLayout.addWidget(self.qtitle)
+        self.qtitle = QtGui.QLabel(self) # field for widget title
+        self.qtitle.setText(str(title))
+        self.qtitle.setFont(bfont)
+        self.qtitle.setWordWrap(True)
+        self.WVLayout.addWidget(self.qtitle)
         
-        if self.units != []:
-            self.lab_units=QtGui.QLabel(self)
-            self.lab_units.setText("Units")
 
-            self.combo_units=QtGui.QComboBox(self)
-            self.combo_units.addItems(self.units)
+        self.lab_units=QtGui.QLabel(self)
+        self.lab_units.setText("Units")
 
-            self.layout.addWidget(self.lab_units,0,0)
-            self.layout.addWidget(self.combo_units,0,1, QtCore.Qt.AlignLeft)
+        self.combo_units=QtGui.QComboBox(self)
+        self.combo_units.addItems(units)
+
+        self.layout.addWidget(self.lab_units,0,0)
+        self.layout.addWidget(self.combo_units,0,1, QtCore.Qt.AlignLeft)
 
         #self.layout.addWidget(self.qtitle, 0, 0, 2, 1) # span two columns
 
@@ -79,7 +78,7 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
             self.qlabels.append(QtGui.QLabel(self))
             self.qlabels[i].setText(self.labels[i])
             self.qlineedit.append(QtGui.QLineEdit(str(
-                                        fb.gD['selFilter'][self.labels[i]])))
+                                        self.specs[self.labels[i]])))
 
             self.layout.addWidget(self.qlabels[i],(i+1),0)
             self.layout.addWidget(self.qlineedit[i],(i+1),1)
@@ -115,15 +114,11 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
         htmlLabel = "<b><i>"+label+"</i></b>"
         return htmlLabel
 #-------------------------------------------------------------        
-    def setEntries(self, title = "", newLabels = []):
+    def setEntries(self, newLabels = []):
         """
         Set title, labels, defaults - when number of elements changes, the 
         layout has to be rebuilt
         """
-        if self.DEBUG: print("UnitBox.Titel:",self.title)
-        if title != "":
-            self.qtitle.setText(title) # new title
-    
         # Check whether the number of entries has changed
         for i in range(max(len(self.labels), len(newLabels))):
              # newLabels is shorter than labels -> delete the difference
@@ -139,7 +134,7 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
                 if (self.labels[i]!=newLabels[i]):     
                     self.qlabels[i].setText(self.rtLabel(newLabels[i]))
                     self.labels[i] = newLabels[i]
-                    self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
+                    self.qlineedit[i].setText(str(self.specs[newLabels[i]]))
                             
     def _delEntry(self,i):
         """
@@ -159,7 +154,7 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
         """
         self.qlabels.append(QtGui.QLabel(self))
         self.labels.append(newLabel)
-        self.qlineedit.append(QtGui.QLineEdit(str(fb.gD['selFilter'][newLabel])))
+        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel])))
         self.qlabels[i].setText(self.rtLabel(newLabel))
         self.layout.addWidget(self.qlabels[i],(i+1),0)
         self.layout.addWidget(self.qlineedit[i],(i+1),1)
@@ -170,7 +165,7 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
         settings etc.
         """
         for i in range(len(self.labels)):
-            self.qlineedit[i].setText(str(fb.gD['selFilter'][self.labels[i]]))
+            self.qlineedit[i].setText(str(self.specs[self.labels[i]]))
 
 
     def storeEntries(self):
@@ -178,18 +173,18 @@ class InputUnits(QtGui.QWidget): #QtGui.QWidget,
         Store specification entries in dict fb.gD['selFilter']
         """
         for i in range(len(self.labels)):
-            fb.gD['selFilter'].update(
+            self.specs.update(
                             {self.labels[i]:float(self.qlineedit[i].text())})
     
 #------------------------------------------------------------------------------ 
     
 if __name__ == '__main__':
-    units = ['dB','V','W',]
-    lab = ['A_SB','A_SB','A_SB2',]
+    import filterbroker as fb
+   
     app = QtGui.QApplication(sys.argv)
-    form = InputUnits(title = "Amplitudes", units = units, labels = lab)#, spec="TEST")
+    form = InputAmpSpecs(specs = fb.gD["selFilter"])
 
-    form.setEntries(title = "Gewichte", newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
+    form.setEntries(newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
     form.setEntries(newLabels = ['W_PB','W_PB2'])
 
     form.show()
