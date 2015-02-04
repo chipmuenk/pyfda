@@ -84,7 +84,8 @@ gD['filterTree'] = {
 # automatically overwritten 
 #-------------------------------------- 
 # Current filter selection, parameters and specifications              
-gD['selFilter'] = {"rt":"LP", "ft":"FIR", "dm":"equiripple", "fo":"man",
+gD['selFilter'] = {'inst':'filter instance',
+                'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
                 'N':10, 'f_S':1,
                 'A_PB':1., 'A_PB2': 1., 'F_PB':0.1, 'F_PB2':0.4,
                 'A_SB':60., 'A_SB2': 60., 'F_SB':0.2, 'F_SB2':0.3,
