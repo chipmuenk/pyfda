@@ -97,6 +97,12 @@ class cheby1(object):
         specs['zpk'] = self.zpk
         try: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N # yes, update filterbroker
+            print("pbc", self.F_PBC, type(self.F_PBC))
+            if self.F_SBC.type in (tuple, list):
+                specs['F_PB'] = self.F_PBC[0] / 2.
+                specs['F_PB2'] = self.F_PBC[1] / 2.
+            else:
+                specs['F_PB'] = self.F_PBC / 2.
         except AttributeError:
             pass
 
