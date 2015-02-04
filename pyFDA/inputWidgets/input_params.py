@@ -19,7 +19,7 @@ if __name__ == "__main__":
 import filterbroker as fb
 from FilterFileReader import FilterTreeBuilder
     
-import input_filter, input_order, input_units, input_freqs, input_weights
+import input_filter, input_order, input_amp_specs, input_freqs, input_weights
 from plotWidgets import plot_all
 
 
@@ -56,8 +56,7 @@ class InputParams(QtGui.QWidget):
         self.fspec = input_freqs.InputFreqs(specs = fb.gD['selFilter'],
                     DEBUG = False)
         # subwidget for Amplitude Specs        
-        self.aspec = input_units.InputUnits(title = "Amplitude Specifications",
-                    units = ["dB","Squared"], labels = ["A_PB","A_SB"],
+        self.aspec = input_amp_specs.InputAmpSpecs(specs = fb.gD['selFilter'],
                     DEBUG = False)
         # subwidget for Weight Specs                                           
         self.wspec = input_weights.InputWeights(specs = fb.gD['selFilter'],
