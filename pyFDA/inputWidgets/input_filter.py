@@ -35,6 +35,8 @@ class SelectFilter(QtGui.QWidget):
         self.DEBUG = DEBUG
         self.initUI()
         
+        self.setResponseType()
+        
         
     def initUI(self): 
         """
@@ -63,7 +65,29 @@ class SelectFilter(QtGui.QWidget):
         for rt in fb.gD['filterTree']:
             self.comboResponseType.addItem(fb.gD['rtNames'][rt], rt)
         self.comboResponseType.setCurrentIndex(0) # set initial index
-        self.setResponseType()
+
+
+
+        """
+        LAYOUT      
+        """
+        # see Summerfield p. 278       
+        hLayout = QtGui.QHBoxLayout()
+        hLayout.addWidget(self.comboResponseType)# QtCore.Qt.AlignLeft)
+        hLayout.addWidget(self.comboFilterType)
+        hLayout.addWidget(self.comboDesignMethod)
+        
+        self.vLayout = QtGui.QVBoxLayout(self) 
+        self.vLayout.addLayout(hLayout)
+        
+        sfFrame = QtGui.QFrame()
+        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        sfFrame.setLayout(self.vLayout)
+        
+        mainLayout = QtGui.QHBoxLayout()
+        mainLayout.addWidget(sfFrame)
+        self.setLayout(mainLayout)
+#        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
         #------------------------------------------------------------
         # SIGNALS & SLOTS      
@@ -74,23 +98,19 @@ class SelectFilter(QtGui.QWidget):
         self.comboFilterType.activated.connect(self.setFilterType) #'IIR'
         self.comboDesignMethod.activated.connect(self.setDesignMethod) #'cheby1'
 
+    def updateLayout(self):
         """
-        LAYOUT      
+        Dynamically add and remove subwidgets as needed
         """
-        # see Summerfield p. 278       
-        layout = QtGui.QHBoxLayout()
-        layout.addWidget(self.comboResponseType)# QtCore.Qt.AlignLeft)
-        layout.addWidget(self.comboFilterType)
-        layout.addWidget(self.comboDesignMethod)
+        #if ... :
+        print(fb.gD['selFilter']['inst'])
+        self.xxx = QtGui.QComboBox(self)
+        self.vLayout.addWidget(self.xxx)
         
-        sfFrame = QtGui.QFrame()
-        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        sfFrame.setLayout(layout)
         
-        mainLayout = QtGui.QHBoxLayout()
-        mainLayout.addWidget(sfFrame)
-        self.setLayout(mainLayout)
-#        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+        self.vLayout.removeWidget(self.xxx)
+        self.xxx.deleteLater()
+        del self.xxx
 
     def setResponseType(self):
         """
@@ -148,6 +168,9 @@ class SelectFilter(QtGui.QWidget):
                                                             [self.dm])
             print("filterTree[dm].keys() = ", fb.gD['filterTree'][self.rt][self.ft]\
                                                             [self.dm].keys())
+                                                            
+                
+        self.updateLayout() # check for new subwidgets and update if needed
 
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]        
