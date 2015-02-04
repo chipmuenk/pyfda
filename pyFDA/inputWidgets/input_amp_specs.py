@@ -97,10 +97,16 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 #        self.setLayout(mainLayout)
         
         # SIGNALS & SLOTS
-        # TODO: not working yet
-        # Call update every time a field is edited: 
-#        self.qlineedit.editingFinished.connect(self.update)
+        # Every time a field is edited, call self.freqUnits - the signal is
+        #   constructed in _addEntry
+        self.combo_units.currentIndexChanged.connect(self.ampUnits)
 
+    def ampUnits(self):
+        """
+        Transform the amplitude spec input fields according to the Units 
+        setting.
+        """
+        pass
     
     def rtLabel(self, label):
         """
@@ -116,65 +122,84 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 #-------------------------------------------------------------        
     def setEntries(self, newLabels = []):
         """
-        Set title, labels, defaults - when number of elements changes, the 
-        layout has to be rebuilt
-        """
+        Set labels and get corresponding values from filter dictionary.
+        When number of elements changes, the layout of subwidget is rebuilt.
+        """ 
         # Check whether the number of entries has changed
-        for i in range(max(len(self.labels), len(newLabels))):
-             # newLabels is shorter than labels -> delete the difference
+        for i in range(max(len(self.qlabels), len(newLabels))):
+             # newLabels is shorter than qlabels -> delete the difference
             if (i > (len(newLabels)-1)):
                 self._delEntry(len(newLabels))
 
-            # newLabels is longer than existing labels -> create new ones!   
-            elif (i > (len(self.labels)-1)):
-                self._addEntry(i,newLabels[i])
+            # newLabels is longer than existing qlabels -> create new ones!   
+            elif (i > (len(self.qlabels)-1)):   
+             self._addEntry(i,newLabels[i])
 
             else:
-                # when label has changed, update it and the default value
-                if (self.labels[i]!=newLabels[i]):     
-                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))
-                    self.labels[i] = newLabels[i]
+                # when entry has changed, update label and corresponding value
+                if self.qlineedit[i].objectName() != newLabels[i]:     
+                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))                   
                     self.qlineedit[i].setText(str(self.specs[newLabels[i]]))
-                            
+                    self.qlineedit[i].setObjectName(newLabels[i])  # update ID     
+                     
     def _delEntry(self,i):
         """
-        Element with position i is deleted (qlabels and qlineedit)
+        Delete entry number i from subwidget (QLabel and QLineEdit)
         """
         self.layout.removeWidget(self.qlabels[i])
         self.layout.removeWidget(self.qlineedit[i])
+
         self.qlabels[i].deleteLater()
-        del self.labels[i]
         del self.qlabels[i]
         self.qlineedit[i].deleteLater()
         del self.qlineedit[i]  
         
+
     def _addEntry(self, i, newLabel): 
         """
-        Element with position i is appended (qlabels und qlineedit)
+        Append entry number i to subwidget (QLabel und QLineEdit)
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.labels.append(newLabel)
-        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel])))
         self.qlabels[i].setText(self.rtLabel(newLabel))
-        self.layout.addWidget(self.qlabels[i],(i+1),0)
-        self.layout.addWidget(self.qlineedit[i],(i+1),1)
+        
+        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel])))
+        self.qlineedit[i].editingFinished.connect(self.ampUnits)
+        self.qlineedit[i].setObjectName(newLabel) # update ID
+
+        self.layout.addWidget(self.qlabels[i],(i+2),0)
+        self.layout.addWidget(self.qlineedit[i],(i+2),1)
+        
+    def _sortEntries(self): 
+        """
+        Sort spec entries with ascending frequency and store in filter dict.
+        """ 
+        fSpecs = [self.qlineedit[i].text() for i in range(len(self.qlineedit))]
+        
+        fSpecs.sort()
+        
+        for i in range(len(self.qlineedit)):
+            self.qlineedit[i].setText(fSpecs[i])
+            
+        self.storeEntries()
       
     def loadEntries(self):
         """
-        Reload textfields from global dictionary to update changed weight
-        settings etc.
+        Reload textfields from filter dictionary to update changed settings 
         """
-        for i in range(len(self.labels)):
-            self.qlineedit[i].setText(str(self.specs[self.labels[i]]))
-
+        for i in range(len(self.qlineedit)): 
+            self.qlineedit[i].setText(
+                str(self.specs[self.qlineedit[i].objectName()]))#text()]))
 
     def storeEntries(self):
         """
-        Store specification entries in dict fb.gD['selFilter']
+        Store specification entries in filter dictionary
+        Entries are normalized with sampling frequency self.f_S !
+        The scale factor (khz, ...) is contained neither in f_S nor the specs
+        hence, it cancels out.
         """
-        for i in range(len(self.labels)):
+        for i in range(len(self.qlabels)): 
             self.specs.update(
-                            {self.labels[i]:float(self.qlineedit[i].text())})
+                {self.qlineedit[i].objectName():float(self.qlineedit[i].text())})
     
 #------------------------------------------------------------------------------ 
     
