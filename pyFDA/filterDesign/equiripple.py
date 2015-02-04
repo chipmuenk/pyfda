@@ -43,9 +43,13 @@ class equiripple(object):
         msg_min = ("Enter the maximum pass band ripple and minimum stop band "
                     "attenuation and the corresponding corner frequencies.")
 
-        # enabled widgets for all man. / min. filter order response types:     
-        enb_man = ['fo','fspec','wspec'] # enabled widget for man. filt. order
-        enb_min = ['fo','fspec','aspec'] # enabled widget for min. filt. order
+        # VISIBLE widgets for all man. / min. filter order response types:     
+        vis_man = ['fo','fspec','aspec'] # manual filter order
+        vis_min = ['fo','fspec','aspec'] # minimum filter order
+
+        # ENABLED widgets for all man. / min. filter order response types:     
+        enb_man = ['fo','fspec','wspec'] # manual filter order
+        enb_min = ['fo','fspec','aspec'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:    
         par_man = ['N', 'f_S'] # enabled widget for man. filt. order
@@ -61,7 +65,7 @@ class equiripple(object):
             "LP": {"man":{"par":['W_PB','W_SB','F_PB','F_SB','A_PB','A_SB']},
                    "min":{"par":['F_PB','F_SB','W_PB','W_SB']}},
             "HP": {"man":{"par":['W_SB','W_PB','F_SB','F_PB','A_SB','A_PB'],
-                          "msg":"\nNote: Order needs to be odd (type II FIR filters)"},
+                          "msg":"\n<b>Note:</b> Order needs to be odd (type II FIR filters)"},
                    "min":{"par":['F_SB','F_PB','W_SB','W_PB']}},
             "BP": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
                                  'W_SB','W_PB','W_SB2','A_SB','A_PB','A_SB2']},
@@ -69,7 +73,7 @@ class equiripple(object):
                                  'W_SB', 'W_PB','W_SB2','A_SB2']}},                                 
             "BS": {"man":{"par":['F_PB', 'F_SB', 'F_SB2', 'F_PB2',
                                  'W_PB', 'W_SB', 'W_PB2','A_PB','A_SB','A_PB2'],
-                      "msg":"\nNote: Order needs to be odd (type II FIR filters)"},
+                      "msg":"\n<b>Note:</b> Order needs to be odd (type II FIR filters)"},
                    "min":{"par":['A_PB2','W_PB','W_SB','W_PB2', 
                                  'F_PB','F_SB','F_SB2','F_PB2']}},
             "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
