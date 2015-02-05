@@ -44,7 +44,7 @@ class InputFreqs(QtGui.QWidget):
 
         title = "Frequency Specifications"      
         
-        self.unitsf = ['Normalized to f_S', 'Normalized to f_S/2', 
+        units = ['Normalized to f_S', 'Normalized to f_S/2', 
                        'Hz', 'kHz', 'MHz', 'GHz']
         
         self.idxOld = -1 # index of comboUnits before last change
@@ -71,7 +71,7 @@ class InputFreqs(QtGui.QWidget):
 
         self.comboUnits = QtGui.QComboBox(self)
         self.comboUnits.setObjectName("comboUnits")
-        self.comboUnits.addItems(self.unitsf)
+        self.comboUnits.addItems(units)
         self.comboUnits.setCurrentIndex(0)
         
         self.butSort = QtGui.QPushButton(self)
@@ -148,7 +148,7 @@ class InputFreqs(QtGui.QWidget):
             # f_S has been edited -> change display of frequency entries and
             # dictionary entry for f_S
             self.specs['f_S'] = self.f_S
-            for i in range(len(self.qlabels)):
+            for i in range(len(self.qlineedit)):
                 f = self.specs[self.qlineedit[i].objectName()]
                 self.qlineedit[i].setText(str(f * self.f_S))
 
@@ -159,7 +159,7 @@ class InputFreqs(QtGui.QWidget):
             
             if self.idxOld == 1: # was: normalized to f_S/2,
                 # remove scaling factor 2 from spec entries
-                for i in range(len(self.qlabels)):
+                for i in range(len(self.qlineedit)):
                     f = self.specs[self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f))
                 self.f_S = 1.
@@ -175,7 +175,7 @@ class InputFreqs(QtGui.QWidget):
                 self.editF_S.setText(str(self.f_S)) # update textedit
                 
                 # recalculate displayed freq spec values but do not store them:
-                for i in range(len(self.qlabels)):
+                for i in range(len(self.qlineedit)):
                     f = self.specs[self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f * self.f_S))
             else: # Hz, kHz, ...
@@ -274,7 +274,7 @@ class InputFreqs(QtGui.QWidget):
         """
         for i in range(len(self.qlineedit)): 
             self.qlineedit[i].setText(
-                str(self.specs[self.qlineedit[i].objectName()] * self.f_S))#text()]))
+                str(self.specs[self.qlineedit[i].objectName()] * self.f_S))
 
     def storeEntries(self):
         """
@@ -283,9 +283,10 @@ class InputFreqs(QtGui.QWidget):
         The scale factor (khz, ...) is contained neither in f_S nor the specs
         hence, it cancels out.
         """
-        for i in range(len(self.qlabels)): 
+        for i in range(len(self.qlineedit)): 
             self.specs.update(
-                {self.qlineedit[i].objectName():float(self.qlineedit[i].text())/self.f_S})
+                {self.qlineedit[i].objectName():
+                    float(self.qlineedit[i].text())/self.f_S})
     
 #------------------------------------------------------------------------------ 
     
