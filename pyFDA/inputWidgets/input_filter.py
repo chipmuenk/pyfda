@@ -14,6 +14,8 @@ from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
 
+# TODO: Add subwidgets, depending on filterSel parameters
+
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
