@@ -101,7 +101,7 @@ class InputInfo(QtGui.QWidget):
         Display info from filter design file
         """
         self.filtInfoFrame.setVisible(self.chkFilterInfo.isChecked())
-        pass
+        self.labFiltInfo.setText(fb.gD["selFilter"]["inst"].info)
     
     def showCoeffs(self):
         self.listCoeff.setVisible(self.chkCoeffList.isChecked())
