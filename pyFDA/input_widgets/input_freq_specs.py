@@ -67,7 +67,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.editF_S.setObjectName("f_S")
 
         self.labelF_S = QtGui.QLabel(self)
-        self.labelF_S.setText(self.rtLabel("f<sub>S</sub>"))
+        self.labelF_S.setText(self.rtLabel("f_S"))
 
         self.comboUnits = QtGui.QComboBox(self)
         self.comboUnits.setObjectName("comboUnits")
