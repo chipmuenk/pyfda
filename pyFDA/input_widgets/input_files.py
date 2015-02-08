@@ -46,7 +46,7 @@ class InputFiles(QtGui.QWidget):
         self.grLayout = QtGui.QGridLayout()
         self.grLayout.addWidget(self.butExportML,1,0) # filter export button
         self.grLayout.addWidget(self.butExportCSV,2,0) # filter export button
-
+        
 
         hbox = QtGui.QHBoxLayout()
         hbox.addLayout(self.grLayout)
@@ -82,6 +82,43 @@ class InputFiles(QtGui.QWidget):
         
         np.savetxt('d:/Daten/filt_coeffs.csv', fb.gD['coeffs'])
         print("exportCSV: CSV - File exported!")
+        
+
+"""
+File save format: use cPickle?
+
+Alternative: Use the shelve module
+
+
+import shelve
+
+### write to database:
+s = shelve.open('test_shelf.fb')
+try:
+    s['key1'] = { 'int': 10, 'float':9.5, 'string':'Sample data' }
+finally:
+    s.close()
+
+### read from database:   
+s = shelve.open('test_shelf.fb')
+# s = shelve.open('test_shelf.fb', flag='r') # read-only
+try:
+    existing = s['key1']
+finally:
+    s.close()
+
+print(existing)
+
+### catch changes to objects, store in in-memory cache and write-back upon close
+s = shelve.open('test_shelf.fb', writeback=True)
+try:
+    print s['key1']
+    s['key1']['new_value'] = 'this was not here before'
+    print s['key1']
+finally:
+    s.close()
+    
+"""
 #------------------------------------------------------------------------------
    
 if __name__ == '__main__':

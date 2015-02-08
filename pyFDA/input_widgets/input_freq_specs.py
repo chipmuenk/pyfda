@@ -17,7 +17,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
         
-class InputFreqs(QtGui.QWidget):
+class InputFreqSpecs(QtGui.QWidget):
     """
     Build and update widget for entering the frequency 
     specifications like F_sb, F_pb etc.
@@ -30,7 +30,7 @@ class InputFreqs(QtGui.QWidget):
         specs: A dictionary containing all the specs
         labels: Names of the frequency spec labels
         """
-        super(InputFreqs, self).__init__()   
+        super(InputFreqSpecs, self).__init__()   
         self.DEBUG = DEBUG
         self.specs = specs  # dictionary containing _all_ specifications of the
                             # currently selected filter
@@ -293,7 +293,7 @@ class InputFreqs(QtGui.QWidget):
 if __name__ == '__main__':
     import filterbroker as fb
     app = QtGui.QApplication(sys.argv)
-    form = InputFreqs(specs = fb.gD["selFilter"])
+    form = InputFreqSpecs(specs = fb.gD["selFilter"])
 
     form.setEntries(newLabels = ['F_SB','F_SB2','F_PB','F_PB2'])
     form.setEntries(newLabels = ['F_PB','F_PB2'])
