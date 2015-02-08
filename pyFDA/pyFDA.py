@@ -11,7 +11,7 @@ import sys
 from PyQt4 import QtGui
 
 #import filterbroker as fb # importing filterbroker initializes all its globals
-from inputWidgets import input_all
+from input_widgets import input_all
 from plotWidgets import plot_all
 
 class pyFDA(QtGui.QMainWindow):
