@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Nov 14 15:21:19 2013
-Main Widget for entering filter specifications
+Widget for entering filter specifications
 
 @author: beike, Christian Münker
 """
@@ -24,10 +24,10 @@ import input_filter, input_order, input_amp_specs, input_freq_specs,\
 from plotWidgets import plot_all
 
 
-class InputParams(QtGui.QWidget):
+class InputSpecs(QtGui.QWidget):
     
     def __init__(self, DEBUG = True):
-        super(InputParams, self).__init__() 
+        super(InputSpecs, self).__init__() 
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
@@ -211,9 +211,8 @@ class InputParams(QtGui.QWidget):
    
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = InputParams()
+    form = InputSpecs()
     form.show()
-#    form.setEnt
     form.storeAll()
    
     app.exec_()

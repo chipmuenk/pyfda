@@ -54,7 +54,7 @@ class pyFDA(QtGui.QMainWindow):
         
         # ============== Signals & Slots ================================
 #        self.butDesignFilt.clicked.connect(self.startDesignFilt)
-        self.inputAll.inputParams.butDesignFilt.clicked.connect(self.pltAll.update)
+        self.inputAll.inputSpecs.butDesignFilt.clicked.connect(self.pltAll.update)
 
         self.statusBar().showMessage("Application is initialized.")
 
