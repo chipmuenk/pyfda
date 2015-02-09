@@ -10,6 +10,7 @@ Updated on Thur Dec 11 2014
 """
 
 # TODO: Check specs IIR / FIR A_PB <-> delta_PB
+# TODO: Rounding errors during muliple to-and-fro changes
 from __future__ import print_function, division, unicode_literals
 from numpy import log10
 import sys, os
@@ -66,7 +67,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.comboUnitsA.addItems(units)
         self.comboUnitsA.setObjectName("comboUnitsA")
         self.comboUnitsA.setToolTip("Set unit for amplitude specifications:\n"
-        "dB is <i>attenuation (positive values)</i>, V and W are less than 1.")
+        "dB is attenuation (positive values)\nV and W are less than 1.")
 
         self.comboUnitsA.setCurrentIndex(0)
 
@@ -196,12 +197,12 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         elif idx == 1:  # Entries are voltages, convert from dBs
             for i in range(len(self.qlineedit)): 
                 self.qlineedit[i].setText(
-                    str(10.**(self.specs[self.qlineedit[i].objectName()]/20.)))
+                    str(10.**(-self.specs[self.qlineedit[i].objectName()]/20.)))
 
         else:  # Entries are powers, convert from dBs
             for i in range(len(self.qlineedit)): 
                 self.qlineedit[i].setText(
-                    str(10.**(self.specs[self.qlineedit[i].objectName()]/10.)))
+                    str(10.**(-self.specs[self.qlineedit[i].objectName()]/10.)))
 
     def storeEntries(self):
         """
