@@ -14,9 +14,7 @@ https://github.com/scipy/scipy/issues/2444
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import cheb1ord, zpk2tf, tf2zpk #, iirdesign
-#import numpy as np
-
-#import filterbroker as fb
+import numpy as np
 
 output = 'zpk' # set output format of filter design routines to 'zpk' or 'ba'
 
@@ -75,6 +73,7 @@ class cheby1(object):
         self.F_SB  = specs['F_SB'] * 2 
         self.F_PB2 = specs['F_PB2'] * 2
         self.F_SB2 = specs['F_SB2'] * 2 
+        self.F_PBC = None
         self.A_PB  = specs['A_PB']
         self.A_SB  = specs['A_SB']
         self.A_PB2 = specs['A_PB2']
@@ -95,17 +94,18 @@ class cheby1(object):
 
         specs['coeffs'] = self.coeffs
         specs['zpk'] = self.zpk
-        try: # has the order been calculated by a "min" filter design?
+        
+        if self.F_PBC is not None: # has corner frequency been calculated?
             specs['N'] = self.N # yes, update filterbroker
-            print("pbc", self.F_PBC, type(self.F_PBC))
-            if self.F_SBC.type in (tuple, list):
+            print("====== cheby1.save ========\nF_PBC = ", self.F_PBC, type(self.F_PBC))
+            print("F_PBC vor", self.F_PBC, type(self.F_PBC))
+            if np.isscalar(self.F_PBC): # HP or LP - a single corner frequency
+                print("skalar!")
+                specs['F_PB'] = self.F_PBC / 2.
+            else: # BP or BS - two corner frequencies
+                print("Tuple!")
                 specs['F_PB'] = self.F_PBC[0] / 2.
                 specs['F_PB2'] = self.F_PBC[1] / 2.
-            else:
-                specs['F_PB'] = self.F_PBC / 2.
-        except AttributeError:
-            pass
-
 
     def LPman(self, specs):
         self.get_params(specs)
@@ -135,12 +135,14 @@ class cheby1(object):
                             btype='highpass', analog = False, output = output))
         
     # For BP and BS, A_PB, F_PB and F_stop have two elements each
+        
+    # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]    
     def BPman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby1(self.N, self.A_PB,[self.F_PB,self.F_PB2],
                             btype='bandpass', analog = False, output = output))
                             
-                                # BP: F_stop[0] < F_PB[0], F_stop[1] > F_PB[1]    
+
     def BPmin(self, specs):
         self.get_params(specs) 
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2], 
@@ -157,7 +159,7 @@ class cheby1(object):
         self.save(specs, sig.cheby1(self.N, self.A_PB, [self.F_PB,self.F_PB2],
                             btype='bandstop', analog = False, output = output))   
 
-    # BS: F_stop[0] > F_PB[0], F_stop[1] < F_PB[1]            
+    # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]            
     def BSmin(self, specs):
         self.get_params(specs)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2], 

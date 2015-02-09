@@ -14,7 +14,7 @@ https://github.com/scipy/scipy/issues/2444
 from __future__ import print_function, division
 import scipy.signal as sig
 from scipy.signal import cheb2ord, zpk2tf, tf2zpk #  iirdesign, 
-#import numpy as np
+import numpy as np
 
 output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
 
@@ -72,7 +72,8 @@ class cheby2(object):
         self.F_PB  = specs['F_PB'] * 2
         self.F_SB  = specs['F_SB'] * 2
         self.F_PB2 = specs['F_PB2'] * 2
-        self.F_SB2 = specs['F_SB2'] * 2 
+        self.F_SB2 = specs['F_SB2'] * 2
+        self.F_SBC = None
         self.A_PB  = specs['A_PB']
         self.A_SB  = specs['A_SB']
         self.A_PB2 = specs['A_PB2']
@@ -93,16 +94,21 @@ class cheby2(object):
             
         specs['coeffs'] = self.coeffs
         specs['zpk'] = self.zpk
-        try: # has the order been calculated by a "min" filter design?
+        
+        if self.F_SBC is not None: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N # yes, update filterbroker
-            print("sbc", self.F_SBC, type(self.F_SBC))
-            if self.F_SBC.type in (tuple, list):
+            print("====== cheby1.save ========\nF_SBC = ", self.F_SBC, type(self.F_SBC))
+            print("F_SBC vor", self.F_SBC, type(self.F_SBC))
+            if np.isscalar(self.F_SBC): # HP or LP - a single corner frequency
+                print("skalar!")
+                specs['F_SB'] = self.F_SBC / 2.
+            else: # BP or BS - two corner frequencies
+                print("Tuple!")
                 specs['F_SB'] = self.F_SBC[0] / 2.
                 specs['F_SB2'] = self.F_SBC[1] / 2.
-            else:
-                specs['F_SB'] = self.F_SBC / 2.
-        except AttributeError:
-            pass
+
+            print("F_SBC nach", specs['F_SB'], type(specs['F_SB']))
+
 
     def LPman(self, specs):
         self.get_params(specs)
@@ -118,7 +124,7 @@ class cheby2(object):
 #                             analog=False, ftype='cheby2', output=output))
 
     def HPman(self, specs):
-        self.get_params(specs)
+        self.get_params(specs)     
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SB, 
                             btype='highpass', analog = False, output = output))
         
@@ -141,7 +147,7 @@ class cheby2(object):
     def BPmin(self, specs):
         self.get_params(specs)
         self.N, self.F_SBC = cheb2ord([self.F_PB, self.F_PB2],
-                                [self.F_SB, self.F_SB2],self.A_PB,self.A_SB)
+                                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
 
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SBC,
                             btype='bandpass', analog = False, output = output))
@@ -158,7 +164,7 @@ class cheby2(object):
     def BSmin(self, specs):
         self.get_params(specs)
         self.N, self.F_SBC = cheb2ord([self.F_PB, self.F_PB2],
-                                [self.F_SB, self.F_SB2],self.A_SB,self.A_SB)
+                                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
 
-        self.save(specs, sig.cheby2(self.N, self.A_PB, self.F_SBC,
+        self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SBC,
                             btype='bandstop', analog = False, output = output))
