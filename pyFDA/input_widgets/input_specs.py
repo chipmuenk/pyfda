@@ -26,7 +26,7 @@ from plotWidgets import plot_all
 
 class InputSpecs(QtGui.QWidget):
     
-    def __init__(self, DEBUG = True):
+    def __init__(self, DEBUG = False):
         super(InputSpecs, self).__init__() 
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
@@ -52,7 +52,7 @@ class InputSpecs(QtGui.QWidget):
         """ 
 
         self.sf = input_filter.SelectFilter(DEBUG = True)
-        self.fo = input_order.InputOrder(DEBUG = True)
+        self.fo = input_order.InputOrder(DEBUG = False)
         # subwidget for Frequency Specs
         self.fspec = input_freq_specs.InputFreqSpecs(specs = fb.gD['selFilter'],
                     DEBUG = False)
@@ -97,7 +97,7 @@ class InputSpecs(QtGui.QWidget):
         mainLayout = QtGui.QVBoxLayout(self)
         mainLayout.addLayout(self.layout)
         mainLayout.addStretch()
-        mainLayout.addWidget(self.butDesignFilt, )   # Design Filter!
+        mainLayout.addWidget(self.butDesignFilt)   # Design Filter!
         self.setLayout(mainLayout)
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
@@ -187,23 +187,20 @@ class InputSpecs(QtGui.QWidget):
         # design the filter by passing current specs to the method:
         getattr(self.myFilter, fb.gD['selFilter']['rt'] +
                                 fb.gD['selFilter']['fo'])(fb.gD['selFilter'])
+        # The filter design routines write coeffs etc. back to global filter dict
+                                
         # Update filter order. weights and freqs in case they have been changed
         self.fo.updateEntries()
         self.wspec.loadEntries()
         self.fspec.loadEntries()
         
-        # Read back filter coefficients and (zeroes, poles, k):
-        fb.gD['zpk'] = self.myFilter.zpk # (zeroes, poles, k)
-        if np.ndim(self.myFilter.coeffs) == 1:  # FIR filter: only b coeffs
-            fb.gD['coeffs'] = (self.myFilter.coeffs, [1]) # add dummy a = [1]
-            # This still has ndim == 1? 
-        else:                                   # IIR filter: [b, a] coeffs
-            fb.gD['coeffs'] = self.myFilter.coeffs 
         if self.DEBUG:
             print("=== pyFDA.py : startDesignFilter ===")
-            print("zpk:" , fb.gD['zpk'])
-            print('ndim gD:', np.ndim(fb.gD['coeffs']))
-            print("b,a = ", fb.gD['coeffs'])
+            print("zpk:" , fb.gD['selFilter']['zpk'])
+            print('ndim gD:', np.ndim(fb.gD['selFilter']['coeffs']))
+            print("b,a = ", fb.gD['selFilter']['coeffs'])
+            print("N = ",fb.gD['selFilter']['N'])
+        print("F_PB, F_SB = ",fb.gD['selFilter']['F_PB'], fb.gD['selFilter']['F_SB'])
      
 #        self.pltAll.update() is executed from pyFDA.py!
   
