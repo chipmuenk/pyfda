@@ -7,8 +7,8 @@ from __future__ import print_function, division, unicode_literals
 import sys, os
 
 from PyQt4 import QtGui
-from PyQt4.QtGui import QSizePolicy
-from PyQt4.QtCore import QSize
+#from PyQt4.QtGui import QSizePolicy
+#from PyQt4.QtCore import QSize
 
 #import matplotlib as plt
 #from matplotlib.figure import Figure
@@ -193,12 +193,14 @@ class PlotHf(QtGui.QMainWindow):
         self.inset = self.btnInset.isChecked()
         self.phase = self.btnPhase.isChecked()
         
-#        self.coeffs = fb.gD['coeffs']# coeffs
-        self.bb = fb.gD['coeffs'][0]
-        self.aa = fb.gD['coeffs'][1]
+        if np.ndim(fb.gD['selFilter']['coeffs']) == 1: # FIR
+            self.bb = fb.gD['selFilter']['coeffs']
+            self.aa = 1.
+        else: # IIR
+            self.bb = fb.gD['selFilter']['coeffs'][0]
+            self.aa = fb.gD['selFilter']['coeffs'][1]
         
         self.f_S = fb.gD['selFilter']['f_S']
-#        self.f_S = 1
         self.F_PB = fb.gD['selFilter']['F_PB'] * self.f_S
         self.F_SB = fb.gD['selFilter']['F_SB'] * self.f_S
         
