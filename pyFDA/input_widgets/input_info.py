@@ -55,7 +55,13 @@ class InputInfo(QtGui.QWidget):
         self.labPoleZeroList = QtGui.QLabel()
         self.labPoleZeroList.setText("Poles / Zeros")
         
-        self.listCoeff = QtGui.QListWidget()
+        self.tableCoeff = QtGui.QTableWidget()
+        self.tableCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
+        self.tableCoeff.setAlternatingRowColors(True)
+#        self.tableCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
+#        self.tableCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
+        self.tableCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
+        
         
         self.labFiltInfo = QtGui.QLabel()
         self.labFiltInfo.setWordWrap(True)
@@ -86,7 +92,7 @@ class InputInfo(QtGui.QWidget):
 
         vbox = QtGui.QVBoxLayout()
         vbox.addLayout(self.chkLayout)
-        vbox.addWidget(self.listCoeff)
+        vbox.addWidget(self.tableCoeff)
         vbox.addWidget(self.filtInfoFrame)
         vbox.addStretch(10)
         self.setLayout(vbox)
@@ -103,32 +109,59 @@ class InputInfo(QtGui.QWidget):
         self.filtInfoFrame.setVisible(self.chkFilterInfo.isChecked())
         self.labFiltInfo.setText(fb.gD["selFilter"]["inst"].info)
     
+        
+    def saveCoeffs(self):
+        coeffs = []
+        num_rows, num_cols = self.tableCoeff.rowCount(),\
+                                        self.tableCoeff.columnCount()
+        print(num_rows, num_cols)
+        for col in range(num_cols):
+            rows = []
+            for row in range(num_rows):
+                item = self.tableCoeff.item(row, col)
+                rows.append(float(item.text()) if item else '')
+            coeffs.append(rows)
+        
+        fb.gD["selFilter"]["coeffs"] = coeffs
+        print ("coeffs updated!")
+        
     def showCoeffs(self):
-        self.listCoeff.setVisible(self.chkCoeffList.isChecked())
-        self.listCoeff.clear()
+            
         coeffs = fb.gD["selFilter"]["coeffs"]
-        print(coeffs)
-        print ("shape", np.shape(coeffs))
-        print ("len", len(coeffs))
-        print("ndim", np.ndim(coeffs))
-        aCoeffs = []
-        bCoeffs = []
+        self.tableCoeff.setVisible(self.chkCoeffList.isChecked())
+        self.tableCoeff.clear()
+        self.tableCoeff.setRowCount(max(np.shape(coeffs)))
+
+
+        if self.DEBUG:
+            print("=====================\nInputInfo.showCoeffs")
+            print(coeffs)
+            print ("shape", np.shape(coeffs))
+            print ("len", len(coeffs))
+            print("ndim", np.ndim(coeffs))
+
         if np.ndim(coeffs) == 1:
             print("FIR!")
+            self.tableCoeff.setColumnCount(1)
+            self.tableCoeff.setHorizontalHeaderLabels(["b"])
             for i in range(len(coeffs)):
-                print(i, fb.gD["selFilter"]["coeffs"][i])
-                bCoeffs.append(str(coeffs[i]))
-            self.listCoeff.addItems(bCoeffs)
-            print(bCoeffs)
+                print(i, coeffs[i])
+                item = QtGui.QTableWidgetItem(str(coeffs[i]))
+                self.tableCoeff.setItem(i,0,item)
         else:
             print("IIR!")
+            self.tableCoeff.setColumnCount(2)
+            self.tableCoeff.setHorizontalHeaderLabels(["b", "a"])
             for i in range(np.shape(coeffs)[1]):
-                print(i, fb.gD["selFilter"]["coeffs"][0][i])
-                bCoeffs.append(str(coeffs[0][i]))
-                aCoeffs.append(str(coeffs[1][i]))
-            self.listCoeff.addItems(bCoeffs)
-#            self.listCoeff.addItems(bCoeffs)
-            print(bCoeffs)
+#                print(i, fb.gD["selFilter"]["coeffs"][0][i])
+#                item = QtGui.QTableWidgetItem(coeffs[0][i])
+#                bCoeffs.append(str(coeffs[0][i]))
+#                aCoeffs.append(str(coeffs[1][i]))
+                self.tableCoeff.setItem(i,0,QtGui.QTableWidgetItem(str(coeffs[0][i])))
+                self.tableCoeff.setItem(i,1,QtGui.QTableWidgetItem(str(coeffs[1][i])))
+
+        self.tableCoeff.resizeColumnsToContents()
+
 
 
 #------------------------------------------------------------------------------
