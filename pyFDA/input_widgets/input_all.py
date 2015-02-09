@@ -28,9 +28,9 @@ class InputAll(QtGui.QWidget):
 
 
 #        self.inputParams = inputParams.inputParams()
-        self.inputSpecs = input_specs.InputSpecs()        
-        self.inputFiles = input_files.InputFiles()
-        self.inputInfo = input_info.InputInfo()
+        self.inputSpecs = input_specs.InputSpecs(DEBUG = False)        
+        self.inputFiles = input_files.InputFiles(DEBUG = False)
+        self.inputInfo = input_info.InputInfo(DEBUG = False)
         
         self.initUI()     
 
