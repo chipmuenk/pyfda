@@ -52,10 +52,28 @@ class pyFDA(QtGui.QMainWindow):
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
         
+        #=============== Menubar =======================================
+        aboutAction = QtGui.QAction('&Info', self)
+        aboutAction.setShortcut('Ctrl+A')
+        aboutAction.setStatusTip('Info about pyFDA')
+
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&About')
+        fileMenu.addAction(aboutAction)
+        
         # ============== Signals & Slots ================================
 #        self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.inputAll.inputSpecs.butDesignFilt.clicked.connect(self.pltAll.update)
+#        self.pltAll.pltHf.
+        aboutAction.triggered.connect(self.aboutWindow)    
+
         self.statusMessage("Application is initialized.")
+        
+    def aboutWindow(self):
+        QtGui.QMessageBox.about(self, "About pyFDA", 
+        ("(c) 2013 - 15 Christian Münker\n\n"
+        "A graphical tool for designing, analyzing and synthesizing digital filters")
+        )   
 
     def statusMessage(self, message):
         self.statusBar().showMessage(message)
@@ -67,6 +85,8 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     main = pyFDA()
+    app.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
+    main.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     main.show()
    
     app.exec_()
