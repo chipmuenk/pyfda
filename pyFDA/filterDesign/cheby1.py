@@ -132,7 +132,7 @@ class cheby1(object):
         self.get_params(specs)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
         self.save(specs, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='low', analog = False, output = output))
+                            btype='highpass', analog = False, output = output))
         
     # For BP and BS, A_PB, F_PB and F_stop have two elements each
     def BPman(self, specs):

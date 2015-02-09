@@ -19,7 +19,7 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 
-class InputWeights(QtGui.QWidget): 
+class InputWeightSpecs(QtGui.QWidget): 
     """
     Build and update widget for entering the weight
     specifications like W_SB, W_PB etc.
@@ -31,7 +31,7 @@ class InputWeights(QtGui.QWidget):
         specs: A dictionary containing all the specs
         """
         
-        super(InputWeights, self).__init__()   
+        super(InputWeightSpecs, self).__init__()   
         self.DEBUG = DEBUG
         self.specs = specs  # dictionary containing _all_ specifications of the
                             # currently selected filter
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     import filterbroker as fb
 
     app = QtGui.QApplication(sys.argv)
-    form = InputWeights(specs = fb.gD["selFilter"])
+    form = InputWeightSpecs(specs = fb.gD["selFilter"])
 
     form.setEntries(newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
     form.setEntries(newLabels = ['W_PB','W_PB2'])

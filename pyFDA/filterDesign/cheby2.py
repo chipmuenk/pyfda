@@ -27,7 +27,7 @@ class cheby2(object):
         # common messages for all man. / min. filter order response types:    
         msg_man = ("Enter the filter order <b><i>N</i></b>, the minimum stop band "
             "attenuation <b><i>A<sub>SB</sub></i></b>, and the frequency / "
-            "frequencies <b><i>F<sub>PB</sub></i></b> where gain first drops "
+            "frequencies <b><i>F<sub>SB</sub></i></b> where gain first drops "
             "below <b><i>A<sub>SB</sub></i></b>.")
         msg_min = ("Enter the maximum pass band ripple and minimum stop band "
                     "attenuation and the corresponding corner frequencies.")
@@ -58,10 +58,10 @@ class cheby2(object):
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
-        self.info = "Chebychev Typ 2 Filter haben nur im Stopband Ripple. \
-        Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im SB \
-        und über die kritische(n) Frequenz(en) bei denen die Verstärkung zuerst\
-        den spezifizierten Wert A_SB erreicht."
+        self.info = ("Chebychev Typ 2 Filter haben nur im Stopband Ripple. "
+        "Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im SB "
+        "und über die kritische(n) Frequenz(en) bei denen die Verstärkung "
+        "zuerst den spezifizierten Wert A_SB erreicht.")
         
     def get_params(self,specs):
         """

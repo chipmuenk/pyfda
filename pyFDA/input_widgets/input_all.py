@@ -16,11 +16,11 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import input_params, input_files
+import input_specs, input_files, input_info
 
 class InputAll(QtGui.QWidget):
     """
-    Create the tabbed window for various input widgets
+    Create a tabbed widget for various input subwidgets
     """
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
@@ -28,8 +28,9 @@ class InputAll(QtGui.QWidget):
 
 
 #        self.inputParams = inputParams.inputParams()
-        self.inputParams = input_params.InputParams()        
+        self.inputSpecs = input_specs.InputSpecs()        
         self.inputFiles = input_files.InputFiles()
+        self.inputInfo = input_info.InputInfo()
         
         self.initUI()     
 
@@ -38,8 +39,9 @@ class InputAll(QtGui.QWidget):
         """ Initialize UI with tabbed subplots """
         tab_widget = QtGui.QTabWidget()
 #        tab_widget.addTab(self.inputParams, 'Params')
-        tab_widget.addTab(self.inputParams, 'Params')
+        tab_widget.addTab(self.inputSpecs, 'Specs')
         tab_widget.addTab(self.inputFiles, 'Files')
+        tab_widget.addTab(self.inputInfo, 'Info')
 
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(tab_widget)
