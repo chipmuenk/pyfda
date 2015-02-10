@@ -17,11 +17,11 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb
-from FilterFileReader import FilterTreeBuilder
+from filter_tree_builder import FilterTreeBuilder
     
 import input_filter, input_order, input_amp_specs, input_freq_specs,\
     input_weight_specs
-from plotWidgets import plot_all
+from plot_widgets import plot_all
 
 
 class InputSpecs(QtGui.QWidget):
@@ -32,7 +32,7 @@ class InputSpecs(QtGui.QWidget):
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
         self.DEBUG = DEBUG  
-        self.ftb = FilterTreeBuilder('Init.txt', 'filterDesign', 
+        self.ftb = FilterTreeBuilder('Init.txt', 'filter_design', 
                                     commentChar = '#', DEBUG = DEBUG) #                                             
         self.initUI()
       

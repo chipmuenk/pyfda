@@ -12,7 +12,7 @@ from PyQt4 import QtGui
 
 #import filterbroker as fb # importing filterbroker initializes all its globals
 from input_widgets import input_all
-from plotWidgets import plot_all
+from plot_widgets import plot_all
 
 class pyFDA(QtGui.QMainWindow):
     """
