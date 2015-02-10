@@ -31,18 +31,22 @@ class InputOrder(QtGui.QFrame):
 
         
     def initUI(self):
+  
+        title = "Filter Order"
+        
         bfont = QtGui.QFont()
         ifont = QtGui.QFont()
   #      font.setPointSize(11)
         bfont.setBold(True)
         bfont.setWeight(75)
         ifont.setItalic(True)
+        
         # Print subwidget title
-        self.titleLabel = QtGui.QLabel("Filter Order")
+        self.titleLabel = QtGui.QLabel(title)
         self.titleLabel.setFont(bfont)
 
         self.chkMin = QtGui.QRadioButton("Minimum",self)          
-        self.spacer = QtGui.QSpacerItem(40,0,
+        self.spacer = QtGui.QSpacerItem(20,0,
                         QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.txtLabel = QtGui.QLabel("N = ")
         self.txtLabel.setFont(ifont)
@@ -51,24 +55,20 @@ class InputOrder(QtGui.QFrame):
 
         #----------------------------------------------------------------------
         # Construct widget layout
-
-        vbox = QtGui.QHBoxLayout()
-        vbox.addWidget(self.chkMin)
-        vbox.addItem(self.spacer)
-        vbox.addWidget(self.txtLabel)
-
-        vbox.addWidget(self.txtManual)
-        layout = QtGui.QVBoxLayout()
-        layout.addWidget(self.titleLabel)
-        layout.addItem(vbox)
-        
+        hbox = QtGui.QHBoxLayout()
+        hbox.addWidget(self.chkMin)
+        hbox.addItem(self.spacer)
+        hbox.addWidget(self.txtLabel)
+        hbox.addWidget(self.txtManual)
+       
         foFrame = QtGui.QFrame()
         foFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        foFrame.setLayout(layout)
+        foFrame.setLayout(hbox)        
         foFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
         
-        mainLayout = QtGui.QHBoxLayout()
+        mainLayout = QtGui.QVBoxLayout() # widget main layout
+        mainLayout.addWidget(self.titleLabel)
         mainLayout.addWidget(foFrame)
         self.setLayout(mainLayout)
 #        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
