@@ -42,38 +42,48 @@ class PlotHf(QtGui.QMainWindow):
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG        
-
-        self.lblLog = QtGui.QLabel("Log. y-scale")        
-        self.btnLog = QtGui.QCheckBox()
-        self.btnLog.setChecked(True)
+        
+        units = ["dB", "V", "W"] 
+        self.comboUnitsA = QtGui.QComboBox(self)
+        self.comboUnitsA.addItems(units)
+        self.comboUnitsA.setObjectName("comboUnitsA")
+        self.comboUnitsA.setToolTip("Set unit for y-axis:\n"
+        "dB is attenuation (positive values)\nV and W are less than 1.")
+        self.comboUnitsA.setCurrentIndex(0)
+        
+        self.lblLinphase = QtGui.QLabel("Linphase")
+        self.chkLinphase = QtGui.QCheckBox()
+        self.chkLinphase.setToolTip("Plot H(f) of acausal linphase system.")
         
         self.lblInset = QtGui.QLabel("Inset")
-        self.btnInset = QtGui.QCheckBox()
-        self.btnInset.setToolTip("Display second zoomed plot")
+        self.chkInset = QtGui.QCheckBox()
+        self.chkInset.setToolTip("Display second zoomed plot")
         
         self.lblSpecs = QtGui.QLabel("Show Specs")
-        self.btnSpecs = QtGui.QCheckBox()
-        self.btnSpecs.setChecked(False)
-        self.btnSpecs.setToolTip("Display filter specs as hatched regions")
+        self.chkSpecs = QtGui.QCheckBox()
+        self.chkSpecs.setChecked(False)
+        self.chkSpecs.setToolTip("Display filter specs as hatched regions")
         
         self.lblPhase = QtGui.QLabel("Phase")
-        self.btnPhase = QtGui.QCheckBox()
-        self.btnPhase.setToolTip("Overlay phase")
+        self.chkPhase = QtGui.QCheckBox()
+        self.chkPhase.setToolTip("Overlay phase")
 
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addStretch(10)
-        self.hbox.addWidget(self.lblLog)
-        self.hbox.addWidget(self.btnLog)
+        self.hbox.addWidget(self.comboUnitsA)
+        self.hbox.addStretch(1)
+        self.hbox.addWidget(self.lblLinphase)
+        self.hbox.addWidget(self.chkLinphase)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.lblInset)
-        self.hbox.addWidget(self.btnInset)
+        self.hbox.addWidget(self.chkInset)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.lblSpecs)
-        self.hbox.addWidget(self.btnSpecs)
+        self.hbox.addWidget(self.chkSpecs)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.lblPhase)
-        self.hbox.addWidget(self.btnPhase)
+        self.hbox.addWidget(self.chkPhase)
         self.hbox.addStretch(10)
     
         self.mplwidget = MplWidget()
@@ -93,12 +103,14 @@ class PlotHf(QtGui.QMainWindow):
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================          
-        self.btnLog.clicked.connect(lambda:self.draw())
-        self.btnInset.clicked.connect(lambda:self.draw())
-        self.btnSpecs.clicked.connect(lambda:self.draw())
-        self.btnPhase.clicked.connect(lambda:self.draw())
+        self.comboUnitsA.currentIndexChanged.connect(lambda:self.draw())
 
-    def plotSpecLimits(self, specAxes, specLog):
+        self.chkLinphase.clicked.connect(lambda:self.draw())
+        self.chkInset.clicked.connect(lambda:self.draw())
+        self.chkSpecs.clicked.connect(lambda:self.draw())
+        self.chkPhase.clicked.connect(lambda:self.draw())
+
+    def plotSpecLimits(self, specAxes, unitA):
         """
         Plot the specifications limits 
         """
@@ -106,26 +118,40 @@ class PlotHf(QtGui.QMainWindow):
         fill_params = {"color":"none","hatch":"/", "edgecolor":"k", "lw":0.0}
         ax = specAxes
         ymax = ax.get_ylim()[1]
-        F_max = self.f_S/2
-        if specLog:
-            if fb.gD['selFilter']['ft'] == "FIR":
-                A_PB_max = self.A_PB # 20*log10(1+del_DB)
-            else: # IIR log
-                A_PB_max = 0
+
+        # extract from filterTree the parameters that are actually used        
+#        myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
+#        freqParams = [l for l in myParams if l[0] == 'F']
+
+        if fb.gD['selFilter']['ft'] == "FIR":
+            A_PB_max = self.A_PB # 20*log10(1+del_PB)
+            A_PB2_max = self.A_PB2             
+        else: # IIR log
+            A_PB_max = 0
+            
+        if unitA == 'V':
+            dBMul = 20.
+        elif unitA == 'W':
+            dBMul = 10.
+            
+        if unitA == 'dB':
             A_PB_min = -self.A_PB
-            A_PB_minx = A_PB_min - 10# 20*log10(1-del_DB)
+            A_PB2_min = -self.A_PB2            
+            A_PB_minx = min(A_PB_min, A_PB2_min) - 10# 20*log10(1-del_PB)
             A_SB = -self.A_SB
+            A_SB2 = -self.A_SB2
             A_SBx = A_SB - 10
         else:
-            if fb.gD['selFilter']['ft'] == 'FIR':
-                A_PB_max = 10**(self.A_PB/20)# 1 + del_DB 
-            else:
-                A_PB_max = 1
-            A_PB_min = 10**(-self.A_PB/20) #1 - del_DB
+            A_PB_max = 10**(A_PB_max/dBMul)# 1 + del_PB
+            A_PB2_max = 10**(A_PB2_max/dBMul)# 1 + del_PB 
+            A_PB_min = 10**(-self.A_PB/dBMul) #1 - del_PB
+            A_PB2_min = 10**(-self.A_PB2/dBMul) #1 - del_PB
             A_PB_minx = A_PB_min / 2
-            A_SB = 10**(-self.A_SB/20)
-            A_SBx = A_SB / 5
-        
+            A_SB = 10**(-self.A_SB/dBMul)
+            A_SB2 = 10**(-self.A_SB2/dBMul)           
+            A_SBx = A_SB / 5    
+
+        F_max = self.f_S/2            
         F_PB = self.F_PB
         F_SB = fb.gD['selFilter']['F_SB'] * self.f_S
         F_SB2 = fb.gD['selFilter']['F_SB2'] * self.f_S
@@ -161,23 +187,23 @@ class PlotHf(QtGui.QMainWindow):
 
             # upper limits:            
             ax.plot([0, F_SB, F_SB, F_SB2, F_SB2, F_max],
-                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB_max, A_PB_max], 'b--')
+                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB2_max, A_PB2_max], 'b--')
             ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
-                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB_max, A_PB_max], 
+                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB2_max, A_PB2_max], 
                         **fill_params)
 
             # lower limits right:            
-            ax.plot([F_PB2, F_PB2, F_max],[A_PB_minx, A_PB_min, A_PB_min],'b--')    
+            ax.plot([F_PB2, F_PB2, F_max],[A_PB_minx, A_PB2_min, A_PB2_min],'b--')    
             ax.fill_between([F_PB2, F_PB2, F_max], A_PB_minx,
-                            [A_PB_minx, A_PB_min, A_PB_min], **fill_params)    
+                            [A_PB_minx, A_PB2_min, A_PB2_min], **fill_params)    
             
 
         if fb.gD['selFilter']['rt'] == "BP":
             # upper limits:
             ax.plot([0,    F_SB,  F_SB,      F_SB2,      F_SB2,  F_max],
-                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB, A_SB], 'b--')
+                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2], 'b--')
             ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
-                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB, A_SB],**fill_params)
+                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2],**fill_params)
             # lower limits:
             ax.plot([F_PB, F_PB, F_PB2, F_PB2], 
                     [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx], 'b--' )
@@ -188,10 +214,17 @@ class PlotHf(QtGui.QMainWindow):
         """ 
         Re-calculate |H(f)| and draw the figure
         """
-        self.log = self.btnLog.isChecked()
-        self.specs = self.btnSpecs.isChecked()
-        self.inset = self.btnInset.isChecked()
-        self.phase = self.btnPhase.isChecked()
+        self.unitA = self.comboUnitsA.currentText()
+        
+        # Linphase settings only makes sense for amplitude plot
+        self.chkLinphase.setCheckable(self.unitA == 'V')
+        self.chkLinphase.setEnabled(self.unitA == 'V')
+        self.lblLinphase.setEnabled(self.unitA == 'V')
+
+        self.linphase = self.chkLinphase.isChecked()
+        self.specs = self.chkSpecs.isChecked()
+        self.inset = self.chkInset.isChecked()
+        self.phase = self.chkPhase.isChecked()
         
         if np.ndim(fb.gD['selFilter']['coeffs']) == 1: # FIR
             self.bb = fb.gD['selFilter']['coeffs']
@@ -200,20 +233,24 @@ class PlotHf(QtGui.QMainWindow):
             self.bb = fb.gD['selFilter']['coeffs'][0]
             self.aa = fb.gD['selFilter']['coeffs'][1]
         
-        self.f_S = fb.gD['selFilter']['f_S']
+        self.f_S  = fb.gD['selFilter']['f_S']
         self.F_PB = fb.gD['selFilter']['F_PB'] * self.f_S
         self.F_SB = fb.gD['selFilter']['F_SB'] * self.f_S
         
-        self.A_PB = fb.gD['selFilter']['A_PB']
-        self.A_SB = fb.gD['selFilter']['A_SB']
-
+        self.A_PB  = fb.gD['selFilter']['A_PB']
+        self.A_PB2 = fb.gD['selFilter']['A_PB2']
+        self.A_SB  = fb.gD['selFilter']['A_SB']
+        self.A_SB2 = fb.gD['selFilter']['A_SB2']
 
         if self.DEBUG:
             print("--- plotHf.draw() --- ") 
             print("b, a = ", self.bb, self.aa)
 
         # calculate |H(W)| for W = 0 ... pi:
-        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'])
+        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'], whole = False)
+        if self.linphase: # remove the linear phase
+            H = H * np.exp(1j * W * fb.gD["selFilter"]["N"]/2.)
+
         F = W / (2 * np.pi) * self.f_S
 
         # clear the axes and (re)draw the plot
@@ -225,30 +262,41 @@ class PlotHf(QtGui.QMainWindow):
         
         #================ Main Plotting Routine =========================
         
-        if self.log:
+        if self.unitA == 'dB':
             ax.plot(F,20*np.log10(abs(H)), lw = fb.gD['rc']['lw'])
 
             ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'+ ' in dB ' +
                         r'$\rightarrow$')
-
-        else: #  'lin'
-            ax.plot(F,abs(H), lw = fb.gD['rc']['lw'])
-
-            ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})| \;$'+
-                        r'$\rightarrow $')
-
-        if self.specs: self.plotSpecLimits(specAxes = ax, specLog = self.log)
-            
-        if self.log:
             ax.axis([0, self.f_S/2., -self.A_SB -10, self.A_PB +1] )
+
+        elif self.unitA == 'V': #  'lin'
+            if self.linphase:
+                ax.plot(F, H.real, lw = fb.gD['rc']['lw'])
+    
+                ax.set_ylabel(r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'+' in V '+
+                            r'$\rightarrow $')
+                ax.axis([0, self.f_S/2., 10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)])
+            else:
+                ax.plot(F,abs(H), lw = fb.gD['rc']['lw'])
+    
+                ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j}\Omega})|$'+' in V '+
+                            r'$\rightarrow $')
+                ax.axis([0, self.f_S/2., 10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)])
+                
         else:
-            ax.axis([0, self.f_S/2., 10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)])
+            ax.plot(F,abs(H)*abs(H), lw = fb.gD['rc']['lw'])
+
+            ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'+ ' in W ' +
+                        r'$\rightarrow $')
+            ax.axis([0, self.f_S/2., 10**((-self.A_SB-10)/10), 10**((self.A_PB+1)/10)])
+
+        if self.specs: self.plotSpecLimits(specAxes = ax, unitA = self.unitA)
+            
         if self.phase:
-            ax.plot(F,np.angle(H), lw = fb.gD['rc']['lw'])
-            pass
+            ax.plot(F,np.unwrap(np.angle(H)), lw = fb.gD['rc']['lw'])                
+
  
         ax.set_title(r'Magnitude Frequency Response')
-#        ax.set_xlabel(r'$F\; \rightarrow $') 
         ax.set_xlabel(fb.gD['selFilter']['plt_fLabel']) 
         
         # ---------- Inset Plot -------------------------------------------
