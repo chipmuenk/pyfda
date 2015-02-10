@@ -168,7 +168,7 @@ if __name__ == '__main__':
     import filterbroker as fb
 
     app = QtGui.QApplication(sys.argv)
-    form = InputWeightSpecs(specs = fb.gD["selFilter"])
+    form = InputWeightSpecs(specs = fb.fil[0])
 
     form.setEntries(newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
     form.setEntries(newLabels = ['W_PB','W_PB2'])

@@ -123,7 +123,7 @@ class PlotHf(QtGui.QMainWindow):
 #        myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
 #        freqParams = [l for l in myParams if l[0] == 'F']
 
-        if fb.gD['selFilter']['ft'] == "FIR":
+        if fb.fil[0]['ft'] == "FIR":
             A_PB_max = self.A_PB # 20*log10(1+del_PB)
             A_PB2_max = self.A_PB2             
         else: # IIR log
@@ -153,11 +153,11 @@ class PlotHf(QtGui.QMainWindow):
 
         F_max = self.f_S/2            
         F_PB = self.F_PB
-        F_SB = fb.gD['selFilter']['F_SB'] * self.f_S
-        F_SB2 = fb.gD['selFilter']['F_SB2'] * self.f_S
-        F_PB2 = fb.gD['selFilter']['F_PB2'] * self.f_S
+        F_SB = fb.fil[0]['F_SB'] * self.f_S
+        F_SB2 = fb.fil[0]['F_SB2'] * self.f_S
+        F_PB2 = fb.fil[0]['F_PB2'] * self.f_S
 
-        if fb.gD['selFilter']['rt'] == 'LP':
+        if fb.fil[0]['rt'] == 'LP':
             # upper limits:            
             ax.plot([0, F_SB, F_SB, F_max],
                     [A_PB_max, A_PB_max, A_SB, A_SB], 'b--')
@@ -168,7 +168,7 @@ class PlotHf(QtGui.QMainWindow):
             ax.fill_between([0, F_PB, F_PB], A_PB_minx,
                             [A_PB_min, A_PB_min, A_PB_minx], **fill_params)
        
-        if fb.gD['selFilter']['rt'] == 'HP':
+        if fb.fil[0]['rt'] == 'HP':
             # upper limits:
             ax.plot([0, F_SB, F_SB, F_max],
                     [A_SB, A_SB, A_PB_max, A_PB_max], 'b--')
@@ -179,7 +179,7 @@ class PlotHf(QtGui.QMainWindow):
             ax.fill_between([F_PB, F_PB, F_max], A_PB_minx,
                             [A_PB_minx, A_PB_min, A_PB_min], **fill_params)
             
-        if fb.gD['selFilter']['rt'] == 'BS':
+        if fb.fil[0]['rt'] == 'BS':
             # lower limits left:            
             ax.plot([0, F_PB, F_PB],[A_PB_min, A_PB_min, A_PB_minx], 'b--')
             ax.fill_between([0, F_PB, F_PB], A_PB_minx,
@@ -198,7 +198,7 @@ class PlotHf(QtGui.QMainWindow):
                             [A_PB_minx, A_PB2_min, A_PB2_min], **fill_params)    
             
 
-        if fb.gD['selFilter']['rt'] == "BP":
+        if fb.fil[0]['rt'] == "BP":
             # upper limits:
             ax.plot([0,    F_SB,  F_SB,      F_SB2,      F_SB2,  F_max],
                     [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2], 'b--')
@@ -226,21 +226,21 @@ class PlotHf(QtGui.QMainWindow):
         self.inset = self.chkInset.isChecked()
         self.phase = self.chkPhase.isChecked()
         
-        if np.ndim(fb.gD['selFilter']['coeffs']) == 1: # FIR
-            self.bb = fb.gD['selFilter']['coeffs']
+        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
+            self.bb = fb.fil[0]['coeffs']
             self.aa = 1.
         else: # IIR
-            self.bb = fb.gD['selFilter']['coeffs'][0]
-            self.aa = fb.gD['selFilter']['coeffs'][1]
+            self.bb = fb.fil[0]['coeffs'][0]
+            self.aa = fb.fil[0]['coeffs'][1]
         
-        self.f_S  = fb.gD['selFilter']['f_S']
-        self.F_PB = fb.gD['selFilter']['F_PB'] * self.f_S
-        self.F_SB = fb.gD['selFilter']['F_SB'] * self.f_S
+        self.f_S  = fb.fil[0]['f_S']
+        self.F_PB = fb.fil[0]['F_PB'] * self.f_S
+        self.F_SB = fb.fil[0]['F_SB'] * self.f_S
         
-        self.A_PB  = fb.gD['selFilter']['A_PB']
-        self.A_PB2 = fb.gD['selFilter']['A_PB2']
-        self.A_SB  = fb.gD['selFilter']['A_SB']
-        self.A_SB2 = fb.gD['selFilter']['A_SB2']
+        self.A_PB  = fb.fil[0]['A_PB']
+        self.A_PB2 = fb.fil[0]['A_PB2']
+        self.A_SB  = fb.fil[0]['A_SB']
+        self.A_SB2 = fb.fil[0]['A_SB2']
 
         if self.DEBUG:
             print("--- plotHf.draw() --- ") 
@@ -249,7 +249,7 @@ class PlotHf(QtGui.QMainWindow):
         # calculate |H(W)| for W = 0 ... pi:
         [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'], whole = False)
         if self.linphase: # remove the linear phase
-            H = H * np.exp(1j * W * fb.gD["selFilter"]["N"]/2.)
+            H = H * np.exp(1j * W * fb.fil[0]["N"]/2.)
 
         F = W / (2 * np.pi) * self.f_S
 
@@ -293,11 +293,14 @@ class PlotHf(QtGui.QMainWindow):
         if self.specs: self.plotSpecLimits(specAxes = ax, unitA = self.unitA)
             
         if self.phase:
-            ax.plot(F,np.unwrap(np.angle(H)), lw = fb.gD['rc']['lw'])                
+            if self.linphase:
+                ax.plot(F,np.angle(H), lw = fb.gD['rc']['lw'])                
+            else:
+                ax.plot(F,np.unwrap(np.angle(H)), lw = fb.gD['rc']['lw'])                
 
  
         ax.set_title(r'Magnitude Frequency Response')
-        ax.set_xlabel(fb.gD['selFilter']['plt_fLabel']) 
+        ax.set_xlabel(fb.fil[0]['plt_fLabel']) 
         
         # ---------- Inset Plot -------------------------------------------
         if self.inset:

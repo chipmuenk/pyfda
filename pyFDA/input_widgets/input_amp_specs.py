@@ -239,7 +239,7 @@ if __name__ == '__main__':
     import filterbroker as fb
    
     app = QtGui.QApplication(sys.argv)
-    form = InputAmpSpecs(specs = fb.gD["selFilter"])
+    form = InputAmpSpecs(specs = fb.fil[0])
 
     form.setEntries(newLabels = ['A_SB','A_SB2','A_PB','A_PB2'])
     form.setEntries(newLabels = ['A_PB','A_PB2'])

@@ -54,13 +54,13 @@ class InputSpecs(QtGui.QWidget):
         self.sf = input_filter.SelectFilter(DEBUG = True)
         self.fo = input_order.InputOrder(DEBUG = False)
         # subwidget for Frequency Specs
-        self.fspec = input_freq_specs.InputFreqSpecs(specs = fb.gD['selFilter'],
+        self.fspec = input_freq_specs.InputFreqSpecs(specs = fb.fil[0],
                     DEBUG = False)
         # subwidget for Amplitude Specs        
-        self.aspec = input_amp_specs.InputAmpSpecs(specs = fb.gD['selFilter'],
+        self.aspec = input_amp_specs.InputAmpSpecs(specs = fb.fil[0],
                     DEBUG = False)
         # subwidget for Weight Specs                                           
-        self.wspec = input_weight_specs.InputWeightSpecs(specs = fb.gD['selFilter'],
+        self.wspec = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
                     DEBUG = False)
         
         self.msg = QtGui.QLabel(self)
@@ -113,7 +113,7 @@ class InputSpecs(QtGui.QWidget):
         
     def chooseDesignMethod(self):
         """
-        Reads:  fb.gD['selFilter'] (currently selected filter), extracting info
+        Reads:  fb.fil[0] (currently selected filter), extracting info
                 from fb.gD['filterTree']
         Writes:
         Depending on SelectFilter and frequency specs, the values of the 
@@ -122,14 +122,14 @@ class InputSpecs(QtGui.QWidget):
         """
         
         # create filter object instance from design method (e.g. 'cheby1'):   
-        self.myFilter = self.ftb.objectWizzard(fb.gD['selFilter']['dm'])
-        fb.gD['selFilter']['inst'] = self.myFilter
+        self.myFilter = self.ftb.objectWizzard(fb.fil[0]['dm'])
+        fb.fil[0]['inst'] = self.myFilter
 
         # Read freq / amp / weight labels for current filter design
-        rt = fb.gD['selFilter']['rt']
-        ft = fb.gD['selFilter']['ft']
-        dm = fb.gD['selFilter']['dm']
-        fo = fb.gD['selFilter']['fo']  
+        rt = fb.fil[0]['rt']
+        ft = fb.fil[0]['ft']
+        dm = fb.fil[0]['dm']
+        fo = fb.fil[0]['fo']  
         myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
         myEnbWdg = fb.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
         myMsg    = fb.gD['filterTree'][rt][ft][dm][fo]['msg'] # message
@@ -140,7 +140,7 @@ class InputSpecs(QtGui.QWidget):
         self.weightParams = [l for l in myParams if l[0] == 'W']
         if self.DEBUG:
             print("=== InputParams.chooseDesignMethod ===")
-            print("selFilter:", fb.gD['selFilter'])
+            print("selFilter:", fb.fil[0])
             print('myLabels:', myParams)
             print('ampLabels:', self.ampParams)
             print('freqLabels:', self.freqParams)
@@ -160,33 +160,33 @@ class InputSpecs(QtGui.QWidget):
             
     def storeAll(self):
         """
-        Update global dict fb.gD['selFilter'] with currently selected filter 
+        Update global dict fb.fil[0] with currently selected filter 
         parameters, using the update methods of the classes
         """
-        # collect data from widgets and write to fb.gD['selFilter']
+        # collect data from widgets and write to fb.fil[0]
         self.fo.updateEntries()   # filter order widget
         self.fspec.storeEntries() # frequency specification widget
         self.aspec.storeEntries() # magnitude specs with unit
         self.wspec.storeEntries() # weight specification  
             
-        if self.DEBUG: print(fb.gD['selFilter'])
+        if self.DEBUG: print(fb.fil[0])
   
     def startDesignFilt(self):
         """
         Design Filter
         """
-        self.storeAll() # input widgets -> fb.gD['selFilter'] 
+        self.storeAll() # input widgets -> fb.fil[0] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
-            print('Specs:', fb.gD['selFilter'])#params)
-            print("fb.gD['selFilter']['dm']", fb.gD['selFilter']['dm']+"."+
-                  fb.gD['selFilter']['rt']+fb.gD['selFilter']['fo'])
+            print('Specs:', fb.fil[0])#params)
+            print("fb.fil[0]['dm']", fb.fil[0]['dm']+"."+
+                  fb.fil[0]['rt']+fb.fil[0]['fo'])
 
         # Now construct the instance method from the response type (e.g.
         # 'LP' -> cheby1.LP) and
         # design the filter by passing current specs to the method:
-        getattr(self.myFilter, fb.gD['selFilter']['rt'] +
-                                fb.gD['selFilter']['fo'])(fb.gD['selFilter'])
+        getattr(self.myFilter, fb.fil[0]['rt'] +
+                                fb.fil[0]['fo'])(fb.fil[0])
         # The filter design routines write coeffs etc. back to global filter dict
                                 
         # Update filter order. weights and freqs in case they have been changed
@@ -196,11 +196,11 @@ class InputSpecs(QtGui.QWidget):
         
         if self.DEBUG:
             print("=== pyFDA.py : startDesignFilter ===")
-            print("zpk:" , fb.gD['selFilter']['zpk'])
-            print('ndim gD:', np.ndim(fb.gD['selFilter']['coeffs']))
-            print("b,a = ", fb.gD['selFilter']['coeffs'])
-            print("N = ",fb.gD['selFilter']['N'])
-        print("F_PB, F_SB = ",fb.gD['selFilter']['F_PB'], fb.gD['selFilter']['F_SB'])
+            print("zpk:" , fb.fil[0]['zpk'])
+            print('ndim gD:', np.ndim(fb.fil[0]['coeffs']))
+            print("b,a = ", fb.fil[0]['coeffs'])
+            print("N = ",fb.fil[0]['N'])
+        print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
      
 #        self.pltAll.update() is executed from pyFDA.py!
   

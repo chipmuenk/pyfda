@@ -76,12 +76,12 @@ class PlotPhi(QtGui.QMainWindow):
         Re-calculate |H(f)| and draw the figure
         """
         
-        if np.ndim(fb.gD['selFilter']['coeffs']) == 1: # FIR
-            self.bb = fb.gD['selFilter']['coeffs']
+        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
+            self.bb = fb.fil[0]['coeffs']
             self.aa = 1.
         else: # IIR
-            self.bb = fb.gD['selFilter']['coeffs'][0]
-            self.aa = fb.gD['selFilter']['coeffs'][1]
+            self.bb = fb.fil[0]['coeffs'][0]
+            self.aa = fb.fil[0]['coeffs'][1]
 
         if self.DEBUG:
             print("--- plotPhi.draw() ---") 
@@ -101,7 +101,7 @@ class PlotPhi(QtGui.QMainWindow):
 #        mpl.axis([0, 0.5, -fb.gD['specs']['A_stop1']-10, 
 #                  fb.gD['specs']['A_pass1']+1] )
         mpl.set_title(r'Phase Frequency Response')
-        mpl.set_xlabel(fb.gD['selFilter']['plt_fLabel'])    
+        mpl.set_xlabel(fb.fil[0]['plt_fLabel'])    
         mpl.set_ylabel(r'$\phi(\mathrm{e}^{\mathrm{j} \Omega})|\; \rightarrow $')    
  
         self.mplwidget.redraw()

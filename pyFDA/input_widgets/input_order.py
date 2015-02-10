@@ -50,7 +50,7 @@ class InputOrder(QtGui.QFrame):
                         QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.txtLabel = QtGui.QLabel("N = ")
         self.txtLabel.setFont(ifont)
-        self.txtManual=QtGui.QLineEdit(str(fb.gD['selFilter']['N']),self)
+        self.txtManual=QtGui.QLineEdit(str(fb.fil[0]['N']),self)
  #       self.txtManual.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
 
         #----------------------------------------------------------------------
@@ -86,17 +86,17 @@ class InputOrder(QtGui.QFrame):
         Read / write text entries and checkbutton for filter order
         """
         # read list of available filter order methods from filterTree:
-        foList = fb.gD['filterTree'][fb.gD['selFilter']['rt']]\
-                [fb.gD['selFilter']['ft']][fb.gD['selFilter']['dm']].keys()
+        foList = fb.gD['filterTree'][fb.fil[0]['rt']]\
+                [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
         if self.DEBUG: 
             print("=== InputOrder.update() ===")            
             print("foList", foList)
 
-        if fb.gD['selFilter']['fo'] in foList:
-            fo = fb.gD['selFilter']['fo'] # keep current setting
+        if fb.fil[0]['fo'] in foList:
+            fo = fb.fil[0]['fo'] # keep current setting
         else:
             fo = foList[0] # use first list entry from filterTree
-            fb.gD['selFilter']['fo'] = fo # and update 'selFilter'
+            fb.fil[0]['fo'] = fo # and update 'selFilter'
 
         # Determine which subwidgets are __visible__
         self.txtLabel.setVisible('man' in foList)
@@ -109,20 +109,20 @@ class InputOrder(QtGui.QFrame):
         if 'min' in foList:
             if self.chkMin.isChecked() == True:
                 # update in case N has been changed outside this class
-                self.txtManual.setText(str(fb.gD['selFilter']['N'])) 
+                self.txtManual.setText(str(fb.fil[0]['N'])) 
                 self.txtManual.setEnabled(False)
                 self.txtLabel.setEnabled(False)
-                fb.gD['selFilter'].update({'fo' : 'min'})
+                fb.fil[0].update({'fo' : 'min'})
             else:
                 self.txtManual.setEnabled(True)
                 self.txtLabel.setEnabled(True)
-                fb.gD['selFilter'].update({'fo' : 'man'})
+                fb.fil[0].update({'fo' : 'man'})
         else:
             self.txtLabel.setEnabled(fo == 'man')
             self.txtManual.setEnabled(fo == 'man')
 
         ordn = int(self.txtManual.text())
-        fb.gD['selFilter'].update({'N' : ordn})
+        fb.fil[0].update({'N' : ordn})
    
 #------------------------------------------------------------------------------        
 if __name__ == '__main__':
@@ -131,10 +131,10 @@ if __name__ == '__main__':
     form.show()
     form.chkMin.setChecked(True)
     form.update()
-    print(fb.gD['selFilter']['fo'])
+    print(fb.fil[0]['fo'])
     form.chkMin.setChecked(False)
     form.update()
-    print(fb.gD['selFilter']['fo'])
+    print(fb.fil[0]['fo'])
 
     app.exec_()
 

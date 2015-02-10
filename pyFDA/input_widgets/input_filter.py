@@ -105,7 +105,7 @@ class SelectFilter(QtGui.QWidget):
         Dynamically add and remove subwidgets as needed
         """
         #if ... :
-        print(fb.gD['selFilter']['inst'])
+        print(fb.fil[0]['inst'])
         self.xxx = QtGui.QComboBox(self)
         self.vLayout.addWidget(self.xxx)
         
@@ -122,7 +122,7 @@ class SelectFilter(QtGui.QWidget):
         self.rtIdx =self.comboResponseType.currentIndex()       
         self.rt = str(self.comboResponseType.itemData(self.rtIdx))
          
-        fb.gD['selFilter']['rt'] = self.rt # abbreviation
+        fb.fil[0]['rt'] = self.rt # abbreviation
 #        rt=fb.gD["rtNames"][self.rt] # full text
 #        print(fb.gD['filterTree'][self.rt].keys())
         # 
@@ -143,7 +143,7 @@ class SelectFilter(QtGui.QWidget):
         for dm in fb.gD['filterTree'][self.rt][self.ft]:
             self.comboDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
 
-        fb.gD['selFilter']['ft'] = self.ft
+        fb.fil[0]['ft'] = self.ft
         self.setDesignMethod()
             
     def setDesignMethod(self):
@@ -153,19 +153,19 @@ class SelectFilter(QtGui.QWidget):
         """
         self.dmIdx = self.comboDesignMethod.currentIndex()
         self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
-        fb.gD['selFilter']['dm'] = self.dm
+        fb.fil[0]['dm'] = self.dm
 
         # Check whether new design method also provides the old filter order 
         # method. If yes, don't change it, else set first available 
         # filter method
-        if fb.gD['selFilter']['fo'] not in \
+        if fb.fil[0]['fo'] not in \
                         fb.gD['filterTree'][self.rt][self.ft][self.dm].keys():
-            fb.gD['selFilter'].update({'fo':{}})
-            fb.gD['selFilter']['fo'] \
+            fb.fil[0].update({'fo':{}})
+            fb.fil[0]['fo'] \
                 = fb.gD['filterTree'][self.rt][self.ft][self.dm].keys()[0]
         if self.DEBUG:
             print("=== InputFilter.setDesignMethod ===")
-            print("selFilter:", fb.gD['selFilter'])
+            print("selFilter:", fb.fil[0])
             print("filterTree[dm] = ", fb.gD['filterTree'][self.rt][self.ft]\
                                                             [self.dm])
             print("filterTree[dm].keys() = ", fb.gD['filterTree'][self.rt][self.ft]\

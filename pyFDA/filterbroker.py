@@ -14,7 +14,7 @@ from __future__ import print_function, division, unicode_literals
 # importing filterbroker runs the module once, defining all globals and variables
 global gD, sF
 
-sF = [None] * 10
+fil = [None] * 10
 gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
@@ -86,7 +86,7 @@ gD['filterTree'] = {
 # automatically overwritten 
 #-------------------------------------- 
 # Current filter selection, parameters and specifications              
-gD['selFilter'] = {'inst':'filter instance',
+fil[0] = {'inst':'filter instance',
                 'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
                 'N':10, 'f_S':1,
                 'A_PB':1., 'A_PB2': 1., 'F_PB':0.1, 'F_PB2':0.4,
@@ -100,19 +100,19 @@ gD['selFilter'] = {'inst':'filter instance',
                 'zpk' : ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                          [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1) }
                          
-sF[0] = {'inst':'filter instance',
-                'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
-                'N':10, 'f_S':1,
-                'A_PB':1., 'A_PB2': 1., 'F_PB':0.1, 'F_PB2':0.4,
-                'A_SB':60., 'A_SB2': 60., 'F_SB':0.2, 'F_SB2':0.3,
-                'W_PB':1., 'W_PB2':1., 'W_SB':1., 'W_SB2':1.,
-                'coeffs':([1,1,1],[3,0,2]), 
-                'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
-                       [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
-                'plt_fLabel':r'$f$ in Hz $\rightarrow$',
-                'coeffs':([1,0,1],[3,0,2]),
-                'zpk' : ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
-                         [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1) }
+#sF[0] = {'inst':'filter instance',
+#                'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
+#                'N':10, 'f_S':1,
+#                'A_PB':1., 'A_PB2': 1., 'F_PB':0.1, 'F_PB2':0.4,
+#                'A_SB':60., 'A_SB2': 60., 'F_SB':0.2, 'F_SB2':0.3,
+#                'W_PB':1., 'W_PB2':1., 'W_SB':1., 'W_SB2':1.,
+#                'coeffs':([1,1,1],[3,0,2]), 
+#                'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+#                       [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
+#                'plt_fLabel':r'$f$ in Hz $\rightarrow$',
+#                'coeffs':([1,0,1],[3,0,2]),
+#                'zpk' : ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
+#                         [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1) }
 
 #gD['coeffs'] = ([1,1,1],[3,0,2])
 #gD['zpk'] = ([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],

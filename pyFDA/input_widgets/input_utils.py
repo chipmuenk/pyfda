@@ -53,7 +53,7 @@ class InputUtils(QtGui.QWidget):
                 if (self.labels[i]!=newLabels[i]):     
                     self.qlabel[i].setText(newLabels[i])
                     self.labels[i] = newLabels[i]
-                    self.qlineedit[i].setText(str(fb.gD['selFilter'][newLabels[i]]))
+                    self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                             
     def delEntry(self,i):
         """
@@ -73,7 +73,7 @@ class InputUtils(QtGui.QWidget):
         """
         self.qlabel.append(QtGui.QLabel(self))
         self.labels.append(newLabel)
-        self.qlineedit.append(QtGui.QLineEdit(str(fb.gD['selFilter'][newLabel])))
+        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
         self.qlabel[i].setText(newLabel)
         self.layout.addWidget(self.qlabel[i],(i+1),0)
         self.layout.addWidget(self.qlineedit[i],(i+1),1)
@@ -84,13 +84,13 @@ class InputUtils(QtGui.QWidget):
         settings etc.
         """
         for i in range(len(self.labels)):
-            self.qlineedit[i].setText(str(fb.gD['selFilter'][self.labels[i]]))
+            self.qlineedit[i].setText(str(fb.fil[0][self.labels[i]]))
 
     def saveEntries(self):
         """
-        Save specification entries in dict fb.gD['selFilter']
+        Save specification entries in dict fb.fil[0]
         """
         for i in range(len(self.labels)):
-            fb.gD['selFilter'].update(
+            fb.fil[0].update(
                             {self.labels[i]:float(self.qlineedit[i].text())})
     
