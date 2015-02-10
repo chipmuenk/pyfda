@@ -1,2 +1,0 @@
-cheby1
-cheby2
