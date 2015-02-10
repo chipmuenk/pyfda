@@ -9,7 +9,7 @@ Tab-Widget for exporting / importing and saving / loading data
 from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
-import scipy.io
+#import scipy.io
 import numpy as np
 
 # import filterbroker from one level above if this file is run as __main__
@@ -61,7 +61,14 @@ class InputInfo(QtGui.QWidget):
 #        self.tableCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
 #        self.tableCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
         self.tableCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
+        self.butAddRow = QtGui.QPushButton()
+        self.butAddRow.setToolTip("Add row to coefficient table.")
+        self.butAddRow.setText("Add")
         
+        self.butDelRow = QtGui.QPushButton()
+        self.butDelRow.setToolTip("Delete row from coefficient table.")
+        self.butDelRow.setText("Delete")
+
         
         self.labFiltInfo = QtGui.QLabel()
         self.labFiltInfo.setWordWrap(True)
@@ -88,11 +95,17 @@ class InputInfo(QtGui.QWidget):
         self.chkLayout.addWidget(self.chkPoleZeroList)
         self.chkLayout.addWidget(self.labPoleZeroList)
         self.chkLayout.addStretch(10)
+        
+        self.butCoeffLayout = QtGui.QHBoxLayout()
+        self.butCoeffLayout.addWidget(self.butAddRow)
+        self.butCoeffLayout.addWidget(self.butDelRow)
+        self.butCoeffLayout.addStretch()
 
 
         vbox = QtGui.QVBoxLayout()
         vbox.addLayout(self.chkLayout)
         vbox.addWidget(self.tableCoeff)
+        vbox.addLayout(self.butCoeffLayout)
         vbox.addWidget(self.filtInfoFrame)
         vbox.addStretch(10)
         self.setLayout(vbox)
@@ -107,7 +120,10 @@ class InputInfo(QtGui.QWidget):
         Display info from filter design file
         """
         self.filtInfoFrame.setVisible(self.chkFilterInfo.isChecked())
-        self.labFiltInfo.setText(fb.gD["selFilter"]["inst"].info)
+        try:
+            self.labFiltInfo.setText(fb.fil[0]["inst"].info)
+        except AttributeError as e:
+            print(e)
     
         
     def saveCoeffs(self):
@@ -115,30 +131,44 @@ class InputInfo(QtGui.QWidget):
         num_rows, num_cols = self.tableCoeff.rowCount(),\
                                         self.tableCoeff.columnCount()
         print(num_rows, num_cols)
-        for col in range(num_cols):
-            rows = []
+        if num_cols > 1:
+            for col in range(num_cols):
+                rows = []
+                for row in range(num_rows):
+                    item = self.tableCoeff.item(row, col)
+                    rows.append(float(item.text()) if item else 0.)
+                coeffs.append(rows)
+        else:
+            col = 0
             for row in range(num_rows):
                 item = self.tableCoeff.item(row, col)
-                rows.append(float(item.text()) if item else '')
-            coeffs.append(rows)
+                coeffs.append(float(item.text()) if item else 0.)            
         
-        fb.gD["selFilter"]["coeffs"] = coeffs
+        fb.fil[0]['coeffs'] = coeffs
         print ("coeffs updated!")
         
     def showCoeffs(self):
             
-        coeffs = fb.gD["selFilter"]["coeffs"]
+        coeffs = fb.fil[0]["coeffs"]
         self.tableCoeff.setVisible(self.chkCoeffList.isChecked())
+
         self.tableCoeff.clear()
         self.tableCoeff.setRowCount(max(np.shape(coeffs)))
 
 
         if self.DEBUG:
             print("=====================\nInputInfo.showCoeffs")
-            print(coeffs)
+            print("Coeffs:\n",coeffs)
             print ("shape", np.shape(coeffs))
             print ("len", len(coeffs))
             print("ndim", np.ndim(coeffs))
+            
+#        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
+#            self.bb = fb.fil[0]['coeffs']
+#            self.aa = 1.
+#        else: # IIR
+#            self.bb = fb.fil[0]['coeffs'][0]
+#            self.aa = fb.fil[0]['coeffs'][1]
 
         if np.ndim(coeffs) == 1:
             print("FIR!")
@@ -153,7 +183,7 @@ class InputInfo(QtGui.QWidget):
             self.tableCoeff.setColumnCount(2)
             self.tableCoeff.setHorizontalHeaderLabels(["b", "a"])
             for i in range(np.shape(coeffs)[1]):
-#                print(i, fb.gD["selFilter"]["coeffs"][0][i])
+#                print(i, fb.fil[0]["coeffs"][0][i])
 #                item = QtGui.QTableWidgetItem(coeffs[0][i])
 #                bCoeffs.append(str(coeffs[0][i]))
 #                aCoeffs.append(str(coeffs[1][i]))
