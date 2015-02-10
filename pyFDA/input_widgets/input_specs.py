@@ -148,7 +148,7 @@ class InputSpecs(QtGui.QWidget):
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.fo.update()
+        self.fo.updateEntries()
         self.fspec.setEntries(newLabels = self.freqParams) # update frequency spec labels
         self.aspec.setVisible(self.ampParams != [])
         self.aspec.setEnabled("aspec" in myEnbWdg)
