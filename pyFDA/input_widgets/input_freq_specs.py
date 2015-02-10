@@ -77,6 +77,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.butSort = QtGui.QPushButton(self)
         self.butSort.setText("Sort")
         self.butSort.setToolTip("Sort frequencies in ascending order.")       
+
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.comboUnits)
         self.hbox.addWidget(self.butSort)
@@ -123,7 +124,7 @@ class InputFreqSpecs(QtGui.QWidget):
         only if the event isn't swallowed by a child widget!!
         """
         print ("InputFreqs Mouse Press")
-        super(InputFreqs, self).mousePressEvent(event)        
+        super(InputFreqSpecs, self).mousePressEvent(event)        
 
 #-------------------------------------------------------------        
     def freqUnits(self):
