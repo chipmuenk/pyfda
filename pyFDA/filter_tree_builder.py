@@ -234,13 +234,6 @@ class FilterTreeBuilder(object):
         # with individual info under e.g. {..., 'LP':{'man':{...}, 'min':{...}} 
 # TODO: calculate cut set first?
                 for minman in myFilter.com:# and filterTree[rt][ft][dm]): cut set?
-                    if self.DEBUG:
-                        print("myFilter.com[com]",myFilter.com[minman])
-                        try:
-                            print("myFilter.com[minman]['PAR']",
-                                  myFilter.com[minman]['par'] )
-                        except KeyError:
-                            pass
                     # add info only when 'man' / 'min' exists in filterTree
                     if minman in filterTree[rt][ft][dm]: 
                         for i in myFilter.com[minman]:
@@ -254,9 +247,12 @@ class FilterTreeBuilder(object):
                                 filterTree[rt][ft][dm][minman].update(\
                                                 {i:myFilter.com[minman][i]})
 
-                            print(dm, minman, i)
-                            print("filterTree[minman][i]:",filterTree[rt][ft][dm][minman][i])
-                            print("myFilter.com[minman][i]",
+                            if self.DEBUG:
+                                print('--- FilterFileReader.buildFilterTree ---')
+                                print(dm, minman, i)
+                                print("filterTree[minman][i]:",
+                                      filterTree[rt][ft][dm][minman][i])
+                                print("myFilter.com[minman][i]",
                                   myFilter.com[minman][i] )
                             
 
@@ -270,8 +266,8 @@ if __name__ == "__main__":
 #    import filterbroker as fb
     print("===== Initialize FilterReader ====")
     
-    initFileName = "Init.txt"
-    subDirectory = "filterDesign"
+    initFileName = "init.txt"
+    subDirectory = "filter_design"
     commentChar  = '#'  
     Debug = True
     
