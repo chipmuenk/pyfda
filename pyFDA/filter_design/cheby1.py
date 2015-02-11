@@ -97,13 +97,11 @@ class cheby1(object):
         
         if self.F_PBC is not None: # has corner frequency been calculated?
             specs['N'] = self.N # yes, update filterbroker
-            print("====== cheby1.save ========\nF_PBC = ", self.F_PBC, type(self.F_PBC))
-            print("F_PBC vor", self.F_PBC, type(self.F_PBC))
+#            print("====== cheby1.save ========\nF_PBC = ", self.F_PBC, type(self.F_PBC))
+#            print("F_PBC vor", self.F_PBC, type(self.F_PBC))
             if np.isscalar(self.F_PBC): # HP or LP - a single corner frequency
-                print("skalar!")
                 specs['F_PB'] = self.F_PBC / 2.
             else: # BP or BS - two corner frequencies
-                print("Tuple!")
                 specs['F_PB'] = self.F_PBC[0] / 2.
                 specs['F_PB2'] = self.F_PBC[1] / 2.
 

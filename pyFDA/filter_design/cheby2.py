@@ -97,18 +97,11 @@ class cheby2(object):
         
         if self.F_SBC is not None: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N # yes, update filterbroker
-            print("====== cheby1.save ========\nF_SBC = ", self.F_SBC, type(self.F_SBC))
-            print("F_SBC vor", self.F_SBC, type(self.F_SBC))
             if np.isscalar(self.F_SBC): # HP or LP - a single corner frequency
-                print("skalar!")
                 specs['F_SB'] = self.F_SBC / 2.
             else: # BP or BS - two corner frequencies
-                print("Tuple!")
                 specs['F_SB'] = self.F_SBC[0] / 2.
                 specs['F_SB2'] = self.F_SBC[1] / 2.
-
-            print("F_SBC nach", specs['F_SB'], type(specs['F_SB']))
-
 
     def LPman(self, specs):
         self.get_params(specs)
