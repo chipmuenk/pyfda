@@ -8,6 +8,7 @@
 
 cheby1.py
 equiripple.py
+firwin.py
 cheby2.py
 
 # ======== Testing ==========
