@@ -23,6 +23,7 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb
+from filter_tree_builder import FilterTreeBuilder
 
 class SelectFilter(QtGui.QWidget):
     """
@@ -35,6 +36,10 @@ class SelectFilter(QtGui.QWidget):
     def __init__(self, DEBUG = True):
         super(SelectFilter, self).__init__()
         self.DEBUG = DEBUG
+        self.ftb = FilterTreeBuilder('init.txt', 'filter_design', 
+                                    commentChar = '#', DEBUG = DEBUG) #                                             
+        
+        
         self.initUI()
         
         self.setResponseType()
@@ -69,25 +74,30 @@ class SelectFilter(QtGui.QWidget):
         self.comboResponseType.setCurrentIndex(0) # set initial index
 
 
-
         """
         LAYOUT      
         """
-        # see Summerfield p. 278       
-        hLayout = QtGui.QHBoxLayout()
+        # see Summerfield p. 278
+        self.hLayout2 = QtGui.QHBoxLayout() # for additional subwidgets
+        self.dynWdgFrame = QtGui.QFrame() # collect subwidgets in frame (no border)
+        self.dynWdgFrame.setLayout(self.hLayout2)
+        
+        hLayout = QtGui.QHBoxLayout() # container for standard subwidgets
         hLayout.addWidget(self.comboResponseType)# QtCore.Qt.AlignLeft)
         hLayout.addWidget(self.comboFilterType)
         hLayout.addWidget(self.comboDesignMethod)
+
+        # stack standard + dynamic subwidgets vertically:       
+        vLayout = QtGui.QVBoxLayout()
+        vLayout.addLayout(hLayout)
+        vLayout.addWidget(self.dynWdgFrame)
         
-        self.vLayout = QtGui.QVBoxLayout(self) 
-        self.vLayout.addLayout(hLayout)
-        
-        sfFrame = QtGui.QFrame()
-        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        sfFrame.setLayout(self.vLayout)
+        self.sfFrame = QtGui.QFrame()
+        self.sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        self.sfFrame.setLayout(vLayout)
         
         mainLayout = QtGui.QHBoxLayout()
-        mainLayout.addWidget(sfFrame)
+        mainLayout.addWidget(self.sfFrame)
         self.setLayout(mainLayout)
 #        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
@@ -100,19 +110,6 @@ class SelectFilter(QtGui.QWidget):
         self.comboFilterType.activated.connect(self.setFilterType) #'IIR'
         self.comboDesignMethod.activated.connect(self.setDesignMethod) #'cheby1'
 
-    def updateLayout(self):
-        """
-        Dynamically add and remove subwidgets as needed
-        """
-        #if ... :
-        print(fb.fil[0]['inst'])
-        self.xxx = QtGui.QComboBox(self)
-        self.vLayout.addWidget(self.xxx)
-        
-        
-        self.vLayout.removeWidget(self.xxx)
-        self.xxx.deleteLater()
-        del self.xxx
 
     def setResponseType(self):
         """
@@ -154,15 +151,23 @@ class SelectFilter(QtGui.QWidget):
         self.dmIdx = self.comboDesignMethod.currentIndex()
         self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
         fb.fil[0]['dm'] = self.dm
+        
+        try: # has a filter object been instantiated yet?
+            if fb.fil[0]['dm'] not in fb.filObj.name:
+                fb.filObj = self.ftb.objectWizzard(fb.fil[0]['dm'])
+        except AttributeError as e: # No, create a filter instance
+            print (e)
+            fb.filObj = self.ftb.objectWizzard(fb.fil[0]['dm'])
 
         # Check whether new design method also provides the old filter order 
         # method. If yes, don't change it, else set first available 
-        # filter method
+        # filter order method
         if fb.fil[0]['fo'] not in \
                         fb.gD['filterTree'][self.rt][self.ft][self.dm].keys():
             fb.fil[0].update({'fo':{}})
             fb.fil[0]['fo'] \
                 = fb.gD['filterTree'][self.rt][self.ft][self.dm].keys()[0]
+
         if self.DEBUG:
             print("=== InputFilter.setDesignMethod ===")
             print("selFilter:", fb.fil[0])
@@ -172,10 +177,40 @@ class SelectFilter(QtGui.QWidget):
                                                             [self.dm].keys())
                                                             
                 
-        self.updateLayout() # check for new subwidgets and update if needed
+        self.updateWidgets() # check for new subwidgets and update if needed
 
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]        
+    def updateWidgets(self):
+        """
+        Delete dynamically created subwidgets and create new ones, depending
+        on requirements of filter design algorithm
+        """
+        self._delWidgets()
+        try:              
+            if 'sf' in fb.filObj.wdg:
+                a = getattr(fb.filObj, fb.filObj.wdg['sf'])
+                self.hLayout2.addWidget(a)
+                self.hLayout2.addStretch()
+                self.dynWdgFrame.setVisible(a != None)
+
+        except AttributeError as e:
+            print("sf.updateWidgets:",e)
+            self.dynWdgFrame.setVisible(False)
+            
+    def _delWidgets(self):
+        """
+        Delete dynamically created subwidgets
+        """
+        widgetList = self.dynWdgFrame.findChildren(
+                                            (QtGui.QComboBox,QtGui.QLineEdit))
+#       widgetListNames = [w.objectName() for w in widgetList]
+
+        for w in widgetList:
+            self.hLayout2.removeWidget(w)   # remove widget from layout
+            w.deleteLater()             # tell Qt to delete object when the 
+                                        # method has completed
+            del w                       # not really needed?
 
 #------------------------------------------------------------------------------ 
     

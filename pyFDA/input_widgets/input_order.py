@@ -26,8 +26,10 @@ class InputOrder(QtGui.QFrame):
     
     def __init__(self, DEBUG = False):
         super(InputOrder, self).__init__()
-        self.DEBUG = DEBUG        
+        self.DEBUG = DEBUG  
+        self.dmLast = '' # design method from last call
         self.initUI()
+
 
         
     def initUI(self):
@@ -41,7 +43,7 @@ class InputOrder(QtGui.QFrame):
         bfont.setWeight(75)
         ifont.setItalic(True)
         
-        # Print subwidget title
+        # Print Widget title
         self.titleLabel = QtGui.QLabel(title)
         self.titleLabel.setFont(bfont)
 
@@ -55,21 +57,28 @@ class InputOrder(QtGui.QFrame):
 
         #----------------------------------------------------------------------
         # Construct widget layout
-        hbox = QtGui.QHBoxLayout()
-        hbox.addWidget(self.chkMin)
-        hbox.addItem(self.spacer)
-        hbox.addWidget(self.txtLabel)
-        hbox.addWidget(self.txtManual)
-       
-        foFrame = QtGui.QFrame()
-        foFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        foFrame.setLayout(hbox)        
-        foFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        # ---------------------------------------------------------------------
+        #  Dynamically created subwidgets
+        self.hbox2 = QtGui.QHBoxLayout()        
+        self.dynWdgFrame = QtGui.QFrame()
+        self.dynWdgFrame.setLayout(self.hbox2)
+        
+        self.hbox = QtGui.QHBoxLayout()
+        self.hbox.addWidget(self.chkMin)
+        self.hbox.addItem(self.spacer)
+        self.hbox.addWidget(self.txtLabel)
+        self.hbox.addWidget(self.txtManual)
+        self.hbox.addWidget(self.dynWdgFrame)
+        
+        self.foFrame = QtGui.QFrame()
+        self.foFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        self.foFrame.setLayout(self.hbox)        
+        self.foFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
         
         mainLayout = QtGui.QVBoxLayout() # widget main layout
         mainLayout.addWidget(self.titleLabel)
-        mainLayout.addWidget(foFrame)
+        mainLayout.addWidget(self.foFrame)
         self.setLayout(mainLayout)
 #        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
@@ -98,12 +107,18 @@ class InputOrder(QtGui.QFrame):
             fo = foList[0] # use first list entry from filterTree
             fb.fil[0]['fo'] = fo # and update 'selFilter'
 
+        if self.DEBUG: print("fo[selFilter] =", fo)
+
+        if fb.fil[0]['dm'] != self.dmLast:
+            self.updateWidgets()
+            
         # Determine which subwidgets are __visible__
         self.txtLabel.setVisible('man' in foList)
         self.txtManual.setVisible('man' in foList)  
-        self.chkMin.setVisible('min' in foList)            
+        self.chkMin.setVisible('min' in foList)
 
-        if self.DEBUG: print("fo[selFilter] =", fo)   
+        # When design method has changed, delete subwidgets referenced from
+        # from previous filter design method and create new ones (if needed)
 
         # Determine which subwidgets are _enabled_
         if 'min' in foList:
@@ -123,7 +138,28 @@ class InputOrder(QtGui.QFrame):
 
         ordn = int(self.txtManual.text())
         fb.fil[0].update({'N' : ordn})
-   
+        self.dmLast = fb.fil[0]["dm"]
+        
+    def updateWidgets(self):
+        self._delWidgets()
+        try:              
+            if 'fo' in fb.filObj.wdg:
+                a = getattr(fb.filObj, fb.filObj.wdg['fo'])
+                self.hbox2.addWidget(a)
+                self.dynWdgFrame.setVisible(a != None)
+        except AttributeError as e: # no attribute 'wdg'
+            print("fo.updateWidgets:", e)
+            self.dynWdgFrame.setVisible(False)
+
+    def _delWidgets(self):
+        widgetList = self.dynWdgFrame.findChildren(
+                                            (QtGui.QComboBox,QtGui.QLineEdit))
+        for w in widgetList:
+            self.hbox2.removeWidget(w)   # remove widget from layout
+            w.deleteLater()             # tell Qt to delete object when the 
+                                        # method has completed
+            del w                       # not really needed?
+        
 #------------------------------------------------------------------------------        
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

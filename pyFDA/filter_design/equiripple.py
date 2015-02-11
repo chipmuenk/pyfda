@@ -14,6 +14,7 @@ from __future__ import print_function, division
 import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
+from PyQt4 import QtGui
 
 #import filterbroker as fb
 
@@ -76,6 +77,15 @@ class equiripple(object):
         self.info = ("Equiripple filter have a constant ripple in pass- and "\
         "stop band, the tolerance bands are fully used. ")
 
+        #----------------------------------------------------------------------
+        # Additional subwidgets
+        self.wdg = {'fo':'combo_equirip_alg'} 
+        #----------------------------------------------------------------------
+        # Combobox for selecting the algorithm to estimate minimum filter order
+        self.combo_equirip_alg = QtGui.QComboBox()
+        self.combo_equirip_alg.setObjectName('combo_firwin_alg')
+        self.combo_equirip_alg.addItems(['ichige','kaiser','herrmann'])
+
     def get_params(self, specs):
         """
         Translate parameters from the passed dictionary to instance
@@ -94,7 +104,7 @@ class equiripple(object):
         self.A_SB  = 10.**(-specs['A_SB']/20.)
         self.A_SB2 = 10.**(-specs['A_SB2']/20.)
 
-        self.alg = 'ichige' # algorithm for determining the minimum order
+        self.alg = str(self.combo_equirip_alg.currentText())
 
     def save(self, specs, arg):
         """ 
