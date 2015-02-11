@@ -121,7 +121,7 @@ class InputInfo(QtGui.QWidget):
         """
         self.filtInfoFrame.setVisible(self.chkFilterInfo.isChecked())
         try:
-            self.labFiltInfo.setText(fb.fil[0]["inst"].info)
+            self.labFiltInfo.setText(fb.filObj.info)
         except AttributeError as e:
             print(e)
     
