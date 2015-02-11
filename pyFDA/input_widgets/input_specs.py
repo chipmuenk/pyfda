@@ -17,7 +17,7 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb
-from filter_tree_builder import FilterTreeBuilder
+#from filter_tree_builder import FilterTreeBuilder
     
 import input_filter, input_order, input_amp_specs, input_freq_specs,\
     input_weight_specs
@@ -32,8 +32,8 @@ class InputSpecs(QtGui.QWidget):
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
         self.DEBUG = DEBUG  
-        self.ftb = FilterTreeBuilder('Init.txt', 'filter_design', 
-                                    commentChar = '#', DEBUG = DEBUG) #                                             
+#        self.ftb = FilterTreeBuilder('init.txt', 'filter_design', 
+#                                    commentChar = '#', DEBUG = DEBUG) #                                             
         self.initUI()
       
     def initUI(self): 
@@ -121,9 +121,15 @@ class InputSpecs(QtGui.QWidget):
         as well.
         """
         
-        # create filter object instance from design method (e.g. 'cheby1'):   
-        self.myFilter = self.ftb.objectWizzard(fb.fil[0]['dm'])
-        fb.fil[0]['inst'] = self.myFilter
+#        # create filter object instance from design method (e.g. 'cheby1'):   
+#        try: # has a filter object been instantiated yet?
+#            if fb.fil[0]['dm'] not in fb.filObj.name:
+#                self.myFilter = self.ftb.objectWizzard(fb.fil[0]['dm'])
+#                fb.filObj = self.myFilter
+#        except AttributeError as e: # No, create a filter instance
+#            print (e)
+#            self.myFilter = self.ftb.objectWizzard(fb.fil[0]['dm'])
+#            fb.filObj = self.myFilter            
 
         # Read freq / amp / weight labels for current filter design
         rt = fb.fil[0]['rt']
@@ -175,7 +181,7 @@ class InputSpecs(QtGui.QWidget):
         """
         Design Filter
         """
-        self.storeAll() # input widgets -> fb.fil[0] 
+        self.storeAll() # entries of input widgets -> fb.fil[0] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print('Specs:', fb.fil[0])#params)
@@ -183,9 +189,10 @@ class InputSpecs(QtGui.QWidget):
                   fb.fil[0]['rt']+fb.fil[0]['fo'])
 
         # Now construct the instance method from the response type (e.g.
-        # 'LP' -> cheby1.LP) and
+        # 'LP'+'man' -> cheby1.LPman) and
         # design the filter by passing current specs to the method:
-        getattr(self.myFilter, fb.fil[0]['rt'] +
+        # cheby1.LPman(fb.fil[0])
+        getattr(fb.filObj, fb.fil[0]['rt'] +
                                 fb.fil[0]['fo'])(fb.fil[0])
         # The filter design routines write coeffs etc. back to global filter dict
                                 
