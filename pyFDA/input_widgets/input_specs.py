@@ -121,15 +121,8 @@ class InputSpecs(QtGui.QWidget):
         as well.
         """
         
-#        # create filter object instance from design method (e.g. 'cheby1'):   
-#        try: # has a filter object been instantiated yet?
-#            if fb.fil[0]['dm'] not in fb.filObj.name:
-#                self.myFilter = self.ftb.objectWizzard(fb.fil[0]['dm'])
-#                fb.filObj = self.myFilter
-#        except AttributeError as e: # No, create a filter instance
-#            print (e)
-#            self.myFilter = self.ftb.objectWizzard(fb.fil[0]['dm'])
-#            fb.filObj = self.myFilter            
+        # filter object instance is created from design method 
+        # (e.g. 'cheby1', 'min') in input_filter.py  
 
         # Read freq / amp / weight labels for current filter design
         rt = fb.fil[0]['rt']
@@ -209,7 +202,7 @@ class InputSpecs(QtGui.QWidget):
             print("N = ",fb.fil[0]['N'])
         print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
      
-#        self.pltAll.update() is executed from pyFDA.py!
+#        self.pltAll.update() is executed from pyFDA.py via signal-slot conn.!
   
 #------------------------------------------------------------------------------ 
    

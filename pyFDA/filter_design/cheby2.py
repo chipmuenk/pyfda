@@ -11,7 +11,7 @@ Expected changes in scipy 0.16:
 https://github.com/scipy/scipy/pull/3717
 https://github.com/scipy/scipy/issues/2444
 """
-from __future__ import print_function, division
+from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import cheb2ord, zpk2tf, tf2zpk #  iirdesign, 
 import numpy as np
