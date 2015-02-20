@@ -39,7 +39,7 @@ class pyFDA(QtGui.QMainWindow):
 
         # Instantiate widget groups
         self.inputAll = input_all.InputAll() # input widgets
-        self.pltAll = plot_all.plotAll() # plot widgets 
+        self.pltAll = plot_all.PlotAll() # plot widgets 
 #        self.inputAll.setMaximumWidth(280)
 
         # ============== UI Layout =====================================
@@ -63,7 +63,7 @@ class pyFDA(QtGui.QMainWindow):
         
         # ============== Signals & Slots ================================
 #        self.butDesignFilt.clicked.connect(self.startDesignFilt)
-        self.inputAll.inputSpecs.butDesignFilt.clicked.connect(self.pltAll.update)
+        self.inputAll.inputSpecs.butDesignFilt.clicked.connect(self.pltAll.updatePlots)
 #        self.pltAll.pltHf.
         aboutAction.triggered.connect(self.aboutWindow)    
 

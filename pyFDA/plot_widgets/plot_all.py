@@ -19,7 +19,7 @@ if __name__ == "__main__": # relative import if this file is run as __main__
 import plot_hf, plot_phi
 
 
-class plotAll(QtGui.QWidget):
+class PlotAll(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
@@ -47,7 +47,7 @@ class plotAll(QtGui.QWidget):
         self.setLayout(vbox)
 
         
-    def update(self):
+    def updatePlots(self):
         """ Update and redraw all subplots with new coefficients"""
         self.pltHf.draw()
         self.pltPhi.draw()
@@ -62,7 +62,7 @@ class plotAll(QtGui.QWidget):
     
 def main():
     app = QtGui.QApplication(sys.argv)
-    form = plotAll()
+    form = PlotAll()
     form.show()
     app.exec_()
 

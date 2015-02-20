@@ -25,6 +25,9 @@ from plot_widgets import plot_all
 
 
 class InputSpecs(QtGui.QWidget):
+    """
+    Build widget for entering all filter specs
+    """
     
     def __init__(self, DEBUG = False):
         super(InputSpecs, self).__init__() 
@@ -82,7 +85,7 @@ class InputSpecs(QtGui.QWidget):
         self.aspec.setVisible(True)
         
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
-        self.pltAll = plot_all.plotAll() # instantiate tabbed plot widgets 
+        self.pltAll = plot_all.PlotAll() # instantiate tabbed plot widgets 
         """
         LAYOUT      
         """
@@ -172,9 +175,15 @@ class InputSpecs(QtGui.QWidget):
   
     def startDesignFilt(self):
         """
-        Design Filter
+        Start the actual filter design process: 
+        - store the entries of all input widgets in the global filter dict.
+        - call the design method, passing the whole dictionary as the 
+          argument: let the design method pick the needed specs
+        - update the input widgets in case weights, corner frequencies etc.
+          have been changed by the filter design method
+        - the plots are updated via signal-slot connection 
         """
-        self.storeAll() # entries of input widgets -> fb.fil[0] 
+        self.storeAll() # store entries of all input widgets -> fb.fil[0] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print('Specs:', fb.fil[0])#params)
@@ -183,11 +192,12 @@ class InputSpecs(QtGui.QWidget):
 
         # Now construct the instance method from the response type (e.g.
         # 'LP'+'man' -> cheby1.LPman) and
-        # design the filter by passing current specs to the method:
-        # cheby1.LPman(fb.fil[0])
+        # design the filter by passing current specs to the method, yielding 
+        # e.g. cheby1.LPman(fb.fil[0])
         getattr(fb.filObj, fb.fil[0]['rt'] +
                                 fb.fil[0]['fo'])(fb.fil[0])
-        # The filter design routines write coeffs etc. back to global filter dict
+        # The filter design routines write coeffs, poles/zeros etc. back to 
+        # the global filter dict
                                 
         # Update filter order. weights and freqs in case they have been changed
         self.fo.updateEntries()
