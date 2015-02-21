@@ -2,7 +2,8 @@ pyFDA
 ======
 ## Python Filter Design Analysis Tool
 
-![Screenshot](https://github.com/chipmuenk/pyFDA/tree/master/images/pyFDA_screenshot.png)
+![Screenshot](https://github.com/chipmuenk/pyFDA/blob/master/images/pyFDA_screenshot.PNG)
+
 
 The goal of this project is to create a GUI based tool to analyse and design discrete time filters implemented in Python and Qt. The following goals of this FOSS project have been reached or will be in the near future:
 
