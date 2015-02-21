@@ -37,18 +37,18 @@ class InputAll(QtGui.QWidget):
         
     def initUI(self):
         """ Initialize UI with tabbed subplots """
-        tab_widget = QtGui.QTabWidget()
+        tabWidget = QtGui.QTabWidget()
 #        tab_widget.addTab(self.inputParams, 'Params')
-        tab_widget.addTab(self.inputSpecs, 'Specs')
-        tab_widget.addTab(self.inputFiles, 'Files')
-        tab_widget.addTab(self.inputInfo, 'Info')
+        tabWidget.addTab(self.inputSpecs, 'Specs')
+        tabWidget.addTab(self.inputFiles, 'Files')
+        tabWidget.addTab(self.inputInfo, 'Info')
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(tab_widget)
+        layVMain = QtGui.QVBoxLayout()
+        layVMain.addWidget(tabWidget)
 #        
-        self.setLayout(vbox)
-#        vbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
-        tab_widget.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        self.setLayout(layVMain)
+#        layVMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+        tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Expanding)
 
         

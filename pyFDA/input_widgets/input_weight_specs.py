@@ -37,8 +37,8 @@ class InputWeightSpecs(QtGui.QWidget):
         self.initUI()     
         
     def initUI(self): 
-        self.WVLayout = QtGui.QVBoxLayout() # Widget vertical layout  
-        self.layout   = QtGui.QGridLayout() # sublayout for spec fields
+        self.layVMain = QtGui.QVBoxLayout() # Widget vertical layout  
+        self.layGSpecWdg   = QtGui.QGridLayout() # sublayout for spec fields
         
         title = "Weight Specifications"    
         bfont = QtGui.QFont()
@@ -48,11 +48,12 @@ class InputWeightSpecs(QtGui.QWidget):
         self.lblTitle.setText(str(title))
         self.lblTitle.setFont(bfont)
         self.lblTitle.setWordWrap(True)
+        self.layVMain.addWidget(self.lblTitle)
+        
         self.butReset = QtGui.QPushButton("Reset", self)
         self.butReset.setToolTip("Reset weights to 1")
-        self.WVLayout.addWidget(self.lblTitle)
 
-        self.layout.addWidget(self.butReset, 1, 1) # span two columns
+        self.layGSpecWdg.addWidget(self.butReset, 1, 1) # span two columns
 
         # - Build a list from all entries in the specs dictionary starting 
         #   with "W" (= weight specifications of the current filter)
@@ -60,14 +61,14 @@ class InputWeightSpecs(QtGui.QWidget):
         newLabels = [l for l in self.specs if l[0] == 'W']
         self.setEntries(newLabels = newLabels)
        
-        sfFrame = QtGui.QFrame()
-        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        sfFrame.setLayout(self.layout)
+        frmMain = QtGui.QFrame()
+        frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        frmMain.setLayout(self.layGSpecWdg)
         
-        self.WVLayout.addWidget(sfFrame)
-#        self.WVLayout.addLayout(self.layout)
+        self.layVMain.addWidget(frmMain)
+#        self.layVMain.addLayout(self.layGSpecWdg)
 
-        self.setLayout(self.WVLayout)
+        self.setLayout(self.layVMain)
 
         # SIGNALS & SLOTS
         self.butReset.clicked.connect(self._resetWeights)
@@ -112,8 +113,8 @@ class InputWeightSpecs(QtGui.QWidget):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit)
         """
-        self.layout.removeWidget(self.qlabels[i])
-        self.layout.removeWidget(self.qlineedit[i])
+        self.layGSpecWdg.removeWidget(self.qlabels[i])
+        self.layGSpecWdg.removeWidget(self.qlineedit[i])
 
         self.qlabels[i].deleteLater()
         del self.qlabels[i]
@@ -132,8 +133,8 @@ class InputWeightSpecs(QtGui.QWidget):
         self.qlineedit[i].editingFinished.connect(self.storeEntries)
         self.qlineedit[i].setObjectName(newLabel) # update ID
 
-        self.layout.addWidget(self.qlabels[i],(i+2),0)
-        self.layout.addWidget(self.qlineedit[i],(i+2),1)
+        self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
+        self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
         
     def _resetWeights(self):
         for i in range(len(self.qlineedit)):
