@@ -2,11 +2,7 @@
 """
 Created on Mon Nov 18 13:36:39 2013
 
-xxx
-
 @author: Julia Beike, Christian Münker
-Created on 18.11.2013
-Updated on Thur Dec 11 2014
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
@@ -27,8 +23,7 @@ class InputWeightSpecs(QtGui.QWidget):
      
     def __init__(self, specs, DEBUG = True):
         """
-        Initialize
-        specs: A dictionary containing all the specs
+        Initialize; specs is a dictionary containing _all_ the filter specs
         """
         
         super(InputWeightSpecs, self).__init__()   
@@ -49,13 +44,13 @@ class InputWeightSpecs(QtGui.QWidget):
         bfont = QtGui.QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        self.qtitle = QtGui.QLabel(self) # field for widget title
-        self.qtitle.setText(str(title))
-        self.qtitle.setFont(bfont)
-        self.qtitle.setWordWrap(True)
+        self.lblTitle = QtGui.QLabel(self) # field for widget title
+        self.lblTitle.setText(str(title))
+        self.lblTitle.setFont(bfont)
+        self.lblTitle.setWordWrap(True)
         self.butReset = QtGui.QPushButton("Reset", self)
         self.butReset.setToolTip("Reset weights to 1")
-        self.WVLayout.addWidget(self.qtitle)
+        self.WVLayout.addWidget(self.lblTitle)
 
         self.layout.addWidget(self.butReset, 1, 1) # span two columns
 
@@ -80,7 +75,7 @@ class InputWeightSpecs(QtGui.QWidget):
 #-------------------------------------------------------------        
     def rtLabel(self, label):
         """
-        Rich text labels: Format labels with HTML tags, replacing '_' by 
+        Rich text label: Format label with HTML tags, replacing '_' by 
         HTML subscript tags
         """
         #"<b><i>{0}</i></b>".format(newLabels[i])) # update label

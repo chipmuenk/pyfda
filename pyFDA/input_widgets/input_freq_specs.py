@@ -2,10 +2,7 @@
 """
 Created on Mon Nov 18 13:36:39 2013
 
-input_freqs.py
-
 @author: Christian Münker
-Created on 23.1.2015
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
@@ -26,9 +23,7 @@ class InputFreqSpecs(QtGui.QWidget):
     def __init__(self, specs, DEBUG = True):
         
         """
-        Initialize
-        specs: A dictionary containing all the specs
-        labels: Names of the frequency spec labels
+        Initialize; specs is a dictionary containing _all_ the filter specs
         """
         super(InputFreqSpecs, self).__init__()   
         self.DEBUG = DEBUG
@@ -47,48 +42,48 @@ class InputFreqSpecs(QtGui.QWidget):
         units = ['Normalized to f_S', 'Normalized to f_S/2', 
                        'Hz', 'kHz', 'MHz', 'GHz']
         
-        self.idxOld = -1 # index of comboUnits before last change
+        self.idxOld = -1 # index of cmbUnits before last change
 
         bfont = QtGui.QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        self.qtitle = QtGui.QLabel(self) # field for widget title
-        self.qtitle.setText(str(title))
-        self.qtitle.setFont(bfont)
-        self.qtitle.setWordWrap(True)
-        self.WVLayout.addWidget(self.qtitle)    
+        self.lblTitle = QtGui.QLabel(self) # field for widget title
+        self.lblTitle.setText(str(title))
+        self.lblTitle.setFont(bfont)
+        self.lblTitle.setWordWrap(True)
+        self.WVLayout.addWidget(self.lblTitle)    
 
-        self.labelUnits=QtGui.QLabel(self)
-        self.labelUnits.setText("Units")
+        self.lblUnits=QtGui.QLabel(self)
+        self.lblUnits.setText("Unit:")
         
         self.f_S = self.specs["f_S"]            
         self.editF_S = QtGui.QLineEdit()
         self.editF_S.setText(str(self.f_S))
         self.editF_S.setObjectName("f_S")
 
-        self.labelF_S = QtGui.QLabel(self)
-        self.labelF_S.setText(self.rtLabel("f_S"))
+        self.lblF_S = QtGui.QLabel(self)
+        self.lblF_S.setText(self.rtLabel("f_S"))
 
-        self.comboUnits = QtGui.QComboBox(self)
-        self.comboUnits.setObjectName("comboUnits")
-        self.comboUnits.addItems(units)
-        self.comboUnits.setCurrentIndex(0)
+        self.cmbUnits = QtGui.QComboBox(self)
+        self.cmbUnits.setObjectName("cmbUnits")
+        self.cmbUnits.addItems(units)
+        self.cmbUnits.setCurrentIndex(0)
         
         self.butSort = QtGui.QPushButton(self)
         self.butSort.setText("Sort")
         self.butSort.setToolTip("Sort frequencies in ascending order.")       
 
         self.hbox = QtGui.QHBoxLayout()
-        self.hbox.addWidget(self.comboUnits)
+        self.hbox.addWidget(self.cmbUnits)
         self.hbox.addWidget(self.butSort)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for setting f_S, the units and the actual frequency specs:
         self.layout = QtGui.QGridLayout() # sublayout for spec fields
         # addWidget(widget,row,col,rowSpan=1, colSpan=1, QtCore.Qt.Alignxxx)
-        self.layout.addWidget(self.labelUnits,0,0)
+        self.layout.addWidget(self.lblUnits,0,0)
         self.layout.addLayout(self.hbox,0,1)
-        self.layout.addWidget(self.labelF_S,1,0)
+        self.layout.addWidget(self.lblF_S,1,0)
         self.layout.addWidget(self.editF_S,1,1)
 
         # - Build a list from all entries in the specs dictionary starting 
@@ -112,7 +107,7 @@ class InputFreqSpecs(QtGui.QWidget):
         # SIGNALS & SLOTS
         # Every time a field is edited, call self.freqUnits - the signal is
         #   constructed in _addEntry
-        self.comboUnits.currentIndexChanged.connect(self.freqUnits)
+        self.cmbUnits.currentIndexChanged.connect(self.freqUnits)
         self.editF_S.editingFinished.connect(self.freqUnits)
         self.butSort.clicked.connect(self._sortEntries)
         
@@ -122,6 +117,7 @@ class InputFreqSpecs(QtGui.QWidget):
         """
         Do something every time a mouse event happens inside this widget - but 
         only if the event isn't swallowed by a child widget!!
+        (not needed or used at the moment)
         """
         print ("InputFreqs Mouse Press")
         super(InputFreqSpecs, self).mousePressEvent(event)        
@@ -136,14 +132,14 @@ class InputFreqSpecs(QtGui.QWidget):
 
         freqUnits is called during init and every time a widget sends a signal.
         """        
-        idx = self.comboUnits.currentIndex()  # read index of units combobox
+        idx = self.cmbUnits.currentIndex()  # read index of units combobox
         self.f_S = float(self.editF_S.text()) # read sampling frequency
 
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName() 
             print(senderName + ' was triggered\n================')
         else: # no sender, freqUnits has been called from initUI
-            senderName = "comboUnits"
+            senderName = "cmbUnits"
 
         if senderName == "f_S" and self.f_S != 0:
             # f_S has been edited -> change display of frequency entries and
@@ -153,10 +149,10 @@ class InputFreqSpecs(QtGui.QWidget):
                 f = self.specs[self.qlineedit[i].objectName()]
                 self.qlineedit[i].setText(str(f * self.f_S))
 
-        elif senderName == "comboUnits" and idx != self.idxOld:
+        elif senderName == "cmbUnits" and idx != self.idxOld:
             # combo unit has changed -> change display of frequency entries
             self.editF_S.setVisible(idx > 1)  # only visible when 
-            self.labelF_S.setVisible(idx > 1) # not normalized
+            self.lblF_S.setVisible(idx > 1) # not normalized
             
             if self.idxOld == 1: # was: normalized to f_S/2,
                 # remove scaling factor 2 from spec entries
@@ -180,7 +176,7 @@ class InputFreqSpecs(QtGui.QWidget):
                     f = self.specs[self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f * self.f_S))
             else: # Hz, kHz, ...
-                unit = str(self.comboUnits.itemText(idx))
+                unit = str(self.cmbUnits.itemText(idx))
                 fLabel = r"$f$ in " + unit + r"$\; \rightarrow$"
 
             self.specs.update({"plt_fLabel":fLabel}) # label for freq. axis
@@ -197,7 +193,7 @@ class InputFreqSpecs(QtGui.QWidget):
     
     def rtLabel(self, label):
         """
-        Rich text labels: Format labels with HTML tags, replacing '_' by 
+        Rich text label: Format label with HTML tags, replacing '_' by 
         HTML subscript tags
         """
         #"<b><i>{0}</i></b>".format(newLabels[i])) # update label

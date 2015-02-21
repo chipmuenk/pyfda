@@ -2,11 +2,7 @@
 """
 Created on Mon Nov 18 13:36:39 2013
 
-xxx
-
 @author: Julia Beike, Christian Münker
-Created on 18.11.2013
-Updated on Thur Dec 11 2014
 """
 
 # TODO: Check specs IIR / FIR A_PB <-> delta_PB
@@ -24,13 +20,14 @@ if __name__ == "__main__":
 
 
 class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget, 
-    
+    """
+    Build and update widget for entering the amplitude
+    specifications like A_sb, A_pb etc.
+    """
     def __init__(self, specs, DEBUG = True):
         
         """
-        Initialisierung
-        units: sind die Einheiten die in der Combobox stehen sollen
-        lab: Namen der Labels in einer Liste
+        Initialize; specs is a dictionary containing _all_ the filter specs
         """
         super(InputAmpSpecs, self).__init__()   
         self.DEBUG = DEBUG
@@ -54,28 +51,28 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         bfont = QtGui.QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        self.qtitle = QtGui.QLabel(self) # field for widget title
-        self.qtitle.setText(str(title))
-        self.qtitle.setFont(bfont)
-        self.qtitle.setWordWrap(True)
-        self.WVLayout.addWidget(self.qtitle)
+        self.lblTitle = QtGui.QLabel(self) # field for widget title
+        self.lblTitle.setText(str(title))
+        self.lblTitle.setFont(bfont)
+        self.lblTitle.setWordWrap(True)
+        self.WVLayout.addWidget(self.lblTitle)
 
-        self.labelUnits = QtGui.QLabel(self)
-        self.labelUnits.setText("Units")
+        self.lblUnits = QtGui.QLabel(self)
+        self.lblUnits.setText("Unit:")
 
-        self.comboUnitsA = QtGui.QComboBox(self)
-        self.comboUnitsA.addItems(units)
-        self.comboUnitsA.setObjectName("comboUnitsA")
-        self.comboUnitsA.setToolTip("Set unit for amplitude specifications:\n"
+        self.cmbUnitsA = QtGui.QComboBox(self)
+        self.cmbUnitsA.addItems(units)
+        self.cmbUnitsA.setObjectName("cmbUnitsA")
+        self.cmbUnitsA.setToolTip("Set unit for amplitude specifications:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
 
-        self.comboUnitsA.setCurrentIndex(0)
+        self.cmbUnitsA.setCurrentIndex(0)
 
         self.layout = QtGui.QGridLayout() # sublayout for spec fields
-        self.layout.addWidget(self.labelUnits,0,0)
-        self.layout.addWidget(self.comboUnitsA,0,1, QtCore.Qt.AlignLeft)
+        self.layout.addWidget(self.lblUnits,0,0)
+        self.layout.addWidget(self.cmbUnitsA,0,1, QtCore.Qt.AlignLeft)
 
-        #self.layout.addWidget(self.qtitle, 0, 0, 2, 1) # span two columns
+        #self.layout.addWidget(self.lblTitle, 0, 0, 2, 1) # span two columns
 
         # - Build a list from all entries in the specs dictionary starting 
         #   with "A" (= amplitude specifications of the current filter)
@@ -97,24 +94,25 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         # SIGNALS & SLOTS
         # Every time a field is edited, call self.freqUnits - the signal is
         #   constructed in _addEntry
-        self.comboUnitsA.currentIndexChanged.connect(self.ampUnits)
+        self.cmbUnitsA.currentIndexChanged.connect(self.ampUnits)
         
         self.ampUnits()
 
     def ampUnits(self):
         """
         Transform the amplitude spec input fields according to the Units 
-        setting.
+        setting. Spec entries are always stored in dB, only the displayed
+        values are adapted to the amplitude unit, not the dictionary!
         """
-        idx = self.comboUnitsA.currentIndex()  # read index of units combobox
+        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
 
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName() 
             print(senderName + ' was triggered\n================')
         else: # no sender, ampUnits has been called from initUI
-            senderName = "comboUnitsA"
+            senderName = "cmbUnitsA"
 
-        if senderName == "comboUnitsA" and idx != self.idxOld:
+        if senderName == "cmbUnitsA" and idx != self.idxOld:
             # combo unit has changed -> change display of amplitude entries
             self.loadEntries()
 
@@ -124,7 +122,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     
     def rtLabel(self, label):
         """
-        Rich text labels: Format labels with HTML tags, replacing '_' by 
+        Rich text label: Format label with HTML tags, replacing '_' by 
         HTML subscript tags
         """
         #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
@@ -187,7 +185,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         """
         Reload textfields from filter dictionary to update changed settings 
         """
-        idx = self.comboUnitsA.currentIndex()  # read index of units combobox
+        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
         
         if idx == 0: # Entry is in dBs, same as in dictionary
             for i in range(len(self.qlineedit)): 
@@ -209,7 +207,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         Store specification entries in filter dictionary
         Entries are always stored in dB (20 log10) !
         """
-        idx = self.comboUnitsA.currentIndex()  # read index of units combobox
+        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
 
 #        for i in range(len(self.qlineedit)): 
 #            self.specs.update(

@@ -42,25 +42,25 @@ class InputInfo(QtGui.QWidget):
         # widget / subwindow for parameter selection
         self.chkFilterInfo = QtGui.QCheckBox()
         self.chkFilterInfo.setToolTip("Display filter info from filter design file.")
-        self.labFilterInfo = QtGui.QLabel()
-        self.labFilterInfo.setText("Filter Info")
+        self.lblFilterInfo = QtGui.QLabel()
+        self.lblFilterInfo.setText("Filter Info")
 
         self.chkCoeffList =  QtGui.QCheckBox()
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
-        self.labCoeffList = QtGui.QLabel()
-        self.labCoeffList.setText("Coefficients")
+        self.lblCoeffList = QtGui.QLabel()
+        self.lblCoeffList.setText("Coefficients")
 
         self.chkPoleZeroList =  QtGui.QCheckBox()
         self.chkPoleZeroList.setToolTip("Show poles and zeros as an editable list.")
-        self.labPoleZeroList = QtGui.QLabel()
-        self.labPoleZeroList.setText("Poles / Zeros")
+        self.lblPoleZeroList = QtGui.QLabel()
+        self.lblPoleZeroList.setText("Poles / Zeros")
         
-        self.tableCoeff = QtGui.QTableWidget()
-        self.tableCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
-        self.tableCoeff.setAlternatingRowColors(True)
-#        self.tableCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
-#        self.tableCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
-        self.tableCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
+        self.tblCoeff = QtGui.QTableWidget()
+        self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
+        self.tblCoeff.setAlternatingRowColors(True)
+#        self.tblCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
+#        self.tblCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
+        self.tblCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
         self.butAddRow = QtGui.QPushButton()
         self.butAddRow.setToolTip("Add row to coefficient table.")
         self.butAddRow.setText("Add")
@@ -70,16 +70,16 @@ class InputInfo(QtGui.QWidget):
         self.butDelRow.setText("Delete")
 
         
-        self.labFiltInfo = QtGui.QLabel()
-        self.labFiltInfo.setWordWrap(True)
+        self.lblFiltInfo = QtGui.QLabel()
+        self.lblFiltInfo.setWordWrap(True)
         
         filtInfoLayout = QtGui.QVBoxLayout()
-        filtInfoLayout.addWidget(self.labFiltInfo)
+        filtInfoLayout.addWidget(self.lblFiltInfo)
         
-        self.filtInfoFrame = QtGui.QFrame()
-        self.filtInfoFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.filtInfoFrame.setLayout(filtInfoLayout)
-        self.filtInfoFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        self.frmFiltInfo = QtGui.QFrame()
+        self.frmFiltInfo.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        self.frmFiltInfo.setLayout(filtInfoLayout)
+        self.frmFiltInfo.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
 
 
@@ -87,13 +87,13 @@ class InputInfo(QtGui.QWidget):
         # ============== UI Layout =====================================
         self.chkLayout = QtGui.QHBoxLayout()
         self.chkLayout.addWidget(self.chkFilterInfo) # filter export button
-        self.chkLayout.addWidget(self.labFilterInfo)
+        self.chkLayout.addWidget(self.lblFilterInfo)
         self.chkLayout.addStretch(1)
         self.chkLayout.addWidget(self.chkCoeffList)
-        self.chkLayout.addWidget(self.labCoeffList)
+        self.chkLayout.addWidget(self.lblCoeffList)
         self.chkLayout.addStretch(1)        
         self.chkLayout.addWidget(self.chkPoleZeroList)
-        self.chkLayout.addWidget(self.labPoleZeroList)
+        self.chkLayout.addWidget(self.lblPoleZeroList)
         self.chkLayout.addStretch(10)
         
         self.butCoeffLayout = QtGui.QHBoxLayout()
@@ -104,9 +104,9 @@ class InputInfo(QtGui.QWidget):
 
         vbox = QtGui.QVBoxLayout()
         vbox.addLayout(self.chkLayout)
-        vbox.addWidget(self.tableCoeff)
+        vbox.addWidget(self.tblCoeff)
         vbox.addLayout(self.butCoeffLayout)
-        vbox.addWidget(self.filtInfoFrame)
+        vbox.addWidget(self.frmFiltInfo)
         vbox.addStretch(10)
         self.setLayout(vbox)
         
@@ -119,29 +119,29 @@ class InputInfo(QtGui.QWidget):
         """
         Display info from filter design file
         """
-        self.filtInfoFrame.setVisible(self.chkFilterInfo.isChecked())
+        self.frmFiltInfo.setVisible(self.chkFilterInfo.isChecked())
         try:
-            self.labFiltInfo.setText(fb.filObj.info)
+            self.lblFiltInfo.setText(fb.filObj.info)
         except AttributeError as e:
             print(e)
     
         
     def saveCoeffs(self):
         coeffs = []
-        num_rows, num_cols = self.tableCoeff.rowCount(),\
-                                        self.tableCoeff.columnCount()
+        num_rows, num_cols = self.tblCoeff.rowCount(),\
+                                        self.tblCoeff.columnCount()
         print(num_rows, num_cols)
         if num_cols > 1:
             for col in range(num_cols):
                 rows = []
                 for row in range(num_rows):
-                    item = self.tableCoeff.item(row, col)
+                    item = self.tblCoeff.item(row, col)
                     rows.append(float(item.text()) if item else 0.)
                 coeffs.append(rows)
         else:
             col = 0
             for row in range(num_rows):
-                item = self.tableCoeff.item(row, col)
+                item = self.tblCoeff.item(row, col)
                 coeffs.append(float(item.text()) if item else 0.)            
         
         fb.fil[0]['coeffs'] = coeffs
@@ -150,10 +150,10 @@ class InputInfo(QtGui.QWidget):
     def showCoeffs(self):
             
         coeffs = fb.fil[0]["coeffs"]
-        self.tableCoeff.setVisible(self.chkCoeffList.isChecked())
+        self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 
-        self.tableCoeff.clear()
-        self.tableCoeff.setRowCount(max(np.shape(coeffs)))
+        self.tblCoeff.clear()
+        self.tblCoeff.setRowCount(max(np.shape(coeffs)))
 
 
         if self.DEBUG:
@@ -172,25 +172,25 @@ class InputInfo(QtGui.QWidget):
 
         if np.ndim(coeffs) == 1:
             print("FIR!")
-            self.tableCoeff.setColumnCount(1)
-            self.tableCoeff.setHorizontalHeaderLabels(["b"])
+            self.tblCoeff.setColumnCount(1)
+            self.tblCoeff.setHorizontalHeaderLabels(["b"])
             for i in range(len(coeffs)):
                 print(i, coeffs[i])
                 item = QtGui.QTableWidgetItem(str(coeffs[i]))
-                self.tableCoeff.setItem(i,0,item)
+                self.tblCoeff.setItem(i,0,item)
         else:
             print("IIR!")
-            self.tableCoeff.setColumnCount(2)
-            self.tableCoeff.setHorizontalHeaderLabels(["b", "a"])
+            self.tblCoeff.setColumnCount(2)
+            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
             for i in range(np.shape(coeffs)[1]):
 #                print(i, fb.fil[0]["coeffs"][0][i])
 #                item = QtGui.QTableWidgetItem(coeffs[0][i])
 #                bCoeffs.append(str(coeffs[0][i]))
 #                aCoeffs.append(str(coeffs[1][i]))
-                self.tableCoeff.setItem(i,0,QtGui.QTableWidgetItem(str(coeffs[0][i])))
-                self.tableCoeff.setItem(i,1,QtGui.QTableWidgetItem(str(coeffs[1][i])))
+                self.tblCoeff.setItem(i,0,QtGui.QTableWidgetItem(str(coeffs[0][i])))
+                self.tblCoeff.setItem(i,1,QtGui.QTableWidgetItem(str(coeffs[1][i])))
 
-        self.tableCoeff.resizeColumnsToContents()
+        self.tblCoeff.resizeColumnsToContents()
 
 
 
