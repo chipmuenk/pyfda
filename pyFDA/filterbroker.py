@@ -48,7 +48,7 @@ gD['imports'] = {} # dict with filter files / classes
 # filter types (ft), design methods (dm) and filter order (fo). 
 # This dict is built + overwritten by FilterFileReader.buildFilterTree() !
          
-gD['filterTree'] = {
+filTree = {
     'HP': 
         {'FIR': 
             {'equiripple': 

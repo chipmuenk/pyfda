@@ -120,7 +120,7 @@ class PlotHf(QtGui.QMainWindow):
         ymax = ax.get_ylim()[1]
 
         # extract from filterTree the parameters that are actually used        
-#        myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
+#        myParams = fb.filTree[rt][ft][dm][fo]['par']
 #        freqParams = [l for l in myParams if l[0] == 'F']
 
         if fb.fil[0]['ft'] == "FIR":

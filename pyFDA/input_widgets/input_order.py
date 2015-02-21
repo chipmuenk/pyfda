@@ -63,16 +63,16 @@ class InputOrder(QtGui.QFrame):
         self.frmDynWdg = QtGui.QFrame()
         self.frmDynWdg.setLayout(self.layHDynWdg)
         
-        self.hbox = QtGui.QHBoxLayout()
-        self.hbox.addWidget(self.chkMin)
-        self.hbox.addItem(self.spacer)
-        self.hbox.addWidget(self.lblOrder)
-        self.hbox.addWidget(self.ledOrder)
-        self.hbox.addWidget(self.frmDynWdg)
+        self.layHAllWdg = QtGui.QHBoxLayout()
+        self.layHAllWdg.addWidget(self.chkMin)
+        self.layHAllWdg.addItem(self.spacer)
+        self.layHAllWdg.addWidget(self.lblOrder)
+        self.layHAllWdg.addWidget(self.ledOrder)
+        self.layHAllWdg.addWidget(self.frmDynWdg)
         
         self.frmFo = QtGui.QFrame()
         self.frmFo.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.frmFo.setLayout(self.hbox)        
+        self.frmFo.setLayout(self.layHAllWdg)        
         self.frmFo.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
         
@@ -95,7 +95,7 @@ class InputOrder(QtGui.QFrame):
         Read / write text entries and checkbutton for filter order
         """
         # read list of available filter order methods from filterTree:
-        foList = fb.gD['filterTree'][fb.fil[0]['rt']]\
+        foList = fb.filTree[fb.fil[0]['rt']]\
                 [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
         if self.DEBUG: 
             print("=== InputOrder.update() ===")            

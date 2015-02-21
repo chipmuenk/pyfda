@@ -66,21 +66,20 @@ class InputSpecs(QtGui.QWidget):
         self.wspec = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
                     DEBUG = False)
         
-        self.msg = QtGui.QLabel(self)
-        self.msg.setText("Just click it!")
-        self.msg.setWordWrap(True)
-#        self.msg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        self.lblMsg = QtGui.QLabel(self)
+        self.lblMsg.setWordWrap(True)
+#        self.lblMsg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
         
-        msgLayout = QtGui.QVBoxLayout()
-        msgLayout.addWidget(self.msg)
+        layVMsg = QtGui.QVBoxLayout()
+        layVMsg.addWidget(self.lblMsg)
         
-        msgFrame = QtGui.QFrame()
-        msgFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        msgFrame.setLayout(msgLayout)
-        msgFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        frmMsg = QtGui.QFrame()
+        frmMsg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        frmMsg.setLayout(layVMsg)
+        frmMsg.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
         
-        self.msg.setVisible(True)
+        self.lblMsg.setVisible(True)
         self.wspec.setVisible(True)
         self.aspec.setVisible(True)
         
@@ -95,7 +94,7 @@ class InputSpecs(QtGui.QWidget):
         self.layout.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
         self.layout.addWidget(self.aspec,3,0)   # Amplitude specs
         self.layout.addWidget(self.wspec,3,1)   # Weight specs
-        self.layout.addWidget(msgFrame,4,0,1,2)  # Text message
+        self.layout.addWidget(frmMsg,4,0,1,2)  # Text message
 
         mainLayout = QtGui.QVBoxLayout(self)
         mainLayout.addLayout(self.layout)
@@ -106,9 +105,9 @@ class InputSpecs(QtGui.QWidget):
         # SIGNALS & SLOTS
         # Call chooseDesignMethod every time filter selection is changed: 
         self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
-        self.sf.comboResponseType.activated.connect(self.chooseDesignMethod)
-        self.sf.comboFilterType.activated.connect(self.chooseDesignMethod)
-        self.sf.comboDesignMethod.activated.connect(self.chooseDesignMethod)
+        self.sf.cmbResponseType.activated.connect(self.chooseDesignMethod)
+        self.sf.cmbFilterType.activated.connect(self.chooseDesignMethod)
+        self.sf.cmbDesignMethod.activated.connect(self.chooseDesignMethod)
         self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
         self.butDesignFilt.clicked.connect(self.startDesignFilt)   
 
@@ -117,7 +116,7 @@ class InputSpecs(QtGui.QWidget):
     def chooseDesignMethod(self):
         """
         Reads:  fb.fil[0] (currently selected filter), extracting info
-                from fb.gD['filterTree']
+                from fb.filTree
         Writes:
         Depending on SelectFilter and frequency specs, the values of the 
         widgets fo, fspec are recreated. For widget ms, the visibility is changed
@@ -132,9 +131,9 @@ class InputSpecs(QtGui.QWidget):
         ft = fb.fil[0]['ft']
         dm = fb.fil[0]['dm']
         fo = fb.fil[0]['fo']  
-        myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
-        myEnbWdg = fb.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
-        myMsg    = fb.gD['filterTree'][rt][ft][dm][fo]['msg'] # message
+        myParams = fb.filTree[rt][ft][dm][fo]['par']
+        myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
+        myMsg    = fb.filTree[rt][ft][dm][fo]['msg'] # message
 
         # build separate parameter lists according to the first letter
         self.freqParams = [l for l in myParams if l[0] == 'F']
@@ -158,7 +157,7 @@ class InputSpecs(QtGui.QWidget):
         self.wspec.setVisible(self.weightParams != []) 
         self.wspec.setEnabled("wspec" in myEnbWdg)
         self.wspec.setEntries(newLabels = self.weightParams)
-        self.msg.setText(myMsg)
+        self.lblMsg.setText(myMsg)
             
     def storeAll(self):
         """

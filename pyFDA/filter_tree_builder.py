@@ -54,7 +54,7 @@ class FilterTreeBuilder(object):
         
         # Build a hierarchical dict with all found filter designs and 
         # response types:
-        fb.gD['filterTree'] = self.buildFilterTree()
+        fb.filTree = self.buildFilterTree()
 
 #==============================================================================
     def readInitFile(self, commentChar = '#'):

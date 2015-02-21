@@ -55,101 +55,101 @@ class SelectFilter(QtGui.QWidget):
 
         #----------------------------------------------------------------------
         # Create combo boxes 
-        # - comboResponseType for selecting response type rt (LP, HP, ...)
-		# - comboFilterType for selection of filter type (IIR, FIR, ...)
-		# - comboDesignMethod for selection of design method (Chebychev, ...)
+        # - cmbResponseType for selecting response type rt (LP, HP, ...)
+		# - cmbFilterType for selection of filter type (IIR, FIR, ...)
+		# - cmbDesignMethod for selection of design method (Chebychev, ...)
 		# and populate them from the "filterTree" dict either directly or by
 		# calling setResponseType() :
-        self.comboResponseType=QtGui.QComboBox(self)
-        self.comboResponseType.setToolTip("Select filter response type.")
-        self.comboFilterType=QtGui.QComboBox(self)
-        self.comboFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
-        self.comboDesignMethod=QtGui.QComboBox(self)
-        self.comboFilterType.setToolTip("Select the actual filter design method.")        
+        self.cmbResponseType=QtGui.QComboBox(self)
+        self.cmbResponseType.setToolTip("Select filter response type.")
+        self.cmbFilterType=QtGui.QComboBox(self)
+        self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
+        self.cmbDesignMethod=QtGui.QComboBox(self)
+        self.cmbFilterType.setToolTip("Select the actual filter design method.")        
         
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in filterbroker.py) and populate combo box:
-        for rt in fb.gD['filterTree']:
-            self.comboResponseType.addItem(fb.gD['rtNames'][rt], rt)
-        self.comboResponseType.setCurrentIndex(0) # set initial index
+        for rt in fb.filTree:
+            self.cmbResponseType.addItem(fb.gD['rtNames'][rt], rt)
+        self.cmbResponseType.setCurrentIndex(0) # set initial index
 
 
         """
         LAYOUT      
         """
         # see Summerfield p. 278
-        self.hLayout2 = QtGui.QHBoxLayout() # for additional subwidgets
-        self.dynWdgFrame = QtGui.QFrame() # collect subwidgets in frame (no border)
-        self.dynWdgFrame.setLayout(self.hLayout2)
+        self.layHDynWdg = QtGui.QHBoxLayout() # for additional subwidgets
+        self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
+        self.frmDynWdg.setLayout(self.layHDynWdg)
         
-        hLayout = QtGui.QHBoxLayout() # container for standard subwidgets
-        hLayout.addWidget(self.comboResponseType)# QtCore.Qt.AlignLeft)
-        hLayout.addWidget(self.comboFilterType)
-        hLayout.addWidget(self.comboDesignMethod)
+        layHStdWdg = QtGui.QHBoxLayout() # container for standard subwidgets
+        layHStdWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        layHStdWdg.addWidget(self.cmbFilterType)
+        layHStdWdg.addWidget(self.cmbDesignMethod)
 
         # stack standard + dynamic subwidgets vertically:       
-        vLayout = QtGui.QVBoxLayout()
-        vLayout.addLayout(hLayout)
-        vLayout.addWidget(self.dynWdgFrame)
+        layVAllWdg = QtGui.QVBoxLayout()
+        layVAllWdg.addLayout(layHStdWdg)
+        layVAllWdg.addWidget(self.frmDynWdg)
         
         self.sfFrame = QtGui.QFrame()
         self.sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.sfFrame.setLayout(vLayout)
+        self.sfFrame.setLayout(layVAllWdg)
         
-        mainLayout = QtGui.QHBoxLayout()
-        mainLayout.addWidget(self.sfFrame)
-        self.setLayout(mainLayout)
-#        mainLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+        layHMain = QtGui.QHBoxLayout()
+        layHMain.addWidget(self.sfFrame)
+        self.setLayout(layHMain)
+#        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
         #------------------------------------------------------------
         # SIGNALS & SLOTS      
         #
         # Connect comboBoxes and setters
         
-        self.comboResponseType.activated.connect(self.setResponseType) # 'LP'
-        self.comboFilterType.activated.connect(self.setFilterType) #'IIR'
-        self.comboDesignMethod.activated.connect(self.setDesignMethod) #'cheby1'
+        self.cmbResponseType.activated.connect(self.setResponseType) # 'LP'
+        self.cmbFilterType.activated.connect(self.setFilterType) #'IIR'
+        self.cmbDesignMethod.activated.connect(self.setDesignMethod) #'cheby1'
 
 
     def setResponseType(self):
         """
-        Triggered when comboResponseType (LP, HP, ...) is changed:
+        Triggered when cmbResponseType (LP, HP, ...) is changed:
         Copy selection to self.rt and fb.gD and reconstruct filter type combo
         """ 
-        self.rtIdx =self.comboResponseType.currentIndex()       
-        self.rt = str(self.comboResponseType.itemData(self.rtIdx))
+        self.rtIdx =self.cmbResponseType.currentIndex()       
+        self.rt = str(self.cmbResponseType.itemData(self.rtIdx))
          
         fb.fil[0]['rt'] = self.rt # abbreviation
 #        rt=fb.gD["rtNames"][self.rt] # full text
-#        print(fb.gD['filterTree'][self.rt].keys())
+#        print(fb.filTree[self.rt].keys())
         # 
-        self.comboFilterType.clear() 
-        self.comboFilterType.addItems(
-            fb.gD['filterTree'][self.rt].keys())
+        self.cmbFilterType.clear() 
+        self.cmbFilterType.addItems(
+            fb.filTree[self.rt].keys())
         self.setFilterType()
         
     def setFilterType(self):
         """"
-        Triggered when comboFilterType (IIR, FIR, ...) is changed: 
+        Triggered when cmbFilterType (IIR, FIR, ...) is changed: 
         Copy selected setting to self.ft and (re)construct design method combo, 
         adding displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
-        self.ft = str(self.comboFilterType.currentText())
-        self.comboDesignMethod.clear()  
+        self.ft = str(self.cmbFilterType.currentText())
+        self.cmbDesignMethod.clear()  
 
-        for dm in fb.gD['filterTree'][self.rt][self.ft]:
-            self.comboDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
+        for dm in fb.filTree[self.rt][self.ft]:
+            self.cmbDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
 
         fb.fil[0]['ft'] = self.ft
         self.setDesignMethod()
             
     def setDesignMethod(self):
         """
-        Triggered when comboDesignMethod (cheby1, ...) is changed: 
+        Triggered when cmbDesignMethod (cheby1, ...) is changed: 
         Copy selected setting to self.dm # TODO: really needed? 
         """
-        self.dmIdx = self.comboDesignMethod.currentIndex()
-        self.dm = str(self.comboDesignMethod.itemData(self.dmIdx))
+        self.dmIdx = self.cmbDesignMethod.currentIndex()
+        self.dm = str(self.cmbDesignMethod.itemData(self.dmIdx))
         fb.fil[0]['dm'] = self.dm
         
         try: # has a filter object been instantiated yet?
@@ -163,17 +163,17 @@ class SelectFilter(QtGui.QWidget):
         # method. If yes, don't change it, else set first available 
         # filter order method
         if fb.fil[0]['fo'] not in \
-                        fb.gD['filterTree'][self.rt][self.ft][self.dm].keys():
+                        fb.filTree[self.rt][self.ft][self.dm].keys():
             fb.fil[0].update({'fo':{}})
             fb.fil[0]['fo'] \
-                = fb.gD['filterTree'][self.rt][self.ft][self.dm].keys()[0]
+                = fb.filTree[self.rt][self.ft][self.dm].keys()[0]
 
         if self.DEBUG:
             print("=== InputFilter.setDesignMethod ===")
             print("selFilter:", fb.fil[0])
-            print("filterTree[dm] = ", fb.gD['filterTree'][self.rt][self.ft]\
+            print("filterTree[dm] = ", fb.filTree[self.rt][self.ft]\
                                                             [self.dm])
-            print("filterTree[dm].keys() = ", fb.gD['filterTree'][self.rt][self.ft]\
+            print("filterTree[dm].keys() = ", fb.filTree[self.rt][self.ft]\
                                                             [self.dm].keys())
                                                             
                 
@@ -190,24 +190,24 @@ class SelectFilter(QtGui.QWidget):
         try:              
             if 'sf' in fb.filObj.wdg:
                 a = getattr(fb.filObj, fb.filObj.wdg['sf'])
-                self.hLayout2.addWidget(a)
-                self.hLayout2.addStretch()
-                self.dynWdgFrame.setVisible(a != None)
+                self.layHDynWdg.addWidget(a, stretch = 1)
+#                self.layHDynWdg.addStretch()
+                self.frmDynWdg.setVisible(a != None)
 
         except AttributeError as e:
             print("sf.updateWidgets:",e)
-            self.dynWdgFrame.setVisible(False)
+            self.frmDynWdg.setVisible(False)
             
     def _delWidgets(self):
         """
         Delete dynamically created subwidgets
         """
-        widgetList = self.dynWdgFrame.findChildren(
+        widgetList = self.frmDynWdg.findChildren(
                                             (QtGui.QComboBox,QtGui.QLineEdit))
 #       widgetListNames = [w.objectName() for w in widgetList]
 
         for w in widgetList:
-            self.hLayout2.removeWidget(w)   # remove widget from layout
+            self.layHDynWdg.removeWidget(w)   # remove widget from layout
             w.deleteLater()             # tell Qt to delete object when the 
                                         # method has completed
             del w                       # not really needed?
