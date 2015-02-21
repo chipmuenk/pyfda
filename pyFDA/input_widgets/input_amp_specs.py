@@ -42,7 +42,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.initUI()     
         
     def initUI(self): 
-        self.WVLayout = QtGui.QVBoxLayout() # Widget vertical layout  
+        self.layVMain = QtGui.QVBoxLayout() # Widget vertical layout  
 
         title = "Amplitude Specifications"
         units = ["dB", "V", "W"] 
@@ -55,7 +55,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.lblTitle.setText(str(title))
         self.lblTitle.setFont(bfont)
         self.lblTitle.setWordWrap(True)
-        self.WVLayout.addWidget(self.lblTitle)
+        self.layVMain.addWidget(self.lblTitle)
 
         self.lblUnits = QtGui.QLabel(self)
         self.lblUnits.setText("Unit:")
@@ -68,11 +68,11 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         self.cmbUnitsA.setCurrentIndex(0)
 
-        self.layout = QtGui.QGridLayout() # sublayout for spec fields
-        self.layout.addWidget(self.lblUnits,0,0)
-        self.layout.addWidget(self.cmbUnitsA,0,1, QtCore.Qt.AlignLeft)
+        self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields
+        self.layGSpecs.addWidget(self.lblUnits,0,0)
+        self.layGSpecs.addWidget(self.cmbUnitsA,0,1, QtCore.Qt.AlignLeft)
 
-        #self.layout.addWidget(self.lblTitle, 0, 0, 2, 1) # span two columns
+        #self.layGSpecs.addWidget(self.lblTitle, 0, 0, 2, 1) # span two columns
 
         # - Build a list from all entries in the specs dictionary starting 
         #   with "A" (= amplitude specifications of the current filter)
@@ -80,15 +80,15 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         newLabels = [l for l in self.specs if l[0] == 'A']
         self.setEntries(newLabels = newLabels)
         
-        sfFrame = QtGui.QFrame()
-        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        sfFrame.setLayout(self.layout)
+        frmMain = QtGui.QFrame()
+        frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        frmMain.setLayout(self.layGSpecs)
         
-        self.WVLayout.addWidget(sfFrame)
-        self.setLayout(self.WVLayout)
+        self.layVMain.addWidget(frmMain)
+        self.setLayout(self.layVMain)
 #        
 #        mainLayout = QtGui.QHBoxLayout()
-#        mainLayout.addWidget(sfFrame)
+#        mainLayout.addWidget(frmMain)
 #        self.setLayout(mainLayout)
         
         # SIGNALS & SLOTS
@@ -158,8 +158,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         """
         Delete entry number i from subwidget (QLabel and QLineEdit)
         """
-        self.layout.removeWidget(self.qlabels[i])
-        self.layout.removeWidget(self.qlineedit[i])
+        self.layGSpecs.removeWidget(self.qlabels[i])
+        self.layGSpecs.removeWidget(self.qlineedit[i])
 
         self.qlabels[i].deleteLater()
         del self.qlabels[i]
@@ -178,8 +178,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.qlineedit[i].editingFinished.connect(self.ampUnits)
         self.qlineedit[i].setObjectName(newLabel) # update ID
 
-        self.layout.addWidget(self.qlabels[i],(i+2),0)
-        self.layout.addWidget(self.qlineedit[i],(i+2),1)
+        self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
+        self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
               
     def loadEntries(self):
         """
