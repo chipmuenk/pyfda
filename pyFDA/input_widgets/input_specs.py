@@ -84,23 +84,25 @@ class InputSpecs(QtGui.QWidget):
         self.aspec.setVisible(True)
         
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
-        self.pltAll = plot_all.PlotAll() # instantiate tabbed plot widgets 
+        self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
+
         """
         LAYOUT      
         """
-        self.layout=QtGui.QGridLayout()
-        self.layout.addWidget(self.sf,0,0,1,2)  # Design method (IIR - ellip, ...)
-        self.layout.addWidget(self.fo,1,0,1,2)  # Filter order
-        self.layout.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
-        self.layout.addWidget(self.aspec,3,0)   # Amplitude specs
-        self.layout.addWidget(self.wspec,3,1)   # Weight specs
-        self.layout.addWidget(frmMsg,4,0,1,2)  # Text message
+        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
+        layGMain = QtGui.QGridLayout()
+        layGMain.addWidget(self.sf,0,0,1,2)  # Design method (IIR - ellip, ...)
+        layGMain.addWidget(self.fo,1,0,1,2)  # Filter order
+        layGMain.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
+        layGMain.addWidget(self.aspec,3,0)   # Amplitude specs
+        layGMain.addWidget(self.wspec,3,1)   # Weight specs
+        layGMain.addWidget(frmMsg,4,0,1,2)  # Text message
+        layGMain.addItem(spcV,5,0)
+        layGMain.addWidget(self.butDesignFilt, 6,0)
+        layGMain.addWidget(self.butReadFiltTree, 6,1)
 
-        mainLayout = QtGui.QVBoxLayout(self)
-        mainLayout.addLayout(self.layout)
-        mainLayout.addStretch()
-        mainLayout.addWidget(self.butDesignFilt)   # Design Filter!
-        self.setLayout(mainLayout)
+        self.setLayout(layGMain)
+        
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
         # Call chooseDesignMethod every time filter selection is changed: 
@@ -109,7 +111,8 @@ class InputSpecs(QtGui.QWidget):
         self.sf.cmbFilterType.activated.connect(self.chooseDesignMethod)
         self.sf.cmbDesignMethod.activated.connect(self.chooseDesignMethod)
         self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
-        self.butDesignFilt.clicked.connect(self.startDesignFilt)   
+        self.butDesignFilt.clicked.connect(self.startDesignFilt)
+        self.butReadFiltTree.clicked.connect(self.sf.ftb.initFilters)
 
         self.chooseDesignMethod() # first time initialization
         

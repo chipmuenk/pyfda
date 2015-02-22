@@ -41,7 +41,7 @@ gD['dmNames'] = {#IIR
 # -----FilterFileReader.__init__() ------
 
 # Lists for dynamic imports from filter design subdirectory
-gD['initFileNames'] = [] # Python file names found in initFile (without .py)
+gD['filtFileNames'] = [] # Python file names found in filtFile (without .py)
 gD['imports'] = {} # dict with filter files / classes
 
 # Dictionary describing the available combinations of response types (rt), 

@@ -36,15 +36,17 @@ class SelectFilter(QtGui.QWidget):
     def __init__(self, DEBUG = True):
         super(SelectFilter, self).__init__()
         self.DEBUG = DEBUG
-        self.ftb = FilterTreeBuilder('init.txt', 'filter_design', 
+        # initialize the FilterTreeBuilder class with the filter directory and
+        # the filter file
+        self.ftb = FilterTreeBuilder('filter_design', 'init.txt', 
                                     commentChar = '#', DEBUG = DEBUG) #                                             
         
         
         self.initUI()
         
         self.setResponseType()
-        
-        
+
+                
     def initUI(self): 
         """
         Initialize UI with comboboxes for selecting filter
