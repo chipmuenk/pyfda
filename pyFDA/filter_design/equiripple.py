@@ -76,6 +76,8 @@ class equiripple(object):
                    }
         self.info = ("Equiripple filter have a constant ripple in pass- and "\
         "stop band, the tolerance bands are fully used. ")
+#        self.info_doc = '<b>From the "Remez" module docstring:</b>\n' + sig.remez.__doc__
+        self.info_doc = sig.remez.__doc__
 
         #----------------------------------------------------------------------
         # Additional subwidgets

@@ -71,8 +71,11 @@ class firwin(object):
 #            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
           #"DIFF":
                    }
-        self.info = ("Equiripple filter have a constant ripple in pass- and "\
-        "stop band, the tolerance bands are fully used. ")
+        self.info = ("Windowed FIR filters are designed by truncating the "
+        "infinite impulse response of an ideal filter with a window function. "
+        "The kind of selected window has great influence on ripple etc. of the "
+        "resulting filter.")
+        self.info_doc = sig.firwin.__doc__
 
         # Additional subwidgets needed for design:
         # These subwidgets are instantiated where needed using the handle to 
