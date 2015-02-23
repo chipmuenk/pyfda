@@ -47,8 +47,8 @@ class PlotAll(QtGui.QWidget):
         self.setLayout(layVMain)
 
         
-    def updatePlots(self):
-        """ Update and redraw all subplots with new coefficients"""
+    def updateAll(self):
+        """ Update and redraw all subplots with new filter data"""
         self.pltHf.draw()
         self.pltPhi.draw()
 #        self.redrawAll()
