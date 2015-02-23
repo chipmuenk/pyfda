@@ -9,6 +9,7 @@ from __future__ import print_function, division, unicode_literals
 import sys, os 
 import numpy as np
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -21,18 +22,22 @@ import filterbroker as fb
     
 import input_filter, input_order, input_amp_specs, input_freq_specs,\
     input_weight_specs
-from plot_widgets import plot_all
+#from plot_widgets import plot_all
 
 
 class InputSpecs(QtGui.QWidget):
     """
     Build widget for entering all filter specs
     """
+    # class variable (shared between instances if more than one exists)
+    filterDesigned = pyqtSignal()  # emitted when filter has been designed
+    filterChanged = pyqtSignal()
     
     def __init__(self, DEBUG = False):
         super(InputSpecs, self).__init__() 
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
+
 
         self.DEBUG = DEBUG  
 #        self.ftb = FilterTreeBuilder('init.txt', 'filter_design', 
@@ -162,6 +167,8 @@ class InputSpecs(QtGui.QWidget):
         self.wspec.setEnabled("wspec" in myEnbWdg)
         self.wspec.setEntries(newLabels = self.weightParams)
         self.lblMsg.setText(myMsg)
+        
+        self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()        
             
     def storeAll(self):
         """
@@ -207,6 +214,9 @@ class InputSpecs(QtGui.QWidget):
         self.wspec.loadEntries()
         self.fspec.loadEntries()
         
+        self.filterDesigned.emit() # ->pyFDA -> pltAll.updateAll()
+
+        
         if self.DEBUG:
             print("=== pyFDA.py : startDesignFilter ===")
             print("zpk:" , fb.fil[0]['zpk'])
@@ -215,7 +225,6 @@ class InputSpecs(QtGui.QWidget):
             print("N = ",fb.fil[0]['N'])
         print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
      
-#        self.pltAll.update() is executed from pyFDA.py via signal-slot conn.!
   
 #------------------------------------------------------------------------------ 
    
