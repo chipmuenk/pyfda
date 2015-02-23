@@ -20,12 +20,13 @@ if __name__ == "__main__":
 
 import filterbroker as fb # importing filterbroker initializes all its globals
 
-
+# TODO: saveCoeffs() is triggered multiple times when table entries are changed
+#       not by user but by e.g. a changed filter design
 class InputCoeffs(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-    def __init__(self, DEBUG = True):
+    def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG
         super(InputCoeffs, self).__init__()
 
@@ -52,6 +53,9 @@ class InputCoeffs(QtGui.QWidget):
 #        self.tblCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
 #        self.tblCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
         self.tblCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
+        self.tblCoeff.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                                          QtGui.QSizePolicy.MinimumExpanding)
+
         self.butAddRow = QtGui.QPushButton()
         self.butAddRow.setToolTip("Add row to coefficient table.")
         self.butAddRow.setText("Add")
@@ -59,19 +63,22 @@ class InputCoeffs(QtGui.QWidget):
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete row from coefficient table.")
         self.butDelRow.setText("Delete")
-
-
+        
+        self.butUpdate = QtGui.QPushButton()
+        self.butUpdate.setToolTip("Update filter info and plots.")
+        self.butUpdate.setText("Update")
  
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkCoeffList)
         self.layHChkBoxes.addWidget(self.lblCoeffList)
         self.layHChkBoxes.addStretch(1)        
-        self.layHChkBoxes.addStretch(10)
+#        self.layHChkBoxes.addStretch(10)
         
         self.layHButtonsCoeffs = QtGui.QHBoxLayout()
         self.layHButtonsCoeffs.addWidget(self.butAddRow)
         self.layHButtonsCoeffs.addWidget(self.butDelRow)
+        self.layHButtonsCoeffs.addWidget(self.butUpdate)
         self.layHButtonsCoeffs.addStretch()
 
 
@@ -79,18 +86,19 @@ class InputCoeffs(QtGui.QWidget):
         vbox.addLayout(self.layHChkBoxes)
         vbox.addWidget(self.tblCoeff)
         vbox.addLayout(self.layHButtonsCoeffs)
-        vbox.addStretch(10)
+#        vbox.addStretch(1)
         self.setLayout(vbox)
         
         # ============== Signals & Slots ================================
         self.chkCoeffList.clicked.connect(self.showCoeffs)        
+        self.butUpdate.clicked.connect(self.showCoeffs)        
 
         
     def saveCoeffs(self):
         coeffs = []
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
-        print(num_rows, num_cols)
+        if self.DEBUG: print(num_rows, num_cols)
         if num_cols > 1:
             for col in range(num_cols):
                 rows = []
@@ -105,7 +113,7 @@ class InputCoeffs(QtGui.QWidget):
                 coeffs.append(float(item.text()) if item else 0.)            
         
         fb.fil[0]['coeffs'] = coeffs
-        print ("coeffs updated!")
+        if self.DEBUG: print ("coeffs updated!")
         
     def showCoeffs(self):
             
@@ -131,15 +139,13 @@ class InputCoeffs(QtGui.QWidget):
 #            self.aa = fb.fil[0]['coeffs'][1]
 
         if np.ndim(coeffs) == 1:
-            print("FIR!")
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
             for i in range(len(coeffs)):
-                print(i, coeffs[i])
+                if self.DEBUG: print(i, coeffs[i])
                 item = QtGui.QTableWidgetItem(str(coeffs[i]))
                 self.tblCoeff.setItem(i,0,item)
         else:
-            print("IIR!")
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
             for i in range(np.shape(coeffs)[1]):
@@ -151,8 +157,7 @@ class InputCoeffs(QtGui.QWidget):
                 self.tblCoeff.setItem(i,1,QtGui.QTableWidgetItem(str(coeffs[1][i])))
 
         self.tblCoeff.resizeColumnsToContents()
-
-
+        
 
 #------------------------------------------------------------------------------
    
