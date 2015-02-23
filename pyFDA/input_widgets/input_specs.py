@@ -85,6 +85,7 @@ class InputSpecs(QtGui.QWidget):
         
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
+        self.butReadFiltTree.setToolTip("Re-read filter design directory and build filter design tree.")
 
         """
         LAYOUT      
