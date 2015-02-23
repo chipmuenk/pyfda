@@ -35,56 +35,52 @@ class InputInfo(QtGui.QWidget):
     def initUI(self): 
         """
         Intitialize the widget, consisting of:
-        - 
-        - 
+        - Checkboxes for selecting the info to be displayed
+        - A large text window for displaying infos about the filter design 
+          algorithm
         """
-        # widget / subwindow for parameter selection
-        self.chkFilterInfo = QtGui.QCheckBox()
-        self.chkFilterInfo.setChecked(True)
-        self.chkFilterInfo.setToolTip("Display filter info from filter design file.")
-        self.lblFilterInfo = QtGui.QLabel()
-        self.lblFilterInfo.setText("Filter Info")
-
+        # widget / subwindow for filter infos
+        self.chkDocstring = QtGui.QCheckBox()
+        self.chkDocstring.setChecked(False)
+        self.chkDocstring.setToolTip("Display docstring from python filter method.")
+        self.lblDocstring = QtGui.QLabel()
+        self.lblDocstring.setText("Show Docstring")
         
-        self.lblFiltInfoBox = QtGui.QLabel()
-        self.lblFiltInfoBox.setWordWrap(True)
+        self.txtFiltInfoBox = QtGui.QTextBrowser()
+        self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                          QtGui.QSizePolicy.Expanding)
         
-        filtInfoLayout = QtGui.QVBoxLayout()
-        filtInfoLayout.addWidget(self.lblFiltInfoBox)
-        
-        self.frmFiltInfoBox = QtGui.QFrame()
-        self.frmFiltInfoBox.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.frmFiltInfoBox.setLayout(filtInfoLayout)
-        self.frmFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                 QtGui.QSizePolicy.Minimum)
-
-
- 
         # ============== UI Layout =====================================
-        self.chkLayout = QtGui.QHBoxLayout()
-        self.chkLayout.addWidget(self.chkFilterInfo) # filter export button
-        self.chkLayout.addWidget(self.lblFilterInfo)
-        self.chkLayout.addStretch(10)
+        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes.addWidget(self.chkDocstring)
+        self.layHChkBoxes.addWidget(self.lblDocstring)
+        self.layHChkBoxes.addStretch(10)
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addLayout(self.chkLayout)
-        vbox.addWidget(self.frmFiltInfoBox)
-        vbox.addStretch(10)
-        self.setLayout(vbox)
+        layVMain = QtGui.QVBoxLayout()
+        layVMain.addLayout(self.layHChkBoxes)
+        layVMain.addWidget(self.txtFiltInfoBox)
+#        layVMain.addStretch(10)
+        self.setLayout(layVMain)
         
         # ============== Signals & Slots ================================
-        self.chkFilterInfo.clicked.connect(self.showInfo)     
+        self.chkDocstring.clicked.connect(self.showInfo)     
 
         
     def showInfo(self):
         """
-        Display info from filter design file
+        Display info from filter design file and docstring
         """
-        self.frmFiltInfoBox.setVisible(self.chkFilterInfo.isChecked())
+
         try:
-            self.lblFiltInfoBox.setText(fb.filObj.info)
+            self.txtFiltInfoBox.setText(fb.filObj.info)
+            
         except AttributeError as e:
             print(e)
+
+        if self.chkDocstring.isChecked() and hasattr(fb.filObj,'info_doc'):
+            self.txtFiltInfoBox.append('<hr /><b>Python module docstring:</b>\n')
+            self.txtFiltInfoBox.append(fb.filObj.info_doc)
+
 
 #------------------------------------------------------------------------------
    
