@@ -16,7 +16,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import input_specs, input_files, input_info
+import input_specs, input_files, input_coeffs, input_info
 
 class InputAll(QtGui.QWidget):
     """
@@ -30,6 +30,7 @@ class InputAll(QtGui.QWidget):
 #        self.inputParams = inputParams.inputParams()
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)        
         self.inputFiles = input_files.InputFiles(DEBUG = False)
+        self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
         self.inputInfo = input_info.InputInfo(DEBUG = False)
         
         self.initUI()     
@@ -41,6 +42,7 @@ class InputAll(QtGui.QWidget):
 #        tab_widget.addTab(self.inputParams, 'Params')
         tabWidget.addTab(self.inputSpecs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')
+        tabWidget.addTab(self.inputCoeffs, 'b,a')
         tabWidget.addTab(self.inputInfo, 'Info')
 
         layVMain = QtGui.QVBoxLayout()
