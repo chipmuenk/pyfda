@@ -54,11 +54,10 @@ class InputAll(QtGui.QWidget):
                                  QtGui.QSizePolicy.Expanding)
 
         
-#    def update(self):
-#        """ Update and redraw all subplots with new coefficients"""
-#        self.pltHf.draw()
-#        self.pltPhi.draw()
-##        self.redrawAll()
+    def updateAll(self):
+        """ Update all widgets with new filter data"""
+        self.inputCoeffs.showCoeffs()
+
 
      
 
