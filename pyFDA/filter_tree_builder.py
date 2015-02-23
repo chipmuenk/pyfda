@@ -4,7 +4,7 @@ Created on Mon Nov 24 10:00:14 2014
 
 @author: Michael Winkler, Christian Münker
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys
 import codecs
 import filterbroker as fb
