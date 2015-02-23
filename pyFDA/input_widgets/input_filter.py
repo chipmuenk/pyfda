@@ -41,7 +41,6 @@ class SelectFilter(QtGui.QWidget):
         self.ftb = FilterTreeBuilder('filter_design', 'init.txt', 
                                     commentChar = '#', DEBUG = DEBUG) #                                             
         
-        
         self.initUI()
         
         self.setResponseType()
