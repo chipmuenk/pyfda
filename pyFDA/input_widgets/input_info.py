@@ -10,8 +10,9 @@ from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
 #import scipy.io
-import numpy as np
-
+from scipy.signal import remez
+#import numpy as np
+from docutils.core import publish_string, publish_parts
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
@@ -70,17 +71,29 @@ class InputInfo(QtGui.QWidget):
         """
         Display info from filter design file and docstring
         """
-
-        try:
-            self.txtFiltInfoBox.setText(fb.filObj.info)
+        if  hasattr(fb.filObj,'info'):
+            self.txtFiltInfoBox.setText(publish_string(fb.filObj.info, 
+            writer_name='html', 
+            settings_overrides={'output_encoding': 'unicode'}))
+        else:
+            self.txtFiltInfoBox.setText("")
             
-        except AttributeError as e:
-            print(e)
-
         if self.chkDocstring.isChecked() and hasattr(fb.filObj,'info_doc'):
-            self.txtFiltInfoBox.append('<hr /><b>Python module docstring:</b>\n')
-            self.txtFiltInfoBox.append(fb.filObj.info_doc)
+#            self.txtFiltInfoBox.append('<hr /><b>Python module docstring:</b>\n')
+     
+#  The following variants choke with 
+#            self.txtFiltInfoBox.append(publish_string(fb.filObj.info_doc,
+#              writer_name='html'))
+#            self.txtFiltInfoBox.append(publish_parts(fb.filObj.info_doc,
+#              writer_name='html')['html_body'])
+#              self.txtFiltInfoBox.append(publish_string(remez.__doc__,
+#              writer_name='html'))   
+#   The following works, but is ugly:
+              self.txtFiltInfoBox.append(fb.filObj.info_doc)
 
+
+#fb.filObj.info_doc
+#writer_name='html'
 
 #------------------------------------------------------------------------------
    
