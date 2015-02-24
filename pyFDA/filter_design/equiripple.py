@@ -26,6 +26,15 @@ output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
 
 class equiripple(object):
+
+    info =\
+    """
+    Equiripple filter have a constant ripple in pass- and 
+    stop band, the tolerance bands are fully used. 
+        
+    The minimum order to fulfill the target specifications is estimated 
+    using one of three algorithms.
+    """
     
     def __init__(self):
         self.name = {'equiripple':'Equiripple'}
@@ -74,10 +83,15 @@ class equiripple(object):
                                  }}
           #"DIFF":
                    }
-        self.info = ("Equiripple filter have a constant ripple in pass- and "\
-        "stop band, the tolerance bands are fully used. ")
+#        self.info = 
+#        """
+#        Equiripple filter have a constant ripple in pass- and 
+#        stop band, the tolerance bands are fully used. 
+#        
+#        The minimum order to fulfill the target specifications is estimated 
+#        using one of three algorithms."""
 #        self.info_doc = '<b>From the "Remez" module docstring:</b>\n' + sig.remez.__doc__
-        self.info_doc = sig.remez.__doc__
+        self.info_doc = '    remez()\n    =======\n'+sig.remez.__doc__
 
         #----------------------------------------------------------------------
         # Additional subwidgets

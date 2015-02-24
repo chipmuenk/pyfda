@@ -77,8 +77,8 @@ The attenuation in the stop band can only be controlled by the filter order.
 
         """
         
-        self.info_doc = '**cheby1()**\n' + sig.cheby1.__doc__ \
-          + '**cheb1ord()**\n' + sig.cheb1ord.__doc__
+        self.info_doc = '\tcheby1()\n\t========\n'+ sig.cheby1.__doc__+\
+                        '\tcheb1ord()\n\t==========\n'+ sig.cheb1ord.__doc__
 
     def get_params(self,specs):
         """

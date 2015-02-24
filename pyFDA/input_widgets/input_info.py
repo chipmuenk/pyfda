@@ -8,6 +8,7 @@ Tab-Widget for displaying infos about filter and filter design method
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
+import textwrap
 from PyQt4 import QtGui
 #import scipy.io
 from scipy.signal import remez
@@ -44,8 +45,16 @@ class InputInfo(QtGui.QWidget):
         self.chkDocstring = QtGui.QCheckBox()
         self.chkDocstring.setChecked(False)
         self.chkDocstring.setToolTip("Display docstring from python filter method.")
+
         self.lblDocstring = QtGui.QLabel()
         self.lblDocstring.setText("Show Docstring")
+        
+        self.chkRichText = QtGui.QCheckBox()
+        self.chkRichText.setChecked(True)
+        self.chkRichText.setToolTip("Render documentation as Rich Text.")
+
+        self.lblRichText = QtGui.QLabel()
+        self.lblRichText.setText("Rich text")
         
         self.txtFiltInfoBox = QtGui.QTextBrowser()
         self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.Minimum,
@@ -55,6 +64,10 @@ class InputInfo(QtGui.QWidget):
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkDocstring)
         self.layHChkBoxes.addWidget(self.lblDocstring)
+        self.layHChkBoxes.addStretch(10)        
+        self.layHChkBoxes.addWidget(self.chkRichText)
+        self.layHChkBoxes.addWidget(self.lblRichText)
+
         self.layHChkBoxes.addStretch(10)
 
         layVMain = QtGui.QVBoxLayout()
@@ -65,32 +78,31 @@ class InputInfo(QtGui.QWidget):
         
         # ============== Signals & Slots ================================
         self.chkDocstring.clicked.connect(self.showInfo)     
+        self.chkRichText.clicked.connect(self.showInfo)     
 
         
     def showInfo(self):
         """
         Display info from filter design file and docstring
         """
-        if  hasattr(fb.filObj,'info'):
-            self.txtFiltInfoBox.setText(publish_string(fb.filObj.info, 
-            writer_name='html', 
-            settings_overrides={'output_encoding': 'unicode'}))
+        if hasattr(fb.filObj,'info'):
+            self.txtFiltInfoBox.setText(publish_string(
+                textwrap.dedent(fb.filObj.info), writer_name='html', 
+                settings_overrides={'output_encoding': 'unicode'}))
         else:
             self.txtFiltInfoBox.setText("")
             
         if self.chkDocstring.isChecked() and hasattr(fb.filObj,'info_doc'):
-#            self.txtFiltInfoBox.append('<hr /><b>Python module docstring:</b>\n')
-     
-#  The following variants choke with 
-#   docutils.utils.SystemMessage: <string>:10: (SEVERE/4) Unexpected section title.
-#            self.txtFiltInfoBox.append(publish_string(fb.filObj.info_doc,
-#              writer_name='html'))
-#            self.txtFiltInfoBox.append(publish_parts(fb.filObj.info_doc,
-#              writer_name='html')['html_body'])
-#              self.txtFiltInfoBox.append(publish_string(remez.__doc__,
-#              writer_name='html'))   
-#   The following works, but is ugly:
-              self.txtFiltInfoBox.append(fb.filObj.info_doc)
+            if self.chkRichText.isChecked:
+                self.txtFiltInfoBox.append(
+                    '<hr /><b>Python module docstring:</b>\n')
+                self.txtFiltInfoBox.append(publish_string(
+                    textwrap.dedent(fb.filObj.info_doc), writer_name='html'))
+            else:
+                self.txtFiltInfoBox.append('\nPython module docstring:\n')
+                self.txtFiltInfoBox.append(
+                     textwrap.dedent(fb.filObj.info_doc))
+                
 
 #------------------------------------------------------------------------------
    

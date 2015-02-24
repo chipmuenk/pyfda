@@ -59,7 +59,7 @@ class cheby2(object):
                  }
 
         self.info = """
-**Chebychev Type 2 filters**
+**Chebyshev Type 2 filters**
 
 have a constant ripple :math:`A_SB` in the stop band(s) only, the pass band 
 drops monotonously. This is achieved by placing `N/2` zeros along the stop
@@ -77,6 +77,11 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
 ``scipy.signal.cheby2()``
 ``scipy.signal.cheb2ord()``
 """
+        self.info_doc = '    cheby2()\n    ========\n'+sig.cheby2.__doc__#\
+#        +'\n    cheb2ord()\n    ----------\n '+ sig.cheb2ord.__doc__
+
+#'\n    cheby2()\n    ========\n'+ 
+#+ sig.cheb2ord.__doc__ 
 
     def get_params(self,specs):
         """
