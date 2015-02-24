@@ -58,10 +58,27 @@ class cheby1(object):
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
-        self.info = "Chebychev Typ 1 Filter haben nur im Passband Ripple. \
-        Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im PB \
-        und über die kritische(n) Frequenz(en) bei denen die Verstärkung unter \
-        den spezifizierten Wert fällt."
+        self.info = """
+**Chebychev Type 1 filters**
+
+have a constant ripple :math:`A_PB` in the passband(s) only, the stopband 
+drops monotonously. This is achieved by placing an `N`-fold zero at :math:`z=-1`.
+
+For the filter design, the order :math:`N`, the passband ripple :math:`A_PB` and 
+the critical frequency / frequencies F\ :sub:`PB` where the gain drops below 
+:math:`-A_PB` have to be specified. 
+
+The attenuation in the stop band can only be controlled by the filter order. 
+
+**Design routines:**
+
+``scipy.signal.cheby1()``
+``scipy.signal.cheb1ord()``
+
+        """
+        
+        self.info_doc = '**cheby1()**\n' + sig.cheby1.__doc__ \
+          + '**cheb1ord()**\n' + sig.cheb1ord.__doc__
 
     def get_params(self,specs):
         """
