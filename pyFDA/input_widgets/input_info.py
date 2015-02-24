@@ -82,6 +82,7 @@ class InputInfo(QtGui.QWidget):
 #            self.txtFiltInfoBox.append('<hr /><b>Python module docstring:</b>\n')
      
 #  The following variants choke with 
+#   docutils.utils.SystemMessage: <string>:10: (SEVERE/4) Unexpected section title.
 #            self.txtFiltInfoBox.append(publish_string(fb.filObj.info_doc,
 #              writer_name='html'))
 #            self.txtFiltInfoBox.append(publish_parts(fb.filObj.info_doc,
@@ -90,10 +91,6 @@ class InputInfo(QtGui.QWidget):
 #              writer_name='html'))   
 #   The following works, but is ugly:
               self.txtFiltInfoBox.append(fb.filObj.info_doc)
-
-
-#fb.filObj.info_doc
-#writer_name='html'
 
 #------------------------------------------------------------------------------
    
