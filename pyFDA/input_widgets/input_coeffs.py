@@ -26,7 +26,7 @@ class InputCoeffs(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-    def __init__(self, DEBUG = False):
+    def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputCoeffs, self).__init__()
 
@@ -52,16 +52,17 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setAlternatingRowColors(True)
 #        self.tblCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
 #        self.tblCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
-        self.tblCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
+#        self.tblCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
+        self.tblCoeff.selectionModel().currentChanged.connect(self.saveCoeffs) 
         self.tblCoeff.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
                                           QtGui.QSizePolicy.MinimumExpanding)
 
         self.butAddRow = QtGui.QPushButton()
-        self.butAddRow.setToolTip("Add row to coefficient table.")
+        self.butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
         self.butAddRow.setText("Add")
         
         self.butDelRow = QtGui.QPushButton()
-        self.butDelRow.setToolTip("Delete row from coefficient table.")
+        self.butDelRow.setToolTip("Delete selected row(s) from coefficient table.")
         self.butDelRow.setText("Delete")
         
         self.butUpdate = QtGui.QPushButton()
@@ -92,21 +93,26 @@ class InputCoeffs(QtGui.QWidget):
         # ============== Signals & Slots ================================
         self.chkCoeffList.clicked.connect(self.showCoeffs)        
         self.butUpdate.clicked.connect(self.showCoeffs)        
+        self.butDelRow.clicked.connect(self.deleteRows) 
+        self.butAddRow.clicked.connect(self.addRows) 
 
         
     def saveCoeffs(self):
+        """
+        Read out table and save the values to the filter coeff dict
+        """
         coeffs = []
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
         if self.DEBUG: print(num_rows, num_cols)
-        if num_cols > 1:
+        if num_cols > 1: # IIR
             for col in range(num_cols):
                 rows = []
                 for row in range(num_rows):
                     item = self.tblCoeff.item(row, col)
                     rows.append(float(item.text()) if item else 0.)
                 coeffs.append(rows)
-        else:
+        else: # FIR
             col = 0
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
@@ -116,7 +122,9 @@ class InputCoeffs(QtGui.QWidget):
         if self.DEBUG: print ("coeffs updated!")
         
     def showCoeffs(self):
-            
+        """
+        Read out table and save the values to the filter coeff dict
+        """            
         coeffs = fb.fil[0]["coeffs"]
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 
@@ -138,14 +146,14 @@ class InputCoeffs(QtGui.QWidget):
 #            self.bb = fb.fil[0]['coeffs'][0]
 #            self.aa = fb.fil[0]['coeffs'][1]
 
-        if np.ndim(coeffs) == 1:
+        if np.ndim(coeffs) == 1: # FIR
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
             for i in range(len(coeffs)):
                 if self.DEBUG: print(i, coeffs[i])
                 item = QtGui.QTableWidgetItem(str(coeffs[i]))
                 self.tblCoeff.setItem(i,0,item)
-        else:
+        else: # IIR
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
             for i in range(np.shape(coeffs)[1]):
@@ -158,6 +166,30 @@ class InputCoeffs(QtGui.QWidget):
 
         self.tblCoeff.resizeColumnsToContents()
         
+    def deleteRows(self):
+        # returns index to rows where _all_ columns are selected
+        rows = self.tblCoeff.selectionModel().selectedRows() 
+        rows = rows[::-1] # revert order of rows before running the loop
+        print (rows)
+        for r in rows:
+            self.tblCoeff.removeRow(r.row())
+        
+        self.saveCoeffs()
+        
+    def addRows(self):
+        nrows = len(self.tblCoeff.selectionModel().selectedRows())
+        if nrows == 0: 
+            nrows = 1 # add at least one row
+        ncols = self.tblCoeff.columnCount()
+        
+
+        if ncols == 1: # FIR
+            fb.fil[0]["coeffs"].extend(list(np.zeros(nrows)))
+        else:
+            z = np.zeros((ncols, nrows))
+            fb.fil[0]["coeffs"] = np.hstack((fb.fil[0]["coeffs"],z))
+            
+        self.showCoeffs() 
 
 #------------------------------------------------------------------------------
    
