@@ -82,12 +82,12 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs.addStretch()
 
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addLayout(self.layHChkBoxes)
-        vbox.addWidget(self.tblCoeff)
-        vbox.addLayout(self.layHButtonsCoeffs)
-#        vbox.addStretch(1)
-        self.setLayout(vbox)
+        layVMain = QtGui.QVBoxLayout()
+        layVMain.addLayout(self.layHChkBoxes)
+        layVMain.addWidget(self.tblCoeff)
+        layVMain.addLayout(self.layHButtonsCoeffs)
+#        layVMain.addStretch(1)
+        self.setLayout(layVMain)
         
         # ============== Signals & Slots ================================
         self.chkCoeffList.clicked.connect(self.showCoeffs)        
