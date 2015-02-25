@@ -15,16 +15,16 @@ http://pymotw.com/2/articles/data_persistence.html
 
 from __future__ import print_function, division, unicode_literals
 # importing filterbroker runs the module once, defining all globals and variables
-global gD, sF
+global gD # dicts are global by default?
 
-fil = [None] * 10
+fil = [None] * 10 # create empty list with length 10 for filter designs
 gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
 
 # Dictionaries for translating short (internal) names to full (displayed) names
 gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
-                 "BS":"Bandstop","AP":"Allpass", 
+                 "BS":"Bandstop","AP":"Allpass", "MB":"Multiband",
                  "HIL":"Hilbert","DIFF":"Differentiator"}
 gD['dmNames'] = {#IIR
                   "butter":"Butterworth", "cheby1":"Chebychev 1", 
@@ -41,14 +41,14 @@ gD['dmNames'] = {#IIR
 # -----FilterFileReader.__init__() ------
 
 # Lists for dynamic imports from filter design subdirectory
-gD['initFileNames'] = [] # Python file names found in initFile (without .py)
+gD['filtFileNames'] = [] # Python file names found in filtFile (without .py)
 gD['imports'] = {} # dict with filter files / classes
 
 # Dictionary describing the available combinations of response types (rt), 
 # filter types (ft), design methods (dm) and filter order (fo). 
 # This dict is built + overwritten by FilterFileReader.buildFilterTree() !
          
-gD['filterTree'] = {
+filTree = {
     'HP': 
         {'FIR': 
             {'equiripple': 
@@ -85,7 +85,7 @@ gD['filterTree'] = {
 
 
 # -----------------------------------------------------------------------------
-# Dictionaries containing current filter selections specifications, they are
+# Dictionaries containing current filter specifications, they are
 # automatically overwritten 
 #-------------------------------------- 
 # Handle to current filter object

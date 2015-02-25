@@ -39,7 +39,7 @@ class pyFDA(QtGui.QMainWindow):
 
         # Instantiate widget groups
         self.inputAll = input_all.InputAll() # input widgets
-        self.pltAll = plot_all.plotAll() # plot widgets 
+        self.pltAll = plot_all.PlotAll() # plot widgets 
 #        self.inputAll.setMaximumWidth(280)
 
         # ============== UI Layout =====================================
@@ -62,13 +62,20 @@ class pyFDA(QtGui.QMainWindow):
         fileMenu.addAction(aboutAction)
         
         # ============== Signals & Slots ================================
-#        self.butDesignFilt.clicked.connect(self.startDesignFilt)
-        self.inputAll.inputSpecs.butDesignFilt.clicked.connect(self.pltAll.update)
-#        self.pltAll.pltHf.
+
+        self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
+        self.inputAll.inputCoeffs.butUpdate.clicked.connect(self.updateOutput)        
+
+        self.inputAll.inputSpecs.filterChanged.connect(self.inputAll.inputInfo.showInfo)
+
         aboutAction.triggered.connect(self.aboutWindow)    
 
         self.statusMessage("Application is initialized.")
         
+    def updateOutput(self):
+        self.pltAll.updateAll()
+        self.inputAll.updateAll()
+
     def aboutWindow(self):
         QtGui.QMessageBox.about(self, "About pyFDA", 
         ("(c) 2013 - 15 Christian Münker\n\n"

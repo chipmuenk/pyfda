@@ -16,7 +16,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import input_specs, input_files, input_info
+import input_specs, input_files, input_coeffs, input_info
 
 class InputAll(QtGui.QWidget):
     """
@@ -30,6 +30,7 @@ class InputAll(QtGui.QWidget):
 #        self.inputParams = inputParams.inputParams()
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)        
         self.inputFiles = input_files.InputFiles(DEBUG = False)
+        self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
         self.inputInfo = input_info.InputInfo(DEBUG = False)
         
         self.initUI()     
@@ -37,26 +38,26 @@ class InputAll(QtGui.QWidget):
         
     def initUI(self):
         """ Initialize UI with tabbed subplots """
-        tab_widget = QtGui.QTabWidget()
+        tabWidget = QtGui.QTabWidget()
 #        tab_widget.addTab(self.inputParams, 'Params')
-        tab_widget.addTab(self.inputSpecs, 'Specs')
-        tab_widget.addTab(self.inputFiles, 'Files')
-        tab_widget.addTab(self.inputInfo, 'Info')
+        tabWidget.addTab(self.inputSpecs, 'Specs')
+        tabWidget.addTab(self.inputFiles, 'Files')
+        tabWidget.addTab(self.inputCoeffs, 'b,a')
+        tabWidget.addTab(self.inputInfo, 'Info')
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(tab_widget)
+        layVMain = QtGui.QVBoxLayout()
+        layVMain.addWidget(tabWidget)
 #        
-        self.setLayout(vbox)
-#        vbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
-        tab_widget.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        self.setLayout(layVMain)
+#        layVMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+        tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Expanding)
 
         
-#    def update(self):
-#        """ Update and redraw all subplots with new coefficients"""
-#        self.pltHf.draw()
-#        self.pltPhi.draw()
-##        self.redrawAll()
+    def updateAll(self):
+        """ Update all widgets with new filter data"""
+        self.inputCoeffs.showCoeffs()
+
 
      
 

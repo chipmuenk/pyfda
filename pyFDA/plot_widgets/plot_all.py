@@ -19,7 +19,7 @@ if __name__ == "__main__": # relative import if this file is run as __main__
 import plot_hf, plot_phi
 
 
-class plotAll(QtGui.QWidget):
+class PlotAll(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 
@@ -30,9 +30,9 @@ class plotAll(QtGui.QWidget):
         
     def initUI(self):
         """ Initialize UI with tabbed subplots """
-        tab_widget = QtGui.QTabWidget()
-        tab_widget.addTab(self.pltHf, '|H(f)|')
-        tab_widget.addTab(self.pltPhi, 'phi(f)')
+        tabWidget = QtGui.QTabWidget()
+        tabWidget.addTab(self.pltHf, '|H(f)|')
+        tabWidget.addTab(self.pltPhi, 'phi(f)')
         
 #        butDraw = QtGui.QPushButton("&No Function")
 #        butDraw.clicked.connect(self.redrawAll)
@@ -41,14 +41,14 @@ class plotAll(QtGui.QWidget):
 #        hbox.addWidget(butDraw)
 #        hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(tab_widget)
+        layVMain = QtGui.QVBoxLayout()
+        layVMain.addWidget(tabWidget)
 #        
-        self.setLayout(vbox)
+        self.setLayout(layVMain)
 
         
-    def update(self):
-        """ Update and redraw all subplots with new coefficients"""
+    def updateAll(self):
+        """ Update and redraw all subplots with new filter data"""
         self.pltHf.draw()
         self.pltPhi.draw()
 #        self.redrawAll()
@@ -62,7 +62,7 @@ class plotAll(QtGui.QWidget):
     
 def main():
     app = QtGui.QApplication(sys.argv)
-    form = plotAll()
+    form = PlotAll()
     form.show()
     app.exec_()
 

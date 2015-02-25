@@ -58,11 +58,31 @@ class cheby2(object):
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
-        self.info = ("Chebychev Typ 2 Filter haben nur im Stopband Ripple. "
-        "Sie werden spezifiziert über die Ordnung, den zulässigen Ripple im SB "
-        "und über die kritische(n) Frequenz(en) bei denen die Verstärkung "
-        "zuerst den spezifizierten Wert A_SB erreicht.")
-        
+        self.info = """
+**Chebyshev Type 2 filters**
+
+have a constant ripple :math:`A_SB` in the stop band(s) only, the pass band 
+drops monotonously. This is achieved by placing `N/2` zeros along the stop
+band.
+
+The order :math:`N`, stop band ripple :math:`A_SB` and 
+the critical frequency / frequencies F\ :sub:`SB` where the stop band attenuation 
+:math:`A_SB` is reached have to be specified for filter design. 
+
+The corner frequency/ies of the pass band can only be controlled indirectly 
+by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
+
+**Design routines:**
+
+``scipy.signal.cheby2()``
+``scipy.signal.cheb2ord()``
+"""
+        self.info_doc = '    cheby2()\n    ========\n'+sig.cheby2.__doc__#\
+#        +'\n    cheb2ord()\n    ----------\n '+ sig.cheb2ord.__doc__
+
+#'\n    cheby2()\n    ========\n'+ 
+#+ sig.cheb2ord.__doc__ 
+
     def get_params(self,specs):
         """
         Translate parameters from the passed dictionary to instance

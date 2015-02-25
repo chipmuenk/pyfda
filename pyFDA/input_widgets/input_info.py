@@ -4,14 +4,16 @@ Created on Tue Nov 26 10:57:30 2013
 
 @author: Christian Muenker
 
-Tab-Widget for exporting / importing and saving / loading data
+Tab-Widget for displaying infos about filter and filter design method
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
+import textwrap
 from PyQt4 import QtGui
 #import scipy.io
-import numpy as np
-
+from scipy.signal import remez
+#import numpy as np
+from docutils.core import publish_string, publish_parts
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__": 
@@ -30,169 +32,77 @@ class InputInfo(QtGui.QWidget):
         super(InputInfo, self).__init__()
 
         self.initUI()
-        self.showCoeffs()
         self.showInfo()
         
     def initUI(self): 
         """
         Intitialize the widget, consisting of:
-        - 
-        - 
+        - Checkboxes for selecting the info to be displayed
+        - A large text window for displaying infos about the filter design 
+          algorithm
         """
-        # widget / subwindow for parameter selection
-        self.chkFilterInfo = QtGui.QCheckBox()
-        self.chkFilterInfo.setToolTip("Display filter info from filter design file.")
-        self.labFilterInfo = QtGui.QLabel()
-        self.labFilterInfo.setText("Filter Info")
+        # widget / subwindow for filter infos
+        self.chkDocstring = QtGui.QCheckBox()
+        self.chkDocstring.setChecked(False)
+        self.chkDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.chkCoeffList =  QtGui.QCheckBox()
-        self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
-        self.labCoeffList = QtGui.QLabel()
-        self.labCoeffList.setText("Coefficients")
+        self.lblDocstring = QtGui.QLabel()
+        self.lblDocstring.setText("Show Docstring")
+        
+        self.chkRichText = QtGui.QCheckBox()
+        self.chkRichText.setChecked(True)
+        self.chkRichText.setToolTip("Render documentation as Rich Text.")
 
-        self.chkPoleZeroList =  QtGui.QCheckBox()
-        self.chkPoleZeroList.setToolTip("Show poles and zeros as an editable list.")
-        self.labPoleZeroList = QtGui.QLabel()
-        self.labPoleZeroList.setText("Poles / Zeros")
+        self.lblRichText = QtGui.QLabel()
+        self.lblRichText.setText("Rich text")
         
-        self.tableCoeff = QtGui.QTableWidget()
-        self.tableCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
-        self.tableCoeff.setAlternatingRowColors(True)
-#        self.tableCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
-#        self.tableCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
-        self.tableCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
-        self.butAddRow = QtGui.QPushButton()
-        self.butAddRow.setToolTip("Add row to coefficient table.")
-        self.butAddRow.setText("Add")
+        self.txtFiltInfoBox = QtGui.QTextBrowser()
+        self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                          QtGui.QSizePolicy.Expanding)
         
-        self.butDelRow = QtGui.QPushButton()
-        self.butDelRow.setToolTip("Delete row from coefficient table.")
-        self.butDelRow.setText("Delete")
-
-        
-        self.labFiltInfo = QtGui.QLabel()
-        self.labFiltInfo.setWordWrap(True)
-        
-        filtInfoLayout = QtGui.QVBoxLayout()
-        filtInfoLayout.addWidget(self.labFiltInfo)
-        
-        self.filtInfoFrame = QtGui.QFrame()
-        self.filtInfoFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.filtInfoFrame.setLayout(filtInfoLayout)
-        self.filtInfoFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                 QtGui.QSizePolicy.Minimum)
-
-
- 
         # ============== UI Layout =====================================
-        self.chkLayout = QtGui.QHBoxLayout()
-        self.chkLayout.addWidget(self.chkFilterInfo) # filter export button
-        self.chkLayout.addWidget(self.labFilterInfo)
-        self.chkLayout.addStretch(1)
-        self.chkLayout.addWidget(self.chkCoeffList)
-        self.chkLayout.addWidget(self.labCoeffList)
-        self.chkLayout.addStretch(1)        
-        self.chkLayout.addWidget(self.chkPoleZeroList)
-        self.chkLayout.addWidget(self.labPoleZeroList)
-        self.chkLayout.addStretch(10)
-        
-        self.butCoeffLayout = QtGui.QHBoxLayout()
-        self.butCoeffLayout.addWidget(self.butAddRow)
-        self.butCoeffLayout.addWidget(self.butDelRow)
-        self.butCoeffLayout.addStretch()
+        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes.addWidget(self.chkDocstring)
+        self.layHChkBoxes.addWidget(self.lblDocstring)
+        self.layHChkBoxes.addStretch(10)        
+        self.layHChkBoxes.addWidget(self.chkRichText)
+        self.layHChkBoxes.addWidget(self.lblRichText)
 
+        self.layHChkBoxes.addStretch(10)
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addLayout(self.chkLayout)
-        vbox.addWidget(self.tableCoeff)
-        vbox.addLayout(self.butCoeffLayout)
-        vbox.addWidget(self.filtInfoFrame)
-        vbox.addStretch(10)
-        self.setLayout(vbox)
+        layVMain = QtGui.QVBoxLayout()
+        layVMain.addLayout(self.layHChkBoxes)
+        layVMain.addWidget(self.txtFiltInfoBox)
+#        layVMain.addStretch(10)
+        self.setLayout(layVMain)
         
         # ============== Signals & Slots ================================
-        self.chkFilterInfo.clicked.connect(self.showInfo)
-        self.chkCoeffList.clicked.connect(self.showCoeffs)        
+        self.chkDocstring.clicked.connect(self.showInfo)     
+        self.chkRichText.clicked.connect(self.showInfo)     
 
         
     def showInfo(self):
         """
-        Display info from filter design file
+        Display info from filter design file and docstring
         """
-        self.filtInfoFrame.setVisible(self.chkFilterInfo.isChecked())
-        try:
-            self.labFiltInfo.setText(fb.filObj.info)
-        except AttributeError as e:
-            print(e)
-    
-        
-    def saveCoeffs(self):
-        coeffs = []
-        num_rows, num_cols = self.tableCoeff.rowCount(),\
-                                        self.tableCoeff.columnCount()
-        print(num_rows, num_cols)
-        if num_cols > 1:
-            for col in range(num_cols):
-                rows = []
-                for row in range(num_rows):
-                    item = self.tableCoeff.item(row, col)
-                    rows.append(float(item.text()) if item else 0.)
-                coeffs.append(rows)
+        if hasattr(fb.filObj,'info'):
+            self.txtFiltInfoBox.setText(publish_string(
+                textwrap.dedent(fb.filObj.info), writer_name='html', 
+                settings_overrides={'output_encoding': 'unicode'}))
         else:
-            col = 0
-            for row in range(num_rows):
-                item = self.tableCoeff.item(row, col)
-                coeffs.append(float(item.text()) if item else 0.)            
-        
-        fb.fil[0]['coeffs'] = coeffs
-        print ("coeffs updated!")
-        
-    def showCoeffs(self):
+            self.txtFiltInfoBox.setText("")
             
-        coeffs = fb.fil[0]["coeffs"]
-        self.tableCoeff.setVisible(self.chkCoeffList.isChecked())
-
-        self.tableCoeff.clear()
-        self.tableCoeff.setRowCount(max(np.shape(coeffs)))
-
-
-        if self.DEBUG:
-            print("=====================\nInputInfo.showCoeffs")
-            print("Coeffs:\n",coeffs)
-            print ("shape", np.shape(coeffs))
-            print ("len", len(coeffs))
-            print("ndim", np.ndim(coeffs))
-            
-#        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
-#            self.bb = fb.fil[0]['coeffs']
-#            self.aa = 1.
-#        else: # IIR
-#            self.bb = fb.fil[0]['coeffs'][0]
-#            self.aa = fb.fil[0]['coeffs'][1]
-
-        if np.ndim(coeffs) == 1:
-            print("FIR!")
-            self.tableCoeff.setColumnCount(1)
-            self.tableCoeff.setHorizontalHeaderLabels(["b"])
-            for i in range(len(coeffs)):
-                print(i, coeffs[i])
-                item = QtGui.QTableWidgetItem(str(coeffs[i]))
-                self.tableCoeff.setItem(i,0,item)
-        else:
-            print("IIR!")
-            self.tableCoeff.setColumnCount(2)
-            self.tableCoeff.setHorizontalHeaderLabels(["b", "a"])
-            for i in range(np.shape(coeffs)[1]):
-#                print(i, fb.fil[0]["coeffs"][0][i])
-#                item = QtGui.QTableWidgetItem(coeffs[0][i])
-#                bCoeffs.append(str(coeffs[0][i]))
-#                aCoeffs.append(str(coeffs[1][i]))
-                self.tableCoeff.setItem(i,0,QtGui.QTableWidgetItem(str(coeffs[0][i])))
-                self.tableCoeff.setItem(i,1,QtGui.QTableWidgetItem(str(coeffs[1][i])))
-
-        self.tableCoeff.resizeColumnsToContents()
-
-
+        if self.chkDocstring.isChecked() and hasattr(fb.filObj,'info_doc'):
+            if self.chkRichText.isChecked:
+                self.txtFiltInfoBox.append(
+                    '<hr /><b>Python module docstring:</b>\n')
+                self.txtFiltInfoBox.append(publish_string(
+                    textwrap.dedent(fb.filObj.info_doc), writer_name='html'))
+            else:
+                self.txtFiltInfoBox.append('\nPython module docstring:\n')
+                self.txtFiltInfoBox.append(
+                     textwrap.dedent(fb.filObj.info_doc))
+                
 
 #------------------------------------------------------------------------------
    

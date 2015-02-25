@@ -9,6 +9,7 @@ from __future__ import print_function, division, unicode_literals
 import sys, os 
 import numpy as np
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -21,15 +22,22 @@ import filterbroker as fb
     
 import input_filter, input_order, input_amp_specs, input_freq_specs,\
     input_weight_specs
-from plot_widgets import plot_all
+#from plot_widgets import plot_all
 
 
 class InputSpecs(QtGui.QWidget):
+    """
+    Build widget for entering all filter specs
+    """
+    # class variable (shared between instances if more than one exists)
+    filterDesigned = pyqtSignal()  # emitted when filter has been designed
+    filterChanged = pyqtSignal()
     
     def __init__(self, DEBUG = False):
         super(InputSpecs, self).__init__() 
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
+
 
         self.DEBUG = DEBUG  
 #        self.ftb = FilterTreeBuilder('init.txt', 'filter_design', 
@@ -63,58 +71,61 @@ class InputSpecs(QtGui.QWidget):
         self.wspec = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
                     DEBUG = False)
         
-        self.msg = QtGui.QLabel(self)
-        self.msg.setText("Just click it!")
-        self.msg.setWordWrap(True)
-#        self.msg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        self.lblMsg = QtGui.QLabel(self)
+        self.lblMsg.setWordWrap(True)
+#        self.lblMsg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
         
-        msgLayout = QtGui.QVBoxLayout()
-        msgLayout.addWidget(self.msg)
+        layVMsg = QtGui.QVBoxLayout()
+        layVMsg.addWidget(self.lblMsg)
         
-        msgFrame = QtGui.QFrame()
-        msgFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        msgFrame.setLayout(msgLayout)
-        msgFrame.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        frmMsg = QtGui.QFrame()
+        frmMsg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        frmMsg.setLayout(layVMsg)
+        frmMsg.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
         
-        self.msg.setVisible(True)
+        self.lblMsg.setVisible(True)
         self.wspec.setVisible(True)
         self.aspec.setVisible(True)
         
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
-        self.pltAll = plot_all.plotAll() # instantiate tabbed plot widgets 
+        self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
+        self.butReadFiltTree.setToolTip("Re-read filter design directory and build filter design tree.")
+
         """
         LAYOUT      
         """
-        self.layout=QtGui.QGridLayout()
-        self.layout.addWidget(self.sf,0,0,1,2)  # Design method (IIR - ellip, ...)
-        self.layout.addWidget(self.fo,1,0,1,2)  # Filter order
-        self.layout.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
-        self.layout.addWidget(self.aspec,3,0)   # Amplitude specs
-        self.layout.addWidget(self.wspec,3,1)   # Weight specs
-        self.layout.addWidget(msgFrame,4,0,1,2)  # Text message
+        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
+        layGMain = QtGui.QGridLayout()
+        layGMain.addWidget(self.sf,0,0,1,2)  # Design method (IIR - ellip, ...)
+        layGMain.addWidget(self.fo,1,0,1,2)  # Filter order
+        layGMain.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
+        layGMain.addWidget(self.aspec,3,0)   # Amplitude specs
+        layGMain.addWidget(self.wspec,3,1)   # Weight specs
+        layGMain.addWidget(frmMsg,4,0,1,2)  # Text message
+        layGMain.addItem(spcV,5,0)
+        layGMain.addWidget(self.butDesignFilt, 6,0)
+        layGMain.addWidget(self.butReadFiltTree, 6,1)
 
-        mainLayout = QtGui.QVBoxLayout(self)
-        mainLayout.addLayout(self.layout)
-        mainLayout.addStretch()
-        mainLayout.addWidget(self.butDesignFilt)   # Design Filter!
-        self.setLayout(mainLayout)
+        self.setLayout(layGMain)
+        
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
         # Call chooseDesignMethod every time filter selection is changed: 
         self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
-        self.sf.comboResponseType.activated.connect(self.chooseDesignMethod)
-        self.sf.comboFilterType.activated.connect(self.chooseDesignMethod)
-        self.sf.comboDesignMethod.activated.connect(self.chooseDesignMethod)
+        self.sf.cmbResponseType.activated.connect(self.chooseDesignMethod)
+        self.sf.cmbFilterType.activated.connect(self.chooseDesignMethod)
+        self.sf.cmbDesignMethod.activated.connect(self.chooseDesignMethod)
         self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
-        self.butDesignFilt.clicked.connect(self.startDesignFilt)   
+        self.butDesignFilt.clicked.connect(self.startDesignFilt)
+        self.butReadFiltTree.clicked.connect(self.sf.ftb.initFilters)
 
         self.chooseDesignMethod() # first time initialization
         
     def chooseDesignMethod(self):
         """
         Reads:  fb.fil[0] (currently selected filter), extracting info
-                from fb.gD['filterTree']
+                from fb.filTree
         Writes:
         Depending on SelectFilter and frequency specs, the values of the 
         widgets fo, fspec are recreated. For widget ms, the visibility is changed
@@ -129,9 +140,9 @@ class InputSpecs(QtGui.QWidget):
         ft = fb.fil[0]['ft']
         dm = fb.fil[0]['dm']
         fo = fb.fil[0]['fo']  
-        myParams = fb.gD['filterTree'][rt][ft][dm][fo]['par']
-        myEnbWdg = fb.gD['filterTree'][rt][ft][dm][fo]['enb'] # enabled widgets
-        myMsg    = fb.gD['filterTree'][rt][ft][dm][fo]['msg'] # message
+        myParams = fb.filTree[rt][ft][dm][fo]['par']
+        myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
+        myMsg    = fb.filTree[rt][ft][dm][fo]['msg'] # message
 
         # build separate parameter lists according to the first letter
         self.freqParams = [l for l in myParams if l[0] == 'F']
@@ -155,7 +166,9 @@ class InputSpecs(QtGui.QWidget):
         self.wspec.setVisible(self.weightParams != []) 
         self.wspec.setEnabled("wspec" in myEnbWdg)
         self.wspec.setEntries(newLabels = self.weightParams)
-        self.msg.setText(myMsg)
+        self.lblMsg.setText(myMsg)
+        
+        self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()        
             
     def storeAll(self):
         """
@@ -172,9 +185,15 @@ class InputSpecs(QtGui.QWidget):
   
     def startDesignFilt(self):
         """
-        Design Filter
+        Start the actual filter design process: 
+        - store the entries of all input widgets in the global filter dict.
+        - call the design method, passing the whole dictionary as the 
+          argument: let the design method pick the needed specs
+        - update the input widgets in case weights, corner frequencies etc.
+          have been changed by the filter design method
+        - the plots are updated via signal-slot connection 
         """
-        self.storeAll() # entries of input widgets -> fb.fil[0] 
+        self.storeAll() # store entries of all input widgets -> fb.fil[0] 
         if self.DEBUG:
             print("--- pyFDA.py : startDesignFilter ---")
             print('Specs:', fb.fil[0])#params)
@@ -183,16 +202,20 @@ class InputSpecs(QtGui.QWidget):
 
         # Now construct the instance method from the response type (e.g.
         # 'LP'+'man' -> cheby1.LPman) and
-        # design the filter by passing current specs to the method:
-        # cheby1.LPman(fb.fil[0])
+        # design the filter by passing current specs to the method, yielding 
+        # e.g. cheby1.LPman(fb.fil[0])
         getattr(fb.filObj, fb.fil[0]['rt'] +
                                 fb.fil[0]['fo'])(fb.fil[0])
-        # The filter design routines write coeffs etc. back to global filter dict
+        # The filter design routines write coeffs, poles/zeros etc. back to 
+        # the global filter dict
                                 
         # Update filter order. weights and freqs in case they have been changed
         self.fo.updateEntries()
         self.wspec.loadEntries()
         self.fspec.loadEntries()
+        
+        self.filterDesigned.emit() # ->pyFDA -> pltAll.updateAll()
+
         
         if self.DEBUG:
             print("=== pyFDA.py : startDesignFilter ===")
@@ -202,7 +225,6 @@ class InputSpecs(QtGui.QWidget):
             print("N = ",fb.fil[0]['N'])
         print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
      
-#        self.pltAll.update() is executed from pyFDA.py via signal-slot conn.!
   
 #------------------------------------------------------------------------------ 
    
