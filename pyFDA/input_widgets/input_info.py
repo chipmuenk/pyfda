@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
 import filterbroker as fb # importing filterbroker initializes all its globals
 
-
+# TODO: Setting the cursor position doesn't work yet
 class InputInfo(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -85,6 +85,9 @@ class InputInfo(QtGui.QWidget):
         """
         Display info from filter design file and docstring
         """
+        
+        pos = self.txtFiltInfoBox.textCursor().position()
+#        print(pos)
         if hasattr(fb.filObj,'info'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
@@ -106,7 +109,9 @@ class InputInfo(QtGui.QWidget):
             else:
                 self.txtFiltInfoBox.append('\nPython module docstring:\n')
                 self.txtFiltInfoBox.append(textwrap.dedent(fb.filObj.info_doc))
-                
+
+#        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect
+        self.txtFiltInfoBox.moveCursor(QtGui.QTextCursor.Start)
 
 #------------------------------------------------------------------------------
    
