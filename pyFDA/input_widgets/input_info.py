@@ -86,22 +86,26 @@ class InputInfo(QtGui.QWidget):
         Display info from filter design file and docstring
         """
         if hasattr(fb.filObj,'info'):
-            self.txtFiltInfoBox.setText(publish_string(
-                textwrap.dedent(fb.filObj.info), writer_name='html', 
-                settings_overrides={'output_encoding': 'unicode'}))
+            if self.chkRichText.isChecked():
+                self.txtFiltInfoBox.setText(publish_string(
+                    textwrap.dedent(fb.filObj.info), writer_name='html', 
+                    settings_overrides={'output_encoding': 'unicode'}))
+            else:
+                self.txtFiltInfoBox.setText(textwrap.dedent(fb.filObj.info))
+
+                
         else:
             self.txtFiltInfoBox.setText("")
             
         if self.chkDocstring.isChecked() and hasattr(fb.filObj,'info_doc'):
-            if self.chkRichText.isChecked:
+            if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.append(
                     '<hr /><b>Python module docstring:</b>\n')
                 self.txtFiltInfoBox.append(publish_string(
                     textwrap.dedent(fb.filObj.info_doc), writer_name='html'))
             else:
                 self.txtFiltInfoBox.append('\nPython module docstring:\n')
-                self.txtFiltInfoBox.append(
-                     textwrap.dedent(fb.filObj.info_doc))
+                self.txtFiltInfoBox.append(textwrap.dedent(fb.filObj.info_doc))
                 
 
 #------------------------------------------------------------------------------
