@@ -93,12 +93,12 @@ class SelectFilter(QtGui.QWidget):
         layVAllWdg.addLayout(layHStdWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
         
-        self.sfFrame = QtGui.QFrame()
-        self.sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.sfFrame.setLayout(layVAllWdg)
+        self.frmMain = QtGui.QFrame()
+        self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        self.frmMain.setLayout(layVAllWdg)
         
         layHMain = QtGui.QHBoxLayout()
-        layHMain.addWidget(self.sfFrame)
+        layHMain.addWidget(self.frmMain)
         self.setLayout(layHMain)
 #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
@@ -117,7 +117,7 @@ class SelectFilter(QtGui.QWidget):
         Triggered when cmbResponseType (LP, HP, ...) is changed:
         Copy selection to self.rt and fb.gD and reconstruct filter type combo
         """ 
-        self.rtIdx =self.cmbResponseType.currentIndex()       
+        self.rtIdx = self.cmbResponseType.currentIndex()       
         self.rt = str(self.cmbResponseType.itemData(self.rtIdx))
          
         fb.fil[0]['rt'] = self.rt # abbreviation

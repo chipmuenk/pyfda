@@ -214,7 +214,7 @@ class InputSpecs(QtGui.QWidget):
         self.wspec.loadEntries()
         self.fspec.loadEntries()
         
-        self.filterDesigned.emit() # ->pyFDA -> pltAll.updateAll()
+        self.filterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
 
         
         if self.DEBUG:

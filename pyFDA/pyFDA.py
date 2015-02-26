@@ -22,24 +22,24 @@ class pyFDA(QtGui.QMainWindow):
         self.DEBUG = True
         super(pyFDA, self).__init__()
         # read directory with filterDesigns and construct filter tree from it
-#        self.ffr = FilterFileReader('Init.txt', 'filterDesign', 
-#                                    commentChar = '#', DEBUG = DEBUG) # 
-        
+#        self.ffr = FilterFileReader('Init.txt', 'filterDesign',
+#                                    commentChar = '#', DEBUG = DEBUG) #
+
         #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
 
-        self.initUI()     
-        
-    def initUI(self): 
+        self.initUI()
+
+    def initUI(self):
         """
         Intitialize the main GUI, consisting of:
         - Subwindow for parameter selection [-> ChooseParams.ChooseParams()]
-        - Filter Design button [-> self.startDesignFilt()] 
+        - Filter Design button [-> self.startDesignFilt()]
         - Plot Window [-> plotAll.plotAll()]
         """
 
         # Instantiate widget groups
         self.inputAll = input_all.InputAll() # input widgets
-        self.pltAll = plot_all.PlotAll() # plot widgets 
+        self.pltAll = plot_all.PlotAll() # plot widgets
 #        self.inputAll.setMaximumWidth(280)
 
         # ============== UI Layout =====================================
@@ -51,7 +51,7 @@ class pyFDA(QtGui.QMainWindow):
         self.setCentralWidget(_widget)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
-        
+
         #=============== Menubar =======================================
         aboutAction = QtGui.QAction('&Info', self)
         aboutAction.setShortcut('Ctrl+A')
@@ -60,34 +60,34 @@ class pyFDA(QtGui.QMainWindow):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&About')
         fileMenu.addAction(aboutAction)
-        
+
         # ============== Signals & Slots ================================
 
         self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
-        self.inputAll.inputCoeffs.butUpdate.clicked.connect(self.updateOutput)        
+        self.inputAll.inputCoeffs.butUpdate.clicked.connect(self.updateOutput)   
 
         self.inputAll.inputSpecs.filterChanged.connect(self.inputAll.inputInfo.showInfo)
 
-        aboutAction.triggered.connect(self.aboutWindow)    
+        aboutAction.triggered.connect(self.aboutWindow)
 
         self.statusMessage("Application is initialized.")
-        
+
     def updateOutput(self):
         self.pltAll.updateAll()
         self.inputAll.updateAll()
 
     def aboutWindow(self):
-        QtGui.QMessageBox.about(self, "About pyFDA", 
+        QtGui.QMessageBox.about(self, "About pyFDA",
         ("(c) 2013 - 15 Christian Münker\n\n"
         "A graphical tool for designing, analyzing and synthesizing digital filters")
-        )   
+        )
 
     def statusMessage(self, message):
         self.statusBar().showMessage(message)
-        
+
 
 #------------------------------------------------------------------------------
-   
+
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
@@ -95,7 +95,5 @@ if __name__ == '__main__':
     app.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     main.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     main.show()
-   
+
     app.exec_()
-    
-    #sys.exit(app.exec_()) ?
