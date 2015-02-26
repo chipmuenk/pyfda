@@ -77,11 +77,12 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
 ``scipy.signal.cheby2()``
 ``scipy.signal.cheb2ord()``
 """
-        self.info_doc = '    cheby2()\n    ========\n'+sig.cheby2.__doc__#\
-#        +'\n    cheb2ord()\n    ----------\n '+ sig.cheb2ord.__doc__
 
-#'\n    cheby2()\n    ========\n'+ 
-#+ sig.cheb2ord.__doc__ 
+        self.info_doc = []
+        self.info_doc.append('cheby2()\n========')
+        self.info_doc.append(sig.cheby2.__doc__)
+        self.info_doc.append('cheb2ord()\n==========')
+        self.info_doc.append(sig.cheb2ord.__doc__)
 
     def get_params(self,specs):
         """

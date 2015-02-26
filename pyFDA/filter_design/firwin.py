@@ -11,6 +11,8 @@ https://github.com/scipy/scipy/pull/3717
 https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
+from importlib import import_module
+import scipy
 import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
@@ -20,6 +22,7 @@ from PyQt4 import QtGui
 
 # TODO: Order of A_XX is incorrect e.g. for BP
 # TODO: Hilbert not working correctly yet
+# TODO: Windows with parameters are missing
 
 output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
@@ -28,6 +31,7 @@ class firwin(object):
     
     def __init__(self):
         self.name = {'firwin':'Windowed FIR'}
+#        print(scipy.signal.windows.boxcar.__doc__)
 
         # common messages for all man. / min. filter order response types:            
         msg_man = (r"Enter desired order and corner frequencies. <br />"
@@ -71,11 +75,15 @@ class firwin(object):
 #            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
           #"DIFF":
                    }
-        self.info = ("Windowed FIR filters are designed by truncating the "
-        "infinite impulse response of an ideal filter with a window function. "
-        "The kind of selected window has great influence on ripple etc. of the "
-        "resulting filter.")
-        self.info_doc = sig.firwin.__doc__
+        self.info = """Windowed FIR filters are designed by truncating the
+        infinite impulse response of an ideal filter with a window function.
+        The kind of selected window has great influence on ripple etc. of the
+        resulting filter.
+        """
+        self.info_doc = []
+        self.info_doc.append('firwin()\n========')
+        self.info_doc.append(sig.firwin.__doc__)
+#        self.info_doc.append(getattr(sig.windows, self.firWindow + '__doc__'))
 
         # Additional subwidgets needed for design:
         # These subwidgets are instantiated where needed using the handle to 
@@ -107,6 +115,13 @@ class firwin(object):
         self.firWindow = str(self.combo_firwin_win.currentText())
         self.alg = str(self.combo_firwin_alg.currentText())
         print(self.firWindow)
+
+#        mod = import_module(scipy.signal) # doesn't work
+#        print(sig.boxcar.__doc__) # this works
+#        met = getattr(sig.boxcar, '.__doc__'  )
+
+
+
 #        print(type(self.firWindow))
 #        self.firWindow = 'hann'
         #self.alg = self.combo_firwin_alg.currentText()
