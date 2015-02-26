@@ -88,6 +88,7 @@ class InputInfo(QtGui.QWidget):
         
         pos = self.txtFiltInfoBox.textCursor().position()
 #        print(pos)
+        
         if hasattr(fb.filObj,'info'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
@@ -99,19 +100,34 @@ class InputInfo(QtGui.QWidget):
                 
         else:
             self.txtFiltInfoBox.setText("")
+
             
         if self.chkDocstring.isChecked() and hasattr(fb.filObj,'info_doc'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.append(
-                    '<hr /><b>Python module docstring:</b>\n')
-                self.txtFiltInfoBox.append(publish_string(
-                    textwrap.dedent(fb.filObj.info_doc), writer_name='html'))
+                '<hr /><b>Python module docstring:</b>\n')
+                for doc in fb.filObj.info_doc:
+                    self.txtFiltInfoBox.append(publish_string(
+                     self.cleanDoc(doc), writer_name='html'))
             else:
                 self.txtFiltInfoBox.append('\nPython module docstring:\n')
-                self.txtFiltInfoBox.append(textwrap.dedent(fb.filObj.info_doc))
+                for doc in fb.filObj.info_doc:
+                    self.txtFiltInfoBox.append(self.cleanDoc(doc))
+
+#                self.txtFiltInfoBox.append(textwrap.dedent(fb.filObj.info_doc))
+
+#
+#                self.txtFiltInfoBox.append(publish_string(
+#                    textwrap.dedent(fb.filObj.info_doc), writer_name='html'))
 
 #        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect
         self.txtFiltInfoBox.moveCursor(QtGui.QTextCursor.Start)
+        
+    def cleanDoc(self, doc):
+        lines = doc.splitlines()
+        result = lines[0].lstrip() +\
+         "\n" + textwrap.dedent("\n".join(lines[1:]))# + '\n'
+        return result
 
 #------------------------------------------------------------------------------
    

@@ -76,13 +76,12 @@ The attenuation in the stop band can only be controlled by the filter order.
 ``scipy.signal.cheb1ord()``
 
         """
-# Dirty hack required to properly display chep1ord() doc: the docstring starts
-# with no indentation, requiring manual prepending        
-        
-        self.info_doc  = '    cheby1()\n    ========\n'
-        self.info_doc += sig.cheby1.__doc__ + '\n'
-        self.info_doc += '    cheb1ord()\n    ==========\n'
-        self.info_doc += '    ' + sig.cheb1ord.__doc__
+       
+        self.info_doc = []
+        self.info_doc.append('cheby1()\n========')
+        self.info_doc.append(sig.cheby1.__doc__)
+        self.info_doc.append('cheb1ord()\n==========')
+        self.info_doc.append(sig.cheb1ord.__doc__)
 
     def get_params(self,specs):
         """
