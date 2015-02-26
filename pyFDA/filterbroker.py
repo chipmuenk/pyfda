@@ -17,7 +17,8 @@ from __future__ import print_function, division, unicode_literals
 # importing filterbroker runs the module once, defining all globals and variables
 #global gD # dicts are global by default?
 
-fil = [None] * 10 # create empty list with length 10 for filter designs
+
+
 gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':12} # rc Params for matplotlib
 gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
@@ -43,7 +44,8 @@ gD['dmNames'] = {#IIR
 # Lists for dynamic imports from filter design subdirectory
 gD['filtFileNames'] = [] # Python file names found in filtFile (without .py)
 gD['imports'] = {} # dict with filter files / classes
-
+rcFDA = {
+    'freqSpecsRangeWhole':False}
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
 # This dict is built + overwritten by FilterFileReader.buildFilterTree() !
@@ -91,6 +93,8 @@ filTree = {
 # Handle to current filter object
 filObj = ""
 # Current filter selection, parameters and specifications
+fil = [None] * 10 # create empty list with length 10 for filter designs
+
 fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'N':10, 'f_S':1,
             'A_PB':1., 'A_PB2': 1., 'F_PB':0.1, 'F_PB2':0.4,

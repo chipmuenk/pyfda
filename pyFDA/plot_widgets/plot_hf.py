@@ -247,7 +247,8 @@ class PlotHf(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate |H(W)| for W = 0 ... pi:
-        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'], whole = False)
+        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'], 
+            whole = fb.rcFDA['freqSpecsRangeWhole'])
         if self.linphase: # remove the linear phase
             H = H * np.exp(1j * W * fb.fil[0]["N"]/2.)
 

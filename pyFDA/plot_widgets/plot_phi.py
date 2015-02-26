@@ -86,7 +86,8 @@ class PlotPhi(QtGui.QMainWindow):
         if self.DEBUG:
             print("--- plotPhi.draw() ---") 
             print("b,a = ", self.bb, self.aa)
-        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT']) # calculate H(W) for W = 0 ... pi
+        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
+                        whole = fb.rcFDA['freqSpecsRangeWhole']) # calculate H(W) for W = 0 ... pi
 
         F = W / (2 * np.pi)
 
