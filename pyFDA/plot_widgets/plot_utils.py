@@ -83,11 +83,11 @@ DEBUG = True
 #            self.hbox1.addWidget(w)
 #            self.hbox1.setAlignment(w, QtCore.Qt.AlignVCenter)
 #            
-#        self.vbox = QtGui.QVBoxLayout()
-#        self.vbox.addWidget(self.mpl_toolbar)
-#        self.vbox.addWidget(self.pltCanv)
-#        self.vbox.addLayout(self.hbox1)         
-#        self.setLayout(self.vbox)
+#        self.layVMainMpl = QtGui.QVBoxLayout()
+#        self.layVMainMpl.addWidget(self.mpl_toolbar)
+#        self.layVMainMpl.addWidget(self.pltCanv)
+#        self.layVMainMpl.addLayout(self.hbox1)         
+#        self.setLayout(self.layVMainMpl)
 #        
 #    def redraw(self):
 #        """
@@ -137,13 +137,13 @@ class MplWidget(QtGui.QWidget):
 #            self.hbox.setAlignment(w, QtCore.Qt.AlignVCenter)
 #        self.hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
             
-        self.vbox = QtGui.QVBoxLayout()
-#        self.vbox.addLayout(self.hbox)
-        self.vbox.addWidget(self.mplToolbar)
-        self.vbox.addWidget(self.pltCanv)
+        self.layVMainMpl = QtGui.QVBoxLayout()
+#        self.layVMainMpl.addLayout(self.hbox)
+        self.layVMainMpl.addWidget(self.mplToolbar)
+        self.layVMainMpl.addWidget(self.pltCanv)
  
        
-        self.setLayout(self.vbox)
+        self.setLayout(self.layVMainMpl)
         
     def redraw(self):
         """
@@ -245,6 +245,7 @@ class MyMplToolbar(NavigationToolbar):
 # KeyError: u'pan'
 # dict _actions should is set 
 # in backend_qt5.NavigationToolbar2QT._init_toolbar, using self.toolitems,
+
 # subclassed from matplotlib.backend_bases.NavigationToolbar2:
 
     # list of toolitems to add to the toolbar, format is:
