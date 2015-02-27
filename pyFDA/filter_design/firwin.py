@@ -41,12 +41,12 @@ class firwin(object):
                     "attenuation and the corresponding corner frequencies.")
 
         # VISIBLE widgets for all man. / min. filter order response types:     
-        vis_man = ['fo','fspec','aspec'] # manual filter order
-        vis_min = ['fo','fspec','aspec'] # minimum filter order
+        vis_man = ['fo','fspecs','aspecs'] # manual filter order
+        vis_min = ['fo','fspecs','aspecs'] # minimum filter order
 
         # ENABLED widgets for all man. / min. filter order response types:     
-        enb_man = ['fo','fspec','wspec'] # manual filter order
-        enb_min = ['fo','fspec','aspec'] # minimum filter order
+        enb_man = ['fo','fspecs','wspecs'] # manual filter order
+        enb_min = ['fo','fspecs','aspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:    
         par_man = ['N', 'f_S'] # enabled widget for man. filt. order
@@ -161,7 +161,7 @@ class firwin(object):
             self.coeffs = sig.zpk2tf(arg[0], arg[1], arg[2])        
             self.zpk = arg
         else: # arg = [b,a]
-            self.zpk = sig.tf2zpk(arg[0], arg[1])#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
+            self.zpk = sig.tf2zpk(arg[0], arg[1])
             self.coeffs = arg  
         specs["coeffs"] = self.coeffs
         specs["zpk"] = self.zpk

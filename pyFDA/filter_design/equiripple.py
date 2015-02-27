@@ -45,12 +45,12 @@ class equiripple(object):
                     "attenuation and the corresponding corner frequencies.")
 
         # VISIBLE widgets for all man. / min. filter order response types:     
-        vis_man = ['fo','fspec','aspec'] # manual filter order
-        vis_min = ['fo','fspec','aspec'] # minimum filter order
+        vis_man = ['fo','fspecs','aspecs'] # manual filter order
+        vis_min = ['fo','fspecs','aspecs'] # minimum filter order
 
         # ENABLED widgets for all man. / min. filter order response types:     
-        enb_man = ['fo','fspec','wspec'] # manual filter order
-        enb_min = ['fo','fspec','aspec'] # minimum filter order
+        enb_man = ['fo','fspecs','wspecs'] # manual filter order
+        enb_min = ['fo','fspecs','aspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:    
         par_man = ['N', 'f_S'] # enabled widget for man. filt. order

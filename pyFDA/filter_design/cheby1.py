@@ -33,8 +33,8 @@ class cheby1(object):
             "band attenuation and the corresponding corner frequencies.")
 
         # enabled widgets for all man. / min. filter order response types:    
-        enb_man = ['fo','fspec','aspec'] # enabled widget for man. filt. order
-        enb_min = ['fo','fspec','aspec'] # enabled widget for min. filt. order
+        enb_man = ['fo','fspecs','aspecs'] # enabled widget for man. filt. order
+        enb_min = ['fo','fspecs','aspecs'] # enabled widget for min. filt. order
         
         # parameters for all man. / min. filter order response types:    
         par_man = ['N', 'f_S', 'F_PB', 'A_PB'] # enabled widget for man. filt. order

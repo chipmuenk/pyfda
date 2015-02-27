@@ -29,7 +29,7 @@ class InputSpecs(QtGui.QWidget):
     """
     Build widget for entering all filter specs
     """
-    # class variable (shared between instances if more than one exists)
+    # class variables (shared between instances if more than one exists)
     filterDesigned = pyqtSignal()  # emitted when filter has been designed
     filterChanged = pyqtSignal()
     
@@ -51,7 +51,7 @@ class InputSpecs(QtGui.QWidget):
         sf : Select Filter with response type rt (LP, ...), 
               filter type ft (IIR, ...), and design method dm (cheby1, ...)
         fo : Filter Order (numeric or 'min')
-        fspec : Frequency Specifications 
+        fspecs : Frequency Specifications 
         ms : Magnitude Specifications with the subwidgets
             txt : only text field for comments / instruction
             val : infostring (title), Label, value
@@ -62,13 +62,13 @@ class InputSpecs(QtGui.QWidget):
         self.sf = input_filter.SelectFilter(DEBUG = True)
         self.fo = input_order.InputOrder(DEBUG = False)
         # subwidget for Frequency Specs
-        self.fspec = input_freq_specs.InputFreqSpecs(specs = fb,
+        self.fspecs = input_freq_specs.InputFreqSpecs(specs = fb,
                     DEBUG = False)
         # subwidget for Amplitude Specs        
-        self.aspec = input_amp_specs.InputAmpSpecs(specs = fb.fil[0],
+        self.aspecs = input_amp_specs.InputAmpSpecs(specs = fb.fil[0],
                     DEBUG = False)
         # subwidget for Weight Specs                                           
-        self.wspec = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
+        self.wspecs = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
                     DEBUG = False)
         
         self.lblMsg = QtGui.QLabel(self)
@@ -85,8 +85,8 @@ class InputSpecs(QtGui.QWidget):
                                  QtGui.QSizePolicy.Minimum)
         
         self.lblMsg.setVisible(True)
-        self.wspec.setVisible(True)
-        self.aspec.setVisible(True)
+        self.wspecs.setVisible(True)
+        self.aspecs.setVisible(True)
         
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
@@ -99,9 +99,9 @@ class InputSpecs(QtGui.QWidget):
         layGMain = QtGui.QGridLayout()
         layGMain.addWidget(self.sf,0,0,1,2)  # Design method (IIR - ellip, ...)
         layGMain.addWidget(self.fo,1,0,1,2)  # Filter order
-        layGMain.addWidget(self.fspec,2,0,1,2)  # Freq. specifications
-        layGMain.addWidget(self.aspec,3,0)   # Amplitude specs
-        layGMain.addWidget(self.wspec,3,1)   # Weight specs
+        layGMain.addWidget(self.fspecs,2,0,1,2)  # Freq. specifications
+        layGMain.addWidget(self.aspecs,3,0)   # Amplitude specs
+        layGMain.addWidget(self.wspecs,3,1)   # Weight specs
         layGMain.addWidget(frmMsg,4,0,1,2)  # Text message
         layGMain.addItem(spcV,5,0)
         layGMain.addWidget(self.butDesignFilt, 6,0)
@@ -128,7 +128,7 @@ class InputSpecs(QtGui.QWidget):
                 from fb.filTree
         Writes:
         Depending on SelectFilter and frequency specs, the values of the 
-        widgets fo, fspec are recreated. For widget ms, the visibility is changed
+        widgets fo, fspecs are recreated. For widget ms, the visibility is changed
         as well.
         """
         
@@ -159,13 +159,13 @@ class InputSpecs(QtGui.QWidget):
         # pass new labels to widgets
         # set widgets invisible if param list is empty
         self.fo.updateEntries()
-        self.fspec.setEntries(newLabels = self.freqParams) # update frequency spec labels
-        self.aspec.setVisible(self.ampParams != [])
-        self.aspec.setEnabled("aspec" in myEnbWdg)
-        self.aspec.setEntries(newLabels = self.ampParams)
-        self.wspec.setVisible(self.weightParams != []) 
-        self.wspec.setEnabled("wspec" in myEnbWdg)
-        self.wspec.setEntries(newLabels = self.weightParams)
+        self.fspecs.setEntries(newLabels = self.freqParams) # update frequency spec labels
+        self.aspecs.setVisible(self.ampParams != [])
+        self.aspecs.setEnabled("aspecs" in myEnbWdg)
+        self.aspecs.setEntries(newLabels = self.ampParams)
+        self.wspecs.setVisible(self.weightParams != []) 
+        self.wspecs.setEnabled("wspecs" in myEnbWdg)
+        self.wspecs.setEntries(newLabels = self.weightParams)
         self.lblMsg.setText(myMsg)
         
         self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()        
@@ -177,9 +177,9 @@ class InputSpecs(QtGui.QWidget):
         """
         # collect data from widgets and write to fb.fil[0]
         self.fo.updateEntries()   # filter order widget
-        self.fspec.storeEntries() # frequency specification widget
-        self.aspec.storeEntries() # magnitude specs with unit
-        self.wspec.storeEntries() # weight specification  
+        self.fspecs.storeEntries() # frequency specification widget
+        self.aspecs.storeEntries() # magnitude specs with unit
+        self.wspecs.storeEntries() # weight specification  
             
         if self.DEBUG: print(fb.fil[0])
   
@@ -211,8 +211,8 @@ class InputSpecs(QtGui.QWidget):
                                 
         # Update filter order. weights and freqs in case they have been changed
         self.fo.updateEntries()
-        self.wspec.loadEntries()
-        self.fspec.loadEntries()
+        self.wspecs.loadEntries()
+        self.fspecs.loadEntries()
         
         self.filterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
 
