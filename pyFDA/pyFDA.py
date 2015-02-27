@@ -63,10 +63,11 @@ class pyFDA(QtGui.QMainWindow):
 
         # ============== Signals & Slots ================================
 
+        self.inputAll.inputSpecs.fspecs.specsChanged.connect(self.updateOutput)
         self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
         self.inputAll.inputCoeffs.butUpdate.clicked.connect(self.updateOutput)   
 
-        self.inputAll.inputSpecs.filterChanged.connect(self.inputAll.inputInfo.showInfo)
+#        self.inputAll.inputUpdated.connect(self.updateOutput)
 
         aboutAction.triggered.connect(self.aboutWindow)
 

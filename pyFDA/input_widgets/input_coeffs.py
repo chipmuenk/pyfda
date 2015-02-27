@@ -11,6 +11,7 @@ import sys, os
 from PyQt4 import QtGui
 #import scipy.io
 import numpy as np
+from scipy.signal import tf2zpk
 from simpleeval import simple_eval
 
 # https://github.com/danthedeckie/simpleeval
@@ -51,13 +52,13 @@ class InputCoeffs(QtGui.QWidget):
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
         self.lblCoeffList = QtGui.QLabel()
         self.lblCoeffList.setText("Show Coefficients")
-        
+
         self.chkIIR =  QtGui.QCheckBox()
         self.chkIIR.setChecked(True)
         self.chkIIR.setToolTip("IIR Filter")
         self.lblIIR = QtGui.QLabel()
         self.lblIIR.setText("IIR")
-        
+
 
         self.tblCoeff = QtGui.QTableWidget()
         self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
@@ -74,7 +75,7 @@ class InputCoeffs(QtGui.QWidget):
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from coefficient table.")
         self.butDelRow.setText("Delete")
-        
+
         self.butClear = QtGui.QPushButton()
         self.butClear.setToolTip("Clear all entries.")
         self.butClear.setText("Clear")
@@ -131,12 +132,12 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.selectionModel().currentChanged.connect(self.saveCoeffs)
 
         self.chkCoeffList.clicked.connect(self.showCoeffs)
-        
+
         self.butDelRow.clicked.connect(self.deleteRows)
         self.butAddRow.clicked.connect(self.addRows)
-        self.butClear.clicked.connect(self.clearTable)        
+        self.butClear.clicked.connect(self.clearTable)
         self.butUpdate.clicked.connect(self.showCoeffs)
-        
+
         self.butSetZero.clicked.connect(self.setCoeffsZero)
 
     def clearTable(self):
@@ -160,7 +161,8 @@ class InputCoeffs(QtGui.QWidget):
                 for row in range(num_rows):
                     item = self.tblCoeff.item(row, col)
                     if item:
-                        rows.append(simple_eval(item.text()))
+                        if item.text() != "":
+                            rows.append(simple_eval(item.text()))
                     else:
                         rows.append(0.)
 #                    rows.append(float(item.text()) if item else 0.)
@@ -169,11 +171,22 @@ class InputCoeffs(QtGui.QWidget):
             col = 0
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
-                coeffs.append(simple_eval(item.text()) if item else 0.)
+                if item:
+                    if item.text() != "":
+                        rows.append(simple_eval(item.text()))
+                else:
+                    rows.append(0.)
+
+#                coeffs.append(simple_eval(item.text()) if item else 0.)
 
         fb.fil[0]['coeffs'] = coeffs
+        if np.ndim(coeffs) == 1:
+            fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
+        else:
+            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
+
         if self.DEBUG: print ("coeffs updated!")
-        self.showCoeffs()
+#        self.showCoeffs()
 
     def showCoeffs(self):
         """
