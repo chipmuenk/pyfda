@@ -9,6 +9,7 @@ Tabbed container for input widgets
 from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 
 # add main directory from one level above if this file is run as __main__
 # for test purposes
@@ -22,6 +23,10 @@ class InputAll(QtGui.QWidget):
     """
     Create a tabbed widget for various input subwidgets
     """
+    # class variables (shared between instances if more than one exists)
+    inputUpdated = pyqtSignal()  # emitted when input widget is updated
+   
+    
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputAll, self).__init__()
@@ -52,11 +57,21 @@ class InputAll(QtGui.QWidget):
 #        layVMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
         tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Expanding)
+                                 
+        # ============== Signals & Slots ================================
+
+#        self.inputSpecs.fspecs.specsChanged.connect(self.updateAll)
+#        self.inputSpecs.filterDesigned.connect(self.updateAll)
+#        self.inputCoeffs.butUpdate.clicked.connect(self.updateAll)   
+
+        self.inputSpecs.filterChanged.connect(self.inputInfo.showInfo)
+
 
         
     def updateAll(self):
         """ Update all widgets with new filter data"""
         self.inputCoeffs.showCoeffs()
+        self.inputUpdated.emit()
 
 
      
