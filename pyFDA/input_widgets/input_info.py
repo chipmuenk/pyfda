@@ -92,7 +92,7 @@ class InputInfo(QtGui.QWidget):
         if hasattr(fb.filObj,'info'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
-                    textwrap.dedent(fb.filObj.info), writer_name='html', 
+                    self.cleanDoc(fb.filObj.info), writer_name='html', 
                     settings_overrides={'output_encoding': 'unicode'}))
             else:
                 self.txtFiltInfoBox.setText(textwrap.dedent(fb.filObj.info))
