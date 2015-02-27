@@ -173,9 +173,9 @@ class InputCoeffs(QtGui.QWidget):
                 item = self.tblCoeff.item(row, col)
                 if item:
                     if item.text() != "":
-                        rows.append(simple_eval(item.text()))
+                        coeffs.append(simple_eval(item.text()))
                 else:
-                    rows.append(0.)
+                    coeffs.append(0.)
 
 #                coeffs.append(simple_eval(item.text()) if item else 0.)
 
