@@ -100,8 +100,10 @@ class PlotTauG(QtGui.QMainWindow):
         mpl.clear()
 
         [tau_g, w] = pyFDA_lib.grpdelay(bb,aa, fb.gD['N_FFT'],
-                        whole = fb.rcFDA['freqSpecsRangeType']!= 'Half')#, Fs = f_S)
-        mpl.plot(w / (2 * np.pi), tau_g, lw = fb.gD['rc']['lw'])
+                        whole = fb.rcFDA['freqSpecsRangeType']!= 'Half')
+                        #Fs = f_S)
+        F = w / (2 * np.pi) * fb.fil[0]['f_S']
+        mpl.plot(F, tau_g, lw = fb.gD['rc']['lw'])
         mpl.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
 
 #        if PLT_AUTOx: dsp.format_ticks('x',f_scale, N_F_str)
