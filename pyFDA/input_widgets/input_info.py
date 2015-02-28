@@ -124,6 +124,12 @@ class InputInfo(QtGui.QWidget):
         self.txtFiltInfoBox.moveCursor(QtGui.QTextCursor.Start)
         
     def cleanDoc(self, doc):
+        """
+        remove uniform number of leading blanks from docstrings for subsequent
+        processing of rich text. The first line is treated differently, _all_
+        leading blanks are removed (if any). This allows for different formats
+        of docstrings.
+        """
         lines = doc.splitlines()
         result = lines[0].lstrip() +\
          "\n" + textwrap.dedent("\n".join(lines[1:]))# + '\n'
