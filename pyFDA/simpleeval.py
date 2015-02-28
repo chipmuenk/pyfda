@@ -78,7 +78,7 @@ well:
 import ast
 import operator as op
 from random import random
-import numpy
+import numpy as np
 
 ########################################
 # Module wide 'globals'
@@ -132,22 +132,25 @@ class StringTooLong(InvalidExpression):
 # Default simple functions to include:
 
 
-    
-def cos(a):
-    ''' returns cos (a) '''
-    return numpy.cos(a)
-    
-def exp(a):
-    ''' returns exp(a) '''
-    return numpy.exp(a)
+#def cos(a):
+#    ''' returns cos (a) [a is in rad]'''
+#    return np.cos(a)
+#    
+#def exp(a):
+#    ''' returns exp(a) '''
+#    return np.exp(a)
     
 def random_int(top):
     ''' return a random int below <top> '''
     return int(random() * top)
     
-def sin(a):
-    ''' returns sin (a) '''
-    return numpy.sin(a)
+#def sin(a):
+#    ''' returns sin (a) [a is in rad]'''
+#    return np.sin(a)
+#
+#def tan(a):
+#    ''' returns tan (a) [a is in rad]'''
+#    return np.tan(a)
 
 def safe_power(a, b): # pylint: disable=invalid-name
     ''' a limited exponent/to-the-power-of function, for safety reasons '''
@@ -186,9 +189,12 @@ DEFAULT_OPERATORS = {ast.Add: safe_add, ast.Sub: op.sub, ast.Mult: safe_mult,
 
 DEFAULT_FUNCTIONS = {"rand": random, "randint": random_int,
                      "int": int, "float": float, "str": unicode, 
-                     "cos": cos, "exp": exp, "sin": sin}
+                     "atan": np.arctan, "arctan": np.arctan,
+                     "cos": np.cos, "exp": np.exp, 
+                     "sqrt": np.sqrt, "root": np.sqrt,
+                     "sin": np.sin, "tan": np.tan}
 
-DEFAULT_NAMES = {"True": True, "False": False, "pi": numpy.pi, "e": numpy.e}
+DEFAULT_NAMES = {"True": True, "False": False, "pi": np.pi, "e": np.e}
 
 ########################################
 # And the actual evaluator:
