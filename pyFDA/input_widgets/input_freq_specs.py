@@ -117,12 +117,13 @@ class InputFreqSpecs(QtGui.QWidget):
 #        self.setLayout(mainLayout)
 
         # SIGNALS & SLOTS =====================================================
-        # Every time a field is edited, call self.freqUnits - the signal is
-        #   constructed in _addEntry
+
         self.cmbUnits.currentIndexChanged.connect(self.freqUnits)
         self.cmbFRange.currentIndexChanged.connect(self.freqRange)
         self.ledF_S.editingFinished.connect(self.freqUnits)
-        self.butSort.clicked.connect(self._sortEntries)
+        self.butSort.clicked.connect(self._sortEntries)     
+        # Every time a textfield is edited, call self.freqUnits - the signal is
+        #   constructed in _addEntry
 
         self.freqUnits()
 
@@ -162,11 +163,12 @@ class InputFreqSpecs(QtGui.QWidget):
         dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
-        freqUnits is called during init and every time a widget sends a signal.
+        freqUnits is called during init and every time a widget emits a signal.
         """
         idx = self.cmbUnits.currentIndex()  # read index of units combobox
         self.f_S = float(self.ledF_S.text()) # read sampling frequency
 
+        # get ID of signal that triggered freqUnits():
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
             print(senderName + ' was triggered\n================')
@@ -175,7 +177,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
         if senderName == "f_S" and self.f_S != 0:
             # f_S has been edited -> change display of frequency entries and
-            # dictionary entry for f_S
+            # update dictionary entry for f_S
             self.specs.fil[0]['f_S'] = self.f_S
             for i in range(len(self.qlineedit)):
                 f = self.specs.fil[0][self.qlineedit[i].objectName()]
@@ -186,22 +188,24 @@ class InputFreqSpecs(QtGui.QWidget):
             self.ledF_S.setVisible(idx > 1)  # only visible when
             self.lblF_S.setVisible(idx > 1) # not normalized
 
-            if self.idxOld == 1: # was: normalized to f_S/2,
-                # remove scaling factor 2 from spec entries
+            # Handle special case when last setting was normalized to f_nyq:
+            #  Restore spec entries (remove scaling factor 2 )
+            if self.idxOld == 1: # was: normalized to f_nyq = f_S/2,
                 for i in range(len(self.qlineedit)):
                     f = self.specs.fil[0][self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f))
                 self.f_S = 1.
 
+            # Now check the new settings: -------------------------------------
             if idx < 2: # normalized frequency
                 if idx == 0: # normalized to f_S
                     self.f_S = 1.
                     fLabel = r"$F = f/f_S = \Omega / 2 \pi \; \rightarrow$"
-                else:   # idx == 1: normalized to f_S / 2
+                else:   # idx == 1: normalized to f_nyq = f_S / 2
                     self.f_S = 2.
                     fLabel = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
 
-                self.ledF_S.setText(str(self.f_S)) # update textedit
+                self.ledF_S.setText(str(self.f_S)) # update field for f_S
 
                 # recalculate displayed freq spec values but do not store them:
                 for i in range(len(self.qlineedit)):
@@ -217,10 +221,11 @@ class InputFreqSpecs(QtGui.QWidget):
 
         else: # freq. spec textfield has been changed -> change dict
             self.storeEntries()
-
+            
         self.idxOld = idx # remember setting of comboBox
         self.f_S_old = self.f_S # and f_S (not used yet)
         self.specsChanged.emit() # ->pyFDA -> pltAll.updateAll()
+        print("PING!!!")
 
 
     def rtLabel(self, label):
