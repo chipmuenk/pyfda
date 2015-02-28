@@ -28,6 +28,8 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 # TODO: selecting and deleting non-adjacent rows deletes the wrong rows
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: Add quantizer widget
+# TODO: eliminate trailing zeros for filter order calculation
+# TODO: IIR button functionality not yet implemented
 class InputCoeffs(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -56,8 +58,11 @@ class InputCoeffs(QtGui.QWidget):
         self.chkIIR =  QtGui.QCheckBox()
         self.chkIIR.setChecked(True)
         self.chkIIR.setToolTip("IIR Filter")
+        self.chkIIR.setCheckable(False) # not implemented yet
+        self.chkIIR.setEnabled(False) # not implemented yet        
         self.lblIIR = QtGui.QLabel()
         self.lblIIR.setText("IIR")
+        self.lblIIR.setEnabled(False) # not implemented yet 
 
 
         self.tblCoeff = QtGui.QTableWidget()
@@ -184,6 +189,8 @@ class InputCoeffs(QtGui.QWidget):
             fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
         else:
             fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
+            
+        fb.fil[0]["N"] = num_rows-1
 
         if self.DEBUG: print ("coeffs updated!")
 #        self.showCoeffs()
