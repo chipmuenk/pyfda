@@ -42,8 +42,15 @@ class PlotHf(QtGui.QMainWindow):
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG
-        
-#        self.wholeF = fb.rcFDA['freqSpecsRangeWhole']
+
+        modes = ["| H |", "re{H}", "im{H}"]
+        self.cmbShowH = QtGui.QComboBox(self)
+        self.cmbShowH.addItems(modes)
+        self.cmbShowH.setObjectName("cmbUnitsH")
+        self.cmbShowH.setToolTip("Show magnitude, real or imag. part of H.")
+        self.cmbShowH.setCurrentIndex(0)
+
+        self.lblIn = QtGui.QLabel("in")
 
         units = ["dB", "V", "W"]
         self.cmbUnitsA = QtGui.QComboBox(self)
@@ -52,10 +59,12 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
         self.cmbUnitsA.setCurrentIndex(0)
+        
 
         self.lblLinphase = QtGui.QLabel("Linphase")
         self.chkLinphase = QtGui.QCheckBox()
-        self.chkLinphase.setToolTip("Plot H(f) of acausal linphase system.")
+        self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
+           "Attention: this may make little sense for a non-linear phase filter.")
 
         self.lblInset = QtGui.QLabel("Inset")
         self.chkInset = QtGui.QCheckBox()
@@ -73,6 +82,8 @@ class PlotHf(QtGui.QMainWindow):
 
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addWidget(self.cmbShowH)
+        self.layHChkBoxes.addWidget(self.lblIn)               
         self.layHChkBoxes.addWidget(self.cmbUnitsA)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLinphase)
@@ -105,10 +116,11 @@ class PlotHf(QtGui.QMainWindow):
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-        self.cmbUnitsA.currentIndexChanged.connect(lambda:self.draw())
+        self.cmbUnitsA.currentIndexChanged.connect(self.draw)
+        self.cmbShowH.currentIndexChanged.connect(self.draw)
 
         self.chkLinphase.clicked.connect(self.draw)
-        self.chkInset.clicked.connect(self.draw)#(lambda:self.draw())
+        self.chkInset.clicked.connect(self.draw)
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
 
@@ -225,7 +237,11 @@ class PlotHf(QtGui.QMainWindow):
 
         self.linphase = self.chkLinphase.isChecked()
         self.specs = self.chkSpecs.isChecked()
+        self.chkInset.setCheckable(False) # not implemented yet
+        self.chkInset.setEnabled(False)
+        self.lblInset.setEnabled(False)
         self.inset = self.chkInset.isChecked()
+        
         self.phase = self.chkPhase.isChecked()
         
         if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
@@ -273,7 +289,17 @@ class PlotHf(QtGui.QMainWindow):
             whole = wholeF)
         if self.linphase: # remove the linear phase
             H = H * np.exp(1j * W * fb.fil[0]["N"]/2.)
-
+            
+        if self.cmbShowH.currentIndex() == 1: # show real part of H
+            H = H.real
+            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+        elif self.cmbShowH.currentIndex() == 2: # show imag. part of H
+            H = H.imag
+            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+        else: # show magnitude of H
+            H = abs(H)
+            H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
+            
         F = W / (2 * np.pi) * self.f_S
 
         # clear the axes and (re)draw the plot
@@ -288,25 +314,16 @@ class PlotHf(QtGui.QMainWindow):
         if self.unitA == 'dB':
             ax.plot(F,20*np.log10(abs(H)), lw = fb.gD['rc']['lw'])
 
-            ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'+ ' in dB ' +
-                        r'$\rightarrow$')
+            ax.set_ylabel(H_str + ' in dB ' + r'$\rightarrow$')
 
         elif self.unitA == 'V': #  'lin'
-            if self.linphase:
-                ax.plot(F, H.real, lw = fb.gD['rc']['lw'])
+            ax.plot(F, H, lw = fb.gD['rc']['lw'])
 
-                ax.set_ylabel(r'$H(\mathrm{e}^{\mathrm{j} \Omega})$'+' in V '+
-                            r'$\rightarrow $')
-            else:
-                ax.plot(F,abs(H), lw = fb.gD['rc']['lw'])
+            ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
+        else: # unit is W
+            ax.plot(F, H * H, lw = fb.gD['rc']['lw'])
 
-                ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j}\Omega})|$'+' in V '+
-                            r'$\rightarrow $')
-        else:
-            ax.plot(F,abs(H)*abs(H), lw = fb.gD['rc']['lw'])
-
-            ax.set_ylabel(r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'+ ' in W ' +
-                        r'$\rightarrow $')
+            ax.set_ylabel(H_str + ' in W ' + r'$\rightarrow $')
         ax.axis(plt_lim)
 
         if self.specs: self.plotSpecLimits(specAxes = ax, unitA = self.unitA)
