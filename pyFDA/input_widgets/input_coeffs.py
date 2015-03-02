@@ -59,10 +59,10 @@ class InputCoeffs(QtGui.QWidget):
         self.chkIIR.setChecked(True)
         self.chkIIR.setToolTip("IIR Filter")
         self.chkIIR.setCheckable(False) # not implemented yet
-        self.chkIIR.setEnabled(False) # not implemented yet        
+        self.chkIIR.setEnabled(False) # not implemented yet
         self.lblIIR = QtGui.QLabel()
         self.lblIIR.setText("IIR")
-        self.lblIIR.setEnabled(False) # not implemented yet 
+        self.lblIIR.setEnabled(False) # not implemented yet
 
 
         self.tblCoeff = QtGui.QTableWidget()
@@ -147,7 +147,7 @@ class InputCoeffs(QtGui.QWidget):
 
     def clearTable(self):
         """
-        Clear table
+        Clear table and fill coeffs with zeros
         """
         self.tblCoeff.clear()
         self.saveCoeffs()
@@ -189,7 +189,7 @@ class InputCoeffs(QtGui.QWidget):
             fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
         else:
             fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
-            
+
         fb.fil[0]["N"] = num_rows-1
 
         if self.DEBUG: print ("coeffs updated!")
