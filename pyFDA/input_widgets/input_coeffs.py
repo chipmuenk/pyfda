@@ -12,7 +12,6 @@ from PyQt4 import QtGui
 #import scipy.io
 import numpy as np
 from scipy.signal import tf2zpk
-from simpleeval import simple_eval
 
 # https://github.com/danthedeckie/simpleeval
 
@@ -23,6 +22,7 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb # importing filterbroker initializes all its globals
+from simpleeval import simple_eval
 
 # TODO: drag & drop doesn't work
 # TODO: selecting and deleting non-adjacent rows deletes the wrong rows
@@ -30,6 +30,7 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 # TODO: Add quantizer widget
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: IIR button functionality not yet implemented
+# TODO: emit signal when table is changed?
 class InputCoeffs(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -78,7 +79,8 @@ class InputCoeffs(QtGui.QWidget):
         self.butAddRow.setText("Add")
 
         self.butDelRow = QtGui.QPushButton()
-        self.butDelRow.setToolTip("Delete selected row(s) from coefficient table.")
+        self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
+                "Multiple rows can be selected using <SHIFT> or <CTRL>.")
         self.butDelRow.setText("Delete")
 
         self.butClear = QtGui.QPushButton()
@@ -135,13 +137,14 @@ class InputCoeffs(QtGui.QWidget):
 #        self.tblCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
         self.tblCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
         self.tblCoeff.selectionModel().currentChanged.connect(self.saveCoeffs)
+        self.butUpdate.clicked.connect(self.saveCoeffs)
 
         self.chkCoeffList.clicked.connect(self.showCoeffs)
 
         self.butDelRow.clicked.connect(self.deleteRows)
         self.butAddRow.clicked.connect(self.addRows)
         self.butClear.clicked.connect(self.clearTable)
-        self.butUpdate.clicked.connect(self.showCoeffs)
+
 
         self.butSetZero.clicked.connect(self.setCoeffsZero)
 
@@ -184,16 +187,17 @@ class InputCoeffs(QtGui.QWidget):
 
 #                coeffs.append(simple_eval(item.text()) if item else 0.)
 
-        fb.fil[0]['coeffs'] = coeffs
-        if np.ndim(coeffs) == 1:
-            fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
-        else:
-            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
-
-        fb.fil[0]["N"] = num_rows-1
+        fb.fil[0]['coeffs'] = np.array(coeffs, dtype = 'float64')
+#        if np.ndim(coeffs) == 1:
+#            print(coeffs)
+#            fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
+#        else:
+#            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
+#            print(coeffs)
+#        fb.fil[0]["N"] = num_rows-1
+#        print( fb.fil[0]["zpk"])
 
         if self.DEBUG: print ("coeffs updated!")
-#        self.showCoeffs()
 
     def showCoeffs(self):
         """
@@ -237,15 +241,33 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.resizeRowsToContents()
 
     def deleteRows(self):
-        # returns index to rows where _all_ columns are selected
-        rows = self.tblCoeff.selectionModel().selectedRows()
-        rows = rows[::-1] # revert order of rows to delete from bottom
+        """
+        Delete all selected rows by: 
+        - reading the indices of all selected cells
+        - collecting the row numbers in a set (only unique elements)
+        - sort the elements in a list in descending order
+        - delete the rows starting at the bottom
+        """
+        # returns index to rows: 
+#        rows = self.tblCoeff.selectionModel().selectedRows()
+        indices = self.tblCoeff.selectionModel().selectedIndexes()
+        rows = set() 
+        for index in indices:
+            rows.add(index.row()) # collect all selected rows in a set
+        rows = sorted(list(rows), reverse = True)# sort rows in decending order
         for r in rows:
-            self.tblCoeff.removeRow(r.row())
+#            self.tblCoeff.removeRow(r.row())
+            self.tblCoeff.removeRow(r)
         self.saveCoeffs()
 
     def addRows(self):
+        """
+        Add the number of selected rows to the table, rows need to be completely
+        selected. If nothing is selected, add 1 row. Afterwards, refresh
+        the table.
+        """
         nrows = len(self.tblCoeff.selectionModel().selectedRows())
+
         if nrows == 0:
             nrows = 1 # add at least one row
         ncols = self.tblCoeff.columnCount()
