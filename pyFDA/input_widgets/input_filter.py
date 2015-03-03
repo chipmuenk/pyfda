@@ -33,7 +33,7 @@ class SelectFilter(QtGui.QWidget):
       - DesignMethod (Butterworth, ...)
     """
     
-    def __init__(self, DEBUG = True):
+    def __init__(self, DEBUG = False):
         super(SelectFilter, self).__init__()
         self.DEBUG = DEBUG
         # initialize the FilterTreeBuilder class with the filter directory and

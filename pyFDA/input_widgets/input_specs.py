@@ -59,7 +59,7 @@ class InputSpecs(QtGui.QWidget):
 
         """ 
 
-        self.sf = input_filter.SelectFilter(DEBUG = True)
+        self.sf = input_filter.SelectFilter(DEBUG = False)
         self.fo = input_order.InputOrder(DEBUG = False)
         # subwidget for Frequency Specs
         self.fspecs = input_freq_specs.InputFreqSpecs(specs = fb,
