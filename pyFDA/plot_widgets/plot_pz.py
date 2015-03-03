@@ -92,6 +92,8 @@ class PlotPZ(QtGui.QMainWindow):
             bb = fb.fil[0]['coeffs'][0]
             aa = fb.fil[0]['coeffs'][1]
 
+        zpk = fb.fil[0]['zpk']
+
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
         # clear the axes and (re)draw the plot
@@ -99,7 +101,7 @@ class PlotPZ(QtGui.QMainWindow):
         mpl = self.mplwidget.ax
         mpl.clear()
         
-        [z, p, k] = pyFDA_lib.zplane(mpl,fb.fil[0]['zpk'])
+        [z, p, k] = pyFDA_lib.zplane(mpl,bb,aa,zpk = False)#fb.fil[0]['zpk'])
 #        [z, p, k] = pyFDA_lib.zplane(mpl, bb, aa)
 
 #        mpl.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])          
