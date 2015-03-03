@@ -189,9 +189,14 @@ class InputPZ(QtGui.QWidget):
 #                    rows.append(float(item.text()) if item else 0.)
             zpk.append(rows)
             
-        zpk.append([float(self.ledGain.text())])
+        zpk.append(float(self.ledGain.text()))
         
         fb.fil[0]["zpk"] = zpk
+        
+#        fb.fil[0]["coeffs"][0] 
+        bb = zpk[2] * np.poly(zpk[0])
+        aa = zpk[2] * np.poly(zpk[1])
+        fb.fil[0]["coeffs"] = (bb,aa) 
 
 #                ZPK.append(simple_eval(item.text()) if item else 0.)
 

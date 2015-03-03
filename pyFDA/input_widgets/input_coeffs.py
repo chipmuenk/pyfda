@@ -188,14 +188,15 @@ class InputCoeffs(QtGui.QWidget):
 #                coeffs.append(simple_eval(item.text()) if item else 0.)
 
         fb.fil[0]['coeffs'] = np.array(coeffs, dtype = 'float64')
-#        if np.ndim(coeffs) == 1:
-#            print(coeffs)
-#            fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
-#        else:
-#            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
-#            print(coeffs)
-#        fb.fil[0]["N"] = num_rows-1
-#        print( fb.fil[0]["zpk"])
+        
+        if np.ndim(coeffs) == 1:
+            print(coeffs)
+            fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
+        else:
+            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
+            print(coeffs)
+        fb.fil[0]["N"] = num_rows-1
+        print( fb.fil[0]["zpk"])
 
         if self.DEBUG: print ("coeffs updated!")
 
