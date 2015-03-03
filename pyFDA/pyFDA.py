@@ -66,7 +66,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputAll.inputSpecs.fspecs.specsChanged.connect(self.updateOutput)
         self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
         self.inputAll.inputCoeffs.butUpdate.clicked.connect(self.updateOutput)   
-
+        self.inputAll.inputPZ.butUpdate.clicked.connect(self.updateOutput)
 #        self.inputAll.inputUpdated.connect(self.updateOutput)
 
         aboutAction.triggered.connect(self.aboutWindow)
