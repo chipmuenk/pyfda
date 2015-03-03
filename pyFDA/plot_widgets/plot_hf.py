@@ -261,7 +261,7 @@ class PlotHf(QtGui.QMainWindow):
         self.A_SB2 = fb.fil[0]['A_SB2']
         
         f_lim = fb.rcFDA['freqSpecsRange']
-        wholeF = fb.rcFDA['freqSpecsRange'] != 'Half'
+        wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
 
 #        self.wholeF = fb.rcFDA['freqSpecsRangeWhole']
 #        if self.wholeF:
@@ -287,6 +287,7 @@ class PlotHf(QtGui.QMainWindow):
         # calculate |H(W)| for W = 0 ... pi:
         [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
             whole = wholeF)
+
         if self.linphase: # remove the linear phase
             H = H * np.exp(1j * W * fb.fil[0]["N"]/2.)
             
@@ -301,6 +302,10 @@ class PlotHf(QtGui.QMainWindow):
             H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
             
         F = W / (2 * np.pi) * self.f_S
+        
+        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
+            H = np.fft.fftshift(H)
+            F = F - self.f_S/2.
 
         # clear the axes and (re)draw the plot
         #

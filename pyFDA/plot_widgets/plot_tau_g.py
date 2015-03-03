@@ -91,6 +91,11 @@ class PlotTauG(QtGui.QMainWindow):
         else: # IIR
             bb = fb.fil[0]['coeffs'][0]
             aa = fb.fil[0]['coeffs'][1]
+            
+        f_lim = fb.rcFDA['freqSpecsRange']
+        wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
+        f_S = fb.fil[0]['f_S']
+
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
@@ -100,11 +105,16 @@ class PlotTauG(QtGui.QMainWindow):
         mpl.clear()
 
         [tau_g, w] = pyFDA_lib.grpdelay(bb,aa, fb.gD['N_FFT'],
-                        whole = fb.rcFDA['freqSpecsRangeType']!= 'Half')
+                        whole = wholeF)
                         #Fs = f_S)
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
+        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
+            tau_g = np.fft.fftshift(tau_g)
+            F = F - f_S / 2.
+        
+        
         mpl.plot(F, tau_g, lw = fb.gD['rc']['lw'])
-        mpl.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        mpl.axis(f_lim + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
 
 #        if PLT_AUTOx: dsp.format_ticks('x',f_scale, N_F_str)
 

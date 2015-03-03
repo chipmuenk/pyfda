@@ -43,8 +43,8 @@ class InputFreqSpecs(QtGui.QWidget):
 
         title = "Frequency Specifications"
 
-        units = ['f_S', 'f_Nyq',
-                       'Hz', 'kHz', 'MHz', 'GHz']
+        units = ['f_S', 'f_Nyq', 'Hz', 'kHz', 'MHz', 'GHz']
+        fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
 
         self.idxOld = -1 # index of cmbUnits before last change
 
@@ -75,7 +75,9 @@ class InputFreqSpecs(QtGui.QWidget):
 
         self.cmbFRange = QtGui.QComboBox(self)
         self.cmbFRange.setObjectName("cmbFRange")
-        self.cmbFRange.addItems(["Half","Whole", "Sym"])
+        for f in fRanges:
+            self.cmbFRange.addItem(f[0],f[1])
+#        self.cmbFRange.addItems(["0...½","0...1", "-½...½"])
         self.cmbFRange.setToolTip("Select frequency range (whole or half).")
         self.cmbFRange.setCurrentIndex(0)
 
@@ -127,14 +129,14 @@ class InputFreqSpecs(QtGui.QWidget):
 
         self.freqUnits()
 
-    def mousePressEvent(self, event):
-        """
-        Do something every time a mouse event happens inside this widget - but
-        only if the event isn't swallowed by a child widget!!
-        (not needed or used at the moment)
-        """
-        print ("InputFreqs Mouse Press")
-        super(InputFreqSpecs, self).mousePressEvent(event)
+#    def mousePressEvent(self, event):
+#        """
+#        Do something every time a mouse event happens inside this widget - but
+#        only if the event isn't swallowed by a child widget!!
+#        (not needed or used at the moment)
+#        """
+#        print ("InputFreqs Mouse Press")
+#        super(InputFreqSpecs, self).mousePressEvent(event)
 
 #-------------------------------------------------------------
     def freqRange(self):
@@ -142,11 +144,12 @@ class InputFreqSpecs(QtGui.QWidget):
         Set frequency range for single-sided spectrum up to f_S/2 or f_S or
         for double-sided spectrum between -f_S/2 and f_S/2
         """
-        rangeType = self.cmbFRange.currentText()#.item(self.cmbFRange.currentIndex())
+#        rangeIdx = self.cmbFRange.currentIndex#.item(self.cmbFRange.currentIndex())
+        rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
         self.specs.rcFDA.update({'freqSpecsRangeType':rangeType})
-        if rangeType == 'Whole':
+        if rangeType == 'whole':
             f_lim = [0, self.f_S]
-        elif rangeType == 'Sym':
+        elif rangeType == 'sym':
             f_lim = [-self.f_S/2, self.f_S/2]
         else:
             f_lim = [0, self.f_S/2]
@@ -224,8 +227,9 @@ class InputFreqSpecs(QtGui.QWidget):
             
         self.idxOld = idx # remember setting of comboBox
         self.f_S_old = self.f_S # and f_S (not used yet)
-        self.specsChanged.emit() # ->pyFDA -> pltAll.updateAll()
-        print("PING!!!")
+        self.freqRange() # update f_lim setting and send redraw signal
+#        self.specsChanged.emit() # ->pyFDA -> pltAll.updateAll()
+#        print("PING!!!")
 
 
     def rtLabel(self, label):

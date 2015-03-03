@@ -85,8 +85,6 @@ class PlotPhi(QtGui.QMainWindow):
         """ 
         Re-calculate |H(f)| and draw the figure
         """
-        f_lim = fb.rcFDA['freqSpecsRange']
-        
         if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
             self.bb = fb.fil[0]['coeffs']
             self.aa = 1.
@@ -97,11 +95,20 @@ class PlotPhi(QtGui.QMainWindow):
         if self.DEBUG:
             print("--- plotPhi.draw() ---") 
             print("b,a = ", self.bb, self.aa)
+
+        f_lim = fb.rcFDA['freqSpecsRange']
+        wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
+        f_S = fb.fil[0]['f_S']
             
         [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
-                        whole = fb.rcFDA['freqSpecsRangeType']!= 'Half') 
+                        whole = wholeF) 
 
-        F = W / (2 * np.pi) * fb.fil[0]['f_S']
+        F = W / (2 * np.pi) * f_S
+        
+        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
+            H = np.fft.fftshift(H)
+            F = F - f_S / 2.
+
         scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
         # clear the axes and (re)draw the plot
