@@ -134,6 +134,7 @@ class equiripple(object):
             specs['N'] = self.N-1 # yes, update filterbroker
         except AttributeError:
             pass
+        specs['creator'] = (output, 'equiripple')
 
 
     def LPman(self, specs):

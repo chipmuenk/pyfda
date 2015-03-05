@@ -115,6 +115,7 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
             
         specs['coeffs'] = self.coeffs
         specs['zpk'] = self.zpk
+        specs['creator'] = (output, 'cheby1')
         
         if self.F_SBC is not None: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N # yes, update filterbroker

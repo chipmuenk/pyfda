@@ -169,6 +169,7 @@ class firwin(object):
             specs['N'] = self.N-1 # yes, update filterbroker
         except AttributeError:
             pass
+        specs['creator'] = (output, 'firwin')
 
 
     def LPman(self, specs):

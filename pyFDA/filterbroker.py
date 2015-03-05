@@ -100,9 +100,11 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'A_PB':1., 'A_PB2': 1., 'F_PB':0.1, 'F_PB2':0.4,
             'A_SB':60., 'A_SB2': 60., 'F_SB':0.2, 'F_SB2':0.3,
             'W_PB':1., 'W_PB2':1., 'W_SB':1., 'W_SB2':1.,
-
-            'coeffs':([1, 1, 1], [3, 0, 2]),
+            #
+            'coeffs':([1, 1, 1], [3, 0, 2]), # tuple of bb, aa
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
-
-            'plt_fLabel':r'$f$ in Hz $\rightarrow$'}
+            'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
+            #
+            'plt_fLabel':r'$f$ in Hz $\rightarrow$',
+            'plt_tLabel':r'$t$ in s $\rightarrow$'}
