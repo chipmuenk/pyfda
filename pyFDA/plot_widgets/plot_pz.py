@@ -101,8 +101,8 @@ class PlotPZ(QtGui.QMainWindow):
         mpl = self.mplwidget.ax
         mpl.clear()
         
-        [z, p, k] = pyFDA_lib.zplane(mpl,bb,aa,zpk = False)#fb.fil[0]['zpk'])
-#        [z, p, k] = pyFDA_lib.zplane(mpl, bb, aa)
+#        [z, p, k] = pyFDA_lib.zplane(mpl,bb,aa,zpk = False)#fb.fil[0]['zpk'])
+        [z, p, k] = pyFDA_lib.zplane(mpl, zpk, verbose = True)
 
 #        mpl.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])          
 
