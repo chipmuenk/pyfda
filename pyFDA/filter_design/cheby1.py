@@ -108,12 +108,13 @@ The attenuation in the stop band can only be controlled by the filter order.
         if output == 'zpk': # arg = [z,p,k]
             self.coeffs = zpk2tf(arg[0], arg[1], arg[2])
             self.zpk = arg
-        else: # arg = [b,a]
+        else: # 'ba', arg = [bb, aa]
             self.zpk = tf2zpk(arg[0], arg[1])
             self.coeffs = arg
 
         specs['coeffs'] = self.coeffs
         specs['zpk'] = self.zpk
+        specs['creator'] = (output, 'cheby1')
         
         if self.F_PBC is not None: # has corner frequency been calculated?
             specs['N'] = self.N # yes, update filterbroker
