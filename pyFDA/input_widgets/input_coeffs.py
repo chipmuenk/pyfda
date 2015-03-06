@@ -40,7 +40,6 @@ class InputCoeffs(QtGui.QWidget):
         super(InputCoeffs, self).__init__()
 
         self.initUI()
-        self.showCoeffs()
 
     def initUI(self):
         """
@@ -131,6 +130,7 @@ class InputCoeffs(QtGui.QWidget):
         layVMain.addLayout(self.layHButtonsCoeffs2)
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
+        self.showCoeffs() # initialize table with default values from fb
 
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
@@ -185,20 +185,20 @@ class InputCoeffs(QtGui.QWidget):
                 else:
                     coeffs.append(0.)
 
-#                coeffs.append(simple_eval(item.text()) if item else 0.)
-
-        fb.fil[0]['coeffs'] = np.array(coeffs, dtype = 'float64')
+        fb.fil[0]['coeffs'] = coeffs # np.array(coeffs, dtype = 'float64')
         
         if np.ndim(coeffs) == 1:
-            print(coeffs)
-            fb.fil[0]["zpk"] = tf2zpk(coeffs, 1)
+            if self.DEBUG: print("Coeffs FIR:",  coeffs)
+            fb.fil[0]["zpk"] = tf2zpk(coeffs, [1])
         else:
-            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], coeffs[1]) # convert to poles / zeros
-            print(coeffs)
+            fb.fil[0]["zpk"] = tf2zpk(coeffs[0],coeffs[1]) # convert to poles / zeros
+            if self.DEBUG: print("Coeffs IIR:", coeffs)
         fb.fil[0]["N"] = num_rows-1
-        print( fb.fil[0]["zpk"])
+        fb.fil[0]['creator'] = ('ba', 'input_coeffs')
 
-        if self.DEBUG: print ("coeffs updated!")
+        if self.DEBUG:
+            print("ZPK:", fb.fil[0]["zpk"])
+            print ("coeffs updated!")
 
     def showCoeffs(self):
         """

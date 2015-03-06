@@ -11,7 +11,7 @@ import sys, os
 from PyQt4 import QtGui
 #import scipy.io
 import numpy as np
-from scipy.signal import tf2zpk
+from scipy.signal import tf2zpk, zpk2tf
 
 # https://github.com/danthedeckie/simpleeval
 
@@ -25,11 +25,24 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 from simpleeval import simple_eval
 
 # TODO: drag & drop doesn't work
-# TODO: selecting and deleting non-adjacent rows deletes the wrong rows
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: Add quantizer widget
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: IIR button functionality not yet implemented
+def cround(x, n_dig = 0):
+    """
+    round complex number to n_dig digits. If n_dig == 0, don't round at all,
+    just convert complex numbers with an imaginary part very close to zero to 
+    real.
+    """
+    x = np.real_if_close(x, 1e-15)
+    if n_dig > 0:
+        if np.iscomplex(x):
+            x = round(x.real, n_dig) + 1j * round(x.imag, n_dig)
+        else:
+            x = round(x, n_dig) 
+    return x
+
 class InputPZ(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -37,11 +50,8 @@ class InputPZ(QtGui.QWidget):
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputPZ, self).__init__()
-        
-        self.ncols = 2
 
         self.initUI()
-        self.showZPK()
 
     def initUI(self):
         """
@@ -57,14 +67,11 @@ class InputPZ(QtGui.QWidget):
         self.lblPZList = QtGui.QLabel()
         self.lblPZList.setText("Show Poles / Zeros")
 
-        self.chkIIR =  QtGui.QCheckBox()
-        self.chkIIR.setChecked(True)
-        self.chkIIR.setToolTip("IIR Filter")
-        self.chkIIR.setCheckable(False) # not implemented yet
-        self.chkIIR.setEnabled(False) # not implemented yet
-        self.lblIIR = QtGui.QLabel()
-        self.lblIIR.setText("IIR")
-        self.lblIIR.setEnabled(False) # not implemented yet
+        self.lblRound = QtGui.QLabel("Digits = ")
+        self.spnRound = QtGui.QSpinBox()
+        self.spnRound.setRange(0,9)
+        self.spnRound.setValue(0)
+        self.spnRound.setToolTip("Round to d digits.")
 
         self.lblGain = QtGui.QLabel()
         self.lblGain.setText("k = ")
@@ -114,11 +121,11 @@ class InputPZ(QtGui.QWidget):
         self.layHChkBoxes.addWidget(self.chkPZList)
         self.layHChkBoxes.addWidget(self.lblPZList)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkIIR)
-        self.layHChkBoxes.addWidget(self.lblIIR)
+        self.layHChkBoxes.addWidget(self.lblRound)
+        self.layHChkBoxes.addWidget(self.spnRound)
 #        self.layHChkBoxes.addStretch(10)
 
-        self.layHGain = QtGui.QHBoxLayout()        
+        self.layHGain = QtGui.QHBoxLayout()
         self.layHGain.addWidget(self.lblGain)
         self.layHGain.addWidget(self.ledGain)
         self.layHGain.addStretch(10)
@@ -144,21 +151,23 @@ class InputPZ(QtGui.QWidget):
         layVMain.addLayout(self.layHButtonsPZs2)
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
+        self.showZPK() # initialize table with default values from filterbroker
 
         # ============== Signals & Slots ================================
 #        self.tblPZ.itemEntered.connect(self.savePZs) # nothing happens
 #        self.tblPZ.itemActivated.connect(self.savePZs) # nothing happens
+        self.spnRound.editingFinished.connect(self.showZPK)
+        self.chkPZList.clicked.connect(self.showZPK)
+
         self.ledGain.editingFinished.connect(self.saveZPK)
         self.tblPZ.itemChanged.connect(self.saveZPK) # works but fires multiple times
         self.tblPZ.selectionModel().currentChanged.connect(self.saveZPK)
         self.butUpdate.clicked.connect(self.saveZPK)
 
-        self.chkPZList.clicked.connect(self.showZPK)
 
         self.butDelRow.clicked.connect(self.deleteRows)
         self.butAddRow.clicked.connect(self.addRows)
         self.butClear.clicked.connect(self.clearTable)
-
 
         self.butSetZero.clicked.connect(self.setZPKZero)
 
@@ -177,7 +186,7 @@ class InputPZ(QtGui.QWidget):
         num_rows = self.tblPZ.rowCount()
         if self.DEBUG: print("nrows:",num_rows)
 
-        for col in range(self.ncols):
+        for col in range(2):
             rows = []
             for row in range(num_rows):
                 item = self.tblPZ.item(row, col)
@@ -188,15 +197,19 @@ class InputPZ(QtGui.QWidget):
                     rows.append(0.)
 #                    rows.append(float(item.text()) if item else 0.)
             zpk.append(rows)
-            
-        zpk.append(float(self.ledGain.text()))
-        
-        fb.fil[0]["zpk"] = zpk
-        
-#        fb.fil[0]["coeffs"][0] 
-        bb = zpk[2] * np.poly(zpk[0])
-        aa = zpk[2] * np.poly(zpk[1])
-        fb.fil[0]["coeffs"] = (bb,aa) 
+
+        zpk.append(simple_eval(self.ledGain.text()))
+        print("Gain:",zpk[2])
+
+        fb.fil[0]['zpk'] = zpk
+
+#        bb = zpk[2] * np.poly(zpk[0])
+#        aa = zpk[2] * np.poly(zpk[1])
+#        fb.fil[0]['coeffs'] = (bb,aa)
+        fb.fil[0]['coeffs'] = zpk2tf(zpk[0], zpk[1], zpk[2])
+
+        fb.fil[0]["N"] = num_rows-1
+        fb.fil[0]['creator'] = ('zpk', 'input_pz')
 
 #                ZPK.append(simple_eval(item.text()) if item else 0.)
 
@@ -213,63 +226,80 @@ class InputPZ(QtGui.QWidget):
         """
         Create table from filter zpk dict
         """
-        zpk = fb.fil[0]["zpk"]
-        self.tblPZ.setVisible(self.chkPZList.isChecked())
+        zpk = fb.fil[0]['zpk']
+        n_digits = int(self.spnRound.text())
+        self.ledGain.setVisible(self.chkPZList.isChecked())
+#        self.ledGain.setText(str(zpk[2]))# update gain k
+        self.ledGain.setText(str(cround(zpk[2], n_digits)))
 
+        self.tblPZ.setVisible(self.chkPZList.isChecked())
         self.tblPZ.setRowCount(max(len(zpk[0]),len(zpk[1])))
 
+
         if self.DEBUG:
-            print("=====================\nInputInfo.showZPK")
+            print("=====================\nInputZPK.showZPK")
             print("ZPK:\n",zpk)
             print ("shape", np.shape(zpk))
             print ("len", len(zpk))
             print("ndim", np.ndim(zpk))
 
-   
-
         self.tblPZ.setColumnCount(2)
-        self.tblPZ.setHorizontalHeaderLabels(["z", "p"])
-        for col in range(self.ncols):
+        self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
+        for col in range(2):
             for row in range(len(zpk[col])):
                 if self.DEBUG:print("Len Row:", len(zpk[col]))
                 item = self.tblPZ.item(row, col)
                 if item:
-                    item.setText(str(zpk[col][row]))
+                    item.setText(str(cround(zpk[col][row], n_digits)))
                 else:
                     self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem(
-                                                        str(zpk[col][row])))
+                                    str(cround(zpk[col][row], n_digits))))
+
+
         self.tblPZ.resizeColumnsToContents()
         self.tblPZ.resizeRowsToContents()
-        self.ledGain.setText(str(zpk[2]))
 
     def deleteRows(self):
+        """
+        Delete all selected rows by:
+        - reading the indices of all selected cells
+        - collecting the row numbers in a set (only unique elements)
+        - sort the elements in a list in descending order
+        - delete the rows starting at the bottom
+        """
+
         indices = self.tblPZ.selectionModel().selectedIndexes()
-        rows = set() 
+        rows = set()
         for index in indices:
             rows.add(index.row()) # collect all selected rows in a set
         rows = sorted(list(rows), reverse = True)# sort rows in decending order
-        print(rows)
         for r in rows:
-#            self.tblCoeff.removeRow(r.row())
             self.tblPZ.removeRow(r)
         self.saveZPK()
-        
+
     def addRows(self):
         """
         Add the number of selected rows to the table, rows need to be fully
         selected. If nothing is selected, add 1 row. Afterwards, refresh
         the table.
         """
-        nrows = len(self.tblPZ.selectionModel().selectedRows())
-        if nrows == 0:
-            nrows = 1 # add at least one row
+        num_rows = self.tblPZ.rowCount()
+        sel_rows = len(self.tblPZ.selectionModel().selectedRows())
 
-        z = np.zeros((self.ncols, nrows))
-        print(np.shape(z))
-        print(np.shape(fb.fil[0]["zpk"]))
-        fb.fil[0]["zpk"][0:1] = np.hstack((fb.fil[0]["zpk"][0:1],z))
+        if sel_rows == 0:
+            sel_rows = 1 # add at least one row
 
-        self.showZPK()
+        z = np.zeros((2, sel_rows))
+        #        fb.fil[0]["zpk"][0:1] = np.hstack((fb.fil[0]["zpk"][0:1],z))
+        for col in range(2):
+            for row in range(num_rows,num_rows + sel_rows):
+                self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem(""))
+
+        self.tblPZ.resizeRowsToContents()
+        self.tblPZ.setRowCount(num_rows + sel_rows)
+        print("rows", num_rows + sel_rows)
+
+        self.saveZPK()
 
     def setZPKZero(self):
         """
@@ -277,12 +307,13 @@ class InputPZ(QtGui.QWidget):
         """
         eps = float(self.ledSetEps.text())
         num_rows= self.tblPZ.rowCount()
-        
-        for col in range(self.ncols):
+
+        for col in range(2):
             for row in range(num_rows):
                 item = self.tblPZ.item(row, col)
-                if abs(simple_eval(item.text())) < eps:
-                    item.setText(str(0.))
+                if item:
+                    if abs(simple_eval(item.text())) < eps:
+                        item.setText(str(0.))
         self.saveZPK()
 
 #------------------------------------------------------------------------------
