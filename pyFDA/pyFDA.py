@@ -65,8 +65,8 @@ class pyFDA(QtGui.QMainWindow):
 
         self.inputAll.inputSpecs.fspecs.specsChanged.connect(self.updateOutput)
         self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
-        self.inputAll.inputCoeffs.butUpdate.clicked.connect(self.updateOutput)   
-        self.inputAll.inputPZ.butUpdate.clicked.connect(self.updateOutput)
+        self.inputAll.inputCoeffs.butSave.clicked.connect(self.updateOutput)   
+        self.inputAll.inputPZ.butSave.clicked.connect(self.updateOutput)
 #        self.inputAll.inputUpdated.connect(self.updateOutput)
 
         aboutAction.triggered.connect(self.aboutWindow)
@@ -74,8 +74,8 @@ class pyFDA(QtGui.QMainWindow):
         self.statusMessage("Application is initialized.")
 
     def updateOutput(self):
+        self.inputAll.updateAll() # input widgets re-read 'coeffs' / 'zpk'
         self.pltAll.updateAll()
-        self.inputAll.updateAll()
 
     def aboutWindow(self):
         QtGui.QMessageBox.about(self, "About pyFDA",

@@ -101,9 +101,9 @@ class InputPZ(QtGui.QWidget):
         self.butClear.setToolTip("Clear all entries.")
         self.butClear.setText("Clear")
 
-        self.butUpdate = QtGui.QPushButton()
-        self.butUpdate.setToolTip("Update filter info and plots.")
-        self.butUpdate.setText("Update")
+        self.butSave = QtGui.QPushButton()
+        self.butSave.setToolTip("Save P/Z & update all plots.")
+        self.butSave.setText("Save")
 
         self.butSetZero = QtGui.QPushButton()
         self.butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
@@ -134,7 +134,7 @@ class InputPZ(QtGui.QWidget):
         self.layHButtonsPZs1.addWidget(self.butAddRow)
         self.layHButtonsPZs1.addWidget(self.butDelRow)
         self.layHButtonsPZs1.addWidget(self.butClear)
-        self.layHButtonsPZs1.addWidget(self.butUpdate)
+        self.layHButtonsPZs1.addWidget(self.butSave)
         self.layHButtonsPZs1.addStretch()
 
         self.layHButtonsPZs2 = QtGui.QHBoxLayout()
@@ -159,11 +159,11 @@ class InputPZ(QtGui.QWidget):
         self.spnRound.editingFinished.connect(self.showZPK)
         self.chkPZList.clicked.connect(self.showZPK)
 
-        self.ledGain.editingFinished.connect(self.saveZPK)
-        self.tblPZ.itemChanged.connect(self.saveZPK) # works but fires multiple times
-        self.tblPZ.selectionModel().currentChanged.connect(self.saveZPK)
-        self.butUpdate.clicked.connect(self.saveZPK)
-
+#        self.ledGain.editingFinished.connect(self.saveZPK)
+#        self.tblPZ.itemChanged.connect(self.saveZPK) # works but fires multiple times
+#        self.tblPZ.selectionModel().currentChanged.connect(self.saveZPK)
+#        self.tblPZ.clicked.connect(self.saveZPK)
+        self.butSave.clicked.connect(self.saveZPK)
 
         self.butDelRow.clicked.connect(self.deleteRows)
         self.butAddRow.clicked.connect(self.addRows)
@@ -175,13 +175,17 @@ class InputPZ(QtGui.QWidget):
         """
         Clear table and fill P/Z with zeros
         """
-        self.tblPZ.clear()
-        self.saveZPK()
+        fb.fil[0]['zpk'] = ([0.,0.],[0.,0.],1.)
+        fb.fil[0]['coeffs'] = ([1.,0.,0.],[1.,0.,0.])
+#        self.tblPZ.clear()
+        self.showZPK()
 
     def saveZPK(self):
         """
         Read out table and save the values to the filter PZ dict
         """
+        if self.DEBUG:
+            print("=====================\nInputPZ.saveZPK")
         zpk = []
         num_rows = self.tblPZ.rowCount()
         if self.DEBUG: print("nrows:",num_rows)
@@ -199,7 +203,7 @@ class InputPZ(QtGui.QWidget):
             zpk.append(rows)
 
         zpk.append(simple_eval(self.ledGain.text()))
-        print("Gain:",zpk[2])
+        print("ZPK - Gain:",zpk[2])
 
         fb.fil[0]['zpk'] = zpk
 
@@ -210,6 +214,10 @@ class InputPZ(QtGui.QWidget):
 
         fb.fil[0]["N"] = num_rows-1
         fb.fil[0]['creator'] = ('zpk', 'input_pz')
+        
+        if self.DEBUG:
+            print("ZPK - coeffs:",  fb.fil[0]['coeffs'])
+            print("ZPK - zpk:",  fb.fil[0]['zpk'])
 
 #                ZPK.append(simple_eval(item.text()) if item else 0.)
 
@@ -220,7 +228,7 @@ class InputPZ(QtGui.QWidget):
 #        fb.fil[0]["N"] = num_rows-1
 #        print( fb.fil[0]["zpk"])
 
-        if self.DEBUG: print ("zpk updated!")
+        if self.DEBUG: print ("ZPK updated!")
 
     def showZPK(self):
         """
@@ -279,25 +287,25 @@ class InputPZ(QtGui.QWidget):
 
     def addRows(self):
         """
-        Add the number of selected rows to the table, rows need to be fully
-        selected. If nothing is selected, add 1 row. Afterwards, refresh
-        the table.
+        Add the number of selected rows to the table and save the table.
+        If nothing is selected, add 1 row. Afterwards, refresh the table.
+        New cells are filled with zeros.
         """
-        num_rows = self.tblPZ.rowCount()
-        sel_rows = len(self.tblPZ.selectionModel().selectedRows())
+        old_rows = self.tblPZ.rowCount()
+        new_rows = len(self.tblPZ.selectionModel().selectedRows()) + old_rows
+        self.tblPZ.setRowCount(new_rows)
 
-        if sel_rows == 0:
-            sel_rows = 1 # add at least one row
+        if old_rows == new_rows: # nothing selected
+            new_rows = old_rows + 1 # add at least one row
 
-        z = np.zeros((2, sel_rows))
-        #        fb.fil[0]["zpk"][0:1] = np.hstack((fb.fil[0]["zpk"][0:1],z))
         for col in range(2):
-            for row in range(num_rows,num_rows + sel_rows):
-                self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem(""))
+            for row in range(old_rows, new_rows):
+                self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
+        self.tblPZ.resizeColumnsToContents()
         self.tblPZ.resizeRowsToContents()
-        self.tblPZ.setRowCount(num_rows + sel_rows)
-        print("rows", num_rows + sel_rows)
+        self.tblPZ.setRowCount(new_rows)
+        print("new_rows", new_rows)
 
         self.saveZPK()
 
@@ -314,6 +322,8 @@ class InputPZ(QtGui.QWidget):
                 if item:
                     if abs(simple_eval(item.text())) < eps:
                         item.setText(str(0.))
+                else: 
+                    self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
         self.saveZPK()
 
 #------------------------------------------------------------------------------

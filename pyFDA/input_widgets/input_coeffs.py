@@ -9,6 +9,7 @@ Tab-Widget for displaying and modifying filter coefficients
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 #import scipy.io
 import numpy as np
 from scipy.signal import tf2zpk
@@ -25,16 +26,20 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 from simpleeval import simple_eval
 
 # TODO: drag & drop doesn't work
-# TODO: selecting and deleting non-adjacent rows deletes the wrong rows
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: Add quantizer widget
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: IIR button functionality not yet implemented
-# TODO: emit signal when table is changed?
+# TODO: emit signal when table is changed : careful, saveCoeffs must not be
+#        triggered when table is changed by program!!!
+
 class InputCoeffs(QtGui.QWidget):
     """
-    Create the window for entering exporting / importing and saving / loading data
+    Create widget for viewing / editing / entering data
     """
+        # class variables (shared between instances if more than one exists)
+    coeffsChanged = pyqtSignal()  # emitted when coeffs have been changed
+                                    # manually
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputCoeffs, self).__init__()
@@ -44,10 +49,10 @@ class InputCoeffs(QtGui.QWidget):
     def initUI(self):
         """
         Intitialize the widget, consisting of:
-        -
-        -
+        - top chkbox row
+        - coefficient table
+        - two bottom rows with action buttons
         """
-        # widget / subwindow for coefficient display / entry
 
         self.chkCoeffList =  QtGui.QCheckBox()
         self.chkCoeffList.setChecked(True)
@@ -58,12 +63,10 @@ class InputCoeffs(QtGui.QWidget):
         self.chkIIR =  QtGui.QCheckBox()
         self.chkIIR.setChecked(True)
         self.chkIIR.setToolTip("IIR Filter")
-        self.chkIIR.setCheckable(False) # not implemented yet
-        self.chkIIR.setEnabled(False) # not implemented yet
+#        self.chkIIR.setCheckable(False) # not implemented yet
+#        self.chkIIR.setEnabled(False) # not implemented yet
         self.lblIIR = QtGui.QLabel()
         self.lblIIR.setText("IIR")
-        self.lblIIR.setEnabled(False) # not implemented yet
-
 
         self.tblCoeff = QtGui.QTableWidget()
         self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
@@ -86,9 +89,9 @@ class InputCoeffs(QtGui.QWidget):
         self.butClear.setToolTip("Clear all entries.")
         self.butClear.setText("Clear")
 
-        self.butUpdate = QtGui.QPushButton()
-        self.butUpdate.setToolTip("Update filter info and plots.")
-        self.butUpdate.setText("Update")
+        self.butSave = QtGui.QPushButton()
+        self.butSave.setToolTip("Save coefficients & update filter plots.")
+        self.butSave.setText("Save")
 
         self.butSetZero = QtGui.QPushButton()
         self.butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
@@ -114,7 +117,7 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs1.addWidget(self.butAddRow)
         self.layHButtonsCoeffs1.addWidget(self.butDelRow)
         self.layHButtonsCoeffs1.addWidget(self.butClear)
-        self.layHButtonsCoeffs1.addWidget(self.butUpdate)
+        self.layHButtonsCoeffs1.addWidget(self.butSave)
         self.layHButtonsCoeffs1.addStretch()
 
         self.layHButtonsCoeffs2 = QtGui.QHBoxLayout()
@@ -135,9 +138,12 @@ class InputCoeffs(QtGui.QWidget):
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
 #        self.tblCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
-        self.tblCoeff.itemChanged.connect(self.saveCoeffs) # works but fires multiple times
-        self.tblCoeff.selectionModel().currentChanged.connect(self.saveCoeffs)
-        self.butUpdate.clicked.connect(self.saveCoeffs)
+        # this works but fires multiple times _and_ fires every time cell is 
+        # changed by program as well!
+#        self.tblCoeff.itemChanged.connect(self.saveCoeffs) 
+#        self.tblCoeff.clicked.connect(self.saveCoeffs)
+#        self.tblCoeff.selectionModel().currentChanged.connect(self.saveCoeffs)
+        self.butSave.clicked.connect(self.saveCoeffs)
 
         self.chkCoeffList.clicked.connect(self.showCoeffs)
 
@@ -145,24 +151,19 @@ class InputCoeffs(QtGui.QWidget):
         self.butAddRow.clicked.connect(self.addRows)
         self.butClear.clicked.connect(self.clearTable)
 
-
         self.butSetZero.clicked.connect(self.setCoeffsZero)
-
-    def clearTable(self):
-        """
-        Clear table and fill coeffs with zeros
-        """
-        self.tblCoeff.clear()
-        self.saveCoeffs()
 
     def saveCoeffs(self):
         """
-        Read out table and save the values to the filter coeff dict
+        Read out coefficients table and save the values to filter 'coeffs' 
+        and 'zpk' dicts. Is called by <Update> and every time a cell is clicked
         """
+        if self.DEBUG:
+            print("=====================\nInputCoeffs.saveCoeffs")
         coeffs = []
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
-        if self.DEBUG: print(num_rows, num_cols)
+        if self.DEBUG: print("Tbl rows /  cols:", num_rows, num_cols)
         if num_cols > 1: # IIR
             for col in range(num_cols):
                 rows = []
@@ -176,6 +177,7 @@ class InputCoeffs(QtGui.QWidget):
 #                    rows.append(float(item.text()) if item else 0.)
                 coeffs.append(rows)
         else: # FIR
+            self.chkIIR.setChecked(False)
             col = 0
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
@@ -188,17 +190,17 @@ class InputCoeffs(QtGui.QWidget):
         fb.fil[0]['coeffs'] = coeffs # np.array(coeffs, dtype = 'float64')
         
         if np.ndim(coeffs) == 1:
-            if self.DEBUG: print("Coeffs FIR:",  coeffs)
-            fb.fil[0]["zpk"] = tf2zpk(coeffs, [1])
+            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], [1], np.zeros(len(coeffs[0]-1)))
+            if self.DEBUG: print("Coeffs - FIR:",  coeffs)
         else:
             fb.fil[0]["zpk"] = tf2zpk(coeffs[0],coeffs[1]) # convert to poles / zeros
-            if self.DEBUG: print("Coeffs IIR:", coeffs)
+            if self.DEBUG: print("Coeffs - IIR:", coeffs)
         fb.fil[0]["N"] = num_rows-1
         fb.fil[0]['creator'] = ('ba', 'input_coeffs')
 
         if self.DEBUG:
-            print("ZPK:", fb.fil[0]["zpk"])
-            print ("coeffs updated!")
+            print("Coeffs - ZPK:", fb.fil[0]["zpk"])
+            print ("Coeffs updated!")
 
     def showCoeffs(self):
         """
@@ -210,13 +212,14 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setRowCount(max(np.shape(coeffs)))
 
         if self.DEBUG:
-            print("=====================\nInputInfo.showCoeffs")
+            print("=====================\nInputCoeffs.showCoeffs")
             print("Coeffs:\n",coeffs)
             print ("shape", np.shape(coeffs))
             print ("len", len(coeffs))
             print("ndim", np.ndim(coeffs))
 
         if np.ndim(coeffs) == 1: # FIR
+            self.chkIIR.setChecked(False) 
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
             for row in range(len(coeffs)):
@@ -228,6 +231,7 @@ class InputCoeffs(QtGui.QWidget):
                     self.tblCoeff.setItem(row,0,QtGui.QTableWidgetItem(
                                     str(coeffs[row])))
         else: # IIR
+            self.chkIIR.setChecked(True) 
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
             for col in range(2):
@@ -259,13 +263,13 @@ class InputCoeffs(QtGui.QWidget):
         for r in rows:
 #            self.tblCoeff.removeRow(r.row())
             self.tblCoeff.removeRow(r)
-        self.saveCoeffs()
+#        self.updateCoeffs()
 
     def addRows(self):
         """
-        Add the number of selected rows to the table, rows need to be completely
-        selected. If nothing is selected, add 1 row. Afterwards, refresh
-        the table.
+        Add the number of selected rows to the table.
+        If nothing is selected, add 1 row. Afterwards, refresh
+        the table and save. 
         """
         nrows = len(self.tblCoeff.selectionModel().selectedRows())
 
@@ -274,16 +278,30 @@ class InputCoeffs(QtGui.QWidget):
         ncols = self.tblCoeff.columnCount()
 
         if ncols == 1: # FIR
-            fb.fil[0]["coeffs"].extend(list(np.zeros(nrows)))
+            fb.fil[0]["coeffs"].extend(list(np.zeros(nrows, dtype = 'float64')))
         else:
-            z = np.zeros((ncols, nrows))
+            z = np.zeros((ncols, nrows), dtype = 'float64')
             fb.fil[0]["coeffs"] = np.hstack((fb.fil[0]["coeffs"],z))
+
+        self.showCoeffs()
+#        self.updateCoeffs()
+
+    def clearTable(self):
+        """
+        Clear table & initialize coeff, zpk for two poles and zeros @ origin
+        """
+        self.tblCoeff.clear()
+        if self.chkIIR.isChecked():
+            fb.fil[0]['coeffs'] = ([1.,0.,0.],[1.,0.,0.])
+        else:
+            fb.fil[0]['coeffs'] = [1.,0.,0.]
+        fb.fil[0]['zpk'] = ([0.,0.],[0.,0.], 1.)
 
         self.showCoeffs()
 
     def setCoeffsZero(self):
         """
-        Set all coefficients = 0 with a magnitude less than eps
+        Set all coefficients = 0 in table with a magnitude less than eps
         """
         eps = float(self.ledSetEps.text())
         num_rows, num_cols = self.tblCoeff.rowCount(),\
@@ -293,7 +311,15 @@ class InputCoeffs(QtGui.QWidget):
                 item = self.tblCoeff.item(row, col)
                 if abs(simple_eval(item.text())) < eps:
                     item.setText(str(0.))
+        
+    def updateCoeffs(self):
+        """
+        When coefficients have been edited by hand (not by another routine),
+        - save coefficients, zpk, ...
+        - emit the signal coeffsChanged
+        """
         self.saveCoeffs()
+        self.coeffsChanged.emit()  # ->pyFDA -> pltAll.updateAll()     
 
 #------------------------------------------------------------------------------
 
