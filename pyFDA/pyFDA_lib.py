@@ -24,16 +24,16 @@ Created on Mon Apr 30 10:29:42 2012
 # The following is derived from the slides presented by
 # Alexander Kain for CS506/606 "Special Topics: Speech Signal Processing"
 # CSLU / OHSU, Spring Term 2011.
-from __future__ import division
-import string # needed for remezord?
+from __future__ import division, print_function
+#import string # needed for remezord?
 import numpy as np
 import numpy.ma as ma   
 from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
    ceil, hstack, mod 
 
 import scipy.signal as sig
-from scipy import special # needed for remezord
-import scipy.spatial.distance as sc_dist
+#from scipy import special # needed for remezord
+#import scipy.spatial.distance as sc_dist
 import matplotlib.pyplot as plt
 from  matplotlib import patches
 #from matplotlib.figure import Figure
@@ -238,7 +238,7 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
 
 
 
-def zplane(plt, b, a=1, pn_eps=1e-2, zpk=True, analog=False, pltLib='matplotlib', 
+def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib', 
           verbose=False, style='square', anaCircleRad=0, lw=2, 
           mps = 10, mzs = 10, mpc = 'r', mzc = 'b', plabel = '', zlabel = ''):
     """
@@ -338,6 +338,9 @@ def zplane(plt, b, a=1, pn_eps=1e-2, zpk=True, analog=False, pltLib='matplotlib'
         k = kn/kd
     else:
         z = b[0]; p = b[1]; k = b[2]
+        
+    print("p_in:", p, "\n")
+    print("z_in:", z)
     # find multiple poles and zeros and their multiplicities
 #    print p, z
     if len(p) < 1:
@@ -346,13 +349,14 @@ def zplane(plt, b, a=1, pn_eps=1e-2, zpk=True, analog=False, pltLib='matplotlib'
     else:
         #p, num_p = sig.signaltools.unique_roots(p, tol = pn_eps, rtype='avg')
         p, num_p = unique_roots(p, tol = pn_eps, rtype='avg')
-        p = np.array(p)
+#        p = np.array(p); num_p = np.ones(len(p))
     if len(z) > 0:
         z, num_z = unique_roots(z, tol = pn_eps, rtype='avg')
-        z = np.array(z)
+#        z = np.array(z); num_z = np.ones(len(z))
         #z, num_z = sig.signaltools.unique_roots(z, tol = pn_eps, rtype='avg')
     else: 
         num_z = []
+
         
 #    print p,z
     if pltLib == 'matplotlib':
