@@ -35,8 +35,8 @@ class InputAll(QtGui.QWidget):
 #        self.inputParams = inputParams.inputParams()
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)        
         self.inputFiles = input_files.InputFiles(DEBUG = False)
-        self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
-        self.inputPZ = input_pz.InputPZ(DEBUG = False)
+        self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = True)
+        self.inputPZ = input_pz.InputPZ(DEBUG = True)
         self.inputInfo = input_info.InputInfo(DEBUG = False)
         
         self.initUI()     
@@ -74,10 +74,6 @@ class InputAll(QtGui.QWidget):
         """ Update all widgets with new filter data"""
         self.inputCoeffs.showCoeffs()
         self.inputPZ.showZPK()
-
-
-
-     
 
 #------------------------------------------------------------------------
     
