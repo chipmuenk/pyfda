@@ -44,6 +44,8 @@ class InputCoeffs(QtGui.QWidget):
         self.DEBUG = DEBUG
         super(InputCoeffs, self).__init__()
 
+#        self.nrows = 0 # keep track of number of rows
+
         self.initUI()
 
     def initUI(self):
@@ -71,6 +73,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff = QtGui.QTableWidget()
         self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
         self.tblCoeff.setAlternatingRowColors(True)
+#        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
         self.tblCoeff.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
         self.tblCoeff.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
@@ -82,16 +85,21 @@ class InputCoeffs(QtGui.QWidget):
 
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
-                "Multiple rows can be selected using <SHIFT> or <CTRL>.")
+                "Multiple rows can be selected using <SHIFT> or <CTRL>.\n"
+                "When noting is selected, delete last row.")
         self.butDelRow.setText("Delete")
-
-        self.butClear = QtGui.QPushButton()
-        self.butClear.setToolTip("Clear all entries.")
-        self.butClear.setText("Clear")
 
         self.butSave = QtGui.QPushButton()
         self.butSave.setToolTip("Save coefficients & update filter plots.")
         self.butSave.setText("Save")
+
+        self.butLoad = QtGui.QPushButton()
+        self.butLoad.setToolTip("Reload coefficients.")
+        self.butLoad.setText("Load")
+
+        self.butClear = QtGui.QPushButton()
+        self.butClear.setToolTip("Clear all entries.")
+        self.butClear.setText("Clear")
 
         self.butSetZero = QtGui.QPushButton()
         self.butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
@@ -103,6 +111,24 @@ class InputCoeffs(QtGui.QWidget):
         self.ledSetEps = QtGui.QLineEdit()
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
+
+        self.butQuant = QtGui.QPushButton()
+        self.butQuant.setToolTip("Quantize coefficients = 0 with a magnitude < eps.")
+        self.butQuant.setText("< Q >")
+
+        self.lblQuant = QtGui.QLabel()
+        self.lblQuant.setText("QI.QF = ")
+
+        self.ledQuantI = QtGui.QLineEdit()
+        self.ledQuantI.setToolTip("Specify number of integer bits.")
+        self.ledQuantI.setText("0")
+
+        self.lblDot = QtGui.QLabel()
+        self.lblDot.setText(".")
+
+        self.ledQuantF = QtGui.QLineEdit()
+        self.ledQuantF.setToolTip("Specify number of fractional bits.")
+        self.ledQuantF.setText("15")
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
@@ -116,47 +142,61 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs1 = QtGui.QHBoxLayout()
         self.layHButtonsCoeffs1.addWidget(self.butAddRow)
         self.layHButtonsCoeffs1.addWidget(self.butDelRow)
-        self.layHButtonsCoeffs1.addWidget(self.butClear)
         self.layHButtonsCoeffs1.addWidget(self.butSave)
+        self.layHButtonsCoeffs1.addWidget(self.butLoad)
         self.layHButtonsCoeffs1.addStretch()
 
         self.layHButtonsCoeffs2 = QtGui.QHBoxLayout()
+        self.layHButtonsCoeffs2.addWidget(self.butClear)
         self.layHButtonsCoeffs2.addWidget(self.butSetZero)
         self.layHButtonsCoeffs2.addWidget(self.lblEps)
         self.layHButtonsCoeffs2.addWidget(self.ledSetEps)
         self.layHButtonsCoeffs2.addStretch()
 
+        self.layHButtonsCoeffs3 = QtGui.QHBoxLayout()
+        self.layHButtonsCoeffs3.addWidget(self.butQuant)
+        self.layHButtonsCoeffs3.addWidget(self.lblQuant)
+        self.layHButtonsCoeffs3.addWidget(self.ledQuantI)
+        self.layHButtonsCoeffs3.addWidget(self.lblDot)
+        self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
+        self.layHButtonsCoeffs3.addStretch()
+
         layVMain = QtGui.QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
-        layVMain.addWidget(self.tblCoeff)
         layVMain.addLayout(self.layHButtonsCoeffs1)
         layVMain.addLayout(self.layHButtonsCoeffs2)
-#        layVMain.addStretch(1)
+        layVMain.addLayout(self.layHButtonsCoeffs3)
+        layVMain.addWidget(self.tblCoeff)
+        layVMain.addStretch(1)
         self.setLayout(layVMain)
         self.showCoeffs() # initialize table with default values from fb
 
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
 #        self.tblCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
-        # this works but fires multiple times _and_ fires every time cell is 
+        # this works but fires multiple times _and_ fires every time cell is
         # changed by program as well!
-#        self.tblCoeff.itemChanged.connect(self.saveCoeffs) 
+#        self.tblCoeff.itemChanged.connect(self.saveCoeffs)
 #        self.tblCoeff.clicked.connect(self.saveCoeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.saveCoeffs)
-        self.butSave.clicked.connect(self.saveCoeffs)
 
         self.chkCoeffList.clicked.connect(self.showCoeffs)
+        self.butLoad.clicked.connect(self.showCoeffs)
+
+        self.butSave.clicked.connect(self.saveCoeffs)
 
         self.butDelRow.clicked.connect(self.deleteRows)
         self.butAddRow.clicked.connect(self.addRows)
-        self.butClear.clicked.connect(self.clearTable)
 
+        self.butClear.clicked.connect(self.clearTable)
         self.butSetZero.clicked.connect(self.setCoeffsZero)
+        self.butQuant.clicked.connect(self.quantCoeffs)
 
     def saveCoeffs(self):
         """
-        Read out coefficients table and save the values to filter 'coeffs' 
-        and 'zpk' dicts. Is called by <Update> and every time a cell is clicked
+        Read out coefficients table and save the values to filter 'coeffs'
+        and 'zpk' dicts. Is called when clicking the <Save> button, triggers
+        a recalculation and replot of all plot widgets.
         """
         if self.DEBUG:
             print("=====================\nInputCoeffs.saveCoeffs")
@@ -188,7 +228,7 @@ class InputCoeffs(QtGui.QWidget):
                     coeffs.append(0.)
 
         fb.fil[0]['coeffs'] = coeffs # np.array(coeffs, dtype = 'float64')
-        
+
         if np.ndim(coeffs) == 1:
             fb.fil[0]["zpk"] = tf2zpk(coeffs[0], [1], np.zeros(len(coeffs[0]-1)))
             if self.DEBUG: print("Coeffs - FIR:",  coeffs)
@@ -201,6 +241,8 @@ class InputCoeffs(QtGui.QWidget):
         if self.DEBUG:
             print("Coeffs - ZPK:", fb.fil[0]["zpk"])
             print ("Coeffs updated!")
+
+        self.coeffsChanged.emit()  # ->pyFDA -> pltAll.updateAll()
 
     def showCoeffs(self):
         """
@@ -219,7 +261,7 @@ class InputCoeffs(QtGui.QWidget):
             print("ndim", np.ndim(coeffs))
 
         if np.ndim(coeffs) == 1: # FIR
-            self.chkIIR.setChecked(False) 
+            self.chkIIR.setChecked(False)
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
             for row in range(len(coeffs)):
@@ -231,7 +273,7 @@ class InputCoeffs(QtGui.QWidget):
                     self.tblCoeff.setItem(row,0,QtGui.QTableWidgetItem(
                                     str(coeffs[row])))
         else: # IIR
-            self.chkIIR.setChecked(True) 
+            self.chkIIR.setChecked(True)
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
             for col in range(2):
@@ -247,57 +289,65 @@ class InputCoeffs(QtGui.QWidget):
 
     def deleteRows(self):
         """
-        Delete all selected rows by: 
+        Delete all selected rows by:
         - reading the indices of all selected cells
         - collecting the row numbers in a set (only unique elements)
         - sort the elements in a list in descending order
         - delete the rows starting at the bottom
+        If nothing is selected, delete last row.
         """
-        # returns index to rows: 
+        # returns index to rows:
 #        rows = self.tblCoeff.selectionModel().selectedRows()
+        nrows = self.tblCoeff.rowCount()
         indices = self.tblCoeff.selectionModel().selectedIndexes()
-        rows = set() 
+        rows = set()
         for index in indices:
             rows.add(index.row()) # collect all selected rows in a set
+        if len(rows) == 0: # nothing selected
+            rows = {nrows-1} # -> select last row
         rows = sorted(list(rows), reverse = True)# sort rows in decending order
         for r in rows:
 #            self.tblCoeff.removeRow(r.row())
             self.tblCoeff.removeRow(r)
-#        self.updateCoeffs()
+        self.tblCoeff.setRowCount(nrows - len(rows))
 
     def addRows(self):
         """
-        Add the number of selected rows to the table.
-        If nothing is selected, add 1 row. Afterwards, refresh
-        the table and save. 
+        Add the number of selected rows to the table and fill new cells with
+        zeros. If nothing is selected, add 1 row.
         """
-        nrows = len(self.tblCoeff.selectionModel().selectedRows())
+        old_rows = self.tblCoeff.rowCount()
+        new_rows = len(self.tblCoeff.selectionModel().selectedRows()) + old_rows
+        self.tblCoeff.setRowCount(new_rows)
 
-        if nrows == 0:
-            nrows = 1 # add at least one row
-        ncols = self.tblCoeff.columnCount()
+        if old_rows == new_rows: # nothing selected
+            new_rows = old_rows + 1 # add at least one row
 
-        if ncols == 1: # FIR
-            fb.fil[0]["coeffs"].extend(list(np.zeros(nrows, dtype = 'float64')))
-        else:
-            z = np.zeros((ncols, nrows), dtype = 'float64')
-            fb.fil[0]["coeffs"] = np.hstack((fb.fil[0]["coeffs"],z))
+        self.tblCoeff.setRowCount(new_rows)
 
-        self.showCoeffs()
-#        self.updateCoeffs()
+        for col in range(2):
+            for row in range(old_rows, new_rows):
+                self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+
+        self.tblCoeff.resizeColumnsToContents()
+        self.tblCoeff.resizeRowsToContents()
+
 
     def clearTable(self):
         """
-        Clear table & initialize coeff, zpk for two poles and zeros @ origin
+        Clear table & initialize coeff, zpk for two poles and zeros @ origin,
+        a = b = [1; 0; 0]
         """
         self.tblCoeff.clear()
-        if self.chkIIR.isChecked():
-            fb.fil[0]['coeffs'] = ([1.,0.,0.],[1.,0.,0.])
-        else:
-            fb.fil[0]['coeffs'] = [1.,0.,0.]
-        fb.fil[0]['zpk'] = ([0.,0.],[0.,0.], 1.)
+        self.tblCoeff.setRowCount(3)
 
-        self.showCoeffs()
+        num_cols = self.tblCoeff.columnCount()
+        for row in range(3):
+            for col in range(num_cols):
+                if row == 0:
+                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("1.0"))
+                else:
+                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
     def setCoeffsZero(self):
         """
@@ -309,17 +359,28 @@ class InputCoeffs(QtGui.QWidget):
         for col in range(num_cols):
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
-                if abs(simple_eval(item.text())) < eps:
-                    item.setText(str(0.))
-        
-    def updateCoeffs(self):
+                if item:
+                    if abs(simple_eval(item.text())) < eps:
+                        item.setText(str(0.))
+                else:
+                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+
+    def quantCoeffs(self):
         """
-        When coefficients have been edited by hand (not by another routine),
-        - save coefficients, zpk, ...
-        - emit the signal coeffsChanged
+        Quantize all coefficients
         """
-        self.saveCoeffs()
-        self.coeffsChanged.emit()  # ->pyFDA -> pltAll.updateAll()     
+        QI = int(self.ledQuantI.text())
+        QF = int(self.ledQuantF.text())
+        qObj = [QI, QF]
+        num_rows, num_cols = self.tblCoeff.rowCount(),\
+                                        self.tblCoeff.columnCount()
+        for col in range(num_cols):
+            for row in range(num_rows):
+                item = self.tblCoeff.item(row, col)
+                if item:
+                    item.setText(str(simple_eval(item.text())))
+                else:
+                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
 #------------------------------------------------------------------------------
 
