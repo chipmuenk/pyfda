@@ -12,11 +12,12 @@ https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
 from importlib import import_module
-import scipy
+#import scipy
 import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
 from PyQt4 import QtGui
+import pyFDA_lib
 
 #import filterbroker as fb
 
@@ -24,7 +25,7 @@ from PyQt4 import QtGui
 # TODO: Hilbert not working correctly yet
 # TODO: Windows with parameters are missing
 
-output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+out_format = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
 
 class firwin(object):
@@ -156,20 +157,13 @@ class firwin(object):
         and second-order sections and store all available formats in the passed
         dictionary 'specs'.
         """
-        
-        if output == 'zpk': # arg = [z,p,k]
-            self.coeffs = sig.zpk2tf(arg[0], arg[1], arg[2])        
-            self.zpk = arg
-        else: # arg = [b,a]
-            self.zpk = sig.tf2zpk(arg[0], arg[1])
-            self.coeffs = arg  
-        specs["coeffs"] = self.coeffs
-        specs["zpk"] = self.zpk
+        pyFDA_lib.saveFil(specs, arg, out_format, 'firwin')
+
         try: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N-1 # yes, update filterbroker
         except AttributeError:
             pass
-        specs['creator'] = (output, 'firwin')
+#        specs['creator'] = (out_format, 'firwin')
 
 
     def LPman(self, specs):

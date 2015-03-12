@@ -27,9 +27,9 @@ Created on Mon Apr 30 10:29:42 2012
 from __future__ import division, print_function
 #import string # needed for remezord?
 import numpy as np
-import numpy.ma as ma   
+import numpy.ma as ma
 from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
-   ceil, hstack, mod 
+   ceil, hstack, mod
 
 import scipy.signal as sig
 #from scipy import special # needed for remezord
@@ -41,7 +41,7 @@ from  matplotlib import patches
 
 
 def H_mag(zaehler, nenner, z, lim):
-    """ Calculate magnitude of H(z) or H(s) in polynomial form at the complex 
+    """ Calculate magnitude of H(z) or H(s) in polynomial form at the complex
     coordinate z = x, 1j * y (skalar or array)
     The result is clipped at lim."""
 #    limvec = lim * np.ones(len(z))
@@ -55,7 +55,7 @@ def H_mag(zaehler, nenner, z, lim):
         n_val = nenner # nenner is a scalar
     else:
         n_val = abs(np.polyval(nenner,z))
-        
+
     return np.minimum((z_val/n_val),lim)
 
 
@@ -69,8 +69,8 @@ def cmplx_sort(p):
     else:
         indx = np.argsort(p)
     return np.take(p, indx, 0), indx
-    
-# from scipy.signal.signaltools.py: 
+
+# from scipy.signal.signaltools.py:
 # TODO: comparison against nan gives a RunTime warning, used masked array
 #       comparison of real values has several problems (5 * tol ???), scalars
 def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
@@ -85,7 +85,7 @@ tol : float, default tol = 1e-3
     The tolerance for two roots to be considered equal. Default is 1e-3.
 magsort: Boolean, default = False
     When magsort = True, use the root magnitude as a sorting criterium (as in
-    the version used in numpy < 1.8.2). This yields false results for roots 
+    the version used in numpy < 1.8.2). This yields false results for roots
     with similar magniudes (e.g. on the unit circle) but is signficantly
     faster for a large number of roots (factor 20 for 500 double roots.)
 rtype : {'max', 'min, 'avg'}, optional
@@ -96,7 +96,7 @@ rtype : {'max', 'min, 'avg'}, optional
     - 'avg' or 'mean' : take the average of those roots.
     - 'median' : take the median of those roots
 dist : {'manhattan', 'euclid'}, optional
-    How to measure the distance between roots: 'euclid' is the euclidian 
+    How to measure the distance between roots: 'euclid' is the euclidian
     distance. 'manhattan' is less common, giving the
     sum of the differences of real and imaginary parts.
 
@@ -130,16 +130,16 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
 """
 
     def manhattan(a,b):
-        """ 
+        """
         Manhattan distance between a and b
         """
         return ma.abs(a.real - b.real) + ma.abs(a.imag - b.imag)
     def euclid(a,b):
-        """ 
+        """
         Euclidian distance between a and b
         """
         return ma.abs(a - b)
-        
+
     if rtype in ['max', 'maximum']:
         comproot = ma.max  # nanmax ignores nan's
     elif rtype in ['min', 'minimum']:
@@ -147,9 +147,9 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
     elif rtype in ['avg', 'mean']:
         comproot = ma.mean # nanmean ignores nan's
 #    elif rtype == 'median':
-    else: 
+    else:
         raise TypeError(rtype)
-    
+
     if rdist in ['euclid', 'euclidian']:
         dist_roots = euclid
     elif rdist in ['rect', 'manhattan']:
@@ -161,9 +161,9 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
     pout = [] # initialize list for reduced output list of roots
     p = np.atleast_1d(p) # convert p to at least 1D array
     tol = abs(tol)
-    if len(p) == 0: 
+    if len(p) == 0:
         return pout, mult
-        
+
     elif len(p) == 1:
         pout = p
         mult = [1]
@@ -171,7 +171,7 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
     else:
         sameroots = [] # temporary list for roots within the tolerance
         pout = p[np.isnan(p)].tolist() # copy nan elements to pout, convert to list
-        mult = len(pout) * [1] # generate an (empty) list with a "1" for each nan 
+        mult = len(pout) * [1] # generate an (empty) list with a "1" for each nan
 #        p = p[~np.isnan(p)]    # delete nan elements from p, convert to list
         p = ma.masked_array(p[~np.isnan(p)])    # delete nan elements from p
 
@@ -182,13 +182,13 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
                 tolarr = dist_roots(p[i], p[i:]) < tol # test also against itself to
                                                   # assure multiplicity is at least one
 #            if ~np.isnan(p[i]): # has current root been "deleted" yet?
-#                tolarr = np.less(dist_roots(p[i], p[i:]), tol)  
+#                tolarr = np.less(dist_roots(p[i], p[i:]), tol)
                 mult.append(np.sum(tolarr)) # multiplicity = number of "hits"
                 sameroots = p[i:][tolarr]   # pick the roots within the tolerance
-                p.mask = tolarr  
+                p.mask = tolarr
 #                p[i:][tolarr] = np.nan      # and "delete" them
                 pout.append(comproot(sameroots)) # avg/mean/max of mult. root
-    
+
     else:
         p,indx = cmplx_sort(p)
         indx = -1
@@ -210,7 +210,7 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
                 mult.append(1)
 
     return np.array(pout), np.array(mult)
-    
+
 ##### original code ####
 #    p = asarray(p) * 1.0
 #    tol = abs(tol)
@@ -238,107 +238,107 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
 
 
 
-def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib', 
-          verbose=False, style='square', anaCircleRad=0, lw=2, 
+def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib',
+          verbose=False, style='square', anaCircleRad=0, lw=2,
           mps = 10, mzs = 10, mpc = 'r', mzc = 'b', plabel = '', zlabel = ''):
     """
-    Plot the poles and zeros in the complex z-plane either from the 
-    coefficients (`b,`a) of a discrete transfer function `H`(`z`) (zpk = False) 
+    Plot the poles and zeros in the complex z-plane either from the
+    coefficients (`b,`a) of a discrete transfer function `H`(`z`) (zpk = False)
     or directly from the zeros and poles (z,p) (zpk = True).
 
     When only b is given, the group delay of the transversal (FIR)
     filter specified by b is calculated.
-    
+
     Parameters
     ----------
     b :  array_like
          Numerator coefficients (transversal part of filter)
-    
+
     a :  array_like (optional, default = 1 for FIR-filter)
          Denominator coefficients (recursive part of filter)
-         
+
     zpk : boolean (default: False)
-        When True, interpret parameter b as an array containing the 
-        position of the poles and parameter a as an array with the 
+        When True, interpret parameter b as an array containing the
+        position of the poles and parameter a as an array with the
         position of the zeros.
-        
+
     analog : boolean (default: False)
         When True, create a P/Z plot suitable for the s-plane, i.e. suppress
-        the unit circle (unless anaCircleRad > 0) and scale the plot for 
+        the unit circle (unless anaCircleRad > 0) and scale the plot for
         a good display of all poles and zeros.
-         
+
     pn_eps : float (default : 1e-2)
-         Tolerance for separating close poles or zeros 
-    
+         Tolerance for separating close poles or zeros
+
     pltLib :  string (default: 'matplotlib')
          Library for plotting the P/Z plane. Currently, only matplotlib is
-         implemented. When pltLib = 'none' or when matplotlib is not 
+         implemented. When pltLib = 'none' or when matplotlib is not
          available, only pass the poles / zeros and their multiplicity
-    
+
     verbose : boolean (default: False)
         When verbose == True, print poles / zeros and their multiplicity.
-        
+
     style : string (default: 'square')
         Style of the plot, for style == 'square' make scale of x- and y-
         axis equal.
-        
+
     mps = 10, mzs = 10, mpc = 'r', mzc = 'b', lw = 2
-    
+
     plabel, zlabel : string (default: '')
         This string is passed to the plot command for poles and zeros and
-        can be displayed by legend() 
-         
-    
+        can be displayed by legend()
+
+
     Returns
     -------
-    tau_g : ndarray 
+    tau_g : ndarray
         The group delay
-        
-    
-    w : ndarray 
+
+
+    w : ndarray
         The angular frequency points where the group delay was computed
-        
+
     Notes
-    -----    
-    
+    -----
+
     """
     # TODO:
     # - polar option
     # - add keywords for size, color etc. of markers and circle -> **kwargs
     # - add option for multi-dimensional arrays and zpk data
 
-    # Alternative: 
+    # Alternative:
     # get a figure/plot
-    # [z,p,k] = scipy.signal.tf2zpk -> poles and zeros 
+    # [z,p,k] = scipy.signal.tf2zpk -> poles and zeros
     # Plotten über
     # scatter(real(p),imag(p))
     # scatter(real(z),imag(z))
 
 
-    # Is input data given as zeros & poles (zpk = True) or 
+    # Is input data given as zeros & poles (zpk = True) or
     # as numerator & denominator coefficients (b, a) of system function?
-    
-    if zpk == False:        
+
+    if zpk == False:
         # The coefficients are less than 1, normalize the coeficients
         if np.max(b) > 1:
             kn = np.max(b)
             b = np.array(b)/float(kn) # make sure that b is an array
         else:
             kn = 1.
-    
+
         if np.max(a) > 1:
             kd = np.max(a)
             a = np.array(a)/abs(kd) # make sure that a is an array
         else:
             kd = 1.
-            
+
         # Calculate the poles, zeros and scaling factor
         p = np.roots(a)
         z = np.roots(b)
         k = kn/kd
     else:
         z = b[0]; p = b[1]; k = b[2]
-        
+
     print("p_in:", p, "\n")
     print("z_in:", z)
     # find multiple poles and zeros and their multiplicities
@@ -354,10 +354,10 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
         z, num_z = unique_roots(z, tol = pn_eps, rtype='avg')
 #        z = np.array(z); num_z = np.ones(len(z))
         #z, num_z = sig.signaltools.unique_roots(z, tol = pn_eps, rtype='avg')
-    else: 
+    else:
         num_z = []
 
-        
+
 #    print p,z
     if pltLib == 'matplotlib':
         ax = plt#.subplot(111)
@@ -383,28 +383,28 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
             # plot real and imaginary axis
             ax.axhline(lw=2, color = 'k', zorder=1)
             ax.axvline(lw=2, color = 'k', zorder=1)
-        
-        # Plot the zeros    
-        ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker = 'o', 
+
+        # Plot the zeros
+        ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker = 'o',
                    facecolor = 'none', edgecolor = mzc, lw = lw, label=zlabel)
 #        t1 = plt.plot(z.real, z.imag, 'go', ms=10, label=label)
 #        plt.setp( t1, markersize=mzs, markeredgewidth=2.0,
 #                  markeredgecolor=mzc, markerfacecolor='none')
         # Plot the poles
-        ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker = 'x', 
-                   edgecolor = mpc, lw = lw, label=plabel)    
+        ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker = 'x',
+                   edgecolor = mpc, lw = lw, label=plabel)
 
-         # Print multiplicity of poles / zeros              
+         # Print multiplicity of poles / zeros
         for i in range(len(z)):
             if verbose == True: print('z', i, z[i], num_z[i])
             if num_z[i] > 1:
                 plt.text(np.real(z[i]), np.imag(z[i]),'  (' + str(num_z[i]) +')',va = 'bottom')
-                
+
         for i in range(len(p)):
             if verbose == True: print('p', i, p[i], num_p[i])
             if num_p[i] > 1:
                 plt.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',va = 'bottom')
-            
+
             # increase distance between ticks and labels
             # to give some room for poles and zeros
         for tick in ax.get_xaxis().get_major_ticks():
@@ -413,25 +413,25 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
         for tick in ax.get_yaxis().get_major_ticks():
             tick.set_pad(12.)
             tick.label1 = tick._get_text1()
-        
+
         if style == 'square':
              plt.axis('equal')
-    
+
         xl = ax.get_xlim(); Dx = max(abs(xl[1]-xl[0]), 0.05)
         yl = ax.get_ylim(); Dy = max(abs(yl[1]-yl[0]), 0.05)
         ax.set_xlim((xl[0]-Dx*0.05, max(xl[1]+Dx*0.05,0)))
         ax.set_ylim((yl[0]-Dy*0.05, yl[1] + Dy*0.05))
     #    print(ax.get_xlim(),ax.get_ylim())
-         
+
     return z, p, k
 
 #
 #==================================================================
 def impz(b, a=1, FS=1, N=1):
     """
-Calculate impulse response of a discrete time filter, specified by 
+Calculate impulse response of a discrete time filter, specified by
 numerator coefficients b and denominator coefficients a of the system
-function H(z). 
+function H(z).
 
 When only b is given, the impulse response of the transversal (FIR)
 filter specified by b is calculated.
@@ -443,20 +443,20 @@ b :  array_like
 
 a :  array_like (optional, default = 1 for FIR-filter)
      Denominator coefficients (recursive part of filter)
-    
+
 FS : float (optional, default: FS = 1)
-     Sampling frequency. 
-    
+     Sampling frequency.
+
 N :  float (optional)
-     Number of calculated points. 
+     Number of calculated points.
      Default: N = len(b) for FIR filters, N = 100 for IIR filters
 
 Returns
 -------
 hn : ndarray with length N (see above)
-td : ndarray containing the time steps with same 
+td : ndarray containing the time steps with same
 
-    
+
 Examples
 --------
 >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
@@ -468,7 +468,7 @@ Examples
         impulse = np.repeat(0.,len(b)) # create float array filled with 0.
         try: len(b)
         except TypeError:
-            print('No proper filter coefficients: len(a) = len(b) = 1 !')   
+            print('No proper filter coefficients: len(a) = len(b) = 1 !')
     else:
         try: len(b)
         except TypeError: b = [b,] # convert scalar to array with len = 1
@@ -478,17 +478,17 @@ Examples
     impulse[0] =1.0 # create dirac impulse
     hn = np.array(sig.lfilter(b,a,impulse)) # calculate impulse response
     td = np.arange(len(hn)) / FS
-    
-    #step = np.cumsum(hn) 
+
+    #step = np.cumsum(hn)
     return hn, td
 
 #==================================================================
 def grpdelay(b, a=1, nfft=512, whole=False, analog=False, Fs=2.*pi):
-#==================================================================    
+#==================================================================
     """
-Calculate group delay of a discrete time filter, specified by 
+Calculate group delay of a discrete time filter, specified by
 numerator coefficients `b` and denominator coefficients `a` of the system
-function `H` ( `z`). 
+function `H` ( `z`).
 
 When only `b` is given, the group delay of the transversal (FIR)
 filter specified by `b` is calculated.
@@ -500,77 +500,77 @@ b :  array_like
 
 a :  array_like (optional, default = 1 for FIR-filter)
      Denominator coefficients (recursive part of filter)
-     
+
 whole : string (optional, default : 'none')
-     Only when whole = 'whole' calculate group delay around 
+     Only when whole = 'whole' calculate group delay around
      the complete unit circle (0 ... 2 pi)
 
 N :  integer (optional, default: 512)
      Number of FFT-points
 
 FS : float (optional, default: FS = 2*pi)
-     Sampling frequency. 
-     
+     Sampling frequency.
+
 
 Returns
 -------
-tau_g : ndarray 
+tau_g : ndarray
     The group delay
-    
 
-w : ndarray 
+
+w : ndarray
     The angular frequency points where the group delay was computed
-    
+
 Notes
 -----
-The group delay :math:`\\tau_g(\\omega)` of discrete and continuous time 
+The group delay :math:`\\tau_g(\\omega)` of discrete and continuous time
 systems is defined by
 
 .. math::
 
-    \\tau_g(\\omega) = -  \\phi'(\\omega) 
-        = -\\frac{\\partial \\phi(\\omega)}{\\partial \\omega} 
-        = -\\frac{\\partial }{\\partial \\omega}\\angle H( \\omega) 
+    \\tau_g(\\omega) = -  \\phi'(\\omega)
+        = -\\frac{\\partial \\phi(\\omega)}{\\partial \\omega}
+        = -\\frac{\\partial }{\\partial \\omega}\\angle H( \\omega)
 
 A useful form for calculating the group delay is obtained by deriving the
-*logarithmic* frequency response in polar form as described in [JOS]_ for 
+*logarithmic* frequency response in polar form as described in [JOS]_ for
 discrete time systems:
 
-.. math:: 
+.. math::
 
-    \\ln ( H( \\omega))  
-      = \\ln \\left({H_A( \\omega)} e^{j \\phi(\\omega)} \\right) 
+    \\ln ( H( \\omega))
+      = \\ln \\left({H_A( \\omega)} e^{j \\phi(\\omega)} \\right)
       = \\ln \\left({H_A( \\omega)} \\right) + j \\phi(\\omega)
-      
-      \\Rightarrow \\; \\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))  
+
+      \\Rightarrow \\; \\frac{\\partial }{\\partial \\omega} \\ln ( H( \\omega))
       = \\frac{H_A'( \\omega)}{H_A( \\omega)} +  j \\phi'(\\omega)
-      
+
 where :math:`H_A(\\omega)` is the amplitude response. :math:`H_A(\\omega)` and
-its derivative :math:`H_A'(\\omega)` are real-valued, therefore, the group 
+its derivative :math:`H_A'(\\omega)` are real-valued, therefore, the group
 delay can be calculated from
 
-.. math::  
+.. math::
 
-      \\tau_g(\\omega) = -\\phi'(\\omega) = 
-      -\\Im \\left\\{ \\frac{\\partial }{\\partial \\omega} 
-      \\ln ( H( \\omega)) \\right\\} 
+      \\tau_g(\\omega) = -\\phi'(\\omega) =
+      -\\Im \\left\\{ \\frac{\\partial }{\\partial \\omega}
+      \\ln ( H( \\omega)) \\right\\}
       =-\\Im \\left\\{ \\frac{H'(\\omega)}{H(\\omega)} \\right\\}
 
 The derivative of a polynome :math:`P(s)` (continuous-time system) or :math:`P(z)`
 (discrete-time system) w.r.t. :math:`\\omega` is calculated by:
 
-.. math:: 
-    
-    \\frac{\\partial }{\\partial \\omega} P(s = j \\omega) 
+.. math::
+
+    \\frac{\\partial }{\\partial \\omega} P(s = j \\omega)
     = \\frac{\\partial }{\\partial \\omega} \\sum_{k = 0}^N c_k (j \\omega)^k
     =  j \\sum_{k = 0}^{N-1} (k+1) c_{k+1} (j \\omega)^{k}
-    =  j P_R(s = j \\omega) 
-    
-    \\frac{\\partial }{\\partial \\omega} P(z = e^{j \\omega T}) 
+    =  j P_R(s = j \\omega)
+
+    \\frac{\\partial }{\\partial \\omega} P(z = e^{j \\omega T})
     = \\frac{\\partial }{\\partial \\omega} \\sum_{k = 0}^N c_k e^{-j k \\omega T}
     =  -jT \\sum_{k = 0}^{N} k c_{k} e^{-j k \\omega T}
-    =  -jT P_R(z = e^{j \\omega T}) 
-    
+    =  -jT P_R(z = e^{j \\omega T})
+
 where :math:`P_R` is the "ramped" polynome, i.e. its `k` th coefficient is
 multiplied by `k` resp. `k` + 1.
 
@@ -585,15 +585,15 @@ yielding:
 
 
 where::
-        
+
                     (H'(e^jwT))       (    H_R(e^jwT))        (H_R(e^jwT))
     tau_g(w) = -im  |---------| = -im |-jT ----------| = T re |----------|
                     ( H(e^jwT))       (    H(e^jwT)  )        ( H(e^jwT) )
 
 where :math:`H(e^{j\\omega T})` is calculated via the DFT at NFFT points and
-the derivative 
-of the polynomial terms :math:`b_k z^-k` using :math:`\\partial / \\partial w b_k e^-jkwT` = -b_k jkT e^-jkwT. 
-This is equivalent to muliplying the polynome with a ramp `k`, 
+the derivative
+of the polynomial terms :math:`b_k z^-k` using :math:`\\partial / \\partial w b_k e^-jkwT` = -b_k jkT e^-jkwT.
+This is equivalent to muliplying the polynome with a ramp `k`,
 yielding the "ramped" function H_R(e^jwT).
 
 
@@ -603,14 +603,14 @@ sampling time and the exponent is positive.
 
 
 
-.. [JOS] Julius O. Smith III, "Numerical Computation of Group Delay" in 
-    "Introduction to Digital Filters with Audio Applications", 
-    Center for Computer Research in Music and Acoustics (CCRMA), 
-    Stanford University, http://ccrma.stanford.edu/~jos/filters/Numerical_Computation_Group_Delay.html, referenced 2014-04-02, 
+.. [JOS] Julius O. Smith III, "Numerical Computation of Group Delay" in
+    "Introduction to Digital Filters with Audio Applications",
+    Center for Computer Research in Music and Acoustics (CCRMA),
+    Stanford University, http://ccrma.stanford.edu/~jos/filters/Numerical_Computation_Group_Delay.html, referenced 2014-04-02,
 
-.. [Lyons] Richard Lyons, "Understanding Digital Signal Processing", 3rd Ed., 
+.. [Lyons] Richard Lyons, "Understanding Digital Signal Processing", 3rd Ed.,
     Prentice Hall, 2010.
-    
+
 Examples
 --------
 >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
@@ -637,7 +637,7 @@ Examples
 ##        d/dw H(z) = -------------------------------
 ##                               A(z) A(z)
 ## Substituting into the expression above yields:
-##                A dB - B dA 
+##                A dB - B dA
 ##        g(w) =  ----------- = dB/B - dA/A
 ##                    A B
 ##
@@ -652,21 +652,21 @@ Examples
         nfft = 2*nfft
 #
     w = Fs * np.arange(0, nfft)/nfft # create frequency vector
-    
+
     try: len(a)
-    except TypeError: 
+    except TypeError:
         a = 1; oa = 0 # a is a scalar or empty -> order of a = 0
         c = b
         try: len(b)
         except TypeError: print('No proper filter coefficients: len(a) = len(b) = 1 !')
-    else:    
+    else:
         oa = len(a)-1               # order of denom. a(z) resp. a(s)
-        c = np.convolve(b,a[::-1])  # a[::-1] reverses denominator coeffs a 
+        c = np.convolve(b,a[::-1])  # a[::-1] reverses denominator coeffs a
                                     # c(z) = b(z) * a(1/z)*z^(-oa)
     try: len(b)
     except TypeError: b=1; ob=0     # b is a scalar or empty -> order of b = 0
-    else:    
-        ob = len(b)-1             # order of b(z)  
+    else:
+        ob = len(b)-1             # order of b(z)
 
     if analog:
         a_b = np.convolve(a,b)
@@ -678,12 +678,12 @@ Examples
 
         num = np.fft.fft(ar_b - br_a, nfft)
         den = np.fft.fft(a_b,nfft)
-    else: 
+    else:
         oc = oa + ob                  # order of c(z)
         cr = c * np.arange(0,oc+1) # multiply with ramp -> derivative of c wrt 1/z
-    
-        num = np.fft.fft(cr,nfft) # 
-        den = np.fft.fft(c,nfft)  # 
+
+        num = np.fft.fft(cr,nfft) #
+        den = np.fft.fft(c,nfft)  #
 #
     minmag = 10. * np.spacing(1) # equivalent to matlab "eps"
     polebins = np.where(abs(den) < minmag)[0] # find zeros of denominator
@@ -693,24 +693,24 @@ Examples
         for i in polebins:
             print ('f = {0} '.format((Fs*i/nfft)))
             num[i] = 0
-            den[i] = 1          
+            den[i] = 1
 
     if analog:
         tau_g = np.real(num / den)
     else:
         tau_g = np.real(num / den) - oa
-#    
+#
     if not whole:
         nfft = nfft/2
         tau_g = tau_g[0:nfft]
         w = w[0:nfft]
 
     return tau_g, w
-    
+
 
 #==================================================================
 def format_ticks(xy, scale, format="%.1f"):
-#==================================================================    
+#==================================================================
     """
 Reformat numbers at x or y - axis. The scale can be changed to display
 e.g. MHz instead of Hz. The number format can be changed as well.
@@ -721,15 +721,15 @@ xy : string, either 'x', 'y' or 'xy'
      select corresponding axis (axes) for reformatting
 
 scale :  real,
-     
-format : string, 
+
+format : string,
          define C-style number formats
 
 Returns
 -------
 nothing
 
-    
+
 Examples
 --------
 >>> format_ticks('x',1000.)
@@ -743,8 +743,33 @@ Two decimal places for numbers on x- and y-axis
     if xy == 'y' or xy == 'xy':
         locy,labely = plt.yticks() # get location and content of xticks
         plt.yticks(locy, map(lambda y: format % y, locy*scale))
-        
 
+def saveFil(specs, arg, out_format, sender):
+    """
+    Convert between poles / zeros / gain, filter coefficients (polynomes)
+    and second-order sections and store all available formats in the passed
+    dictionary 'specs'.
+    """
+    print("saveFil: arg = ",arg)
+    if out_format == 'zpk': # arg = [z,p,k]
+        (b, a) = sig.zpk2tf(arg[0], arg[1], arg[2])
+        zpk = arg
+    elif out_format == 'ba': # arg = [b,a]
+        if np.ndim(arg) == 1:
+            print(len(arg))
+            b = np.asarray(arg)
+            a = np.zeros(len(arg))
+            a[0] = 1
+        else:
+            b = arg[0]
+            a = arg[1]
+        print("saveFil: b, a = ",b , a)
+        zpk = sig.tf2zpk(b, a)#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
+    else:
+        raise ValueError("Unknown output format {0:s}".format(out_format))
+    specs['coeffs'] = [b, a]
+    specs['zpk'] = zpk
+    specs['creator'] = (out_format, sender)
 
 #######################################
 # If called directly, do some example #
