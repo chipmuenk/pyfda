@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
 import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib
+import pyfda_lib_fix_v3 as fix
 from simpleeval import simple_eval
 
 # TODO: drag & drop doesn't work
@@ -34,6 +35,8 @@ from simpleeval import simple_eval
 # TODO: IIR button functionality not yet implemented
 # TODO: emit signal when table is changed : careful, saveCoeffs must not be
 #        triggered when table is changed by program!!!
+# TODO: Fill combobox for Wrap / Quant settings
+# TODO: Fix fixpoint lib: toggling between -MSB and + MSB is wrong
 
 class InputCoeffs(QtGui.QWidget):
     """
@@ -124,13 +127,22 @@ class InputCoeffs(QtGui.QWidget):
         self.ledQuantI = QtGui.QLineEdit()
         self.ledQuantI.setToolTip("Specify number of integer bits.")
         self.ledQuantI.setText("0")
-
+        self.ledQuantI.setMaxLength(2) # maximum of 2 digits
+        self.ledQuantI.setFixedWidth(30) # width of lineedit in points(?)
+        
         self.lblDot = QtGui.QLabel()
         self.lblDot.setText(".")
 
         self.ledQuantF = QtGui.QLineEdit()
         self.ledQuantF.setToolTip("Specify number of fractional bits.")
         self.ledQuantF.setText("15")
+        self.ledQuantF.setMaxLength(2) # maximum of 2 digits
+#        self.ledQuantF.setFixedWidth(30) # width of lineedit in points(?)
+        self.ledQuantF.setMaximumWidth(30)
+        
+        self.cmbQWrap = QtGui.QComboBox()
+#        self.cmbQWrap.setItemD
+        self.cmbQQuant = QtGui.QComboBox()
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
@@ -161,6 +173,8 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs3.addWidget(self.ledQuantI)
         self.layHButtonsCoeffs3.addWidget(self.lblDot)
         self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
+        self.layHButtonsCoeffs3.addWidget(self.cmbQWrap)
+        self.layHButtonsCoeffs3.addWidget(self.cmbQQuant)        
         self.layHButtonsCoeffs3.addStretch()
 
         layVMain = QtGui.QVBoxLayout()
@@ -354,16 +368,17 @@ class InputCoeffs(QtGui.QWidget):
         """
         Quantize all coefficients
         """
-        QI = int(self.ledQuantI.text())
-        QF = int(self.ledQuantF.text())
-        qObj = [QI, QF]
+        qI = int(self.ledQuantI.text())
+        qF = int(self.ledQuantF.text())
+        q_obj =  {'QI':qI, 'QF': qF, 'quant':'round', 'ovfl': 'wrap'}
+        myQ = fix.Fixed(q_obj) # instantiate fixed-point object
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
         for col in range(num_cols):
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
                 if item:
-                    item.setText(str(simple_eval(item.text())))
+                    item.setText(str(myQ.fix(simple_eval(item.text()))))
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
