@@ -15,8 +15,9 @@ from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import cheb1ord, zpk2tf, tf2zpk #, iirdesign
 import numpy as np
+import pyfda_lib
 
-output = 'zpk' # set output format of filter design routines to 'zpk' or 'ba'
+frmt = 'zpk' # set output format of filter design routines to 'zpk' or 'ba'
 
 class cheby1(object):
     
@@ -105,16 +106,7 @@ The attenuation in the stop band can only be controlled by the filter order.
         and second-order sections and store all available formats in the global
         database.
         """
-        if output == 'zpk': # arg = [z,p,k]
-            self.coeffs = zpk2tf(arg[0], arg[1], arg[2])
-            self.zpk = arg
-        else: # 'ba', arg = [bb, aa]
-            self.zpk = tf2zpk(arg[0], arg[1])
-            self.coeffs = arg
-
-        specs['coeffs'] = self.coeffs
-        specs['zpk'] = self.zpk
-        specs['creator'] = (output, 'cheby1')
+        pyfda_lib.saveFil(specs, arg, frmt, __name__)
         
         if self.F_PBC is not None: # has corner frequency been calculated?
             specs['N'] = self.N # yes, update filterbroker
@@ -129,29 +121,29 @@ The attenuation in the stop band can only be controlled by the filter order.
     def LPman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby1(self.N, self.A_PB, self.F_PB,
-                            btype='low', analog = False, output = output))
+                            btype='low', analog = False, output = frmt))
                             
     # LP: F_PB < F_stop
     def LPmin(self, specs):
         self.get_params(specs)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
         self.save(specs, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='low', analog = False, output = output))
+                            btype='low', analog = False, output = frmt))
 #
 #        self.save(specs, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
-#                             analog=False, ftype='cheby1', output=output))
+#                             analog=False, ftype='cheby1', output=frmt))
 
     def HPman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby1(self.N, self.A_PB, self.F_PB,
-                            btype='highpass', analog = False, output = output))
+                            btype='highpass', analog = False, output = frmt))
 
     # HP: F_stop < F_PB                          
     def HPmin(self, specs):
         self.get_params(specs)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
         self.save(specs, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='highpass', analog = False, output = output))
+                            btype='highpass', analog = False, output = frmt))
         
     # For BP and BS, A_PB, F_PB and F_stop have two elements each
         
@@ -159,7 +151,7 @@ The attenuation in the stop band can only be controlled by the filter order.
     def BPman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby1(self.N, self.A_PB,[self.F_PB,self.F_PB2],
-                            btype='bandpass', analog = False, output = output))
+                            btype='bandpass', analog = False, output = frmt))
                             
 
     def BPmin(self, specs):
@@ -167,16 +159,16 @@ The attenuation in the stop band can only be controlled by the filter order.
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2], 
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
         self.save(specs, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='bandpass', analog = False, output = output))
+                            btype='bandpass', analog = False, output = frmt))
                                 
 #        self.save(specs, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
-#            self.A_PB, self.A_SB, analog=False, ftype='cheby1', output=output))
+#            self.A_PB, self.A_SB, analog=False, ftype='cheby1', output=frmt))
 
         
     def BSman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby1(self.N, self.A_PB, [self.F_PB,self.F_PB2],
-                            btype='bandstop', analog = False, output = output))   
+                            btype='bandstop', analog = False, output = frmt))   
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]            
     def BSmin(self, specs):
@@ -184,4 +176,4 @@ The attenuation in the stop band can only be controlled by the filter order.
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2], 
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
         self.save(specs, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='bandstop', analog = False, output = output))
+                            btype='bandstop', analog = False, output = frmt))

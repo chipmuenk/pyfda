@@ -22,6 +22,7 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda_lib
 from simpleeval import simple_eval
 
 # TODO: drag & drop doesn't work
@@ -218,17 +219,9 @@ class InputPZ(QtGui.QWidget):
             zpk.append(rows)
 
         zpk.append(simple_eval(self.ledGain.text()))
-#        print("ZPK - Gain:",zpk[2])
 
-        fb.fil[0]['zpk'] = zpk
-
-#        bb = zpk[2] * np.poly(zpk[0])
-#        aa = zpk[2] * np.poly(zpk[1])
-#        fb.fil[0]['coeffs'] = (bb,aa)
-        fb.fil[0]['coeffs'] = zpk2tf(zpk[0], zpk[1], zpk[2])
-
-        fb.fil[0]["N"] = num_rows-1
-        fb.fil[0]['creator'] = ('zpk', 'input_pz')
+        fb.fil[0]["N"] = num_rows
+        pyfda_lib.saveFil(fb.fil[0], zpk, 'zpk', __name__)
 
         if self.DEBUG:
             print("ZPK - coeffs:",  fb.fil[0]['coeffs'])

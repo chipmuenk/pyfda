@@ -12,7 +12,8 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 #import scipy.io
 import numpy as np
-from scipy.signal import tf2zpk
+#from scipy.signal import tf2zpk
+
 
 # https://github.com/danthedeckie/simpleeval
 
@@ -23,6 +24,7 @@ if __name__ == "__main__":
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda_lib
 from simpleeval import simple_eval
 
 # TODO: drag & drop doesn't work
@@ -62,7 +64,7 @@ class InputCoeffs(QtGui.QWidget):
         self.lblCoeffList = QtGui.QLabel()
         self.lblCoeffList.setText("Show Coefficients")
 
-        self.chkIIR =  QtGui.QCheckBox()
+        self.chkIIR = QtGui.QCheckBox()
         self.chkIIR.setChecked(True)
         self.chkIIR.setToolTip("IIR Filter")
 #        self.chkIIR.setCheckable(False) # not implemented yet
@@ -204,42 +206,25 @@ class InputCoeffs(QtGui.QWidget):
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
         if self.DEBUG: print("Tbl rows /  cols:", num_rows, num_cols)
-        if num_cols > 1: # IIR
-            for col in range(num_cols):
-                rows = []
-                for row in range(num_rows):
-                    item = self.tblCoeff.item(row, col)
-                    if item:
-                        if item.text() != "":
-                            rows.append(simple_eval(item.text()))
-                    else:
-                        rows.append(0.)
-#                    rows.append(float(item.text()) if item else 0.)
-                coeffs.append(rows)
-        else: # FIR
-            self.chkIIR.setChecked(False)
-            col = 0
+#        if num_cols > 1: # IIR
+        for col in range(num_cols):
+            rows = []
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
                 if item:
                     if item.text() != "":
-                        coeffs.append(simple_eval(item.text()))
+                        rows.append(simple_eval(item.text()))
                 else:
-                    coeffs.append(0.)
+                    rows.append(0.)
+#                    rows.append(float(item.text()) if item else 0.)
+            coeffs.append(rows)
 
-        fb.fil[0]['coeffs'] = coeffs # np.array(coeffs, dtype = 'float64')
-
-        if np.ndim(coeffs) == 1:
-            fb.fil[0]["zpk"] = tf2zpk(coeffs[0], [1], np.zeros(len(coeffs[0]-1)))
-            if self.DEBUG: print("Coeffs - FIR:",  coeffs)
-        else:
-            fb.fil[0]["zpk"] = tf2zpk(coeffs[0],coeffs[1]) # convert to poles / zeros
-            if self.DEBUG: print("Coeffs - IIR:", coeffs)
-        fb.fil[0]["N"] = num_rows-1
-        fb.fil[0]['creator'] = ('ba', 'input_coeffs')
+        fb.fil[0]["N"] = num_rows - 1       
+        pyfda_lib.saveFil(fb.fil[0], coeffs, 'ba', __name__)
 
         if self.DEBUG:
             print("Coeffs - ZPK:", fb.fil[0]["zpk"])
+            print("Coeffs - IIR:", coeffs)
             print ("Coeffs updated!")
 
         self.coeffsChanged.emit()  # ->pyFDA -> pltAll.updateAll()

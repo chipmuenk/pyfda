@@ -21,7 +21,7 @@ if __name__ == "__main__": # relative import if this file is run as __main__
     sys.path.append(cwd + '/..')
 
 import filterbroker as fb
-import pyFDA_lib
+import pyfda_lib
 
 from plot_utils import MplWidget#, MplCanvas 
 
@@ -102,7 +102,7 @@ class PlotPZ(QtGui.QMainWindow):
         mpl.clear()
         
 #        [z, p, k] = pyFDA_lib.zplane(mpl,bb,aa,zpk = False)#fb.fil[0]['zpk'])
-        [z, p, k] = pyFDA_lib.zplane(mpl, zpk, verbose = True)
+        [z, p, k] = pyfda_lib.zplane(mpl, zpk, verbose = True)
 
 #        mpl.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])          
 

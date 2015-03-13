@@ -13,10 +13,11 @@ https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
-from scipy.signal import cheb2ord, zpk2tf, tf2zpk #  iirdesign, 
+from scipy.signal import cheb2ord
 import numpy as np
+import pyfda_lib
 
-output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+frmt = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
 
 class cheby2(object):    
     
@@ -105,17 +106,7 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
         Convert poles / zeros / gain to filter coefficients (polynomes) and the
         other way round
         """
-        if output == 'zpk': # arg = [z,p,k]
-            self.coeffs = zpk2tf(arg[0], arg[1], arg[2])
-            self.zpk = arg
-
-        else: # arg = [b,a]
-            self.zpk = tf2zpk(arg[0], arg[1])
-            self.coeffs = arg
-            
-        specs['coeffs'] = self.coeffs
-        specs['zpk'] = self.zpk
-        specs['creator'] = (output, 'cheby1')
+        pyfda_lib.saveFil(specs, arg, frmt, __name__)
         
         if self.F_SBC is not None: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N # yes, update filterbroker
@@ -128,27 +119,27 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
     def LPman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SB,
-                              btype='low', analog = False, output = output))
+                              btype='low', analog = False, output = frmt))
     # LP: F_PB < F_SB
     def LPmin(self, specs):
         self.get_params(specs)
         self.N, self.F_SBC = cheb2ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='lowpass', analog = False, output = output))
+                            btype='lowpass', analog = False, output = frmt))
 #        self.save(specs, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
-#                             analog=False, ftype='cheby2', output=output))
+#                             analog=False, ftype='cheby2', output=frmt))
 
     def HPman(self, specs):
         self.get_params(specs)     
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SB, 
-                            btype='highpass', analog = False, output = output))
+                            btype='highpass', analog = False, output = frmt))
         
     # HP: F_SB < F_PB                          
     def HPmin(self, specs):
         self.get_params(specs)
         self.N, self.F_SBC = cheb2ord(self.F_PB, self.F_SB,self.A_PB,self.A_SB)
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='highpass', analog = False, output = output))
+                            btype='highpass', analog = False, output = frmt))
 
 
 
@@ -156,7 +147,7 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
     def BPman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby2(self.N, self.A_SB, [self.F_SB, self.F_SB2], 
-                            btype='bandpass', analog = False, output = output))
+                            btype='bandpass', analog = False, output = frmt))
         
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]    
     def BPmin(self, specs):
@@ -165,15 +156,15 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
                                 [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
 
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='bandpass', analog = False, output = output))
+                            btype='bandpass', analog = False, output = frmt))
 #        self.save(specs, iirdesign([self.F_PB,self.F_PB2], 
 #                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
-#                             analog=False, ftype='cheby2', output=output))
+#                             analog=False, ftype='cheby2', output=frmt))
 
     def BSman(self, specs):
         self.get_params(specs)
         self.save(specs, sig.cheby2(self.N, self.A_SB, [self.F_SB, self.F_SB2],
-                        btype='bandstop', analog = False, output = output))
+                        btype='bandstop', analog = False, output = frmt))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]            
     def BSmin(self, specs):
@@ -182,4 +173,4 @@ by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
                                 [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
 
         self.save(specs, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='bandstop', analog = False, output = output))
+                            btype='bandstop', analog = False, output = frmt))

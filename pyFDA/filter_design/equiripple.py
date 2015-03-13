@@ -15,7 +15,7 @@ import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
 from PyQt4 import QtGui
-import pyFDA_lib
+import pyfda_lib
 
 #import filterbroker as fb
 
@@ -23,7 +23,7 @@ import pyFDA_lib
 # TODO: Try HP with even order & type = Hilbert
 # TODO: Hilbert not working correctly yet
 
-output = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+frmt = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
 
 class equiripple(object):
@@ -122,23 +122,13 @@ class equiripple(object):
         and second-order sections and store all available formats in the passed
         dictionary 'specs'.
         """
-#        
-#        if output == 'zpk': # arg = [z,p,k]
-#            self.coeffs = sig.zpk2tf(arg[0], arg[1], arg[2])        
-#            self.zpk = arg
-#        else: # arg = [b,a]
-#            self.zpk = sig.tf2zpk(arg[0], arg[1])#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
-#            self.coeffs = arg  
-#        specs["coeffs"] = self.coeffs
-#        specs["zpk"] = self.zpk
         
-        pyFDA_lib.saveFil(specs, arg, output, 'equiripple')
+        pyfda_lib.saveFil(specs, arg, frmt, __name__)
+
         try: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N-1 # yes, update filterbroker
         except AttributeError:
             pass
-#        specs['creator'] = (output, 'equiripple')
-
 
     def LPman(self, specs):
         self.get_params(specs)

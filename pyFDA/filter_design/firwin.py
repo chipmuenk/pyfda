@@ -17,7 +17,7 @@ import scipy.signal as sig
 import numpy as np
 from numpy import log10, pi, arctan
 from PyQt4 import QtGui
-import pyFDA_lib
+import pyfda_lib
 
 #import filterbroker as fb
 
@@ -25,7 +25,7 @@ import pyFDA_lib
 # TODO: Hilbert not working correctly yet
 # TODO: Windows with parameters are missing
 
-out_format = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
+frmt = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
              # currently, only 'ba' is supported for equiripple routines
 
 class firwin(object):
@@ -157,14 +157,12 @@ class firwin(object):
         and second-order sections and store all available formats in the passed
         dictionary 'specs'.
         """
-        pyFDA_lib.saveFil(specs, arg, out_format, 'firwin')
+        pyfda_lib.saveFil(specs, arg, frmt, __name__)
 
         try: # has the order been calculated by a "min" filter design?
-            specs['N'] = self.N-1 # yes, update filterbroker
+            specs['N'] = self.N - 1 # yes, update filterbroker
         except AttributeError:
             pass
-#        specs['creator'] = (out_format, 'firwin')
-
 
     def LPman(self, specs):
         self.get_params(specs)
