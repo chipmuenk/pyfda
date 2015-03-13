@@ -53,7 +53,7 @@ class pyFDA(QtGui.QMainWindow):
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
 
         #=============== Menubar =======================================
-        aboutAction = QtGui.QAction('&Info', self)
+        aboutAction = QtGui.QAction('&About', self)
         aboutAction.setShortcut('Ctrl+A')
         aboutAction.setStatusTip('Info about pyFDA')
 
