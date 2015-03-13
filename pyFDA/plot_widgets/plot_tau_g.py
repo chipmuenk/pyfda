@@ -21,7 +21,7 @@ if __name__ == "__main__": # relative import if this file is run as __main__
     sys.path.append(cwd + '/..')
 
 import filterbroker as fb
-import pyFDA_lib
+import pyfda_lib
 
 from plot_utils import MplWidget#, MplCanvas
 
@@ -104,7 +104,7 @@ class PlotTauG(QtGui.QMainWindow):
         mpl = self.mplwidget.ax
         mpl.clear()
 
-        [tau_g, w] = pyFDA_lib.grpdelay(bb,aa, fb.gD['N_FFT'],
+        [tau_g, w] = pyfda_lib.grpdelay(bb,aa, fb.gD['N_FFT'],
                         whole = wholeF)
                         #Fs = f_S)
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
