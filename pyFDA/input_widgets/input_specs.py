@@ -5,7 +5,7 @@ Widget for entering filter specifications
 
 @author: beike, Christian Münker
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os 
 import numpy as np
 from PyQt4 import QtGui
@@ -20,8 +20,8 @@ if __name__ == "__main__":
 import filterbroker as fb
 #from filter_tree_builder import FilterTreeBuilder
     
-import input_filter, input_order, input_amp_specs, input_freq_specs,\
-    input_weight_specs
+from input_widgets import (input_filter, input_order, input_amp_specs,
+                           input_freq_specs, input_weight_specs)
 #from plot_widgets import plot_all
 
 

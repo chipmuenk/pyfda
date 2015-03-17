@@ -28,13 +28,11 @@ import pyfda_lib
 import pyfda_lib_fix_v3 as fix
 from simpleeval import simple_eval
 
+# TODO: delete / insert individual cells instead of rows 
 # TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end
-# TODO: Add quantizer widget
 # TODO: eliminate trailing zeros for filter order calculation
-# TODO: IIR button functionality not yet implemented
-# TODO: emit signal when table is changed : careful, saveCoeffs must not be
-#        triggered when table is changed by program!!!
+# TODO: IIR button functionality not yet implemented, needed?
 # TODO: Fill combobox for Wrap / Quant settings
 # TODO: Fix fixpoint lib: toggling between -MSB and + MSB is wrong
 

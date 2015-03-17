@@ -188,7 +188,7 @@ DEFAULT_OPERATORS = {ast.Add: safe_add, ast.Sub: op.sub, ast.Mult: safe_mult,
                      ast.UAdd: op.pos}
 
 DEFAULT_FUNCTIONS = {"rand": random, "randint": random_int,
-                     "int": int, "float": float, "str": unicode, 
+                     "int": int, "float": float,# "str": unicode, 
                      "atan": np.arctan, "arctan": np.arctan,
                      "cos": np.cos, "exp": np.exp, 
                      "sqrt": np.sqrt, "root": np.sqrt,

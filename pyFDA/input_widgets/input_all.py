@@ -6,7 +6,7 @@ Created on Jan 5th
 
 Tabbed container for input widgets
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
-import input_specs, input_files, input_coeffs, input_info, input_pz
+from input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
 
 class InputAll(QtGui.QWidget):
     """

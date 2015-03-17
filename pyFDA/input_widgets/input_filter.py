@@ -126,7 +126,7 @@ class SelectFilter(QtGui.QWidget):
         # 
         self.cmbFilterType.clear() 
         self.cmbFilterType.addItems(
-            fb.filTree[self.rt].keys())
+            list(fb.filTree[self.rt].keys())) # list() needed for Py3
         self.setFilterType()
         
     def setFilterType(self):

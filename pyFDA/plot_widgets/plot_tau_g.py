@@ -3,7 +3,7 @@
 
 Edited by Christian Münker, 2013
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui #, QtCore
 
@@ -14,7 +14,7 @@ from PyQt4 import QtGui #, QtCore
 #from matplotlib.figure import Figure
 
 import numpy as np
-import scipy.signal as sig
+#import scipy.signal as sig
 
 if __name__ == "__main__": # relative import if this file is run as __main__
     cwd=os.path.dirname(os.path.abspath(__file__))
@@ -23,9 +23,8 @@ if __name__ == "__main__": # relative import if this file is run as __main__
 import filterbroker as fb
 import pyfda_lib
 
-from plot_utils import MplWidget#, MplCanvas
+from plot_widgets.plot_utils import MplWidget#, MplCanvas
 
-DEBUG = True
 
 """
 QMainWindow is a class that understands GUI elements like a toolbar, statusbar,

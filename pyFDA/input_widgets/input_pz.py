@@ -25,11 +25,12 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib
 from simpleeval import simple_eval
 
+# TODO: delete / insert individual cells instead of rows 
+# TODO: correct scaling after insertion / deletion of cells
 # TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end
-# TODO: Add quantizer widget
 # TODO: eliminate trailing zeros for filter order calculation
-# TODO: IIR button functionality not yet implemented
+
 def cround(x, n_dig = 0):
     """
     round complex number to n_dig digits. If n_dig == 0, don't round at all,
@@ -39,9 +40,10 @@ def cround(x, n_dig = 0):
     x = np.real_if_close(x, 1e-15)
     if n_dig > 0:
         if np.iscomplex(x):
-            x = round(x.real, n_dig) + 1j * round(x.imag, n_dig)
+            x = np.complex(np.around(x.real, n_dig), np.around(x.imag, n_dig))
+            if x.real == 0: x = 1j*x.imag # avoid printing -0 - 0.1234 j
         else:
-            x = round(x, n_dig)
+            x = np.around(x, n_dig)
     return x
 
 class InputPZ(QtGui.QWidget):
@@ -118,7 +120,7 @@ class InputPZ(QtGui.QWidget):
         self.butSetZero.setText("Set Zero")
 
         self.lblEps = QtGui.QLabel()
-        self.lblEps.setText("for b, a <")
+        self.lblEps.setText("for P, Z <")
 
         self.ledSetEps = QtGui.QLineEdit()
         self.ledSetEps.setToolTip("Specify eps value.")
@@ -255,7 +257,7 @@ class InputPZ(QtGui.QWidget):
         self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
         for col in range(2):
             for row in range(len(zpk[col])):
-                if self.DEBUG:print("Len Row:", len(zpk[col]))
+                if self.DEBUG: print("Len Row:", len(zpk[col]))
                 item = self.tblPZ.item(row, col)
                 if item:
                     item.setText(str(cround(zpk[col][row], n_digits)))

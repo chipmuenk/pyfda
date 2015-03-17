@@ -3,7 +3,7 @@
 
 Edited by Christian Münker, 2013
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 
 from PyQt4 import QtGui
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
 import filterbroker as fb
 
-from plot_utils import MplWidget#, MyMplToolbar, MplCanvas
+from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
 
 
 """

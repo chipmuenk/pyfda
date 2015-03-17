@@ -3,7 +3,7 @@
 
 Edited by Christian Münker, 2013
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 # import EITHER PyQt4 OR PySide, depending on your system:
 from PyQt4 import QtGui #, QtCore
@@ -17,7 +17,7 @@ if __name__ == "__main__": # relative import if this file is run as __main__
     cwd=os.path.dirname(os.path.abspath(__file__))
     sys.path.append(cwd + '/..')
 
-import plot_hf, plot_phi, plot_pz, plot_tau_g
+from plot_widgets import plot_hf, plot_phi, plot_pz, plot_tau_g
 
 
 class PlotAll(QtGui.QWidget):
