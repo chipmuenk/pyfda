@@ -24,33 +24,37 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Switch between design methods**, keeping all other settings
  * Filter order and corner frequencies calculated by minimum order algorithms can be fine-tuned by hand
  * Directly compare how a set of specifications influences the resulting filter for different design methods
+* ** Graphical Analyses **
+ * Magnitude response (lin / power / log) with optional display of the specification bands
+ * Phase response (wrapped / unwrapped)
+ * Group delay
+ * Pole / Zero plot
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
  * Filter design files can be added and edited *without* changing or even restarting the program
  * Special widgets needed by design methods (e.g. for choosing the window in Firwin) are included in the filter design file, not in the main program
-* **Saving of filter coefficients** as
-  * Comma-separated values (CSV)
-  * Matlab (R) workspace format
+* **Filter coefficients and poles / zeros**
+ * Display, edit and quantize 
+ * Save as Comma-separated values (CSV) or Matlab (R) workspace format
+* ** Display help files (own / Python docstrings) as rich text
+* ** Runs under Python 2.7 and Python 3.x **
 
 ### Release 0.1 ((target: end of March 2015)
 
 The following features are still missing for the first release. Help is very welcome!
-* Testing pyFDA under Python 3.x - so far, the application has been only developed unter Python 2.7 with 3.x in mind (from __future__ ...)
 * Filter design methods (some clean-up of the design method files' structure needed before implementing more methods)
  * Butterworth
  * Elliptic
 * Graphical analyses (some updates to the plotting infrastructure needed)
- * Pole/Zero plot
  * Impulse response
- * Group delay
-* Input widget: displaying and editing filter coefficients and poles / zeros (already started)
+ * 3D-Plots
 * Save and load filter designs (pickle? shelve?)
-* Load coefficients / poles and zeros 
+* Load coefficients / poles and zeros
+* Smooth some rough edges (more debugging, warnings, look and feel of GUI, ...)
 
 ### Following releases
 * Better help files and messages
 * Show error messages and warnings in the GUI
 * Design, analysis and export of filters as second-order sections
-* Quantization of filter coefficients
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
 * Export of Python filter objects
 * Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
