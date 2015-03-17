@@ -38,7 +38,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Display help files** (own / Python docstrings) as rich text
 * **Runs under Python 2.7 and Python 3.x**
 
-### Release 0.1 ((target: end of March 2015)
+### Release 0.1 (target: end of March 2015)
 
 The following features are still missing for the first release. Help is very welcome!
 * Filter design methods (some clean-up of the design method files' structure needed before implementing more methods)
