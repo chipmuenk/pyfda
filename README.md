@@ -2,7 +2,7 @@ pyFDA
 ======
 ## Python Filter Design Analysis Tool
 
-The goal of this project is to create a GUI based tool in Python / Qt to analyse and design discrete time filters. 
+The goal of this project is to create a GUI based tool in Python / Qt to analyse, design and synthesize discrete time filters. 
 
 ![Screenshot](images/pyFDA_screenshot.PNG)
 
