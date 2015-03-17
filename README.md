@@ -58,7 +58,7 @@ The following features are still missing for the first release. Help is very wel
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
 * Export of Python filter objects
 * Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
-* Fixpoint filter sythesis and export using the myHDL module (<myhdl.org>)
+* Fixpoint filter sythesis and export using the myHDL module (<http://myhdl.org>)
 
 ### Further ideas are
 * Wave-Digital Filters
