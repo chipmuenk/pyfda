@@ -24,7 +24,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Switch between design methods**, keeping all other settings
  * Filter order and corner frequencies calculated by minimum order algorithms can be fine-tuned by hand
  * Directly compare how a set of specifications influences the resulting filter for different design methods
-* ** Graphical Analyses **
+* **Graphical Analyses**
  * Magnitude response (lin / power / log) with optional display of the specification bands
  * Phase response (wrapped / unwrapped)
  * Group delay
@@ -35,8 +35,8 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Filter coefficients and poles / zeros**
  * Display, edit and quantize 
  * Save as Comma-separated values (CSV) or Matlab (R) workspace format
-* ** Display help files (own / Python docstrings) as rich text
-* ** Runs under Python 2.7 and Python 3.x **
+* **Display help files** (own / Python docstrings) as rich text
+* **Runs under Python 2.7 and Python 3.x**
 
 ### Release 0.1 ((target: end of March 2015)
 
