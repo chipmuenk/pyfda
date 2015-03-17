@@ -125,7 +125,7 @@ class FilterTreeBuilder(object):
             
         except IOError as e:
             print('--- FilterFileReader.readFiltFile ---')
-            print("Init file {0} could not be found.".format(self.initDirFile))
+            print("Init file {0} could not be found.".format(self.filtDirFile))
             if self.DEBUG: 
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
@@ -288,13 +288,13 @@ if __name__ == "__main__":
     Debug = True
     
     # Create a new FilterFileReader instance & initialize it
-    myTreeBuilder = FilterTreeBuilder(filtFileName, subDirectory, commentChar, Debug)
+    myTreeBuilder = FilterTreeBuilder(subDirectory, filtFileName, commentChar, Debug)
 
     print("\n===== Start Test ====")    
     for name in fb.gD['imports']:
         myFilter = myTreeBuilder.objectWizzard(name)
         print('myFilter', myFilter)
-    myFilterTree = myTreeBuilder.buildFilterTree()
+    myFilterTree = myTreeBuilder.buildFilTree()
     print('myFilterTree = ', myFilterTree)
     print(fb.gD['imports'])
     
