@@ -6,16 +6,17 @@ Created on Tue Nov 26 10:57:30 2013
 
 Tab-Widget for exporting / importing and saving / loading data
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
 #from PyQt4.QtCore import SIGNAL
 import scipy.io
 import numpy as np
+import xlwt, xlrd
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
-if __name__ == "__main__": 
+if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
@@ -30,59 +31,72 @@ class InputFiles(QtGui.QWidget):
         self.DEBUG = DEBUG
         super(InputFiles, self).__init__()
 
-        self.initUI()     
-        
-    def initUI(self): 
+        self.initUI()
+
+    def initUI(self):
         """
         Intitialize the main GUI, consisting of:
         - Buttons for Exporting and Saving
-        - 
+        -
         """
         # widget / subwindow for parameter selection
-        self.butExportML = QtGui.QPushButton("Export -> ML", self)
-        self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
-        
+        self.butExport = QtGui.QPushButton("Export Coefficients", self)
+#        self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
+
         # ============== UI Layout =====================================
-        self.grLayout = QtGui.QGridLayout()
-        self.grLayout.addWidget(self.butExportML,1,0) # filter export button
-        self.grLayout.addWidget(self.butExportCSV,2,0) # filter export button
-        
+        self.layVExport = QtGui.QVBoxLayout()
+        self.layVExport.addWidget(self.butExport) # -> Matlab workspace
+#        self.layVExport.addWidget(self.butExportCSV) # -> CSV format
+        self.layVExport.addStretch(1)
 
-        hbox = QtGui.QHBoxLayout()
-        hbox.addLayout(self.grLayout)
-        self.setLayout(hbox)
-        
+        layHMain = QtGui.QHBoxLayout()
+        layHMain.addLayout(self.layVExport)
+        self.setLayout(layHMain)
+
         # ============== Signals & Slots ================================
-        self.butExportML.clicked.connect(self.exportML)
-        self.butExportCSV.clicked.connect(self.exportCSV)        
+        self.butExport.clicked.connect(self.export)
+#        self.butExportCSV.clicked.connect(self.exportCSV)
 
-        
-    def exportML(self):
+
+    def export(self):
         """
-        Export filter coefficients to a file that can be imported into 
-        Matlab workspace - see also Summerfield p. 192 ff
+        Export filter coefficients in various formats - see also
+        Summerfield p. 192 ff
         """
-#        myMLfile = QtGui.QFileDialog.setNameFilter('.mat')
-#        myMLfile.getOpenFileName()
-        formats = ["*.mat", "*.csv"]
         dlg=QtGui.QFileDialog( self )
 
+        file_types = ("CSV (*.csv);;Matlab-Workspace (*.mat);;"
+            "Excel Worksheet (.xls);;Numpy Array (*.npz)")
 
-        myMLfile = dlg.getSaveFileName(filter="Workspace / csv (*.mat *.csv)\nAll files(*.*)", directory="D:/Daten", 
-                caption = "Save filter coefficients as")
-       
-        scipy.io.savemat(myMLfile, 
-                         mdict={'filt_coeffs': fb.gD['coeffs']})
-        print("exportML: Matlab workspace exported to %s!" %myMLfile)
-        
-    def exportCSV(self):
-        """
-        Export filter coefficients to a CSV-file 
-        """
-        
-        np.savetxt('d:/Daten/filt_coeffs.csv', fb.gD['coeffs'])
-        print("exportCSV: CSV - File exported!")
-        
+        myFile, myFilter = dlg.getSaveFileNameAndFilter(self,
+                caption = "Save filter coefficients as", directory="D:/Daten",
+                filter = file_types)
+#        print(myFile, myFilter)
+
+        if myFile.endswith('mat'):
+            scipy.io.savemat(myFile,
+                             mdict={'filt_coeffs': fb.fil[0]['coeffs']})
+            print("Matlab workspace exported to %s!" %myFile)
+        elif myFile.endswith('csv'):
+            np.savetxt(myFile, fb.fil[0]['coeffs'], delimiter = ', ')
+            print("CSV - File exported to %s!" %myFile)
+            # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
+        elif myFile.endswith('npz'):
+            np.savez(myFile, fb.fil[0]['coeffs'])
+            print("NPZ - File exported to %s!" %myFile)
+        elif myFile.endswith('xls'):
+            book = xlwt.Workbook(encoding="utf-8")
+            sheet1 = book.add_sheet("Python Sheet 1")
+            sheet1.write(0, 0, "This is the First Cell of the First Sheet") 
+            book.save(myFile)
+            #http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
+        else:
+            print("No File exported!")
+
+        # Download the Simple ods py module:
+        # http://simple-odspy.sourceforge.net/
+        # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
+
 
 """
 File save format: use cPickle?
@@ -99,7 +113,7 @@ try:
 finally:
     s.close()
 
-### read from database:   
+### read from database:
 s = shelve.open('test_shelf.fb')
 # s = shelve.open('test_shelf.fb', flag='r') # read-only
 try:
@@ -117,14 +131,14 @@ try:
     print s['key1']
 finally:
     s.close()
-    
+
 """
 #------------------------------------------------------------------------------
-   
+
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     form = InputFiles()
     form.show()
-   
+
     app.exec_()
