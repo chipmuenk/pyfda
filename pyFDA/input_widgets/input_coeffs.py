@@ -257,30 +257,19 @@ class InputCoeffs(QtGui.QWidget):
             print ("len", len(coeffs))
             print("ndim", np.ndim(coeffs))
 
-        if np.ndim(coeffs) == 1: # FIR
-            self.chkIIR.setChecked(False)
-            self.tblCoeff.setColumnCount(1)
-            self.tblCoeff.setHorizontalHeaderLabels(["b"])
-            for row in range(len(coeffs)):
-                if self.DEBUG: print(row, coeffs[row])
-                item = self.tblCoeff.item(row, 0)
+#        if np.ndim(coeffs) == 1: # FIR
+
+        self.chkIIR.setChecked(True)
+        self.tblCoeff.setColumnCount(2)
+        self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+        for col in range(2):
+            for row in range(np.shape(coeffs)[1]):
+                item = self.tblCoeff.item(row, col)
                 if item:
-                    item.setText(str(coeffs[row]))
+                    item.setText(str(coeffs[col][row]))
                 else:
-                    self.tblCoeff.setItem(row,0,QtGui.QTableWidgetItem(
-                                    str(coeffs[row])))
-        else: # IIR
-            self.chkIIR.setChecked(True)
-            self.tblCoeff.setColumnCount(2)
-            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-            for col in range(2):
-                for row in range(np.shape(coeffs)[1]):
-                    item = self.tblCoeff.item(row, col)
-                    if item:
-                        item.setText(str(coeffs[col][row]))
-                    else:
-                        self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem(
-                                                        str(coeffs[col][row])))
+                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem(
+                                                    str(coeffs[col][row])))
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
 
