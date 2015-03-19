@@ -139,7 +139,7 @@ class PlotImpz(QtGui.QMainWindow):
         else:
             title_str = r'Impulse Response'
             H_str = r'$h[n]$'
-            bottom = 0
+        bottom = 0
             
         if self.cmbShowH.currentIndex() > 0: # log. response
             H_str = r'$\log$ ' + H_str + ' in dB'
