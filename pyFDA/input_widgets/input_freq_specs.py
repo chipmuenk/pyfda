@@ -207,7 +207,7 @@ class InputFreqSpecs(QtGui.QWidget):
                 else:   # idx == 1: normalized to f_nyq = f_S / 2
                     self.f_S = 2.
                     fLabel = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
-
+                tLabel = r"$n \; \rightarrow$"
                 self.ledF_S.setText(str(self.f_S)) # update field for f_S
 
                 # recalculate displayed freq spec values but do not store them:
@@ -217,8 +217,10 @@ class InputFreqSpecs(QtGui.QWidget):
             else: # Hz, kHz, ...
                 unit = str(self.cmbUnits.itemText(idx))
                 fLabel = r"$f$ in " + unit + r"$\; \rightarrow$"
+                tLabel = r"$t$ in s"
 
             self.specs.fil[0].update({"plt_fLabel":fLabel}) # label for freq. axis
+            self.specs.fil[0].update({"plt_tLabel":tLabel}) # label for freq. axis
             self.specs.fil[0]['f_S'] = self.f_S # store f_S in dictionary
             self.ledF_S.setText(str(self.f_S))
 

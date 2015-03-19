@@ -17,7 +17,7 @@ if __name__ == "__main__": # relative import if this file is run as __main__
     cwd=os.path.dirname(os.path.abspath(__file__))
     sys.path.append(cwd + '/..')
 
-from plot_widgets import plot_hf, plot_phi, plot_pz, plot_tau_g
+from plot_widgets import plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz
 
 
 class PlotAll(QtGui.QWidget):
@@ -28,6 +28,7 @@ class PlotAll(QtGui.QWidget):
         self.pltPhi = plot_phi.PlotPhi()
         self.pltPZ = plot_pz.PlotPZ()
         self.pltTauG = plot_tau_g.PlotTauG()
+        self.pltImpz = plot_impz.PlotImpz()
 
         self.initUI()
 
@@ -38,6 +39,8 @@ class PlotAll(QtGui.QWidget):
         tabWidget.addTab(self.pltPhi, 'phi(f)')
         tabWidget.addTab(self.pltPZ, 'P/Z')
         tabWidget.addTab(self.pltTauG, 'tau_g')
+        tabWidget.addTab(self.pltImpz, 'h[n]')
+        
 
 #        butDraw = QtGui.QPushButton("&No Function")
 #        butDraw.clicked.connect(self.redrawAll)
@@ -58,6 +61,8 @@ class PlotAll(QtGui.QWidget):
         self.pltPhi.draw()
         self.pltPZ.draw()
         self.pltTauG.draw()
+        self.pltImpz.draw()
+
 
 #        self.redrawAll()
 

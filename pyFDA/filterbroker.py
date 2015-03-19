@@ -107,4 +107,4 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
             #
             'plt_fLabel':r'$f$ in Hz $\rightarrow$',
-            'plt_tLabel':r'$t$ in s $\rightarrow$'}
+            'plt_tLabel':r'$n \; \rightarrow$'}
