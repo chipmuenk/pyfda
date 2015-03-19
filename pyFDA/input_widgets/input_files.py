@@ -12,7 +12,23 @@ from PyQt4 import QtGui
 #from PyQt4.QtCore import SIGNAL
 import scipy.io
 import numpy as np
-import xlwt, xlrd
+try:
+    import xlwt
+except ImportError:
+    XLWT = False
+    print("Warning: Module xlwt not installed -> no *.xls import / export")
+else:
+    XLWT = True
+    
+try: 
+    import XlsxWriter as xlsx
+except ImportError:
+    XLSX = False
+    print("Warning: Module XlsxWriter not installed -> no *.xlsx import / export")
+else:
+    XLSX = True
+
+import xlrd
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -65,31 +81,71 @@ class InputFiles(QtGui.QWidget):
         """
         dlg=QtGui.QFileDialog( self )
 
-        file_types = ("CSV (*.csv);;Matlab-Workspace (*.mat);;"
-            "Excel Worksheet (.xls);;Numpy Array (*.npz)")
+        file_types = "CSV (*.csv);;Matlab-Workspace (*.mat);;Numpy Array (*.npz)"
+        
+        if XLWT:
+            file_types += ";;Excel Worksheet (.xls)"
+        if XLSX:
+            file_types += ";;Excel 2007 Worksheet (.xlsx)"
 
         myFile, myFilter = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save filter coefficients as", directory="D:/Daten",
                 filter = file_types)
 #        print(myFile, myFilter)
-
+        coeffs = fb.fil[0]['coeffs']
         if myFile.endswith('mat'):
             scipy.io.savemat(myFile,
-                             mdict={'filt_coeffs': fb.fil[0]['coeffs']})
+                             mdict={'filt_coeffs': coeffs})
             print("Matlab workspace exported to %s!" %myFile)
         elif myFile.endswith('csv'):
-            np.savetxt(myFile, fb.fil[0]['coeffs'], delimiter = ', ')
+            np.savetxt(myFile, coeffs, delimiter = ', ')
             print("CSV - File exported to %s!" %myFile)
             # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
         elif myFile.endswith('npz'):
-            np.savez(myFile, fb.fil[0]['coeffs'])
+            np.savez(myFile, coeffs)
             print("NPZ - File exported to %s!" %myFile)
         elif myFile.endswith('xls'):
-            book = xlwt.Workbook(encoding="utf-8")
-            sheet1 = book.add_sheet("Python Sheet 1")
-            sheet1.write(0, 0, "This is the First Cell of the First Sheet") 
-            book.save(myFile)
-            #http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
+            # see 
+            # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
+            # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
+            # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
+            workbook = xlwt.Workbook(encoding="utf-8")
+            worksheet = workbook.add_sheet("Python Sheet 1")
+            bold = xlwt.easyxf('font: bold 1')
+            worksheet.write(0, 0, 'b', bold)
+            worksheet.write(0, 1, 'a', bold)
+            for col in range(2):
+                for row in range(np.shape(coeffs)[1]):
+                    worksheet.write(row+1, col, coeffs[col][row]) # vertical 
+            workbook.save(myFile)
+            print("Exported %s!" %myFile)
+
+        elif myFile.endswith('xlsx'):
+            # from https://pypi.python.org/pypi/XlsxWriter
+            # Create an new Excel file and add a worksheet.
+            workbook = xlsx.Workbook(myFile)
+            worksheet = workbook.add_worksheet()            
+            # Widen the first column to make the text clearer.
+            worksheet.set_column('A:A', 20)
+            # Add a bold format to use to highlight cells.
+            bold = workbook.add_format({'bold': True})
+            # Write labels with formatting.
+            worksheet.write('A1', 'b', bold)
+            worksheet.write('B1', 'a', bold)
+            
+            # Write some numbers, with row/column notation.
+            for col in range(2):
+                for row in range(np.shape(coeffs)[1]):
+                    worksheet.write(row+1, col, coeffs[col][row]) # vertical 
+#                    worksheet.write(row, col, coeffs[col][row]) # horizontal
+
+            
+            # Insert an image - useful for documentation export ?!.
+#            worksheet.insert_image('B5', 'logo.png')
+            
+            workbook.close()
+            print("Exported %s!" %myFile)
+            
         else:
             print("No File exported!")
 
