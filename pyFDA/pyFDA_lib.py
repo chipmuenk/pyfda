@@ -427,7 +427,7 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
 
 #
 #==================================================================
-def impz(b, a=1, FS=1, N=1):
+def impz(b, a=1, FS=1, N=1, step = False):
     """
 Calculate impulse response of a discrete time filter, specified by
 numerator coefficients b and denominator coefficients a of the system
@@ -474,12 +474,13 @@ Examples
         except TypeError: b = [b,] # convert scalar to array with len = 1
         impulse = np.repeat(0.,100)  # IIR-Filter
     if N > 1:
-        impulse = np.repeat(0.,N)
-    impulse[0] =1.0 # create dirac impulse
-    hn = np.array(sig.lfilter(b,a,impulse)) # calculate impulse response
+        impulse = np.repeat(0., N)
+    impulse[0] =1.0 # create dirac impulse as input signal
+    hn = np.array(sig.lfilter(b, a, impulse)) # calculate impulse response
     td = np.arange(len(hn)) / FS
 
-    #step = np.cumsum(hn)
+    if step:
+        hn = np.cumsum(hn)
     return hn, td
 
 #==================================================================
