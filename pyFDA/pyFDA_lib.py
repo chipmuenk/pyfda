@@ -478,9 +478,11 @@ Examples
     impulse[0] =1.0 # create dirac impulse as input signal
     hn = np.array(sig.lfilter(b, a, impulse)) # calculate impulse response
     td = np.arange(len(hn)) / FS
-
+#
     if step:
+#
         hn = np.cumsum(hn)
+#
     return hn, td
 
 #==================================================================
