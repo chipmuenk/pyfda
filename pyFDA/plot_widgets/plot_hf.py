@@ -10,21 +10,17 @@ from PyQt4 import QtGui
 #from PyQt4.QtGui import QSizePolicy
 #from PyQt4.QtCore import QSize
 
-#import matplotlib as plt
-#from matplotlib.figure import Figure
-
 import numpy as np
 import scipy.signal as sig
-# import filterbroker from one level above if this file is run as __main__
+
+# import modules from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
 
 import filterbroker as fb
-
 from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
-
 
 """
 QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
@@ -36,6 +32,13 @@ more preferably, QDialog
 """
 
 class PlotHf(QtGui.QMainWindow):
+# TODO: spec limits are not hatched in Python 3, it seems dict "fill_params" 
+#           is not recognized
+# TODO: inset plot cannot be zoomed independently from main window
+# TODO: inset plot should have useful preset range, depending on filter type,
+#       stop band or pass band should be selectable as well as lin / log scale
+# TODO: position and size of inset plot should be selectable
+# TODO: unit of phase should be derived from phase widget
 
     def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
         super(PlotHf, self).__init__(parent) # initialize QWidget base class
@@ -123,7 +126,7 @@ class PlotHf(QtGui.QMainWindow):
         self.chkLinphase.clicked.connect(self.draw)
         self.chkInset.clicked.connect(self.draw_inset)
         self.chkSpecs.clicked.connect(self.draw)
-        self.chkPhase.clicked.connect(self.draw)
+        self.chkPhase.clicked.connect(self.draw_phase)
 
     def plotSpecLimits(self, specAxes):
         """
@@ -236,14 +239,11 @@ class PlotHf(QtGui.QMainWindow):
         self.chkLinphase.setEnabled(self.unitA == 'V')
         self.lblLinphase.setEnabled(self.unitA == 'V')
 
-        self.linphase = self.chkLinphase.isChecked()
         self.specs = self.chkSpecs.isChecked()
-#        self.chkInset.setCheckable(False) # not implemented yet
-#        self.chkInset.setEnabled(False)
-#        self.lblInset.setEnabled(False)
         self.inset = self.chkInset.isChecked()
-        
         self.phase = self.chkPhase.isChecked()
+        self.linphase = self.chkLinphase.isChecked()
+
         
         if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
             self.bb = fb.fil[0]['coeffs']
@@ -286,30 +286,32 @@ class PlotHf(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate H_c(W) (complex) for W = 0 ... pi:
-        [W,H_c] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
+        [W, self.H_c] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
             whole = wholeF)
         self.F = W / (2 * np.pi) * self.f_S
             
         if fb.rcFDA['freqSpecsRangeType'] == 'sym':
-            H_c = np.fft.fftshift(H_c)
+            self.H_c = np.fft.fftshift(self.H_c)
             self.F = self.F - self.f_S/2.
 
         if self.linphase: # remove the linear phase
-            H = H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
+            H = self.H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
             
         if self.cmbShowH.currentIndex() == 1: # show real part of H
-            H = H_c.real
+            H = self.H_c.real
             H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
         elif self.cmbShowH.currentIndex() == 2: # show imag. part of H
-            H = H_c.imag
+            H = self.H_c.imag
             H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
         else: # show magnitude of H
-            H = abs(H_c)
+            H = abs(self.H_c)
             H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
             
         # clear the axes and (re)draw the plot
         #
+#        self.draw_phase()
         self.ax.clear()
+
 
         #================ Main Plotting Routine =========================
 
@@ -330,53 +332,57 @@ class PlotHf(QtGui.QMainWindow):
 
         if self.specs: self.plotSpecLimits(specAxes = self.ax)
 
-#        if self.phase:
-#            self.ax_p = self.ax.twinx() # second axes system for phase
-##            self.ax_p.clear()
-#            nbins = len(self.ax.get_yticks())
-##            self.ax_p.locator_params(axis = 'y', nbins = nbins)
-#            if self.linphase:
-#                self.ax_p.plot(self.F,np.angle(H_c), 'b.', lw = fb.gD['rc']['lw'])
-#            else:
-#                self.ax_p.plot(self.F,np.unwrap(np.angle(H_c)), 'b--', lw = fb.gD['rc']['lw'])
-#            self.ax_p.set_xlim(f_lim)
-#            self.ax_p.set_ylabel(r'$\angle H((\mathrm{e}^{\mathrm{j} \Omega})$'
-#                    + r'$\rightarrow $', color='blue')
-#        else:
-#            try:
-#                self.mplwidget.fig.delaxes(self.ax_p)
-#            except (KeyError, AttributeError):
-#                pass           
 
         self.ax.set_title(r'Magnitude Frequency Response')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
 
         self.mplwidget.redraw()
 
+    def draw_phase(self):
+        self.phase = self.chkPhase.isChecked()
+        if self.phase:
+            self.ax_p = self.ax.twinx() # second axes system with same x-axis for phase
+#            self.ax_p.clear()
+#            nbins = len(self.ax.get_yticks())
+#            self.ax_p.locator_params(axis = 'y', nbins = nbins)
+#            if <some button>:
+#                self.ax_p.plot(self.F,np.angle(self.H_c), 'b--', lw = fb.gD['rc']['lw'])
+#            else:
+            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c)), 'b--', lw = fb.gD['rc']['lw'])
+            self.ax_p.set_ylabel(r'$\angle H((\mathrm{e}^{\mathrm{j} \Omega})$'
+                    + r'$\rightarrow $', color='blue')
+        else:
+            try:
+                self.mplwidget.fig.delaxes(self.ax_p)
+            except (KeyError, AttributeError):
+                pass
+        self.draw()
+
     def draw_inset(self):
-        print(self.mplwidget.fig.axes)
-        for ax in self.mplwidget.fig.axes:
-            print(ax)
-        # axes #Read-only: list of axes in Figure        
-        # delaxes(a) # remove a from the figure and update the current axes
-        # sca(a) # Set the current axes to be a and return a
-        # add_axes(*args, **kwargs)
-        #   Add an axes at position rect [left, bottom, width, height] 
-        # get_axes()
-        # ---------- Inset Plot -------------------------------------------
+        """
+        Construct / destruct second axes for an inset second plot
+        """
+        # TODO:  try   ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
+        # TODO: use sca(a) # Set the current axes to be a and return a
+        self.inset = self.chkInset.isChecked()
+        if self.DEBUG:
+            print(self.mplwidget.fig.axes) # list of axes in Figure 
+            for ax in self.mplwidget.fig.axes:
+                print(ax)
+
         if self.inset:
-            self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3]);  # x,y,dx,dy
-            print(self.mplwidget.fig.get_axes())            
-#            ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
+            #  Add an axes at position rect [left, bottom, width, height]:
+            self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
             self.ax_i.clear() # clear old plot and specs
-            if self.specs: self.plotSpecLimits(specAxes = self.ax_i)
+            if self.specs: 
+                self.plotSpecLimits(specAxes = self.ax_i)
             self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
         else:
             try:
-                self.mplwidget.fig.delaxes(self.ax_i)
+                #remove ax_i from the figure and update the current axes
+                self.mplwidget.fig.delaxes(self.ax_i) 
             except AttributeError:
                 pass
-
         self.draw()
 #        self.mplwidget.redraw()
 
