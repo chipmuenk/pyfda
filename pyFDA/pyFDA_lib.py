@@ -70,9 +70,8 @@ def cmplx_sort(p):
         indx = np.argsort(p)
     return np.take(p, indx, 0), indx
 
-# from scipy.signal.signaltools.py:
-# TODO: comparison against nan gives a RunTime warning, used masked array
-#       comparison of real values has several problems (5 * tol ???), scalars
+# adapted from scipy.signal.signaltools.py:
+# TODO:  comparison of real values has several problems (5 * tol ???)
 def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
     """
 Determine unique roots and their multiplicities from a list of roots.
@@ -134,6 +133,7 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
         Manhattan distance between a and b
         """
         return ma.abs(a.real - b.real) + ma.abs(a.imag - b.imag)
+
     def euclid(a,b):
         """
         Euclidian distance between a and b
@@ -161,32 +161,31 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
     pout = [] # initialize list for reduced output list of roots
     p = np.atleast_1d(p) # convert p to at least 1D array
     tol = abs(tol)
-    if len(p) == 0:
+
+    if len(p) == 0:  # empty argument, return empty lists
         return pout, mult
 
-    elif len(p) == 1:
+    elif len(p) == 1: # scalar input, return arg with multiplicity = 1
         pout = p
         mult = [1]
         return pout, mult
+
     else:
         sameroots = [] # temporary list for roots within the tolerance
-        pout = p[np.isnan(p)].tolist() # copy nan elements to pout, convert to list
-        mult = len(pout) * [1] # generate an (empty) list with a "1" for each nan
-#        p = p[~np.isnan(p)]    # delete nan elements from p, convert to list
-        p = ma.masked_array(p[~np.isnan(p)])    # delete nan elements from p
+        pout = p[np.isnan(p)].tolist() # copy nan elements to pout as list
+        mult = len(pout) * [1] # generate a list with a "1" for each nan
+        #p = ma.masked_array(p[~np.isnan(p)]) # delete nan elements, convert to ma
+        p = np.ma.masked_where(np.isnan(p), p) # only masks nans, preferrable?
 
-    if np.iscomplexobj(p) and ~magsort:
+    if np.iscomplexobj(p) and not magsort:
 
         for i in range(len(p)): # p[i] is current root under test
             if not p[i] is ma.masked: # has current root been "deleted" yet?
-                tolarr = dist_roots(p[i], p[i:]) < tol # test also against itself to
-                                                  # assure multiplicity is at least one
-#            if ~np.isnan(p[i]): # has current root been "deleted" yet?
-#                tolarr = np.less(dist_roots(p[i], p[i:]), tol)
+                tolarr = dist_roots(p[i], p[i:]) < tol # test against itself and
+                # subsequent roots, giving a multiplicity of at least one
                 mult.append(np.sum(tolarr)) # multiplicity = number of "hits"
                 sameroots = p[i:][tolarr]   # pick the roots within the tolerance
-                p.mask = tolarr
-#                p[i:][tolarr] = np.nan      # and "delete" them
+                p[i:] = ma.masked_where(tolarr, p[i:]) # and "delete" (mask) them
                 pout.append(comproot(sameroots)) # avg/mean/max of mult. root
 
     else:
