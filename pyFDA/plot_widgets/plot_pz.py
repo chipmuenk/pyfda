@@ -96,19 +96,21 @@ class PlotPZ(QtGui.QMainWindow):
 
         # clear the axes and (re)draw the plot
         #
-        mpl = self.mplwidget.ax
-        mpl.clear()
+#        ax = self.mplwidget.ax
 
-#        [z, p, k] = pyFDA_lib.zplane(mpl,bb,aa,zpk = False)#fb.fil[0]['zpk'])
-        [z, p, k] = pyfda_lib.zplane(mpl, zpk, verbose = True)
+        ax = self.mplwidget.fig.add_subplot(111)
+        ax.clear()
 
-#        mpl.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])
+#        [z, p, k] = pyFDA_lib.zplane(ax,bb,aa,zpk = False)#fb.fil[0]['zpk'])
+        [z, p, k] = pyfda_lib.zplane(ax, zpk, verbose = True)
 
-        mpl.set_title(r'Pole / Zero Plot')
-        mpl.set_xlabel('Real axis')
-        mpl.set_ylabel('Imaginary axis')
+#        ax.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])
 
-        mpl.axis([-1.1, 1.1, -1.1, 1.1])
+        ax.set_title(r'Pole / Zero Plot')
+        ax.set_xlabel('Real axis')
+        ax.set_ylabel('Imaginary axis')
+
+        ax.axis([-1.1, 1.1, -1.1, 1.1])
 
         self.mplwidget.redraw()
 

@@ -110,18 +110,18 @@ class PlotPhi(QtGui.QMainWindow):
         scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
         # clear the axes and (re)draw the plot
-        #
-        mpl = self.mplwidget.ax
-        mpl.clear()
+        ax = self.mplwidget.fig.add_subplot(111)
+#        ax = self.mplwidget.ax
+        ax.clear()
         if self.btnWrap.isChecked():
-            mpl.plot(F, np.angle(H) * scale, lw = fb.gD['rc']['lw'])
+            ax.plot(F, np.angle(H) * scale, lw = fb.gD['rc']['lw'])
         else:
-            mpl.plot(F, np.unwrap(np.angle(H)) * scale, lw = fb.gD['rc']['lw'])
+            ax.plot(F, np.unwrap(np.angle(H)) * scale, lw = fb.gD['rc']['lw'])
 
-        mpl.set_title(r'Phase Frequency Response')
-        mpl.set_xlabel(fb.fil[0]['plt_fLabel'])
-        mpl.set_ylabel(r'$\phi(\mathrm{e}^{\mathrm{j} \Omega})\; \rightarrow $')
-        mpl.set_xlim(f_lim)
+        ax.set_title(r'Phase Frequency Response')
+        ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        ax.set_ylabel(r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})\; \rightarrow $')
+        ax.set_xlim(f_lim)
 
         self.mplwidget.redraw()
 

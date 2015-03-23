@@ -110,6 +110,7 @@ class PlotHf(QtGui.QMainWindow):
         self.setCentralWidget(self.mplwidget)
 
 #        self.setLayout(self.layHChkBoxes)
+        self.ax = self.mplwidget.fig.add_subplot(111)
 
         self.draw() # calculate and draw |H(f)|
 
@@ -120,11 +121,11 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbShowH.currentIndexChanged.connect(self.draw)
 
         self.chkLinphase.clicked.connect(self.draw)
-        self.chkInset.clicked.connect(self.draw)
+        self.chkInset.clicked.connect(self.draw_inset)
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
 
-    def plotSpecLimits(self, specAxes, unitA):
+    def plotSpecLimits(self, specAxes):
         """
         Plot the specifications limits
         """
@@ -143,12 +144,12 @@ class PlotHf(QtGui.QMainWindow):
         else: # IIR log
             A_PB_max = 0
 
-        if unitA == 'V':
+        if self.unitA == 'V':
             dBMul = 20.
-        elif unitA == 'W':
+        elif self.unitA == 'W':
             dBMul = 10.
 
-        if unitA == 'dB':
+        if self.unitA == 'dB':
             A_PB_min = -self.A_PB
             A_PB2_min = -self.A_PB2
             A_PB_minx = min(A_PB_min, A_PB2_min) - 10# 20*log10(1-del_PB)
@@ -237,9 +238,9 @@ class PlotHf(QtGui.QMainWindow):
 
         self.linphase = self.chkLinphase.isChecked()
         self.specs = self.chkSpecs.isChecked()
-        self.chkInset.setCheckable(False) # not implemented yet
-        self.chkInset.setEnabled(False)
-        self.lblInset.setEnabled(False)
+#        self.chkInset.setCheckable(False) # not implemented yet
+#        self.chkInset.setEnabled(False)
+#        self.lblInset.setEnabled(False)
         self.inset = self.chkInset.isChecked()
         
         self.phase = self.chkPhase.isChecked()
@@ -284,88 +285,100 @@ class PlotHf(QtGui.QMainWindow):
             print("--- plotHf.draw() --- ")
             print("b, a = ", self.bb, self.aa)
 
-        # calculate |H(W)| for W = 0 ... pi:
-        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
+        # calculate H_c(W) (complex) for W = 0 ... pi:
+        [W,H_c] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
             whole = wholeF)
+        self.F = W / (2 * np.pi) * self.f_S
+            
+        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
+            H_c = np.fft.fftshift(H_c)
+            self.F = self.F - self.f_S/2.
 
         if self.linphase: # remove the linear phase
-            H = H * np.exp(1j * W * fb.fil[0]["N"]/2.)
+            H = H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
             
         if self.cmbShowH.currentIndex() == 1: # show real part of H
-            H = H.real
+            H = H_c.real
             H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
         elif self.cmbShowH.currentIndex() == 2: # show imag. part of H
-            H = H.imag
+            H = H_c.imag
             H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
         else: # show magnitude of H
-            H = abs(H)
+            H = abs(H_c)
             H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
             
-        F = W / (2 * np.pi) * self.f_S
-        
-        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
-            H = np.fft.fftshift(H)
-            F = F - self.f_S/2.
-
         # clear the axes and (re)draw the plot
         #
-        fig = self.mplwidget.fig
-        ax = self.mplwidget.ax# fig.add_axes([.1,.1,.8,.8])#  ax = fig.add_axes([.1,.1,.8,.8])
-#        ax2= self.mplwidget.ax2
-        ax.clear()
+        self.ax.clear()
 
         #================ Main Plotting Routine =========================
 
         if self.unitA == 'dB':
-            ax.plot(F,20*np.log10(abs(H)), lw = fb.gD['rc']['lw'])
-
-            ax.set_ylabel(H_str + ' in dB ' + r'$\rightarrow$')
+            self.H_plt = 20*np.log10(abs(H))
+            self.ax.set_ylabel(H_str + ' in dB ' + r'$\rightarrow$')
 
         elif self.unitA == 'V': #  'lin'
-            ax.plot(F, H, lw = fb.gD['rc']['lw'])
-
-            ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
+            self.H_plt = H
+            self.ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
         else: # unit is W
-            ax.plot(F, H * H, lw = fb.gD['rc']['lw'])
+            self.H_plt = H * H
+            self.ax.set_ylabel(H_str + ' in W ' + r'$\rightarrow $')
+        #-----------------------------------------------------------
+        self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
+        #-----------------------------------------------------------
+        self.ax.axis(plt_lim)
 
-            ax.set_ylabel(H_str + ' in W ' + r'$\rightarrow $')
-        ax.axis(plt_lim)
+        if self.specs: self.plotSpecLimits(specAxes = self.ax)
 
-        if self.specs: self.plotSpecLimits(specAxes = ax, unitA = self.unitA)
+#        if self.phase:
+#            self.ax_p = self.ax.twinx() # second axes system for phase
+##            self.ax_p.clear()
+#            nbins = len(self.ax.get_yticks())
+##            self.ax_p.locator_params(axis = 'y', nbins = nbins)
+#            if self.linphase:
+#                self.ax_p.plot(self.F,np.angle(H_c), 'b.', lw = fb.gD['rc']['lw'])
+#            else:
+#                self.ax_p.plot(self.F,np.unwrap(np.angle(H_c)), 'b--', lw = fb.gD['rc']['lw'])
+#            self.ax_p.set_xlim(f_lim)
+#            self.ax_p.set_ylabel(r'$\angle H((\mathrm{e}^{\mathrm{j} \Omega})$'
+#                    + r'$\rightarrow $', color='blue')
+#        else:
+#            try:
+#                self.mplwidget.fig.delaxes(self.ax_p)
+#            except (KeyError, AttributeError):
+#                pass           
 
-        if self.phase:
-            if self.linphase:
-                ax.plot(F,np.angle(H), lw = fb.gD['rc']['lw'])
-            else:
-                ax.plot(F,np.unwrap(np.angle(H)), lw = fb.gD['rc']['lw'])
-
-
-        ax.set_title(r'Magnitude Frequency Response')
-        ax.set_xlabel(fb.fil[0]['plt_fLabel'])
-
-        # ---------- Inset Plot -------------------------------------------
-        if self.inset:
-            ax_i = fig.add_axes([0.65, 0.61, .3, .3]);  # x,y,dx,dy
-#            ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
-            ax_i.clear() # clear old plot and specs
-            if self.specs: self.plotSpecs(specAxes = ax_i, specLog = self.log)
-            if self.unitA == 'dB':
-                ax_i.plot(F,20*np.log10(abs(H)), lw = fb.gD['rc']['lw'])
-            else:
-                ax_i.plot(F,abs(H), lw = fb.gD['rc']['lw'])
-#            ax1.set_xlim(0, self.F_PB)
-#            ax1.set_ylim(-self.A_PB, self.A_PB)
-
-
-        else:
-            try:
-#                for ax in fig.axes:
-#                    fig.delaxes(ax)
-                fig.delaxes(ax_i)
-            except UnboundLocalError:
-                pass
+        self.ax.set_title(r'Magnitude Frequency Response')
+        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
 
         self.mplwidget.redraw()
+
+    def draw_inset(self):
+        print(self.mplwidget.fig.axes)
+        for ax in self.mplwidget.fig.axes:
+            print(ax)
+        # axes #Read-only: list of axes in Figure        
+        # delaxes(a) # remove a from the figure and update the current axes
+        # sca(a) # Set the current axes to be a and return a
+        # add_axes(*args, **kwargs)
+        #   Add an axes at position rect [left, bottom, width, height] 
+        # get_axes()
+        # ---------- Inset Plot -------------------------------------------
+        if self.inset:
+            self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3]);  # x,y,dx,dy
+            print(self.mplwidget.fig.get_axes())            
+#            ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
+            self.ax_i.clear() # clear old plot and specs
+            if self.specs: self.plotSpecLimits(specAxes = self.ax_i)
+            self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
+        else:
+            try:
+                self.mplwidget.fig.delaxes(self.ax_i)
+            except AttributeError:
+                pass
+
+        self.draw()
+#        self.mplwidget.redraw()
 
 #------------------------------------------------------------------------------
 

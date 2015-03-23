@@ -91,17 +91,16 @@ class PlotTauG(QtGui.QMainWindow):
             bb = fb.fil[0]['coeffs'][0]
             aa = fb.fil[0]['coeffs'][1]
             
-        f_lim = fb.rcFDA['freqSpecsRange']
         wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
-
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
         # clear the axes and (re)draw the plot
         #
-        mpl = self.mplwidget.ax
-        mpl.clear()
+#        ax = self.mplwidget.ax
+        ax = self.mplwidget.fig.add_subplot(111)
+        ax.clear()
 
         [tau_g, w] = pyfda_lib.grpdelay(bb,aa, fb.gD['N_FFT'],
                         whole = wholeF)
@@ -112,15 +111,14 @@ class PlotTauG(QtGui.QMainWindow):
             F = F - f_S / 2.
         
         
-        mpl.plot(F, tau_g, lw = fb.gD['rc']['lw'])
-        mpl.axis(f_lim + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        ax.plot(F, tau_g, lw = fb.gD['rc']['lw'])
 
 #        if PLT_AUTOx: dsp.format_ticks('x',f_scale, N_F_str)
 
-        mpl.set_title(r'Group Delay $ \tau_g$')
-        mpl.set_xlabel(fb.fil[0]['plt_fLabel'])
-        mpl.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
-        mpl.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        ax.set_title(r'Group Delay $ \tau_g$')
+        ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+        ax.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
 
 
         self.mplwidget.redraw()

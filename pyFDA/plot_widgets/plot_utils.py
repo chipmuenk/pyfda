@@ -111,9 +111,11 @@ class MplWidget(QtGui.QWidget):
         # Create the mpl figure and subplot (white bg, 100 dots-per-inch).
         # Construct the canvas with the figure
         #
+        self.plt_lim = [] # x,y plot limits
         self.dpi = 100
         self.fig = Figure(dpi=self.dpi,facecolor = '#FFFFFF')
-        self.ax = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])# 
+#        self.mpl = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])# 
+#        self.mpl21 = self.fig.add_subplot(211)
         
         self.pltCanv = FigureCanvas(self.fig)
         self.pltCanv.setSizePolicy(QSizePolicy.Expanding, 
@@ -158,8 +160,11 @@ class MplWidget(QtGui.QWidget):
         self.pltCanv.updateGeometry()
         
     def pltFullView(self):
-        self.ax.autoscale()
-#        self.ax.set_xlim([-1,1])
+        """
+        Full zoom
+        """
+        for ax in self.fig.axes:
+            ax.autoscale()
         self.redraw()
 
 #-----------------------------------------------------------------------------        

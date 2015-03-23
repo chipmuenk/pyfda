@@ -67,6 +67,11 @@ class PlotImpz(QtGui.QMainWindow):
         self.chkStep = QtGui.QCheckBox()
         self.chkStep.setChecked(False)
         self.chkStep.setToolTip("Show step response instead of impulse response.")
+        
+        self.lblLockZoom = QtGui.QLabel("Lock Zoom")
+        self.chkLockZoom = QtGui.QCheckBox()
+        self.chkLockZoom.setChecked(False)
+        self.chkLockZoom.setToolTip("Lock zoom to current setting.")
 
 
         self.layHChkBoxes = QtGui.QHBoxLayout()
@@ -75,6 +80,9 @@ class PlotImpz(QtGui.QMainWindow):
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblStep)
         self.layHChkBoxes.addWidget(self.chkStep)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.lblLockZoom)
+        self.layHChkBoxes.addWidget(self.chkLockZoom)
 #        self.layHChkBoxes.addStretch(1)
 #        self.layHChkBoxes.addWidget(self.lblPhase)
 #        self.layHChkBoxes.addWidget(self.chkPhase)
@@ -130,8 +138,7 @@ class PlotImpz(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate |H(W)| for W = 0 ... pi:
-        [h,t] = pylib.impz(self.bb, self.aa, self.f_S,
-            step = step)
+        [h,t] = pylib.impz(self.bb, self.aa, self.f_S, step = step)
             
         if step:
             title_str = r'Step Response'
@@ -141,29 +148,33 @@ class PlotImpz(QtGui.QMainWindow):
             H_str = r'$h[n]$'
         bottom = 0
             
-        if self.cmbShowH.currentIndex() > 0: # log. response
+#        if self.cmbShowH.currentIndex() > 0: # log. response
+        if self.cmbShowH.currentText() == 'log':
             H_str = r'$\log$ ' + H_str + ' in dB'
             h = np.maximum(20 * np.log10(abs(h)), -80)
             bottom = -80
-            
-        t_lim = [min(t), max(t)]
-        y_lim = [min(h), max(h)]
-        plt_lim = t_lim + y_lim
+
+        if self.mplwidget.plt_lim == [] or not self.chkLockZoom.isChecked():
+            print(self.mplwidget.plt_lim)
+            print(self.chkLockZoom.isChecked())            
+            t_lim = [min(t), max(t)]
+            y_lim = [min(h), max(h)]
+            self.mplwidget.plt_lim = t_lim + y_lim
         
         # clear the axes and (re)draw the plot
         #
         fig = self.mplwidget.fig
-        ax = self.mplwidget.ax# fig.add_axes([.1,.1,.8,.8])#  ax = fig.add_axes([.1,.1,.8,.8])
-#        ax2= self.mplwidget.ax2
+        ax = fig.add_subplot(111)
         ax.clear()
 
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = ax.stem(t, h, bottom = bottom)
+        
 
-#        ax.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
+#        fig.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
  #       ax.setp(sl, lw = fb.gD['rc']['lw'])
-
-        ax.axis(plt_lim)
+        print(self.mplwidget.plt_lim)
+        ax.axis(self.mplwidget.plt_lim)
 
 
         ax.set_title(title_str)
