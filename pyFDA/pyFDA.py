@@ -8,7 +8,7 @@ Mainwindow  for the pyFDA app, initializes UI
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
 #import filterbroker as fb # importing filterbroker initializes all its globals
 from input_widgets import input_all
@@ -39,15 +39,37 @@ class pyFDA(QtGui.QMainWindow):
 
         # Instantiate widget groups
         self.inputAll = input_all.InputAll() # input widgets
+        self.inputAll.setMaximumWidth(280)
         self.pltAll = plot_all.PlotAll() # plot widgets
-#        self.inputAll.setMaximumWidth(280)
 
+# variable size tabs
+#        layVInput = QtGui.QVBoxLayout()
+#        layVInput.addWidget(self.inputAll)
+#        layVPlt = QtGui.QVBoxLayout()
+#        layVPlt.addWidget(self.pltAll)
+#        
+#        frmInput = QtGui.QFrame()
+#        frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+#        frmInput.setLayout(layVInput)
+#        frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
+#                                 QtGui.QSizePolicy.Minimum)
+#                                 
+#        frmPlt = QtGui.QFrame()
+#        frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+#        frmPlt.setLayout(layVPlt)
+#        frmPlt.setSizePolicy(QtGui.QSizePolicy.Minimum,
+#                                 QtGui.QSizePolicy.Minimum)
+#                                 
+#        splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
+#        splitter.addWidget(frmInput)
+#        splitter.addWidget(frmPlt)
+        
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
         hbox = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
         hbox.addWidget(self.inputAll)
         hbox.addWidget(self.pltAll)
-
+#        hbox.addWidget(splitter)
         self.setCentralWidget(_widget)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
@@ -76,6 +98,8 @@ class pyFDA(QtGui.QMainWindow):
     def updateOutput(self):
         self.inputAll.updateAll() # input widgets re-read 'coeffs' / 'zpk'
         self.pltAll.updateAll()
+#        self.frmInput.adjustSize()
+#        self.pltAll.adjustSize()
 
     def aboutWindow(self):
         QtGui.QMessageBox.about(self, "About pyFDA",
