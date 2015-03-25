@@ -42,8 +42,8 @@ class PlotPhi(QtGui.QMainWindow):
         self.DEBUG = DEBUG
 
         self.cmbUnitsPhi = QtGui.QComboBox(self)
-        units = ["rad", "rad/pi", "deg"]
-        scales = [1., 1./ np.pi, 180./np.pi]
+        units = ["rad", "rad/pi",  "deg"]
+        scales = [1.,   1./ np.pi, 180./np.pi]
         for unit, scale in zip(units, scales):
             self.cmbUnitsPhi.addItem(unit, scale)
         self.cmbUnitsPhi.setObjectName("cmbUnitsA")
@@ -83,6 +83,9 @@ class PlotPhi(QtGui.QMainWindow):
         """
         Re-calculate |H(f)| and draw the figure
         """
+
+        self.unitPhi = self.cmbUnitsPhi.currentText()
+
         if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
             self.bb = fb.fil[0]['coeffs']
             self.aa = 1.
@@ -94,7 +97,6 @@ class PlotPhi(QtGui.QMainWindow):
             print("--- plotPhi.draw() ---")
             print("b,a = ", self.bb, self.aa)
 
-        f_lim = fb.rcFDA['freqSpecsRange']
         wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
@@ -108,20 +110,31 @@ class PlotPhi(QtGui.QMainWindow):
             F = F - f_S / 2.
 
         scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
+        y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
+        if self.unitPhi == 'rad':
+            y_str += ' in rad ' + r'$\rightarrow $'
+        elif self.unitPhi == 'rad/pi':
+            y_str += ' in rad' + r'$ / \pi \;\rightarrow $'
+        else:
+            y_str += ' in deg ' + r'$\rightarrow $'
 
         # clear the axes and (re)draw the plot
+        #        ax = self.mplwidget.ax
         ax = self.mplwidget.fig.add_subplot(111)
-#        ax = self.mplwidget.ax
         ax.clear()
         if self.btnWrap.isChecked():
-            ax.plot(F, np.angle(H) * scale, lw = fb.gD['rc']['lw'])
+            phi_plt = np.angle(H) * scale
         else:
-            ax.plot(F, np.unwrap(np.angle(H)) * scale, lw = fb.gD['rc']['lw'])
+            phi_plt = np.unwrap(np.angle(H) * scale)
+
+        #---------------------------------------------------------
+        line_phi, = ax.plot(F, phi_plt, lw = fb.gD['rc']['lw'])
+        #---------------------------------------------------------
 
         ax.set_title(r'Phase Frequency Response')
         ax.set_xlabel(fb.fil[0]['plt_fLabel'])
-        ax.set_ylabel(r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})\; \rightarrow $')
-        ax.set_xlim(f_lim)
+        ax.set_ylabel(y_str)
+        ax.set_xlim(fb.rcFDA['freqSpecsRange'])
 
         self.mplwidget.redraw()
 

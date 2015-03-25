@@ -32,7 +32,7 @@ more preferably, QDialog
 """
 
 class PlotHf(QtGui.QMainWindow):
-# TODO: spec limits are not hatched in Python 3, it seems dict "fill_params" 
+# TODO: spec limits are not hatched in Python 3, it seems dict "fill_params"
 #           is not recognized
 # TODO: inset plot cannot be zoomed independently from main window
 # TODO: inset plot should have useful preset range, depending on filter type,
@@ -62,7 +62,7 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
         self.cmbUnitsA.setCurrentIndex(0)
-        
+
 
         self.lblLinphase = QtGui.QLabel("Linphase")
         self.chkLinphase = QtGui.QCheckBox()
@@ -86,7 +86,7 @@ class PlotHf(QtGui.QMainWindow):
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.cmbShowH)
-        self.layHChkBoxes.addWidget(self.lblIn)               
+        self.layHChkBoxes.addWidget(self.lblIn)
         self.layHChkBoxes.addWidget(self.cmbUnitsA)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLinphase)
@@ -244,7 +244,7 @@ class PlotHf(QtGui.QMainWindow):
         self.phase = self.chkPhase.isChecked()
         self.linphase = self.chkLinphase.isChecked()
 
-        
+
         if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
             self.bb = fb.fil[0]['coeffs']
             self.aa = 1.
@@ -260,7 +260,7 @@ class PlotHf(QtGui.QMainWindow):
         self.A_PB2 = fb.fil[0]['A_PB2']
         self.A_SB  = fb.fil[0]['A_SB']
         self.A_SB2 = fb.fil[0]['A_SB2']
-        
+
         f_lim = fb.rcFDA['freqSpecsRange']
         wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
 
@@ -271,15 +271,8 @@ class PlotHf(QtGui.QMainWindow):
 #            f_lim = [-self.f_S/2, self.f_S/2]
 #        else:
 #            f_lim = [0, self.f_S/2]
-         
-        if self.unitA == 'dB':
-            A_lim = [-self.A_SB -10, self.A_PB +1]
-        elif self.unitA == 'V':
-            A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
-        else:
-            A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
-        
-        plt_lim = f_lim + A_lim
+
+
 
         if self.DEBUG:
             print("--- plotHf.draw() --- ")
@@ -289,14 +282,14 @@ class PlotHf(QtGui.QMainWindow):
         [W, self.H_c] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
             whole = wholeF)
         self.F = W / (2 * np.pi) * self.f_S
-            
+
         if fb.rcFDA['freqSpecsRangeType'] == 'sym':
             self.H_c = np.fft.fftshift(self.H_c)
             self.F = self.F - self.f_S/2.
 
         if self.linphase: # remove the linear phase
             H = self.H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
-            
+
         if self.cmbShowH.currentIndex() == 1: # show real part of H
             H = self.H_c.real
             H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
@@ -306,32 +299,35 @@ class PlotHf(QtGui.QMainWindow):
         else: # show magnitude of H
             H = abs(self.H_c)
             H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
-            
+
         # clear the axes and (re)draw the plot
         #
-#        self.draw_phase()
         self.ax.clear()
-
 
         #================ Main Plotting Routine =========================
 
         if self.unitA == 'dB':
+            A_lim = [-self.A_SB -10, self.A_PB +1]
             self.H_plt = 20*np.log10(abs(H))
             self.ax.set_ylabel(H_str + ' in dB ' + r'$\rightarrow$')
 
         elif self.unitA == 'V': #  'lin'
+            A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
             self.H_plt = H
             self.ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
         else: # unit is W
+            A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
             self.H_plt = H * H
             self.ax.set_ylabel(H_str + ' in W ' + r'$\rightarrow $')
+
+        plt_lim = f_lim + A_lim
+
         #-----------------------------------------------------------
         self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
         #-----------------------------------------------------------
         self.ax.axis(plt_lim)
 
         if self.specs: self.plotSpecLimits(specAxes = self.ax)
-
 
         self.ax.set_title(r'Magnitude Frequency Response')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
@@ -366,7 +362,7 @@ class PlotHf(QtGui.QMainWindow):
         # TODO: use sca(a) # Set the current axes to be a and return a
         self.inset = self.chkInset.isChecked()
         if self.DEBUG:
-            print(self.mplwidget.fig.axes) # list of axes in Figure 
+            print(self.mplwidget.fig.axes) # list of axes in Figure
             for ax in self.mplwidget.fig.axes:
                 print(ax)
 
@@ -374,13 +370,13 @@ class PlotHf(QtGui.QMainWindow):
             #  Add an axes at position rect [left, bottom, width, height]:
             self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
             self.ax_i.clear() # clear old plot and specs
-            if self.specs: 
+            if self.specs:
                 self.plotSpecLimits(specAxes = self.ax_i)
             self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
         else:
             try:
                 #remove ax_i from the figure and update the current axes
-                self.mplwidget.fig.delaxes(self.ax_i) 
+                self.mplwidget.fig.delaxes(self.ax_i)
             except AttributeError:
                 pass
         self.draw()

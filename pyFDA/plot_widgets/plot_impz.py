@@ -163,8 +163,7 @@ class PlotImpz(QtGui.QMainWindow):
         
         # clear the axes and (re)draw the plot
         #
-        fig = self.mplwidget.fig
-        ax = fig.add_subplot(111)
+        ax = self.mplwidget.fig.add_subplot(111)
         ax.clear()
 
         #================ Main Plotting Routine =========================

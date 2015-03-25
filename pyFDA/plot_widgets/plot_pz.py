@@ -97,7 +97,6 @@ class PlotPZ(QtGui.QMainWindow):
         # clear the axes and (re)draw the plot
         #
 #        ax = self.mplwidget.ax
-
         ax = self.mplwidget.fig.add_subplot(111)
         ax.clear()
 
