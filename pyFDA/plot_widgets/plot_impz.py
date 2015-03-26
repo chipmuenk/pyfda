@@ -52,16 +52,12 @@ class PlotImpz(QtGui.QMainWindow):
         self.cmbShowH.setToolTip("Show lin. or log. impulse response.")
         self.cmbShowH.setCurrentIndex(0)
 
-#        self.lblIn = QtGui.QLabel("in")
-#
-#        units = ["dB", "V", "W"]
-#        self.cmbUnitsA = QtGui.QComboBox(self)
-#        self.cmbUnitsA.addItems(units)
-#        self.cmbUnitsA.setObjectName("cmbUnitsA")
-#        self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
-#        "dB is attenuation (positive values)\nV and W are less than 1.")
-#        self.cmbUnitsA.setCurrentIndex(0)
-        
+        self.lblNPoints = QtGui.QLabel("Number of points")
+
+        self.ledNPoints = QtGui.QLineEdit(self)
+        self.ledNPoints.setText("0")
+        self.ledNPoints.setToolTip("Number of points to calculate and display.\n"
+        "N = 0 chooses automatically.")
 
         self.lblStep = QtGui.QLabel("Step Response")
         self.chkStep = QtGui.QCheckBox()
@@ -73,7 +69,6 @@ class PlotImpz(QtGui.QMainWindow):
         self.chkLockZoom.setChecked(False)
         self.chkLockZoom.setToolTip("Lock zoom to current setting.")
 
-
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.cmbShowH)
@@ -83,6 +78,9 @@ class PlotImpz(QtGui.QMainWindow):
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLockZoom)
         self.layHChkBoxes.addWidget(self.chkLockZoom)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.lblNPoints)
+        self.layHChkBoxes.addWidget(self.ledNPoints)
 #        self.layHChkBoxes.addStretch(1)
 #        self.layHChkBoxes.addWidget(self.lblPhase)
 #        self.layHChkBoxes.addWidget(self.chkPhase)
@@ -105,11 +103,10 @@ class PlotImpz(QtGui.QMainWindow):
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-#        self.cmbUnitsA.currentIndexChanged.connect(self.draw)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
+        self.ledNPoints.editingFinished.connect(self.draw)
 
         self.chkStep.clicked.connect(self.draw)
-
 
 
     def draw(self):
@@ -138,7 +135,8 @@ class PlotImpz(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate |H(W)| for W = 0 ... pi:
-        [h,t] = pylib.impz(self.bb, self.aa, self.f_S, step = step)
+        [h,t] = pylib.impz(self.bb, self.aa, self.f_S, step = step,
+                     N = int(self.ledNPoints.text()))
             
         if step:
             title_str = r'Step Response'
@@ -154,12 +152,7 @@ class PlotImpz(QtGui.QMainWindow):
             h = np.maximum(20 * np.log10(abs(h)), -80)
             bottom = -80
 
-        if self.mplwidget.plt_lim == [] or not self.chkLockZoom.isChecked():
-            print(self.mplwidget.plt_lim)
-            print(self.chkLockZoom.isChecked())            
-            t_lim = [min(t), max(t)]
-            y_lim = [min(h), max(h)]
-            self.mplwidget.plt_lim = t_lim + y_lim
+
         
         # clear the axes and (re)draw the plot
         #
@@ -172,10 +165,15 @@ class PlotImpz(QtGui.QMainWindow):
 
 #        fig.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
  #       ax.setp(sl, lw = fb.gD['rc']['lw'])
-        print(self.mplwidget.plt_lim)
-        ax.axis(self.mplwidget.plt_lim)
+  #      print(self.mplwidget.plt_lim)
+  #      ax.axis(self.mplwidget.plt_lim)
 
-
+#        if self.mplwidget.plt_lim == [] or not self.chkLockZoom.isChecked():
+#            
+#            self.mplwidget.plt_lim = t_lim + y_lim
+#            self.mplwidget.x_lim = t_lim
+            
+        ax.set_xlim([min(t), max(t)])
         ax.set_title(title_str)
         ax.set_xlabel(fb.fil[0]['plt_tLabel'])
         ax.set_ylabel(H_str + r'$\rightarrow $')
