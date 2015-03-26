@@ -426,7 +426,7 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
 
 #
 #==================================================================
-def impz(b, a=1, FS=1, N=1, step = False):
+def impz(b, a=1, FS=1, N=0, step = False):
     """
 Calculate impulse response of a discrete time filter, specified by
 numerator coefficients b and denominator coefficients a of the system
@@ -461,27 +461,40 @@ Examples
 >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
 >>> h, n = dsp_lib.impz(b)
 """
-    try: len(a) #len_a = len(a)
-    except TypeError:
-         # a has len = 1 -> FIR-Filter
-        impulse = np.repeat(0.,len(b)) # create float array filled with 0.
-        try: len(b)
-        except TypeError:
-            print('No proper filter coefficients: len(a) = len(b) = 1 !')
+#    IIR = True
+    a = np.array(a)
+    b = np.asarray(b)
+    
+    if len(a) == 1:
+        if len(b) == 1:
+            raise TypeError(
+            'No proper filter coefficients: len(a) = len(b) = 1 !')
+        else:
+            IIR = False
     else:
-        try: len(b)
-        except TypeError: b = [b,] # convert scalar to array with len = 1
-        impulse = np.repeat(0.,100)  # IIR-Filter
-    if N > 1:
-        impulse = np.repeat(0., N)
+        if len(b) == 1:
+            IIR = True
+        # Test whether all elements except first are zero
+        elif not np.any(a[1:]) and a[0] <> 0:
+            #  same as:   elif np.all(a[1:] == 0) and a[0] <> 0:
+            IIR = False
+        else:
+            IIR = True
+
+    if N == 0: # set number of data points automatically
+        if IIR:
+            N = 100 # TODO: IIR: more intelligent algorithm needed
+        else:
+            N = min(len(b),  100) # FIR: N = number of coefficients (max. 100)
+
+    impulse = np.zeros(N)
     impulse[0] =1.0 # create dirac impulse as input signal
     hn = np.array(sig.lfilter(b, a, impulse)) # calculate impulse response
     td = np.arange(len(hn)) / FS
-#
-    if step:
-#
+
+    if step: # calculate step response
         hn = np.cumsum(hn)
-#
+
     return hn, td
 
 #==================================================================
