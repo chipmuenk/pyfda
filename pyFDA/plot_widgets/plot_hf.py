@@ -325,12 +325,14 @@ class PlotHf(QtGui.QMainWindow):
         #-----------------------------------------------------------
         self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
         #-----------------------------------------------------------
+        self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get] 
+
         self.ax.axis(plt_lim)
 
         if self.specs: self.plotSpecLimits(specAxes = self.ax)
 
         self.ax.set_title(r'Magnitude Frequency Response')
-        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
 
         self.mplwidget.redraw()
 
@@ -338,15 +340,28 @@ class PlotHf(QtGui.QMainWindow):
         self.phase = self.chkPhase.isChecked()
         if self.phase:
             self.ax_p = self.ax.twinx() # second axes system with same x-axis for phase
-#            self.ax_p.clear()
+
+            phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
+            if fb.rcFDA['plt_phiUnit'] == 'rad':
+                phi_str += ' in rad ' + r'$\rightarrow $'
+                scale = 1.
+            elif fb.rcFDA['plt_phiUnit'] == 'rad/pi':
+                phi_str += ' in rad' + r'$ / \pi \;\rightarrow $'
+                scale = 1./ np.pi
+            else:
+                phi_str += ' in deg ' + r'$\rightarrow $'
+                scale = 180./np.pi
+    
+            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
+                               'b--', lw = fb.gD['rc']['lw'])
+            self.ax_p.set_ylabel(phi_str, color='blue')
 #            nbins = len(self.ax.get_yticks())
 #            self.ax_p.locator_params(axis = 'y', nbins = nbins)
-#            if <some button>:
-#                self.ax_p.plot(self.F,np.angle(self.H_c), 'b--', lw = fb.gD['rc']['lw'])
-#            else:
-            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c)), 'b--', lw = fb.gD['rc']['lw'])
-            self.ax_p.set_ylabel(r'$\angle H((\mathrm{e}^{\mathrm{j} \Omega})$'
-                    + r'$\rightarrow $', color='blue')
+#
+#            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0], 
+#                                             self.ax_p.get_ybound()[1],  
+#                                             len(self.ax.get_yticks())-1))
+            
         else:
             try:
                 self.mplwidget.fig.delaxes(self.ax_p)
