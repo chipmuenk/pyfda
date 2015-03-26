@@ -475,7 +475,7 @@ Examples
         if len(b) == 1:
             IIR = True
         # Test whether all elements except first are zero
-        elif not np.any(a[1:]) and a[0] <> 0:
+        elif not np.any(a[1:]) and a[0] != 0:
             #  same as:   elif np.all(a[1:] == 0) and a[0] <> 0:
             IIR = False
         else:
