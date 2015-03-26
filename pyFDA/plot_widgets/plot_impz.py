@@ -175,7 +175,7 @@ class PlotImpz(QtGui.QMainWindow):
             
         ax.set_xlim([min(t), max(t)])
         ax.set_title(title_str)
-        ax.set_xlabel(fb.fil[0]['plt_tLabel'])
+        ax.set_xlabel(fb.rcFDA['plt_tLabel'])
         ax.set_ylabel(H_str + r'$\rightarrow $')
 
 
