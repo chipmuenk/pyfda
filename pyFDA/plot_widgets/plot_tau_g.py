@@ -118,6 +118,7 @@ class PlotTauG(QtGui.QMainWindow):
         ax.set_title(r'Group Delay $ \tau_g$')
         ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+        # widen limits to suppress numerical inaccuracies when tau_g = constant
         ax.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
 
 
