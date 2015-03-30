@@ -184,7 +184,7 @@ class firwin(object):
         self.get_params(specs)
         (N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1], 
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-        self.N = self.oddround(N)  # enforce odd length = even order
+        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
         self.save(specs, sig.firwin(self.N, self.F_PB, window = self.firWindow,
                                     pass_zero=False, nyq = 0.5))
     # For BP and BS, F_PB and F_SB have two elements each
@@ -211,7 +211,7 @@ class firwin(object):
         (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB, 
                                 self.F_SB2, self.F_PB2], [1, 0, 1], 
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = self.oddround(N)  # enforce odd length = even order
+        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
         self.save(specs, sig.firwin(self.N, [self.F_SB, self.F_SB2], 
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 

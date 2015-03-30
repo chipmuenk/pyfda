@@ -160,7 +160,7 @@ class equiripple(object):
         self.get_params(specs)
         (N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1], 
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-        self.N = self.oddround(N)  # enforce odd length = even order
+        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
         specs['W_SB'] = W[0]
         specs['W_PB'] = W[1]
         self.save(specs, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, type = 'bandpass'))
@@ -193,7 +193,7 @@ class equiripple(object):
         (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB, 
                                 self.F_SB2, self.F_PB2], [1, 0, 1], 
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = self.oddround(N)  # enforce odd length = even order
+        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
         specs['W_PB']  = W[0]
         specs['W_SB']  = W[1]
         specs['W_PB2'] = W[2]   
