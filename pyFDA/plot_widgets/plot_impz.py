@@ -19,7 +19,7 @@ import scipy.signal as sig
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 import pyfda_lib as pylib
@@ -63,7 +63,7 @@ class PlotImpz(QtGui.QMainWindow):
         self.chkStep = QtGui.QCheckBox()
         self.chkStep.setChecked(False)
         self.chkStep.setToolTip("Show step response instead of impulse response.")
-        
+
         self.lblLockZoom = QtGui.QLabel("Lock Zoom")
         self.chkLockZoom = QtGui.QCheckBox()
         self.chkLockZoom.setChecked(False)
@@ -115,7 +115,7 @@ class PlotImpz(QtGui.QMainWindow):
         """
         modeH = self.cmbShowH.currentText()
         step = self.chkStep.isChecked()
-               
+
 #        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
 
         self.bb = fb.fil[0]['coeffs'][0]
@@ -137,7 +137,7 @@ class PlotImpz(QtGui.QMainWindow):
         # calculate |H(W)| for W = 0 ... pi:
         [h,t] = pylib.impz(self.bb, self.aa, self.f_S, step = step,
                      N = int(self.ledNPoints.text()))
-            
+
         if step:
             title_str = r'Step Response'
             H_str = r'$h_{\epsilon}[n]$'
@@ -145,7 +145,7 @@ class PlotImpz(QtGui.QMainWindow):
             title_str = r'Impulse Response'
             H_str = r'$h[n]$'
         bottom = 0
-            
+
 #        if self.cmbShowH.currentIndex() > 0: # log. response
         if self.cmbShowH.currentText() == 'log':
             H_str = r'$\log$ ' + H_str + ' in dB'
@@ -153,7 +153,7 @@ class PlotImpz(QtGui.QMainWindow):
             bottom = -80
 
 
-        
+
         # clear the axes and (re)draw the plot
         #
         ax = self.mplwidget.fig.add_subplot(111)
@@ -161,7 +161,7 @@ class PlotImpz(QtGui.QMainWindow):
 
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = ax.stem(t, h, bottom = bottom)
-        
+
 
 #        fig.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
  #       ax.setp(sl, lw = fb.gD['rc']['lw'])
@@ -169,10 +169,10 @@ class PlotImpz(QtGui.QMainWindow):
   #      ax.axis(self.mplwidget.plt_lim)
 
 #        if self.mplwidget.plt_lim == [] or not self.chkLockZoom.isChecked():
-#            
+#
 #            self.mplwidget.plt_lim = t_lim + y_lim
 #            self.mplwidget.x_lim = t_lim
-            
+
         ax.set_xlim([min(t), max(t)])
         ax.set_title(title_str)
         ax.set_xlabel(fb.rcFDA['plt_tLabel'])

@@ -17,7 +17,7 @@ import scipy.signal as sig
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
@@ -325,7 +325,7 @@ class PlotHf(QtGui.QMainWindow):
         #-----------------------------------------------------------
         self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
         #-----------------------------------------------------------
-        self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get] 
+        self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
 
         self.ax.axis(plt_lim)
 
@@ -351,17 +351,17 @@ class PlotHf(QtGui.QMainWindow):
             else:
                 phi_str += ' in deg ' + r'$\rightarrow $'
                 scale = 180./np.pi
-    
+
             self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
                                'b--', lw = fb.gD['rc']['lw'])
             self.ax_p.set_ylabel(phi_str, color='blue')
 #            nbins = len(self.ax.get_yticks())
 #            self.ax_p.locator_params(axis = 'y', nbins = nbins)
 #
-#            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0], 
-#                                             self.ax_p.get_ybound()[1],  
+#            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
+#                                             self.ax_p.get_ybound()[1],
 #                                             len(self.ax.get_yticks())-1))
-            
+
         else:
             try:
                 self.mplwidget.fig.delaxes(self.ax_p)

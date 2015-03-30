@@ -19,8 +19,8 @@ except ImportError:
     print("Warning: Module xlwt not installed -> no *.xls import / export")
 else:
     XLWT = True
-    
-try: 
+
+try:
     import XlsxWriter as xlsx
 except ImportError:
     XLSX = False
@@ -34,7 +34,7 @@ import xlrd
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb # importing filterbroker initializes all its globals
 
@@ -82,7 +82,7 @@ class InputFiles(QtGui.QWidget):
         dlg=QtGui.QFileDialog( self )
 
         file_types = "CSV (*.csv);;Matlab-Workspace (*.mat);;Numpy Array (*.npz)"
-        
+
         if XLWT:
             file_types += ";;Excel Worksheet (.xls)"
         if XLSX:
@@ -105,7 +105,7 @@ class InputFiles(QtGui.QWidget):
             np.savez(myFile, coeffs)
             print("NPZ - File exported to %s!" %myFile)
         elif myFile.endswith('xls'):
-            # see 
+            # see
             # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
             # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
             # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
@@ -116,7 +116,7 @@ class InputFiles(QtGui.QWidget):
             worksheet.write(0, 1, 'a', bold)
             for col in range(2):
                 for row in range(np.shape(coeffs)[1]):
-                    worksheet.write(row+1, col, coeffs[col][row]) # vertical 
+                    worksheet.write(row+1, col, coeffs[col][row]) # vertical
             workbook.save(myFile)
             print("Exported %s!" %myFile)
 
@@ -124,7 +124,7 @@ class InputFiles(QtGui.QWidget):
             # from https://pypi.python.org/pypi/XlsxWriter
             # Create an new Excel file and add a worksheet.
             workbook = xlsx.Workbook(myFile)
-            worksheet = workbook.add_worksheet()            
+            worksheet = workbook.add_worksheet()
             # Widen the first column to make the text clearer.
             worksheet.set_column('A:A', 20)
             # Add a bold format to use to highlight cells.
@@ -132,20 +132,20 @@ class InputFiles(QtGui.QWidget):
             # Write labels with formatting.
             worksheet.write('A1', 'b', bold)
             worksheet.write('B1', 'a', bold)
-            
+
             # Write some numbers, with row/column notation.
             for col in range(2):
                 for row in range(np.shape(coeffs)[1]):
-                    worksheet.write(row+1, col, coeffs[col][row]) # vertical 
+                    worksheet.write(row+1, col, coeffs[col][row]) # vertical
 #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
 
-            
+
             # Insert an image - useful for documentation export ?!.
 #            worksheet.insert_image('B5', 'logo.png')
-            
+
             workbook.close()
             print("Exported %s!" %myFile)
-            
+
         else:
             print("No File exported!")
 

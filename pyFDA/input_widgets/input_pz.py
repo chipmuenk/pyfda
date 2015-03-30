@@ -19,13 +19,13 @@ from scipy.signal import tf2zpk, zpk2tf
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib
 from simpleeval import simple_eval
 
-# TODO: delete / insert individual cells instead of rows 
+# TODO: delete / insert individual cells instead of rows
 # TODO: correct scaling after insertion / deletion of cells
 # TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end

@@ -17,8 +17,8 @@ import numpy as np
 #import scipy.signal as sig
 
 if __name__ == "__main__": # relative import if this file is run as __main__
-    cwd=os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(cwd + '/..')
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 import pyfda_lib

@@ -13,7 +13,7 @@ from PyQt4.QtCore import pyqtSignal
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 class InputFreqSpecs(QtGui.QWidget):
     """
@@ -123,7 +123,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.cmbUnits.currentIndexChanged.connect(self.freqUnits)
         self.cmbFRange.currentIndexChanged.connect(self.freqRange)
         self.ledF_S.editingFinished.connect(self.freqUnits)
-        self.butSort.clicked.connect(self._sortEntries)     
+        self.butSort.clicked.connect(self._sortEntries)
         # Every time a textfield is edited, call self.freqUnits - the signal is
         #   constructed in _addEntry
 
@@ -153,7 +153,7 @@ class InputFreqSpecs(QtGui.QWidget):
             f_lim = [-self.f_S/2, self.f_S/2]
         else:
             f_lim = [0, self.f_S/2]
-            
+
         self.specs.rcFDA['freqSpecsRange'] = f_lim
         self.specsChanged.emit() # ->pyFDA -> pltAll.updateAll()
 
@@ -226,7 +226,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
         else: # freq. spec textfield has been changed -> change dict
             self.storeEntries()
-            
+
         self.idxOld = idx # remember setting of comboBox
         self.f_S_old = self.f_S # and f_S (not used yet)
         self.freqRange() # update f_lim setting and send redraw signal
