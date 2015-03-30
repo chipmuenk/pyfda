@@ -464,7 +464,7 @@ Examples
 #    IIR = True
     a = np.array(a)
     b = np.asarray(b)
-    
+
     if len(a) == 1:
         if len(b) == 1:
             raise TypeError(
@@ -475,7 +475,7 @@ Examples
         if len(b) == 1:
             IIR = True
         # Test whether all elements except first are zero
-        elif not np.any(a[1:]) and a[0] <> 0:
+        elif not np.any(a[1:]) and a[0] != 0:
             #  same as:   elif np.all(a[1:] == 0) and a[0] <> 0:
             IIR = False
         else:
@@ -785,7 +785,7 @@ def saveFil(specs, arg, out_format, sender):
     specs['coeffs'] = [b, a]
     specs['zpk'] = zpk
     specs['creator'] = (out_format, sender)
-    
+
 #==============================================================================
 
 #========================================================
@@ -807,23 +807,23 @@ Parameters
 ----------
 
     freqs : list
-        A monotonic sequence of band edges specified in Hertz. All elements 
-        must be non-negative and less than 1/2 the sampling frequency as 
-        given by the Hz parameter. The band edges "0" and "f_S / 2" do not 
+        A monotonic sequence of band edges specified in Hertz. All elements
+        must be non-negative and less than 1/2 the sampling frequency as
+        given by the Hz parameter. The band edges "0" and "f_S / 2" do not
         have to be specified, hence  2 * number(amps) - 2 freqs are needed.
-    
+
     amps : list
-        A sequence containing the amplitudes of the signal to be 
+        A sequence containing the amplitudes of the signal to be
         filtered over the various bands, e.g. 1 for the passband, 0 for the
         stopband and 0.42 for some intermediate band.
-    
-    rips : list 
-        A list with the peak ripples (linear, not in dB!) for each band. For 
+
+    rips : list
+        A list with the peak ripples (linear, not in dB!) for each band. For
         the stop band this is equivalent to the minimum attenuation.
-        
+
     Hz : float
         Sampling frequency
-    
+
     alg : string
         Filter length approximation algorithm. May be either 'herrmann',
         'kaiser' or 'ichige'. Depending on the specifications, some of
@@ -836,8 +836,8 @@ numtaps,bands,desired,weight -- See help for the remez function.
 
 Examples
 --------
-        We want to design a lowpass with the band edges of 40 resp. 50 Hz and a 
-        sampling frequency of 200 Hz, a passband peak ripple of 10% 
+        We want to design a lowpass with the band edges of 40 resp. 50 Hz and a
+        sampling frequency of 200 Hz, a passband peak ripple of 10%
         and a stop band ripple of 0.01 or 40 dB.
     >>> (L, F, A, W) = remezord([40, 50], [1, 0], [0.1, 0.01], Hz = 200)
 
@@ -863,7 +863,7 @@ Examples
         remlplen = remlplen_ichige
     else:
         raise ValueError('Unknown filter length approximation algorithm.')
-    
+
     # Validate inputs:
     if any(freqs > 0.5):
         raise ValueError('Frequency band edges must not exceed the Nyquist frequency.')
@@ -894,12 +894,12 @@ Examples
     # The filter design weights correspond to the ratios between the maximum
     # ripple and all of the other ripples:
     weight = max(rips)/rips
-    
+
     return [L,bands,amps,weight]
 
 #------------------------------------------------------------------------------
 #    abs = np.absolute
- 
+
 def oddround(x):
     """Return the nearest odd integer from x."""
 
@@ -909,7 +909,7 @@ def oddceil(x):
     """Return the smallest odd integer not less than x."""
 
     return oddround(x+1)
-    
+
 def remlplen_herrmann(fp,fs,dp,ds):
     """
 Determine the length of the low pass filter with passband frequency
@@ -934,7 +934,7 @@ Jour., 52(6):769-799, Jul./Aug. 1973.
 
     #        return int(self.oddround(N1))
     return int(N1)
-    #------------------------------------------------------------------------------    
+    #------------------------------------------------------------------------------
 
 def remlplen_kaiser(fp,fs,dp,ds):
     """
@@ -977,9 +977,9 @@ Circuits and Systems, 47(10):1008-1017, October 2000.
     N3 = np.ceil(Nc*(g(fp,dF,dp)+g(0.5-dF-fp,dF,dp)+1.0)/3.0)
     DN = np.ceil(Nm*(h(fp,dF,1.1)-(h(0.5-dF-fp,dF,0.29)-1.0)/2.0))
     N4 = N3+DN
-    
+
     #        return int(self.oddceil(N4))
-    return int(N4)    
+    return int(N4)
 
 #######################################
 # If called directly, do some example #
