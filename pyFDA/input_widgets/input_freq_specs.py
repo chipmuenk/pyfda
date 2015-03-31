@@ -43,7 +43,8 @@ class InputFreqSpecs(QtGui.QWidget):
 
         title = "Frequency Specifications"
 
-        units = ['f_S', 'f_Nyq', 'Hz', 'kHz', 'MHz', 'GHz']
+        f_units = ['f_S', 'f_Nyq', 'Hz', 'kHz', 'MHz', 'GHz']
+        self.t_units = ['', '', 's', 'ms', r'us', 'ns']
         fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
 
         self.idxOld = -1 # index of cmbUnits before last change
@@ -70,7 +71,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
         self.cmbUnits = QtGui.QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")
-        self.cmbUnits.addItems(units)
+        self.cmbUnits.addItems(f_units)
         self.cmbUnits.setCurrentIndex(0)
 
         self.cmbFRange = QtGui.QComboBox(self)
@@ -187,6 +188,7 @@ class InputFreqSpecs(QtGui.QWidget):
                 self.qlineedit[i].setText(str(f * self.f_S))
 
         elif senderName == "cmbUnits" and idx != self.idxOld:
+
             # combo unit has changed -> change display of frequency entries
             self.ledF_S.setVisible(idx > 1)  # only visible when
             self.lblF_S.setVisible(idx > 1) # not normalized
@@ -215,12 +217,13 @@ class InputFreqSpecs(QtGui.QWidget):
                     f = self.specs.fil[0][self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f * self.f_S))
             else: # Hz, kHz, ...
+                    
                 unit = str(self.cmbUnits.itemText(idx))
                 fLabel = r"$f$ in " + unit + r"$\; \rightarrow$"
-                tLabel = r"$t$ in s"
+                tLabel = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-            self.specs.fil[0].update({"plt_fLabel":fLabel}) # label for freq. axis
-            self.specs.fil[0].update({"plt_tLabel":tLabel}) # label for freq. axis
+            self.specs.rcFDA.update({"plt_fLabel":fLabel}) # label for freq. axis
+            self.specs.rcFDA.update({"plt_tLabel":tLabel}) # label for freq. axis
             self.specs.fil[0]['f_S'] = self.f_S # store f_S in dictionary
             self.ledF_S.setText(str(self.f_S))
 

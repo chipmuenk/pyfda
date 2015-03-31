@@ -45,9 +45,12 @@ gD['dmNames'] = {#IIR
 gD['filtFileNames'] = [] # Python file names found in filtFile (without .py)
 gD['imports'] = {} # dict with filter files / classes
 rcFDA = {
-    'freqSpecsRangeType':'Half', 'freqSpecsRange': [0,0.5],
+    'freqSpecsRangeType':'Half',
+    'freqSpecsRange': [0,0.5],
     'plt_fLabel':r'$f$ in Hz $\rightarrow$',
+    'plt_fUnit':'Hz',
     'plt_tLabel':r'$n \; \rightarrow$',
+    'plt_tUnit':'s',
     'plt_phiUnit': 'rad',
     'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $'}
     
