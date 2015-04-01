@@ -32,13 +32,12 @@ more preferably, QDialog
 """
 
 class PlotHf(QtGui.QMainWindow):
-# TODO: spec limits are not hatched in Python 3, it seems dict "fill_params"
-#           is not recognized
+
 # TODO: inset plot cannot be zoomed independently from main window
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
 # TODO: position and size of inset plot should be selectable
-# TODO: unit of phase should be derived from phase widget
+
 
     def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
         super(PlotHf, self).__init__(parent) # initialize QWidget base class
@@ -133,9 +132,9 @@ class PlotHf(QtGui.QMainWindow):
         Plot the specifications limits
         """
 #        fc = (0.8,0.8,0.8) # color for shaded areas
-        fill_params = {"color":"none","hatch":"/", "edgecolor":"k", "lw":0.0}
+        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':'k', 'lw':0.0}
+        line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
         ax = specAxes
-        ymax = ax.get_ylim()[1]
 
         # extract from filterTree the parameters that are actually used
 #        myParams = fb.filTree[rt][ft][dm][fo]['par']
@@ -145,7 +144,7 @@ class PlotHf(QtGui.QMainWindow):
             A_PB_max = self.A_PB # 20*log10(1+del_PB)
             A_PB2_max = self.A_PB2
         else: # IIR log
-            A_PB_max = 0
+            A_PB_max = A_PB2_max = 0
 
         if self.unitA == 'V':
             dBMul = 20.
@@ -175,58 +174,70 @@ class PlotHf(QtGui.QMainWindow):
         F_SB2 = fb.fil[0]['F_SB2'] * self.f_S
         F_PB2 = fb.fil[0]['F_PB2'] * self.f_S
 
+        y_min =  A_PB_minx
+        y_max = ax.get_ylim()[1]
+
+        F_lim_lor = []
+        A_lim_lor = []
+
         if fb.fil[0]['rt'] == 'LP':
-            # upper limits:
-            ax.plot([0, F_SB, F_SB, F_max],
-                    [A_PB_max, A_PB_max, A_SB, A_SB], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_max], ymax,
-                    [A_PB_max, A_PB_max, A_SB, A_SB], **fill_params)
-            # lower limits:
-            ax.plot([0, F_PB, F_PB],[A_PB_min, A_PB_min, A_PB_minx], 'b--')
-            ax.fill_between([0, F_PB, F_PB], A_PB_minx,
-                            [A_PB_min, A_PB_min, A_PB_minx], **fill_params)
+            F_lim_up = [0,        F_SB,     F_SB, F_max]
+            A_lim_up = [A_PB_max, A_PB_max, A_SB, A_SB]
+            F_lim_lo = [0,        F_PB,     F_PB]
+            A_lim_lo = [A_PB_min, A_PB_min, A_PB_minx]
 
         if fb.fil[0]['rt'] == 'HP':
-            # upper limits:
-            ax.plot([0, F_SB, F_SB, F_max],
-                    [A_SB, A_SB, A_PB_max, A_PB_max], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_max], 10,
-                    [A_SB, A_SB, A_PB_max, A_PB_max], **fill_params)
-            # lower limits:
-            ax.plot([F_PB, F_PB, F_max],[A_PB_minx, A_PB_min, A_PB_min], 'b--')
-            ax.fill_between([F_PB, F_PB, F_max], A_PB_minx,
-                            [A_PB_minx, A_PB_min, A_PB_min], **fill_params)
+            F_lim_up = [0,    F_SB, F_SB,     F_max]
+            A_lim_up = [A_SB, A_SB, A_PB_max, A_PB_max]
+            F_lim_lo = [F_PB,      F_PB,     F_max]
+            A_lim_lo = [A_PB_minx, A_PB_min, A_PB_min]
 
         if fb.fil[0]['rt'] == 'BS':
+            F_lim_up = [0,        F_SB,     F_SB, F_SB2, F_SB2,     F_max]
+            A_lim_up = [A_PB_max, A_PB_max, A_SB, A_SB,  A_PB2_max, A_PB2_max]
             # lower limits left:
-            ax.plot([0, F_PB, F_PB],[A_PB_min, A_PB_min, A_PB_minx], 'b--')
-            ax.fill_between([0, F_PB, F_PB], A_PB_minx,
-                            [A_PB_min, A_PB_min, A_PB_minx], **fill_params)
-
-            # upper limits:
-            ax.plot([0, F_SB, F_SB, F_SB2, F_SB2, F_max],
-                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB2_max, A_PB2_max], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
-                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB2_max, A_PB2_max],
-                        **fill_params)
-
+            F_lim_lo = [0,        F_PB,     F_PB]
+            A_lim_lo = [A_PB_min, A_PB_min, A_PB_minx]
             # lower limits right:
-            ax.plot([F_PB2, F_PB2, F_max],[A_PB_minx, A_PB2_min, A_PB2_min],'b--')
-            ax.fill_between([F_PB2, F_PB2, F_max], A_PB_minx,
-                            [A_PB_minx, A_PB2_min, A_PB2_min], **fill_params)
-
+            F_lim_lor = [F_PB2, F_PB2, F_max]
+            A_lim_lor = [A_PB_minx, A_PB2_min, A_PB2_min]
 
         if fb.fil[0]['rt'] == "BP":
+            F_lim_up = [0,    F_SB, F_SB,     F_SB2,    F_SB2, F_max]
+            A_lim_up = [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2]
+            F_lim_lo = [F_PB,      F_PB,     F_PB2,    F_PB2]
+            A_lim_lo = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
+
+        F_lim_up = np.array(F_lim_up)
+        F_lim_lo = np.array(F_lim_lo)
+        F_lim_lor = np.array(F_lim_lor)
+
+        # upper limits:
+        ax.plot(F_lim_up, A_lim_up, -F_lim_up, A_lim_up,**line_params)
+        ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
+        # lower limits:
+        ax.plot(F_lim_lo, A_lim_lo, -F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
+        ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
+        ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+
+        if fb.rcFDA['freqSpecsRangeType'] != 'half': # frequency axis +/- f_S/2
+            # plot limits for other half of the spectrum
+            if fb.rcFDA['freqSpecsRangeType'] == 'sym': # frequency axis +/- f_S/2
+                F_lim_up = -F_lim_up
+                F_lim_lo = -F_lim_lo
+                F_lim_lor = -F_lim_lor
+            else: # -> 'whole'
+                F_lim_up = self.f_S - F_lim_up
+                F_lim_lo = self.f_S - F_lim_lo
+                F_lim_lor = self.f_S - F_lim_lor
             # upper limits:
-            ax.plot([0,    F_SB,  F_SB,      F_SB2,      F_SB2,  F_max],
-                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
-                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2],**fill_params)
+            ax.plot(F_lim_up, A_lim_up, -F_lim_up, A_lim_up,**line_params)
+            ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
             # lower limits:
-            ax.plot([F_PB, F_PB, F_PB2, F_PB2],
-                    [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx], 'b--' )
-            ax.fill_between([F_PB, F_PB, F_PB2, F_PB2], A_PB_minx,
-                    [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx], **fill_params)
+            ax.plot(F_lim_lo, A_lim_lo, -F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
+            ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
+            ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+
 
     def draw(self):
         """
