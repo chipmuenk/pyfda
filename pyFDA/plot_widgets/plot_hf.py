@@ -45,11 +45,12 @@ class PlotHf(QtGui.QMainWindow):
 
         self.DEBUG = DEBUG
 
-        modes = ["| H |", "re{H}", "im{H}"]
+        modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
         self.cmbShowH.addItems(modes)
         self.cmbShowH.setObjectName("cmbUnitsH")
-        self.cmbShowH.setToolTip("Show magnitude, real or imag. part of H.")
+        self.cmbShowH.setToolTip("Show magnitude, real / imag. part of H or H \n"
+        "without linear phase (acausal system).")
         self.cmbShowH.setCurrentIndex(0)
 
         self.lblIn = QtGui.QLabel("in")
@@ -63,10 +64,10 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbUnitsA.setCurrentIndex(0)
 
 
-        self.lblLinphase = QtGui.QLabel("Linphase")
+        self.lblLinphase = QtGui.QLabel("Remove lin. phase")
         self.chkLinphase = QtGui.QCheckBox()
         self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
-           "Attention: this may make little sense for a non-linear phase filter.")
+           "Attention: this makes no sense for a non-linear phase system!")
 
         self.lblInset = QtGui.QLabel("Inset")
         self.chkInset = QtGui.QCheckBox()
@@ -299,17 +300,18 @@ class PlotHf(QtGui.QMainWindow):
             self.F = self.F - self.f_S/2.
 
         if self.linphase: # remove the linear phase
-            H = self.H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
+            self.H_c = self.H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
 
-        if self.cmbShowH.currentIndex() == 1: # show real part of H
-            H = self.H_c.real
-            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
-        elif self.cmbShowH.currentIndex() == 2: # show imag. part of H
-            H = self.H_c.imag
-            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
-        else: # show magnitude of H
+        if self.cmbShowH.currentIndex() == 0: # show magnitude of H
             H = abs(self.H_c)
             H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
+        elif self.cmbShowH.currentIndex() == 1: # show real part of H
+            H = self.H_c.real
+            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+        else:  # show imag. part of H
+            H = self.H_c.imag
+            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+
 
         # clear the axes and (re)draw the plot
         #
@@ -321,14 +323,13 @@ class PlotHf(QtGui.QMainWindow):
             A_lim = [-self.A_SB -10, self.A_PB +1]
             self.H_plt = 20*np.log10(abs(H))
             self.ax.set_ylabel(H_str + ' in dB ' + r'$\rightarrow$')
-
         elif self.unitA == 'V': #  'lin'
             A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
             self.H_plt = H
             self.ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
         else: # unit is W
             A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
-            self.H_plt = H * H
+            self.H_plt = H * H.conj()
             self.ax.set_ylabel(H_str + ' in W ' + r'$\rightarrow $')
 
         plt_lim = f_lim + A_lim
