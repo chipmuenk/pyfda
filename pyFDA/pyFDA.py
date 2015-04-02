@@ -2,7 +2,7 @@
 """
 Created on Tue Nov 26 10:57:30 2013
 
-@author: Julia Beike, Christian Muenker
+@author: Julia Beike, Christian Muenker und Michael Winkler
 
 Mainwindow  for the pyFDA app, initializes UI
 """
@@ -36,11 +36,13 @@ class pyFDA(QtGui.QMainWindow):
         - Filter Design button [-> self.startDesignFilt()]
         - Plot Window [-> plotAll.plotAll()]
         """
-
+        
         # Instantiate widget groups
         self.inputAll = input_all.InputAll() # input widgets
         self.inputAll.setMaximumWidth(280)
         self.pltAll = plot_all.PlotAll() # plot widgets
+
+        
 
 # variable size tabs
 #        layVInput = QtGui.QVBoxLayout()
@@ -70,9 +72,27 @@ class pyFDA(QtGui.QMainWindow):
         hbox.addWidget(self.inputAll)
         hbox.addWidget(self.pltAll)
 #        hbox.addWidget(splitter)
-        self.setCentralWidget(_widget)
+        #self.setCentralWidget(_widget)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
+    
+    
+        #Die Die Minimale Größe für das _wiidget liegt bei 800x600 Pixel
+        _widget.setMinimumSize(QtCore.QSize(800,600))
+        
+        #Erstellen der ScrollArea
+        scrollArea = QtGui.QScrollArea()
+        
+        #Das Widget, welches die ScrollArea "überwachen" soll ist _widget
+        scrollArea.setWidget(_widget)
+        
+        #Die Größe des "überwachten" Widgets darf nach oben hin vergrößert werden
+        scrollArea.setWidgetResizable(True)
+        
+        #Das CentralWidget (Focus der GUI?) ist nun die ScrollArea
+        self.setCentralWidget(scrollArea)
+        
+
 
         #=============== Menubar =======================================
         aboutAction = QtGui.QAction('&About', self)
@@ -119,6 +139,13 @@ if __name__ == '__main__':
     main = pyFDA()
     app.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     main.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
+    
+    """
+    Die Linkeecke des Fensters ist 100pixel in (X und Y) von der oberen linken
+    Bildschirmecke entfernt.
+    Die Standardgröße des pyFDA Fensters ist 1600x900
+    """
+    main.setGeometry(100, 100, 1600, 900)
     main.show()
 
     app.exec_()
