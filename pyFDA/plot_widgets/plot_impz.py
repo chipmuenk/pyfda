@@ -51,8 +51,14 @@ class PlotImpz(QtGui.QMainWindow):
         self.cmbShowH.setObjectName("cmbUnitsH")
         self.cmbShowH.setToolTip("Show lin. or log. impulse response.")
         self.cmbShowH.setCurrentIndex(0)
+        
+        self.lblLogBottom = QtGui.QLabel("Log. bottom:")
 
-        self.lblNPoints = QtGui.QLabel("Number of points")
+        self.ledLogBottom = QtGui.QLineEdit(self)
+        self.ledLogBottom.setText("-80")
+        self.ledLogBottom.setToolTip("Minimum display value for log. scale.")
+
+        self.lblNPoints = QtGui.QLabel("<i>N</i> =")
 
         self.ledNPoints = QtGui.QLineEdit(self)
         self.ledNPoints.setText("0")
@@ -73,6 +79,9 @@ class PlotImpz(QtGui.QMainWindow):
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.cmbShowH)
         self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.lblLogBottom)
+        self.layHChkBoxes.addWidget(self.ledLogBottom)
+        self.layHChkBoxes.addStretch(1)        
         self.layHChkBoxes.addWidget(self.lblStep)
         self.layHChkBoxes.addWidget(self.chkStep)
         self.layHChkBoxes.addStretch(1)
@@ -105,9 +114,29 @@ class PlotImpz(QtGui.QMainWindow):
 #        #=============================================
         self.cmbShowH.currentIndexChanged.connect(self.draw)
         self.ledNPoints.editingFinished.connect(self.draw)
+        self.ledLogBottom.editingFinished.connect(self.draw)
 
         self.chkStep.clicked.connect(self.draw)
+        
 
+    def initAxes(self):
+        # clear the axes and (re)draw the plot
+        #
+        try:
+            self.mplwidget.fig.delaxes(self.ax_r)
+            self.mplwidget.fig.delaxes(self.ax_i)
+        except (KeyError, AttributeError, UnboundLocalError):
+            pass
+        
+#        if cmplx:
+        self.ax_r = self.mplwidget.fig.add_subplot(211)
+        self.ax_r.clear()
+        self.ax_i = self.mplwidget.fig.add_subplot(212)
+        self.ax_i.clear()
+#        else:
+#            self.ax_r = self.mplwidget.fig.add_subplot(111)
+#            self.ax.clear()
+        
 
     def draw(self):
         """
@@ -115,6 +144,9 @@ class PlotImpz(QtGui.QMainWindow):
         """
         modeH = self.cmbShowH.currentText()
         step = self.chkStep.isChecked()
+        log = (self.cmbShowH.currentText() == 'log')
+        self.lblLogBottom.setEnabled(log)
+        self.ledLogBottom.setEnabled(log)
 
 #        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
 
@@ -144,23 +176,30 @@ class PlotImpz(QtGui.QMainWindow):
         else:
             title_str = r'Impulse Response'
             H_str = r'$h[n]$'
-        bottom = 0
-
-#        if self.cmbShowH.currentIndex() > 0: # log. response
-        if self.cmbShowH.currentText() == 'log':
+        
+        cmplx = np.any(np.iscomplex(h))
+        if cmplx:
+            h_i = h.imag
+            h = h.real
+            H_i_str = r'$\Im\{$' + H_str + '$\}$'
+            H_str = r'$\Re\{$' + H_str + '$\}$'
+        if log:        
+            bottom = float(self.ledLogBottom.text())
             H_str = r'$\log$ ' + H_str + ' in dB'
-            h = np.maximum(20 * np.log10(abs(h)), -80)
-            bottom = -80
+            h = np.maximum(20 * np.log10(abs(h)), bottom)
+            if cmplx:
+                h_i = np.maximum(20 * np.log10(abs(h_i)), bottom)
+                H_i_str = r'$\log$ ' + H_i_str + ' in dB'
+        else:
+            bottom = 0
 
+        self.initAxes()
 
-
-        # clear the axes and (re)draw the plot
-        #
-        ax = self.mplwidget.fig.add_subplot(111)
-        ax.clear()
 
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = ax.stem(t, h, bottom = bottom)
+        [ml, sl, bl] = self.ax_r.stem(t, h, bottom = bottom)
+        if cmplx:
+            [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom = bottom)
 
 
 #        fig.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
@@ -173,10 +212,15 @@ class PlotImpz(QtGui.QMainWindow):
 #            self.mplwidget.plt_lim = t_lim + y_lim
 #            self.mplwidget.x_lim = t_lim
 
-        ax.set_xlim([min(t), max(t)])
-        ax.set_title(title_str)
-        ax.set_xlabel(fb.rcFDA['plt_tLabel'])
-        ax.set_ylabel(H_str + r'$\rightarrow $')
+        self.ax_r.set_xlim([min(t), max(t)])
+        self.ax_r.set_title(title_str)
+        if cmplx:
+            self.ax_i.set_xlabel(fb.rcFDA['plt_tLabel'])
+            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+            self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
+        else:
+            self.ax_r.set_xlabel(fb.rcFDA['plt_tLabel'])
+            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
 
 
         self.mplwidget.redraw()
