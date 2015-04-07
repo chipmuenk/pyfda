@@ -22,7 +22,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
-import pyfda_lib as pylib
+import pyfda_lib
 
 
 from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
@@ -128,21 +128,20 @@ class PlotImpz(QtGui.QMainWindow):
         except (KeyError, AttributeError, UnboundLocalError):
             pass
         
-#        if cmplx:
-        self.ax_r = self.mplwidget.fig.add_subplot(211)
-        self.ax_r.clear()
-        self.ax_i = self.mplwidget.fig.add_subplot(212)
-        self.ax_i.clear()
-#        else:
-#            self.ax_r = self.mplwidget.fig.add_subplot(111)
-#            self.ax.clear()
+        if self.cmplx:
+            self.ax_r = self.mplwidget.fig.add_subplot(211)
+            self.ax_r.clear()
+            self.ax_i = self.mplwidget.fig.add_subplot(212)
+            self.ax_i.clear()
+        else:
+            self.ax_r = self.mplwidget.fig.add_subplot(111)
+            self.ax_r.clear()
         
 
     def draw(self):
         """
         Re-calculate |H(f)| and draw the figure
         """
-        modeH = self.cmbShowH.currentText()
         step = self.chkStep.isChecked()
         log = (self.cmbShowH.currentText() == 'log')
         self.lblLogBottom.setEnabled(log)
@@ -166,8 +165,8 @@ class PlotImpz(QtGui.QMainWindow):
             print("--- plotHf.draw() --- ")
             print("b, a = ", self.bb, self.aa)
 
-        # calculate |H(W)| for W = 0 ... pi:
-        [h,t] = pylib.impz(self.bb, self.aa, self.f_S, step = step,
+        # calculate h[n]
+        [h,t] = pyfda_lib.impz(self.bb, self.aa, self.f_S, step = step,
                      N = int(self.ledNPoints.text()))
 
         if step:
@@ -177,8 +176,8 @@ class PlotImpz(QtGui.QMainWindow):
             title_str = r'Impulse Response'
             H_str = r'$h[n]$'
         
-        cmplx = np.any(np.iscomplex(h))
-        if cmplx:
+        self.cmplx = np.any(np.iscomplex(h))
+        if self.cmplx:
             h_i = h.imag
             h = h.real
             H_i_str = r'$\Im\{$' + H_str + '$\}$'
@@ -187,7 +186,7 @@ class PlotImpz(QtGui.QMainWindow):
             bottom = float(self.ledLogBottom.text())
             H_str = r'$\log$ ' + H_str + ' in dB'
             h = np.maximum(20 * np.log10(abs(h)), bottom)
-            if cmplx:
+            if self.cmplx:
                 h_i = np.maximum(20 * np.log10(abs(h_i)), bottom)
                 H_i_str = r'$\log$ ' + H_i_str + ' in dB'
         else:
@@ -197,11 +196,22 @@ class PlotImpz(QtGui.QMainWindow):
 
 
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom = bottom)
-        if cmplx:
-            [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom = bottom)
-
-
+        [ml, sl, bl] = self.ax_r.stem(t, h, bottom = bottom,
+            markerfmt = 'bo', linefmt = 'r')
+        self.ax_r.set_xlim([min(t), max(t)])
+        self.ax_r.set_title(title_str)
+        
+        if self.cmplx:
+            [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom = bottom, 
+            markerfmt = 'rd', linefmt = 'b')
+            self.ax_i.set_xlabel(fb.rcFDA['plt_tLabel'])
+            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+            self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
+        else:
+            self.ax_r.set_xlabel(fb.rcFDA['plt_tLabel'])
+            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+            
+            
 #        fig.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
  #       ax.setp(sl, lw = fb.gD['rc']['lw'])
   #      print(self.mplwidget.plt_lim)
@@ -211,16 +221,6 @@ class PlotImpz(QtGui.QMainWindow):
 #
 #            self.mplwidget.plt_lim = t_lim + y_lim
 #            self.mplwidget.x_lim = t_lim
-
-        self.ax_r.set_xlim([min(t), max(t)])
-        self.ax_r.set_title(title_str)
-        if cmplx:
-            self.ax_i.set_xlabel(fb.rcFDA['plt_tLabel'])
-            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
-            self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
-        else:
-            self.ax_r.set_xlabel(fb.rcFDA['plt_tLabel'])
-            self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
 
 
         self.mplwidget.redraw()
