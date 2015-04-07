@@ -30,7 +30,13 @@ class InputAll(QtGui.QWidget):
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputAll, self).__init__()
+        css = """
+        QTabBar{
+        font-weight:bold;
+        }
+        """
 
+        self.setStyleSheet(css)
 
 #        self.inputParams = inputParams.inputParams()
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)
@@ -54,6 +60,7 @@ class InputAll(QtGui.QWidget):
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addWidget(tabWidget)
+        layVMain.setContentsMargins(1,1,1,1)
 #
         self.setLayout(layVMain)
 #        layVMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)

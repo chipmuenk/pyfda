@@ -41,9 +41,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputAll = input_all.InputAll() # input widgets
         self.inputAll.setMaximumWidth(280)
         self.pltAll = plot_all.PlotAll() # plot widgets
-
         
-
 # variable size tabs
 #        layVInput = QtGui.QVBoxLayout()
 #        layVInput.addWidget(self.inputAll)
@@ -68,14 +66,15 @@ class pyFDA(QtGui.QMainWindow):
         
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
-        hbox = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
-        hbox.addWidget(self.inputAll)
-        hbox.addWidget(self.pltAll)
+        layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
+        layHMain.addWidget(self.inputAll)
+        layHMain.addWidget(self.pltAll)
+        layHMain.setContentsMargins(0,0,0,0)#(left, top, right, bottom)
+
 #        hbox.addWidget(splitter)
         #self.setCentralWidget(_widget)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
-    
     
         #Die Die Minimale Größe für das _wiidget liegt bei 800x600 Pixel
         _widget.setMinimumSize(QtCore.QSize(800,600))
@@ -88,6 +87,7 @@ class pyFDA(QtGui.QMainWindow):
         
         #Die Größe des "überwachten" Widgets darf nach oben hin vergrößert werden
         scrollArea.setWidgetResizable(True)
+
         
         #Das CentralWidget (Focus der GUI?) ist nun die ScrollArea
         self.setCentralWidget(scrollArea)
@@ -102,6 +102,7 @@ class pyFDA(QtGui.QMainWindow):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&About')
         fileMenu.addAction(aboutAction)
+        
 
         # ============== Signals & Slots ================================
 

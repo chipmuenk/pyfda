@@ -14,7 +14,7 @@ from PyQt4 import QtGui #, QtCore
 #import numpy as np
 #import scipy.signal as sig
 if __name__ == "__main__": # relative import if this file is run as __main__
-    cwd=os.path.dirname(os.path.abspath(__file__))
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
 from plot_widgets import plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz
@@ -23,7 +23,37 @@ from plot_widgets import plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz
 class PlotAll(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
+        css = """
 
+/*
+QWidget
+{
+Background: #CCCCCC;
+color:black;
+font:14px bold;
+font-weight:bold;
+border-radius: 1px;
+}
+*/
+/*height: 14px;*/
+/*
+QDialog{
+Background-image:url('img/xxx.png');
+font-size:14px;
+color: black;
+}
+*/
+
+QTabBar{
+font-weight:bold;
+}
+
+QToolButton:hover{
+Background: #DDEEFF;
+}
+"""
+
+        self.setStyleSheet(css)
         self.pltHf = plot_hf.PlotHf()
         self.pltPhi = plot_phi.PlotPhi()
         self.pltPZ = plot_pz.PlotPZ()
@@ -41,7 +71,6 @@ class PlotAll(QtGui.QWidget):
         tabWidget.addTab(self.pltTauG, 'tau_g')
         tabWidget.addTab(self.pltImpz, 'h[n]')
 
-
 #        butDraw = QtGui.QPushButton("&No Function")
 #        butDraw.clicked.connect(self.redrawAll)
 
@@ -51,8 +80,10 @@ class PlotAll(QtGui.QWidget):
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addWidget(tabWidget)
+        layVMain.setContentsMargins(1,1,1,1)#(left, top, right, bottom)
 #
         self.setLayout(layVMain)
+
 
 
     def updateAll(self):
