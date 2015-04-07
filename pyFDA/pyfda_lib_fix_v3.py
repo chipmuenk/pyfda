@@ -171,12 +171,12 @@ class Fixed(object):
             # No. of pos. / neg. / all overflows occured since last reset:
             self.N_over_neg += np.sum(over_neg)
             self.N_over_pos += np.sum(over_pos)
-            self.N_over = self.N_over_neg + self.N_over_pos 
+            self.N_over = self.N_over_neg + self.N_over_pos
 
             # Replace overflows with Min/Max-Values (saturation):           
             if self.overflow == 'sat':
-                yq = yq * (~over_pos) * (~over_neg) - over_neg * self.MSB\
-                                            + over_pos * (self.MSB - self.LSB)
+                yq = np.where(over_pos, self.MSB-self.LSB, yq) # (cond, true, false)
+                yq = np.where(over_neg, -self.MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.overflow == 'wrap':
                 yq = yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB))
