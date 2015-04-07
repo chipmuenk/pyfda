@@ -24,7 +24,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb # importing filterbroker initializes all its globals
-import pyfda_lib
+from pyfda_lib import cround, save_fil
 import pyfda_lib_fix_v3 as fix
 from simpleeval import simple_eval
 
@@ -138,9 +138,12 @@ class InputCoeffs(QtGui.QWidget):
 #        self.ledQuantF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledQuantF.setMaximumWidth(30)
 
-        self.cmbQWrap = QtGui.QComboBox()
-#        self.cmbQWrap.setItemD
         self.cmbQQuant = QtGui.QComboBox()
+        qQuant = ['none', 'round', 'fix']
+        self.cmbQQuant.addItems(qQuant)
+        self.cmbQOvfl = QtGui.QComboBox()
+        qOvfl = ['none', 'wrap', 'sat']
+        self.cmbQOvfl.addItems(qOvfl)
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
@@ -171,7 +174,7 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs3.addWidget(self.ledQuantI)
         self.layHButtonsCoeffs3.addWidget(self.lblDot)
         self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
-        self.layHButtonsCoeffs3.addWidget(self.cmbQWrap)
+        self.layHButtonsCoeffs3.addWidget(self.cmbQOvfl)
         self.layHButtonsCoeffs3.addWidget(self.cmbQQuant)
         self.layHButtonsCoeffs3.addStretch()
 
@@ -232,7 +235,7 @@ class InputCoeffs(QtGui.QWidget):
             coeffs.append(rows)
 
         fb.fil[0]["N"] = num_rows - 1
-        pyfda_lib.saveFil(fb.fil[0], coeffs, 'ba', __name__)
+        save_fil(fb.fil[0], coeffs, 'ba', __name__)
 
         if self.DEBUG:
             print("Coeffs - ZPK:", fb.fil[0]["zpk"])
@@ -267,10 +270,10 @@ class InputCoeffs(QtGui.QWidget):
             for row in range(np.shape(coeffs)[1]):
                 item = self.tblCoeff.item(row, col)
                 if item:
-                    item.setText(str(coeffs[col][row]))
+                    item.setText(str(cround(coeffs[col][row])))
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem(
-                                                    str(coeffs[col][row])))
+                                            str(cround(coeffs[col][row]))))
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
 
@@ -358,7 +361,9 @@ class InputCoeffs(QtGui.QWidget):
         """
         qI = int(self.ledQuantI.text())
         qF = int(self.ledQuantF.text())
-        q_obj =  {'QI':qI, 'QF': qF, 'quant':'round', 'ovfl': 'wrap'}
+        qQuant = self.cmbQQuant.currentText()
+        qOvfl = self.cmbQOvfl.currentText()
+        q_obj =  {'QI':qI, 'QF': qF, 'quant': qQuant, 'ovfl': qOvfl}
         myQ = fix.Fixed(q_obj) # instantiate fixed-point object
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
@@ -369,6 +374,9 @@ class InputCoeffs(QtGui.QWidget):
                     item.setText(str(myQ.fix(simple_eval(item.text()))))
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                    
+        self.tblCoeff.resizeColumnsToContents()
+        self.tblCoeff.resizeRowsToContents()
 
 #------------------------------------------------------------------------------
 
