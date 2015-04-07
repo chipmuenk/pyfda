@@ -11,7 +11,7 @@ import sys, os
 from PyQt4 import QtGui
 #import scipy.io
 import numpy as np
-from scipy.signal import tf2zpk, zpk2tf
+#from scipy.signal import tf2zpk, zpk2tf
 
 # https://github.com/danthedeckie/simpleeval
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb # importing filterbroker initializes all its globals
-import pyfda_lib
+from pyfda_lib import cround, save_fil
 from simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows
@@ -31,20 +31,6 @@ from simpleeval import simple_eval
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
 
-def cround(x, n_dig = 0):
-    """
-    round complex number to n_dig digits. If n_dig == 0, don't round at all,
-    just convert complex numbers with an imaginary part very close to zero to
-    real.
-    """
-    x = np.real_if_close(x, 1e-15)
-    if n_dig > 0:
-        if np.iscomplex(x):
-            x = np.complex(np.around(x.real, n_dig), np.around(x.imag, n_dig))
-            if x.real == 0: x = 1j*x.imag # avoid printing -0 - 0.1234 j
-        else:
-            x = np.around(x, n_dig)
-    return x
 
 class InputPZ(QtGui.QWidget):
     """
@@ -223,7 +209,7 @@ class InputPZ(QtGui.QWidget):
         zpk.append(simple_eval(self.ledGain.text()))
 
         fb.fil[0]["N"] = num_rows
-        pyfda_lib.saveFil(fb.fil[0], zpk, 'zpk', __name__)
+        save_fil(fb.fil[0], zpk, 'zpk', __name__)
 
         if self.DEBUG:
             print("ZPK - coeffs:",  fb.fil[0]['coeffs'])
