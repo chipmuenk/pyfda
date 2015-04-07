@@ -9,7 +9,7 @@ Tab-Widget for displaying infos about filter and filter design method
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 import textwrap
-from PyQt4 import QtGui
+from PyQt4 import Qt, QtGui, QtWebKit
 from docutils.core import publish_string #, publish_parts
 import numpy as np
 from numpy import pi, log10
@@ -155,10 +155,12 @@ class InputInfo(QtGui.QWidget):
         self.tblFiltPerf.setHorizontalHeaderLabels(['Test Case', 'f(Hz)','|H(f)|','|H(f)| (dB)'])
         for row in range(len(H_test)):
             self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbl[row]))
-            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str(F_test[row])))
-            self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str(abs(H_test[row]))))
-            self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str(20*log10(abs(H_test[row])))))
+            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test[row]))))
+            self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
+            self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str('%2.3f'%(20*log10(abs(H_test[row]))))))
 
+        self.tblFiltPerf.resizeColumnsToContents()
+        self.tblFiltPerf.resizeRowsToContents()
 
 
 #        self.txtFiltPerf.setText(('============ Filter Characteristics ================\n'
@@ -221,6 +223,33 @@ class InputInfo(QtGui.QWidget):
         result = lines[0].lstrip() +\
          "\n" + textwrap.dedent("\n".join(lines[1:]))# + '\n'
         return result
+        
+        
+#app = QtGui.QApplication([])
+#view = QtWebKit.QWebView()
+#
+#class MyWebPage(QtWebKit.QWebPage):
+#    def acceptNavigationRequest(self, frame, req, nav_type):
+#        if nav_type == QtWebKit.QWebPage.NavigationTypeFormSubmitted:
+#            text = "<br/>\n".join(["%s: %s" % pair for pair in req.url().queryItems()])
+#            view.setHtml(text)
+#            return False
+#        else:
+#            return super(MyWebPage, self).acceptNavigationRequest(frame, req, nav_type)
+#
+#view.setPage(MyWebPage())
+#
+#html = """
+#<h1>Hello World!</h1>
+#"""
+#
+#view.setHtml(html)
+#
+##view.setWindowFlags(Qt.FramelessWindowHint) # no title
+##view.setWindowFlags(Qt.CustomizeWindowHint) # resizable frame
+#
+#view.show()
+#app.exec_()
 
 #------------------------------------------------------------------------------
 
