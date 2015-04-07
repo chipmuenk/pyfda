@@ -39,6 +39,20 @@ from  matplotlib import patches
 #from matplotlib.figure import Figure
 #from matplotlib import rcParams
 
+def cround(x, n_dig = 0):
+    """
+    Round complex number to n_dig digits. If n_dig == 0, don't round at all,
+    just convert complex numbers with an imaginary part very close to zero to
+    real.
+    """
+    x = np.real_if_close(x, 1e-15)
+    if n_dig > 0:
+        if np.iscomplex(x):
+            x = np.complex(np.around(x.real, n_dig), np.around(x.imag, n_dig))
+            if x.real == 0: x = 1j*x.imag # avoid printing -0 - 0.1234 j
+        else:
+            x = np.around(x, n_dig)
+    return x
 
 def H_mag(zaehler, nenner, z, lim):
     """ Calculate magnitude of H(z) or H(s) in polynomial form at the complex
@@ -759,7 +773,7 @@ Two decimal places for numbers on x- and y-axis
         locy,labely = plt.yticks() # get location and content of xticks
         plt.yticks(locy, map(lambda y: format % y, locy*scale))
 
-def saveFil(specs, arg, out_format, sender):
+def save_fil(specs, arg, out_format, sender):
     """
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all available formats in the passed
