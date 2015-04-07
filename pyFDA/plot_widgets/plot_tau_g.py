@@ -17,8 +17,8 @@ import numpy as np
 #import scipy.signal as sig
 
 if __name__ == "__main__": # relative import if this file is run as __main__
-    cwd=os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(cwd + '/..')
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 import pyfda_lib
@@ -90,7 +90,7 @@ class PlotTauG(QtGui.QMainWindow):
         else: # IIR
             bb = fb.fil[0]['coeffs'][0]
             aa = fb.fil[0]['coeffs'][1]
-            
+
         wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
@@ -109,15 +109,16 @@ class PlotTauG(QtGui.QMainWindow):
         if fb.rcFDA['freqSpecsRangeType'] == 'sym':
             tau_g = np.fft.fftshift(tau_g)
             F = F - f_S / 2.
-        
-        
+
+
         ax.plot(F, tau_g, lw = fb.gD['rc']['lw'])
 
 #        if PLT_AUTOx: dsp.format_ticks('x',f_scale, N_F_str)
 
         ax.set_title(r'Group Delay $ \tau_g$')
-        ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        ax.set_xlabel(fb.rcFDA['plt_fLabel'])
         ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+        # widen limits to suppress numerical inaccuracies when tau_g = constant
         ax.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
 
 

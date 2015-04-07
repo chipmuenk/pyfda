@@ -21,14 +21,14 @@ import numpy as np
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib
 import pyfda_lib_fix_v3 as fix
 from simpleeval import simple_eval
 
-# TODO: delete / insert individual cells instead of rows 
+# TODO: delete / insert individual cells instead of rows
 # TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
@@ -127,7 +127,7 @@ class InputCoeffs(QtGui.QWidget):
         self.ledQuantI.setText("0")
         self.ledQuantI.setMaxLength(2) # maximum of 2 digits
         self.ledQuantI.setFixedWidth(30) # width of lineedit in points(?)
-        
+
         self.lblDot = QtGui.QLabel()
         self.lblDot.setText(".")
 
@@ -137,7 +137,7 @@ class InputCoeffs(QtGui.QWidget):
         self.ledQuantF.setMaxLength(2) # maximum of 2 digits
 #        self.ledQuantF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledQuantF.setMaximumWidth(30)
-        
+
         self.cmbQWrap = QtGui.QComboBox()
 #        self.cmbQWrap.setItemD
         self.cmbQQuant = QtGui.QComboBox()
@@ -172,7 +172,7 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs3.addWidget(self.lblDot)
         self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
         self.layHButtonsCoeffs3.addWidget(self.cmbQWrap)
-        self.layHButtonsCoeffs3.addWidget(self.cmbQQuant)        
+        self.layHButtonsCoeffs3.addWidget(self.cmbQQuant)
         self.layHButtonsCoeffs3.addStretch()
 
         layVMain = QtGui.QVBoxLayout()
@@ -231,7 +231,7 @@ class InputCoeffs(QtGui.QWidget):
 #                    rows.append(float(item.text()) if item else 0.)
             coeffs.append(rows)
 
-        fb.fil[0]["N"] = num_rows - 1       
+        fb.fil[0]["N"] = num_rows - 1
         pyfda_lib.saveFil(fb.fil[0], coeffs, 'ba', __name__)
 
         if self.DEBUG:
@@ -249,6 +249,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 
         self.tblCoeff.setRowCount(max(np.shape(coeffs)))
+        self.tblCoeff.setColumnCount(2)
 
         if self.DEBUG:
             print("=====================\nInputCoeffs.showCoeffs")
@@ -260,7 +261,7 @@ class InputCoeffs(QtGui.QWidget):
 #        if np.ndim(coeffs) == 1: # FIR
 
         self.chkIIR.setChecked(True)
-        self.tblCoeff.setColumnCount(2)
+
         self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
         for col in range(2):
             for row in range(np.shape(coeffs)[1]):

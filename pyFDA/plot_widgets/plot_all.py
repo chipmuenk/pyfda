@@ -15,7 +15,7 @@ from PyQt4 import QtGui #, QtCore
 #import scipy.signal as sig
 if __name__ == "__main__": # relative import if this file is run as __main__
     cwd=os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(cwd + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 from plot_widgets import plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz
 
@@ -40,7 +40,7 @@ class PlotAll(QtGui.QWidget):
         tabWidget.addTab(self.pltPZ, 'P/Z')
         tabWidget.addTab(self.pltTauG, 'tau_g')
         tabWidget.addTab(self.pltImpz, 'h[n]')
-        
+
 
 #        butDraw = QtGui.QPushButton("&No Function")
 #        butDraw.clicked.connect(self.redrawAll)

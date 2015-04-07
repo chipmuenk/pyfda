@@ -17,8 +17,8 @@ import numpy as np
 import scipy.signal as sig
 
 if __name__ == "__main__": # relative import if this file is run as __main__
-    cwd=os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(cwd + '/..')
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 
@@ -37,7 +37,6 @@ class PlotPhi(QtGui.QMainWindow):
 
     def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
         super(PlotPhi, self).__init__(parent) # initialize QWidget base class
-#        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG
 
@@ -109,14 +108,19 @@ class PlotPhi(QtGui.QMainWindow):
             H = np.fft.fftshift(H)
             F = F - f_S / 2.
 
-        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
+#        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
         y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
         if self.unitPhi == 'rad':
             y_str += ' in rad ' + r'$\rightarrow $'
+            scale = 1.
         elif self.unitPhi == 'rad/pi':
             y_str += ' in rad' + r'$ / \pi \;\rightarrow $'
+            scale = 1./ np.pi
         else:
             y_str += ' in deg ' + r'$\rightarrow $'
+            scale = 180./np.pi
+        fb.rcFDA['plt_phiLabel'] = y_str
+        fb.rcFDA['plt_phiUnit'] = self.unitPhi
 
         # clear the axes and (re)draw the plot
         #        ax = self.mplwidget.ax
@@ -125,14 +129,14 @@ class PlotPhi(QtGui.QMainWindow):
         if self.btnWrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:
-            phi_plt = np.unwrap(np.angle(H) * scale)
+            phi_plt = np.unwrap(np.angle(H)) * scale
 
         #---------------------------------------------------------
         line_phi, = ax.plot(F, phi_plt, lw = fb.gD['rc']['lw'])
         #---------------------------------------------------------
 
         ax.set_title(r'Phase Frequency Response')
-        ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        ax.set_xlabel(fb.rcFDA['plt_fLabel'])
         ax.set_ylabel(y_str)
         ax.set_xlim(fb.rcFDA['freqSpecsRange'])
 

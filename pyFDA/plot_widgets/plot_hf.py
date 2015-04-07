@@ -17,7 +17,7 @@ import scipy.signal as sig
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
@@ -32,13 +32,12 @@ more preferably, QDialog
 """
 
 class PlotHf(QtGui.QMainWindow):
-# TODO: spec limits are not hatched in Python 3, it seems dict "fill_params"
-#           is not recognized
+
 # TODO: inset plot cannot be zoomed independently from main window
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
 # TODO: position and size of inset plot should be selectable
-# TODO: unit of phase should be derived from phase widget
+
 
     def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
         super(PlotHf, self).__init__(parent) # initialize QWidget base class
@@ -46,11 +45,12 @@ class PlotHf(QtGui.QMainWindow):
 
         self.DEBUG = DEBUG
 
-        modes = ["| H |", "re{H}", "im{H}"]
+        modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
         self.cmbShowH.addItems(modes)
         self.cmbShowH.setObjectName("cmbUnitsH")
-        self.cmbShowH.setToolTip("Show magnitude, real or imag. part of H.")
+        self.cmbShowH.setToolTip("Show magnitude, real / imag. part of H or H \n"
+        "without linear phase (acausal system).")
         self.cmbShowH.setCurrentIndex(0)
 
         self.lblIn = QtGui.QLabel("in")
@@ -64,10 +64,10 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbUnitsA.setCurrentIndex(0)
 
 
-        self.lblLinphase = QtGui.QLabel("Linphase")
+        self.lblLinphase = QtGui.QLabel("Remove lin. phase")
         self.chkLinphase = QtGui.QCheckBox()
         self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
-           "Attention: this may make little sense for a non-linear phase filter.")
+           "Attention: this makes no sense for a non-linear phase system!")
 
         self.lblInset = QtGui.QLabel("Inset")
         self.chkInset = QtGui.QCheckBox()
@@ -133,9 +133,9 @@ class PlotHf(QtGui.QMainWindow):
         Plot the specifications limits
         """
 #        fc = (0.8,0.8,0.8) # color for shaded areas
-        fill_params = {"color":"none","hatch":"/", "edgecolor":"k", "lw":0.0}
+        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':'k', 'lw':0.0}
+        line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
         ax = specAxes
-        ymax = ax.get_ylim()[1]
 
         # extract from filterTree the parameters that are actually used
 #        myParams = fb.filTree[rt][ft][dm][fo]['par']
@@ -145,7 +145,7 @@ class PlotHf(QtGui.QMainWindow):
             A_PB_max = self.A_PB # 20*log10(1+del_PB)
             A_PB2_max = self.A_PB2
         else: # IIR log
-            A_PB_max = 0
+            A_PB_max = A_PB2_max = 0
 
         if self.unitA == 'V':
             dBMul = 20.
@@ -175,58 +175,70 @@ class PlotHf(QtGui.QMainWindow):
         F_SB2 = fb.fil[0]['F_SB2'] * self.f_S
         F_PB2 = fb.fil[0]['F_PB2'] * self.f_S
 
+        y_min =  A_PB_minx
+        y_max = ax.get_ylim()[1]
+
+        F_lim_lor = []
+        A_lim_lor = []
+
         if fb.fil[0]['rt'] == 'LP':
-            # upper limits:
-            ax.plot([0, F_SB, F_SB, F_max],
-                    [A_PB_max, A_PB_max, A_SB, A_SB], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_max], ymax,
-                    [A_PB_max, A_PB_max, A_SB, A_SB], **fill_params)
-            # lower limits:
-            ax.plot([0, F_PB, F_PB],[A_PB_min, A_PB_min, A_PB_minx], 'b--')
-            ax.fill_between([0, F_PB, F_PB], A_PB_minx,
-                            [A_PB_min, A_PB_min, A_PB_minx], **fill_params)
+            F_lim_up = [0,        F_SB,     F_SB, F_max]
+            A_lim_up = [A_PB_max, A_PB_max, A_SB, A_SB]
+            F_lim_lo = [0,        F_PB,     F_PB]
+            A_lim_lo = [A_PB_min, A_PB_min, A_PB_minx]
 
         if fb.fil[0]['rt'] == 'HP':
-            # upper limits:
-            ax.plot([0, F_SB, F_SB, F_max],
-                    [A_SB, A_SB, A_PB_max, A_PB_max], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_max], 10,
-                    [A_SB, A_SB, A_PB_max, A_PB_max], **fill_params)
-            # lower limits:
-            ax.plot([F_PB, F_PB, F_max],[A_PB_minx, A_PB_min, A_PB_min], 'b--')
-            ax.fill_between([F_PB, F_PB, F_max], A_PB_minx,
-                            [A_PB_minx, A_PB_min, A_PB_min], **fill_params)
+            F_lim_up = [0,    F_SB, F_SB,     F_max]
+            A_lim_up = [A_SB, A_SB, A_PB_max, A_PB_max]
+            F_lim_lo = [F_PB,      F_PB,     F_max]
+            A_lim_lo = [A_PB_minx, A_PB_min, A_PB_min]
 
         if fb.fil[0]['rt'] == 'BS':
+            F_lim_up = [0,        F_SB,     F_SB, F_SB2, F_SB2,     F_max]
+            A_lim_up = [A_PB_max, A_PB_max, A_SB, A_SB,  A_PB2_max, A_PB2_max]
             # lower limits left:
-            ax.plot([0, F_PB, F_PB],[A_PB_min, A_PB_min, A_PB_minx], 'b--')
-            ax.fill_between([0, F_PB, F_PB], A_PB_minx,
-                            [A_PB_min, A_PB_min, A_PB_minx], **fill_params)
-
-            # upper limits:
-            ax.plot([0, F_SB, F_SB, F_SB2, F_SB2, F_max],
-                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB2_max, A_PB2_max], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
-                    [A_PB_max, A_PB_max, A_SB, A_SB, A_PB2_max, A_PB2_max],
-                        **fill_params)
-
+            F_lim_lo = [0,        F_PB,     F_PB]
+            A_lim_lo = [A_PB_min, A_PB_min, A_PB_minx]
             # lower limits right:
-            ax.plot([F_PB2, F_PB2, F_max],[A_PB_minx, A_PB2_min, A_PB2_min],'b--')
-            ax.fill_between([F_PB2, F_PB2, F_max], A_PB_minx,
-                            [A_PB_minx, A_PB2_min, A_PB2_min], **fill_params)
-
+            F_lim_lor = [F_PB2, F_PB2, F_max]
+            A_lim_lor = [A_PB_minx, A_PB2_min, A_PB2_min]
 
         if fb.fil[0]['rt'] == "BP":
+            F_lim_up = [0,    F_SB, F_SB,     F_SB2,    F_SB2, F_max]
+            A_lim_up = [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2]
+            F_lim_lo = [F_PB,      F_PB,     F_PB2,    F_PB2]
+            A_lim_lo = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
+
+        F_lim_up = np.array(F_lim_up)
+        F_lim_lo = np.array(F_lim_lo)
+        F_lim_lor = np.array(F_lim_lor)
+
+        # upper limits:
+        ax.plot(F_lim_up, A_lim_up, -F_lim_up, A_lim_up,**line_params)
+        ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
+        # lower limits:
+        ax.plot(F_lim_lo, A_lim_lo, -F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
+        ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
+        ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+
+        if fb.rcFDA['freqSpecsRangeType'] != 'half': # frequency axis +/- f_S/2
+            # plot limits for other half of the spectrum
+            if fb.rcFDA['freqSpecsRangeType'] == 'sym': # frequency axis +/- f_S/2
+                F_lim_up = -F_lim_up
+                F_lim_lo = -F_lim_lo
+                F_lim_lor = -F_lim_lor
+            else: # -> 'whole'
+                F_lim_up = self.f_S - F_lim_up
+                F_lim_lo = self.f_S - F_lim_lo
+                F_lim_lor = self.f_S - F_lim_lor
             # upper limits:
-            ax.plot([0,    F_SB,  F_SB,      F_SB2,      F_SB2,  F_max],
-                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2], 'b--')
-            ax.fill_between([0, F_SB, F_SB, F_SB2, F_SB2, F_max], 10,
-                    [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2],**fill_params)
+            ax.plot(F_lim_up, A_lim_up, -F_lim_up, A_lim_up,**line_params)
+            ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
             # lower limits:
-            ax.plot([F_PB, F_PB, F_PB2, F_PB2],
-                    [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx], 'b--' )
-            ax.fill_between([F_PB, F_PB, F_PB2, F_PB2], A_PB_minx,
-                    [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx], **fill_params)
+            ax.plot(F_lim_lo, A_lim_lo, -F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
+            ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
+            ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+
 
     def draw(self):
         """
@@ -288,17 +300,18 @@ class PlotHf(QtGui.QMainWindow):
             self.F = self.F - self.f_S/2.
 
         if self.linphase: # remove the linear phase
-            H = self.H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
+            self.H_c = self.H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
 
-        if self.cmbShowH.currentIndex() == 1: # show real part of H
-            H = self.H_c.real
-            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
-        elif self.cmbShowH.currentIndex() == 2: # show imag. part of H
-            H = self.H_c.imag
-            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
-        else: # show magnitude of H
+        if self.cmbShowH.currentIndex() == 0: # show magnitude of H
             H = abs(self.H_c)
             H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
+        elif self.cmbShowH.currentIndex() == 1: # show real part of H
+            H = self.H_c.real
+            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+        else:  # show imag. part of H
+            H = self.H_c.imag
+            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+
 
         # clear the axes and (re)draw the plot
         #
@@ -310,14 +323,13 @@ class PlotHf(QtGui.QMainWindow):
             A_lim = [-self.A_SB -10, self.A_PB +1]
             self.H_plt = 20*np.log10(abs(H))
             self.ax.set_ylabel(H_str + ' in dB ' + r'$\rightarrow$')
-
         elif self.unitA == 'V': #  'lin'
             A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
             self.H_plt = H
             self.ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
         else: # unit is W
             A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
-            self.H_plt = H * H
+            self.H_plt = H * H.conj()
             self.ax.set_ylabel(H_str + ' in W ' + r'$\rightarrow $')
 
         plt_lim = f_lim + A_lim
@@ -325,12 +337,14 @@ class PlotHf(QtGui.QMainWindow):
         #-----------------------------------------------------------
         self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
         #-----------------------------------------------------------
+        self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
+
         self.ax.axis(plt_lim)
 
         if self.specs: self.plotSpecLimits(specAxes = self.ax)
 
         self.ax.set_title(r'Magnitude Frequency Response')
-        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+        self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
 
         self.mplwidget.redraw()
 
@@ -338,15 +352,28 @@ class PlotHf(QtGui.QMainWindow):
         self.phase = self.chkPhase.isChecked()
         if self.phase:
             self.ax_p = self.ax.twinx() # second axes system with same x-axis for phase
-#            self.ax_p.clear()
+
+            phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
+            if fb.rcFDA['plt_phiUnit'] == 'rad':
+                phi_str += ' in rad ' + r'$\rightarrow $'
+                scale = 1.
+            elif fb.rcFDA['plt_phiUnit'] == 'rad/pi':
+                phi_str += ' in rad' + r'$ / \pi \;\rightarrow $'
+                scale = 1./ np.pi
+            else:
+                phi_str += ' in deg ' + r'$\rightarrow $'
+                scale = 180./np.pi
+
+            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
+                               'b--', lw = fb.gD['rc']['lw'])
+            self.ax_p.set_ylabel(phi_str, color='blue')
 #            nbins = len(self.ax.get_yticks())
 #            self.ax_p.locator_params(axis = 'y', nbins = nbins)
-#            if <some button>:
-#                self.ax_p.plot(self.F,np.angle(self.H_c), 'b--', lw = fb.gD['rc']['lw'])
-#            else:
-            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c)), 'b--', lw = fb.gD['rc']['lw'])
-            self.ax_p.set_ylabel(r'$\angle H((\mathrm{e}^{\mathrm{j} \Omega})$'
-                    + r'$\rightarrow $', color='blue')
+#
+#            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
+#                                             self.ax_p.get_ybound()[1],
+#                                             len(self.ax.get_yticks())-1))
+
         else:
             try:
                 self.mplwidget.fig.delaxes(self.ax_p)

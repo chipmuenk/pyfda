@@ -11,43 +11,43 @@ from PyQt4 import QtGui
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
-if __name__ == "__main__": 
+if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
+    sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 
 class InputOrder(QtGui.QFrame):
     """
-    Build and update widget for selecting either 
-    - manual filter order, specified by an integer 
+    Build and update widget for selecting either
+    - manual filter order, specified by an integer
     - minimum ('min') filter order
     """
-    
+
     def __init__(self, DEBUG = False):
         super(InputOrder, self).__init__()
-        self.DEBUG = DEBUG  
+        self.DEBUG = DEBUG
         self.dmLast = '' # design method from last call
         self.initUI()
 
 
-        
+
     def initUI(self):
-  
+
         title = "Filter Order"
-        
+
         bfont = QtGui.QFont()
         ifont = QtGui.QFont()
   #      font.setPointSize(11)
         bfont.setBold(True)
         bfont.setWeight(75)
         ifont.setItalic(True)
-        
+
         # Print Widget title
         self.lblTitle = QtGui.QLabel(title)
         self.lblTitle.setFont(bfont)
 
-        self.chkMin = QtGui.QRadioButton("Minimum",self)          
+        self.chkMin = QtGui.QRadioButton("Minimum",self)
         self.spacer = QtGui.QSpacerItem(20,0,
                         QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.lblOrder = QtGui.QLabel("N = ")
@@ -59,23 +59,23 @@ class InputOrder(QtGui.QFrame):
         # Construct widget layout
         # ---------------------------------------------------------------------
         #  Dynamically created subwidgets
-        self.layHDynWdg = QtGui.QHBoxLayout()        
+        self.layHDynWdg = QtGui.QHBoxLayout()
         self.frmDynWdg = QtGui.QFrame()
         self.frmDynWdg.setLayout(self.layHDynWdg)
-        
+
         self.layHAllWdg = QtGui.QHBoxLayout()
         self.layHAllWdg.addWidget(self.chkMin)
         self.layHAllWdg.addItem(self.spacer)
         self.layHAllWdg.addWidget(self.lblOrder)
         self.layHAllWdg.addWidget(self.ledOrder)
         self.layHAllWdg.addWidget(self.frmDynWdg)
-        
+
         self.frmFo = QtGui.QFrame()
         self.frmFo.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.frmFo.setLayout(self.layHAllWdg)        
+        self.frmFo.setLayout(self.layHAllWdg)
         self.frmFo.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
-        
+
         layVMain = QtGui.QVBoxLayout() # widget main layout
         layVMain.addWidget(self.lblTitle)
         layVMain.addWidget(self.frmFo)
@@ -87,9 +87,9 @@ class InputOrder(QtGui.QFrame):
 
         self.chkMin.clicked.connect(self.updateEntries)
         self.ledOrder.editingFinished.connect(self.updateEntries)
-        
+
         self.updateEntries() # initialize with default settings
-        
+
     def updateEntries(self):
         """
         Read / write text entries and checkbutton for filter order
@@ -97,8 +97,8 @@ class InputOrder(QtGui.QFrame):
         # read list of available filter order methods from filterTree:
         foList = fb.filTree[fb.fil[0]['rt']]\
                 [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
-        if self.DEBUG: 
-            print("=== InputOrder.update() ===")            
+        if self.DEBUG:
+            print("=== InputOrder.update() ===")
             print("foList", foList)
 
         if fb.fil[0]['fo'] in foList:
@@ -111,10 +111,10 @@ class InputOrder(QtGui.QFrame):
 
         if fb.fil[0]['dm'] != self.dmLast:
             self.updateWidgets()
-            
+
         # Determine which subwidgets are __visible__
         self.lblOrder.setVisible('man' in foList)
-        self.ledOrder.setVisible('man' in foList)  
+        self.ledOrder.setVisible('man' in foList)
         self.chkMin.setVisible('min' in foList)
 
         # When design method has changed, delete subwidgets referenced from
@@ -124,7 +124,7 @@ class InputOrder(QtGui.QFrame):
         if 'min' in foList:
             if self.chkMin.isChecked() == True:
                 # update in case N has been changed outside this class
-                self.ledOrder.setText(str(fb.fil[0]['N'])) 
+                self.ledOrder.setText(str(fb.fil[0]['N']))
                 self.ledOrder.setEnabled(False)
                 self.lblOrder.setEnabled(False)
                 fb.fil[0].update({'fo' : 'min'})
@@ -139,10 +139,10 @@ class InputOrder(QtGui.QFrame):
         ordn = int(self.ledOrder.text())
         fb.fil[0].update({'N' : ordn})
         self.dmLast = fb.fil[0]["dm"]
-        
+
     def updateWidgets(self):
         self._delWidgets()
-        try:              
+        try:
             if 'fo' in fb.filObj.wdg:
                 a = getattr(fb.filObj, fb.filObj.wdg['fo'])
                 self.layHDynWdg.addWidget(a)
@@ -159,11 +159,11 @@ class InputOrder(QtGui.QFrame):
                                             (QtGui.QComboBox,QtGui.QLineEdit))
         for w in widgetList:
             self.layHDynWdg.removeWidget(w)   # remove widget from layout
-            w.deleteLater()             # tell Qt to delete object when the 
+            w.deleteLater()             # tell Qt to delete object when the
                                         # method has completed
             del w                       # not really needed?
-        
-#------------------------------------------------------------------------------        
+
+#------------------------------------------------------------------------------
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputOrder()
@@ -178,9 +178,8 @@ if __name__ == '__main__':
     app.exec_()
 
 
-   
-        
 
 
 
- 
+
+
