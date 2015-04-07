@@ -327,6 +327,7 @@ class PlotHf(QtGui.QMainWindow):
             A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
             self.H_plt = H
             self.ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
+            self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
         else: # unit is W
             A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
             self.H_plt = H * H.conj()
@@ -373,7 +374,6 @@ class PlotHf(QtGui.QMainWindow):
 #            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
 #                                             self.ax_p.get_ybound()[1],
 #                                             len(self.ax.get_yticks())-1))
-
         else:
             try:
                 self.mplwidget.fig.delaxes(self.ax_p)
