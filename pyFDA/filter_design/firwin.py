@@ -157,7 +157,7 @@ class firwin(object):
         and second-order sections and store all available formats in the passed
         dictionary 'specs'.
         """
-        pyfda_lib.saveFil(specs, arg, frmt, __name__)
+        pyfda_lib.save_fil(specs, arg, frmt, __name__)
 
         try: # has the order been calculated by a "min" filter design?
             specs['N'] = self.N - 1 # yes, update filterbroker

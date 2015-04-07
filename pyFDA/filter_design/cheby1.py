@@ -106,7 +106,7 @@ The attenuation in the stop band can only be controlled by the filter order.
         and second-order sections and store all available formats in the global
         database.
         """
-        pyfda_lib.saveFil(specs, arg, frmt, __name__)
+        pyfda_lib.save_fil(specs, arg, frmt, __name__)
         
         if self.F_PBC is not None: # has corner frequency been calculated?
             specs['N'] = self.N # yes, update filterbroker
