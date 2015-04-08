@@ -234,6 +234,12 @@ class MyMplToolbar(NavigationToolbar):
 
 
     derived from http://www.python-forum.de/viewtopic.php?f=24&t=26437
+    
+    http://pydoc.net/Python/pyQPCR/0.7/pyQPCR.widgets.matplotlibWidget/  !!
+    
+    see also http://stackoverflow.com/questions/17711099/programmatically-change-matplotlib-toolbar-mode-in-qt4
+             http://matplotlib-users.narkive.com/C8XwIXah/need-help-with-darren-dale-qt-example-of-extending-toolbar
+             https://sukhbinder.wordpress.com/2013/12/16/simple-pyqt-and-matplotlib-example-with-zoompan/
     """
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
