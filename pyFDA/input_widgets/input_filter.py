@@ -99,6 +99,8 @@ class SelectFilter(QtGui.QWidget):
 
         layHMain = QtGui.QHBoxLayout()
         layHMain.addWidget(self.frmMain)
+        layHMain.setContentsMargins(1,1,1,1)
+
         self.setLayout(layHMain)
 #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 

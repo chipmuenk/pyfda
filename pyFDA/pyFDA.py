@@ -26,7 +26,6 @@ class pyFDA(QtGui.QMainWindow):
 #                                    commentChar = '#', DEBUG = DEBUG) #
 
         #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
-
         self.initUI()
 
     def initUI(self):
@@ -135,8 +134,9 @@ class pyFDA(QtGui.QMainWindow):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-
+    myFont = QtGui.QFont("Tahoma", 11)
     app = QtGui.QApplication(sys.argv)
+    app.setFont(myFont)
     main = pyFDA()
     app.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     main.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))

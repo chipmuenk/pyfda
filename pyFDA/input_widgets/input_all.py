@@ -60,6 +60,8 @@ class InputAll(QtGui.QWidget):
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addWidget(tabWidget)
+        
+        #setContentsMargins -> Anzahl derPixel zwischen Frame und Fenster
         layVMain.setContentsMargins(1,1,1,1)
 #
         self.setLayout(layVMain)

@@ -79,6 +79,8 @@ class InputOrder(QtGui.QFrame):
         layVMain = QtGui.QVBoxLayout() # widget main layout
         layVMain.addWidget(self.lblTitle)
         layVMain.addWidget(self.frmFo)
+        layVMain.setContentsMargins(1,1,1,1)
+
         self.setLayout(layVMain)
 #        layVMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 

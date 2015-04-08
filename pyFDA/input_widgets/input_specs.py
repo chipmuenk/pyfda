@@ -106,6 +106,7 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addItem(spcV,5,0)
         layGMain.addWidget(self.butDesignFilt, 6,0)
         layGMain.addWidget(self.butReadFiltTree, 6,1)
+        layGMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(layGMain)
 
