@@ -112,6 +112,8 @@ class InputFreqSpecs(QtGui.QWidget):
         sfFrame.setLayout(self.layGSpecWdg)
 
         self.layVMain.addWidget(sfFrame)
+        self.layVMain.setContentsMargins(1,1,1,1)
+
         self.setLayout(self.layVMain)
 
 #        self.layVMain.addLayout(self.layGSpecWdg) # no frame

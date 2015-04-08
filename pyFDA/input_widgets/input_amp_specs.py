@@ -85,6 +85,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         frmMain.setLayout(self.layGSpecs)
 
         self.layVMain.addWidget(frmMain)
+        self.layVMain.setContentsMargins(1,1,1,1)
+
         self.setLayout(self.layVMain)
 #
 #        mainLayout = QtGui.QHBoxLayout()

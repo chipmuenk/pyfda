@@ -67,6 +67,8 @@ class InputWeightSpecs(QtGui.QWidget):
 
         self.layVMain.addWidget(frmMain)
 #        self.layVMain.addLayout(self.layGSpecWdg)
+        self.layVMain.setContentsMargins(1,1,1,1)
+
 
         self.setLayout(self.layVMain)
 
