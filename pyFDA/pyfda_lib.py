@@ -352,8 +352,8 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
     else:
         z = b[0]; p = b[1]; k = b[2]
 
-    print("p_in:", p, "\n")
-    print("z_in:", z)
+#    print("p_in:", p, "\n")
+#    print("z_in:", z)
     # find multiple poles and zeros and their multiplicities
 #    print p, z
     if len(p) < 1:

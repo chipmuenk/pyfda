@@ -243,7 +243,7 @@ class InputPZ(QtGui.QWidget):
         self.tblPZ.setRowCount(max(len(zpk[0]),len(zpk[1])))
 
         if self.DEBUG:
-            print("=====================\nInputZPK.showZPK")
+            print("=====================\nInputPZ.showZPK")
             print("ZPK:\n",zpk)
             print ("shape", np.shape(zpk))
             print ("len", len(zpk))
