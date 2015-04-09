@@ -55,6 +55,7 @@ class InputInfo(QtGui.QWidget):
         self.tblFiltPerf = QtGui.QTableWidget()
 #        self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
         self.tblFiltPerf.setAlternatingRowColors(True)
+        self.tblFiltPerf.verticalHeader().setVisible(False)
 #        self.tblCoeff.QItemSelectionModel.Clear
 #        self.tblCoeff.setDragEnabled(True)
 #        self.tblCoeff.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
