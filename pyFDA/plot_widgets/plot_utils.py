@@ -9,16 +9,22 @@ from __future__ import print_function, division, unicode_literals
 
 from PyQt4 import QtGui, QtCore
 
-from PyQt4.QtGui import QSizePolicy
-from PyQt4.QtCore import QSize
-
+from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
+#from PyQt4.QtCore import QSize
 
 #import matplotlib as mpl
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.backend_bases import cursors as mplCursors
+#from matplotlib.backend_bases import cursors as mplCursors
 from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d.axes3d import Axes3D
+#from mpl_toolkits.mplot3d.axes3d import Axes3D
+import six
+
+try:
+    import matplotlib.backends.qt_editor.figureoptions as figureoptions
+except ImportError:
+    figureoptions = None
+#from .qt_compat import QtCore, QtGui, QtWidgets, _getSaveFileName, __version__
 
 from matplotlib import rcParams
 rcParams['font.size'] = 12
@@ -126,7 +132,7 @@ class MplWidget(QtGui.QWidget):
         # Create the custom navigation toolbar, tied to the canvas
         #
         # self.mpl_toolbar = NavigationToolbar(self.pltCanv, self) # original
-        self.mplToolbar = MyMplToolbar(self.pltCanv, self)
+        self.mplToolbar = MyMplToolbar2(self.pltCanv, self)
         self.mplToolbar.grid = True
 
         #=============================================
@@ -246,6 +252,9 @@ class MyMplToolbar(NavigationToolbar):
     #def __init__(self, canvas, parent, coordinates=True):
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
+        
+#        QtWidgets.QToolBar.__init__(self, parent)
+
 
 
     def _init_toolbar(self):
@@ -261,7 +270,9 @@ class MyMplToolbar(NavigationToolbar):
 # dict _actions is set in
 #    backend_qt5.NavigationToolbar2QT._init_toolbar, using self.toolitems,
 
-# subclassed from matplotlib.backend_bases.NavigationToolbar2:
+
+# subclassed from matplotlib.backend_bases.NavigationToolbar2 in 
+#... Lib\site-packages\matplotlib\backend_bases.py # 
 
     # list of toolitems to add to the toolbar, format is:
     # (
@@ -347,6 +358,7 @@ class MyMplToolbar(NavigationToolbar):
 
         # reference holder for subplots_adjust window
         self.adj_window = None
+        
 
     def toggle_grid(self):
         self.grid = not self.grid
@@ -383,3 +395,141 @@ class MyMplToolbar(NavigationToolbar):
 #                else:
 #                    self.set_message(s)
 #        else: self.set_message(self.mode)
+
+class MyMplToolbar2(NavigationToolbar):
+    """
+    Custom Matplotlib Navigationtoolbar, derived (sublassed) from
+    Navigationtoolbar with the following changes:
+    - new icon set
+    - new functions and icons grid, full view
+    - removed buttons for configuring subplots and editing curves
+    - added an x,y location widget and icon
+
+
+    derived from http://www.python-forum.de/viewtopic.php?f=24&t=26437
+    
+    http://pydoc.net/Python/pyQPCR/0.7/pyQPCR.widgets.matplotlibWidget/  !!
+    
+    see also http://stackoverflow.com/questions/17711099/programmatically-change-matplotlib-toolbar-mode-in-qt4
+             http://matplotlib-users.narkive.com/C8XwIXah/need-help-with-darren-dale-qt-example-of-extending-toolbar
+             https://sukhbinder.wordpress.com/2013/12/16/simple-pyqt-and-matplotlib-example-with-zoompan/
+    """
+    
+    toolitems = (
+        ('Home', 'Reset original view', 'home', 'home'),
+        ('Back', 'Back to  previous view', 'action-undo', 'back'),
+        ('Forward', 'Forward to next view', 'action-redo', 'forward'),
+        (None, None, None, None),
+        ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+        ('Zoom', 'Zoom to rectangle', 'magnifying-glass', 'zoom'),
+        (None, None, None, None),
+#        ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
+        ('Save', 'Save the figure', 'file', 'save_figure'),
+#        ('Grid', 'Toggle grid', 'grid-four-up.svg', toggle_grid),
+      )
+# subclass NavigationToolbar, passing through arguments:
+    #def __init__(self, canvas, parent, coordinates=True):
+    def __init__(self, *args, **kwargs):
+        NavigationToolbar.__init__(self, *args, **kwargs)
+        
+#        QtWidgets.QToolBar.__init__(self, parent)
+
+#    def _icon(self, name):
+#        return QtGui.QIcon(os.path.join(self.basedir, name))
+#        
+    def _init_toolbar(self):
+#        self.basedir = os.path.join(rcParams[ 'datapath' ], 'images/icons')
+        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+           '..','images','icons', '')
+
+# org        self.basedir = os.path.join(rcParams['datapath'], 'images')
+        self.basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+           '..','images', 'icons', '')
+
+        for text, tooltip_text, image_file, callback in self.toolitems:
+            if text is None:
+                self.addSeparator()
+            else:
+                a = self.addAction(self._icon(image_file + '.svg'),
+                                         text, getattr(self, callback))
+                self._actions[callback] = a
+                if callback in ['zoom', 'pan']:
+                    a.setCheckable(True)
+                if tooltip_text is not None:
+                    a.setToolTip(tooltip_text)
+
+        a = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
+            'Full View', self.parent.pltFullView)
+        a.setToolTip('Full view')
+        
+       # GRID:
+        self.addSeparator()
+        a = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
+                           'Grid', self.toggle_grid)
+        a.setToolTip('Toggle Grid')
+        # REDRAW:
+        a = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
+                           'Redraw', self.parent.redraw)
+        a.setToolTip('Redraw Plot')
+        
+        if figureoptions is not None:
+            a = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
+                               'Customize', self.edit_parameters)
+#            a = self.addAction(self._icon("cog"),
+#                               'Customize', self.edit_parameters)
+            a.setToolTip('Edit curves line and axes parameters')
+
+        self.buttons = {}
+
+        # Add the x,y location widget at the right side of the toolbar
+        # The stretch factor is 1 which means any resizing of the toolbar
+        # will resize this label instead of the buttons.
+        if self.coordinates:
+            self.locLabel = QLabel("", self)
+            self.locLabel.setAlignment(
+                    QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+            self.locLabel.setSizePolicy(
+                QSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Ignored))
+            labelAction = self.addWidget(self.locLabel)
+            labelAction.setVisible(True)
+
+        # reference holder for subplots_adjust window
+        self.adj_window = None
+
+    if figureoptions is not None:
+        def edit_parameters(self):
+            allaxes = self.canvas.figure.get_axes()
+            if len(allaxes) == 1:
+                axes = allaxes[0]
+            else:
+                titles = []
+                for axes in allaxes:
+                    title = axes.get_title()
+                    ylabel = axes.get_ylabel()
+                    label = axes.get_label()
+                    if title:
+                        fmt = "%(title)s"
+                        if ylabel:
+                            fmt += ": %(ylabel)s"
+                        fmt += " (%(axes_repr)s)"
+                    elif ylabel:
+                        fmt = "%(axes_repr)s (%(ylabel)s)"
+                    elif label:
+                        fmt = "%(axes_repr)s (%(label)s)"
+                    else:
+                        fmt = "%(axes_repr)s"
+                    titles.append(fmt % dict(title=title,
+                                         ylabel=ylabel, label=label,
+                                         axes_repr=repr(axes)))
+                item, ok = QInputDialog.getItem(
+                    self.parent, 'Customize', 'Select axes:', titles, 0, False)
+                if ok:
+                    axes = allaxes[titles.index(six.text_type(item))]
+                else:
+                    return
+
+            figureoptions.figure_edit(axes, self)
+    def toggle_grid(self):
+        self.grid = not self.grid
+        self.parent.redraw()
