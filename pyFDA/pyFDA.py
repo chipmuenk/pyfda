@@ -94,14 +94,14 @@ class pyFDA(QtGui.QMainWindow):
 
 
         #=============== Menubar =======================================
-        aboutAction = QtGui.QAction('&About', self)
-        aboutAction.setShortcut('Ctrl+A')
-        aboutAction.setStatusTip('Info about pyFDA')
-
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&About')
-        fileMenu.addAction(aboutAction)
-        
+#        aboutAction = QtGui.QAction('&About', self)
+#        aboutAction.setShortcut('Ctrl+A')
+#        aboutAction.setStatusTip('Info about pyFDA')
+#
+#        menubar = self.menuBar()
+#        fileMenu = menubar.addMenu('&About')
+#        fileMenu.addAction(aboutAction)
+#        
 
         # ============== Signals & Slots ================================
 
@@ -111,7 +111,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputAll.inputPZ.butSave.clicked.connect(self.updateOutput)
 #        self.inputAll.inputUpdated.connect(self.updateOutput)
 
-        aboutAction.triggered.connect(self.aboutWindow)
+#        aboutAction.triggered.connect(self.aboutWindow)
 
         self.statusMessage("Application is initialized.")
 
@@ -134,7 +134,7 @@ class pyFDA(QtGui.QMainWindow):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    myFont = QtGui.QFont("Tahoma", 11)
+    myFont = QtGui.QFont("Tahoma", 10)
     app = QtGui.QApplication(sys.argv)
     app.setFont(myFont)
     main = pyFDA()
@@ -142,11 +142,11 @@ if __name__ == '__main__':
     main.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     
     """
-    Die Linkeecke des Fensters ist 100pixel in (X und Y) von der oberen linken
+    Die Linkeecke des Fensters ist 20 pixel in (X und Y) von der oberen linken
     Bildschirmecke entfernt.
     Die Standardgröße des pyFDA Fensters ist 1600x900
     """
-    main.setGeometry(100, 100, 1600, 900)
+    main.setGeometry(20, 20, 1200, 700)
     main.show()
 
     app.exec_()
