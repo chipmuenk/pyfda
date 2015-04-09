@@ -45,12 +45,12 @@ class PlotImpz(QtGui.QMainWindow):
 
         self.DEBUG = DEBUG
 
-        modes = ["lin", "log"]
-        self.cmbShowH = QtGui.QComboBox(self)
-        self.cmbShowH.addItems(modes)
-        self.cmbShowH.setObjectName("cmbUnitsH")
-        self.cmbShowH.setToolTip("Show lin. or log. impulse response.")
-        self.cmbShowH.setCurrentIndex(0)
+        self.lblLog = QtGui.QLabel(self)
+        self.lblLog.setText("Log.")
+        self.chkLog = QtGui.QCheckBox(self)
+        self.chkLog.setObjectName("chkLog")
+        self.chkLog.setToolTip("Show logarithmic impulse / step response.")
+        self.chkLog.setChecked(False)
         
         self.lblLogBottom = QtGui.QLabel("Log. bottom:")
 
@@ -77,7 +77,8 @@ class PlotImpz(QtGui.QMainWindow):
 
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
-        self.layHChkBoxes.addWidget(self.cmbShowH)
+        self.layHChkBoxes.addWidget(self.lblLog)
+        self.layHChkBoxes.addWidget(self.chkLog)        
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLogBottom)
         self.layHChkBoxes.addWidget(self.ledLogBottom)
@@ -90,9 +91,6 @@ class PlotImpz(QtGui.QMainWindow):
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblNPoints)
         self.layHChkBoxes.addWidget(self.ledNPoints)
-#        self.layHChkBoxes.addStretch(1)
-#        self.layHChkBoxes.addWidget(self.lblPhase)
-#        self.layHChkBoxes.addWidget(self.chkPhase)
         self.layHChkBoxes.addStretch(10)
 
         self.mplwidget = MplWidget()
@@ -112,12 +110,10 @@ class PlotImpz(QtGui.QMainWindow):
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-        self.cmbShowH.currentIndexChanged.connect(self.draw)
-        self.ledNPoints.editingFinished.connect(self.draw)
-        self.ledLogBottom.editingFinished.connect(self.draw)
-
+        self.chkLog.clicked.connect(self.draw)
         self.chkStep.clicked.connect(self.draw)
-        
+        self.ledNPoints.editingFinished.connect(self.draw)
+        self.ledLogBottom.editingFinished.connect(self.draw)  
 
     def initAxes(self):
         # clear the axes and (re)draw the plot
@@ -142,8 +138,8 @@ class PlotImpz(QtGui.QMainWindow):
         """
         Re-calculate |H(f)| and draw the figure
         """
+        log = self.chkLog.isChecked()
         step = self.chkStep.isChecked()
-        log = (self.cmbShowH.currentText() == 'log')
         self.lblLogBottom.setEnabled(log)
         self.ledLogBottom.setEnabled(log)
 
