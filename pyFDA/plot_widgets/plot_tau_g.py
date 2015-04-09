@@ -6,13 +6,6 @@ Edited by Christian Münker, 2013
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui #, QtCore
-
-#from PyQt4.QtGui import QSizePolicy
-#from PyQt4.QtCore import QSize
-
-#import matplotlib as plt
-#from matplotlib.figure import Figure
-
 import numpy as np
 #import scipy.signal as sig
 
@@ -42,15 +35,6 @@ class PlotTauG(QtGui.QMainWindow):
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG
-
-#        self.cmbUnitsPhi = QtGui.QComboBox(self)
-#        units = ["rad", "rad/pi", "deg"]
-#        scales = [1., 1./ np.pi, 180./np.pi]
-#        for unit, scale in zip(units, scales):
-#            self.cmbUnitsPhi.addItem(unit, scale)
-#        self.cmbUnitsPhi.setObjectName("cmbUnitsA")
-#        self.cmbUnitsPhi.setToolTip("Set unit for phase.")
-#        self.cmbUnitsPhi.setCurrentIndex(0)
 #
 #        self.lblWrap = QtGui.QLabel("Wrapped Phase")
 #        self.btnWrap = QtGui.QCheckBox()
@@ -59,9 +43,6 @@ class PlotTauG(QtGui.QMainWindow):
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
 #        self.layHChkBoxes.addWidget(self.cmbUnitsPhi)
-#        self.layHChkBoxes.addWidget(self.lblWrap)
-#        self.layHChkBoxes.addWidget(self.btnWrap)
-#        self.layHChkBoxes.addStretch(10)
 
         self.mplwidget = MplWidget()
 #        self.mplwidget.setParent(self)
@@ -71,6 +52,8 @@ class PlotTauG(QtGui.QMainWindow):
         self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
+        
+        self.initAxes()
 
         self.draw() # calculate and draw phi(f)
 
@@ -79,6 +62,17 @@ class PlotTauG(QtGui.QMainWindow):
 #        #=============================================
 #        self.btnWrap.clicked.connect(self.draw)
 #        self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
+
+    def initAxes(self):
+        """Initialize and clear the axes
+        """
+#        self.ax = self.mplwidget.ax
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
+        self.ax.set_title(r'Group Delay $ \tau_g$')
+        self.ax.hold(False)
+        #plt.gca().cla()
+        #p.clf()
 
     def draw(self):
         """
@@ -96,30 +90,20 @@ class PlotTauG(QtGui.QMainWindow):
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
-        # clear the axes and (re)draw the plot
-        #
-#        ax = self.mplwidget.ax
-        ax = self.mplwidget.fig.add_subplot(111)
-        ax.clear()
-
         [tau_g, w] = pyfda_lib.grpdelay(bb,aa, fb.gD['N_FFT'],
                         whole = wholeF)
-                        #Fs = f_S)
+
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
         if fb.rcFDA['freqSpecsRangeType'] == 'sym':
             tau_g = np.fft.fftshift(tau_g)
             F = F - f_S / 2.
 
+        self.ax.plot(F, tau_g, lw = fb.gD['rc']['lw'])
 
-        ax.plot(F, tau_g, lw = fb.gD['rc']['lw'])
-
-#        if PLT_AUTOx: dsp.format_ticks('x',f_scale, N_F_str)
-
-        ax.set_title(r'Group Delay $ \tau_g$')
-        ax.set_xlabel(fb.rcFDA['plt_fLabel'])
-        ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+        self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
+        self.ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
         # widen limits to suppress numerical inaccuracies when tau_g = constant
-        ax.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        self.ax.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
 
 
         self.mplwidget.redraw()
