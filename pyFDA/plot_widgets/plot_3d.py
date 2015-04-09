@@ -77,6 +77,13 @@ class Plot3D(QtGui.QMainWindow):
         self.cmbMode3D.setToolTip("Select 3D-plot mode.")
         self.cmbMode3D.setCurrentIndex(0)
         
+        self.lblColBar = QtGui.QLabel(self)
+        self.lblColBar.setText("Colorbar")
+        self.chkColBar = QtGui.QCheckBox(self)
+        self.chkColBar.setObjectName("chkColBar")
+        self.chkColBar.setToolTip("Show colorbar")
+        self.chkColBar.setChecked(False)
+        
         self.lblContour2D = QtGui.QLabel(self)
         self.lblContour2D.setText("Contour2D")
         self.chkContour2D = QtGui.QCheckBox(self)
@@ -102,6 +109,9 @@ class Plot3D(QtGui.QMainWindow):
         self.layHChkBoxes.addWidget(self.chkHf)        
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.cmbMode3D)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.lblColBar)
+        self.layHChkBoxes.addWidget(self.chkColBar)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblContour2D)
         self.layHChkBoxes.addWidget(self.chkContour2D) 
@@ -131,6 +141,7 @@ class Plot3D(QtGui.QMainWindow):
         self.chkHf.clicked.connect(self.draw)
         self.chkPZ.clicked.connect(self.draw)
         self.cmbMode3D.currentIndexChanged.connect(self.draw)
+        self.chkColBar.clicked.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
     def initAxes(self):
@@ -297,10 +308,13 @@ class Plot3D(QtGui.QMainWindow):
                     linewidth=0, antialiased=False, edgecolor = 'grey', shade = True)
                     # Colormaps: 'hsv', 'jet', 'bone', 'prism' 'gray' 'colorcube', 'prism'
     #       ax.setp(g,'EdgeColor', 'r')#(.4, .4, .4)) # medium gray color for mesh
-            self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
+            if self.chkColBar.isChecked():
+                self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
         elif self.cmbMode3D.currentText() == 'Contour': # Contour plot
-            self.ax.contourf3D(x,y,Hmag,
+            s = self.ax.contourf3D(x,y,Hmag,
                             rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE)
+            if self.chkColBar.isChecked():
+                self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
                             
         if self.chkContour2D.isChecked():
             self.ax.contourf(x, y, Hmag, zdir='x', offset=xmin, 
