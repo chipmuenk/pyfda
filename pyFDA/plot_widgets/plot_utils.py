@@ -409,6 +409,7 @@ class MyMplToolbar2(NavigationToolbar):
     derived from http://www.python-forum.de/viewtopic.php?f=24&t=26437
     
     http://pydoc.net/Python/pyQPCR/0.7/pyQPCR.widgets.matplotlibWidget/  !!
+    http://matplotlib.org/users/navigation_toolbar.html !!
     
     see also http://stackoverflow.com/questions/17711099/programmatically-change-matplotlib-toolbar-mode-in-qt4
              http://matplotlib-users.narkive.com/C8XwIXah/need-help-with-darren-dale-qt-example-of-extending-toolbar
@@ -475,8 +476,6 @@ class MyMplToolbar2(NavigationToolbar):
         if figureoptions is not None:
             a = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
                                'Customize', self.edit_parameters)
-#            a = self.addAction(self._icon("cog"),
-#                               'Customize', self.edit_parameters)
             a.setToolTip('Edit curves line and axes parameters')
 
         self.buttons = {}
