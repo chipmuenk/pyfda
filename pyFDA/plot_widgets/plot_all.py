@@ -17,7 +17,8 @@ if __name__ == "__main__": # relative import if this file is run as __main__
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-from plot_widgets import plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz
+from plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
+                          plot_3d)
 
 
 class PlotAll(QtGui.QWidget):
@@ -59,6 +60,7 @@ Background: #DDEEFF;
         self.pltPZ = plot_pz.PlotPZ()
         self.pltTauG = plot_tau_g.PlotTauG()
         self.pltImpz = plot_impz.PlotImpz()
+        self.plt3D = plot_3d.Plot3D()
 
         self.initUI()
 
@@ -70,6 +72,7 @@ Background: #DDEEFF;
         tabWidget.addTab(self.pltPZ, 'P/Z')
         tabWidget.addTab(self.pltTauG, 'tau_g')
         tabWidget.addTab(self.pltImpz, 'h[n]')
+        tabWidget.addTab(self.plt3D, '3D')
 
 #        butDraw = QtGui.QPushButton("&No Function")
 #        butDraw.clicked.connect(self.redrawAll)
@@ -93,6 +96,7 @@ Background: #DDEEFF;
         self.pltPZ.draw()
         self.pltTauG.draw()
         self.pltImpz.draw()
+        self.plt3D.draw()
 
 
 #        self.redrawAll()
