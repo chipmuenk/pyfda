@@ -257,12 +257,12 @@ class PlotHf(QtGui.QMainWindow):
         self.linphase = self.chkLinphase.isChecked()
 
 
-        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
-            self.bb = fb.fil[0]['coeffs']
-            self.aa = 1.
-        else: # IIR
-            self.bb = fb.fil[0]['coeffs'][0]
-            self.aa = fb.fil[0]['coeffs'][1]
+#        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
+#            self.bb = fb.fil[0]['coeffs']
+#            self.aa = 1.
+#        else: # IIR
+        self.bb = fb.fil[0]['coeffs'][0]
+        self.aa = fb.fil[0]['coeffs'][1]
 
         self.f_S  = fb.fil[0]['f_S']
         self.F_PB = fb.fil[0]['F_PB'] * self.f_S
