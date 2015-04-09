@@ -98,7 +98,7 @@ class PlotTauG(QtGui.QMainWindow):
             tau_g = np.fft.fftshift(tau_g)
             F = F - f_S / 2.
 
-        self.ax.plot(F, tau_g, lw = fb.gD['rc']['lw'])
+        self.ax.plot(F, tau_g, lw = fb.gD['rc']['lw'], label = "Group Delay")
 
         self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
         self.ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')

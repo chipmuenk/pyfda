@@ -336,7 +336,7 @@ class PlotHf(QtGui.QMainWindow):
         plt_lim = f_lim + A_lim
 
         #-----------------------------------------------------------
-        self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
+        self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'], label = 'H(f)')
         #-----------------------------------------------------------
         self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
 
@@ -364,9 +364,10 @@ class PlotHf(QtGui.QMainWindow):
             else:
                 phi_str += ' in deg ' + r'$\rightarrow $'
                 scale = 180./np.pi
-
+        #-----------------------------------------------------------
             self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
-                               'b--', lw = fb.gD['rc']['lw'])
+                               'b--', lw = fb.gD['rc']['lw'], label = "Phase")
+        #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str, color='blue')
 #            nbins = len(self.ax.get_yticks())
 #            self.ax_p.locator_params(axis = 'y', nbins = nbins)
