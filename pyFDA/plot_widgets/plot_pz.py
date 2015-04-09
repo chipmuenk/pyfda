@@ -101,7 +101,7 @@ class PlotPZ(QtGui.QMainWindow):
         ax.clear()
 
 #        [z, p, k] = pyFDA_lib.zplane(ax,bb,aa,zpk = False)#fb.fil[0]['zpk'])
-        [z, p, k] = pyfda_lib.zplane(ax, zpk, verbose = True)
+        [z, p, k] = pyfda_lib.zplane(ax, zpk, verbose = False)
 
 #        ax.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])
 
