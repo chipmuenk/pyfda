@@ -130,6 +130,7 @@ class pyFDA(QtGui.QMainWindow):
 
     def statusMessage(self, message):
         self.statusBar().showMessage(message)
+        
 
 
 #------------------------------------------------------------------------------
