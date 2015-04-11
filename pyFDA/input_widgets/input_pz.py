@@ -64,6 +64,13 @@ class InputPZ(QtGui.QWidget):
 
         self.lblGain = QtGui.QLabel()
         self.lblGain.setText("k = ")
+        
+        self.chkNorm =  QtGui.QCheckBox()
+        self.chkNorm.setChecked(True)
+        self.chkNorm.setToolTip("Normalize max. (H(f)).")
+        self.lblNorm = QtGui.QLabel()
+        self.lblNorm.setText("Normalize")
+
 
         self.ledGain = QtGui.QLineEdit()
         self.ledGain.setToolTip("Specify gain factor k.")
@@ -124,7 +131,10 @@ class InputPZ(QtGui.QWidget):
         self.layHGain = QtGui.QHBoxLayout()
         self.layHGain.addWidget(self.lblGain)
         self.layHGain.addWidget(self.ledGain)
-        self.layHGain.addStretch(10)
+        self.layHChkBoxes.addStretch(1)
+        self.layHGain.addWidget(self.lblNorm)
+        self.layHGain.addWidget(self.chkNorm)
+        self.layHGain.addStretch()
 
         self.layHButtonsPZs1 = QtGui.QHBoxLayout()
         self.layHButtonsPZs1.addWidget(self.butAddRow)
@@ -233,7 +243,7 @@ class InputPZ(QtGui.QWidget):
         self.tblPZ.setRowCount(max(len(zpk[0]),len(zpk[1])))
 
         if self.DEBUG:
-            print("=====================\nInputZPK.showZPK")
+            print("=====================\nInputPZ.showZPK")
             print("ZPK:\n",zpk)
             print ("shape", np.shape(zpk))
             print ("len", len(zpk))
@@ -253,6 +263,14 @@ class InputPZ(QtGui.QWidget):
 
         self.tblPZ.resizeColumnsToContents()
         self.tblPZ.resizeRowsToContents()
+        
+    def normalizeCoeffs(self):
+        """
+        Correct gain factor K when P / Z has been changed
+        """
+        maxP = np.polyval(fb.fil[0]['zpk'][1], 0.5)
+        maxZ = np.polyval(fb.fil[0]['zpk'][0], 0.5)
+        
 
     def deleteRows(self):
         """

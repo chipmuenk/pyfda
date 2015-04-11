@@ -257,12 +257,12 @@ class PlotHf(QtGui.QMainWindow):
         self.linphase = self.chkLinphase.isChecked()
 
 
-        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
-            self.bb = fb.fil[0]['coeffs']
-            self.aa = 1.
-        else: # IIR
-            self.bb = fb.fil[0]['coeffs'][0]
-            self.aa = fb.fil[0]['coeffs'][1]
+#        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
+#            self.bb = fb.fil[0]['coeffs']
+#            self.aa = 1.
+#        else: # IIR
+        self.bb = fb.fil[0]['coeffs'][0]
+        self.aa = fb.fil[0]['coeffs'][1]
 
         self.f_S  = fb.fil[0]['f_S']
         self.F_PB = fb.fil[0]['F_PB'] * self.f_S
@@ -336,7 +336,7 @@ class PlotHf(QtGui.QMainWindow):
         plt_lim = f_lim + A_lim
 
         #-----------------------------------------------------------
-        self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
+        self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'], label = 'H(f)')
         #-----------------------------------------------------------
         self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
 
@@ -364,9 +364,10 @@ class PlotHf(QtGui.QMainWindow):
             else:
                 phi_str += ' in deg ' + r'$\rightarrow $'
                 scale = 180./np.pi
-
+        #-----------------------------------------------------------
             self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
-                               'b--', lw = fb.gD['rc']['lw'])
+                               'b--', lw = fb.gD['rc']['lw'], label = "Phase")
+        #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str, color='blue')
 #            nbins = len(self.ax.get_yticks())
 #            self.ax_p.locator_params(axis = 'y', nbins = nbins)

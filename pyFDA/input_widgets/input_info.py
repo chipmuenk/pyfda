@@ -55,6 +55,7 @@ class InputInfo(QtGui.QWidget):
         self.tblFiltPerf = QtGui.QTableWidget()
 #        self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
         self.tblFiltPerf.setAlternatingRowColors(True)
+        self.tblFiltPerf.verticalHeader().setVisible(False)
 #        self.tblCoeff.QItemSelectionModel.Clear
 #        self.tblCoeff.setDragEnabled(True)
 #        self.tblCoeff.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
@@ -163,18 +164,19 @@ class InputInfo(QtGui.QWidget):
         self.tblFiltPerf.resizeRowsToContents()
 
 
-#        self.txtFiltPerf.setText(('============ Filter Characteristics ================\n'
-#            '  Test Case  |  f (Hz)    |   |H(f)|   | |H(f)| (dB)'))
-        print('----------------------------------------------------')
-
-        for i in range(len(H_test)):
-            print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f}'\
-                .format(F_test_lbl[i], f[i], abs(H_test[i]),
-                        20*log10(abs(H_test[i]))))
-        print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
-            .format('Maximum', F_max, H_max, H_max_dB))
-        print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
-            .format('Minimum', F_min, H_min, H_min_dB))
+        if self.DEBUG:
+            print('============ Filter Characteristics ================\n'
+                '  Test Case  |  f (Hz)    |   |H(f)|   | |H(f)| (dB)')
+            print('----------------------------------------------------')
+    
+            for i in range(len(H_test)):
+                print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f}'\
+                    .format(F_test_lbl[i], f[i], abs(H_test[i]),
+                            20*log10(abs(H_test[i]))))
+            print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
+                .format('Maximum', F_max, H_max, H_max_dB))
+            print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
+                .format('Minimum', F_min, H_min, H_min_dB))
 
 
     def showInfo(self):
