@@ -61,6 +61,8 @@ class SelectFilter(QtGui.QWidget):
 		# - cmbDesignMethod for selection of design method (Chebychev, ...)
 		# and populate them from the "filterTree" dict either directly or by
 		# calling setResponseType() :
+
+        #TODO: Hier wird 2x der Tooltip für self.cmbFilterType gesetzt?
         self.cmbResponseType=QtGui.QComboBox(self)
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType=QtGui.QComboBox(self)
@@ -204,7 +206,7 @@ class SelectFilter(QtGui.QWidget):
                 self.layHDynWdg.addWidget(a, stretch = 1)
 #                self.layHDynWdg.addStretch()
                 self.frmDynWdg.setVisible(a != None)
-
+            
         except AttributeError as e:
             print("sf.updateWidgets:",e)
             self.frmDynWdg.setVisible(False)
