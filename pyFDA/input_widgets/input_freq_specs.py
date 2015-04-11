@@ -74,6 +74,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.cmbUnits.addItems(f_units)
         self.cmbUnits.setCurrentIndex(0)
 
+
         self.cmbFRange = QtGui.QComboBox(self)
         self.cmbFRange.setObjectName("cmbFRange")
         for f in fRanges:
@@ -81,6 +82,12 @@ class InputFreqSpecs(QtGui.QWidget):
 #        self.cmbFRange.addItems(["0...½","0...1", "-½...½"])
         self.cmbFRange.setToolTip("Select frequency range (whole or half).")
         self.cmbFRange.setCurrentIndex(0)
+        
+        """EDIT WinMic"""
+        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+        self.cmbUnits.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbFRange.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
 
 
         self.butSort = QtGui.QPushButton(self)

@@ -68,6 +68,14 @@ class SelectFilter(QtGui.QWidget):
         self.cmbDesignMethod=QtGui.QComboBox(self)
         self.cmbFilterType.setToolTip("Select the actual filter design method.")
 
+
+        """Edit WincMIC"""
+        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+        self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbDesignMethod.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        
+        """END"""
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in filterbroker.py) and populate combo box:
         for rt in fb.filTree:
@@ -103,7 +111,7 @@ class SelectFilter(QtGui.QWidget):
 
         self.setLayout(layHMain)
 #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
-
+        
         #------------------------------------------------------------
         # SIGNALS & SLOTS
         #
