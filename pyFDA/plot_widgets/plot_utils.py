@@ -131,7 +131,7 @@ class MplWidget(QtGui.QWidget):
 
         # Create the custom navigation toolbar, tied to the canvas
         #
-        # self.mpl_toolbar = NavigationToolbar(self.pltCanv, self) # original
+        #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MyMplToolbar2(self.pltCanv, self)
         self.mplToolbar.grid = True
 
@@ -163,6 +163,13 @@ class MplWidget(QtGui.QWidget):
             ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
         self.fig.tight_layout(pad = 0.5)
+        self.pltCanv.draw()
+        self.pltCanv.updateGeometry()
+        
+    def redraw3D(self):
+        """
+        Redraw the figure with new properties (grid, linewidth)
+        """
         self.pltCanv.draw()
         self.pltCanv.updateGeometry()
 
@@ -416,18 +423,18 @@ class MyMplToolbar2(NavigationToolbar):
              https://sukhbinder.wordpress.com/2013/12/16/simple-pyqt-and-matplotlib-example-with-zoompan/
     """
     
-    toolitems = (
-        ('Home', 'Reset original view', 'home', 'home'),
-        ('Back', 'Back to  previous view', 'action-undo', 'back'),
-        ('Forward', 'Forward to next view', 'action-redo', 'forward'),
-        (None, None, None, None),
-        ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-        ('Zoom', 'Zoom to rectangle', 'magnifying-glass', 'zoom'),
-        (None, None, None, None),
+#    toolitems = (
+#        ('Home', 'Reset original view', 'home', 'home'),
+#        ('Back', 'Back to  previous view', 'action-undo', 'back'),
+#        ('Forward', 'Forward to next view', 'action-redo', 'forward'),
+#        (None, None, None, None),
+#        ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+#        ('Zoom', 'Zoom to rectangle', 'magnifying-glass', 'zoom'),
+#        (None, None, None, None),
 #        ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-        ('Save', 'Save the figure', 'file', 'save_figure'),
-#        ('Grid', 'Toggle grid', 'grid-four-up.svg', toggle_grid),
-      )
+#        ('Save', 'Save the figure', 'file', 'save_figure'),
+#      )
+    
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
     def __init__(self, *args, **kwargs):
@@ -446,32 +453,73 @@ class MyMplToolbar2(NavigationToolbar):
 # org        self.basedir = os.path.join(rcParams['datapath'], 'images')
         self.basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
            '..','images', 'icons', '')
+           
+#        # Pan, Zoom
+#        for text, tooltip_text, image_file, callback in self.toolitems:
+#            if text is None:
+#                self.addSeparator()
+#            else:
+#                a = self.addAction(self._icon(image_file + '.svg'),
+#                                         text, getattr(self, callback))
+#                self._actions[callback] = a
+#                if callback in ['zoom', 'pan']:
+#                    a.setCheckable(True)
+#                if tooltip_text is not None:
+#                    a.setToolTip(tooltip_text)
 
-        for text, tooltip_text, image_file, callback in self.toolitems:
-            if text is None:
-                self.addSeparator()
-            else:
-                a = self.addAction(self._icon(image_file + '.svg'),
-                                         text, getattr(self, callback))
-                self._actions[callback] = a
-                if callback in ['zoom', 'pan']:
-                    a.setCheckable(True)
-                if tooltip_text is not None:
-                    a.setToolTip(tooltip_text)
+           
+#---------------- Construct Toolbar ---------------------------------------           
+        # HOME:
+        a = self.addAction(QtGui.QIcon(iconDir + 'home.svg'), \
+                           'Home', self.home)
+        a.setToolTip('Reset original view')
+        # BACK:
+        a = self.addAction(QtGui.QIcon(iconDir + 'action-undo.svg'), \
+                           'Back', self.back)
+        a.setToolTip('Back to previous view')
+        # FORWARD:
+        a = self.addAction(QtGui.QIcon(iconDir + 'action-redo.svg'), \
+                           'Forward', self.forward)
+        a.setToolTip('Forward to next view')
+
+        self.addSeparator() #---------------------------------------------
+        
+        # PAN:
+        a = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
+                           'Pan', self.pan)
+        a.setToolTip('Pan axes with left mouse button, zoom with right')
+        self._actions['pan'] = a
+        a.setCheckable(True)
+        
+        # ZOOM RECTANGLE:
+        a = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
+                           'Zoom', self.zoom)
+        a.setToolTip('Zoom in / out to rectangle with left / right mouse button.')
+        self._actions['zoom'] = a
+        a.setCheckable(True)
 
         a = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
             'Full View', self.parent.pltFullView)
         a.setToolTip('Full view')
         
-       # GRID:
         self.addSeparator()
+        
+        # GRID:
         a = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
                            'Grid', self.toggle_grid)
         a.setToolTip('Toggle Grid')
+        a.setCheckable(True)
+        
         # REDRAW:
         a = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
                            'Redraw', self.parent.redraw)
         a.setToolTip('Redraw Plot')
+        
+        # SAVE:
+        a = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
+                           'Save', self.save_figure)
+        a.setToolTip('Save the figure')
+
         
         if figureoptions is not None:
             a = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
@@ -529,6 +577,7 @@ class MyMplToolbar2(NavigationToolbar):
                     return
 
             figureoptions.figure_edit(axes, self)
+            
     def toggle_grid(self):
         self.grid = not self.grid
         self.parent.redraw()
