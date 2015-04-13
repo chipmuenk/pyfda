@@ -91,17 +91,48 @@ class SelectFilter(QtGui.QWidget):
         # see Summerfield p. 278
         self.layHDynWdg = QtGui.QHBoxLayout() # for additional subwidgets
         self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
+        
+        """Edit WinMic"""
+        #Verschiebt alles was in dem Frame dargestellt wird, so wird Platz gespart.
+        #TODO: Unlauber?
+        self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
+        self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
+        
+        #Die folgende Zeile dient nur dazu um den 2. Frame, welcher für für dynamische
+        #subwidgets ist anzuzeigen.
+        #TODO: Zeile löschen fals Sie hier vergessen wird.
+        
+        #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
+        """END"""
+        
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
         layHStdWdg = QtGui.QHBoxLayout() # container for standard subwidgets
+        
+        """EDIT WinMic"""
+#        
+#        layHStdWdg.addItem(spacer)
+        """END"""
         layHStdWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
         layHStdWdg.addWidget(self.cmbFilterType)
         layHStdWdg.addWidget(self.cmbDesignMethod)
+        
+        """EDIT WinMic"""
+#        layHStdWdg.addItem(spacer)
+        """END"""
 
         # stack standard + dynamic subwidgets vertically:
         layVAllWdg = QtGui.QVBoxLayout()
+
         layVAllWdg.addLayout(layHStdWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
+        
+#        """EDIT WinMic"""
+#        #Fals Windowes ausgewählt wird, verhindert der Spacer das nach unten abtauchen
+#        #des neuen Subwidgets
+#        spacer = QtGui.QSpacerItem(0, 1, QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+#        layVAllWdg.addItem(spacer)
+#        """END"""
 
         self.frmMain = QtGui.QFrame()
         self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -109,7 +140,7 @@ class SelectFilter(QtGui.QWidget):
 
         layHMain = QtGui.QHBoxLayout()
         layHMain.addWidget(self.frmMain)
-        layHMain.setContentsMargins(1,1,1,1)
+        layHMain.setContentsMargins(0,0,0,0)
 
         self.setLayout(layHMain)
 #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)

@@ -145,9 +145,8 @@ if __name__ == '__main__':
     """
     Die Linkeecke des Fensters ist 20 pixel in (X und Y) von der oberen linken
     Bildschirmecke entfernt.
-    Die Standardgröße des pyFDA Fensters ist 1600x900
     """
-    main.setGeometry(20, 20, 1200, 700)
+    main.setGeometry(20, 20, 1200, 800)
     main.show()
 
     app.exec_()
