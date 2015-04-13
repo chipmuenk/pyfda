@@ -94,7 +94,7 @@ class SelectFilter(QtGui.QWidget):
         
         """Edit WinMic"""
         #Verschiebt alles was in dem Frame dargestellt wird, so wird Platz gespart.
-        #TODO: Unlauber?
+        #TODO: Unsauber?
         self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
         self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
         

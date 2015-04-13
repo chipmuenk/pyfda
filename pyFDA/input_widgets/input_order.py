@@ -62,6 +62,14 @@ class InputOrder(QtGui.QFrame):
         self.layHDynWdg = QtGui.QHBoxLayout()
         self.frmDynWdg = QtGui.QFrame()
         self.frmDynWdg.setLayout(self.layHDynWdg)
+        
+        """EDIT WinMic"""
+        #Negativer Offset für fensterbeginne innerhalt des neuen Frames (somit verschwindet der ramen)
+        #TODO: Unsauber?
+        self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
+        self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
+#        #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
+        """END"""
 
         self.layHAllWdg = QtGui.QHBoxLayout()
         self.layHAllWdg.addWidget(self.chkMin)
