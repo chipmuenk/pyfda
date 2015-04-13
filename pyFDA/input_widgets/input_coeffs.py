@@ -144,6 +144,12 @@ class InputCoeffs(QtGui.QWidget):
         self.cmbQOvfl = QtGui.QComboBox()
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
+        
+        """Edit WinMic"""
+        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+        self.cmbQQuant.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbQOvfl.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
