@@ -38,7 +38,9 @@ class pyFDA(QtGui.QMainWindow):
         
         # Instantiate widget groups
         self.inputAll = input_all.InputAll() # input widgets
-        self.inputAll.setMaximumWidth(280)
+        
+        #War früher 280px, aber dann gibt es in den Input Widgets Probleme mit der gesamten Darstellung
+        self.inputAll.setMaximumWidth(330)
         self.pltAll = plot_all.PlotAll() # plot widgets
         
 # variable size tabs
@@ -145,9 +147,8 @@ if __name__ == '__main__':
     """
     Die Linkeecke des Fensters ist 20 pixel in (X und Y) von der oberen linken
     Bildschirmecke entfernt.
-    Die Standardgröße des pyFDA Fensters ist 1600x900
     """
-    main.setGeometry(20, 20, 1200, 700)
+    main.setGeometry(20, 20, 1200, 800)
     main.show()
 
     app.exec_()

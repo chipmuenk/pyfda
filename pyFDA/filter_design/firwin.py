@@ -95,17 +95,29 @@ class firwin(object):
         self.combo_firwin_alg = QtGui.QComboBox()
         self.combo_firwin_alg.setObjectName('combo_firwin_alg')
         self.combo_firwin_alg.addItems(['ichige','kaiser','herrmann'])
+        
+        
 
         # Combobox for selecting the window used for filter design
         self.combo_firwin_win = QtGui.QComboBox()
         self.combo_firwin_win.setObjectName('combo_firwin_win')
+        
+        #TODO: Eigennamen mit Großbuchstaben beginnen?
         windows = ['boxcar','triang','blackman','hamming','hann','bartlett', 
                    'flattop', 'parzen', 'bohman', 'blackmanharris', 'nuttall',
                    'barthann']
+                   
         #kaiser (needs beta), gaussian (needs std), general_gaussian 
         #(needs power, width), slepian (needs width), chebwin (needs attenuation)
         self.combo_firwin_win.addItems(windows)
         self.combo_firwin_win.setCurrentIndex(0)
+        
+        """EDIT WinMic"""
+        #groeße der ComboBoxen dynamisch.
+        #koennen aber durch ein Layout auf fixer groeße gehalten werden
+        self.combo_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.combo_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)        
+        """END"""
         
         self.combo_firwin_win.activated.connect(self.updateWindow)
         self.combo_firwin_alg.activated.connect(self.updateWindow)
