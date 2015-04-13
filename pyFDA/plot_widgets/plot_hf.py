@@ -346,6 +346,8 @@ class PlotHf(QtGui.QMainWindow):
 
         self.ax.set_title(r'Magnitude Frequency Response')
         self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
+        
+#        self.draw_phase()
 
         self.mplwidget.redraw()
 
