@@ -7,7 +7,7 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 - Filter Type (IIR, FIR, CIC ...)
 - DesignMethod (Butterworth, ...)
 
-@author: Julia Beike, Christian Münker
+@author: Julia Beike, Christian Münker, Michael Winkler
 Datum: 4.12.2014
 """
 from __future__ import print_function, division, unicode_literals

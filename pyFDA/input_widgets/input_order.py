@@ -2,7 +2,7 @@
 """
 Widget for selecting / entering manual or minimum filter order
 
-@author: juliabeike, Christian Muenker
+@author: Julia Beike, Christian Muenker, Michael Winkler
 Datum: 20.01.2015
 """
 from __future__ import print_function, division, unicode_literals
@@ -186,10 +186,3 @@ if __name__ == '__main__':
     print(fb.fil[0]['fo'])
 
     app.exec_()
-
-
-
-
-
-
-
