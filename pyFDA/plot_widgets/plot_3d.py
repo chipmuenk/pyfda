@@ -164,11 +164,11 @@ class Plot3D(QtGui.QMainWindow):
         see http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
         """
         
-#        self.ax = self.mplwidget.ax
-#        self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax = Axes3D(self.mplwidget.fig)
-#        self.ax = self.mplwidget.fig.gca(projection='3d')
-        self.ax.clear()
+#        self.ax3d = self.mplwidget.ax
+#        self.ax3d = self.mplwidget.fig.add_subplot(111)
+        self.ax3d = Axes3D(self.mplwidget.fig)
+#        self.ax3d = self.mplwidget.fig.gca(projection='3d')
+        self.ax3d.clear()
         
         self.phi_EK = np.linspace(0, 2*pi, 400) # 400 points from 0 ... 2 pi
         self.xy_UC = np.exp(1j * self.phi_EK) # x,y coordinates of unity circle
@@ -269,13 +269,13 @@ class Plot3D(QtGui.QMainWindow):
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped 
         # between bottom and thresh
         if self.chkLog.isChecked():
-            thresh = 20 * log10(thresh)
 #            bottom = self.zmin_dB
             bottom = np.floor(max(self.zmin_dB, H_min_dB) / 10) * 10 
             H_UC = np.maximum(
                 20 * log10(pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh)),bottom) 
             Hmag = np.maximum(20 * log10(pyfda_lib.H_mag(bb, aa, z, thresh)), 
                               bottom)
+            thresh = 20 * log10(thresh)
             plevel = thresh + 20*log10(plevel_rel)
             zlevel = bottom + 10*log10(zlevel_rel)
         else: 
@@ -290,25 +290,25 @@ class Plot3D(QtGui.QMainWindow):
             zlevel = zlevel_rel * thresh # height of displayed zero position         
 
         
-        self.ax.cla()
-        self.ax.hold(True)
+        self.ax3d.cla()
+        self.ax3d.hold(True)
 
         #===============================================================
         ## plot unit circle
         #===============================================================       
         if self.chkUC.isChecked():        
         # Plot unit circle:
-            self.ax.plot(self.xy_UC.real, self.xy_UC.imag, ones(len(self.xy_UC)) * bottom, 
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, ones(len(self.xy_UC)) * bottom, 
                      linewidth=2, color = 'k')
                      
         #===============================================================
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================        
         if self.chkHf.isChecked():
-            self.ax.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, lw = fb.gD['rc']['lw'])
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, lw = fb.gD['rc']['lw'])
             NL = 2 # plot line every NL points on the UC
             for k in range(len(self.xy_UC[::NL])):
-                self.ax.plot([self.xy_UC.real[::NL][k], self.xy_UC.real[::NL][k]],
+                self.ax3d.plot([self.xy_UC.real[::NL][k], self.xy_UC.real[::NL][k]],
                     [self.xy_UC.imag[::NL][k], self.xy_UC.imag[::NL][k]],
                     [np.ones(len(self.xy_UC[::NL]))[k]*bottom, H_UC[::NL][k]],
                      linewidth=1, color=(0.5, 0.5, 0.5))
@@ -320,57 +320,68 @@ class Plot3D(QtGui.QMainWindow):
             PN_SIZE = 8 # size of P/N symbols
             
             # Plot zero markers at |H(z_i)| = zlevel with "stems":     
-            self.ax.plot(zz.real, zz.imag, ones(len(zz)) * zlevel, 'o',
+            self.ax3d.plot(zz.real, zz.imag, ones(len(zz)) * zlevel, 'o',
                markersize = PN_SIZE, markeredgecolor='blue', markeredgewidth=2.0,
                 markerfacecolor = 'none') 
             for k in range(len(zz)): # plot zero "stems"
-                self.ax.plot([zz[k].real, zz[k].real], [zz[k].imag, zz[k].imag],
+                self.ax3d.plot([zz[k].real, zz[k].real], [zz[k].imag, zz[k].imag],
                             [bottom, zlevel], linewidth=1, color='b')
                             
             # Plot the poles at |H(z_p)| = plevel with "stems":
-            self.ax.plot(np.real(pp), np.imag(pp), plevel,
+            self.ax3d.plot(np.real(pp), np.imag(pp), plevel,
               'x', markersize = PN_SIZE, markeredgewidth=2.0, markeredgecolor='red') 
             for k in range(len(pp)): # plot pole "stems"
-                self.ax.plot([pp[k].real, pp[k].real], [pp[k].imag, pp[k].imag],
+                self.ax3d.plot([pp[k].real, pp[k].real], [pp[k].imag, pp[k].imag],
                             [0, plevel], linewidth=1, color='r')
 
         #===============================================================
         ## 3D-Surface Plots
-        #===============================================================    
+        #===============================================================
+
+        if not self.chkColBar.isChecked():
+            # colorbar creates a second subplot, making it difficult to remove
+            if hasattr(self, 'colb'): # has colorbar been created?
+                # ves, remove colorbar
+                self.colb.remove()
+                # rescale (doesn't work)
+#                self.mplwidget.fig.subplots_adjust(right=0.90)
+                # remove the object
+                del self.colb
+                
         if self.cmbMode3D.currentText() == 'Mesh':
         #    fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
-        #    self.ax.set_zlim(0,2)
+        #    self.ax3d.set_zlim(0,2)
         
-            self.ax.plot_wireframe(x, y, Hmag, rstride=5,
+            self.ax3d.plot_wireframe(x, y, Hmag, rstride=5,
                                   cstride=OPT_3D_MSTRIDE, linewidth = 1, color = 'gray') 
 
     #        [xplane, yplane, zplane] = np.ogrid[-5:5:100 , -5:5:100 , -5:5:100]
         elif self.cmbMode3D.currentText() == 'Surf':
             #plot 3D-surface of |H(z)|; clipped at |H(z)| = thresh
-            s = self.ax.plot_surface(x, y, Hmag, 
+            s = self.ax3d.plot_surface(x, y, Hmag, 
                     alpha = OPT_3D_ALPHA, rstride=1, cstride=1, cmap = cm.jet_r,
-                    linewidth=0, antialiased=False, edgecolor = 'gray', shade = True)
+                    linewidth=0, antialiased=False, shade = True) # facecolors= cm.jet_r ??
+            s.set_edgecolor('gray') 
                     # Colormaps: 'hsv', 'jet', 'bone', 'prism' 'gray', 'prism'
-    #       ax.setp(g,'EdgeColor', 'r')#(.4, .4, .4)) # medium gray color for mesh
             if self.chkColBar.isChecked():
                 self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
 
         elif self.cmbMode3D.currentText() == 'Contour': # Contour plot
-            s = self.ax.contourf3D(x, y, Hmag,
+            s = self.ax3d.contourf3D(x, y, Hmag,
                             rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, cmap = cm.jet_r)
             if self.chkColBar.isChecked():
                 self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
                             
         if self.chkContour2D.isChecked():
-            self.ax.contourf(x, y, Hmag, zdir='x', offset=xmin, 
+            self.ax3d.contourf(x, y, Hmag, zdir='x', offset=xmin, 
                                  cmap=cm.coolwarm) #vmin = zmin, vmax = thresh, 
-            self.ax.contourf(x, y, Hmag, zdir='y', offset=ymax, cmap=cm.coolwarm)
+            self.ax3d.contourf(x, y, Hmag, zdir='y', offset=ymax, cmap=cm.coolwarm)
 
-        self.ax.set_zlim3d(bottom, thresh)
-        self.ax.set_xlabel('Re')#(fb.rcFDA['plt_fLabel'])
-        self.ax.set_ylabel('Im') #(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
-        self.ax.set_title(r'3D-Plot of $|H(\mathrm{e}^{\mathrm{j} \Omega})|$ and $|H(z)|$')
-        self.ax.hold(False)
+        self.ax3d.set_zlim3d(bottom, thresh)
+        self.ax3d.set_xlabel('Re')#(fb.rcFDA['plt_fLabel'])
+        self.ax3d.set_ylabel('Im') #(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+        self.ax3d.set_title(r'3D-Plot of $|H(\mathrm{e}^{\mathrm{j} \Omega})|$ and $|H(z)|$')
+        self.ax3d.hold(False)
         
         self.mplwidget.redraw3D()
 
