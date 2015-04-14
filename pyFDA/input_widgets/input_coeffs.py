@@ -58,6 +58,30 @@ class InputCoeffs(QtGui.QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
+        
+        """Edit WinMic"""
+         #Whitch Button holds the longest Text?
+        
+        
+#        butAddRowText = 
+#        butDelRowtext = 
+#        butSaveText = "Save"
+#        butLoadText = "Load"
+#        butClearText = "Clear"
+#        butSetZeroText = "Set Zero"
+#        butQuantText = "< Q >"
+        MaxTextlen = 0
+        longestText = ""
+        ButLength = 0
+        butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
+        
+        for item in butTexts:
+            if len(item) > MaxTextlen:
+                MaxTextlen = len(item)
+                longestText = item        
+        """End"""
+        
+        
 
         self.chkCoeffList =  QtGui.QCheckBox()
         self.chkCoeffList.setChecked(True)
@@ -84,47 +108,45 @@ class InputCoeffs(QtGui.QWidget):
 
         self.butAddRow = QtGui.QPushButton()
         self.butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
-        self.butAddRow.setText("Add")
+        
+        """EDIT WinMic"""
+        
+        self.butAddRow.setText(butTexts[0])
+        
+        #Calculate the length for the Buttons based on the longest ButtonText
+        ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
+        self.butAddRow.setMaximumWidth(ButLength)
+        """End"""
+
+         
 
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
                 "Multiple rows can be selected using <SHIFT> or <CTRL>.\n"
                 "When noting is selected, delete last row.")
-        self.butDelRow.setText("Delete")
+        self.butDelRow.setText(butTexts[1])
+        self.butDelRow.setMaximumWidth(ButLength)
 
         self.butSave = QtGui.QPushButton()
         self.butSave.setToolTip("Save coefficients & update filter plots.")
-        self.butSave.setText("Save")
+        self.butSave.setText(butTexts[2])
+        self.butSave.setMaximumWidth(ButLength)
 
         self.butLoad = QtGui.QPushButton()
         self.butLoad.setToolTip("Reload coefficients.")
-        self.butLoad.setText("Load")
+        self.butLoad.setText(butTexts[3])
+        self.butLoad.setMaximumWidth(ButLength)
 
         self.butClear = QtGui.QPushButton()
         self.butClear.setToolTip("Clear all entries.")
-        
-        
-        
-        """Edit WinMic"""
-        #Making the Clear and SetZero Buttons smaller, so the LineEdit can be BIGGER!
-        
-        
-        butClearText = "Clear"
-        self.butClear.setText(butClearText)
-        
-        #Changes the MaximumWidth of the button.
-        #New Width is Textlength (with Fontspecific Values) + 10
-        self.butClear.setMaximumWidth((self.butClear.fontMetrics().boundingRect(butClearText).width())+10)
-        """End"""
+        self.butClear.setText(butTexts[4])
+        self.butClear.setMaximumWidth(ButLength)
+
 
         self.butSetZero = QtGui.QPushButton()
         self.butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
-        
-        """Edit WinMic"""
-        butSetZeroText = "Set Zero"
-        self.butSetZero.setText(butSetZeroText)
-        self.butSetZero.setMaximumWidth((self.butClear.fontMetrics().boundingRect(butSetZeroText).width())+10)
-        """End"""
+        self.butSetZero.setText(butTexts[5])
+        self.butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QtGui.QLabel()
         self.lblEps.setText("for b, a <")
@@ -135,14 +157,15 @@ class InputCoeffs(QtGui.QWidget):
 
         self.butQuant = QtGui.QPushButton()
         self.butQuant.setToolTip("Quantize coefficients = 0 with a magnitude < eps.")
-        self.butQuant.setText("< Q >")
+        self.butQuant.setText(butTexts[6])
+        self.butQuant.setMaximumWidth(ButLength)
 
         self.lblQuant = QtGui.QLabel()
         self.lblQuant.setText("QI.QF = ")
         
         """EditWinMic"""
         self.lblQuantisierung = QtGui.QLabel()
-        self.lblQuantisierung.setText("Koeffizientenquantisierung :")
+        self.lblQuantisierung.setText("Koeffizientenquant. :")
         """END"""
 
         self.ledQuantI = QtGui.QLineEdit()
