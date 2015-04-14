@@ -8,7 +8,7 @@ Tab-Widget for displaying and modifying filter coefficients
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal
 #import scipy.io
 import numpy as np
@@ -102,11 +102,29 @@ class InputCoeffs(QtGui.QWidget):
 
         self.butClear = QtGui.QPushButton()
         self.butClear.setToolTip("Clear all entries.")
-        self.butClear.setText("Clear")
+        
+        
+        
+        """Edit WinMic"""
+        #Making the Clear and SetZero Buttons smaller, so the LineEdit can be BIGGER!
+        
+        
+        butClearText = "Clear"
+        self.butClear.setText(butClearText)
+        
+        #Changes the MaximumWidth of the button.
+        #New Width is Textlength (with Fontspecific Values) + 10
+        self.butClear.setMaximumWidth((self.butClear.fontMetrics().boundingRect(butClearText).width())+10)
+        """End"""
 
         self.butSetZero = QtGui.QPushButton()
         self.butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
-        self.butSetZero.setText("Set Zero")
+        
+        """Edit WinMic"""
+        butSetZeroText = "Set Zero"
+        self.butSetZero.setText(butSetZeroText)
+        self.butSetZero.setMaximumWidth((self.butClear.fontMetrics().boundingRect(butSetZeroText).width())+10)
+        """End"""
 
         self.lblEps = QtGui.QLabel()
         self.lblEps.setText("for b, a <")
@@ -124,7 +142,7 @@ class InputCoeffs(QtGui.QWidget):
         
         """EditWinMic"""
         self.lblQuantisierung = QtGui.QLabel()
-        self.lblQuantisierung.setText("Koeffizientenquantisierung")
+        self.lblQuantisierung.setText("Koeffizientenquantisierung :")
         """END"""
 
         self.ledQuantI = QtGui.QLineEdit()
@@ -188,12 +206,14 @@ class InputCoeffs(QtGui.QWidget):
 
         self.layHButtonsCoeffs3.addStretch()
         
+        """EDIT WinMic"""
         self.layHButtonsCoeffs4 = QtGui.QHBoxLayout()
         spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         self.layHButtonsCoeffs4.addWidget(self.lblQuantisierung)
         self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
         self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
         self.layHButtonsCoeffs4.addItem(spacer)
+        """END"""
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
