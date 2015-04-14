@@ -64,11 +64,7 @@ class InputOrder(QtGui.QFrame):
         self.frmDynWdg.setLayout(self.layHDynWdg)
         
         """EDIT WinMic"""
-        #Negativer Offset für fensterbeginne innerhalt des neuen Frames (somit verschwindet der ramen)
-        #TODO: Unsauber?
-        self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
         self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
-#        #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
         """END"""
 
         self.layHAllWdg = QtGui.QHBoxLayout()
@@ -156,6 +152,7 @@ class InputOrder(QtGui.QFrame):
             if 'fo' in fb.filObj.wdg:
                 a = getattr(fb.filObj, fb.filObj.wdg['fo'])
                 self.layHDynWdg.addWidget(a)
+                self.layHDynWdg.setContentsMargins(0,0,0,0)
                 self.frmDynWdg.setVisible(a != None)
         except AttributeError as e: # no attribute 'wdg'
             print("fo.updateWidgets:", e)

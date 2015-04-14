@@ -68,12 +68,12 @@ class pyFDA(QtGui.QMainWindow):
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
-        layHMain.addWidget(self.inputAll)
+        layHMain.addWidget(self.inputAll)        
         layHMain.addWidget(self.pltAll)
         layHMain.setContentsMargins(0,0,0,0)#(left, top, right, bottom)
 
-#        hbox.addWidget(splitter)
-        #self.setCentralWidget(_widget)
+        #hbox.addWidget(splitter)
+#        self.setCentralWidget(_widget)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
     

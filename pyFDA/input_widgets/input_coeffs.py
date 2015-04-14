@@ -121,6 +121,11 @@ class InputCoeffs(QtGui.QWidget):
 
         self.lblQuant = QtGui.QLabel()
         self.lblQuant.setText("QI.QF = ")
+        
+        """EditWinMic"""
+        self.lblQuantisierung = QtGui.QLabel()
+        self.lblQuantisierung.setText("Koeffizientenquantisierung")
+        """END"""
 
         self.ledQuantI = QtGui.QLineEdit()
         self.ledQuantI.setToolTip("Specify number of integer bits.")
@@ -180,15 +185,22 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs3.addWidget(self.ledQuantI)
         self.layHButtonsCoeffs3.addWidget(self.lblDot)
         self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
-        self.layHButtonsCoeffs3.addWidget(self.cmbQOvfl)
-        self.layHButtonsCoeffs3.addWidget(self.cmbQQuant)
+
         self.layHButtonsCoeffs3.addStretch()
+        
+        self.layHButtonsCoeffs4 = QtGui.QHBoxLayout()
+        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        self.layHButtonsCoeffs4.addWidget(self.lblQuantisierung)
+        self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
+        self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
+        self.layHButtonsCoeffs4.addItem(spacer)
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
         layVMain.addLayout(self.layHButtonsCoeffs1)
         layVMain.addLayout(self.layHButtonsCoeffs2)
         layVMain.addLayout(self.layHButtonsCoeffs3)
+        layVMain.addLayout(self.layHButtonsCoeffs4)
         layVMain.addWidget(self.tblCoeff)
         layVMain.addStretch(1)
         self.setLayout(layVMain)
