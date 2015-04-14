@@ -95,7 +95,7 @@ class SelectFilter(QtGui.QWidget):
         """Edit WinMic"""
         #Verschiebt alles was in dem Frame dargestellt wird, so wird Platz gespart.
         #TODO: Unsauber?
-        self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
+#        self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
         self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
         
         #Die folgende Zeile dient nur dazu um den 2. Frame, welcher für für dynamische
@@ -241,6 +241,8 @@ class SelectFilter(QtGui.QWidget):
             if 'sf' in fb.filObj.wdg:
                 a = getattr(fb.filObj, fb.filObj.wdg['sf'])
                 self.layHDynWdg.addWidget(a, stretch = 1)
+                self.layHDynWdg.setContentsMargins(0,0,0,0)
+#                self.a.setContentsMargins(0,10,0,0)
 #                self.layHDynWdg.addStretch()
                 self.frmDynWdg.setVisible(a != None)
             
