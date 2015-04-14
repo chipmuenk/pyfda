@@ -87,6 +87,10 @@ class Plot3D(QtGui.QMainWindow):
         self.cmbMode3D.setToolTip("Select 3D-plot mode.")
         self.cmbMode3D.setCurrentIndex(0)
         
+        """EDIT WinMic"""
+        self.cmbMode3D.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
+        
         self.lblColBar = QtGui.QLabel(self)
         self.lblColBar.setText("Colorbar")
         self.chkColBar = QtGui.QCheckBox(self)

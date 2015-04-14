@@ -48,6 +48,10 @@ class PlotPhi(QtGui.QMainWindow):
         self.cmbUnitsPhi.setObjectName("cmbUnitsA")
         self.cmbUnitsPhi.setToolTip("Set unit for phase.")
         self.cmbUnitsPhi.setCurrentIndex(0)
+        
+        """EDIT WinMic"""
+        self.cmbUnitsPhi.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
 
         self.lblWrap = QtGui.QLabel("Wrapped Phase")
         self.btnWrap = QtGui.QCheckBox()

@@ -110,11 +110,17 @@ class SelectFilter(QtGui.QWidget):
         layHStdWdg = QtGui.QHBoxLayout() # container for standard subwidgets
         
         """EDIT WinMic"""
-#        
-#        layHStdWdg.addItem(spacer)
+        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         """END"""
+        
         layHStdWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        
+        layHStdWdg.addItem(spacer)
+        
         layHStdWdg.addWidget(self.cmbFilterType)
+        
+        layHStdWdg.addItem(spacer)        
+        
         layHStdWdg.addWidget(self.cmbDesignMethod)
         
         """EDIT WinMic"""

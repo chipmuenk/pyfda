@@ -62,6 +62,12 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
         self.cmbUnitsA.setCurrentIndex(0)
+        
+        """EDIT WinMic"""
+        self.cmbShowH.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
+        
 
 
         self.lblLinphase = QtGui.QLabel("Remove lin. phase")

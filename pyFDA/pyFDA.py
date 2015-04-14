@@ -40,7 +40,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputAll = input_all.InputAll() # input widgets
         
         #War früher 280px, aber dann gibt es in den Input Widgets Probleme mit der gesamten Darstellung
-        self.inputAll.setMaximumWidth(330)
+        self.inputAll.setMaximumWidth(340)
         self.pltAll = plot_all.PlotAll() # plot widgets
         
 # variable size tabs
