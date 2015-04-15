@@ -44,7 +44,7 @@ class PlotHf(QtGui.QMainWindow):
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG
-
+        
         modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
         self.cmbShowH.addItems(modes)
