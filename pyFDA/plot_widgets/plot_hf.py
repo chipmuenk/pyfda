@@ -118,8 +118,7 @@ class PlotHf(QtGui.QMainWindow):
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
 
-#        self.setLayout(self.layHChkBoxes)
-        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.initAxes()
 
         self.draw() # calculate and draw |H(f)|
 
@@ -133,6 +132,13 @@ class PlotHf(QtGui.QMainWindow):
         self.chkInset.clicked.connect(self.draw_inset)
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw_phase)
+        
+    def initAxes(self):
+        """Initialize and clear the axes
+        """
+#        self.ax = self.mplwidget.ax
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
 
     def plotSpecLimits(self, specAxes):
         """

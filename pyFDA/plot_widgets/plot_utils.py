@@ -127,6 +127,7 @@ class MplWidget(QtGui.QWidget):
         self.pltCanv = FigureCanvas(self.fig)
         self.pltCanv.setSizePolicy(QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
+
         self.pltCanv.updateGeometry()
 
         # Create the custom navigation toolbar, tied to the canvas

@@ -142,7 +142,7 @@ class Plot3D(QtGui.QMainWindow):
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
-        self.mplwidget.setFocus()
+#        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
         

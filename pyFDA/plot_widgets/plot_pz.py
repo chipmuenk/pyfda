@@ -67,9 +67,11 @@ class PlotPZ(QtGui.QMainWindow):
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
-        self.mplwidget.setFocus()
+#        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
+        
+        self.initAxes()
 
         self.draw() # calculate and draw phi(f)
 
@@ -78,6 +80,13 @@ class PlotPZ(QtGui.QMainWindow):
 #        #=============================================
 #        self.btnWrap.clicked.connect(self.draw)
 #        self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
+
+    def initAxes(self):
+        """Initialize and clear the axes
+        """
+#        self.ax = self.mplwidget.ax
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
 
     def draw(self):
         """
@@ -97,19 +106,19 @@ class PlotPZ(QtGui.QMainWindow):
         # clear the axes and (re)draw the plot
         #
 #        ax = self.mplwidget.ax
-        ax = self.mplwidget.fig.add_subplot(111)
-        ax.clear()
+#        ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
 
 #        [z, p, k] = pyFDA_lib.zplane(ax,bb,aa,zpk = False)#fb.fil[0]['zpk'])
-        [z, p, k] = pyfda_lib.zplane(ax, zpk, verbose = False)
+        [z, p, k] = pyfda_lib.zplane(self.ax, zpk, verbose = False)
 
 #        ax.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])
 
-        ax.set_title(r'Pole / Zero Plot')
-        ax.set_xlabel('Real axis')
-        ax.set_ylabel('Imaginary axis')
+        self.ax.set_title(r'Pole / Zero Plot')
+        self.ax.set_xlabel('Real axis')
+        self.ax.set_ylabel('Imaginary axis')
 
-        ax.axis([-1.1, 1.1, -1.1, 1.1])
+        self.ax.axis([-1.1, 1.1, -1.1, 1.1])
 
         self.mplwidget.redraw()
 

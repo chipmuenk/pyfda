@@ -62,13 +62,12 @@ class SelectFilter(QtGui.QWidget):
 		# and populate them from the "filterTree" dict either directly or by
 		# calling setResponseType() :
 
-        #TODO: Hier wird 2x der Tooltip für self.cmbFilterType gesetzt?
         self.cmbResponseType=QtGui.QComboBox(self)
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType=QtGui.QComboBox(self)
         self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
         self.cmbDesignMethod=QtGui.QComboBox(self)
-        self.cmbFilterType.setToolTip("Select the actual filter design method.")
+        self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
 
 
         """Edit WincMIC"""
