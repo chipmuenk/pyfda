@@ -73,7 +73,7 @@ class InputPZ(QtGui.QWidget):
         self.lblRound = QtGui.QLabel("Digits = ")
         self.spnRound = QtGui.QSpinBox()
         self.spnRound.setRange(0,9)
-        self.spnRound.setValue(3)
+        self.spnRound.setValue(0)
         self.spnRound.setToolTip("Round to d digits.")
 
         self.lblGain = QtGui.QLabel()
