@@ -44,6 +44,7 @@ class PlotImpz(QtGui.QMainWindow):
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG
+        self.ACTIVE_3D = False
 
         self.lblLog = QtGui.QLabel(self)
         self.lblLog.setText("Log.")
@@ -132,6 +133,8 @@ class PlotImpz(QtGui.QMainWindow):
         else:
             self.ax_r = self.mplwidget.fig.add_subplot(111)
             self.ax_r.clear()
+        if self.ACTIVE_3D:            
+            self.ax3d = Axes3D(fig)
         
 
     def draw(self):
@@ -207,6 +210,22 @@ class PlotImpz(QtGui.QMainWindow):
             self.ax_r.set_xlabel(fb.rcFDA['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
             
+            
+        if self.ACTIVE_3D:
+        
+            # plotting the stems
+            for i in range(len(t)):
+              self.ax3d.plot([t[i], t[i]], [h[i], h[i]], [0, h_i[i]], 
+                      '-', linewidth=2, color='b', alpha=.5)
+            
+            # plotting a circle on the top of each stem
+            self.ax3d.plot(t, h, h_i, 'o', markersize=8, 
+                    markerfacecolor='none', color='b',label='ib')
+            
+            self.ax3d.set_xlabel('x')
+            self.ax3d.set_ylabel('y')
+            self.ax3d.set_zlabel('z')
+
             
 #        fig.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
  #       ax.setp(sl, lw = fb.gD['rc']['lw'])
