@@ -2,7 +2,7 @@
 """
 Widget for selecting / entering manual or minimum filter order
 
-@author: juliabeike, Christian Muenker
+@author: Julia Beike, Christian Muenker, Michael Winkler
 Datum: 20.01.2015
 """
 from __future__ import print_function, division, unicode_literals
@@ -62,6 +62,10 @@ class InputOrder(QtGui.QFrame):
         self.layHDynWdg = QtGui.QHBoxLayout()
         self.frmDynWdg = QtGui.QFrame()
         self.frmDynWdg.setLayout(self.layHDynWdg)
+        
+        """EDIT WinMic"""
+        self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
+        """END"""
 
         self.layHAllWdg = QtGui.QHBoxLayout()
         self.layHAllWdg.addWidget(self.chkMin)
@@ -148,6 +152,7 @@ class InputOrder(QtGui.QFrame):
             if 'fo' in fb.filObj.wdg:
                 a = getattr(fb.filObj, fb.filObj.wdg['fo'])
                 self.layHDynWdg.addWidget(a)
+                self.layHDynWdg.setContentsMargins(0,0,0,0)
                 self.frmDynWdg.setVisible(a != None)
         except AttributeError as e: # no attribute 'wdg'
             print("fo.updateWidgets:", e)
@@ -178,10 +183,3 @@ if __name__ == '__main__':
     print(fb.fil[0]['fo'])
 
     app.exec_()
-
-
-
-
-
-
-

@@ -65,6 +65,11 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.cmbUnitsA.setObjectName("cmbUnitsA")
         self.cmbUnitsA.setToolTip("Set unit for amplitude specifications:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
+        
+        """Edit WincMIC"""
+        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+        self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
 
         self.cmbUnitsA.setCurrentIndex(0)
 

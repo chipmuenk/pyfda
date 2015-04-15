@@ -48,6 +48,10 @@ class PlotPhi(QtGui.QMainWindow):
         self.cmbUnitsPhi.setObjectName("cmbUnitsA")
         self.cmbUnitsPhi.setToolTip("Set unit for phase.")
         self.cmbUnitsPhi.setCurrentIndex(0)
+        
+        """EDIT WinMic"""
+        self.cmbUnitsPhi.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
 
         self.lblWrap = QtGui.QLabel("Wrapped Phase")
         self.btnWrap = QtGui.QCheckBox()
@@ -65,9 +69,11 @@ class PlotPhi(QtGui.QMainWindow):
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
-        self.mplwidget.setFocus()
+#        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
+        
+        self.initAxes()
 
         self.draw() # calculate and draw phi(f)
 
@@ -77,6 +83,14 @@ class PlotPhi(QtGui.QMainWindow):
 #        self.mplwidget.sldLw.valueChanged.connect(lambda:self.draw())
         self.btnWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
+        
+    def initAxes(self):
+        """Initialize and clear the axes
+        """
+#        self.ax = self.mplwidget.ax
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
+        self.ax.hold(False)
 
     def draw(self):
         """
@@ -124,21 +138,22 @@ class PlotPhi(QtGui.QMainWindow):
 
         # clear the axes and (re)draw the plot
         #        ax = self.mplwidget.ax
-        ax = self.mplwidget.fig.add_subplot(111)
-        ax.clear()
+#        ax = self.mplwidget.fig.add_subplot(111)
+#        ax.clear()
         if self.btnWrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
 
+        self.ax.clear()
         #---------------------------------------------------------
-        line_phi, = ax.plot(F, phi_plt, lw = fb.gD['rc']['lw'])
+        line_phi, = self.ax.plot(F, phi_plt, lw = fb.gD['rc']['lw'])
         #---------------------------------------------------------
 
-        ax.set_title(r'Phase Frequency Response')
-        ax.set_xlabel(fb.rcFDA['plt_fLabel'])
-        ax.set_ylabel(y_str)
-        ax.set_xlim(fb.rcFDA['freqSpecsRange'])
+        self.ax.set_title(r'Phase Frequency Response')
+        self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
+        self.ax.set_ylabel(y_str)
+        self.ax.set_xlim(fb.rcFDA['freqSpecsRange'])
 
         self.mplwidget.redraw()
 

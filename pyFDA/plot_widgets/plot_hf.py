@@ -44,7 +44,7 @@ class PlotHf(QtGui.QMainWindow):
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG
-
+        
         modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
         self.cmbShowH.addItems(modes)
@@ -62,6 +62,12 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
         self.cmbUnitsA.setCurrentIndex(0)
+        
+        """EDIT WinMic"""
+        self.cmbShowH.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        """END"""
+        
 
 
         self.lblLinphase = QtGui.QLabel("Remove lin. phase")
@@ -112,8 +118,7 @@ class PlotHf(QtGui.QMainWindow):
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
 
-#        self.setLayout(self.layHChkBoxes)
-        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.initAxes()
 
         self.draw() # calculate and draw |H(f)|
 
@@ -127,6 +132,13 @@ class PlotHf(QtGui.QMainWindow):
         self.chkInset.clicked.connect(self.draw_inset)
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw_phase)
+        
+    def initAxes(self):
+        """Initialize and clear the axes
+        """
+#        self.ax = self.mplwidget.ax
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
 
     def plotSpecLimits(self, specAxes):
         """
@@ -346,6 +358,8 @@ class PlotHf(QtGui.QMainWindow):
 
         self.ax.set_title(r'Magnitude Frequency Response')
         self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
+        
+#        self.draw_phase()
 
         self.mplwidget.redraw()
 

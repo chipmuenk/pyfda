@@ -49,6 +49,20 @@ class InputPZ(QtGui.QWidget):
         -
         """
         # widget / subwindow for Pole/Zero display / entry
+        
+        """Edit WinMic"""
+         #Whitch Button holds the longest Text?
+        
+        MaxTextlen = 0
+        longestText = ""
+        ButLength = 0
+        butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero"]
+        
+        for item in butTexts:
+            if len(item) > MaxTextlen:
+                MaxTextlen = len(item)
+                longestText = item        
+        """End"""
 
         self.chkPZList =  QtGui.QCheckBox()
         self.chkPZList.setChecked(True)
@@ -87,30 +101,47 @@ class InputPZ(QtGui.QWidget):
         self.butAddRow = QtGui.QPushButton()
         self.butAddRow.setToolTip("Add row to PZ table.\n"
                                 "Select n existing rows to append n new rows.")
-        self.butAddRow.setText("Add")
+        self.butAddRow.setText(butTexts[0])
+        
+        """Edit WinMic"""
+        ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
+        self.butAddRow.setMaximumWidth(ButLength)
+
+        """End"""        
+        
 
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
                 "Multiple rows can be selected using <SHIFT> or <CTRL>."
                 "If nothing is selected, delete last row.")
-        self.butDelRow.setText("Delete")
+        self.butDelRow.setText(butTexts[1])
+        self.butDelRow.setMaximumWidth(ButLength)
+        
+        
 
         self.butClear = QtGui.QPushButton()
         self.butClear.setToolTip("Clear all entries.")
-        self.butClear.setText("Clear")
+        self.butClear.setText(butTexts[4])
+        self.butClear.setMaximumWidth(ButLength)        
+        
 
         self.butSave = QtGui.QPushButton()
         self.butSave.setToolTip("Save P/Z & update all plots.\n"
                                 "No modifications are saved before!")
-        self.butSave.setText("Save")
+        self.butSave.setText(butTexts[2])
+        self.butSave.setMaximumWidth(ButLength)
 
         self.butLoad = QtGui.QPushButton()
         self.butLoad.setToolTip("Reload P / Z.")
-        self.butLoad.setText("Load")
+        self.butLoad.setText(butTexts[3])
+        self.butLoad.setMaximumWidth(ButLength)        
+        
 
         self.butSetZero = QtGui.QPushButton()
         self.butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
-        self.butSetZero.setText("Set Zero")
+        self.butSetZero.setText(butTexts[5])
+        self.butSetZero.setMaximumWidth(ButLength)        
+        
 
         self.lblEps = QtGui.QLabel()
         self.lblEps.setText("for P, Z <")

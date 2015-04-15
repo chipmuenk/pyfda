@@ -7,7 +7,7 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 - Filter Type (IIR, FIR, CIC ...)
 - DesignMethod (Butterworth, ...)
 
-@author: Julia Beike, Christian Münker
+@author: Julia Beike, Christian Münker, Michael Winkler
 Datum: 4.12.2014
 """
 from __future__ import print_function, division, unicode_literals
@@ -61,13 +61,22 @@ class SelectFilter(QtGui.QWidget):
 		# - cmbDesignMethod for selection of design method (Chebychev, ...)
 		# and populate them from the "filterTree" dict either directly or by
 		# calling setResponseType() :
+
         self.cmbResponseType=QtGui.QComboBox(self)
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType=QtGui.QComboBox(self)
         self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
         self.cmbDesignMethod=QtGui.QComboBox(self)
-        self.cmbFilterType.setToolTip("Select the actual filter design method.")
+        self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
 
+
+        """Edit WincMIC"""
+        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+        self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbDesignMethod.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        
+        """END"""
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in filterbroker.py) and populate combo box:
         for rt in fb.filTree:
@@ -81,17 +90,54 @@ class SelectFilter(QtGui.QWidget):
         # see Summerfield p. 278
         self.layHDynWdg = QtGui.QHBoxLayout() # for additional subwidgets
         self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
+        
+        """Edit WinMic"""
+        #Verschiebt alles was in dem Frame dargestellt wird, so wird Platz gespart.
+        #TODO: Unsauber?
+#        self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
+        self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
+        
+        #Die folgende Zeile dient nur dazu um den 2. Frame, welcher für für dynamische
+        #subwidgets ist anzuzeigen.
+        #TODO: Zeile löschen fals Sie hier vergessen wird.
+        
+        #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
+        """END"""
+        
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
         layHStdWdg = QtGui.QHBoxLayout() # container for standard subwidgets
+        
+        """EDIT WinMic"""
+        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        """END"""
+        
         layHStdWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        
+        layHStdWdg.addItem(spacer)
+        
         layHStdWdg.addWidget(self.cmbFilterType)
+        
+        layHStdWdg.addItem(spacer)        
+        
         layHStdWdg.addWidget(self.cmbDesignMethod)
+        
+        """EDIT WinMic"""
+#        layHStdWdg.addItem(spacer)
+        """END"""
 
         # stack standard + dynamic subwidgets vertically:
         layVAllWdg = QtGui.QVBoxLayout()
+
         layVAllWdg.addLayout(layHStdWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
+        
+#        """EDIT WinMic"""
+#        #Fals Windowes ausgewählt wird, verhindert der Spacer das nach unten abtauchen
+#        #des neuen Subwidgets
+#        spacer = QtGui.QSpacerItem(0, 1, QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+#        layVAllWdg.addItem(spacer)
+#        """END"""
 
         self.frmMain = QtGui.QFrame()
         self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -99,11 +145,11 @@ class SelectFilter(QtGui.QWidget):
 
         layHMain = QtGui.QHBoxLayout()
         layHMain.addWidget(self.frmMain)
-        layHMain.setContentsMargins(1,1,1,1)
+        layHMain.setContentsMargins(0,0,0,0)
 
         self.setLayout(layHMain)
 #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
-
+        
         #------------------------------------------------------------
         # SIGNALS & SLOTS
         #
@@ -194,9 +240,11 @@ class SelectFilter(QtGui.QWidget):
             if 'sf' in fb.filObj.wdg:
                 a = getattr(fb.filObj, fb.filObj.wdg['sf'])
                 self.layHDynWdg.addWidget(a, stretch = 1)
+                self.layHDynWdg.setContentsMargins(0,0,0,0)
+#                self.a.setContentsMargins(0,10,0,0)
 #                self.layHDynWdg.addStretch()
                 self.frmDynWdg.setVisible(a != None)
-
+            
         except AttributeError as e:
             print("sf.updateWidgets:",e)
             self.frmDynWdg.setVisible(False)
