@@ -251,8 +251,11 @@ class PlotHf(QtGui.QMainWindow):
             ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
             ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
 
-
     def draw(self):
+        if self.mplwidget.mplToolbar.enable_update:
+            self.draw_hf()
+
+    def draw_hf(self):
         """
         Re-calculate |H(f)| and draw the figure
         """
@@ -334,16 +337,16 @@ class PlotHf(QtGui.QMainWindow):
         if self.unitA == 'dB':
             A_lim = [-self.A_SB -10, self.A_PB +1]
             self.H_plt = 20*np.log10(abs(H))
-            self.ax.set_ylabel(H_str + ' in dB ' + r'$\rightarrow$')
+            H_str += ' in dB ' + r'$\rightarrow$'
         elif self.unitA == 'V': #  'lin'
             A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
             self.H_plt = H
-            self.ax.set_ylabel(H_str +' in V ' + r'$\rightarrow $')
+            H_str +=' in V ' + r'$\rightarrow $'
             self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
         else: # unit is W
             A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
             self.H_plt = H * H.conj()
-            self.ax.set_ylabel(H_str + ' in W ' + r'$\rightarrow $')
+            H_str += ' in W ' + r'$\rightarrow $'
 
         plt_lim = f_lim + A_lim
 
@@ -358,8 +361,7 @@ class PlotHf(QtGui.QMainWindow):
 
         self.ax.set_title(r'Magnitude Frequency Response')
         self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
-        
-#        self.draw_phase()
+        self.ax.set_ylabel(H_str)
 
         self.mplwidget.redraw()
 

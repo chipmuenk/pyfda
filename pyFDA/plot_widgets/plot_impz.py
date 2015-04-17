@@ -132,11 +132,14 @@ class PlotImpz(QtGui.QMainWindow):
         else:
             self.ax_r = self.mplwidget.fig.add_subplot(111)
             self.ax_r.clear()
-        
 
     def draw(self):
+        if self.mplwidget.mplToolbar.enable_update:
+            self.draw_impz()        
+
+    def draw_impz(self):
         """
-        Re-calculate |H(f)| and draw the figure
+        (Re-)calculate h[n] and draw the figure
         """
         log = self.chkLog.isChecked()
         step = self.chkStep.isChecked()

@@ -135,6 +135,7 @@ class MplWidget(QtGui.QWidget):
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MyMplToolbar2(self.pltCanv, self)
         self.mplToolbar.grid = True
+        self.mplToolbar.enable_update = True
 
         #=============================================
         # Widget layout with QHBox / QVBox
@@ -348,6 +349,7 @@ class MyMplToolbar(NavigationToolbar):
         a = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
                            'Redraw', self.parent.redraw)
         a.setToolTip('Redraw Plot')
+        
 
         self.buttons = {}
 
@@ -470,62 +472,75 @@ class MyMplToolbar2(NavigationToolbar):
 
            
 #---------------- Construct Toolbar ---------------------------------------           
+
+        # ENABLE:
+        a = self.addAction(QtGui.QIcon(iconDir + 'circle-check.svg'), \
+                           'Enable Plot', self.enable_update)
+        a.setToolTip('Enable plot update.')
+        a.setCheckable(True)
+        a.setChecked(True)
+#        a.setEnabled(False) 
+        
+        self.addSeparator() #---------------------------------------------
+        
         # HOME:
-        a = self.addAction(QtGui.QIcon(iconDir + 'home.svg'), \
+        self.a_ho = self.addAction(QtGui.QIcon(iconDir + 'home.svg'), \
                            'Home', self.home)
-        a.setToolTip('Reset original view')
+        self.a_ho.setToolTip('Reset original view')
         # BACK:
-        a = self.addAction(QtGui.QIcon(iconDir + 'action-undo.svg'), \
+        self.a_ba = self.addAction(QtGui.QIcon(iconDir + 'action-undo.svg'), \
                            'Back', self.back)
-        a.setToolTip('Back to previous view')
+        self.a_ba.setToolTip('Back to previous view')
         # FORWARD:
-        a = self.addAction(QtGui.QIcon(iconDir + 'action-redo.svg'), \
+        self.a_fw = self.addAction(QtGui.QIcon(iconDir + 'action-redo.svg'), \
                            'Forward', self.forward)
-        a.setToolTip('Forward to next view')
+        self.a_fw.setToolTip('Forward to next view')
 
         self.addSeparator() #---------------------------------------------
         
         # PAN:
-        a = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
+        self.a_pa = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
                            'Pan', self.pan)
-        a.setToolTip('Pan axes with left mouse button, zoom with right')
-        self._actions['pan'] = a
-        a.setCheckable(True)
+        self.a_pa.setToolTip('Pan axes with left mouse button, zoom with right')
+        self._actions['pan'] = self.a_pa
+        self.a_pa.setCheckable(True)
         
         # ZOOM RECTANGLE:
-        a = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
+        self.a_zo = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
                            'Zoom', self.zoom)
-        a.setToolTip('Zoom in / out to rectangle with left / right mouse button.')
-        self._actions['zoom'] = a
-        a.setCheckable(True)
+        self.a_zo.setToolTip('Zoom in / out to rectangle with left / right mouse button.')
+        self._actions['zoom'] = self.a_zo
+        self.a_zo.setCheckable(True)
 
-        a = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
+        # FULL VIEW:
+        self.a_fv = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
             'Full View', self.parent.pltFullView)
-        a.setToolTip('Full view')
+        self.a_fv.setToolTip('Full view')
         
         self.addSeparator()
         
         # GRID:
-        a = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
+        self.a_gr = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
                            'Grid', self.toggle_grid)
-        a.setToolTip('Toggle Grid')
-        a.setCheckable(True)
+        self.a_gr.setToolTip('Toggle Grid')
+        self.a_gr.setCheckable(True)
+        self.a_gr.setChecked(True)
         
         # REDRAW:
-        a = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
+        self.a_rd = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
                            'Redraw', self.parent.redraw)
-        a.setToolTip('Redraw Plot')
+        self.a_rd.setToolTip('Redraw Plot')
         
         # SAVE:
-        a = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
+        self.a_sv = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
                            'Save', self.save_figure)
-        a.setToolTip('Save the figure')
+        self.a_sv.setToolTip('Save the figure')
 
         
         if figureoptions is not None:
-            a = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
+            self.a_op = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
                                'Customize', self.edit_parameters)
-            a.setToolTip('Edit curves line and axes parameters')
+            self.a_op.setToolTip('Edit curves line and axes parameters')
 
         self.buttons = {}
 
@@ -582,3 +597,16 @@ class MyMplToolbar2(NavigationToolbar):
     def toggle_grid(self):
         self.grid = not self.grid
         self.parent.redraw()
+        
+    def enable_update(self):
+        self.enable_update = not self.enable_update
+        self.a_gr.setEnabled(self.enable_update)
+        self.a_ho.setEnabled(self.enable_update)
+        self.a_ba.setEnabled(self.enable_update)
+        self.a_fw.setEnabled(self.enable_update)
+        self.a_pa.setEnabled(self.enable_update)
+        self.a_zo.setEnabled(self.enable_update)
+        self.a_fv.setEnabled(self.enable_update)
+        self.a_rd.setEnabled(self.enable_update)
+        self.a_sv.setEnabled(self.enable_update)
+        self.a_op.setEnabled(self.enable_update)

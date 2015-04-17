@@ -163,6 +163,10 @@ class Plot3D(QtGui.QMainWindow):
         self.chkColBar.clicked.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
+    def draw(self):
+        if self.mplwidget.mplToolbar.enable_update:
+            self.draw_3d()
+
     def initAxes(self):
         """Initialize and clear the axes
         see http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
@@ -201,7 +205,7 @@ class Plot3D(QtGui.QMainWindow):
             
         self.draw()
 
-    def draw(self):
+    def draw_3d(self):
         """
         Draw group delay
         """

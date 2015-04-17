@@ -73,17 +73,16 @@ class PlotTauG(QtGui.QMainWindow):
         self.ax.hold(False)
         #plt.gca().cla()
         #p.clf()
-
     def draw(self):
+        if self.mplwidget.mplToolbar.enable_update:
+            self.draw_taug()
+
+    def draw_taug(self):
         """
         Draw group delay
         """
-        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
-            bb = fb.fil[0]['coeffs']
-            aa = 1.
-        else: # IIR
-            bb = fb.fil[0]['coeffs'][0]
-            aa = fb.fil[0]['coeffs'][1]
+        bb = fb.fil[0]['coeffs'][0]
+        aa = fb.fil[0]['coeffs'][1]
 
         wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
