@@ -29,7 +29,7 @@ class InputInfo(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-    def __init__(self, DEBUG = True):
+    def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG
         super(InputInfo, self).__init__()
 
@@ -125,8 +125,6 @@ class InputInfo(QtGui.QWidget):
 
         F_test_lbl = [l for l in fb.fil[0] if l[0] == 'F']
         F_test = np.array([fb.fil[0][l] for l in F_test_lbl]) * f_S
-        print(F_test_lbl)
-        print(F_test)
 
 #        F_test = np.array([0, F_sig, 0.5]) # Vektor mit Testfrequenzen
 
@@ -147,7 +145,9 @@ class InputInfo(QtGui.QWidget):
         F_test_lbl += ['Minimum','Maximum']
         F_test = np.append(F_test, [F_min, F_max])
         H_test = np.append(H_test, [H_min, H_max])
-        print(H_test)
+        if self.DEBUG:
+            print("input_info.showFiltPerf\n===================H_test", H_test)
+            print("F_test", F_test)
 #        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
 
         self.tblFiltPerf.setRowCount(len(H_test))

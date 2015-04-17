@@ -785,14 +785,14 @@ def save_fil(specs, arg, out_format, sender):
         zpk = arg
     elif out_format == 'ba': # arg = [b,a]
         if np.ndim(arg) == 1:
-            print(len(arg))
+#            print(len(arg))
             b = np.asarray(arg)
             a = np.zeros(len(arg))
             a[0] = 1
         else:
             b = arg[0]
             a = arg[1]
-        print("saveFil: b, a = ",b , a)
+#        print("saveFil: b, a = ",b , a)
         zpk = sig.tf2zpk(b, a)#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
     else:
         raise ValueError("Unknown output format {0:s}".format(out_format))
