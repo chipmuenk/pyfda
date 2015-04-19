@@ -91,10 +91,14 @@ class PlotPhi(QtGui.QMainWindow):
         self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.clear()
         self.ax.hold(False)
-
+        
     def draw(self):
+        if self.mplwidget.mplToolbar.enable_update:
+            self.draw_phi()
+
+    def draw_phi(self):
         """
-        Re-calculate |H(f)| and draw the figure
+        Re-calculate phi(f) and draw the figure
         """
 
         self.unitPhi = self.cmbUnitsPhi.currentText()
@@ -136,10 +140,6 @@ class PlotPhi(QtGui.QMainWindow):
         fb.rcFDA['plt_phiLabel'] = y_str
         fb.rcFDA['plt_phiUnit'] = self.unitPhi
 
-        # clear the axes and (re)draw the plot
-        #        ax = self.mplwidget.ax
-#        ax = self.mplwidget.fig.add_subplot(111)
-#        ax.clear()
         if self.btnWrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:

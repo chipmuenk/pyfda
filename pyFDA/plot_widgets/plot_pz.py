@@ -67,7 +67,6 @@ class PlotPZ(QtGui.QMainWindow):
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
-#        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
         
@@ -89,30 +88,19 @@ class PlotPZ(QtGui.QMainWindow):
         self.ax.clear()
 
     def draw(self):
+        if self.mplwidget.mplToolbar.enable_update:
+            self.draw_pz()
+
+    def draw_pz(self):
         """
-        Draw P/Z plot
+        (re)draw P/Z plot
         """
-        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
-            bb = fb.fil[0]['coeffs']
-            aa = 1.
-        else: # IIR
-            bb = fb.fil[0]['coeffs'][0]
-            aa = fb.fil[0]['coeffs'][1]
 
         zpk = fb.fil[0]['zpk']
 
-#        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
-
-        # clear the axes and (re)draw the plot
-        #
-#        ax = self.mplwidget.ax
-#        ax = self.mplwidget.fig.add_subplot(111)
         self.ax.clear()
 
-#        [z, p, k] = pyFDA_lib.zplane(ax,bb,aa,zpk = False)#fb.fil[0]['zpk'])
         [z, p, k] = pyfda_lib.zplane(self.ax, zpk, verbose = False)
-
-#        ax.plot(F, np.angle(H), lw = fb.gD['rc']['lw'])
 
         self.ax.set_title(r'Pole / Zero Plot')
         self.ax.set_xlabel('Real axis')
