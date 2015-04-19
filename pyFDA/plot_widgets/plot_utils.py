@@ -133,7 +133,7 @@ class MplWidget(QtGui.QWidget):
         # Create the custom navigation toolbar, tied to the canvas
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
-        self.mplToolbar = MyMplToolbar2(self.pltCanv, self)
+        self.mplToolbar = MyMplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
         self.mplToolbar.enable_update = True
 
@@ -183,230 +183,9 @@ class MplWidget(QtGui.QWidget):
             ax.autoscale()
         self.redraw()
 
-#-----------------------------------------------------------------------------
-
-#class MplCanvas(FigureCanvas):
-#    """
-#    Construct a canvas with a MatplotlibWidget, inheriting PyQt4.QtGui.QWidget
-#    and matplotlib.backend_bases.FigureCanvasBase
-#
-#    Usage example:
-#
-#    class PlotHf(QtGui.QMainWindow):
-#
-#    def __init__(self):
-#        super(PlotHf, self).__init__() # initialize QWidget base class
-#
-#        self.coeffs = ([1,1,1],[3,0,0]) # dummy definition
-#        self.mplCanv = MplCanvas()
-#        self.mplCanv.setFocus()
-#        self.setCentralWidget(self.mplCanv)
-#
-#        mpl = self.mplCanv.ax
-#        mpl.plot(...)
-#        self.mplCanv.figure.tight_layout()
-#        self.mplCanv.draw()
-#
-#    """
-#    def __init__(self, parent=None):
-#
-#        self.dpi = 100
-#        self.width = 5
-#        self.height = 4
-#        # create figure and Axes object
-#        self.fig = Figure(figsize=(self.width, self.height), dpi=self.dpi)
-#        self.ax = self.fig.add_subplot(111)
-#
-#        FigureCanvas.__init__(self, self.fig)
-#        self.setParent(parent)
-#
-#
-#        FigureCanvas.setSizePolicy(self, QSizePolicy.Expanding,
-#                                   QSizePolicy.Expanding)
-#        FigureCanvas.updateGeometry(self)
-#
-#    def sizeHint(self):
-#        w, h = self.get_width_height()
-#        return QSize(w, h)
-#
-#    def minimumSizeHint(self):
-#        return QSize(10, 10)
-#
-#    def redrawPlt(self):
-#        FigureCanvas.draw(self)
-#        FigureCanvas.updateGeometry(self)
-
 #------------------------------------------------------------------------------
 
-
 class MyMplToolbar(NavigationToolbar):
-    """
-    Custom Matplotlib Navigationtoolbar, derived (sublassed) from
-    Navigationtoolbar with the following changes:
-    - new icon set
-    - new functions and icons grid, full view
-    - removed buttons for configuring subplots and editing curves
-    - added an x,y location widget and icon
-
-
-    derived from http://www.python-forum.de/viewtopic.php?f=24&t=26437
-    
-    http://pydoc.net/Python/pyQPCR/0.7/pyQPCR.widgets.matplotlibWidget/  !!
-    
-    see also http://stackoverflow.com/questions/17711099/programmatically-change-matplotlib-toolbar-mode-in-qt4
-             http://matplotlib-users.narkive.com/C8XwIXah/need-help-with-darren-dale-qt-example-of-extending-toolbar
-             https://sukhbinder.wordpress.com/2013/12/16/simple-pyqt-and-matplotlib-example-with-zoompan/
-    """
-# subclass NavigationToolbar, passing through arguments:
-    #def __init__(self, canvas, parent, coordinates=True):
-    def __init__(self, *args, **kwargs):
-        NavigationToolbar.__init__(self, *args, **kwargs)
-        
-#        QtWidgets.QToolBar.__init__(self, parent)
-
-
-
-    def _init_toolbar(self):
-#        self.basedir = os.path.join(rcParams[ 'datapath' ], 'images/icons')
-        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-           '..','images','icons', '')
-
-# Icons taken from https://useiconic.com/open/
-
-# TODO: clicking pan or zoom gives the following error:
-#    self._actions['pan'].setChecked(self._active == 'PAN')
-# KeyError: u'pan'
-# dict _actions is set in
-#    backend_qt5.NavigationToolbar2QT._init_toolbar, using self.toolitems,
-
-
-# subclassed from matplotlib.backend_bases.NavigationToolbar2 in 
-#... Lib\site-packages\matplotlib\backend_bases.py # 
-
-    # list of toolitems to add to the toolbar, format is:
-    # (
-    #   text, # the text of the button (often not visible to users)
-    #   tooltip_text, # the tooltip shown on hover (where possible)
-    #   image_file, # name of the image for the button (without the extension)
-    #   name_of_method, # name of the method in NavigationToolbar2 to call
-    # )
-#    toolitems = (
-#        ('Home', 'Reset original view', 'home', 'home'),
-#        ('Back', 'Back to  previous view', 'back', 'back'),
-#        ('Forward', 'Forward to next view', 'forward', 'forward'),
-#        (None, None, None, None),
-#        ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-#        ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
-#        (None, None, None, None),
-#        ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-#        ('Save', 'Save the figure', 'filesave', 'save_figure'),
-#      )
-
-#        print (self.toolitems)
-
-        # HOME:
-        a = self.addAction(QtGui.QIcon(iconDir + 'home.svg'), \
-                           'Home', self.home)
-        a.setToolTip('Reset original view')
-        # BACK:
-        a = self.addAction(QtGui.QIcon(iconDir + 'action-undo.svg'), \
-                           'Back', self.back)
-        a.setToolTip('Back to previous view')
-        # FORWARD:
-        a = self.addAction(QtGui.QIcon(iconDir + 'action-redo.svg'), \
-                           'Forward', self.forward)
-        a.setToolTip('Forward to next view')
-
-        self.addSeparator() #---------------------------------------------
-
-        # PAN:
-        a = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
-                           'Pan', self.pan)
-#                           'Pan', self.pan('self.move','self.pan')) # nearly works ...
-        a.setToolTip('Pan axes with left mouse button, zoom with right')
-        # ZOOM RECTANGLE:
-        a = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
-                           'Zoom', self.zoom)
-        a.setToolTip('Zoom in / out to rectangle with left / right mouse button.')
-        # Full View:
-        a = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
-            'Full View', self.parent.pltFullView)
-        a.setToolTip('Full view')
-
-        self.addSeparator() #---------------------------------------------
-
-        # SAVE:
-        a = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
-                           'Save', self.save_figure)
-        a.setToolTip('Save the figure')
-
-        # GRID:
-        self.addSeparator()
-        a = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
-                           'Grid', self.toggle_grid)
-        a.setToolTip('Toggle Grid')
-        # REDRAW:
-        a = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
-                           'Redraw', self.parent.redraw)
-        a.setToolTip('Redraw Plot')
-        
-
-        self.buttons = {}
-
-        # Add the x,y location widget at the right side of the toolbar
-        # The stretch factor is 1 which means any resizing of the toolbar
-        # will resize this label instead of the buttons.
-        if self.coordinates:
-            self.locLabel = QtGui.QLabel("", self)
-            self.locLabel.setAlignment(
-                    QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
-            self.locLabel.setSizePolicy(
-                QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding,
-                                  QtGui.QSizePolicy.Ignored))
-            labelAction = self.addWidget(self.locLabel)
-            labelAction.setVisible(True)
-
-        # reference holder for subplots_adjust window
-        self.adj_window = None
-        
-
-    def toggle_grid(self):
-        self.grid = not self.grid
-        self.parent.redraw()
-
-#    def mouse_move(self, event):
-#        if not event.inaxes or not self._active:
-#            if self._lastCursor != mplCursors.POINTER:
-#                self.set_cursor(mplCursors.POINTER)
-#                self._lastCursor = mplCursors.POINTER
-#        else:
-#            if self._active == 'ZOOM':
-#                if self._lastCursor != mplCursors.SELECT_REGION:
-#                    self.set_cursor(mplCursors.SELECT_REGION)
-#                    self._lastCursor = mplCursors.SELECT_REGION
-#                if self._xypress:
-#                    x, y = event.x, event.y
-#                    lastx, lasty, _, _, _, _ = self._xypress[0]
-#                    self.draw_rubberband(event, x, y, lastx, lasty)
-#            elif (self._active == 'PAN' and
-#                  self._lastCursor != mplCursors.MOVE):
-#                self.set_cursor(mplCursors.MOVE)
-#
-#                self._lastCursor = mplCursors.MOVE
-#
-#        if event.inaxes and event.inaxes.get_navigate():
-#
-#            try: s = event.inaxes.format_coord(event.xdata, event.ydata)
-#            except ValueError: pass
-#            except OverflowError: pass
-#            else:
-#                if len(self.mode):
-#                    self.set_message('%s : %s' % (self.mode, s))
-#                else:
-#                    self.set_message(s)
-#        else: self.set_message(self.mode)
-
-class MyMplToolbar2(NavigationToolbar):
     """
     Custom Matplotlib Navigationtoolbar, derived (sublassed) from
     Navigationtoolbar with the following changes:
@@ -593,6 +372,38 @@ class MyMplToolbar2(NavigationToolbar):
                     return
 
             figureoptions.figure_edit(axes, self)
+            
+#    def mouse_move(self, event):
+#        if not event.inaxes or not self._active:
+#            if self._lastCursor != mplCursors.POINTER:
+#                self.set_cursor(mplCursors.POINTER)
+#                self._lastCursor = mplCursors.POINTER
+#        else:
+#            if self._active == 'ZOOM':
+#                if self._lastCursor != mplCursors.SELECT_REGION:
+#                    self.set_cursor(mplCursors.SELECT_REGION)
+#                    self._lastCursor = mplCursors.SELECT_REGION
+#                if self._xypress:
+#                    x, y = event.x, event.y
+#                    lastx, lasty, _, _, _, _ = self._xypress[0]
+#                    self.draw_rubberband(event, x, y, lastx, lasty)
+#            elif (self._active == 'PAN' and
+#                  self._lastCursor != mplCursors.MOVE):
+#                self.set_cursor(mplCursors.MOVE)
+#
+#                self._lastCursor = mplCursors.MOVE
+#
+#        if event.inaxes and event.inaxes.get_navigate():
+#
+#            try: s = event.inaxes.format_coord(event.xdata, event.ydata)
+#            except ValueError: pass
+#            except OverflowError: pass
+#            else:
+#                if len(self.mode):
+#                    self.set_message('%s : %s' % (self.mode, s))
+#                else:
+#                    self.set_message(s)
+#        else: self.set_message(self.mode)
             
     def toggle_grid(self):
         self.grid = not self.grid
