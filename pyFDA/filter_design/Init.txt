@@ -10,6 +10,7 @@ cheby1.py
 equiripple.py
 firwin.py
 cheby2.py
+ellip.py
 
 # ======== Testing ==========
 .py
