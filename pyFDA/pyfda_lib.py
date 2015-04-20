@@ -773,13 +773,13 @@ Two decimal places for numbers on x- and y-axis
         locy,labely = plt.yticks() # get location and content of xticks
         plt.yticks(locy, map(lambda y: format % y, locy*scale))
 
-def save_fil(specs, arg, out_format, sender):
+def save_fil(specs, arg, out_format, sender, DEBUG = False):
     """
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all available formats in the passed
     dictionary 'specs'.
     """
-    print("saveFil: arg = ",arg)
+    if DEBUG: print("saveFil: arg = ",arg)
     if out_format == 'zpk': # arg = [z,p,k]
         (b, a) = sig.zpk2tf(arg[0], arg[1], arg[2])
         zpk = arg
