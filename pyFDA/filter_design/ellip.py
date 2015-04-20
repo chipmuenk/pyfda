@@ -13,7 +13,7 @@ https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
-from scipy.signal import ellipord, zpk2tf, tf2zpk #, iirdesign
+from scipy.signal import ellipord
 import numpy as np
 import pyfda_lib
 
@@ -25,7 +25,8 @@ class ellip(object):
         self.name = {'ellip':'Elliptic'}
         
         # common messages for all man. / min. filter order response types:            
-        msg_man = ("Enter the filter order <b><i>N</i></b>, the maximum ripple "
+        msg_man = ("Enter the filter order <b><i>N</i></b>, the minimum stop "
+            "band attenuation <b><i>A<sub>SB</sub></i></b>, the maximum ripple "
             "<b><i>A<sub>PB</sub></i></b> allowed below unity gain in the "
             " passband and the frequency or frequencies "
             "<b><i>F<sub>PB</sub></i></b>  where the gain first drops below "
@@ -38,9 +39,9 @@ class ellip(object):
         enb_min = ['fo','fspecs','aspecs'] # enabled widget for min. filt. order
         
         # parameters for all man. / min. filter order response types:    
-        par_man = ['N', 'f_S', 'F_PB', 'A_PB'] # enabled widget for man. filt. order
-        par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
-
+        par_man = ['N', 'f_S', 'F_PB', 'A_PB', 'A_SB'] 
+        par_min = ['f_S', 'A_PB', 'A_SB'] 
+        
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types 
         # (common data comes first):
@@ -60,16 +61,15 @@ class ellip(object):
                  }
 
         self.info = """
-** Elliptic filters**
+**Elliptic filters**
 
-(also known as Cauer filters) have a constant ripple :math:`A_PB` in both
-pass- and stopband(s). 
+(also known as Cauer filters) have a constant ripple :math:`A_PB` resp.
+:math:`A_SB` in both pass- and stopband(s). 
 
-For the filter design, the order :math:`N`, the passband ripple :math:`A_PB` and 
+For the filter design, the order :math:`N`, minimum stopband attenuation 
+:math:`A_SB`, the passband ripple :math:`A_PB` and 
 the critical frequency / frequencies F\ :sub:`PB` where the gain drops below 
 :math:`-A_PB` have to be specified. 
-
-The attenuation in the stop band can only be controlled by the filter order. 
 
 **Design routines:**
 
@@ -82,7 +82,7 @@ The attenuation in the stop band can only be controlled by the filter order.
         self.info_doc.append('ellip()\n========')
         self.info_doc.append(sig.ellip.__doc__)
         self.info_doc.append('ellipord()\n==========')
-        self.info_doc.append(sig.ellipord.__doc__)
+        self.info_doc.append(ellipord.__doc__)
 
     def get_params(self,specs):
         """
@@ -120,14 +120,14 @@ The attenuation in the stop band can only be controlled by the filter order.
 
     def LPman(self, specs):
         self.get_params(specs)
-        self.save(specs, sig.ellip(self.N, self.A_PB, self.F_PB,
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                             btype='low', analog = False, output = frmt))
                             
     # LP: F_PB < F_stop
     def LPmin(self, specs):
         self.get_params(specs)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
-        self.save(specs, sig.ellip(self.N, self.A_PB, self.F_PBC,
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='low', analog = False, output = frmt))
 #
 #        self.save(specs, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
@@ -135,14 +135,14 @@ The attenuation in the stop band can only be controlled by the filter order.
 
     def HPman(self, specs):
         self.get_params(specs)
-        self.save(specs, sig.ellip(self.N, self.A_PB, self.F_PB,
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                             btype='highpass', analog = False, output = frmt))
 
     # HP: F_stop < F_PB                          
     def HPmin(self, specs):
         self.get_params(specs)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
-        self.save(specs, sig.ellip(self.N, self.A_PB, self.F_PBC,
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='highpass', analog = False, output = frmt))
         
     # For BP and BS, A_PB, F_PB and F_stop have two elements each
@@ -150,15 +150,15 @@ The attenuation in the stop band can only be controlled by the filter order.
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]    
     def BPman(self, specs):
         self.get_params(specs)
-        self.save(specs, sig.ellip(self.N, self.A_PB,[self.F_PB,self.F_PB2],
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, [self.F_PB,self.F_PB2],
                             btype='bandpass', analog = False, output = frmt))
                             
 
     def BPmin(self, specs):
         self.get_params(specs) 
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2], 
-                                [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
-        self.save(specs, sig.ellip(self.N, self.A_PB, self.F_PBC,
+                                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='bandpass', analog = False, output = frmt))
                                 
 #        self.save(specs, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
@@ -167,7 +167,7 @@ The attenuation in the stop band can only be controlled by the filter order.
         
     def BSman(self, specs):
         self.get_params(specs)
-        self.save(specs, sig.ellip(self.N, self.A_PB, [self.F_PB,self.F_PB2],
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, [self.F_PB,self.F_PB2],
                             btype='bandstop', analog = False, output = frmt))   
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]            
@@ -175,5 +175,5 @@ The attenuation in the stop band can only be controlled by the filter order.
         self.get_params(specs)
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2], 
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
-        self.save(specs, sig.ellip(self.N, self.A_PB, self.F_PBC,
+        self.save(specs, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='bandstop', analog = False, output = frmt))
