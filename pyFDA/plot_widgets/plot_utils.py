@@ -166,14 +166,14 @@ class MplWidget(QtGui.QWidget):
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
         self.fig.tight_layout(pad = 0.5)
         self.pltCanv.draw()
-        self.pltCanv.updateGeometry()
+        #self.pltCanv.updateGeometry()
         
     def redraw3D(self):
         """
         Redraw the figure with new properties (grid, linewidth)
         """
         self.pltCanv.draw()
-        self.pltCanv.updateGeometry()
+        #self.pltCanv.updateGeometry()
 
     def pltFullView(self):
         """

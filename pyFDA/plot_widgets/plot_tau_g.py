@@ -19,6 +19,7 @@ import pyfda_lib
 from plot_widgets.plot_utils import MplWidget#, MplCanvas
 
 
+
 """
 QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
 central widget, docking areas. QWidget is just a raw widget.
@@ -46,7 +47,7 @@ class PlotTauG(QtGui.QMainWindow):
 
         self.mplwidget = MplWidget()
 #        self.mplwidget.setParent(self)
-
+        
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
         self.mplwidget.setFocus()
@@ -71,8 +72,10 @@ class PlotTauG(QtGui.QMainWindow):
         self.ax.clear()
         self.ax.set_title(r'Group Delay $ \tau_g$')
         self.ax.hold(False)
+        
         #plt.gca().cla()
         #p.clf()
+        
     def draw(self):
         if self.mplwidget.mplToolbar.enable_update:
             self.draw_taug()
@@ -106,7 +109,6 @@ class PlotTauG(QtGui.QMainWindow):
 
 
         self.mplwidget.redraw()
-
 #------------------------------------------------------------------------------
 
 def main():

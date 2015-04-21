@@ -90,6 +90,7 @@ class pyFDA(QtGui.QMainWindow):
         
         #Die Größe des "überwachten" Widgets darf nach oben hin vergrößert werden
         scrollArea.setWidgetResizable(True)
+        
 
         
         #Das CentralWidget (Focus der GUI?) ist nun die ScrollArea
