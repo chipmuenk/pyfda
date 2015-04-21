@@ -209,6 +209,10 @@ class InputPZ(QtGui.QWidget):
         self.butClear.clicked.connect(self.clearTable)
 
         self.butSetZero.clicked.connect(self.setZPKZero)
+        
+        
+        
+        
 
     def clearTable(self):
         """
@@ -231,10 +235,13 @@ class InputPZ(QtGui.QWidget):
         """
         if self.DEBUG:
             print("=====================\nInputPZ.saveZPK")
-        zpk = []
+            
+        zpk = [] #final values with are used to calculate the filter
+        
         num_rows = self.tblPZ.rowCount()
         if self.DEBUG: print("nrows:",num_rows)
 
+        #iterate over both column
         for col in range(2):
             rows = []
             for row in range(num_rows):

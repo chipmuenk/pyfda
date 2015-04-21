@@ -165,14 +165,18 @@ class MplWidget(QtGui.QWidget):
             ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
         self.fig.tight_layout(pad = 0.5)
+#        self.pltCanv.updateGeometry()
         self.pltCanv.draw()
-        #self.pltCanv.updateGeometry()
+#
         
     def redraw3D(self):
         """
         Redraw the figure with new properties (grid, linewidth)
         """
         self.pltCanv.draw()
+        
+        
+        #mysterious pixel growing
         #self.pltCanv.updateGeometry()
 
     def pltFullView(self):
