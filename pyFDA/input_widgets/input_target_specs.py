@@ -33,7 +33,7 @@ class InputTargetSpecs(QtGui.QWidget):
     filterDesigned = pyqtSignal()  # emitted when filter has been designed
     filterChanged = pyqtSignal()
 
-    def __init__(self, DEBUG = False):
+    def __init__(self, specs, DEBUG = False):
         super(InputTargetSpecs, self).__init__()
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
@@ -130,7 +130,7 @@ class InputTargetSpecs(QtGui.QWidget):
 
         self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()
 
-    def storeAll(self):
+    def storeEntries(self):
         """
         Update global dict fb.fil[0] with currently selected filter
         parameters, using the update methods of the classes
