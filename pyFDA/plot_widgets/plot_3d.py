@@ -260,12 +260,7 @@ class Plot3D(QtGui.QMainWindow):
         H_max = max(H_abs)
         H_max_dB = 20*log10(H_max)
         F_max = f[np.argmax(H_abs)]
-        
-        if OPT_3D_FORCE_ZMAX == True:
-            thresh = float(self.ledTop.text())
-        else:
-            thresh = zmax_rel * H_max # calculate display thresh. from max. of H(f)
- 
+         
         
         H_min = min(H_abs)
         H_min_dB = 20*log10(H_min)
@@ -277,19 +272,21 @@ class Plot3D(QtGui.QMainWindow):
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped 
         # between bottom and thresh
         if self.chkLog.isChecked():
-#            bottom = self.zmin_dB
             bottom = np.floor(max(self.zmin_dB, H_min_dB) / 10) * 10 
-            H_UC = np.maximum(
-                20 * log10(pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh)),bottom) 
-            Hmag = np.maximum(20 * log10(pyfda_lib.H_mag(bb, aa, z, thresh)), 
-                              bottom)
-            thresh = 20 * log10(thresh)
-            plevel = thresh + 20*log10(plevel_rel)
-            zlevel = bottom + 10*log10(zlevel_rel)
+            thresh = self.zmax_dB
+            plevel = thresh + (thresh - bottom) * (plevel_rel - 1)
+            zlevel = bottom - (thresh - bottom) * (zlevel_rel)
+            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh, H_min = bottom, 
+                                   log = True)
+            Hmag = pyfda_lib.H_mag(bb, aa, z, thresh, H_min = bottom, log = True)
+            print(np.max(Hmag))
+
         else: 
             bottom = max(self.zmin, H_min)
-            H_UC = np.maximum(pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh), bottom)
-            Hmag = np.maximum(pyfda_lib.H_mag(bb, aa, z, thresh), bottom)
+            thresh = self.zmax
+        #   thresh = zmax_rel * H_max # calculate display thresh. from max. of H(f)
+            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh, H_min = bottom)
+            Hmag = pyfda_lib.H_mag(bb, aa, z, thresh, H_min = bottom)
             
             if self.cmbMode3D.currentText() == 'None':
                 plevel = H_max * 0.3 # plevel = H_max * 0.1 / zlevel = 0.1

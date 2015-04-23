@@ -54,24 +54,66 @@ def cround(x, n_dig = 0):
             x = np.around(x, n_dig)
     return x
 
-def H_mag(zaehler, nenner, z, lim):
-    """ Calculate magnitude of H(z) or H(s) in polynomial form at the complex
-    coordinate z = x, 1j * y (skalar or array)
-    The result is clipped at lim."""
-#    limvec = lim * np.ones(len(z))
-    try: len(zaehler)
-    except TypeError:
-        z_val = abs(zaehler) # zaehler is a scalar
-    else:
-        z_val = abs(np.polyval(zaehler,z)) # evaluate zaehler at z
-    try: len(nenner)
-    except TypeError:
-        n_val = nenner # nenner is a scalar
-    else:
-        n_val = abs(np.polyval(nenner,z))
+def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
+    """ 
+    Calculate `|H(z)|` at the complex frequency(ies) `z` (scalar or 
+    array-like).  The function `H(z)` is given in polynomial form with numerator and
+    denominator. When log = True, `20 log_10 (|H(z)|)` is returned.
+    
+    The result is clipped at H_min, H_max; clipping can be disabled by passing 
+    None as the argument.
+    
+    Parameters
+    ----------
+    num : float or array-like
+        The numerator polynome of H(z).
+    den : float or array-like
+        The denominator polynome of H(z).
+    z : float or array-like
+        The complex frequency(ies) where `H(z)` is to be evaluated
+    H_max : float
+        The maximum value to which the result is clipped
+    H_min : float, optional
+        The minimum value to which the result is clipped (default: 0)
+    log : boolean, optional
+        When true, return 20 * log10 (|H(z)|). The clipping limits have to 
+        be given as dB in this case.
+    div_by_0 : string, optional
+        What to do when division by zero occurs during calculation (default: 
+        'ignore'). As the denomintor of H(z) becomes 0 at each pole, warnings
+        are suppressed by default. This parameter is passed to numpy.seterr(), 
+        hence other valid options are 'warn', 'raise' and 'print'.
+    
+    Returns
+    -------
+    H_mag : float or ndarray 
+        The magnitude |`H(z)`| for each value of `z`.
+    """
 
-    return np.minimum((z_val/n_val),lim)
+    try: len(num)
+    except TypeError:
+        num_val = abs(num) # numerator is a scalar
+    else:
+        num_val = abs(np.polyval(num, z)) # evaluate numerator at z
+    try: len(den)
+    except TypeError:
+        den_val = abs(den) # denominator is a scalar
+    else:
+        den_val = abs(np.polyval(den, z)) # evaluate denominator at z
+    
+    olderr = np.geterr()  # store current floating point error behaviour
+    # turn off divide by zero warnings, just return 'inf':
+    np.seterr(divide = 'ignore') 
 
+    if log:
+        H_val = 20 * np.log10(num_val / den_val)
+    else:
+        H_val = num_val / den_val
+
+    np.seterr(**olderr) # restore previous floating point error behaviour
+
+    # clip result to H_min / H_max    
+    return np.clip(H_val, H_min, H_max)
 
 #----------------------------------------------
 # from scipy.sig.signaltools.py:
@@ -475,8 +517,7 @@ Examples
 >>> b = [1,2,3] # Coefficients of H(z) = 1 + 2 z^2 + 3 z^3
 >>> h, n = dsp_lib.impz(b)
 """
-#    IIR = True
-    a = np.array(a)
+    a = np.asarray(a)
     b = np.asarray(b)
 
     if len(a) == 1:
