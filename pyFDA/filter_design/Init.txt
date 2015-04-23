@@ -11,6 +11,7 @@ equiripple.py
 firwin.py
 cheby2.py
 ellip.py
+butter.py
 
 # ======== Testing ==========
 .py
