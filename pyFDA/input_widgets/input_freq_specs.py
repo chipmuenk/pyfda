@@ -61,7 +61,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.lblUnits=QtGui.QLabel(self)
         self.lblUnits.setText("Unit:")
 
-        self.f_S = self.specs.fil[0]["f_S"]
+        self.f_S = self.specs["f_S"]
         self.ledF_S = QtGui.QLineEdit()
         self.ledF_S.setText(str(self.f_S))
         self.ledF_S.setObjectName("f_S")
@@ -83,12 +83,10 @@ class InputFreqSpecs(QtGui.QWidget):
         self.cmbFRange.setToolTip("Select frequency range (whole or half).")
         self.cmbFRange.setCurrentIndex(0)
         
-        """EDIT WinMic"""
-        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+
+        # Combobox resizes with longest entry
         self.cmbUnits.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbFRange.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        """END"""
-
 
         self.butSort = QtGui.QPushButton(self)
         self.butSort.setText("Sort")
@@ -103,15 +101,16 @@ class InputFreqSpecs(QtGui.QWidget):
         # for setting f_S, the units and the actual frequency specs:
         self.layGSpecWdg = QtGui.QGridLayout() # sublayout for spec fields
         # addWidget(widget,row,col,rowSpan=1, colSpan=1, QtCore.Qt.Alignxxx)
-        self.layGSpecWdg.addWidget(self.lblUnits,0,0)
-        self.layGSpecWdg.addLayout(self.layHUnits,0,1)
         self.layGSpecWdg.addWidget(self.lblF_S,1,0)
         self.layGSpecWdg.addWidget(self.ledF_S,1,1)
+        self.layGSpecWdg.addWidget(self.lblUnits,0,0)
+        self.layGSpecWdg.addLayout(self.layHUnits,0,1)
+
 
         # - Build a list from all entries in the specs dictionary starting
         #   with "F" (= frequency specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        newLabels = [l for l in self.specs.fil[0] if l[0] == 'F']
+        newLabels = [l for l in self.specs if l[0] == 'F']
         self.setEntries(newLabels = newLabels)
 
         sfFrame = QtGui.QFrame()
@@ -156,7 +155,7 @@ class InputFreqSpecs(QtGui.QWidget):
         """
 #        rangeIdx = self.cmbFRange.currentIndex#.item(self.cmbFRange.currentIndex())
         rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
-        self.specs.rcFDA.update({'freqSpecsRangeType':rangeType})
+        self.specs.update({'freqSpecsRangeType':rangeType})
         if rangeType == 'whole':
             f_lim = [0, self.f_S]
         elif rangeType == 'sym':
@@ -164,7 +163,7 @@ class InputFreqSpecs(QtGui.QWidget):
         else:
             f_lim = [0, self.f_S/2]
 
-        self.specs.rcFDA['freqSpecsRange'] = f_lim
+        self.specs['freqSpecsRange'] = f_lim
         self.specsChanged.emit() # ->pyFDA -> pltAll.updateAll()
 
 
@@ -184,16 +183,16 @@ class InputFreqSpecs(QtGui.QWidget):
         # get ID of signal that triggered freqUnits():
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
-            print(senderName + ' was triggered\n================')
+            if self.DEBUG: print(senderName + ' was triggered\n================')
         else: # no sender, freqUnits has been called from initUI
             senderName = "cmbUnits"
 
         if senderName == "f_S" and self.f_S != 0:
             # f_S has been edited -> change display of frequency entries and
             # update dictionary entry for f_S
-            self.specs.fil[0]['f_S'] = self.f_S
+            self.specs['f_S'] = self.f_S
             for i in range(len(self.qlineedit)):
-                f = self.specs.fil[0][self.qlineedit[i].objectName()]
+                f = self.specs[self.qlineedit[i].objectName()]
                 self.qlineedit[i].setText(str(f * self.f_S))
 
         elif senderName == "cmbUnits" and idx != self.idxOld:
@@ -206,7 +205,7 @@ class InputFreqSpecs(QtGui.QWidget):
             #  Restore spec entries (remove scaling factor 2 )
             if self.idxOld == 1: # was: normalized to f_nyq = f_S/2,
                 for i in range(len(self.qlineedit)):
-                    f = self.specs.fil[0][self.qlineedit[i].objectName()]
+                    f = self.specs[self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f))
                 self.f_S = 1.
 
@@ -223,7 +222,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
                 # recalculate displayed freq spec values but do not store them:
                 for i in range(len(self.qlineedit)):
-                    f = self.specs.fil[0][self.qlineedit[i].objectName()]
+                    f = self.specs[self.qlineedit[i].objectName()]
                     self.qlineedit[i].setText(str(f * self.f_S))
             else: # Hz, kHz, ...
                     
@@ -231,9 +230,9 @@ class InputFreqSpecs(QtGui.QWidget):
                 fLabel = r"$f$ in " + unit + r"$\; \rightarrow$"
                 tLabel = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-            self.specs.rcFDA.update({"plt_fLabel":fLabel}) # label for freq. axis
-            self.specs.rcFDA.update({"plt_tLabel":tLabel}) # label for freq. axis
-            self.specs.fil[0]['f_S'] = self.f_S # store f_S in dictionary
+            self.specs.update({"plt_fLabel":fLabel}) # label for freq. axis
+            self.specs.update({"plt_tLabel":tLabel}) # label for freq. axis
+            self.specs['f_S'] = self.f_S # store f_S in dictionary
             self.ledF_S.setText(str(self.f_S))
 
         else: # freq. spec textfield has been changed -> change dict
@@ -277,7 +276,7 @@ class InputFreqSpecs(QtGui.QWidget):
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
                     self.qlabels[i].setText(self.rtLabel(newLabels[i]))
-                    self.qlineedit[i].setText(str(self.specs.fil[0][newLabels[i]]*self.f_S))
+                    self.qlineedit[i].setText(str(self.specs[newLabels[i]]*self.f_S))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
     def _delEntry(self,i):
@@ -300,7 +299,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self.rtLabel(newLabel))
 
-        self.qlineedit.append(QtGui.QLineEdit(str(self.specs.fil[0][newLabel]*self.f_S)))
+        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel]*self.f_S)))
         self.qlineedit[i].editingFinished.connect(self.freqUnits)
         self.qlineedit[i].setObjectName(newLabel) # update ID
 
@@ -326,7 +325,7 @@ class InputFreqSpecs(QtGui.QWidget):
         """
         for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText(
-                str(self.specs.fil[0][self.qlineedit[i].objectName()] * self.f_S))
+                str(self.specs[self.qlineedit[i].objectName()] * self.f_S))
 
     def storeEntries(self):
         """
@@ -336,7 +335,7 @@ class InputFreqSpecs(QtGui.QWidget):
         hence, it cancels out.
         """
         for i in range(len(self.qlineedit)):
-            self.specs.fil[0].update(
+            self.specs.update(
                 {self.qlineedit[i].objectName():
                     float(self.qlineedit[i].text())/self.f_S})
 
@@ -345,7 +344,7 @@ class InputFreqSpecs(QtGui.QWidget):
 if __name__ == '__main__':
     import filterbroker as fb
     app = QtGui.QApplication(sys.argv)
-    form = InputFreqSpecs(specs = fb) #.fil[0])
+    form = InputFreqSpecs(specs = fb.fil[0]) #)
 
     form.setEntries(newLabels = ['F_SB','F_SB2','F_PB','F_PB2'])
     form.setEntries(newLabels = ['F_PB','F_PB2'])

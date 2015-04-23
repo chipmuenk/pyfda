@@ -208,11 +208,11 @@ class PlotImpz(QtGui.QMainWindow):
         if self.cmplx:
             [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom = bottom, 
             markerfmt = 'rd', linefmt = 'b')
-            self.ax_i.set_xlabel(fb.rcFDA['plt_tLabel'])
+            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
         else:
-            self.ax_r.set_xlabel(fb.rcFDA['plt_tLabel'])
+            self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
             
             

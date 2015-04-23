@@ -233,9 +233,9 @@ class PlotHf(QtGui.QMainWindow):
         ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
         ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
 
-        if fb.rcFDA['freqSpecsRangeType'] != 'half': # frequency axis +/- f_S/2
+        if fb.fil[0]['freqSpecsRangeType'] != 'half': # frequency axis +/- f_S/2
             # plot limits for other half of the spectrum
-            if fb.rcFDA['freqSpecsRangeType'] == 'sym': # frequency axis +/- f_S/2
+            if fb.fil[0]['freqSpecsRangeType'] == 'sym': # frequency axis +/- f_S/2
                 F_lim_up = -F_lim_up
                 F_lim_lo = -F_lim_lo
                 F_lim_lor = -F_lim_lor
@@ -288,10 +288,10 @@ class PlotHf(QtGui.QMainWindow):
         self.A_SB  = fb.fil[0]['A_SB']
         self.A_SB2 = fb.fil[0]['A_SB2']
 
-        f_lim = fb.rcFDA['freqSpecsRange']
-        wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
+        f_lim = fb.fil[0]['freqSpecsRange']
+        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
 
-#        self.wholeF = fb.rcFDA['freqSpecsRangeWhole']
+#        self.wholeF = fb.fil[0]['freqSpecsRangeWhole']
 #        if self.wholeF:
 #            f_lim = [0, self.f_S]
 #        elif self.wholeF == 'sym':
@@ -310,7 +310,7 @@ class PlotHf(QtGui.QMainWindow):
             whole = wholeF)
         self.F = W / (2 * np.pi) * self.f_S
 
-        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
+        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             self.H_c = np.fft.fftshift(self.H_c)
             self.F = self.F - self.f_S/2.
 
@@ -360,7 +360,7 @@ class PlotHf(QtGui.QMainWindow):
         if self.specs: self.plotSpecLimits(specAxes = self.ax)
 
         self.ax.set_title(r'Magnitude Frequency Response')
-        self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
+        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(H_str)
 
         self.mplwidget.redraw()
@@ -371,10 +371,10 @@ class PlotHf(QtGui.QMainWindow):
             self.ax_p = self.ax.twinx() # second axes system with same x-axis for phase
 
             phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
-            if fb.rcFDA['plt_phiUnit'] == 'rad':
+            if fb.fil[0]['plt_phiUnit'] == 'rad':
                 phi_str += ' in rad ' + r'$\rightarrow $'
                 scale = 1.
-            elif fb.rcFDA['plt_phiUnit'] == 'rad/pi':
+            elif fb.fil[0]['plt_phiUnit'] == 'rad/pi':
                 phi_str += ' in rad' + r'$ / \pi \;\rightarrow $'
                 scale = 1./ np.pi
             else:

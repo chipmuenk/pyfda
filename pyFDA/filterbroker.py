@@ -44,20 +44,10 @@ gD['dmNames'] = {#IIR
 # Lists for dynamic imports from filter design subdirectory
 gD['filtFileNames'] = [] # Python file names found in filtFile (without .py)
 gD['imports'] = {} # dict with filter files / classes
-rcFDA = {
-    'freqSpecsRangeType':'Half',
-    'freqSpecsRange': [0,0.5],
-    'plt_fLabel':r'$f$ in Hz $\rightarrow$',
-    'plt_fUnit':'Hz',
-    'plt_tLabel':r'$n \; \rightarrow$',
-    'plt_tUnit':'s',
-    'plt_phiUnit': 'rad',
-    'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $'}
     
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
 # This dict is built + overwritten by FilterFileReader.buildFilterTree() !
-
 filTree = {
     'HP':
         {'FIR':
@@ -113,5 +103,13 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
+            'freqSpecsRangeType':'Half',
+            'freqSpecsRange': [0,0.5],
+            'plt_fLabel':r'$f$ in Hz $\rightarrow$',
+            'plt_fUnit':'Hz',
+            'plt_tLabel':r'$n \; \rightarrow$',
+            'plt_tUnit':'s',
+            'plt_phiUnit': 'rad',
+            'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $'
             }
 

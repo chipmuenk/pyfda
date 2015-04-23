@@ -114,7 +114,7 @@ class PlotPhi(QtGui.QMainWindow):
             print("--- plotPhi.draw() ---")
             print("b,a = ", self.bb, self.aa)
 
-        wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
+        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
         [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
@@ -122,7 +122,7 @@ class PlotPhi(QtGui.QMainWindow):
 
         F = W / (2 * np.pi) * f_S
 
-        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
+        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             H = np.fft.fftshift(H)
             F = F - f_S / 2.
 
@@ -137,8 +137,8 @@ class PlotPhi(QtGui.QMainWindow):
         else:
             y_str += ' in deg ' + r'$\rightarrow $'
             scale = 180./np.pi
-        fb.rcFDA['plt_phiLabel'] = y_str
-        fb.rcFDA['plt_phiUnit'] = self.unitPhi
+        fb.fil[0]['plt_phiLabel'] = y_str
+        fb.fil[0]['plt_phiUnit'] = self.unitPhi
 
         if self.btnWrap.isChecked():
             phi_plt = np.angle(H) * scale
@@ -151,9 +151,9 @@ class PlotPhi(QtGui.QMainWindow):
         #---------------------------------------------------------
 
         self.ax.set_title(r'Phase Frequency Response')
-        self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
+        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(y_str)
-        self.ax.set_xlim(fb.rcFDA['freqSpecsRange'])
+        self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         self.mplwidget.redraw()
 

@@ -87,7 +87,7 @@ class PlotTauG(QtGui.QMainWindow):
         bb = fb.fil[0]['coeffs'][0]
         aa = fb.fil[0]['coeffs'][1]
 
-        wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
+        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
@@ -96,16 +96,16 @@ class PlotTauG(QtGui.QMainWindow):
                         whole = wholeF)
 
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
-        if fb.rcFDA['freqSpecsRangeType'] == 'sym':
+        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             tau_g = np.fft.fftshift(tau_g)
             F = F - f_S / 2.
 
         self.ax.plot(F, tau_g, lw = fb.gD['rc']['lw'], label = "Group Delay")
 
-        self.ax.set_xlabel(fb.rcFDA['plt_fLabel'])
+        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
         # widen limits to suppress numerical inaccuracies when tau_g = constant
-        self.ax.axis(fb.rcFDA['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        self.ax.axis(fb.fil[0]['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
 
 
         self.mplwidget.redraw()
