@@ -58,6 +58,7 @@ class Plot3D(QtGui.QMainWindow):
         self.ledTop.setObjectName("ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
+#        self.ledTop.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
 
         self.lblUC = QtGui.QLabel(self)
         self.lblUC.setText("UC")
@@ -86,10 +87,7 @@ class Plot3D(QtGui.QMainWindow):
         self.cmbMode3D.setObjectName("cmbShow3D")
         self.cmbMode3D.setToolTip("Select 3D-plot mode.")
         self.cmbMode3D.setCurrentIndex(0)
-        
-        """EDIT WinMic"""
         self.cmbMode3D.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        """END"""
         
         self.lblColBar = QtGui.QLabel(self)
         self.lblColBar.setText("Colorbar")
@@ -97,6 +95,24 @@ class Plot3D(QtGui.QMainWindow):
         self.chkColBar.setObjectName("chkColBar")
         self.chkColBar.setToolTip("Show colorbar")
         self.chkColBar.setChecked(False)
+        
+        self.diaAlpha = QtGui.QDial(self)
+        self.diaAlpha.setRange(0.,10.)
+        self.diaAlpha.setValue(5)
+        self.diaAlpha.setTracking(False) # produce less events when turning
+        self.diaAlpha.setFixedHeight(30)
+        self.diaAlpha.setFixedWidth(30)
+        self.diaAlpha.setWrapping(False)
+        self.diaAlpha.setToolTip("Set transparency for surf and contour plot.")
+        
+        self.diaHatch = QtGui.QDial(self)
+        self.diaHatch.setRange(0.,10.)
+        self.diaHatch.setValue(5)
+        self.diaHatch.setTracking(False) # produce less events when turning
+        self.diaHatch.setFixedHeight(30)
+        self.diaHatch.setFixedWidth(30)
+        self.diaHatch.setWrapping(False)
+        self.diaHatch.setToolTip("Set hatching for H(jw).")
         
         self.lblContour2D = QtGui.QLabel(self)
         self.lblContour2D.setText("Contour2D")
@@ -131,6 +147,9 @@ class Plot3D(QtGui.QMainWindow):
         self.layHChkBoxes.addWidget(self.lblColBar)
         self.layHChkBoxes.addWidget(self.chkColBar)
         self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.diaAlpha)
+        self.layHChkBoxes.addWidget(self.diaHatch)
+        self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblContour2D)
         self.layHChkBoxes.addWidget(self.chkContour2D) 
 
@@ -161,6 +180,8 @@ class Plot3D(QtGui.QMainWindow):
         self.chkPZ.clicked.connect(self.draw)
         self.cmbMode3D.currentIndexChanged.connect(self.draw)
         self.chkColBar.clicked.connect(self.draw)
+        self.diaAlpha.valueChanged.connect(self.draw)
+        self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
     def draw(self):
@@ -215,9 +236,11 @@ class Plot3D(QtGui.QMainWindow):
         zz = np.array(fb.fil[0]['zpk'][0])
         pp = np.array(fb.fil[0]['zpk'][1])
 
-        wholeF = fb.rcFDA['freqSpecsRangeType'] != 'half'
+        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
         N_FFT = fb.gD['N_FFT']
+        alpha = self.diaAlpha.value()/10.
+        hatch = self.diaHatch.value()
         
         #-----------------------------------------------------------------------------
         # Define 3D-Plotting Options
@@ -226,7 +249,7 @@ class Plot3D(QtGui.QMainWindow):
         OPT_3D_POLAR_SPEC = True # Plot circular range in 3D-Plot
         OPT_3D_FORCE_ZMAX = True # Enforce absolute limit for 3D-Plot
         OPT_3D_MSTRIDE = 1 # Schrittweite für MESH und CONT3D
-        OPT_3D_ALPHA = 0.5 # Transparency for surface plot
+        OPT_3D_ALPHA = alpha#0.5 # Transparency for surface plot
         #
         steps = 80               # number of steps for x, y, r, phi
         rmin = 0;    rmax = 1.2  # polar range definition
@@ -279,7 +302,6 @@ class Plot3D(QtGui.QMainWindow):
             H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh, H_min = bottom, 
                                    log = True)
             Hmag = pyfda_lib.H_mag(bb, aa, z, thresh, H_min = bottom, log = True)
-            print(np.max(Hmag))
 
         else: 
             bottom = max(self.zmin, H_min)
@@ -311,12 +333,13 @@ class Plot3D(QtGui.QMainWindow):
         #===============================================================        
         if self.chkHf.isChecked():
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, lw = fb.gD['rc']['lw'])
-            NL = 2 # plot line every NL points on the UC
-            for k in range(len(self.xy_UC[::NL])):
-                self.ax3d.plot([self.xy_UC.real[::NL][k], self.xy_UC.real[::NL][k]],
-                    [self.xy_UC.imag[::NL][k], self.xy_UC.imag[::NL][k]],
-                    [np.ones(len(self.xy_UC[::NL]))[k]*bottom, H_UC[::NL][k]],
-                     linewidth=1, color=(0.5, 0.5, 0.5))
+            NL = hatch # plot line every NL points on the UC
+            if NL > 0:
+                for k in range(len(self.xy_UC[::NL])):
+                    self.ax3d.plot([self.xy_UC.real[::NL][k], self.xy_UC.real[::NL][k]],
+                        [self.xy_UC.imag[::NL][k], self.xy_UC.imag[::NL][k]],
+                        [np.ones(len(self.xy_UC[::NL]))[k]*bottom, H_UC[::NL][k]],
+                         linewidth=1, color=(0.5, 0.5, 0.5))
         #===============================================================
         ## plot Poles and Zeros
         #===============================================================        
@@ -372,7 +395,7 @@ class Plot3D(QtGui.QMainWindow):
                 self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
 
         elif self.cmbMode3D.currentText() == 'Contour': # Contour plot
-            s = self.ax3d.contourf3D(x, y, Hmag,
+            s = self.ax3d.contourf3D(x, y, Hmag, alpha = alpha,
                             rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, cmap = cm.jet_r)
             if self.chkColBar.isChecked():
                 self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
@@ -382,8 +405,11 @@ class Plot3D(QtGui.QMainWindow):
                                  cmap=cm.coolwarm) #vmin = zmin, vmax = thresh, 
             self.ax3d.contourf(x, y, Hmag, zdir='y', offset=ymax, cmap=cm.coolwarm)
 
+        self.ax3d.set_xlim3d(xmin, xmax)
+        self.ax3d.set_ylim3d(ymin, ymax)
+        
         self.ax3d.set_zlim3d(bottom, thresh)
-        self.ax3d.set_xlabel('Re')#(fb.rcFDA['plt_fLabel'])
+        self.ax3d.set_xlabel('Re')#(fb.fil[0]['plt_fLabel'])
         self.ax3d.set_ylabel('Im') #(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
         self.ax3d.set_title(r'3D-Plot of $|H(\mathrm{e}^{\mathrm{j} \Omega})|$ and $|H(z)|$')
         self.ax3d.hold(False)
