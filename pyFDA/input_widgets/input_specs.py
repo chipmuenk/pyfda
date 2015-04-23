@@ -224,7 +224,7 @@ class InputSpecs(QtGui.QWidget):
             print('ndim gD:', np.ndim(fb.fil[0]['coeffs']))
             print("b,a = ", fb.fil[0]['coeffs'])
             print("N = ",fb.fil[0]['N'])
-        print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
+            print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
 
 
 #------------------------------------------------------------------------------
