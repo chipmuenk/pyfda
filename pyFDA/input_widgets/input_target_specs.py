@@ -108,6 +108,9 @@ class InputTargetSpecs(QtGui.QWidget):
         ft = fb.fil[0]['ft']
         dm = fb.fil[0]['dm']
         fo = fb.fil[0]['fo']
+#        print(fb.filTree[rt][ft])
+#TODO: The following fails when a design method has no minimum filter order 
+#       algorithm! Solution: Provide generic parameters for LP / BP / ... as fallback        
         myParams = fb.filTree[rt][ft][dm]['min']['par']
 #        myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
 
@@ -146,9 +149,9 @@ class InputTargetSpecs(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = InputTargetSpecs()
+    form = InputTargetSpecs(specs = fb.fil[0])
     form.show()
-    form.storeAll()
+    form.storeEntries()
 
     app.exec_()
 

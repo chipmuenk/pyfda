@@ -71,8 +71,8 @@ class InputSpecs(QtGui.QWidget):
         self.wspecs = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
                     DEBUG = False)
                     
-        self.tspecs = input_target_specs.InputTargetSpecs(specs = fb.fil[0],
-                    DEBUG = False)
+#TODO:        self.tspecs = input_target_specs.InputTargetSpecs(specs = fb.fil[0],
+#                    DEBUG = False)
 
         self.lblMsg = QtGui.QLabel(self)
         self.lblMsg.setWordWrap(True)
