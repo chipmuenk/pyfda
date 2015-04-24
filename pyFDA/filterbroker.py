@@ -30,6 +30,7 @@ gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
 gD['dmNames'] = {#IIR
                   "butter":"Butterworth", "cheby1":"Chebychev 1",
                   "cheby2":"Chebychev 2", "ellip":"Elliptic",
+                  "bessel":"Bessel",
                   # FIR:
                   "equiripple":"Equiripple", "firls":"Least-Square",
                   "firwin":"Windowed"}

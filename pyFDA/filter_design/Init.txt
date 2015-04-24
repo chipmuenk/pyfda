@@ -12,6 +12,7 @@ firwin.py
 cheby2.py
 ellip.py
 butter.py
+#bessel.py
 
 # ======== Testing ==========
 .py
