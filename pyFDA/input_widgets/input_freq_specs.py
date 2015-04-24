@@ -43,8 +43,8 @@ class InputFreqSpecs(QtGui.QWidget):
 
         title = "Frequency Specifications"
 
-        f_units = ['f_S', 'f_Nyq', 'Hz', 'kHz', 'MHz', 'GHz']
-        self.t_units = ['', '', 's', 'ms', r'us', 'ns']
+        f_units = ['f/f_S', 'f/f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
+        self.t_units = ['', '', 's', 'ms', r'$\mu$s', 'ns']
         fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
 
         self.idxOld = -1 # index of cmbUnits before last change
