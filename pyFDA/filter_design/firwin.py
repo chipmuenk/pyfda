@@ -64,7 +64,7 @@ class firwin(object):
                    "min":{"par":['F_PB','F_SB']}},
             "HP": {"man":{"par":['F_SB','F_PB','A_SB','A_PB'],
                           "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
-                   "min":{"par":['F_SB','F_PB','W_SB','W_PB']}},
+                   "min":{"par":['F_SB','F_PB']}},
             "BP": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
                                  'A_SB','A_PB','A_SB2']},
                    "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 
