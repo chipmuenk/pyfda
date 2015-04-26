@@ -45,6 +45,11 @@ class pyFDA(QtGui.QMainWindow):
         
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
+
+        _desktop = QtGui.QDesktopWidget()
+        screen_h = _desktop.availableGeometry().height()
+        screen_w = _desktop.availableGeometry().width()
+
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
 
         # comment out following 3 lines for splitter design
@@ -64,7 +69,7 @@ class pyFDA(QtGui.QMainWindow):
 #        frmInput.setLayout(layVInput)
 #        frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
 #                                 QtGui.QSizePolicy.Minimum)
-#                                 
+# 
 #        frmPlt = QtGui.QFrame()
 #        frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
 #        frmPlt.setLayout(layVPlt)
@@ -79,23 +84,25 @@ class pyFDA(QtGui.QMainWindow):
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
     
-        #Die Die Minimale Größe für das _wiidget liegt bei 800x600 Pixel
-        _widget.setMinimumSize(QtCore.QSize(800,600))
+        # set minimum _widget size of central widget (matplotlib canvas) before scrollbars appear
+        # print(_widget.height())
+    
+#        _widget.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 400))
         
-        #Erstellen der ScrollArea
+        
+        # Create scroll area and "monitor" _widget whether scrollbars are needed
         scrollArea = QtGui.QScrollArea()
-        
-        #Das Widget, welches die ScrollArea "überwachen" soll ist _widget
         scrollArea.setWidget(_widget)
         
-        #Die Größe des "überwachten" Widgets darf nach oben hin vergrößert werden
+        # the following command has no effect?
+        _widget.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 400))
+#        scrollArea.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 200))
+        
+        # Size of monitored widget is allowed to grow:
         scrollArea.setWidgetResizable(True)
         
-
-        
-        #Das CentralWidget (Focus der GUI?) ist nun die ScrollArea
+        # CentralWidget (focus of GUI?) is now the ScrollArea
         self.setCentralWidget(scrollArea)
-        
 
 
         #=============== Menubar =======================================
@@ -151,7 +158,7 @@ if __name__ == '__main__':
     Die Linkeecke des Fensters ist 20 pixel in (X und Y) von der oberen linken
     Bildschirmecke entfernt.
     """
-    main.setGeometry(20, 20, 1200, 800)
+    main.setGeometry(20, 20, 1200, 700) # ltop left / top right, deltax, delta y
     main.show()
 
     app.exec_()
