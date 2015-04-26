@@ -71,8 +71,9 @@ class InputSpecs(QtGui.QWidget):
         self.wspecs = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
                     DEBUG = False)
                     
-#TODO:        self.tspecs = input_target_specs.InputTargetSpecs(specs = fb.fil[0],
-#                    DEBUG = False)
+#TODO:  
+        self.tspecs = input_target_specs.InputTargetSpecs(specs = fb.fil[0],
+                   DEBUG = False)
 
         self.lblMsg = QtGui.QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -107,7 +108,8 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.wspecs,3,1)   # Weight specs
         layGMain.addWidget(frmMsg,4,0,1,2)  # Text message
         layGMain.addItem(spcV,5,0)
-#TODO:        layGMain.addWidget(self.tspecs,5,0,1,2)   # Target specs
+#TODO:        
+        layGMain.addWidget(self.tspecs,5,0,1,2)   # Target specs
         layGMain.addWidget(self.butDesignFilt, 6,0)
         layGMain.addWidget(self.butReadFiltTree, 6,1)
         layGMain.setContentsMargins(1,1,1,1)
@@ -185,7 +187,8 @@ class InputSpecs(QtGui.QWidget):
         self.fspecs.storeEntries() # frequency specification widget
         self.aspecs.storeEntries() # magnitude specs with unit
         self.wspecs.storeEntries() # weight specification
-#TODO:        self.tspecs.storeEntries() # target specs
+#TODO: 
+        self.tspecs.storeEntries() # target specs
 
         if self.DEBUG: print(fb.fil[0])
 
