@@ -107,11 +107,11 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.aspecs,3,0)   # Amplitude specs
         layGMain.addWidget(self.wspecs,3,1)   # Weight specs
         layGMain.addWidget(frmMsg,4,0,1,2)  # Text message
-        layGMain.addItem(spcV,5,0)
 #TODO:        
-        layGMain.addWidget(self.tspecs,5,0,1,2)   # Target specs
+#        layGMain.addWidget(self.tspecs,5,0,1,2)   # Target specs
         layGMain.addWidget(self.butDesignFilt, 6,0)
         layGMain.addWidget(self.butReadFiltTree, 6,1)
+        layGMain.addItem(spcV,7,0)
         layGMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(layGMain)
