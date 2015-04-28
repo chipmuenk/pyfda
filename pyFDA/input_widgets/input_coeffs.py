@@ -60,7 +60,7 @@ class InputCoeffs(QtGui.QWidget):
         """
         
         """Edit WinMic"""
-         #Whitch Button holds the longest Text?
+         #Which Button holds the longest Text?
         
         
 #        butAddRowText = 
@@ -89,13 +89,13 @@ class InputCoeffs(QtGui.QWidget):
         self.lblCoeffList = QtGui.QLabel()
         self.lblCoeffList.setText("Show Coefficients")
 
-        self.chkIIR = QtGui.QCheckBox()
-        self.chkIIR.setChecked(True)
-        self.chkIIR.setToolTip("IIR Filter")
+#        self.chkIIR = QtGui.QCheckBox()
+#        self.chkIIR.setChecked(True)
+#        self.chkIIR.setToolTip("IIR Filter")
 #        self.chkIIR.setCheckable(False) # not implemented yet
 #        self.chkIIR.setEnabled(False) # not implemented yet
-        self.lblIIR = QtGui.QLabel()
-        self.lblIIR.setText("IIR")
+#        self.lblIIR = QtGui.QLabel()
+#        self.lblIIR.setText("IIR")
 
         self.tblCoeff = QtGui.QTableWidget()
         self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
@@ -112,13 +112,10 @@ class InputCoeffs(QtGui.QWidget):
         """EDIT WinMic"""
         
         self.butAddRow.setText(butTexts[0])
-        
         #Calculate the length for the Buttons based on the longest ButtonText
         ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
         self.butAddRow.setMaximumWidth(ButLength)
         """End"""
-
-         
 
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
@@ -160,13 +157,9 @@ class InputCoeffs(QtGui.QWidget):
         self.butQuant.setText(butTexts[6])
         self.butQuant.setMaximumWidth(ButLength)
 
-        self.lblQuant = QtGui.QLabel()
-        self.lblQuant.setText("QI.QF = ")
-        
-        """EditWinMic"""
-        self.lblQuantisierung = QtGui.QLabel()
-        self.lblQuantisierung.setText("Koeffizientenquant. :")
-        """END"""
+        self.lblQIQF  = QtGui.QLabel("QI.QF = ")
+        self.lblQOvfl = QtGui.QLabel("Ovfl.:")
+        self.lblQuant = QtGui.QLabel("Quant.:")
 
         self.ledQuantI = QtGui.QLineEdit()
         self.ledQuantI.setToolTip("Specify number of integer bits.")
@@ -187,23 +180,23 @@ class InputCoeffs(QtGui.QWidget):
         self.cmbQQuant = QtGui.QComboBox()
         qQuant = ['none', 'round', 'fix']
         self.cmbQQuant.addItems(qQuant)
+        self.cmbQQuant.setToolTip("Select the kind of quantization.")
         self.cmbQOvfl = QtGui.QComboBox()
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
+        self.cmbQOvfl.setToolTip("Select overflow behaviour.")
         
-        """Edit WinMic"""
-        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+        # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        """END"""
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkCoeffList)
         self.layHChkBoxes.addWidget(self.lblCoeffList)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkIIR)
-        self.layHChkBoxes.addWidget(self.lblIIR)
+#        self.layHChkBoxes.addWidget(self.chkIIR)
+#        self.layHChkBoxes.addWidget(self.lblIIR)
 #        self.layHChkBoxes.addStretch(10)
 
         self.layHButtonsCoeffs1 = QtGui.QHBoxLayout()
@@ -222,21 +215,20 @@ class InputCoeffs(QtGui.QWidget):
 
         self.layHButtonsCoeffs3 = QtGui.QHBoxLayout()
         self.layHButtonsCoeffs3.addWidget(self.butQuant)
-        self.layHButtonsCoeffs3.addWidget(self.lblQuant)
+        self.layHButtonsCoeffs3.addWidget(self.lblQIQF)
         self.layHButtonsCoeffs3.addWidget(self.ledQuantI)
         self.layHButtonsCoeffs3.addWidget(self.lblDot)
         self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
 
         self.layHButtonsCoeffs3.addStretch()
         
-        """EDIT WinMic"""
         self.layHButtonsCoeffs4 = QtGui.QHBoxLayout()
         spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        self.layHButtonsCoeffs4.addWidget(self.lblQuantisierung)
+        self.layHButtonsCoeffs4.addWidget(self.lblQOvfl)
         self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
+        self.layHButtonsCoeffs4.addWidget(self.lblQuant)
         self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
         self.layHButtonsCoeffs4.addItem(spacer)
-        """END"""
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
@@ -321,10 +313,6 @@ class InputCoeffs(QtGui.QWidget):
             print ("shape", np.shape(coeffs))
             print ("len", len(coeffs))
             print("ndim", np.ndim(coeffs))
-
-#        if np.ndim(coeffs) == 1: # FIR
-
-        self.chkIIR.setChecked(True)
 
         self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
         for col in range(2):
