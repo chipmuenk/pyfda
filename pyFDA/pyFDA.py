@@ -46,10 +46,6 @@ class pyFDA(QtGui.QMainWindow):
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
 
-        _desktop = QtGui.QDesktopWidget()
-        screen_h = _desktop.availableGeometry().height()
-        screen_w = _desktop.availableGeometry().width()
-
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
 
         # comment out following 3 lines for splitter design
@@ -80,7 +76,7 @@ class pyFDA(QtGui.QMainWindow):
 #        splitter.addWidget(frmInput)
 #        splitter.addWidget(frmPlt)
 #        layHMain.addWidget(splitter)
-#        self.setCentralWidget(_widget)
+        self.setCentralWidget(_widget)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
     
@@ -95,11 +91,18 @@ class pyFDA(QtGui.QMainWindow):
         scrollArea.setWidget(_widget)
         
         # the following command has no effect?
-        _widget.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 400))
-#        scrollArea.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 200))
+#        _widget.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 400))
+        scrollArea.setMinimumSize(QtCore.QSize(800, 200))
+#        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default?
+#        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+
+                                 
+        scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                                 QtGui.QSizePolicy.MinimumExpanding)
         
         # Size of monitored widget is allowed to grow:
         scrollArea.setWidgetResizable(True)
+
         
         # CentralWidget (focus of GUI?) is now the ScrollArea
         self.setCentralWidget(scrollArea)
@@ -147,18 +150,33 @@ class pyFDA(QtGui.QMainWindow):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    myFont = QtGui.QFont("Tahoma", 10)
     app = QtGui.QApplication(sys.argv)
+    
+    _desktop = QtGui.QDesktopWidget()
+    screen_h = _desktop.availableGeometry().height()
+    screen_w = _desktop.availableGeometry().width()
+    print(screen_h, screen_w)
+    
+    if screen_h < 800:
+        fontsize = 10
+        delta = 50
+    elif screen_h < 1200:
+        fontsize = 11
+        delta = 100
+    else:
+        fontsize = 12
+        delta = 200
+
+    myFont = QtGui.QFont("Tahoma", fontsize)
+
     app.setFont(myFont)
     main = pyFDA()
     app.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     main.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     
-    """
-    Die Linkeecke des Fensters ist 20 pixel in (X und Y) von der oberen linken
-    Bildschirmecke entfernt.
-    """
-    main.setGeometry(20, 20, 1200, 700) # ltop left / top right, deltax, delta y
+    
+    # set position + size of main window on desktop
+#    main.setGeometry(20, 20, screen_w - delta, screen_h + 2 * delta) # ltop left / top right, deltax, delta y
     main.show()
 
     app.exec_()
