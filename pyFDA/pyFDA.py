@@ -16,8 +16,18 @@ from plot_widgets import plot_all
 
 class pyFDA(QtGui.QMainWindow):
     """
-    Create the main window for entering the filter specifications
+    Create the main window consisting of a tabbed widget for entering filter
+    specifications, poles / zeros etc. and another tabbed widget for plotting 
+    various filter characteristics
+    
+    QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
+    central widget, docking areas. QWidget is just a raw widget.
+    When you want to have a main window for you project, use QMainWindow.
+
+    If you want to create a dialog box (modal dialog), use QWidget, or,
+    more preferably, QDialog
     """
+    
     def __init__(self):
         self.DEBUG = True
         super(pyFDA, self).__init__()
@@ -87,15 +97,11 @@ class pyFDA(QtGui.QMainWindow):
         # set minimum _widget size of central widget (matplotlib canvas) before scrollbars appear
         # print(_widget.height())
     
-#        _widget.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 400))
-        
-        
         # Create scroll area and "monitor" _widget whether scrollbars are needed
         scrollArea = QtGui.QScrollArea()
         scrollArea.setWidget(_widget)
         
-        # the following command has no effect?
-        _widget.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 400))
+        _widget.setMinimumSize(QtCore.QSize(800,500))
 #        scrollArea.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 200))
         
         # Size of monitored widget is allowed to grow:
