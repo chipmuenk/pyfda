@@ -93,7 +93,7 @@ class MplWidget(QtGui.QWidget):
         for ax in self.fig.axes:
             ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
-        self.fig.tight_layout(pad = 0.1)
+        self.fig.tight_layout(pad = 0.2)
 #        self.pltCanv.updateGeometry()
         self.pltCanv.draw()
 #
