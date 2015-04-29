@@ -5,13 +5,7 @@ Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-from PyQt4 import QtGui #, QtCore
-
-#from PyQt4.QtGui import QSizePolicy
-#from PyQt4.QtCore import QSize
-
-#import matplotlib as plt
-#from matplotlib.figure import Figure
+from PyQt4 import QtGui
 
 import numpy as np
 import scipy.signal as sig
@@ -24,14 +18,6 @@ import filterbroker as fb
 
 from plot_widgets.plot_utils import MplWidget#, MplCanvas
 
-"""
-QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
-central widget, docking areas. QWidget is just a raw widget.
-When you want to have a main window for you project, use QMainWindow.
-
-If you want to create a dialog box (modal dialog), use QWidget, or,
-more preferably, QDialog
-"""
 
 class PlotPhi(QtGui.QMainWindow):
 

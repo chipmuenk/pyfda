@@ -7,14 +7,9 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys, os
 
 from PyQt4 import QtGui
-#from PyQt4.QtGui import QSizePolicy
-#from PyQt4.QtCore import QSize
-
-#import matplotlib as plt
-#from matplotlib.figure import Figure
 
 import numpy as np
-import scipy.signal as sig
+
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__":
@@ -25,17 +20,8 @@ import filterbroker as fb
 import pyfda_lib
 
 
-from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
+from plot_widgets.plot_utils import MplWidget
 
-
-"""
-QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
-central widget, docking areas. QWidget is just a raw widget.
-When you want to have a main window for you project, use QMainWindow.
-
-If you want to create a dialog box (modal dialog), use QWidget, or,
-more preferably, QDialog
-"""
 
 class PlotImpz(QtGui.QMainWindow):
 
@@ -216,7 +202,7 @@ class PlotImpz(QtGui.QMainWindow):
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
             
             
-        if self.ACTIVE_3D:
+        if self.ACTIVE_3D: # not implemented yet
         
             # plotting the stems
             for i in range(len(t)):

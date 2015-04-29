@@ -7,8 +7,6 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys, os
 
 from PyQt4 import QtGui
-#from PyQt4.QtGui import QSizePolicy
-#from PyQt4.QtCore import QSize
 
 import numpy as np
 import scipy.signal as sig
@@ -22,14 +20,6 @@ if __name__ == "__main__":
 import filterbroker as fb
 from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
 
-"""
-QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
-central widget, docking areas. QWidget is just a raw widget.
-When you want to have a main window for you project, use QMainWindow.
-
-If you want to create a dialog box (modal dialog), use QWidget, or,
-more preferably, QDialog
-"""
 
 class PlotHf(QtGui.QMainWindow):
 
