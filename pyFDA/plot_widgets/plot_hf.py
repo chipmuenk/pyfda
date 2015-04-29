@@ -53,21 +53,22 @@ class PlotHf(QtGui.QMainWindow):
         "dB is attenuation (positive values)\nV and W are less than 1.")
         self.cmbUnitsA.setCurrentIndex(0)
         
-        """EDIT WinMic"""
         self.cmbShowH.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        """END"""
-        
-
-
-        self.lblLinphase = QtGui.QLabel("Remove lin. phase")
+    
+        self.lblLinphase = QtGui.QLabel("Acausal system")
         self.chkLinphase = QtGui.QCheckBox()
         self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
            "Attention: this makes no sense for a non-linear phase system!")
 
         self.lblInset = QtGui.QLabel("Inset")
-        self.chkInset = QtGui.QCheckBox()
-        self.chkInset.setToolTip("Display second zoomed plot")
+
+        self.cmbInset = QtGui.QComboBox(self)
+        self.cmbInset.addItems(['off', 'edit', 'fixed'])
+        self.cmbInset.setObjectName("cmbInset")
+        self.cmbInset.setToolTip("Display/edit second inset plot")
+        self.cmbInset.setCurrentIndex(0)
+        self.inset_idx = 0 # store previous index for comparison
 
         self.lblSpecs = QtGui.QLabel("Show Specs")
         self.chkSpecs = QtGui.QCheckBox()
@@ -89,7 +90,7 @@ class PlotHf(QtGui.QMainWindow):
         self.layHChkBoxes.addWidget(self.chkLinphase)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblInset)
-        self.layHChkBoxes.addWidget(self.chkInset)
+        self.layHChkBoxes.addWidget(self.cmbInset)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblSpecs)
         self.layHChkBoxes.addWidget(self.chkSpecs)
@@ -119,7 +120,8 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbShowH.currentIndexChanged.connect(self.draw)
 
         self.chkLinphase.clicked.connect(self.draw)
-        self.chkInset.clicked.connect(self.draw_inset)
+        self.cmbInset.currentIndexChanged.connect(self.draw_inset)
+
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw_phase)
         
@@ -257,7 +259,6 @@ class PlotHf(QtGui.QMainWindow):
         self.lblLinphase.setEnabled(self.unitA == 'V')
 
         self.specs = self.chkSpecs.isChecked()
-        self.inset = self.chkInset.isChecked()
         self.phase = self.chkPhase.isChecked()
         self.linphase = self.chkLinphase.isChecked()
 
@@ -320,38 +321,40 @@ class PlotHf(QtGui.QMainWindow):
 
         # clear the axes and (re)draw the plot
         #
-        self.ax.clear()
+        if self.ax.get_navigate():
 
-        #================ Main Plotting Routine =========================
-
-        if self.unitA == 'dB':
-            A_lim = [-self.A_SB -10, self.A_PB +1]
-            self.H_plt = 20*np.log10(abs(H))
-            H_str += ' in dB ' + r'$\rightarrow$'
-        elif self.unitA == 'V': #  'lin'
-            A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
-            self.H_plt = H
-            H_str +=' in V ' + r'$\rightarrow $'
-            self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
-        else: # unit is W
-            A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
-            self.H_plt = H * H.conj()
-            H_str += ' in W ' + r'$\rightarrow $'
-
-        plt_lim = f_lim + A_lim
-
-        #-----------------------------------------------------------
-        self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'], label = 'H(f)')
-        #-----------------------------------------------------------
-        self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
-
-        self.ax.axis(plt_lim)
-
-        if self.specs: self.plotSpecLimits(specAxes = self.ax)
-
-        self.ax.set_title(r'Magnitude Frequency Response')
-        self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
-        self.ax.set_ylabel(H_str)
+            self.ax.clear()
+    
+            #================ Main Plotting Routine =========================
+    
+            if self.unitA == 'dB':
+                A_lim = [-self.A_SB -10, self.A_PB +1]
+                self.H_plt = 20*np.log10(abs(H))
+                H_str += ' in dB ' + r'$\rightarrow$'
+            elif self.unitA == 'V': #  'lin'
+                A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
+                self.H_plt = H
+                H_str +=' in V ' + r'$\rightarrow $'
+                self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
+            else: # unit is W
+                A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
+                self.H_plt = H * H.conj()
+                H_str += ' in W ' + r'$\rightarrow $'
+    
+            plt_lim = f_lim + A_lim
+    
+            #-----------------------------------------------------------
+            self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'], label = 'H(f)')
+            #-----------------------------------------------------------
+            self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
+    
+            self.ax.axis(plt_lim)
+    
+            if self.specs: self.plotSpecLimits(specAxes = self.ax)
+    
+            self.ax.set_title(r'Magnitude Frequency Response')
+            self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+            self.ax.set_ylabel(H_str)
 
         self.mplwidget.redraw()
 
@@ -394,27 +397,40 @@ class PlotHf(QtGui.QMainWindow):
         """
         # TODO:  try   ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
         # TODO: use sca(a) # Set the current axes to be a and return a
-        self.inset = self.chkInset.isChecked()
+
         if self.DEBUG:
-            print(self.mplwidget.fig.axes) # list of axes in Figure
+            print(self.cmbInset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
             for ax in self.mplwidget.fig.axes:
                 print(ax)
+                print("cmbInset, inset_idx:",self.cmbInset.currentIndex(), self.inset_idx)
+        if self.cmbInset.currentIndex() > 0:
+            if self.inset_idx == 0:
+                # Inset was turned off before, create a new one
+                #  Add an axes at position rect [left, bottom, width, height]:
+                self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
+                self.ax_i.clear() # clear old plot and specs
+                self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
+                self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
 
-        if self.inset:
-            #  Add an axes at position rect [left, bottom, width, height]:
-            self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
-            self.ax_i.clear() # clear old plot and specs
-            if self.specs:
-                self.plotSpecLimits(specAxes = self.ax_i)
-            self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
-        else:
+            if self.cmbInset.currentIndex() == 1: # edit / navigate inset
+                self.ax_i.set_navigate(True)
+                self.ax.set_navigate(False)
+                if self.specs:
+                    self.plotSpecLimits(specAxes = self.ax_i)
+            else: # edit / navigate main plot
+                self.ax_i.set_navigate(False)
+                self.ax.set_navigate(True)
+        else:  # inset has been turned off, delete it
+            self.ax.set_navigate(True)
             try:
-                #remove ax_i from the figure and update the current axes
+                #remove ax_i from the figure
                 self.mplwidget.fig.delaxes(self.ax_i)
             except AttributeError:
                 pass
+
+        self.inset_idx = self.cmbInset.currentIndex() # update index
         self.draw()
-#        self.mplwidget.redraw()
+
 
 #------------------------------------------------------------------------------
 
