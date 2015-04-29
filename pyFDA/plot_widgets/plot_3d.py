@@ -166,6 +166,8 @@ class Plot3D(QtGui.QMainWindow):
         self.setCentralWidget(self.mplwidget)
         
         self.initAxes()
+        
+        self.initCoord()
 
         self.draw() # calculate and draw phi(f)
 
@@ -184,25 +186,21 @@ class Plot3D(QtGui.QMainWindow):
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
-    def draw(self):
-        if self.mplwidget.mplToolbar.enable_update:
-            self.draw_3d()
+
+    def initCoord(self):
+        """ Initialize coordinates for the unit circle """
+        # TODO: move creation of x,y-grid here as well 
+        self.phi_EK = np.linspace(0, 2*pi, 400) # 400 points from 0 ... 2 pi
+        self.xy_UC = np.exp(1j * self.phi_EK) # x,y coordinates of unity circle
 
     def initAxes(self):
         """Initialize and clear the axes
         see http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
         """
-        
-#        self.ax3d = self.mplwidget.ax
-#        self.ax3d = self.mplwidget.fig.add_subplot(111)
-        self.ax3d = Axes3D(self.mplwidget.fig)
-#        self.ax3d = self.mplwidget.fig.gca(projection='3d')
+
+        self.ax3d = self.mplwidget.fig.add_subplot(111, projection = '3d')
         self.ax3d.clear()
-        
-        self.phi_EK = np.linspace(0, 2*pi, 400) # 400 points from 0 ... 2 pi
-        self.xy_UC = np.exp(1j * self.phi_EK) # x,y coordinates of unity circle
-        #plt.gca().cla()
-        #p.clf()
+
         
     def logClicked(self):
         self.log = self.chkLog.isChecked()
@@ -226,9 +224,14 @@ class Plot3D(QtGui.QMainWindow):
             
         self.draw()
 
+    def draw(self):
+        if self.mplwidget.mplToolbar.enable_update:
+            self.draw_3d()
+
+
     def draw_3d(self):
         """
-        Draw group delay
+        Draw various 3D plots
         """
         bb = fb.fil[0]['coeffs'][0]
         aa = fb.fil[0]['coeffs'][1]
@@ -314,25 +317,24 @@ class Plot3D(QtGui.QMainWindow):
                 plevel = H_max * 0.3 # plevel = H_max * 0.1 / zlevel = 0.1
             else:
                 plevel = plevel_rel * thresh # height of displayed pole position
-            zlevel = zlevel_rel * thresh # height of displayed zero position         
-
-        
-        self.ax3d.cla()
-        self.ax3d.hold(True)
+            zlevel = zlevel_rel * thresh # height of displayed zero position
+            
+        self.ax3d.cla() # clear axes
 
         #===============================================================
         ## plot unit circle
         #===============================================================       
         if self.chkUC.isChecked():        
         # Plot unit circle:
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, ones(len(self.xy_UC)) * bottom, 
-                     linewidth=2, color = 'k')
-                     
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, 
+                           ones(len(self.xy_UC)) * bottom, lw = 2, color = 'k')
+
         #===============================================================
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================        
         if self.chkHf.isChecked():
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, lw = fb.gD['rc']['lw'])
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, color = 'b', 
+                           lw = fb.gD['rc']['lw'])
             NL = hatch # plot line every NL points on the UC
             if NL > 0:
                 for k in range(len(self.xy_UC[::NL])):
@@ -363,18 +365,18 @@ class Plot3D(QtGui.QMainWindow):
                             [0, plevel], linewidth=1, color='r')
 
         #===============================================================
-        ## 3D-Surface Plots
+        ## 3D-Plots of |H(z)|
         #===============================================================
 
         if not self.chkColBar.isChecked():
             # colorbar creates a second subplot, making it difficult to remove
             if hasattr(self, 'colb'): # has colorbar been created?
-                # ves, remove colorbar
+                # yes, remove colorbar
                 self.colb.remove()
-                # rescale (doesn't work)
-#                self.mplwidget.fig.subplots_adjust(right=0.90)
-                # remove the object
                 del self.colb
+
+        #---------------------------------------------------------------
+        ## Mesh plot
                 
         if self.cmbMode3D.currentText() == 'Mesh':
         #    fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
@@ -383,23 +385,30 @@ class Plot3D(QtGui.QMainWindow):
             self.ax3d.plot_wireframe(x, y, Hmag, rstride=5,
                                   cstride=OPT_3D_MSTRIDE, linewidth = 1, color = 'gray') 
 
-    #        [xplane, yplane, zplane] = np.ogrid[-5:5:100 , -5:5:100 , -5:5:100]
+        #---------------------------------------------------------------
+        ## 3D-surface of |H(z)|; clipped at |H(z)| = thresh
         elif self.cmbMode3D.currentText() == 'Surf':
-            #plot 3D-surface of |H(z)|; clipped at |H(z)| = thresh
             s = self.ax3d.plot_surface(x, y, Hmag, 
                     alpha = OPT_3D_ALPHA, rstride=1, cstride=1, cmap = cm.jet_r,
                     linewidth=0, antialiased=False, shade = True) # facecolors= cm.jet_r ??
             s.set_edgecolor('gray') 
                     # Colormaps: 'hsv', 'jet', 'bone', 'prism' 'gray', 'prism'
             if self.chkColBar.isChecked():
-                self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
+                self.colb = self.mplwidget.fig.colorbar(mappable = s, 
+                ax = self.ax3d, shrink=0.75, aspect=20)
 
-        elif self.cmbMode3D.currentText() == 'Contour': # Contour plot
-            s = self.ax3d.contourf3D(x, y, Hmag, alpha = alpha,
-                            rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, cmap = cm.jet_r)
+        #---------------------------------------------------------------
+        ## 3D-Contour plot
+        elif self.cmbMode3D.currentText() == 'Contour': 
+            s = self.ax3d.contourf3D(x, y, Hmag, 20, alpha = alpha,
+                            rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, 
+                            cmap = cm.jet_r)
             if self.chkColBar.isChecked():
-                self.colb = self.mplwidget.fig.colorbar(s, shrink=0.5, aspect=10)
+                self.colb = self.mplwidget.fig.colorbar(mappable = s, 
+                  ax = self.ax3d, shrink=0.75, aspect=20)
                             
+        #---------------------------------------------------------------
+        ## 2D-Contour plot
         if self.chkContour2D.isChecked():
             self.ax3d.contourf(x, y, Hmag, zdir='x', offset=xmin, 
                                  cmap=cm.coolwarm) #vmin = zmin, vmax = thresh, 
@@ -407,14 +416,14 @@ class Plot3D(QtGui.QMainWindow):
 
         self.ax3d.set_xlim3d(xmin, xmax)
         self.ax3d.set_ylim3d(ymin, ymax)
-        
         self.ax3d.set_zlim3d(bottom, thresh)
+        
         self.ax3d.set_xlabel('Re')#(fb.fil[0]['plt_fLabel'])
         self.ax3d.set_ylabel('Im') #(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
+#        self.ax3d.set_zlabel(r'$|H(z)|\; \rightarrow $')
         self.ax3d.set_title(r'3D-Plot of $|H(\mathrm{e}^{\mathrm{j} \Omega})|$ and $|H(z)|$')
-        self.ax3d.hold(False)
         
-        self.mplwidget.redraw3D()
+        self.mplwidget.redraw()
 
 #------------------------------------------------------------------------------
 
