@@ -4,15 +4,17 @@ Created on Wed Nov 26 15:48:44 2014
 
 @author: Christian Muenker
 http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
+
+http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-runs-slow-after-several-loads-or-looks-messy
 """
 from __future__ import print_function, division, unicode_literals
 
 from PyQt4 import QtGui, QtCore
 
 from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
-#from PyQt4.QtCore import QSize
 
-#import matplotlib as mpl
+
+# do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!! 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 #from matplotlib.backend_bases import cursors as mplCursors
@@ -24,7 +26,6 @@ try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
     figureoptions = None
-#from .qt_compat import QtCore, QtGui, QtWidgets, _getSaveFileName, __version__
 
 from matplotlib import rcParams
 rcParams['font.size'] = 12
@@ -34,77 +35,6 @@ import os
 # import scipy.signal as sig
 
 DEBUG = True
-
-#------------------------------------------------------------------------------
-#class MplWidgetBut(QtGui.QWidget):
-#    """
-#    Construct a subwidget with Matplotlib canvas, NavigationToolbar
-#    and some buttons
-#    """
-#
-#    def __init__(self, parent = None):
-#        super(MplWidget, self).__init__() # initialize QWidget Base Class
-#        # Create the mpl figure and subplot (5x4 inches, 100 dots-per-inch).
-#        # Construct the canvas with the figure
-#        #
-#        self.dpi = 100
-#        self.fig = Figure(dpi=self.dpi,facecolor = '#FFFFFF')
-#        self.ax = self.fig.add_subplot(111)
-#
-#        self.pltCanv = FigureCanvas(self.fig)
-#
-#
-#        self.pltCanv.setSizePolicy(QSizePolicy.Expanding,
-#                                   QSizePolicy.Expanding)
-#        self.pltCanv.updateGeometry()
-#
-#        # Create the navigation toolbar, tied to the canvas
-#        #
-#        self.mpl_toolbar = self.MyMplToolbar(self.pltCanv, self)
-#
-#        self.butDraw = QtGui.QPushButton("&Redraw")
-#        self.butDraw.clicked.connect(self.redraw)
-#
-#        self.cboxGrid = QtGui.QCheckBox("Show &Grid")
-#        self.cboxGrid.setChecked(True)
-#        # Attention: passes unwanted clicked bool argument:
-#        self.cboxGrid.clicked.connect(self.redraw)
-#
-#        #=============================================
-#        # Slider for line width
-#        #=============================================
-#        lblLw = QtGui.QLabel('Line width:')
-#        self.sldLw = QtGui.QSlider(QtCore.Qt.Horizontal)
-#        self.sldLw.setRange(1, 10)
-#        self.sldLw.setValue(5)
-#        self.sldLw.setTracking(True)
-#        self.sldLw.setTickPosition(QtGui.QSlider.NoTicks)
-##        self.sldLw.valueChanged.connect(self.redraw)
-#
-#        #=============================================
-#        # Widget layout with QHBox / QVBox
-#        #=============================================
-#
-#        self.hbox1 = QtGui.QHBoxLayout()
-#        for w in [self.butDraw, self.cboxGrid, lblLw, self.sldLw]:
-#            self.hbox1.addWidget(w)
-#            self.hbox1.setAlignment(w, QtCore.Qt.AlignVCenter)
-#
-#        self.layVMainMpl = QtGui.QVBoxLayout()
-#        self.layVMainMpl.addWidget(self.mpl_toolbar)
-#        self.layVMainMpl.addWidget(self.pltCanv)
-#        self.layVMainMpl.addLayout(self.hbox1)
-#        self.setLayout(self.layVMainMpl)
-#
-#    def redraw(self):
-#        """
-#        Redraw the figure with new properties (grid, linewidth)
-#        """
-#        self.ax.grid(self.cboxGrid.isChecked())
-##        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
-#        self.fig.tight_layout(pad = 0.5)
-#        self.pltCanv.draw()
-#        self.pltCanv.updateGeometry()
 
 
 #------------------------------------------------------------------------------
@@ -120,7 +50,7 @@ class MplWidget(QtGui.QWidget):
         #
         self.plt_lim = [] # x,y plot limits
         self.dpi = 100
-        self.fig = Figure(dpi=self.dpi,facecolor = '#FFFFFF')
+        self.fig = Figure(dpi=self.dpi, figsize=(5, 4), facecolor = '#FFFFFF')
 #        self.mpl = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])#
 #        self.mpl21 = self.fig.add_subplot(211)
 
@@ -130,7 +60,7 @@ class MplWidget(QtGui.QWidget):
 
         self.pltCanv.updateGeometry()
 
-        # Create the custom navigation toolbar, tied to the canvas
+        # Create a custom navigation toolbar, tied to the canvas
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MyMplToolbar(self.pltCanv, self)
@@ -153,7 +83,6 @@ class MplWidget(QtGui.QWidget):
         self.layVMainMpl.addWidget(self.mplToolbar)
         self.layVMainMpl.addWidget(self.pltCanv)
 
-
         self.setLayout(self.layVMainMpl)
 
     def redraw(self):
@@ -164,20 +93,10 @@ class MplWidget(QtGui.QWidget):
         for ax in self.fig.axes:
             ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
-        self.fig.tight_layout(pad = 0.5)
+        self.fig.tight_layout(pad = 0.1)
 #        self.pltCanv.updateGeometry()
         self.pltCanv.draw()
 #
-        
-    def redraw3D(self):
-        """
-        Redraw the figure with new properties (grid, linewidth)
-        """
-        self.pltCanv.draw()
-        
-        
-        #mysterious pixel growing
-        #self.pltCanv.updateGeometry()
 
     def pltFullView(self):
         """
@@ -239,21 +158,8 @@ class MyMplToolbar(NavigationToolbar):
 # org        self.basedir = os.path.join(rcParams['datapath'], 'images')
         self.basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
            '..','images', 'icons', '')
-           
-#        # Pan, Zoom
-#        for text, tooltip_text, image_file, callback in self.toolitems:
-#            if text is None:
-#                self.addSeparator()
-#            else:
-#                a = self.addAction(self._icon(image_file + '.svg'),
-#                                         text, getattr(self, callback))
-#                self._actions[callback] = a
-#                if callback in ['zoom', 'pan']:
-#                    a.setCheckable(True)
-#                if tooltip_text is not None:
-#                    a.setToolTip(tooltip_text)
 
-           
+
 #---------------- Construct Toolbar ---------------------------------------           
 
         # ENABLE:
