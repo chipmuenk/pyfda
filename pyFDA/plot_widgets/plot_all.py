@@ -5,14 +5,9 @@ Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-# import EITHER PyQt4 OR PySide, depending on your system:
-from PyQt4 import QtGui #, QtCore
-#from PySide.QtCore import *
-#from PySide.QtGui import *
 
+from PyQt4 import QtGui
 
-#import numpy as np
-#import scipy.signal as sig
 if __name__ == "__main__": # relative import if this file is run as __main__
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
@@ -74,19 +69,11 @@ Background: #DDEEFF;
         tabWidget.addTab(self.pltImpz, 'h[n]')
         tabWidget.addTab(self.plt3D, '3D')
 
-#        butDraw = QtGui.QPushButton("&No Function")
-#        butDraw.clicked.connect(self.redrawAll)
-
-#        hbox = QtGui.QHBoxLayout()
-#        hbox.addWidget(butDraw)
-#        hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
-
         layVMain = QtGui.QVBoxLayout()
         layVMain.addWidget(tabWidget)
         layVMain.setContentsMargins(1,1,1,1)#(left, top, right, bottom)
 #
         self.setLayout(layVMain)
-
 
 
     def updateAll(self):
@@ -97,14 +84,6 @@ Background: #DDEEFF;
         self.pltTauG.draw()
         self.pltImpz.draw()
         self.plt3D.draw()
-
-
-#        self.redrawAll()
-
-#    def redrawAll(self):
-#        """ Redraw all subplots"""
-#        self.pltHf.redraw()
-#        self.pltPhi.redraw()
 
 #------------------------------------------------------------------------
 

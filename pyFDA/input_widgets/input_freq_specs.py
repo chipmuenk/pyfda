@@ -6,7 +6,7 @@ Created on Mon Nov 18 13:36:39 2013
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui
+from PyQt4 import QtGui, Qt
 from PyQt4.QtCore import pyqtSignal
 
 # add main directory from one level above if this file is run as __main__
@@ -45,7 +45,6 @@ class InputFreqSpecs(QtGui.QWidget):
 
         f_units = ['f/f_S', 'f/f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
         self.t_units = ['', '', 's', 'ms', r'$\mu$s', 'ns']
-        fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
 
         self.idxOld = -1 # index of cmbUnits before last change
 
@@ -73,13 +72,14 @@ class InputFreqSpecs(QtGui.QWidget):
         self.cmbUnits.setObjectName("cmbUnits")
         self.cmbUnits.addItems(f_units)
         self.cmbUnits.setCurrentIndex(0)
+#        self.cmbUnits.setItemData(0, (0,QtGui.QColor("#FF333D"),Qt.BackgroundColorRole))#
+#        self.cmbUnits.setItemData(0, (QtGui.QFont('Verdana', bold=True), Qt.FontRole)
 
-
+        fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
         self.cmbFRange = QtGui.QComboBox(self)
         self.cmbFRange.setObjectName("cmbFRange")
         for f in fRanges:
             self.cmbFRange.addItem(f[0],f[1])
-#        self.cmbFRange.addItems(["0...½","0...1", "-½...½"])
         self.cmbFRange.setToolTip("Select frequency range (whole or half).")
         self.cmbFRange.setCurrentIndex(0)
         
