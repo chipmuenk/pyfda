@@ -15,6 +15,7 @@ import sys, os
 from PyQt4 import QtGui
 
 # TODO: Add subwidgets, depending on filterSel parameters
+# TODO:  index = myComboBox.findText('item02') 
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -121,10 +122,6 @@ class SelectFilter(QtGui.QWidget):
         layHStdWdg.addItem(spacer)        
         
         layHStdWdg.addWidget(self.cmbDesignMethod)
-        
-        """EDIT WinMic"""
-#        layHStdWdg.addItem(spacer)
-        """END"""
 
         # stack standard + dynamic subwidgets vertically:
         layVAllWdg = QtGui.QVBoxLayout()
