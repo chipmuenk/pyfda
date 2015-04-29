@@ -97,20 +97,17 @@ class pyFDA(QtGui.QMainWindow):
         scrollArea = QtGui.QScrollArea()
         scrollArea.setWidget(_widget)
         
-<<<<<<< HEAD
-        # the following command has no effect?
-#        _widget.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 400))
-        scrollArea.setMinimumSize(QtCore.QSize(800, 200))
+        scrollArea.setMinimumSize(QtCore.QSize(800, 500))
+#        scrollArea.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 200))
+
+
 #        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default?
 #        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
                                  
         scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
                                  QtGui.QSizePolicy.MinimumExpanding)
-=======
-        _widget.setMinimumSize(QtCore.QSize(800,500))
-#        scrollArea.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 200))
->>>>>>> origin/master
+
         
         # Size of monitored widget is allowed to grow:
         scrollArea.setWidgetResizable(True)
@@ -188,7 +185,7 @@ if __name__ == '__main__':
     
     
     # set position + size of main window on desktop
-#    main.setGeometry(20, 20, screen_w - delta, screen_h + 2 * delta) # ltop left / top right, deltax, delta y
+    main.setGeometry(20, 20, screen_w - delta, screen_h - delta) # ltop left / top right, deltax, delta y
     main.show()
 
     app.exec_()
