@@ -190,19 +190,19 @@ class Plot3D(QtGui.QMainWindow):
     def initCoord(self):
         """ Initialize coordinates for the unit circle """
         # TODO: move creation of x,y-grid here as well 
-        self.phi_EK = np.linspace(0, 2*pi, 400) # 400 points from 0 ... 2 pi
+        self.phi_EK = np.linspace(0, 2*pi, 400, endpoint = True)
         self.xy_UC = np.exp(1j * self.phi_EK) # x,y coordinates of unity circle
 
     def initAxes(self):
         """Initialize and clear the axes
         see http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
         """
-
+        self.mplwidget.fig.clf() # needed to get rid of colormap 
         self.ax3d = self.mplwidget.fig.add_subplot(111, projection = '3d')
-        self.ax3d.clear()
 
         
     def logClicked(self):
+        """ Change scale and settings to log / lin """
         self.log = self.chkLog.isChecked()
         if self.sender().objectName() == 'chkLog': # origin of signal that triggered the slot
             if self.log:
@@ -223,6 +223,8 @@ class Plot3D(QtGui.QMainWindow):
                 self.zmax = float(self.ledTop.text()) 
             
         self.draw()
+        
+
 
     def draw(self):
         if self.mplwidget.mplToolbar.enable_update:
@@ -233,6 +235,9 @@ class Plot3D(QtGui.QMainWindow):
         """
         Draw various 3D plots
         """
+        self.initAxes() # needed to get rid of colormap
+
+        
         bb = fb.fil[0]['coeffs'][0]
         aa = fb.fil[0]['coeffs'][1]
         
@@ -268,8 +273,8 @@ class Plot3D(QtGui.QMainWindow):
         dx = (xmax - xmin) / steps  
         dy = (ymax - ymin) / steps # grid size cartesian range
         if OPT_3D_POLAR_SPEC == True: # polar grid
-            [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr), np.arange(0,2*pi,dphi)) 
-        #    [x, y] = np.pol2cart(phi,r) # 
+            [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr), 
+                                np.linspace(0, 2 * pi, steps, endpoint = True))
             x = r * cos(phi)
             y = r * sin(phi)
         else: # cartesian grid
@@ -319,7 +324,6 @@ class Plot3D(QtGui.QMainWindow):
                 plevel = plevel_rel * thresh # height of displayed pole position
             zlevel = zlevel_rel * thresh # height of displayed zero position
             
-        self.ax3d.cla() # clear axes
 
         #===============================================================
         ## plot unit circle
@@ -365,28 +369,18 @@ class Plot3D(QtGui.QMainWindow):
                             [0, plevel], linewidth=1, color='r')
 
         #===============================================================
-        ## 3D-Plots of |H(z)|
+        ## 3D-Plots of |H(z)| clipped between |H(z)| = thresh
         #===============================================================
-
-        if not self.chkColBar.isChecked():
-            # colorbar creates a second subplot, making it difficult to remove
-            if hasattr(self, 'colb'): # has colorbar been created?
-                # yes, remove colorbar
-                self.colb.remove()
-                del self.colb
-
-        #---------------------------------------------------------------
+        #
         ## Mesh plot
-                
         if self.cmbMode3D.currentText() == 'Mesh':
         #    fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
         #    self.ax3d.set_zlim(0,2)
-        
             self.ax3d.plot_wireframe(x, y, Hmag, rstride=5,
-                                  cstride=OPT_3D_MSTRIDE, linewidth = 1, color = 'gray') 
+                    cstride=OPT_3D_MSTRIDE, linewidth = 1, color = 'gray') 
 
         #---------------------------------------------------------------
-        ## 3D-surface of |H(z)|; clipped at |H(z)| = thresh
+        ## 3D-surface plot;
         elif self.cmbMode3D.currentText() == 'Surf':
             s = self.ax3d.plot_surface(x, y, Hmag, 
                     alpha = OPT_3D_ALPHA, rstride=1, cstride=1, cmap = cm.jet_r,
@@ -394,8 +388,9 @@ class Plot3D(QtGui.QMainWindow):
             s.set_edgecolor('gray') 
                     # Colormaps: 'hsv', 'jet', 'bone', 'prism' 'gray', 'prism'
             if self.chkColBar.isChecked():
-                self.colb = self.mplwidget.fig.colorbar(mappable = s, 
-                ax = self.ax3d, shrink=0.75, aspect=20)
+                self.colb = self.mplwidget.fig.colorbar(mappable = s,
+                    ax = self.ax3d, shrink=0.8, aspect=20, 
+                    pad = 0.02, fraction = 0.08)
 
         #---------------------------------------------------------------
         ## 3D-Contour plot
@@ -404,9 +399,10 @@ class Plot3D(QtGui.QMainWindow):
                             rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, 
                             cmap = cm.jet_r)
             if self.chkColBar.isChecked():
-                self.colb = self.mplwidget.fig.colorbar(mappable = s, 
-                  ax = self.ax3d, shrink=0.75, aspect=20)
-                            
+                self.colb = self.mplwidget.fig.colorbar(s, 
+                  ax = self.ax3d, shrink=0.8, aspect=20,
+                  pad = 0.02, fraction = 0.08)
+                                 
         #---------------------------------------------------------------
         ## 2D-Contour plot
         if self.chkContour2D.isChecked():
