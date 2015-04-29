@@ -165,16 +165,13 @@ if __name__ == '__main__':
     screen_h = _desktop.availableGeometry().height()
     screen_w = _desktop.availableGeometry().width()
     print(screen_h, screen_w)
-    
+
+    fontsize = 10    
     if screen_h < 800:
-        fontsize = 10
         delta = 50
-    elif screen_h < 1200:
-        fontsize = 11
-        delta = 100
     else:
-        fontsize = 12
-        delta = 200
+        delta = 100
+
 
     myFont = QtGui.QFont("Tahoma", fontsize)
 
