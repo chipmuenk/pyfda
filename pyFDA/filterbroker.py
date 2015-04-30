@@ -45,7 +45,7 @@ gD['dmNames'] = {#IIR
 # Lists for dynamic imports from filter design subdirectory
 gD['filtFileNames'] = [] # Python file names found in filtFile (without .py)
 gD['imports'] = {} # dict with filter files / classes
-    
+
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
 # This dict is built + overwritten by FilterFileReader.buildFilterTree() !
@@ -84,15 +84,18 @@ filTree = {
                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}},
     }
 
-
-# -----------------------------------------------------------------------------
-# Dictionaries containing current filter specifications, they are
-# automatically overwritten
 #--------------------------------------
 # Handle to current filter object
 filObj = ""
-# Current filter selection, parameters and specifications
-fil = [None] * 10 # create empty list with length 10 for filter designs
+
+# -----------------------------------------------------------------------------
+# Dictionary containing current filter type, specifications, design and some
+# auxiliary information, it is automatically overwritten by input widgets
+# and design routines
+#--------------------------------------
+
+fil = [None] * 10 # create empty list with length 10 for multiple filter designs
+# This functionality is not implemented yet, currently only fil[0] is used
 
 fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'N':10, 'f_S':1,
@@ -103,7 +106,8 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'coeffs':([1, 1, 1], [3, 0, 2]), # tuple of bb, aa
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
-            'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
+            'sos': None,
+            'creator':('coeffs','filterbroker'), #(format ['coeffs', 'zpk', 'sos'], routine)
             'freqSpecsRangeType':'Half',
             'freqSpecsRange': [0,0.5],
             'plt_fLabel':r'$f$ in Hz $\rightarrow$',

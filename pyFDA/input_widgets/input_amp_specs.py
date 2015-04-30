@@ -24,14 +24,14 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     Build and update widget for entering the amplitude
     specifications like A_sb, A_pb etc.
     """
-    def __init__(self, specs, DEBUG = True):
+    def __init__(self, fil_dict, DEBUG = True):
 
         """
-        Initialize; specs is a dictionary containing _all_ the filter specs
+        Initialize; fil_dict is a dictionary containing _all_ the filter specs
         """
         super(InputAmpSpecs, self).__init__()
         self.DEBUG = DEBUG
-        self.specs = specs  # dictionary containing _all_ specifications of the
+        self.fil_dict = fil_dict  # dictionary containing _all_ specifications of the
                             # currently selected filter
 
 #        self.labels = labels # list with labels for combobox
@@ -65,7 +65,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.cmbUnitsA.setObjectName("cmbUnitsA")
         self.cmbUnitsA.setToolTip("Set unit for amplitude specifications:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
-        
+
         """Edit WincMIC"""
         #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
         self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
@@ -79,10 +79,10 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         #self.layGSpecs.addWidget(self.lblTitle, 0, 0, 2, 1) # span two columns
 
-        # - Build a list from all entries in the specs dictionary starting
+        # - Build a list from all entries in the fil_dict dictionary starting
         #   with "A" (= amplitude specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        newLabels = [l for l in self.specs if l[0] == 'A']
+        newLabels = [l for l in self.fil_dict if l[0] == 'A']
         self.setEntries(newLabels = newLabels)
 
         frmMain = QtGui.QFrame()
@@ -158,7 +158,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
                     self.qlabels[i].setText(self.rtLabel(newLabels[i]))
-                    self.qlineedit[i].setText(str(self.specs[newLabels[i]]))
+                    self.qlineedit[i].setText(str(self.fil_dict[newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
     def _delEntry(self,i):
@@ -181,7 +181,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self.rtLabel(newLabel))
 
-        self.qlineedit.append(QtGui.QLineEdit(str(self.specs[newLabel])))
+        self.qlineedit.append(QtGui.QLineEdit(str(self.fil_dict[newLabel])))
         self.qlineedit[i].editingFinished.connect(self.ampUnits)
         self.qlineedit[i].setObjectName(newLabel) # update ID
 
@@ -197,17 +197,17 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         if idx == 0: # Entry is in dBs, same as in dictionary
             for i in range(len(self.qlineedit)):
                 self.qlineedit[i].setText(
-                    str(self.specs[self.qlineedit[i].objectName()]))
+                    str(self.fil_dict[self.qlineedit[i].objectName()]))
 
         elif idx == 1:  # Entries are voltages, convert from dBs
             for i in range(len(self.qlineedit)):
                 self.qlineedit[i].setText(
-                    str(10.**(-self.specs[self.qlineedit[i].objectName()]/20.)))
+                    str(10.**(-self.fil_dict[self.qlineedit[i].objectName()]/20.)))
 
         else:  # Entries are powers, convert from dBs
             for i in range(len(self.qlineedit)):
                 self.qlineedit[i].setText(
-                    str(10.**(-self.specs[self.qlineedit[i].objectName()]/10.)))
+                    str(10.**(-self.fil_dict[self.qlineedit[i].objectName()]/10.)))
 
     def storeEntries(self):
         """
@@ -217,23 +217,23 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
 
 #        for i in range(len(self.qlineedit)):
-#            self.specs.update(
+#            self.fil_dict.update(
 #                {self.qlineedit[i].objectName():float(self.qlineedit[i].text())})
 
         if idx == 0: # Entry is in dBs, same as in dictionary
             for i in range(len(self.qlineedit)):
-                self.specs.update(
+                self.fil_dict.update(
                     {self.qlineedit[i].objectName():
                         float(self.qlineedit[i].text())})
 
         elif idx == 1:  # Entries are voltages, convert to dBs
             for i in range(len(self.qlineedit)):
-                self.specs.update(
+                self.fil_dict.update(
                     {self.qlineedit[i].objectName():
                        - 20. * log10 (float(self.qlineedit[i].text()))})
         else:  # Entries are powers, convert to dBs
             for i in range(len(self.qlineedit)):
-                self.specs.update(
+                self.fil_dict.update(
                     {self.qlineedit[i].objectName():
                        - 10. * log10 (float(self.qlineedit[i].text()))})
 
@@ -244,7 +244,7 @@ if __name__ == '__main__':
     import filterbroker as fb
 
     app = QtGui.QApplication(sys.argv)
-    form = InputAmpSpecs(specs = fb.fil[0])
+    form = InputAmpSpecs(fil_dict = fb.fil[0])
 
     form.setEntries(newLabels = ['A_SB','A_SB2','A_PB','A_PB2'])
     form.setEntries(newLabels = ['A_PB','A_PB2'])

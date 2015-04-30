@@ -95,7 +95,8 @@ class MplWidget(QtGui.QWidget):
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
         self.fig.tight_layout(pad = 0.2)
 #        self.pltCanv.updateGeometry()
-        self.pltCanv.draw()
+#        self.pltCanv.adjustSize() #  resize the parent widget to fit its content
+        self.pltCanv.draw() # now (re-)draw the figure
 #
 
     def pltFullView(self):
@@ -105,6 +106,7 @@ class MplWidget(QtGui.QWidget):
         for ax in self.fig.axes:
             ax.autoscale()
         self.redraw()
+
 
 #------------------------------------------------------------------------------
 

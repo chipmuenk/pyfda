@@ -58,44 +58,25 @@ class InputCoeffs(QtGui.QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
-        
-        """Edit WinMic"""
+
          #Which Button holds the longest Text?
-        
-        
-#        butAddRowText = 
-#        butDelRowtext = 
-#        butSaveText = "Save"
-#        butLoadText = "Load"
-#        butClearText = "Clear"
-#        butSetZeroText = "Set Zero"
-#        butQuantText = "< Q >"
+
         MaxTextlen = 0
         longestText = ""
         ButLength = 0
         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
-        
+
         for item in butTexts:
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
-                longestText = item        
-        """End"""
-        
-        
+                longestText = item
+
 
         self.chkCoeffList =  QtGui.QCheckBox()
         self.chkCoeffList.setChecked(True)
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
         self.lblCoeffList = QtGui.QLabel()
         self.lblCoeffList.setText("Show Coefficients")
-
-#        self.chkIIR = QtGui.QCheckBox()
-#        self.chkIIR.setChecked(True)
-#        self.chkIIR.setToolTip("IIR Filter")
-#        self.chkIIR.setCheckable(False) # not implemented yet
-#        self.chkIIR.setEnabled(False) # not implemented yet
-#        self.lblIIR = QtGui.QLabel()
-#        self.lblIIR.setText("IIR")
 
         self.tblCoeff = QtGui.QTableWidget()
         self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
@@ -108,14 +89,10 @@ class InputCoeffs(QtGui.QWidget):
 
         self.butAddRow = QtGui.QPushButton()
         self.butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
-        
-        """EDIT WinMic"""
-        
         self.butAddRow.setText(butTexts[0])
-        #Calculate the length for the Buttons based on the longest ButtonText
+        #Calculate the length for the buttons based on the longest ButtonText
         ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
         self.butAddRow.setMaximumWidth(ButLength)
-        """End"""
 
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
@@ -185,7 +162,7 @@ class InputCoeffs(QtGui.QWidget):
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
-        
+
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
@@ -195,9 +172,6 @@ class InputCoeffs(QtGui.QWidget):
         self.layHChkBoxes.addWidget(self.chkCoeffList)
         self.layHChkBoxes.addWidget(self.lblCoeffList)
         self.layHChkBoxes.addStretch(1)
-#        self.layHChkBoxes.addWidget(self.chkIIR)
-#        self.layHChkBoxes.addWidget(self.lblIIR)
-#        self.layHChkBoxes.addStretch(10)
 
         self.layHButtonsCoeffs1 = QtGui.QHBoxLayout()
         self.layHButtonsCoeffs1.addWidget(self.butAddRow)
@@ -221,7 +195,7 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
 
         self.layHButtonsCoeffs3.addStretch()
-        
+
         self.layHButtonsCoeffs4 = QtGui.QHBoxLayout()
         spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         self.layHButtonsCoeffs4.addWidget(self.lblQOvfl)
@@ -288,7 +262,7 @@ class InputCoeffs(QtGui.QWidget):
             coeffs.append(rows)
 
         fb.fil[0]["N"] = num_rows - 1
-        save_fil(fb.fil[0], coeffs, 'ba', __name__)
+        save_fil(fb.fil[0], coeffs, 'coeffs', __name__)
 
         if self.DEBUG:
             print("Coeffs - ZPK:", fb.fil[0]["zpk"])
@@ -423,7 +397,7 @@ class InputCoeffs(QtGui.QWidget):
                     item.setText(str(myQ.fix(simple_eval(item.text()))))
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
-                    
+
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
 

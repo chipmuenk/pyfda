@@ -86,29 +86,22 @@ class pyFDA(QtGui.QMainWindow):
 #        splitter.addWidget(frmInput)
 #        splitter.addWidget(frmPlt)
 #        layHMain.addWidget(splitter)
-        self.setCentralWidget(_widget)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
     
-        # set minimum _widget size of central widget (matplotlib canvas) before scrollbars appear
-        # print(_widget.height())
     
         # Create scroll area and "monitor" _widget whether scrollbars are needed
         scrollArea = QtGui.QScrollArea()
-        scrollArea.setWidget(_widget)
+        scrollArea.setWidget(_widget) # splitter for var. size tabs?
         
-        scrollArea.setMinimumSize(QtCore.QSize(800, 500))
-#        scrollArea.setMinimumSize(QtCore.QSize(screen_w - 200,screen_h - 200))
-
-
-#        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default?
-#        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-
-                                 
+        #============= Set behaviour of scroll area ======================
+        # scroll bars appear when the scroll area shrinks below this size:
+        scrollArea.setMinimumSize(QtCore.QSize(800, 500)) 
+#        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
+#        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default                                
         scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
                                  QtGui.QSizePolicy.MinimumExpanding)
 
-        
         # Size of monitored widget is allowed to grow:
         scrollArea.setWidgetResizable(True)
 
@@ -118,6 +111,7 @@ class pyFDA(QtGui.QMainWindow):
 
 
         #=============== Menubar =======================================
+
 #        aboutAction = QtGui.QAction('&About', self)
 #        aboutAction.setShortcut('Ctrl+A')
 #        aboutAction.setStatusTip('Info about pyFDA')
@@ -128,22 +122,18 @@ class pyFDA(QtGui.QMainWindow):
 #        
 
         # ============== Signals & Slots ================================
-
         self.inputAll.inputSpecs.fspecs.specsChanged.connect(self.updateOutput)
         self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
         self.inputAll.inputCoeffs.butSave.clicked.connect(self.updateOutput)
         self.inputAll.inputPZ.butSave.clicked.connect(self.updateOutput)
 #        self.inputAll.inputUpdated.connect(self.updateOutput)
-
-#        aboutAction.triggered.connect(self.aboutWindow)
+#        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
         self.statusMessage("Application is initialized.")
 
     def updateOutput(self):
         self.inputAll.updateAll() # input widgets re-read 'coeffs' / 'zpk'
         self.pltAll.updateAll()
-#        self.frmInput.adjustSize()
-#        self.pltAll.adjustSize()
 
     def aboutWindow(self):
         QtGui.QMessageBox.about(self, "About pyFDA",

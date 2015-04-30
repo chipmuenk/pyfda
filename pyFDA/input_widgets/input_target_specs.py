@@ -33,7 +33,7 @@ class InputTargetSpecs(QtGui.QWidget):
     filterDesigned = pyqtSignal()  # emitted when filter has been designed
     filterChanged = pyqtSignal()
 
-    def __init__(self, specs, DEBUG = False):
+    def __init__(self, fil_dict, DEBUG = False):
         super(InputTargetSpecs, self).__init__()
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
@@ -54,10 +54,10 @@ class InputTargetSpecs(QtGui.QWidget):
         """
 
         # subwidget for Frequency Specs
-        self.fspecs = input_freq_specs.InputFreqSpecs(specs = fb.fil[0],
+        self.fspecs = input_freq_specs.InputFreqSpecs(fil_dict = fb.fil[0],
                     DEBUG = False)
         # subwidget for Amplitude Specs
-        self.aspecs = input_amp_specs.InputAmpSpecs(specs = fb.fil[0],
+        self.aspecs = input_amp_specs.InputAmpSpecs(fil_dict = fb.fil[0],
                     DEBUG = False)
 
         self.aspecs.setVisible(True)
@@ -74,7 +74,7 @@ class InputTargetSpecs(QtGui.QWidget):
         spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
 #        layGMain.addWidget(self.fspecs,0,0,1,2)
-        
+
         layGMain.addWidget(lblTitle,0,0,1,2)
         layGMain.addWidget(self.fspecs,1,0)  # Freq. specifications
         layGMain.addWidget(self.aspecs,1,1)   # Amplitude specs
@@ -109,8 +109,8 @@ class InputTargetSpecs(QtGui.QWidget):
         dm = fb.fil[0]['dm']
 #        fo = fb.fil[0]['fo']
 #        print(fb.filTree[rt][ft])
-#TODO: The following fails when a design method has no minimum filter order 
-#       algorithm! Solution: Provide generic parameters for LP / BP / ... as fallback        
+#TODO: The following fails when a design method has no minimum filter order
+#       algorithm! Solution: Provide generic parameters for LP / BP / ... as fallback
         if 'min' in fb.filTree[rt][ft][dm]:
             myParams = fb.filTree[rt][ft][dm]['min']['par']
         else:
@@ -152,7 +152,7 @@ class InputTargetSpecs(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = InputTargetSpecs(specs = fb.fil[0])
+    form = InputTargetSpecs(fil_dict = fb.fil[0])
     form.show()
     form.storeEntries()
 

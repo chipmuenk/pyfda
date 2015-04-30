@@ -62,17 +62,17 @@ class InputSpecs(QtGui.QWidget):
         self.sf = input_filter.SelectFilter(DEBUG = False)
         self.fo = input_order.InputOrder(DEBUG = False)
         # subwidget for Frequency Specs
-        self.fspecs = input_freq_specs.InputFreqSpecs(specs = fb.fil[0],
-                    DEBUG = False)
+        self.fspecs = input_freq_specs.InputFreqSpecs(fil_dict = fb.fil[0],
+                    DEBUG = True)
         # subwidget for Amplitude Specs
-        self.aspecs = input_amp_specs.InputAmpSpecs(specs = fb.fil[0],
+        self.aspecs = input_amp_specs.InputAmpSpecs(fil_dict = fb.fil[0],
                     DEBUG = False)
         # subwidget for Weight Specs
-        self.wspecs = input_weight_specs.InputWeightSpecs(specs = fb.fil[0],
+        self.wspecs = input_weight_specs.InputWeightSpecs(fil_dict = fb.fil[0],
                     DEBUG = False)
-                    
-#TODO:  
-        self.tspecs = input_target_specs.InputTargetSpecs(specs = fb.fil[0],
+
+#TODO: get target specs up and running
+        self.tspecs = input_target_specs.InputTargetSpecs(fil_dict = fb.fil[0],
                    DEBUG = False)
 
         self.lblMsg = QtGui.QLabel(self)
@@ -107,7 +107,7 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.aspecs,3,0)   # Amplitude specs
         layGMain.addWidget(self.wspecs,3,1)   # Weight specs
         layGMain.addWidget(frmMsg,4,0,1,2)  # Text message
-#TODO:        
+#TODO: get target specs up and running
 #        layGMain.addWidget(self.tspecs,5,0,1,2)   # Target specs
         layGMain.addWidget(self.butDesignFilt, 6,0)
         layGMain.addWidget(self.butReadFiltTree, 6,1)
@@ -187,7 +187,7 @@ class InputSpecs(QtGui.QWidget):
         self.fspecs.storeEntries() # frequency specification widget
         self.aspecs.storeEntries() # magnitude specs with unit
         self.wspecs.storeEntries() # weight specification
-#TODO: 
+#TODO: get target specs up and running
         self.tspecs.storeEntries() # target specs
 
         if self.DEBUG: print(fb.fil[0])

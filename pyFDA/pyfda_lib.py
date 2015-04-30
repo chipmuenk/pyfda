@@ -32,12 +32,9 @@ from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
    ceil, hstack, mod
 
 import scipy.signal as sig
-#from scipy import special # needed for remezord
-#import scipy.spatial.distance as sc_dist
 import matplotlib.pyplot as plt
 from  matplotlib import patches
-#from matplotlib.figure import Figure
-#from matplotlib import rcParams
+
 
 def cround(x, n_dig = 0):
     """
@@ -55,14 +52,14 @@ def cround(x, n_dig = 0):
     return x
 
 def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
-    """ 
-    Calculate `|H(z)|` at the complex frequency(ies) `z` (scalar or 
+    """
+    Calculate `|H(z)|` at the complex frequency(ies) `z` (scalar or
     array-like).  The function `H(z)` is given in polynomial form with numerator and
     denominator. When log = True, `20 log_10 (|H(z)|)` is returned.
-    
-    The result is clipped at H_min, H_max; clipping can be disabled by passing 
+
+    The result is clipped at H_min, H_max; clipping can be disabled by passing
     None as the argument.
-    
+
     Parameters
     ----------
     num : float or array-like
@@ -76,17 +73,17 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
     H_min : float, optional
         The minimum value to which the result is clipped (default: 0)
     log : boolean, optional
-        When true, return 20 * log10 (|H(z)|). The clipping limits have to 
+        When true, return 20 * log10 (|H(z)|). The clipping limits have to
         be given as dB in this case.
     div_by_0 : string, optional
-        What to do when division by zero occurs during calculation (default: 
+        What to do when division by zero occurs during calculation (default:
         'ignore'). As the denomintor of H(z) becomes 0 at each pole, warnings
-        are suppressed by default. This parameter is passed to numpy.seterr(), 
+        are suppressed by default. This parameter is passed to numpy.seterr(),
         hence other valid options are 'warn', 'raise' and 'print'.
-    
+
     Returns
     -------
-    H_mag : float or ndarray 
+    H_mag : float or ndarray
         The magnitude |`H(z)`| for each value of `z`.
     """
 
@@ -100,10 +97,10 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
         den_val = abs(den) # denominator is a scalar
     else:
         den_val = abs(np.polyval(den, z)) # evaluate denominator at z
-    
+
     olderr = np.geterr()  # store current floating point error behaviour
     # turn off divide by zero warnings, just return 'inf':
-    np.seterr(divide = 'ignore') 
+    np.seterr(divide = 'ignore')
 
     if log:
         H_val = 20 * np.log10(num_val / den_val)
@@ -112,7 +109,7 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
 
     np.seterr(**olderr) # restore previous floating point error behaviour
 
-    # clip result to H_min / H_max    
+    # clip result to H_min / H_max
     return np.clip(H_val, H_min, H_max)
 
 #----------------------------------------------
@@ -365,10 +362,9 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
     # Alternative:
     # get a figure/plot
     # [z,p,k] = scipy.signal.tf2zpk -> poles and zeros
-    # Plotten über
+    # Plot using
     # scatter(real(p),imag(p))
     # scatter(real(z),imag(z))
-
 
     # Is input data given as zeros & poles (zpk = True) or
     # as numerator & denominator coefficients (b, a) of system function?
@@ -814,17 +810,19 @@ Two decimal places for numbers on x- and y-axis
         locy,labely = plt.yticks() # get location and content of xticks
         plt.yticks(locy, map(lambda y: format % y, locy*scale))
 
-def save_fil(specs, arg, out_format, sender, DEBUG = False):
+#==============================================================================
+
+def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
     """
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all available formats in the passed
-    dictionary 'specs'.
+    dictionary 'fil_dict'.
     """
     if DEBUG: print("saveFil: arg = ",arg)
     if out_format == 'zpk': # arg = [z,p,k]
         (b, a) = sig.zpk2tf(arg[0], arg[1], arg[2])
         zpk = arg
-    elif out_format == 'ba': # arg = [b,a]
+    elif out_format == 'coeffs': # arg = [b,a]
         if np.ndim(arg) == 1:
 #            print(len(arg))
             b = np.asarray(arg)
@@ -837,9 +835,10 @@ def save_fil(specs, arg, out_format, sender, DEBUG = False):
         zpk = sig.tf2zpk(b, a)#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
     else:
         raise ValueError("Unknown output format {0:s}".format(out_format))
-    specs['coeffs'] = [b, a]
-    specs['zpk'] = zpk
-    specs['creator'] = (out_format, sender)
+    fil_dict['coeffs'] = [b, a]
+    fil_dict['zpk'] = zpk
+    fil_dict['sos'] = None
+    fil_dict['creator'] = (out_format, sender)
 
 #==============================================================================
 

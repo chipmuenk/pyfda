@@ -4,7 +4,7 @@ Created on Jan 5th
 
 @author: Christian Muenker
 
-Tabbed container for input widgets
+Tabbed container for all input widgets
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
@@ -38,7 +38,6 @@ class InputAll(QtGui.QWidget):
 
         self.setStyleSheet(css)
 
-#        self.inputParams = inputParams.inputParams()
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)
         self.inputFiles = input_files.InputFiles(DEBUG = False)
         self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
@@ -51,7 +50,7 @@ class InputAll(QtGui.QWidget):
     def initUI(self):
         """ Initialize UI with tabbed subplots """
         tabWidget = QtGui.QTabWidget()
-#        tab_widget.addTab(self.inputParams, 'Params')
+        
         tabWidget.addTab(self.inputSpecs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')
         tabWidget.addTab(self.inputCoeffs, 'b,a')
@@ -61,11 +60,10 @@ class InputAll(QtGui.QWidget):
         layVMain = QtGui.QVBoxLayout()
         layVMain.addWidget(tabWidget)
         
-        #setContentsMargins -> Anzahl derPixel zwischen Frame und Fenster
-        layVMain.setContentsMargins(1,1,1,1)
+        #setContentsMargins -> number of pixels between frame window border
+        layVMain.setContentsMargins(1,1,1,1) # R, T, L, B
 #
         self.setLayout(layVMain)
-#        layVMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
         tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Expanding)
 
@@ -80,7 +78,14 @@ class InputAll(QtGui.QWidget):
 
 
     def updateAll(self):
-        """ Update all widgets with new filter data"""
+        """ 
+        Update all input widgets that can / need to display new filter data.
+        This method is called from the main routine in pyFDA.py each time the 
+        filter design has been updated. 
+        
+        The individual methods called below have to get updated info from the
+        central filter dict.
+        """
         self.inputCoeffs.showCoeffs()
         self.inputPZ.showZPK()
 
@@ -94,5 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
+    
