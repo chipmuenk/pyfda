@@ -130,22 +130,19 @@ class InputFreqSpecs(QtGui.QWidget):
 
         self.setLayout(self.layVMain)
 
-#        self.layVMain.addLayout(self.layGSpecWdg) # no frame
-#        mainLayout = QtGui.QHBoxLayout()
-#        mainLayout.addWidget(sfFrame)
-#        self.setLayout(mainLayout)
-
-        # SIGNALS & SLOTS =====================================================
-
+        # =========== SIGNALS & SLOTS =======================================
         self.cmbUnits.currentIndexChanged.connect(self.freqUnits)
         self.cmbFRange.currentIndexChanged.connect(self.freqRange)
         self.ledF_S.editingFinished.connect(self.freqUnits)
-        self.butSort.clicked.connect(self._sortEntries)
-#        self.chkSortAuto.clicked.connect(self._sortEntries)
-        # Every time a textfield is edited, call self.freqUnits - the signal is
-        #   constructed in _addEntry
+        self.butSort.clicked.connect(self._sortStoreEntries)
+        self.chkSortAuto.clicked.connect(self._sortStoreEntries)
+        # DYNAMIC SIGNAL SLOT CONNECTION:
+        # Every time a field is edited, call self.freqUnits - this signal-slot
+        # mechanism is constructed in self._addEntry / destructed in 
+        # self._delEntry each time the widget is updated, i.e. when a new 
+        # filter design method is selected.
 
-        self.freqUnits()
+        self.freqUnits() # first time initialization
 
 #    def mousePressEvent(self, event):
 #        """
@@ -174,7 +171,6 @@ class InputFreqSpecs(QtGui.QWidget):
 
         self.fil_dict['freqSpecsRange'] = f_lim
         self.specsChanged.emit() # ->pyFDA -> pltAll.updateAll()
-
 
 #-------------------------------------------------------------
     def freqUnits(self):
@@ -253,7 +249,6 @@ class InputFreqSpecs(QtGui.QWidget):
         self.f_S_old = self.f_S # and f_S (not used yet)
         self.freqRange() # update f_lim setting and send redraw signal
 #        self.specsChanged.emit() # ->pyFDA -> pltAll.updateAll()
-#        print("PING!!!")
 
 
     def rtLabel(self, label):
@@ -290,10 +285,16 @@ class InputFreqSpecs(QtGui.QWidget):
                     self.qlineedit[i].setText(str(self.fil_dict[newLabels[i]]*self.f_S))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
+        if self.chkSortAuto.isChecked():
+            self._sortEntries()
+
     def _delEntry(self,i):
         """
-        Delete entry number i from subwidget (QLabel and QLineEdit)
+        Delete entry number i from subwidget (QLabel and QLineEdit) and
+        disconnect the lineedit field from self.freqUnits
         """
+        self.qlineedit[i].editingFinished.disconnect(self.freqUnits) # needed?
+
         self.layGSpecWdg.removeWidget(self.qlabels[i])
         self.layGSpecWdg.removeWidget(self.qlineedit[i])
 
@@ -305,31 +306,42 @@ class InputFreqSpecs(QtGui.QWidget):
 
     def _addEntry(self, i, newLabel):
         """
-        Append entry number i to subwidget (QLabel und QLineEdit)
+        Append entry number i to subwidget (QLabel und QLineEdit) and
+        connect QLineEdit widget to self.freqUnits. This way, the central filter
+        dictionary is updated automatically when a QLineEdit field has been
+        edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self.rtLabel(newLabel))
 
         self.qlineedit.append(QtGui.QLineEdit(str(self.fil_dict[newLabel]*self.f_S)))
-        self.qlineedit[i].editingFinished.connect(self.freqUnits)
         self.qlineedit[i].setObjectName(newLabel) # update ID
+        
+        self.qlineedit[i].editingFinished.connect(self.freqUnits)
 
         self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
 
-    def _sortEntries(self):
+
+    def _sortStoreEntries(self):
         """
         Sort spec entries with ascending frequency and store in filter dict.
         """
-        # self.butSort.setDisabled(self.chkSortAuto.isChecked())
+        self._sortEntries()
+        self.storeEntries()
+        
+        
+    def _sortEntries(self):
+        """
+        Sort spec entries with ascending frequency.
+        """
+        self.butSort.setDisabled(self.chkSortAuto.isChecked())
         fSpecs = [self.qlineedit[i].text() for i in range(len(self.qlineedit))]
 
         fSpecs.sort()
 
         for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText(fSpecs[i])
-
-        self.storeEntries()
 
     def loadEntries(self):
         """
@@ -353,7 +365,10 @@ class InputFreqSpecs(QtGui.QWidget):
                 {self.qlineedit[i].objectName():
                     float(self.qlineedit[i].text())/self.f_S})
             if self.DEBUG:
-                print(self.qlineedit[i].objectName(), float(self.qlineedit[i].text())/self.f_S)
+                print(self.qlineedit[i].objectName(),
+                      float(self.qlineedit[i].text())/self.f_S,
+                      float(self.fil_dict[self.qlineedit[i].objectName()]))
+
 
 #------------------------------------------------------------------------------
 
