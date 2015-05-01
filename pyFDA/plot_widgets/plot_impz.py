@@ -139,8 +139,8 @@ class PlotImpz(QtGui.QMainWindow):
 
 #        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
 
-        self.bb = fb.fil[0]['coeffs'][0]
-        self.aa = fb.fil[0]['coeffs'][1]
+        self.bb = fb.fil[0]['ba'][0]
+        self.aa = fb.fil[0]['ba'][1]
 
         self.f_S  = fb.fil[0]['f_S']
         self.F_PB = fb.fil[0]['F_PB'] * self.f_S

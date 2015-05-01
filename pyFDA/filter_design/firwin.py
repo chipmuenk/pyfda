@@ -25,8 +25,8 @@ import pyfda_lib
 # TODO: Hilbert not working correctly yet
 # TODO: Windows with parameters are missing
 
-frmt = 'ba' # set output format of filter design routines to 'zpk' or 'ba'
-             # currently, only 'ba' is supported for equiripple routines
+frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+            # currently, only 'ba' is supported for firwin routines
 
 class firwin(object):
 
@@ -102,10 +102,9 @@ class firwin(object):
         self.combo_firwin_win = QtGui.QComboBox()
         self.combo_firwin_win.setObjectName('combo_firwin_win')
 
-        #TODO: Eigennamen mit Großbuchstaben beginnen?
-        windows = ['boxcar','triang','blackman','hamming','hann','bartlett',
-                   'flattop', 'parzen', 'bohman', 'blackmanharris', 'nuttall',
-                   'barthann']
+        windows = ['Boxcar','Triang','Blackman','Hamming','Hann','Bartlett',
+                   'Flattop', 'Parzen', 'Bohman', 'Blackmanharris', 'Nuttall',
+                   'Barthann']
 
         #kaiser (needs beta), gaussian (needs std), general_gaussian
         #(needs power, width), slepian (needs width), chebwin (needs attenuation)
@@ -125,15 +124,12 @@ class firwin(object):
         self.updateWindow()
 
     def updateWindow(self):
-        self.firWindow = str(self.combo_firwin_win.currentText())
+        self.firWindow = str(self.combo_firwin_win.currentText()).lower()
         self.alg = str(self.combo_firwin_alg.currentText())
-        print(self.firWindow)
 
 #        mod = import_module(scipy.signal) # doesn't work
 #        print(sig.boxcar.__doc__) # this works
 #        met = getattr(sig.boxcar, '.__doc__'  )
-
-
 
 #        print(type(self.firWindow))
 #        self.firWindow = 'hann'
