@@ -41,9 +41,10 @@ class SelectFilter(QtGui.QWidget):
         # the filter file
         self.ftb = FilterTreeBuilder('filter_design', 'init.txt',
                                     commentChar = '#', DEBUG = DEBUG) #
+        self.filter_initialized = False
 
         self.initUI()
-
+        
         self.setResponseType()
 
 
@@ -52,7 +53,7 @@ class SelectFilter(QtGui.QWidget):
         Initialize UI with comboboxes for selecting filter
         """
 #-----------------------------------------------------------------------------
-#        see filterBroker.py for structure and content of "filterTree" dict
+#        see filterbroker.py for structure and content of "filterTree" dict
 #-----------------------------------------------------------------------------
 
         #----------------------------------------------------------------------
@@ -71,13 +72,12 @@ class SelectFilter(QtGui.QWidget):
         self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
 
 
-        """Edit WincMIC"""
-        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
+
+        # Adapt combobox size dynamically to largest element
         self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbDesignMethod.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        
-        """END"""
+
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in filterbroker.py) and populate combo box:
         for rt in fb.filTree:
@@ -109,9 +109,8 @@ class SelectFilter(QtGui.QWidget):
 
         layHStdWdg = QtGui.QHBoxLayout() # container for standard subwidgets
         
-        """EDIT WinMic"""
-        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        """END"""
+        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, 
+                                         QtGui.QSizePolicy.Fixed)
         
         layHStdWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
         
@@ -160,18 +159,35 @@ class SelectFilter(QtGui.QWidget):
     def setResponseType(self):
         """
         Triggered when cmbResponseType (LP, HP, ...) is changed:
-        Copy selection to self.rt and fb.gD and reconstruct filter type combo
+        Copy selection to self.rt and fb.fil[0] and reconstruct filter type combo
+
+        If previous filter type (FIR, IIR, ...) exists for new rt, set the 
+        filter type combo box to the old setting 
         """
+        # cmbBox.currentText() shows full text ('Lowpass'), 
+        # itemData only abbreviation ('LP')
         self.rtIdx = self.cmbResponseType.currentIndex()
         self.rt = str(self.cmbResponseType.itemData(self.rtIdx))
 
-        fb.fil[0]['rt'] = self.rt # abbreviation
-#        rt=fb.gD["rtNames"][self.rt] # full text
-#        print(fb.filTree[self.rt].keys())
-        #
+        fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
+
+        # rebuild filter type combobox entries for new rt setting 
+        # The combobox is populated with the "long name", the internal name
+        # is stored in comboBox.itemData               
         self.cmbFilterType.clear()
         self.cmbFilterType.addItems(
-            list(fb.filTree[self.rt].keys())) # list() needed for Py3
+            list(fb.filTree[self.rt].keys())) # explicit list() needed for Py3
+
+        # get list of available filter types for new rt
+        ftList = fb.filTree[self.rt].keys() 
+        # Is last filter type (e.g. IIR) in list for new rt? 
+        # And has the widget been initialized?
+        if fb.fil[0]['ft'] in ftList and self.filter_initialized:
+            ft_idx = self.cmbFilterType.findText(fb.fil[0]['ft'])
+            self.cmbFilterType.setCurrentIndex(ft_idx) # yes, set same ft as before
+        else:
+            self.cmbFilterType.setCurrentIndex(0)     # no, set index 0        
+        
         self.setFilterType()
 
     def setFilterType(self):
@@ -180,13 +196,40 @@ class SelectFilter(QtGui.QWidget):
         Copy selected setting to self.ft and (re)construct design method combo,
         adding displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
+        # cmbBox.currentText() has full text ('IIR'), 
+        # itemData only abbreviation ('IIR')
+        ftIdx = self.cmbFilterType.currentIndex()
         self.ft = str(self.cmbFilterType.currentText())
-        self.cmbDesignMethod.clear()
-
-        for dm in fb.filTree[self.rt][self.ft]:
-            self.cmbDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
+        # TODO: This line gives back key 'None' causing a crash downstream
+        # self.ft = str(self.cmbFilterType.itemData(ftIdx))
 
         fb.fil[0]['ft'] = self.ft
+
+        # Rebuild design method combobox entries for new ft setting:
+        # The combobox is populated with the "long name", the internal name
+        # is stored in comboBox.itemData        
+        self.cmbDesignMethod.clear()
+        
+        # TODO: The following line dumps a core when the key does not exist !!!
+        for dm in fb.filTree[self.rt][self.ft]:
+            self.cmbDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
+                       
+        # get list of available design methods for new ft
+        dmList = fb.filTree[self.rt][self.ft].keys() 
+        if self.DEBUG: 
+            print("dmlist", dmList)
+            print(fb.fil[0]['dm'])
+
+        # Is previous design method (e.g. ellip) in list for new ft? 
+        # And has the widget been initialized?
+        if fb.fil[0]['dm'] in dmList and self.filter_initialized:
+            dm_idx = self.cmbDesignMethod.findText(fb.gD['dmNames'][fb.fil[0]['dm']])
+            print("dm_idx", dm_idx)
+            self.cmbDesignMethod.setCurrentIndex(dm_idx) # yes, set same dm as before
+        else:
+            self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0  
+
+
         self.setDesignMethod()
 
     def setDesignMethod(self):
@@ -194,9 +237,10 @@ class SelectFilter(QtGui.QWidget):
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
         Copy selected setting to self.dm # TODO: really needed?
         """
-        self.dmIdx = self.cmbDesignMethod.currentIndex()
-        self.dm = str(self.cmbDesignMethod.itemData(self.dmIdx))
+        dmIdx = self.cmbDesignMethod.currentIndex()
+        self.dm = str(self.cmbDesignMethod.itemData(dmIdx))
         fb.fil[0]['dm'] = self.dm
+
 
         try: # has a filter object been instantiated yet?
             if fb.fil[0]['dm'] not in fb.filObj.name:
@@ -223,6 +267,8 @@ class SelectFilter(QtGui.QWidget):
                                                             [self.dm].keys())
 
 
+        self.filter_initialized = True
+        
         self.updateWidgets() # check for new subwidgets and update if needed
 
         # reverse dictionary lookup
