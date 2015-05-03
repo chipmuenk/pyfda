@@ -409,6 +409,7 @@ class Plot3D(QtGui.QMainWindow):
             self.ax3d.contourf(x, y, Hmag, zdir='x', offset=xmin, 
                                  cmap=cm.coolwarm) #vmin = zmin, vmax = thresh, 
             self.ax3d.contourf(x, y, Hmag, zdir='y', offset=ymax, cmap=cm.coolwarm)
+            self.ax3d.contourf(x, y, Hmag, zdir='z', offset=bottom, cmap=cm.coolwarm)
 
         self.ax3d.set_xlim3d(xmin, xmax)
         self.ax3d.set_ylim3d(ymin, ymax)
