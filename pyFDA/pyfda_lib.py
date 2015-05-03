@@ -822,7 +822,7 @@ def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
     if out_format == 'zpk': # arg = [z,p,k]
         (b, a) = sig.zpk2tf(arg[0], arg[1], arg[2])
         zpk = arg
-    elif out_format == 'coeffs': # arg = [b,a]
+    elif out_format == 'ba': # arg = [b,a]
         if np.ndim(arg) == 1:
 #            print(len(arg))
             b = np.asarray(arg)
@@ -835,7 +835,7 @@ def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
         zpk = sig.tf2zpk(b, a)#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
     else:
         raise ValueError("Unknown output format {0:s}".format(out_format))
-    fil_dict['coeffs'] = [b, a]
+    fil_dict['ba'] = [b, a]
     fil_dict['zpk'] = zpk
     fil_dict['sos'] = None
     fil_dict['creator'] = (out_format, sender)

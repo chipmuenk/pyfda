@@ -89,12 +89,8 @@ class PlotPhi(QtGui.QMainWindow):
 
         self.unitPhi = self.cmbUnitsPhi.currentText()
 
-        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
-            self.bb = fb.fil[0]['coeffs']
-            self.aa = 1.
-        else: # IIR
-            self.bb = fb.fil[0]['coeffs'][0]
-            self.aa = fb.fil[0]['coeffs'][1]
+        self.bb = fb.fil[0]['ba'][0]
+        self.aa = fb.fil[0]['ba'][1]
 
         if self.DEBUG:
             print("--- plotPhi.draw() ---")

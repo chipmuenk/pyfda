@@ -238,8 +238,8 @@ class Plot3D(QtGui.QMainWindow):
         self.initAxes() # needed to get rid of colormap
 
         
-        bb = fb.fil[0]['coeffs'][0]
-        aa = fb.fil[0]['coeffs'][1]
+        bb = fb.fil[0]['ba'][0]
+        aa = fb.fil[0]['ba'][1]
         
         zz = np.array(fb.fil[0]['zpk'][0])
         pp = np.array(fb.fil[0]['zpk'][1])

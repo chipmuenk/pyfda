@@ -118,8 +118,8 @@ class InputInfo(QtGui.QWidget):
         """
         self.tblFiltPerf.setVisible(self.chkFiltPerf.isChecked())
 
-        bb = fb.fil[0]['coeffs'][0]
-        aa = fb.fil[0]['coeffs'][1]
+        bb = fb.fil[0]['ba'][0]
+        aa = fb.fil[0]['ba'][1]
 
         f_S  = fb.fil[0]['f_S']
 

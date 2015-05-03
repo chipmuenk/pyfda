@@ -33,7 +33,7 @@ class InputSpecs(QtGui.QWidget):
     filterDesigned = pyqtSignal()  # emitted when filter has been designed
     filterChanged = pyqtSignal()
 
-    def __init__(self, DEBUG = False):
+    def __init__(self, DEBUG = True):
         super(InputSpecs, self).__init__()
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
@@ -72,8 +72,8 @@ class InputSpecs(QtGui.QWidget):
                     DEBUG = False)
 
 #TODO: get target specs up and running
-        self.tspecs = input_target_specs.InputTargetSpecs(fil_dict = fb.fil[0],
-                   DEBUG = False)
+        #self.tspecs = input_target_specs.InputTargetSpecs(fil_dict = fb.fil[0],
+        #           DEBUG = False)
 
         self.lblMsg = QtGui.QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -123,7 +123,7 @@ class InputSpecs(QtGui.QWidget):
         self.sf.cmbResponseType.activated.connect(self.chooseDesignMethod)
         self.sf.cmbFilterType.activated.connect(self.chooseDesignMethod)
         self.sf.cmbDesignMethod.activated.connect(self.chooseDesignMethod)
-        self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
+#        self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.butReadFiltTree.clicked.connect(self.sf.ftb.initFilters)
 
@@ -131,16 +131,21 @@ class InputSpecs(QtGui.QWidget):
 
     def chooseDesignMethod(self):
         """
-        Reads:  fb.fil[0] (currently selected filter), extracting info
-                from fb.filTree
-        Writes:
-        Depending on SelectFilter and frequency specs, the values of the
-        widgets fo, fspecs are recreated. For widget ms, the visibility is changed
-        as well.
+        This method is called every time filter design method or order 
+        (min / man) have been changed. At this time, the actual filter object instance 
+        instance has been created from design method and order 
+        (e.g. 'cheby1', 'min') in input_filter.py. Its handle has been stored
+        in fb.filobj.
+        
+        fb.fil[0] (currently selected filter) is read, then general information 
+        for the selected filter type and order (min/man) is gathered from 
+        the filter tree [fb.filTree], i.e. which parameters are needed, which
+        widgets are visible and which message shall be displayed.
+        
+        Then, all subwidgets are recreated and finally the signal 
+        'filterChanged' is emitted.
         """
 
-        # filter object instance is created from design method
-        # (e.g. 'cheby1', 'min') in input_filter.py
 
         # Read freq / amp / weight labels for current filter design
         rt = fb.fil[0]['rt']
@@ -173,6 +178,8 @@ class InputSpecs(QtGui.QWidget):
         self.wspecs.setVisible(self.weightParams != [])
         self.wspecs.setEnabled("wspecs" in myEnbWdg)
         self.wspecs.setEntries(newLabels = self.weightParams)
+#TODO: get target specs up and running
+        #self.tspecs.setEntries(newLabels = (self.freqParams, self.ampParams)
         self.lblMsg.setText(myMsg)
 
         self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()
@@ -188,9 +195,11 @@ class InputSpecs(QtGui.QWidget):
         self.aspecs.storeEntries() # magnitude specs with unit
         self.wspecs.storeEntries() # weight specification
 #TODO: get target specs up and running
-        self.tspecs.storeEntries() # target specs
+        #self.tspecs.storeEntries() # target specs
 
-        if self.DEBUG: print(fb.fil[0])
+        if self.DEBUG: 
+            print("=== pyFDA.py : storeAll ===")
+            print(fb.fil[0])
 
     def startDesignFilt(self):
         """
@@ -202,9 +211,10 @@ class InputSpecs(QtGui.QWidget):
           have been changed by the filter design method
         - the plots are updated via signal-slot connection
         """
-        self.storeAll() # store entries of all input widgets -> fb.fil[0]
+#        self.storeAll() # store entries of all input widgets -> fb.fil[0]
+#       this is not needed as individual subwidgets store results automatically
         if self.DEBUG:
-            print("--- pyFDA.py : startDesignFilter ---")
+            print("--- pyFDA.py : startDesignFilter: Specs ---")
             print('Specs:', fb.fil[0])#params)
             print("fb.fil[0]['dm']", fb.fil[0]['dm']+"."+
                   fb.fil[0]['rt']+fb.fil[0]['fo'])
@@ -227,9 +237,9 @@ class InputSpecs(QtGui.QWidget):
 
 
         if self.DEBUG:
-            print("=== pyFDA.py : startDesignFilter ===")
+            print("=== pyFDA.py : startDesignFilter: Results ===")
             print("zpk:" , fb.fil[0]['zpk'])
-            print('ndim gD:', np.ndim(fb.fil[0]['coeffs']))
+            print('ndim coeffs:', np.ndim(fb.fil[0]['coeffs']))
             print("b,a = ", fb.fil[0]['coeffs'])
             print("N = ",fb.fil[0]['N'])
             print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])

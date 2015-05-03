@@ -74,8 +74,8 @@ class PlotTauG(QtGui.QMainWindow):
         """
         Draw group delay
         """
-        bb = fb.fil[0]['coeffs'][0]
-        aa = fb.fil[0]['coeffs'][1]
+        bb = fb.fil[0]['ba'][0]
+        aa = fb.fil[0]['ba'][1]
 
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']

@@ -72,8 +72,13 @@ class InputWeightSpecs(QtGui.QWidget):
 
         self.setLayout(self.layVMain)
 
-        # SIGNALS & SLOTS
+        # =========== SIGNALS & SLOTS =======================================
         self.butReset.clicked.connect(self._resetWeights)
+        # DYNAMIC SIGNAL SLOT CONNECTION:
+        # Every time a field is edited, call self.storeEntries - this signal-
+        # slot mechanism is constructed in self._addEntry/ destructed in 
+        # self._delEntry each time the widget is updated, i.e. when a new 
+        # filter design method is selected.
 
 #-------------------------------------------------------------
     def rtLabel(self, label):
@@ -113,8 +118,11 @@ class InputWeightSpecs(QtGui.QWidget):
 
     def _delEntry(self,i):
         """
-        Delete entry number i from subwidget (QLabel and QLineEdit)
+        Delete entry number i from subwidget (QLabel and QLineEdit) and
+        disconnect the lineedit field from self.storeEntries
         """
+        self.qlineedit[i].editingFinished.disconnect(self.storeEntries)
+        
         self.layGSpecWdg.removeWidget(self.qlabels[i])
         self.layGSpecWdg.removeWidget(self.qlineedit[i])
 
@@ -126,14 +134,18 @@ class InputWeightSpecs(QtGui.QWidget):
 
     def _addEntry(self, i, newLabel):
         """
-        Append entry number i to subwidget (QLabel und QLineEdit)
+        Append entry number i to subwidget (QLabel und QLineEdit) and
+        connect QLineEdit widget to self.storeEntries. This way, the central filter
+        dictionary is updated automatically when a QLineEdit field has been
+        edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self.rtLabel(newLabel))
 
         self.qlineedit.append(QtGui.QLineEdit(str(self.fil_dict[newLabel])))
-        self.qlineedit[i].editingFinished.connect(self.storeEntries)
         self.qlineedit[i].setObjectName(newLabel) # update ID
+        
+        self.qlineedit[i].editingFinished.connect(self.storeEntries)
 
         self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)

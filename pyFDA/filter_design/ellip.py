@@ -17,7 +17,7 @@ from scipy.signal import ellipord
 import numpy as np
 import pyfda_lib
 
-frmt = 'zpk' #output format of filter design routines 'zpk' / 'coeffs' / 'sos'
+frmt = 'zpk' #output format of filter design routines 'zpk' / 'ba' / 'sos'
 
 class ellip(object):
 
@@ -100,7 +100,7 @@ the critical frequency / frequencies F\ :sub:`PB` where the gain drops below
         self.A_PB2 = fil_dict['A_PB2']
         self.A_SB2 = fil_dict['A_SB2']
 
-        print("F_PB - F_SB - F_SB2 - P_PB2\n", self.F_PB, self.F_SB, self.F_SB2, self.F_PB2 )
+#        print("Ellip: F_PB - F_SB - F_SB2 - P_PB2\n", self.F_PB, self.F_SB, self.F_SB2, self.F_PB2 )
 
     def save(self, fil_dict, arg):
         """

@@ -17,7 +17,7 @@ from scipy.signal import cheb2ord
 import numpy as np
 import pyfda_lib
 
-frmt = 'coeffs' # output format of filter design routines 'zpk' / 'coeffs' / 'sos'
+frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
 class cheby2(object):
 

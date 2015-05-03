@@ -262,11 +262,11 @@ class InputCoeffs(QtGui.QWidget):
             coeffs.append(rows)
 
         fb.fil[0]["N"] = num_rows - 1
-        save_fil(fb.fil[0], coeffs, 'coeffs', __name__)
+        save_fil(fb.fil[0], coeffs, 'ba', __name__)
 
         if self.DEBUG:
             print("Coeffs - ZPK:", fb.fil[0]["zpk"])
-            print("Coeffs - IIR:", coeffs)
+            print("Coeffs - b,a:", fb.fil[0]["ba"])
             print ("Coeffs updated!")
 
         self.coeffsChanged.emit()  # ->pyFDA -> pltAll.updateAll()
@@ -275,7 +275,7 @@ class InputCoeffs(QtGui.QWidget):
         """
         Create table from filter coeff dict
         """
-        coeffs = fb.fil[0]["coeffs"]
+        coeffs = fb.fil[0]['ba']
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 
         self.tblCoeff.setRowCount(max(np.shape(coeffs)))

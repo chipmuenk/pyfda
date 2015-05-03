@@ -93,17 +93,16 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(self.layVMain)
-#
-#        mainLayout = QtGui.QHBoxLayout()
-#        mainLayout.addWidget(frmMain)
-#        self.setLayout(mainLayout)
 
-        # SIGNALS & SLOTS
-        # Every time a field is edited, call self.freqUnits - the signal is
-        #   constructed in _addEntry
+#========= SIGNALS & SLOTS ===================================================
         self.cmbUnitsA.currentIndexChanged.connect(self.ampUnits)
+        # DYNAMIC SIGNAL SLOT CONNECTION:
+        # Every time a field is edited, call self.freqUnits - this signal-slot
+        # mechanism is constructed in self._addEntry/ destructed in 
+        # self._delEntry each time the widget is updated, i.e. when a new 
+        # filter design method is selected.
 
-        self.ampUnits()
+        self.ampUnits() # first time initialization
 
     def ampUnits(self):
         """
@@ -163,8 +162,11 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
     def _delEntry(self,i):
         """
-        Delete entry number i from subwidget (QLabel and QLineEdit)
+        Delete entry number i from subwidget (QLabel and QLineEdit) and
+        disconnect the lineedit field from self.ampUnits
         """
+        self.qlineedit[i].editingFinished.disconnect(self.ampUnits) # needed?
+        
         self.layGSpecs.removeWidget(self.qlabels[i])
         self.layGSpecs.removeWidget(self.qlineedit[i])
 
@@ -176,21 +178,26 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
     def _addEntry(self, i, newLabel):
         """
-        Append entry number i to subwidget (QLabel und QLineEdit)
+        Append entry number i to subwidget (QLabel und QLineEdit) and
+        connect QLineEdit widget to self.ampUnits. This way, the central filter
+        dictionary is updated automatically when a QLineEdit field has been
+        edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self.rtLabel(newLabel))
 
         self.qlineedit.append(QtGui.QLineEdit(str(self.fil_dict[newLabel])))
-        self.qlineedit[i].editingFinished.connect(self.ampUnits)
         self.qlineedit[i].setObjectName(newLabel) # update ID
+        
+        self.qlineedit[i].editingFinished.connect(self.ampUnits)
 
         self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
 
     def loadEntries(self):
         """
-        Reload textfields from filter dictionary to update changed settings
+        Reload textfields from filter dictionary to reflect settings that
+        may have been changed by the filter design algorithm
         """
         idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
 

@@ -29,8 +29,8 @@ import pyfda_lib
 # TODO: Try HP with even order & type = Hilbert
 # TODO: Hilbert not working correctly yet
 
-frmt = 'coeffs' #output format of filter design routines 'zpk' / 'coeffs' / 'sos'
-             # currently, only 'coeffs' is supported for equiripple routines
+frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
+             # currently, only 'ba' is supported for equiripple routines
 
 class equiripple(object):
 
@@ -122,6 +122,8 @@ class equiripple(object):
 
 #        self.alg = str(self.combo_equirip_alg.currentText())
         self.alg = 'ichige'
+#        print("Ellip: F_PB - F_SB - F_SB2 - P_PB2\n", self.F_PB, self.F_SB, self.F_SB2, self.F_PB2 )
+
 
     def save(self, fil_dict, arg):
         """
