@@ -58,6 +58,13 @@ class MplWidget(QtGui.QWidget):
         self.pltCanv.setSizePolicy(QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
 
+        # Needed for mouse modifiers (x,y, <CTRL>, ...):
+        #    Key press events in general are not processed unless you 
+        #    "activate the focus of Qt onto your mpl canvas"
+        # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none                               
+        self.pltCanv.setFocusPolicy( QtCore.Qt.ClickFocus )
+        self.pltCanv.setFocus()
+
         self.pltCanv.updateGeometry()
 
         # Create a custom navigation toolbar, tied to the canvas
@@ -103,6 +110,8 @@ class MplWidget(QtGui.QWidget):
         """
         Full zoom
         """
+        # Add current view limits to view history to enable "back to previous view"
+        self.mplToolbar.push_current() 
         for ax in self.fig.axes:
             ax.autoscale()
         self.redraw()
