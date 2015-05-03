@@ -100,13 +100,15 @@ class InputOrder(QtGui.QFrame):
         """
         Read / write text entries and checkbutton for filter order
         """
-        # read list of available filter order methods from filterTree:
+        # read list of available filter order [fo] methods for latest 
+        # design method [dm] from filTree:
         foList = fb.filTree[fb.fil[0]['rt']]\
                 [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
         if self.DEBUG:
             print("=== InputOrder.update() ===")
             print("foList", foList)
 
+        # is current fo (min / max) setting available for new dm as well ?
         if fb.fil[0]['fo'] in foList:
             fo = fb.fil[0]['fo'] # keep current setting
         else:
