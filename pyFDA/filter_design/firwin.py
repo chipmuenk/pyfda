@@ -156,8 +156,8 @@ class firwin(object):
 
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.combo_firwin_alg.currentText()
-        print("===== firwin ====\n", self.alg)
-        print(self.firWindow)
+#        print("===== firwin ====\n", self.alg)
+#        print(self.firWindow)
 
     def save(self, fil_dict, arg):
         """
