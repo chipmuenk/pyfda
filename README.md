@@ -16,14 +16,17 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 
 ### The following features are currently implemented:
 
-* **Clearly structured GUI** - only widgets needed for the currently selected design method are visible
-* **Common interface for all filter design methods:**
- * Currently implemented (scipy.signal): Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 
- * use absolute frequencies or frequencies normalized to sampling or Nyquist frequency
- * specify ripple and attenuations in dB, as voltage or as power ratios
-* **Switch between design methods**, keeping all other settings
+* **Design methods** (from scipy.signal): Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 
+* **Switch between design methods**, keeping all other settings:
  * Filter order and corner frequencies calculated by minimum order algorithms can be fine-tuned by hand
  * Directly compare how a set of specifications influences the resulting filter for different design methods
+* **Clearly structured GUI**
+ * only widgets needed for the currently selected design method are visible
+ * enhanced matplotlib NavigationToolbar (nicer icons, additional functions 'grid' and 'zoom full extent')
+* **Common interface for all filter design methods:**
+ * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
+ * specify ripple and attenuations in dB, as voltage or as power ratios
+ * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
 * **Graphical Analyses**
  * Magnitude response (lin / power / log) with optional display of the specification bands and inset plot
  * Phase response (wrapped / unwrapped)
@@ -38,7 +41,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * Display, edit and quantize 
  * Save as Comma-separated values (CSV) or Matlab (R) workspace format
 * **Display help files** (own / Python docstrings) as rich text
-* **Runs under Python 2.7 and Python 3.x (mostly)** 
+* **Runs under Python 2.7 and Python 3.4** 
 
 ### Release 0.1 (target: end of May 2015)
 
@@ -48,10 +51,16 @@ The following features are still missing for the first release. Help is very wel
   * Display coefficients / poles and zeros with fewer digits while keeping full precision
   * Group multiple poles / zeros
   * Load coefficients / poles and zeros, 
-* Smooth some rough edges (more debugging, warnings, look and feel of GUI, ...)
+* Smooth some rough edges:
+  * not all text fields are supported by simpleeval yet
+  * better debugging options
+  * reflect in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error occurred
 
 ### Following releases
 * Better help files and messages
+* Add a tracking cursor
+* Graphical modification of poles / zeros
+* Export of filter properties as PDF / HTML files
 * Show error messages and warnings in the GUI
 * Design, analysis and export of filters as second-order sections
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
