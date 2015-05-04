@@ -19,6 +19,7 @@ if __name__ == "__main__":
 
 import filterbroker as fb
 from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
+from matplotlib.patches import Rectangle
 
 
 class PlotHf(QtGui.QMainWindow):
@@ -396,8 +397,8 @@ class PlotHf(QtGui.QMainWindow):
         Construct / destruct second axes for an inset second plot
         """
         # TODO:  try   ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
-        # TODO: use sca(a) # Set the current axes to be a and return a
-
+        # TODO: choose size & position of inset, maybe dependent on filter type
+        #        or specs (i.e. where is passband etc.)
         if self.DEBUG:
             print(self.cmbInset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
             for ax in self.mplwidget.fig.axes:
@@ -409,6 +410,19 @@ class PlotHf(QtGui.QMainWindow):
                 #  Add an axes at position rect [left, bottom, width, height]:
                 self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
                 self.ax_i.clear() # clear old plot and specs
+                
+                # draw an opaque background with the extent of the inset plot:
+#                self.ax_i.patch.set_facecolor('green') # without label area
+#                self.mplwidget.fig.patch.set_facecolor('green') # whole figure
+                extent = self.mplwidget.full_extent(self.ax_i, pad = 0.0)
+                # Transform this back to figure coordinates - otherwise, it
+                #  won't behave correctly when the size of the plot is changed:
+                extent = extent.transformed(self.mplwidget.fig.transFigure.inverted())
+                rect = Rectangle((extent.xmin, extent.ymin), extent.width, 
+                        extent.height, facecolor=(1.0,1.0,1.0), edgecolor='none',
+                        transform=self.mplwidget.fig.transFigure, zorder=-1)
+                self.ax_i.patches.append(rect)
+                
                 self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
                 self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
 

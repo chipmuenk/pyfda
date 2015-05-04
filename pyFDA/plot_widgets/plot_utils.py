@@ -19,6 +19,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 #from matplotlib.backend_bases import cursors as mplCursors
 from matplotlib.figure import Figure
+from matplotlib.transforms import Bbox
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 import six
 
@@ -116,7 +117,18 @@ class MplWidget(QtGui.QWidget):
             ax.autoscale()
         self.redraw()
 
-
+    def full_extent(self, ax, pad=0.0):
+        """Get the full extent of an axes, including axes labels, tick labels, and
+        titles."""
+        #http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
+        # For text objects, we need to draw the figure first, otherwise the extents
+        # are undefined.
+        self.pltCanv.draw()
+        items = ax.get_xticklabels() + ax.get_yticklabels() 
+        items += [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
+#        items += [ax, ax.title]
+        bbox = Bbox.union([item.get_window_extent() for item in items])        
+        return bbox.expanded(1.0 + pad, 1.0 + pad)
 #------------------------------------------------------------------------------
 
 class MyMplToolbar(NavigationToolbar):
@@ -179,7 +191,7 @@ class MyMplToolbar(NavigationToolbar):
         # ENABLE:
         a = self.addAction(QtGui.QIcon(iconDir + 'circle-check.svg'), \
                            'Enable Plot', self.enable_update)
-        a.setToolTip('Enable plot update.')
+        a.setToolTip('Enable plot update')
         a.setCheckable(True)
         a.setChecked(True)
 #        a.setEnabled(False) 
@@ -204,21 +216,23 @@ class MyMplToolbar(NavigationToolbar):
         # PAN:
         self.a_pa = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
                            'Pan', self.pan)
-        self.a_pa.setToolTip('Pan axes with left mouse button, zoom with right')
+        self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
+        "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
         
         # ZOOM RECTANGLE:
         self.a_zo = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
                            'Zoom', self.zoom)
-        self.a_zo.setToolTip('Zoom in / out to rectangle with left / right mouse button.')
+        self.a_zo.setToolTip("Zoom in / out to rectangle with left / right mouse button,\n"
+        "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
 
         # FULL VIEW:
         self.a_fv = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
-            'Full View', self.parent.pltFullView)
-        self.a_fv.setToolTip('Full view')
+            'Zoom full extent', self.parent.pltFullView)
+        self.a_fv.setToolTip('Zoom to full extent')
         
         self.addSeparator()
         
