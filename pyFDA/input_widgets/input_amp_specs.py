@@ -18,6 +18,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
+from simpleeval import simple_eval
 
 class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     """
@@ -33,8 +34,6 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.DEBUG = DEBUG
         self.fil_dict = fil_dict  # dictionary containing _all_ specifications of the
                             # currently selected filter
-
-#        self.labels = labels # list with labels for combobox
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -231,18 +230,18 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
             for i in range(len(self.qlineedit)):
                 self.fil_dict.update(
                     {self.qlineedit[i].objectName():
-                        float(self.qlineedit[i].text())})
+                        simple_eval(self.qlineedit[i].text())})
 
         elif idx == 1:  # Entries are voltages, convert to dBs
             for i in range(len(self.qlineedit)):
                 self.fil_dict.update(
                     {self.qlineedit[i].objectName():
-                       - 20. * log10 (float(self.qlineedit[i].text()))})
+                       - 20. * log10 (simple_eval(self.qlineedit[i].text()))})
         else:  # Entries are powers, convert to dBs
             for i in range(len(self.qlineedit)):
                 self.fil_dict.update(
                     {self.qlineedit[i].objectName():
-                       - 10. * log10 (float(self.qlineedit[i].text()))})
+                       - 10. * log10 (simple_eval(self.qlineedit[i].text()))})
 
 
 #------------------------------------------------------------------------------

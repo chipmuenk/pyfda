@@ -6,7 +6,7 @@ Created on Mon Nov 18 13:36:39 2013
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
-from PyQt4 import QtGui, Qt
+from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 # add main directory from one level above if this file is run as __main__
@@ -14,6 +14,8 @@ from PyQt4.QtCore import pyqtSignal
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
+    
+from simpleeval import simple_eval
 
 class InputFreqSpecs(QtGui.QWidget):
     """
@@ -336,12 +338,13 @@ class InputFreqSpecs(QtGui.QWidget):
         Sort spec entries with ascending frequency.
         """
         self.butSort.setDisabled(self.chkSortAuto.isChecked())
-        fSpecs = [self.qlineedit[i].text() for i in range(len(self.qlineedit))]
+        fSpecs = [simple_eval(self.qlineedit[i].text())
+                                        for i in range(len(self.qlineedit))]
 
         fSpecs.sort()
 
         for i in range(len(self.qlineedit)):
-            self.qlineedit[i].setText(fSpecs[i])
+            self.qlineedit[i].setText(str(fSpecs[i]))
 
     def loadEntries(self):
         """
@@ -363,10 +366,10 @@ class InputFreqSpecs(QtGui.QWidget):
         for i in range(len(self.qlineedit)):
             self.fil_dict.update(
                 {self.qlineedit[i].objectName():
-                    float(self.qlineedit[i].text())/self.f_S})
+                    simple_eval(self.qlineedit[i].text())/self.f_S})
             if self.DEBUG:
                 print(self.qlineedit[i].objectName(),
-                      float(self.qlineedit[i].text())/self.f_S,
+                      simple_eval(self.qlineedit[i].text())/self.f_S,
                       float(self.fil_dict[self.qlineedit[i].objectName()]))
 
 
