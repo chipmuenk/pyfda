@@ -258,8 +258,11 @@ class Plot3D(QtGui.QMainWindow):
         OPT_3D_FORCE_ZMAX = True # Enforce absolute limit for 3D-Plot
         OPT_3D_MSTRIDE = 1 # Schrittweite für MESH und CONT3D
         OPT_3D_ALPHA = alpha#0.5 # Transparency for surface plot
+        cmap = cm.jet_r
+        # Colormaps: 'hsv', 'jet', 'bone', 'prism' 'gray', 'prism', 'coolwarm'
+        # *_r colormaps reverse the color order
         #
-        steps = 80               # number of steps for x, y, r, phi
+        steps = 100               # number of steps for x, y, r, phi
         rmin = 0;    rmax = 1.2  # polar range definition
         #
         xmin = -1.5; xmax = 1.5  # cartesian range definition
@@ -299,30 +302,31 @@ class Plot3D(QtGui.QMainWindow):
 
         plevel_rel = 1.05 # height of plotted pole position relative to zmax
         zlevel_rel = 0.1 # height of plotted zero position relative to zmax
+
     
         # calculate H(jw)| along the unity circle and |H(z)|, each clipped 
-        # between bottom and thresh
+        # between bottom and top
         if self.chkLog.isChecked():
             bottom = np.floor(max(self.zmin_dB, H_min_dB) / 10) * 10 
-            thresh = self.zmax_dB
-            plevel = thresh + (thresh - bottom) * (plevel_rel - 1)
-            zlevel = bottom - (thresh - bottom) * (zlevel_rel)
-            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh, H_min = bottom, 
+            top = self.zmax_dB
+            plevel = top + (top - bottom) * (plevel_rel - 1)
+            zlevel = bottom - (top - bottom) * (zlevel_rel)
+            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, top, H_min = bottom, 
                                    log = True)
-            Hmag = pyfda_lib.H_mag(bb, aa, z, thresh, H_min = bottom, log = True)
+            Hmag = pyfda_lib.H_mag(bb, aa, z, top, H_min = bottom, log = True)
 
         else: 
             bottom = max(self.zmin, H_min)
-            thresh = self.zmax
-        #   thresh = zmax_rel * H_max # calculate display thresh. from max. of H(f)
-            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, thresh, H_min = bottom)
-            Hmag = pyfda_lib.H_mag(bb, aa, z, thresh, H_min = bottom)
+            top = self.zmax
+        #   top = zmax_rel * H_max # calculate display top from max. of H(f)
+            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, top, H_min = bottom)
+            Hmag = pyfda_lib.H_mag(bb, aa, z, top, H_min = bottom)
             
             if self.cmbMode3D.currentText() == 'None':
                 plevel = H_max * 0.3 # plevel = H_max * 0.1 / zlevel = 0.1
             else:
-                plevel = plevel_rel * thresh # height of displayed pole position
-            zlevel = zlevel_rel * thresh # height of displayed zero position
+                plevel = plevel_rel * top # height of displayed pole position
+            zlevel = zlevel_rel * top # height of displayed zero position
             
 
         #===============================================================
@@ -369,7 +373,7 @@ class Plot3D(QtGui.QMainWindow):
                             [0, plevel], linewidth=1, color='r')
 
         #===============================================================
-        ## 3D-Plots of |H(z)| clipped between |H(z)| = thresh
+        ## 3D-Plots of |H(z)| clipped between |H(z)| = top
         #===============================================================
         #
         ## Mesh plot
@@ -383,37 +387,42 @@ class Plot3D(QtGui.QMainWindow):
         ## 3D-surface plot;
         elif self.cmbMode3D.currentText() == 'Surf':
             s = self.ax3d.plot_surface(x, y, Hmag, 
-                    alpha = OPT_3D_ALPHA, rstride=1, cstride=1, cmap = cm.jet_r,
-                    linewidth=0, antialiased=False, shade = True) # facecolors= cm.jet_r ??
+                    alpha = OPT_3D_ALPHA, rstride=1, cstride=1, cmap = cmap,
+                    linewidth=0, antialiased=False, shade = True) # facecolors= cmap ??
             s.set_edgecolor('gray') 
-                    # Colormaps: 'hsv', 'jet', 'bone', 'prism' 'gray', 'prism'
-            if self.chkColBar.isChecked():
-                self.colb = self.mplwidget.fig.colorbar(mappable = s,
-                    ax = self.ax3d, shrink=0.8, aspect=20, 
-                    pad = 0.02, fraction = 0.08)
 
         #---------------------------------------------------------------
         ## 3D-Contour plot
         elif self.cmbMode3D.currentText() == 'Contour': 
             s = self.ax3d.contourf3D(x, y, Hmag, 20, alpha = alpha,
-                            rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, 
-                            cmap = cm.jet_r)
-            if self.chkColBar.isChecked():
-                self.colb = self.mplwidget.fig.colorbar(s, 
-                  ax = self.ax3d, shrink=0.8, aspect=20,
-                  pad = 0.02, fraction = 0.08)
+                    rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, cmap = cmap)
                                  
         #---------------------------------------------------------------
         ## 2D-Contour plot
+        # TODO: zdir = x / y delivers unexpected results -> rather plot max(H)
+        #       along the other axis?
+        # TODO: colormap is created depending on the zdir = 'z' contour plot
+        #       -> set limits of (all) other plots manually?
         if self.chkContour2D.isChecked():
-            self.ax3d.contourf(x, y, Hmag, zdir='x', offset=xmin, 
-                                 cmap=cm.coolwarm) #vmin = zmin, vmax = thresh, 
-            self.ax3d.contourf(x, y, Hmag, zdir='y', offset=ymax, cmap=cm.coolwarm)
-            self.ax3d.contourf(x, y, Hmag, zdir='z', offset=bottom, cmap=cm.coolwarm)
-
+            self.ax3d.contourf(x, y, Hmag, 20, zdir='x', offset=xmin, 
+                                 cmap=cmap, alpha = alpha, vmin = bottom)#, vmax = top, vmin = bottom)
+            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax, 
+                               cmap=cmap, alpha = alpha, vmin = bottom)#, vmax = top, vmin = bottom)
+            s = self.ax3d.contourf(x, y, Hmag, 20, zdir='z', 
+                               offset = bottom - (top - bottom) * 0.05, 
+                                cmap=cmap, alpha = alpha)
+                                
+        if self.cmbMode3D.currentText() in {'Contour', 'Surf'}\
+                    or self.chkContour2D.isChecked():
+                        if self.chkColBar.isChecked():
+                            self.colb = self.mplwidget.fig.colorbar(s, 
+                                ax = self.ax3d, shrink=0.8, aspect=20,
+                                pad = 0.02, fraction = 0.08)
+                        
+                        
         self.ax3d.set_xlim3d(xmin, xmax)
         self.ax3d.set_ylim3d(ymin, ymax)
-        self.ax3d.set_zlim3d(bottom, thresh)
+        self.ax3d.set_zlim3d(bottom, top)
         
         self.ax3d.set_xlabel('Re')#(fb.fil[0]['plt_fLabel'])
         self.ax3d.set_ylabel('Im') #(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
