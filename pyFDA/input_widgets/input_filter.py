@@ -221,15 +221,7 @@ class SelectFilter(QtGui.QWidget):
             print(fb.fil[0]['dm'])
             
             
-            """This should Break the Programm"""
-#            print (fb.fil[0]['xy'] ) #This Line will crash the programm
-            
-#            print("\nCRASH?????????????")
-            
-             #This Line is the solution how to read the Dict. without crashing the programm
-#            print(fb.fil[0].get('xy')) 
-#            print("\n")
-            """END BREAKTING EVERYTHING"""
+
             
         # Is previous design method (e.g. ellip) in list for new ft? 
         # And has the widget been initialized?
@@ -321,7 +313,7 @@ class SelectFilter(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = SelectFilter(DEBUG = True)
+    form = SelectFilter()
     form.show()
 
     app.exec_()
