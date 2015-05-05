@@ -201,7 +201,7 @@ class SelectFilter(QtGui.QWidget):
         ftIdx = self.cmbFilterType.currentIndex()
         self.ft = str(self.cmbFilterType.currentText())
         # TODO: This line gives back key 'None' causing a crash downstream
-        # self.ft = str(self.cmbFilterType.itemData(ftIdx))
+        #self.ft = str(self.cmbFilterType.itemData(ftIdx))
 
         fb.fil[0]['ft'] = self.ft
 
@@ -219,7 +219,18 @@ class SelectFilter(QtGui.QWidget):
         if self.DEBUG: 
             print("dmlist", dmList)
             print(fb.fil[0]['dm'])
-
+            
+            
+            """This should Break the Programm"""
+#            print (fb.fil[0]['xy'] ) #This Line will crash the programm
+            
+#            print("\nCRASH?????????????")
+            
+             #This Line is the solution how to read the Dict. without crashing the programm
+#            print(fb.fil[0].get('xy')) 
+#            print("\n")
+            """END BREAKTING EVERYTHING"""
+            
         # Is previous design method (e.g. ellip) in list for new ft? 
         # And has the widget been initialized?
         if fb.fil[0]['dm'] in dmList and self.filter_initialized:
