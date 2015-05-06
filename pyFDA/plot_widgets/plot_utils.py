@@ -14,7 +14,7 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
 
 
-# do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!! 
+# do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 #from matplotlib.backend_bases import cursors as mplCursors
@@ -60,9 +60,9 @@ class MplWidget(QtGui.QWidget):
                                    QSizePolicy.Expanding)
 
         # Needed for mouse modifiers (x,y, <CTRL>, ...):
-        #    Key press events in general are not processed unless you 
+        #    Key press events in general are not processed unless you
         #    "activate the focus of Qt onto your mpl canvas"
-        # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none                               
+        # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
         self.pltCanv.setFocusPolicy( QtCore.Qt.ClickFocus )
         self.pltCanv.setFocus()
 
@@ -109,12 +109,14 @@ class MplWidget(QtGui.QWidget):
 
     def pltFullView(self):
         """
-        Full zoom
+        Zoom to full extent of data if axes is set to "navigationable"
+        by the navigation toolbar
         """
-        # Add current view limits to view history to enable "back to previous view"
-        self.mplToolbar.push_current() 
+        #Add current view limits to view history to enable "back to previous view"
+        self.mplToolbar.push_current()
         for ax in self.fig.axes:
-            ax.autoscale()
+            if ax.get_navigate():
+                ax.autoscale()
         self.redraw()
 
     def full_extent(self, ax, pad=0.0):
@@ -124,10 +126,10 @@ class MplWidget(QtGui.QWidget):
         # For text objects, we need to draw the figure first, otherwise the extents
         # are undefined.
         self.pltCanv.draw()
-        items = ax.get_xticklabels() + ax.get_yticklabels() 
+        items = ax.get_xticklabels() + ax.get_yticklabels()
         items += [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
 #        items += [ax, ax.title]
-        bbox = Bbox.union([item.get_window_extent() for item in items])        
+        bbox = Bbox.union([item.get_window_extent() for item in items])
         return bbox.expanded(1.0 + pad, 1.0 + pad)
 #------------------------------------------------------------------------------
 
@@ -142,18 +144,18 @@ class MyMplToolbar(NavigationToolbar):
 
 
     derived from http://www.python-forum.de/viewtopic.php?f=24&t=26437
-    
+
     http://pydoc.net/Python/pyQPCR/0.7/pyQPCR.widgets.matplotlibWidget/  !!
     http://matplotlib.org/users/navigation_toolbar.html !!
-    
+
     see also http://stackoverflow.com/questions/17711099/programmatically-change-matplotlib-toolbar-mode-in-qt4
              http://matplotlib-users.narkive.com/C8XwIXah/need-help-with-darren-dale-qt-example-of-extending-toolbar
              https://sukhbinder.wordpress.com/2013/12/16/simple-pyqt-and-matplotlib-example-with-zoompan/
-             
-    Changing the info: 
+
+    Changing the info:
     http://stackoverflow.com/questions/15876011/add-information-to-matplotlib-navigation-toolbar-status-bar
     """
-    
+
 #    toolitems = (
 #        ('Home', 'Reset original view', 'home', 'home'),
 #        ('Back', 'Back to  previous view', 'action-undo', 'back'),
@@ -165,17 +167,17 @@ class MyMplToolbar(NavigationToolbar):
 #        ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
 #        ('Save', 'Save the figure', 'file', 'save_figure'),
 #      )
-    
+
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
-        
+
 #        QtWidgets.QToolBar.__init__(self, parent)
 
 #    def _icon(self, name):
 #        return QtGui.QIcon(os.path.join(self.basedir, name))
-#        
+#
     def _init_toolbar(self):
 #        self.basedir = os.path.join(rcParams[ 'datapath' ], 'images/icons')
         iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -186,7 +188,7 @@ class MyMplToolbar(NavigationToolbar):
            '..','images', 'icons', '')
 
 
-#---------------- Construct Toolbar ---------------------------------------           
+#---------------- Construct Toolbar ---------------------------------------
 
         # ENABLE:
         a = self.addAction(QtGui.QIcon(iconDir + 'circle-check.svg'), \
@@ -194,10 +196,10 @@ class MyMplToolbar(NavigationToolbar):
         a.setToolTip('Enable plot update')
         a.setCheckable(True)
         a.setChecked(True)
-#        a.setEnabled(False) 
-        
+#        a.setEnabled(False)
+
         self.addSeparator() #---------------------------------------------
-        
+
         # HOME:
         self.a_ho = self.addAction(QtGui.QIcon(iconDir + 'home.svg'), \
                            'Home', self.home)
@@ -212,7 +214,7 @@ class MyMplToolbar(NavigationToolbar):
         self.a_fw.setToolTip('Forward to next view')
 
         self.addSeparator() #---------------------------------------------
-        
+
         # PAN:
         self.a_pa = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
                            'Pan', self.pan)
@@ -220,7 +222,7 @@ class MyMplToolbar(NavigationToolbar):
         "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
-        
+
         # ZOOM RECTANGLE:
         self.a_zo = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
                            'Zoom', self.zoom)
@@ -233,27 +235,27 @@ class MyMplToolbar(NavigationToolbar):
         self.a_fv = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
             'Zoom full extent', self.parent.pltFullView)
         self.a_fv.setToolTip('Zoom to full extent')
-        
+
         self.addSeparator()
-        
+
         # GRID:
         self.a_gr = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
                            'Grid', self.toggle_grid)
         self.a_gr.setToolTip('Toggle Grid')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
-        
+
         # REDRAW:
         self.a_rd = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
                            'Redraw', self.parent.redraw)
         self.a_rd.setToolTip('Redraw Plot')
-        
+
         # SAVE:
         self.a_sv = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
                            'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
 
-        
+
         if figureoptions is not None:
             self.a_op = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
                                'Customize', self.edit_parameters)
@@ -310,7 +312,7 @@ class MyMplToolbar(NavigationToolbar):
                     return
 
             figureoptions.figure_edit(axes, self)
-            
+
 #    def mouse_move(self, event):
 #        if not event.inaxes or not self._active:
 #            if self._lastCursor != mplCursors.POINTER:
@@ -342,11 +344,11 @@ class MyMplToolbar(NavigationToolbar):
 #                else:
 #                    self.set_message(s)
 #        else: self.set_message(self.mode)
-            
+
     def toggle_grid(self):
         self.grid = not self.grid
         self.parent.redraw()
-        
+
     def enable_update(self):
         self.enable_update = not self.enable_update
         self.a_gr.setEnabled(self.enable_update)
