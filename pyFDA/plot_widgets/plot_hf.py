@@ -20,11 +20,11 @@ if __name__ == "__main__":
 import filterbroker as fb
 from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
 from matplotlib.patches import Rectangle
+import matplotlib.ticker
 
 
 class PlotHf(QtGui.QMainWindow):
 
-# TODO: inset plot cannot be zoomed independently from main window
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
 # TODO: position and size of inset plot should be selectable
@@ -35,7 +35,7 @@ class PlotHf(QtGui.QMainWindow):
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.DEBUG = DEBUG
-        
+
         modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
         self.cmbShowH.addItems(modes)
@@ -53,10 +53,10 @@ class PlotHf(QtGui.QMainWindow):
         self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
         self.cmbUnitsA.setCurrentIndex(0)
-        
+
         self.cmbShowH.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-    
+
         self.lblLinphase = QtGui.QLabel("Acausal system")
         self.chkLinphase = QtGui.QCheckBox()
         self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
@@ -125,7 +125,7 @@ class PlotHf(QtGui.QMainWindow):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw_phase)
-        
+
     def initAxes(self):
         """Initialize and clear the axes
         """
@@ -135,7 +135,8 @@ class PlotHf(QtGui.QMainWindow):
 
     def plotSpecLimits(self, specAxes):
         """
-        Plot the specifications limits
+        Plot the specifications limits (F_SB, A_SB, ...) as lines and as
+        hatched areas.
         """
 #        fc = (0.8,0.8,0.8) # color for shaded areas
         fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':'k', 'lw':0.0}
@@ -219,10 +220,10 @@ class PlotHf(QtGui.QMainWindow):
         F_lim_lor = np.array(F_lim_lor)
 
         # upper limits:
-        ax.plot(F_lim_up, A_lim_up, -F_lim_up, A_lim_up,**line_params)
+        ax.plot(F_lim_up, A_lim_up, **line_params)
         ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
         # lower limits:
-        ax.plot(F_lim_lo, A_lim_lo, -F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
+        ax.plot(F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
         ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
         ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
 
@@ -237,10 +238,10 @@ class PlotHf(QtGui.QMainWindow):
                 F_lim_lo = self.f_S - F_lim_lo
                 F_lim_lor = self.f_S - F_lim_lor
             # upper limits:
-            ax.plot(F_lim_up, A_lim_up, -F_lim_up, A_lim_up,**line_params)
+            ax.plot(F_lim_up, A_lim_up, **line_params)
             ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
             # lower limits:
-            ax.plot(F_lim_lo, A_lim_lo, -F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
+            ax.plot(F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
             ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
             ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
 
@@ -263,11 +264,6 @@ class PlotHf(QtGui.QMainWindow):
         self.phase = self.chkPhase.isChecked()
         self.linphase = self.chkLinphase.isChecked()
 
-
-#        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
-#            self.bb = fb.fil[0]['coeffs']
-#            self.aa = 1.
-#        else: # IIR
         self.bb = fb.fil[0]['ba'][0]
         self.aa = fb.fil[0]['ba'][1]
 
@@ -282,15 +278,6 @@ class PlotHf(QtGui.QMainWindow):
 
         f_lim = fb.fil[0]['freqSpecsRange']
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
-
-#        self.wholeF = fb.fil[0]['freqSpecsRangeWhole']
-#        if self.wholeF:
-#            f_lim = [0, self.f_S]
-#        elif self.wholeF == 'sym':
-#            f_lim = [-self.f_S/2, self.f_S/2]
-#        else:
-#            f_lim = [0, self.f_S/2]
-
 
 
         if self.DEBUG:
@@ -325,9 +312,9 @@ class PlotHf(QtGui.QMainWindow):
         if self.ax.get_navigate():
 
             self.ax.clear()
-    
+
             #================ Main Plotting Routine =========================
-    
+
             if self.unitA == 'dB':
                 A_lim = [-self.A_SB -10, self.A_PB +1]
                 self.H_plt = 20*np.log10(abs(H))
@@ -341,18 +328,18 @@ class PlotHf(QtGui.QMainWindow):
                 A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
                 self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
-    
+
             plt_lim = f_lim + A_lim
-    
+
             #-----------------------------------------------------------
             self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'], label = 'H(f)')
             #-----------------------------------------------------------
             self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
-    
+
             self.ax.axis(plt_lim)
-    
+
             if self.specs: self.plotSpecLimits(specAxes = self.ax)
-    
+
             self.ax.set_title(r'Magnitude Frequency Response')
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
@@ -379,7 +366,20 @@ class PlotHf(QtGui.QMainWindow):
                                'b--', lw = fb.gD['rc']['lw'], label = "Phase")
         #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str, color='blue')
-#            nbins = len(self.ax.get_yticks())
+            nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
+            # manual setting:
+            #self.ax_p.set_yticks( np.linspace(self.ax_p.get_ylim()[0],self.ax_p.get_ylim()[1],nbins) )
+            #
+            # use helper functions from matplotlib.ticker:
+            #   MaxNLocator: set no more than nbins + 1 ticks
+            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.MaxNLocator(nbins = nbins) )
+            # further options: integer = False,
+            #                   prune = [‘lower’ | ‘upper’ | ‘both’ | None] Remove edge ticks
+            #   AutoLocator:
+            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.AutoLocator() )
+            #   LinearLocator:
+            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.LinearLocator(numticks = nbins -1 ) )
+
 #            self.ax_p.locator_params(axis = 'y', nbins = nbins)
 #
 #            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
@@ -410,7 +410,7 @@ class PlotHf(QtGui.QMainWindow):
                 #  Add an axes at position rect [left, bottom, width, height]:
                 self.ax_i = self.mplwidget.fig.add_axes([0.65, 0.61, .3, .3])
                 self.ax_i.clear() # clear old plot and specs
-                
+
                 # draw an opaque background with the extent of the inset plot:
 #                self.ax_i.patch.set_facecolor('green') # without label area
 #                self.mplwidget.fig.patch.set_facecolor('green') # whole figure
@@ -418,11 +418,11 @@ class PlotHf(QtGui.QMainWindow):
                 # Transform this back to figure coordinates - otherwise, it
                 #  won't behave correctly when the size of the plot is changed:
                 extent = extent.transformed(self.mplwidget.fig.transFigure.inverted())
-                rect = Rectangle((extent.xmin, extent.ymin), extent.width, 
+                rect = Rectangle((extent.xmin, extent.ymin), extent.width,
                         extent.height, facecolor=(1.0,1.0,1.0), edgecolor='none',
                         transform=self.mplwidget.fig.transFigure, zorder=-1)
                 self.ax_i.patches.append(rect)
-                
+
                 self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
                 self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
 
