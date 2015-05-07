@@ -28,11 +28,11 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * specify ripple and attenuations in dB, as voltage or as power ratios
  * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
 * **Graphical Analyses**
- * Magnitude response (lin / power / log) with optional display of the specification bands and inset plot
+ * Magnitude response (lin / power / log) with optional display of the specification bands, the phase and an inset plot
  * Phase response (wrapped / unwrapped)
  * Group delay
  * Pole / Zero plot
- * Impulse response
+ * Impulse response and step response (lin / log)
  * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
  * Filter design files can be added and edited *without* changing or even restarting the program
@@ -52,7 +52,6 @@ The following features are still missing for the first release. Help is very wel
   * Group multiple poles / zeros
   * Load coefficients / poles and zeros, 
 * Smooth some rough edges:
-  * not all text fields are supported by simpleeval yet
   * better debugging options
   * reflect in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error occurred
 
