@@ -6,6 +6,17 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
+<table>
+    <tr>
+        <td><img src = "images/pyFDA_screenshot_3d_2.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>        
+   </tr>
+    <tr>
+        <td><img src = "images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
+    </tr>
+</table>
+
 ### Why yet another filter design tool?
 * **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
 * **Show-off:** Demonstrate that Python is a potent tool for digital signal processing applications as well. The interfaces for textual filter design routines are a nightmare: linear vs. logarithmic specs, frequencies normalized w.r.t. to sampling or Nyquist frequency, -3 dB vs. -6 dB vs. band-edge frequencies ... (This is due to the different backgrounds and the history of filter design algorithms and not Python-specific.)
@@ -28,7 +39,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * specify ripple and attenuations in dB, as voltage or as power ratios
  * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
 * **Graphical Analyses**
- * Magnitude response (lin / power / log) with optional display of the specification bands, the phase and an inset plot
+ * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
  * Phase response (wrapped / unwrapped)
  * Group delay
  * Pole / Zero plot
