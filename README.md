@@ -28,7 +28,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * specify ripple and attenuations in dB, as voltage or as power ratios
  * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
 * **Graphical Analyses**
- * Magnitude response (lin / power / log) with optional display of the specification bands, the phase and an inset plot
+ * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
  * Phase response (wrapped / unwrapped)
  * Group delay
  * Pole / Zero plot
