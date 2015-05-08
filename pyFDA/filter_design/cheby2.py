@@ -63,15 +63,15 @@ class cheby2(object):
 **Chebyshev Type 2 filters**
 
 have a constant ripple :math:`A_SB` in the stop band(s) only, the pass band
-drops monotonously. This is achieved by placing `N/2` zeros along the stop
+drops monotonously. This is achieved by placing :math:`N/2` zeros along the stop
 band.
 
 The order :math:`N`, stop band ripple :math:`A_SB` and
-the critical frequency / frequencies F\ :sub:`SB` where the stop band attenuation
+the critical frequency / frequencies :math:`F_SB` where the stop band attenuation
 :math:`A_SB` is reached have to be specified for filter design.
 
 The corner frequency/ies of the pass band can only be controlled indirectly
-by the filter order and by slightly adapting the value(s) of F\ :sub:`SB`.
+by the filter order and by slightly adapting the value(s) of :math:`F_SB`.
 
 **Design routines:**
 

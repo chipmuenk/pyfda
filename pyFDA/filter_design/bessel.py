@@ -62,9 +62,9 @@ class bessel(object):
 
 have ripple in neither pass- nor stopband(s).
 
-For the filter design, only the order :math:`N` and the passband ripple :math:`A_PB` and
-the critical frequency / frequencies F\ :sub:`PB` where the gain drops below
-:math:`-A_PB` have to be specified.
+For the filter design, only the order :math:`N` and -3 dB frequency / frequencies :math:`F_-3dB` where the gain drops below
+- 3dB can be specified. There is no proper minimum order formula, the buttord can be used with the -3dB frequency but not for
+arbitrary passband constraints.
 
 **Design routines:**
 

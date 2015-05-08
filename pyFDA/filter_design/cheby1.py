@@ -66,7 +66,7 @@ have a constant ripple :math:`A_PB` in the passband(s) only, the stopband
 drops monotonously. This is achieved by placing an `N`-fold zero at :math:`z=-1`.
 
 For the filter design, the order :math:`N`, the passband ripple :math:`A_PB` and
-the critical frequency / frequencies F\ :sub:`PB` where the gain drops below
+the critical frequency / frequencies :math:`F_PB` where the gain drops below
 :math:`-A_PB` have to be specified.
 
 The attenuation in the stop band can only be controlled by the filter order.

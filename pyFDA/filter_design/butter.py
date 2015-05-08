@@ -62,7 +62,7 @@ class butter(object):
 have ripple in neither pass- nor stopband(s).
 
 For the filter design, only the order :math:`N` and the passband ripple :math:`A_PB` and
-the critical frequency / frequencies F\ :sub:`PB` where the gain drops below
+the critical frequency / frequencies :math:`F_PB` where the gain drops below
 :math:`-A_PB` have to be specified.
 
 **Design routines:**
