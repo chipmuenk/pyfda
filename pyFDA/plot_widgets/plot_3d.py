@@ -106,7 +106,7 @@ class Plot3D(QtGui.QMainWindow):
         self.diaAlpha.setToolTip("Set transparency for surf and contour plot.")
         
         self.diaHatch = QtGui.QDial(self)
-        self.diaHatch.setRange(0.,10.)
+        self.diaHatch.setRange(0.,9.)
         self.diaHatch.setValue(5)
         self.diaHatch.setTracking(False) # produce less events when turning
         self.diaHatch.setFixedHeight(30)
@@ -248,7 +248,6 @@ class Plot3D(QtGui.QMainWindow):
         f_S = fb.fil[0]['f_S']
         N_FFT = fb.gD['N_FFT']
         alpha = self.diaAlpha.value()/10.
-        hatch = self.diaHatch.value()
         
         #-----------------------------------------------------------------------------
         # Define 3D-Plotting Options
@@ -258,8 +257,8 @@ class Plot3D(QtGui.QMainWindow):
         OPT_3D_FORCE_ZMAX = True # Enforce absolute limit for 3D-Plot
         OPT_3D_MSTRIDE = 1 # Schrittweite für MESH und CONT3D
         OPT_3D_ALPHA = alpha#0.5 # Transparency for surface plot
-        cmap = cm.jet_r
-        # Colormaps: 'hsv', 'jet', 'bone', 'prism' 'gray', 'prism', 'coolwarm'
+        cmap = cm.jet
+        # Colormaps: 'hsv', 'jet_r', 'bone', 'prism' 'gray', 'prism', 'coolwarm'
         # *_r colormaps reverse the color order
         #
         steps = 100               # number of steps for x, y, r, phi
@@ -309,7 +308,8 @@ class Plot3D(QtGui.QMainWindow):
         if self.chkLog.isChecked():
             bottom = np.floor(max(self.zmin_dB, H_min_dB) / 10) * 10 
             top = self.zmax_dB
-            plevel = top + (top - bottom) * (plevel_rel - 1)
+            plevel_top = top + (top - bottom) * (plevel_rel - 1)
+            plevel_btm = top
             zlevel = bottom - (top - bottom) * (zlevel_rel)
             H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, top, H_min = bottom, 
                                    log = True)
@@ -321,30 +321,33 @@ class Plot3D(QtGui.QMainWindow):
         #   top = zmax_rel * H_max # calculate display top from max. of H(f)
             H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, top, H_min = bottom)
             Hmag = pyfda_lib.H_mag(bb, aa, z, top, H_min = bottom)
-            
-            if self.cmbMode3D.currentText() == 'None':
-                plevel = H_max * 0.3 # plevel = H_max * 0.1 / zlevel = 0.1
-            else:
-                plevel = plevel_rel * top # height of displayed pole position
+
             zlevel = zlevel_rel * top # height of displayed zero position
-            
+
+            if self.cmbMode3D.currentText() == 'None': # "Poleposition" for H(f) plot only
+                plevel_top = H_max * 0.3 # plevel = H_max * 0.1 / zlevel = 0.1
+                plevel_btm = bottom
+            else:
+                plevel_top = plevel_rel * top # height of displayed pole position
+                plevel_btm = top
 
         #===============================================================
         ## plot unit circle
         #===============================================================       
         if self.chkUC.isChecked():        
-        # Plot unit circle:
+        # Plot unit circle and marker at (1,0):
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, 
                            ones(len(self.xy_UC)) * bottom, lw = 2, color = 'k')
+            self.ax3d.plot([0.97, 1.03],[0,0], [bottom, bottom], lw = 2, color = 'k')
 
         #===============================================================
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================        
         if self.chkHf.isChecked():
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, color = 'b', 
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC,
                            lw = fb.gD['rc']['lw'])
-            NL = hatch # plot line every NL points on the UC
-            if NL > 0:
+            NL = 10 - self.diaHatch.value() # plot line every NL points on the UC
+            if NL < 10:
                 for k in range(len(self.xy_UC[::NL])):
                     self.ax3d.plot([self.xy_UC.real[::NL][k], self.xy_UC.real[::NL][k]],
                         [self.xy_UC.imag[::NL][k], self.xy_UC.imag[::NL][k]],
@@ -366,11 +369,11 @@ class Plot3D(QtGui.QMainWindow):
                             [bottom, zlevel], linewidth=1, color='b')
                             
             # Plot the poles at |H(z_p)| = plevel with "stems":
-            self.ax3d.plot(np.real(pp), np.imag(pp), plevel,
+            self.ax3d.plot(np.real(pp), np.imag(pp), plevel_top,
               'x', markersize = PN_SIZE, markeredgewidth=2.0, markeredgecolor='red') 
             for k in range(len(pp)): # plot pole "stems"
                 self.ax3d.plot([pp[k].real, pp[k].real], [pp[k].imag, pp[k].imag],
-                            [0, plevel], linewidth=1, color='r')
+                            [plevel_btm, plevel_top], linewidth=1, color='r')
 
         #===============================================================
         ## 3D-Plots of |H(z)| clipped between |H(z)| = top
@@ -399,15 +402,17 @@ class Plot3D(QtGui.QMainWindow):
                                  
         #---------------------------------------------------------------
         ## 2D-Contour plot
+        # TODO: 2D contour plots do not plot correctly together with 3D plots in
+        #       current matplotlib 1.4.3 -> disable them for now
         # TODO: zdir = x / y delivers unexpected results -> rather plot max(H)
         #       along the other axis?
         # TODO: colormap is created depending on the zdir = 'z' contour plot
         #       -> set limits of (all) other plots manually?
         if self.chkContour2D.isChecked():
-            self.ax3d.contourf(x, y, Hmag, 20, zdir='x', offset=xmin, 
-                                 cmap=cmap, alpha = alpha, vmin = bottom)#, vmax = top, vmin = bottom)
-            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax, 
-                               cmap=cmap, alpha = alpha, vmin = bottom)#, vmax = top, vmin = bottom)
+#            self.ax3d.contourf(x, y, Hmag, 20, zdir='x', offset=xmin, 
+#                                 cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
+#            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax, 
+#                               cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
             s = self.ax3d.contourf(x, y, Hmag, 20, zdir='z', 
                                offset = bottom - (top - bottom) * 0.05, 
                                 cmap=cmap, alpha = alpha)

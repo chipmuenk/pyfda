@@ -64,6 +64,7 @@ class MplWidget(QtGui.QWidget):
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
         self.pltCanv.setFocusPolicy( QtCore.Qt.ClickFocus )
+        #self.pltCanv.setFocusPolicy(QtCore.Qt.WheelFocus)
         self.pltCanv.setFocus()
 
         self.pltCanv.updateGeometry()

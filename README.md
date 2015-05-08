@@ -4,7 +4,9 @@ pyFDA
 
 The goal of this project is to create a GUI based tool in Python / Qt to analyse, design and synthesize discrete time filters. 
 
+**Screenshot from the current version:**
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
+
 
 ### Why yet another filter design tool?
 * **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
@@ -12,7 +14,6 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Fixpoint filter design for uCs:** Recursive filters have become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable e.g. for uCs.
 * **Fixpoint filter design for FPGAs**: Especially on low-budget FPGAs, multipliers are rare. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.
 * **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [myHDL](http://myhdl.org) can automate both design and verification.
-
 
 ### The following features are currently implemented:
 
@@ -28,11 +29,11 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * specify ripple and attenuations in dB, as voltage or as power ratios
  * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
 * **Graphical Analyses**
- * Magnitude response (lin / power / log) with optional display of the specification bands and inset plot
+ * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
  * Phase response (wrapped / unwrapped)
  * Group delay
  * Pole / Zero plot
- * Impulse response
+ * Impulse response and step response (lin / log)
  * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
  * Filter design files can be added and edited *without* changing or even restarting the program
@@ -43,6 +44,18 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Display help files** (own / Python docstrings) as rich text
 * **Runs under Python 2.7 and Python 3.4** 
 
+**More screenshots from the current version:**
+<table>
+    <tr>
+        <td><img src = "images/pyFDA_screenshot_3d_2.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>        
+   </tr>
+    <tr>
+        <td><img src = "images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
+    </tr>
+</table>
+
 ### Release 0.1 (target: end of May 2015)
 
 The following features are still missing for the first release. Help is very welcome!
@@ -52,7 +65,6 @@ The following features are still missing for the first release. Help is very wel
   * Group multiple poles / zeros
   * Load coefficients / poles and zeros, 
 * Smooth some rough edges:
-  * not all text fields are supported by simpleeval yet
   * better debugging options
   * reflect in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error occurred
 
