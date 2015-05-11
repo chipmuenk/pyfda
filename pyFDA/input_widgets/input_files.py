@@ -73,13 +73,11 @@ class InputFiles(QtGui.QWidget):
         bfont = QtGui.QFont()
 #        font.setPointSize(11)
         bfont.setBold(True)
-#        bfont.setWeight(75)
         
         bifont = QtGui.QFont()
         bifont.setBold(True)
         bifont.setItalic(True)
-#        bfont2.setWeight(75)
-        
+
         ifont = QtGui.QFont()
         ifont.setItalic(True)
 
@@ -123,6 +121,7 @@ class InputFiles(QtGui.QWidget):
             self.lblQOvfl_o = QtGui.QLabel(lblOv)
             self.lblQuant_o = QtGui.QLabel(lblQ)
 
+# -------------------------------------------------------------------
 
             self.lblQInput = QtGui.QLabel("Input:")
             self.lblQInput.setFont(bifont)
@@ -275,6 +274,7 @@ class InputFiles(QtGui.QWidget):
             self.layHButtonsHDL_h = QtGui.QHBoxLayout()
             self.layHButtonsHDL_h.addWidget(self.cmbHDL)            
             self.layHButtonsHDL_h.addWidget(self.butHDL)
+# -------------------------------------------------------------------
 
 
             layVMain.addWidget(self.HLine())
@@ -294,7 +294,9 @@ class InputFiles(QtGui.QWidget):
             
             layVMain.addLayout(self.layHButtonsHDL_h)
             
-            self.butHDL.clicked.connect(self.createHDL)
+            self.butHDL.clicked.connect(self.exportHDL)
+# -------------------------------------------------------------------
+
             
         self.setLayout(layVMain)
 
@@ -394,7 +396,7 @@ class InputFiles(QtGui.QWidget):
         # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
 
 
-    def createHDL(self):
+    def exportHDL(self):
         """
         Synthesize HDL description of filter using myHDL module
         """
@@ -403,13 +405,16 @@ class InputFiles(QtGui.QWidget):
         file_types = "Verilog (*.v);;VHDL (*.vhd)"
 
 
-        myFile, myFilter = dlg.getSaveFileNameAndFilter(self,
+        hdl_file, hdl_filter = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save HDL as", directory="D:",
                 filter = file_types)
+        print(hdl_file)
         
         coeffs = fb.fil[0]['ba']
         zpk =  fb.fil[0]['zpk']
-        typeHDL = self.cmbHDL.currentText()
+        sos = fb.fil[0]['sos']
+        
+        typeHDL = self.cmbHDL.currentText() # could use hdl_filter as well
 
         qI_i = int(self.ledQIInput.text())
         qF_i = int(self.ledQIInput.text())
