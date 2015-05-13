@@ -11,7 +11,7 @@ import sys, os
 from PyQt4 import QtGui
 #import scipy.io
 import numpy as np
-#from scipy.signal import tf2zpk, zpk2tf
+from scipy.signal import freqz
 
 # https://github.com/danthedeckie/simpleeval
 
@@ -45,14 +45,9 @@ class InputPZ(QtGui.QWidget):
     def initUI(self):
         """
         Intitialize the widget, consisting of:
-        -
-        -
         """
-        # widget / subwindow for Pole/Zero display / entry
         
-        """Edit WinMic"""
-         #Whitch Button holds the longest Text?
-        
+        # Find which button holds the longest text:
         MaxTextlen = 0
         longestText = ""
         ButLength = 0
@@ -62,13 +57,11 @@ class InputPZ(QtGui.QWidget):
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
                 longestText = item        
-        """End"""
 
         self.chkPZList =  QtGui.QCheckBox()
         self.chkPZList.setChecked(True)
         self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable list.")
-        self.lblPZList = QtGui.QLabel()
-        self.lblPZList.setText("Show Poles / Zeros")
+        self.chkPZList.setText("Show Poles / Zeros")
 
         self.lblRound = QtGui.QLabel("Digits = ")
         self.spnRound = QtGui.QSpinBox()
@@ -76,15 +69,12 @@ class InputPZ(QtGui.QWidget):
         self.spnRound.setValue(0)
         self.spnRound.setToolTip("Round to d digits.")
 
-        self.lblGain = QtGui.QLabel()
-        self.lblGain.setText("k = ")
+        self.lblGain = QtGui.QLabel("k = ")
         
         self.chkNorm =  QtGui.QCheckBox()
         self.chkNorm.setChecked(True)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
-        self.lblNorm = QtGui.QLabel()
-        self.lblNorm.setText("Normalize")
-
+        self.chkNorm.setText("Normalize")
 
         self.ledGain = QtGui.QLineEdit()
         self.ledGain.setToolTip("Specify gain factor k.")
@@ -96,19 +86,15 @@ class InputPZ(QtGui.QWidget):
         self.tblPZ.setDragEnabled(True)
         self.tblPZ.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
         self.tblPZ.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                          QtGui.QSizePolicy.MinimumExpanding)
+                                          QtGui.QSizePolicy.Expanding)
 
         self.butAddRow = QtGui.QPushButton()
         self.butAddRow.setToolTip("Add row to PZ table.\n"
                                 "Select n existing rows to append n new rows.")
         self.butAddRow.setText(butTexts[0])
         
-        """Edit WinMic"""
         ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
         self.butAddRow.setMaximumWidth(ButLength)
-
-        """End"""        
-        
 
         self.butDelRow = QtGui.QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
@@ -116,14 +102,11 @@ class InputPZ(QtGui.QWidget):
                 "If nothing is selected, delete last row.")
         self.butDelRow.setText(butTexts[1])
         self.butDelRow.setMaximumWidth(ButLength)
-        
-        
 
         self.butClear = QtGui.QPushButton()
         self.butClear.setToolTip("Clear all entries.")
         self.butClear.setText(butTexts[4])
-        self.butClear.setMaximumWidth(ButLength)        
-        
+        self.butClear.setMaximumWidth(ButLength)              
 
         self.butSave = QtGui.QPushButton()
         self.butSave.setToolTip("Save P/Z & update all plots.\n"
@@ -134,17 +117,14 @@ class InputPZ(QtGui.QWidget):
         self.butLoad = QtGui.QPushButton()
         self.butLoad.setToolTip("Reload P / Z.")
         self.butLoad.setText(butTexts[3])
-        self.butLoad.setMaximumWidth(ButLength)        
-        
+        self.butLoad.setMaximumWidth(ButLength)              
 
         self.butSetZero = QtGui.QPushButton()
         self.butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
         self.butSetZero.setText(butTexts[5])
-        self.butSetZero.setMaximumWidth(ButLength)        
-        
+        self.butSetZero.setMaximumWidth(ButLength)              
 
-        self.lblEps = QtGui.QLabel()
-        self.lblEps.setText("for P, Z <")
+        self.lblEps = QtGui.QLabel("for P, Z <")
 
         self.ledSetEps = QtGui.QLineEdit()
         self.ledSetEps.setToolTip("Specify eps value.")
@@ -153,17 +133,14 @@ class InputPZ(QtGui.QWidget):
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkPZList)
-        self.layHChkBoxes.addWidget(self.lblPZList)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblRound)
         self.layHChkBoxes.addWidget(self.spnRound)
-#        self.layHChkBoxes.addStretch(10)
 
         self.layHGain = QtGui.QHBoxLayout()
         self.layHGain.addWidget(self.lblGain)
         self.layHGain.addWidget(self.ledGain)
         self.layHChkBoxes.addStretch(1)
-        self.layHGain.addWidget(self.lblNorm)
         self.layHGain.addWidget(self.chkNorm)
         self.layHGain.addStretch()
 
@@ -187,7 +164,7 @@ class InputPZ(QtGui.QWidget):
         layVMain.addLayout(self.layHButtonsPZs1)
         layVMain.addLayout(self.layHButtonsPZs2)
         layVMain.addWidget(self.tblPZ)
-        layVMain.addStretch(1)
+#        layVMain.addStretch(1)
         self.setLayout(layVMain)
         self.showZPK() # initialize table with default values from filterbroker
 
@@ -210,13 +187,10 @@ class InputPZ(QtGui.QWidget):
 
         self.butSetZero.clicked.connect(self.setZPKZero)
         
-        
-        
-        
 
     def clearTable(self):
         """
-        Clear table & initialize zpk for two poles and zeros @ origin,
+        Clear & initialize table for two poles and zeros @ origin,
         P = Z = [0; 0], k = 1
         """
         self.tblPZ.clear()
@@ -233,15 +207,19 @@ class InputPZ(QtGui.QWidget):
         """
         Read out table and save the values to the filter PZ dict
         """
+        if self.chkNorm.isChecked():
+            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
+            self.Hmax_last = max(abs(H)) # store current max. filter gain
+            
         if self.DEBUG:
             print("=====================\nInputPZ.saveZPK")
             
-        zpk = [] #final values with are used to calculate the filter
+        zpk = [] 
         
         num_rows = self.tblPZ.rowCount()
         if self.DEBUG: print("nrows:",num_rows)
 
-        #iterate over both column
+        #iterate over both columns
         for col in range(2):
             rows = []
             for row in range(num_rows):
@@ -254,15 +232,24 @@ class InputPZ(QtGui.QWidget):
 
             zpk.append(rows)
 
-        zpk.append(simple_eval(self.ledGain.text()))
+        zpk.append(simple_eval(self.ledGain.text())) # append k factor to zpk
 
         fb.fil[0]["N"] = num_rows
         save_fil(fb.fil[0], zpk, 'zpk', __name__)
+        
+        if self.chkNorm.isChecked():
+            # set gain factor k (zpk[2]) in such a way that the max. filter 
+            # gain remains unchanged
+            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
+            zpk[2] = zpk[2] * self.Hmax_last / max(abs(H))
+            save_fil(fb.fil[0], zpk, 'zpk', __name__)
+            self.showZPK()
 
         if self.DEBUG:
-            print("ZPK - coeffs:",  fb.fil[0]['coeffs'])
+            print("ZPK - coeffs:",  fb.fil[0]['ba'])
             print("ZPK - zpk:",  fb.fil[0]['zpk'])
             print("ZPK updated!")
+
 
     def showZPK(self):
         """
@@ -274,7 +261,6 @@ class InputPZ(QtGui.QWidget):
         self.lblGain.setVisible(self.chkPZList.isChecked())
         self.tblPZ.setVisible(self.chkPZList.isChecked())
 
-#        self.ledGain.setText(str(zpk[2]))# update gain k
         self.ledGain.setText(str(cround(zpk[2], n_digits)))
 
         self.tblPZ.setVisible(self.chkPZList.isChecked())
@@ -293,21 +279,17 @@ class InputPZ(QtGui.QWidget):
             for row in range(len(zpk[col])):
                 if self.DEBUG: print("Len Row:", len(zpk[col]))
                 item = self.tblPZ.item(row, col)
-                if item:
-                    item.setText(str(cround(zpk[col][row], n_digits)))
-                else:
+                # copy content of zpk to corresponding table field, rounding 
+                # as specified and removing the brackets of complex arguments
+                if item: # does item exist?
+                    item.setText(str(cround(zpk[col][row], n_digits)).strip('()'))
+                else: # no construct it
                     self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem(
-                                    str(cround(zpk[col][row], n_digits))))
+                          str(cround(zpk[col][row], n_digits)).strip('()')))
 
         self.tblPZ.resizeColumnsToContents()
         self.tblPZ.resizeRowsToContents()
         
-    def normalizeCoeffs(self):
-        """
-        Correct gain factor K when P / Z has been changed
-        """
-        maxP = np.polyval(fb.fil[0]['zpk'][1], 0.5)
-        maxZ = np.polyval(fb.fil[0]['zpk'][0], 0.5)
         
 
     def deleteRows(self):
