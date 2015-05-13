@@ -155,12 +155,14 @@ class InputCoeffs(QtGui.QWidget):
         self.ledQuantF.setMaximumWidth(30)
 
         self.cmbQQuant = QtGui.QComboBox()
-        qQuant = ['none', 'round', 'fix']
+        qQuant = ['none', 'round', 'fix', 'floor']
         self.cmbQQuant.addItems(qQuant)
+        self.cmbQQuant.setCurrentIndex(1) # 'round'
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
         self.cmbQOvfl = QtGui.QComboBox()
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
+        self.cmbQOvfl.setCurrentIndex(2) # 'sat'
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
 
         # ComboBox size is adjusted automatically to fit the longest element
@@ -211,7 +213,7 @@ class InputCoeffs(QtGui.QWidget):
         layVMain.addLayout(self.layHButtonsCoeffs3)
         layVMain.addLayout(self.layHButtonsCoeffs4)
         layVMain.addWidget(self.tblCoeff)
-        layVMain.addStretch(1)
+#        layVMain.addStretch(1)
         self.setLayout(layVMain)
         self.showCoeffs() # initialize table with default values from fb
 
@@ -279,7 +281,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 
         self.tblCoeff.setRowCount(max(np.shape(coeffs)))
-        self.tblCoeff.setColumnCount(2)
+        self.tblCoeff.setColumnCount(2) 
 
         if self.DEBUG:
             print("=====================\nInputCoeffs.showCoeffs")
@@ -292,11 +294,13 @@ class InputCoeffs(QtGui.QWidget):
         for col in range(2):
             for row in range(np.shape(coeffs)[1]):
                 item = self.tblCoeff.item(row, col)
+                # copy content of zpk to corresponding table field, rounding 
+                # as specified and removing the brackets of complex arguments
                 if item:
-                    item.setText(str(cround(coeffs[col][row])))
+                    item.setText(str(cround(coeffs[col][row])).strip('()'))
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem(
-                                            str(cround(coeffs[col][row]))))
+                                str(cround(coeffs[col][row])).strip('()')))
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
 
