@@ -346,6 +346,10 @@ class Plot3D(QtGui.QMainWindow):
         if self.chkHf.isChecked():
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC,
                            lw = fb.gD['rc']['lw'])
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC,
+                           'w--', lw = fb.gD['rc']['lw'])
+
+                           
             NL = 10 - self.diaHatch.value() # plot line every NL points on the UC
             if NL < 10:
                 for k in range(len(self.xy_UC[::NL])):
