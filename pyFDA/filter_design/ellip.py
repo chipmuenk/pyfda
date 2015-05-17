@@ -104,9 +104,9 @@ the critical frequency / frequencies :math:`F_PB` where the gain drops below
 
     def save(self, fil_dict, arg):
         """
-        Convert between poles / zeros / gain, filter coefficients (polynomes)
-        and second-order sections and store all available formats in the global
-        database.
+        Store results of filter design in the global filter dictionary. Corner
+        frequencies calculated for minimum filter order are also stored in the 
+        dictionary to allow for a smooth manual filter design.
         """
         pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
 
