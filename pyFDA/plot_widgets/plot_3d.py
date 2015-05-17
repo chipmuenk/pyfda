@@ -4,20 +4,22 @@
 Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
 from PyQt4 import QtGui #, QtCore
 import numpy as np
 from numpy import pi, ones, zeros, sin, cos, log10
 import scipy.signal as sig
 
-if __name__ == "__main__": # relative import if this file is run as __main__
+# add path to libraries one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__":
+    import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
 import pyfda_lib
+from plot_widgets.plot_utils import MplWidget
 
-from plot_widgets.plot_utils import MplWidget#, MplCanvas
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap
 

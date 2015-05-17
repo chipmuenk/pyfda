@@ -4,24 +4,22 @@
 Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
 
 from PyQt4 import QtGui
-
 import numpy as np
 import scipy.signal as sig
+from matplotlib.patches import Rectangle
+import matplotlib.ticker
 
-# import modules from one level above if this file is run as __main__
+# add path to libraries one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__":
+    import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
-from plot_widgets.plot_utils import MplWidget#, MyMplToolbar, MplCanvas
-from matplotlib.patches import Rectangle
-import matplotlib.ticker
-
+from plot_widgets.plot_utils import MplWidget
 
 class PlotHf(QtGui.QMainWindow):
 
@@ -106,7 +104,7 @@ class PlotHf(QtGui.QMainWindow):
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 #        self.mplwidget.layVMainMpl1.addWidget(self.mplwidget)
 
-        self.mplwidget.setFocus()
+#        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
 

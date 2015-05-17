@@ -4,19 +4,20 @@
 Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
-from PyQt4 import QtGui
 
+from PyQt4 import QtGui
 import numpy as np
 import scipy.signal as sig
 
-if __name__ == "__main__": # relative import if this file is run as __main__
+# add path to libraries one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__":
+    import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
-
-from plot_widgets.plot_utils import MplWidget#, MplCanvas
+from plot_widgets.plot_utils import MplWidget
 
 
 class PlotPhi(QtGui.QMainWindow):
@@ -34,10 +35,7 @@ class PlotPhi(QtGui.QMainWindow):
         self.cmbUnitsPhi.setObjectName("cmbUnitsA")
         self.cmbUnitsPhi.setToolTip("Set unit for phase.")
         self.cmbUnitsPhi.setCurrentIndex(0)
-        
-        """EDIT WinMic"""
         self.cmbUnitsPhi.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        """END"""
 
         self.lblWrap = QtGui.QLabel("Wrapped Phase")
         self.btnWrap = QtGui.QCheckBox()
