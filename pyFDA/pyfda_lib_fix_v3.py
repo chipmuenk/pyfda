@@ -191,45 +191,49 @@ class Fixed(object):
             
 
 #----------------------------------------------------------------------
-class FIX_filt_MA(Fixed):
-    """
-    yq = FIX_filt_MA.fixFilt(x,aq,bq,gq)
-	FIR-Filter mit verschiedenen internen Quantisierungen: 
-	q_mul beschreibt Requantisierung nach Koeffizientenmultiplikation
-	q_acc beschreibt Requantisierung bei jeder Summation im Akkumulator 
-	(bzw. gemeinsamen Summenpunkt)
-    """
-    def __init__(self, q_mul, q_acc):
-        """
-        Initialize fixed object with q_obj
-        """
-        # test if all passed keys of quantizer object are known
-        self.setQobj(q_mul)
-        self.resetN() # initialize overflow-counter	
-
-	
-# Calculate filter response via difference equation with quantization:
-
-    def fixFilt(x, bq, aq, gq, q_mul, q_acc, verbose = True):
-        
-        # Initialize vectors (also speeds up calculation)
-    #    Nx = len(x)
-    #    s = zeros(Nx) # not needed in this filter
-        yq = accu_q = np.zeros(len(x))
-    #    bq_len = len(bq)
-        x_bq = np.zeros(len(bq))
-        
-        for k in range(len(x) - len(bq)):
-            # weighted state-vector x at time k:
-            x_bq, N_over_m = Fixed.fix(q_mul, x[k:k + len(bq)] * bq)
-            # sum up x_bq to get accu[k]
-            accu_q[k], N_over_a = Fixed.fix(q_acc, sum(x_bq))
-        yq = accu_q * gq # scaling at the output of the accumulator
-        s = x # copy state-vector
-        if (N_over_m and verbose): print('Overflows in Multiplier:  ', N_over_m)
-        if (N_over_a and verbose): print('Overflows in Accumulator: ', N_over_a)
+#============ not working yet =================================================
+# class FIX_filt_MA(Fixed):
+#     """
+#     yq = FIX_filt_MA.fixFilt(x,aq,bq,gq)
+# 	FIR-Filter mit verschiedenen internen Quantisierungen: 
+# 	q_mul beschreibt Requantisierung nach Koeffizientenmultiplikation
+# 	q_acc beschreibt Requantisierung bei jeder Summation im Akkumulator 
+# 	(bzw. gemeinsamen Summenpunkt)
+#     """
+#     def __init__(self, q_mul, q_acc):
+#         """
+#         Initialize fixed object with q_obj
+#         """
+#         # test if all passed keys of quantizer object are known
+#         self.setQobj(q_mul)
+#         self.resetN() # initialize overflow-counter	
+# 
+# 	
+# # Calculate filter response via difference equation with quantization:
+# 
+#     def fixFilt(x, bq, aq, gq, q_mul, q_acc, verbose = True):
+#         
+#         # Initialize vectors (also speeds up calculation)
+#     #    Nx = len(x)
+#     #    s = zeros(Nx) # not needed in this filter
+#         yq = accu_q = np.zeros(len(x))
+#     #    bq_len = len(bq)
+#         x_bq = np.zeros(len(bq))
+#         
+#         for k in range(len(x) - len(bq)):
+#             # weighted state-vector x at time k:
+#             x_bq, N_over_m = Fixed.fix(q_mul, x[k:k + len(bq)] * bq)
+#             # sum up x_bq to get accu[k]
+#             accu_q[k], N_over_a = Fixed.fix(q_acc, sum(x_bq))
+#         yq = accu_q * gq # scaling at the output of the accumulator
+#         s = x # copy state-vector
+#         if (N_over_m and verbose): print('Overflows in Multiplier:  ', N_over_m)
+#         if (N_over_a and verbose): print('Overflows in Accumulator: ', N_over_a)
+#
+#       return yq
+#
+#==============================================================================
              
-        return yq
     
 # nested loop would be much slower!
 #  for k in range(Nx - len(bq)):
