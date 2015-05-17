@@ -1,0 +1,630 @@
+% External style file for pyFDA documentation (LaTeX)
+
+%\documentclass[paper=a4, pagesize, twoside, openright, draft=false,
+%BCOR7mm, DIV13, fontsize=11pt, headings=normal, footinclude=false, 
+%chapterprefix = false, toc=listof, ngerman]{scrbook} % doppelseitiger Druck
+% Options für KOMA-Paket: 
+% pagesize: Informationen über Seitengröße werden an dvips / pdftex weitergegeben
+% twoside: Doppelseitiger Druck; linke und rechte Seite sind unterschiedlich
+% twocolumn: Zweispaltiger Satz
+% openany/openright: Startseite für neues Kapitel
+% draft/final: Bei draft werden bei überlangen Zeilen schwarze Kästchen ans Zeilenende gesetzt
+% BCOR (Binding Correction): Zusätzlicher Rand für Bindung 
+% fontsize: 10/11/12pt
+% headings: small/normal/big
+% footinclude: false: footer geht nicht in Berechnung des Seitenspiegels ein
+% chapterprefix = false: "Kapitel xy" wird weggelassen (standard)
+% DIV: Seitenaufteilung, Defaults: A4: DIV10 für 11pt, DIVcalc für autom. Ber.
+%
+%\KOMAoptions{DIV=last} % identisch mit documentclass Optionen
+\usepackage[automark,headsepline]{scrpage2}
+%\usepackage{scrhack}
+%\usepackage{titlesec}
+%===== Encoding & Fonts ==================================
+\usepackage[ngerman]{babel}  % spell checker & hyphenation?
+\usepackage[T1]{fontenc}     % Type 1 fonts only - gibt Probleme mit dvi!?
+\usepackage{marvosym} % \EURtm, \HollowBox, 
+\usepackage[latin1,cp1252]{inputenc} % encoding for Umlaut-Input
+%\usepackage[cp1252]{inputenc} % Euro-Zeichen direkt eingeben
+\usepackage{ae}% " almost european - provides Umlaute by combinating accents and characters % 
+\usepackage{amssymb, amsmath, amsfonts}  % special fonts for formulas
+%\let\equation\gather -> redefine gather environment for equation
+%\let\endequation\endgather -> does not work with equationbox!
+%\usepackage{dotlessj}  % definitions for \j and \jmath (dotless)
+%\usepackage{mathptmx}  % clear math font for pdf Files
+\usepackage[scaled=.90]{helvet} % "
+\usepackage[scaled]{beramono}
+%\usepackage{courier} %  
+% Enthalten im Paket "was":
+\usepackage{fixmath} % Griechische Großbuchstaben werden kursiv dargestellt
+\usepackage{upgreek} % senkrechte griechische Buchstaben (\uppi, \upOmega, ...) 
+% \usepackage{gensymb} % Symbole: \ohm, \micro, \degree, \Celsius, \perthousand - funktioniert nicht mit allen Fonts gut!
+\usepackage{trfsigns} % enthält \e, \im, \ftrans etc.
+%\usepackage{bm} % bold fonts in math mode
+%\usepackage{fouriernc} % Freie Mathematikfonts im Stil von Adobe Utopia, lassen sie sich auch mit der Textschrift New Century Schoolbook kombinieren           "
+
+%============ Layout ==================================%
+\usepackage{float}     % better handling of floating objects?
+%\usepackage{flafter}   % place float objects only (!) after insertion point
+\usepackage{floatflt} % allows text floating around figures
+    %\begin{floatingfigure}[r]{breite} % r, l, p (l auf gerader /r auf ungerader Seite)
+        %\centering
+        %\includegraphics{graphik.pdf}
+        %\caption{Bildunterschrift}
+        %\label{fig:figlabel}
+    %\end{floatingfigure}
+\usepackage{multicol} % mehrspaltiger Satz
+\usepackage{parcolumns}
+%
+\usepackage[format=hang,justification=centering,font={small}]{caption} % define caption format 
+%\usepackage{parskip}    % linebreak in-between paragraphs
+\usepackage[subfigure]{tocloft}    % Spacings in TOC, LOF, LOT
+
+%\usepackage{dcolumn} % decimal columns (.)
+\usepackage{booktabs} % Tabellen: top/mid/bottomrule
+\usepackage{longtable}
+\usepackage{tabularx}
+%
+%\usepackage{remreset}  % allow changing counter dependencies (\@addtoreset)
+%\usepackage[absolute]{textpos}   % option: [absolute ]
+%\usepackage{rotating}
+\usepackage{pdflscape}    % for landscape pages
+%
+%================  Grafik   =========================%
+%
+\usepackage[pdftex]{graphicx}  % standard graphic package
+\usepackage{color}     % needed e.g. by \fcolorbox option [monochrome] to fix font colors?
+%\graphicspath{{../graphics/eps/}{../graphics/eps_import/}{../graphics/eps_plots/}} 
+\usepackage[export]{adjustbox}
+\graphicspath{{img/}}
+% set path for graphic files
+% rather use environment variable TEXINPUTS 
+\usepackage[tight,hang]{subfigure}
+\usepackage{tikz}
+\usetikzlibrary{backgrounds} %arrows,snakes,trees
+\usetikzlibrary{trees}
+\usepackage{fancybox}  % create pretty boxes with \shadowbox, \doublebox etc.
+\usepackage{mdframed}
+
+%================ LISTINGS ============================%
+%\newcommand*{\Verb}[1]{\texttt{\$#1}}% "`verb"'-Umgebung mit Zeilenumbruch
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{FFFFFF}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+\usepackage{listings}
+  % layout VHDL etc. listings
+%\lstdefinelanguage{VHDL}
+%{ morekeywords= {begin,sc_signal_rv,sc_signal_resolved,sc_mutex,sc_semaphore,:=, =>, <n>},%
+%  sensitive=true,
+%  morecomment=[l]{//},
+%  morecomment=[s]{/*}{*/},
+%  morestring=[b]",
+%}
+
+
+\lstset{ showstringspaces=false, frame=tb, lineskip=-1pt, extendedchars=true, 
+         basicstyle=\ttfamily\footnotesize, xleftmargin=1em, xrightmargin=0em, captionpos=b,
+				emphstyle=\color{red},columns=fixed, breaklines=true, backgroundcolor=\color{background}]}
+\lstdefinestyle{numbers}{numbers=left, numberstyle=\tiny\color{gray}, stepnumber=1, 
+				 numbersep=5pt}
+\lstdefinestyle{mlStyle}{language = Matlab, style = numbers}
+\lstdefinestyle{mlStyle2}{language = Matlab, numbers = none, firstline = \mlFirstLine}
+%\lstset{basicstyle=\sffamily\scriptsize,}
+\lstdefinelanguage{sPython}[]{Python}{morekeywords={ 
+as, abs, append, array, exit, float, len, range, round, strip, True, False, None, unicode,
+% numpy
+angle, arange, asarray, convolve, cos, fft, fftfreq, fftshift, linspace, log10, ones, pi, rand, 
+randn, sin, sqrt, tan, zeros,
+% matplotlib
+axes, axis, axhline, axvline, clf, draw, figure, grid, legend, plot, set_ydata, show, stem, step, subplot, subplots_adjust, title, 
+xlabel, xlim, ylabel, ylim, mgrid, meshgrid,
+% scipy
+freqz, interp1d, iirdesign, lfilter,
+% sympy
+integrate
+}}
+\lstdefinestyle{pyStyle}{language=sPython, style=numbers, firstline = \pyFirstLine}
+\lstdefinestyle{pyStyle2}{language=sPython, style=numbers, xrightmargin=5pt, firstline = \pyFirstLine}
+\lstdefinestyle{pySnippet}{language=sPython, style=numbers}
+
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{background},
+    literate=
+     *{0}{{{\color{numb}0}}}{1}
+      {1}{{{\color{numb}1}}}{1}
+      {2}{{{\color{numb}2}}}{1}
+      {3}{{{\color{numb}3}}}{1}
+      {4}{{{\color{numb}4}}}{1}
+      {5}{{{\color{numb}5}}}{1}
+      {6}{{{\color{numb}6}}}{1}
+      {7}{{{\color{numb}7}}}{1}
+      {8}{{{\color{numb}8}}}{1}
+      {9}{{{\color{numb}9}}}{1}
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+%\lstset{morekeywords={super, cos, arange, pi, np.linspace, fft}}
+
+%\lstset{ %
+%language=Matlab,                % choose the language of the code
+%basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+%numbers=left,                   % where to put the line-numbers % none, right
+%numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+%stepnumber=2,                   % the step between two line-numbers. If it's 1 each line 
+                                %% will be numbered
+%numbersep=5pt,                  % how far the line-numbers are from the code
+%backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+%showspaces=false,               % show spaces adding particular underscores
+%showstringspaces=false,         % underline spaces within strings
+%showtabs=false,                 % show tabs within strings adding particular underscores
+%frame=single,                   % adds a frame around the code
+%frame=tb						 % top and bottom lines						 % top/bottom lines
+%tabsize=2,                      % sets default tabsize to 2 spaces
+%columns = fixed                 % Options: fullflexible, sets different alignment of text columns
+%captionpos=b,                   % sets the caption-position to bottom
+%breaklines=true,                % sets automatic line breaking
+%breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+%title=\lstname,                 % show the filename of files included with \lstinputlisting;
+                                %% also try caption instead of title
+%escapeinside={\%*}{*)},         % if you want to add a comment within your code
+%morekeywords={*,...}            % if you want to add more keywords to the set
+%}
+
+%========= Verschiedenes ==============
+%\usepackage[geometry,weather,misc,clock]{ifsym} % symbols \Square \Cross
+%\usepackage{bbding}
+ 
+\usepackage{array}
+\usepackage{tabularx}
+%\usepackage{supertabular}
+%\usepackage{hhline}
+\usepackage{enumerate} % mehr Flexibilität bei Aufzählungen
+\usepackage{polynom} % Polynomdivision
+
+%=============== Kommentierte Bibliografie ==============
+\usepackage{xstring}
+
+\makeatletter
+\newcommand{\partialcites}[1]{%
+  \begingroup
+  \let\etalchar\@undefined
+  \def\thebibliography##1{\begin{itemize}}%
+  \def\endthebibliography{\end{itemize}}%
+  % for plain style
+  %\def\bibitem##1##2\par{\IfSubStr{#1}{##1}{\item[\cite{##1}]##2}{}}%
+  \def\bibitem[##1]##2##3\par{\IfSubStr{,#1,}{,##2,}{\item[\cite{##2}]##3}{}}%
+  \@input{\jobname.bbl}%
+  \endgroup}
+\makeatother
+% Gefunden in:
+% http://tex.stackexchange.com/questions/41585/bibliography-with-some-specific-
+% entries-independently-of-the-global-bibliograph
+
+%===========  PDF - und Hyperlink - Generierung ================%
+\usepackage[hyphens]{url} % enable hyphenation in long URLs
+\usepackage{hyperref}  % should be declared as _last_ package
+\hypersetup{
+%       pdftex, %% gesetzt in Option für graphics
+%				breaklinks = true,    %% allow breaking urls
+%				pagebackref,   %% list pages in references, bereits anderweitig gesetzt?
+				%backref,      %% list sections in references
+%-------- Colorsettings -------------------------------------------
+                   colorlinks=true, %% enable colored links?
+                   filecolor=blue, %% 
+                   urlcolor=blue,  %% links to URLs
+                   linkcolor=blue, %% for links on same page
+                   citecolor=blue,
+                   menucolor=blue,
+                   %pagecolor=blue, %% for links to other pages
+                   anchorcolor=black,
+%-------- Settings when opening document --------------------------
+                   pdfpagemode=UseOutlines, % show bookmarks [alt: none] 
+                   bookmarksopen=false, % show only highest bookmark level
+                   %bookmarkopenlevel=section, % bis zum section level ausklappen
+                   bookmarksnumbered=true, % number bookmarks
+                   pdffitwindow=true, % fit PDF Size to window size 
+                   %pdfstartview=Fit, %[FitV, FitH,]
+%-------- Document Info ------------------------------------------- 
+                   % pdfcreator={ps2pdf}, % automatically
+                   % pdfproducer={Latex + Ghostscript}, % automatically
+                   % pdftitle={Übungen zu Digitale Signalverarbeitung auf FPGAs},
+                   % pdfauthor={Christian Muenker},
+                   % pdfsubject={Übungen zu Digitale Signalverarbeitung auf FPGAs},
+                   % pdfkeywords={DSP, FPGA}
+                   }
+% Further hyperref Color Options, white (invisible) = 1 1 1,:
+%                citebordercolor=0 0.5 0,        %% color for \cite
+%                filebordercolor=0 0.5 0,
+%                linkbordercolor=0.5 0 0,
+%                menubordercolor=0.5 0 0,
+%                pagebordercolor=0.5 0.5 0,
+%                urlbordercolor=0 0.5 0.5,
+%                pdfhighlight=/I,
+%                pdfborder=0 0 0.5,      %% to show _really_ only a box
+%                                        %% around the links and not a
+%                                        %% filled recangle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%                 Numbering etc.                     %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\newcommand{\figref}[1]{Abb.~\ref{#1}}%
+%\newcommand{\secref}[1]{Aufgabe~\ref{#1}}%
+\newcommand{\tabref}[1]{Tab.~\ref{#1}}%
+%\newcommand{\chapref}[1]{Kap.~\ref{#1}}%
+\newcommand{\appref}[1]{App.~\ref{#1}}%
+\newcommand{\lstref}[1]{Listing~\ref{#1}}%
+
+%\addto\captionsngerman{
+%\renewcommand{\figurename}{Abb.}
+%\renewcommand{\tablename}{Tab.}
+%\renewcommand{\lstlistingname}{Lst.}
+%}
+\renewcommand{\texteuro}{\EURtm} % from marvosym
+
+%\renewcommand{\sectionname}{Aufgabe~\ref{#1}.\ref{#2}}%
+%\renewcommand{\pagedeclaration}[1]{, see p.~#1}
+%\titleformat{\chapter}{\sf\Huge}{Übungsaufgaben zu Kapitel \thechapter\quad}{0em}{} % usepackage{titlesec}
+
+%\chapterformat{}
+
+\makeatletter
+\@addtoreset{chapter}{part}  % reset chapter number at beginning of each part
+\makeatother
+
+%% enumerate with bold characters
+%\newcounter{myenum}
+%\newenvironment{abcenumerate}
+      %{\setcounter{myenum}{1}
+			%\def\item{\par{\bfseries \alph{myenum})\ }
+			%\stepcounter{myenum}}}
+			%{\newline}
+			
+\renewcommand{\labelenumi}{\bfseries \alph{enumi})}
+
+% package tocloft
+%\cftsetindents{<entry>}{<indent>}{<numwidth>}
+%\renewcommand{\cftchapnumwidth}{2.1em} % TOC: Breite für Kapitelnummerierung
+\cftsetindents{section}{2.1em}{3.0em}% 1.5em - 2.3 em ist Standard
+\cftsetindents{subsection}{4.0em}{3.2em}%3.8em - 3.2em ist Standard
+
+\cftsetindents{figure}{1.5em}{3.0em} % 1.5em - 2.3 em ist Standard
+\cftsetindents{table}{1.5em}{2.8em} % 1.5em - 2.3 em ist Standard
+
+\makeatletter
+\def\l@lstlisting#1#2{\@dottedtocline{1}{1.5em}{3em}{#1}{#2}}
+\makeatother
+
+% Prevent pagebreak after item or heading
+% Usage: \nobrk or \nobrk[5mm] instead of \\ or \\[5mm]
+\makeatletter
+ \newcommand\nobrk[1][-2mm]{\par\nobreak\@afterheading\vspace{#1}}
+\makeatother
+
+%%% Seitenlayout %%%%%%%%%
+%\widowpenalty10000 % Hurenkinder,
+%\displaywidowpenalty=10000 % auch nach abgesetzter Formel,
+%\clubpenalty10000 % und Schusterjungen verhindern
+
+\pagestyle{scrheadings}      % "selbstgebastelte Kopf- und Fußzeilen
+\clearscrheadfoot            % löscht alle bisherigen Kopf- und Fußzeilen
+\setheadsepline{.8pt}
+\setfootsepline{0.4pt}
+\automark[section]{chapter} % [rechte Seite]{linke Seite}
+
+\ihead[]{\headmark} % Innen abwechelnd Kapitel / Section, nicht am Kapitelanfang 
+\ohead[]{\pagemark} % Außen Seitennummer, [] = nicht bei Kapitelanfang
+\ofoot{\includegraphics[scale=0.33]{HM_logo_2.png}} % outer footer
+%\lefoot{\includegraphics[scale=0.33]{D:/Daten/tex/graphics/HM_logo_2.png}} % outer footer
+\refoot[]{\itshape Prof. Dr. Christian Münker} % [] = keine Authorenname bei Kapitelanfang
+\lofoot{\itshape \today}
+
+%\headheight=10mm % Height of header
+% \hoffset=0pt % horizontal offset on page from left side (plus 1 inch)
+%\headsep=10mm % Separation between header and text
+\footskip=10mm % Separation between text and footer
+
+\setlength{\emergencystretch}{1em} % insert a maximum of 1 em between words
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%                  Tabellen                          %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\newcommand\arraybslash{\let\\\@arraycr}
+\makeatother
+
+\newcommand{\myarraystretch}{1.2} % default-Zeilenabstand in Tabellen
+\newcommand{\blankarraystretch}{2} % Zeilenabstand in Tabellen mit Feldern zum Ausfüllen
+\renewcommand{\arraystretch}{\myarraystretch} % Zeilenabstand
+%\setlength{\tabcolsep}{10pt} % Spaltenabstand
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}} % zentrierter Satz mit def. Breite
+\newcolumntype{L}{>{\bfseries\ttfamily}l} % Linke Spalte, fett gedruckt
+%
+\newcolumntype{f}{>{$}l<{$}} % Formelspalte, links
+\newcolumntype{F}{>{\boldmath$}c<{$}} % Formelspalte, fett, zentriert
+\newcolumntype{m}[1]{>{$}p{#1}<{$}} % math mit fester Breite
+
+%\newsavebox{\bformula}%
+%\newcolumntype{X}{%
+%>{\begin{lrbox}{\bformula}}%
+%c%
+%<{\end{lrbox}%
+%    $\usebox{\bformula}$}%
+% }
+
+%\newcolumntype{n}{l}
+%\newcolumntype{N}{>{\scriptsize}l}
+\newcolumntype{v}[1]{>{\raggedright\hspace{0pt}}p{#1}} % Flattersatz mit def. Breite, v{14em}
+%\newcolumntype{V}[1]{>{\scriptsize\raggedright\hspace{0pt}}p{#1}} % wie v, aber kleiner Font
+
+%\newcolumntype{d}[1]{>{\DC@{.}{,}{#1}}l<{\DC@end}}
+%\newcolumntype{R}[1]{%
+ %>{\begin{turn}{90}\begin{minipage}{#1}\scriptsize\raggedright\hspace{0pt}}l%
+ %<{\end{minipage}\end{turn}}% rotierte Beschriftung
+ %}
+%\newcolumntype{x}{>{\scriptsize\raggedright\hspace{0pt}}X}
+
+\newcolumntype{+}{>{\global\let\currentrowstyle\relax}}
+\newcolumntype{^}{>{\currentrowstyle}}
+\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+    #1\ignorespaces
+    }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%                  Floats                            %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+% Placement: 
+%   [t] top of page, [b] bottom of page, [h] here, [p] separate float page
+%   [H] (float package) enforces placement and starts a new page if necessary
+% Make Latex ignore most of the following parameters using ! (e.g. [ht!] )
+%   except \topfraction, \bottomfraction, and the ones with floatpage
+% \clearpage : Start a new page and insert all pending floats
+% \afterpage{\clearpage} : similar, using package afterpage, but finishes 
+%                          current page first
+% \FloatBarrier (package placeins) causes all unprocessed floats to be processed 
+%     at that point, but does not start a new page unless necessary.
+%     \usepackage[section]{placeins} keeps floats in their sections
+%
+% All following settings are effective from the position of their definition:
+%
+%   topnumber    | max. number of floats at top of page    | 2
+%   dbltopnumber | same for two-column layout
+%   bottomnumber | max. number of floats at bottom of page | 1
+%   totalnumber  | max. number of floats on page           | 3
+%		    change defaults using e.g. \setcounter{topnumber}{3}
+%
+% * Parameters for ALL pages:
+%  \topfraction    | max. fraction of page for floats at top    | 0.7
+%  \dbltopfraction | same for two-column layout
+%  \bottomfraction | max. fraction of page for floats at bottom | 0.3
+%  \textfraction   | min. fraction of page for text             | 0.2
+% * Parameters only for FLOAT pages:
+%  \floatpagefraction | min. fraction of floatpage [p] that should
+%                   have floats before using a new one.         | 0.5
+%  \dblfloatpagefraction | same for two-column layouts
+%       change defaults using e.g. \renewcommand{\textfraction}{0.1}
+
+% ATTENTION: Small values of \floatpagefraction create many small floatpages!
+%            Large values prevent placement of slightly smaller large floats
+%            -> floatpagefraction MUST be less than topfraction!          
+% 
+\renewcommand{\textfraction}{0.07} % allow minimum amount of text on page
+%\renewcommand{\floatpagefraction}{.90}
+%
+%  \floatsep     | vertical spacing between [t] or [b] floats | 12pt plus 2pt minus 2pt
+%  \dblfloatsep  | same for two-column layout
+%  \textfloatsep | vertical spacing between [t]/[b] floats and text | 20pt plus 2pt minus 4pt
+%  \intextsep | vertical spacing between inline-floats [h] and text | 12pt plus 2pt minus 2pt
+%      change defaults using \setlength{\floatsep}{3 pt}
+%
+%%%% Rulers %%%%%%%%%
+%  \topfigrule | Create horizontal rule before the float
+%  \botfigrule | Create horizontal rule after the float
+%		  activate using e.g. \renewcommand{\topfigrule}
+%%%% Formulas %%%%%%%%%%%
+%There are four predefined lengths, which control the vertical whitespace of displayed
+% formulas. Lenghts are elastic (plus / minus):
+%\abovedisplayskip=12pt  plus  3pt  minus  9pt
+%\abovedisplayshortskip=5pt  plus  3pt
+%\belowdisplayskip=12pt  plus  3pt  minus  9pt
+%\belowdisplayshortskip=7pt  plus  3pt  minus  4pt
+%The short skips are used if the formula starts behind the end of the foregoing last
+%line. 
+
+\floatstyle{ruled}
+\newfloat{important}{thp}{lop}
+\floatname{important}{Box}
+
+\definecolor{lgray}{gray}{0.75}% define lighter shade of gray
+\definecolor{mgray}{gray}{0.50}% define medium shade of gray
+\definecolor{dgray}{gray}{0.20}% define dark shade of gray
+
+\newsavebox{\grayboxa}%
+
+%***********************************************************************%
+%***************                                        ****************%
+%*******                  summary box                           ********%
+%**********
+%*****                                                  ****************%   
+%***********************************************************************%
+% Create a summary at the beginning of a chapter    %
+%***************                                        ****************%
+\newenvironment{summarybox1}
+{
+%\hspace{0.1\textwidth}
+\begin{minipage}[b]{\textwidth}%+\marginparwidth}
+\begin{itshape} %\itshape, \flushleft, \flushright
+}
+% The text goes here
+{
+\end{itshape}
+%\hfill
+\vspace{2mm}
+\end{minipage}%
+\hfill % ensure fresh start for following line
+\rule{3cm}{0.05cm}
+}
+
+
+
+%***********************************************************************%
+%***************                                        ****************%
+%*******                  summarybox                            ********%
+%***************                                        ****************%   
+%***********************************************************************%
+% Create a shadowed frame for important text or other stuff             % 
+%***************                                        ****************%
+\mdfdefinestyle{mymdstyle}{skipabove=\topskip,skipbelow=\topskip,
+innerleftmargin=15pt, innertopmargin=\topskip, innerbottommargin=\topskip,
+linecolor=gray,linewidth=2pt,
+frametitlefont={\normalfont\sffamily\huge\color{gray}}, frametitleaboveskip = 10pt
+}
+%\newmdenv[skipabove=10pt,skipbelow=10pt,
+%innerleftmargin=15pt, innertopmargin=10pt, innerbottommargin=10pt,
+%linecolor=gray,linewidth=2pt]{infobox}
+
+
+\newmdenv[style = mymdstyle, frametitle = Content, shadow = true, shadowsize = 6pt
+]{summarybox} 
+
+\newmdenv[style = mymdstyle, frametitle = {Important Expressions}]{infobox}
+
+%\newenvironment{summarybox}% {parameter}: title for shade box
+  %{\bigskip
+   %\begin{lrbox}{\grayboxa}
+	 %\hspace{5 mm}
+	 %\begin{minipage}{\dimexpr\textwidth-10mm\relax} 
+          %%{\bigskip \Large \sffamily \textbf{Inhalt}}  % large font for the title and print it
+          %% \rule{\textwidth}{0.5mm}
+					%\vspace{1 mm}
+  %}
+  %%%							% Fill in text here
+  %{\vspace{5 mm}
+   %\end{minipage}
+	 %\hspace{5 mm}
+	 %\end{lrbox}%                           % Finish commands
+      %{\shadowbox
+        %{\parbox{\textwidth}{\usebox{\grayboxa}
+         %\hfill\hbox{}}}}           % fill up horiz. space till the border
+  %}
+
+%***********************************************************************%
+%***************                                        ****************%
+%*******                   equationbox                          ********%
+%***************                                        ****************%   
+%***********************************************************************%
+% Create a grey box for important formulas                              %
+% Use this with \begin{equationbox} ... \end{equationbox}, 
+%   \begin{equation} is not needed
+%*************** 
+\newenvironment{equationbox}[1]% {parameter}: title for formula box
+  {\bigskip
+  \begin{lrbox}{\grayboxa}% define lrbox environment called grayboxa
+     \begin{minipage}{\textwidth-5mm}
+       \begin{center} 
+          {\large #1}  % set large font for the box and formula, print title
+       \end{center}
+       \vspace{2mm}
+       \begin{equation} % start equation environment
+  }
+   %%
+   %% here goes the formula
+   %%
+  {
+   \end{equation}
+   \end{minipage}%
+   \end{lrbox}%
+   {\fcolorbox{black}{lgray} % create new box in light gray
+       {\parbox{\textwidth-3mm}{\usebox{\grayboxa}\hfill\hbox{}}}
+   } 
+ \\[5mm]  } %
+
+%***********************************************************************%
+%***************                                        ****************%
+%*******                   Examplebox                           ********%
+%***************                                        ****************%
+%***********************************************************************%
+% Create a box with a light gray title bar for numbered Examples,       %
+%    counter name is 'theexcounter'                                     %
+%       Parameter 1: (optional)  Label instead of ``Example'' (XLarge)  %
+%       Parameter 2: (mandatory) Title for examplebox (Large)           %
+%    Example: \begin{examplebox}{Application of the world formula}      %
+%                ...                                                    %
+%             \end{examplebox}                                          %
+%***************                                        ****************%
+%***********************************************************************%
+\newenvironment{examplebox}[2][Example]
+  {         % starting part of examplebox
+   \begin{lrbox}{\grayboxa}% define lrbox environment called grayboxa
+       {\color{black}
+         {\scshape \Large #1 \theexcounter: } % ``Example'' No. x
+         {\large #2}         %  Title 
+       }    
+       \addtocounter{excounter}{1} % increase excounter
+   \end{lrbox}%
+       {\fcolorbox{white}{lgray} % create new box in dark gray
+           {\parbox{\textwidth}
+               {\usebox{\grayboxa}\hfill\hbox{}}}} 
+   \begin{quote}
+  }
+   %%
+   %% here goes the example text
+   %%
+  { \end{quote}
+    \color{lgray}\rule{\textwidth}{0.5mm}
+  }     
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define Fonts for URL Typesetting 
+% http://www.kronto.org/thesis/tips/url-formatting.html
+%% Define a new 'leo' style for the package that will use a smaller font.
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+%% Now actually use the newly defined style.
+\urlstyle{leo}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%                  Math. Zeichen                     %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\bm}[1]{\boldsymbol{#1}}%
+
+\renewcommand{\pi}{\uppi}
+
+\newcommand{\ftrans}{
+\; \circ \!\! -\!\! \bullet \;
+}
+\newcommand{\iftrans}{
+\; \bullet \!\! -\!\! \circ \;
+}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\si}{\operatorname{si}}
+\newcommand{\di}{\operatorname{di}}
+\newcommand{\rect}{\operatorname{rect}}
+\newcommand{\round}{\operatorname{round}}
+
+
+\newcommand{\entspricht}{\mathrel{\widehat{=}}}
+\newcommand{\sollgleich}{\stackrel{!}{=}}
+\newcommand{\mydefine}{\mathrel{\mathop:}=} 
+%\newcommand{\abs}[1]{\ensuremath{\lvert #1 \rvert}}
+\newcommand{\abs}[1]{\ensuremath{\left| #1 \right|}}
+\newcommand{\norm}[1]{\ensuremath{\Lvert #1 \Rvert}}
+\newcommand{\dig}[1]{{\;}^D\!\!#1} 
+
+%==============================
+\newcommand{\ts}[1]{\textsubscript{#1}}
+\newcommand{\textbt}[1]{\textbf{\texttt{#1}}}
