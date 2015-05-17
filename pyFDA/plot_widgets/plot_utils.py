@@ -31,11 +31,39 @@ except ImportError:
 from matplotlib import rcParams
 rcParams['font.size'] = 12
 
-import os
+import os, sys
 #import numpy as np
 # import scipy.signal as sig
 
 DEBUG = True
+
+####USED TO GET THE USERS HOME DIRECTORY FOR USE OF A TEMP FILE
+# taken from
+# http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
+def valid(path):
+    if path and os.path.isdir(path):
+        return True
+    return False
+ 
+def env(name):
+    return os.environ.get( name, '' )
+ 
+def getHomeDir():
+    if sys.platform != 'win32':
+        return os.path.expanduser( '~' )
+ 
+    homeDir = env( 'USERPROFILE' )
+    if not valid(homeDir):
+        homeDir = env( 'HOME' )
+        if not valid(homeDir) :
+            homeDir = '%s%s' % (env('HOMEDRIVE'),env('HOMEPATH'))
+            if not valid(homeDir) :
+                homeDir = env( 'SYSTEMDRIVE' )
+                if homeDir and (not homeDir.endswith('\\')) :
+                    homeDir += '\\'
+                if not valid(homeDir) :
+                    homeDir = 'C:\\'
+    return homeDir
 
 
 #------------------------------------------------------------------------------
@@ -237,7 +265,9 @@ class MyMplToolbar(NavigationToolbar):
             'Zoom full extent', self.parent.pltFullView)
         self.a_fv.setToolTip('Zoom to full extent')
 
+        # --------------------------------------
         self.addSeparator()
+        # --------------------------------------
 
         # GRID:
         self.a_gr = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
@@ -255,7 +285,19 @@ class MyMplToolbar(NavigationToolbar):
         self.a_sv = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
                            'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
+        
+        self.cb = None #will be used for the clipboard
+        self.tempPath = getHomeDir()
+        self.tempPath = os.path.join(self.tempPath,'tempMPL.png')
+ 
+        self.a_cb = self.addAction(QtGui.QIcon(iconDir + 'camera-slr.svg'), \
+                           'Save', self.mpl2Clip)
+        self.a_cb.setToolTip('Copy to clipboard')
+        self.a_cb.setShortcut("Ctrl+C")
 
+        # --------------------------------------
+        self.addSeparator()
+        # --------------------------------------
 
         if figureoptions is not None:
             self.a_op = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
@@ -347,10 +389,15 @@ class MyMplToolbar(NavigationToolbar):
 #        else: self.set_message(self.mode)
 
     def toggle_grid(self):
+        """Toggle the grid and redraw the figure."""
         self.grid = not self.grid
         self.parent.redraw()
 
     def enable_update(self):
+        """
+        Toggle the enable button and setting and enable / disable all 
+        buttons accordingly. 
+        """
         self.enable_update = not self.enable_update
         self.a_gr.setEnabled(self.enable_update)
         self.a_ho.setEnabled(self.enable_update)
@@ -361,4 +408,23 @@ class MyMplToolbar(NavigationToolbar):
         self.a_fv.setEnabled(self.enable_update)
         self.a_rd.setEnabled(self.enable_update)
         self.a_sv.setEnabled(self.enable_update)
+        self.a_cb.setEnabled(self.enable_update)
         self.a_op.setEnabled(self.enable_update)
+        
+            
+    def mpl2Clip(self):
+        """
+        Save current figure to temporary file and copy it to the clipboard.
+        """
+        try:
+            self.canvas.figure.savefig(self.tempPath)
+            #  savefig(fname, dpi=None, facecolor='w', edgecolor='w',
+            #  orientation='portrait', papertype=None, format=None,
+            #  transparent=False):
+            tempImg = QtGui.QImage(self.tempPath)
+            self.cb = QtGui.QApplication.clipboard()
+            self.cb.setImage(tempImg)
+        except:
+            print('Error copying figure to clipboard')
+            errorMsg = "Sorry: %s\n\n:%s\n"%(sys.exc_type, sys.exc_value)
+            print(errorMsg)
