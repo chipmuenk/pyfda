@@ -26,7 +26,7 @@ if __name__ == "__main__":
 import filterbroker as fb
 from filter_tree_builder import FilterTreeBuilder
 
-class SelectFilter(QtGui.QWidget):
+class InputFilter(QtGui.QWidget):
     """
     Construct combo boxes for selecting the filter, consisting of:
       - Response Type (LP, HP, Hilbert, ...)
@@ -35,7 +35,7 @@ class SelectFilter(QtGui.QWidget):
     """
 
     def __init__(self, DEBUG = False):
-        super(SelectFilter, self).__init__()
+        super(InputFilter, self).__init__()
         self.DEBUG = DEBUG
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file
@@ -89,21 +89,13 @@ class SelectFilter(QtGui.QWidget):
         LAYOUT
         """
         # see Summerfield p. 278
-        self.layHDynWdg = QtGui.QHBoxLayout() # for additional subwidgets
+        self.layHDynWdg = QtGui.QHBoxLayout() # for additional dynamic subwidgets
         self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
         
-        """Edit WinMic"""
-        #Verschiebt alles was in dem Frame dargestellt wird, so wird Platz gespart.
-        #TODO: Unsauber?
-#        self.frmDynWdg.setContentsMargins(-10,-9,-10,-9)
         self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
         
-        #Die folgende Zeile dient nur dazu um den 2. Frame, welcher für für dynamische
-        #subwidgets ist anzuzeigen.
-        #TODO: Zeile löschen fals Sie hier vergessen wird.
-        
+        #Debugging: enable next line to show border of frmDnyWdg
         #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
-        """END"""
         
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
@@ -128,12 +120,9 @@ class SelectFilter(QtGui.QWidget):
         layVAllWdg.addLayout(layHStdWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
         
-#        """EDIT WinMic"""
-#        #Fals Windowes ausgewählt wird, verhindert der Spacer das nach unten abtauchen
-#        #des neuen Subwidgets
+        # prevent disappearing of new subwidget
 #        spacer = QtGui.QSpacerItem(0, 1, QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
 #        layVAllWdg.addItem(spacer)
-#        """END"""
 
         self.frmMain = QtGui.QFrame()
         self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -197,10 +186,11 @@ class SelectFilter(QtGui.QWidget):
         adding displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
         # cmbBox.currentText() has full text ('IIR'), 
-        # itemData only abbreviation ('IIR')
-        ftIdx = self.cmbFilterType.currentIndex()
+        # itemData only abbreviation ('IIR') which is the same in this case
+
         self.ft = str(self.cmbFilterType.currentText())
-        # TODO: This line gives back key 'None' causing a crash downstream
+        # TODO: These two lines gives back key 'None' causing a crash downstream
+        #ftIdx = self.cmbFilterType.currentIndex()
         #self.ft = str(self.cmbFilterType.itemData(ftIdx))
 
         fb.fil[0]['ft'] = self.ft
@@ -313,7 +303,7 @@ class SelectFilter(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = SelectFilter()
+    form = InputFilter()
     form.show()
 
     app.exec_()
