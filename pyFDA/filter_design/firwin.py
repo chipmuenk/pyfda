@@ -11,15 +11,21 @@ https://github.com/scipy/scipy/pull/3717
 https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
-#from importlib import import_module
-#import scipy
 import scipy.signal as sig
 #import numpy as np
 #from numpy import log10, pi, arctan
 from PyQt4 import QtGui
+
+# import filterbroker from one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__":
+    import sys, os
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.dirname(__cwd__))
+    import filterbroker as fb # importing filterbroker initializes all its globals
+    
 import pyfda_lib
 
-#import filterbroker as fb
 
 # TODO: Order of A_XX is incorrect e.g. for BP
 # TODO: Hilbert not working correctly yet
@@ -111,12 +117,10 @@ class firwin(object):
         self.combo_firwin_win.addItems(windows)
         self.combo_firwin_win.setCurrentIndex(0)
 
-        """EDIT WinMic"""
-        #groeße der ComboBoxen dynamisch.
-        #koennen aber durch ein Layout auf fixer groeße gehalten werden
+        # Basic size of comboboxes is minimum, this can be changed in the 
+        # upper hierarchy level using layouts
         self.combo_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.combo_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        """END"""
 
         self.combo_firwin_win.activated.connect(self.updateWindow)
         self.combo_firwin_alg.activated.connect(self.updateWindow)
@@ -222,4 +226,11 @@ class firwin(object):
         self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
         self.save(fil_dict, sig.firwin(self.N, [self.F_SB, self.F_SB2],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
+
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    filt = firwin()        # instantiate filter
+    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    print(fb.fil[0][frmt]) # return results in default format
 
