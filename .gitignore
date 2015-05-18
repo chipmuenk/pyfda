@@ -56,3 +56,15 @@ target/
 # Spyder
 .spyderproject
 .spyderworkspace
+
+# Tex
+*.synctex
+*.lot
+*.lof
+*.toc
+*.out
+*.aux
+*.bbl
+*.blg
+*.bib.bak
+*.synctex
