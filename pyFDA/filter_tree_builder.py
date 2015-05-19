@@ -9,8 +9,8 @@ import os, sys
 import codecs
 import filterbroker as fb
 
-# TODO: need to delete unused imports from memory? 
-# TODO: replace __import__ by importlib.import_module()
+# TODO: fix warning 'QWidget: Must construct a QApplication before a QPaintDevice'
+#       probably caused by filter class firwin containing widgets
 
 class FilterTreeBuilder(object):
     
@@ -183,9 +183,7 @@ class FilterTreeBuilder(object):
                 
                 
               #  Now, modules should be deleted from memory (?)
-#                setattr(pyPackage, pyName, None)
-#                del sys.modules[pyPackage.pyName]
-#                del pyName
+                del sys.modules[self.filtDir + '.' + pyName]      
                 
             except ImportError:
                 if self.DEBUG: 
@@ -197,28 +195,43 @@ class FilterTreeBuilder(object):
 #==============================================================================
     def buildFilTree(self):
         """
-        Read info attributes (ft, rt) from all filter objects and build 
-        a tree of all possible filter combinatiions from it, with the elements
-        - response type (rt): 'LP' (lowpass), 'HP' ...
-        - filter type (ft): 'FIR', 'IIR', ... 
-        - design method (dm): 'cheby1', 'equiripple', ...
-        """
+        Read info attributes (ft, rt, fo) from all filter objects (dm) and build 
+        a dictionary of all possible filter combinations from it 
+        with the hierarchy:
+        
+        response type -> filter type -> design method  -> filter order        
+        rt ('LP')        ft ('IIR')     dm ('Elliptic')   fo ('min','man')
+        
+        For each branch (filter combination), all the attributes found in the
+        corresponding filter class are stored, e.g.
+        'par':['f_S', 'F_PB', 'F_SB', 'A_PB', 'A_SB']   # required parameters
+        'msg':r"<br /><b>Note:</b> Order needs to be even!" # message
+        'enb':['fo','fspecs','wspecs']                     # enabled widgets
+        'vis':['fo','fspecs']  # visibe widgets (not yet implemented) 
+     """
         filTree = {}
-        for dm in fb.gD['imports']:           # iterate over designMethods 
-            myFilter = self.objectWizzard(dm) # instantiate filter class
+        for dm in fb.gD['imports']:           # iterate over designMethods(dm)
+            myFilter = self.objectWizzard(dm) # instantiate object of filter class dm
             ft = myFilter.ft                  # get filter type ('FIR')
+            
             for rt in myFilter.rt:            # iterate over response types
-                if rt not in filTree:      # is rt in dict already?
-                    filTree.update({rt:{}}) # no, create it
-                if ft not in filTree[rt]:  # is ft already in dict[rt]?
+                if rt not in filTree:         # is rt key in dict already?
+                    filTree.update({rt:{}})   # no, create it
+
+                if ft not in filTree[rt]:  # is ft key already in dict[rt]?
                     filTree[rt].update({ft:{}}) # no, create it
                 filTree[rt][ft].update({dm:{}}) # append dm to list dict[rt][ft]
-                filTree[rt][ft][dm].update(myFilter.rt[rt]) # append fo dict
+                # finally append all the individual 'min' / 'man' info 
+                # to dm in filTree. These are e.g. the params for 'min' and /or
+                # 'man' filter order
+                filTree[rt][ft][dm].update(myFilter.rt[rt]) 
 
-        # combine common info com = {'man':{...}, 'min':{...}}
-        # with individual info under e.g. {..., 'LP':{'man':{...}, 'min':{...}} 
-# TODO: calculate cut set first?
-                for minman in myFilter.com:# and filTree[rt][ft][dm]): cut set?
+                # combine common info for all response types 
+                #     com = {'man':{...}, 'min':{...}}
+                # with individual info from the last step
+                #      e.g. {..., 'LP':{'man':{...}, 'min':{...}} 
+
+                for minman in myFilter.com:
                     # add info only when 'man' / 'min' exists in filTree
                     if minman in filTree[rt][ft][dm]: 
                         for i in myFilter.com[minman]:
@@ -239,8 +252,9 @@ class FilterTreeBuilder(object):
                                       filTree[rt][ft][dm][minman][i])
                                 print("myFilter.com[minman][i]",
                                   myFilter.com[minman][i] )
-                            
 
+            del myFilter # delete obsolete filter object (needed?)
+            
         if self.DEBUG: print("filTree = ", filTree)
         
         return filTree

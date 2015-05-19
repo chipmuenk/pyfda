@@ -15,6 +15,15 @@ from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import buttord
 import numpy as np
+
+# import filterbroker from one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__":
+    import sys, os
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.dirname(__cwd__))
+    import filterbroker as fb # importing filterbroker initializes all its globals
+    
 import pyfda_lib
 
 frmt = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
@@ -171,3 +180,10 @@ the critical frequency / frequencies :math:`F_PB` where the gain drops below
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
         self.save(fil_dict, sig.butter(self.N, self.F_PBC,
                             btype='bandstop', analog = False, output = frmt))
+                            
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    filt = butter()        # instantiate filter
+    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    print(fb.fil[0][frmt]) # return results in default format
