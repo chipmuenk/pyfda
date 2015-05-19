@@ -35,7 +35,7 @@ pdftitle={pyFDA: Software Architecture and Filter API},
 \\[1cm]
 \LARGE Christian M\"unker
 \vfill
-\includegraphics[width=13cm]{pyFDA_screenshot}
+\includegraphics[width=13cm]{pyFDA_screenshot_3}
 
 \footnotesize{pyFDA screenshot}
 \vfill
@@ -67,8 +67,15 @@ pdftitle={pyFDA: Software Architecture and Filter API},
 \setcounter{topnumber}{3} % max. Anzahl von Gleitobjekten im oberen Teil der Seite
 
 \section{Overview}
+pyFDA has been written to be extensible and modular, easing the addition of own filter and analysis modules. 
+
+This has (hopefully) been achieved with two central ideas:
+\begin{description}
+\item[A central global dictionary:] The file \textbt{filterbroker.py} with module-level attributes (dictionaries) is imported by all files that need to store and exchange parameters, filter designs etc. (\url{https://docs.python.org/3/faq/programming.html#how-do-i-share-global-variables-across-modules})
+\item[Dynamically imported design files:] A tree with all available filter design classes and characteristics is built at the start of the program from all files in the \textt{filter_widgets} directory. The actual classes with the design algorithms are imported dynamically when needed, the GUI is adapted according to the parameters defined in each filter design class. Additional widgets can be defined in the design class.
+\end{description}
 \subsection{Class Structure and Hierarchy}
-The following graphics have been created from the top directory using \textbt{pyreverse} (and they are only readable when zoomed in):
+The following graphics have been created from the top directory using \textbt{pyreverse} and some post-processing with LibreOffice (and they are only readable when zoomed in):
 
 \texttt{pyreverse -o pdf -k --ignore=simpleeval.py,input\_target\_spec.py -p pyFDA .}
 
