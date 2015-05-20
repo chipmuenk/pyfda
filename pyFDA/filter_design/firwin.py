@@ -12,8 +12,8 @@ https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
-#import numpy as np
-#from numpy import log10, pi, arctan
+from importlib import import_module
+import inspect
 from PyQt4 import QtGui
 
 # import filterbroker from one level above if this file is run as __main__
@@ -102,20 +102,19 @@ class firwin(object):
         self.combo_firwin_alg.setObjectName('combo_firwin_alg')
         self.combo_firwin_alg.addItems(['ichige','kaiser','herrmann'])
 
-
-
         # Combobox for selecting the window used for filter design
         self.combo_firwin_win = QtGui.QComboBox()
         self.combo_firwin_win.setObjectName('combo_firwin_win')
 
-        windows = ['Boxcar','Triang','Blackman','Hamming','Hann','Bartlett',
-                   'Flattop', 'Parzen', 'Bohman', 'Blackmanharris', 'Nuttall',
-                   'Barthann']
+        windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
+                   'Boxcar','Chebwin','Flattop','General_Gaussian','Gaussian',
+                   'Hamming','Hann','Kaiser','Nuttall','Parzen','Slepian','Triang']
 
         #kaiser (needs beta), gaussian (needs std), general_gaussian
         #(needs power, width), slepian (needs width), chebwin (needs attenuation)
         self.combo_firwin_win.addItems(windows)
-        self.combo_firwin_win.setCurrentIndex(0)
+        win_idx = self.combo_firwin_win.findText('Boxcar')
+        self.combo_firwin_win.setCurrentIndex(win_idx)
 
         # Basic size of comboboxes is minimum, this can be changed in the 
         # upper hierarchy level using layouts
@@ -131,13 +130,21 @@ class firwin(object):
         self.firWindow = str(self.combo_firwin_win.currentText()).lower()
         self.alg = str(self.combo_firwin_alg.currentText())
 
-#        mod = import_module(scipy.signal) # doesn't work
-#        print(sig.boxcar.__doc__) # this works
-#        met = getattr(sig.boxcar, '.__doc__'  )
-
-#        print(type(self.firWindow))
-#        self.firWindow = 'hann'
-        #self.alg = self.combo_firwin_alg.currentText()
+        mod_ = import_module('scipy.signal') # works
+#        mod = __import__('scipy.signal') # works
+        class_ = getattr(mod_, self.firWindow)
+#        docstring = getattr(sig.boxcar, '__doc__'  ) # works
+        win_doc = getattr(class_, '__doc__') # works!
+        self.winArgs = inspect.getargspec(class_)[0] # return args of window
+        # and remove standard args for all window types 'sym' and 'M'
+        self.winArgs = [k for k in self.winArgs if k not in {'sym', 'M'}]
+        print(self.winArgs)
+        
+        self.info_doc = []
+        self.info_doc.append('firwin()\n========')
+        self.info_doc.append(sig.firwin.__doc__)
+        self.info_doc.append(self.firWindow + '()\n========')
+        self.info_doc.append(win_doc)
 
 
     def get_params(self, fil_dict):
@@ -230,7 +237,24 @@ class firwin(object):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    
+    app = QtGui.QApplication(sys.argv)
+  
+    filt = firwin()  # instantiate filter
+    win_type = getattr(filt, filt.wdg['sf'])
+ #   print(filt.firWindow)
+#
+    filt_alg = getattr(filt, filt.wdg['fo'])
+    
+    layVDynWdg = QtGui.QVBoxLayout()
+    layVDynWdg.addWidget(win_type, stretch = 1)
+    layVDynWdg.addWidget(filt_alg, stretch = 1)
+    
+    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    print(fb.fil[0][frmt]) # return results in default format
+
     frmDynWdg = QtGui.QFrame()
+    frmDynWdg.setLayout(layVDynWdg)
     
     layVAllWdg = QtGui.QVBoxLayout()
     layVAllWdg.addWidget(frmDynWdg)
@@ -239,23 +263,12 @@ if __name__ == '__main__':
     frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
     frmMain.setLayout(layVAllWdg)    
 
-    layHMain = QtGui.QHBoxLayout()
-    layHMain.addWidget(frmMain)
-    layHMain.setContentsMargins(0,0,0,0)
+    form = frmMain
 
-
-    
-    app = QtGui.QApplication(sys.argv)
-    firwin.combo_firwin_win().setLayout(layHMain)
-    form = firwin.combo_firwin_win()
-
-#    form = firwin.combo_firwin_win()
     form.show()
 
     app.exec_()
    
     
-#    filt = firwin()        # instantiate filter
-#    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-#    print(fb.fil[0][frmt]) # return results in default format
-
+#
+#
