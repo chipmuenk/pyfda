@@ -272,18 +272,19 @@ class InputFilter(QtGui.QWidget):
         on requirements of filter design algorithm
         """
         self._delWidgets()
-        try:
-            if 'sf' in fb.filObj.wdg:
-                a = getattr(fb.filObj, fb.filObj.wdg['sf'])
-                self.layHDynWdg.addWidget(a, stretch = 1)
-                self.layHDynWdg.setContentsMargins(0,0,0,0)
-#                self.a.setContentsMargins(0,10,0,0)
-#                self.layHDynWdg.addStretch()
-                self.frmDynWdg.setVisible(a != None)
-            
-        except AttributeError as e:
-            print("sf.updateWidgets:",e)
-            self.frmDynWdg.setVisible(False)
+        if hasattr(fb.filObj, 'wdg'):
+            try:
+                if 'sf' in fb.filObj.wdg:
+                    a = getattr(fb.filObj, fb.filObj.wdg['sf'])
+                    self.layHDynWdg.addWidget(a, stretch = 1)
+                    self.layHDynWdg.setContentsMargins(0,0,0,0)
+    #                self.a.setContentsMargins(0,10,0,0)
+    #                self.layHDynWdg.addStretch()
+                    self.frmDynWdg.setVisible(a != None)
+                
+            except AttributeError as e:
+                print("sf.updateWidgets:",e)
+                self.frmDynWdg.setVisible(False)
 
     def _delWidgets(self):
         """
