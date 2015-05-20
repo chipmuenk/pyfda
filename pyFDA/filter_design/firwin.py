@@ -230,7 +230,32 @@ class firwin(object):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    filt = firwin()        # instantiate filter
-    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][frmt]) # return results in default format
+    frmDynWdg = QtGui.QFrame()
+    
+    layVAllWdg = QtGui.QVBoxLayout()
+    layVAllWdg.addWidget(frmDynWdg)
+
+    frmMain = QtGui.QFrame()
+    frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+    frmMain.setLayout(layVAllWdg)    
+
+    layHMain = QtGui.QHBoxLayout()
+    layHMain.addWidget(frmMain)
+    layHMain.setContentsMargins(0,0,0,0)
+
+
+    
+    app = QtGui.QApplication(sys.argv)
+    firwin.combo_firwin_win().setLayout(layHMain)
+    form = firwin.combo_firwin_win()
+
+#    form = firwin.combo_firwin_win()
+    form.show()
+
+    app.exec_()
+   
+    
+#    filt = firwin()        # instantiate filter
+#    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+#    print(fb.fil[0][frmt]) # return results in default format
 
