@@ -46,7 +46,6 @@ def cround(x, n_dig = 0):
     if n_dig > 0:
         if np.iscomplex(x):
             x = np.complex(np.around(x.real, n_dig), np.around(x.imag, n_dig))
-            if x.real == 0: x = 1j*x.imag # avoid printing -0 - 0.1234 j
         else:
             x = np.around(x, n_dig)
     return x
