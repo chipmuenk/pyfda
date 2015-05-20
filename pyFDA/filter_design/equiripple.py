@@ -11,19 +11,17 @@ https://github.com/scipy/scipy/pull/3717
 https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
 import scipy.signal as sig
-#import numpy as np
-#from numpy import log10, pi, arctan
-#from PyQt4 import QtGui
 
 if __name__ == "__main__":
+    import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
+    import filterbroker as fb
 
 import pyfda_lib
 
-#import filterbroker as fb
+
 
 # TODO: Order of A_XX is incorrect e.g. for BP
 # TODO: Try HP with even order & type = Hilbert
@@ -207,3 +205,10 @@ class equiripple(object):
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']], Hz = 1,
                 type = 'hilbert'))
+
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    filt = equiripple()        # instantiate filter
+    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    print(fb.fil[0][frmt]) # return results in default format

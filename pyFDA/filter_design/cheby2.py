@@ -15,6 +15,14 @@ from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import cheb2ord
 import numpy as np
+# import filterbroker from one level above if this file is run as __main__
+# for test purposes
+if __name__ == "__main__":
+    import sys, os
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.dirname(__cwd__))
+    import filterbroker as fb # importing filterbroker initializes all its globals
+
 import pyfda_lib
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
@@ -174,3 +182,11 @@ by the filter order and by slightly adapting the value(s) of :math:`F_SB`.
 
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
                             btype='bandstop', analog = False, output = frmt))
+
+
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    filt = cheby2()        # instantiate filter
+    filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
+    print(fb.fil[0][frmt]) # return results in default format
