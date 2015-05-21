@@ -71,8 +71,6 @@ class InputFilter(QtGui.QWidget):
         self.cmbDesignMethod=QtGui.QComboBox(self)
         self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
 
-
-
         # Adapt combobox size dynamically to largest element
         self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
@@ -83,7 +81,6 @@ class InputFilter(QtGui.QWidget):
         for rt in fb.filTree:
             self.cmbResponseType.addItem(fb.gD['rtNames'][rt], rt)
         self.cmbResponseType.setCurrentIndex(0) # set initial index
-
 
         """
         LAYOUT
@@ -189,10 +186,6 @@ class InputFilter(QtGui.QWidget):
         # itemData only abbreviation ('IIR') which is the same in this case
 
         self.ft = str(self.cmbFilterType.currentText())
-        # TODO: These two lines gives back key 'None' causing a crash downstream
-        #ftIdx = self.cmbFilterType.currentIndex()
-        #self.ft = str(self.cmbFilterType.itemData(ftIdx))
-
         fb.fil[0]['ft'] = self.ft
 
         # Rebuild design method combobox entries for new ft setting:
@@ -210,9 +203,6 @@ class InputFilter(QtGui.QWidget):
             print("dmlist", dmList)
             print(fb.fil[0]['dm'])
             
-            
-
-            
         # Is previous design method (e.g. ellip) in list for new ft? 
         # And has the widget been initialized?
         if fb.fil[0]['dm'] in dmList and self.filter_initialized:
@@ -228,11 +218,11 @@ class InputFilter(QtGui.QWidget):
     def setDesignMethod(self):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
-        Copy selected setting to self.dm # TODO: really needed?
+        Instantiate filter object
         """
         dmIdx = self.cmbDesignMethod.currentIndex()
-        self.dm = str(self.cmbDesignMethod.itemData(dmIdx))
-        fb.fil[0]['dm'] = self.dm
+        dm = str(self.cmbDesignMethod.itemData(dmIdx))
+        fb.fil[0]['dm'] = dm
 
 
         try: # has a filter object been instantiated yet?
@@ -245,20 +235,17 @@ class InputFilter(QtGui.QWidget):
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
         # filter order method
-        if fb.fil[0]['fo'] not in \
-                        fb.filTree[self.rt][self.ft][self.dm].keys():
+        if fb.fil[0]['fo'] not in fb.filTree[self.rt][self.ft][dm].keys():
             fb.fil[0].update({'fo':{}})
             fb.fil[0]['fo'] \
-                = fb.filTree[self.rt][self.ft][self.dm].keys()[0]
+                = fb.filTree[self.rt][self.ft][dm].keys()[0]
 
         if self.DEBUG:
             print("=== InputFilter.setDesignMethod ===")
             print("selFilter:", fb.fil[0])
-            print("filterTree[dm] = ", fb.filTree[self.rt][self.ft]\
-                                                            [self.dm])
+            print("filterTree[dm] = ", fb.filTree[self.rt][self.ft][dm])
             print("filterTree[dm].keys() = ", fb.filTree[self.rt][self.ft]\
-                                                            [self.dm].keys())
-
+                                                            [dm].keys())
 
         self.filter_initialized = True
         
@@ -278,8 +265,6 @@ class InputFilter(QtGui.QWidget):
                     a = getattr(fb.filObj, fb.filObj.wdg['sf'])
                     self.layHDynWdg.addWidget(a, stretch = 1)
                     self.layHDynWdg.setContentsMargins(0,0,0,0)
-    #                self.a.setContentsMargins(0,10,0,0)
-    #                self.layHDynWdg.addStretch()
                     self.frmDynWdg.setVisible(a != None)
                 
             except AttributeError as e:
