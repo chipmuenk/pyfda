@@ -87,16 +87,18 @@ class firwin(object):
         The kind of selected window has great influence on ripple etc. of the
         resulting filter.
         """
-        self.info_doc = []
-        self.info_doc.append('firwin()\n========')
-        self.info_doc.append(sig.firwin.__doc__)
-#        self.info_doc.append(getattr(sig.windows, self.firWindow + '__doc__'))
+        #self.info_doc = [] is set in self.updateWindow()
+        
+        self.initUI()
 
+        
+    def initUI(self):
+        
         # Additional subwidgets needed for design:
         # These subwidgets are instantiated where needed using the handle to
         # the filter object
 
-        self.wdg = {'fo':'combo_firwin_alg', 'sf':'combo_firwin_win'}
+        self.wdg = {'fo':'combo_firwin_alg', 'sf':'wdg_firwin_win'}
         # Combobox for selecting the algorithm to estimate minimum filter order
         self.combo_firwin_alg = QtGui.QComboBox()
         self.combo_firwin_alg.setObjectName('combo_firwin_alg')
@@ -108,13 +110,40 @@ class firwin(object):
 
         windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
                    'Boxcar','Chebwin','Flattop','General_Gaussian','Gaussian',
-                   'Hamming','Hann','Kaiser','Nuttall','Parzen','Slepian','Triang']
+                   'Hamming','Hann','Kaiser','Nuttall','Parzen','Triang']
+                   # 'Slepian',
 
         #kaiser (needs beta), gaussian (needs std), general_gaussian
         #(needs power, width), slepian (needs width), chebwin (needs attenuation)
         self.combo_firwin_win.addItems(windows)
         win_idx = self.combo_firwin_win.findText('Boxcar')
         self.combo_firwin_win.setCurrentIndex(win_idx)
+        
+        self.lbl_firwin_win1 = QtGui.QLabel("a")
+        self.led_firwin_win1 = QtGui.QLineEdit()
+        self.led_firwin_win1.setText("0.5")
+        self.led_firwin_win1.setObjectName('led_firwin_win1')
+        self.lbl_firwin_win1.setVisible(False)
+        self.led_firwin_win1.setVisible(False)
+               
+        self.lbl_firwin_win2 = QtGui.QLabel("b")
+        self.led_firwin_win2 = QtGui.QLineEdit()
+        self.led_firwin_win2.setText("0.5")
+        self.led_firwin_win2.setObjectName('led_firwin_win2')
+        self.led_firwin_win2.setVisible(False)
+        self.lbl_firwin_win2.setVisible(False)
+        
+        self.wdg_firwin_win = QtGui.QWidget()
+        self.wdg_firwin_win.setObjectName('wdg_firwin_win')
+        self.layGWin = QtGui.QGridLayout()
+        self.layGWin.addWidget(self.combo_firwin_win,0,0,1,4)
+        self.layGWin.addWidget(self.lbl_firwin_win1,1,0)
+        self.layGWin.addWidget(self.led_firwin_win1,1,1)
+        self.layGWin.addWidget(self.lbl_firwin_win2,1,2)
+        self.layGWin.addWidget(self.led_firwin_win2,1,3)
+        self.layGWin.setContentsMargins(0,0,0,0)
+        self.wdg_firwin_win.setLayout(self.layGWin)
+
 
         # Basic size of comboboxes is minimum, this can be changed in the 
         # upper hierarchy level using layouts
@@ -122,29 +151,64 @@ class firwin(object):
         self.combo_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
         self.combo_firwin_win.activated.connect(self.updateWindow)
+        self.led_firwin_win1.editingFinished.connect(self.updateWindow)
+        self.led_firwin_win2.editingFinished.connect(self.updateWindow)   
+        
         self.combo_firwin_alg.activated.connect(self.updateWindow)
 
         self.updateWindow()
+        
 
     def updateWindow(self):
         self.firWindow = str(self.combo_firwin_win.currentText()).lower()
         self.alg = str(self.combo_firwin_alg.currentText())
 
-        mod_ = import_module('scipy.signal') # works
-#        mod = __import__('scipy.signal') # works
-        class_ = getattr(mod_, self.firWindow)
-#        docstring = getattr(sig.boxcar, '__doc__'  ) # works
-        win_doc = getattr(class_, '__doc__') # works!
-        self.winArgs = inspect.getargspec(class_)[0] # return args of window
-        # and remove standard args for all window types 'sym' and 'M'
-        self.winArgs = [k for k in self.winArgs if k not in {'sym', 'M'}]
-        print(self.winArgs)
+        mod_ = import_module('scipy.signal')
+#        mod = __import__('scipy.signal') # works, but not with the next line
+        class_ = getattr(mod_, self.firWindow) # instantiate window class
+        win_doc = getattr(class_, '__doc__') # read window docstring
         
         self.info_doc = []
         self.info_doc.append('firwin()\n========')
         self.info_doc.append(sig.firwin.__doc__)
-        self.info_doc.append(self.firWindow + '()\n========')
+        self.info_doc.append(self.firWindow + '()' +'\n' + 
+                                        '=' * (len(self.firWindow) + 2))
         self.info_doc.append(win_doc)
+        
+        self.winArgs = inspect.getargspec(class_)[0] # return args of window
+        # and remove standard args for all window types 'sym' and 'M':
+        self.winArgs = [k for k in self.winArgs if k not in {'sym', 'M'}]
+        #print(self.winArgs)
+        N_args = len(self.winArgs)
+        self.win_params = ""
+
+        # make edit boxes for additional parameters visible if needed
+        self.lbl_firwin_win1.setVisible(N_args > 0)
+        self.led_firwin_win1.setVisible(N_args > 0)
+        if N_args > 0 :
+            self.lbl_firwin_win1.setText(self.winArgs[0])
+            self.firWindow = (str(self.combo_firwin_win.currentText()).lower(),
+                                      float(self.led_firwin_win1.text()))
+            
+        self.lbl_firwin_win2.setVisible(len(self.winArgs) > 1)
+        self.led_firwin_win2.setVisible(len(self.winArgs) > 1)
+        if N_args > 1 :
+            self.lbl_firwin_win2.setText(self.winArgs[1])
+            self.firWindow = (str(self.combo_firwin_win.currentText()).lower(),
+                float(self.led_firwin_win1.text()), 
+                float(self.led_firwin_win2.text()))
+        #print(self.firWindow)           
+
+            
+    def deleteWidget(self):
+        """
+        Delete all dynamically created subwidgets
+        When changing e.g. from LP to HP, Runtime Error occurs: 
+        
+            self.layHDynWdg.addWidget(a, stretch = 1)
+        RuntimeError: wrapped C/C++ object of type QWidget has been deleted
+        """
+        pass          
 
 
     def get_params(self, fil_dict):
@@ -186,13 +250,14 @@ class firwin(object):
     def LPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.firwin(self.N, self.F_PB,
-                                    window = self.firWindow, nyq = 0.5))
+                                       window = self.firWindow, nyq = 0.5))
 
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
         (self.N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
-        self.save(fil_dict, sig.firwin(self.N, self.F_PB, window = self.firWindow, nyq = 0.5))
+        self.save(fil_dict, sig.firwin(self.N, self.F_PB, 
+                                       window = self.firWindow, nyq = 0.5))
 
     def HPman(self, fil_dict):
         self.get_params(fil_dict)
