@@ -291,7 +291,8 @@ class InputFilter(QtGui.QWidget):
         Delete dynamically created subwidgets
         """
         widgetList = self.frmDynWdg.findChildren(
-                                            (QtGui.QComboBox,QtGui.QLineEdit))
+                                            (QtGui.QComboBox,QtGui.QLineEdit, 
+                                             QtGui.QLabel, QtGui.QWidget))
 #       widgetListNames = [w.objectName() for w in widgetList]
 
         for w in widgetList:
