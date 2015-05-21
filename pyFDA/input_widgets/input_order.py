@@ -149,16 +149,22 @@ class InputOrder(QtGui.QFrame):
         self.dmLast = fb.fil[0]["dm"]
 
     def updateWidgets(self):
+        """
+        Delete dynamically created subwidgets and create new ones, depending
+        on requirements of filter design algorithm
+        """
+
         self._delWidgets()
-        try:
-            if 'fo' in fb.filObj.wdg:
-                a = getattr(fb.filObj, fb.filObj.wdg['fo'])
-                self.layHDynWdg.addWidget(a)
-                self.layHDynWdg.setContentsMargins(0,0,0,0)
-                self.frmDynWdg.setVisible(a != None)
-        except AttributeError as e: # no attribute 'wdg'
-            print("fo.updateWidgets:", e)
-            self.frmDynWdg.setVisible(False)
+        if hasattr(fb.filObj, 'wdg'):
+            try:
+                if 'fo' in fb.filObj.wdg:
+                    a = getattr(fb.filObj, fb.filObj.wdg['fo'])
+                    self.layHDynWdg.addWidget(a)
+                    self.layHDynWdg.setContentsMargins(0,0,0,0)
+                    self.frmDynWdg.setVisible(a != None)
+            except AttributeError as e: # no attribute 'wdg'
+                print("fo.updateWidgets:", e)
+                self.frmDynWdg.setVisible(False)
 
     def _delWidgets(self):
         """
