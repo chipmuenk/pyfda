@@ -63,7 +63,7 @@ class InputSpecs(QtGui.QWidget):
         self.fo = input_order.InputOrder(DEBUG = False)
         # subwidget for Frequency Specs
         self.fspecs = input_freq_specs.InputFreqSpecs(fil_dict = fb.fil[0],
-                    DEBUG = True)
+                    DEBUG = False)
         # subwidget for Amplitude Specs
         self.aspecs = input_amp_specs.InputAmpSpecs(fil_dict = fb.fil[0],
                     DEBUG = False)
