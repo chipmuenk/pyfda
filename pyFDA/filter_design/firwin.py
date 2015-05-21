@@ -110,11 +110,11 @@ class firwin(object):
 
         windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
                    'Boxcar','Chebwin','Flattop','General_Gaussian','Gaussian',
-                   'Hamming','Hann','Kaiser','Nuttall','Parzen','Triang']
-                   # 'Slepian',
+                   'Hamming','Hann','Kaiser','Nuttall','Parzen','Slepian','Triang']
 
         #kaiser (needs beta), gaussian (needs std), general_gaussian
         #(needs power, width), slepian (needs width), chebwin (needs attenuation)
+
         self.combo_firwin_win.addItems(windows)
         win_idx = self.combo_firwin_win.findText('Boxcar')
         self.combo_firwin_win.setCurrentIndex(win_idx)
@@ -143,7 +143,6 @@ class firwin(object):
         self.layGWin.addWidget(self.led_firwin_win2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
         self.wdg_firwin_win.setLayout(self.layGWin)
-
 
         # Basic size of comboboxes is minimum, this can be changed in the 
         # upper hierarchy level using layouts
