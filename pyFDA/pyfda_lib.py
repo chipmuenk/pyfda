@@ -167,7 +167,7 @@ determined. For a more general routine, see `numpy.unique`.
 Examples
 --------
 >>> vals = [0, 1.3, 1.31, 2.8, 1.25, 2.2, 10.3]
->>> uniq, mult = sp.signal.unique_roots(vals, tol=2e-2, rtype='avg')
+>>> uniq, mult = unique_roots(vals, tol=2e-2, rtype='avg')
 
 Check which roots have multiplicity larger than 1:
 
@@ -176,7 +176,7 @@ array([ 1.305])
 
 Find multiples of complex roots on the unit circle:
 >>> vals = np.roots(1,2,3,2,1)
-uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
+uniq, mult = unique_roots(vals, rtype='avg')
 
 """
 
@@ -184,24 +184,25 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
         """
         Manhattan distance between a and b
         """
-        return ma.abs(a.real - b.real) + ma.abs(a.imag - b.imag)
+        return np.abs(a.real - b.real) + np.abs(a.imag - b.imag)
 
     def euclid(a,b):
         """
         Euclidian distance between a and b
         """
-        return ma.abs(a - b)
+        return np.abs(a - b)
 
     if rtype in ['max', 'maximum']:
-        comproot = ma.max  # nanmax ignores nan's
+        comproot = np.max  
     elif rtype in ['min', 'minimum']:
-        comproot = ma.min  # nanmin ignores nan's
+        comproot = np.min
     elif rtype in ['avg', 'mean']:
-        comproot = ma.mean # nanmean ignores nan's
-#    elif rtype == 'median':
-    else:
+        comproot = np.mean 
+    elif rtype == 'median':
+        comproot = np.median
+    else: 
         raise TypeError(rtype)
-
+    
     if rdist in ['euclid', 'euclidian']:
         dist_roots = euclid
     elif rdist in ['rect', 'manhattan']:
@@ -211,56 +212,56 @@ uniq, mult = sp.signal.unique_roots(vals, rtype='avg')
 
     mult = [] # initialize list for multiplicities
     pout = [] # initialize list for reduced output list of roots
-    p = np.atleast_1d(p) # convert p to at least 1D array
+
     tol = abs(tol)
-
-    if len(p) == 0:  # empty argument, return empty lists
-        return pout, mult
-
-    elif len(p) == 1: # scalar input, return arg with multiplicity = 1
+    p = np.atleast_1d(p) # convert p to at least 1D array
+    if len(p) == 0: 
+        return pout, mult 
+    
+    elif len(p) == 1:
         pout = p
         mult = [1]
         return pout, mult
-
+        
     else:
-        sameroots = [] # temporary list for roots within the tolerance
-        pout = p[np.isnan(p)].tolist() # copy nan elements to pout as list
-        mult = len(pout) * [1] # generate a list with a "1" for each nan
-        #p = ma.masked_array(p[~np.isnan(p)]) # delete nan elements, convert to ma
-        p = np.ma.masked_where(np.isnan(p), p) # only masks nans, preferrable?
+        pout = p[np.isnan(p)].tolist() # copy nan elements to pout, convert to list
+        mult = len(pout) * [1] # generate an (empty) list with a "1" for each nan 
+        p = p[~np.isnan(p)]    # delete nan elements from p, convert to list
+        
+        if len(p) == 0:
+            pass
 
-    if np.iscomplexobj(p) and not magsort:
-
-        for i in range(len(p)): # p[i] is current root under test
-            if not p[i] is ma.masked: # has current root been "deleted" yet?
-                tolarr = dist_roots(p[i], p[i:]) < tol # test against itself and
-                # subsequent roots, giving a multiplicity of at least one
+        elif (np.iscomplexobj(p) and not magsort):
+            while len(p):
+                # calculate distance of first root against all others and itself
+                # -> multiplicity is at least 1, first root is always deleted
+                tolarr = np.less(dist_roots(p[0], p), tol)                               # assure multiplicity is at least one
                 mult.append(np.sum(tolarr)) # multiplicity = number of "hits"
-                sameroots = p[i:][tolarr]   # pick the roots within the tolerance
-                p[i:] = ma.masked_where(tolarr, p[i:]) # and "delete" (mask) them
-                pout.append(comproot(sameroots)) # avg/mean/max of mult. root
+                pout.append(comproot(p[tolarr])) # pick the roots within the tolerance
 
-    else:
-        p,indx = cmplx_sort(p)
-        indx = -1
-        curp = p[0] + 5 * tol # needed to avoid "self-detection" ?
-        for k in range(len(p)):
-            tr = p[k]
-#            if dist_roots(tr, curp) < tol:
-            if abs(tr - curp) < tol:
-                sameroots.append(tr)
-                curp = comproot(sameroots)  # not correct for 'avg'
-                                            # of multiple (N > 2) root !
-                pout[indx] = curp
-                mult[indx] += 1
-            else:
-                pout.append(tr)
-                curp = tr
-                sameroots = [tr]
-                indx += 1
-                mult.append(1)
+                p = p[~tolarr]  # and delete them
+        
+        else:
+            sameroots = [] # temporary list for roots within the tolerance
+            p,indx = cmplx_sort(p)
+            indx = len(mult)-1
+            curp = p[0] + 5 * tol # needed to avoid "self-detection" ?
+            for k in range(len(p)):
+                tr = p[k]
+                if abs(tr - curp) < tol:
+                    sameroots.append(tr)
+                    curp = comproot(sameroots)  # not correct for 'avg'
+                                                # of multiple (N > 2) root !
+                    pout[indx] = curp
+                    mult[indx] += 1
+                else:
+                    pout.append(tr)
+                    curp = tr
+                    sameroots = [tr]
+                    indx += 1
+                    mult.append(1)
 
-    return np.array(pout), np.array(mult)
+        return np.array(pout), np.array(mult)
 
 ##### original code ####
 #    p = asarray(p) * 1.0
