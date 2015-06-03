@@ -109,8 +109,15 @@ class InputInfo(QtGui.QWidget):
 
         # ============== Signals & Slots ================================
         self.chkFiltPerf.clicked.connect(self.showFiltPerf)
-        self.chkDocstring.clicked.connect(self.showInfo)
-        self.chkRichText.clicked.connect(self.showInfo)
+        self.chkDocstring.clicked.connect(self.showDocs)
+        self.chkRichText.clicked.connect(self.showDocs)
+
+    def showInfo(self):
+        """
+        update docs and filter performance
+        """
+        self.showDocs()
+        self.showFiltPerf()
 
     def showFiltPerf(self):
         """
@@ -179,7 +186,7 @@ class InputInfo(QtGui.QWidget):
                 .format('Minimum', F_min, H_min, H_min_dB))
 
 
-    def showInfo(self):
+    def showDocs(self):
         """
         Display info from filter design file and docstring
         """
