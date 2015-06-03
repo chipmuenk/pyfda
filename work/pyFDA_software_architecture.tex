@@ -72,7 +72,7 @@ pyFDA has been written to be extensible and modular, easing the addition of own 
 This has (hopefully) been achieved with two central ideas:
 \begin{description}
 \item[A central global dictionary:] The file \textbt{filterbroker.py} with module-level attributes (dictionaries) is imported by all files that need to store and exchange parameters, filter designs etc. (\url{https://docs.python.org/3/faq/programming.html#how-do-i-share-global-variables-across-modules})
-\item[Dynamically imported design files:] A tree with all available filter design classes and characteristics is built at the start of the program from all files in the \textt{filter_widgets} directory. The actual classes with the design algorithms are imported dynamically when needed, the GUI is adapted according to the parameters defined in each filter design class. Additional widgets can be defined in the design class.
+\item[Dynamically imported design files:] A tree with all available filter design classes and characteristics is built at the start of the program from all files in the \texttt{filter\_widgets} directory. The actual classes with the design algorithms are imported dynamically when needed, the GUI is adapted according to the parameters defined in each filter design class. Additional widgets can be defined in the design class.
 \end{description}
 \subsection{Class Structure and Hierarchy}
 The following graphics have been created from the top directory using \textbt{pyreverse} and some post-processing with LibreOffice (and they are only readable when zoomed in):
@@ -153,7 +153,26 @@ layGXXX: &QGridLayout\\
 
 \section{Plot Widgets}
 
-\section{Filter Objects}
+\section{Communication}
+When a filter design has been changed, this information is propagated through the hierarchy to various input and plot widgets using Qt's signal-slot mechanism. 
+
+Individual widgets generate signals when the filter specs have been changed or a new filter has been designed:
+\begin{lstlisting}[style = pySnippet]{}
+from PyQt4.QtCore import pyqtSignal
+...
+class MyTopClass(QtGui.QWidget):
+
+	  sigFilterChanged  = pyqtSignal()
+		sigFilterDesigned = pyqtSignal()
+		...	
+		def myInputWidget(self):
+				self.sigFilterChanged.emit()
+				self.sigFilterDesigned.emit()
+\end{lstlisting}
+
+These 
+
+\section{Filter Design Objects}
 The structure of a filter file and the attributes and methods that need to be provided are described in this section.
 
 When starting pyFDA, \texttt{filter\_tree\_builder.py} is run, extracting the relevant information from all *.py files found in the subdirectory filter\_design and building a hierachical tree in \texttt{filter\_broker.py}. 
