@@ -9,7 +9,7 @@ Tab-Widget for displaying and modifying filter Poles and Zeros
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
-#import scipy.io
+from PyQt4.QtCore import pyqtSignal
 import numpy as np
 from scipy.signal import freqz
 
@@ -36,6 +36,9 @@ class InputPZ(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
+    
+    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
+    
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputPZ, self).__init__()
@@ -207,9 +210,6 @@ class InputPZ(QtGui.QWidget):
         """
         Read out table and save the values to the filter PZ dict
         """
-        if self.chkNorm.isChecked():
-            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
-            self.Hmax_last = max(abs(H)) # store current max. filter gain
             
         if self.DEBUG:
             print("=====================\nInputPZ.saveZPK")
@@ -235,15 +235,19 @@ class InputPZ(QtGui.QWidget):
         zpk.append(simple_eval(self.ledGain.text())) # append k factor to zpk
 
         fb.fil[0]["N"] = num_rows
-        save_fil(fb.fil[0], zpk, 'zpk', __name__)
+        save_fil(fb.fil[0], zpk, 'zpk', __name__) # save & convert to 'ba'
         
         if self.chkNorm.isChecked():
             # set gain factor k (zpk[2]) in such a way that the max. filter 
             # gain remains unchanged
             [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
             zpk[2] = zpk[2] * self.Hmax_last / max(abs(H))
-            save_fil(fb.fil[0], zpk, 'zpk', __name__)
-            self.showZPK()
+            save_fil(fb.fil[0], zpk, 'zpk', __name__) # save with new gain '
+
+        if __name__ == '__main__':
+            self.showZPK() # only needed for stand-alone test
+            
+        self.sigFilterDesigned.emit()
 
         if self.DEBUG:
             print("ZPK - coeffs:",  fb.fil[0]['ba'])
@@ -260,6 +264,10 @@ class InputPZ(QtGui.QWidget):
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
         self.tblPZ.setVisible(self.chkPZList.isChecked())
+        
+        if self.chkNorm.isChecked():
+            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
+            self.Hmax_last = max(abs(H)) # store current max. filter gain
 
         self.ledGain.setText(str(cround(zpk[2], n_digits)))
 
