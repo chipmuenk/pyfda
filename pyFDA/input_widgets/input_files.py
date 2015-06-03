@@ -9,10 +9,16 @@ Tab-Widget for exporting / importing and saving / loading data
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
-#from PyQt4.QtCore import SIGNAL
+from PyQt4.QtCore import pyqtSignal
+
 import scipy.io
 import numpy as np
-
+#import shelve
+try:
+    import cPickle as pickle
+except:
+    import pickle
+import pprint
 
 try:
     import xlwt
@@ -53,6 +59,9 @@ class InputFiles(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
+    
+    sigFilterDesigned = pyqtSignal()
+
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputFiles, self).__init__()
@@ -67,6 +76,8 @@ class InputFiles(QtGui.QWidget):
         """
         # widget / subwindow for parameter selection
         self.butExport = QtGui.QPushButton("Export Coefficients", self)
+        self.butSave = QtGui.QPushButton("Save Filter", self)
+        self.butLoad = QtGui.QPushButton("Load Filter", self)
 #        self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
 
         # ============== UI Layout =====================================
@@ -81,9 +92,13 @@ class InputFiles(QtGui.QWidget):
         ifont = QtGui.QFont()
         ifont.setItalic(True)
 
-
         self.layVExport = QtGui.QVBoxLayout()
+        self.layVExport.addWidget(self.butSave) # -> Matlab workspace
+        self.layVExport.addWidget(self.butLoad) # -> Matlab workspace
+        self.layVExport.addWidget(self.HLine())
         self.layVExport.addWidget(self.butExport) # -> Matlab workspace
+
+        
 #        self.layVExport.addWidget(self.butExportCSV) # -> CSV format
         self.layVExport.addStretch(1)
 
@@ -302,6 +317,8 @@ class InputFiles(QtGui.QWidget):
 
         # ============== Signals & Slots ================================
         self.butExport.clicked.connect(self.export)
+        self.butSave.clicked.connect(self.save_filter)
+        self.butLoad.clicked.connect(self.load_filter)
 #        self.butExportCSV.clicked.connect(self.exportCSV)
 
 
@@ -316,6 +333,49 @@ class InputFiles(QtGui.QWidget):
         line.setFrameShadow(QtGui.QFrame.Sunken)
         return line
 
+        
+    def load_filter(self):
+        """
+        Load (c)pickled filter dictionary and update input and plot widgets
+        """
+        dlg=QtGui.QFileDialog( self )
+        my_file, myFilter = dlg.getOpenFileNameAndFilter(self,
+                caption = "Load filter ", directory="D:/Daten",
+                filter = '*.pkl')
+        out_s = open(my_file, 'rb')
+        try:
+            fb.fil[0] = pickle.load(out_s)
+            print("Loaded filter %s successfully!" %my_file)
+            pprint.pprint(fb.fil[0])
+            self.sigFilterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
+        except IOError:
+            print("Failed loading %s!" %my_file)
+        finally:
+            out_s.close()
+
+    def save_filter(self):
+        """
+        Save Filter as shelve object
+        Open a persistent dictionary for reading and writing.
+        """
+        dlg=QtGui.QFileDialog( self )
+        my_file, my_filter = dlg.getSaveFileNameAndFilter(self,
+                caption = "Save filter as", directory="D:/Daten",
+                filter = '*.pkl')
+    
+        out_s = open(my_file, 'wb')
+        try:
+            # Write to the stream
+#            for o in data:
+#                print ('WRITING: %s (%s)' % (o.name, o.name_backwards))
+            pickle.dump(fb.fil[0], out_s)
+            print("Filter saved as %s!" %my_file)
+        except IOError:
+            print("Failed saving %s!" %my_file)
+        finally:
+            out_s.close()
+
+
     def export(self):
         """
         Export filter coefficients in various formats - see also
@@ -323,7 +383,8 @@ class InputFiles(QtGui.QWidget):
         """
         dlg=QtGui.QFileDialog( self )
 
-        file_types = "CSV (*.csv);;Matlab-Workspace (*.mat);;Numpy Array (*.npz)"
+        file_types = ("CSV (*.csv);;Matlab-Workspace (*.mat);;Numpy Array (*.npz)"
+        ";;Filter (*.sdb)")
 
         if XLWT:
             file_types += ";;Excel Worksheet (.xls)"
@@ -331,7 +392,7 @@ class InputFiles(QtGui.QWidget):
             file_types += ";;Excel 2007 Worksheet (.xlsx)"
 
         myFile, myFilter = dlg.getSaveFileNameAndFilter(self,
-                caption = "Save filter coefficients as", directory="D:/Daten",
+                caption = "Save filter (coefficients) as", directory="D:/Daten",
                 filter = file_types)
 #        print(myFile, myFilter)
         coeffs = fb.fil[0]['ba']
@@ -429,13 +490,11 @@ class InputFiles(QtGui.QWidget):
         myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
 
 
-
-    def saveFilter(self):
-        pass
 """
-File save format: use cPickle?
 
-Alternative: Use the shelve module
+Alternative to (c)pickle: Use the shelve module that opens
+a persistent dictionary for reading and writing.
+This would get rid of the fb global dictionary?
 
 
 import shelve
