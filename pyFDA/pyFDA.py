@@ -119,21 +119,17 @@ class pyFDA(QtGui.QMainWindow):
 #        menubar = self.menuBar()
 #        fileMenu = menubar.addMenu('&About')
 #        fileMenu.addAction(aboutAction)
-#        
-
-        # ============== Signals & Slots ================================
-        self.inputAll.inputSpecs.fspecs.specsChanged.connect(self.updateOutput)
-        self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
-        self.inputAll.inputCoeffs.butSave.clicked.connect(self.updateOutput)
-        self.inputAll.inputPZ.butSave.clicked.connect(self.updateOutput)
-#        self.inputAll.inputUpdated.connect(self.updateOutput)
-#        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
         self.statusMessage("Application is initialized.")
+       
 
-    def updateOutput(self):
-        self.inputAll.updateAll() # input widgets re-read 'coeffs' / 'zpk'
-        self.pltAll.updateAll()
+        # ============== Signals & Slots ================================
+
+        self.inputAll.inputUpdated.connect(self.pltAll.updateAll)
+#        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
+
+
+
 
     def aboutWindow(self):
         QtGui.QMessageBox.about(self, "About pyFDA",
@@ -142,9 +138,10 @@ class pyFDA(QtGui.QMainWindow):
         )
 
     def statusMessage(self, message):
+        """
+        Display a message in the statusbar.
+        """
         self.statusBar().showMessage(message)
-        
-
 
 #------------------------------------------------------------------------------
 

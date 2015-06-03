@@ -39,10 +39,15 @@ class InputAll(QtGui.QWidget):
         self.setStyleSheet(css)
 
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)
+        self.inputSpecs.setObjectName("inputSpecs")
         self.inputFiles = input_files.InputFiles(DEBUG = False)
+        self.inputFiles.setObjectName("inputFiles")
         self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
+        self.inputCoeffs.setObjectName("inputCoeffs")
         self.inputPZ = input_pz.InputPZ(DEBUG = False)
+        self.inputPZ.setObjectName("inputPZ")
         self.inputInfo = input_info.InputInfo(DEBUG = False)
+        self.inputInfo.setObjectName("inputInfo")        
 
         self.initUI()
 
@@ -73,7 +78,15 @@ class InputAll(QtGui.QWidget):
 #        self.inputSpecs.filterDesigned.connect(self.updateAll)
 #        self.inputCoeffs.butUpdate.clicked.connect(self.updateAll)
 
-        self.inputSpecs.filterChanged.connect(self.inputInfo.showInfo)
+        #self.inputSpecs.filterChanged.connect(self.inputInfo.showInfo)
+
+        
+        self.inputSpecs.fspecs.specsChanged.connect(self.updateAll)
+        
+        self.inputSpecs.sigFilterDesigned.connect(self.updateAll)
+        self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
+        self.inputPZ.sigFilterDesigned.connect(self.updateAll)
+        self.inputFiles.sigFilterDesigned.connect(self.updateAll)
 
 
 
@@ -86,8 +99,11 @@ class InputAll(QtGui.QWidget):
         The individual methods called below have to get updated info from the
         central filter dict.
         """
+        print(self.sender().objectName())
         self.inputCoeffs.showCoeffs()
         self.inputPZ.showZPK()
+        self.inputInfo.showInfo()
+        self.inputUpdated.emit()
 
 #------------------------------------------------------------------------
 

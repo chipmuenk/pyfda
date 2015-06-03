@@ -22,7 +22,6 @@ import filterbroker as fb
 
 from input_widgets import (input_filter, input_order, input_amp_specs,
                            input_freq_specs, input_weight_specs, input_target_specs)
-#from plot_widgets import plot_all
 
 
 class InputSpecs(QtGui.QWidget):
@@ -30,8 +29,8 @@ class InputSpecs(QtGui.QWidget):
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    filterDesigned = pyqtSignal()  # emitted when filter has been designed
-    filterChanged = pyqtSignal()
+    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
+    sigFilterChanged = pyqtSignal() # emitted when specs have been changed
 
     def __init__(self, DEBUG = True):
         super(InputSpecs, self).__init__()
@@ -182,7 +181,7 @@ class InputSpecs(QtGui.QWidget):
         #self.tspecs.setEntries(newLabels = (self.freqParams, self.ampParams)
         self.lblMsg.setText(myMsg)
 
-        self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()
+        self.sigFilterChanged.emit() # ->pyFDA -> pltAll.updateAll()
 
     def storeAll(self):
         """
