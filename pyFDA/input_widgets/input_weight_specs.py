@@ -7,6 +7,7 @@ Created on Mon Nov 18 13:36:39 2013
 from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -20,6 +21,8 @@ class InputWeightSpecs(QtGui.QWidget):
     Build and update widget for entering the weight
     specifications like W_SB, W_PB etc.
     """
+           
+    sigFilterChanged = pyqtSignal()
 
     def __init__(self, fil_dict, DEBUG = True):
         """
@@ -170,6 +173,8 @@ class InputWeightSpecs(QtGui.QWidget):
         for i in range(len(self.qlabels)):
             self.fil_dict.update(
                 {self.qlineedit[i].objectName():float(self.qlineedit[i].text())})
+                       
+        self.sigFilterChanged.emit() # -> input_all
 
 #------------------------------------------------------------------------------
 

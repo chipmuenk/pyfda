@@ -10,7 +10,8 @@ Created on Mon Nov 18 13:36:39 2013
 from __future__ import print_function, division, unicode_literals
 from numpy import log10
 import sys, os
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal, Qt
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -25,6 +26,9 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     Build and update widget for entering the amplitude
     specifications like A_sb, A_pb etc.
     """
+    
+    sigFilterChanged = pyqtSignal()
+    
     def __init__(self, fil_dict, DEBUG = True):
 
         """
@@ -65,16 +69,14 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.cmbUnitsA.setToolTip("Set unit for amplitude specifications:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
 
-        """Edit WincMIC"""
-        #Die ComboBox passt Ihre größe dynamisch dem längsten element an.
         self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        """END"""
+        # fit size dynamically to largest element
 
         self.cmbUnitsA.setCurrentIndex(0)
 
         self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields
         self.layGSpecs.addWidget(self.lblUnits,0,0)
-        self.layGSpecs.addWidget(self.cmbUnitsA,0,1, QtCore.Qt.AlignLeft)
+        self.layGSpecs.addWidget(self.cmbUnitsA,0,1, Qt.AlignLeft)
 
         #self.layGSpecs.addWidget(self.lblTitle, 0, 0, 2, 1) # span two columns
 
@@ -113,7 +115,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
-            print(senderName + ' was triggered\n================')
+            if self.DEBUG:
+                print(senderName + ' was triggered\n================')
         else: # no sender, ampUnits has been called from initUI
             senderName = "cmbUnitsA"
 
@@ -123,6 +126,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         else: # amplitude spec textfield has been changed
             self.storeEntries()
+            
         self.idxOld = idx
 
     def rtLabel(self, label):
@@ -242,6 +246,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                 self.fil_dict.update(
                     {self.qlineedit[i].objectName():
                        - 10. * log10 (simple_eval(self.qlineedit[i].text()))})
+                       
+        self.sigFilterChanged.emit() # -> input_all
 
 
 #------------------------------------------------------------------------------
