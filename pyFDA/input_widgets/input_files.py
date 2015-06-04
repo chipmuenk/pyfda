@@ -343,15 +343,19 @@ class InputFiles(QtGui.QWidget):
                 caption = "Load filter ", directory="D:/Daten",
                 filter = '*.pkl')
         out_s = open(my_file, 'rb')
+#        print("1:", fb.fil[0]['F_PB'])
         try:
-            fb.fil[0] = pickle.load(out_s)
+            fb.fil = pickle.load(out_s)
             print("Loaded filter %s successfully!" %my_file)
-            pprint.pprint(fb.fil[0])
+#            pprint.pprint(fb.fil)
             self.sigFilterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
         except IOError:
             print("Failed loading %s!" %my_file)
         finally:
             out_s.close()
+#        print("2:", fb.fil[0]['F_PB'])
+#        fb.fil[0]['F_PB'] = 0.123
+#        print("3:", fb.fil[0]['F_PB'])
 
     def save_filter(self):
         """
@@ -368,7 +372,7 @@ class InputFiles(QtGui.QWidget):
             # Write to the stream
 #            for o in data:
 #                print ('WRITING: %s (%s)' % (o.name, o.name_backwards))
-            pickle.dump(fb.fil[0], out_s)
+            pickle.dump(fb.fil, out_s)
             print("Filter saved as %s!" %my_file)
         except IOError:
             print("Failed saving %s!" %my_file)
