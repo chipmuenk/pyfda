@@ -11,6 +11,7 @@ import sys, os
 import textwrap
 from PyQt4 import Qt, QtGui, QtWebKit
 from docutils.core import publish_string #, publish_parts
+import pprint
 import numpy as np
 from numpy import pi, log10
 import scipy.signal as sig
@@ -44,16 +45,14 @@ class InputInfo(QtGui.QWidget):
         - A large text window for displaying infos about the filter design
           algorithm
         """
-        self.chkFiltPerf = QtGui.QCheckBox()
+        self.chkFiltPerf = QtGui.QCheckBox("H(f)")
         self.chkFiltPerf.setChecked(True)
-        self.chkFiltPerf.setToolTip("Display filter performance at test frequencies.")
-        self.lblFiltPerf = QtGui.QLabel("Performance")
-
+        self.chkFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
         self.txtFiltPerf = QtGui.QTextBrowser()
+        self.txtFiltDict = QtGui.QTextBrowser()
 
         self.tblFiltPerf = QtGui.QTableWidget()
-#        self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
         self.tblFiltPerf.setAlternatingRowColors(True)
         self.tblFiltPerf.verticalHeader().setVisible(False)
 #        self.tblCoeff.QItemSelectionModel.Clear
@@ -67,48 +66,47 @@ class InputInfo(QtGui.QWidget):
 #        self.txtFiltPerf.setSizePolicy(QtGui.QSizePolicy.Minimum,
 #                                          QtGui.QSizePolicy.Expanding)
         # widget / subwindow for filter infos
-        self.chkDocstring = QtGui.QCheckBox()
+        self.chkDocstring = QtGui.QCheckBox("Doc$")
         self.chkDocstring.setChecked(False)
         self.chkDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.lblDocstring = QtGui.QLabel()
-        self.lblDocstring.setText("Docstring")
-
-        self.chkRichText = QtGui.QCheckBox()
+        self.chkRichText = QtGui.QCheckBox("RTF")
         self.chkRichText.setChecked(True)
         self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.lblRichText = QtGui.QLabel()
-        self.lblRichText.setText("RTF")
-
         self.txtFiltInfoBox = QtGui.QTextBrowser()
-        self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
                                           QtGui.QSizePolicy.Expanding)
+                                          
+        self.chkFiltDict = QtGui.QCheckBox("FiltDict")
+        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")
+
+        self.txtFiltDict = QtGui.QTextBrowser()
+        self.txtFiltDict.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                          QtGui.QSizePolicy.Expanding)
+
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkFiltPerf)
-        self.layHChkBoxes.addWidget(self.lblFiltPerf)
-
         self.layHChkBoxes.addStretch(10)
-
         self.layHChkBoxes.addWidget(self.chkDocstring)
-        self.layHChkBoxes.addWidget(self.lblDocstring)
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkRichText)
-        self.layHChkBoxes.addWidget(self.lblRichText)
-
         self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addWidget(self.chkFiltDict)
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
         layVMain.addWidget(self.tblFiltPerf)
         layVMain.addWidget(self.txtFiltInfoBox)
-#        layVMain.addStretch(10)
+        layVMain.addWidget(self.txtFiltDict)
+        layVMain.addStretch(10)
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
         self.chkFiltPerf.clicked.connect(self.showFiltPerf)
+        self.chkFiltDict.clicked.connect(self.showFiltDict)
         self.chkDocstring.clicked.connect(self.showDocs)
         self.chkRichText.clicked.connect(self.showDocs)
 
@@ -118,6 +116,7 @@ class InputInfo(QtGui.QWidget):
         """
         self.showDocs()
         self.showFiltPerf()
+        self.showFiltDict()
 
     def showFiltPerf(self):
         """
@@ -130,12 +129,13 @@ class InputInfo(QtGui.QWidget):
 
         f_S  = fb.fil[0]['f_S']
 
+        # Build a list with all frequency related labels
         F_test_lbl = [l for l in fb.fil[0] if l[0] == 'F']
+
+        # Vector with test frequencies of the labels above    
         F_test = np.array([fb.fil[0][l] for l in F_test_lbl]) * f_S
 
-#        F_test = np.array([0, F_sig, 0.5]) # Vektor mit Testfrequenzen
-
-        # Berechne Frequenzantwort bei Testfrequenzen und gebe sie aus:
+        # Calculate frequency response at test frequencies and over the whole range:
         [w_test, H_test] = sig.freqz(bb, aa, F_test * 2.0 * pi)
         [w, H] = sig.freqz(bb, aa)
 
@@ -169,21 +169,6 @@ class InputInfo(QtGui.QWidget):
 
         self.tblFiltPerf.resizeColumnsToContents()
         self.tblFiltPerf.resizeRowsToContents()
-
-
-        if self.DEBUG:
-            print('============ Filter Characteristics ================\n'
-                '  Test Case  |  f (Hz)    |   |H(f)|   | |H(f)| (dB)')
-            print('----------------------------------------------------')
-    
-            for i in range(len(H_test)):
-                print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f}'\
-                    .format(F_test_lbl[i], f[i], abs(H_test[i]),
-                            20*log10(abs(H_test[i]))))
-            print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
-                .format('Maximum', F_max, H_max, H_max_dB))
-            print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
-                .format('Minimum', F_min, H_min, H_min_dB))
 
 
     def showDocs(self):
@@ -232,6 +217,20 @@ class InputInfo(QtGui.QWidget):
         result = lines[0].lstrip() +\
          "\n" + textwrap.dedent("\n".join(lines[1:]))# + '\n'
         return result
+
+    def showFiltDict(self):
+        """
+        Print filter dict for debugging
+        """
+        self.txtFiltDict.setVisible(self.chkFiltDict.isChecked())
+
+        dictstr = pprint.saferepr(fb.fil[0])
+        self.txtFiltDict.setText(dictstr)
+#        self.txtFiltDict.setText(publish_string(
+#                    self.cleanDoc(dictstr), writer_name='html',
+#                    settings_overrides={'output_encoding': 'unicode'}))
+#
+        pprint.pprint(fb.fil[0])
         
         
 #app = QtGui.QApplication([])
