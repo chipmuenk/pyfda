@@ -9,12 +9,14 @@ import sys, os
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
-# import filterbroker from one level above if this file is run as __main__
+# import from one level above if this file is run as __main__
 # for test purposes
 if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
+import filterbroker as fb
+from simpleeval import simple_eval
 
 class InputWeightSpecs(QtGui.QWidget):
     """
@@ -22,17 +24,15 @@ class InputWeightSpecs(QtGui.QWidget):
     specifications like W_SB, W_PB etc.
     """
            
-    sigFilterChanged = pyqtSignal()
+    sigSpecsChanged = pyqtSignal()
 
-    def __init__(self, fil_dict, DEBUG = True):
+    def __init__(self, DEBUG = True):
         """
         Initialize; fil_dict is a dictionary containing _all_ the filter specs
         """
 
         super(InputWeightSpecs, self).__init__()
         self.DEBUG = DEBUG
-        self.fil_dict = fil_dict  # dictionary containing _all_ specifications of the
-                            # currently selected filter
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -61,7 +61,7 @@ class InputWeightSpecs(QtGui.QWidget):
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        newLabels = [l for l in self.fil_dict if l[0] == 'W']
+        newLabels = [l for l in fb.fil[0] if l[0] == 'W']
         self.setEntries(newLabels = newLabels)
 
         frmMain = QtGui.QFrame()
@@ -116,7 +116,7 @@ class InputWeightSpecs(QtGui.QWidget):
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
                     self.qlabels[i].setText(self.rtLabel(newLabels[i]))
-                    self.qlineedit[i].setText(str(self.fil_dict[newLabels[i]]))
+                    self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
     def _delEntry(self,i):
@@ -145,7 +145,7 @@ class InputWeightSpecs(QtGui.QWidget):
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self.rtLabel(newLabel))
 
-        self.qlineedit.append(QtGui.QLineEdit(str(self.fil_dict[newLabel])))
+        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
         self.qlineedit[i].setObjectName(newLabel) # update ID
         
         self.qlineedit[i].editingFinished.connect(self.storeEntries)
@@ -164,17 +164,17 @@ class InputWeightSpecs(QtGui.QWidget):
         """
         for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText(
-                str(self.fil_dict[self.qlineedit[i].objectName()]))
+                str(fb.fil[0][self.qlineedit[i].objectName()]))
 
     def storeEntries(self):
         """
         Store specification entries in filter dictionary
         """
         for i in range(len(self.qlabels)):
-            self.fil_dict.update(
+            fb.fil[0].update(
                 {self.qlineedit[i].objectName():float(self.qlineedit[i].text())})
                        
-        self.sigFilterChanged.emit() # -> input_all
+        self.sigSpecsChanged.emit() # -> input_all
 
 #------------------------------------------------------------------------------
 

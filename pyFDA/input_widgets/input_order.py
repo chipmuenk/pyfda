@@ -24,16 +24,18 @@ class InputOrder(QtGui.QFrame):
     - minimum ('min') filter order
     """
 
-    def __init__(self, DEBUG = False):
+    def __init__(self, DEBUG = True):
         super(InputOrder, self).__init__()
         self.DEBUG = DEBUG
         self.dmLast = '' # design method from last call
         self.initUI()
 
 
-
     def initUI(self):
-
+        """
+        Initialize User Interface for filter order widget
+        """        
+        
         title = "Filter Order"
 
         bfont = QtGui.QFont()
@@ -61,12 +63,10 @@ class InputOrder(QtGui.QFrame):
         #  Dynamically created subwidgets
         self.layHDynWdg = QtGui.QHBoxLayout()
         self.frmDynWdg = QtGui.QFrame()
-        self.frmDynWdg.setLayout(self.layHDynWdg)
-        
-        """EDIT WinMic"""
+        self.frmDynWdg.setLayout(self.layHDynWdg)        
         self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
-        """END"""
 
+        #  All subwidgets, including dynamically created ones
         self.layHAllWdg = QtGui.QHBoxLayout()
         self.layHAllWdg.addWidget(self.chkMin)
         self.layHAllWdg.addItem(self.spacer)
@@ -86,69 +86,86 @@ class InputOrder(QtGui.QFrame):
         layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(layVMain)
-#        layVMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
 
-        self.chkMin.clicked.connect(self.updateEntries)
-        self.ledOrder.editingFinished.connect(self.updateEntries)
+        self.chkMin.clicked.connect(self.storeEntries)
+        self.ledOrder.editingFinished.connect(self.storeEntries)
 
-        self.updateEntries() # initialize with default settings
+        self.storeEntries() # initialize with default settings
+        
+    def updateUI(self):
+        """
+        (Re)Create filter order widget depending on the available 
+        options ('min', 'man') of the selected design method 
+        """
 
-    def updateEntries(self):
-        """
-        Read / write text entries and checkbutton for filter order
-        """
-        # read list of available filter order [fo] methods for latest 
+        # read list of available filter order [fo] methods for current 
         # design method [dm] from filTree:
         foList = fb.filTree[fb.fil[0]['rt']]\
-                [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
+            [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
         if self.DEBUG:
             print("=== InputOrder.update() ===")
             print("foList", foList)
 
-        # is current fo (min / max) setting available for new dm as well ?
+        # is currently selected fo setting available for (new) dm ?
         if fb.fil[0]['fo'] in foList:
-            fo = fb.fil[0]['fo'] # keep current setting
+            self.fo = fb.fil[0]['fo'] # keep current setting
         else:
-            fo = foList[0] # use first list entry from filterTree
-            fb.fil[0]['fo'] = fo # and update 'selFilter'
+            self.fo = foList[0] # use first list entry from filterTree
+            fb.fil[0]['fo'] = self.fo # and update fo method
 
-        if self.DEBUG: print("fo[selFilter] =", fo)
-
+        # When design method has changed, delete dynamically created subwidgets
+        # from previous filter design method and create new ones (if needed):
         if fb.fil[0]['dm'] != self.dmLast:
-            self.updateWidgets()
+            self.updateDynWidgets()
 
         # Determine which subwidgets are __visible__
         self.lblOrder.setVisible('man' in foList)
         self.ledOrder.setVisible('man' in foList)
         self.chkMin.setVisible('min' in foList)
 
-        # When design method has changed, delete subwidgets referenced from
-        # from previous filter design method and create new ones (if needed)
+
+    def loadEntries(self):
+        """
+        Read filter order settings from global dictionary and update the UI 
+        correspondingly
+        """
+        self.updateUI()
+        self.chkMin.setChecked(fb.fil[0]['fo'] == 'min')
+        self.ledOrder.setText(str(fb.fil[0]['N']))
+        self.ledOrder.setEnabled(not self.chkMin.isChecked())
+        self.lblOrder.setEnabled(not self.chkMin.isChecked())
+
+    def storeEntries(self):
+        """
+        Read / write text entries and checkbutton for filter order
+        """
+        self.updateUI()
 
         # Determine which subwidgets are _enabled_
-        if 'min' in foList:
+        if self.chkMin.isVisible():
+            self.ledOrder.setEnabled(not self.chkMin.isChecked())
+            self.lblOrder.setEnabled(not self.chkMin.isChecked())
+            
             if self.chkMin.isChecked() == True:
                 # update in case N has been changed outside this class
                 self.ledOrder.setText(str(fb.fil[0]['N']))
-                self.ledOrder.setEnabled(False)
-                self.lblOrder.setEnabled(False)
                 fb.fil[0].update({'fo' : 'min'})
+                
             else:
-                self.ledOrder.setEnabled(True)
-                self.lblOrder.setEnabled(True)
                 fb.fil[0].update({'fo' : 'man'})
+                
         else:
-            self.lblOrder.setEnabled(fo == 'man')
-            self.ledOrder.setEnabled(fo == 'man')
+            self.lblOrder.setEnabled(self.fo == 'man')
+            self.ledOrder.setEnabled(self.fo == 'man')
 
         ordn = int(self.ledOrder.text())
         fb.fil[0].update({'N' : ordn})
         self.dmLast = fb.fil[0]["dm"]
 
-    def updateWidgets(self):
+    def updateDynWidgets(self):
         """
         Delete dynamically created subwidgets and create new ones, depending
         on requirements of filter design algorithm

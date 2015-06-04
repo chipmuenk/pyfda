@@ -80,7 +80,10 @@ class InputFilter(QtGui.QWidget):
         # (correspondence is defined in filterbroker.py) and populate combo box:
         for rt in fb.filTree:
             self.cmbResponseType.addItem(fb.gD['rtNames'][rt], rt)
-        self.cmbResponseType.setCurrentIndex(0) # set initial index
+#        idx = self.cmbResponseType.findText('Lowpass') # find index for 'Lowpass'
+        idx = self.cmbResponseType.findData('LP') # find index for 'LP'
+
+        self.cmbResponseType.setCurrentIndex(idx) # set initial index
 
         """
         LAYOUT
@@ -140,6 +143,18 @@ class InputFilter(QtGui.QWidget):
         self.cmbResponseType.activated.connect(self.setResponseType) # 'LP'
         self.cmbFilterType.activated.connect(self.setFilterType) #'IIR'
         self.cmbDesignMethod.activated.connect(self.setDesignMethod) #'cheby1'
+
+
+    def loadEntries(self):
+        """
+        Reload comboboxes from filter dictionary to update changed settings
+        e.g. by loading filter design
+        """
+        idx_rt = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
+        self.cmbResponseType.setCurrentIndex(idx_rt)
+        self.setResponseType()
+#        idx_ft = self.cmbResponseType.findData(fb.fil[0]['ft']) # find index for 'LP'
+#        self.cmbResponseType.setCurrentIndex(idx_ft)
 
 
     def setResponseType(self):

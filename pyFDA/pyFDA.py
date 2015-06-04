@@ -2,7 +2,7 @@
 """
 Created on Tue Nov 26 10:57:30 2013
 
-@author: Julia Beike, Christian Muenker und Michael Winkler
+@author: Julia Beike, Christian Muenker and Michael Winkler
 
 Mainwindow  for the pyFDA app, initializes UI
 """
@@ -47,10 +47,9 @@ class pyFDA(QtGui.QMainWindow):
         """
         
         # Instantiate widget groups
-        self.inputAll = input_all.InputAll() # input widgets
-        
-        #War früher 280px, aber dann gibt es in den Input Widgets Probleme mit der gesamten Darstellung
+        self.inputAll = input_all.InputAll() # input widgets        
         self.inputAll.setMaximumWidth(280) # comment out for splitter
+        
         self.pltAll = plot_all.PlotAll() # plot widgets
         
         # ============== UI Layout =====================================
@@ -125,10 +124,11 @@ class pyFDA(QtGui.QMainWindow):
 
         # ============== Signals & Slots ================================
 
-        self.inputAll.inputUpdated.connect(self.pltAll.updateAll)
+        self.inputAll.sigFilterDesigned.connect(self.pltAll.updateAll)
+
+        self.inputAll.sigSpecsChanged.connect(self.pltAll.updateSpecs)
+        
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
-
-
 
 
     def aboutWindow(self):

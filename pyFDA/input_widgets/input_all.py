@@ -24,7 +24,8 @@ class InputAll(QtGui.QWidget):
     Create a tabbed widget for various input subwidgets
     """
     # class variables (shared between instances if more than one exists)
-    inputUpdated = pyqtSignal()  # emitted when input widget is updated
+    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
+    sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
 
 
     def __init__(self, DEBUG = True):
@@ -74,15 +75,11 @@ class InputAll(QtGui.QWidget):
 
         # ============== Signals & Slots ================================
 
-#        self.inputSpecs.fspecs.specsChanged.connect(self.updateAll)
-#        self.inputSpecs.filterDesigned.connect(self.updateAll)
-#        self.inputCoeffs.butUpdate.clicked.connect(self.updateAll)
-
-        #self.inputSpecs.filterChanged.connect(self.inputInfo.showInfo)
-
-        
-        self.inputSpecs.fspecs.specsChanged.connect(self.updateAll)
-        
+        # signal indicating that filter specs have changed, requiring update of
+        # plot widgets only:        
+        self.inputSpecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        # signal indicating that filter design has changed, requiring update of
+        # plot widgets and some input widgets:        
         self.inputSpecs.sigFilterDesigned.connect(self.updateAll)
         self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
         self.inputPZ.sigFilterDesigned.connect(self.updateAll)
@@ -92,18 +89,19 @@ class InputAll(QtGui.QWidget):
 
     def updateAll(self):
         """ 
-        Update all input widgets that can / need to display new filter data.
-        This method is called from the main routine in pyFDA.py each time the 
-        filter design has been updated. 
+        - Update all input widgets that can / need to display new filter data,
+            accessing the central filter dict.
+        - Update all plot widgets via the signal 
         
-        The individual methods called below have to get updated info from the
-        central filter dict.
         """
-        print(self.sender().objectName())
+        if self.DEBUG: print("input_all.updateAll:\n",self.sender().objectName())
+        
+        self.inputInfo.showInfo()
+        self.inputSpecs.loadAll()
         self.inputCoeffs.showCoeffs()
         self.inputPZ.showZPK()
-        self.inputInfo.showInfo()
-        self.inputUpdated.emit()
+
+        self.sigFilterDesigned.emit() # pyFDA -> plot_all -> ... all plot widgets
 
 #------------------------------------------------------------------------
 

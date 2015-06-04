@@ -77,13 +77,20 @@ Background: #DDEEFF;
 
 
     def updateAll(self):
-        """ Update and redraw all subplots with new filter data"""
+        """ Update and redraw all subplots with new filter DATA"""
         self.pltHf.draw()
         self.pltPhi.draw()
         self.pltPZ.draw()
         self.pltTauG.draw()
         self.pltImpz.draw()
         self.plt3D.draw()
+        
+    def updateSpecs(self):
+        """ Update and redraw all subplots with new filter SPECS"""
+        self.pltHf.draw()
+        self.pltPhi.draw()
+        self.pltTauG.draw()
+        self.pltImpz.draw()
 
 #------------------------------------------------------------------------
 
