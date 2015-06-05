@@ -169,19 +169,23 @@ class InputPZ(QtGui.QWidget):
         layVMain.addWidget(self.tblPZ)
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
+        
         self.showZPK() # initialize table with default values from filterbroker
 
-        # ============== Signals & Slots ================================
-#        self.tblPZ.itemEntered.connect(self.savePZs) # nothing happens
-#        self.tblPZ.itemActivated.connect(self.savePZs) # nothing happens
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+#        self.tblPZ.itemEntered.connect(self.saveZPK) # nothing happens
+#        self.tblPZ.itemActivated.connect(self.saveZPK) # nothing happens
+#        self.tblPZ.itemChanged.connect(self.saveZPK) # works but fires multiple times
+#        self.tblPZ.selectionModel().currentChanged.connect(self.saveZPK)
+#        self.tblPZ.clicked.connect(self.saveZPK)
+#        self.ledGain.editingFinished.connect(self.saveZPK)
+
         self.spnRound.editingFinished.connect(self.showZPK)
         self.butLoad.clicked.connect(self.showZPK)
         self.chkPZList.clicked.connect(self.showZPK)
 
-#        self.ledGain.editingFinished.connect(self.saveZPK)
-#        self.tblPZ.itemChanged.connect(self.saveZPK) # works but fires multiple times
-#        self.tblPZ.selectionModel().currentChanged.connect(self.saveZPK)
-#        self.tblPZ.clicked.connect(self.saveZPK)
         self.butSave.clicked.connect(self.saveZPK)
 
         self.butDelRow.clicked.connect(self.deleteRows)
@@ -189,7 +193,8 @@ class InputPZ(QtGui.QWidget):
         self.butClear.clicked.connect(self.clearTable)
 
         self.butSetZero.clicked.connect(self.setZPKZero)
-        
+        #----------------------------------------------------------------------
+
 
     def clearTable(self):
         """
