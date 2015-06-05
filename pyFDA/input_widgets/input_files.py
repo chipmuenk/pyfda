@@ -55,6 +55,8 @@ if __name__ == "__main__":
 import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib_fix_v3 as fix
 
+# TODO: Setting of dynamic subwidgets is not stored / restored
+
 class InputFiles(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -315,12 +317,14 @@ class InputFiles(QtGui.QWidget):
             
         self.setLayout(layVMain)
 
-        # ============== Signals & Slots ================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.butExport.clicked.connect(self.export)
         self.butSave.clicked.connect(self.save_filter)
         self.butLoad.clicked.connect(self.load_filter)
 #        self.butExportCSV.clicked.connect(self.exportCSV)
-
+        #----------------------------------------------------------------------
 
     def HLine(self):
         # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt

@@ -73,8 +73,9 @@ class InputAll(QtGui.QWidget):
         tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Expanding)
 
-        # ============== Signals & Slots ================================
-
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         # signal indicating that filter specs have changed, requiring update of
         # plot widgets only:        
         self.inputSpecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
@@ -84,7 +85,7 @@ class InputAll(QtGui.QWidget):
         self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
         self.inputPZ.sigFilterDesigned.connect(self.updateAll)
         self.inputFiles.sigFilterDesigned.connect(self.updateAll)
-
+        #----------------------------------------------------------------------
 
 
     def updateAll(self):

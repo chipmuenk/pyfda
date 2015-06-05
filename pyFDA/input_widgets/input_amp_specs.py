@@ -94,13 +94,16 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         self.setLayout(self.layVMain)
 
-#========= SIGNALS & SLOTS ===================================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self.ampUnits)
         # DYNAMIC SIGNAL SLOT CONNECTION:
         # Every time a field is edited, call self.freqUnits - this signal-slot
         # mechanism is constructed in self._addEntry/ destructed in 
         # self._delEntry each time the widget is updated, i.e. when a new 
         # filter design method is selected.
+        #----------------------------------------------------------------------
 
         self.ampUnits() # first time initialization
 
