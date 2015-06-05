@@ -5,7 +5,7 @@ input_filter.py
 Subwidget for selecting the filter, consisting of combo boxes for:
 - Response Type (LP, HP, Hilbert, ...)
 - Filter Type (IIR, FIR, CIC ...)
-- DesignMethod (Butterworth, ...)
+- Design Method (Butterworth, ...)
 
 @author: Julia Beike, Christian Münker, Michael Winkler
 Datum: 4.12.2014
@@ -13,9 +13,7 @@ Datum: 4.12.2014
 from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
-
-# TODO: Add subwidgets, depending on filterSel parameters
-# TODO:  index = myComboBox.findText('item02') 
+from PyQt4.QtCore import pyqtSignal
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -26,6 +24,12 @@ if __name__ == "__main__":
 import filterbroker as fb
 from filter_tree_builder import FilterTreeBuilder
 
+# TODO: Add subwidgets, depending on filterSel parameters
+# TODO:  index = myComboBox.findText('item02') 
+        # reverse dictionary lookup
+        #key = [key for key,value in dict.items() if value=='value' ][0]
+
+
 class InputFilter(QtGui.QWidget):
     """
     Construct combo boxes for selecting the filter, consisting of:
@@ -33,6 +37,8 @@ class InputFilter(QtGui.QWidget):
       - Filter Type (IIR, FIR, CIC ...)
       - DesignMethod (Butterworth, ...)
     """
+    
+    sigSpecsChanged = pyqtSignal()
 
     def __init__(self, DEBUG = False):
         super(InputFilter, self).__init__()
@@ -43,9 +49,11 @@ class InputFilter(QtGui.QWidget):
                                     commentChar = '#', DEBUG = DEBUG) #
         self.filter_initialized = False
 
+        self.dmLast = '' # design method from last call
+
         self.initUI()
         
-        self.setResponseType()
+        self.setResponseType() # first time initialization
 
 
     def initUI(self):
@@ -80,8 +88,10 @@ class InputFilter(QtGui.QWidget):
         # (correspondence is defined in filterbroker.py) and populate combo box:
         for rt in fb.filTree:
             self.cmbResponseType.addItem(fb.gD['rtNames'][rt], rt)
-#        idx = self.cmbResponseType.findText('Lowpass') # find index for 'Lowpass'
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
+
+        if idx == -1: # Key 'LP' does not exist, use first entry instead
+            idx = 0
 
         self.cmbResponseType.setCurrentIndex(idx) # set initial index
 
@@ -121,7 +131,8 @@ class InputFilter(QtGui.QWidget):
         layVAllWdg.addWidget(self.frmDynWdg)
         
         # prevent disappearing of new subwidget
-#        spacer = QtGui.QSpacerItem(0, 1, QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+#        spacer = QtGui.QSpacerItem(0, 1, QtGui.QSizePolicy.MinimumExpanding, 
+#                         QtGui.QSizePolicy.MinimumExpanding)
 #        layVAllWdg.addItem(spacer)
 
         self.frmMain = QtGui.QFrame()
@@ -137,12 +148,15 @@ class InputFilter(QtGui.QWidget):
         
         #------------------------------------------------------------
         # SIGNALS & SLOTS
-        #
-        # Connect comboBoxes and setters
-
+        #------------------------------------------------------------
+        # Connect comboBoxes and setters:
         self.cmbResponseType.activated.connect(self.setResponseType) # 'LP'
+        self.cmbResponseType.activated.connect(self.sigSpecsChanged.emit)
         self.cmbFilterType.activated.connect(self.setFilterType) #'IIR'
+        self.cmbFilterType.activated.connect(self.sigSpecsChanged.emit)
         self.cmbDesignMethod.activated.connect(self.setDesignMethod) #'cheby1'
+        self.cmbDesignMethod.activated.connect(self.sigSpecsChanged.emit)
+        #------------------------------------------------------------
 
 
     def loadEntries(self):
@@ -153,8 +167,6 @@ class InputFilter(QtGui.QWidget):
         idx_rt = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
         self.cmbResponseType.setCurrentIndex(idx_rt)
         self.setResponseType()
-#        idx_ft = self.cmbResponseType.findData(fb.fil[0]['ft']) # find index for 'LP'
-#        self.cmbResponseType.setCurrentIndex(idx_ft)
 
 
     def setResponseType(self):
@@ -171,16 +183,19 @@ class InputFilter(QtGui.QWidget):
         self.rt = str(self.cmbResponseType.itemData(self.rtIdx))
 
         fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
-
-        # rebuild filter type combobox entries for new rt setting 
+     
+        # Get list of available filter types for new rt
+        ftList = list(fb.filTree[self.rt].keys()) # explicit list() needed for Py3
+        
+        # Rebuild filter type combobox entries for new rt setting 
         # The combobox is populated with the "long name", the internal name
-        # is stored in comboBox.itemData               
+        # is stored in comboBox.itemData   
         self.cmbFilterType.clear()
-        self.cmbFilterType.addItems(
-            list(fb.filTree[self.rt].keys())) # explicit list() needed for Py3
+#        self.cmbFilterType.addItems(
+#            list(fb.filTree[self.rt].keys())) # explicit list() needed for Py3
 
-        # get list of available filter types for new rt
-        ftList = fb.filTree[self.rt].keys() 
+        self.cmbFilterType.addItems(ftList)
+
         # Is last filter type (e.g. IIR) in list for new rt? 
         # And has the widget been initialized?
         if fb.fil[0]['ft'] in ftList and self.filter_initialized:
@@ -221,14 +236,13 @@ class InputFilter(QtGui.QWidget):
         # Is previous design method (e.g. ellip) in list for new ft? 
         # And has the widget been initialized?
         if fb.fil[0]['dm'] in dmList and self.filter_initialized:
+            # yes, set same dm as before, don't calll setDesignMethod
             dm_idx = self.cmbDesignMethod.findText(fb.gD['dmNames'][fb.fil[0]['dm']])
-            print("dm_idx", dm_idx)
-            self.cmbDesignMethod.setCurrentIndex(dm_idx) # yes, set same dm as before
+            if self.DEBUG: print("dm_idx", dm_idx)
+            self.cmbDesignMethod.setCurrentIndex(dm_idx) 
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0  
-
-
-        self.setDesignMethod()
+            self.setDesignMethod()
 
     def setDesignMethod(self):
         """
@@ -264,16 +278,36 @@ class InputFilter(QtGui.QWidget):
 
         self.filter_initialized = True
         
-        self.updateWidgets() # check for new subwidgets and update if needed
+        self._updateWidgets() # check for new subwidgets and update if needed
 
-        # reverse dictionary lookup
-        #key = [key for key,value in dict.items() if value=='value' ][0]
-    def updateWidgets(self):
+#        self.sigSpecsChanged.emit() # -> input_all
+
+
+    def _updateWidgets(self):
         """
-        Delete dynamically created subwidgets and create new ones, depending
-        on requirements of filter design algorithm
+        Delete dynamically (i.e. within filter design routine) created subwidgets 
+        and create new ones, depending on requirements of filter design algorithm
+ 
+        
+        This does NOT work when the subwidgets to be deleted and created are
+        identical, as the deletion is only performed when the current scope has
+        been left (?)! Hence, it is necessary to skip this method when the new
+        design method is the same as the old one.
         """
-        self._delWidgets()
+        
+        # Find "old" dyn. subwidgets and delete them:
+        widgetList = self.frmDynWdg.findChildren(
+                                            (QtGui.QComboBox,QtGui.QLineEdit, 
+                                             QtGui.QLabel, QtGui.QWidget))
+#       widgetListNames = [w.objectName() for w in widgetList]
+
+        for w in widgetList:
+            self.layHDynWdg.removeWidget(w)   # remove widget from layout
+            w.deleteLater()             # tell Qt to delete object when the
+                                        # method has completed
+            del w                       # not really needed?        
+
+        # Try to create "new" dyn. subwidgets:
         if hasattr(fb.filObj, 'wdg'):
             try:
                 if 'sf' in fb.filObj.wdg:
@@ -286,20 +320,20 @@ class InputFilter(QtGui.QWidget):
                 print("sf.updateWidgets:",e)
                 self.frmDynWdg.setVisible(False)
 
-    def _delWidgets(self):
-        """
-        Delete dynamically created subwidgets
-        """
-        widgetList = self.frmDynWdg.findChildren(
-                                            (QtGui.QComboBox,QtGui.QLineEdit, 
-                                             QtGui.QLabel, QtGui.QWidget))
-#       widgetListNames = [w.objectName() for w in widgetList]
-
-        for w in widgetList:
-            self.layHDynWdg.removeWidget(w)   # remove widget from layout
-            w.deleteLater()             # tell Qt to delete object when the
-                                        # method has completed
-            del w                       # not really needed?
+#    def _delWidgets(self):
+#        """
+#        Delete dynamically created subwidgets
+#        """
+#        widgetList = self.frmDynWdg.findChildren(
+#                                            (QtGui.QComboBox,QtGui.QLineEdit, 
+#                                             QtGui.QLabel, QtGui.QWidget))
+##       widgetListNames = [w.objectName() for w in widgetList]
+#
+#        for w in widgetList:
+#            self.layHDynWdg.removeWidget(w)   # remove widget from layout
+#            w.deleteLater()             # tell Qt to delete object when the
+#                                        # method has completed
+#            del w                       # not really needed?
 
 #------------------------------------------------------------------------------
 

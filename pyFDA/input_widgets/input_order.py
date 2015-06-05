@@ -8,6 +8,7 @@ Datum: 20.01.2015
 from __future__ import print_function, division, unicode_literals
 import sys, os
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -23,6 +24,8 @@ class InputOrder(QtGui.QFrame):
     - manual filter order, specified by an integer
     - minimum ('min') filter order
     """
+    
+    sigSpecsChanged = pyqtSignal()
 
     def __init__(self, DEBUG = True):
         super(InputOrder, self).__init__()
@@ -89,9 +92,10 @@ class InputOrder(QtGui.QFrame):
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
-
+        #----------------------------------------------------------------------
         self.chkMin.clicked.connect(self.storeEntries)
         self.ledOrder.editingFinished.connect(self.storeEntries)
+        #----------------------------------------------------------------------
 
         self.storeEntries() # initialize with default settings
         
@@ -119,7 +123,7 @@ class InputOrder(QtGui.QFrame):
         # When design method has changed, delete dynamically created subwidgets
         # from previous filter design method and create new ones (if needed):
         if fb.fil[0]['dm'] != self.dmLast:
-            self.updateDynWidgets()
+            self._updateDynWidgets()
 
         # Determine which subwidgets are __visible__
         self.lblOrder.setVisible('man' in foList)
@@ -133,10 +137,14 @@ class InputOrder(QtGui.QFrame):
         correspondingly
         """
         self.updateUI()
+        
         self.chkMin.setChecked(fb.fil[0]['fo'] == 'min')
         self.ledOrder.setText(str(fb.fil[0]['N']))
         self.ledOrder.setEnabled(not self.chkMin.isChecked())
         self.lblOrder.setEnabled(not self.chkMin.isChecked())
+        
+        self.dmLast = fb.fil[0]["dm"]
+        
 
     def storeEntries(self):
         """
@@ -164,14 +172,31 @@ class InputOrder(QtGui.QFrame):
         ordn = int(self.ledOrder.text())
         fb.fil[0].update({'N' : ordn})
         self.dmLast = fb.fil[0]["dm"]
+        
+        self.sigSpecsChanged.emit() # -> input_all
+        
 
-    def updateDynWidgets(self):
+    def _updateDynWidgets(self):
         """
-        Delete dynamically created subwidgets and create new ones, depending
-        on requirements of filter design algorithm
+        Delete dynamically (i.e. within filter design routine) created subwidgets 
+        and create new ones, depending on requirements of filter design algorithm
+        
+        This does NOT work when the subwidgets to be deleted and created are
+        identical, as the deletion is only performed when the current scope has
+        been left (?)! Hence, it is necessary to skip this method when the new
+        design method is the same as the old one.
+        
         """
+        # Find "old" dyn. subwidgets and delete them:
+        widgetList = self.frmDynWdg.findChildren(
+                                            (QtGui.QComboBox,QtGui.QLineEdit))
+        for w in widgetList:
+            self.layHDynWdg.removeWidget(w)   # remove widget from layout
+            w.deleteLater()             # tell Qt to delete object when the
+                                        # method has completed
+            del w                       # not really needed?
 
-        self._delWidgets()
+        # Try to create "new" dyn. subwidgets:
         if hasattr(fb.filObj, 'wdg'):
             try:
                 if 'fo' in fb.filObj.wdg:
@@ -183,17 +208,6 @@ class InputOrder(QtGui.QFrame):
                 print("fo.updateWidgets:", e)
                 self.frmDynWdg.setVisible(False)
 
-    def _delWidgets(self):
-        """
-        Delete all dynamically (i.e. by filter design routine) created widgets
-        """
-        widgetList = self.frmDynWdg.findChildren(
-                                            (QtGui.QComboBox,QtGui.QLineEdit))
-        for w in widgetList:
-            self.layHDynWdg.removeWidget(w)   # remove widget from layout
-            w.deleteLater()             # tell Qt to delete object when the
-                                        # method has completed
-            del w                       # not really needed?
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':

@@ -119,10 +119,9 @@ class InputSpecs(QtGui.QWidget):
         # SIGNALS & SLOTS
         # Call updateUI every time filter (order) method is changed
         # updateUI emits sigFilterChanged when it's finished
-        self.filord.chkMin.clicked.connect(self.updateUI)
-        self.selfil.cmbResponseType.activated.connect(self.updateUI)
-        self.selfil.cmbFilterType.activated.connect(self.updateUI)
-        self.selfil.cmbDesignMethod.activated.connect(self.updateUI)
+
+        self.filord.sigSpecsChanged.connect(self.updateAllUIs)  
+        self.selfil.sigSpecsChanged.connect(self.updateAllUIs)  
         
         self.fspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.aspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
@@ -133,12 +132,12 @@ class InputSpecs(QtGui.QWidget):
         self.butReadFiltTree.clicked.connect(self.selfil.ftb.initFilters)
         #----------------------------------------------------------------------
 
-        self.updateUI() # first time initialization
+        self.updateAllUIs() # first time initialization
 
-    def updateUI(self):
+    def updateAllUIs(self):
         """
         This method is called every time filter design method or order 
-        (min / man) is changed. At this time, the actual filter object instance 
+        (min / man) is changed. At this time, the actual filter object
         instance has been created from design method and order 
         (e.g. 'cheby1', 'min') in input_filter.py. Its handle has been stored
         in fb.filobj.
@@ -151,7 +150,6 @@ class InputSpecs(QtGui.QWidget):
         Then, all subwidgets are recreated and finally the signal 
         'sigSpecsChanged' is emitted.
         """
-
 
         # Read freq / amp / weight labels for current filter design
         rt = fb.fil[0]['rt']
@@ -176,7 +174,7 @@ class InputSpecs(QtGui.QWidget):
 
         # pass new labels to widgets 
         # set widgets invisible if param list is empty
-        self.filord.storeEntries()
+        self.filord.loadEntries()
         self.fspecs.setEntries(newLabels = self.freqParams) 
         self.aspecs.setVisible(self.ampParams != [])
         self.aspecs.setEnabled("aspecs" in myEnbWdg)
