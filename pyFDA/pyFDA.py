@@ -119,7 +119,7 @@ class pyFDA(QtGui.QMainWindow):
 #        fileMenu = menubar.addMenu('&About')
 #        fileMenu.addAction(aboutAction)
 
-        self.statusMessage("Application is initialized.")
+#        self.statusMessage("Application is initialized.")
        
 
         # ============== Signals & Slots ================================
