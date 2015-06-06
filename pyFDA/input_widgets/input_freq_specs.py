@@ -68,7 +68,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.ledF_S.setObjectName("f_S")
 
         self.lblF_S = QtGui.QLabel(self)
-        self.lblF_S.setText(self.rtLabel("f_S"))
+        self.lblF_S.setText(self._rtLabel("f_S"))
 
         self.cmbUnits = QtGui.QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")
@@ -121,7 +121,7 @@ class InputFreqSpecs(QtGui.QWidget):
         #   with "F" (= frequency specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         newLabels = [l for l in fb.fil[0] if l[0] == 'F']
-        self.setEntries(newLabels = newLabels)
+        self.updateUI(newLabels = newLabels)
 
         sfFrame = QtGui.QFrame()
         sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -147,24 +147,6 @@ class InputFreqSpecs(QtGui.QWidget):
 
         self.freqUnits() # first time initialization
 
-#-------------------------------------------------------------
-    def freqRange(self):
-        """
-        Set frequency range for single-sided spectrum up to f_S/2 or f_S or
-        for double-sided spectrum between -f_S/2 and f_S/2
-        """
-        rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
-        fb.fil[0].update({'freqSpecsRangeType':rangeType})
-        if rangeType == 'whole':
-            f_lim = [0, self.f_S]
-        elif rangeType == 'sym':
-            f_lim = [-self.f_S/2, self.f_S/2]
-        else:
-            f_lim = [0, self.f_S/2]
-
-        fb.fil[0]['freqSpecsRange'] = f_lim
-        
-        self.sigSpecsChanged.emit() # -> inputAll()
 
 #-------------------------------------------------------------
     def freqUnits(self):
@@ -244,105 +226,29 @@ class InputFreqSpecs(QtGui.QWidget):
             self.storeEntries()
 
         self.idxOld = idx # remember setting of comboBox
-        self.f_S_old = self.f_S # and f_S (not used yet)
         self.freqRange() # update f_lim setting and send redraw signal
-
-
-    def rtLabel(self, label):
-        """
-        Rich text label: Format label with HTML tags, replacing '_' by
-        HTML subscript tags
-        """
-        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
-        if "_" in label:
-            label = label.replace('_', '<sub>')
-            label += "</sub>"
-        htmlLabel = "<b><i>"+label+"</i></b>"
-        return htmlLabel
-
-    def setEntries(self, newLabels = []):
-        """
-        Set labels and get corresponding values from filter dictionary.
-        When number of elements changes, the layout of subwidget is rebuilt.
-        """
-        # Check whether the number of entries has changed
-        for i in range(max(len(self.qlabels), len(newLabels))):
-             # newLabels is shorter than qlabels -> delete the difference
-            if (i > (len(newLabels)-1)):
-                self._delEntry(len(newLabels))
-
-            # newLabels is longer than existing qlabels -> create new ones!
-            elif (i > (len(self.qlabels)-1)):
-             self._addEntry(i,newLabels[i])
-
-            else:
-                # when entry has changed, update label and corresponding value
-                if self.qlineedit[i].objectName() != newLabels[i]:
-                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))
-                    self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]*self.f_S))
-                    self.qlineedit[i].setObjectName(newLabels[i])  # update ID
-
-        if self.chkSortAuto.isChecked():
-            self._sortEntries()
-
-    def _delEntry(self,i):
-        """
-        Delete entry number i from subwidget (QLabel and QLineEdit) and
-        disconnect the lineedit field from self.freqUnits
-        """
-        self.qlineedit[i].editingFinished.disconnect(self.freqUnits) # needed?
-
-        self.layGSpecWdg.removeWidget(self.qlabels[i])
-        self.layGSpecWdg.removeWidget(self.qlineedit[i])
-
-        self.qlabels[i].deleteLater()
-        del self.qlabels[i]
-        self.qlineedit[i].deleteLater()
-        del self.qlineedit[i]
-
-
-    def _addEntry(self, i, newLabel):
-        """
-        Append entry number i to subwidget (QLabel und QLineEdit) and
-        connect QLineEdit widget to self.freqUnits. This way, the central filter
-        dictionary is updated automatically when a QLineEdit field has been
-        edited.
-        """
-        self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(self.rtLabel(newLabel))
-
-        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel]*self.f_S)))
-        self.qlineedit[i].setObjectName(newLabel) # update ID
         
-        self.qlineedit[i].editingFinished.connect(self.freqUnits)
-
-        self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
-        self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
-
-
-    def _sortStoreEntries(self):
+#-------------------------------------------------------------
+    def freqRange(self):
         """
-        Sort spec entries with ascending frequency, store in filter dict and
-        emit sigFilterChanged signal
+        Set frequency range for single-sided spectrum up to f_S/2 or f_S or
+        for double-sided spectrum between -f_S/2 and f_S/2
         """
-        self._sortEntries()
-        self.storeEntries()
+        rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
+        fb.fil[0].update({'freqSpecsRangeType':rangeType})
+        if rangeType == 'whole':
+            f_lim = [0, self.f_S]
+        elif rangeType == 'sym':
+            f_lim = [-self.f_S/2, self.f_S/2]
+        else:
+            f_lim = [0, self.f_S/2]
+
+        fb.fil[0]['freqSpecsRange'] = f_lim
         
         self.sigSpecsChanged.emit() # -> inputAll()
-        
-        
-    def _sortEntries(self):
-        """
-        Sort spec entries with ascending frequency.
-        """
-        self.butSort.setDisabled(self.chkSortAuto.isChecked())
-        fSpecs = [simple_eval(self.qlineedit[i].text())
-                                        for i in range(len(self.qlineedit))]
-        fSpecs.sort()
 
-        for i in range(len(self.qlineedit)):
-            self.qlineedit[i].setText(str(fSpecs[i]))
 
+#-------------------------------------------------------------        
     def loadEntries(self):
         """
         Reload textfields from filter dictionary to update changed settings
@@ -351,6 +257,8 @@ class InputFreqSpecs(QtGui.QWidget):
             self.qlineedit[i].setText(
                 str(fb.fil[0][self.qlineedit[i].objectName()] * self.f_S))
 
+
+#-------------------------------------------------------------
     def storeEntries(self):
         """
         Store specification entries in filter dictionary
@@ -370,15 +278,119 @@ class InputFreqSpecs(QtGui.QWidget):
                       float(fb.fil[0][self.qlineedit[i].objectName()]))
 
 
+#-------------------------------------------------------------
+    def _rtLabel(self, label):
+        """
+        Rich text label: Format label with HTML tags, replacing '_' by
+        HTML subscript tags
+        """
+        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+        if "_" in label:
+            label = label.replace('_', '<sub>')
+            label += "</sub>"
+        htmlLabel = "<b><i>"+label+"</i></b>"
+        return htmlLabel
+
+
+#-------------------------------------------------------------
+    def updateUI(self, newLabels = []):
+        """
+        Set labels and get corresponding values from filter dictionary.
+        When number of elements changes, the layout of subwidget is rebuilt.
+        """
+        # Check whether the number of entries has changed
+        for i in range(max(len(self.qlabels), len(newLabels))):
+             # newLabels is shorter than qlabels -> delete the difference
+            if (i > (len(newLabels)-1)):
+                self._delEntry(len(newLabels))
+
+            # newLabels is longer than existing qlabels -> create new ones!
+            elif (i > (len(self.qlabels)-1)):
+             self._addEntry(i,newLabels[i])
+
+            else:
+                # when entry has changed, update label and corresponding value
+                if self.qlineedit[i].objectName() != newLabels[i]:
+                    self.qlabels[i].setText(self._rtLabel(newLabels[i]))
+                    self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]*self.f_S))
+                    self.qlineedit[i].setObjectName(newLabels[i])  # update ID
+
+        if self.chkSortAuto.isChecked():
+            self._sortEntries()
+
+
+#-------------------------------------------------------------
+    def _delEntry(self,i):
+        """
+        Delete entry number i from subwidget (QLabel and QLineEdit) and
+        disconnect the lineedit field from self.freqUnits
+        """
+        self.qlineedit[i].editingFinished.disconnect(self.freqUnits) # needed?
+
+        self.layGSpecWdg.removeWidget(self.qlabels[i])
+        self.layGSpecWdg.removeWidget(self.qlineedit[i])
+
+        self.qlabels[i].deleteLater()
+        del self.qlabels[i]
+        self.qlineedit[i].deleteLater()
+        del self.qlineedit[i]
+
+
+#-------------------------------------------------------------
+    def _addEntry(self, i, newLabel):
+        """
+        Append entry number i to subwidget (QLabel und QLineEdit) and
+        connect QLineEdit widget to self.freqUnits. This way, the central filter
+        dictionary is updated automatically when a QLineEdit field has been
+        edited.
+        """
+        self.qlabels.append(QtGui.QLabel(self))
+        self.qlabels[i].setText(self._rtLabel(newLabel))
+
+        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel]*self.f_S)))
+        self.qlineedit[i].setObjectName(newLabel) # update ID
+        
+        self.qlineedit[i].editingFinished.connect(self.freqUnits)
+
+        self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
+        self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
+
+
+#-------------------------------------------------------------
+    def _sortStoreEntries(self):
+        """
+        Sort spec entries with ascending frequency, store in filter dict and
+        emit sigFilterChanged signal
+        """
+        self._sortEntries()
+        self.storeEntries()
+        
+        self.sigSpecsChanged.emit() # -> inputAll()
+
+        
+#-------------------------------------------------------------        
+    def _sortEntries(self):
+        """
+        Sort spec entries with ascending frequency.
+        """
+        self.butSort.setDisabled(self.chkSortAuto.isChecked())
+        fSpecs = [simple_eval(self.qlineedit[i].text())
+                                        for i in range(len(self.qlineedit))]
+        fSpecs.sort()
+
+        for i in range(len(self.qlineedit)):
+            self.qlineedit[i].setText(str(fSpecs[i]))
+
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import filterbroker as fb
-    app = QtGui.QApplication(sys.argv)
-    form = InputFreqSpecs(fil_dict = fb.fil[0]) #)
 
-    form.setEntries(newLabels = ['F_SB','F_SB2','F_PB','F_PB2'])
-    form.setEntries(newLabels = ['F_PB','F_PB2'])
+    app = QtGui.QApplication(sys.argv)
+    form = InputFreqSpecs() #)
+
+    form.updateUI(newLabels = ['F_SB','F_SB2','F_PB','F_PB2'])
+    form.updateUI(newLabels = ['F_PB','F_PB2'])
 
     form.show()
 

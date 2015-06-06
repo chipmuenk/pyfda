@@ -119,7 +119,6 @@ class InputSpecs(QtGui.QWidget):
         # SIGNALS & SLOTS
         # Call updateUI every time filter (order) method is changed
         # updateUI emits sigFilterChanged when it's finished
-
         self.filord.sigSpecsChanged.connect(self.updateAllUIs)  
         self.selfil.sigSpecsChanged.connect(self.updateAllUIs)  
         
@@ -127,13 +126,14 @@ class InputSpecs(QtGui.QWidget):
         self.aspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.wspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
 
-
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.butReadFiltTree.clicked.connect(self.selfil.ftb.initFilters)
         #----------------------------------------------------------------------
 
         self.updateAllUIs() # first time initialization
 
+
+#------------------------------------------------------------------------------
     def updateAllUIs(self):
         """
         This method is called every time filter design method or order 
@@ -172,23 +172,27 @@ class InputSpecs(QtGui.QWidget):
             print('freqLabels:', self.freqParams)
             print('weightLabels:', self.weightParams)
 
-        # pass new labels to widgets 
+        # pass new labels to widgets and recreate UI
         # set widgets invisible if param list is empty
         self.filord.loadEntries()
-        self.fspecs.setEntries(newLabels = self.freqParams) 
+        
+        self.fspecs.updateUI(newLabels = self.freqParams)
+        
         self.aspecs.setVisible(self.ampParams != [])
         self.aspecs.setEnabled("aspecs" in myEnbWdg)
-        self.aspecs.setEntries(newLabels = self.ampParams)
+        self.aspecs.updateUI(newLabels = self.ampParams)
+        
         self.wspecs.setVisible(self.weightParams != [])
         self.wspecs.setEnabled("wspecs" in myEnbWdg)
-        self.wspecs.setEntries(newLabels = self.weightParams)
+        self.wspecs.updateUI(newLabels = self.weightParams)
 #TODO: get target specs up and running
         #self.tspecs.setEntries(newLabels = (self.freqParams, self.ampParams)
         self.lblMsg.setText(myMsg)
 
         self.sigSpecsChanged.emit()
         
-        
+
+#------------------------------------------------------------------------------        
     def storeAll(self):
         """
         Store currently selected filter in global dict fb.fil[0]
@@ -202,6 +206,7 @@ class InputSpecs(QtGui.QWidget):
 #TODO: get target specs up and running
         #self.tspecs.storeEntries() # target specs        
 
+#------------------------------------------------------------------------------
     def loadAll(self):
         """
         Update entries from global dict fb.fil[0]
@@ -219,6 +224,8 @@ class InputSpecs(QtGui.QWidget):
             print("=== pyFDA.py : storeAll ===")
             print(fb.fil[0])
 
+
+#------------------------------------------------------------------------------
     def startDesignFilt(self):
         """
         Start the actual filter design process:

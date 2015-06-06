@@ -28,7 +28,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
     def __init__(self, DEBUG = True):
         """
-        Initialize; fil_dict is a dictionary containing _all_ the filter specs
+        Initialize
         """
 
         super(InputWeightSpecs, self).__init__()
@@ -39,7 +39,11 @@ class InputWeightSpecs(QtGui.QWidget):
 
         self.initUI()
 
+#------------------------------------------------------------------------------
     def initUI(self):
+        """
+        Initialize UI
+        """
         self.layVMain = QtGui.QVBoxLayout() # Widget vertical layout
         self.layGSpecWdg   = QtGui.QGridLayout() # sublayout for spec fields
 
@@ -62,7 +66,7 @@ class InputWeightSpecs(QtGui.QWidget):
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         newLabels = [l for l in fb.fil[0] if l[0] == 'W']
-        self.setEntries(newLabels = newLabels)
+        self.updateUI(newLabels = newLabels)
 
         frmMain = QtGui.QFrame()
         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -83,21 +87,9 @@ class InputWeightSpecs(QtGui.QWidget):
         # self._delEntry each time the widget is updated, i.e. when a new 
         # filter design method is selected.
 
-#-------------------------------------------------------------
-    def rtLabel(self, label):
-        """
-        Rich text label: Format label with HTML tags, replacing '_' by
-        HTML subscript tags
-        """
-        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
-        if "_" in label:
-            label = label.replace('_', '<sub>')
-            label += "</sub>"
-        htmlLabel = "<b><i>"+label+"</i></b>"
-        return htmlLabel
 
 #-------------------------------------------------------------
-    def setEntries(self, newLabels = []):
+    def updateUI(self, newLabels = []):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
@@ -115,10 +107,33 @@ class InputWeightSpecs(QtGui.QWidget):
             else:
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
-                    self.qlabels[i].setText(self.rtLabel(newLabels[i]))
+                    self.qlabels[i].setText(self._rtLabel(newLabels[i]))
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
+#------------------------------------------------------------------------------
+    def loadEntries(self):
+        """
+        Reload textfields from filter dictionary to update changed settings
+        """
+        for i in range(len(self.qlineedit)):
+            self.qlineedit[i].setText(
+                str(fb.fil[0][self.qlineedit[i].objectName()]))
+
+#------------------------------------------------------------------------------
+    def storeEntries(self):
+        """
+        Store specification entries in filter dictionary
+        """
+        for i in range(len(self.qlabels)):
+            fb.fil[0].update(
+                {self.qlineedit[i].objectName():
+                    simple_eval(self.qlineedit[i].text())})
+                       
+        self.sigSpecsChanged.emit() # -> input_all
+        
+        
+#------------------------------------------------------------------------------
     def _delEntry(self,i):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit) and
@@ -135,6 +150,7 @@ class InputWeightSpecs(QtGui.QWidget):
         del self.qlineedit[i]
 
 
+#------------------------------------------------------------------------------
     def _addEntry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and
@@ -143,7 +159,7 @@ class InputWeightSpecs(QtGui.QWidget):
         edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(self.rtLabel(newLabel))
+        self.qlabels[i].setText(self._rtLabel(newLabel))
 
         self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
         self.qlineedit[i].setObjectName(newLabel) # update ID
@@ -153,40 +169,37 @@ class InputWeightSpecs(QtGui.QWidget):
         self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
 
+#------------------------------------------------------------------------------
     def _resetWeights(self):
+        """
+        Reset all entries to "1.0" and store them in the filter dictionary
+        """
         for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText("1.0")
         self.storeEntries()
 
-    def loadEntries(self):
+#-------------------------------------------------------------
+    def _rtLabel(self, label):
         """
-        Reload textfields from filter dictionary to update changed settings
+        Rich text label: Format label with HTML tags, replacing '_' by
+        HTML subscript tags
         """
-        for i in range(len(self.qlineedit)):
-            self.qlineedit[i].setText(
-                str(fb.fil[0][self.qlineedit[i].objectName()]))
-
-    def storeEntries(self):
-        """
-        Store specification entries in filter dictionary
-        """
-        for i in range(len(self.qlabels)):
-            fb.fil[0].update(
-                {self.qlineedit[i].objectName():float(self.qlineedit[i].text())})
-                       
-        self.sigSpecsChanged.emit() # -> input_all
+        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+        if "_" in label:
+            label = label.replace('_', '<sub>')
+            label += "</sub>"
+        htmlLabel = "<b><i>"+label+"</i></b>"
+        return htmlLabel
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    import filterbroker as fb
-
     app = QtGui.QApplication(sys.argv)
-    form = InputWeightSpecs(fil_dict = fb.fil[0])
+    form = InputWeightSpecs()
 
-    form.setEntries(newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
-    form.setEntries(newLabels = ['W_PB','W_PB2'])
+    form.updateUI(newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
+    form.updateUI(newLabels = ['W_PB','W_PB2'])
 
     form.show()
 
