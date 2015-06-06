@@ -139,14 +139,24 @@ class InputInfo(QtGui.QWidget):
         # Finally, flatten the list of lists and convert it into a set to 
         # eliminate double entries:
         fil_set = set([item for sublist in fil_list for item in sublist])
-        
-        F_test_lbl = [l for l in fil_set if l[0] == 'F']
+        # extract all labels starting with 'F':
+        F_test_lbls = [lbl for lbl in fil_set if lbl[0] == 'F']
+        # construct a list of lists [frequency, label], sorted by frequency:
+        F_test = sorted([[fb.fil[0][lbl]*f_S, lbl] for lbl in F_test_lbls])
+
+        # construct a list of lists consisting of [label, frequency]:
+        # F_test = [[lbl, fb.fil[0][lbl]*f_S] for lbl in F_test_lbls]
+        ## sort list of tuples using the LAST element of the tuple (= frequency)
+        # F_test = sorted(F_test, key=lambda t: t[::-1])
+
+        if self.DEBUG: print("input_info.showFiltPerf\nF_test = ", F_test)
+
 
         # Vector with test frequencies of the labels above    
-        F_test = np.array([fb.fil[0][l] for l in F_test_lbl]) * f_S
-
+        F_test_vals = np.array([item[0] for item in F_test]) * f_S
+        F_test_lbls = [item[1] for item in F_test]
         # Calculate frequency response at test frequencies and over the whole range:
-        [w_test, H_test] = sig.freqz(bb, aa, F_test * 2.0 * pi)
+        [w_test, H_test] = sig.freqz(bb, aa, F_test_vals * 2.0 * pi)
         [w, H] = sig.freqz(bb, aa)
 
         f = w  * f_S / (2.0 * pi)
@@ -159,12 +169,12 @@ class InputInfo(QtGui.QWidget):
         H_min_dB = 20*log10(H_min)
         F_min = f[np.argmin(H_abs)]
 
-        F_test_lbl += ['Minimum','Maximum']
-        F_test = np.append(F_test, [F_min, F_max])
+        F_test_lbls += ['Min.','Max.']
+        F_test_vals = np.append(F_test_vals, [F_min, F_max])
         H_test = np.append(H_test, [H_min, H_max])
         if self.DEBUG:
             print("input_info.showFiltPerf\n===================H_test", H_test)
-            print("F_test", F_test)
+            print("F_test", F_test_vals)
 #        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
 
         self.tblFiltPerf.setRowCount(len(H_test))
@@ -172,8 +182,8 @@ class InputInfo(QtGui.QWidget):
 
         self.tblFiltPerf.setHorizontalHeaderLabels(['Test Case', 'f(Hz)','|H(f)|','|H(f)| (dB)'])
         for row in range(len(H_test)):
-            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbl[row]))
-            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test[row]))))
+            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbls[row]))
+            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]))))
             self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
             self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str('%2.3f'%(20*log10(abs(H_test[row]))))))
 
