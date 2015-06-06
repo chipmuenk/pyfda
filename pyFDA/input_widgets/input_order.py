@@ -120,10 +120,8 @@ class InputOrder(QtGui.QFrame):
             self.fo = foList[0] # use first list entry from filterTree
             fb.fil[0]['fo'] = self.fo # and update fo method
 
-        # When design method has changed, delete dynamically created subwidgets
-        # from previous filter design method and create new ones (if needed):
-        if fb.fil[0]['dm'] != self.dmLast:
-            self._updateDynWidgets()
+        # update dynamic (i.e. defined in filter design routine) subwidgets
+        self._updateDynWidgets()
 
         # Determine which subwidgets are __visible__
         self.lblOrder.setVisible('man' in foList)
@@ -142,8 +140,6 @@ class InputOrder(QtGui.QFrame):
         self.ledOrder.setText(str(fb.fil[0]['N']))
         self.ledOrder.setEnabled(not self.chkMin.isChecked())
         self.lblOrder.setEnabled(not self.chkMin.isChecked())
-        
-        self.dmLast = fb.fil[0]["dm"]
         
 
     def storeEntries(self):
@@ -171,7 +167,6 @@ class InputOrder(QtGui.QFrame):
 
         ordn = int(self.ledOrder.text())
         fb.fil[0].update({'N' : ordn})
-        self.dmLast = fb.fil[0]["dm"]
         
         self.sigSpecsChanged.emit() # -> input_all
         
@@ -187,26 +182,31 @@ class InputOrder(QtGui.QFrame):
         design method is the same as the old one.
         
         """
-        # Find "old" dyn. subwidgets and delete them:
-        widgetList = self.frmDynWdg.findChildren(
-                                            (QtGui.QComboBox,QtGui.QLineEdit))
-        for w in widgetList:
-            self.layHDynWdg.removeWidget(w)   # remove widget from layout
-            w.deleteLater()             # tell Qt to delete object when the
-                                        # method has completed
-            del w                       # not really needed?
 
-        # Try to create "new" dyn. subwidgets:
-        if hasattr(fb.filObj, 'wdg'):
-            try:
-                if 'fo' in fb.filObj.wdg:
-                    a = getattr(fb.filObj, fb.filObj.wdg['fo'])
-                    self.layHDynWdg.addWidget(a)
-                    self.layHDynWdg.setContentsMargins(0,0,0,0)
-                    self.frmDynWdg.setVisible(a != None)
-            except AttributeError as e: # no attribute 'wdg'
-                print("fo.updateWidgets:", e)
-                self.frmDynWdg.setVisible(False)
+        if fb.fil[0]['dm'] != self.dmLast:
+                
+            # Find "old" dyn. subwidgets and delete them:
+            widgetList = self.frmDynWdg.findChildren(
+                                                (QtGui.QComboBox,QtGui.QLineEdit))
+            for w in widgetList:
+                self.layHDynWdg.removeWidget(w)   # remove widget from layout
+                w.deleteLater()             # tell Qt to delete object when the
+                                            # method has completed
+                del w                       # not really needed?
+    
+            # Try to create "new" dyn. subwidgets:
+            if hasattr(fb.filObj, 'wdg'):
+                try:
+                    if 'fo' in fb.filObj.wdg:
+                        a = getattr(fb.filObj, fb.filObj.wdg['fo'])
+                        self.layHDynWdg.addWidget(a)
+                        self.layHDynWdg.setContentsMargins(0,0,0,0)
+                        self.frmDynWdg.setVisible(a != None)
+                except AttributeError as e: # no attribute 'wdg'
+                    print("fo.updateWidgets:", e)
+                    self.frmDynWdg.setVisible(False)
+
+        self.dmLast = fb.fil[0]["dm"]
 
 
 #------------------------------------------------------------------------------

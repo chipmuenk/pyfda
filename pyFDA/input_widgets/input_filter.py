@@ -253,7 +253,6 @@ class InputFilter(QtGui.QWidget):
         dm = str(self.cmbDesignMethod.itemData(dmIdx))
         fb.fil[0]['dm'] = dm
 
-
         try: # has a filter object been instantiated yet?
             if fb.fil[0]['dm'] not in fb.filObj.name:
                 fb.filObj = self.ftb.objectWizzard(fb.fil[0]['dm'])
@@ -278,12 +277,12 @@ class InputFilter(QtGui.QWidget):
 
         self.filter_initialized = True
         
-        self._updateWidgets() # check for new subwidgets and update if needed
+        self._updateDynWidgets() # check for new subwidgets and update if needed
 
 #        self.sigSpecsChanged.emit() # -> input_all
 
 
-    def _updateWidgets(self):
+    def _updateDynWidgets(self):
         """
         Delete dynamically (i.e. within filter design routine) created subwidgets 
         and create new ones, depending on requirements of filter design algorithm
@@ -294,46 +293,38 @@ class InputFilter(QtGui.QWidget):
         been left (?)! Hence, it is necessary to skip this method when the new
         design method is the same as the old one.
         """
-        
-        # Find "old" dyn. subwidgets and delete them:
-        widgetList = self.frmDynWdg.findChildren(
-                                            (QtGui.QComboBox,QtGui.QLineEdit, 
-                                             QtGui.QLabel, QtGui.QWidget))
-#       widgetListNames = [w.objectName() for w in widgetList]
 
-        for w in widgetList:
-            self.layHDynWdg.removeWidget(w)   # remove widget from layout
-            w.deleteLater()             # tell Qt to delete object when the
-                                        # method has completed
-            del w                       # not really needed?        
-
-        # Try to create "new" dyn. subwidgets:
-        if hasattr(fb.filObj, 'wdg'):
-            try:
-                if 'sf' in fb.filObj.wdg:
-                    a = getattr(fb.filObj, fb.filObj.wdg['sf'])
-                    self.layHDynWdg.addWidget(a, stretch = 1)
-                    self.layHDynWdg.setContentsMargins(0,0,0,0)
-                    self.frmDynWdg.setVisible(a != None)
-                
-            except AttributeError as e:
-                print("sf.updateWidgets:",e)
+        if fb.fil[0]['dm'] != self.dmLast:
+            
+            # Find "old" dyn. subwidgets and delete them:
+            widgetList = self.frmDynWdg.findChildren(
+                                                (QtGui.QComboBox,QtGui.QLineEdit, 
+                                                 QtGui.QLabel, QtGui.QWidget))
+    #       widgetListNames = [w.objectName() for w in widgetList]
+    
+            for w in widgetList:
+                self.layHDynWdg.removeWidget(w)   # remove widget from layout
+                w.deleteLater()             # tell Qt to delete object when the
+                                            # method has completed
+                del w                       # not really needed?        
+    
+            # Try to create "new" dyn. subwidgets:
+            if hasattr(fb.filObj, 'wdg'):
+                try:
+                    if 'sf' in fb.filObj.wdg:
+                        a = getattr(fb.filObj, fb.filObj.wdg['sf'])
+                        self.layHDynWdg.addWidget(a, stretch = 1)
+                        self.layHDynWdg.setContentsMargins(0,0,0,0)
+                        self.frmDynWdg.setVisible(a != None)
+                    
+                except AttributeError as e:
+                    print("sf.updateWidgets:",e)
+                    self.frmDynWdg.setVisible(False)
+            else:
                 self.frmDynWdg.setVisible(False)
+                
+        self.dmLast = fb.fil[0]['dm']
 
-#    def _delWidgets(self):
-#        """
-#        Delete dynamically created subwidgets
-#        """
-#        widgetList = self.frmDynWdg.findChildren(
-#                                            (QtGui.QComboBox,QtGui.QLineEdit, 
-#                                             QtGui.QLabel, QtGui.QWidget))
-##       widgetListNames = [w.objectName() for w in widgetList]
-#
-#        for w in widgetList:
-#            self.layHDynWdg.removeWidget(w)   # remove widget from layout
-#            w.deleteLater()             # tell Qt to delete object when the
-#                                        # method has completed
-#            del w                       # not really needed?
 
 #------------------------------------------------------------------------------
 
