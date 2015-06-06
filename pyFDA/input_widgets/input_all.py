@@ -28,7 +28,7 @@ class InputAll(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
 
 
-    def __init__(self, DEBUG = True):
+    def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG
         super(InputAll, self).__init__()
         css = """
