@@ -26,6 +26,7 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 # TODO: Setting the cursor position doesn't work yet
 # TODO: Docstrings cannot be displayed with Py3:
 #       Line 113: QTextEdit.append(str): argument 1 has unexpected type 'bytes'
+# TODO: Passband and stopband info should be separated, showing min / max values
 class InputInfo(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -36,7 +37,6 @@ class InputInfo(QtGui.QWidget):
 
         self.initUI()
         self.showInfo()
-        self.showFiltPerf()
 
     def initUI(self):
         """
@@ -101,7 +101,7 @@ class InputInfo(QtGui.QWidget):
         layVMain.addWidget(self.tblFiltPerf)
         layVMain.addWidget(self.txtFiltInfoBox)
         layVMain.addWidget(self.txtFiltDict)
-        layVMain.addStretch(10)
+#        layVMain.addStretch(10)
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
@@ -129,8 +129,18 @@ class InputInfo(QtGui.QWidget):
 
         f_S  = fb.fil[0]['f_S']
 
-        # Build a list with all frequency related labels
-        F_test_lbl = [l for l in fb.fil[0] if l[0] == 'F']
+        # Build a list with all frequency related labels:
+        #--------------------------------------------------------------------
+        # First, extract the dicts for min / man filter order of the selected
+        # design method from filter tree:
+        fil_dict = fb.filTree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['dm']]
+        # Now, extract the parameter lists (key 'par'), yielding a nested list:
+        fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
+        # Finally, flatten the list of lists and convert it into a set to 
+        # eliminate double entries:
+        fil_set = set([item for sublist in fil_list for item in sublist])
+        
+        F_test_lbl = [l for l in fil_set if l[0] == 'F']
 
         # Vector with test frequencies of the labels above    
         F_test = np.array([fb.fil[0][l] for l in F_test_lbl]) * f_S
@@ -215,7 +225,7 @@ class InputInfo(QtGui.QWidget):
         """
         lines = doc.splitlines()
         result = lines[0].lstrip() +\
-         "\n" + textwrap.dedent("\n".join(lines[1:]))# + '\n'
+         "\n" + textwrap.dedent("\n".join(lines[1:]))
         return result
 
     def showFiltDict(self):
@@ -224,13 +234,12 @@ class InputInfo(QtGui.QWidget):
         """
         self.txtFiltDict.setVisible(self.chkFiltDict.isChecked())
 
-        dictstr = pprint.saferepr(fb.fil[0])
+        fb_sorted = [str(key) +' : '+ str(fb.fil[0][key]) for key in sorted(fb.fil[0].keys())]
+        dictstr = pprint.pformat(fb_sorted)
+#        dictstr = pprint.pformat(fb.fil[0])
         self.txtFiltDict.setText(dictstr)
-#        self.txtFiltDict.setText(publish_string(
-#                    self.cleanDoc(dictstr), writer_name='html',
-#                    settings_overrides={'output_encoding': 'unicode'}))
-#
-        pprint.pprint(fb.fil[0])
+
+#        pprint.pprint(fb.fil[0])
         
         
 #app = QtGui.QApplication([])
