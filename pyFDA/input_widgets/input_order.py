@@ -97,7 +97,7 @@ class InputOrder(QtGui.QFrame):
         self.ledOrder.editingFinished.connect(self.storeEntries)
         #----------------------------------------------------------------------
 
-        self.storeEntries() # initialize with default settings
+        self.loadEntries() # initialize with default settings
         
     def updateUI(self):
         """
@@ -144,9 +144,8 @@ class InputOrder(QtGui.QFrame):
 
     def storeEntries(self):
         """
-        Read / write text entries and checkbutton for filter order
+        Write text entries and checkbutton setting for filter order to dict
         """
-        self.updateUI()
 
         # Determine which subwidgets are _enabled_
         if self.chkMin.isVisible():
