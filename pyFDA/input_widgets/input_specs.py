@@ -156,7 +156,7 @@ class InputSpecs(QtGui.QWidget):
         ft = fb.fil[0]['ft']
         dm = fb.fil[0]['dm']
         fo = fb.fil[0]['fo']
-        myParams = fb.filTree[rt][ft][dm][fo]['par']
+        myParams = fb.filTree[rt][ft][dm][fo]['par'] # all parameters e.g. 'F_SB'
         myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
         myMsg    = fb.filTree[rt][ft][dm][fo]['msg'] # message
 
