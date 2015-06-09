@@ -41,9 +41,8 @@ class firwin(object):
 #        print(scipy.signal.windows.boxcar.__doc__)
 
         # common messages for all man. / min. filter order response types:
-        msg_man = (r"Enter desired order and corner frequencies. <br />"
-                    "<b>Note: </b> Corner frequencies are <b>-6 dB</b> "
-                    " frequencies.")
+        msg_man = (r"Enter desired order and <b>-6 dB</b> pass band corner "
+                    "frequencies.")
         msg_min = ("Enter the maximum pass band ripple, minimum stop band "
                     "attenuation and the corresponding corner frequencies.")
 
@@ -56,7 +55,7 @@ class firwin(object):
         enb_min = ['fo','fspecs','aspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S'] # enabled widget for man. filt. order
+        par_man = ['N', 'f_S', 'F_PB'] # enabled widget for man. filt. order
         par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
 
         # Common data for all man. / min. filter order response types:
@@ -66,25 +65,24 @@ class firwin(object):
                     "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":['F_PB','F_SB','A_PB','A_SB']},
+            "LP": {"man":{"par":[]},
                    "min":{"par":['F_PB','F_SB']}},
-            "HP": {"man":{"par":['F_SB','F_PB','A_SB','A_PB'],
+            "HP": {"man":{"par":[],
                           "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
                    "min":{"par":['F_SB','F_PB']}},
-            "BP": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'A_SB','A_PB','A_SB2']},
-                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'A_SB2']}},
-            "BS": {"man":{"par":['F_PB', 'F_SB', 'F_SB2', 'F_PB2',
-                                 'A_PB','A_SB','A_PB2'],
+            "BP": {"man":{"par":['F_PB2']},
+                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
+            "BS": {"man":{"par":['F_PB2'],
                       "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
                    "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
 #            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
           #"DIFF":
                    }
+        self.hdl = None
+        
         self.info = """Windowed FIR filters are designed by truncating the
         infinite impulse response of an ideal filter with a window function.
-        The kind of selected window has great influence on ripple etc. of the
+        The kind of used window has strong influence on ripple etc. of the
         resulting filter.
         """
         #self.info_doc = [] is set in self.updateWindow()
@@ -159,12 +157,15 @@ class firwin(object):
         
 
     def updateWindow(self):
+        """
+        """
         self.firWindow = str(self.combo_firwin_win.currentText()).lower()
         self.alg = str(self.combo_firwin_alg.currentText())
 
         mod_ = import_module('scipy.signal')
 #        mod = __import__('scipy.signal') # works, but not with the next line
-        class_ = getattr(mod_, self.firWindow) # instantiate window class
+         # construct window class, e.g. scipy.signal.boxcar :
+        class_ = getattr(mod_, self.firWindow)
         win_doc = getattr(class_, '__doc__') # read window docstring
         
         self.info_doc = []
@@ -176,38 +177,30 @@ class firwin(object):
         
         self.winArgs = inspect.getargspec(class_)[0] # return args of window
         # and remove standard args for all window types 'sym' and 'M':
-        self.winArgs = [k for k in self.winArgs if k not in {'sym', 'M'}]
+        self.winArgs = [arg for arg in self.winArgs if arg not in {'sym', 'M'}]
         #print(self.winArgs)
-        N_args = len(self.winArgs)
-        self.win_params = ""
+
 
         # make edit boxes for additional parameters visible if needed
+        # and construct tuples consisting of a string with the window name and
+        # one or two optional float parameters. If there are no additional 
+        # parameters, just pass the name of the window.
+        N_args = len(self.winArgs)
         self.lbl_firwin_win1.setVisible(N_args > 0)
         self.led_firwin_win1.setVisible(N_args > 0)
-        if N_args > 0 :
-            self.lbl_firwin_win1.setText(self.winArgs[0])
-            self.firWindow = (str(self.combo_firwin_win.currentText()).lower(),
-                                      float(self.led_firwin_win1.text()))
+        self.lbl_firwin_win2.setVisible(N_args > 1)
+        self.led_firwin_win2.setVisible(N_args > 1)
             
-        self.lbl_firwin_win2.setVisible(len(self.winArgs) > 1)
-        self.led_firwin_win2.setVisible(len(self.winArgs) > 1)
         if N_args > 1 :
             self.lbl_firwin_win2.setText(self.winArgs[1])
-            self.firWindow = (str(self.combo_firwin_win.currentText()).lower(),
-                float(self.led_firwin_win1.text()), 
-                float(self.led_firwin_win2.text()))
+            self.firWindow = (self.firWindow,
+                                      float(self.led_firwin_win1.text()), 
+                                      float(self.led_firwin_win2.text()))
+        elif N_args > 0 :
+            self.lbl_firwin_win1.setText(self.winArgs[0])
+            self.firWindow = (self.firWindow,
+                                      float(self.led_firwin_win1.text()))
         #print(self.firWindow)           
-
-            
-    def deleteWidget(self):
-        """
-        Delete all dynamically created subwidgets
-        When changing e.g. from LP to HP, Runtime Error occurs: 
-        
-            self.layHDynWdg.addWidget(a, stretch = 1)
-        RuntimeError: wrapped C/C++ object of type QWidget has been deleted
-        """
-        pass          
 
 
     def get_params(self, fil_dict):
@@ -274,7 +267,7 @@ class firwin(object):
     def BPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
-                                    window = self.firWindow, pass_zero=False))
+                            window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
@@ -286,7 +279,7 @@ class firwin(object):
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, [self.F_SB, self.F_SB2],
+        self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
     def BSmin(self, fil_dict):
