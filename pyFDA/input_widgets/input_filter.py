@@ -101,7 +101,7 @@ class InputFilter(QtGui.QWidget):
         # see Summerfield p. 278
         self.layHDynWdg = QtGui.QHBoxLayout() # for additional dynamic subwidgets
         self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
-        
+        self.frmDynWdg.setObjectName("wdg_frmDynWdg")
         self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
         
         #Debugging: enable next line to show border of frmDnyWdg
@@ -223,7 +223,6 @@ class InputFilter(QtGui.QWidget):
         # is stored in comboBox.itemData        
         self.cmbDesignMethod.clear()
         
-        # TODO: The following line dumps a core when the key does not exist !!!
         for dm in fb.filTree[self.rt][self.ft]:
             self.cmbDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
                        
