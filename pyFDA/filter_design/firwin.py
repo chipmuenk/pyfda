@@ -94,11 +94,12 @@ class firwin(object):
 
         
     def initUI(self):
-        
-        # Additional subwidgets needed for filter design:
-        # These subwidgets are instantiated where needed using the handle to
-        # the filter object
-
+        """
+        Create additional subwidget(s) needed for filter design with the 
+        names given in self.wdg :
+        These subwidgets are instantiated dynamically where needed using 
+        the handle to the filter object.
+        """
 
         # Combobox for selecting the algorithm to estimate minimum filter order
         self.cmb_firwin_alg = QtGui.QComboBox()
@@ -113,7 +114,7 @@ class firwin(object):
                    'Boxcar','Chebwin','Cosine','Flattop','General_Gaussian',
                    'Gaussian','Hamming','Hann','Kaiser','Nuttall','Parzen',
                    'Slepian','Triang']
-
+        #=== Windows with parameters =======
         # kaiser - needs beta
         # gaussian needs std
         # general_gaussian - needs power, width
@@ -124,31 +125,31 @@ class firwin(object):
         win_idx = self.cmb_firwin_win.findText('Boxcar')
         self.cmb_firwin_win.setCurrentIndex(win_idx)
         
-        self.lbl_firwin_win1 = QtGui.QLabel("a")
-        self.lbl_firwin_win1.setObjectName('wdg_lbl_firwin_win1')
-        self.led_firwin_win1 = QtGui.QLineEdit()
-        self.led_firwin_win1.setText("0.5")
-        self.led_firwin_win1.setObjectName('wdg_led_firwin_win1')
-        self.lbl_firwin_win1.setVisible(False)
-        self.led_firwin_win1.setVisible(False)
+        self.lbl_firwin_1 = QtGui.QLabel("a")
+        self.lbl_firwin_1.setObjectName('wdg_lbl_firwin_1')
+        self.led_firwin_1 = QtGui.QLineEdit()
+        self.led_firwin_1.setText("0.5")
+        self.led_firwin_1.setObjectName('wdg_led_firwin_1')
+        self.lbl_firwin_1.setVisible(False)
+        self.led_firwin_1.setVisible(False)
                
-        self.lbl_firwin_win2 = QtGui.QLabel("b")
-        self.lbl_firwin_win2.setObjectName('wdg_lbl_firwin_win2')
-        self.led_firwin_win2 = QtGui.QLineEdit()
-        self.led_firwin_win2.setText("0.5")
-        self.led_firwin_win2.setObjectName('wdg_led_firwin_win2')
-        self.led_firwin_win2.setVisible(False)
-        self.lbl_firwin_win2.setVisible(False)
+        self.lbl_firwin_2 = QtGui.QLabel("b")
+        self.lbl_firwin_2.setObjectName('wdg_lbl_firwin_2')
+        self.led_firwin_2 = QtGui.QLineEdit()
+        self.led_firwin_2.setText("0.5")
+        self.led_firwin_2.setObjectName('wdg_led_firwin_2')
+        self.led_firwin_2.setVisible(False)
+        self.lbl_firwin_2.setVisible(False)
         
         self.wdg_firwin_win = QtGui.QWidget()
         self.wdg_firwin_win.setObjectName('wdg_firwin_win')
         self.layGWin = QtGui.QGridLayout()
         self.layGWin.setObjectName('wdg_layGWin')
         self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,4)
-        self.layGWin.addWidget(self.lbl_firwin_win1,1,0)
-        self.layGWin.addWidget(self.led_firwin_win1,1,1)
-        self.layGWin.addWidget(self.lbl_firwin_win2,1,2)
-        self.layGWin.addWidget(self.led_firwin_win2,1,3)
+        self.layGWin.addWidget(self.lbl_firwin_1,1,0)
+        self.layGWin.addWidget(self.led_firwin_1,1,1)
+        self.layGWin.addWidget(self.lbl_firwin_2,1,2)
+        self.layGWin.addWidget(self.led_firwin_2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
         self.wdg_firwin_win.setLayout(self.layGWin)
 
@@ -157,21 +158,27 @@ class firwin(object):
         self.cmb_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmb_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
-        self.cmb_firwin_win.activated.connect(self.updateWindow)
-        self.led_firwin_win1.editingFinished.connect(self.updateWindow)
-        self.led_firwin_win2.editingFinished.connect(self.updateWindow)   
-        
-        self.cmb_firwin_alg.activated.connect(self.updateWindow)
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.cmb_firwin_win.activated.connect(self.updateUI)
+        self.led_firwin_1.editingFinished.connect(self.updateUI)
+        self.led_firwin_2.editingFinished.connect(self.updateUI)
+        self.cmb_firwin_alg.activated.connect(self.updateUI)
 
-        self.updateWindow()
-        
+        self.updateUI()
 
-    def updateWindow(self):
+
+    def updateUI(self):
         """
+        Update UI when one of the comboboxes or line edits is changed
         """
+        self.firWindow = str(self.cmb_firwin_win.currentText()).lower()
+        self.alg = str(self.cmb_firwin_alg.currentText())
 
         mod_ = import_module('scipy.signal')
 #        mod = __import__('scipy.signal') # works, but not with the next line
+        
          # construct window class, e.g. scipy.signal.boxcar :
         class_ = getattr(mod_, self.firWindow)
         win_doc = getattr(class_, '__doc__') # read window docstring
@@ -194,20 +201,20 @@ class firwin(object):
         # one or two optional float parameters. If there are no additional 
         # parameters, just pass the name of the window.
         N_args = len(self.winArgs)
-        self.lbl_firwin_win1.setVisible(N_args > 0)
-        self.led_firwin_win1.setVisible(N_args > 0)
-        self.lbl_firwin_win2.setVisible(N_args > 1)
-        self.led_firwin_win2.setVisible(N_args > 1)
+        self.lbl_firwin_1.setVisible(N_args > 0)
+        self.led_firwin_1.setVisible(N_args > 0)
+        self.lbl_firwin_2.setVisible(N_args > 1)
+        self.led_firwin_2.setVisible(N_args > 1)
             
         if N_args > 1 :
-            self.lbl_firwin_win2.setText(self.winArgs[1])
+            self.lbl_firwin_2.setText(self.winArgs[1])
             self.firWindow = (self.firWindow,
-                                      float(self.led_firwin_win1.text()), 
-                                      float(self.led_firwin_win2.text()))
+                                      float(self.led_firwin_1.text()), 
+                                      float(self.led_firwin_2.text()))
         elif N_args > 0 :
-            self.lbl_firwin_win1.setText(self.winArgs[0])
+            self.lbl_firwin_1.setText(self.winArgs[0])
             self.firWindow = (self.firWindow,
-                                      float(self.led_firwin_win1.text()))
+                                      float(self.led_firwin_1.text()))
         #print(self.firWindow)           
 
     def loadEntries(self):
@@ -259,6 +266,7 @@ class firwin(object):
             fil_dict['N'] = self.N - 1 # yes, update filterbroker
         except AttributeError:
             pass
+        #fil_dict["wdg"] = self.firWindow
 
     def LPman(self, fil_dict):
         self.get_params(fil_dict)
