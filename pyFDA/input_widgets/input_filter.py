@@ -15,7 +15,19 @@ import sys, os
 from PyQt4 import QtGui
 
 # TODO: Add subwidgets, depending on filterSel parameters
-# TODO:  index = myComboBox.findText('item02') 
+# TODO: Switching back to Hilbert gives an error 
+"""Traceback (most recent call last):
+  File "D:\Daten\design\python\git\pyFDA\pyFDA\input_widgets\input_specs.py", line 155, in chooseDesignMethod
+    myParams = fb.filTree[rt][ft][dm][fo]['par']
+    TypeError: unhashable type: 'dict'
+"""
+    
+"""
+    self.setDesignMethod()
+  File "D:\Daten\design\python\git\pyFDA\pyFDA\input_widgets\input_filter.py", line 241, in setDesignMethod
+    = fb.filTree[self.rt][self.ft][dm].keys()[0]
+TypeError: 'dict_keys' object does not support indexing
+"""
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -88,7 +100,7 @@ class InputFilter(QtGui.QWidget):
         # see Summerfield p. 278
         self.layHDynWdg = QtGui.QHBoxLayout() # for additional dynamic subwidgets
         self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
-        
+        self.frmDynWdg.setObjectName("wdg_frmDynWdg")
         self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
         
         #Debugging: enable next line to show border of frmDnyWdg
@@ -193,7 +205,6 @@ class InputFilter(QtGui.QWidget):
         # is stored in comboBox.itemData        
         self.cmbDesignMethod.clear()
         
-        # TODO: The following line dumps a core when the key does not exist !!!
         for dm in fb.filTree[self.rt][self.ft]:
             self.cmbDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
                        
@@ -207,7 +218,7 @@ class InputFilter(QtGui.QWidget):
         # And has the widget been initialized?
         if fb.fil[0]['dm'] in dmList and self.filter_initialized:
             dm_idx = self.cmbDesignMethod.findText(fb.gD['dmNames'][fb.fil[0]['dm']])
-            print("dm_idx", dm_idx)
+#            print("dm_idx", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx) # yes, set same dm as before
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0  
@@ -251,17 +262,15 @@ class InputFilter(QtGui.QWidget):
         
         self.updateWidgets() # check for new subwidgets and update if needed
 
-        # reverse dictionary lookup
-        #key = [key for key,value in dict.items() if value=='value' ][0]
     def updateWidgets(self):
         """
         Delete dynamically created subwidgets and create new ones, depending
         on requirements of filter design algorithm
         """
         self._delWidgets()
-        if hasattr(fb.filObj, 'wdg'):
+        if hasattr(fb.filObj, 'wdg'): # has the filter object own dyn. widgets?
             try:
-                if 'sf' in fb.filObj.wdg:
+                if 'sf' in fb.filObj.wdg: # does select filter contain a dyn. widget?
                     a = getattr(fb.filObj, fb.filObj.wdg['sf'])
                     self.layHDynWdg.addWidget(a, stretch = 1)
                     self.layHDynWdg.setContentsMargins(0,0,0,0)
@@ -278,7 +287,8 @@ class InputFilter(QtGui.QWidget):
         widgetList = self.frmDynWdg.findChildren(
                                             (QtGui.QComboBox,QtGui.QLineEdit, 
                                              QtGui.QLabel, QtGui.QWidget))
-#       widgetListNames = [w.objectName() for w in widgetList]
+        widgetListNames = [w.objectName() for w in widgetList]
+        print("sf._delWidgets\n==============\n",widgetListNames, widgetList)
 
         for w in widgetList:
             self.layHDynWdg.removeWidget(w)   # remove widget from layout
