@@ -24,10 +24,11 @@ class InputAll(QtGui.QWidget):
     Create a tabbed widget for various input subwidgets
     """
     # class variables (shared between instances if more than one exists)
-    inputUpdated = pyqtSignal()  # emitted when input widget is updated
+    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
+    sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
 
 
-    def __init__(self, DEBUG = True):
+    def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG
         super(InputAll, self).__init__()
         css = """
@@ -39,10 +40,15 @@ class InputAll(QtGui.QWidget):
         self.setStyleSheet(css)
 
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)
+        self.inputSpecs.setObjectName("inputSpecs")
         self.inputFiles = input_files.InputFiles(DEBUG = False)
+        self.inputFiles.setObjectName("inputFiles")
         self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
+        self.inputCoeffs.setObjectName("inputCoeffs")
         self.inputPZ = input_pz.InputPZ(DEBUG = False)
+        self.inputPZ.setObjectName("inputPZ")
         self.inputInfo = input_info.InputInfo(DEBUG = False)
+        self.inputInfo.setObjectName("inputInfo")        
 
         self.initUI()
 
@@ -67,27 +73,36 @@ class InputAll(QtGui.QWidget):
         tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Expanding)
 
-        # ============== Signals & Slots ================================
-
-#        self.inputSpecs.fspecs.specsChanged.connect(self.updateAll)
-#        self.inputSpecs.filterDesigned.connect(self.updateAll)
-#        self.inputCoeffs.butUpdate.clicked.connect(self.updateAll)
-
-        self.inputSpecs.filterChanged.connect(self.inputInfo.showInfo)
-
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        # signal indicating that filter specs have changed, requiring update of
+        # plot widgets only:        
+        self.inputSpecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        # signal indicating that filter design has changed, requiring update of
+        # plot widgets and some input widgets:        
+        self.inputSpecs.sigFilterDesigned.connect(self.updateAll)
+        self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
+        self.inputPZ.sigFilterDesigned.connect(self.updateAll)
+        self.inputFiles.sigFilterDesigned.connect(self.updateAll)
+        #----------------------------------------------------------------------
 
 
     def updateAll(self):
         """ 
-        Update all input widgets that can / need to display new filter data.
-        This method is called from the main routine in pyFDA.py each time the 
-        filter design has been updated. 
+        - Update all input widgets that can / need to display new filter data,
+            accessing the central filter dict.
+        - Update all plot widgets via the signal 
         
-        The individual methods called below have to get updated info from the
-        central filter dict.
         """
+        if self.DEBUG: print("input_all.updateAll:\n",self.sender().objectName())
+        
+        self.inputInfo.showInfo()
+        self.inputSpecs.loadAll()
         self.inputCoeffs.showCoeffs()
         self.inputPZ.showZPK()
+
+        self.sigFilterDesigned.emit() # pyFDA -> plot_all -> ... all plot widgets
 
 #------------------------------------------------------------------------
 

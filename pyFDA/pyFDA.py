@@ -2,7 +2,7 @@
 """
 Created on Tue Nov 26 10:57:30 2013
 
-@author: Julia Beike, Christian Muenker und Michael Winkler
+@author: Julia Beike, Christian Muenker and Michael Winkler
 
 Mainwindow  for the pyFDA app, initializes UI
 """
@@ -47,10 +47,9 @@ class pyFDA(QtGui.QMainWindow):
         """
         
         # Instantiate widget groups
-        self.inputAll = input_all.InputAll() # input widgets
-        
-        #War früher 280px, aber dann gibt es in den Input Widgets Probleme mit der gesamten Darstellung
+        self.inputAll = input_all.InputAll() # input widgets        
         self.inputAll.setMaximumWidth(280) # comment out for splitter
+        
         self.pltAll = plot_all.PlotAll() # plot widgets
         
         # ============== UI Layout =====================================
@@ -119,21 +118,18 @@ class pyFDA(QtGui.QMainWindow):
 #        menubar = self.menuBar()
 #        fileMenu = menubar.addMenu('&About')
 #        fileMenu.addAction(aboutAction)
-#        
+
+#        self.statusMessage("Application is initialized.")
+       
 
         # ============== Signals & Slots ================================
-        self.inputAll.inputSpecs.fspecs.specsChanged.connect(self.updateOutput)
-        self.inputAll.inputSpecs.filterDesigned.connect(self.updateOutput)
-        self.inputAll.inputCoeffs.butSave.clicked.connect(self.updateOutput)
-        self.inputAll.inputPZ.butSave.clicked.connect(self.updateOutput)
-#        self.inputAll.inputUpdated.connect(self.updateOutput)
+
+        self.inputAll.sigFilterDesigned.connect(self.pltAll.updateAll)
+
+        self.inputAll.sigSpecsChanged.connect(self.pltAll.updateSpecs)
+        
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
-        self.statusMessage("Application is initialized.")
-
-    def updateOutput(self):
-        self.inputAll.updateAll() # input widgets re-read 'coeffs' / 'zpk'
-        self.pltAll.updateAll()
 
     def aboutWindow(self):
         QtGui.QMessageBox.about(self, "About pyFDA",
@@ -142,9 +138,10 @@ class pyFDA(QtGui.QMainWindow):
         )
 
     def statusMessage(self, message):
+        """
+        Display a message in the statusbar.
+        """
         self.statusBar().showMessage(message)
-        
-
 
 #------------------------------------------------------------------------------
 

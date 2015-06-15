@@ -167,8 +167,15 @@ class firwin(object):
         
 
     def updateWindow(self):
+<<<<<<< HEAD
+        self.firWindow = str(self.cmb_firwin_win.currentText()).lower()
+        self.alg = str(self.cmb_firwin_alg.currentText())
+=======
         """
         """
+        self.firWindow = str(self.combo_firwin_win.currentText()).lower()
+        self.alg = str(self.combo_firwin_alg.currentText())
+>>>>>>> origin/master
 
         mod_ = import_module('scipy.signal')
 #        mod = __import__('scipy.signal') # works, but not with the next line
@@ -196,18 +203,22 @@ class firwin(object):
         N_args = len(self.winArgs)
         self.lbl_firwin_win1.setVisible(N_args > 0)
         self.led_firwin_win1.setVisible(N_args > 0)
+<<<<<<< HEAD
+        if N_args > 0 :
+            self.lbl_firwin_win1.setText(self.winArgs[0])
+            self.firWindow = (str(self.cmb_firwin_win.currentText()).lower(),
+                                      float(self.led_firwin_win1.text()))
+=======
         self.lbl_firwin_win2.setVisible(N_args > 1)
         self.led_firwin_win2.setVisible(N_args > 1)
+>>>>>>> origin/master
             
         if N_args > 1 :
             self.lbl_firwin_win2.setText(self.winArgs[1])
-            self.firWindow = (self.firWindow,
-                                      float(self.led_firwin_win1.text()), 
-                                      float(self.led_firwin_win2.text()))
-        elif N_args > 0 :
-            self.lbl_firwin_win1.setText(self.winArgs[0])
-            self.firWindow = (self.firWindow,
-                                      float(self.led_firwin_win1.text()))
+<<<<<<< HEAD
+            self.firWindow = (str(self.cmb_firwin_win.currentText()).lower(),
+                float(self.led_firwin_win1.text()), 
+                float(self.led_firwin_win2.text()))
         #print(self.firWindow)           
 
     def loadEntries(self):
@@ -223,6 +234,28 @@ class firwin(object):
         """
         pass
 #        fb.fil[0][]
+            
+    def deleteWidget(self):
+        """
+        Delete all dynamically created subwidgets
+        When changing e.g. from LP to HP, Runtime Error occurs: 
+        
+            self.layHDynWdg.addWidget(a, stretch = 1)
+        RuntimeError: wrapped C/C++ object of type QWidget has been deleted
+        """
+        pass          
+
+=======
+            self.firWindow = (self.firWindow,
+                                      float(self.led_firwin_win1.text()), 
+                                      float(self.led_firwin_win2.text()))
+        elif N_args > 0 :
+            self.lbl_firwin_win1.setText(self.winArgs[0])
+            self.firWindow = (self.firWindow,
+                                      float(self.led_firwin_win1.text()))
+        #print(self.firWindow)           
+
+>>>>>>> origin/master
 
     def get_params(self, fil_dict):
         """

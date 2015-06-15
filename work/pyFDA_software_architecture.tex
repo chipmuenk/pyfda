@@ -71,8 +71,9 @@ pyFDA has been written to be extensible and modular, easing the addition of own 
 
 This has (hopefully) been achieved with two central ideas:
 \begin{description}
-\item[A central global dictionary:] The file \textbt{filterbroker.py} with module-level attributes (dictionaries) is imported by all files that need to store and exchange parameters, filter designs etc. (\url{https://docs.python.org/3/faq/programming.html#how-do-i-share-global-variables-across-modules})
-\item[Dynamically imported design files:] A tree with all available filter design classes and characteristics is built at the start of the program from all files in the \textt{filter_widgets} directory. The actual classes with the design algorithms are imported dynamically when needed, the GUI is adapted according to the parameters defined in each filter design class. Additional widgets can be defined in the design class.
+\item[Data persistence in a central global dictionary:] The file \textbt{filterbroker.py} with module-level attributes (dictionaries) is imported by all files that need to store and exchange parameters, filter designs etc. (\url{https://docs.python.org/3/faq/programming.html#how-do-i-share-global-variables-across-modules}). This global dictionary is also saved to / loaded from disk using (c)Pickle.
+\item[Hierarchical signaling:] As the number of input, plot and design widgets increases, it gets harder to track when which widgets need to be updated. Hence, the information is collected at each hierarchical level and propagated upwards resp. received and distributed downwards.
+\item[Dynamically imported design files:] A tree with all available filter design classes and characteristics is built at the start of the program from all files in the \texttt{filter\_widgets} directory. The actual classes with the design algorithms are imported dynamically when needed, the GUI is adapted according to the parameters defined in each filter design class. Additional widgets can be defined in the design class.
 \end{description}
 \subsection{Class Structure and Hierarchy}
 The following graphics have been created from the top directory using \textbt{pyreverse} and some post-processing with LibreOffice (and they are only readable when zoomed in):
@@ -145,6 +146,8 @@ spcXXX:	&QSpacerItem\\
 layVXXX: &QVBoxLayout\\
 layHXXX: &QHBoxLayout\\
 layGXXX: &QGridLayout\\
+\textbf{QtCore}
+sigXXX &Signals\\
 \end{tabular}
 
 \subsection{simpleeval}
@@ -153,7 +156,33 @@ layGXXX: &QGridLayout\\
 
 \section{Plot Widgets}
 
-\section{Filter Objects}
+\section{Signaling}
+When a filter design has been changed, this information is propagated through the hierarchy to various input and plot widgets using Qt's signal-slot mechanism. 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width = \textwidth]{pyFDA_signals}
+\caption{Signaling across hierarchies in pyFDA}
+\end{figure}
+
+
+Individual widgets generate signals when the filter specs have been changed or a new filter has been designed:
+\begin{lstlisting}[style = pySnippet]{}
+from PyQt4.QtCore import pyqtSignal
+...
+class MyTopClass(QtGui.QWidget):
+
+	sigSpecsChanged  = pyqtSignal()
+	sigFilterDesigned = pyqtSignal()
+		...	
+		def myInputWidget(self):
+				self.sigSpecsChanged.emit()
+				self.sigFilterDesigned.emit()
+\end{lstlisting}
+
+where \textbt{sigSpecsChanged} signifies that specifications have been changed (no replot necessary) and \textbt{sigFilterDesigned} that the filter design is finished.
+
+\section{Filter Design Objects}
 The structure of a filter file and the attributes and methods that need to be provided are described in this section.
 
 When starting pyFDA, \texttt{filter\_tree\_builder.py} is run, extracting the relevant information from all *.py files found in the subdirectory filter\_design and building a hierachical tree in \texttt{filter\_broker.py}. 

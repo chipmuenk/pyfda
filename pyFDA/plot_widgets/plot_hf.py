@@ -207,7 +207,7 @@ class PlotHf(QtGui.QMainWindow):
             F_lim_lor = [F_PB2, F_PB2, F_max]
             A_lim_lor = [A_PB_minx, A_PB2_min, A_PB2_min]
 
-        if fb.fil[0]['rt'] == "BP":
+        if fb.fil[0]['rt'] in {"BP", "HIL"}:
             F_lim_up = [0,    F_SB, F_SB,     F_SB2,    F_SB2, F_max]
             A_lim_up = [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2]
             F_lim_lo = [F_PB,      F_PB,     F_PB2,    F_PB2]

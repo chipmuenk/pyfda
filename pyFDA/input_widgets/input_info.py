@@ -11,6 +11,7 @@ import sys, os
 import textwrap
 from PyQt4 import Qt, QtGui, QtWebKit
 from docutils.core import publish_string #, publish_parts
+import pprint
 import numpy as np
 from numpy import pi, log10
 import scipy.signal as sig
@@ -25,6 +26,7 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 # TODO: Setting the cursor position doesn't work yet
 # TODO: Docstrings cannot be displayed with Py3:
 #       Line 113: QTextEdit.append(str): argument 1 has unexpected type 'bytes'
+# TODO: Passband and stopband info should be separated, showing min / max values
 class InputInfo(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -35,7 +37,6 @@ class InputInfo(QtGui.QWidget):
 
         self.initUI()
         self.showInfo()
-        self.showFiltPerf()
 
     def initUI(self):
         """
@@ -44,16 +45,14 @@ class InputInfo(QtGui.QWidget):
         - A large text window for displaying infos about the filter design
           algorithm
         """
-        self.chkFiltPerf = QtGui.QCheckBox()
+        self.chkFiltPerf = QtGui.QCheckBox("H(f)")
         self.chkFiltPerf.setChecked(True)
-        self.chkFiltPerf.setToolTip("Display filter performance at test frequencies.")
-        self.lblFiltPerf = QtGui.QLabel("Performance")
-
+        self.chkFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
         self.txtFiltPerf = QtGui.QTextBrowser()
+        self.txtFiltDict = QtGui.QTextBrowser()
 
         self.tblFiltPerf = QtGui.QTableWidget()
-#        self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
         self.tblFiltPerf.setAlternatingRowColors(True)
         self.tblFiltPerf.verticalHeader().setVisible(False)
 #        self.tblCoeff.QItemSelectionModel.Clear
@@ -67,50 +66,57 @@ class InputInfo(QtGui.QWidget):
 #        self.txtFiltPerf.setSizePolicy(QtGui.QSizePolicy.Minimum,
 #                                          QtGui.QSizePolicy.Expanding)
         # widget / subwindow for filter infos
-        self.chkDocstring = QtGui.QCheckBox()
+        self.chkDocstring = QtGui.QCheckBox("Doc$")
         self.chkDocstring.setChecked(False)
         self.chkDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.lblDocstring = QtGui.QLabel()
-        self.lblDocstring.setText("Docstring")
-
-        self.chkRichText = QtGui.QCheckBox()
+        self.chkRichText = QtGui.QCheckBox("RTF")
         self.chkRichText.setChecked(True)
         self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.lblRichText = QtGui.QLabel()
-        self.lblRichText.setText("RTF")
-
         self.txtFiltInfoBox = QtGui.QTextBrowser()
-        self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.Minimum,
+        self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
                                           QtGui.QSizePolicy.Expanding)
+                                          
+        self.chkFiltDict = QtGui.QCheckBox("FiltDict")
+        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")
+
+        self.txtFiltDict = QtGui.QTextBrowser()
+        self.txtFiltDict.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                          QtGui.QSizePolicy.Expanding)
+
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkFiltPerf)
-        self.layHChkBoxes.addWidget(self.lblFiltPerf)
-
         self.layHChkBoxes.addStretch(10)
-
         self.layHChkBoxes.addWidget(self.chkDocstring)
-        self.layHChkBoxes.addWidget(self.lblDocstring)
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkRichText)
-        self.layHChkBoxes.addWidget(self.lblRichText)
-
         self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addWidget(self.chkFiltDict)
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
         layVMain.addWidget(self.tblFiltPerf)
         layVMain.addWidget(self.txtFiltInfoBox)
+        layVMain.addWidget(self.txtFiltDict)
 #        layVMain.addStretch(10)
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
         self.chkFiltPerf.clicked.connect(self.showFiltPerf)
-        self.chkDocstring.clicked.connect(self.showInfo)
-        self.chkRichText.clicked.connect(self.showInfo)
+        self.chkFiltDict.clicked.connect(self.showFiltDict)
+        self.chkDocstring.clicked.connect(self.showDocs)
+        self.chkRichText.clicked.connect(self.showDocs)
+
+    def showInfo(self):
+        """
+        update docs and filter performance
+        """
+        self.showDocs()
+        self.showFiltPerf()
+        self.showFiltDict()
 
     def showFiltPerf(self):
         """
@@ -123,13 +129,34 @@ class InputInfo(QtGui.QWidget):
 
         f_S  = fb.fil[0]['f_S']
 
-        F_test_lbl = [l for l in fb.fil[0] if l[0] == 'F']
-        F_test = np.array([fb.fil[0][l] for l in F_test_lbl]) * f_S
+        # Build a list with all frequency related labels:
+        #--------------------------------------------------------------------
+        # First, extract the dicts for min / man filter order of the selected
+        # design method from filter tree:
+        fil_dict = fb.filTree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['dm']]
+        # Now, extract the parameter lists (key 'par'), yielding a nested list:
+        fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
+        # Finally, flatten the list of lists and convert it into a set to 
+        # eliminate double entries:
+        fil_set = set([item for sublist in fil_list for item in sublist])
+        # extract all labels starting with 'F':
+        F_test_lbls = [lbl for lbl in fil_set if lbl[0] == 'F']
+        # construct a list of lists [frequency, label], sorted by frequency:
+        F_test = sorted([[fb.fil[0][lbl]*f_S, lbl] for lbl in F_test_lbls])
 
-#        F_test = np.array([0, F_sig, 0.5]) # Vektor mit Testfrequenzen
+        # construct a list of lists consisting of [label, frequency]:
+        # F_test = [[lbl, fb.fil[0][lbl]*f_S] for lbl in F_test_lbls]
+        ## sort list of tuples using the LAST element of the tuple (= frequency)
+        # F_test = sorted(F_test, key=lambda t: t[::-1])
 
-        # Berechne Frequenzantwort bei Testfrequenzen und gebe sie aus:
-        [w_test, H_test] = sig.freqz(bb, aa, F_test * 2.0 * pi)
+        if self.DEBUG: print("input_info.showFiltPerf\nF_test = ", F_test)
+
+
+        # Vector with test frequencies of the labels above    
+        F_test_vals = np.array([item[0] for item in F_test]) * f_S
+        F_test_lbls = [item[1] for item in F_test]
+        # Calculate frequency response at test frequencies and over the whole range:
+        [w_test, H_test] = sig.freqz(bb, aa, F_test_vals * 2.0 * pi)
         [w, H] = sig.freqz(bb, aa)
 
         f = w  * f_S / (2.0 * pi)
@@ -142,12 +169,12 @@ class InputInfo(QtGui.QWidget):
         H_min_dB = 20*log10(H_min)
         F_min = f[np.argmin(H_abs)]
 
-        F_test_lbl += ['Minimum','Maximum']
-        F_test = np.append(F_test, [F_min, F_max])
+        F_test_lbls += ['Min.','Max.']
+        F_test_vals = np.append(F_test_vals, [F_min, F_max])
         H_test = np.append(H_test, [H_min, H_max])
         if self.DEBUG:
             print("input_info.showFiltPerf\n===================H_test", H_test)
-            print("F_test", F_test)
+            print("F_test", F_test_vals)
 #        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
 
         self.tblFiltPerf.setRowCount(len(H_test))
@@ -155,8 +182,8 @@ class InputInfo(QtGui.QWidget):
 
         self.tblFiltPerf.setHorizontalHeaderLabels(['Test Case', 'f(Hz)','|H(f)|','|H(f)| (dB)'])
         for row in range(len(H_test)):
-            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbl[row]))
-            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test[row]))))
+            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbls[row]))
+            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]))))
             self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
             self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str('%2.3f'%(20*log10(abs(H_test[row]))))))
 
@@ -164,22 +191,7 @@ class InputInfo(QtGui.QWidget):
         self.tblFiltPerf.resizeRowsToContents()
 
 
-        if self.DEBUG:
-            print('============ Filter Characteristics ================\n'
-                '  Test Case  |  f (Hz)    |   |H(f)|   | |H(f)| (dB)')
-            print('----------------------------------------------------')
-    
-            for i in range(len(H_test)):
-                print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f}'\
-                    .format(F_test_lbl[i], f[i], abs(H_test[i]),
-                            20*log10(abs(H_test[i]))))
-            print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
-                .format('Maximum', F_max, H_max, H_max_dB))
-            print('{0:12} | {1:10.3f} | {2:10.6f} | {3:9.4f} '\
-                .format('Minimum', F_min, H_min, H_min_dB))
-
-
-    def showInfo(self):
+    def showDocs(self):
         """
         Display info from filter design file and docstring
         """
@@ -223,8 +235,21 @@ class InputInfo(QtGui.QWidget):
         """
         lines = doc.splitlines()
         result = lines[0].lstrip() +\
-         "\n" + textwrap.dedent("\n".join(lines[1:]))# + '\n'
+         "\n" + textwrap.dedent("\n".join(lines[1:]))
         return result
+
+    def showFiltDict(self):
+        """
+        Print filter dict for debugging
+        """
+        self.txtFiltDict.setVisible(self.chkFiltDict.isChecked())
+
+        fb_sorted = [str(key) +' : '+ str(fb.fil[0][key]) for key in sorted(fb.fil[0].keys())]
+        dictstr = pprint.pformat(fb_sorted)
+#        dictstr = pprint.pformat(fb.fil[0])
+        self.txtFiltDict.setText(dictstr)
+
+#        pprint.pprint(fb.fil[0])
         
         
 #app = QtGui.QApplication([])

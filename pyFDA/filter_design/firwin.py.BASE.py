@@ -22,14 +22,14 @@ if __name__ == "__main__":
     import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
-
-import filterbroker as fb # importing filterbroker initializes all its globals
+    import filterbroker as fb # importing filterbroker initializes all its globals
+    
 import pyfda_lib
 
 
-# TODO: Order of A_XX is incorrect for BP and BS
+# TODO: Order of A_XX is incorrect e.g. for BP
 # TODO: Hilbert not working correctly yet
-# TODO: Windows need to be saved / read from dictionary
+# TODO: Windows with parameters are missing
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
@@ -41,8 +41,9 @@ class firwin(object):
 #        print(scipy.signal.windows.boxcar.__doc__)
 
         # common messages for all man. / min. filter order response types:
-        msg_man = (r"Enter desired order and <b>-6 dB</b> pass band corner "
-                    "frequencies.")
+        msg_man = (r"Enter desired order and corner frequencies. <br />"
+                    "<b>Note: </b> Corner frequencies are <b>-6 dB</b> "
+                    " frequencies.")
         msg_min = ("Enter the maximum pass band ripple, minimum stop band "
                     "attenuation and the corresponding corner frequencies.")
 
@@ -55,7 +56,7 @@ class firwin(object):
         enb_min = ['fo','fspecs','aspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_PB'] # enabled widget for man. filt. order
+        par_man = ['N', 'f_S'] # enabled widget for man. filt. order
         par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
 
         # Common data for all man. / min. filter order response types:
@@ -65,86 +66,77 @@ class firwin(object):
                     "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":[]},
+            "LP": {"man":{"par":['F_PB','F_SB','A_PB','A_SB']},
                    "min":{"par":['F_PB','F_SB']}},
-            "HP": {"man":{"par":[],
+            "HP": {"man":{"par":['F_SB','F_PB','A_SB','A_PB'],
                           "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
                    "min":{"par":['F_SB','F_PB']}},
-            "BP": {"man":{"par":['F_PB2']},
-                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
-            "BS": {"man":{"par":['F_PB2'],
+            "BP": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+                                 'A_SB','A_PB','A_SB2']},
+                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+                                 'A_SB2']}},
+            "BS": {"man":{"par":['F_PB', 'F_SB', 'F_SB2', 'F_PB2',
+                                 'A_PB','A_SB','A_PB2'],
                       "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
                    "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
 #            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
           #"DIFF":
                    }
-        self.hdl = None
-        
         self.info = """Windowed FIR filters are designed by truncating the
         infinite impulse response of an ideal filter with a window function.
-        The kind of used window has strong influence on ripple etc. of the
+        The kind of selected window has great influence on ripple etc. of the
         resulting filter.
         """
         #self.info_doc = [] is set in self.updateWindow()
-        
-        # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = {'fo':'cmb_firwin_alg', 'sf':'wdg_firwin_win'}
         
         self.initUI()
 
         
     def initUI(self):
         
-        # Additional subwidgets needed for filter design:
+        # Additional subwidgets needed for design:
         # These subwidgets are instantiated where needed using the handle to
         # the filter object
 
-
+        self.wdg = {'fo':'combo_firwin_alg', 'sf':'wdg_firwin_win'}
         # Combobox for selecting the algorithm to estimate minimum filter order
-        self.cmb_firwin_alg = QtGui.QComboBox()
-        self.cmb_firwin_alg.setObjectName('wdg_cmb_firwin_alg')
-        self.cmb_firwin_alg.addItems(['ichige','kaiser','herrmann'])
+        self.combo_firwin_alg = QtGui.QComboBox()
+        self.combo_firwin_alg.setObjectName('combo_firwin_alg')
+        self.combo_firwin_alg.addItems(['ichige','kaiser','herrmann'])
 
         # Combobox for selecting the window used for filter design
-        self.cmb_firwin_win = QtGui.QComboBox()
-        self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
+        self.combo_firwin_win = QtGui.QComboBox()
+        self.combo_firwin_win.setObjectName('combo_firwin_win')
 
         windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
-                   'Boxcar','Chebwin','Cosine','Flattop','General_Gaussian',
-                   'Gaussian','Hamming','Hann','Kaiser','Nuttall','Parzen',
-                   'Slepian','Triang']
+                   'Boxcar','Chebwin','Flattop','General_Gaussian','Gaussian',
+                   'Hamming','Hann','Kaiser','Nuttall','Parzen','Slepian','Triang']
 
-        # kaiser - needs beta
-        # gaussian needs std
-        # general_gaussian - needs power, width
-        # slepian - needs width
-        # chebwin - needs attenuation
+        #kaiser (needs beta), gaussian (needs std), general_gaussian
+        #(needs power, width), slepian (needs width), chebwin (needs attenuation)
 
-        self.cmb_firwin_win.addItems(windows)
-        win_idx = self.cmb_firwin_win.findText('Boxcar')
-        self.cmb_firwin_win.setCurrentIndex(win_idx)
+        self.combo_firwin_win.addItems(windows)
+        win_idx = self.combo_firwin_win.findText('Boxcar')
+        self.combo_firwin_win.setCurrentIndex(win_idx)
         
         self.lbl_firwin_win1 = QtGui.QLabel("a")
-        self.lbl_firwin_win1.setObjectName('wdg_lbl_firwin_win1')
         self.led_firwin_win1 = QtGui.QLineEdit()
         self.led_firwin_win1.setText("0.5")
-        self.led_firwin_win1.setObjectName('wdg_led_firwin_win1')
+        self.led_firwin_win1.setObjectName('led_firwin_win1')
         self.lbl_firwin_win1.setVisible(False)
         self.led_firwin_win1.setVisible(False)
                
         self.lbl_firwin_win2 = QtGui.QLabel("b")
-        self.lbl_firwin_win2.setObjectName('wdg_lbl_firwin_win2')
         self.led_firwin_win2 = QtGui.QLineEdit()
         self.led_firwin_win2.setText("0.5")
-        self.led_firwin_win2.setObjectName('wdg_led_firwin_win2')
+        self.led_firwin_win2.setObjectName('led_firwin_win2')
         self.led_firwin_win2.setVisible(False)
         self.lbl_firwin_win2.setVisible(False)
         
         self.wdg_firwin_win = QtGui.QWidget()
         self.wdg_firwin_win.setObjectName('wdg_firwin_win')
         self.layGWin = QtGui.QGridLayout()
-        self.layGWin.setObjectName('wdg_layGWin')
-        self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,4)
+        self.layGWin.addWidget(self.combo_firwin_win,0,0,1,4)
         self.layGWin.addWidget(self.lbl_firwin_win1,1,0)
         self.layGWin.addWidget(self.led_firwin_win1,1,1)
         self.layGWin.addWidget(self.lbl_firwin_win2,1,2)
@@ -152,28 +144,27 @@ class firwin(object):
         self.layGWin.setContentsMargins(0,0,0,0)
         self.wdg_firwin_win.setLayout(self.layGWin)
 
-        # Basic size of cmbboxes is minimum, this can be changed in the 
+        # Basic size of comboboxes is minimum, this can be changed in the 
         # upper hierarchy level using layouts
-        self.cmb_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmb_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.combo_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.combo_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
-        self.cmb_firwin_win.activated.connect(self.updateWindow)
+        self.combo_firwin_win.activated.connect(self.updateWindow)
         self.led_firwin_win1.editingFinished.connect(self.updateWindow)
         self.led_firwin_win2.editingFinished.connect(self.updateWindow)   
         
-        self.cmb_firwin_alg.activated.connect(self.updateWindow)
+        self.combo_firwin_alg.activated.connect(self.updateWindow)
 
         self.updateWindow()
         
 
     def updateWindow(self):
-        """
-        """
+        self.firWindow = str(self.combo_firwin_win.currentText()).lower()
+        self.alg = str(self.combo_firwin_alg.currentText())
 
         mod_ = import_module('scipy.signal')
 #        mod = __import__('scipy.signal') # works, but not with the next line
-         # construct window class, e.g. scipy.signal.boxcar :
-        class_ = getattr(mod_, self.firWindow)
+        class_ = getattr(mod_, self.firWindow) # instantiate window class
         win_doc = getattr(class_, '__doc__') # read window docstring
         
         self.info_doc = []
@@ -185,44 +176,39 @@ class firwin(object):
         
         self.winArgs = inspect.getargspec(class_)[0] # return args of window
         # and remove standard args for all window types 'sym' and 'M':
-        self.winArgs = [arg for arg in self.winArgs if arg not in {'sym', 'M'}]
+        self.winArgs = [k for k in self.winArgs if k not in {'sym', 'M'}]
         #print(self.winArgs)
-
+        N_args = len(self.winArgs)
+        self.win_params = ""
 
         # make edit boxes for additional parameters visible if needed
-        # and construct tuples consisting of a string with the window name and
-        # one or two optional float parameters. If there are no additional 
-        # parameters, just pass the name of the window.
-        N_args = len(self.winArgs)
         self.lbl_firwin_win1.setVisible(N_args > 0)
         self.led_firwin_win1.setVisible(N_args > 0)
-        self.lbl_firwin_win2.setVisible(N_args > 1)
-        self.led_firwin_win2.setVisible(N_args > 1)
+        if N_args > 0 :
+            self.lbl_firwin_win1.setText(self.winArgs[0])
+            self.firWindow = (str(self.combo_firwin_win.currentText()).lower(),
+                                      float(self.led_firwin_win1.text()))
             
+        self.lbl_firwin_win2.setVisible(len(self.winArgs) > 1)
+        self.led_firwin_win2.setVisible(len(self.winArgs) > 1)
         if N_args > 1 :
             self.lbl_firwin_win2.setText(self.winArgs[1])
-            self.firWindow = (self.firWindow,
-                                      float(self.led_firwin_win1.text()), 
-                                      float(self.led_firwin_win2.text()))
-        elif N_args > 0 :
-            self.lbl_firwin_win1.setText(self.winArgs[0])
-            self.firWindow = (self.firWindow,
-                                      float(self.led_firwin_win1.text()))
+            self.firWindow = (str(self.combo_firwin_win.currentText()).lower(),
+                float(self.led_firwin_win1.text()), 
+                float(self.led_firwin_win2.text()))
         #print(self.firWindow)           
 
-    def loadEntries(self):
+            
+    def deleteWidget(self):
         """
-        Reload window selection and parameters from filter dictionary.
+        Delete all dynamically created subwidgets
+        When changing e.g. from LP to HP, Runtime Error occurs: 
+        
+            self.layHDynWdg.addWidget(a, stretch = 1)
+        RuntimeError: wrapped C/C++ object of type QWidget has been deleted
         """
-        pass
+        pass          
 
-    def storeEntries(self):
-        """
-        Store window selection and parameter settings (if any) in filter
-        dictionary.
-        """
-        pass
-#        fb.fil[0][]
 
     def get_params(self, fil_dict):
         """
@@ -243,7 +229,7 @@ class firwin(object):
         self.A_SB2 = 10.**(-fil_dict['A_SB2']/20.)
 
 #        self.alg = 'ichige' # algorithm for determining the minimum order
-#        self.alg = self.cmb_firwin_alg.currentText()
+#        self.alg = self.combo_firwin_alg.currentText()
 #        print("===== firwin ====\n", self.alg)
 #        print(self.firWindow)
 
@@ -288,7 +274,7 @@ class firwin(object):
     def BPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
-                            window = self.firWindow, pass_zero=False, nyq = 0.5))
+                                    window = self.firWindow, pass_zero=False))
 
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
@@ -300,7 +286,7 @@ class firwin(object):
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
+        self.save(fil_dict, sig.firwin(self.N, [self.F_SB, self.F_SB2],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
     def BSmin(self, fil_dict):

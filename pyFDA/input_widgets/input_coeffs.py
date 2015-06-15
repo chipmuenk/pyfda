@@ -8,12 +8,9 @@ Tab-Widget for displaying and modifying filter coefficients
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
-#import scipy.io
 import numpy as np
-#from scipy.signal import tf2zpk
-
 
 # https://github.com/danthedeckie/simpleeval
 
@@ -41,7 +38,7 @@ class InputCoeffs(QtGui.QWidget):
     Create widget for viewing / editing / entering data
     """
         # class variables (shared between instances if more than one exists)
-    coeffsChanged = pyqtSignal()  # emitted when coeffs have been changed
+    sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
                                     # manually
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
@@ -271,7 +268,7 @@ class InputCoeffs(QtGui.QWidget):
             print("Coeffs - b,a:", fb.fil[0]["ba"])
             print ("Coeffs updated!")
 
-        self.coeffsChanged.emit()  # ->pyFDA -> pltAll.updateAll()
+        self.sigFilterDesigned.emit()  # -> input_all -> pyFDA -> pltAll.updateAll()
 
     def showCoeffs(self):
         """

@@ -22,7 +22,6 @@ import filterbroker as fb
 
 from input_widgets import (input_filter, input_order, input_amp_specs,
                            input_freq_specs, input_weight_specs, input_target_specs)
-#from plot_widgets import plot_all
 
 
 class InputSpecs(QtGui.QWidget):
@@ -30,8 +29,8 @@ class InputSpecs(QtGui.QWidget):
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    filterDesigned = pyqtSignal()  # emitted when filter has been designed
-    filterChanged = pyqtSignal()
+    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
+    sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
 
     def __init__(self, DEBUG = True):
         super(InputSpecs, self).__init__()
@@ -48,9 +47,9 @@ class InputSpecs(QtGui.QWidget):
         """
         Create all widgets:
 
-        sf : Select Filter with response type rt (LP, ...),
+        selfil : Select Filter with response type rt (LP, ...),
               filter type ft (IIR, ...), and design method dm (cheby1, ...)
-        fo : Filter Order (numeric or 'min')
+        filord : Filter Order (numeric or 'min')
         fspecs : Frequency Specifications
         ms : Magnitude Specifications with the subwidgets
             txt : only text field for comments / instruction
@@ -59,17 +58,17 @@ class InputSpecs(QtGui.QWidget):
 
         """
 
-        self.sf = input_filter.InputFilter(DEBUG = False)
-        self.fo = input_order.InputOrder(DEBUG = False)
+        self.selfil = input_filter.InputFilter(DEBUG = False)
+        self.filord = input_order.InputOrder(DEBUG = False)
         # subwidget for Frequency Specs
-        self.fspecs = input_freq_specs.InputFreqSpecs(fil_dict = fb.fil[0],
-                    DEBUG = False)
+        self.fspecs = input_freq_specs.InputFreqSpecs(DEBUG = False)
+        self.fspecs.setObjectName("freqSpecs")
         # subwidget for Amplitude Specs
-        self.aspecs = input_amp_specs.InputAmpSpecs(fil_dict = fb.fil[0],
-                    DEBUG = False)
+        self.aspecs = input_amp_specs.InputAmpSpecs(DEBUG = False)
+        self.aspecs.setObjectName("ampSpecs")
         # subwidget for Weight Specs
-        self.wspecs = input_weight_specs.InputWeightSpecs(fil_dict = fb.fil[0],
-                    DEBUG = False)
+        self.wspecs = input_weight_specs.InputWeightSpecs(DEBUG = False)
+        self.wspecs.setObjectName("weightSpecs")
 
 #TODO: get target specs up and running
         #self.tspecs = input_target_specs.InputTargetSpecs(fil_dict = fb.fil[0],
@@ -101,8 +100,8 @@ class InputSpecs(QtGui.QWidget):
         """
         spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
-        layGMain.addWidget(self.sf,0,0,1,2)  # Design method (IIR - ellip, ...)
-        layGMain.addWidget(self.fo,1,0,1,2)  # Filter order
+        layGMain.addWidget(self.selfil,0,0,1,2)  # Design method (IIR - ellip, ...)
+        layGMain.addWidget(self.filord,1,0,1,2)  # Filter order
         layGMain.addWidget(self.fspecs,2,0,1,2)  # Freq. specifications
         layGMain.addWidget(self.aspecs,3,0)   # Amplitude specs
         layGMain.addWidget(self.wspecs,3,1)   # Weight specs
@@ -118,21 +117,27 @@ class InputSpecs(QtGui.QWidget):
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
-        # Call chooseDesignMethod every time filter selection is changed:
-        self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
-        self.sf.cmbResponseType.activated.connect(self.chooseDesignMethod)
-        self.sf.cmbFilterType.activated.connect(self.chooseDesignMethod)
-        self.sf.cmbDesignMethod.activated.connect(self.chooseDesignMethod)
-#        self.fo.chkMin.clicked.connect(self.chooseDesignMethod)
+        # Call updateUI every time filter (order) method is changed
+        # updateUI emits sigFilterChanged when it's finished
+        self.filord.sigSpecsChanged.connect(self.updateAllUIs)  
+        self.selfil.sigSpecsChanged.connect(self.updateAllUIs)  
+        
+        self.fspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        self.aspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        self.wspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
-        self.butReadFiltTree.clicked.connect(self.sf.ftb.initFilters)
+        self.butReadFiltTree.clicked.connect(self.selfil.ftb.initFilters)
+        #----------------------------------------------------------------------
 
-        self.chooseDesignMethod() # first time initialization
+        self.updateAllUIs() # first time initialization
 
-    def chooseDesignMethod(self):
+
+#------------------------------------------------------------------------------
+    def updateAllUIs(self):
         """
         This method is called every time filter design method or order 
-        (min / man) have been changed. At this time, the actual filter object instance 
+        (min / man) is changed. At this time, the actual filter object
         instance has been created from design method and order 
         (e.g. 'cheby1', 'min') in input_filter.py. Its handle has been stored
         in fb.filobj.
@@ -143,16 +148,15 @@ class InputSpecs(QtGui.QWidget):
         widgets are visible and which message shall be displayed.
         
         Then, all subwidgets are recreated and finally the signal 
-        'filterChanged' is emitted.
+        'sigSpecsChanged' is emitted.
         """
-
 
         # Read freq / amp / weight labels for current filter design
         rt = fb.fil[0]['rt']
         ft = fb.fil[0]['ft']
         dm = fb.fil[0]['dm']
         fo = fb.fil[0]['fo']
-        myParams = fb.filTree[rt][ft][dm][fo]['par']
+        myParams = fb.filTree[rt][ft][dm][fo]['par'] # all parameters e.g. 'F_SB'
         myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
         myMsg    = fb.filTree[rt][ft][dm][fo]['msg'] # message
 
@@ -168,39 +172,60 @@ class InputSpecs(QtGui.QWidget):
             print('freqLabels:', self.freqParams)
             print('weightLabels:', self.weightParams)
 
-        # pass new labels to widgets
+        # pass new labels to widgets and recreate UI
         # set widgets invisible if param list is empty
-        self.fo.updateEntries()
-        self.fspecs.setEntries(newLabels = self.freqParams) # update frequency spec labels
+        self.filord.loadEntries()
+        
+        self.fspecs.updateUI(newLabels = self.freqParams)
+        
         self.aspecs.setVisible(self.ampParams != [])
         self.aspecs.setEnabled("aspecs" in myEnbWdg)
-        self.aspecs.setEntries(newLabels = self.ampParams)
+        self.aspecs.updateUI(newLabels = self.ampParams)
+        
         self.wspecs.setVisible(self.weightParams != [])
         self.wspecs.setEnabled("wspecs" in myEnbWdg)
-        self.wspecs.setEntries(newLabels = self.weightParams)
+        self.wspecs.updateUI(newLabels = self.weightParams)
 #TODO: get target specs up and running
         #self.tspecs.setEntries(newLabels = (self.freqParams, self.ampParams)
         self.lblMsg.setText(myMsg)
 
-        self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()
+        self.sigSpecsChanged.emit()
+        
 
+#------------------------------------------------------------------------------        
     def storeAll(self):
         """
-        Update global dict fb.fil[0] with currently selected filter
-        parameters, using the update methods of the classes
+        Store currently selected filter in global dict fb.fil[0]
+        parameters, using the "store" methods of the classes
         """
         # collect data from widgets and write to fb.fil[0]
-        self.fo.updateEntries()   # filter order widget
+        self.filord.storeEntries()   # filter order widget
         self.fspecs.storeEntries() # frequency specification widget
         self.aspecs.storeEntries() # magnitude specs with unit
         self.wspecs.storeEntries() # weight specification
 #TODO: get target specs up and running
-        #self.tspecs.storeEntries() # target specs
+        #self.tspecs.storeEntries() # target specs        
+
+#------------------------------------------------------------------------------
+    def loadAll(self):
+        """
+        Update entries from global dict fb.fil[0]
+        parameters, using the "load" methods of the classes
+        """
+        self.selfil.loadEntries() # select filter widget
+        self.filord.loadEntries() # filter order widget
+        self.fspecs.loadEntries() # frequency specification widget
+        self.aspecs.loadEntries() # magnitude specs with unit
+        self.wspecs.loadEntries() # weight specification
+#TODO: get target specs up and running
+        #self.tspecs.loadEntries() # target specs
 
         if self.DEBUG: 
             print("=== pyFDA.py : storeAll ===")
             print(fb.fil[0])
 
+
+#------------------------------------------------------------------------------
     def startDesignFilt(self):
         """
         Start the actual filter design process:
@@ -229,21 +254,20 @@ class InputSpecs(QtGui.QWidget):
         # the global filter dict
 
         # Update filter order. weights and freqs in case they have been changed
-        self.fo.updateEntries()
+        self.filord.loadEntries()
         self.wspecs.loadEntries()
         self.fspecs.loadEntries()
 
-        self.filterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
+        self.sigFilterDesigned.emit() # emit signal -> input_all
 
 
         if self.DEBUG:
             print("=== pyFDA.py : startDesignFilter: Results ===")
             print("zpk:" , fb.fil[0]['zpk'])
-            print('ndim coeffs:', np.ndim(fb.fil[0]['coeffs']))
-            print("b,a = ", fb.fil[0]['coeffs'])
+            print('ndim coeffs:', np.ndim(fb.fil[0]['ba']))
+            print("b,a = ", fb.fil[0]['ba'])
             print("N = ",fb.fil[0]['N'])
             print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
-
 
 #------------------------------------------------------------------------------
 
