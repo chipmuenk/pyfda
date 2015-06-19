@@ -76,11 +76,15 @@ class InputAll(QtGui.QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        # signal indicating that filter specs have changed, requiring update of
-        # plot widgets only:        
-        self.inputSpecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
-        # signal indicating that filter design has changed, requiring update of
-        # plot widgets and some input widgets:        
+        # Collect "specs changed" / "filter designed" signals from all input 
+        # widgets and route them to plot / input widgets that need to be updated
+        #
+        # sigSpecsChanged: signal indicating that filter SPECS have changed, 
+        # requiring update of some plot widgets only:        
+        self.inputSpecs.sigSpecsChanged.connect(self.updateSpecs)
+        #
+        # sigFilterDesigned: signal indicating that filter has been DESIGNED,
+        # requiring update of all plot and some input widgets:        
         self.inputSpecs.sigFilterDesigned.connect(self.updateAll)
         self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
         self.inputPZ.sigFilterDesigned.connect(self.updateAll)
@@ -88,21 +92,32 @@ class InputAll(QtGui.QWidget):
         #----------------------------------------------------------------------
 
 
+    def updateSpecs(self):
+        """
+        Called when filter SPECS have been changed:
+        Update some input and plot widgets with new filter SPECS from global dict
+        """
+        self.inputInfo.showInfo()
+        self.sigSpecsChanged.emit() # pyFDA -> plot_all.updateSpecs
+        
+
     def updateAll(self):
-        """ 
+        """
+        Called when a new filter has been DESIGNED
         - Update all input widgets that can / need to display new filter data,
-            accessing the central filter dict.
-        - Update all plot widgets via the signal 
+            from the global filter dict.
+        - Update all plot widgets via the signal sigFilterDesigned
         
         """
         if self.DEBUG: print("input_all.updateAll:\n",self.sender().objectName())
-        
+      
         self.inputInfo.showInfo()
         self.inputSpecs.loadAll()
         self.inputCoeffs.showCoeffs()
         self.inputPZ.showZPK()
 
-        self.sigFilterDesigned.emit() # pyFDA -> plot_all -> ... all plot widgets
+        self.sigFilterDesigned.emit() # pyFDA -> plot_all.updateAll
+
 
 #------------------------------------------------------------------------
 

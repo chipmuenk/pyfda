@@ -47,8 +47,8 @@ class InputFilter(QtGui.QWidget):
         # the filter file
         self.ftb = FilterTreeBuilder('filter_design', 'init.txt',
                                     commentChar = '#', DEBUG = DEBUG) #
-        self.filter_initialized = False
 
+        self.filter_initialized = False
         self.dmLast = '' # design method from last call
 
         self.initUI()
@@ -191,9 +191,6 @@ class InputFilter(QtGui.QWidget):
         # The combobox is populated with the "long name", the internal name
         # is stored in comboBox.itemData   
         self.cmbFilterType.clear()
-#        self.cmbFilterType.addItems(
-#            list(fb.filTree[self.rt].keys())) # explicit list() needed for Py3
-
         self.cmbFilterType.addItems(ftList)
 
         # Is last filter type (e.g. IIR) in list for new rt? 
@@ -235,13 +232,14 @@ class InputFilter(QtGui.QWidget):
         # Is previous design method (e.g. ellip) in list for new ft? 
         # And has the widget been initialized?
         if fb.fil[0]['dm'] in dmList and self.filter_initialized:
-            # yes, set same dm as before, don't calll setDesignMethod
+            # yes, set same dm as before, don't call setDesignMethod
             dm_idx = self.cmbDesignMethod.findText(fb.gD['dmNames'][fb.fil[0]['dm']])
             if self.DEBUG: print("dm_idx", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx) 
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0  
-            self.setDesignMethod()
+
+        self.setDesignMethod()
 
     def setDesignMethod(self):
         """

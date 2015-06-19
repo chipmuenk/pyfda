@@ -2,7 +2,9 @@
 """
 Design windowed FIR filters (LP, HP, BP, BS) with fixed order, return
 the filter design in zeros, poles, gain (zpk) format
-Created on Tue Nov 26 12:13:41 2013
+
+Attention: This class is re-instantiated dynamically everytime it is selected
+hence, __init__
 
 @author: Christian Muenker
 
@@ -11,10 +13,11 @@ https://github.com/scipy/scipy/pull/3717
 https://github.com/scipy/scipy/issues/2444
 """
 from __future__ import print_function, division, unicode_literals
+import numpy as np
 import scipy.signal as sig
 from importlib import import_module
 import inspect
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
 # import filterbroker from one level above if this file is run as __main__
 # for test purposes
@@ -30,6 +33,8 @@ import pyfda_lib
 # TODO: Order of A_XX is incorrect for BP and BS
 # TODO: Hilbert not working correctly yet
 # TODO: Windows need to be saved / read from dictionary
+# TODO: When filter is read from dictionary, dynamic widgets are missing
+# TODO: self.Nargs -> Nargs
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
@@ -37,32 +42,35 @@ frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 class firwin(object):
 
     def __init__(self):
+        
+        # The first part contains static information that is used to build
+        # the filter tree:
         self.name = {'firwin':'Windowed FIR'}
-#        print(scipy.signal.windows.boxcar.__doc__)
 
         # common messages for all man. / min. filter order response types:
         msg_man = (r"Enter desired order and <b>-6 dB</b> pass band corner "
-                    "frequencies.")
+                    "frequency(ies).")
         msg_min = ("Enter the maximum pass band ripple, minimum stop band "
                     "attenuation and the corresponding corner frequencies.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','aspecs'] # manual filter order
-        vis_min = ['fo','fspecs','aspecs'] # minimum filter order
+        vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
+        vis_min = ['fo','fspecs','aspecs','tspecs'] # minimum filter order
 
         # ENABLED widgets for all man. / min. filter order response types:
-        enb_man = ['fo','fspecs','wspecs'] # manual filter order
+        enb_man = ['fo','fspecs'] # manual filter order
         enb_min = ['fo','fspecs','aspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_PB'] # enabled widget for man. filt. order
         par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
 
-        # Common data for all man. / min. filter order response types:
+        # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
         self.com = {"man":{"enb":enb_man, "msg":msg_man, "par": par_man},
                     "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
+                    
         self.ft = 'FIR'
         self.rt = {
             "LP": {"man":{"par":[]},
@@ -78,7 +86,6 @@ class firwin(object):
 #            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
           #"DIFF":
                    }
-        self.hdl = None
         
         self.info = """Windowed FIR filters are designed by truncating the
         infinite impulse response of an ideal filter with a window function.
@@ -90,6 +97,8 @@ class firwin(object):
         # additional dynamic widgets that need to be set in the main widgets
         self.wdg = {'fo':'cmb_firwin_alg', 'sf':'wdg_firwin_win'}
         
+        self.hdl = None
+        
         self.initUI()
 
         
@@ -97,14 +106,16 @@ class firwin(object):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
-        These subwidgets are instantiated dynamically where needed using 
-        the handle to the filter object.
+        These subwidgets are instantiated dynamically when needed in 
+        input_filter.py using the handle to the filter object, fb.filObj .
         """
 
         # Combobox for selecting the algorithm to estimate minimum filter order
         self.cmb_firwin_alg = QtGui.QComboBox()
         self.cmb_firwin_alg.setObjectName('wdg_cmb_firwin_alg')
         self.cmb_firwin_alg.addItems(['ichige','kaiser','herrmann'])
+        # Minimum size, can be changed in the upper hierarchy levels using layouts:
+        self.cmb_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
         # Combobox for selecting the window used for filter design
         self.cmb_firwin_win = QtGui.QComboBox()
@@ -122,9 +133,9 @@ class firwin(object):
         # chebwin - needs attenuation
 
         self.cmb_firwin_win.addItems(windows)
-        win_idx = self.cmb_firwin_win.findText('Boxcar')
-        self.cmb_firwin_win.setCurrentIndex(win_idx)
-        
+        # Minimum size, can be changed in the upper hierarchy levels using layouts:
+        self.cmb_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+
         self.lbl_firwin_1 = QtGui.QLabel("a")
         self.lbl_firwin_1.setObjectName('wdg_lbl_firwin_1')
         self.led_firwin_1 = QtGui.QLineEdit()
@@ -140,7 +151,8 @@ class firwin(object):
         self.led_firwin_2.setObjectName('wdg_led_firwin_2')
         self.led_firwin_2.setVisible(False)
         self.lbl_firwin_2.setVisible(False)
-        
+
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
         self.wdg_firwin_win = QtGui.QWidget()
         self.wdg_firwin_win.setObjectName('wdg_firwin_win')
         self.layGWin = QtGui.QGridLayout()
@@ -153,10 +165,6 @@ class firwin(object):
         self.layGWin.setContentsMargins(0,0,0,0)
         self.wdg_firwin_win.setLayout(self.layGWin)
 
-        # Basic size of cmbboxes is minimum, this can be changed in the 
-        # upper hierarchy level using layouts
-        self.cmb_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmb_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -165,13 +173,16 @@ class firwin(object):
         self.led_firwin_1.editingFinished.connect(self.updateUI)
         self.led_firwin_2.editingFinished.connect(self.updateUI)
         self.cmb_firwin_alg.activated.connect(self.updateUI)
+        #----------------------------------------------------------------------
 
+        self.loadEntries() # get initial / last setting from dictionary
         self.updateUI()
 
 
     def updateUI(self):
         """
-        Update UI when one of the comboboxes or line edits is changed
+        Update UI and info_doc when one of the comboboxes or line edits is 
+        changed.
         """
         self.firWindow = str(self.cmb_firwin_win.currentText()).lower()
         self.alg = str(self.cmb_firwin_alg.currentText())
@@ -181,7 +192,7 @@ class firwin(object):
         
          # construct window class, e.g. scipy.signal.boxcar :
         class_ = getattr(mod_, self.firWindow)
-        win_doc = getattr(class_, '__doc__') # read window docstring
+        win_doc = getattr(class_, '__doc__') # read docstring attribute from class
         
         self.info_doc = []
         self.info_doc.append('firwin()\n========')
@@ -191,15 +202,13 @@ class firwin(object):
         self.info_doc.append(win_doc)
         
         self.winArgs = inspect.getargspec(class_)[0] # return args of window
-        # and remove standard args for all window types 'sym' and 'M':
+        # and remove common args for all window types ('sym' and 'M'):
         self.winArgs = [arg for arg in self.winArgs if arg not in {'sym', 'M'}]
-        #print(self.winArgs)
 
-
-        # make edit boxes for additional parameters visible if needed
-        # and construct tuples consisting of a string with the window name and
-        # one or two optional float parameters. If there are no additional 
-        # parameters, just pass the name of the window.
+        # make edit boxes and labels for additional parameters visible if needed
+        # and construct self.firWindow as a tuple consisting of a string with 
+        # the window name and optionally one or two float parameters. 
+        # If there are no additional parameters, just pass the window name string.
         N_args = len(self.winArgs)
         self.lbl_firwin_1.setVisible(N_args > 0)
         self.led_firwin_1.setVisible(N_args > 0)
@@ -207,29 +216,60 @@ class firwin(object):
         self.led_firwin_2.setVisible(N_args > 1)
             
         if N_args > 1 :
-            self.lbl_firwin_2.setText(self.winArgs[1])
+            self.lbl_firwin_2.setText(self.winArgs[1] + ":")
             self.firWindow = (self.firWindow,
                                       float(self.led_firwin_1.text()), 
                                       float(self.led_firwin_2.text()))
         elif N_args > 0 :
-            self.lbl_firwin_1.setText(self.winArgs[0])
+            self.lbl_firwin_1.setText(self.winArgs[0] + ":")
             self.firWindow = (self.firWindow,
                                       float(self.led_firwin_1.text()))
         #print(self.firWindow)           
 
     def loadEntries(self):
         """
-        Reload window selection and parameters from filter dictionary.
+        Reload window selection and parameters from filter dictionary
+        and set UI elements accordingly (when filter is loaded from disk).
         """
-        pass
+        win_idx = 0
+        alg_idx = 0
+        try:
+            dyn_wdg_par = fb.fil[0]['wdg_dyn']
+            if 'win' in dyn_wdg_par:
+                if np.isscalar(dyn_wdg_par['win']): # true for strings (non-vectors) 
+                    window = dyn_wdg_par['win']
+                else:
+                    window = dyn_wdg_par['win'][0]
+                    self.led_firwin_1.setText(str(dyn_wdg_par['win'][1]))
+                    if len(dyn_wdg_par['win']) > 2:
+                        self.led_firwin_2.setText(str(dyn_wdg_par['win'][2]))                       
+
+                # find index for window string
+                win_idx = self.cmb_firwin_win.findText(window, 
+                                QtCore.Qt.MatchFixedString) # case insensitive flag
+                if win_idx == -1: # Key does not exist, use first entry instead
+                    win_idx = 0
+                    
+            if 'alg' in dyn_wdg_par:
+                alg_idx = self.cmb_firwin_alg.findText(dyn_wdg_par['alg'], 
+                                QtCore.Qt.MatchFixedString)
+                if alg_idx == -1: # Key does not exist, use first entry instead
+                    alg_idx = 0
+                
+        except KeyError as e:
+            print("Key Error:",e)
+        
+        self.cmb_firwin_win.setCurrentIndex(win_idx) # set index
+        self.cmb_firwin_alg.setCurrentIndex(alg_idx)
 
     def storeEntries(self):
         """
-        Store window selection and parameter settings (if any) in filter
+        Store window and alg. selection and parameter settings (if any) in filter
         dictionary.
         """
-        pass
-#        fb.fil[0][]
+        fb.fil[0].update({'wdg_dyn':{'win':self.firWindow,
+                                 'alg':self.alg}})
+
 
     def get_params(self, fil_dict):
         """
@@ -266,7 +306,7 @@ class firwin(object):
             fil_dict['N'] = self.N - 1 # yes, update filterbroker
         except AttributeError:
             pass
-        #fil_dict["wdg"] = self.firWindow
+        self.storeEntries()
 
     def LPman(self, fil_dict):
         self.get_params(fil_dict)

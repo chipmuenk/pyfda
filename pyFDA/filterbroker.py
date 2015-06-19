@@ -115,6 +115,7 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'plt_tLabel':r'$n \; \rightarrow$',
             'plt_tUnit':'s',
             'plt_phiUnit': 'rad',
-            'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $'
+            'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $',
+            'wdg_dyn':{'win':'hann'}
             }
 

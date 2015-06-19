@@ -122,11 +122,21 @@ class pyFDA(QtGui.QMainWindow):
 #        self.statusMessage("Application is initialized.")
        
 
-        # ============== Signals & Slots ================================
-
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        # Here, signals about spec and design changes from lower hierarchies
+        # are distributed. At the moment, only changes in the input widgets are
+        # routed to the plot widgets:
+        # 
+        # sigSpecsChanged: signal indicating that filter SPECS have changed, 
+        # requiring partial update of some plot widgets:
+        self.inputAll.sigSpecsChanged.connect(self.pltAll.updateSpecs)
+        #
+        # sigFilterDesigned: signal indicating that filter has been DESIGNED,
+        #  requiring full update of all plot widgets: 
         self.inputAll.sigFilterDesigned.connect(self.pltAll.updateAll)
 
-        self.inputAll.sigSpecsChanged.connect(self.pltAll.updateSpecs)
         
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
