@@ -24,10 +24,10 @@ Created on Mon Apr 30 10:29:42 2012
 # The following is derived from the slides presented by
 # Alexander Kain for CS506/606 "Special Topics: Speech Signal Processing"
 # CSLU / OHSU, Spring Term 2011.
+
 from __future__ import division, print_function
-#import string # needed for remezord?
 import numpy as np
-import numpy.ma as ma
+#import numpy.ma as ma
 from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
    ceil, hstack, mod
 
