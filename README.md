@@ -56,17 +56,24 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
     </tr>
 </table>
 
-### Release 0.1 (target: end of May 2015)
+### Release 0.1 (target: end of <s>May</s> June 2015)
 
 The following features are still missing for the first release. Help is very welcome!
-* Save and load filter designs (pickle? shelve?)
+* Clean separation between target specifications and design specifications (= required by filter design method)
+* Feedback in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error has occurred by coloring the >> DESIGN FILTER << button
+
+### Release 0.2 (target: end of 2015)
 * **Filter coefficients and poles / zeros**
-  * Display coefficients / poles and zeros with fewer digits while keeping full precision
+Implement model-view controller architecture for the following features:
+  * Display coefficients / poles and zeros with fewer digits while keeping full precision internally
   * Group multiple poles / zeros
-  * Load coefficients / poles and zeros, 
-* Smooth some rough edges:
-  * better debugging options
-  * reflect in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error occurred
+  * Load coefficients / poles and zeros in various formats 
+* **myHDL support**
+    * Export of VHDL / Verilog netlists for basic filter topologies
+    * Fixpoint simulation
+* **Filter Manager**
+  * Store multiple designs in one filter dict
+  * Compare multiple designs in plots
 
 ### Following releases
 * Better help files and messages
@@ -78,7 +85,6 @@ The following features are still missing for the first release. Help is very wel
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
 * Export of Python filter objects
 * Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
-* Fixpoint filter sythesis and export using the myHDL module (<http://myhdl.org>)
 
 ### Further ideas are
 * Wave-Digital Filters
