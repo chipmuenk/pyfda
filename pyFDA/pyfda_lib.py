@@ -836,7 +836,7 @@ def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
     else:
         raise ValueError("Unknown output format {0:s}".format(out_format))
     fil_dict['ba'] = [b, a]
-    fil_dict['zpk'] = zpk
+    fil_dict['zpk'] = [zpk[0], zpk[1], zpk[2]]#zpk
     fil_dict['sos'] = None
     fil_dict['creator'] = (out_format, sender)
 
