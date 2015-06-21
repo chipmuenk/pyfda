@@ -13,6 +13,8 @@ from PyQt4.QtCore import pyqtSignal
 
 import scipy.io
 import numpy as np
+import re
+
 #import shelve
 try:
     import cPickle as pickle
@@ -55,11 +57,12 @@ if __name__ == "__main__":
 import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib_fix_v3 as fix
 
-# TODO: Setting of dynamic subwidgets is not stored / restored
+# TODO: Get rid of error messages when cancelling a file operation
+# TODO: Save P/Z as well if possible
 
 class InputFiles(QtGui.QWidget):
     """
-    Create the window for entering exporting / importing and saving / loading data
+    Create the widget for entering exporting / importing / saving / loading data
     """
     
     sigFilterDesigned = pyqtSignal()
@@ -67,6 +70,10 @@ class InputFiles(QtGui.QWidget):
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputFiles, self).__init__()
+        
+        self.basedir = os.path.dirname(os.path.abspath(__file__))
+        self.basedir = 'D:/Daten'
+#        print("basedir =", self.basedir)
 
         self.initUI()
 
@@ -78,6 +85,7 @@ class InputFiles(QtGui.QWidget):
         """
         # widget / subwindow for parameter selection
         self.butExport = QtGui.QPushButton("Export Coefficients", self)
+        self.butImport = QtGui.QPushButton("Import Coefficients", self)
         self.butSave = QtGui.QPushButton("Save Filter", self)
         self.butLoad = QtGui.QPushButton("Load Filter", self)
 #        self.butExportCSV = QtGui.QPushButton("Export -> CSV", self)
@@ -94,18 +102,19 @@ class InputFiles(QtGui.QWidget):
         ifont = QtGui.QFont()
         ifont.setItalic(True)
 
-        self.layVExport = QtGui.QVBoxLayout()
-        self.layVExport.addWidget(self.butSave) # -> Matlab workspace
-        self.layVExport.addWidget(self.butLoad) # -> Matlab workspace
-        self.layVExport.addWidget(self.HLine())
-        self.layVExport.addWidget(self.butExport) # -> Matlab workspace
+        self.layVIO = QtGui.QVBoxLayout()
+        self.layVIO.addWidget(self.butSave) # -> Matlab workspace
+        self.layVIO.addWidget(self.butLoad) # -> Matlab workspace
+        self.layVIO.addWidget(self.HLine())
+        self.layVIO.addWidget(self.butExport) # export coeffs -> various formats
+        self.layVIO.addWidget(self.butImport) # export coeffs -> various formats
 
         
 #        self.layVExport.addWidget(self.butExportCSV) # -> CSV format
-        self.layVExport.addStretch(1)
+        self.layVIO.addStretch(1)
 
         layVMain = QtGui.QVBoxLayout()
-        layVMain.addLayout(self.layVExport)
+        layVMain.addLayout(self.layVIO)
 
 #        MYHDL = True # uncomment for test purposes
         if MYHDL:
@@ -320,7 +329,8 @@ class InputFiles(QtGui.QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.butExport.clicked.connect(self.export)
+        self.butExport.clicked.connect(self.export_coeffs)
+        self.butImport.clicked.connect(self.import_coeffs)
         self.butSave.clicked.connect(self.save_filter)
         self.butLoad.clicked.connect(self.load_filter)
 #        self.butExportCSV.clicked.connect(self.exportCSV)
@@ -342,127 +352,194 @@ class InputFiles(QtGui.QWidget):
         """
         Load (c)pickled filter dictionary and update input and plot widgets
         """
+        file_types = ("Pickled (*.pkl);;Zipped Binary Numpy Array (*.npz)")   
         dlg=QtGui.QFileDialog( self )
-        my_file, myFilter = dlg.getOpenFileNameAndFilter(self,
-                caption = "Load filter ", directory="D:/Daten",
-                filter = '*.pkl')
-        out_s = open(my_file, 'rb')
-#        print("1:", fb.fil[0]['F_PB'])
-        try:
-            fb.fil = pickle.load(out_s)
-            print("Loaded filter %s successfully!" %my_file)
-#            pprint.pprint(fb.fil)
-            self.sigFilterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
-        except IOError:
-            print("Failed loading %s!" %my_file)
-        finally:
-            out_s.close()
-#        print("2:", fb.fil[0]['F_PB'])
-#        fb.fil[0]['F_PB'] = 0.123
-#        print("3:", fb.fil[0]['F_PB'])
+        file_name, file_type = dlg.getOpenFileNameAndFilter(self,
+                caption = "Load filter ", directory = self.basedir,
+                filter = file_types)
+        if file_name != "": # cancelled file operation returns empty string
+            file_type_err = False              
+            try:
+                with open(file_name, 'rb') as f:
+                    if file_name.endswith('pkl'):
+                        fb.fil = pickle.load(f)
+                    elif file_name.endswith('npz'):
+                        # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
+                        a = np.load(f) # array containing dict, dtype 'object'
+                        
+                        for key in a:
+                            if np.ndim(a[key]) == 0:
+                                # scalar objects may be extracted with the item() method
+                                fb.fil[0][key] = a[key].item()
+                            else:
+                                # array objects are converted to list first
+                                fb.fil[0][key] = a[key].tolist()
+                    else:
+                        print('Unknown file type "%s"' 
+                                            %os.path.splitext(file_name)[1])
+                        file_type_err = True
+                    if not file_type_err:
+                        print('Loaded filter "%s"' %file_name)                    
+                        self.sigFilterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
+            except IOError:
+                print("Failed loading %s!" %file_name)
+            
 
     def save_filter(self):
         """
-        Save Filter as shelve object
-        Open a persistent dictionary for reading and writing.
+        Save Filter as pickle object
         """
-        dlg=QtGui.QFileDialog( self )
-        my_file, my_filter = dlg.getSaveFileNameAndFilter(self,
-                caption = "Save filter as", directory="D:/Daten",
-                filter = '*.pkl')
-    
-        out_s = open(my_file, 'wb')
-        try:
-            # Write to the stream
-#            for o in data:
-#                print ('WRITING: %s (%s)' % (o.name, o.name_backwards))
-            pickle.dump(fb.fil, out_s)
-            print("Filter saved as %s!" %my_file)
-        except IOError:
-            print("Failed saving %s!" %my_file)
-        finally:
-            out_s.close()
+        file_types = ("Pickled (*.pkl);;Zipped Binary Numpy Array (*.npz)")        
+        dlg = QtGui.QFileDialog( self )
+        file_name, file_type = dlg.getSaveFileNameAndFilter(self,
+                caption = "Save filter as", directory = self.basedir,
+                filter = file_types)                
+        if file_name != "": # cancelled file operation returns empty string 
+            file_type_err = False
+            try:
+                with open(file_name, 'wb') as f:
+                    if file_name.endswith('pkl'):
+                        pickle.dump(fb.fil, f)
+                    elif file_name.endswith('npz'):
+                        np.savez(f, **fb.fil[0])
+                    else:
+                        print('Unknown file type "%s"' 
+                                            %os.path.splitext(file_name)[1])
+                        file_type_err = True
+                    if not file_type_err:
+                        print('Filter saved as "%s"' %file_name)
+                            
+            except IOError as e:
+                    print('Failed saving "%s"!\n' %file_name, e)
 
 
-    def export(self):
+    def export_coeffs(self):
         """
         Export filter coefficients in various formats - see also
         Summerfield p. 192 ff
         """
         dlg=QtGui.QFileDialog( self )
 
-        file_types = ("CSV (*.csv);;Matlab-Workspace (*.mat);;Numpy Array (*.npz)"
-        ";;Filter (*.sdb)")
+        file_types = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
+            ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
 
+        # Add further file types if modules could be imported:
         if XLWT:
             file_types += ";;Excel Worksheet (.xls)"
         if XLSX:
             file_types += ";;Excel 2007 Worksheet (.xlsx)"
 
-        myFile, myFilter = dlg.getSaveFileNameAndFilter(self,
-                caption = "Save filter (coefficients) as", directory="D:/Daten",
-                filter = file_types)
-#        print(myFile, myFilter)
-        coeffs = fb.fil[0]['ba']
-        if myFile.endswith('mat'):
-            scipy.io.savemat(myFile,
-                             mdict={'filt_coeffs': coeffs})
-            print("Matlab workspace exported to %s!" %myFile)
-        elif myFile.endswith('csv'):
-            np.savetxt(myFile, coeffs, delimiter = ', ')
-            print("CSV - File exported to %s!" %myFile)
-            # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
-        elif myFile.endswith('npz'):
-            np.savez(myFile, coeffs)
-            print("NPZ - File exported to %s!" %myFile)
-        elif myFile.endswith('xls'):
-            # see
-            # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
-            # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
-            # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
-            workbook = xlwt.Workbook(encoding="utf-8")
-            worksheet = workbook.add_sheet("Python Sheet 1")
-            bold = xlwt.easyxf('font: bold 1')
-            worksheet.write(0, 0, 'b', bold)
-            worksheet.write(0, 1, 'a', bold)
-            for col in range(2):
-                for row in range(np.shape(coeffs)[1]):
-                    worksheet.write(row+1, col, coeffs[col][row]) # vertical
-            workbook.save(myFile)
-            print("Exported %s!" %myFile)
+        file_name, file_type = dlg.getSaveFileNameAndFilter(self,
+                caption = "Export filter coefficients as", 
+                directory = self.basedir, filter = file_types) 
+        if file_name != '': # cancelled file operation returns empty string   
+            ba = fb.fil[0]['ba']
+            file_type_err = False
+            try:
+                with open(file_name, 'wb') as f:
+                    if file_name.endswith('mat'):   
+                        scipy.io.savemat(f, mdict={'ba':fb.fil[0]['ba']})
+                    elif file_name.endswith('csv'):
+                        np.savetxt(f, ba, delimiter = ', ')
+                        # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
+                    elif file_name.endswith('npy'):
+                        # can only store one array in the file:
+                        np.save(f, ba)
+                    elif file_name.endswith('npz'):
+                        # would be possible to store multiple array in the file
+                        np.savez(f, ba = ba)
+                    elif file_name.endswith('xls'):
+                        # see
+                        # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
+                        # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
+                        # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
+                        workbook = xlwt.Workbook(encoding="utf-8")
+                        worksheet = workbook.add_sheet("Python Sheet 1")
+                        bold = xlwt.easyxf('font: bold 1')
+                        worksheet.write(0, 0, 'b', bold)
+                        worksheet.write(0, 1, 'a', bold)
+                        for col in range(2):
+                            for row in range(np.shape(ba)[1]):
+                                worksheet.write(row+1, col, ba[col][row]) # vertical
+                        workbook.save(f)
+            
+                    elif file_name.endswith('xlsx'):
+                        # from https://pypi.python.org/pypi/XlsxWriter
+                        # Create an new Excel file and add a worksheet.
+                        workbook = xlsx.Workbook(f)
+                        worksheet = workbook.add_worksheet()
+                        # Widen the first column to make the text clearer.
+                        worksheet.set_column('A:A', 20)
+                        # Add a bold format to use to highlight cells.
+                        bold = workbook.add_format({'bold': True})
+                        # Write labels with formatting.
+                        worksheet.write('A1', 'b', bold)
+                        worksheet.write('B1', 'a', bold)
+            
+                        # Write some numbers, with row/column notation.
+                        for col in range(2):
+                            for row in range(np.shape(ba)[1]):
+                                worksheet.write(row+1, col, ba[col][row]) # vertical
+            #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
+            
+            
+                        # Insert an image - useful for documentation export ?!.
+            #            worksheet.insert_image('B5', 'logo.png')
+            
+                        workbook.close()
+            
+                    else:
+                        print('Unknown file type "%s"' 
+                                            %os.path.splitext(file_name)[1])
+                        file_type_err = True
+                        
+                    if not file_type_err:
+                        print('Exported coefficients as %s - file to \n"%s"' 
+                                %(self.del_file_ext(file_type), file_name))
+                    
+            except IOError as e:
+                print('Failed saving "%s"!\n' %file_name, e)
 
-        elif myFile.endswith('xlsx'):
-            # from https://pypi.python.org/pypi/XlsxWriter
-            # Create an new Excel file and add a worksheet.
-            workbook = xlsx.Workbook(myFile)
-            worksheet = workbook.add_worksheet()
-            # Widen the first column to make the text clearer.
-            worksheet.set_column('A:A', 20)
-            # Add a bold format to use to highlight cells.
-            bold = workbook.add_format({'bold': True})
-            # Write labels with formatting.
-            worksheet.write('A1', 'b', bold)
-            worksheet.write('B1', 'a', bold)
-
-            # Write some numbers, with row/column notation.
-            for col in range(2):
-                for row in range(np.shape(coeffs)[1]):
-                    worksheet.write(row+1, col, coeffs[col][row]) # vertical
-#                    worksheet.write(row, col, coeffs[col][row]) # horizontal
+    
+            # Download the Simple ods py module:
+            # http://simple-odspy.sourceforge.net/
+            # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
 
 
-            # Insert an image - useful for documentation export ?!.
-#            worksheet.insert_image('B5', 'logo.png')
+    def import_coeffs(self):
+        """
+        Import filter coefficients from a file
+        """
+        file_types = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
+        "Zipped Binary Numpy Array(*.npz)")
+        dlg=QtGui.QFileDialog( self )
+        file_name, file_type = dlg.getOpenFileNameAndFilter(self,
+                caption = "Import filter coefficients ", 
+                directory = self.basedir, filter = file_types)
+        if file_name != '': # cancelled file operation returns empty string  
+            file_type_err = False
+            try:
+                with open(file_name, 'r') as f:
+                    if file_name.endswith('mat'):
+                        data = scipy.io.loadmat(f)
+                        fb.fil[0]['ba'] = data['ba']
+                    elif file_name.endswith('npy'):
+                        fb.fil[0]['ba'] = np.load(f)
+                        # can only store one array in the file
+                    elif file_name.endswith('npz'):
+                        fb.fil[0]['ba'] = np.load(f)['ba']
+                        # would be possible to store several arrays in one file
+                    else:
+                        print('Unknown file type "%s"' 
+                                            %os.path.splitext(file_name)[1])
+                        file_type_err = True
+                        
+                    if not file_type_err:
+                        print('Loaded coefficient file\n"%s"' %file_name)
+                        self.sigFilterDesigned.emit() # emit signal -> pyFDA                     
 
-            workbook.close()
-            print("Exported %s!" %myFile)
-
-        else:
-            print("No File exported!")
-
-        # Download the Simple ods py module:
-        # http://simple-odspy.sourceforge.net/
-        # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
+            except IOError as e:
+                print("Failed loading %s!\n" %file_name, e)
 
 
     def exportHDL(self):
@@ -498,6 +575,22 @@ class InputFiles(QtGui.QWidget):
         myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
 
 
+    def del_file_ext(self, file_type):
+        """
+        Delete file extension, e.g. '(*.txt)' from file type description
+        """
+        # regular expression: re.sub(pattern, repl, string) 
+        #  Return the string obtained by replacing the leftmost non-overlapping 
+        #  occurrences of the pattern in string by repl
+        #   '.' means any character
+        #   '+' means one or more
+        #   '[^a]' means except for 'a'
+        # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
+        # '(' must be escaped as '\('
+
+        return re.sub('\([^\)]+\)', '', file_type) 
+
+ 
 """
 
 Alternative to (c)pickle: Use the shelve module that opens
