@@ -41,7 +41,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * Filter design files can be added and edited *without* changing or even restarting the program
  * Special widgets needed by design methods (e.g. for choosing the window in Firwin) are included in the filter design file, not in the main program
 * **Saving and loading**
- * Save and load filter designs in pickled format
+ * Save and load filter designs in pickled and in numpy's NPZ-format
  * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format
 * **Display help files** (own / Python docstrings) as rich text
 * **Runs under Python 2.7 and Python 3.4** 
@@ -60,11 +60,11 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 
 ### Release 0.1 (target: end of <s>May</s> June 2015)
 
-The following features are still missing for the first release. Help is very welcome!
+The following features are still missing for the first release. 
 * Clean separation between target specifications and design specifications (= required by filter design method)
-* Feedback in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error has occurred by coloring the >> DESIGN FILTER << button
+* Documentation
 
-### Release 0.2 (target: end of 2015)
+### Release 0.2 (target: end of 2015) - Help is very welcome!
 * **Filter coefficients and poles / zeros**<br />
 Implement model-view controller architecture for the following features:
   * Display coefficients / poles and zeros with fewer digits while keeping full precision internally
