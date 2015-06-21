@@ -17,10 +17,12 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 
 ### The following features are currently implemented:
 
-* **Design methods** (from scipy.signal): Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 
-* **Switch between design methods**, keeping all other settings:
- * Filter order and corner frequencies calculated by minimum order algorithms can be fine-tuned by hand
- * Directly compare how a set of specifications influences the resulting filter for different design methods
+* **Filter design**
+    * **Design methods** from scipy.signal: Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 
+    * **Remember all specifications** when changing filter design methods
+    * **Fine-tune** manually filter order and corner frequencies calculated by minimum order algorithms
+    * **Compare filter designs** for a given set of specifications and different design methods
+    * **Filter coefficients and poles / zeroes** can be displayed, edited and quantized
 * **Clearly structured GUI**
  * only widgets needed for the currently selected design method are visible
  * enhanced matplotlib NavigationToolbar (nicer icons, additional functions 'grid' and 'zoom full extent')
@@ -38,9 +40,9 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
  * Filter design files can be added and edited *without* changing or even restarting the program
  * Special widgets needed by design methods (e.g. for choosing the window in Firwin) are included in the filter design file, not in the main program
-* **Filter coefficients and poles / zeros**
- * Display, edit and quantize 
- * Save as Comma-separated values (CSV) or Matlab (R) workspace format
+* **Saving and loading**
+ * Save and load filter designs in pickled format
+ * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format
 * **Display help files** (own / Python docstrings) as rich text
 * **Runs under Python 2.7 and Python 3.4** 
 
@@ -56,17 +58,24 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
     </tr>
 </table>
 
-### Release 0.1 (target: end of May 2015)
+### Release 0.1 (target: end of <s>May</s> June 2015)
 
 The following features are still missing for the first release. Help is very welcome!
-* Save and load filter designs (pickle? shelve?)
-* **Filter coefficients and poles / zeros**
-  * Display coefficients / poles and zeros with fewer digits while keeping full precision
+* Clean separation between target specifications and design specifications (= required by filter design method)
+* Feedback in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error has occurred by coloring the >> DESIGN FILTER << button
+
+### Release 0.2 (target: end of 2015)
+* **Filter coefficients and poles / zeros**<br />
+Implement model-view controller architecture for the following features:
+  * Display coefficients / poles and zeros with fewer digits while keeping full precision internally
   * Group multiple poles / zeros
-  * Load coefficients / poles and zeros, 
-* Smooth some rough edges:
-  * better debugging options
-  * reflect in the GUI whether a filter design was successful, is out-of-date (specs have been changed) or whether an error occurred
+  * Load coefficients / poles and zeros in various formats 
+* **myHDL support**
+    * Export of VHDL / Verilog netlists for basic filter topologies
+    * Fixpoint simulation
+* **Filter Manager**
+  * Store multiple designs in one filter dict
+  * Compare multiple designs in plots
 
 ### Following releases
 * Better help files and messages
@@ -78,7 +87,6 @@ The following features are still missing for the first release. Help is very wel
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
 * Export of Python filter objects
 * Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
-* Fixpoint filter sythesis and export using the myHDL module (<http://myhdl.org>)
 
 ### Further ideas are
 * Wave-Digital Filters
