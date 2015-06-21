@@ -92,6 +92,7 @@ class InputSpecs(QtGui.QWidget):
         self.aspecs.setVisible(True)
 
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
+        self.color_design_button("changed")
         self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
         self.butReadFiltTree.setToolTip("Re-read filter design directory and build filter design tree.")
 
@@ -248,18 +249,26 @@ class InputSpecs(QtGui.QWidget):
         # 'LP'+'man' -> cheby1.LPman) and
         # design the filter by passing current specs to the method, yielding
         # e.g. cheby1.LPman(fb.fil[0])
-        getattr(fb.filObj, fb.fil[0]['rt'] +
+
+        try:
+            getattr(fb.filObj, fb.fil[0]['rt'] +
                                 fb.fil[0]['fo'])(fb.fil[0])
-        # The filter design routines write coeffs, poles/zeros etc. back to
-        # the global filter dict
 
-        # Update filter order. weights and freqs in case they have been changed
-        self.filord.loadEntries()
-        self.wspecs.loadEntries()
-        self.fspecs.loadEntries()
-
-        self.sigFilterDesigned.emit() # emit signal -> input_all
-
+            # The filter design routines write coeffs, poles/zeros etc. back to
+            # the global filter dict
+    
+            # Update filter order. weights and freqs in case they have been changed
+            self.filord.loadEntries()
+            self.wspecs.loadEntries()
+            self.fspecs.loadEntries()
+            
+            self.sigFilterDesigned.emit() # emit signal -> input_all
+                                
+        except Exception as e:
+            print(e)
+            print(e.__doc__)
+            self.color_design_button("error")
+            
 
         if self.DEBUG:
             print("=== pyFDA.py : startDesignFilter: Results ===")
@@ -268,6 +277,24 @@ class InputSpecs(QtGui.QWidget):
             print("b,a = ", fb.fil[0]['ba'])
             print("N = ",fb.fil[0]['N'])
             print("F_PB, F_SB = ",fb.fil[0]['F_PB'], fb.fil[0]['F_SB'])
+            
+    def color_design_button(self, state):
+        """
+        Color the >> DESIGN FILTER << button:
+        green:  filter has been designed, everything ok
+        yellow: filter specs have been changed
+        red:    an error has occurred during filter desigtn
+        """
+        if state == "designed": 
+            css = "QPushButton { background-color: green;  color: white}"
+        elif state == "changed": 
+            css = "QPushButton { background-color: yellow}"
+        elif state == "error": 
+            css = "QPushButton { background-color: red; color: white}" #
+        else: css = ""
+        
+        self.butDesignFilt.setStyleSheet(css +
+                      "QPushButton:pressed { background-color: orange }" )
 
 #------------------------------------------------------------------------------
 

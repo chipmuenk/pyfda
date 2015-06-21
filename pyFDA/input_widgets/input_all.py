@@ -97,6 +97,7 @@ class InputAll(QtGui.QWidget):
         Called when filter SPECS have been changed:
         Update some input and plot widgets with new filter SPECS from global dict
         """
+        self.inputSpecs.color_design_button("changed")      
         self.inputInfo.showInfo()
         self.sigSpecsChanged.emit() # pyFDA -> plot_all.updateSpecs
         
@@ -110,9 +111,10 @@ class InputAll(QtGui.QWidget):
         
         """
         if self.DEBUG: print("input_all.updateAll:\n",self.sender().objectName())
-      
-        self.inputInfo.showInfo()
+
+        self.inputSpecs.color_design_button("designed")      
         self.inputSpecs.loadAll()
+        self.inputInfo.showInfo()
         self.inputCoeffs.showCoeffs()
         self.inputPZ.showZPK()
 
