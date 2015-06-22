@@ -33,7 +33,7 @@ class InputTargetSpecs(QtGui.QWidget):
     filterDesigned = pyqtSignal()  # emitted when filter has been designed
     filterChanged = pyqtSignal()
 
-    def __init__(self, fil_dict, DEBUG = False):
+    def __init__(self, DEBUG = False):
         super(InputTargetSpecs, self).__init__()
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
@@ -54,11 +54,9 @@ class InputTargetSpecs(QtGui.QWidget):
         """
 
         # subwidget for Frequency Specs
-        self.fspecs = input_freq_specs.InputFreqSpecs(fil_dict = fb.fil[0],
-                    DEBUG = False)
+        self.fspecs = input_freq_specs.InputFreqSpecs(DEBUG = False)
         # subwidget for Amplitude Specs
-        self.aspecs = input_amp_specs.InputAmpSpecs(fil_dict = fb.fil[0],
-                    DEBUG = False)
+        self.aspecs = input_amp_specs.InputAmpSpecs(DEBUG = False)
 
         self.aspecs.setVisible(True)
         """
@@ -130,9 +128,9 @@ class InputTargetSpecs(QtGui.QWidget):
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.fspecs.setEntries(newLabels = self.freqParams) # update frequency spec labels
+        self.fspecs.updateUI(newLabels = self.freqParams) # update frequency spec labels
         self.aspecs.setVisible(self.ampParams != [])
-        self.aspecs.setEntries(newLabels = self.ampParams)
+        self.aspecs.updateUI(newLabels = self.ampParams)
 
         self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()
 
@@ -147,12 +145,21 @@ class InputTargetSpecs(QtGui.QWidget):
 
         if self.DEBUG: print(fb.fil[0])
 
+#------------------------------------------------------------------------------
+    def loadEntries(self):
+        """
+        Update entries from global dict fb.fil[0]
+        parameters, using the "load" methods of the classes
+        """
+        self.aspecs.loadEntries() # magnitude specs with unit
+        self.fspecs.loadEntries() # weight specification
+
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = InputTargetSpecs(fil_dict = fb.fil[0])
+    form = InputTargetSpecs()
     form.show()
     form.storeEntries()
 
