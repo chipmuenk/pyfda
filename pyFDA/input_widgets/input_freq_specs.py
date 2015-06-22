@@ -92,20 +92,20 @@ class InputFreqSpecs(QtGui.QWidget):
 
         self.butSort = QtGui.QToolButton(self)
         self.butSort.setText("Sort")
-        self.butSort.setToolTip("Sort frequencies in ascending order.")
+        self.butSort.setCheckable(True)
+        self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
+        self.butSort.setStyleSheet("QToolButton:checked {font-weight:bold}")
+#        self.butSort.setStyleSheet("QToolButton { background-color: red; color: white}") #
+
+
  #       self.butSort.setSizePolicy(QtGui.QSizePolicy.Minimum,
  #                                QtGui.QSizePolicy.MinimumExpanding)
 
-
-        self.chkSortAuto = QtGui.QCheckBox(self)
-        self.chkSortAuto.setText("Auto")
-        self.chkSortAuto.setToolTip("Automatically sort frequencies in ascending order.")
 
         self.layHUnits = QtGui.QHBoxLayout()
         self.layHUnits.addWidget(self.cmbUnits)
         self.layHUnits.addWidget(self.cmbFRange)
         self.layHUnits.addWidget(self.butSort)
-        self.layHUnits.addWidget(self.chkSortAuto)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for setting f_S, the units and the actual frequency specs:
@@ -137,8 +137,7 @@ class InputFreqSpecs(QtGui.QWidget):
         self.cmbFRange.currentIndexChanged.connect(self.freqRange)
         self.ledF_S.editingFinished.connect(self.freqUnits)
         
-        self.butSort.clicked.connect(self._sortStoreEntries)
-        self.chkSortAuto.clicked.connect(self._sortStoreEntries)
+        self.butSort.clicked.connect(self._sort_store_entries)
         # DYNAMIC SIGNAL SLOT CONNECTION:
         # Every time a field is edited, call self.freqUnits - this signal-slot
         # connection is constructed in self._addEntry / destructed in 
@@ -221,9 +220,7 @@ class InputFreqSpecs(QtGui.QWidget):
             self.ledF_S.setText(str(self.f_S))
 
         else: # freq. spec textfield has been edited -> store in global dict
-            if self.chkSortAuto.isChecked():
-                self._sortEntries()
-            self.storeEntries()
+            self._sort_store_entries()
 
         self.idxOld = idx # remember setting of comboBox
         self.freqRange() # update f_lim setting and send redraw signal
@@ -315,8 +312,7 @@ class InputFreqSpecs(QtGui.QWidget):
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]*self.f_S))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
-        if self.chkSortAuto.isChecked():
-            self._sortEntries()
+        self._sort_entries()
 
 
 #-------------------------------------------------------------
@@ -357,29 +353,30 @@ class InputFreqSpecs(QtGui.QWidget):
 
 
 #-------------------------------------------------------------
-    def _sortStoreEntries(self):
+    def _sort_store_entries(self):
         """
-        Sort spec entries with ascending frequency, store in filter dict and
-        emit sigFilterChanged signal
+        - sort spec entries with ascending frequency if button is pressed
+        - store in filter dict and
+        - emit sigFilterChanged signal
         """
-        self._sortEntries()
+        self._sort_entries()
         self.storeEntries()
         
         self.sigSpecsChanged.emit() # -> inputAll()
 
         
 #-------------------------------------------------------------        
-    def _sortEntries(self):
+    def _sort_entries(self):
         """
-        Sort spec entries with ascending frequency.
+        Sort spec entries with ascending frequency if button is pressed.
         """
-        self.butSort.setDisabled(self.chkSortAuto.isChecked())
-        fSpecs = [simple_eval(self.qlineedit[i].text())
-                                        for i in range(len(self.qlineedit))]
-        fSpecs.sort()
-
-        for i in range(len(self.qlineedit)):
-            self.qlineedit[i].setText(str(fSpecs[i]))
+        if self.butSort.isChecked():
+            fSpecs = [simple_eval(self.qlineedit[i].text())
+                                            for i in range(len(self.qlineedit))]
+            fSpecs.sort()
+    
+            for i in range(len(self.qlineedit)):
+                self.qlineedit[i].setText(str(fSpecs[i]))
 
 
 #------------------------------------------------------------------------------
