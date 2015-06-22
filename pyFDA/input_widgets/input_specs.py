@@ -71,8 +71,7 @@ class InputSpecs(QtGui.QWidget):
         self.wspecs.setObjectName("weightSpecs")
 
 #TODO: get target specs up and running
-        #self.tspecs = input_target_specs.InputTargetSpecs(fil_dict = fb.fil[0],
-        #           DEBUG = False)
+        self.tspecs = input_target_specs.InputTargetSpecs(DEBUG = False)
 
         self.lblMsg = QtGui.QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -108,7 +107,7 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.wspecs,3,1)   # Weight specs
         layGMain.addWidget(frmMsg,4,0,1,2)  # Text message
 #TODO: get target specs up and running
-#        layGMain.addWidget(self.tspecs,5,0,1,2)   # Target specs
+        layGMain.addWidget(self.tspecs,5,0,1,2)   # Target specs
         layGMain.addWidget(self.butDesignFilt, 6,0)
         layGMain.addWidget(self.butReadFiltTree, 6,1)
         layGMain.addItem(spcV,7,0)
@@ -187,7 +186,8 @@ class InputSpecs(QtGui.QWidget):
         self.wspecs.setEnabled("wspecs" in myEnbWdg)
         self.wspecs.updateUI(newLabels = self.weightParams)
 #TODO: get target specs up and running
-        #self.tspecs.setEntries(newLabels = (self.freqParams, self.ampParams)
+#        self.tspecs.updateUI(newLabels = (self.freqParams, self.ampParams))
+        self.tspecs.setVisible(False)        
         self.lblMsg.setText(myMsg)
 
         self.sigSpecsChanged.emit()
@@ -205,7 +205,7 @@ class InputSpecs(QtGui.QWidget):
         self.aspecs.storeEntries() # magnitude specs with unit
         self.wspecs.storeEntries() # weight specification
 #TODO: get target specs up and running
-        #self.tspecs.storeEntries() # target specs        
+#        self.tspecs.storeEntries() # target specs        
 
 #------------------------------------------------------------------------------
     def loadAll(self):
@@ -219,7 +219,7 @@ class InputSpecs(QtGui.QWidget):
         self.aspecs.loadEntries() # magnitude specs with unit
         self.wspecs.loadEntries() # weight specification
 #TODO: get target specs up and running
-        #self.tspecs.loadEntries() # target specs
+        self.tspecs.loadEntries() # target specs
 
         if self.DEBUG: 
             print("=== pyFDA.py : storeAll ===")
