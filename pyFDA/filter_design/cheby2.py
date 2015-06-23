@@ -34,19 +34,26 @@ class cheby2(object):
         self.name = {'cheby2':'Chebychev 2'}
 
         # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter the filter order <b><i>N</i></b>, the minimum stop band "
-            "attenuation <b><i>A<sub>SB</sub></i></b>, and the frequency / "
-            "frequencies <b><i>F<sub>SB</sub></i></b> where gain first drops "
-            "below <b><i>A<sub>SB</sub></i></b>.")
-        msg_min = ("Enter the maximum pass band ripple and minimum stop band "
-                    "attenuation and the corresponding corner frequencies.")
+        msg_man = ("Enter the filter order <b><i>N</i></b> and the critical "
+            "frequency / frequencies <b><i>F<sub>C</sub></i></b> where the gain "
+            "first drops below the minimum stop band "
+            "attenuation <b><i>A<sub>SB</sub></i></b>.")
+        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
+                    "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
+                    "and the corresponding corner frequencies of pass band and "
+                    "stop band, <b><i>F<sub>PB</sub></i></b> and "
+                    "<b><i>F<sub>PB</sub></i></b>.")
+
+        # VISIBLE widgets for all man. / min. filter order response types:
+        vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
+        vis_min = ['fo','fspecs','aspecs','tspecs'] # minimum filter order
 
         # enabled widgets for all man. / min. filter order response types:
         enb_man = ['fo','fspecs','aspecs'] # enabled widget for man. filt. order
         enb_min = ['fo','fspecs','aspecs'] # enabled widget for min. filt. order
 
         # common parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_SB', 'A_SB'] # enabled widget for man. filt. order
+        par_man = ['N', 'f_S', 'F_C', 'A_SB'] # enabled widget for man. filt. order
         par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
 
         # Common data for all man. / min. filter order response types:
@@ -61,9 +68,9 @@ class cheby2(object):
                  "min":{"par":['F_PB','F_SB']}},
           "HP": {"man":{"par":[]},
                  "min":{"par":['F_SB','F_PB']}},
-          "BP": {"man":{"par":['F_SB2']},
+          "BP": {"man":{"par":['F_C2']},
                  "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-          "BS": {"man":{"par":['F_SB2']},
+          "BS": {"man":{"par":['F_C2']},
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
@@ -75,11 +82,11 @@ drops monotonously. This is achieved by placing :math:`N/2` zeros along the stop
 band.
 
 The order :math:`N`, stop band ripple :math:`A_SB` and
-the critical frequency / frequencies :math:`F_SB` where the stop band attenuation
+the critical frequency / frequencies :math:`F_C` where the stop band attenuation
 :math:`A_SB` is reached have to be specified for filter design.
 
 The corner frequency/ies of the pass band can only be controlled indirectly
-by the filter order and by slightly adapting the value(s) of :math:`F_SB`.
+by the filter order and by slightly adapting the value(s) of :math:`F_C`.
 
 **Design routines:**
 
@@ -99,11 +106,15 @@ by the filter order and by slightly adapting the value(s) of :math:`F_SB`.
         parameters, scaling / transforming them if needed.
         """
         self.N     = fil_dict['N']
+        # Frequencies are normalized to f_Nyq = f_S/2 !
         self.F_PB  = fil_dict['F_PB'] * 2
         self.F_SB  = fil_dict['F_SB'] * 2
+        self.F_C = fil_dict['F_C'] * 2
         self.F_PB2 = fil_dict['F_PB2'] * 2
         self.F_SB2 = fil_dict['F_SB2'] * 2
+        self.F_C2 = fil_dict['F_C2'] * 2
         self.F_SBC = None
+        
         self.A_PB  = fil_dict['A_PB']
         self.A_SB  = fil_dict['A_SB']
         self.A_PB2 = fil_dict['A_PB2']
@@ -119,69 +130,77 @@ by the filter order and by slightly adapting the value(s) of :math:`F_SB`.
         if self.F_SBC is not None: # has the order been calculated by a "min" filter design?
             fil_dict['N'] = self.N # yes, update filterbroker
             if np.isscalar(self.F_SBC): # HP or LP - a single corner frequency
-                fil_dict['F_SB'] = self.F_SBC / 2.
+                fil_dict['F_C'] = self.F_SBC / 2.
             else: # BP or BS - two corner frequencies
-                fil_dict['F_SB'] = self.F_SBC[0] / 2.
-                fil_dict['F_SB2'] = self.F_SBC[1] / 2.
+                fil_dict['F_C'] = self.F_SBC[0] / 2.
+                fil_dict['F_C2'] = self.F_SBC[1] / 2
 
-    def LPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SB,
-                              btype='low', analog = False, output = frmt))
-    # LP: F_PB < F_SB
+#------------------------------------------------------------------------------
+#
+#         DESIGN ROUTINES
+#
+#------------------------------------------------------------------------------
+
+# HP & LP
+#        self.save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
+#                             analog=False, ftype='cheby2', output=frmt))
+# BP & BS:
+#        self.save(fil_dict, iirdesign([self.F_PB,self.F_PB2],
+#                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
+#                             analog=False, ftype='cheby2', output=frmt))
+
+
+    # LP: F_PB < F_SB ---------------------------------------------------------
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_SBC = cheb2ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
                             btype='lowpass', analog = False, output = frmt))
-#        self.save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
-#                             analog=False, ftype='cheby2', output=frmt))
-
-    def HPman(self, fil_dict):
+    def LPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SB,
-                            btype='highpass', analog = False, output = frmt))
+        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_C,
+                              btype='low', analog = False, output = frmt))
 
-    # HP: F_SB < F_PB
+    # HP: F_SB < F_PB ---------------------------------------------------------
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_SBC = cheb2ord(self.F_PB, self.F_SB,self.A_PB,self.A_SB)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
                             btype='highpass', analog = False, output = frmt))
 
+    def HPman(self, fil_dict):
+        self.get_params(fil_dict)
+        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_C,
+                            btype='highpass', analog = False, output = frmt))
 
 
     # For BP and BS, A_PB, A_SB, F_PB and F_SB have two elements each
-    def BPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, [self.F_SB, self.F_SB2],
-                            btype='bandpass', analog = False, output = frmt))
 
-    # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]
+    # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1] --------------------------------
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_SBC = cheb2ord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
 
+    def BPman(self, fil_dict):
+        self.get_params(fil_dict)
+        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, [self.F_C, self.F_C2],
+                            btype='bandpass', analog = False, output = frmt))
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
                             btype='bandpass', analog = False, output = frmt))
-#        self.save(fil_dict, iirdesign([self.F_PB,self.F_PB2],
-#                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB,
-#                             analog=False, ftype='cheby2', output=frmt))
 
-    def BSman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, [self.F_SB, self.F_SB2],
-                        btype='bandstop', analog = False, output = frmt))
-
-    # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]
+    # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_SBC = cheb2ord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
-
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
                             btype='bandstop', analog = False, output = frmt))
+
+    def BSman(self, fil_dict):
+        self.get_params(fil_dict)
+        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, [self.F_C, self.F_C2],
+                        btype='bandstop', analog = False, output = frmt))
 
 
 #------------------------------------------------------------------------------
