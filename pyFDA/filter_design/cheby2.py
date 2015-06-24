@@ -40,17 +40,17 @@ class cheby2(object):
             "attenuation <b><i>A<sub>SB</sub></i></b>.")
         msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
                     "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                    "and the corresponding corner frequencies of pass band and "
+                    "and the corresponding corner frequencies of pass and "
                     "stop band, <b><i>F<sub>PB</sub></i></b> and "
                     "<b><i>F<sub>PB</sub></i></b>.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','aspecs','tspecs'] # minimum filter order
+        vis_min = ['fo','tspecs'] # minimum filter order
 
         # enabled widgets for all man. / min. filter order response types:
         enb_man = ['fo','fspecs','aspecs'] # enabled widget for man. filt. order
-        enb_min = ['fo','fspecs','aspecs'] # enabled widget for min. filt. order
+        enb_min = ['fo','fspecs','aspecs', 'tspecs'] # enabled widget for min. filt. order
 
         # common parameters for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_C', 'A_SB'] # enabled widget for man. filt. order
@@ -105,6 +105,8 @@ by the filter order and by slightly adapting the value(s) of :math:`F_C`.
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
+        self.analog = False # set to True for analog filters
+        
         self.N     = fil_dict['N']
         # Frequencies are normalized to f_Nyq = f_S/2 !
         self.F_PB  = fil_dict['F_PB'] * 2
@@ -153,25 +155,27 @@ by the filter order and by slightly adapting the value(s) of :math:`F_C`.
     # LP: F_PB < F_SB ---------------------------------------------------------
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
-        self.N, self.F_SBC = cheb2ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
+        self.N, self.F_SBC = cheb2ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
+                                                      analog = self.analog)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='lowpass', analog = False, output = frmt))
+                        btype='lowpass', analog = self.analog, output = frmt))
     def LPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_C,
-                              btype='low', analog = False, output = frmt))
+                             btype='low', analog = self.analog, output = frmt))
 
     # HP: F_SB < F_PB ---------------------------------------------------------
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
-        self.N, self.F_SBC = cheb2ord(self.F_PB, self.F_SB,self.A_PB,self.A_SB)
+        self.N, self.F_SBC = cheb2ord(self.F_PB, self.F_SB,self.A_PB,self.A_SB,
+                                                      analog = self.analog)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='highpass', analog = False, output = frmt))
+                        btype='highpass', analog = self.analog, output = frmt))
 
     def HPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_C,
-                            btype='highpass', analog = False, output = frmt))
+                        btype='highpass', analog = self.analog, output = frmt))
 
 
     # For BP and BS, A_PB, A_SB, F_PB and F_SB have two elements each
@@ -180,27 +184,28 @@ by the filter order and by slightly adapting the value(s) of :math:`F_C`.
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_SBC = cheb2ord([self.F_PB, self.F_PB2],
-                                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
+            [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog = self.analog)
+        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
+                        btype='bandpass', analog = self.analog, output = frmt))
 
     def BPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, [self.F_C, self.F_C2],
-                            btype='bandpass', analog = False, output = frmt))
-        self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='bandpass', analog = False, output = frmt))
+                        btype='bandpass', analog = self.analog, output = frmt))
+
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_SBC = cheb2ord([self.F_PB, self.F_PB2],
-                                [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
+            [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog = self.analog)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, self.F_SBC,
-                            btype='bandstop', analog = False, output = frmt))
+                        btype='bandstop', analog = self.analog, output = frmt))
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby2(self.N, self.A_SB, [self.F_C, self.F_C2],
-                        btype='bandstop', analog = False, output = frmt))
+                        btype='bandstop', analog = self.analog, output = frmt))
 
 
 #------------------------------------------------------------------------------

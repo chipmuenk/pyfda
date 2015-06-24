@@ -31,7 +31,7 @@ class cheby1(object):
 
     def __init__(self):
         self.name = {'cheby1':'Chebychev 1'}
-
+ 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the critical frequency "
             " or frequencies <b><i>F<sub>C</sub></i></b> where the gain first drops below "
@@ -40,17 +40,17 @@ class cheby1(object):
             " passband.")
         msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
                     "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                    "and the corresponding corner frequencies of pass band and "
+                    "and the corresponding corner frequencies of pass and "
                     "stop band, <b><i>F<sub>PB</sub></i></b> and "
                     "<b><i>F<sub>PB</sub></i></b>.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','aspecs','tspecs'] # minimum filter order
+        vis_man = ['fo','fspecs','tspecs'] # manual filter order
+        vis_min = ['fo','tspecs'] # minimum filter order
 
         # enabled widgets for all man. / min. filter order response types:
         enb_man = ['fo','fspecs','aspecs'] # enabled widget for man. filt. order
-        enb_min = ['fo','fspecs','aspecs'] # enabled widget for min. filt. order
+        enb_min = ['fo','fspecs','aspecs','tspecs'] # enabled widget for min. filt. order
 
         # parameters for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_C', 'A_PB'] # enabled widget for man. filt. order
@@ -104,6 +104,8 @@ The attenuation in the stop band can only be controlled by the filter order.
         Translate parameters from filter dictionary to instance
         parameters, scaling / transforming them if needed.
         """
+        self.analog = False # set to True for analog filters
+
         self.N     = fil_dict['N']
         # Frequencies are normalized to f_Nyq = f_S/2 !
         self.F_PB  = fil_dict['F_PB'] * 2
@@ -116,8 +118,6 @@ The attenuation in the stop band can only be controlled by the filter order.
         
         self.A_PB  = fil_dict['A_PB']
         self.A_SB  = fil_dict['A_SB']
-        self.A_PB2 = fil_dict['A_PB2']
-        self.A_SB2 = fil_dict['A_SB2']
 
     def save(self, fil_dict, arg):
         """
@@ -154,26 +154,28 @@ The attenuation in the stop band can only be controlled by the filter order.
     # LP: F_PB < F_SB ---------------------------------------------------------
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
-        self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
+        self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
+                                              analog = self.analog)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='low', analog = False, output = frmt))
+                            btype='low', analog = self.analog, output = frmt))
  
     def LPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
-                            btype='low', analog = False, output = frmt))
+                            btype='low', analog = self.analog, output = frmt))
 
     # HP: F_SB < F_PB ---------------------------------------------------------
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
-        self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
+        self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
+                                                          analog = self.analog)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='highpass', analog = False, output = frmt))
+                        btype='highpass', analog = self.analog, output = frmt))
 
     def HPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
-                            btype='highpass', analog = False, output = frmt))
+                        btype='highpass', analog = self.analog, output = frmt))
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each:
 
@@ -181,28 +183,28 @@ The attenuation in the stop band can only be controlled by the filter order.
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
-                                [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
+            [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='bandpass', analog = False, output = frmt))
+                        btype='bandpass', analog = self.analog, output = frmt))
 
     def BPman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB,[self.F_C,self.F_C2],
-                            btype='bandpass', analog = False, output = frmt))
+                        btype='bandpass', analog = self.analog, output = frmt))
 
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
-                                [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
+            [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='bandstop', analog = False, output = frmt))
+                        btype='bandstop', analog = self.analog, output = frmt))
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.cheby1(self.N, self.A_PB, [self.F_C,self.F_C2],
-                            btype='bandstop', analog = False, output = frmt))
+                        btype='bandstop', analog = self.analog, output = frmt))
 
 
 #------------------------------------------------------------------------------

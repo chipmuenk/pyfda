@@ -55,7 +55,7 @@ class firwin(object):
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','aspecs','tspecs'] # minimum filter order
+        vis_min = ['fo','tspecs'] # minimum filter order
 
         # ENABLED widgets for all man. / min. filter order response types:
         enb_man = ['fo','fspecs'] # manual filter order
