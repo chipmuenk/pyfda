@@ -4,13 +4,9 @@ Design windowed FIR filters (LP, HP, BP, BS) with fixed order, return
 the filter design in zeros, poles, gain (zpk) format
 
 Attention: This class is re-instantiated dynamically everytime it is selected
-hence, __init__
+hence, __init__ is called everytime.
 
-@author: Christian Muenker
-
-Expected changes in scipy 0.16:
-https://github.com/scipy/scipy/pull/3717
-https://github.com/scipy/scipy/issues/2444
+Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
 import numpy as np
@@ -32,9 +28,10 @@ import pyfda_lib
 
 # TODO: Order of A_XX is incorrect for BP and BS
 # TODO: Hilbert not working correctly yet
-# TODO: Windows need to be saved / read from dictionary
-# TODO: When filter is read from dictionary, dynamic widgets are missing
-# TODO: self.Nargs -> Nargs
+# TODO: Finish calculation of F_C and F_C2 using the weights
+# TODO: Automatic setting of density factor for remez calculation? 
+#       Automatic switching to Kaiser / Hermann?
+# TODO: Switching between BPmin and BSmin produces errors?
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
@@ -49,20 +46,21 @@ class firwin(object):
 
         # common messages for all man. / min. filter order response types:
         msg_man = (r"Enter desired order and <b>-6 dB</b> pass band corner "
-                    "frequency(ies).")
+                    "frequency(ies) <b><i>F<sub>C</sub></i></b>.")
         msg_min = ("Enter the maximum pass band ripple, minimum stop band "
-                    "attenuation and the corresponding corner frequencies.")
+                "attenuation and the corresponding frequencies "
+                "<b><i>F<sub>PB</sub></i></b> and <b><i>F<sub>SB</sub></i></b>.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','aspecs','tspecs'] # minimum filter order
+        vis_min = ['fo','tspecs'] # minimum filter order
 
         # ENABLED widgets for all man. / min. filter order response types:
         enb_man = ['fo','fspecs'] # manual filter order
-        enb_min = ['fo','fspecs','aspecs'] # minimum filter order
+        enb_min = ['fo','fspecs','aspecs', 'tspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_PB'] # enabled widget for man. filt. order
+        par_man = ['N', 'f_S', 'F_C'] # enabled widget for man. filt. order
         par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
 
         # Common data for all filter response types:
@@ -78,9 +76,9 @@ class firwin(object):
             "HP": {"man":{"par":[],
                           "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
                    "min":{"par":['F_SB','F_PB']}},
-            "BP": {"man":{"par":['F_PB2']},
+            "BP": {"man":{"par":['F_C2']},
                    "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
-            "BS": {"man":{"par":['F_PB2'],
+            "BS": {"man":{"par":['F_C2'],
                       "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
                    "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
 #            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
@@ -205,6 +203,7 @@ class firwin(object):
         # and remove common args for all window types ('sym' and 'M'):
         self.winArgs = [arg for arg in self.winArgs if arg not in {'sym', 'M'}]
 
+        # print(scipy.signal.window.boxcar.func_code.co_varnames) # also works
         # make edit boxes and labels for additional parameters visible if needed
         # and construct self.firWindow as a tuple consisting of a string with 
         # the window name and optionally one or two float parameters. 
@@ -282,6 +281,9 @@ class firwin(object):
         self.F_SB  = fil_dict['F_SB']
         self.F_PB2 = fil_dict['F_PB2']
         self.F_SB2 = fil_dict['F_SB2']
+        self.F_C   = fil_dict['F_C']
+        self.F_C2  = fil_dict['F_C2']
+        
         # remez amplitude specs are linear (not in dBs) and need to be
         # multiplied by a factor of two to obtain a "tight fit" (why??)
         self.A_PB  = (10.**(fil_dict['A_PB']/20.)-1) / (10**(fil_dict['A_PB']/20.)+1)*2
@@ -304,38 +306,41 @@ class firwin(object):
 
         try: # has the order been calculated by a "min" filter design?
             fil_dict['N'] = self.N - 1 # yes, update filterbroker
+            fil_dict['F_C'] = self.F_C
         except AttributeError:
             pass
         self.storeEntries()
 
     def LPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, self.F_PB,
+        self.save(fil_dict, sig.firwin(self.N, self.F_C,
                                        window = self.firWindow, nyq = 0.5))
 
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
         (self.N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
+        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, self.F_PB, 
                                        window = self.firWindow, nyq = 0.5))
 
     def HPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, self.F_PB, window = self.firWindow,
+        self.save(fil_dict, sig.firwin(self.N, self.F_C, window = self.firWindow,
                                     pass_zero=False, nyq = 0.5))
 
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
         (N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
+        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
         self.save(fil_dict, sig.firwin(self.N, self.F_PB, window = self.firWindow,
                                     pass_zero=False, nyq = 0.5))
     # For BP and BS, F_PB and F_SB have two elements each
     def BPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
+        self.save(fil_dict, sig.firwin(self.N, [self.F_C, self.F_C2],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BPmin(self, fil_dict):
@@ -343,12 +348,14 @@ class firwin(object):
         (self.N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)
+        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        self.F_C2 = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
+        self.save(fil_dict, sig.firwin(self.N, [self.F_C, self.F_C2],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
     def BSmin(self, fil_dict):
@@ -357,6 +364,8 @@ class firwin(object):
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
         self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
+        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        self.F_C2 = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, [self.F_SB, self.F_SB2],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
