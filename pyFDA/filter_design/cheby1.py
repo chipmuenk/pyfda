@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 26 12:13:41 2013
+Design Chebychev 1 filters (LP, HP, BP, BS) with fixed or minimum order, return
+the filter design in zpk (zeros, poles, gain) format
 
-Design cheby1-Filters (LP, HP, BP, BS) with fixed or minimum order, return
-the filter design in zeros, poles, gain (zpk) format
-
-@author: Christian Muenker
-
-Expected changes in scipy 0.16:
-https://github.com/scipy/scipy/pull/3717
-https://github.com/scipy/scipy/issues/2444
+Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -85,6 +79,9 @@ the critical frequency / frequencies :math:`F_C` where the gain drops below
 :math:`-A_PB` have to be specified.
 
 The attenuation in the stop band can only be controlled by the filter order.
+
+The ``cheb1ord()`` helper routine calculates the minimum order :math:`N` and the 
+critical passband frequency :math:`F_C` from passband / stopband specifications.
 
 **Design routines:**
 

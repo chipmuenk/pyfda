@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 26 12:13:41 2013
-
 Design ellip-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
-@author: Christian Muenker
-
-Expected changes in scipy 0.16:
-https://github.com/scipy/scipy/pull/3717
-https://github.com/scipy/scipy/issues/2444
+Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -83,6 +77,9 @@ For the filter design, the order :math:`N`, minimum stopband attenuation
 the critical frequency / frequencies :math:`F_PB` where the gain first drops below
 the maximum passband ripple :math:`-A_PB` have to be specified.
 
+The ``ellipord()`` helper routine calculates the minimum order :math:`N` and the 
+critical passband frequency :math:`F_C` from pass and stop band specifications.
+
 **Design routines:**
 
 ``scipy.signal.ellip()``
@@ -125,8 +122,7 @@ the maximum passband ripple :math:`-A_PB` have to be specified.
 
         if self.F_PBC is not None: # has corner frequency been calculated?
             fil_dict['N'] = self.N # yes, update filterbroker
-#            print("====== ellip.save ========\nF_PBC = ", self.F_PBC, type(self.F_PBC))
-#            print("F_PBC vor", self.F_PBC, type(self.F_PBC))
+
             if np.isscalar(self.F_PBC): # HP or LP - a single corner frequency
                 fil_dict['F_PB'] = self.F_PBC / 2.
             else: # BP or BS - two corner frequencies

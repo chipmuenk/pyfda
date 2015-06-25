@@ -81,7 +81,7 @@ For the filter design, only the order :math:`N` and
 the - 3dB corner frequency / frequencies :math:`F_C` can be specified.
 
 The ``buttord()`` helper routine calculates the minimum order :math:`N` and the 
-critical frequency from passband / stopband specifications.
+critical frequency from pass and stop band specifications.
 
 **Design routines:**
 

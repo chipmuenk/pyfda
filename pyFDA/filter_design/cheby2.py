@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed December 17 2014
-
 Design cheby2-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
-@author: Christian Muenker
-
-Expected changes in scipy 0.16:
-https://github.com/scipy/scipy/pull/3717
-https://github.com/scipy/scipy/issues/2444
+Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -87,6 +81,9 @@ the critical frequency / frequencies :math:`F_C` where the stop band attenuation
 
 The corner frequency/ies of the pass band can only be controlled indirectly
 by the filter order and by slightly adapting the value(s) of :math:`F_C`.
+
+The ``cheb2ord()`` helper routine calculates the minimum order :math:`N` and the 
+critical stop band frequency :math:`F_C` from pass and stop band specifications.
 
 **Design routines:**
 
