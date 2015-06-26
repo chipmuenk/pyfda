@@ -29,9 +29,10 @@ import pyfda_lib
 # TODO: Order of A_XX is incorrect for BP and BS
 # TODO: Hilbert not working correctly yet
 # TODO: Finish calculation of F_C and F_C2 using the weights
+# TODO: Better way of discriminating between HP/LP and BP / BS needed
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
-# TODO: Switching between BPmin and BSmin produces errors?
+# TODO: remezord fails for wide transition regions and small ripple specs?
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
