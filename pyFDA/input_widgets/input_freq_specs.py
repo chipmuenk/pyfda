@@ -312,7 +312,8 @@ class InputFreqSpecs(QtGui.QWidget):
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]*self.f_S))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
-        self._sort_entries()
+        self._sort_store_entries()  # store values of new / 
+                                    # newly sorted fields to dict
 
 
 #-------------------------------------------------------------
@@ -368,7 +369,8 @@ class InputFreqSpecs(QtGui.QWidget):
 #-------------------------------------------------------------        
     def _sort_entries(self):
         """
-        Sort spec entries with ascending frequency if button is pressed.
+        Sort visible spec entries with ascending frequency if "sort" button is
+        pressed and write the sorted freq. specs back into the lineedit widgets.
         """
         if self.butSort.isChecked():
             fSpecs = [simple_eval(self.qlineedit[i].text())
