@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
 """
 Design equiripple-Filters (LP, HP, BP, BS) with fixed or minimum order, return
-the filter design in zeros, poles, gain (zpk) format
-Created on Tue Nov 26 12:13:41 2013
+the filter design in coefficients format ('ba')
 
-@author: Christian Muenker
-
-Expected changes in scipy 0.16:
-https://github.com/scipy/scipy/pull/3717
-https://github.com/scipy/scipy/issues/2444
+Attention: 
+This class is re-instantiated dynamically everytime the filter design method
+is selected, calling the __init__ method.
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
+from PyQt4 import QtGui
+import numpy as np
 
 if __name__ == "__main__":
     import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
-    import filterbroker as fb
 
+import filterbroker as fb
 import pyfda_lib
 
 
-
-# TODO: Order of A_XX is incorrect e.g. for BP
-# TODO: Try HP with even order & type = Hilbert
-# TODO: Hilbert not working correctly yet
+# TODO: min order for Hilbert & Differentiator
+# TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
+# TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
+#       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
+#         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
+#           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
 
 frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
              # currently, only 'ba' is supported for equiripple routines
@@ -37,7 +38,7 @@ class equiripple(object):
     stop band, the tolerance bands are fully used.
 
     The minimum order to fulfill the target specifications is estimated
-    using one of three algorithms.
+    using Ichige's algorithm.
     """
 
     def __init__(self):
@@ -83,29 +84,88 @@ class equiripple(object):
                    "min":{"par":['A_PB2','W_PB','W_SB','W_PB2',
                                  'F_PB','F_SB','F_SB2','F_PB2']}},
             "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB', 'W_PB', 'W_SB2','A_SB','A_PB','A_SB2']
-                                 }}
-          #"DIFF":
+                                 'W_SB', 'W_PB', 'W_SB2','A_SB','A_PB','A_SB2']}},
+            "DIFF": {"man":{"par":['F_PB', 'W_PB']}}
                    }
         self.info_doc = []
         self.info_doc.append('remez()\n=======')
         self.info_doc.append(sig.remez.__doc__)
 
+        # additional dynamic widgets that need to be set in the main widgets
+        self.wdg = {'sf':'wdg_remez'}
         #----------------------------------------------------------------------
-        # Additional subwidgets
-#        self.wdg = {'fo':'combo_equirip_alg'}
+        self.initUI()
+
+
+    def initUI(self):
+        """
+        Create additional subwidget(s) needed for filter design with the 
+        names given in self.wdg :
+        These subwidgets are instantiated dynamically when needed in 
+        input_filter.py using the handle to the filter object, fb.filObj .
+        """
+
+        self.lbl_remez_1 = QtGui.QLabel("Grid Density")
+        self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
+        self.led_remez_1 = QtGui.QLineEdit()
+        self.led_remez_1.setText("16")
+        self.led_remez_1.setObjectName('wdg_led_remez_1')
+        self.led_remez_1.setToolTip("Set number of frequency grid points for ")
+               
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
+        self.wdg_remez = QtGui.QWidget()
+        self.wdg_remez.setObjectName('wdg_remez')
+        self.layHWin = QtGui.QHBoxLayout()
+        self.layHWin.setObjectName('wdg_layGWin')
+        self.layHWin.addWidget(self.lbl_remez_1)
+        self.layHWin.addWidget(self.led_remez_1)
+        self.layHWin.setContentsMargins(0,0,0,0)
+        self.wdg_remez.setLayout(self.layHWin)
+
         #----------------------------------------------------------------------
-        # Combobox for selecting the algorithm to estimate minimum filter order
-#        self.combo_equirip_alg = QtGui.QComboBox()
-#        self.combo_equirip_alg.setObjectName('combo_firwin_alg')
-#        self.combo_equirip_alg.addItems(['ichige','kaiser','herrmann'])
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.led_remez_1.editingFinished.connect(self.updateUI)
+        #----------------------------------------------------------------------
+
+        self.loadEntries() # get initial / last setting from dictionary
+        self.updateUI()
+        
+    def updateUI(self):
+        """
+        Update UI when line edit field is changed (here, only the text is read
+        and converted to integer.)
+        """
+        self.grid_density = abs(round(float(self.led_remez_1.text())))
+        self.led_remez_1.setText(str(self.grid_density))
+        
+    def loadEntries(self):
+        """
+        Reload parameter(s) from filter dictionary and set UI elements 
+        when filter is loaded from disk.
+        """
+        try:
+            dyn_wdg_par = fb.fil[0]['wdg_dyn']
+            if 'grid_density' in dyn_wdg_par:
+                self.led_remez_1.setText(str(dyn_wdg_par['grid_density']))
+        except KeyError as e:
+            print("Key Error:",e)
+
+
+    def storeEntries(self):
+        """
+        Store parameter settings in filter dictionary.
+        """
+        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+
+
 
     def get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N'] + 1 # remez algorithms expects number of taps
+        self.N     = fil_dict['N'] # remez algorithms expects number of taps
                                 # which is larger by one than the order!!
         self.F_PB  = fil_dict['F_PB']
         self.F_SB  = fil_dict['F_SB']
@@ -118,7 +178,6 @@ class equiripple(object):
         self.A_SB  = 10.**(-fil_dict['A_SB']/20.)
         self.A_SB2 = 10.**(-fil_dict['A_SB2']/20.)
 
-#        self.alg = str(self.combo_equirip_alg.currentText())
         self.alg = 'ichige'
 #        print("Ellip: F_PB - F_SB - F_SB2 - P_PB2\n", self.F_PB, self.F_SB, self.F_SB2, self.F_PB2 )
 
@@ -133,14 +192,16 @@ class equiripple(object):
         pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
 
         try: # has the order been calculated by a "min" filter design?
-            fil_dict['N'] = self.N-1 # yes, update filterbroker
+            fil_dict['N'] = self.N  # yes, update filterbroker
         except AttributeError:
             pass
 
     def LPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5],
-               [1, 0], weight = [fil_dict['W_PB'],fil_dict['W_SB']],Hz = 1))
+        self.save(fil_dict, 
+                  sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
+                        weight = [fil_dict['W_PB'],fil_dict['W_SB']], Hz = 1,
+                        grid_density = self.grid_density))
 
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
@@ -148,29 +209,45 @@ class equiripple(object):
             [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
         fil_dict['W_PB'] = W[0]
         fil_dict['W_SB'] = W[1]
-        self.save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1))
+        self.save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
+                        grid_density = self.grid_density))
+
 
     def HPman(self, fil_dict):
         self.get_params(fil_dict)
-#        N = self.oddround(self.N) # enforce odd order
-        self.save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5],
-                [0, 1], weight = [fil_dict['W_SB'],fil_dict['W_PB']], Hz = 1))
+        if (self.N % 2 == 0): # even order, use odd symmetry (type III)
+            self.save(fil_dict, 
+                  sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
+                        weight = [fil_dict['W_SB'],fil_dict['W_PB']], Hz = 1,
+                        type = 'hilbert', grid_density = self.grid_density))
+        else: # odd order, 
+            self.save(fil_dict, 
+                  sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
+                        weight = [fil_dict['W_SB'],fil_dict['W_PB']], Hz = 1,
+                        type = 'bandpass', grid_density = self.grid_density))
 
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1],
+        (self.N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
+#        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
         fil_dict['W_SB'] = W[0]
         fil_dict['W_PB'] = W[1]
-        self.save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, type = 'bandpass'))
+        if (self.N % 2 == 0): # even order
+            self.save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+                        type = 'hilbert', grid_density = self.grid_density))
+        else:
+            self.save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+                        type = 'bandpass', grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
+        self.save(fil_dict,
+                 sig.remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
-                weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']], Hz = 1))
+                weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
+                Hz = 1, grid_density = self.grid_density))
 
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
@@ -180,35 +257,71 @@ class equiripple(object):
         fil_dict['W_SB']  = W[0]
         fil_dict['W_PB']  = W[1]
         fil_dict['W_SB2'] = W[2]
-        self.save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, Hz = 1))
+        self.save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, Hz = 1,
+                                      grid_density = self.grid_density))
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
+#        self.N = pyfda_lib.ceil_odd(self.N) # enforce odd order
         self.save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
-                self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
-                weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],Hz = 1))
+            self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
+            weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],
+            Hz = 1, grid_density = self.grid_density))
 
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
         (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
+        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
         fil_dict['W_PB2'] = W[2]
-        self.save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1))
+        self.save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1,
+                                      grid_density = self.grid_density))
 
     def HILman(self, fil_dict):
         self.get_params(fil_dict)
         self.save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
-                weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']], Hz = 1,
-                type = 'hilbert'))
+                weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
+                Hz = 1, type = 'hilbert', grid_density = self.grid_density))
+
+    def DIFFman(self, fil_dict):
+        self.get_params(fil_dict)
+        self.N = pyfda_lib.ceil_even(self.N) # enforce even order
+        self.save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
+                Hz = 1, type = 'differentiator', grid_density = self.grid_density))
+
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    app = QtGui.QApplication(sys.argv)
     filt = equiripple()        # instantiate filter
+    grid_density = getattr(filt, filt.wdg['sf'])
+
+    layVDynWdg = QtGui.QVBoxLayout()
+    layVDynWdg.addWidget(grid_density, stretch = 1)
+    
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][frmt]) # return results in default format
+
+    frmDynWdg = QtGui.QFrame()
+    frmDynWdg.setLayout(layVDynWdg)
+    
+    layVAllWdg = QtGui.QVBoxLayout()
+    layVAllWdg.addWidget(frmDynWdg)
+
+    frmMain = QtGui.QFrame()
+    frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+    frmMain.setLayout(layVAllWdg)    
+
+    form = frmMain
+
+    form.show()
+    
+
+    app.exec_()
+    #------------------------------------------------------------------------------
+
