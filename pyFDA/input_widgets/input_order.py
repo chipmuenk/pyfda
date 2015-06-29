@@ -164,7 +164,8 @@ class InputOrder(QtGui.QFrame):
             self.lblOrder.setEnabled(self.fo == 'man')
             self.ledOrder.setEnabled(self.fo == 'man')
 
-        ordn = int(self.ledOrder.text())
+        ordn = abs(int(float(self.ledOrder.text())))
+        self.ledOrder.setText(str(ordn))
         fb.fil[0].update({'N' : ordn})
         
         self.sigSpecsChanged.emit() # -> input_all
