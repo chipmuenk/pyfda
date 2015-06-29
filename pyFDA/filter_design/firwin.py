@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Design windowed FIR filters (LP, HP, BP, BS) with fixed order, return
-the filter design in zeros, poles, gain (zpk) format
+the filter design in coefficient ('ba') format
 
-Attention: This class is re-instantiated dynamically everytime it is selected
-hence, __init__ is called everytime.
+Attention: 
+This class is re-instantiated dynamically everytime the filter design method
+is selected, calling the __init__ method.
 
 Author: Christian Muenker
 """
@@ -26,12 +27,10 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib
 
 
-# TODO: Order of A_XX is incorrect for BP and BS
-# TODO: Hilbert not working correctly yet
+# TODO: Hilbert, differentiator, multiband are missing
 # TODO: Finish calculation of F_C and F_C2 using the weights
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
-# TODO: Switching between BPmin and BSmin produces errors?
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
@@ -275,7 +274,7 @@ class firwin(object):
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N'] + 1 # remez algorithms expects number of taps
+        self.N     = fil_dict['N'] # remez algorithms expects number of taps
                                 # which is larger by one than the order!!
         self.F_PB  = fil_dict['F_PB']
         self.F_SB  = fil_dict['F_SB']
@@ -305,69 +304,73 @@ class firwin(object):
         pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
 
         try: # has the order been calculated by a "min" filter design?
-            fil_dict['N'] = self.N - 1 # yes, update filterbroker
-            fil_dict['F_C'] = self.F_C
+            fil_dict['N'] = self.N # yes, update filterbroker
         except AttributeError:
             pass
         self.storeEntries()
-
-    def LPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, self.F_C,
-                                       window = self.firWindow, nyq = 0.5))
 
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
         (self.N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
-        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.save(fil_dict, sig.firwin(self.N, self.F_PB, 
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                                        window = self.firWindow, nyq = 0.5))
 
-    def HPman(self, fil_dict):
+    def LPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, self.F_C, window = self.firWindow,
-                                    pass_zero=False, nyq = 0.5))
+        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'],
+                                       window = self.firWindow, nyq = 0.5))
 
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
         (N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
-        self.save(fil_dict, sig.firwin(self.N, self.F_PB, window = self.firWindow,
-                                    pass_zero=False, nyq = 0.5))
-    # For BP and BS, F_PB and F_SB have two elements each
-    def BPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, [self.F_C, self.F_C2],
-                            window = self.firWindow, pass_zero=False, nyq = 0.5))
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
+        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+                    window = self.firWindow, pass_zero=False, nyq = 0.5))
 
+    def HPman(self, fil_dict):
+        self.get_params(fil_dict)
+        self.N = pyfda_lib.ceil_odd(self.N)  # enforce odd order
+        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+            window = self.firWindow, pass_zero=False, nyq = 0.5))
+
+
+    # For BP and BS, F_PB and F_SB have two elements each
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
         (self.N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)
-        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.F_C2 = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
-        self.save(fil_dict, sig.firwin(self.N, [self.F_PB, self.F_PB2],
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
+        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
-    def BSman(self, fil_dict):
+    def BPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, [self.F_C, self.F_C2],
-                            window = self.firWindow, pass_zero=True, nyq = 0.5))
+        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+                            window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
         (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = pyfda_lib.oddround(N)  # enforce odd length = even order
-        self.F_C = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.F_C2 = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
-        self.save(fil_dict, sig.firwin(self.N, [self.F_SB, self.F_SB2],
+        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
+        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
+
+    def BSman(self, fil_dict):
+        self.get_params(fil_dict)
+        self.N = pyfda_lib.ceil_odd(self.N)  # enforce odd order
+        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+                            window = self.firWindow, pass_zero=True, nyq = 0.5))
+
 
 #------------------------------------------------------------------------------
 
@@ -403,7 +406,4 @@ if __name__ == '__main__':
     form.show()
 
     app.exec_()
-   
-    
-#
-#
+
