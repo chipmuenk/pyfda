@@ -283,7 +283,8 @@ class InputSpecs(QtGui.QWidget):
         Color the >> DESIGN FILTER << button:
         green:  filter has been designed, everything ok
         yellow: filter specs have been changed
-        red:    an error has occurred during filter desigtn
+        red:    an error has occurred during filter design
+        orange: filter does not meet target specs
         """
         if state == "designed": 
             css = "QPushButton { background-color: green;  color: white}"
@@ -291,10 +292,13 @@ class InputSpecs(QtGui.QWidget):
             css = "QPushButton { background-color: yellow}"
         elif state == "error": 
             css = "QPushButton { background-color: red; color: white}" #
+        elif state == "spec_fail": 
+            css = "QPushButton { background-color: orange; color: white}" #
+
         else: css = ""
         
         self.butDesignFilt.setStyleSheet(css +
-                      "QPushButton:pressed { background-color: orange }" )
+                      "QPushButton:pressed { background-color: black; color: white}" )
 
 #------------------------------------------------------------------------------
 
