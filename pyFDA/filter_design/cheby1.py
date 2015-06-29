@@ -3,6 +3,10 @@
 Design Chebychev 1 filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zpk (zeros, poles, gain) format
 
+Attention:
+This class is re-instantiated dynamically everytime the filter design method
+is selected, calling the __init__ method.
+
 Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals

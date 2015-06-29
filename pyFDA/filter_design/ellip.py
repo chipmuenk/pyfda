@@ -3,6 +3,10 @@
 Design ellip-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
+Attention:
+This class is re-instantiated dynamically everytime the filter design method
+is selected, calling the __init__ method.
+
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals

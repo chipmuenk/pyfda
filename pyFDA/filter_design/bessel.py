@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 26 12:13:41 2013
-
-Design Bessell-Filters (LP, HP, BP, BS) with fixed or minimum order, return
+Design Bessel-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
-@author: Christian Muenker
+Attention:
+This class is re-instantiated dynamically everytime the filter design method
+is selected, calling the __init__ method.
 
-Expected changes in scipy 0.16:
-https://github.com/scipy/scipy/pull/3717
-https://github.com/scipy/scipy/issues/2444
+Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -26,6 +24,7 @@ if __name__ == "__main__":
 import pyfda_lib
 
 frmt = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+
 class bessel(object):
 
     def __init__(self):
