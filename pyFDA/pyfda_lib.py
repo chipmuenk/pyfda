@@ -954,15 +954,29 @@ Examples
 #------------------------------------------------------------------------------
 #    abs = np.absolute
 
-def oddround(x):
-    """Return the nearest odd integer from x."""
+def round_odd(x):
+    """Return the nearest odd integer from x. x can be integer or float."""
+    return int(x-np.mod(x,2)+1)
+    
+    
+def round_even(x):
+    """Return the nearest even integer from x. x can be integer or float."""
+    return int(x-np.mod(x,2))
+    
 
-    return x-np.mod(x,2)+1
-
-def oddceil(x):
-    """Return the smallest odd integer not less than x."""
-
-    return oddround(x+1)
+def ceil_odd(x):
+    """
+    Return the smallest odd integer not less than x. x can be integer or float.
+    """
+    return round_odd(x+1)
+    
+    
+def ceil_even(x):
+    """
+    Return the smallest odd integer not less than x. x can be integer or float.
+    """
+    return round_even(x+1)
+    
 
 def remlplen_herrmann(fp,fs,dp,ds):
     """
@@ -986,7 +1000,6 @@ Jour., 52(6):769-799, Jul./Aug. 1973.
     f = b[0]+b[1]*(log10(dp)-log10(ds))
     N1 = Dinf/dF-f*dF+1
 
-    #        return int(self.oddround(N1))
     return int(N1)
     #------------------------------------------------------------------------------
 
@@ -1006,7 +1019,6 @@ function, Proc. IEEE Int. Symp. Circuits and Systems, 20-23, April 1974.
     dF = fs-fp
     N2 = (-20*log10(np.sqrt(dp*ds))-13.0)/(14.6*dF)+1.0
 
-#        return int(self.oddceil(N2))
     return int(N2)
 #------------------------------------------------------------------------------
 
@@ -1032,7 +1044,6 @@ Circuits and Systems, 47(10):1008-1017, October 2000.
     DN = np.ceil(Nm*(h(fp,dF,1.1)-(h(0.5-dF-fp,dF,0.29)-1.0)/2.0))
     N4 = N3+DN
 
-    #        return int(self.oddceil(N4))
     return int(N4)
 
 #######################################
