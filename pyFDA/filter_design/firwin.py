@@ -29,6 +29,7 @@ import pyfda_lib
 
 # TODO: Hilbert, differentiator, multiband are missing
 # TODO: Finish calculation of F_C and F_C2 using the weights
+# TODO: Better way of discriminating between HP/LP and BP / BS needed
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
 
