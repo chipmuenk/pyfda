@@ -28,8 +28,9 @@ import pyfda_lib
 
 
 # TODO: Hilbert, differentiator, multiband are missing
-# TODO: Finish calculation of F_C and F_C2 using the weights
-# TODO: Better way of discriminating between HP/LP and BP / BS needed
+# TODO: Use kaiserord, kaiser_beta & kaiser_atten to calculate params for 
+#       kaiser window
+# TODO: Improve calculation of F_C and F_C2 using the weights
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
 
@@ -49,7 +50,9 @@ class firwin(object):
                     "frequency(ies) <b><i>F<sub>C</sub></i></b>.")
         msg_min = ("Enter the maximum pass band ripple, minimum stop band "
                 "attenuation and the corresponding frequencies "
-                "<b><i>F<sub>PB</sub></i></b> and <b><i>F<sub>SB</sub></i></b>.")
+                "<b><i>F<sub>PB</sub></i></b> and <b><i>F<sub>SB</sub></i></b>."
+                "<br />The minimum order algorithm only gives a rough approximation - "
+                "manual fine tuning will be necessary!")
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
@@ -74,12 +77,12 @@ class firwin(object):
             "LP": {"man":{"par":[]},
                    "min":{"par":['F_PB','F_SB']}},
             "HP": {"man":{"par":[],
-                          "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
+                          "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
                    "min":{"par":['F_SB','F_PB']}},
             "BP": {"man":{"par":['F_C2']},
                    "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
             "BS": {"man":{"par":['F_C2'],
-                      "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
+                      "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
                    "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
 #            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
           #"DIFF":
@@ -276,7 +279,7 @@ class firwin(object):
         parameters, scaling / transforming them if needed.
         """
         self.N     = fil_dict['N'] # remez algorithms expects number of taps
-                                # which is larger by one than the order!!
+                                # which is larger by one than the order?!
         self.F_PB  = fil_dict['F_PB']
         self.F_SB  = fil_dict['F_SB']
         self.F_PB2 = fil_dict['F_PB2']
@@ -328,13 +331,13 @@ class firwin(object):
         (N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
+        self.N = pyfda_lib.round_odd(N)  # enforce odd order
         self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                     window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def HPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.N = pyfda_lib.ceil_odd(self.N)  # enforce odd order
+        self.N = pyfda_lib.round_odd(self.N)  # enforce odd order
         self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
@@ -360,7 +363,7 @@ class firwin(object):
         (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
+        self.N = pyfda_lib.round_odd(N)  # enforce odd order
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
@@ -368,7 +371,7 @@ class firwin(object):
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
-        self.N = pyfda_lib.ceil_odd(self.N)  # enforce odd order
+        self.N = pyfda_lib.round_odd(self.N)  # enforce odd order
         self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 

@@ -71,8 +71,7 @@ class equiripple(object):
         self.rt = {
             "LP": {"man":{"par":['W_PB','W_SB','F_PB','F_SB','A_PB','A_SB']},
                    "min":{"par":['F_PB','F_SB','W_PB','W_SB']}},
-            "HP": {"man":{"par":['W_SB','W_PB','F_SB','F_PB','A_SB','A_PB'],
-                          "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
+            "HP": {"man":{"par":['W_SB','W_PB','F_SB','F_PB','A_SB','A_PB']},
                    "min":{"par":['F_SB','F_PB','W_SB','W_PB']}},
             "BP": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
                                  'W_SB','W_PB','W_SB2','A_SB','A_PB','A_SB2']},
@@ -80,7 +79,7 @@ class equiripple(object):
                                  'W_SB', 'W_PB','W_SB2','A_SB2']}},
             "BS": {"man":{"par":['F_PB', 'F_SB', 'F_SB2', 'F_PB2',
                                  'W_PB', 'W_SB', 'W_PB2','A_PB','A_SB','A_PB2'],
-                      "msg":r"<br /><b>Note:</b> Order needs to be even (type I FIR filters)!"},
+                      "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
                    "min":{"par":['A_PB2','W_PB','W_SB','W_PB2',
                                  'F_PB','F_SB','F_SB2','F_PB2']}},
             "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
@@ -262,7 +261,7 @@ class equiripple(object):
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
-#        self.N = pyfda_lib.ceil_odd(self.N) # enforce odd order
+        self.N = pyfda_lib.round_odd(self.N) # enforce odd order
         self.save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
             self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
             weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],
@@ -273,7 +272,7 @@ class equiripple(object):
         (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
+        self.N = pyfda_lib.round_odd(N)  # enforce odd order
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
         fil_dict['W_PB2'] = W[2]
