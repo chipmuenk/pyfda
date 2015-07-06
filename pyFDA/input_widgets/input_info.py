@@ -201,12 +201,15 @@ class InputInfo(QtGui.QWidget):
 
         self.targ_spec_passed = np.all(H_targ_pass)
 #            
-        print(H_targ, H_targ_pass)
-        print(H_test_dB)
-        print(self.targ_spec_passed)
         if self.DEBUG:
-            print("input_info.showFiltPerf\n===================H_test", H_test)
+            print("input_info.showFiltPerf\n===================")
+            print("H_targ", H_targ)
+            print("H_test", H_test)
+            print("H_test_dB", H_test_dB)
             print("F_test", F_test_vals)
+            print("H_targ_pass",H_targ_pass)
+            print("passed:", self.targ_spec_passed)
+
 #        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
 
         self.tblFiltPerf.setRowCount(len(H_test))
