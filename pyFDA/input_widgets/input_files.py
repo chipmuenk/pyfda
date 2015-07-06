@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 26 10:57:30 2013
+Widget for exporting / importing and saving / loading data
 
-@author: Christian Muenker
-
-Tab-Widget for exporting / importing and saving / loading data
+Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
@@ -57,7 +55,6 @@ if __name__ == "__main__":
 import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib_fix_v3 as fix
 
-# TODO: Get rid of error messages when cancelling a file operation
 # TODO: Save P/Z as well if possible
 
 class InputFiles(QtGui.QWidget):
@@ -72,8 +69,6 @@ class InputFiles(QtGui.QWidget):
         super(InputFiles, self).__init__()
         
         self.basedir = os.path.dirname(os.path.abspath(__file__))
-        self.basedir = 'D:/Daten'
-#        print("basedir =", self.basedir)
 
         self.initUI()
 
@@ -381,6 +376,7 @@ class InputFiles(QtGui.QWidget):
                     if not file_type_err:
                         print('Loaded filter "%s"' %file_name)                    
                         self.sigFilterDesigned.emit() # emit signal -> pyFDA -> pltAll.updateAll()
+                        self.basedir = os.path.dirname(file_name)
             except IOError:
                 print("Failed loading %s!" %file_name)
             
@@ -408,6 +404,7 @@ class InputFiles(QtGui.QWidget):
                         file_type_err = True
                     if not file_type_err:
                         print('Filter saved as "%s"' %file_name)
+                        self.basedir = os.path.dirname(file_name)
                             
             except IOError as e:
                     print('Failed saving "%s"!\n' %file_name, e)
@@ -496,6 +493,7 @@ class InputFiles(QtGui.QWidget):
                     if not file_type_err:
                         print('Exported coefficients as %s - file to \n"%s"' 
                                 %(self.del_file_ext(file_type), file_name))
+                        self.basedir = os.path.dirname(file_name)
                     
             except IOError as e:
                 print('Failed saving "%s"!\n' %file_name, e)
@@ -537,7 +535,7 @@ class InputFiles(QtGui.QWidget):
                     if not file_type_err:
                         print('Loaded coefficient file\n"%s"' %file_name)
                         self.sigFilterDesigned.emit() # emit signal -> pyFDA                     
-
+                        self.basedir = os.path.dirname(file_name)
             except IOError as e:
                 print("Failed loading %s!\n" %file_name, e)
 
