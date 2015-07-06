@@ -135,7 +135,7 @@ class equiripple(object):
         Update UI when line edit field is changed (here, only the text is read
         and converted to integer.)
         """
-        self.grid_density = abs(round(float(self.led_remez_1.text())))
+        self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
         self.led_remez_1.setText(str(self.grid_density))
         
     def loadEntries(self):
