@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 26 10:57:30 2013
+Widget for displaying infos about filter and filter design method
 
-@author: Christian Muenker
-
-Tab-Widget for displaying infos about filter and filter design method
+Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
