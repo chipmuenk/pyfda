@@ -110,6 +110,8 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
             'freqSpecsRangeType':'Half',
             'freqSpecsRange': [0,0.5],
+            'freq_specs_sort' : True,
+            'freq_specs_unit' : 'f_S',
             'plt_fLabel':r'$f$ in Hz $\rightarrow$',
             'plt_fUnit':'Hz',
             'plt_tLabel':r'$n \; \rightarrow$',
