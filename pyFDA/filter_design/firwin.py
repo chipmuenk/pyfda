@@ -55,22 +55,22 @@ class firwin(object):
                 "manual fine tuning will be necessary!")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
-        vis_min = ['fo','tspecs'] # minimum filter order
+        vis_man = ['fo','fspecs','tspecs'] # manual filter order
+        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
-        # ENABLED widgets for all man. / min. filter order response types:
-        enb_man = ['fo','fspecs'] # manual filter order
-        enb_min = ['fo','fspecs','aspecs', 'tspecs'] # minimum filter order
+        # DISABLED widgets for all man. / min. filter order response types:
+        dis_man = [] # manual filter order
+        dis_min = ['fspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C'] # enabled widget for man. filt. order
-        par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
+        par_man = ['N', 'f_S', 'F_C']     #  manual filter order
+        par_min = ['f_S', 'A_PB', 'A_SB'] #  minimum filter order
 
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"enb":enb_man, "msg":msg_man, "par": par_man},
-                    "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
+        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
+                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
                     
         self.ft = 'FIR'
         self.rt = {

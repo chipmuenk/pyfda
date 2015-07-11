@@ -32,15 +32,19 @@ class bessel(object):
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the -3 dB corner "
-            "frequency or frequencies <b><i>F<sub>PB</sub></i></b>.")
+            "frequency or frequencies <b><i>F<sub>PB</sub></i></b> .")
         msg_min = ("Enter the desired pass band gain and minimum stop "
             "band attenuation at the corresponding corner frequencies."
             "No Bessel order algorithm is implemented yet, buttord() (min. "
             "order of a Butterworth filter) is used as a cheap replacement.")
 
-        # enabled widgets for all man. / min. filter order response types:
-        enb_man = ['fo','fspecs'] # enabled widget for man. filt. order
-        enb_min = ['fo','fspecs','aspecs'] # enabled widget for min. filt. order
+        # VISIBLE widgets for all man. / min. filter order response types:
+        vis_man = ['fo','fspecs','tspecs'] # manual filter order
+        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
+
+        # DISABLED widgets for all man. / min. filter order response types:
+        dis_man = [] # enabled widget for man. filt. order
+        dis_min = ['fspecs'] # enabled widget for min. filt. order
 
         # parameters for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_PB']
@@ -49,8 +53,8 @@ class bessel(object):
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"enb":enb_man, "msg":msg_man, "par":par_man},
-                    "min":{"enb":enb_min, "msg":msg_min, "par":par_min}}
+        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
+                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
 
         self.ft = 'IIR'
         self.rt = {

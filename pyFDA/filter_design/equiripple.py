@@ -51,12 +51,12 @@ class equiripple(object):
                     "attenuation and the corresponding corner frequencies.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','aspecs'] # manual filter order
-        vis_min = ['fo','fspecs','aspecs'] # minimum filter order
+        vis_man = ['fo','wspecs', 'tspecs'] # manual filter order
+        vis_min = ['fo','wspecs', 'tspecs'] # minimum filter order
 
-        # ENABLED widgets for all man. / min. filter order response types:
-        enb_man = ['fo','fspecs','wspecs'] # manual filter order
-        enb_min = ['fo','fspecs','aspecs'] # minimum filter order
+        # DISABLED widgets for all man. / min. filter order response types:
+        dis_man = [] # manual filter order
+        dis_min = ['wspecs'] # minimum filter order
 
         # common parameters for all man. / min. filter order response types:
         par_man = ['N', 'f_S'] # enabled widget for man. filt. order
@@ -65,8 +65,8 @@ class equiripple(object):
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"enb":enb_man, "msg":msg_man, "par": par_man},
-                    "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
+        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par": par_man},
+                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
             "LP": {"man":{"par":['W_PB','W_SB','F_PB','F_SB','A_PB','A_SB']},
@@ -83,8 +83,9 @@ class equiripple(object):
                    "min":{"par":['A_PB2','W_PB','W_SB','W_PB2',
                                  'F_PB','F_SB','F_SB2','F_PB2']}},
             "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB', 'W_PB', 'W_SB2','A_SB','A_PB','A_SB2']}},
-            "DIFF": {"man":{"par":['F_PB', 'W_PB']}}
+                                 'W_SB', 'W_PB', 'W_SB2'],
+                                 "vis":["fspecs"], }},
+            "DIFF": {"man":{"par":['F_PB', 'W_PB'], "vis":["fspecs"]}}
                    }
         self.info_doc = []
         self.info_doc.append('remez()\n=======')
