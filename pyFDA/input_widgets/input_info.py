@@ -21,10 +21,9 @@ if __name__ == "__main__":
 
 import filterbroker as fb # importing filterbroker initializes all its globals
 
-# TODO: Setting the cursor position doesn't work yet
 # TODO: Docstrings cannot be displayed with Py3:
 #       Line 113: QTextEdit.append(str): argument 1 has unexpected type 'bytes'
-# TODO: Passband and stopband info should be separated, showing min / max values
+# TODO: Passband and stopband info should show min / max values for each band
 class InputInfo(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -151,14 +150,14 @@ class InputInfo(QtGui.QWidget):
 
 
         # Vector with test frequencies of the labels above    
-        F_test_vals = np.array([item[0] for item in F_test]) * f_S
+        F_test_vals = np.array([item[0] for item in F_test]) / f_S
         F_test_lbls = [item[1] for item in F_test]
         
         # Calculate frequency response at test frequencies and over the whole range:
         [w_test, H_test] = sig.freqz(bb, aa, F_test_vals * 2.0 * pi)
         [w, H] = sig.freqz(bb, aa)
 
-        f = w  * f_S / (2.0 * pi)
+        f = w / (2.0 * pi) # frequency normalized to f_S
         H_abs = abs(H)
         H_max = max(H_abs);
         H_max_dB = 20*log10(H_max);
@@ -167,6 +166,8 @@ class InputInfo(QtGui.QWidget):
         H_min = min(H_abs)
         H_min_dB = 20*log10(H_min)
         F_min = f[np.argmin(H_abs)]
+        
+#        f = f * f_S 
 
         F_test_lbls += ['Min.','Max.']
         F_test_vals = np.append(F_test_vals, [F_min, F_max])
@@ -214,10 +215,11 @@ class InputInfo(QtGui.QWidget):
         self.tblFiltPerf.setColumnCount(5)
         self.target_spec_passed = False
 
-        self.tblFiltPerf.setHorizontalHeaderLabels(['Test Case', 'f(Hz)','|H(f)|','|H(f)| (dB)', 'Spec'])
+        self.tblFiltPerf.setHorizontalHeaderLabels(['Test Case', 
+        'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'|H(f)|','|H(f)| (dB)', 'Spec'] )
         for row in range(len(H_test)):
             self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbls[row]))
-            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]))))
+            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]*f_S))))
             self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
             self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str('%2.3f'%(H_test_dB[row]))))
             if not H_targ_pass[row]:
@@ -235,8 +237,6 @@ class InputInfo(QtGui.QWidget):
         """
         Display info from filter design file and docstring
         """
-        pos = self.txtFiltInfoBox.textCursor().position()
-#        print(pos)
 
         if hasattr(fb.filObj,'info'):
             if self.chkRichText.isChecked():
