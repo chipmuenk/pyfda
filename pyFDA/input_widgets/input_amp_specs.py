@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 18 13:36:39 2013
+Widget for entering amplitude specifications
 
-@author: Julia Beike, Christian Münker
+Author: Christian Münker
 """
 
 # TODO: Check specs IIR / FIR A_PB <-> delta_PB
@@ -30,12 +30,13 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     
     sigSpecsChanged = pyqtSignal()
     
-    def __init__(self, DEBUG = True):
+    def __init__(self, DEBUG = True,  title = "Amplitude Specs"):
         """
         Initialize
         """
         super(InputAmpSpecs, self).__init__()
         self.DEBUG = DEBUG
+        self.title = title
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -48,7 +49,6 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         """
         self.layVMain = QtGui.QVBoxLayout() # Widget vertical layout
 
-        title = "Amplitude Specifications"
         units = ["dB", "V", "W"]
         self.idxOld = -1 # index of comboUnits before last change
 
@@ -56,7 +56,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         bfont.setBold(True)
 #            bfont.setWeight(75)
         self.lblTitle = QtGui.QLabel(self) # field for widget title
-        self.lblTitle.setText(str(title))
+        self.lblTitle.setText(str(self.title))
         self.lblTitle.setFont(bfont)
         self.lblTitle.setWordWrap(True)
         self.layVMain.addWidget(self.lblTitle)

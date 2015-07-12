@@ -56,12 +56,15 @@ class InputAll(QtGui.QWidget):
     def initUI(self):
         """ Initialize UI with tabbed subplots """
         tabWidget = QtGui.QTabWidget()
-        
+#        tabWidget.setTabShape(QtGui.QTabWidget.Triangular) # different look ....
         tabWidget.addTab(self.inputSpecs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')
         tabWidget.addTab(self.inputCoeffs, 'b,a')
         tabWidget.addTab(self.inputPZ, 'P/Z')
         tabWidget.addTab(self.inputInfo, 'Info')
+#        QTabBar.setTabTextColor() 
+#        css = "QTabWidget { background-color: red; color: white}" 
+#        self.inputInfo.setStyleSheet(css)#
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addWidget(tabWidget)
@@ -94,19 +97,23 @@ class InputAll(QtGui.QWidget):
 
     def updateSpecs(self):
         """
-        Called when filter SPECS have been changed:
-        Update some input and plot widgets with new filter SPECS from global dict
+        Called when filter SPECS have been changed: 
+            Pass new filter SPECS from global dict
+        - Update some input widgets that can / need to display specs
+        - Update some plot widgets via sigSpecsChanged signal that need new
+            specs, e.g. plotHf widget for the filter regions
         """
-        self.inputSpecs.color_design_button("changed")      
+        self.inputSpecs.color_design_button("changed")   
+        self.inputSpecs.loadAll()
         self.inputInfo.showInfo()
         self.sigSpecsChanged.emit() # pyFDA -> plot_all.updateSpecs
         
 
     def updateAll(self):
         """
-        Called when a new filter has been DESIGNED
-        - Update all input widgets that can / need to display new filter data,
-            from the global filter dict.
+        Called when a new filter has been DESIGNED: 
+            Pass new filter data from the global filter dict
+        - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         
         """

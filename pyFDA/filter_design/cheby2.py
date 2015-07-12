@@ -35,20 +35,20 @@ class cheby2(object):
         msg_man = ("Enter the filter order <b><i>N</i></b> and the critical "
             "frequency / frequencies <b><i>F<sub>C</sub></i></b> where the gain "
             "first drops below the minimum stop band "
-            "attenuation <b><i>A<sub>SB</sub></i></b>.")
+            "attenuation <b><i>A<sub>SB</sub></i></b> .")
         msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
                     "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
                     "and the corresponding corner frequencies of pass and "
                     "stop band, <b><i>F<sub>PB</sub></i></b> and "
-                    "<b><i>F<sub>PB</sub></i></b>.")
+                    "<b><i>F<sub>PB</sub></i></b> .")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','aspecs','tspecs'] # manual filter order
-        vis_min = ['fo','tspecs'] # minimum filter order
+        vis_man = ['fo','fspecs','tspecs'] # manual filter order
+        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
-        # enabled widgets for all man. / min. filter order response types:
-        enb_man = ['fo','fspecs','aspecs'] # enabled widget for man. filt. order
-        enb_min = ['fo','fspecs','aspecs', 'tspecs'] # enabled widget for min. filt. order
+        # DISABLED widgets for all man. / min. filter order response types:
+        dis_man = [] # disabled widgets for man. filt. order
+        dis_min = ['fspecs'] # disabled widget for min. filt. order
 
         # common parameters for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_C', 'A_SB'] # enabled widget for man. filt. order
@@ -57,8 +57,8 @@ class cheby2(object):
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"enb":enb_man, "msg":msg_man, "par": par_man},
-                    "min":{"enb":enb_min, "msg":msg_min, "par": par_min}}
+        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
+                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
 
         self.ft = 'IIR'
         self.rt = {

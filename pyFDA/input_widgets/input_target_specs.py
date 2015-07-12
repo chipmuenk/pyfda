@@ -30,16 +30,17 @@ class InputTargetSpecs(QtGui.QWidget):
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    filterDesigned = pyqtSignal()  # emitted when filter has been designed
-    filterChanged = pyqtSignal()
+    sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
 
-    def __init__(self, DEBUG = False):
+
+    def __init__(self, DEBUG = False, title = "Target Specs"):
         super(InputTargetSpecs, self).__init__()
 #        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
 #        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
 
         self.DEBUG = DEBUG
+        self.title = title
 #        self.ftb = FilterTreeBuilder('init.txt', 'filter_design',
 #                                    commentChar = '#', DEBUG = DEBUG) #
         self.initUI()
@@ -50,13 +51,14 @@ class InputTargetSpecs(QtGui.QWidget):
 
         fspecs : Frequency Specifications
 
-
         """
 
         # subwidget for Frequency Specs
-        self.fspecs = input_freq_specs.InputFreqSpecs(DEBUG = False)
+        self.fspecs = input_freq_specs.InputFreqSpecs(DEBUG = False, 
+                                                      title = "Frequency")
         # subwidget for Amplitude Specs
-        self.aspecs = input_amp_specs.InputAmpSpecs(DEBUG = False)
+        self.aspecs = input_amp_specs.InputAmpSpecs(DEBUG = False, 
+                                                    title = "Amplitude")
 
         self.aspecs.setVisible(True)
         """
@@ -66,7 +68,7 @@ class InputTargetSpecs(QtGui.QWidget):
         bfont.setBold(True)
 #            bfont.setWeight(75)
         lblTitle = QtGui.QLabel(self) # field for widget title
-        lblTitle.setText("Target Specifications")
+        lblTitle.setText(self.title)
         lblTitle.setFont(bfont)
 
         spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
@@ -84,56 +86,27 @@ class InputTargetSpecs(QtGui.QWidget):
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
-        # Call chooseDesignMethod every time filter selection is changed:
+        # Call updateUI every time filter selection is changed:
 
-        self.chooseDesignMethod() # first time initialization
+        self.updateUI() # first time initialization
+        
 
-    def chooseDesignMethod(self):
+#------------------------------------------------------------------------------
+    def updateUI(self, freqParams = [], ampParams = []):
         """
-        Reads:  fb.fil[0] (currently selected filter), extracting info
-                from fb.filTree
-        Writes:
-        Depending on SelectFilter and frequency specs, the values of the
-        widgets fo, fspecs are recreated. For widget ms, the visibility is changed
-        as well.
+        Pass frequency and amplitude labels to the amplitude and frequency
+        spec widgets and emit a specs changed signal
         """
-
-        # filter object instance is created from design method
-        # (e.g. 'cheby1', 'min') in input_filter.py
-
-        # Read freq / amp / weight labels for current filter design
-        rt = fb.fil[0]['rt']
-        ft = fb.fil[0]['ft']
-        dm = fb.fil[0]['dm']
-#        fo = fb.fil[0]['fo']
-#        print(fb.filTree[rt][ft])
-#TODO: The following fails when a design method has no minimum filter order
-#       algorithm! Solution: Provide generic parameters for LP / BP / ... as fallback
-        if 'min' in fb.filTree[rt][ft][dm]:
-            myParams = fb.filTree[rt][ft][dm]['min']['par']
-        else:
-            myParams = {}
-#        myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
-
-        # build separate parameter lists according to the first letter
-        self.freqParams = [l for l in myParams if l[0] == 'F']
-        self.ampParams = [l for l in myParams if l[0] == 'A']
-        if self.DEBUG:
-            print("=== InputParams.chooseDesignMethod ===")
-            print("selFilter:", fb.fil[0])
-            print('myLabels:', myParams)
-            print('ampLabels:', self.ampParams)
-            print('freqLabels:', self.freqParams)
-            print('weightLabels:', self.weightParams)
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.fspecs.updateUI(newLabels = self.freqParams) # update frequency spec labels
-        self.aspecs.setVisible(self.ampParams != [])
-        self.aspecs.updateUI(newLabels = self.ampParams)
+        self.fspecs.updateUI(newLabels = freqParams) # update frequency spec labels
+        self.aspecs.setVisible(ampParams != [])
+        self.aspecs.updateUI(newLabels = ampParams)
 
-        self.filterChanged.emit() # ->pyFDA -> pltAll.updateAll()
+        self.sigSpecsChanged.emit() # ->pyFDA -> pltAll.updateAll()
 
+#------------------------------------------------------------------------------
     def storeEntries(self):
         """
         Update global dict fb.fil[0] with currently selected filter
@@ -159,7 +132,25 @@ class InputTargetSpecs(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = InputTargetSpecs()
+
+    # Read freq / amp / weight labels for current filter design
+    rt = fb.fil[0]['rt']
+    ft = fb.fil[0]['ft']
+    dm = fb.fil[0]['dm']
+#        fo = fb.fil[0]['fo']
+#        print(fb.filTree[rt][ft])
+    if 'min' in fb.filTree[rt][ft][dm]:
+        myParams = fb.filTree[rt][ft][dm]['min']['par']
+    else:
+        myParams = {}
+#        myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
+
+    # build separate parameter lists according to the first letter
+    freqParams = [l for l in myParams if l[0] == 'F']
+    ampParams = [l for l in myParams if l[0] == 'A']
+
+    form = InputTargetSpecs(title = "Test Specs")
+    form.updateUI(freqParams, ampParams)
     form.show()
     form.storeEntries()
 
