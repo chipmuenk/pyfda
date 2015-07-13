@@ -40,8 +40,9 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * Impulse response and step response (lin / log)
  * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
+ * Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. 
+ * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
  * Filter design files can be added and edited *without* changing or even restarting the program
- * Special widgets needed by design methods (e.g. for choosing the window in Firwin) are included in the filter design file, not in the main program
 * **Saving and loading**
  * Save and load filter designs in pickled and in numpy's NPZ-format
  * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format
