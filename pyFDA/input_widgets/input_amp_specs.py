@@ -72,8 +72,10 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         # fit size dynamically to largest element
-
         self.cmbUnitsA.setCurrentIndex(0)
+        
+        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,
+                                      QtGui.QSizePolicy.Expanding)
 
         self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields
         self.layGSpecs.addWidget(self.lblUnits,0,0)
@@ -90,6 +92,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         frmMain.setLayout(self.layGSpecs)
 
         self.layVMain.addWidget(frmMain)
+        self.layVMain.addItem(spcV)
         self.layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(self.layVMain)
@@ -190,7 +193,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     def updateUI(self, newLabels = []):
         """
         Set labels and get corresponding values from filter dictionary.
-        When number of elements changes, the layout of subwidget is rebuilt.
+        When number of elements changes, the layout of subwidget is rebuilt in
+        self.layGSpecs.
         """
         # Check whether the number of entries has changed
         for i in range(max(len(self.qlabels), len(newLabels))):
@@ -244,10 +248,10 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 #------------------------------------------------------------------------------
     def _addEntry(self, i, newLabel):
         """
-        Append entry number i to subwidget (QLabel und QLineEdit) and
-        connect QLineEdit widget to self.ampUnits. This way, the central filter
-        dictionary is updated automatically when a QLineEdit field has been
-        edited.
+        Append entry number i to subwidget (QLabel und QLineEdit) in self.layGSpecs
+        and connect QLineEdit widget to self.ampUnits. This way, the central
+        filter dictionary is updated automatically when a QLineEdit field has 
+        been edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(self._rtLabel(newLabel))

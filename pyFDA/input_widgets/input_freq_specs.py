@@ -54,6 +54,9 @@ class InputFreqSpecs(QtGui.QWidget):
         self.lblTitle.setFont(bfont)
         self.lblTitle.setWordWrap(True)
         self.layVMain.addWidget(self.lblTitle)
+        
+        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,
+                                      QtGui.QSizePolicy.Expanding)
 
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
@@ -65,6 +68,7 @@ class InputFreqSpecs(QtGui.QWidget):
         sfFrame.setLayout(self.layGSpecWdg)
 
         self.layVMain.addWidget(sfFrame)
+        self.layVMain.addItem(spcV)
         self.layVMain.setContentsMargins(1,1,1,1)
         self.setLayout(self.layVMain)
 

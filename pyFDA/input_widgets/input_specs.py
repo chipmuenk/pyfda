@@ -65,7 +65,8 @@ class InputSpecs(QtGui.QWidget):
         self.w_specs = input_weight_specs.InputWeightSpecs(DEBUG = False)
         self.w_specs.setObjectName("weight_specs")
         # subwidget for target specs (frequency and amplitude)
-        self.t_specs = input_target_specs.InputTargetSpecs(DEBUG = False)
+        self.t_specs = input_target_specs.InputTargetSpecs(DEBUG = False, 
+                                            title = "Target Specifications")
         self.t_specs.setObjectName("target_specs")
         # subwidget for displaying infos on the design method
         self.lblMsg = QtGui.QLabel(self)

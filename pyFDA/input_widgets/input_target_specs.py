@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 14 15:21:19 2013
-Widget for entering filter specifications
+Widget collecting subwidgets for the target filter specifications (currently
+only amplitude and frequency specs.)
 
-@author: beike, Christian Münker
+Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
@@ -18,39 +18,33 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb
-#from filter_tree_builder import FilterTreeBuilder
 
-from input_widgets import (input_filter, input_order, input_amp_specs,
-                           input_freq_specs, input_weight_specs)
-#from plot_widgets import plot_all
+from input_widgets import input_amp_specs, input_freq_specs
 
 
 class InputTargetSpecs(QtGui.QWidget):
     """
-    Build widget for entering all filter specs
+    Build and update widget for entering the target specifications (frequencies
+    and amplitudes) like F_sb, F_pb, A_SB, etc.
     """
+
     # class variables (shared between instances if more than one exists)
     sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
 
 
     def __init__(self, DEBUG = False, title = "Target Specs"):
         super(InputTargetSpecs, self).__init__()
-#        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
-#        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px; border:1px solid rgb(0, 255, 0); ")
 
 
         self.DEBUG = DEBUG
         self.title = title
-#        self.ftb = FilterTreeBuilder('init.txt', 'filter_design',
-#                                    commentChar = '#', DEBUG = DEBUG) #
+        
         self.initUI()
+
 
     def initUI(self):
         """
-        Create all widgets:
-
-        fspecs : Frequency Specifications
-
+        Initialize user interface
         """
 
         # subwidget for Frequency Specs
@@ -71,22 +65,17 @@ class InputTargetSpecs(QtGui.QWidget):
         lblTitle.setText(self.title)
         lblTitle.setFont(bfont)
 
-        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
-#        layGMain.addWidget(self.fspecs,0,0,1,2)
-
         layGMain.addWidget(lblTitle,0,0,1,2)
         layGMain.addWidget(self.fspecs,1,0)  # Freq. specifications
         layGMain.addWidget(self.aspecs,1,1)   # Amplitude specs
-        layGMain.addItem(spcV,2,0)   # Amplitude specs
 
         layGMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(layGMain)
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTS
-        # Call updateUI every time filter selection is changed:
+        # NO   SIGNALS & SLOTS
 
         self.updateUI() # first time initialization
         
