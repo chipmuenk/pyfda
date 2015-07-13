@@ -74,9 +74,6 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         # fit size dynamically to largest element
         self.cmbUnitsA.setCurrentIndex(0)
         
-        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,
-                                      QtGui.QSizePolicy.Expanding)
-
         self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields
         self.layGSpecs.addWidget(self.lblUnits,0,0)
         self.layGSpecs.addWidget(self.cmbUnitsA,0,1, Qt.AlignLeft)
@@ -92,7 +89,6 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         frmMain.setLayout(self.layGSpecs)
 
         self.layVMain.addWidget(frmMain)
-        self.layVMain.addItem(spcV)
         self.layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(self.layVMain)

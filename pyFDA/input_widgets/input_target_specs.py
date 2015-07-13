@@ -64,11 +64,19 @@ class InputTargetSpecs(QtGui.QWidget):
         lblTitle = QtGui.QLabel(self) # field for widget title
         lblTitle.setText(self.title)
         lblTitle.setFont(bfont)
-
+        
+        layVFreq = QtGui.QVBoxLayout()  # add stretch at bottom of ampSpecs
+        layVFreq.addWidget(self.fspecs) # to compensate for different number of 
+        layVFreq.addStretch()           # arguments
+        
+        layVAmp = QtGui.QVBoxLayout()  # add stretch at bottom of freqSpecs
+        layVAmp.addWidget(self.aspecs) # to compensate for different number of 
+        layVAmp.addStretch()           # arguments
+        
         layGMain = QtGui.QGridLayout()
-        layGMain.addWidget(lblTitle,0,0,1,2)
-        layGMain.addWidget(self.fspecs,1,0)  # Freq. specifications
-        layGMain.addWidget(self.aspecs,1,1)   # Amplitude specs
+        layGMain.addWidget(lblTitle,0,0,1,2)# title
+        layGMain.addLayout(layVFreq,1,0)  # frequency specifications
+        layGMain.addLayout(layVAmp,1,1)  # amplitude specifications
 
         layGMain.setContentsMargins(1,1,1,1)
 

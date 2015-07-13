@@ -94,7 +94,8 @@ class InputSpecs(QtGui.QWidget):
         """
         LAYOUT
         """
-        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
+        spcV = QtGui.QSpacerItem(0,0, QtGui.QSizePolicy.Minimum,
+                                      QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
         layGMain.addWidget(self.sel_fil,0,0,1,2)  # Design method (IIR - ellip, ...)
         layGMain.addWidget(self.fil_ord,1,0,1,2)  # Filter order
@@ -173,7 +174,6 @@ class InputSpecs(QtGui.QWidget):
             
         vis_wdgs = fb.filTree[rt][ft][dm][fo]['vis'] # visible widgets
         dis_wdgs = fb.filTree[rt][ft][dm][fo]['dis'] # disabled widgets
-        print("vis_wdgs", vis_wdgs)
         msg    = fb.filTree[rt][ft][dm][fo]['msg'] # message
 
         # build separate parameter lists according to the first letter
