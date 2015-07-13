@@ -22,12 +22,12 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 * **Filter design**
     * **Design methods** from scipy.signal: Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 
     * **Remember all specifications** when changing filter design methods
-    * **Fine-tune** manually filter order and corner frequencies calculated by minimum order algorithms
+    * **Fine-tune** manually the filter order and corner frequencies calculated by minimum order algorithms
     * **Compare filter designs** for a given set of specifications and different design methods
     * **Filter coefficients and poles / zeroes** can be displayed, edited and quantized
 * **Clearly structured GUI**
  * only widgets needed for the currently selected design method are visible
- * enhanced matplotlib NavigationToolbar (nicer icons, additional functions 'grid' and 'zoom full extent')
+ * enhanced matplotlib NavigationToolbar (nicer icons, additional functions)
 * **Common interface for all filter design methods:**
  * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
  * specify ripple and attenuations in dB, as voltage or as power ratios
@@ -40,8 +40,9 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
  * Impulse response and step response (lin / log)
  * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
+ * Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. 
+ * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
  * Filter design files can be added and edited *without* changing or even restarting the program
- * Special widgets needed by design methods (e.g. for choosing the window in Firwin) are included in the filter design file, not in the main program
 * **Saving and loading**
  * Save and load filter designs in pickled and in numpy's NPZ-format
  * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format
@@ -63,7 +64,6 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 ### Release 0.1 (target: end of <s>May</s> June 2015)
 
 The following features are still missing for the first release. 
-* Clean separation between target specifications and design specifications (= required by filter design method)
 * Documentation
 
 ### Release 0.2 (target: end of 2015) - Help is very welcome!
@@ -92,5 +92,6 @@ Implement model-view controller architecture for the following features:
 
 ### Further ideas are
 * Wave-Digital Filters
+* test filters in real-time with a audio stream
 * ...
 
