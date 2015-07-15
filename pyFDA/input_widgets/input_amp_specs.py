@@ -6,7 +6,7 @@ Author: Christian Münker
 """
 
 # TODO: Check specs IIR / FIR A_PB <-> delta_PB
-# TODO: Rounding errors during muliple to-and-fro changes
+
 from __future__ import print_function, division, unicode_literals
 from numpy import log10
 import sys, os
@@ -174,13 +174,13 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         elif idx == 1:  # Entries are voltages, convert to dBs
             for i in range(len(self.qlineedit)):
                 fb.fil[0].update(
-                    {self.qlineedit[i].objectName():
-                       - 20. * log10 (simple_eval(self.qlineedit[i].text()))})
+                   {self.qlineedit[i].objectName():round(
+                      -20 * log10 (simple_eval(self.qlineedit[i].text())),8)})
         else:  # Entries are powers, convert to dBs
             for i in range(len(self.qlineedit)):
                 fb.fil[0].update(
-                    {self.qlineedit[i].objectName():
-                       - 10. * log10 (simple_eval(self.qlineedit[i].text()))})
+                    {self.qlineedit[i].objectName():round(
+                       -10 * log10 (simple_eval(self.qlineedit[i].text())),8)})
                        
         self.sigSpecsChanged.emit() # -> input_all
 
