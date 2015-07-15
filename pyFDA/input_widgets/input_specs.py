@@ -82,10 +82,6 @@ class InputSpecs(QtGui.QWidget):
         frmMsg.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                  QtGui.QSizePolicy.Minimum)
 
-#        self.lblMsg.setVisible(True)
-#        self.w_specs.setVisible(True)
-#        self.a_specs.setVisible(True)
-
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.color_design_button("changed")
         self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
