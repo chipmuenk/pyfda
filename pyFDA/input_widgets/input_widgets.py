@@ -9,7 +9,15 @@ Tabbed container for all input widgets
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtCore import pyqtSignal, pyqtSlot
+
+try:
+    import myhdl
+except ImportError:
+    MYHDL = False
+    print("Warning: Module myHDL not installed -> no filter synthesis")
+else:
+    MYHDL = True
 
 # add main directory from one level above if this file is run as __main__
 # for test purposes
@@ -19,7 +27,7 @@ if __name__ == "__main__":
 
 from input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
 
-class InputAll(QtGui.QWidget):
+class InputWidgets(QtGui.QWidget):
     """
     Create a tabbed widget for various input subwidgets
     """
@@ -30,7 +38,7 @@ class InputAll(QtGui.QWidget):
 
     def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG
-        super(InputAll, self).__init__()
+        super(InputWidgets, self).__init__()
         css = """
         QTabBar{
         font-weight:bold;
@@ -82,6 +90,9 @@ class InputAll(QtGui.QWidget):
         # Collect "specs changed" / "filter designed" signals from all input 
         # widgets and route them to plot / input widgets that need to be updated
         #
+        # Check:
+        #http://www.pythoncentral.io/pysidepyqt-tutorial-creating-your-own-signals-and-slots/#custom-tab-2-pyqt
+        #
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
         # requiring update of some plot widgets only:        
         self.inputSpecs.sigSpecsChanged.connect(self.updateSpecs)
@@ -97,10 +108,10 @@ class InputAll(QtGui.QWidget):
 
     def updateSpecs(self):
         """
-        Called when filter SPECS have been changed: 
-            Pass new filter SPECS from global dict
-        - Update some input widgets that can / need to display specs
-        - Update some plot widgets via sigSpecsChanged signal that need new
+        Propagate new filter SPECS from global filter dict to UIs
+            
+        - Update input widgets that can / need to display specs
+        - Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
         self.inputSpecs.color_design_button("changed")   
@@ -108,7 +119,7 @@ class InputAll(QtGui.QWidget):
         self.inputInfo.showInfo()
         self.sigSpecsChanged.emit() # pyFDA -> plot_all.updateSpecs
         
-
+    @pyqtSlot() # possible, but not neccessary
     def updateAll(self):
         """
         Called when a new filter has been DESIGNED: 
@@ -132,7 +143,7 @@ class InputAll(QtGui.QWidget):
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    form = InputAll()
+    form = InputWidgets()
     form.show()
     app.exec_()
 
