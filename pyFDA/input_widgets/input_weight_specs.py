@@ -130,7 +130,7 @@ class InputWeightSpecs(QtGui.QWidget):
                 {self.qlineedit[i].objectName():
                     simple_eval(self.qlineedit[i].text())})
                        
-        self.sigSpecsChanged.emit() # -> input_all
+        self.sigSpecsChanged.emit() # -> input_widgets
         
         
 #------------------------------------------------------------------------------

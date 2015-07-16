@@ -198,7 +198,7 @@ class InputFreqUnits(QtGui.QWidget):
 
         fb.fil[0]['freqSpecsRange'] = f_lim
         
-        self.sigSpecsChanged.emit() # -> inputAll()
+        self.sigSpecsChanged.emit() # -> input_widgets
 
 
     #-------------------------------------------------------------
@@ -248,7 +248,7 @@ class InputFreqUnits(QtGui.QWidget):
         Store sort flag in filter dict and emit sigSpecsChanged
         """
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
-        self.sigSpecsChanged.emit() # -> inputAll()
+        self.sigSpecsChanged.emit() # -> input_widgets
 
  
 #------------------------------------------------------------------------------

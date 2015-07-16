@@ -101,7 +101,7 @@ class InputTargetSpecs(QtGui.QWidget):
         self.aspecs.setVisible(ampParams != [])
         self.aspecs.updateUI(newLabels = ampParams)
 
-        self.sigSpecsChanged.emit() # ->pyFDA -> pltAll.updateAll()
+        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
     def storeEntries(self):

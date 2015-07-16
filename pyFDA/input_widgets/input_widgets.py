@@ -128,7 +128,7 @@ class InputWidgets(QtGui.QWidget):
         - Update all plot widgets via the signal sigFilterDesigned
         
         """
-        if self.DEBUG: print("input_all.updateAll:\n",self.sender().objectName())
+        if self.DEBUG: print("input_widgets.updateAll:\n",self.sender().objectName())
 
         self.inputSpecs.color_design_button("designed")      
         self.inputSpecs.loadAll()

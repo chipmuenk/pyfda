@@ -268,7 +268,7 @@ class InputCoeffs(QtGui.QWidget):
             print("Coeffs - b,a:", fb.fil[0]["ba"])
             print ("Coeffs updated!")
 
-        self.sigFilterDesigned.emit()  # -> input_all -> pyFDA -> pltAll.updateAll()
+        self.sigFilterDesigned.emit()  # -> input_widgets -> pyFDA -> pltWidgets.updateAll()
 
     def showCoeffs(self):
         """

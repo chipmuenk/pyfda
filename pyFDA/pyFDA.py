@@ -11,8 +11,8 @@ import sys
 from PyQt4 import QtGui, QtCore
 
 #import filterbroker as fb # importing filterbroker initializes all its globals
-from input_widgets import input_all
-from plot_widgets import plot_all
+from input_widgets import input_widgets 
+from plot_widgets import plot_widgets
 
 class pyFDA(QtGui.QMainWindow):
     """
@@ -47,10 +47,10 @@ class pyFDA(QtGui.QMainWindow):
         """
         
         # Instantiate widget groups
-        self.inputAll = input_all.InputAll() # input widgets        
-        self.inputAll.setMaximumWidth(280) # comment out for splitter
+        self.inputWidgets = input_widgets.InputWidgets() # input widgets        
+        self.inputWidgets.setMaximumWidth(280) # comment out for splitter
         
-        self.pltAll = plot_all.PlotAll() # plot widgets
+        self.pltWidgets = plot_widgets.PlotWidgets() # plot widgets
         
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
@@ -58,16 +58,16 @@ class pyFDA(QtGui.QMainWindow):
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
 
         # comment out following 3 lines for splitter design
-        layHMain.addWidget(self.inputAll)        
-        layHMain.addWidget(self.pltAll)
+        layHMain.addWidget(self.inputWidgets)        
+        layHMain.addWidget(self.pltWidgets)
         layHMain.setContentsMargins(0,0,0,0)#(left, top, right, bottom)
 
 
 # variable size tabs (splitter)
 #        layVInput = QtGui.QVBoxLayout()
-#        layVInput.addWidget(self.inputAll)
+#        layVInput.addWidget(self.inputWidgets)
 #        layVPlt = QtGui.QVBoxLayout()
-#        layVPlt.addWidget(self.pltAll)
+#        layVPlt.addWidget(self.pltWidgets)
 #        
 #        frmInput = QtGui.QFrame()
 #        frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -131,11 +131,11 @@ class pyFDA(QtGui.QMainWindow):
         # 
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
         # requiring partial update of some plot widgets:
-        self.inputAll.sigSpecsChanged.connect(self.pltAll.updateSpecs)
+        self.inputWidgets.sigSpecsChanged.connect(self.pltWidgets.updateSpecs)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets: 
-        self.inputAll.sigFilterDesigned.connect(self.pltAll.updateAll)
+        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.updateAll)
 
         
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window

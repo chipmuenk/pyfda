@@ -168,7 +168,7 @@ class InputOrder(QtGui.QFrame):
         self.ledOrder.setText(str(ordn))
         fb.fil[0].update({'N' : ordn})
         
-        self.sigSpecsChanged.emit() # -> input_all
+        self.sigSpecsChanged.emit() # -> input_widgets
         
 
     def _updateDynWidgets(self):

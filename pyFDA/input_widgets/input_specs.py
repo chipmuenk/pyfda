@@ -115,7 +115,8 @@ class InputSpecs(QtGui.QWidget):
         # Call updateUI every time filter (order) method is changed
         # updateUI emits sigFilterChanged when it's finished
         #
-        # Changes requiring update of UI:
+        # Changes requiring update of UI because number or kind of 
+        # input fields has changed:
         self.fil_ord.sigSpecsChanged.connect(self.updateAllUIs)  
         self.sel_fil.sigSpecsChanged.connect(self.updateAllUIs)
 
@@ -131,6 +132,7 @@ class InputSpecs(QtGui.QWidget):
         self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
 
+        # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.butReadFiltTree.clicked.connect(self.sel_fil.ftb.initFilters)
         #----------------------------------------------------------------------
@@ -285,7 +287,7 @@ class InputSpecs(QtGui.QWidget):
             self.w_specs.loadEntries()
             self.f_specs.loadEntries()
             
-            self.sigFilterDesigned.emit() # emit signal -> input_all
+            self.sigFilterDesigned.emit() # emit signal -> input_widgets
                                 
         except Exception as e:
             print(e)

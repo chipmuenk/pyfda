@@ -182,7 +182,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                     {self.qlineedit[i].objectName():round(
                        -10 * log10 (simple_eval(self.qlineedit[i].text())),8)})
                        
-        self.sigSpecsChanged.emit() # -> input_all
+        self.sigSpecsChanged.emit() # -> input_widgets
 
 
 #------------------------------------------------------------------------------
