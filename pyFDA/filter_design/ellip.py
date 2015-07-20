@@ -38,7 +38,7 @@ class ellip(object):
         msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
                     "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
                     "and the corresponding corner frequencies of pass and "
-                    "stop band, <b><i>F<sub>PB</sub></i></b> and "
+                    "stop band, <b><i>F<sub>PB</sub></i></b>&nbsp; and "
                     "<b><i>F<sub>SB</sub></i></b> .")
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','tspecs'] # manual filter order

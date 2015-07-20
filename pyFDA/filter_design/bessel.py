@@ -34,9 +34,7 @@ class bessel(object):
         msg_man = ("Enter the filter order <b><i>N</i></b> and the -3 dB corner "
             "frequency or frequencies <b><i>F<sub>PB</sub></i></b> .")
         msg_min = ("Enter the desired pass band gain and minimum stop "
-            "band attenuation at the corresponding corner frequencies."
-            "No Bessel order algorithm is implemented yet, buttord() (min. "
-            "order of a Butterworth filter) is used as a cheap replacement.")
+            "band attenuation at the corresponding corner frequencies.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','tspecs'] # manual filter order
@@ -73,9 +71,11 @@ class bessel(object):
 
 have ripple in neither pass- nor stopband(s).
 
-For the filter design, only the order :math:`N` and -3 dB frequency / frequencies :math:`F_-3dB` where the gain drops below
-- 3dB can be specified. There is no proper minimum order formula, the buttord can be used with the -3dB frequency but not for
-arbitrary passband constraints.
+For the filter design, only the order :math:`N` and -3 dB frequency / 
+frequencies :math:`F_-3dB` where the gain drops below -3dB can be specified. 
+There is no proper minimum order formula; instead, the minimum butterworth 
+order can be used for the -3dB frequency. It gives inexact results for
+passband constraints <> -3 dB.
 
 **Design routines:**
 

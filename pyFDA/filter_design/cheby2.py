@@ -33,13 +33,13 @@ class cheby2(object):
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the critical "
-            "frequency / frequencies <b><i>F<sub>C</sub></i></b> where the gain "
+            "frequency / frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain "
             "first drops below the minimum stop band "
             "attenuation <b><i>A<sub>SB</sub></i></b> .")
         msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
-                    "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
+                    "and minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b> "
                     "and the corresponding corner frequencies of pass and "
-                    "stop band, <b><i>F<sub>PB</sub></i></b> and "
+                    "stop band, <b><i>F<sub>PB</sub></i></b>&nbsp; and "
                     "<b><i>F<sub>PB</sub></i></b> .")
 
         # VISIBLE widgets for all man. / min. filter order response types:
