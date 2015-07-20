@@ -124,8 +124,8 @@ class InputSpecs(QtGui.QWidget):
         self.f_units.sigSpecsChanged.connect(self.f_specs.loadEntries)
         self.f_units.sigSpecsChanged.connect(self.t_specs.loadEntries)
         
-        # Changes requiring reload of parameters e.g. in the plot tabs 
-        # via sigSpecChanged    
+        # Connect sigSpecsChanged signal to next hierarchy level to propagate
+        # changes requiring reload of parameters e.g. to the plot tabs  
         self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged.emit)        
         self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
