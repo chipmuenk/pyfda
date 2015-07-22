@@ -339,39 +339,6 @@ class InputFiles(QtGui.QWidget):
                 print("Failed loading %s!\n" %file_name, e)
 
 
-    def exportHDL(self):
-        """
-        Synthesize HDL description of filter using myHDL module
-        """
-        dlg=QtGui.QFileDialog( self )
-        
-        file_types = "Verilog (*.v);;VHDL (*.vhd)"
-
-
-        hdl_file, hdl_filter = dlg.getSaveFileNameAndFilter(self,
-                caption = "Save HDL as", directory="D:",
-                filter = file_types)
-        print(hdl_file)
-        
-        coeffs = fb.fil[0]['ba']
-        zpk =  fb.fil[0]['zpk']
-        sos = fb.fil[0]['sos']
-        
-        typeHDL = self.cmbHDL.currentText() # could use hdl_filter as well
-
-        qI_i = int(self.ledQIInput.text())
-        qF_i = int(self.ledQIInput.text())
-        
-        qI_o = int(self.ledQIOutput.text())
-        qF_o = int(self.ledQIOutput.text())
-        
-        qQuant_o = self.cmbQuant_o.currentText()
-        qOvfl_o = self.cmbOvfl_o.currentText()
-        
-        q_obj_o =  {'QI':qI_o, 'QF': qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
-        myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
-
-
     def del_file_ext(self, file_type):
         """
         Delete file extension, e.g. '(*.txt)' from file type description
