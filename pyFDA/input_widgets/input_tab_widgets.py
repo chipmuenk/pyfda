@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Jan 5th
+Tabbed container with all input widgets
 
-@author: Christian Muenker
-
-Tabbed container for all input widgets
+Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
@@ -26,6 +24,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 from input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
+from hdl_generation import hdl_specs
 
 class InputWidgets(QtGui.QWidget):
     """
@@ -56,7 +55,9 @@ class InputWidgets(QtGui.QWidget):
         self.inputPZ = input_pz.InputPZ(DEBUG = False)
         self.inputPZ.setObjectName("inputPZ")
         self.inputInfo = input_info.InputInfo(DEBUG = False)
-        self.inputInfo.setObjectName("inputInfo")        
+        self.inputInfo.setObjectName("inputInfo") 
+        self.hdlSpecs = hdl_specs.HDLSpecs(DEBUG = False)
+
 
         self.initUI()
 
@@ -70,6 +71,7 @@ class InputWidgets(QtGui.QWidget):
         tabWidget.addTab(self.inputCoeffs, 'b,a')
         tabWidget.addTab(self.inputPZ, 'P/Z')
         tabWidget.addTab(self.inputInfo, 'Info')
+        tabWidget.addTab(self.hdlSpecs, 'HDL')
 #        QTabBar.setTabTextColor() 
 #        css = "QTabWidget { background-color: red; color: white}" 
 #        self.inputInfo.setStyleSheet(css)#
@@ -117,7 +119,7 @@ class InputWidgets(QtGui.QWidget):
         self.inputSpecs.color_design_button("changed")   
         self.inputSpecs.loadAll()
         self.inputInfo.showInfo()
-        self.sigSpecsChanged.emit() # pyFDA -> plot_all.updateSpecs
+        self.sigSpecsChanged.emit() # pyFDA -> plot_widgets.updateSpecs
         
     @pyqtSlot() # possible, but not neccessary
     def updateAll(self):

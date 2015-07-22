@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 26 10:57:30 2013
+Mainwindow  for the pyFDA app, initializes UI 
 
-@author: Julia Beike, Christian Muenker and Michael Winkler
-
-Mainwindow  for the pyFDA app, initializes UI
+Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 from PyQt4 import QtGui, QtCore
 
 #import filterbroker as fb # importing filterbroker initializes all its globals
-from input_widgets import input_widgets 
-from plot_widgets import plot_widgets
+from input_widgets import input_tab_widgets 
+from plot_widgets import plot_tab_widgets
 
 class pyFDA(QtGui.QMainWindow):
     """
@@ -20,12 +18,8 @@ class pyFDA(QtGui.QMainWindow):
     specifications, poles / zeros etc. and another tabbed widget for plotting 
     various filter characteristics
     
-    QMainWindow is a class that understands GUI elements like a toolbar, statusbar,
-    central widget, docking areas. QWidget is just a raw widget.
-    When you want to have a main window for you project, use QMainWindow.
-
-    If you want to create a dialog box (modal dialog), use QWidget, or,
-    more preferably, QDialog
+    QMainWindow is used here as it is a class that understands GUI elements like 
+    toolbar, statusbar, central widget, docking areas etc.
     """
     
     def __init__(self):
@@ -47,10 +41,10 @@ class pyFDA(QtGui.QMainWindow):
         """
         
         # Instantiate widget groups
-        self.inputWidgets = input_widgets.InputWidgets() # input widgets        
-        self.inputWidgets.setMaximumWidth(280) # comment out for splitter
+        self.inputWidgets = input_tab_widgets.InputWidgets() # input widgets        
+        self.inputWidgets.setMaximumWidth(320) # comment out for splitter
         
-        self.pltWidgets = plot_widgets.PlotWidgets() # plot widgets
+        self.pltWidgets = plot_tab_widgets.PlotWidgets() # plot widgets
         
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
