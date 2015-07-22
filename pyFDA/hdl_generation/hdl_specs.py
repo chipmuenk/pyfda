@@ -30,6 +30,7 @@ import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib_fix_v3 as fix
 
 
+#------------------------------------------------------------------------------
 class HDLSpecs(QtGui.QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
@@ -279,6 +280,8 @@ class HDLSpecs(QtGui.QWidget):
         self.butHDL.clicked.connect(self.exportHDL)
         #----------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
     def HLine(self):
         # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
         # solution 
@@ -291,8 +294,7 @@ class HDLSpecs(QtGui.QWidget):
         return line
 
         
-
-
+#------------------------------------------------------------------------------
     def exportHDL(self):
         """
         Synthesize HDL description of filter using myHDL module

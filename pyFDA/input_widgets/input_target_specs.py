@@ -42,6 +42,7 @@ class InputTargetSpecs(QtGui.QWidget):
         self.initUI()
 
 
+#------------------------------------------------------------------------------
     def initUI(self):
         """
         Initialize user interface

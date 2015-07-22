@@ -9,8 +9,6 @@ import os, sys
 import codecs
 import filterbroker as fb
 
-# TODO: fix warning 'QWidget: Must construct a QApplication before a QPaintDevice'
-#       probably caused by filter class firwin containing widgets
 
 class FilterTreeBuilder(object):
     
