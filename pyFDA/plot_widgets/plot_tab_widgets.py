@@ -17,6 +17,8 @@ if __name__ == "__main__":
 from plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
 
+
+#------------------------------------------------------------------------------
 class PlotWidgets(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
@@ -60,6 +62,8 @@ Background: #DDEEFF;
 
         self.initUI()
 
+
+#------------------------------------------------------------------------------
     def initUI(self):
         """ Initialize UI with tabbed subplots """
         tabWidget = QtGui.QTabWidget()
@@ -77,7 +81,8 @@ Background: #DDEEFF;
         self.setLayout(layVMain)
 
 
-    def updateAll(self):
+#------------------------------------------------------------------------------
+    def updateData(self):
         """ Update and redraw all subplots with new filter DATA"""
         self.pltHf.draw()
         self.pltPhi.draw()
@@ -86,6 +91,7 @@ Background: #DDEEFF;
         self.pltImpz.draw()
         self.plt3D.draw()
         
+#------------------------------------------------------------------------------
     def updateSpecs(self):
         """ Update and redraw all subplots with new filter SPECS"""
         self.pltHf.draw()

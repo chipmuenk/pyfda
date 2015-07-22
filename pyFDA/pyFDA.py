@@ -129,18 +129,20 @@ class pyFDA(QtGui.QMainWindow):
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets: 
-        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.updateAll)
+        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.updateData)
 
         
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
 
+#------------------------------------------------------------------------------
     def aboutWindow(self):
         QtGui.QMessageBox.about(self, "About pyFDA",
         ("(c) 2013 - 15 Christian Münker\n\n"
         "A graphical tool for designing, analyzing and synthesizing digital filters")
         )
 
+#------------------------------------------------------------------------------
     def statusMessage(self, message):
         """
         Display a message in the statusbar.
