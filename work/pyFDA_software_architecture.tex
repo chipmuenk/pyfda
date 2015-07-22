@@ -94,7 +94,7 @@ where
 \begin{figure}[ht]
 \centering
 \includegraphics[width = \textwidth]{classes_pyFDA}
-\caption{Class hierarchy in pyFDA}
+\caption{Class hierarchy in pyFDA (composition diagram)}
 \end{figure}
 
 
@@ -181,6 +181,12 @@ class MyTopClass(QtGui.QWidget):
 \end{lstlisting}
 
 where \textbt{sigSpecsChanged} signifies that specifications have been changed (no replot necessary) and \textbt{sigFilterDesigned} that the filter design is finished.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width = \textwidth]{pyFDA_signals_input_widgets}
+\caption{Signaling between input widgets (component: input\_widgets.py)}
+\end{figure}
 
 \section{Filter Design Objects}
 The structure of a filter file and the attributes and methods that need to be provided are described in this section.
