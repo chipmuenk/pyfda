@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 18 13:36:39 2013
+Widget for entering weight specifications
 
-@author: Julia Beike, Christian Münker
+Author: Julia Beike, Christian Münker
 """
 from __future__ import print_function, division, unicode_literals
 import sys, os
