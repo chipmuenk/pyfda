@@ -68,14 +68,14 @@ The following features are still missing for the first release.
 
 ### Release 0.2 (target: end of 2015) - Help is very welcome!
 * **scipy 0.16 SOS features**
+* **myHDL support**
+    * Export of VHDL / Verilog netlists for basic filter topologies
+    * Fixpoint simulation
 * **Filter coefficients and poles / zeros**<br />
 Implement model-view controller architecture for the following features:
   * Display coefficients / poles and zeros with fewer digits while keeping full precision internally
   * Group multiple poles / zeros
   * Load coefficients / poles and zeros in various formats 
-* **myHDL support**
-    * Export of VHDL / Verilog netlists for basic filter topologies
-    * Fixpoint simulation
 * **Filter Manager**
   * Store multiple designs in one filter dict
   * Compare multiple designs in plots
