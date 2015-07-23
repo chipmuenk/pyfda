@@ -55,8 +55,9 @@ class InputWidgets(QtGui.QWidget):
         self.inputPZ = input_pz.InputPZ(DEBUG = False)
         self.inputPZ.setObjectName("inputPZ")
         self.inputInfo = input_info.InputInfo(DEBUG = False)
-        self.inputInfo.setObjectName("inputInfo") 
-        self.hdlSpecs = hdl_specs.HDLSpecs(DEBUG = False)
+        self.inputInfo.setObjectName("inputInfo")
+        if MYHDL:
+            self.hdlSpecs = hdl_specs.HDLSpecs(DEBUG = False)
 
 
         self.initUI()
@@ -71,7 +72,8 @@ class InputWidgets(QtGui.QWidget):
         tabWidget.addTab(self.inputCoeffs, 'b,a')
         tabWidget.addTab(self.inputPZ, 'P/Z')
         tabWidget.addTab(self.inputInfo, 'Info')
-        tabWidget.addTab(self.hdlSpecs, 'HDL')
+        if MYHDL:
+            tabWidget.addTab(self.hdlSpecs, 'HDL')
 #        QTabBar.setTabTextColor() 
 #        css = "QTabWidget { background-color: red; color: white}" 
 #        self.inputInfo.setStyleSheet(css)#
