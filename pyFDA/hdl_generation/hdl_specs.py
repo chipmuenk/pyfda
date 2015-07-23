@@ -11,12 +11,10 @@ from PyQt4.QtCore import pyqtSignal
 
 import numpy as np
 
-
 try:
     import myhdl
 except ImportError:
     MYHDL = False
-    print("Warning: Module myHDL not installed -> no filter synthesis")
 else:
     MYHDL = True
 
@@ -63,8 +61,8 @@ class HDLSpecs(QtGui.QWidget):
         ifont = QtGui.QFont()
         ifont.setItalic(True)
 
-        self.lblMyhdl1 = QtGui.QLabel("myHDL")
-        self.lblMyhdl1.setFont(bfont)
+#        self.lblMyhdl1 = QtGui.QLabel("myHDL")
+#        self.lblMyhdl1.setFont(bfont)
         self.lblMyhdl2 = QtGui.QLabel("Enter variable formats as QI.QF:")
 
         
@@ -251,10 +249,9 @@ class HDLSpecs(QtGui.QWidget):
 # -------------------------------------------------------------------
 
 
-        layVMain.addWidget(self.HLine())
 
-        layVMain.addWidget(self.lblMyhdl1)
         layVMain.addWidget(self.lblMyhdl2)
+        layVMain.addWidget(self.HLine())
         layVMain.addLayout(self.layHButtonsHDL_i)
         
         layVMain.addLayout(self.layHButtonsHDL_c)
@@ -267,6 +264,8 @@ class HDLSpecs(QtGui.QWidget):
         layVMain.addLayout(self.layHButtonsHDL_oc)
         
         layVMain.addLayout(self.layHButtonsHDL_h)
+        
+        layVMain.addStretch()
         
 
 # -------------------------------------------------------------------
