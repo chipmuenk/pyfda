@@ -49,9 +49,17 @@ class InputInfo(QtGui.QWidget):
         self.txtFiltPerf = QtGui.QTextBrowser()
         self.txtFiltDict = QtGui.QTextBrowser()
 
+        bfont = QtGui.QFont()
+        bfont.setBold(True)
         self.tblFiltPerf = QtGui.QTableWidget()
+        self.tblFiltPerf.setColumnCount(4)
         self.tblFiltPerf.setAlternatingRowColors(True)
-        self.tblFiltPerf.verticalHeader().setVisible(False)
+#        self.tblFiltPerf.verticalHeader().setVisible(False)
+        self.tblFiltPerf.horizontalHeader().setHighlightSections(False)
+        self.tblFiltPerf.horizontalHeader().setFont(bfont)
+        self.tblFiltPerf.verticalHeader().setHighlightSections(False)
+        self.tblFiltPerf.verticalHeader().setFont(bfont)
+        
 #        self.tblCoeff.QItemSelectionModel.Clear
 #        self.tblCoeff.setDragEnabled(True)
 #        self.tblCoeff.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
@@ -212,20 +220,20 @@ class InputInfo(QtGui.QWidget):
 #        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
 
         self.tblFiltPerf.setRowCount(len(H_test))
-        self.tblFiltPerf.setColumnCount(5)
         self.target_spec_passed = False
 
-        self.tblFiltPerf.setHorizontalHeaderLabels(['Test Case', 
+        self.tblFiltPerf.setHorizontalHeaderLabels([
         'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'|H(f)|','|H(f)| (dB)', 'Spec'] )
+        self.tblFiltPerf.setVerticalHeaderLabels(F_test_lbls)
         for row in range(len(H_test)):
-            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbls[row]))
-            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]*f_S))))
-            self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
-            self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str('%2.3f'%(H_test_dB[row]))))
+#            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbls[row]))
+            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]*f_S))))
+            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
+            self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str('%2.3f'%(H_test_dB[row]))))
             if not H_targ_pass[row]:
+                self.tblFiltPerf.item(row,1).setBackgroundColor(Qt.QColor('red'))
                 self.tblFiltPerf.item(row,2).setBackgroundColor(Qt.QColor('red'))
-                self.tblFiltPerf.item(row,3).setBackgroundColor(Qt.QColor('red'))
-            self.tblFiltPerf.setItem(row,4,QtGui.QTableWidgetItem(str('%2.3f'%(H_targ[row]))))
+            self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str('%2.3f'%(H_targ[row]))))
 
 
     #    self.tblFiltPerf.item(1,1).setBackgroundColor(Qt.QColor('red'))
