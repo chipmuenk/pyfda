@@ -134,8 +134,8 @@ class InputFreqSpecs(QtGui.QWidget):
 
         # recalculate displayed freq spec values for (maybe) changed f_S
         for i in range(len(self.qlineedit)):
-            f = fb.fil[0][self.qlineedit[i].objectName()]
-            self.qlineedit[i].setText(str(f * fb.fil[0]['f_S']))
+            f = fb.fil[0][self.qlineedit[i].objectName()] * fb.fil[0]['f_S']
+            self.qlineedit[i].setText(str(round(f,11)))
 
         self._sort_store_entries()
 
@@ -228,8 +228,8 @@ class InputFreqSpecs(QtGui.QWidget):
                 
         for i in range(len(self.qlineedit)):
             fb.fil[0].update(
-                {self.qlineedit[i].objectName():
-                    simple_eval(self.qlineedit[i].text())/fb.fil[0]['f_S']})
+                {self.qlineedit[i].objectName():round(
+                    simple_eval(self.qlineedit[i].text())/fb.fil[0]['f_S'],11)})
 
 
 
