@@ -79,6 +79,7 @@ Implement model-view controller architecture for the following features:
 * **Filter Manager**
   * Store multiple designs in one filter dict
   * Compare multiple designs in plots
+* **Documentation using Sphinx**
 
 ### Following releases
 * Better help files and messages
