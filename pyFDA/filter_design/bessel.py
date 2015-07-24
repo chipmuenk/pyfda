@@ -32,21 +32,24 @@ class bessel(object):
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the -3 dB corner "
-            "frequency or frequencies <b><i>F<sub>PB</sub></i></b> .")
-        msg_min = ("Enter the desired pass band gain and minimum stop "
-            "band attenuation at the corresponding corner frequencies.")
+            "frequency or frequencies <b><i>F<sub>C</sub></i></b> .")
+        msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                    "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
+                    "&nbsp;and the corresponding corner frequencies of pass and "
+                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+                    "<b><i>F<sub>SB</sub></i></b>&nbsp; (only an approximation).")
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','tspecs'] # manual filter order
         vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # enabled widget for man. filt. order
-        dis_min = ['fspecs'] # enabled widget for min. filt. order
+        dis_man = [] # manual filter order
+        dis_min = ['fspecs'] # minimum filter order
 
-        # parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_PB']
-        par_min = ['f_S', 'A_PB', 'A_SB']
+        # common PARAMETERS for all man. / min. filter order response types:
+        par_man = ['N', 'f_S', 'F_C'] # manual filter order
+        par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
 
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
@@ -60,9 +63,9 @@ class bessel(object):
                  "min":{"par":['F_PB','F_SB']}},
           "HP": {"man":{"par":[]},
                  "min":{"par":['F_SB','F_PB']}},
-          "BP": {"man":{"par":['F_PB2']},
+          "BP": {"man":{"par":['F_C2']},
                  "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-          "BS": {"man":{"par":['F_PB2']},
+          "BS": {"man":{"par":['F_C2']},
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
@@ -72,9 +75,9 @@ class bessel(object):
 have ripple in neither pass- nor stopband(s).
 
 For the filter design, only the order :math:`N` and -3 dB frequency / 
-frequencies :math:`F_-3dB` where the gain drops below -3dB can be specified. 
+frequencies :math:`F_-3dB` where the gain drops below -3 dB can be specified. 
 There is no proper minimum order formula; instead, the minimum butterworth 
-order can be used for the -3dB frequency. It gives inexact results for
+order can be used for the -3 dB frequency. It gives only approximate results for
 passband constraints <> -3 dB.
 
 **Design routines:**
@@ -119,10 +122,10 @@ passband constraints <> -3 dB.
 #            print("====== bessel.save ========\nF_PBC = ", self.F_PBC, type(self.F_PBC))
 #            print("F_PBC vor", self.F_PBC, type(self.F_PBC))
             if np.isscalar(self.F_PBC): # HP or LP - a single corner frequency
-                fil_dict['F_PB'] = self.F_PBC / 2.
+                fil_dict['F_C'] = self.F_PBC / 2.
             else: # BP or BS - two corner frequencies
-                fil_dict['F_PB'] = self.F_PBC[0] / 2.
-                fil_dict['F_PB2'] = self.F_PBC[1] / 2.
+                fil_dict['F_C'] = self.F_PBC[0] / 2.
+                fil_dict['F_C2'] = self.F_PBC[1] / 2.
 
     def LPman(self, fil_dict):
         self.get_params(fil_dict)
