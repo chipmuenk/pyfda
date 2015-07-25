@@ -33,11 +33,11 @@ class butter(object):
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the -3 dB corner "
-            "frequency or frequencies <b><i>F<sub>C</sub></i></b> .")
-        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
-                    "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                    "and the corresponding corner frequencies of pass and "
-                    "stop band, <b><i>F<sub>PB</sub></i></b> and "
+            "frequency(ies) <b><i>F<sub>C</sub></i></b> .")
+        msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                    "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
+                    "&nbsp;and the corresponding corner frequencies of pass and "
+                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
                     "<b><i>F<sub>SB</sub></i></b> .")
 
         # VISIBLE widgets for all man. / min. filter order response types:
@@ -45,12 +45,12 @@ class butter(object):
         vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # enabled widget for man. filt. order
-        dis_min = ['fspecs'] # enabled widget for min. filt. order
+        dis_man = [] # manual filter order
+        dis_min = ['fspecs'] # minimum filter order
 
-        # parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C']
-        par_min = ['f_S', 'A_PB', 'A_SB']
+        # common PARAMETERS for all man. / min. filter order response types:
+        par_man = ['N', 'f_S', 'F_C'] # manual filter order
+        par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
 
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types

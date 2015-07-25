@@ -46,13 +46,13 @@ class firwin(object):
         self.name = {'firwin':'Windowed FIR'}
 
         # common messages for all man. / min. filter order response types:
-        msg_man = (r"Enter desired order and <b>-6 dB</b> pass band corner "
-                    "frequency(ies) <b><i>F<sub>C</sub></i></b>.")
-        msg_min = ("Enter the maximum pass band ripple, minimum stop band "
-                "attenuation and the corresponding frequencies "
-                "<b><i>F<sub>PB</sub></i></b> and <b><i>F<sub>SB</sub></i></b>."
-                "<br />The minimum order algorithm only gives a rough approximation - "
-                "manual fine tuning will be necessary!")
+        msg_man = (r"Enter desired filter order <b><i>N</i></b> and <b>-6 dB</b> pass band corner "
+                    "frequency(ies) <b><i>F<sub>C</sub></i></b> .")
+        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
+                "and the corresponding frequencies <b><i>F<sub>PB</sub></i></b>"
+                "&nbsp; and <b><i>F<sub>SB</sub></i></b> ."
+                "<br /><b>Note:</b> This is only a rough approximation!")
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','fspecs','tspecs'] # manual filter order
@@ -62,7 +62,7 @@ class firwin(object):
         dis_man = [] # manual filter order
         dis_min = ['fspecs'] # minimum filter order
 
-        # common parameters for all man. / min. filter order response types:
+        # common PARAMETERS for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_C']     #  manual filter order
         par_min = ['f_S', 'A_PB', 'A_SB'] #  minimum filter order
 

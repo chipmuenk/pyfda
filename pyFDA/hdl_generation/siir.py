@@ -54,14 +54,14 @@ http://dsp.stackexchange.com/questions/1605/designing-butterworth-filter-in-matl
 from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
                    instance, instances, intbv, traceSignals, 
                    Simulation, StopSimulation)
-import myhdl
+#import myhdl
 
 import numpy as np
 from numpy import pi, log10
 from numpy.fft import fft, fftshift
 from numpy.random import uniform, normal
 
-from scipy.signal import iirfilter, freqz
+from scipy.signal import freqz
 import pylab
 
 
@@ -240,6 +240,10 @@ class SIIR():
 
         -------
         """
+        print("init_SIIR")
+        print("b",b)
+        print(type(b), b)
+        print("a", a)
         # The W format, intended to be (total bits, integer bits,
         # fraction bits) is not fully supported.
         # Determine the max and min for the word-widths specified
@@ -271,6 +275,9 @@ class SIIR():
         # fixed-point Coefficients for the IIR filter
         self.fxb = np.round(self.b * self.max)/self.max
         self.fxa = np.floor(self.a * self.max)/self.max
+        
+        print("fxa", len(self.fxa), self.fxa)
+        print("fxb", len(self.fxb), self.fxb)
 
         # Save off the frequency response for the fixed-point
         # coefficients.
@@ -349,7 +356,7 @@ class SIIR():
         """Floating-point IIR filter direct-form II
         """
         if self.isSos:
-            raise StandardError, "WIP SOS"
+            raise (StandardError, "WIP SOS")
 
         w = x - self._d[0]*self.a[1] - self._d[1]*self.a[2]
         y = self.b[0]*w + self._d[0]*self.b[1] + self._d[1]*self.b[2]
@@ -481,20 +488,25 @@ class SIIR():
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == '__main__':
     # Instantiate the filter and define the Signal
-    W = (24,0)
-    flt = SIIR(W = W, b = [1, 1, 1], a = [3, 0, 2])
+    W = (8,0)
+    b = np.asarray([1,1,1])
+#    b = [1,1,1]
+    a = np.asarray([3, 0, 2])
+    # need to be ndarrays, with type list / tuple the filter "explodes" 
+    flt = SIIR(W = W, b = b, a = a)
+
 #    clk = Signal(False)
 #    ts  = Signal(False)
 #    x   = Signal(intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
 #    y   = Signal(intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
 #
     # Setup the Testbench and run
-    print "Simulation"
+    print ("Simulation")
     tb = flt.TestFreqResponse(Nloops=3, Nfft=1024)
     sim = Simulation(tb)
-    print "Run Simulation"
+    print ("Run Simulation")
     sim.run()
-    print "Plot Response"
+    print ("Plot Response")
     flt.PlotResponse()
 
     flt.Convert()

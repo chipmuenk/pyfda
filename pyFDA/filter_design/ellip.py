@@ -34,22 +34,24 @@ class ellip(object):
         msg_man = ("Enter the filter order <b><i>N</i></b>, the minimum stop "
             "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
             "frequencies <b><i>F<sub>PB</sub></i></b>  where the gain first "
-            " drops below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")
-        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b> "
-                    "and minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                    "and the corresponding corner frequencies of pass and "
-                    "stop band, <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+            "drops below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> ."
+            "Stop band corner frequency(ies) <b><i>F<sub>SB</sub></i></b>&nbsp;"
+            "are not regarded.")
+        msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                    "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
+                    "&nbsp;and the corresponding corner frequencies of pass and "
+                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
                     "<b><i>F<sub>SB</sub></i></b> .")
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs'] # manual filter order
+        vis_man = ['fo','tspecs'] # manual filter order
         vis_min = ['fo','tspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # enabled widget for man. filt. order
-        dis_min = [] # enabled widget for min. filt. order
+        dis_man = [] # manual filter order
+        dis_min = [] # minimum filter order
 
         # parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_PB', 'A_PB', 'A_SB']
+        par_man = ['N', 'f_S', 'A_PB', 'A_SB']
         par_min = ['f_S', 'A_PB', 'A_SB']
 
         # Common data for all man. / min. filter order response types:
@@ -64,9 +66,9 @@ class ellip(object):
                  "min":{"par":['F_PB','F_SB']}},
           "HP": {"man":{"par":[]},
                  "min":{"par":['F_SB','F_PB']}},
-          "BP": {"man":{"par":['F_PB2']},
+          "BP": {"man":{"par":[]},
                  "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-          "BS": {"man":{"par":['F_PB2']},
+          "BS": {"man":{"par":[]},
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
@@ -132,7 +134,8 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
             else: # BP or BS - two corner frequencies
                 fil_dict['F_PB'] = self.F_PBC[0] / 2.
                 fil_dict['F_PB2'] = self.F_PBC[1] / 2.
-
+                fil_dict['A_PB2'] = self.A_PB
+                fil_dict['A_SB2'] = self.A_SB
 #------------------------------------------------------------------------------
 #
 #         DESIGN ROUTINES

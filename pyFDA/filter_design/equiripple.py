@@ -45,10 +45,15 @@ class equiripple(object):
         self.name = {'equiripple':'Equiripple'}
 
         # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter desired order, corner frequencies and a weight "
-            "value for each band.")
-        msg_min = ("Enter the maximum pass band ripple, minimum stop band "
-                    "attenuation and the corresponding corner frequencies.")
+        msg_man = ("Enter desired filter order <b><i>N</i></b>, corner "
+        "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
+        "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
+        "value <b><i>W</i></b>&nbsp; for each band.")
+        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                    "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
+                    "and the corresponding corner frequencies of pass and "
+                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+                    "<b><i>F<sub>SB</sub></i></b> .")
 
         # VISIBLE widgets for all man. / min. filter order response types:
         vis_man = ['fo','wspecs', 'tspecs'] # manual filter order
@@ -58,9 +63,9 @@ class equiripple(object):
         dis_man = [] # manual filter order
         dis_min = ['wspecs'] # minimum filter order
 
-        # common parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S'] # enabled widget for man. filt. order
-        par_min = ['f_S', 'A_PB', 'A_SB'] # enabled widget for min. filt. order
+        # common PARAMETERS for all man. / min. filter order response types:
+        par_man = ['N', 'f_S'] # manual filter order
+        par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
 
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
@@ -79,7 +84,7 @@ class equiripple(object):
                                  'W_SB', 'W_PB','W_SB2','A_SB2']}},
             "BS": {"man":{"par":['F_PB', 'F_SB', 'F_SB2', 'F_PB2',
                                  'W_PB', 'W_SB', 'W_PB2','A_PB','A_SB','A_PB2'],
-                      "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
+                      "msg":r"<br /><b>Note:</b> Order needs to be odd for a bandstop!"},
                    "min":{"par":['A_PB2','W_PB','W_SB','W_PB2',
                                  'F_PB','F_SB','F_SB2','F_PB2']}},
             "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
