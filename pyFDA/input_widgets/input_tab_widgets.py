@@ -24,7 +24,8 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 from input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
-from hdl_generation import hdl_specs
+if MYHDL:
+    from hdl_generation import hdl_specs
 
 class InputWidgets(QtGui.QWidget):
     """
