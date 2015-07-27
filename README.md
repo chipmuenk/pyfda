@@ -9,6 +9,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 **Screenshot from the current version:**
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
+![Getting started](webpage/getting_started.html)
 
 ### Why yet another filter design tool?
 * **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
