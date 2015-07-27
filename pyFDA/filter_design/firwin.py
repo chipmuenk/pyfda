@@ -261,8 +261,8 @@ class firwin(object):
         except KeyError as e:
             print("Key Error:",e)
         
-        self.cmb_firwin_win.setCurrentIndex(win_idx) # set index
-        self.cmb_firwin_alg.setCurrentIndex(alg_idx)
+        self.cmb_firwin_win.setCurrentIndex(win_idx) # set index for window and
+        self.cmb_firwin_alg.setCurrentIndex(alg_idx) # and algorithm cmbBox
 
     def storeEntries(self):
         """
