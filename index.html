@@ -1,89 +1,216 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="pyFDA : Python Filter Design Analysis Tool">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>pyFDA</title>
+    <meta charset="UTF-8">
+    <title>pyFDA by chipmuenk</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">pyFDA</h1>
+      <h2 class="project-tagline">Python Filter Design Analysis Tool</h2>
+      <a href="https://github.com/chipmuenk/pyFDA" class="btn">View on GitHub</a>
+      <a href="https://github.com/chipmuenk/pyFDA/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/chipmuenk/pyFDA/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/chipmuenk/pyFDA">View on GitHub</a>
-
-          <h1 id="project_title">pyFDA</h1>
-          <h2 id="project_tagline">Python Filter Design Analysis Tool</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/chipmuenk/pyFDA/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/chipmuenk/pyFDA/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a id="pyfda" class="anchor" href="#pyfda" aria-hidden="true"><span class="octicon octicon-link"></span></a>PyFDA</h1>
+    <section class="main-content">
+      <h1>
+<a id="pyfda" class="anchor" href="#pyfda" aria-hidden="true"><span class="octicon octicon-link"></span></a>pyFDA</h1>
 
 <h2>
 <a id="python-filter-design-analysis-tool" class="anchor" href="#python-filter-design-analysis-tool" aria-hidden="true"><span class="octicon octicon-link"></span></a>Python Filter Design Analysis Tool</h2>
 
-<p><img src= "https://github.com/chipmuenk/pyFDA/blob/master/docs/pyFDA_screenshot_3.PNG" alt="Screenshot"></p>
+<p><a href="https://gitter.im/chipmuenk/pyFDA?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Join the chat at https://gitter.im/chipmuenk/pyFDA"></a></p>
 
-<p>The goal of this project is to create a GUI based tool to analyse and design discrete time filters implemented in Python and Qt. The following goals of this FOSS project have been reached or will be in the near future:</p>
+<p>The goal of this project is to create a GUI based tool in Python / Qt to analyse, design and synthesize discrete time filters. </p>
+
+<p><strong>Screenshot from the current version:</strong>
+<img src="images/pyFDA_screenshot_3.PNG" alt="Screenshot"></p>
+
+<p><img src="webpage/getting_started.html" alt="Getting started"></p>
+
+<h3>
+<a id="why-yet-another-filter-design-tool" class="anchor" href="#why-yet-another-filter-design-tool" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why yet another filter design tool?</h3>
 
 <ul>
-<li>Easy to use, clearly structured GUI</li>
-<li>Accessing Scipy filter design methods with a common interface (frequency and amplitude specifications)</li>
-<li>Easy switching between manual and minimum filter order without losing all the settings</li>
-<li>Modular structure, facilitating the implementation of new filter design and analysis methods</li>
-<li>Filter design files can simply be added to the filter_design subdirectory without changes to the program and without restarting</li>
-<li>Comfortable saving and loading of filter designs</li>
-<li>Export of filter coefficients and poles / zeros as CSV and in Matlab (R) workspace format</li>
+<li>
+<strong>Education:</strong> There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.</li>
+<li>
+<strong>Show-off:</strong> Demonstrate that Python is a potent tool for digital signal processing applications as well. The interfaces for textual filter design routines are a nightmare: linear vs. logarithmic specs, frequencies normalized w.r.t. to sampling or Nyquist frequency, -3 dB vs. -6 dB vs. band-edge frequencies ... (This is due to the different backgrounds and the history of filter design algorithms and not Python-specific.)</li>
+<li>
+<strong>Fixpoint filter design for uCs:</strong> Recursive filters have become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable e.g. for uCs.</li>
+<li>
+<strong>Fixpoint filter design for FPGAs</strong>: Especially on low-budget FPGAs, multipliers are rare. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.</li>
+<li>
+<strong>HDL filter implementation:</strong> Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module <a href="http://myhdl.org">myHDL</a> can automate both design and verification.</li>
 </ul>
 
-<p>Plans for the not-so near future include:</p>
+<h3>
+<a id="the-following-features-are-currently-implemented" class="anchor" href="#the-following-features-are-currently-implemented" aria-hidden="true"><span class="octicon octicon-link"></span></a>The following features are currently implemented:</h3>
 
 <ul>
-<li>Quantization of filter coefficients</li>
-<li>Multiplier-free filter designs (CIC, GCIC, SigmaDelta-Filters, ...)</li>
+<li>
+<strong>Filter design</strong>
+
+<ul>
+<li>
+<strong>Design methods</strong> from scipy.signal: Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 </li>
+<li>
+<strong>Remember all specifications</strong> when changing filter design methods</li>
+<li>
+<strong>Fine-tune</strong> manually the filter order and corner frequencies calculated by minimum order algorithms</li>
+<li>
+<strong>Compare filter designs</strong> for a given set of specifications and different design methods</li>
+<li>
+<strong>Filter coefficients and poles / zeroes</strong> can be displayed, edited and quantized</li>
+</ul>
+</li>
+<li>
+<strong>Clearly structured GUI</strong>
+
+<ul>
+<li>only widgets needed for the currently selected design method are visible</li>
+<li>enhanced matplotlib NavigationToolbar (nicer icons, additional functions)</li>
+</ul>
+</li>
+<li>
+<strong>Common interface for all filter design methods:</strong>
+
+<ul>
+<li>specify frequencies as absolute values or normalized to sampling or Nyquist frequency</li>
+<li>specify ripple and attenuations in dB, as voltage or as power ratios</li>
+<li>enter expressions like exp(-pi/4 * 1j) with the help of the library <a href="https://pypi.python.org/pypi/simpleeval">simpleeval</a> (included in source files)</li>
+</ul>
+</li>
+<li>
+<strong>Graphical Analyses</strong>
+
+<ul>
+<li>Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot</li>
+<li>Phase response (wrapped / unwrapped)</li>
+<li>Group delay</li>
+<li>Pole / Zero plot</li>
+<li>Impulse response and step response (lin / log)</li>
+<li>3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display</li>
+</ul>
+</li>
+<li>
+<strong>Modular architecture</strong>, facilitating the implementation of new filter design and analysis methods
+
+<ul>
+<li>Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. </li>
+<li>Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program</li>
+<li>Filter design files can be added and edited <em>without</em> changing or even restarting the program</li>
+</ul>
+</li>
+<li>
+<strong>Saving and loading</strong>
+
+<ul>
+<li>Save and load filter designs in pickled and in numpy's NPZ-format</li>
+<li>Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format</li>
+</ul>
+</li>
+<li>
+<strong>Display help files</strong> (own / Python docstrings) as rich text</li>
+<li>
+<strong>Runs under Python 2.7 and Python 3.4</strong> </li>
+</ul>
+
+<p><strong>More screenshots from the current version:</strong></p>
+
+<table>
+    <tr>
+        <td><img src="images/pyFDA_screenshot_3d_2.PNG" alt="Screenshot" width="300px"></td>
+        <td><img src="images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width="300px"></td>        
+   </tr>
+    <tr>
+        <td><img src="images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width="300px"></td>
+        <td><img src="images/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width="300px"></td>
+    </tr>
+</table>
+
+<h3>
+<a id="release-01-target-end-of-may-june-2015" class="anchor" href="#release-01-target-end-of-may-june-2015" aria-hidden="true"><span class="octicon octicon-link"></span></a>Release 0.1 (target: end of <s>May</s> June 2015)</h3>
+
+<p>The following features are still missing for the first release. </p>
+
+<ul>
+<li>Documentation</li>
+</ul>
+
+<h3>
+<a id="release-02-target-end-of-2015---help-is-very-welcome" class="anchor" href="#release-02-target-end-of-2015---help-is-very-welcome" aria-hidden="true"><span class="octicon octicon-link"></span></a>Release 0.2 (target: end of 2015) - Help is very welcome!</h3>
+
+<ul>
+<li><strong>scipy 0.16 SOS features</strong></li>
+<li>
+<strong>myHDL support</strong>
+
+<ul>
+<li>Export of VHDL / Verilog netlists for basic filter topologies</li>
+<li>Fixpoint simulation</li>
+</ul>
+</li>
+<li>
+<strong>Filter coefficients and poles / zeros</strong><br>
+Implement model-view controller architecture for the following features:
+
+<ul>
+<li>Display coefficients / poles and zeros with fewer digits while keeping full precision internally</li>
+<li>Group multiple poles / zeros</li>
+<li>Load coefficients / poles and zeros in various formats </li>
+</ul>
+</li>
+<li>
+<strong>Filter Manager</strong>
+
+<ul>
+<li>Store multiple designs in one filter dict</li>
+<li>Compare multiple designs in plots</li>
+</ul>
+</li>
+<li><strong>Documentation using Sphinx</strong></li>
+</ul>
+
+<h3>
+<a id="following-releases" class="anchor" href="#following-releases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Following releases</h3>
+
+<ul>
+<li>Better help files and messages</li>
+<li>Add a tracking cursor</li>
+<li>Graphical modification of poles / zeros</li>
+<li>Export of filter properties as PDF / HTML files</li>
+<li>Show error messages and warnings in the GUI</li>
+<li>Design, analysis and export of filters as second-order sections</li>
+<li>Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)</li>
 <li>Export of Python filter objects</li>
 <li>Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise</li>
-<li>Fixpoint filter sythesis and export using the myHDL module ()</li>
 </ul>
 
-<p>And maybe the future will bring</p>
+<h3>
+<a id="further-ideas-are" class="anchor" href="#further-ideas-are" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further ideas are</h3>
 
 <ul>
 <li>Wave-Digital Filters</li>
+<li>test filters in real-time with a audio stream</li>
 <li>...</li>
 </ul>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-      </section>
-    </div>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/chipmuenk/pyFDA">pyFDA</a> is maintained by <a href="https://github.com/chipmuenk">chipmuenk</a>.</span>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">pyFDA maintained by <a href="https://github.com/chipmuenk">chipmuenk</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-    
+    </section>
 
+  
   </body>
 </html>
+
