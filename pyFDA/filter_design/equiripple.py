@@ -22,6 +22,7 @@ import pyfda_lib
 
 
 # TODO: min order for Hilbert & Differentiator
+# TODO: grid density is saved to dict / file but not reloaded from dictionary
 # TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
 # TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
 #       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
@@ -98,7 +99,10 @@ class equiripple(object):
 
         # additional dynamic widgets that need to be set in the main widgets
         self.wdg = {'sf':'wdg_remez'}
+        
+        self.hdl = None
         #----------------------------------------------------------------------
+
         self.initUI()
 
 
@@ -152,7 +156,8 @@ class equiripple(object):
         try:
             dyn_wdg_par = fb.fil[0]['wdg_dyn']
             if 'grid_density' in dyn_wdg_par:
-                self.led_remez_1.setText(str(dyn_wdg_par['grid_density']))
+                self.grid_density = dyn_wdg_par['grid_density']
+                self.led_remez_1.setText(str(self.grid_density))
         except KeyError as e:
             print("Key Error:",e)
 
@@ -200,6 +205,7 @@ class equiripple(object):
             fil_dict['N'] = self.N  # yes, update filterbroker
         except AttributeError:
             pass
+        self.storeEntries()
 
     def LPman(self, fil_dict):
         self.get_params(fil_dict)

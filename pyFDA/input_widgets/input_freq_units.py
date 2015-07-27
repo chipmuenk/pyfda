@@ -16,7 +16,9 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb    
-from simpleeval import simple_eval
+
+# TODO: self.cmbFRange is not updated when file is loaded from disk although
+#           fb.fil[0] is updated to correct setting?
 
 class InputFreqUnits(QtGui.QWidget):
     """
@@ -149,8 +151,8 @@ class InputFreqUnits(QtGui.QWidget):
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
             if self.DEBUG: print(senderName + ' was triggered\n================')
-        else: # no sender, updateUI has been called from initUI
-            senderName = "cmbUnits"
+        else: # no sender, updateUI has been called from initUI or another method
+            senderName = ""
 
         if senderName == "f_S" and self.f_S != 0:
             # f_S has been edited -> update dictionary entry for f_S and
@@ -187,6 +189,13 @@ class InputFreqUnits(QtGui.QWidget):
         for double-sided spectrum between -f_S/2 and f_S/2 and emit
         sigSpecsChanged signal
         """
+        # get ID of signal that triggered updateUI():
+        if self.sender(): # origin of signal that triggered the slot
+            senderName = self.sender().objectName()
+            if self.DEBUG: print(senderName + ' was triggered\n================')
+        else: # no sender, updateUI has been called from initUI or another method
+            senderName = ""
+
         rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
         if rangeType == 'whole':
@@ -198,7 +207,9 @@ class InputFreqUnits(QtGui.QWidget):
 
         fb.fil[0]['freqSpecsRange'] = f_lim
         
-        self.sigSpecsChanged.emit() # -> input_widgets
+        # only emit signal when freqRange has been triggered by combobox
+        if len(senderName) > 2:          
+            self.sigSpecsChanged.emit() # -> input_widgets
 
 
     #-------------------------------------------------------------
@@ -206,13 +217,16 @@ class InputFreqUnits(QtGui.QWidget):
         """
         Reload settings and textfields from filter dictionary
         """
-        self.ledF_S.setText(str(fb.fil[0]['f_S'])) # read sampling frequency
+        self.f_S = fb.fil[0]['f_S']  # read sampling frequency
+        self.ledF_S.setText(str(self.f_S))
 
-        idx = self.cmbUnits.findText(fb.fil[0]['freq_specs_unit']) # find index
-        self.cmbUnits.setCurrentIndex(idx)
+        idx = self.cmbUnits.findText(fb.fil[0]['freq_specs_unit']) # get and set
+        self.cmbUnits.setCurrentIndex(idx) # index for freq. unit combo box
 
         idx = self.cmbFRange.findData(fb.fil[0]['freqSpecsRangeType'])
-        self.cmbFRange.setCurrentIndex(idx)
+        self.cmbFRange.setCurrentIndex(idx) # set frequency range
+#        print(fb.fil[0]['freqSpecsRangeType'])
+#        print("idx", idx)
         
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
 
@@ -224,8 +238,7 @@ class InputFreqUnits(QtGui.QWidget):
         - Emit sigFilterChanged signal
         """
         # simply call updateUI? 
-        fb.fil[0].update({"plt_fLabel":f_label}) # label for freq. axis
-        fb.fil[0].update({"plt_tLabel":t_label}) # label for time axis
+#        self.updateUI()
         fb.fil[0].update({'freq_specs_unit':self.cmbUnits.currentText()})
         fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
         
@@ -258,8 +271,8 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputFreqUnits() #)
 
-    form.updateUI(newLabels = ['F_SB','F_SB2','F_PB','F_PB2'])
-    form.updateUI(newLabels = ['F_PB','F_PB2'])
+    form.updateUI()
+#    form.updateUI(newLabels = ['F_PB','F_PB2'])
 
     form.show()
 

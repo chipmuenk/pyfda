@@ -228,6 +228,7 @@ class InputSpecs(QtGui.QWidget):
         # self.f_units.storeEntries() # frequency units widget - not working yet
         self.fil_ord.storeEntries() # filter order widget
         self.f_specs.storeEntries() # frequency specification widget
+        self.f_units.storeEntries() # frequency specification widget
         self.a_specs.storeEntries() # magnitude specs with unit
         self.w_specs.storeEntries() # weight specification
         self.t_specs.storeEntries() # target specs        
@@ -282,7 +283,8 @@ class InputSpecs(QtGui.QWidget):
             # The filter design routines write coeffs, poles/zeros etc. back to
             # the global filter dict
     
-            # Update filter order. weights and freqs in case they have been changed
+            # Update filter order. weights and freq display in case they 
+            # have been changed by the design algorithm
             self.fil_ord.loadEntries()
             self.w_specs.loadEntries()
             self.f_specs.loadEntries()
