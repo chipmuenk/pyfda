@@ -12,12 +12,13 @@ from PyQt4.QtCore import pyqtSignal
 import scipy.io
 import numpy as np
 import re
+#import json
 
 #import shelve
-try:
-    import cPickle as pickle
-except:
-    import pickle
+#try:
+#    import cPickle as pickle
+#except:
+#    import pickle
 import pprint
 
 try:
@@ -144,9 +145,11 @@ class InputFiles(QtGui.QWidget):
         
     def load_filter(self):
         """
-        Load (c)pickled filter dictionary and update input and plot widgets
+        Load filter from zipped binary numpy array or (c)pickled object to
+        filter dictionary and update input and plot widgets
         """
-        file_types = ("Pickled (*.pkl);;Zipped Binary Numpy Array (*.npz)")   
+#        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg=QtGui.QFileDialog( self )
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Load filter ", directory = self.basedir,
@@ -155,9 +158,7 @@ class InputFiles(QtGui.QWidget):
             file_type_err = False              
             try:
                 with open(file_name, 'rb') as f:
-                    if file_name.endswith('pkl'):
-                        fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
-                    elif file_name.endswith('npz'):
+                    if file_name.endswith('npz'):
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
                         a = np.load(f) # array containing dict, dtype 'object'
                         
@@ -168,6 +169,9 @@ class InputFiles(QtGui.QWidget):
                             else:
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
+#                    elif file_name.endswith('pkl'):
+#                        # this only works for python >= 3.3
+#                        fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
                     else:
                         print('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
@@ -182,9 +186,10 @@ class InputFiles(QtGui.QWidget):
 
     def save_filter(self):
         """
-        Save Filter as pickle object
+        Save filter as zipped binary numpy array or pickle object
         """
-        file_types = ("Pickled (*.pkl);;Zipped Binary Numpy Array (*.npz)")        
+#        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl);;JSON (*.json)")
+        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg = QtGui.QFileDialog( self )
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save filter as", directory = self.basedir,
@@ -193,11 +198,14 @@ class InputFiles(QtGui.QWidget):
             file_type_err = False
             try:
                 with open(file_name, 'wb') as f:
-                    if file_name.endswith('pkl'):
-                        # save as a version compatible with Python 2.x
-                        pickle.dump(fb.fil, f, protocol = 2, fix_imports = True)
-                    elif file_name.endswith('npz'):
+                    if file_name.endswith('npz'):
                         np.savez(f, **fb.fil[0])
+#                    elif file_name.endswith('pkl'):
+#                        # save as a version compatible with Python 2.x
+#                        pickle.dump(fb.fil, f, protocol = 2)
+#                    elif file_name.endswith('json'):
+#                        json.dumps(fb.fil[0],f, sort_keys = True, indent = 4,
+#                                       ensure_ascii=False)
                     else:
                         print('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
