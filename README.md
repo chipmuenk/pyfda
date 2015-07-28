@@ -9,13 +9,17 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 **Screenshot from the current version:**
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
-![Getting started](webpage/getting_started.html)
+### Prerequisites
+The project builds only on standard python libraries, libraries from the scipy stack (numpy, scipy, matplotlib) and the pyQt4 widget library. When the modules xlwt and / or XlsxWriter are installed, coefficients can be exported as *.xls(x) files.
+
+### Getting started
+Just download the zip file and extract it to a directory of your choice. The application is started with the file pyfda from the main directory.
 
 ### Why yet another filter design tool?
 * **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
 * **Show-off:** Demonstrate that Python is a potent tool for digital signal processing applications as well. The interfaces for textual filter design routines are a nightmare: linear vs. logarithmic specs, frequencies normalized w.r.t. to sampling or Nyquist frequency, -3 dB vs. -6 dB vs. band-edge frequencies ... (This is due to the different backgrounds and the history of filter design algorithms and not Python-specific.)
 * **Fixpoint filter design for uCs:** Recursive filters have become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable e.g. for uCs.
-* **Fixpoint filter design for FPGAs**: Especially on low-budget FPGAs, multipliers are rare. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.
+* **Fixpoint filter design for FPGAs**: Especially on low-budget FPGAs, multipliers are expensive. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.
 * **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [myHDL](http://myhdl.org) can automate both design and verification.
 
 ### The following features are currently implemented:
@@ -62,7 +66,7 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
     </tr>
 </table>
 
-### Release 0.1 (target: end of <s>May</s> June 2015)
+### Release 0.1 (target: end of <s>May</s> July 2015)
 
 The following features are still missing for the first release. 
 * Documentation
