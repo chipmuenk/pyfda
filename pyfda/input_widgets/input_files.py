@@ -47,7 +47,6 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import filterbroker as fb # importing filterbroker initializes all its globals
-from filter_tree_builder import FilterTreeBuilder
 
 # TODO: Save P/Z as well if possible
 
@@ -57,16 +56,13 @@ class InputFiles(QtGui.QWidget):
     """
     
     sigFilterDesigned = pyqtSignal()
+    sigReadFilters = pyqtSignal()  # emitted when button "Read Filters" is pressed
 
     def __init__(self, DEBUG = True):
         self.DEBUG = DEBUG
         super(InputFiles, self).__init__()
         
         self.basedir = os.path.dirname(os.path.abspath(__file__))
-
-#        self.ftb = FilterTreeBuilder('filter_design', 'init.txt',
-#                                    commentChar = '#', DEBUG = DEBUG) #
-
 
         self.initUI()
 
@@ -128,7 +124,7 @@ class InputFiles(QtGui.QWidget):
         self.butSave.clicked.connect(self.save_filter)
         self.butLoad.clicked.connect(self.load_filter)
         
-#        self.butReadFiltTree.clicked.connect(self.ftb.initFilters)
+        self.butReadFiltTree.clicked.connect(self.sigReadFilters.emit)
         #----------------------------------------------------------------------
 
     def HLine(self):

@@ -84,8 +84,6 @@ class InputSpecs(QtGui.QWidget):
 
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
         self.color_design_button("changed")
-        self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
-        self.butReadFiltTree.setToolTip("Re-read filter design directory and build filter design tree.")
 
         """
         LAYOUT
@@ -101,9 +99,9 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.w_specs,5,0,1,2)  # Weight specs
         layGMain.addWidget(frmMsg,6,0,1,2)        # Text message
         layGMain.addWidget(self.t_specs,7,0,1,2)  # Target specs
-        layGMain.addWidget(self.butDesignFilt, 8,0)
-        layGMain.addWidget(self.butReadFiltTree, 8,1)
-        layGMain.addItem(spcV,10,0)
+        layGMain.addWidget(self.butDesignFilt, 8,0,1,2)
+#        layGMain.addWidget(self.butReadFiltTree, 8,1)
+        layGMain.addItem(spcV,2,0)
 #        layGMain.addWidget(self.HLine(), 9,0) # create HLine
         layGMain.setContentsMargins(1,1,1,1)
         
@@ -134,7 +132,6 @@ class InputSpecs(QtGui.QWidget):
 
         # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
-        self.butReadFiltTree.clicked.connect(self.sel_fil.ftb.initFilters)
         #----------------------------------------------------------------------
 
         self.updateAllUIs() # first time initialization

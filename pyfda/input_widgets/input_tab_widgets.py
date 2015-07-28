@@ -108,6 +108,7 @@ class InputWidgets(QtGui.QWidget):
         self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
         self.inputPZ.sigFilterDesigned.connect(self.updateAll)
         self.inputFiles.sigFilterDesigned.connect(self.updateAll)
+        self.inputFiles.sigReadFilters.connect(self.inputSpecs.sel_fil.ftb.initFilters)
         #----------------------------------------------------------------------
 
 
