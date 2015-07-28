@@ -21,8 +21,8 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb
-from filter_tree_builder import FilterTreeBuilder
+import pyfda.filterbroker as fb
+from pyfda.filter_tree_builder import FilterTreeBuilder
 
 # TODO: Add subwidgets, depending on filterSel parameters
 # TODO:  index = myComboBox.findText('item02') 

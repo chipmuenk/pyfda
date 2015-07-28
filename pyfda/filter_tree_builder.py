@@ -7,7 +7,7 @@ Created on Mon Nov 24 10:00:14 2014
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys
 import codecs
-import filterbroker as fb
+import pyfda.filterbroker as fb
 
 
 class FilterTreeBuilder(object):

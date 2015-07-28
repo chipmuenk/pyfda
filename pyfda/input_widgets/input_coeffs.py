@@ -20,10 +20,10 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda_lib import cround, save_fil
-import pyfda_lib_fix_v3 as fix
-from simpleeval import simple_eval
+import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+from pyfda.pyfda_lib import cround, save_fil
+import pyfda.pyfda_lib_fix_v3 as fix
+from pyfda.simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows
 # TODO: drag & drop doesn't work

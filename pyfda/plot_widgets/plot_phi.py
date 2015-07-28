@@ -16,8 +16,8 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb
-from plot_widgets.plot_utils import MplWidget
+import pyfda.filterbroker as fb
+from pyfda.plot_widgets.plot_utils import MplWidget
 
 
 class PlotPhi(QtGui.QMainWindow):

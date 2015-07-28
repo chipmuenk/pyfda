@@ -45,8 +45,8 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb # importing filterbroker initializes all its globals
-from filter_tree_builder import FilterTreeBuilder
+import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+from pyfda.filter_tree_builder import FilterTreeBuilder
 
 # TODO: Save P/Z as well if possible
 

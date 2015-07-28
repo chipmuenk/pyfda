@@ -19,7 +19,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 # TODO: Docstrings cannot be displayed with Py3:
 #       Line 113: QTextEdit.append(str): argument 1 has unexpected type 'bytes'
