@@ -1,8 +1,8 @@
 # This file is used for initializing filters in the pyFDA tool: 
-#  Only the files listed here are imported into pyFDA
-# All lines starting with # are regarded as comment lines
-# The class name in a filter file has to be identical to its file name 
-#  (without the .py suffix)
+#  - Only the files listed here are imported into pyFDA
+#  - All lines starting with # are regarded as comment lines
+#  - The class name in a filter file has to be identical to its file name 
+#     (without the .py suffix)
 
 # This file should be encoded as UTF-8 without BOM or standard ASCII
 
@@ -12,7 +12,7 @@ firwin.py
 cheby2.py
 ellip.py
 butter.py
-bessel.py
+#bessel.py
 
 # ======== Testing ==========
 .py

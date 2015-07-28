@@ -45,7 +45,7 @@ class InputFilter(QtGui.QWidget):
         self.DEBUG = DEBUG
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file
-        self.ftb = FilterTreeBuilder('filter_design', 'init.txt',
+        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
                                     commentChar = '#', DEBUG = DEBUG) #
 
         self.filter_initialized = False
@@ -129,11 +129,7 @@ class InputFilter(QtGui.QWidget):
 
         layVAllWdg.addLayout(layHStdWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
-        
-        # prevent disappearing of new subwidget
-#        spacer = QtGui.QSpacerItem(0, 1, QtGui.QSizePolicy.MinimumExpanding, 
-#                         QtGui.QSizePolicy.MinimumExpanding)
-#        layVAllWdg.addItem(spacer)
+    
 
         self.frmMain = QtGui.QFrame()
         self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
