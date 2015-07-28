@@ -30,7 +30,7 @@ if __name__ == "__main__":
 import filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda_lib_fix_v3 as fix
 
-from hdl_generation.siir import SIIR #  second order IIR filter object
+from hdl_generation.filter_iir import SIIR #  second order IIR filter object
 
 
 

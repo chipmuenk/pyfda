@@ -20,34 +20,24 @@
 ==================
 Simple IIR Filter
 ==================
-
 The following is a straight forward HDL description of a Direct Form I IIR
 filter and an object that encapsulates the design and configuration of the
 IIR filter.  This module can be used to generate synthesizable Verilog/VHDL
 for an FPGA.
-
 How to use this module
 -----------------------
   1.  Instantiate an instance of the SIIR object.  Pass the desired low-pass
       frequency cutoff (Fc) and the sample rate (Fs).
-
    >>> flt = SIIR(Fc=1333, Fs=48000)
-
   2.  Test the frequency response by running a simulation that inputs random
       samples and then computes the FFT of the input and output, compute
       Y(x)/X(w) = H(w) and plot.
-
    >>> flt.TestFreqResponse()
-
   3.  If all looks good create the Verilog and VHDL
-
    >>> flt.Convert()
-
 This code is discussed in the following
 http://www.fpgarelated.com/showarticle/7.php
 http://dsp.stackexchange.com/questions/1605/designing-butterworth-filter-in-matlab-and-obtaining-filter-a-b-coefficients-a
-
-
 :Author: Christopher Felton <cfelton@ieee.org>
 """
 
@@ -237,7 +227,6 @@ class SIIR():
         the HDL based on a set of coefficients or a sum of
         sections matrix.  This object can only be used for 2nd
         order type=I IIR filters or cascaded 2nd orders.
-
         -------
         """
         print("init_SIIR")
