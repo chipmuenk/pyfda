@@ -156,7 +156,7 @@ class InputFiles(QtGui.QWidget):
             try:
                 with open(file_name, 'rb') as f:
                     if file_name.endswith('pkl'):
-                        fb.fil = pickle.load(f)
+                        fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
                     elif file_name.endswith('npz'):
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
                         a = np.load(f) # array containing dict, dtype 'object'
@@ -194,7 +194,8 @@ class InputFiles(QtGui.QWidget):
             try:
                 with open(file_name, 'wb') as f:
                     if file_name.endswith('pkl'):
-                        pickle.dump(fb.fil, f)
+                        # save as a version compatible with Python 2.x
+                        pickle.dump(fb.fil, f, protocol = 2, fix_imports = True)
                     elif file_name.endswith('npz'):
                         np.savez(f, **fb.fil[0])
                     else:
