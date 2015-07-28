@@ -16,12 +16,12 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb
+import pyfda.filterbroker as fb
 #from filter_tree_builder import FilterTreeBuilder
 
-from input_widgets import (input_filter, input_order, input_amp_specs,
-                           input_freq_specs, input_freq_units, 
-                           input_weight_specs, input_target_specs)
+from pyfda.input_widgets import (input_filter, input_order, input_amp_specs,
+                                 input_freq_specs, input_freq_units, 
+                                 input_weight_specs, input_target_specs)
 
 
 class InputSpecs(QtGui.QWidget):
