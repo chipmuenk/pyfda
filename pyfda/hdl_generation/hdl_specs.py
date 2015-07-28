@@ -77,7 +77,7 @@ class HDLSpecs(QtGui.QWidget):
         " in the pyFDA root directory.")
         self.lblMyhdl1.setWordWrap(True)
 #        self.lblMyhdl1.setFont(bfont)
-        self.lblMyhdl2 = QtGui.QLabel("Enter variable formats as QI.QF:")
+        self.lblMyhdl2 = QtGui.QLabel("Enter fixpoint signal formats as QI.QF:")
 
         
         ledMaxWid = 30 # Max. Width of QLineEdit fields
@@ -285,13 +285,18 @@ class HDLSpecs(QtGui.QWidget):
         self.cmbHDL.addItems(['Verilog','VHDL'])
         self.cmbHDL.setToolTip("Select type of HDL for filter synthesis.")
 
-        self.butHDL = QtGui.QPushButton()
-        self.butHDL.setToolTip("Create VHDL and Verilog files, start fixpoint simulation.")
-        self.butHDL.setText("Create HDL")
+        self.butExportHDL = QtGui.QPushButton()
+        self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
+        self.butExportHDL.setText("Create HDL")
+        
+        self.butSimFixPoint = QtGui.QPushButton()
+        self.butSimFixPoint.setToolTip("Simulate filter with fixpoint effects.")
+        self.butSimFixPoint.setText("Simulate")
+
         
         self.layHButtonsHDL_h = QtGui.QHBoxLayout()
-    #   self.layHButtonsHDL_h.addWidget(self.cmbHDL)            
-        self.layHButtonsHDL_h.addWidget(self.butHDL)
+        self.layHButtonsHDL_h.addWidget(self.butSimFixPoint)            
+        self.layHButtonsHDL_h.addWidget(self.butExportHDL)
 # -------------------------------------------------------------------
 
 
@@ -323,7 +328,8 @@ class HDLSpecs(QtGui.QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.butHDL.clicked.connect(self.exportHDL)
+        self.butExportHDL.clicked.connect(self.exportHDL)
+        self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
 
 
@@ -338,6 +344,37 @@ class HDLSpecs(QtGui.QWidget):
         line.setFrameShape(QtGui.QFrame.HLine)
         line.setFrameShadow(QtGui.QFrame.Sunken)
         return line
+
+#------------------------------------------------------------------------------
+    def setupHDL(self):
+        """
+        Setup instance of myHDL object with word lengths and coefficients
+        """
+
+        qI_i = int(self.ledQIInput.text())
+        qF_i = int(self.ledQFInput.text())
+        
+        qI_o = int(self.ledQIOutput.text())
+        qF_o = int(self.ledQFOutput.text())
+        
+        qQuant_o = self.cmbQuant_o.currentText()
+        qOvfl_o = self.cmbOvfl_o.currentText()
+        
+        q_obj_o =  {'QI':qI_o, 'QF': qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
+        myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
+
+
+        self.W = (qI_i + qF_i + 1, 0) # Matlab format: (W,WF)
+        print("W = ", self.W)
+        
+        #       get filter coefficients etc. from filter dict    
+        coeffs = fb.fil[0]['ba']
+        zpk =  fb.fil[0]['zpk']
+        sos = fb.fil[0]['sos']
+
+        # =============== adapted from C. Feltons SIIR example =============
+        self.flt = SIIR(W = self.W, b = np.array(coeffs[0][0:3]), 
+                          a = np.array(coeffs[1][0:3]))
 
         
 #------------------------------------------------------------------------------
@@ -361,46 +398,33 @@ class HDLSpecs(QtGui.QWidget):
 #        print(self.hdl_filename)
 #        print(self.hdl_file_noext)
 
-#       get filter coefficients etc. from filterbroker        
-        coeffs = fb.fil[0]['ba']
-        zpk =  fb.fil[0]['zpk']
-        sos = fb.fil[0]['sos']
 
-        qI_i = int(self.ledQIInput.text())
-        qF_i = int(self.ledQFInput.text())
         
-        qI_o = int(self.ledQIOutput.text())
-        qF_o = int(self.ledQFOutput.text())
-        
-        qQuant_o = self.cmbQuant_o.currentText()
-        qOvfl_o = self.cmbOvfl_o.currentText()
-        
-        q_obj_o =  {'QI':qI_o, 'QF': qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
-        myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
+        self.setupHDL()
+        self.flt.hdl_name = "IIR_example"  
+        self.flt.Convert()
+        print("HDL ConversionFinished!")
 
-        # =============== adapted from C. Feltons SIIR example =============
-        W = (qI_i + qF_i + 1, 0) # Matlab format: (W,WF)
-        print("W = ", W)
-        
-        flt = SIIR(W = W, b = coeffs[0][0:3], a = coeffs[1][0:3]) 
-#        clk = Signal(False)
-#        ts  = Signal(False)
-#        x   = Signal(intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
-#        y   = Signal(intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
-        
+#------------------------------------------------------------------------------
+    def simFixPoint(self):
+        """
+        Simulate filter in fix-point description
+        """
         # Setup the Testbench and run
+        self.setupHDL()
         print("Simulation")
-        tb = flt.TestFreqResponse(Nloops=3, Nfft=1024)
+        tb = self.flt.TestFreqResponse(Nloops=3, Nfft=1024)
+        clk = Signal(False)
+        ts  = Signal(False)
+        x   = Signal(intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
+        y   = Signal(intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
+
         sim = Simulation(tb)
         print("Run Simulation")
         sim.run()
         print("Plot Response")
-        flt.PlotResponse()
-    
-        flt.Convert()
-        print("Finished!")
-
-
+        self.flt.PlotResponse()
+        print("Finished Plotting")
 
 #------------------------------------------------------------------------------
 
