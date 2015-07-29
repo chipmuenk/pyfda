@@ -382,26 +382,26 @@ class HDLSpecs(QtGui.QWidget):
         """
         Synthesize HDL description of filter using myHDL module
         """
-# This does not work yet: file name is currently fixed to "siir_hdl" via the 
-# function with the same name
-#        dlg=QtGui.QFileDialog( self )
-#        
-#        file_types = "Verilog (*.v);;VHDL (*.vhd)"
-#
-#
-#        hdl_file, hdl_filter = dlg.getSaveFileNameAndFilter(self,
-#                caption = "Save HDL as", directory="D:",
-#                filter = file_types)
-#        print(hdl_file)
-#        self.hdl_filename = os.path.splitext(os.path.basename(hdl_file))[0]
-#        self.hdl_file_noext = os.path.splitext(hdl_file)[0]
-#        print(self.hdl_filename)
-#        print(self.hdl_file_noext)
-
-
+        # This does not work yet: file name is currently fixed to "siir_hdl" via the 
+        # function with the same name
+        dlg=QtGui.QFileDialog( self )
         
+        file_types = "Verilog (*.v);;VHDL (*.vhd)"
+
+
+        hdl_file, hdl_filter = dlg.getSaveFileNameAndFilter(self,
+                caption = "Save HDL as", directory="D:",
+                filter = file_types)
+        print(hdl_file)
+        hdl_filename = os.path.splitext(os.path.basename(hdl_file))[0]
+        hdl_dirname = os.path.splitext(hdl_file)[0]
+        print(self.hdl_filename)
+        print(self.hdl_dirname)
+
         self.setupHDL()
-        self.flt.hdl_name = "IIR_example"  
+        self.flt.hdl_name = hdl_filename
+        self.flt.hdl_directory = hdl_dirname
+        self.flt.hdl_target = 'verilog' # or 'vhdl'
         self.flt.Convert()
         print("HDL ConversionFinished!")
 
