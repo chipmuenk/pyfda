@@ -209,10 +209,10 @@ class FilterTreeBuilder(object):
      """
         filTree = {}
         for dm in fb.gD['imports']:           # iterate over designMethods(dm)
-            myFilter = self.objectWizzard(dm) # instantiate object of filter class dm
-            ft = myFilter.ft                  # get filter type ('FIR')
+            cur_filter = self.objectWizzard(dm) # instantiate object of filter class dm
+            ft = cur_filter.ft                  # get filter type ('FIR')
             
-            for rt in myFilter.rt:            # iterate over response types
+            for rt in cur_filter.rt:            # iterate over response types
                 if rt not in filTree:         # is rt key in dict already?
                     filTree.update({rt:{}})   # no, create it
 
@@ -222,36 +222,36 @@ class FilterTreeBuilder(object):
                 # finally append all the individual 'min' / 'man' info 
                 # to dm in filTree. These are e.g. the params for 'min' and /or
                 # 'man' filter order
-                filTree[rt][ft][dm].update(myFilter.rt[rt]) 
+                filTree[rt][ft][dm].update(cur_filter.rt[rt]) 
 
                 # combine common info for all response types 
                 #     com = {'man':{...}, 'min':{...}}
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}} 
 
-                for minman in myFilter.com:
+                for minman in cur_filter.com:
                     # add info only when 'man' / 'min' exists in filTree
                     if minman in filTree[rt][ft][dm]: 
-                        for i in myFilter.com[minman]:
+                        for i in cur_filter.com[minman]:
                             # Test whether entry exists in filTree:
                             if i in filTree[rt][ft][dm][minman]:
                                 # yes, prepend common data
                                 filTree[rt][ft][dm][minman][i] =\
-                                myFilter.com[minman][i] + filTree[rt][ft][dm][minman][i]
+                                cur_filter.com[minman][i] + filTree[rt][ft][dm][minman][i]
                             else:
                                 # no, create new entry
                                 filTree[rt][ft][dm][minman].update(\
-                                                {i:myFilter.com[minman][i]})
+                                                {i:cur_filter.com[minman][i]})
 
                             if self.DEBUG:
-                                print('--- FilterFileReader.buildFilterTree ---')
+                                print('\n--- FilterFileReader.buildFilterTree ---')
                                 print(dm, minman, i)
                                 print("filTree[minman][i]:",
                                       filTree[rt][ft][dm][minman][i])
-                                print("myFilter.com[minman][i]",
-                                  myFilter.com[minman][i] )
+                                print("cur_filter.com[minman][i]",
+                                  cur_filter.com[minman][i] )
 
-            del myFilter # delete obsolete filter object (needed?)
+            del cur_filter # delete obsolete filter object (needed?)
             
         if self.DEBUG: print("filTree = ", filTree)
         
@@ -264,7 +264,7 @@ class FilterTreeBuilder(object):
         when the corresponding module has been imported already, e.g. using
         the function dynamicImport.
 
-        E.g.  self.myFilter = fr.objectWizzard('cheby1')
+        E.g.  self.cur_filter = fr.objectWizzard('cheby1')
         
         Parameters
         ----------
@@ -294,7 +294,7 @@ if __name__ == "__main__":
 #    import filterbroker as fb
     print("===== Initialize FilterReader ====")
     
-    filtFileName = "init.txt"
+    filtFileName = "filter_list.txt"
     subDirectory = "filter_design"
     commentChar  = '#'  
     Debug = True
@@ -304,9 +304,9 @@ if __name__ == "__main__":
 
     print("\n===== Start Test ====")    
     for name in fb.gD['imports']:
-        myFilter = myTreeBuilder.objectWizzard(name)
-        print('myFilter', myFilter)
-    myFilterTree = myTreeBuilder.buildFilTree()
-    print('myFilterTree = ', myFilterTree)
+        cur_filter = myTreeBuilder.objectWizzard(name)
+        print('cur_filter', cur_filter)
+    filterTree = myTreeBuilder.buildFilTree()
+    print('filterTree = ', filterTree)
     print(fb.gD['imports'])
     
