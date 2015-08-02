@@ -129,10 +129,12 @@ class FilterTreeBuilder(object):
 
             filtFileComments = filtFileNames = []
             
+        print("FilterTreeBuilder: Filter list read!")
+            
         return filtFileNames
 
 #==============================================================================
-    def dynFiltImport(self):#, pyPackage):
+    def dynFiltImport(self):
         """
         Try to import all modules / classes found by readFiltFile() from 
         self.filtDir (= subdirectory with filter design algorithms + __init__.py).
@@ -186,7 +188,9 @@ class FilterTreeBuilder(object):
             except ImportError:
                 if self.DEBUG: 
                     print("Error in 'FilterFileReader.dynamicImport()':" )
-                    print("Module '%s' could not be imported."%pyName) 
+                    print("Module '%s' could not be imported."%pyName)
+
+        print("FilterTreeBuilder: Filter imported!")
                     
         return imports
  
@@ -204,12 +208,16 @@ class FilterTreeBuilder(object):
         corresponding filter class are stored, e.g.
         'par':['f_S', 'F_PB', 'F_SB', 'A_PB', 'A_SB']   # required parameters
         'msg':r"<br /><b>Note:</b> Order needs to be even!" # message
-        'enb':['fo','fspecs','wspecs']                     # enabled widgets
-        'vis':['fo','fspecs']  # visibe widgets (not yet implemented) 
+        'dis':['fo','fspecs','wspecs']  # disabled widgets
+        'vis':['fo','fspecs']           # visible widgets 
      """
+     
+     
         filTree = {}
         for dm in fb.gD['imports']:           # iterate over designMethods(dm)
+
             cur_filter = self.objectWizzard(dm) # instantiate object of filter class dm
+
             ft = cur_filter.ft                  # get filter type ('FIR')
             
             for rt in cur_filter.rt:            # iterate over response types
@@ -290,14 +298,20 @@ class FilterTreeBuilder(object):
             
 #==============================================================================
 if __name__ == "__main__":
+    
+    # Need to start a QApplication to avoid the error
+    #  "QWidget: Must construct a QApplication before a QPaintDevice"
+    # when instantiating filters with dynamic widgets (equiripple, firwin)
 
+    from PyQt4 import QtGui
+    app = QtGui.QApplication(sys.argv)
 #    import filterbroker as fb
     print("===== Initialize FilterReader ====")
     
     filtFileName = "filter_list.txt"
     subDirectory = "filter_design"
     commentChar  = '#'  
-    Debug = True
+    Debug = False
     
     # Create a new FilterFileReader instance & initialize it
     myTreeBuilder = FilterTreeBuilder(subDirectory, filtFileName, commentChar, Debug)
