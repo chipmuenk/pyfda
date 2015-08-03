@@ -395,8 +395,8 @@ class HDLSpecs(QtGui.QWidget):
         print(hdl_file)
         hdl_filename = os.path.splitext(os.path.basename(hdl_file))[0]
         hdl_dirname = os.path.splitext(hdl_file)[0]
-        print(self.hdl_filename)
-        print(self.hdl_dirname)
+        print(hdl_filename)
+        print(hdl_dirname)
 
         self.setupHDL()
         self.flt.hdl_name = hdl_filename
