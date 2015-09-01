@@ -7,7 +7,7 @@ Author: Christian Muenker
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 import textwrap
-from PyQt4 import Qt, QtGui, QtWebKit
+from PyQt4 import Qt, QtGui#, QtWebKit
 from docutils.core import publish_string #, publish_parts
 import pprint
 import numpy as np

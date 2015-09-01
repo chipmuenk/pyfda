@@ -129,10 +129,12 @@ class FilterTreeBuilder(object):
 
             filtFileComments = filtFileNames = []
             
+        print("FilterTreeBuilder: Filter list read!")
+            
         return filtFileNames
 
 #==============================================================================
-    def dynFiltImport(self):#, pyPackage):
+    def dynFiltImport(self):
         """
         Try to import all modules / classes found by readFiltFile() from 
         self.filtDir (= subdirectory with filter design algorithms + __init__.py).
@@ -186,7 +188,9 @@ class FilterTreeBuilder(object):
             except ImportError:
                 if self.DEBUG: 
                     print("Error in 'FilterFileReader.dynamicImport()':" )
-                    print("Module '%s' could not be imported."%pyName) 
+                    print("Module '%s' could not be imported."%pyName)
+
+        print("FilterTreeBuilder: Filter imported!")
                     
         return imports
  
@@ -204,15 +208,19 @@ class FilterTreeBuilder(object):
         corresponding filter class are stored, e.g.
         'par':['f_S', 'F_PB', 'F_SB', 'A_PB', 'A_SB']   # required parameters
         'msg':r"<br /><b>Note:</b> Order needs to be even!" # message
-        'enb':['fo','fspecs','wspecs']                     # enabled widgets
-        'vis':['fo','fspecs']  # visibe widgets (not yet implemented) 
+        'dis':['fo','fspecs','wspecs']  # disabled widgets
+        'vis':['fo','fspecs']           # visible widgets 
      """
+     
+     
         filTree = {}
         for dm in fb.gD['imports']:           # iterate over designMethods(dm)
-            myFilter = self.objectWizzard(dm) # instantiate object of filter class dm
-            ft = myFilter.ft                  # get filter type ('FIR')
+
+            cur_filter = self.objectWizzard(dm) # instantiate object of filter class dm
+
+            ft = cur_filter.ft                  # get filter type ('FIR')
             
-            for rt in myFilter.rt:            # iterate over response types
+            for rt in cur_filter.rt:            # iterate over response types
                 if rt not in filTree:         # is rt key in dict already?
                     filTree.update({rt:{}})   # no, create it
 
@@ -222,36 +230,36 @@ class FilterTreeBuilder(object):
                 # finally append all the individual 'min' / 'man' info 
                 # to dm in filTree. These are e.g. the params for 'min' and /or
                 # 'man' filter order
-                filTree[rt][ft][dm].update(myFilter.rt[rt]) 
+                filTree[rt][ft][dm].update(cur_filter.rt[rt]) 
 
                 # combine common info for all response types 
                 #     com = {'man':{...}, 'min':{...}}
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}} 
 
-                for minman in myFilter.com:
+                for minman in cur_filter.com:
                     # add info only when 'man' / 'min' exists in filTree
                     if minman in filTree[rt][ft][dm]: 
-                        for i in myFilter.com[minman]:
+                        for i in cur_filter.com[minman]:
                             # Test whether entry exists in filTree:
                             if i in filTree[rt][ft][dm][minman]:
                                 # yes, prepend common data
                                 filTree[rt][ft][dm][minman][i] =\
-                                myFilter.com[minman][i] + filTree[rt][ft][dm][minman][i]
+                                cur_filter.com[minman][i] + filTree[rt][ft][dm][minman][i]
                             else:
                                 # no, create new entry
                                 filTree[rt][ft][dm][minman].update(\
-                                                {i:myFilter.com[minman][i]})
+                                                {i:cur_filter.com[minman][i]})
 
                             if self.DEBUG:
-                                print('--- FilterFileReader.buildFilterTree ---')
+                                print('\n--- FilterFileReader.buildFilterTree ---')
                                 print(dm, minman, i)
                                 print("filTree[minman][i]:",
                                       filTree[rt][ft][dm][minman][i])
-                                print("myFilter.com[minman][i]",
-                                  myFilter.com[minman][i] )
+                                print("cur_filter.com[minman][i]",
+                                  cur_filter.com[minman][i] )
 
-            del myFilter # delete obsolete filter object (needed?)
+            del cur_filter # delete obsolete filter object (needed?)
             
         if self.DEBUG: print("filTree = ", filTree)
         
@@ -264,7 +272,7 @@ class FilterTreeBuilder(object):
         when the corresponding module has been imported already, e.g. using
         the function dynamicImport.
 
-        E.g.  self.myFilter = fr.objectWizzard('cheby1')
+        E.g.  self.cur_filter = fr.objectWizzard('cheby1')
         
         Parameters
         ----------
@@ -290,23 +298,29 @@ class FilterTreeBuilder(object):
             
 #==============================================================================
 if __name__ == "__main__":
+    
+    # Need to start a QApplication to avoid the error
+    #  "QWidget: Must construct a QApplication before a QPaintDevice"
+    # when instantiating filters with dynamic widgets (equiripple, firwin)
 
+    from PyQt4 import QtGui
+    app = QtGui.QApplication(sys.argv)
 #    import filterbroker as fb
     print("===== Initialize FilterReader ====")
     
-    filtFileName = "init.txt"
+    filtFileName = "filter_list.txt"
     subDirectory = "filter_design"
     commentChar  = '#'  
-    Debug = True
+    Debug = False
     
     # Create a new FilterFileReader instance & initialize it
     myTreeBuilder = FilterTreeBuilder(subDirectory, filtFileName, commentChar, Debug)
 
     print("\n===== Start Test ====")    
     for name in fb.gD['imports']:
-        myFilter = myTreeBuilder.objectWizzard(name)
-        print('myFilter', myFilter)
-    myFilterTree = myTreeBuilder.buildFilTree()
-    print('myFilterTree = ', myFilterTree)
+        cur_filter = myTreeBuilder.objectWizzard(name)
+        print('cur_filter', cur_filter)
+    filterTree = myTreeBuilder.buildFilTree()
+    print('filterTree = ', filterTree)
     print(fb.gD['imports'])
     
