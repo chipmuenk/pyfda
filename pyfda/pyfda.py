@@ -9,8 +9,8 @@ import sys
 from PyQt4 import QtGui, QtCore
 
 #import filterbroker as fb # importing filterbroker initializes all its globals
-from input_widgets import input_tab_widgets 
-from plot_widgets import plot_tab_widgets
+from .input_widgets import input_tab_widgets 
+from .plot_widgets import plot_tab_widgets
 
 class pyFDA(QtGui.QMainWindow):
     """
@@ -149,9 +149,10 @@ class pyFDA(QtGui.QMainWindow):
         """
         self.statusBar().showMessage(message)
 
-#------------------------------------------------------------------------------
 
-if __name__ == '__main__':
+#------------------------------------------------------------------------------
+def main():
+    """ entry point for the pyfda application """
     app = QtGui.QApplication(sys.argv)
     
     _desktop = QtGui.QDesktopWidget()
@@ -169,13 +170,18 @@ if __name__ == '__main__':
     myFont = QtGui.QFont("Tahoma", fontsize)
 
     app.setFont(myFont)
-    main = pyFDA()
+    mainw = pyFDA()
     app.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
-    main.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
+    mainw.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
     
     
     # set position + size of main window on desktop
-    main.setGeometry(20, 20, screen_w - delta, screen_h - delta) # ltop left / top right, deltax, delta y
-    main.show()
+    mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # ltop left / top right, deltax, delta y
+    mainw.show()
 
     app.exec_()
+    
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    main()

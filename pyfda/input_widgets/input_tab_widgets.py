@@ -23,9 +23,9 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-from input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
+from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
 if MYHDL:
-    from hdl_generation import hdl_specs
+    from pyfda.hdl_generation import hdl_specs
 
 class InputWidgets(QtGui.QWidget):
     """

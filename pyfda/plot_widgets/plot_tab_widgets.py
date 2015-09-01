@@ -14,7 +14,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
  
-from plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
+from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
 
 

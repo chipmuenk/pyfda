@@ -15,7 +15,7 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb    
+import pyfda.filterbroker as fb    
 
 # TODO: self.cmbFRange is not updated when file is loaded from disk although
 #           fb.fil[0] is updated to correct setting?

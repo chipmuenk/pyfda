@@ -27,10 +27,10 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb # importing filterbroker initializes all its globals
-import pyfda_lib_fix_v3 as fix
+import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.pyfda_lib_fix_v3 as fix
 
-from hdl_generation.filter_iir import SIIR #  second order IIR filter object
+from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
 
 
 

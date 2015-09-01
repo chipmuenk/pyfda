@@ -16,9 +16,9 @@ if __name__ == "__main__":
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
 
-import filterbroker as fb
-import pyfda_lib
-from plot_widgets.plot_utils import MplWidget
+import pyfda.filterbroker as fb
+import pyfda.pyfda_lib
+from pyfda.plot_widgets.plot_utils import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap
