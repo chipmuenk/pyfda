@@ -240,18 +240,20 @@ class InputFilter(QtGui.QWidget):
     def setDesignMethod(self):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
-        Instantiate filter object
+        Instantiate (new) filter object
         """
         dmIdx = self.cmbDesignMethod.currentIndex()
         dm = str(self.cmbDesignMethod.itemData(dmIdx))
         fb.fil[0]['dm'] = dm
 
+        # Check whether this is called for the first time (= no filter object 
+        # exists, creates AttributeError) or whether the design method has been
+        #  changed. A (new) filter object is instantiated if needed
         try: # has a filter object been instantiated yet?
-            if fb.fil[0]['dm'] not in fb.filObj.name:
-                fb.filObj = self.ftb.objectWizzard(fb.fil[0]['dm'])
+            if dm not in fb.filObj.name: # Yes (if no error occurs), check name
+                fb.filObj = self.ftb.objectWizzard(dm)
         except AttributeError as e: # No, create a filter instance
-            print (e)
-            fb.filObj = self.ftb.objectWizzard(fb.fil[0]['dm'])
+            fb.filObj = self.ftb.objectWizzard(dm)
 
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
@@ -286,6 +288,7 @@ class InputFilter(QtGui.QWidget):
         been left (?)! Hence, it is necessary to skip this method when the new
         design method is the same as the old one.
         """
+# TODO: see https://www.commandprompt.com/community/pyqt/x3410.htm
 
         if fb.fil[0]['dm'] != self.dmLast:
             
