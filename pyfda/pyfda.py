@@ -157,7 +157,7 @@ if __name__ == '__main__':
     _desktop = QtGui.QDesktopWidget()
     screen_h = _desktop.availableGeometry().height()
     screen_w = _desktop.availableGeometry().width()
-    print(screen_h, screen_w)
+    print("Available screen resolution:", screen_w, "x", screen_h)
 
     fontsize = 10    
     if screen_h < 800:
