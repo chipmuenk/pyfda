@@ -302,7 +302,7 @@ class InputFilter(QtGui.QWidget):
                 self.layHDynWdg.removeWidget(w)   # remove widget from layout
                 w.deleteLater()             # tell Qt to delete object when the
                                             # method has completed
-                del w                       # not really needed?        
+#                del w                       # not really needed?        
     
             # Try to create "new" dyn. subwidgets:
             if hasattr(fb.filObj, 'wdg'):
