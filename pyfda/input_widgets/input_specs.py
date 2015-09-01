@@ -101,8 +101,8 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.t_specs,7,0,1,2)  # Target specs
         layGMain.addWidget(self.butDesignFilt, 8,0,1,2)
 #        layGMain.addWidget(self.butReadFiltTree, 8,1)
-        layGMain.addItem(spcV,2,0)
-#        layGMain.addWidget(self.HLine(), 9,0) # create HLine
+        layGMain.addItem(spcV,9,0,1,2)
+#        layGMain.addWidget(self.HLine(), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(1,1,1,1)
         
 
