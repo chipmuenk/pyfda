@@ -13,9 +13,9 @@ try:
     import myhdl
 except ImportError:
     MYHDL = False
-    print("Warning: Module myHDL not installed -> no filter synthesis")
 else:
     MYHDL = True
+    print("Info: Module myHDL found -> filter synthesis enabled!")
 
 # add main directory from one level above if this file is run as __main__
 # for test purposes
@@ -59,7 +59,6 @@ class InputWidgets(QtGui.QWidget):
         self.inputInfo.setObjectName("inputInfo")
         if MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs(DEBUG = False)
-
 
         self.initUI()
 
