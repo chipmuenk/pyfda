@@ -92,6 +92,7 @@ class FilterTreeBuilder(object):
 
         filtFileComments = [] # comment lines from filtFile
         filtFileNames = [] # Filenames found in filtFile without .py
+        num_filters = 0 # number of filter design files found in self.filtDirFile
         
         try:
             # Try to open the filtFile in read mode:
@@ -118,19 +119,21 @@ class FilterTreeBuilder(object):
                             # append the file name to the lines list, 
                             # otherwise discard the line
                             filtFileNames.append(curLine[0:suffixPos])
+                            num_filters += 1
                         
                 curLine = fp.readline() # read next line
+                
+            print("FilterTreeBuilder: Filter list read, {0} entries found!"
+                                                        .format(num_filters))
             
         except IOError as e:
-            print('--- FilterFileReader.readFiltFile ---')
+            print("--- FilterTreeBuilder.readFiltFile ---")
             print("Init file {0} could not be found.".format(self.filtDirFile))
             if self.DEBUG: 
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
             filtFileComments = filtFileNames = []
-            
-        print("FilterTreeBuilder: Filter list read!")
-            
+
         return filtFileNames
 
 #==============================================================================
@@ -166,12 +169,13 @@ class FilterTreeBuilder(object):
             }
 
         """
-        imports = {}
+        imports = {}    # dict with filter name and 
+        num_imports = 0 # number of successful filter imports
         
         for pyName in fb.gD['filtFileNames']:
             try:
                 # Try to import the module from the subDirectory (= package)
-                importedModule = __import__(self.filtDir + '.' + pyName, 
+                importedModule = __import__('pyfda.' + self.filtDir + '.' + pyName, 
                                             fromlist=[''])
   
                 # when successful, add the filename without '.py' and the 
@@ -180,17 +184,19 @@ class FilterTreeBuilder(object):
                 
 #                {'cheby1': <module 'filterDesign.cheby1' from ...
                 imports.update({pyName:importedModule})
+                num_imports += 1
                 
                 
               #  Now, modules should be deleted from memory (?)
                 del sys.modules[self.filtDir + '.' + pyName]      
                 
-            except ImportError:
-                if self.DEBUG: 
-                    print("Error in 'FilterFileReader.dynamicImport()':" )
-                    print("Module '%s' could not be imported."%pyName)
+            except ImportError as e:
+                print(e)
+                print("Error in 'FilterFileReader.dynamicImport()':" )
+                print("Module '%s' could not be imported."%pyName)
 
-        print("FilterTreeBuilder: Filter imported!")
+        print("FilterTreeBuilder: {0} filters successfully imported!"
+                                                    .format(num_imports))
                     
         return imports
  
