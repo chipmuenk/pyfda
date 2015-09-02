@@ -12,6 +12,8 @@ from PyQt4 import QtGui, QtCore
 from .input_widgets import input_tab_widgets 
 from .plot_widgets import plot_tab_widgets
 
+__version__ = "0.1a1"
+
 class pyFDA(QtGui.QMainWindow):
     """
     Create the main window consisting of a tabbed widget for entering filter
