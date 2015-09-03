@@ -38,7 +38,8 @@ class FilterTreeBuilder(object):
             True/False, for printing verbose debug messages
         """
         cwd = os.path.dirname(os.path.abspath(__file__))
-        self.filtDirFile = os.path.abspath(cwd+'/'+filtDir+"/"+ filtFile)
+#        self.filtDirFile = os.path.abspath(cwd + '/' + filtDir + "/" + filtFile)
+        self.filtDirFile = os.path.join(cwd, filtDir, filtFile)
         if DEBUG: print(self.filtDirFile)
         self.DEBUG = DEBUG
         self.commentChar = commentChar
@@ -188,7 +189,7 @@ class FilterTreeBuilder(object):
                 
                 
               #  Now, modules should be deleted from memory (?)
-                del sys.modules[self.filtDir + '.' + pyName]      
+                del sys.modules['pyfda.' + self.filtDir + '.' + pyName]      
                 
             except ImportError as e:
                 print(e)

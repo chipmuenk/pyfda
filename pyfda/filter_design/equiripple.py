@@ -12,13 +12,13 @@ import scipy.signal as sig
 from PyQt4 import QtGui
 import numpy as np
 
+# import package internal files from one level above when run as __main__ :
 if __name__ == "__main__":
     import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(__cwd__ + '/..')
-
-import filterbroker as fb
-import pyfda_lib
+import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
 
 
 # TODO: min order for Hilbert & Differentiator
@@ -199,7 +199,7 @@ class equiripple(object):
         dictionary 'fil_dict'.
         """
 
-        pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
+        save_fil(fil_dict, arg, frmt, __name__)
 
         try: # has the order been calculated by a "min" filter design?
             fil_dict['N'] = self.N  # yes, update filterbroker
@@ -216,7 +216,7 @@ class equiripple(object):
 
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (self.N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB], [1, 0],
+        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
         fil_dict['W_PB'] = W[0]
         fil_dict['W_SB'] = W[1]
@@ -239,9 +239,9 @@ class equiripple(object):
 
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (self.N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1],
+        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-#        self.N = pyfda_lib.ceil_odd(N)  # enforce odd order
+#        self.N = ceil_odd(N)  # enforce odd order
         fil_dict['W_SB'] = W[0]
         fil_dict['W_PB'] = W[1]
         if (self.N % 2 == 0): # even order
@@ -262,7 +262,7 @@ class equiripple(object):
 
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (self.N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB,
+        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)
         fil_dict['W_SB']  = W[0]
@@ -273,7 +273,7 @@ class equiripple(object):
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
-        self.N = pyfda_lib.round_odd(self.N) # enforce odd order
+        self.N = round_odd(self.N) # enforce odd order
         self.save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
             self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
             weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],
@@ -281,10 +281,10 @@ class equiripple(object):
 
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
-        (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB,
+        (N, F, A, W) = remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = pyfda_lib.round_odd(N)  # enforce odd order
+        self.N = round_odd(N)  # enforce odd order
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
         fil_dict['W_PB2'] = W[2]
@@ -300,7 +300,7 @@ class equiripple(object):
 
     def DIFFman(self, fil_dict):
         self.get_params(fil_dict)
-        self.N = pyfda_lib.ceil_even(self.N) # enforce even order
+        self.N = ceil_even(self.N) # enforce even order
         self.save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
                 Hz = 1, type = 'differentiator', grid_density = self.grid_density))
 

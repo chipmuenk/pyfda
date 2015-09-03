@@ -16,15 +16,13 @@ from importlib import import_module
 import inspect
 from PyQt4 import QtGui, QtCore
 
-# import filterbroker from one level above if this file is run as __main__
-# for test purposes
+# import package internal files from one level above when run as __main__ :
 if __name__ == "__main__":
     import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
-
-import filterbroker as fb # importing filterbroker initializes all its globals
-import pyfda_lib
+import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+from pyfda.pyfda_lib import save_fil, remezord, round_odd
 
 
 # TODO: Hilbert, differentiator, multiband are missing
@@ -305,7 +303,7 @@ class firwin(object):
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-        pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
+        save_fil(fil_dict, arg, frmt, __name__)
 
         try: # has the order been calculated by a "min" filter design?
             fil_dict['N'] = self.N # yes, update filterbroker
@@ -315,7 +313,7 @@ class firwin(object):
 
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (self.N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB], [1, 0],
+        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
@@ -328,16 +326,16 @@ class firwin(object):
 
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB], [0, 1],
+        (N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.N = pyfda_lib.round_odd(N)  # enforce odd order
+        self.N = round_odd(N)  # enforce odd order
         self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                     window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def HPman(self, fil_dict):
         self.get_params(fil_dict)
-        self.N = pyfda_lib.round_odd(self.N)  # enforce odd order
+        self.N = round_odd(self.N)  # enforce odd order
         self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
@@ -345,7 +343,7 @@ class firwin(object):
     # For BP and BS, F_PB and F_SB have two elements each
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (self.N, F, A, W) = pyfda_lib.remezord([self.F_SB, self.F_PB,
+        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
@@ -360,10 +358,10 @@ class firwin(object):
 
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
-        (N, F, A, W) = pyfda_lib.remezord([self.F_PB, self.F_SB,
+        (N, F, A, W) = remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
-        self.N = pyfda_lib.round_odd(N)  # enforce odd order
+        self.N = round_odd(N)  # enforce odd order
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
@@ -371,7 +369,7 @@ class firwin(object):
 
     def BSman(self, fil_dict):
         self.get_params(fil_dict)
-        self.N = pyfda_lib.round_odd(self.N)  # enforce odd order
+        self.N = round_odd(self.N)  # enforce odd order
         self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 

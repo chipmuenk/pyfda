@@ -14,7 +14,7 @@ if __name__ == "__main__": # relative import if this file is run as __main__
     sys.path.append(os.path.dirname(__cwd__))
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_lib
+from pyfda.pyfda_lib import zplane
 
 from pyfda.plot_widgets.plot_utils import MplWidget#, MplCanvas
 
@@ -38,13 +38,13 @@ class PlotPZ(QtGui.QMainWindow):
         
         self.initAxes()
 
-        self.draw() # calculate and draw phi(f)
+        self.draw() # calculate and draw poles and zeros
 
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-#        self.btnWrap.clicked.connect(self.draw)
-#        self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
+#        self.btnWhatever.clicked.connect(self.draw)
+
 
     def initAxes(self):
         """Initialize and clear the axes
@@ -66,7 +66,7 @@ class PlotPZ(QtGui.QMainWindow):
 
         self.ax.clear()
 
-        [z, p, k] = pyfda_lib.zplane(self.ax, zpk, verbose = False)
+        [z, p, k] = zplane(self.ax, zpk, verbose = False)
 
         self.ax.set_title(r'Pole / Zero Plot')
         self.ax.set_xlabel('Real axis')

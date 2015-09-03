@@ -17,7 +17,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_lib
+from pyfda.pyfda_lib import H_mag
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -313,16 +313,16 @@ class Plot3D(QtGui.QMainWindow):
             plevel_top = top + (top - bottom) * (plevel_rel - 1)
             plevel_btm = top
             zlevel = bottom - (top - bottom) * (zlevel_rel)
-            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, top, H_min = bottom, 
+            H_UC = H_mag(bb, aa, self.xy_UC, top, H_min = bottom, 
                                    log = True)
-            Hmag = pyfda_lib.H_mag(bb, aa, z, top, H_min = bottom, log = True)
+            Hmag = H_mag(bb, aa, z, top, H_min = bottom, log = True)
 
         else: 
             bottom = max(self.zmin, H_min)
             top = self.zmax
         #   top = zmax_rel * H_max # calculate display top from max. of H(f)
-            H_UC = pyfda_lib.H_mag(bb, aa, self.xy_UC, top, H_min = bottom)
-            Hmag = pyfda_lib.H_mag(bb, aa, z, top, H_min = bottom)
+            H_UC = H_mag(bb, aa, self.xy_UC, top, H_min = bottom)
+            Hmag = H_mag(bb, aa, z, top, H_min = bottom)
 
             zlevel = zlevel_rel * top # height of displayed zero position
 

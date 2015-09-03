@@ -16,7 +16,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(__cwd__))
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_lib
+from pyfda.pyfda_lib import impz
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 
@@ -153,7 +153,7 @@ class PlotImpz(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate h[n]
-        [h,t] = pyfda_lib.impz(self.bb, self.aa, self.f_S, step = step,
+        [h,t] = impz(self.bb, self.aa, self.f_S, step = step,
                      N = int(self.ledNPoints.text()))
 
         if step:

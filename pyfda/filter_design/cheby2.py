@@ -13,15 +13,14 @@ from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import cheb2ord
 import numpy as np
-# import filterbroker from one level above if this file is run as __main__
-# for test purposes
+
+# import package internal files from one level above when run as __main__ :
 if __name__ == "__main__":
     import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
-    import filterbroker as fb # importing filterbroker initializes all its globals
-
-import pyfda_lib
+    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+from pyfda.pyfda_lib import save_fil
 
 frmt = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
@@ -128,7 +127,7 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         Convert poles / zeros / gain to filter coefficients (polynomes) and the
         other way round
         """
-        pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
+        save_fil(fil_dict, arg, frmt, __name__)
 
         if self.F_SBC is not None: # has the order been calculated by a "min" filter design?
             fil_dict['N'] = self.N # yes, update filterbroker

@@ -9,7 +9,7 @@ from PyQt4 import QtGui
 import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
-import matplotlib.ticker
+#import matplotlib.ticker
 
 # add path to libraries one level above if this file is run as __main__
 # for test purposes

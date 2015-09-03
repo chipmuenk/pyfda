@@ -14,15 +14,13 @@ import scipy.signal as sig
 from scipy.signal import buttord
 import numpy as np
 
-# import filterbroker from one level above if this file is run as __main__
-# for test purposes
+# import package internal files from one level above when run as __main__ :
 if __name__ == "__main__":
     import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(__cwd__))
-    import filterbroker as fb # importing filterbroker initializes all its globals
-    
-import pyfda_lib
+    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals 
+from pyfda.pyfda_lib import save_fil
 
 frmt = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
@@ -119,7 +117,7 @@ critical frequency from pass and stop band specifications.
         and second-order sections and store all available formats in the global
         database.
         """
-        pyfda_lib.save_fil(fil_dict, arg, frmt, __name__)
+        save_fil(fil_dict, arg, frmt, __name__)
 
         if self.F_PBC is not None: # has corner frequency been calculated?
             fil_dict['N'] = self.N # yes, update filterbroker
