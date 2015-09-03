@@ -5,7 +5,7 @@ Mainwindow  for the pyFDA app, initializes UI
 Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
+import sys, os
 from PyQt4 import QtGui, QtCore
 
 #import filterbroker as fb # importing filterbroker initializes all its globals
@@ -156,6 +156,8 @@ class pyFDA(QtGui.QMainWindow):
 def main():
     """ entry point for the pyfda application """
     app = QtGui.QApplication(sys.argv)
+
+    icon = os.path.join("pyfda","images","icons","Logo_LST_4.svg") 
     
     _desktop = QtGui.QDesktopWidget()
     screen_h = _desktop.availableGeometry().height()
@@ -173,15 +175,15 @@ def main():
 
     app.setFont(myFont)
     mainw = pyFDA()
-    app.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
-    mainw.setWindowIcon(QtGui.QIcon("images/icons/Logo_LST_4.svg"))
-    
-    
+
+    app.setWindowIcon(QtGui.QIcon(icon))
+    mainw.setWindowIcon(QtGui.QIcon(icon))
+      
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # ltop left / top right, deltax, delta y
     mainw.show()
 
-    app.exec_()
+    sys.exit(app.exec_())
     
 #------------------------------------------------------------------------------
 
