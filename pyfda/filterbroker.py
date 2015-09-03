@@ -15,10 +15,9 @@ http://pymotw.com/2/articles/data_persistence.html
 
 from __future__ import print_function, division, unicode_literals
 # importing filterbroker runs the module once, defining all globals and variables
-#global gD # dicts are global by default?
 
 
-
+# module variables, similar to class variables, are global
 gD = {}
 gD['rc'] = {'lw':1.5, 'font.size':14} # rc Params for matplotlib
 gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
