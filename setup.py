@@ -25,6 +25,8 @@ setup(
     author_email = '',
     license = 'Apache',
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
+    package_data = {'pyfda': ['images/icons/*']},
+    data_files = [('pyfda/filter_design', ['pyfda/filter_design/filter_list.txt'])],
     entry_points = {
         'console_scripts': [
             'pyfdax = pyfda:main',
