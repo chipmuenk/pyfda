@@ -28,6 +28,7 @@ from pyfda.filter_tree_builder import FilterTreeBuilder
 # TODO:  index = myComboBox.findText('item02') 
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]
+# TODO: setResponseType is called  4 times every time filter is changed - why?
 
 
 class InputFilter(QtGui.QWidget):
@@ -177,6 +178,7 @@ class InputFilter(QtGui.QWidget):
         # itemData only abbreviation ('LP')
         self.rtIdx = self.cmbResponseType.currentIndex()
         self.rt = str(self.cmbResponseType.itemData(self.rtIdx))
+        print("self.rt", self.rt)
 
         fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
      
@@ -253,6 +255,7 @@ class InputFilter(QtGui.QWidget):
             if dm not in fb.filObj.name: # Yes (if no error occurs), check name
                 fb.filObj = self.ftb.objectWizzard(dm)
         except AttributeError as e: # No, create a filter instance
+            print("setDesignMethod", e)
             fb.filObj = self.ftb.objectWizzard(dm)
 
         # Check whether new design method also provides the old filter order
