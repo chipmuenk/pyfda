@@ -41,12 +41,6 @@ gD['dmNames'] = {#IIR
 #
 # ----- FilterTreeBuilder.__init__() ------
 #
-# List with design method file names (= class names) found in the subdirectory
-# filter_design AND listed in filter_lst.txt (without .py suffix):
-gD['filtFileNames'] = [] 
-# dict with filter files / classes
-gD['imports'] = {} 
-
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
 # This dict is built + overwritten by FilterFileReader.buildFilterTree() !
