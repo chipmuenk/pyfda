@@ -35,15 +35,17 @@ gD['dmNames'] = {#IIR
                   "firwin":"Windowed"}
 
 #==============================================================================
-# The following entries are created and updated dynamically during program
-# execution. The entries only demonstrate the structure of the dicts and lists
-# or are used as initial / default entries.
-# -----------------------------------------------------------------------------
-# -----FilterFileReader.__init__() ------
-
-# Lists for dynamic imports from filter design subdirectory
-gD['filtFileNames'] = [] # Python file names found in filtFile (without .py)
-gD['imports'] = {} # dict with filter files / classes
+# The following entries are only used as initial / default entries and
+# demonstrate the structure of the global dicts and lists. The entries are 
+# created resp. overwritten by
+#
+# ----- FilterTreeBuilder.__init__() ------
+#
+# List with design method file names (= class names) found in the subdirectory
+# filter_design AND listed in filter_lst.txt (without .py suffix):
+gD['filtFileNames'] = [] 
+# dict with filter files / classes
+gD['imports'] = {} 
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).

@@ -44,6 +44,7 @@ class FilterTreeBuilder(object):
         self.DEBUG = DEBUG
         self.commentChar = commentChar
         self.filtDir = filtDir
+        self.filtFileNames = [] 
         
         self.initFilters()
 
@@ -134,7 +135,7 @@ class FilterTreeBuilder(object):
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
 
             filtFileComments = filtFileNames = []
-
+            
         return filtFileNames
 
 #==============================================================================
@@ -196,28 +197,43 @@ class FilterTreeBuilder(object):
                 print("Error in 'FilterFileReader.dynamicImport()':" )
                 print("Module '%s' could not be imported."%pyName)
 
-        print("FilterTreeBuilder: {0} filters successfully imported!"
-                                                    .format(num_imports))
-                    
+        print("FilterTreeBuilder: Imported successfully the following "
+                    "{0} filter designs:".format(num_imports))
+        for dm in imports: print(dm)
         return imports
  
 #==============================================================================
     def buildFilTree(self):
         """
-        Read info attributes (ft, rt, fo) from all filter objects (dm) and build 
-        a dictionary of all possible filter combinations from it 
-        with the hierarchy:
+        Read attributes (ft, rt, rt:fo) from all design method (dm) classes 
+        listed in the global dict fb.gD['imports']. Attributes are stored in
+        the design method classes in the format (example from cheby1.py)
         
-        response type -> filter type -> design method  -> filter order        
-        rt ('LP')        ft ('IIR')     dm ('Elliptic')   fo ('min','man')
+        self.ft = 'IIR'
+        self.rt = {
+          "LP": {"man":{"par":[]},
+                 "min":{"par":['F_PB','F_SB']}},
+          "HP": {"man":{"par":[]},
+                 "min":{"par":['F_SB','F_PB']}},
+          "BP": {"man":{"par":['F_C2']},
+                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
+          "BS": {"man":{"par":['F_C2']},
+                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
+                 }        
         
-        For each branch (filter combination), all the attributes found in the
-        corresponding filter class are stored, e.g.
+        and build 
+        a dictionary of all possible filter combinations with the hierarchy:
+        
+        response types -> filter types -> design methods  -> filter order        
+        rt (e.g. 'LP')    ft (e.g. 'IIR') dm (e.g. 'cheby1') fo ('min' or 'man')
+        
+        Additionally, all the attributes found in each filter branch ()
+        corresponding design method class are stored, e.g.
         'par':['f_S', 'F_PB', 'F_SB', 'A_PB', 'A_SB']   # required parameters
         'msg':r"<br /><b>Note:</b> Order needs to be even!" # message
         'dis':['fo','fspecs','wspecs']  # disabled widgets
         'vis':['fo','fspecs']           # visible widgets 
-     """
+        """
      
      
         filTree = {}
@@ -228,8 +244,8 @@ class FilterTreeBuilder(object):
             ft = cur_filter.ft                  # get filter type ('FIR')
             
             for rt in cur_filter.rt:            # iterate over response types
-                if rt not in filTree:         # is rt key in dict already?
-                    filTree.update({rt:{}})   # no, create it
+                if rt not in filTree:           # is rt key in dict already?
+                    filTree.update({rt:{}})     # no, create it
 
                 if ft not in filTree[rt]:  # is ft key already in dict[rt]?
                     filTree[rt].update({ft:{}}) # no, create it
@@ -277,7 +293,7 @@ class FilterTreeBuilder(object):
         """
         Try to create an instance of "objectName". This is only possible 
         when the corresponding module has been imported already, e.g. using
-        the function dynamicImport.
+        the method dynFiltImport.
 
         E.g.  self.cur_filter = fr.objectWizzard('cheby1')
         
