@@ -169,11 +169,12 @@ class FilterTreeBuilder(object):
             {
              file name without .py (= class names), e.g. 'cheby1' in
             :
-             full module name <module 'filter_design.cheby1'> with path name
+             full module name, e.g. <module 'filter_design.cheby1'> from 
+              'd:\\ ... \\pyfda\\filter_design\\cheby1.py"
             }
 
         """
-        self.design_methods = {} # dict with filter name and 
+        self.design_methods = {} # dict with filter name and full module name
         num_imports = 0   # number of successful filter imports
         
         for pyName in self.filt_file_names:
@@ -307,7 +308,7 @@ class FilterTreeBuilder(object):
         when the corresponding module has been imported already, e.g. using
         the method dynFiltImport.
 
-        E.g.  self.cur_filter = fr.objectWizzard('cheby1')
+        E.g.  self.cur_filter = objectWizzard('cheby1')
         
         Parameters
         ----------
@@ -320,7 +321,6 @@ class FilterTreeBuilder(object):
         The instance
         
         """
-
         inst = getattr(self.design_methods[objectName], objectName)
             
         if (inst != None):# yes, the attribute exists, return the instance
