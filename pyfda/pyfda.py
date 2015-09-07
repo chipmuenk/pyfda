@@ -186,7 +186,13 @@ def main():
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     mainw.show()
 
-    sys.exit(app.exec_())
+#    def fdaQuit():
+#        if blabla:
+#        app.quit()
+#        
+#    app.lastWindowClosed.connect(fdaQuit)
+
+    app.exec_()
 
 #------------------------------------------------------------------------------
 
