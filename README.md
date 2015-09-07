@@ -12,8 +12,28 @@ The goal of this project is to create a GUI based tool in Python / Qt to analyse
 ### Prerequisites
 The project builds only on standard python libraries, libraries from the scipy stack (numpy, scipy, matplotlib) and the pyQt4 widget library. When the modules xlwt and / or XlsxWriter are installed, coefficients can be exported as *.xls(x) files.
 
-### Getting started
-Just download the zip file and extract it to a directory of your choice. The application is started with the file pyfda from the main directory.
+### Installing and starting pyFDA
+Download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
+
+    python setup.py -install
+
+or run it where you have installed the python source files using (for testing / development)
+
+    python setup.py -develop
+
+In both cases, start scripts `pyfda*` are created in `<python>/Scripts`.
+
+For development, you can also run pyFDA using
+
+    %run -m pyfda.pyfda # IPython or
+    python -m pyfda.pyfda # plain python interpreter
+or files from pyFDA using e.g.
+
+    %run -m pyfda.input_widgets.input_pz # IPython or 
+    python -m pyfda.input_widgets.input_pz # plain python interpreter
+   
+
+
 
 ### Why yet another filter design tool?
 * **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
