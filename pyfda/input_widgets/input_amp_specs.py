@@ -81,7 +81,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "A" (= amplitude specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        newLabels = [l for l in fb.fil[0] if l[0] == 'A']
+        # ATTENTION: Entries need to be converted to str first for Py 2 (???)
+        newLabels = [str(l) for l in fb.fil[0] if l[0] == 'A'] 
         self.updateUI(newLabels = newLabels)
 
         frmMain = QtGui.QFrame()
@@ -144,17 +145,17 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         if idx == 0: # Entry is in dBs, same as in dictionary
             for i in range(len(self.qlineedit)):
                 self.qlineedit[i].setText(
-                    str(fb.fil[0][self.qlineedit[i].objectName()]))
+                    str(fb.fil[0][str(self.qlineedit[i].objectName())]))
 
         elif idx == 1:  # Entries are voltages, convert from dBs
             for i in range(len(self.qlineedit)):
                 self.qlineedit[i].setText(
-                    str(10.**(-fb.fil[0][self.qlineedit[i].objectName()]/20.)))
+                    str(10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/20.)))
 
         else:  # Entries are powers, convert from dBs
             for i in range(len(self.qlineedit)):
                 self.qlineedit[i].setText(
-                    str(10.**(-fb.fil[0][self.qlineedit[i].objectName()]/10.)))
+                    str(10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/10.)))
 
 
 #------------------------------------------------------------------------------

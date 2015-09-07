@@ -70,7 +70,7 @@ class InputFreqSpecs(QtGui.QWidget):
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "F" (= frequency specifications of the current filter)
         # - Pass the list to updateUI which recreates the widget
-        newLabels = [l for l in fb.fil[0] if l[0] == 'F']
+        newLabels = [str(l) for l in fb.fil[0] if l[0] == 'F']
         
         self.updateUI(newLabels = newLabels)
 
