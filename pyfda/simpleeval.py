@@ -308,4 +308,4 @@ def simple_eval(expr, operators=None, functions=None, names=None):
     s = SimpleEval(operators=operators,
                    functions=functions,
                    names=names)
-    return s.eval(expr)
+    return s.eval(str(expr))
