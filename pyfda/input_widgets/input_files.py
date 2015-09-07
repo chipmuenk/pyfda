@@ -125,8 +125,9 @@ class InputFiles(QtGui.QWidget):
         self.butLoad.clicked.connect(self.load_filter)
         
         self.butReadFiltTree.clicked.connect(self.sigReadFilters.emit)
-        #----------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
     def HLine(self):
         # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
         # solution 
@@ -138,7 +139,7 @@ class InputFiles(QtGui.QWidget):
         line.setFrameShadow(QtGui.QFrame.Sunken)
         return line
 
-        
+#------------------------------------------------------------------------------        
     def load_filter(self):
         """
         Load filter from zipped binary numpy array or (c)pickled object to
@@ -173,13 +174,14 @@ class InputFiles(QtGui.QWidget):
                                             %os.path.splitext(file_name)[1])
                         file_type_err = True
                     if not file_type_err:
-                        print('Loaded filter "%s"' %file_name)                    
-                        self.sigFilterDesigned.emit() # emit signal -> pyFDA -> pltWidgets.updateAll()
+                        print('Loaded filter "%s"' %file_name)
+                         # emit signal -> pyFDA -> pltWidgets.updateAll() :
+                        self.sigFilterDesigned.emit()
                         self.basedir = os.path.dirname(file_name)
             except IOError:
                 print("Failed loading %s!" %file_name)
             
-
+#------------------------------------------------------------------------------
     def save_filter(self):
         """
         Save filter as zipped binary numpy array or pickle object
@@ -213,7 +215,7 @@ class InputFiles(QtGui.QWidget):
             except IOError as e:
                     print('Failed saving "%s"!\n' %file_name, e)
 
-
+#------------------------------------------------------------------------------
     def export_coeffs(self):
         """
         Export filter coefficients in various formats - see also
@@ -307,7 +309,7 @@ class InputFiles(QtGui.QWidget):
             # http://simple-odspy.sourceforge.net/
             # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
 
-
+#------------------------------------------------------------------------------
     def import_coeffs(self):
         """
         Import filter coefficients from a file
@@ -344,6 +346,7 @@ class InputFiles(QtGui.QWidget):
                 print("Failed loading %s!\n" %file_name, e)
 
 
+#------------------------------------------------------------------------------
     def del_file_ext(self, file_type):
         """
         Delete file extension, e.g. '(*.txt)' from file type description

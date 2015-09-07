@@ -90,7 +90,7 @@ class InputFilter(QtGui.QWidget):
         for rt in fb.filTree:
             self.cmbResponseType.addItem(fb.gD['rtNames'][rt], rt)
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
-
+        
         if idx == -1: # Key 'LP' does not exist, use first entry instead
             idx = 0
 
@@ -156,6 +156,7 @@ class InputFilter(QtGui.QWidget):
         #------------------------------------------------------------
 
 
+#------------------------------------------------------------------------------
     def loadEntries(self):
         """
         Reload comboboxes from filter dictionary to update changed settings
@@ -166,6 +167,7 @@ class InputFilter(QtGui.QWidget):
         self.setResponseType()
 
 
+#------------------------------------------------------------------------------
     def setResponseType(self):
         """
         Triggered when cmbResponseType (LP, HP, ...) is changed:
@@ -175,19 +177,22 @@ class InputFilter(QtGui.QWidget):
         filter type combo box to the old setting 
         """
         # cmbBox.currentText() shows full text ('Lowpass'), 
-        # itemData only abbreviation ('LP')
+        # itemData contains abbreviation ('LP')
         self.rtIdx = self.cmbResponseType.currentIndex()
-        self.rt = str(self.cmbResponseType.itemData(self.rtIdx))
-        print("self.rt", self.rt)
+        self.rt = self.cmbResponseType.itemData(self.rtIdx) 
 
+        # In Python 3, python objects are automatically converted to QVariant 
+        # when stored as "data" e.g. in a QComboBox and converted back when
+        # retrieving. In Python 2, QVariant is returned when data is retrieved.
+        # This is first converted from the QVariant container format to a 
+        # QString, next to a "normal" non-unicode string  
+        if not isinstance(self.rt, str):
+            self.rt = str(self.rt.toString()) # Why is QString -> str necessary?
         fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
-     
         # Get list of available filter types for new rt
         ftList = list(fb.filTree[self.rt].keys()) # explicit list() needed for Py3
         
-        # Rebuild filter type combobox entries for new rt setting 
-        # The combobox is populated with the "long name", the internal name
-        # is stored in comboBox.itemData   
+        # Rebuild filter type combobox entries for new rt setting   
         self.cmbFilterType.clear()
         self.cmbFilterType.addItems(ftList)
 
@@ -201,6 +206,7 @@ class InputFilter(QtGui.QWidget):
         
         self.setFilterType()
 
+#------------------------------------------------------------------------------
     def setFilterType(self):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
@@ -239,23 +245,27 @@ class InputFilter(QtGui.QWidget):
 
         self.setDesignMethod()
 
+
+#------------------------------------------------------------------------------
     def setDesignMethod(self):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
         Instantiate (new) filter object
         """
         dmIdx = self.cmbDesignMethod.currentIndex()
-        dm = str(self.cmbDesignMethod.itemData(dmIdx))
+        dm = self.cmbDesignMethod.itemData(dmIdx)
+        if not isinstance(dm, str):
+            dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
 
-        # Check whether this is called for the first time (= no filter object 
-        # exists, creates AttributeError) or whether the design method has been
-        #  changed. A (new) filter object is instantiated if needed
+        # Check whether setDesignMethod has been called for the first time 
+        # (= no filter object exists, AttributeError is raised). If not, check
+        # whether the design method has been changed. In both cases, 
+        # a (new) filter object is instantiated
         try: # has a filter object been instantiated yet?
             if dm not in fb.filObj.name: # Yes (if no error occurs), check name
                 fb.filObj = self.ftb.objectWizzard(dm)
         except AttributeError as e: # No, create a filter instance
-            print("setDesignMethod", e)
             fb.filObj = self.ftb.objectWizzard(dm)
 
         # Check whether new design method also provides the old filter order
@@ -280,6 +290,7 @@ class InputFilter(QtGui.QWidget):
 #        self.sigSpecsChanged.emit() # -> input_widgets
 
 
+#------------------------------------------------------------------------------
     def _updateDynWidgets(self):
         """
         Delete dynamically (i.e. within filter design routine) created subwidgets 
@@ -323,7 +334,6 @@ class InputFilter(QtGui.QWidget):
                 self.frmDynWdg.setVisible(False)
                 
         self.dmLast = fb.fil[0]['dm']
-
 
 #------------------------------------------------------------------------------
 
