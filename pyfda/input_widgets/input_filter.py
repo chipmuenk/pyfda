@@ -10,7 +10,7 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 @author: Julia Beike, Christian Münker, Michael Winkler
 Datum: 4.12.2014
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
@@ -179,6 +179,7 @@ class InputFilter(QtGui.QWidget):
         self.rt = str(self.cmbResponseType.itemData(self.rtIdx))
 
         fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
+        print("self.rt", self.rt)
      
         # Get list of available filter types for new rt
         ftList = list(fb.filTree[self.rt].keys()) # explicit list() needed for Py3

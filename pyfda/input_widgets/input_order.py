@@ -5,7 +5,7 @@ Widget for selecting / entering manual or minimum filter order
 @author: Julia Beike, Christian Muenker, Michael Winkler
 Datum: 20.01.2015
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal

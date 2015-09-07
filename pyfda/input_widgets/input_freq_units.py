@@ -4,7 +4,7 @@ Widget for entering frequency units
 
 Author: Christian Muenker
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
