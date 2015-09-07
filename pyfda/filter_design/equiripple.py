@@ -36,7 +36,7 @@ class equiripple(object):
 
     info ="""
     Equiripple filter have a constant ripple in pass- and
-    stop band, the tolerance bands are fully used.
+    stop band, the tolerance bands are fully used. 
 
     The minimum order to fulfill the target specifications is estimated
     using Ichige's algorithm.

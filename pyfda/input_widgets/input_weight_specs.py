@@ -65,7 +65,7 @@ class InputWeightSpecs(QtGui.QWidget):
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        newLabels = [l for l in fb.fil[0] if l[0] == 'W']
+        newLabels = [str(l) for l in fb.fil[0] if l[0] == 'W']
         self.updateUI(newLabels = newLabels)
 
         frmMain = QtGui.QFrame()
@@ -118,7 +118,7 @@ class InputWeightSpecs(QtGui.QWidget):
         """
         for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText(
-                str(fb.fil[0][self.qlineedit[i].objectName()]))
+                str(fb.fil[0][str(self.qlineedit[i].objectName())]))
 
 #------------------------------------------------------------------------------
     def storeEntries(self):
