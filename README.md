@@ -4,7 +4,7 @@ pyFDA
 
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The goal of this project is to create a GUI based tool in Python / Qt to analyse, design and synthesize discrete time filters. 
+pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.
 
 **Screenshot from the current version:**
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
