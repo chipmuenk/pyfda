@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Widget for exporting / importing and saving / loading data
+Widget for simulating fixpoint filters and 
+generating VHDL and Verilog Code 
 
 Author: Christian Muenker
 """
@@ -21,11 +22,6 @@ except ImportError:
 else:
     MYHDL = True
     
-
-# imports from one level above if this file is run as __main__ during test:
-if __name__ == "__main__":
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_lib_fix_v3 as fix

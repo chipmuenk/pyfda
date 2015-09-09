@@ -17,12 +17,6 @@ else:
     MYHDL = True
     print("Info: Module myHDL found -> filter synthesis enabled!")
 
-# add main directory from one level above if this file is run as __main__
-# for test purposes
-if __name__ == "__main__":
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
-
 from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
 if MYHDL:
     from pyfda.hdl_generation import hdl_specs

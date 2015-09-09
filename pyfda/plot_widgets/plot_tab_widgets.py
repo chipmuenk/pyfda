@@ -7,16 +7,8 @@ Author: Christian Münker
 from __future__ import print_function, division, unicode_literals, absolute_import
 from PyQt4 import QtGui
 
-# add path to libraries one level above if this file is run as __main__
-# for test purposes
-if __name__ == "__main__":
-    import sys, os
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
- 
 from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
-
 
 #------------------------------------------------------------------------------
 class PlotWidgets(QtGui.QWidget):
@@ -102,6 +94,7 @@ Background: #DDEEFF;
 #------------------------------------------------------------------------
 
 def main():
+    import sys
     app = QtGui.QApplication(sys.argv)
     form = PlotWidgets()
     form.show()

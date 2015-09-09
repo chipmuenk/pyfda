@@ -16,11 +16,6 @@ from importlib import import_module
 import inspect
 from PyQt4 import QtGui, QtCore
 
-# import package internal files from one level above when run as __main__ :
-if __name__ == "__main__":
-    import sys, os
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import save_fil, remezord, round_odd
 
@@ -31,6 +26,8 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd
 # TODO: Improve calculation of F_C and F_C2 using the weights
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
+
+__version__ = "1.0"
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
@@ -377,7 +374,7 @@ class firwin(object):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    
+    import sys
     app = QtGui.QApplication(sys.argv)
   
     filt = firwin()  # instantiate filter

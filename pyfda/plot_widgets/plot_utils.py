@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 26 15:48:44 2014
+Common plotting utilities
 
-@author: Christian Muenker
+Author: Christian Muenker 2015
 http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
 
 http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-runs-slow-after-several-loads-or-looks-messy
@@ -10,9 +10,7 @@ http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-r
 from __future__ import print_function, division, unicode_literals
 
 from PyQt4 import QtGui, QtCore
-
 from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
-
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas

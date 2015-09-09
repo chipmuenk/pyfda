@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
+Plotting widget |H(f)|
 
-Edited by Christian Münker, 2013
+Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
@@ -10,13 +11,6 @@ import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
 #import matplotlib.ticker
-
-# add path to libraries one level above if this file is run as __main__
-# for test purposes
-if __name__ == "__main__":
-    import sys, os
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
 
 import pyfda.filterbroker as fb
 from pyfda.plot_widgets.plot_utils import MplWidget
@@ -456,6 +450,7 @@ class PlotHf(QtGui.QMainWindow):
 #------------------------------------------------------------------------------
 
 def main():
+    import sys
     app = QtGui.QApplication(sys.argv)
     form = PlotHf()
     form.show()

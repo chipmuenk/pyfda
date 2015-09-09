@@ -13,14 +13,10 @@ from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import cheb1ord
 import numpy as np
-
-# import package internal files from one level above when run as __main__ :
-if __name__ == "__main__":
-    import sys, os
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
-    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+    
 from pyfda.pyfda_lib import save_fil
+
+__version__ = "1.0"
 
 frmt = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
@@ -211,5 +207,6 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
 
 if __name__ == '__main__':
     filt = cheby1()        # instantiate filter
+    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][frmt]) # return results in default format

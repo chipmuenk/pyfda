@@ -12,11 +12,6 @@ import scipy.signal as sig
 from PyQt4 import QtGui
 import numpy as np
 
-# import package internal files from one level above when run as __main__ :
-if __name__ == "__main__":
-    import sys, os
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(__cwd__ + '/..')
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
 
@@ -28,6 +23,8 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
 #       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
 #         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
 #           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
+
+__version__ = "1.0"
 
 frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
              # currently, only 'ba' is supported for equiripple routines
@@ -308,6 +305,7 @@ class equiripple(object):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    import sys
     app = QtGui.QApplication(sys.argv)
     filt = equiripple()        # instantiate filter
     grid_density = getattr(filt, filt.wdg['sf'])

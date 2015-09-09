@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Widget for plotting poles and zeros
 
-Edited by Christian Münker, 2013
+Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+
 from PyQt4 import QtGui
-
-#import numpy as np
-
-if __name__ == "__main__": # relative import if this file is run as __main__
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import zplane
@@ -79,6 +74,7 @@ class PlotPZ(QtGui.QMainWindow):
 #------------------------------------------------------------------------------
 
 def main():
+    import sys
     app = QtGui.QApplication(sys.argv)
     form = PlotPZ()
     form.show()

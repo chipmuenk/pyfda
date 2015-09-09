@@ -8,13 +8,6 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from PyQt4 import QtGui
 import numpy as np
 
-# add path to libraries one level above if this file is run as __main__
-# for test purposes
-if __name__ == "__main__":
-    import sys, os
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
-
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import grpdelay
 from pyfda.plot_widgets.plot_utils import MplWidget
@@ -102,6 +95,7 @@ class PlotTauG(QtGui.QMainWindow):
 #------------------------------------------------------------------------------
 
 def main():
+    import sys
     app = QtGui.QApplication(sys.argv)
     form = PlotTauG()
     form.show()

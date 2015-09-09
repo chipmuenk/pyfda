@@ -5,7 +5,7 @@ Widget for displaying infos about filter and filter design method
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys
 import textwrap
 from PyQt4 import Qt, QtGui#, QtWebKit
 from docutils.core import publish_string #, publish_parts
@@ -13,20 +13,14 @@ import pprint
 import numpy as np
 from numpy import pi, log10
 import scipy.signal as sig
-# import pyfda.filterbroker from one level above if this file is run as __main__
-# for test purposes
-if __name__ == "__main__":
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-# TODO: Docstrings cannot be displayed with Py3:
-#       Line 113: QTextEdit.append(str): argument 1 has unexpected type 'bytes'
 # TODO: Passband and stopband info should show min / max values for each band
+
 class InputInfo(QtGui.QWidget):
     """
-    Create the window for entering exporting / importing and saving / loading data
+    Create widget for displaying infos about filter and filter design method
     """
     def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG

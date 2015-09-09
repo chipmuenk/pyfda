@@ -13,14 +13,6 @@ from PyQt4.QtCore import pyqtSignal
 import numpy as np
 from scipy.signal import freqz
 
-# https://github.com/danthedeckie/simpleeval
-
-# import pyfda.filterbroker from one level above if this file is run as __main__
-# for test purposes
-if __name__ == "__main__":
-    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.dirname(__cwd__))
-
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import cround, save_fil
 from pyfda.simpleeval import simple_eval
