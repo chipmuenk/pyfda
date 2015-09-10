@@ -8,7 +8,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys, os
 from PyQt4 import QtGui, QtCore
 
-#import filterbroker as fb # importing filterbroker initializes all its globals
+from pyfda import user_settings
 from .input_widgets import input_tab_widgets
 from .plot_widgets import plot_tab_widgets
 
@@ -173,7 +173,8 @@ def main():
 
     myFont = QtGui.QFont("Tahoma", fontsize)
 
-    app.setFont(myFont)
+#    app.setFont(myFont)
+    app.setStyleSheet(user_settings.css_rc['QApplication'])
     mainw = pyFDA()
 
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)),

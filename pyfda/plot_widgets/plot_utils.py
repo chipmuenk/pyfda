@@ -12,6 +12,9 @@ from __future__ import print_function, division, unicode_literals
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
 
+import os, sys
+import six
+
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
@@ -19,19 +22,19 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
-import six
+from matplotlib import rcParams
 
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
     figureoptions = None
 
-from matplotlib import rcParams
-rcParams['font.size'] = 12
+import pyfda.user_settings as user_settings
 
-import os, sys
-#import numpy as np
-# import scipy.signal as sig
+# read user settings for linewidth, font size etc.
+for key in user_settings.mpl_rc:
+    rcParams[key] = user_settings.mpl_rc[key]
+user_settings.mpl_rc['font.size'] = 8
 
 DEBUG = True
 

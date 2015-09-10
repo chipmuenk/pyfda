@@ -324,7 +324,7 @@ class PlotHf(QtGui.QMainWindow):
             plt_lim = f_lim + A_lim
 
             #-----------------------------------------------------------
-            self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'], label = 'H(f)')
+            self.ax.plot(self.F, self.H_plt, label = 'H(f)')
             #-----------------------------------------------------------
             self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
 
@@ -355,7 +355,7 @@ class PlotHf(QtGui.QMainWindow):
                 scale = 180./np.pi
         #-----------------------------------------------------------
             self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
-                               'b--', lw = fb.gD['rc']['lw'], label = "Phase")
+                               'b--', label = "Phase")
         #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str, color='blue')
             nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
@@ -425,7 +425,7 @@ class PlotHf(QtGui.QMainWindow):
                 self.ax_i.patches.append(rect)
 
                 self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
-                self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
+                self.ax_i.plot(self.F, self.H_plt)
 
             if self.cmbInset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)

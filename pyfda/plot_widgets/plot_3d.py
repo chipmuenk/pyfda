@@ -25,7 +25,7 @@ class Plot3D(QtGui.QMainWindow):
     - optional display of poles / zeros
     """
 
-    def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
+    def __init__(self, parent=None, DEBUG=False): # default parent = None -> top Window
         super(Plot3D, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
@@ -92,7 +92,7 @@ class Plot3D(QtGui.QMainWindow):
         self.chkColBar.setChecked(False)
 
         self.diaAlpha = QtGui.QDial(self)
-        self.diaAlpha.setRange(0.,10.)
+        self.diaAlpha.setRange(0., 10.)
         self.diaAlpha.setValue(5)
         self.diaAlpha.setTracking(False) # produce less events when turning
         self.diaAlpha.setFixedHeight(30)
@@ -101,7 +101,7 @@ class Plot3D(QtGui.QMainWindow):
         self.diaAlpha.setToolTip("Set transparency for surf and contour plot.")
 
         self.diaHatch = QtGui.QDial(self)
-        self.diaHatch.setRange(0.,9.)
+        self.diaHatch.setRange(0., 9.)
         self.diaHatch.setValue(5)
         self.diaHatch.setTracking(False) # produce less events when turning
         self.diaHatch.setFixedHeight(30)
@@ -185,7 +185,7 @@ class Plot3D(QtGui.QMainWindow):
     def initCoord(self):
         """ Initialize coordinates for the unit circle """
         # TODO: move creation of x,y-grid here as well
-        self.phi_EK = np.linspace(0, 2*pi, 400, endpoint = True)
+        self.phi_EK = np.linspace(0, 2*pi, 400, endpoint=True)
         self.xy_UC = np.exp(1j * self.phi_EK) # x,y coordinates of unity circle
 
     def initAxes(self):
@@ -193,7 +193,7 @@ class Plot3D(QtGui.QMainWindow):
         see http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
         """
         self.mplwidget.fig.clf() # needed to get rid of colormap
-        self.ax3d = self.mplwidget.fig.add_subplot(111, projection = '3d')
+        self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
 
 
     def logClicked(self):
@@ -271,7 +271,7 @@ class Plot3D(QtGui.QMainWindow):
         dy = (ymax - ymin) / steps # grid size cartesian range
         if OPT_3D_POLAR_SPEC == True: # polar grid
             [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
-                                np.linspace(0, 2 * pi, steps, endpoint = True))
+                            np.linspace(0, 2 * pi, steps, endpoint=True))
             x = r * cos(phi)
             y = r * sin(phi)
         else: # cartesian grid
@@ -306,8 +306,7 @@ class Plot3D(QtGui.QMainWindow):
             plevel_top = top + (top - bottom) * (plevel_rel - 1)
             plevel_btm = top
             zlevel = bottom - (top - bottom) * (zlevel_rel)
-            H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom,
-                                   log = True)
+            H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=True)
             Hmag = H_mag(bb, aa, z, top, H_min=bottom, log=True)
 
         else:
@@ -333,16 +332,15 @@ class Plot3D(QtGui.QMainWindow):
         # Plot unit circle and marker at (1,0):
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag,
                            ones(len(self.xy_UC)) * bottom, lw=2, color='k')
-            self.ax3d.plot([0.97, 1.03],[0, 0], [bottom, bottom], lw=2, color='k')
+            self.ax3d.plot([0.97, 1.03], [0, 0], [bottom, bottom], lw=2, color='k')
 
         #===============================================================
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================
         if self.chkHf.isChecked():
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC,
-                           lw = fb.gD['rc']['lw'])
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC,
-                           'w--', lw = fb.gD['rc']['lw'])
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC)
+            # draw once more as dashed white line to improve visibility
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--')
 
 
             NL = 10 - self.diaHatch.value() # plot line every NL points on the UC
@@ -361,15 +359,15 @@ class Plot3D(QtGui.QMainWindow):
 
             # Plot zero markers at |H(z_i)| = zlevel with "stems":
             self.ax3d.plot(zz.real, zz.imag, ones(len(zz)) * zlevel, 'o',
-               markersize = PN_SIZE, markeredgecolor='blue', markeredgewidth=2.0,
-                markerfacecolor = 'none')
+               markersize=PN_SIZE, markeredgecolor='blue', markeredgewidth=2.0,
+                markerfacecolor='none')
             for k in range(len(zz)): # plot zero "stems"
                 self.ax3d.plot([zz[k].real, zz[k].real], [zz[k].imag, zz[k].imag],
                             [bottom, zlevel], linewidth=1, color='b')
 
             # Plot the poles at |H(z_p)| = plevel with "stems":
             self.ax3d.plot(np.real(pp), np.imag(pp), plevel_top,
-              'x', markersize = PN_SIZE, markeredgewidth=2.0, markeredgecolor='red')
+              'x', markersize=PN_SIZE, markeredgewidth=2.0, markeredgecolor='red')
             for k in range(len(pp)): # plot pole "stems"
                 self.ax3d.plot([pp[k].real, pp[k].real], [pp[k].imag, pp[k].imag],
                             [plevel_btm, plevel_top], linewidth=1, color='r')
@@ -383,21 +381,21 @@ class Plot3D(QtGui.QMainWindow):
         #    fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
         #    self.ax3d.set_zlim(0,2)
             self.ax3d.plot_wireframe(x, y, Hmag, rstride=5,
-                    cstride=OPT_3D_MSTRIDE, linewidth = 1, color = 'gray')
+                    cstride=OPT_3D_MSTRIDE, linewidth=1, color='gray')
 
         #---------------------------------------------------------------
         ## 3D-surface plot;
         elif self.cmbMode3D.currentText() == 'Surf':
             s = self.ax3d.plot_surface(x, y, Hmag,
-                    alpha = OPT_3D_ALPHA, rstride=1, cstride=1, cmap = cmap,
-                    linewidth=0, antialiased=False, shade = True) # facecolors= cmap ??
+                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
+                    linewidth=0, antialiased=False, shade=True) # facecolors= cmap ??
             s.set_edgecolor('gray')
 
         #---------------------------------------------------------------
         ## 3D-Contour plot
         elif self.cmbMode3D.currentText() == 'Contour':
-            s = self.ax3d.contourf3D(x, y, Hmag, 20, alpha = alpha,
-                    rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, cmap = cmap)
+            s = self.ax3d.contourf3D(x, y, Hmag, 20, alpha=alpha,
+                    rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, cmap=cmap)
 
         #---------------------------------------------------------------
         ## 2D-Contour plot
@@ -409,9 +407,9 @@ class Plot3D(QtGui.QMainWindow):
         #       -> set limits of (all) other plots manually?
         if self.chkContour2D.isChecked():
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='x', offset=xmin,
-#                                 cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
+#                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax,
-#                               cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
+#                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
             s = self.ax3d.contourf(x, y, Hmag, 20, zdir='z',
                                offset=bottom - (top - bottom) * 0.05,
                                 cmap=cmap, alpha=alpha)

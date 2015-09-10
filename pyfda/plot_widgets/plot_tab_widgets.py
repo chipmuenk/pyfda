@@ -10,41 +10,20 @@ from PyQt4 import QtGui
 from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
 
+from pyfda import user_settings
+
 #------------------------------------------------------------------------------
 class PlotWidgets(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
-        css = """
+#        css = """
+#QTabBar{
+#font-weight:normal;
+#}
+#
+#"""
 
-/*
-QWidget
-{
-Background: #CCCCCC;
-color:black;
-font:14px bold;
-font-weight:bold;
-border-radius: 1px;
-}
-*/
-/*height: 14px;*/
-/*
-QDialog{
-Background-image:url('img/xxx.png');
-font-size:14px;
-color: black;
-}
-*/
-
-QTabBar{
-font-weight:bold;
-}
-
-QToolButton:hover{
-Background: #DDEEFF;
-}
-"""
-
-        self.setStyleSheet(css)
+#        self.setStyleSheet(css)
         self.pltHf = plot_hf.PlotHf()
         self.pltPhi = plot_phi.PlotPhi()
         self.pltPZ = plot_pz.PlotPZ()
@@ -59,6 +38,7 @@ Background: #DDEEFF;
     def initUI(self):
         """ Initialize UI with tabbed subplots """
         tabWidget = QtGui.QTabWidget()
+        tabWidget.setStyleSheet(user_settings.css_rc['QTabBar'])
         tabWidget.addTab(self.pltHf, '|H(f)|')
         tabWidget.addTab(self.pltPhi, 'phi(f)')
         tabWidget.addTab(self.pltPZ, 'P/Z')

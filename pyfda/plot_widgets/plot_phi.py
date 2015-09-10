@@ -121,7 +121,7 @@ class PlotPhi(QtGui.QMainWindow):
 
         self.ax.clear()
         #---------------------------------------------------------
-        line_phi, = self.ax.plot(F, phi_plt, lw = fb.gD['rc']['lw'])
+        line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------
 
         self.ax.set_title(r'Phase Frequency Response')
