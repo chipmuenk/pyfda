@@ -174,7 +174,9 @@ def main():
     myFont = QtGui.QFont("Tahoma", fontsize)
 
 #    app.setFont(myFont)
-    app.setStyleSheet(user_settings.css_rc['QApplication'])
+    app.setStyleSheet(user_settings.css_rc['QWidget'] + 
+                      user_settings.css_rc['QLineEdit'] +
+                      user_settings.css_rc['QTabBar'])
     mainw = pyFDA()
 
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)),

@@ -62,7 +62,7 @@ class InputWidgets(QtGui.QWidget):
     def initUI(self):
         """ Initialize UI with tabbed input widgets """
         tabWidget = QtGui.QTabWidget()
-        tabWidget.setStyleSheet(user_settings.css_rc['QTabBar'])
+#        tabWidget.setStyleSheet(user_settings.css_rc['QTabBar'])
 #        tabWidget.setTabShape(QtGui.QTabWidget.Triangular) # different look ....
         tabWidget.addTab(self.inputSpecs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')

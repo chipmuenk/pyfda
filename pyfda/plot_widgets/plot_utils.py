@@ -31,10 +31,9 @@ except ImportError:
 
 import pyfda.user_settings as user_settings
 
-# read user settings for linewidth, font size etc.
+# read user settings for linewidth, font size etc. and apply them to matplotlib
 for key in user_settings.mpl_rc:
     rcParams[key] = user_settings.mpl_rc[key]
-user_settings.mpl_rc['font.size'] = 8
 
 DEBUG = True
 
@@ -79,8 +78,7 @@ class MplWidget(QtGui.QWidget):
         # Construct the canvas with the figure
         #
         self.plt_lim = [] # x,y plot limits
-        self.dpi = 100
-        self.fig = Figure(dpi=self.dpi, figsize=(5, 4), facecolor = '#FFFFFF')
+        self.fig = Figure() 
 #        self.mpl = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])#
 #        self.mpl21 = self.fig.add_subplot(211)
 
