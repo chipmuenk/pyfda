@@ -135,7 +135,7 @@ class InputFreqUnits(QtGui.QWidget):
         Finally, store freqSpecsRange and emit sigFilterChanged signal via freqRange
         """
         idx = self.cmbUnits.currentIndex() # read index of units combobox
-        unit = self.cmbUnits.currentText()
+        unit = str(self.cmbUnits.currentText())
         self.f_S = float(self.ledF_S.text()) # read sampling frequency
 
         self.ledF_S.setVisible(unit not in {"f_S", "f_Ny"}) # only vis. when
