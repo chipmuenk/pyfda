@@ -10,8 +10,6 @@ from PyQt4 import QtGui
 from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
 
-from pyfda import user_settings
-
 #------------------------------------------------------------------------------
 class PlotWidgets(QtGui.QWidget):
     def __init__(self):

@@ -29,11 +29,11 @@ try:
 except ImportError:
     figureoptions = None
 
-import pyfda.user_settings as user_settings
+from pyfda import pyfda_rc
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
-for key in user_settings.mpl_rc:
-    rcParams[key] = user_settings.mpl_rc[key]
+for key in pyfda_rc.mpl_rc:
+    rcParams[key] = pyfda_rc.mpl_rc[key]
 
 DEBUG = True
 

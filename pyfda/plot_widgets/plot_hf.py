@@ -10,6 +10,7 @@ from PyQt4 import QtGui
 import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
+from matplotlib import rcParams
 #import matplotlib.ticker
 
 import pyfda.filterbroker as fb
@@ -131,7 +132,7 @@ class PlotHf(QtGui.QMainWindow):
         hatched areas.
         """
 #        fc = (0.8,0.8,0.8) # color for shaded areas
-        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':'k', 'lw':0.0}
+        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
         line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
         ax = specAxes
 
@@ -420,7 +421,7 @@ class PlotHf(QtGui.QMainWindow):
                 #  won't behave correctly when the size of the plot is changed:
                 extent = extent.transformed(self.mplwidget.fig.transFigure.inverted())
                 rect = Rectangle((extent.xmin, extent.ymin), extent.width,
-                        extent.height, facecolor=(1.0,1.0,1.0), edgecolor='none',
+                        extent.height, facecolor=rcParams['figure.facecolor'], edgecolor='none',
                         transform=self.mplwidget.fig.transFigure, zorder=-1)
                 self.ax_i.patches.append(rect)
 

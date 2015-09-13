@@ -20,8 +20,7 @@ else:
 from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
 if MYHDL:
     from pyfda.hdl_generation import hdl_specs
-    
-import pyfda.user_settings as user_settings
+
 
 class InputWidgets(QtGui.QWidget):
     """
@@ -62,6 +61,7 @@ class InputWidgets(QtGui.QWidget):
     def initUI(self):
         """ Initialize UI with tabbed input widgets """
         tabWidget = QtGui.QTabWidget()
+        tabWidget.setObjectName("TabWidg")
 #        tabWidget.setStyleSheet(user_settings.css_rc['QTabBar'])
 #        tabWidget.setTabShape(QtGui.QTabWidget.Triangular) # different look ....
         tabWidget.addTab(self.inputSpecs, 'Specs')
