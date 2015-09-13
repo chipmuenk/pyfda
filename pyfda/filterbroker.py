@@ -18,7 +18,7 @@ from __future__ import division, unicode_literals
 # module variables, similar to class variables, are global
 gD = {}
 
-gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
+#gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
 
 # Dictionaries for translating short (internal) names to full (displayed) names
 gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",

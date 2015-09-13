@@ -22,7 +22,7 @@ from __future__ import division, unicode_literals
 # importing pyfdarc runs the module once, defining all module variables
 # which are global (similar to class variables)
 
-THEME = 'light'
+THEME = 'dark'
 
 # -----------------------------
 # Layout for matplotlib widgets
@@ -71,19 +71,19 @@ mpl_rc = {'lines.linewidth': 1.5,
 
 # dark theme            
 css_dark = {'TopWidget':( 'QWidget{color:white;background: #222222;}'
-                        'QPushButton{background-color:grey; color:white;}'),
-            'TabBar':('QTabBar{color:black;} QTabBar::tab{background:darkgrey;}'
+                        'QPushButton{background-color:grey; color:white;}'
+                        'QTabBar{color:black;} QTabBar::tab{background:darkgrey;}'
                         'QTabBar::tab:selected{background:lightblue;}'
                         'QTableView{alternate-background-color:#222222;'
                              'background-color:black; gridline-color: white;}' 
-                        'QHeaderView::section{background-color:rgb(190,1,1);}'),
+                        'QHeaderView::section{background-color:rgb(190,1,1);}'
+                        'QLineEdit{background: #222222; color:white;}'),
           'LineEdit':'QLineEdit{background: #222222; color:white;}'
           }
           
 # light theme          
 css_light = {'TopWidget':('QWidget{color:black; background: white}'
                         'QPushButton{background-color:lightgrey; color:black;}'),
-            'TabBar':'',
             'LineEdit':''
 }
 #            'TabBar':('QTabWidget::pane {border-top: 2px solid #C2C7CB;}' 
@@ -93,8 +93,8 @@ css_light = {'TopWidget':('QWidget{color:black; background: white}'
 #          }
 
 # common layout settings
-css_rc = {'TopWidget':'QWidget{font-size:12px; font-family: Tahoma;}',
-          'TabBar':'QTabBar{font-size:13px; font-weight:bold;}',
+css_rc = {'TopWidget':  'QWidget{font-size:12px; font-family: Tahoma;}'
+                        'QTabBar{font-size:13px; font-weight:bold;}',
           'LineEdit':''
           }
 
@@ -108,7 +108,7 @@ else:
     for key in css_rc:
         css_rc[key]+= css_light[key]
     
-N_FFT = 2048 # number of FFT points for plot commands (freqz etc.)
+params = {'N_FFT':  2048} # number of FFT points for plot commands (freqz etc.)
 
 
 #          'QWidget':('QWidget{Background: #CCCCCC; color:black; font-size:14px;'

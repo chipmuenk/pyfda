@@ -11,6 +11,7 @@ import scipy.signal as sig
 
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import H_mag
 from pyfda.plot_widgets.plot_utils import MplWidget
 
@@ -241,7 +242,7 @@ class Plot3D(QtGui.QMainWindow):
 
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
-        N_FFT = fb.gD['N_FFT']
+        N_FFT = rc.params['N_FFT']
         alpha = self.diaAlpha.value()/10.
 
         #-----------------------------------------------------------------------------

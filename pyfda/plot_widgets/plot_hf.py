@@ -14,6 +14,7 @@ from matplotlib import rcParams
 #import matplotlib.ticker
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_rc as rc
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 class PlotHf(QtGui.QMainWindow):
@@ -278,7 +279,7 @@ class PlotHf(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate H_c(W) (complex) for W = 0 ... pi:
-        [W, self.H_c] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
+        [W, self.H_c] = sig.freqz(self.bb, self.aa, worN = rc.params['N_FFT'],
             whole = wholeF)
         self.F = W / (2 * np.pi) * self.f_S
 
