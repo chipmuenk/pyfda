@@ -128,13 +128,11 @@ if __name__ == '__main__':
     rt = fb.fil[0]['rt']
     ft = fb.fil[0]['ft']
     dm = fb.fil[0]['dm']
-#        fo = fb.fil[0]['fo']
-#        print(fb.filTree[rt][ft])
-    if 'min' in fb.filTree[rt][ft][dm]:
-        myParams = fb.filTree[rt][ft][dm]['min']['par']
+
+    if 'min' in fb.fil_tree[rt][ft][dm]:
+        myParams = fb.fil_tree[rt][ft][dm]['min']['par']
     else:
         myParams = {}
-#        myEnbWdg = fb.filTree[rt][ft][dm][fo]['enb'] # enabled widgets
 
     # build separate parameter lists according to the first letter
     freqParams = [l for l in myParams if l[0] == 'F']

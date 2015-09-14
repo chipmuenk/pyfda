@@ -110,6 +110,13 @@ else:
     
 params = {'N_FFT':  2048} # number of FFT points for plot commands (freqz etc.)
 
+# Dictionary with translations between short method names and long names for
+# response types
+rt_names = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
+            "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
+            "HIL":"Hilbert", "DIFF":"Differentiator"}
+
+#self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
 
 #          'QWidget':('QWidget{Background: #CCCCCC; color:black; font-size:14px;'
 #                     'font-weight:bold; border-radius: 1px;}')
@@ -128,3 +135,8 @@ QToolButton:hover{
 Background: #DDEEFF;
 }
 """
+
+# self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
+# self.setStyleSheet("background-color: rgb(255,0,0); margin:5px;
+#        border:1px solid rgb(0, 255, 0); ")
+

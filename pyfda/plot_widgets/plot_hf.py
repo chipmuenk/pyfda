@@ -138,7 +138,7 @@ class PlotHf(QtGui.QMainWindow):
         ax = specAxes
 
         # extract from filterTree the parameters that are actually used
-#        myParams = fb.filTree[rt][ft][dm][fo]['par']
+#        myParams = fb.fil_tree[rt][ft][dm][fo]['par']
 #        freqParams = [l for l in myParams if l[0] == 'F']
 
         if fb.fil[0]['ft'] == "FIR":

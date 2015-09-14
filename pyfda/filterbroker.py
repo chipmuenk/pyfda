@@ -2,47 +2,42 @@
 """
 filterbroker.py
 
-Created on Wed Dec 03 06:13:50 2014
+Dynamic parameters and settings are exchanged via the dictionaries in this file.
+Importing filterbroker.py runs the module once, defining all module variables.
+Module variables are global like class variables. 
 
+See also:
 http://stackoverflow.com/questions/13034496/using-global-variables-between-files-in-python
-oder
+http://stackoverflow.com/questions/1977362/how-to-create-module-wide-variables-in-python
 http://pymotw.com/2/articles/data_persistence.html
 
-@author: Christian Muenker
+Author: Christian Muenker
 """
 
-# TODO: dmNames need to be built automatically from entries in the filter files!
-
 from __future__ import division, unicode_literals
-# importing filterbroker runs the module once, defining all variables
-# module variables, similar to class variables, are global
-gD = {}
-
-#gD['N_FFT'] = 2048 # number of FFT points for plot commands (freqz etc.)
-
-# Dictionaries for translating short (internal) names to full (displayed) names
-gD['rtNames'] = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
-                 "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
-                 "HIL":"Hilbert", "DIFF":"Differentiator"}
-gD['dmNames'] = {#IIR
-                  "butter":"Butterworth", "cheby1":"Chebychev 1",
-                  "cheby2":"Chebychev 2", "ellip":"Elliptic",
-                  "bessel":"Bessel",
-                  # FIR:
-                  "equiripple":"Equiripple", "firls":"Least-Square",
-                  "firwin":"Windowed"}
 
 #==============================================================================
-# The following entries are only used as initial / default entries and
-# demonstrate the structure of the global dicts and lists. The entries are 
-# created resp. overwritten by
+# The entries in this file are only used as initial / default entries and
+# demonstrate the structure of the global dicts and lists. 
+
+#The actual entries are created resp. overwritten by
 #
 # ----- FilterTreeBuilder.__init__() ------
 #
+
+# Dictionary with translations between short class names and long names for
+# design methods
+dm_names = {#IIR
+            "butter":"Butterworth", "cheby1":"Chebychev 1",
+            "bessel":"Bessel",
+            # FIR:
+            "equiripple":"Equiripple", "firls":"Least-Square",
+            "firwin":"Windowed"}
+
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
 # This dict is built + overwritten by FilterFileReader.buildFilterTree() !
-filTree = {
+fil_tree = {
     'HP':
         {'FIR':
             {'equiripple':
