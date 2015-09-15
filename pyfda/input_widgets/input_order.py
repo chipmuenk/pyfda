@@ -100,8 +100,8 @@ class InputOrder(QtGui.QFrame):
         """
 
         # read list of available filter order [fo] methods for current 
-        # design method [dm] from filTree:
-        foList = fb.filTree[fb.fil[0]['rt']]\
+        # design method [dm] from fil_tree:
+        foList = fb.fil_tree[fb.fil[0]['rt']]\
             [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
         if self.DEBUG:
             print("=== InputOrder.update() ===")

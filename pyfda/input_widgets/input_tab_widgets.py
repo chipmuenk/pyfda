@@ -21,6 +21,7 @@ from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_in
 if MYHDL:
     from pyfda.hdl_generation import hdl_specs
 
+
 class InputWidgets(QtGui.QWidget):
     """
     Create a tabbed widget for various input subwidgets
@@ -58,8 +59,10 @@ class InputWidgets(QtGui.QWidget):
 
 
     def initUI(self):
-        """ Initialize UI with tabbed subplots """
+        """ Initialize UI with tabbed input widgets """
         tabWidget = QtGui.QTabWidget()
+        tabWidget.setObjectName("TabWidg")
+#        tabWidget.setStyleSheet(user_settings.css_rc['QTabBar'])
 #        tabWidget.setTabShape(QtGui.QTabWidget.Triangular) # different look ....
         tabWidget.addTab(self.inputSpecs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')

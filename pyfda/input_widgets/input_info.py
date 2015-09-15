@@ -132,7 +132,7 @@ class InputInfo(QtGui.QWidget):
         #--------------------------------------------------------------------
         # First, extract the dicts for min / man filter order of the selected
         # design method from filter tree:
-        fil_dict = fb.filTree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['dm']]
+        fil_dict = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['dm']]
         # Now, extract the parameter lists (key 'par'), yielding a nested list:
         fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
         # Finally, flatten the list of lists and convert it into a set to 

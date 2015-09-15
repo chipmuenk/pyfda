@@ -12,6 +12,9 @@ from __future__ import print_function, division, unicode_literals
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
 
+import os, sys
+import six
+
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
@@ -19,19 +22,18 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
-import six
+from matplotlib import rcParams
 
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
     figureoptions = None
 
-from matplotlib import rcParams
-rcParams['font.size'] = 12
+from pyfda import pyfda_rc
 
-import os, sys
-#import numpy as np
-# import scipy.signal as sig
+# read user settings for linewidth, font size etc. and apply them to matplotlib
+for key in pyfda_rc.mpl_rc:
+    rcParams[key] = pyfda_rc.mpl_rc[key]
 
 DEBUG = True
 
@@ -76,8 +78,7 @@ class MplWidget(QtGui.QWidget):
         # Construct the canvas with the figure
         #
         self.plt_lim = [] # x,y plot limits
-        self.dpi = 100
-        self.fig = Figure(dpi=self.dpi, figsize=(5, 4), facecolor = '#FFFFFF')
+        self.fig = Figure() 
 #        self.mpl = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])#
 #        self.mpl21 = self.fig.add_subplot(211)
 

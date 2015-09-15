@@ -11,11 +11,12 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 Datum: 4.12.2014
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_rc as rc
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 # TODO: Add subwidgets, depending on filterSel parameters
@@ -41,7 +42,7 @@ class InputFilter(QtGui.QWidget):
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file
         self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
-                                     commentChar='#', DEBUG=DEBUG)
+                                     comment_char='#', DEBUG=DEBUG)
 
         self.filter_initialized = False
         self.dm_last = '' # design method from last call
@@ -81,8 +82,8 @@ class InputFilter(QtGui.QWidget):
 
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in filterbroker.py) and populate combo box:
-        for rt in fb.filTree:
-            self.cmbResponseType.addItem(fb.gD['rtNames'][rt], rt)
+        for rt in fb.fil_tree:
+            self.cmbResponseType.addItem(rc.rt_names[rt], rt)
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
 
         if idx == -1: # Key 'LP' does not exist, use first entry instead
@@ -186,7 +187,7 @@ class InputFilter(QtGui.QWidget):
         fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
 
         # Get list of available filter types for new rt
-        ft_list = list(fb.filTree[self.rt].keys()) # explicit list() needed for Py3
+        ft_list = list(fb.fil_tree[self.rt].keys()) # explicit list() needed for Py3
 
         # Rebuild filter type combobox entries for new rt setting
         self.cmbFilterType.clear()
@@ -220,11 +221,11 @@ class InputFilter(QtGui.QWidget):
         # is stored in comboBox.itemData
         self.cmbDesignMethod.clear()
 
-        for dm in fb.filTree[self.rt][self.ft]:
-            self.cmbDesignMethod.addItem(fb.gD['dmNames'][dm], dm)
+        for dm in fb.fil_tree[self.rt][self.ft]:
+            self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
 
         # get list of available design methods for new ft
-        dm_list = fb.filTree[self.rt][self.ft].keys()
+        dm_list = fb.fil_tree[self.rt][self.ft].keys()
         if self.DEBUG:
             print("dm_list", dm_list)
             print(fb.fil[0]['dm'])
@@ -233,7 +234,7 @@ class InputFilter(QtGui.QWidget):
         # And has the widget been initialized?
         if fb.fil[0]['dm'] in dm_list and self.filter_initialized:
             # yes, set same dm as before, don't call setDesignMethod
-            dm_idx = self.cmbDesignMethod.findText(fb.gD['dmNames'][fb.fil[0]['dm']])
+            dm_idx = self.cmbDesignMethod.findText(fb.dm_names[fb.fil[0]['dm']])
             if self.DEBUG: 
                 print("dm_idx", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx)
@@ -268,15 +269,15 @@ class InputFilter(QtGui.QWidget):
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
         # filter order method
-        if fb.fil[0]['fo'] not in fb.filTree[self.rt][self.ft][dm].keys():
+        if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][dm].keys():
             fb.fil[0].update({'fo':{}})
-            fb.fil[0]['fo'] = fb.filTree[self.rt][self.ft][dm].keys()[0]
+            fb.fil[0]['fo'] = fb.fil_tree[self.rt][self.ft][dm].keys()[0]
 
         if self.DEBUG:
             print("=== InputFilter.setDesignMethod ===")
             print("selFilter:", fb.fil[0])
-            print("filterTree[dm] = ", fb.filTree[self.rt][self.ft][dm])
-            print("filterTree[dm].keys() = ", fb.filTree[self.rt][self.ft]\
+            print("filterTree[dm] = ", fb.fil_tree[self.rt][self.ft][dm])
+            print("filterTree[dm].keys() = ", fb.fil_tree[self.rt][self.ft]\
                                                             [dm].keys())
 
         self.filter_initialized = True

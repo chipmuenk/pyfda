@@ -9,6 +9,7 @@ from PyQt4 import QtGui
 import numpy as np
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import grpdelay
 from pyfda.plot_widgets.plot_utils import MplWidget
 
@@ -76,14 +77,14 @@ class PlotTauG(QtGui.QMainWindow):
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
-        [tau_g, w] = grpdelay(bb,aa, fb.gD['N_FFT'], whole = wholeF)
+        [tau_g, w] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF)
 
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             tau_g = np.fft.fftshift(tau_g)
             F = F - f_S / 2.
 
-        self.ax.plot(F, tau_g, lw = fb.gD['rc']['lw'], label = "Group Delay")
+        self.ax.plot(F, tau_g, label = "Group Delay")
 
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')

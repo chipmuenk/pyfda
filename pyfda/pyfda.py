@@ -8,7 +8,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys, os
 from PyQt4 import QtGui, QtCore
 
-#import filterbroker as fb # importing filterbroker initializes all its globals
+from pyfda import pyfda_rc
 from .input_widgets import input_tab_widgets
 from .plot_widgets import plot_tab_widgets
 
@@ -29,9 +29,8 @@ class pyFDA(QtGui.QMainWindow):
         super(pyFDA, self).__init__()
         # read directory with filterDesigns and construct filter tree from it
 #        self.ffr = FilterFileReader('Init.txt', 'filterDesign',
-#                                    commentChar = '#', DEBUG = DEBUG) #
+#                                    comment_char = '#', DEBUG = DEBUG) #
 
-        #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
         self.initUI()
 
     def initUI(self):
@@ -159,6 +158,7 @@ class pyFDA(QtGui.QMainWindow):
 def main():
     """ entry point for the pyfda application """
     app = QtGui.QApplication(sys.argv)
+    app.setObjectName("TopApp")
 
     _desktop = QtGui.QDesktopWidget()
     screen_h = _desktop.availableGeometry().height()
@@ -173,7 +173,10 @@ def main():
 
     myFont = QtGui.QFont("Tahoma", fontsize)
 
-    app.setFont(myFont)
+#    app.setFont(myFont)
+    app.setStyleSheet(pyfda_rc.css_rc['TopWidget']) 
+#                      pyfda_rc.css_rc['LineEdit'] +
+ #                     pyfda_rc.css_rc['TabBar'])
     mainw = pyFDA()
 
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)),

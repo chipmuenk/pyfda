@@ -10,9 +10,11 @@ from PyQt4 import QtGui
 import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
+from matplotlib import rcParams
 #import matplotlib.ticker
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_rc as rc
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 class PlotHf(QtGui.QMainWindow):
@@ -131,12 +133,12 @@ class PlotHf(QtGui.QMainWindow):
         hatched areas.
         """
 #        fc = (0.8,0.8,0.8) # color for shaded areas
-        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':'k', 'lw':0.0}
+        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
         line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
         ax = specAxes
 
         # extract from filterTree the parameters that are actually used
-#        myParams = fb.filTree[rt][ft][dm][fo]['par']
+#        myParams = fb.fil_tree[rt][ft][dm][fo]['par']
 #        freqParams = [l for l in myParams if l[0] == 'F']
 
         if fb.fil[0]['ft'] == "FIR":
@@ -277,7 +279,7 @@ class PlotHf(QtGui.QMainWindow):
             print("b, a = ", self.bb, self.aa)
 
         # calculate H_c(W) (complex) for W = 0 ... pi:
-        [W, self.H_c] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
+        [W, self.H_c] = sig.freqz(self.bb, self.aa, worN = rc.params['N_FFT'],
             whole = wholeF)
         self.F = W / (2 * np.pi) * self.f_S
 
@@ -324,7 +326,7 @@ class PlotHf(QtGui.QMainWindow):
             plt_lim = f_lim + A_lim
 
             #-----------------------------------------------------------
-            self.ax.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'], label = 'H(f)')
+            self.ax.plot(self.F, self.H_plt, label = 'H(f)')
             #-----------------------------------------------------------
             self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
 
@@ -355,7 +357,7 @@ class PlotHf(QtGui.QMainWindow):
                 scale = 180./np.pi
         #-----------------------------------------------------------
             self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
-                               'b--', lw = fb.gD['rc']['lw'], label = "Phase")
+                               'b--', label = "Phase")
         #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str, color='blue')
             nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
@@ -420,12 +422,12 @@ class PlotHf(QtGui.QMainWindow):
                 #  won't behave correctly when the size of the plot is changed:
                 extent = extent.transformed(self.mplwidget.fig.transFigure.inverted())
                 rect = Rectangle((extent.xmin, extent.ymin), extent.width,
-                        extent.height, facecolor=(1.0,1.0,1.0), edgecolor='none',
+                        extent.height, facecolor=rcParams['figure.facecolor'], edgecolor='none',
                         transform=self.mplwidget.fig.transFigure, zorder=-1)
                 self.ax_i.patches.append(rect)
 
                 self.ax_i.set_xlim(fb.fil[0]['freqSpecsRange'])
-                self.ax_i.plot(self.F, self.H_plt, lw = fb.gD['rc']['lw'])
+                self.ax_i.plot(self.F, self.H_plt)
 
             if self.cmbInset.currentIndex() == 1: # edit / navigate inset
                 self.ax_i.set_navigate(True)

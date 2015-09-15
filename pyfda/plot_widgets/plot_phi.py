@@ -11,6 +11,7 @@ import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_rc as rc
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 
@@ -91,7 +92,7 @@ class PlotPhi(QtGui.QMainWindow):
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
-        [W,H] = sig.freqz(self.bb, self.aa, worN = fb.gD['N_FFT'],
+        [W,H] = sig.freqz(self.bb, self.aa, worN = rc.params['N_FFT'],
                         whole = wholeF)
 
         F = W / (2 * np.pi) * f_S
@@ -121,7 +122,7 @@ class PlotPhi(QtGui.QMainWindow):
 
         self.ax.clear()
         #---------------------------------------------------------
-        line_phi, = self.ax.plot(F, phi_plt, lw = fb.gD['rc']['lw'])
+        line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------
 
         self.ax.set_title(r'Phase Frequency Response')

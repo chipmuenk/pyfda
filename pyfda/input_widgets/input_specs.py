@@ -34,14 +34,10 @@ class InputSpecs(QtGui.QWidget):
 
     def __init__(self, DEBUG=True):
         super(InputSpecs, self).__init__()
-#        self.setStyleSheet("margin:5px; border:1px solid rgb(0, 0, 0); ")
-#        self.setStyleSheet("background-color: rgb(255,0,0); margin:5px;
-#        border:1px solid rgb(0, 255, 0); ")
-
 
         self.DEBUG = DEBUG
 #        self.ftb = FilterTreeBuilder('init.txt', 'filter_design',
-#                                    commentChar = '#', DEBUG = DEBUG) #
+#                                    comment_char = '#', DEBUG = DEBUG) #
         self.initUI()
 
     def initUI(self):
@@ -152,7 +148,7 @@ class InputSpecs(QtGui.QWidget):
 
         fb.fil[0] (currently selected filter) is read, then general information
         for the selected filter type and order (min/man) is gathered from
-        the filter tree [fb.filTree], i.e. which parameters are needed, which
+        the filter tree [fb.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
         Then, the UIs of all subwidgets are updated using their "updateUI" method,
@@ -164,16 +160,16 @@ class InputSpecs(QtGui.QWidget):
         ft = fb.fil[0]['ft']
         dm = fb.fil[0]['dm']
         fo = fb.fil[0]['fo']
-        all_params = fb.filTree[rt][ft][dm][fo]['par'] # all parameters e.g. 'F_SB'
+        all_params = fb.fil_tree[rt][ft][dm][fo]['par'] # all parameters e.g. 'F_SB'
         min_params = man_params = []
-        if "min" in fb.filTree[rt][ft][dm]:
-            min_params = fb.filTree[rt][ft][dm]['min']['par']
-        if "man" in fb.filTree[rt][ft][dm]:
-            man_params = fb.filTree[rt][ft][dm]['man']['par']
+        if "min" in fb.fil_tree[rt][ft][dm]:
+            min_params = fb.fil_tree[rt][ft][dm]['min']['par']
+        if "man" in fb.fil_tree[rt][ft][dm]:
+            man_params = fb.fil_tree[rt][ft][dm]['man']['par']
 
-        vis_wdgs = fb.filTree[rt][ft][dm][fo]['vis'] # visible widgets
-        dis_wdgs = fb.filTree[rt][ft][dm][fo]['dis'] # disabled widgets
-        msg      = fb.filTree[rt][ft][dm][fo]['msg'] # message
+        vis_wdgs = fb.fil_tree[rt][ft][dm][fo]['vis'] # visible widgets
+        dis_wdgs = fb.fil_tree[rt][ft][dm][fo]['dis'] # disabled widgets
+        msg      = fb.fil_tree[rt][ft][dm][fo]['msg'] # message
 
         # build separate parameter lists according to the first letter
         self.f_params = [l for l in all_params if l[0] == 'F']
