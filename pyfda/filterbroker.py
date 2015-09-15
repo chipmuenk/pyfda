@@ -6,10 +6,6 @@ Dynamic parameters and settings are exchanged via the dictionaries in this file.
 Importing filterbroker.py runs the module once, defining all module variables.
 Module variables are global like class variables. 
 
-See also:
-http://stackoverflow.com/questions/13034496/using-global-variables-between-files-in-python
-http://stackoverflow.com/questions/1977362/how-to-create-module-wide-variables-in-python
-http://pymotw.com/2/articles/data_persistence.html
 
 Author: Christian Muenker
 """
@@ -109,3 +105,65 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'wdg_dyn':{'win':'hann'}
             }
 
+
+###############################################################################
+"""
+See also on data persistence and global variables:
+http://stackoverflow.com/questions/13034496/using-global-variables-between-files-in-python
+http://stackoverflow.com/questions/1977362/how-to-create-module-wide-variables-in-python
+http://pymotw.com/2/articles/data_persistence.html
+
+Alternative approaches for data persistence
+
+shelve
+------
+a persistent dictionary for reading and writing.
+This would get rid of the fb global dictionary
+
+
+import shelve
+
+### write to database:
+s = shelve.open('test_shelf.fb')
+try:
+    s['key1'] = { 'int': 10, 'float':9.5, 'string':'Sample data' }
+finally:
+    s.close()
+
+### read from database:
+s = shelve.open('test_shelf.fb')
+# s = shelve.open('test_shelf.fb', flag='r') # read-only
+try:
+    existing = s['key1']
+finally:
+    s.close()
+
+print(existing)
+
+### catch changes to objects, store in in-memory cache and write-back upon close
+s = shelve.open('test_shelf.fb', writeback=True)
+try:
+    print s['key1']
+    s['key1']['new_value'] = 'this was not here before'
+    print s['key1']
+finally:
+    s.close()
+
+
+===============================================================================
+pickleshare
+-----------
+https://github.com/pickleshare/pickleshare
+PickleShare - a small 'shelve' like datastore with concurrency support
+Concurrency is possible because the values are stored in separate files. 
+Hence the "database" is a directory where all files are governed by PickleShare.
+
+from pickleshare import *
+db = PickleShareDB('~/testpickleshare')
+db.clear()
+print "Should be empty:",db.items()
+db['hello'] = 15
+db['aku ankka'] = [1,2,313]
+db['paths/are/ok/key'] = [1,(5,46)]
+print db.keys()
+"""

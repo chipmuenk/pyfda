@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Widget for exporting / importing and saving / loading data
+Widget for exporting / importing and saving / loading filter data
 
 Author: Christian Muenker
 """
@@ -339,6 +339,7 @@ class InputFiles(QtGui.QWidget):
                 print("Failed loading %s!\n" %file_name, e)
 
 
+
 #------------------------------------------------------------------------------
     def del_file_ext(self, file_type):
         """
@@ -355,43 +356,7 @@ class InputFiles(QtGui.QWidget):
 
         return re.sub('\([^\)]+\)', '', file_type) 
 
- 
-"""
 
-Alternative to (c)pickle: Use the shelve module that opens
-a persistent dictionary for reading and writing.
-This would get rid of the fb global dictionary?
-
-
-import shelve
-
-### write to database:
-s = shelve.open('test_shelf.fb')
-try:
-    s['key1'] = { 'int': 10, 'float':9.5, 'string':'Sample data' }
-finally:
-    s.close()
-
-### read from database:
-s = shelve.open('test_shelf.fb')
-# s = shelve.open('test_shelf.fb', flag='r') # read-only
-try:
-    existing = s['key1']
-finally:
-    s.close()
-
-print(existing)
-
-### catch changes to objects, store in in-memory cache and write-back upon close
-s = shelve.open('test_shelf.fb', writeback=True)
-try:
-    print s['key1']
-    s['key1']['new_value'] = 'this was not here before'
-    print s['key1']
-finally:
-    s.close()
-
-"""
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
