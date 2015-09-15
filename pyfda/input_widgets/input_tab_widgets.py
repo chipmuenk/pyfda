@@ -132,7 +132,7 @@ class InputWidgets(QtGui.QWidget):
         """
         if self.DEBUG: print("input_widgets.updateAll:\n",self.sender().objectName())
 
-        self.inputSpecs.color_design_button("designed")      
+        self.inputSpecs.color_design_button("ok")      
         self.inputSpecs.loadAll()
         self.inputInfo.showInfo()
         self.inputCoeffs.showCoeffs()

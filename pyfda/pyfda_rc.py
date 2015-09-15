@@ -70,7 +70,7 @@ mpl_rc = {'lines.linewidth': 1.5,
 # ---------------------
 
 # dark theme            
-css_dark = {'TopWidget':( 'QWidget{color:white;background: #222222;}'
+css_dark = {'TopWidget':('QWidget{color:white;background: #222222;}'
                         'QPushButton{background-color:grey; color:white;}'
                         'QTabBar{color:black;} QTabBar::tab{background:darkgrey;}'
                         'QTabBar::tab:selected{background:lightblue;}'
@@ -93,10 +93,16 @@ css_light = {'TopWidget':('QWidget{color:black; background: white}'
 #          }
 
 # common layout settings
-css_rc = {'TopWidget':  'QWidget{font-size:12px; font-family: Tahoma;}'
-                        'QTabBar{font-size:13px; font-weight:bold;}',
+css_rc = {'TopWidget':('*[state="changed"]{background-color:yellow; color:black}'
+                      '*[state="error"]{background-color:red; color:white}'
+                      '*[state="fail"]{background-color:orange; color:white}'
+                      '*[state="ok"]{background-color:green; color:white}'
+                      'QPushButton:pressed {background-color:black; color:white}'
+                      'QWidget{font-size:12px; font-family: Tahoma;}'
+                      'QTabBar{font-size:13px; font-weight:bold;}'),
           'LineEdit':''
           }
+
 
 if THEME == 'dark':
 

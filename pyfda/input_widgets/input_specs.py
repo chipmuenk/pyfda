@@ -311,19 +311,12 @@ class InputSpecs(QtGui.QWidget):
         red:    an error has occurred during filter design
         orange: filter does not meet target specs
         """
-        if state == "designed":
-            css = "QPushButton { background-color: green;  color: white}"
-        elif state == "changed":
-            css = "QPushButton { background-color: yellow}"
-        elif state == "error":
-            css = "QPushButton { background-color: red; color: white}" #
-        elif state == "spec_fail":
-            css = "QPushButton { background-color: orange; color: white}" #
 
-        else: css = ""
-
-        self.butDesignFilt.setStyleSheet(css +
-            "QPushButton:pressed { background-color: black; color: white}")
+  #      print("state", state)
+        self.butDesignFilt.setProperty("state", str(state))
+        self.butDesignFilt.style().unpolish(self.butDesignFilt)
+        self.butDesignFilt.style().polish(self.butDesignFilt)
+        self.butDesignFilt.update()
 
 #------------------------------------------------------------------------------
     def HLine(self):
