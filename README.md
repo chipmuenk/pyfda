@@ -15,24 +15,24 @@ The project builds only on standard python libraries, libraries from the scipy s
 ### Installing and starting pyFDA
 Download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
 
-    python setup.py -install
+    >> python setup.py install
 
 or run it where you have installed the python source files using (for testing / development)
 
-    python setup.py -develop
+    >> python setup.py develop
 
 In both cases, start scripts `pyfda*` are created in `<python>/Scripts`.
 
 For development, you can also run pyFDA using
 
-    %run -m pyfda.pyfda # IPython or
-    python -m pyfda.pyfda # plain python interpreter
+    In [1]: %run -m pyfda.pyfda # IPython or
+    >> python -m pyfda.pyfda    # plain python interpreter
+    
 or files from pyFDA using e.g.
 
-    %run -m pyfda.input_widgets.input_pz # IPython or 
-    python -m pyfda.input_widgets.input_pz # plain python interpreter
+    In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
+    >> python -m pyfda.input_widgets.input_pz  # plain python interpreter
    
-
 
 
 ### Why yet another filter design tool?
