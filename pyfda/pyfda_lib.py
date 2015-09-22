@@ -31,6 +31,11 @@ import numpy as np
 from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
    ceil, hstack, mod
 
+# Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
+# that default to pyQT5
+import matplotlib
+matplotlib.use("Qt4Agg")
+
 import scipy.signal as sig
 import matplotlib.pyplot as plt
 from  matplotlib import patches
@@ -193,16 +198,16 @@ uniq, mult = unique_roots(vals, rtype='avg')
         return np.abs(a - b)
 
     if rtype in ['max', 'maximum']:
-        comproot = np.max  
+        comproot = np.max
     elif rtype in ['min', 'minimum']:
         comproot = np.min
     elif rtype in ['avg', 'mean']:
-        comproot = np.mean 
+        comproot = np.mean
     elif rtype == 'median':
         comproot = np.median
-    else: 
+    else:
         raise TypeError(rtype)
-    
+
     if rdist in ['euclid', 'euclidian']:
         dist_roots = euclid
     elif rdist in ['rect', 'manhattan']:
@@ -215,19 +220,19 @@ uniq, mult = unique_roots(vals, rtype='avg')
 
     tol = abs(tol)
     p = np.atleast_1d(p) # convert p to at least 1D array
-    if len(p) == 0: 
-        return pout, mult 
-    
+    if len(p) == 0:
+        return pout, mult
+
     elif len(p) == 1:
         pout = p
         mult = [1]
         return pout, mult
-        
+
     else:
         pout = p[np.isnan(p)].tolist() # copy nan elements to pout, convert to list
-        mult = len(pout) * [1] # generate an (empty) list with a "1" for each nan 
+        mult = len(pout) * [1] # generate an (empty) list with a "1" for each nan
         p = p[~np.isnan(p)]    # delete nan elements from p, convert to list
-        
+
         if len(p) == 0:
             pass
 
@@ -240,7 +245,7 @@ uniq, mult = unique_roots(vals, rtype='avg')
                 pout.append(comproot(p[tolarr])) # pick the roots within the tolerance
 
                 p = p[~tolarr]  # and delete them
-        
+
         else:
             sameroots = [] # temporary list for roots within the tolerance
             p,indx = cmplx_sort(p)
@@ -957,26 +962,26 @@ Examples
 def round_odd(x):
     """Return the nearest odd integer from x. x can be integer or float."""
     return int(x-np.mod(x,2)+1)
-    
-    
+
+
 def round_even(x):
     """Return the nearest even integer from x. x can be integer or float."""
     return int(x-np.mod(x,2))
-    
+
 
 def ceil_odd(x):
     """
     Return the smallest odd integer not less than x. x can be integer or float.
     """
     return round_odd(x+1)
-    
-    
+
+
 def ceil_even(x):
     """
     Return the smallest odd integer not less than x. x can be integer or float.
     """
     return round_even(x+1)
-    
+
 
 def remlplen_herrmann(fp,fs,dp,ds):
     """
