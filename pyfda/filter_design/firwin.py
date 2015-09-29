@@ -180,21 +180,21 @@ class firwin(object):
         Update UI and info_doc when one of the comboboxes or line edits is 
         changed.
         """
-        self.firWindow = str(self.cmb_firwin_win.currentText()).lower()
+        self.fir_window_name = str(self.cmb_firwin_win.currentText()).lower()
         self.alg = str(self.cmb_firwin_alg.currentText())
 
         mod_ = import_module('scipy.signal')
 #        mod = __import__('scipy.signal') # works, but not with the next line
         
          # construct window class, e.g. scipy.signal.boxcar :
-        class_ = getattr(mod_, self.firWindow)
+        class_ = getattr(mod_, self.fir_window_name)
         win_doc = getattr(class_, '__doc__') # read docstring attribute from class
         
         self.info_doc = []
         self.info_doc.append('firwin()\n========')
         self.info_doc.append(sig.firwin.__doc__)
-        self.info_doc.append(self.firWindow + '()' +'\n' + 
-                                        '=' * (len(self.firWindow) + 2))
+        self.info_doc.append(self.fir_window_name + '()' +'\n' + 
+                                        '=' * (len(self.fir_window_name) + 2))
         self.info_doc.append(win_doc)
         
         self.winArgs = inspect.getargspec(class_)[0] # return args of window
@@ -214,13 +214,15 @@ class firwin(object):
             
         if N_args > 1 :
             self.lbl_firwin_2.setText(self.winArgs[1] + ":")
-            self.firWindow = (self.firWindow,
+            self.firWindow = (self.fir_window_name,
                                       float(self.led_firwin_1.text()), 
                                       float(self.led_firwin_2.text()))
         elif N_args > 0 :
             self.lbl_firwin_1.setText(self.winArgs[0] + ":")
-            self.firWindow = (self.firWindow,
+            self.firWindow = (self.fir_window_name,
                                       float(self.led_firwin_1.text()))
+        else:
+            self.firWindow = self.fir_window_name
         #print(self.firWindow)           
 
     def loadEntries(self):
@@ -261,9 +263,11 @@ class firwin(object):
 
     def storeEntries(self):
         """
-        Store window and alg. selection and parameter settings (if any) in filter
-        dictionary.
+        Store window and alg. selection and parameter settings (part of 
+        self.firWindow, if any) in filter dictionary.
         """
+            
+            
         fb.fil[0].update({'wdg_dyn':{'win':self.firWindow,
                                  'alg':self.alg}})
 
@@ -307,11 +311,38 @@ class firwin(object):
         except AttributeError:
             pass
         self.storeEntries()
+        
+        
+    def firwin_ord(self, F, W, A, alg):
+        #http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
+        delta_f = abs(F[1] - F[0])
+        delta_A = np.sqrt(A[0] * A[1])
+        if self.fir_window_name == 'kaiser':
+            N, beta = sig.kaiserord(fb.fil[0]['A_SB'], delta_f)
+            self.led_firwin_1.setText(str(beta))
+            fb.fil[0]['wdg_dyn'][1] = beta
+            self.firWindow[1] = beta
+            self.loadEntries()
+            return N
+        
+        if self.firWindow == 'hann':
+            gamma = 3.11
+            sidelobe = 44
+        elif self.firWindow == 'hamming':
+            gamma = 3.32
+            sidelobe = 53
+        elif self.firWindow == 'blackman':
+            gamma = 5.56
+            sidelobe = 75
+        else:
+            gamma = 1
+        N = remezord(F, W, A, Hz = 1, alg = alg)[0]
+        return N
 
     def LPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
-            [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
+        self.N = self.firwin_ord([self.F_PB, self.F_SB], [1, 0],
+                                 [self.A_PB, self.A_SB], alg = self.alg)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                                        window = self.firWindow, nyq = 0.5))
@@ -323,10 +354,10 @@ class firwin(object):
 
     def HPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
-            [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
+        N = self.firwin_ord([self.F_SB, self.F_PB], [0, 1],
+                            [self.A_SB, self.A_PB], alg = self.alg)
         self.N = round_odd(N)  # enforce odd order
+        fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                     window = self.firWindow, pass_zero=False, nyq = 0.5))
 
@@ -340,9 +371,8 @@ class firwin(object):
     # For BP and BS, F_PB and F_SB have two elements each
     def BPmin(self, fil_dict):
         self.get_params(fil_dict)
-        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB,
-                                self.F_PB2, self.F_SB2], [0, 1, 0],
-            [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)
+        self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
+            [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)[0]
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
@@ -355,9 +385,8 @@ class firwin(object):
 
     def BSmin(self, fil_dict):
         self.get_params(fil_dict)
-        (N, F, A, W) = remezord([self.F_PB, self.F_SB,
-                                self.F_SB2, self.F_PB2], [1, 0, 1],
-            [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
+        N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
+            [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
