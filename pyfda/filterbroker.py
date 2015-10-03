@@ -23,6 +23,8 @@ from __future__ import division, unicode_literals
 
 # Dictionary with translations between short class names and long names for
 # design methods
+design_methods = {}
+
 dm_names = {#IIR
             "butter":"Butterworth", "cheby1":"Chebychev 1",
             "bessel":"Bessel",
@@ -71,6 +73,44 @@ fil_tree = {
 #--------------------------------------
 # Handle to current filter object
 filObj = ""
+#filObj = ftb.objectWizzard(dm)
+def create_instance(dm):
+    """
+    Try to create an instance of "dm" from the module stored in design_methods[dm].
+    This dictionary has beed compiled by filter_tree_builder.py
+
+    E.g.  self.cur_filter = create_instance('cheby1')
+
+    Parameters
+    ----------
+    dm: string
+
+        The name of the design method to be constructed (e.g. 'cheby1' or 'equiripple')
+
+    Returns
+    -------
+    The instance
+
+    """
+    
+    try:
+        # Try to import the module containing dm
+        dm_module = __import__(design_methods[dm], fromlist=[''])
+
+    except ImportError as e:
+        print(e)
+        print("Error in 'FilterTreeBuilder.dynFiltImport()':")
+        print("Filter design '%s' could not be imported."%dm)
+        
+    inst = getattr(dm_module, dm)
+
+    if inst != None:# yes, the attribute exists, return the instance
+        return inst()
+    else:
+        print('--- FilterTreeBuilder.objectWizzard\n ---')
+        print("Unknown object '{0}', could not be created,".format(dm))
+        return None
+
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some

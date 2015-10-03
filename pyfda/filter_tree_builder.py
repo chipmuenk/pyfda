@@ -175,26 +175,26 @@ class FilterTreeBuilder(object):
             }
 
         """
-        self.design_methods = {} # dict with filter name and full module name
+        fb.design_methods = {} # dict with filter name and full module name
         num_imports = 0   # number of successful filter imports
 
         for pyName in self.filt_list_names:
             try:
                 # Try to import the module from the subDirectory (= package)
-                importedModule = __import__('pyfda.' + self.filt_dir + '.' + pyName,
-                                            fromlist=[''])
+                module_name = 'pyfda.' + self.filt_dir + '.' + pyName
+                importedModule = __import__(module_name, fromlist=[''])
 
                 # when successful, add the filename without '.py' and the
-                # dynamically imported module to the dict 'imports' which
-                # looks like that:
+                # full module name to the dict 'imports' which
+                # looks e.g. like that:
 
-#                {'cheby1': <module 'filterDesign.cheby1' from ...
-                self.design_methods.update({pyName:importedModule})
+#                {'cheby1': 'pyfda.filter_design.cheby1'}
+                fb.design_methods.update({pyName:module_name})#importedModule})
                 num_imports += 1
 
 
               #  Now, modules should be deleted from memory (?)
-                del sys.modules['pyfda.' + self.filt_dir + '.' + pyName]
+#                del sys.modules[module_name]
 
             except ImportError as e:
                 print(e)
@@ -203,7 +203,7 @@ class FilterTreeBuilder(object):
 
         print("FilterTreeBuilder: Imported successfully the following "
                     "{0} filter designs:".format(num_imports))
-        for dm in self.design_methods:
+        for dm in fb.design_methods:
             print(dm)
         print("\n")
 
@@ -252,16 +252,16 @@ class FilterTreeBuilder(object):
 
         fb.fil_tree = {}
         fb.dm_names = {}
-        for dm in self.design_methods:           # iterate over found designMethods(dm)
+        for dm in fb.design_methods:           # iterate over found designMethods(dm)
 
-            cur_filter = self.objectWizzard(dm) # instantiate object of filter class dm
+            cur_filter = fb.create_instance(dm) # instantiate object of filter class dm
 
             try:
                 fb.dm_names.update(cur_filter.name)
             except AttributeError:
                 print('Warning: Skipping design method "{0}" due to missing attribute "name".'.format(dm))
                 continue # continue with next entry in dm
-            ft = cur_filter.ft                  # get filter type ('FIR')
+            ft = cur_filter.ft                  # get filter type (e.g. 'FIR')
 
             for rt in cur_filter.rt:            # iterate over response types
                 if rt not in fb.fil_tree:           # is rt key in dict already?
@@ -302,39 +302,10 @@ class FilterTreeBuilder(object):
                                 print("cur_filter.com[minman][i]",
                                   cur_filter.com[minman][i])
 
-            del cur_filter # delete obsolete filter object (needed?)
+#            del cur_filter # delete obsolete filter object (needed?)
 
         if self.DEBUG:
             print("fb.fil_tree = ", fb.fil_tree)
-
-#==============================================================================
-    def objectWizzard(self, objectName):
-        """
-        Try to create an instance of "objectName". This is only possible
-        when the corresponding module has been imported already, e.g. using
-        the method dynFiltImport.
-
-        E.g.  self.cur_filter = objectWizzard('cheby1')
-
-        Parameters
-        ----------
-        objectName: string
-
-            The object to be constructed (e.g. 'cheby1' or 'equiripple')
-
-        Returns
-        -------
-        The instance
-
-        """
-        inst = getattr(self.design_methods[objectName], objectName)
-
-        if inst != None:# yes, the attribute exists, return the instance
-            return inst()
-        else:
-            print('--- FilterTreeBuilder.objectWizzard\n ---')
-            print("Unknown object '{0}', could not be created,".format(objectName))
-            return None
 
 #==============================================================================
 if __name__ == "__main__":

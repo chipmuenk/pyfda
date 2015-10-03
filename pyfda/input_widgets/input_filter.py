@@ -262,9 +262,9 @@ class InputFilter(QtGui.QWidget):
         # a (new) filter object is instantiated
         try: # has a filter object been instantiated yet?
             if dm not in fb.filObj.name: # Yes (if no error occurs), check name
-                fb.filObj = self.ftb.objectWizzard(dm)
+                fb.filObj = fb.create_instance(dm)
         except AttributeError as e: # No, create a filter instance
-            fb.filObj = self.ftb.objectWizzard(dm)
+            fb.filObj = fb.create_instance(dm)
 
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
