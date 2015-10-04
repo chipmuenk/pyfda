@@ -7,6 +7,7 @@ Created on Mon Nov 24 10:00:14 2014
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys
 import codecs
+import importlib
 import pyfda.filterbroker as fb
 
 
@@ -178,18 +179,20 @@ class FilterTreeBuilder(object):
         fb.design_methods = {} # dict with filter name and full module name
         num_imports = 0   # number of successful filter imports
 
-        for pyName in self.filt_list_names:
+        for dm in self.filt_list_names:
             try:
-                # Try to import the module from the subDirectory (= package)
-                module_name = 'pyfda.' + self.filt_dir + '.' + pyName
-                importedModule = __import__(module_name, fromlist=[''])
+                # Try to import the module from the  package)
+                # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
+                module_name = 'pyfda.' + self.filt_dir + '.' + dm
+
+                importlib.import_module(module_name)
 
                 # when successful, add the filename without '.py' and the
                 # full module name to the dict 'imports' which
                 # looks e.g. like that:
 
 #                {'cheby1': 'pyfda.filter_design.cheby1'}
-                fb.design_methods.update({pyName:module_name})#importedModule})
+                fb.design_methods.update({dm:module_name})
                 num_imports += 1
 
 
@@ -199,7 +202,7 @@ class FilterTreeBuilder(object):
             except ImportError as e:
                 print(e)
                 print("Error in 'FilterTreeBuilder.dynFiltImport()':")
-                print("Filter design '%s' could not be imported."%pyName)
+                print("Filter design '%s' could not be imported."%dm)
 
         print("FilterTreeBuilder: Imported successfully the following "
                     "{0} filter designs:".format(num_imports))

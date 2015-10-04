@@ -11,6 +11,7 @@ Author: Christian Muenker
 """
 
 from __future__ import division, unicode_literals
+import importlib
 
 #==============================================================================
 # The entries in this file are only used as initial / default entries and
@@ -94,8 +95,8 @@ def create_instance(dm):
     """
     
     try:
-        # Try to import the module containing dm
-        dm_module = __import__(design_methods[dm], fromlist=[''])
+        # Try to dynamically import the module dm from package 'filter_design'
+        dm_module = importlib.import_module(design_methods[dm])
 
     except ImportError as e:
         print(e)
