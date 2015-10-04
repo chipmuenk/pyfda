@@ -89,6 +89,7 @@ or files from pyFDA using e.g.
 ### Release 0.1 (target: end of <s>May</s> July 2015)
 
 The following features are still missing for the first release. 
+* Fix issue #8 (pyFDA doesn't shut down properly)
 * Documentation
 
 ### Release 0.2 (target: end of 2015) - Help is very welcome!
