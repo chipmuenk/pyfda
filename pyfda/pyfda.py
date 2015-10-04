@@ -9,6 +9,7 @@ import sys, os
 from PyQt4 import QtGui, QtCore
 
 from pyfda import pyfda_rc
+from pyfda.filter_tree_builder import FilterTreeBuilder
 from .input_widgets import input_tab_widgets
 from .plot_widgets import plot_tab_widgets
 
@@ -30,7 +31,11 @@ class pyFDA(QtGui.QMainWindow):
         # read directory with filterDesigns and construct filter tree from it
 #        self.ffr = FilterFileReader('Init.txt', 'filterDesign',
 #                                    comment_char = '#', DEBUG = DEBUG) #
-
+        # initialize the FilterTreeBuilder class with the filter directory and
+        # the filter file
+        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
+                                     comment_char='#', DEBUG=self.DEBUG)
+                                     
         self.initUI()
 
     def initUI(self):

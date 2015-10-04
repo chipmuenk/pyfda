@@ -10,12 +10,6 @@ import numpy as np
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
-# import pyfda.filterbroker from one level above if this file is run as __main__
-# for test purposes
-#if __name__ == "__main__":
-#    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-#    sys.path.append(os.path.dirname(__cwd__))
-
 import pyfda.filterbroker as fb
 
 from pyfda.input_widgets import (input_filter, input_order, input_amp_specs,
@@ -36,8 +30,6 @@ class InputSpecs(QtGui.QWidget):
         super(InputSpecs, self).__init__()
 
         self.DEBUG = DEBUG
-#        self.ftb = FilterTreeBuilder('init.txt', 'filter_design',
-#                                    comment_char = '#', DEBUG = DEBUG) #
         self.initUI()
 
     def initUI(self):
