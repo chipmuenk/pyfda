@@ -28,11 +28,9 @@ class pyFDA(QtGui.QMainWindow):
     def __init__(self):
         self.DEBUG = True
         super(pyFDA, self).__init__()
-        # read directory with filterDesigns and construct filter tree from it
-#        self.ffr = FilterFileReader('Init.txt', 'filterDesign',
-#                                    comment_char = '#', DEBUG = DEBUG) #
         # initialize the FilterTreeBuilder class with the filter directory and
-        # the filter file
+        # the filter file as parameters:         
+        # read directory with filterDesigns and construct filter tree from it
         self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
                                      comment_char='#', DEBUG=self.DEBUG)
                                      
@@ -136,8 +134,8 @@ class pyFDA(QtGui.QMainWindow):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
         self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.updateData)
-
-
+        # sigReadFilters: button has been pressed to rebuild filter tree:
+        self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.initFilters)
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
 
