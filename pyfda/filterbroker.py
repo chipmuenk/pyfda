@@ -94,6 +94,10 @@ def create_instance(dm):
 
     """
     
+    # TODO: InputFilter.setDesignMethod() : fb.create_instance(dm) takes complete
+    #       dictionary entry instead of key only ?!
+    # TODO: improve create_instance to either create a new instance or test for 
+    #       existing one (code from InputFilter.setDesignMethod())
     try:
         # Try to dynamically import the module dm from package 'filter_design'
         dm_module = importlib.import_module(design_methods[dm])
