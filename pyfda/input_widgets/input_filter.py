@@ -17,7 +17,6 @@ from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
-from pyfda.filter_tree_builder import FilterTreeBuilder
 
 # TODO: Add subwidgets, depending on filterSel parameters
 # TODO:  index = myComboBox.findText('item02')
@@ -39,10 +38,6 @@ class InputFilter(QtGui.QWidget):
     def __init__(self, DEBUG=False):
         super(InputFilter, self).__init__()
         self.DEBUG = DEBUG
-        # initialize the FilterTreeBuilder class with the filter directory and
-        # the filter file
-        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
-                                     comment_char='#', DEBUG=DEBUG)
 
         self.filter_initialized = False
         self.dm_last = '' # design method from last call
@@ -261,6 +256,7 @@ class InputFilter(QtGui.QWidget):
         # whether the design method has been changed. In both cases,
         # a (new) filter object is instantiated
         try: # has a filter object been instantiated yet?
+            print("filObj.name",fb.filObj.name)
             if dm not in fb.filObj.name: # Yes (if no error occurs), check name
                 fb.filObj = fb.create_instance(dm)
         except AttributeError as e: # No, create a filter instance
