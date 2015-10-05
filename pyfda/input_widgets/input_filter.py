@@ -240,7 +240,7 @@ class InputFilter(QtGui.QWidget):
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
 
-        self.setDesignMethod()
+            self.setDesignMethod()
 
 
 #------------------------------------------------------------------------------
@@ -278,7 +278,7 @@ class InputFilter(QtGui.QWidget):
 
         self.filter_initialized = True
 
-#        self._update_dyn_widgets() # check for new subwidgets and update if needed
+        self._update_dyn_widgets() # check for new subwidgets and update if needed
 
 #        self.sigSpecsChanged.emit() # -> input_widgets
 
@@ -311,10 +311,10 @@ class InputFilter(QtGui.QWidget):
 #                del w                       # not really needed?
 
             # Try to create "new" dyn. subwidgets:
-            if hasattr(self.fil_inst, 'wdg'):
+            if hasattr(fb.fil_inst, 'wdg'):
                 try:
-                    if 'sf' in self.fil_inst.wdg:
-                        a = getattr(self.fil_inst, self.fil_inst.wdg['sf'])
+                    if 'sf' in fb.fil_inst.wdg:
+                        a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
                         self.layHDynWdg.addWidget(a, stretch=1)
                         self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
                         self.frmDynWdg.setVisible(a != None)
