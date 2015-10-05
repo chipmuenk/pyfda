@@ -30,7 +30,7 @@ class InputSpecs(QtGui.QWidget):
         super(InputSpecs, self).__init__()
 
         self.DEBUG = DEBUG
-        self.ffb = fb.Fb() # instantiate Fb object
+#        self.ffb = fb.Fb() # instantiate Fb object
         self.initUI()
 
     def initUI(self):
@@ -268,9 +268,9 @@ class InputSpecs(QtGui.QWidget):
 
         try:
             print("\n---- InputSpecs.startDesignFilt ----")
-            fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
-            print(type(fil_inst))
-            getattr(fil_inst, fb.fil[0]['rt'] + fb.fil[0]['fo'])(fb.fil[0])
+#            fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
+            print(type(fb.fil_inst))
+            getattr(fb.fil_inst, fb.fil[0]['rt'] + fb.fil[0]['fo'])(fb.fil[0])
 
             # The filter design routines write coeffs, poles/zeros etc. back to
             # the global filter dict

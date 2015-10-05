@@ -259,16 +259,16 @@ class FilterTreeBuilder(object):
         fb.dm_names = {}
         for dm in fb.design_methods:  # iterate over keys in designMethods (= dm)
 
-            cur_filter = self.ffb.create_instance(dm) # instantiate object of filter class dm
+            self.ffb.create_instance(dm) # instantiate object of filter class dm
  
             try:
-                fb.dm_names.update(cur_filter.name)
+                fb.dm_names.update(fb.fil_inst.name)
             except AttributeError:
                 print('Warning: Skipping design method "{0}" due to missing attribute "name".'.format(dm))
                 continue # continue with next entry in dm
-            ft = cur_filter.ft                  # get filter type (e.g. 'FIR')
+            ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
-            for rt in cur_filter.rt:            # iterate over response types
+            for rt in fb.fil_inst.rt:            # iterate over response types
                 if rt not in fb.fil_tree:           # is rt key in dict already?
                     fb.fil_tree.update({rt:{}})     # no, create it
 
@@ -278,34 +278,34 @@ class FilterTreeBuilder(object):
                 # finally append all the individual 'min' / 'man' info
                 # to dm in fb.fil_tree. These are e.g. the params for 'min' and /or
                 # 'man' filter order
-                fb.fil_tree[rt][ft][dm].update(cur_filter.rt[rt])
+                fb.fil_tree[rt][ft][dm].update(fb.fil_inst.rt[rt])
 
                 # combine common info for all response types
                 #     com = {'man':{...}, 'min':{...}}
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}}
 
-                for minman in cur_filter.com:
+                for minman in fb.fil_inst.com:
                     # add info only when 'man' / 'min' exists in fb.fil_tree
                     if minman in fb.fil_tree[rt][ft][dm]:
-                        for i in cur_filter.com[minman]:
+                        for i in fb.fil_inst.com[minman]:
                             # Test whether entry exists in fb.fil_tree:
                             if i in fb.fil_tree[rt][ft][dm][minman]:
                                 # yes, prepend common data
                                 fb.fil_tree[rt][ft][dm][minman][i] =\
-                                cur_filter.com[minman][i] + fb.fil_tree[rt][ft][dm][minman][i]
+                                fb.fil_inst.com[minman][i] + fb.fil_tree[rt][ft][dm][minman][i]
                             else:
                                 # no, create new entry
                                 fb.fil_tree[rt][ft][dm][minman].update(\
-                                                {i:cur_filter.com[minman][i]})
+                                                {i:fb.fil_inst.com[minman][i]})
 
                             if self.DEBUG:
                                 print('\n--- FilterFileReader.buildFilterTree ---')
                                 print(dm, minman, i)
                                 print("fb.fil_tree[minman][i]:",
                                       fb.fil_tree[rt][ft][dm][minman][i])
-                                print("cur_filter.com[minman][i]",
-                                  cur_filter.com[minman][i])
+                                print("fb.fil_inst.com[minman][i]",
+                                  fb.fil_inst.com[minman][i])
 
 #            del cur_filter # delete obsolete filter object (needed?)
 

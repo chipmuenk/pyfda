@@ -110,8 +110,14 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'wdg_dyn':{'win':'hann'}
             }
 
-# TODO: Try global fil_inst = ...
-my_inst = ""
+# This variable is globally visible
+fil_inst = ""
+
+# This instance of Fb is globally visible!
+# myfb = Fb()
+
+# see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
+# see http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
 class Fb(object):
     def __init__(self):
@@ -140,7 +146,7 @@ class Fb(object):
     
         """
    
-        global my_inst  # only required when _WRITING_ to my_inst, reading tries
+        global fil_inst  # only required when _WRITING_ to my_inst, reading tries
                         # tries going up the scope 
 
         print("create_instance: dm =", dm)
@@ -162,26 +168,27 @@ class Fb(object):
         try: # has a filter object been instantiated yet?
             if dm not in self.fil_inst.name: # Yes (if no error occurs), check name
                 inst = getattr(dm_module, dm)
-                self.fil_inst = inst()
+                fil_inst = inst()
 
         except AttributeError as e: # No, create a filter instance
             inst = getattr(dm_module, dm)
-            my_inst = inst()
+            fil_inst = inst()
 
-            self.fil_inst = inst()
+#            self.fil_inst = inst()
 
-        if self.fil_inst != None:# yes, the attribute exists, return the instance
+        if fil_inst != None:# yes, the attribute exists, return the instance
 #            print('\n--- Filterbroker.create_instance() ---')
 #            print("dm_module = ", dm_module)
 #            print("dm = ", dm)
 #            print("Type(fil_inst = ", type(self.fil_inst))
 #            print("Name(fil_inst) = ", self.fil_inst().name)
-            
-            return self.fil_inst
+            pass
+
         else:
             print('--- Filterbroker.create_instance() ---\n')
             print("Unknown object '{0}', could not be created,".format(dm))
-            return None
+        return fil_inst
+
 
 
 ###############################################################################

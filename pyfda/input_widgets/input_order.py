@@ -25,7 +25,7 @@ class InputOrder(QtGui.QFrame):
         super(InputOrder, self).__init__()
         self.DEBUG = DEBUG
         self.dmLast = '' # design method from last call
-        self.ffb = fb.Fb() # instantiate Fb object
+#        self.ffb = fb.Fb() # instantiate Fb object
         self.initUI()
 
 
@@ -190,12 +190,12 @@ class InputOrder(QtGui.QFrame):
 #                del w                       # not really needed?
                 
             # Create instance of selected filter design method class
-            self.fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
+#            self.fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
             # Try to create "new" dyn. subwidgets:
-            if hasattr(self.fil_inst, 'wdg'):
+            if hasattr(fb.fil_inst, 'wdg'):
                 try:
-                    if 'fo' in self.fil_inst.wdg:
-                        a = getattr(self.fil_inst, self.fil_inst.wdg['fo'])
+                    if 'fo' in fb.fil_inst.wdg:
+                        a = getattr(fb.fil_inst, fb.fil_inst.wdg['fo'])
                         self.layHDynWdg.addWidget(a)
                         self.layHDynWdg.setContentsMargins(0,0,0,0)
                         self.frmDynWdg.setVisible(a != None)
