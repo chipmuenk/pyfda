@@ -26,7 +26,7 @@ class pyFDA(QtGui.QMainWindow):
     """
 
     def __init__(self):
-        self.DEBUG = True
+        self.DEBUG = False
         super(pyFDA, self).__init__()
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
