@@ -203,7 +203,8 @@ class InputFilter(QtGui.QWidget):
     def setFilterType(self):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
-        Copy selected setting to self.ft and (re)construct design method combo,
+        - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
+        - (re)construct design method combo,
         adding displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
         # cmbBox.currentText() has full text ('IIR'),
@@ -216,12 +217,14 @@ class InputFilter(QtGui.QWidget):
         # The combobox is populated with the "long name", the internal name
         # is stored in comboBox.itemData
         self.cmbDesignMethod.clear()
+        dm_list = []
 
         for dm in fb.fil_tree[self.rt][self.ft]:
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
+            dm_list.append(dm)
 
         # get list of available design methods for new ft
-        dm_list = fb.fil_tree[self.rt][self.ft].keys()
+#        dm_list = fb.fil_tree[self.rt][self.ft].keys()
         if self.DEBUG:
             print("dm_list", dm_list)
             print(fb.fil[0]['dm'])
@@ -244,7 +247,10 @@ class InputFilter(QtGui.QWidget):
     def setDesignMethod(self):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
-        Instantiate (new) filter object
+        - read design method dm and copy it to fb.fil[0]
+        - create / update global filter instance fb.fil_inst of dm class
+        - update dynamic widgets (if any)
+        - set filter_initialized = True
         """
         dm_idx = self.cmbDesignMethod.currentIndex()
         dm = self.cmbDesignMethod.itemData(dm_idx)
@@ -252,7 +258,7 @@ class InputFilter(QtGui.QWidget):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
 
-        # Create /update instance of selected filter design method class
+        # Create / update global instance fb.fil_inst of selected filter dm class
 #        self.fil_inst = self.ffb.create_instance(dm)
         fb.fb.create_instance(dm)
 
