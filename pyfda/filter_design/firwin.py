@@ -91,6 +91,7 @@ class firwin(object):
         #self.info_doc = [] is set in self.updateWindow()
         
         # additional dynamic widgets that need to be set in the main widgets
+        # input_filter ('sf') and input_order ('fo')
         self.wdg = {'fo':'cmb_firwin_alg', 'sf':'wdg_firwin_win'}
         
         self.hdl = None
