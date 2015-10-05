@@ -116,7 +116,7 @@ class InputOrder(QtGui.QFrame):
             fb.fil[0]['fo'] = self.fo # and update fo method
 
         # update dynamic (i.e. defined in filter design routine) subwidgets
-#        self._update_dyn_widgets()
+        self._update_dyn_widgets()
 
         # Determine which subwidgets are __visible__
         self.lblOrder.setVisible('man' in foList)
