@@ -25,7 +25,8 @@ class InputInfo(QtGui.QWidget):
     def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG
         super(InputInfo, self).__init__()
-
+        
+        self.ffb = fb.Fb() # instantiate Fb object
         self.initUI()
         self.showInfo()
 
@@ -239,30 +240,30 @@ class InputInfo(QtGui.QWidget):
         """
         Display info from filter design file and docstring
         """
-
-        if hasattr(fb.filObj,'info'):
+        self.fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
+        if hasattr(self.fil_inst,'info'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
-                    self.cleanDoc(fb.filObj.info), writer_name='html',
+                    self.cleanDoc(self.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
             else:
-                self.txtFiltInfoBox.setText(textwrap.dedent(fb.filObj.info))
+                self.txtFiltInfoBox.setText(textwrap.dedent(self.fil_inst.info))
 
         else:
             self.txtFiltInfoBox.setText("")
 
 
-        if self.chkDocstring.isChecked() and hasattr(fb.filObj,'info_doc'):
+        if self.chkDocstring.isChecked() and hasattr(self.fil_inst,'info_doc'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.append(
                 '<hr /><b>Python module docstring:</b>\n')
-                for doc in fb.filObj.info_doc:
+                for doc in self.fil_inst.info_doc:
                     self.txtFiltInfoBox.append(publish_string(
                      self.cleanDoc(doc), writer_name='html',
                         settings_overrides = {'output_encoding': 'unicode'}))
             else:
                 self.txtFiltInfoBox.append('\nPython module docstring:\n')
-                for doc in fb.filObj.info_doc:
+                for doc in self.fil_inst.info_doc:
                     self.txtFiltInfoBox.append(self.cleanDoc(doc))
 
 #        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect

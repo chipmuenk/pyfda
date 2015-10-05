@@ -46,6 +46,8 @@ class FilterTreeBuilder(object):
         self.DEBUG = DEBUG
         self.comment_char = comment_char
         self.filt_dir = filt_dir
+        
+        self.ffb = fb.Fb() # instantiate Fb object
 
         self.initFilters()
 
@@ -255,10 +257,10 @@ class FilterTreeBuilder(object):
 
         fb.fil_tree = {}
         fb.dm_names = {}
-        for dm in fb.design_methods:           # iterate over found designMethods(dm)
+        for dm in fb.design_methods:  # iterate over keys in designMethods (= dm)
 
-            cur_filter = fb.create_instance(dm) # instantiate object of filter class dm
-
+            cur_filter = self.ffb.create_instance(dm) # instantiate object of filter class dm
+ 
             try:
                 fb.dm_names.update(cur_filter.name)
             except AttributeError:

@@ -30,6 +30,7 @@ class InputSpecs(QtGui.QWidget):
         super(InputSpecs, self).__init__()
 
         self.DEBUG = DEBUG
+        self.ffb = fb.Fb() # instantiate Fb object
         self.initUI()
 
     def initUI(self):
@@ -266,7 +267,10 @@ class InputSpecs(QtGui.QWidget):
         # e.g. cheby1.LPman(fb.fil[0])
 
         try:
-            getattr(fb.filObj, fb.fil[0]['rt'] + fb.fil[0]['fo'])(fb.fil[0])
+            print("\n---- InputSpecs.startDesignFilt ----")
+            fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
+            print(type(fil_inst))
+            getattr(fil_inst, fb.fil[0]['rt'] + fb.fil[0]['fo'])(fb.fil[0])
 
             # The filter design routines write coeffs, poles/zeros etc. back to
             # the global filter dict
@@ -280,6 +284,7 @@ class InputSpecs(QtGui.QWidget):
             self.sigFilterDesigned.emit() # emit signal -> input_widgets
 
         except Exception as e:
+            print("\n---- InputSpecs.startDesignFilt ----")
             print(e)
             print(e.__doc__)
             self.color_design_button("error")

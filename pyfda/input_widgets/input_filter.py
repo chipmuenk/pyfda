@@ -22,7 +22,7 @@ import pyfda.pyfda_rc as rc
 # TODO:  index = myComboBox.findText('item02')
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]
-# TODO: setResponseType is called  4 times every time filter is changed - why?
+# TODO: setResponseType is called 3 times every time filter is changed - why?
 
 
 class InputFilter(QtGui.QWidget):
@@ -41,6 +41,7 @@ class InputFilter(QtGui.QWidget):
 
         self.filter_initialized = False
         self.dm_last = '' # design method from last call
+        self.ffb = fb.Fb() # instantiate Fb object
 
         self.initUI()
 
@@ -251,16 +252,8 @@ class InputFilter(QtGui.QWidget):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
 
-        # Check whether setDesignMethod has been called for the first time
-        # (= no filter object exists, AttributeError is raised). If not, check
-        # whether the design method has been changed. In both cases,
-        # a (new) filter object is instantiated
-        try: # has a filter object been instantiated yet?
-            print("filObj.name",fb.filObj.name)
-            if dm not in fb.filObj.name: # Yes (if no error occurs), check name
-                fb.filObj = fb.create_instance(dm)
-        except AttributeError as e: # No, create a filter instance
-            fb.filObj = fb.create_instance(dm)
+        # Create instance of selected filter design method class
+        self.fil_inst = self.ffb.create_instance(dm)
 
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
@@ -311,10 +304,10 @@ class InputFilter(QtGui.QWidget):
 #                del w                       # not really needed?
 
             # Try to create "new" dyn. subwidgets:
-            if hasattr(fb.filObj, 'wdg'):
+            if hasattr(self.fil_inst, 'wdg'):
                 try:
-                    if 'sf' in fb.filObj.wdg:
-                        a = getattr(fb.filObj, fb.filObj.wdg['sf'])
+                    if 'sf' in self.fil_inst.wdg:
+                        a = getattr(self.fil_inst, self.fil_inst.wdg['sf'])
                         self.layHDynWdg.addWidget(a, stretch=1)
                         self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
                         self.frmDynWdg.setVisible(a != None)

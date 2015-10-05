@@ -13,6 +13,8 @@ Author: Christian Muenker
 from __future__ import division, unicode_literals
 import importlib
 
+
+
 #==============================================================================
 # The entries in this file are only used as initial / default entries and
 # demonstrate the structure of the global dicts and lists. 
@@ -20,12 +22,16 @@ import importlib
 #The actual entries are created resp. overwritten by
 #
 # ----- FilterTreeBuilder.__init__() ------
+# ------                 .buildFilTree()
 #
+
+# Dictionary with filter name and full module name
+design_methods = {"equiripple":"pyfda.filter_designs.equiripple",
+                  "cheby1":"pyfda.filter_designs.cheby1",
+                  "cheby2":"pyfda.filter_designs.cheby2"}
 
 # Dictionary with translations between short class names and long names for
 # design methods
-design_methods = {}
-
 dm_names = {#IIR
             "butter":"Butterworth", "cheby1":"Chebychev 1",
             "bessel":"Bessel",
@@ -35,7 +41,6 @@ dm_names = {#IIR
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
-# This dict is built + overwritten by FilterFileReader.buildFilterTree() !
 fil_tree = {
     'HP':
         {'FIR':
@@ -71,57 +76,12 @@ fil_tree = {
                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}},
     }
 
-#--------------------------------------
-# Handle to current filter object
-filObj = ""
-#filObj = ftb.objectWizzard(dm)
-def create_instance(dm):
-    """
-    Try to create an instance of "dm" from the module stored in design_methods[dm].
-    This dictionary has beed compiled by filter_tree_builder.py
-
-    E.g.  self.cur_filter = create_instance('cheby1')
-
-    Parameters
-    ----------
-    dm: string
-
-        The name of the design method to be constructed (e.g. 'cheby1' or 'equiripple')
-
-    Returns
-    -------
-    The instance
-
-    """
-    
-    # TODO: InputFilter.setDesignMethod() : fb.create_instance(dm) takes complete
-    #       dictionary entry instead of key only ?!
-    # TODO: improve create_instance to either create a new instance or test for 
-    #       existing one (code from InputFilter.setDesignMethod())
-    try:
-        # Try to dynamically import the module dm from package 'filter_design'
-        dm_module = importlib.import_module(design_methods[dm])
-
-    except ImportError as e:
-        print(e)
-        print("Error in 'FilterTreeBuilder.dynFiltImport()':")
-        print("Filter design '%s' could not be imported."%dm)
-        
-    inst = getattr(dm_module, dm)
-
-    if inst != None:# yes, the attribute exists, return the instance
-        return inst()
-    else:
-        print('--- FilterTreeBuilder.objectWizzard\n ---')
-        print("Unknown object '{0}', could not be created,".format(dm))
-        return None
-
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
 # auxiliary information, it is automatically overwritten by input widgets
 # and design routines
-#--------------------------------------
+#------------------------------------------------------------------------------
 
 fil = [None] * 10 # create empty list with length 10 for multiple filter designs
 # This functionality is not implemented yet, currently only fil[0] is used
@@ -149,6 +109,79 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $',
             'wdg_dyn':{'win':'hann'}
             }
+
+# TODO: Try global fil_inst = ...
+my_inst = ""
+
+class Fb(object):
+    def __init__(self):
+        #--------------------------------------
+        # Handle to current filter object
+#        self.fil_inst = ""
+        pass
+
+
+    def create_instance(self, dm):
+        """
+        Try to create an instance of "dm" from the module stored in design_methods[dm].
+        This dictionary has beed compiled by filter_tree_builder.py
+    
+        E.g.  self.cur_filter = create_instance('cheby1')
+    
+        Parameters
+        ----------
+        dm: string
+    
+            The name of the design method to be constructed (e.g. 'cheby1' or 'equiripple')
+    
+        Returns
+        -------
+        The instance
+    
+        """
+   
+        global my_inst  # only required when _WRITING_ to my_inst, reading tries
+                        # tries going up the scope 
+
+        print("create_instance: dm =", dm)
+        
+        try:
+            # Try to dynamically import the module dm from package 'filter_design'
+            dm_module = importlib.import_module(design_methods[dm])
+
+    
+        except ImportError as e:
+            print(e)
+            print("Error in 'FilterTreeBuilder.dynFiltImport()':")
+            print("Filter design '%s' could not be imported."%dm)
+            
+        # Check whether setDesignMethod has been called for the first time
+        # (= no filter object exists, AttributeError is raised). If not, check
+        # whether the design method has been changed. In both cases,
+        # a (new) filter object is instantiated
+        try: # has a filter object been instantiated yet?
+            if dm not in self.fil_inst.name: # Yes (if no error occurs), check name
+                inst = getattr(dm_module, dm)
+                self.fil_inst = inst()
+
+        except AttributeError as e: # No, create a filter instance
+            inst = getattr(dm_module, dm)
+            my_inst = inst()
+
+            self.fil_inst = inst()
+
+        if self.fil_inst != None:# yes, the attribute exists, return the instance
+#            print('\n--- Filterbroker.create_instance() ---')
+#            print("dm_module = ", dm_module)
+#            print("dm = ", dm)
+#            print("Type(fil_inst = ", type(self.fil_inst))
+#            print("Name(fil_inst) = ", self.fil_inst().name)
+            
+            return self.fil_inst
+        else:
+            print('--- Filterbroker.create_instance() ---\n')
+            print("Unknown object '{0}', could not be created,".format(dm))
+            return None
 
 
 ###############################################################################
