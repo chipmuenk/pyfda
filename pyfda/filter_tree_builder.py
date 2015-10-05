@@ -259,17 +259,17 @@ class FilterTreeBuilder(object):
         fb.dm_names = {}
         for dm in fb.design_methods:  # iterate over keys in designMethods (= dm)
 
-            self.ffb.create_instance(dm) # instantiate object of filter class dm
- 
+#            self.ffb.create_instance(dm) # instantiate object of filter class dm
+            fb.fb.create_instance(dm) # instantiate / update global object of filter class dm
             try:
                 fb.dm_names.update(fb.fil_inst.name)
             except AttributeError:
                 print('Warning: Skipping design method "{0}" due to missing attribute "name".'.format(dm))
-                continue # continue with next entry in dm
+                continue # continue with next entry in design_methods
             ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in fb.fil_inst.rt:            # iterate over response types
-                if rt not in fb.fil_tree:           # is rt key in dict already?
+                if rt not in fb.fil_tree:           # is rt key already in dict?
                     fb.fil_tree.update({rt:{}})     # no, create it
 
                 if ft not in fb.fil_tree[rt]:  # is ft key already in dict[rt]?

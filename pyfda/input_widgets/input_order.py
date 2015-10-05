@@ -116,7 +116,7 @@ class InputOrder(QtGui.QFrame):
             fb.fil[0]['fo'] = self.fo # and update fo method
 
         # update dynamic (i.e. defined in filter design routine) subwidgets
-        self._updateDynWidgets()
+#        self._update_dyn_widgets()
 
         # Determine which subwidgets are __visible__
         self.lblOrder.setVisible('man' in foList)
@@ -166,7 +166,7 @@ class InputOrder(QtGui.QFrame):
         self.sigSpecsChanged.emit() # -> input_widgets
         
 
-    def _updateDynWidgets(self):
+    def _update_dyn_widgets(self):
         """
         Delete dynamically (i.e. within filter design routine) created subwidgets 
         and create new ones, depending on requirements of filter design algorithm

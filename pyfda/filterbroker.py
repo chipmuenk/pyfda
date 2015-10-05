@@ -113,8 +113,7 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
 # This variable is globally visible
 fil_inst = ""
 
-# This instance of Fb is globally visible!
-# myfb = Fb()
+
 
 # see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 # see http://stackoverflow.com/questions/2447353/getattr-on-a-module
@@ -189,7 +188,8 @@ class Fb(object):
             print("Unknown object '{0}', could not be created,".format(dm))
         return fil_inst
 
-
+# This instance of Fb is globally visible!
+fb = Fb()
 
 ###############################################################################
 """
