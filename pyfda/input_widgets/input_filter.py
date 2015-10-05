@@ -167,11 +167,11 @@ class InputFilter(QtGui.QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-        print("InputFilter.setResponseType triggered")
         # cmbBox.currentText() shows full text ('Lowpass'),
         # itemData contains abbreviation ('LP')
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)
+        print("InputFilter.setResponseType triggered:", self.rt)
 
         # In Python 3, python objects are automatically converted to QVariant
         # when stored as "data" e.g. in a QComboBox and converted back when
@@ -212,6 +212,7 @@ class InputFilter(QtGui.QWidget):
 
         self.ft = str(self.cmbFilterType.currentText())
         fb.fil[0]['ft'] = self.ft
+        print("InputFilter.setFilterType triggered:", self.ft)
 
         # Rebuild design method combobox entries for new ft setting:
         # The combobox is populated with the "long name", the internal name
@@ -257,6 +258,7 @@ class InputFilter(QtGui.QWidget):
         if not isinstance(dm, str):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
+        print("InputFilter.setDesignMethod triggered:", dm)
 
         # Create / update global instance fb.fil_inst of selected filter dm class
 #        self.fil_inst = self.ffb.create_instance(dm)
