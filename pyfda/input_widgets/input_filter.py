@@ -330,12 +330,16 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = fb.fil[0]['dm']
 
+
+#    def closeEvent(self, event):
+#        exit()
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputFilter()
     form.show()
+    
 
     app.exec_()
 
