@@ -37,6 +37,7 @@ class InputFilter(QtGui.QWidget):
 
     def __init__(self, DEBUG=False):
         super(InputFilter, self).__init__()
+        print("initialized InputFilter!")
         self.DEBUG = DEBUG
 
         self.filter_initialized = False
