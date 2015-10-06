@@ -26,15 +26,15 @@ import importlib
 #
 
 # Dictionary with filter name and full module name
-design_methods = {"equiripple":"pyfda.filter_designs.equiripple",
-                  "cheby1":"pyfda.filter_designs.cheby1",
-                  "cheby2":"pyfda.filter_designs.cheby2"}
+design_methods = {"equiripple":"pyfda.filter_design.equiripple",
+                  "cheby1":"pyfda.filter_design.cheby1",
+                  "cheby2":"pyfda.filter_design.cheby2"}
 
 # Dictionary with translations between short class names and long names for
 # design methods
 dm_names = {#IIR
             "butter":"Butterworth", "cheby1":"Chebychev 1",
-            "bessel":"Bessel",
+            "bessel":"Bessel", "cheby2":"Chebychev 2",
             # FIR:
             "equiripple":"Equiripple", "firls":"Least-Square",
             "firwin":"Windowed"}
