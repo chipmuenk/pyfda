@@ -156,6 +156,19 @@ class pyFDA(QtGui.QMainWindow):
         """
         self.statusBar().showMessage(message)
 
+#------------------------------------------------------------------------------       
+    def closeEvent(self, event): # reimplement QMainWindow.closeEvent
+        print("event", event)
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+#    combine with:
+#    self.btnExit.clicked.connect(self.close)
+
 
 #------------------------------------------------------------------------------
 def main():
@@ -181,6 +194,9 @@ def main():
 #                      pyfda_rc.css_rc['LineEdit'] +
  #                     pyfda_rc.css_rc['TabBar'])
     mainw = pyFDA()
+# http://stackoverflow.com/questions/5506781/pyqt4-application-on-windows-is-crashing-on-exit
+    app.setActiveWindow(mainw) #<---- This is what's probably missing
+
 
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         'images', 'icons', "Logo_LST_4.svg")
@@ -196,9 +212,11 @@ def main():
 #        if blabla:
 #        app.quit()
 #        
-#    app.lastWindowClosed.connect(fdaQuit)
+ #   app.lastWindowClosed.connect(mainw.closeEvent())
 
-    app.exec_()
+    #start the application's exec loop, return the exit code to the OS
+    sys.exit(app.exec_())
+#    app.exit()
 
 #------------------------------------------------------------------------------
 
