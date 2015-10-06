@@ -41,39 +41,66 @@ dm_names = {#IIR
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
+vis_man = ['fo','fspecs','tspecs'] # manual filter order
+vis_min = ['fo','fspecs','tspecs'] # minimum filter order
+dis_man = [] # manual filter order
+dis_min = ['fspecs'] # minimum filter order
+msg_min = "minimum"
+msg_man = "maximum"
 fil_tree = {
     'HP':
         {'FIR':
             {'equiripple':
-                {'man': {"par":['N', 'A_PB', 'F_PB']},
-                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}},
+                {'man': {"par":['N', 'A_PB', 'F_PB'],
+                         "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                         "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
          'IIR':
              {'cheby1':
-                 {'man': {"par":['N', 'A_PB', 'F_PB']},
-                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}},
+                 {'man': {"par":['N', 'A_PB', 'F_PB'],
+                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                          "vis":vis_min, "dis":dis_min, "msg":msg_min}},
               'cheby2':
-                  {'man': {"par":['N', 'A_SB', 'F_SB']},
-                   'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}},
+                  {'man': {"par":['N', 'A_SB', 'F_SB'],
+                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                   'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                           "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
     'BP':
         {'FIR':
             {'equiripple':
-                {'man': {"par":['N', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2']}}},
+                {'man': {"par":['N', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2'],
+                         "vis":vis_man, "dis":dis_man, "msg":msg_man}}},
          'IIR':
-             {'cheby1': {'man': {"par":['N', 'A_PB', 'F_PB', 'F_PB2']},
-                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2']}},
-              'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB', 'F_SB2']},
-                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2']}}}},
+             {'cheby1': {'man': {"par":['N', 'A_PB', 'F_PB', 'F_PB2'], 
+                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2'],
+                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}},
+              'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB', 'F_SB2'],
+                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2'],
+                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
     'LP':
         {'FIR':
             {'equiripple':
-                {'man': {"par":['N', 'A_PB', 'F_PB']},
-                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}},
+                {'man': {"par":['N', 'A_PB', 'F_PB'], 
+                         "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                         "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
          'IIR':
              {'cheby1':
-                 {'man': {"par":['N', 'A_PB', 'F_PB']},
-                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}},
-             'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB']},
-                        'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB']}}}},
+                 {'man': {"par":['N', 'A_PB', 'F_PB'],
+                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'], 
+                          "vis":vis_min, "dis":dis_min, "msg":msg_min},
+             'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB'],
+                                "vis":vis_man, "dis":dis_man, "msg":msg_man},
+                        'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                                "vis":vis_min, "dis":dis_min, "msg":msg_min}
+                        }
+                }
+            }
+        }
     }
 
 
@@ -175,15 +202,15 @@ class Fb(object):
 
 #            self.fil_inst = inst()
 
-        if fil_inst != None:# yes, the attribute exists, return the instance
+#        if fil_inst != None:# yes, the attribute exists, return the instance
 #            print('\n--- Filterbroker.create_instance() ---')
 #            print("dm_module = ", dm_module)
 #            print("dm = ", dm)
 #            print("Type(fil_inst = ", type(self.fil_inst))
 #            print("Name(fil_inst) = ", self.fil_inst().name)
-            pass
-
-        else:
+#            pass
+#        else:
+        if not fil_inst:
             print('--- Filterbroker.create_instance() ---\n')
             print("Unknown object '{0}', could not be created,".format(dm))
         return fil_inst
