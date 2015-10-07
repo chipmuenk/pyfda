@@ -330,8 +330,8 @@ class InputFilter(QtGui.QWidget):
         self.dm_last = fb.fil[0]['dm']
 
 
-#    def closeEvent(self, event):
-#        exit()
+    def closeEvent(self, event):
+        exit()
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
