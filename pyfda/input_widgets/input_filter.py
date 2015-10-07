@@ -172,7 +172,6 @@ class InputFilter(QtGui.QWidget):
         # itemData contains abbreviation ('LP')
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)
-        print("InputFilter.setResponseType triggered:", self.rt)
 
         # In Python 3, python objects are automatically converted to QVariant
         # when stored as "data" e.g. in a QComboBox and converted back when
