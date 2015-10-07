@@ -92,16 +92,16 @@ fil_tree = {
                  {'man': {"par":['N', 'A_PB', 'F_PB'],
                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
                   'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'], 
-                          "vis":vis_min, "dis":dis_min, "msg":msg_min},
+                          "vis":vis_min, "dis":dis_min, "msg":msg_min}},
              'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB'],
                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}
                         }
-                }
             }
         }
     }
+
 
 
 # -----------------------------------------------------------------------------
