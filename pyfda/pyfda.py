@@ -135,7 +135,8 @@ class pyFDA(QtGui.QMainWindow):
         #  requiring full update of all plot widgets:
         self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.updateData)
         # sigReadFilters: button has been pressed to rebuild filter tree:
-        self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.initFilters)
+        self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
+#####        self.closeEvent.connect(self.aboutToQuit)
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
 
@@ -157,6 +158,9 @@ class pyFDA(QtGui.QMainWindow):
         self.statusBar().showMessage(message)
 
 #------------------------------------------------------------------------------       
+    def quitEvent(self): # reimplement QMainWindow.closeEvent
+        pass
+    
     def closeEvent(self, event): # reimplement QMainWindow.closeEvent
         print("event", event)
         reply = QtGui.QMessageBox.question(self, 'Message',
@@ -166,17 +170,27 @@ class pyFDA(QtGui.QMainWindow):
             event.accept()
         else:
             event.ignore()
+
 #    combine with:
 #    self.btnExit.clicked.connect(self.close)
 
 
 #------------------------------------------------------------------------------
 def main():
-    """ entry point for the pyfda application """
-    app = QtGui.QApplication(sys.argv)
+    """ 
+    entry point for the pyfda application 
+    see http://pyqt.sourceforge.net/Docs/PyQt4/qapplication.html :
+    
+    "For any GUI application using Qt, there is precisely *one* QApplication object,
+    no matter whether the application has 0, 1, 2 or more windows at any given time.
+    ...
+    Since the QApplication object does so much initialization, it must be created 
+    *before* any other objects related to the user interface are created."     
+    """
+    app = QtGui.QApplication(sys.argv) # instantiate QApplication object, passing ?
     app.setObjectName("TopApp")
 
-    _desktop = QtGui.QDesktopWidget()
+    _desktop = QtGui.QDesktopWidget() # test the available desktop resolution
     screen_h = _desktop.availableGeometry().height()
     screen_w = _desktop.availableGeometry().width()
     print("Available screen resolution:", screen_w, "x", screen_h)
