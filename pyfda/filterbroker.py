@@ -145,7 +145,11 @@ fil_inst = ""
 # see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 # see http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
-class Fb(object):
+class FilterFactory(object):
+    """
+    This class implements a filter facory that (re)creates the globally accessible
+    filter instance "fil_inst" from module path and class name, passed as strings.
+    """
     def __init__(self):
         #--------------------------------------
         # Handle to current filter object
@@ -172,10 +176,7 @@ class Fb(object):
     
         """
    
-        global fil_inst  # only required when _WRITING_ to my_inst, reading tries
-                        # tries going up the scope 
-
-        print("create_instance: dm =", dm)
+        global fil_inst  # this allows _WRITING_ to fil_inst
         
         try:
             # Try to dynamically import the module dm from package 'filter_design'
@@ -213,10 +214,12 @@ class Fb(object):
         if not fil_inst:
             print('--- Filterbroker.create_instance() ---\n')
             print("Unknown object '{0}', could not be created,".format(dm))
-        return fil_inst
+        else:
+            print("create_instance: dm =", dm)
+#        return fil_inst
 
-# This instance of Fb is globally visible!
-fb = Fb()
+# This instance of FilterFactory is globally visible!
+fil_factory = FilterFactory()
 
 ###############################################################################
 """

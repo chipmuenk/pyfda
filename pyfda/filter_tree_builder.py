@@ -46,13 +46,11 @@ class FilterTreeBuilder(object):
         self.DEBUG = DEBUG
         self.comment_char = comment_char
         self.filt_dir = filt_dir
-        
-        self.ffb = fb.Fb() # instantiate Fb object
 
-        self.initFilters()
+        self.init_filters()
 
 #==============================================================================
-    def initFilters(self):
+    def init_filters(self):
         """
         - Extract the names of all Python files in the file specified during
           instantiation (self.filt_dir_file) and write them to a list
@@ -259,8 +257,7 @@ class FilterTreeBuilder(object):
         fb.dm_names = {}
         for dm in fb.design_methods:  # iterate over keys in designMethods (= dm)
 
-#            self.ffb.create_instance(dm) # instantiate object of filter class dm
-            fb.fb.create_instance(dm) # instantiate / update global object of filter class dm
+            fb.fil_factory.create_instance(dm) # instantiate / update global object of filter class dm
             try:
                 fb.dm_names.update(fb.fil_inst.name)
             except AttributeError:

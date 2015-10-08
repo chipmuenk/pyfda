@@ -42,7 +42,6 @@ class InputFilter(QtGui.QWidget):
 
         self.filter_initialized = False
         self.dm_last = '' # design method from last call
-#        self.ffb = fb.Fb() # instantiate Fb object
 
         self.initUI()
 
@@ -261,8 +260,7 @@ class InputFilter(QtGui.QWidget):
         print("InputFilter.setDesignMethod triggered:", dm)
 
         # Create / update global instance fb.fil_inst of selected filter dm class
-#        self.fil_inst = self.ffb.create_instance(dm)
-        fb.fb.create_instance(dm)
+        fb.fil_factory.create_instance(dm)
 
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
@@ -330,8 +328,8 @@ class InputFilter(QtGui.QWidget):
         self.dm_last = fb.fil[0]['dm']
 
 
-    def closeEvent(self, event):
-        exit()
+#    def closeEvent(self, event):
+#        exit()
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
