@@ -10,8 +10,9 @@ Module variables are global like class variables.
 Author: Christian Muenker
 """
 
-from __future__ import division, unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
 import importlib
+import six
 
 
 
@@ -158,12 +159,13 @@ class FilterFactory(object):
         pass
 
 
-    def create_instance(self, dm):
+    def create_fil_inst(self, dm):
         """
         Create an instance of "dm" from the module found in design_methods[dm].
-        This dictionary has been collected by filter_tree_builder.py
-    
-        E.g.  create_instance('cheby1')
+        This dictionary has been collected by filter_tree_builder.py. 
+        
+        The instance can then be referenced as the global 'fil_inst'.
+
     
         Parameters
         ----------
@@ -173,42 +175,124 @@ class FilterFactory(object):
     
         Returns
         -------
-        The class instance as global variable fil_inst
+        err_code: integer
+            -2: new filter instance was created sucessfully
+            -1: filter instance was created for the first time
+             0: filter instance exists already, no re-instantiation necessary
+             1: filter class (module) could not be imported
+             2: filter class was imported, but could not be instantiated..
+        
+        Example
+        -------
+            
+        >>> create_instance('cheby1')
+        >>> fil_inst.LPmin(fil[0])
+        
+        The example first creates an instance of the filter class 'cheby1' and 
+        then performs the actual filter design by calling the method 'LPmin',
+        passing the global filter dictionary fil[0] as the parameter.
     
         """
    
         global fil_inst  # this allows _WRITING_ to fil_inst
+        err_code = 0
         
         try:
             # Try to dynamically import the module dm from package 'filter_design'
             dm_module = importlib.import_module(design_methods[dm])
 
-    
-        except ImportError as e:
+        except (ImportError, KeyError) as e:
+            # Filter class dm is not in dictionary 'design_methods', 
+            # i.e. it was not found by FilterTreeBuilder.
             print(e)
-            print("Error in 'FilterTreeBuilder.dynFiltImport()':")
-            print("Filter design '%s' could not be imported."%dm)
+            print("\nERROR in 'FilterFactory.create_fil_inst()':\n"
+                  "Filter design class '%s' could not be imported."%dm)
+            err_code = 1
+            return err_code
             
-        # Check whether setDesignMethod has been called for the first time
-        # (= no filter object exists, AttributeError is raised). If not, check
-        # whether the design method has been changed. In both cases,
-        # a (new) filter object is instantiated
-        try: # has a filter object been instantiated yet?
-            if dm != self.fil_inst.name: # Yes (if no error occurs), check name
-                inst = getattr(dm_module, dm)
+        # Check whether create_fil_inst is called for the first time
+        #    (= no filter object exists, AttributeError is raised). 
+        # If not, check whether the design method has been changed. 
+        # In both cases, a (new) filter object is instantiated.
+
+        try: # has a filter object been instantiated yet?           
+            if dm != fil_inst.name: # Yes (if no error occurs), check name
+                inst = getattr(dm_module, dm, None)
                 fil_inst = inst()
+                err_code = -2 # design method has been changed
 
         except AttributeError as e: # No, create a filter instance
-            inst = getattr(dm_module, dm)
+            inst = getattr(dm_module, dm, None)
             fil_inst = inst()
+            err_code = -1 # filter instance has been created for the first time
 
-        if not fil_inst:
-            print('--- FilterFactory.create_instance() ---\n')
-            print("Unknown design class '{0}', could not be created,".format(dm))
+        if not inst:
+            print("\nERROR in 'FilterFactory.create_fil_inst()':\n")
+            print("Unknown design class '{0}', could not be created.".format(dm))
+            err_code = 2
         else:
-            print("FilterFactory.create_instance(): dm =", dm)
+            print("FilterFactory.create_fil_inst(): created", dm)
+        
+        return err_code
+
+#------------------------------------------------------------------------------      
+    def create_fil_method(self, method):
+        """
+        Create a global reference `fil_method` to the method passed as string `method`
+        of the filter class instantiated before as `fil_inst` (global).         . 
+
+    
+        Parameters
+        ----------
+        method: string
+    
+            The name of the design method to be constructed (e.g. 'LPmin')
+    
+        Returns
+        -------
+        err_code: integer
+             0: filter method exists and is callable
+             1: filter does not exist in class 
+             2: filter class was imported, but could not be instantiated..
+        
+        Example
+        -------
+            
+        >>> create_instance('cheby1')
+        >>> fil_inst.LPmin(fil[0])
+        
+        The example first creates an instance of the filter class 'cheby1' and 
+        then performs the actual filter design by calling the method 'LPmin',
+        passing the global filter dictionary fil[0] as the parameter.
+    
+        """
+        global fil_method  # this allows _WRITING_ to fil_method
+        # test whether 'method' is a string or unicode type under Py2 and Py3
+        if not isinstance(method, six.string_types):
+            err_string = "Method '{0}' is not a string.".format(method)
+            err_code = 3
+        else:
+            #------------------------------------------------------------------
+            fil_method = getattr(fil_inst, method, None) # returns None if attribute doesn't exist
+            #------------------------------------------------------------------
+            if not fil_method:
+                err_string = "Method '{0}' doesn't exist in class '{1}'.".format(method, fil_inst)
+                err_code = 1
+    
+            elif not callable(fil_method):
+                err_string = "Method '{0}' of class '{1}' is not callable.".format(method, fil_inst)
+                err_code = 2
+            else:
+                err_code = 0
+                
+        if err_code > 0:
+                print("\nERROR in 'FilterFactory.select_fil_method()':\n")
+                print(err_string)
+            
+        return err_code
+        
 #------------------------------------------------------------------------------            
-    def call_method(self, method):
+    def call_fil_method(self, method):
         """
         Dynamically select, store and call the method passed as string "method" 
         of the filter class instantiated as the global fil_inst. 
@@ -226,19 +310,22 @@ class FilterFactory(object):
     
         Returns
         -------
-        None
+        Error code
     
         """
    
-        global fil_method  # this allows _WRITING_ to fil_method
-        # dynamically select the method given by  fil_inst.method 
-        try:     
-#            getattr(fil_inst, fil[0]['rt'] + fil[0]['fo'])(fil[0])
-            fil_method = getattr(fil_inst, method) # 
-            fil_method(fil[0])
-        except ImportError as e:
-            print("call_method(): ", e)
-            pass
+        global fil_method   # this allows _WRITING_ to fil_method
+        # dynamically select the method given by  fil_inst.method:
+        err_code = self.create_fil_method(method)
+        fil_method(fil[0])
+#        try:     
+# #           fil_method = getattr(fil_inst, method) # 
+#            fil_method(fil[0])
+#            err_code = 0
+#        except AttributeError as e: 
+#            print("\nERROR in FilterFactory.call_method():\n", e)
+#            err_code = 1
+        return err_code
         
 #------------------------------------------------------------------------------
         
@@ -252,57 +339,22 @@ http://stackoverflow.com/questions/13034496/using-global-variables-between-files
 http://stackoverflow.com/questions/1977362/how-to-create-module-wide-variables-in-python
 http://pymotw.com/2/articles/data_persistence.html
 
-Alternative approaches for data persistence
+Alternative approaches for data persistence: Module shelve or pickleshare
 
-shelve
-------
-a persistent dictionary for reading and writing.
-This would get rid of the fb global dictionary
-
-
-import shelve
-
-### write to database:
-s = shelve.open('test_shelf.fb')
-try:
-    s['key1'] = { 'int': 10, 'float':9.5, 'string':'Sample data' }
-finally:
-    s.close()
-
-### read from database:
-s = shelve.open('test_shelf.fb')
-# s = shelve.open('test_shelf.fb', flag='r') # read-only
-try:
-    existing = s['key1']
-finally:
-    s.close()
-
-print(existing)
-
-### catch changes to objects, store in in-memory cache and write-back upon close
-s = shelve.open('test_shelf.fb', writeback=True)
-try:
-    print s['key1']
-    s['key1']['new_value'] = 'this was not here before'
-    print s['key1']
-finally:
-    s.close()
-
-
-===============================================================================
-pickleshare
------------
-https://github.com/pickleshare/pickleshare
-PickleShare - a small 'shelve' like datastore with concurrency support
-Concurrency is possible because the values are stored in separate files. 
-Hence the "database" is a directory where all files are governed by PickleShare.
-
-from pickleshare import *
-db = PickleShareDB('~/testpickleshare')
-db.clear()
-print "Should be empty:",db.items()
-db['hello'] = 15
-db['aku ankka'] = [1,2,313]
-db['paths/are/ok/key'] = [1,(5,46)]
-print db.keys()
 """
+if __name__ == '__main__':
+    print("design_methods\n", design_methods)
+    print(fil_factory.create_fil_inst("aaa")) # class doesnt exist
+    print(fil_factory.create_fil_inst("cheby1")) # first time inst.
+    print(fil_factory.create_fil_inst("cheby1")) # second time inst.
+    print(fil_factory.create_fil_inst("cheby2")) # new class
+    print(fil_factory.create_fil_inst("bbb")) # class doesnt exist
+    
+    
+    print(fil_factory.create_fil_method("LPman"))
+    print(fil_factory.create_fil_method("LPmax")) # doesn't exist
+    print(fil_factory.create_fil_method(1)) # not a string
+    print(fil_factory.create_fil_method("LPmin")) # not a string
+    
+    print(fil_factory.call_method("LPmin")) # 
+    
