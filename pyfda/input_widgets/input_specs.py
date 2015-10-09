@@ -10,12 +10,6 @@ import numpy as np
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
-# import pyfda.filterbroker from one level above if this file is run as __main__
-# for test purposes
-#if __name__ == "__main__":
-#    __cwd__ = os.path.dirname(os.path.abspath(__file__))
-#    sys.path.append(os.path.dirname(__cwd__))
-
 import pyfda.filterbroker as fb
 
 from pyfda.input_widgets import (input_filter, input_order, input_amp_specs,
@@ -36,8 +30,7 @@ class InputSpecs(QtGui.QWidget):
         super(InputSpecs, self).__init__()
 
         self.DEBUG = DEBUG
-#        self.ftb = FilterTreeBuilder('init.txt', 'filter_design',
-#                                    comment_char = '#', DEBUG = DEBUG) #
+#        self.ffb = fb.Fb() # instantiate Fb object
         self.initUI()
 
     def initUI(self):
@@ -274,10 +267,19 @@ class InputSpecs(QtGui.QWidget):
         # e.g. cheby1.LPman(fb.fil[0])
 
         try:
-            getattr(fb.filObj, fb.fil[0]['rt'] + fb.fil[0]['fo'])(fb.fil[0])
-
-            # The filter design routines write coeffs, poles/zeros etc. back to
-            # the global filter dict
+            print("\n---- InputSpecs.startDesignFilt ----")
+            print(type(fb.fil_inst))
+ 
+            # Create / update global instance fb.fil_inst of selected filter dm class
+            err1 = fb.fil_factory.create_fil_inst(fb.fil[0]['dm'])
+            # call the method specified as a string in the argument of the
+            # filter instance defined previously
+            err2 = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
+            # The called method writes coeffs, poles/zeros etc. back to
+            # the global filter dict fb.fil[0]
+            
+            if err1 > 0  or err2 > 0:
+                raise AttributeError("Unknown design class or method.") 
 
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
@@ -288,6 +290,7 @@ class InputSpecs(QtGui.QWidget):
             self.sigFilterDesigned.emit() # emit signal -> input_widgets
 
         except Exception as e:
+            print("\n---- InputSpecs.startDesignFilt ----")
             print(e)
             print(e.__doc__)
             self.color_design_button("error")

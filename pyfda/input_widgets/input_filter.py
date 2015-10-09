@@ -17,13 +17,12 @@ from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
-from pyfda.filter_tree_builder import FilterTreeBuilder
 
 # TODO: Add subwidgets, depending on filterSel parameters
 # TODO:  index = myComboBox.findText('item02')
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]
-# TODO: setResponseType is called  4 times every time filter is changed - why?
+# TODO: setResponseType is called 3 times every time filter is changed - why?
 
 
 class InputFilter(QtGui.QWidget):
@@ -38,11 +37,8 @@ class InputFilter(QtGui.QWidget):
 
     def __init__(self, DEBUG=False):
         super(InputFilter, self).__init__()
+        print("initialized InputFilter!")
         self.DEBUG = DEBUG
-        # initialize the FilterTreeBuilder class with the filter directory and
-        # the filter file
-        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
-                                     comment_char='#', DEBUG=DEBUG)
 
         self.filter_initialized = False
         self.dm_last = '' # design method from last call
@@ -171,7 +167,6 @@ class InputFilter(QtGui.QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-        print("InputFilter.setResponseType triggered")
         # cmbBox.currentText() shows full text ('Lowpass'),
         # itemData contains abbreviation ('LP')
         rt_idx = self.cmbResponseType.currentIndex()
@@ -207,7 +202,8 @@ class InputFilter(QtGui.QWidget):
     def setFilterType(self):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
-        Copy selected setting to self.ft and (re)construct design method combo,
+        - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
+        - (re)construct design method combo,
         adding displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
         # cmbBox.currentText() has full text ('IIR'),
@@ -215,17 +211,20 @@ class InputFilter(QtGui.QWidget):
 
         self.ft = str(self.cmbFilterType.currentText())
         fb.fil[0]['ft'] = self.ft
+        print("InputFilter.setFilterType triggered:", self.ft)
 
         # Rebuild design method combobox entries for new ft setting:
         # The combobox is populated with the "long name", the internal name
         # is stored in comboBox.itemData
         self.cmbDesignMethod.clear()
+        dm_list = []
 
         for dm in fb.fil_tree[self.rt][self.ft]:
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
+            dm_list.append(dm)
 
         # get list of available design methods for new ft
-        dm_list = fb.fil_tree[self.rt][self.ft].keys()
+#        dm_list = fb.fil_tree[self.rt][self.ft].keys()
         if self.DEBUG:
             print("dm_list", dm_list)
             print(fb.fil[0]['dm'])
@@ -241,31 +240,25 @@ class InputFilter(QtGui.QWidget):
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
 
-        self.setDesignMethod()
+            self.setDesignMethod()
 
 
 #------------------------------------------------------------------------------
     def setDesignMethod(self):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
-        Instantiate (new) filter object
+        - read design method dm and copy it to fb.fil[0]
+        - create / update global filter instance fb.fil_inst of dm class
+        - update dynamic widgets (if any)
+        - set filter_initialized = True
         """
         dm_idx = self.cmbDesignMethod.currentIndex()
         dm = self.cmbDesignMethod.itemData(dm_idx)
         if not isinstance(dm, str):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
-
-        # Check whether setDesignMethod has been called for the first time
-        # (= no filter object exists, AttributeError is raised). If not, check
-        # whether the design method has been changed. In both cases,
-        # a (new) filter object is instantiated
-        try: # has a filter object been instantiated yet?
-            if dm not in fb.filObj.name: # Yes (if no error occurs), check name
-                fb.filObj = self.ftb.objectWizzard(dm)
-        except AttributeError as e: # No, create a filter instance
-            fb.filObj = self.ftb.objectWizzard(dm)
-
+        print("InputFilter.setDesignMethod triggered:", dm)
+        
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
         # filter order method
@@ -315,10 +308,10 @@ class InputFilter(QtGui.QWidget):
 #                del w                       # not really needed?
 
             # Try to create "new" dyn. subwidgets:
-            if hasattr(fb.filObj, 'wdg'):
+            if hasattr(fb.fil_inst, 'wdg'):
                 try:
-                    if 'sf' in fb.filObj.wdg:
-                        a = getattr(fb.filObj, fb.filObj.wdg['sf'])
+                    if 'sf' in fb.fil_inst.wdg:
+                        a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
                         self.layHDynWdg.addWidget(a, stretch=1)
                         self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
                         self.frmDynWdg.setVisible(a != None)
@@ -331,12 +324,16 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = fb.fil[0]['dm']
 
+
+#    def closeEvent(self, event):
+#        exit()
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputFilter()
     form.show()
+    
 
     app.exec_()
 

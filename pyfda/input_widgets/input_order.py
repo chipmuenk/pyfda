@@ -25,6 +25,7 @@ class InputOrder(QtGui.QFrame):
         super(InputOrder, self).__init__()
         self.DEBUG = DEBUG
         self.dmLast = '' # design method from last call
+#        self.ffb = fb.Fb() # instantiate Fb object
         self.initUI()
 
 
@@ -115,7 +116,7 @@ class InputOrder(QtGui.QFrame):
             fb.fil[0]['fo'] = self.fo # and update fo method
 
         # update dynamic (i.e. defined in filter design routine) subwidgets
-        self._updateDynWidgets()
+        self._update_dyn_widgets()
 
         # Determine which subwidgets are __visible__
         self.lblOrder.setVisible('man' in foList)
@@ -165,7 +166,7 @@ class InputOrder(QtGui.QFrame):
         self.sigSpecsChanged.emit() # -> input_widgets
         
 
-    def _updateDynWidgets(self):
+    def _update_dyn_widgets(self):
         """
         Delete dynamically (i.e. within filter design routine) created subwidgets 
         and create new ones, depending on requirements of filter design algorithm
@@ -186,13 +187,15 @@ class InputOrder(QtGui.QFrame):
                 self.layHDynWdg.removeWidget(w)   # remove widget from layout
                 w.deleteLater()             # tell Qt to delete object when the
                                             # method has completed
-                del w                       # not really needed?
-    
+#                del w                       # not really needed?
+                
+            # Create instance of selected filter design method class
+#            self.fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
             # Try to create "new" dyn. subwidgets:
-            if hasattr(fb.filObj, 'wdg'):
+            if hasattr(fb.fil_inst, 'wdg'):
                 try:
-                    if 'fo' in fb.filObj.wdg:
-                        a = getattr(fb.filObj, fb.filObj.wdg['fo'])
+                    if 'fo' in fb.fil_inst.wdg:
+                        a = getattr(fb.fil_inst, fb.fil_inst.wdg['fo'])
                         self.layHDynWdg.addWidget(a)
                         self.layHDynWdg.setContentsMargins(0,0,0,0)
                         self.frmDynWdg.setVisible(a != None)

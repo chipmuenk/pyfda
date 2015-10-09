@@ -1,0 +1,6 @@
+Core dumps at:
+C:\Users\Christian Muenker\AppData\Local\Microsoft\Windows\WER
+
+Debug using WindowsDebugger All Programs -> Windows Kits -> Debugging Tools for Windows -> Windows Debugger
+
+http://www.codeproject.com/Articles/22245/Quick-start-to-using-WinDbg

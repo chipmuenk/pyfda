@@ -9,6 +9,7 @@ import sys, os
 from PyQt4 import QtGui, QtCore
 
 from pyfda import pyfda_rc
+from pyfda.filter_tree_builder import FilterTreeBuilder
 from .input_widgets import input_tab_widgets
 from .plot_widgets import plot_tab_widgets
 
@@ -25,12 +26,14 @@ class pyFDA(QtGui.QMainWindow):
     """
 
     def __init__(self):
-        self.DEBUG = True
+        self.DEBUG = False
         super(pyFDA, self).__init__()
+        # initialize the FilterTreeBuilder class with the filter directory and
+        # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
-#        self.ffr = FilterFileReader('Init.txt', 'filterDesign',
-#                                    comment_char = '#', DEBUG = DEBUG) #
-
+        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
+                                     comment_char='#', DEBUG=self.DEBUG)
+                                     
         self.initUI()
 
     def initUI(self):
@@ -131,8 +134,9 @@ class pyFDA(QtGui.QMainWindow):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
         self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.updateData)
-
-
+        # sigReadFilters: button has been pressed to rebuild filter tree:
+        self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
+#####        self.closeEvent.connect(self.aboutToQuit)
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
 
 
@@ -153,14 +157,40 @@ class pyFDA(QtGui.QMainWindow):
         """
         self.statusBar().showMessage(message)
 
+#------------------------------------------------------------------------------       
+    def quitEvent(self): # reimplement QMainWindow.closeEvent
+        pass
+    
+    def closeEvent(self, event): # reimplement QMainWindow.closeEvent
+        print("event", event)
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
+
+#    combine with:
+#    self.btnExit.clicked.connect(self.close)
+
 
 #------------------------------------------------------------------------------
 def main():
-    """ entry point for the pyfda application """
-    app = QtGui.QApplication(sys.argv)
+    """ 
+    entry point for the pyfda application 
+    see http://pyqt.sourceforge.net/Docs/PyQt4/qapplication.html :
+    
+    "For any GUI application using Qt, there is precisely *one* QApplication object,
+    no matter whether the application has 0, 1, 2 or more windows at any given time.
+    ...
+    Since the QApplication object does so much initialization, it must be created 
+    *before* any other objects related to the user interface are created."     
+    """
+    app = QtGui.QApplication(sys.argv) # instantiate QApplication object, passing ?
     app.setObjectName("TopApp")
 
-    _desktop = QtGui.QDesktopWidget()
+    _desktop = QtGui.QDesktopWidget() # test the available desktop resolution
     screen_h = _desktop.availableGeometry().height()
     screen_w = _desktop.availableGeometry().width()
     print("Available screen resolution:", screen_w, "x", screen_h)
@@ -178,6 +208,9 @@ def main():
 #                      pyfda_rc.css_rc['LineEdit'] +
  #                     pyfda_rc.css_rc['TabBar'])
     mainw = pyFDA()
+# http://stackoverflow.com/questions/5506781/pyqt4-application-on-windows-is-crashing-on-exit
+    app.setActiveWindow(mainw) #<---- This is what's probably missing
+
 
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         'images', 'icons', "Logo_LST_4.svg")
@@ -193,9 +226,11 @@ def main():
 #        if blabla:
 #        app.quit()
 #        
-#    app.lastWindowClosed.connect(fdaQuit)
+ #   app.lastWindowClosed.connect(mainw.closeEvent())
 
-    app.exec_()
+    #start the application's exec loop, return the exit code to the OS
+    sys.exit(app.exec_())
+#    app.exit()
 
 #------------------------------------------------------------------------------
 
