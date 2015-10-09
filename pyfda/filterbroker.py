@@ -137,8 +137,11 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'wdg_dyn':{'win':'hann'}
             }
 
-# This variable is globally visible
+# Instance of current filter design class (e.g. "cheby1")
 fil_inst = ""
+
+# Current method of current filter design class (e.g. cheby1.LPmin)
+fil_method = ""
 
 
 
@@ -152,8 +155,6 @@ class FilterFactory(object):
     """
     def __init__(self):
         #--------------------------------------
-        # Handle to current filter object
-#        self.fil_inst = ""
         pass
 
 
@@ -162,7 +163,7 @@ class FilterFactory(object):
         Try to create an instance of "dm" from the module stored in design_methods[dm].
         This dictionary has beed compiled by filter_tree_builder.py
     
-        E.g.  self.cur_filter = create_instance('cheby1')
+        E.g.  create_instance('cheby1')
     
         Parameters
         ----------
@@ -172,7 +173,7 @@ class FilterFactory(object):
     
         Returns
         -------
-        The instance
+        The class instance as global variable fil_inst
     
         """
    
@@ -193,7 +194,7 @@ class FilterFactory(object):
         # whether the design method has been changed. In both cases,
         # a (new) filter object is instantiated
         try: # has a filter object been instantiated yet?
-            if dm not in self.fil_inst.name: # Yes (if no error occurs), check name
+            if dm != self.fil_inst.name: # Yes (if no error occurs), check name
                 inst = getattr(dm_module, dm)
                 fil_inst = inst()
 
@@ -213,11 +214,39 @@ class FilterFactory(object):
 #        else:
         if not fil_inst:
             print('--- Filterbroker.create_instance() ---\n')
-            print("Unknown object '{0}', could not be created,".format(dm))
+            print("Unknown design method '{0}', could not be created,".format(dm))
         else:
             print("create_instance: dm =", dm)
-#        return fil_inst
-
+#------------------------------------------------------------------------------            
+    def call_method(self, method):
+        """
+        Call the method passed as string "method" of the filter class instantiated as 
+        the global fil_inst using 
+        
+        E.g.  call_method('LP'+'min')
+    
+        Parameters
+        ----------
+        method: string
+    
+            The name of the design method to be called (e.g. 'LPmin')
+    
+        Returns
+        -------
+        None
+    
+        """
+   
+        global fil_method  # this allows _WRITING_ to fil_method
+        # dynamically select the method given by  fil_inst.method 
+        getattr(fil_inst, fil[0]['rt'] + fil[0]['fo'])(fil[0])
+#        try:            
+#            fil_method = getattr(fil_inst, fil[0]['rt'] + fil[0]['fo'])(fil[0])
+#        except ImportError as e:
+#            pass
+        
+#------------------------------------------------------------------------------
+        
 # This instance of FilterFactory is globally visible!
 fil_factory = FilterFactory()
 
