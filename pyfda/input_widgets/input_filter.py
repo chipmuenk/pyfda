@@ -258,10 +258,7 @@ class InputFilter(QtGui.QWidget):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
         print("InputFilter.setDesignMethod triggered:", dm)
-
-        # Create / update global instance fb.fil_inst of selected filter dm class
-        fb.fil_factory.create_instance(dm)
-
+        
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
         # filter order method
