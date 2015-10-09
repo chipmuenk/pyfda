@@ -160,8 +160,8 @@ class FilterFactory(object):
 
     def create_instance(self, dm):
         """
-        Try to create an instance of "dm" from the module stored in design_methods[dm].
-        This dictionary has beed compiled by filter_tree_builder.py
+        Create an instance of "dm" from the module found in design_methods[dm].
+        This dictionary has been collected by filter_tree_builder.py
     
         E.g.  create_instance('cheby1')
     
@@ -202,26 +202,19 @@ class FilterFactory(object):
             inst = getattr(dm_module, dm)
             fil_inst = inst()
 
-#            self.fil_inst = inst()
-
-#        if fil_inst != None:# yes, the attribute exists, return the instance
-#            print('\n--- Filterbroker.create_instance() ---')
-#            print("dm_module = ", dm_module)
-#            print("dm = ", dm)
-#            print("Type(fil_inst = ", type(self.fil_inst))
-#            print("Name(fil_inst) = ", self.fil_inst().name)
-#            pass
-#        else:
         if not fil_inst:
-            print('--- Filterbroker.create_instance() ---\n')
-            print("Unknown design method '{0}', could not be created,".format(dm))
+            print('--- FilterFactory.create_instance() ---\n')
+            print("Unknown design class '{0}', could not be created,".format(dm))
         else:
-            print("create_instance: dm =", dm)
+            print("FilterFactory.create_instance(): dm =", dm)
 #------------------------------------------------------------------------------            
     def call_method(self, method):
         """
-        Call the method passed as string "method" of the filter class instantiated as 
-        the global fil_inst using 
+        Dynamically select, store and call the method passed as string "method" 
+        of the filter class instantiated as the global fil_inst. 
+
+        fil_method is a reference to the the selected filter design method and
+        can be called subsequently using fil_method(my_params)
         
         E.g.  call_method('LP'+'min')
     
@@ -239,11 +232,13 @@ class FilterFactory(object):
    
         global fil_method  # this allows _WRITING_ to fil_method
         # dynamically select the method given by  fil_inst.method 
-        getattr(fil_inst, fil[0]['rt'] + fil[0]['fo'])(fil[0])
-#        try:            
-#            fil_method = getattr(fil_inst, fil[0]['rt'] + fil[0]['fo'])(fil[0])
-#        except ImportError as e:
-#            pass
+        try:     
+#            getattr(fil_inst, fil[0]['rt'] + fil[0]['fo'])(fil[0])
+            fil_method = getattr(fil_inst, method) # 
+            fil_method(fil[0])
+        except ImportError as e:
+            print("call_method(): ", e)
+            pass
         
 #------------------------------------------------------------------------------
         
