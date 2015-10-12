@@ -127,6 +127,7 @@ class FilterTreeBuilder(object):
 
             print("FilterTreeBuilder: Filter list read, {0} entries found!\n"
                                                         .format(num_filters))
+            fp.close()
 
         except IOError as e:
             print("FATAL ERROR in 'FilterTreeBuilder.readFiltFile':\n"
@@ -186,7 +187,7 @@ class FilterTreeBuilder(object):
                 num_imports += 1
 
                 #  Now, module should be deleted to free memory (?)
-#                del sys.modules[module_name]
+                del sys.modules[module_name]
 
             except ImportError as e:
                 print(e)
