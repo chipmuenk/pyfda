@@ -211,7 +211,8 @@ class InputFilter(QtGui.QWidget):
 
         self.ft = str(self.cmbFilterType.currentText())
         fb.fil[0]['ft'] = self.ft
-        print("InputFilter.setFilterType triggered:", self.ft)
+        if self.DEBUG:
+            print("InputFilter.setFilterType triggered:", self.ft)
 
         # Rebuild design method combobox entries for new ft setting:
         # The combobox is populated with the "long name", the internal name
@@ -257,7 +258,8 @@ class InputFilter(QtGui.QWidget):
         if not isinstance(dm, str):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
-        print("InputFilter.setDesignMethod triggered:", dm)
+        if self.DEBUG:
+            print("InputFilter.setDesignMethod triggered:", dm)
         
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
