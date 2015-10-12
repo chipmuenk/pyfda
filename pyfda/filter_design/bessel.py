@@ -35,7 +35,7 @@ class bessel(object):
                     "<b><i>F<sub>SB</sub></i></b>&nbsp; (only an approximation).")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs'] # manual filter order
+        vis_man = ['fo','fspecs'] # manual filter order
         vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
@@ -55,13 +55,17 @@ class bessel(object):
         self.ft = 'IIR'
         self.rt = {
           "LP": {"man":{"par":[]},
-                 "min":{"par":['F_PB','F_SB']}},
+#                 "min":{"par":['F_PB','F_SB']}
+                 },
           "HP": {"man":{"par":[]},
-                 "min":{"par":['F_SB','F_PB']}},
+#                 "min":{"par":['F_SB','F_PB']}
+                 },
           "BP": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
+#                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}
+                 },
           "BS": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
+#                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}
+                 }
                  }
 
         self.info = """
@@ -78,9 +82,10 @@ passband constraints <> -3 dB.
 **Design routines:**
 
 ``scipy.signal.bessel()``
-``scipy.signal.buttord()``
-
         """
+#``scipy.signal.buttord()``
+
+
 
         self.info_doc = []
         self.info_doc.append('bessel()\n========')
