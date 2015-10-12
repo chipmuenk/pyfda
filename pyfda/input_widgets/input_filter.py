@@ -42,7 +42,6 @@ class InputFilter(QtGui.QWidget):
 
         self.filter_initialized = False
         self.dm_last = '' # design method from last call
-#        self.ffb = fb.Fb() # instantiate Fb object
 
         self.initUI()
 
@@ -172,7 +171,6 @@ class InputFilter(QtGui.QWidget):
         # itemData contains abbreviation ('LP')
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)
-        print("InputFilter.setResponseType triggered:", self.rt)
 
         # In Python 3, python objects are automatically converted to QVariant
         # when stored as "data" e.g. in a QComboBox and converted back when
@@ -260,11 +258,7 @@ class InputFilter(QtGui.QWidget):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
         print("InputFilter.setDesignMethod triggered:", dm)
-
-        # Create / update global instance fb.fil_inst of selected filter dm class
-#        self.fil_inst = self.ffb.create_instance(dm)
-        fb.fb.create_instance(dm)
-
+        
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
         # filter order method

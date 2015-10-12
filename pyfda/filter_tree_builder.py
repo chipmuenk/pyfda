@@ -12,47 +12,40 @@ import pyfda.filterbroker as fb
 
 
 class FilterTreeBuilder(object):
+    """
+    Construct a tree with all the filter combinations
+
+    Parameters
+    ----------
+
+    filt_dir: string
+        Name of the subdirectory containing the init-file and the
+        Python files to be read, needs to have __init__.py)
+
+    filt_list: string
+        Name of the init file
+
+    comment_char: char
+        comment character at the beginning of a comment line
+
+    DEBUG: Boolean
+        True/False, for printing verbose debug messages
+    """
 
     def __init__(self, filt_dir, filt_list, comment_char='#', DEBUG=False):
-        """
-        - Extract the names of all Python files in 'filt_dir'/'filt_list'
-          and write them to a list
-        - Try to import all python files and return a dict with all file names
-          and corresponding objects (the class needs to have the same name as
-          the file)
-        - Construct a tree with all the filter combinations
-
-        Parameters
-        ----------
-
-        filt_dir: string
-            Name of the subdirectory containing the init-file and the
-            Python files to be read, needs to have __init__.py)
-
-        filt_list: string
-            Name of the init file
-
-        comment_char: char
-            comment character at the beginning of a comment line
-
-        DEBUG: Boolean
-            True/False, for printing verbose debug messages
-        """
         cwd = os.path.dirname(os.path.abspath(__file__))
         self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list)
-        
+
         if DEBUG:
             print(self.filt_dir_file)
         self.DEBUG = DEBUG
         self.comment_char = comment_char
         self.filt_dir = filt_dir
-        
-        self.ffb = fb.Fb() # instantiate Fb object
 
-        self.initFilters()
+        self.init_filters()
 
 #==============================================================================
-    def initFilters(self):
+    def init_filters(self):
         """
         - Extract the names of all Python files in the file specified during
           instantiation (self.filt_dir_file) and write them to a list
@@ -64,19 +57,19 @@ class FilterTreeBuilder(object):
         This method can also be called when the main app runs to re-read the
         filter directory
         """
-        # Scan filt_list.txt for python file names and extract them
-        self.readFiltFile()
+        # Scan filter_list.txt for python file names and extract them
+        self.read_filt_file()
 
-        # Try to import all filter modules in filtFileNames, store names and
+        # Try to import all filter modules found in filter_list, store names and
         # modules in the dict self.design_methods as {filterName:filterModule}:
-        self.dynFiltImport()
+        self.dyn_filt_import()
 
         # Build a hierarchical dict fb.fil_tree with all valid filter designs
         # and response types:
-        self.buildFilTree()
+        self.build_fil_tree()
 
 #==============================================================================
-    def readFiltFile(self):
+    def read_filt_file(self):
         """
         Extract all file names = class names from self.filt_dir_file:
         - Lines that don't begin with commentCh are stripped from Newline
@@ -107,45 +100,44 @@ class FilterTreeBuilder(object):
             # Try to open filt_dir_file in read mode:
  #           fp = open(self.initDirFile,'rU', 1) # 1 = line buffered
             fp = codecs.open(self.filt_dir_file, 'rU', encoding='utf-8')
-            curLine = fp.readline()
+            cur_line = fp.readline()
 
-            while curLine: # read until currentLine is empty (EOF reached)
+            while cur_line: # read until currentLine is empty (EOF reached)
                 # remove white space and Newline characters at beginning and end:
-#                curLine = curLine.encode('UTF-8')
-                curLine = curLine.strip(' \n')
+#                cur_line = cur_line.encode('UTF-8')
+                cur_line = cur_line.strip(' \n')
                 # Only process line if it is longer than 1 character
-                if len(curLine) > 1:
+                if len(cur_line) > 1:
                     # Does current line begin with the comment character?
-                    if curLine[0] == self.comment_char:
+                    if cur_line[0] == self.comment_char:
                         # yes, append line to list filt_list_comments :
-                            filt_list_comments.append((curLine[1:]))
+                        filt_list_comments.append((cur_line[1:]))
                     # No, this is not a comment line
                     else:
-                        # Is '.py' contained in curLine? Starting at which pos?
-                        suffixPos = curLine.find(".py")
-                        if suffixPos > 0:
+                        # Is '.py' contained in cur_line? Starting at which pos?
+                        suffix_pos = cur_line.find(".py")
+                        if suffix_pos > 0:
                             # Yes, strip '.py' and all characters after,
                             # append the file name to the lines list,
                             # otherwise discard the line
-                            self.filt_list_names.append(curLine[0:suffixPos])
+                            self.filt_list_names.append(cur_line[0:suffix_pos])
                             num_filters += 1
 
-                curLine = fp.readline() # read next line
+                cur_line = fp.readline() # read next line
 
             print("FilterTreeBuilder: Filter list read, {0} entries found!\n"
                                                         .format(num_filters))
 
         except IOError as e:
-            print("--- FilterTreeBuilder.readFiltFile ---")
-            print("Init file {0} could not be found.".format(self.filt_dir_file))
-            if self.DEBUG:
-                print("I/O error({0}): {1}".format(e.errno, e.strerror))
+            print("FATAL ERROR in 'FilterTreeBuilder.readFiltFile':\n"
+                  "Init file {0} could not be found.".format(self.filt_dir_file))
+            print("I/O Error({0}): {1}".format(e.errno, e.strerror))
 
             filt_list_comments = self.filt_list_names = []
 
 
 #==============================================================================
-    def dynFiltImport(self):
+    def dyn_filt_import(self):
         """
         Try to import all modules / classes found by readFiltFile() from
         self.filt_dir (= subdirectory with filter design algorithms + __init__.py).
@@ -168,18 +160,16 @@ class FilterTreeBuilder(object):
         Returns
         -------
 
-        self.design_methods: dict  containing entries (for SUCCESSFUL imports)
+        None, results are stored in
 
-            {
-             file name without .py (= class names), e.g. 'cheby1' in
-            :
-             full module name, e.g. <module 'filter_design.cheby1'> from
-              'd:\\ ... \\pyfda\\filter_design\\cheby1.py"
-            }
+        fb.design_methods: dict  containing entries (for SUCCESSFUL imports)
+
+            {file name without .py (= class name):full module name}
+             e.g. {"cheby1":"pyfda.filter_design.cheby1"}
 
         """
-        fb.design_methods = {} # dict with filter name and full module name
-        num_imports = 0   # number of successful filter imports
+        fb.design_methods = {} # clear global dict
+        num_imports = 0   # initialize number of successful filter imports
 
         for dm in self.filt_list_names:
             try:
@@ -190,20 +180,17 @@ class FilterTreeBuilder(object):
                 importlib.import_module(module_name)
 
                 # when successful, add the filename without '.py' and the
-                # full module name to the dict 'imports' which
-                # looks e.g. like that:
-
-#                {'cheby1': 'pyfda.filter_design.cheby1'}
+                # full module name to the dict 'imports', e.g.
+                #      {'cheby1': 'pyfda.filter_design.cheby1'}
                 fb.design_methods.update({dm:module_name})
                 num_imports += 1
 
-
-              #  Now, modules should be deleted from memory (?)
+                #  Now, module should be deleted to free memory (?)
 #                del sys.modules[module_name]
 
             except ImportError as e:
                 print(e)
-                print("Error in 'FilterTreeBuilder.dynFiltImport()':")
+                print("ERROR in 'FilterTreeBuilder.dyn_filt_import()':")
                 print("Filter design '%s' could not be imported."%dm)
 
         print("FilterTreeBuilder: Imported successfully the following "
@@ -213,7 +200,7 @@ class FilterTreeBuilder(object):
         print("\n")
 
 #==============================================================================
-    def buildFilTree(self):
+    def build_fil_tree(self):
         """
         Read attributes (ft, rt, rt:fo) from all design method (dm) classes
         listed in the global dict fb.gD['imports']. Attributes are stored in
@@ -259,12 +246,12 @@ class FilterTreeBuilder(object):
         fb.dm_names = {}
         for dm in fb.design_methods:  # iterate over keys in designMethods (= dm)
 
-#            self.ffb.create_instance(dm) # instantiate object of filter class dm
-            fb.fb.create_instance(dm) # instantiate / update global object of filter class dm
+            # instantiate / update global instance of filter class dm
+            fb.fil_factory.create_fil_inst(dm)
             try:
                 fb.dm_names.update(fb.fil_inst.name)
             except AttributeError:
-                print('Warning: Skipping design method "{0}" due to missing attribute "name".'.format(dm))
+                print('WARNING: Skipping design method "{0}" due to missing attribute "name".'.format(dm))
                 continue # continue with next entry in design_methods
             ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
@@ -326,15 +313,12 @@ if __name__ == "__main__":
 
     filt_file_name = "filter_list.txt"
     filt_dir = "filter_design"
-    comment_char  = '#'
+    comment_char = '#'
     DEBUG = False
 
     # Create a new FilterFileReader instance & initialize it
     myTreeBuilder = FilterTreeBuilder(filt_dir, filt_file_name, comment_char, DEBUG)
 
     print("\n===== Start Test ====")
-    for name in myTreeBuilder.design_methods:
-        cur_filter = myTreeBuilder.objectWizzard(name)
-        print('cur_filter', cur_filter)
-    filterTree = myTreeBuilder.buildFilTree()
+    filterTree = myTreeBuilder.build_fil_tree()
     print('fb.fil_tree = ', fb.fil_tree)

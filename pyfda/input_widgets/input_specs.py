@@ -268,12 +268,18 @@ class InputSpecs(QtGui.QWidget):
 
         try:
             print("\n---- InputSpecs.startDesignFilt ----")
-#            fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
             print(type(fb.fil_inst))
-            getattr(fb.fil_inst, fb.fil[0]['rt'] + fb.fil[0]['fo'])(fb.fil[0])
-
-            # The filter design routines write coeffs, poles/zeros etc. back to
-            # the global filter dict
+ 
+            # Create / update global instance fb.fil_inst of selected filter dm class
+            err1 = fb.fil_factory.create_fil_inst(fb.fil[0]['dm'])
+            # call the method specified as a string in the argument of the
+            # filter instance defined previously
+            err2 = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
+            # The called method writes coeffs, poles/zeros etc. back to
+            # the global filter dict fb.fil[0]
+            
+            if err1 > 0  or err2 > 0:
+                raise AttributeError("Unknown design class or method.") 
 
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm

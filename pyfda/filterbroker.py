@@ -10,8 +10,9 @@ Module variables are global like class variables.
 Author: Christian Muenker
 """
 
-from __future__ import division, unicode_literals
+from __future__ import division, unicode_literals, print_function, absolute_import
 import importlib
+import six
 
 
 
@@ -53,18 +54,18 @@ fil_tree = {
             {'equiripple':
                 {'man': {"par":['N', 'A_PB', 'F_PB'],
                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                 'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
                          "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
          'IIR':
              {'cheby1':
                  {'man': {"par":['N', 'A_PB', 'F_PB'],
                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                  'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
                           "vis":vis_min, "dis":dis_min, "msg":msg_min}},
               'cheby2':
                   {'man': {"par":['N', 'A_SB', 'F_SB'],
                            "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                   'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                   'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
                            "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
     'BP':
         {'FIR':
@@ -92,16 +93,16 @@ fil_tree = {
                  {'man': {"par":['N', 'A_PB', 'F_PB'],
                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
                   'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'], 
-                          "vis":vis_min, "dis":dis_min, "msg":msg_min},
+                          "vis":vis_min, "dis":dis_min, "msg":msg_min}},
              'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB'],
                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}
                         }
-                }
             }
         }
     }
+
 
 
 # -----------------------------------------------------------------------------
@@ -137,28 +138,34 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'wdg_dyn':{'win':'hann'}
             }
 
-# This variable is globally visible
+# Instance of current filter design class (e.g. "cheby1")
 fil_inst = ""
+
+# Current method of current filter design class (e.g. cheby1.LPmin)
+fil_method = ""
 
 
 
 # see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 # see http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
-class Fb(object):
+class FilterFactory(object):
+    """
+    This class implements a filter facory that (re)creates the globally accessible
+    filter instance "fil_inst" from module path and class name, passed as strings.
+    """
     def __init__(self):
         #--------------------------------------
-        # Handle to current filter object
-#        self.fil_inst = ""
         pass
 
 
-    def create_instance(self, dm):
+    def create_fil_inst(self, dm):
         """
-        Try to create an instance of "dm" from the module stored in design_methods[dm].
-        This dictionary has beed compiled by filter_tree_builder.py
-    
-        E.g.  self.cur_filter = create_instance('cheby1')
+        Create an instance of "dm" from the module found in design_methods[dm].
+        This dictionary has been collected by filter_tree_builder.py. 
+        
+        The instance can then be referenced as the global 'fil_inst'.
+
     
         Parameters
         ----------
@@ -168,55 +175,162 @@ class Fb(object):
     
         Returns
         -------
-        The instance
+        err_code: integer
+            -2: new filter instance was created sucessfully
+            -1: filter instance was created for the first time
+             0: filter instance exists already, no re-instantiation necessary
+             1: filter class (module) could not be imported
+             2: filter class was imported, but could not be instantiated..
+        
+        Example
+        -------
+            
+        >>> create_instance('cheby1')
+        >>> fil_inst.LPmin(fil[0])
+        
+        The example first creates an instance of the filter class 'cheby1' and 
+        then performs the actual filter design by calling the method 'LPmin',
+        passing the global filter dictionary fil[0] as the parameter.
     
         """
    
-        global fil_inst  # only required when _WRITING_ to my_inst, reading tries
-                        # tries going up the scope 
-
-        print("create_instance: dm =", dm)
+        global fil_inst  # this allows _WRITING_ to fil_inst
+        err_code = 0
         
         try:
             # Try to dynamically import the module dm from package 'filter_design'
             dm_module = importlib.import_module(design_methods[dm])
 
-    
-        except ImportError as e:
+        except (ImportError, KeyError) as e:
+            # Filter class dm is not in dictionary 'design_methods', 
+            # i.e. it was not found by FilterTreeBuilder.
             print(e)
-            print("Error in 'FilterTreeBuilder.dynFiltImport()':")
-            print("Filter design '%s' could not be imported."%dm)
+            print("\nERROR in 'FilterFactory.create_fil_inst()':\n"
+                  "Filter design class '%s' could not be imported."%dm)
+            err_code = 1
+            return err_code
             
-        # Check whether setDesignMethod has been called for the first time
-        # (= no filter object exists, AttributeError is raised). If not, check
-        # whether the design method has been changed. In both cases,
-        # a (new) filter object is instantiated
-        try: # has a filter object been instantiated yet?
-            if dm not in self.fil_inst.name: # Yes (if no error occurs), check name
-                inst = getattr(dm_module, dm)
+        # Check whether create_fil_inst is called for the first time
+        #    (= no filter object exists, AttributeError is raised). 
+        # If not, check whether the design method has been changed. 
+        # In both cases, a (new) filter object is instantiated.
+
+        try: # has a filter object been instantiated yet?           
+            if dm != fil_inst.name: # Yes (if no error occurs), check name
+                inst = getattr(dm_module, dm, None)
                 fil_inst = inst()
+                err_code = -2 # design method has been changed
 
         except AttributeError as e: # No, create a filter instance
-            inst = getattr(dm_module, dm)
+            inst = getattr(dm_module, dm, None)
             fil_inst = inst()
+            err_code = -1 # filter instance has been created for the first time
 
-#            self.fil_inst = inst()
+        if not inst:
+            print("\nERROR in 'FilterFactory.create_fil_inst()':\n")
+            print("Unknown design class '{0}', could not be created.".format(dm))
+            err_code = 2
+        else:
+            print("FilterFactory.create_fil_inst(): created", dm)
+        
+        return err_code
 
-#        if fil_inst != None:# yes, the attribute exists, return the instance
-#            print('\n--- Filterbroker.create_instance() ---')
-#            print("dm_module = ", dm_module)
-#            print("dm = ", dm)
-#            print("Type(fil_inst = ", type(self.fil_inst))
-#            print("Name(fil_inst) = ", self.fil_inst().name)
-#            pass
-#        else:
-        if not fil_inst:
-            print('--- Filterbroker.create_instance() ---\n')
-            print("Unknown object '{0}', could not be created,".format(dm))
-        return fil_inst
+#------------------------------------------------------------------------------      
+    def create_fil_method(self, method):
+        """
+        Create a global reference `fil_method` to the method passed as string `method`
+        of the filter class instantiated before as `fil_inst` (global).         . 
 
-# This instance of Fb is globally visible!
-fb = Fb()
+    
+        Parameters
+        ----------
+        method: string
+    
+            The name of the design method to be constructed (e.g. 'LPmin')
+    
+        Returns
+        -------
+        err_code: integer
+             0: filter method exists and is callable
+             1: filter does not exist in class 
+             2: filter class was imported, but could not be instantiated..
+        
+        Example
+        -------
+            
+        >>> create_instance('cheby1')
+        >>> fil_inst.LPmin(fil[0])
+        
+        The example first creates an instance of the filter class 'cheby1' and 
+        then performs the actual filter design by calling the method 'LPmin',
+        passing the global filter dictionary fil[0] as the parameter.
+    
+        """
+        global fil_method  # this allows _WRITING_ to fil_method
+        # test whether 'method' is a string or unicode type under Py2 and Py3
+        if not isinstance(method, six.string_types):
+            err_string = "Method '{0}' is not a string.".format(method)
+            err_code = 3
+        else:
+            #------------------------------------------------------------------
+            fil_method = getattr(fil_inst, method, None) # returns None if attribute doesn't exist
+            #------------------------------------------------------------------
+            if not fil_method:
+                err_string = "Method '{0}' doesn't exist in class '{1}'.".format(method, fil_inst)
+                err_code = 1
+    
+            elif not callable(fil_method):
+                err_string = "Method '{0}' of class '{1}' is not callable.".format(method, fil_inst)
+                err_code = 2
+            else:
+                err_code = 0
+                
+        if err_code > 0:
+                print("\nERROR in 'FilterFactory.select_fil_method()':\n")
+                print(err_string)
+            
+        return err_code
+        
+#------------------------------------------------------------------------------            
+    def call_fil_method(self, method):
+        """
+        Dynamically select, store and call the method passed as string "method" 
+        of the filter class instantiated as the global fil_inst. 
+
+        fil_method is a reference to the the selected filter design method and
+        can be called subsequently using fil_method(my_params)
+        
+        E.g.  call_method('LP'+'min')
+    
+        Parameters
+        ----------
+        method: string
+    
+            The name of the design method to be called (e.g. 'LPmin')
+    
+        Returns
+        -------
+        Error code
+    
+        """
+   
+        global fil_method   # this allows _WRITING_ to fil_method
+        # dynamically select the method given by  fil_inst.method:
+        err_code = self.create_fil_method(method)
+        fil_method(fil[0])
+#        try:     
+# #           fil_method = getattr(fil_inst, method) # 
+#            fil_method(fil[0])
+#            err_code = 0
+#        except AttributeError as e: 
+#            print("\nERROR in FilterFactory.call_method():\n", e)
+#            err_code = 1
+        return err_code
+        
+#------------------------------------------------------------------------------
+        
+# This instance of FilterFactory is globally visible!
+fil_factory = FilterFactory()
 
 ###############################################################################
 """
@@ -225,57 +339,22 @@ http://stackoverflow.com/questions/13034496/using-global-variables-between-files
 http://stackoverflow.com/questions/1977362/how-to-create-module-wide-variables-in-python
 http://pymotw.com/2/articles/data_persistence.html
 
-Alternative approaches for data persistence
+Alternative approaches for data persistence: Module shelve or pickleshare
 
-shelve
-------
-a persistent dictionary for reading and writing.
-This would get rid of the fb global dictionary
-
-
-import shelve
-
-### write to database:
-s = shelve.open('test_shelf.fb')
-try:
-    s['key1'] = { 'int': 10, 'float':9.5, 'string':'Sample data' }
-finally:
-    s.close()
-
-### read from database:
-s = shelve.open('test_shelf.fb')
-# s = shelve.open('test_shelf.fb', flag='r') # read-only
-try:
-    existing = s['key1']
-finally:
-    s.close()
-
-print(existing)
-
-### catch changes to objects, store in in-memory cache and write-back upon close
-s = shelve.open('test_shelf.fb', writeback=True)
-try:
-    print s['key1']
-    s['key1']['new_value'] = 'this was not here before'
-    print s['key1']
-finally:
-    s.close()
-
-
-===============================================================================
-pickleshare
------------
-https://github.com/pickleshare/pickleshare
-PickleShare - a small 'shelve' like datastore with concurrency support
-Concurrency is possible because the values are stored in separate files. 
-Hence the "database" is a directory where all files are governed by PickleShare.
-
-from pickleshare import *
-db = PickleShareDB('~/testpickleshare')
-db.clear()
-print "Should be empty:",db.items()
-db['hello'] = 15
-db['aku ankka'] = [1,2,313]
-db['paths/are/ok/key'] = [1,(5,46)]
-print db.keys()
 """
+if __name__ == '__main__':
+    print("design_methods\n", design_methods)
+    print(fil_factory.create_fil_inst("aaa")) # class doesnt exist
+    print(fil_factory.create_fil_inst("cheby1")) # first time inst.
+    print(fil_factory.create_fil_inst("cheby1")) # second time inst.
+    print(fil_factory.create_fil_inst("cheby2")) # new class
+    print(fil_factory.create_fil_inst("bbb")) # class doesnt exist
+    
+    
+    print(fil_factory.create_fil_method("LPman"))
+    print(fil_factory.create_fil_method("LPmax")) # doesn't exist
+    print(fil_factory.create_fil_method(1)) # not a string
+    print(fil_factory.create_fil_method("LPmin")) # not a string
+    
+    print(fil_factory.call_method("LPmin")) # 
+    
