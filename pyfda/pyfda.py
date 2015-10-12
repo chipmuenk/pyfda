@@ -162,7 +162,6 @@ class pyFDA(QtGui.QMainWindow):
         pass
     
     def closeEvent(self, event): # reimplement QMainWindow.closeEvent
-        print("event", event)
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
 
