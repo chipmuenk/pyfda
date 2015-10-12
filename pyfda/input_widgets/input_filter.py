@@ -138,12 +138,12 @@ class InputFilter(QtGui.QWidget):
         # SIGNALS & SLOTS
         #------------------------------------------------------------
         # Connect comboBoxes and setters:
-        self.cmbResponseType.activated.connect(self.setResponseType) # 'LP'
-        self.cmbResponseType.activated.connect(self.sigSpecsChanged.emit)
-        self.cmbFilterType.activated.connect(self.setFilterType) #'IIR'
-        self.cmbFilterType.activated.connect(self.sigSpecsChanged.emit)
-        self.cmbDesignMethod.activated.connect(self.setDesignMethod) #'cheby1'
-        self.cmbDesignMethod.activated.connect(self.sigSpecsChanged.emit)
+        self.cmbResponseType.currentIndexChanged.connect(self.setResponseType) # 'LP'
+        self.cmbResponseType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+        self.cmbFilterType.currentIndexChanged.connect(self.setFilterType) #'IIR'
+        self.cmbFilterType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+        self.cmbDesignMethod.currentIndexChanged.connect(self.setDesignMethod) #'cheby1'
+        self.cmbDesignMethod.currentIndexChanged.connect(self.sigSpecsChanged.emit)
         #------------------------------------------------------------
 
 
@@ -184,7 +184,9 @@ class InputFilter(QtGui.QWidget):
         # Get list of available filter types for new rt
         ft_list = list(fb.fil_tree[self.rt].keys()) # explicit list() needed for Py3
 
+        #---------------------------------------------------------------
         # Rebuild filter type combobox entries for new rt setting
+        self.cmbFilterType.blockSignals(True) # don't fire when changed programmatically
         self.cmbFilterType.clear()
         self.cmbFilterType.addItems(ft_list)
 
@@ -196,6 +198,9 @@ class InputFilter(QtGui.QWidget):
         else:
             self.cmbFilterType.setCurrentIndex(0)     # no, set index 0
 
+        self.cmbFilterType.blockSignals(False)
+        #---------------------------------------------------------------
+        
         self.setFilterType()
 
 #------------------------------------------------------------------------------
@@ -203,20 +208,24 @@ class InputFilter(QtGui.QWidget):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
         - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
-        - (re)construct design method combo,
-        adding displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
+        - (re)construct design method combo, adding
+          displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
         # cmbBox.currentText() has full text ('IIR'),
-        # itemData only abbreviation ('IIR') which is the same in this case
+        # cmbBox.itemData only abbreviation ('IIR') which is the same here
 
         self.ft = str(self.cmbFilterType.currentText())
         fb.fil[0]['ft'] = self.ft
         if self.DEBUG:
             print("InputFilter.setFilterType triggered:", self.ft)
 
-        # Rebuild design method combobox entries for new ft setting:
-        # The combobox is populated with the "long name", the internal name
-        # is stored in comboBox.itemData
+        #---------------------------------------------------------------
+        # Get all available design methods for new ft from fil_tree and
+        # - Collect them in list dm_list
+        # - Rebuild design method combobox entries for new ft setting:
+        #    The combobox is populated with the "long name", 
+        #    the internal name is stored in comboBox.itemData
+        self.cmbDesignMethod.blockSignals(True)
         self.cmbDesignMethod.clear()
         dm_list = []
 
@@ -224,8 +233,6 @@ class InputFilter(QtGui.QWidget):
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
             dm_list.append(dm)
 
-        # get list of available design methods for new ft
-#        dm_list = fb.fil_tree[self.rt][self.ft].keys()
         if self.DEBUG:
             print("dm_list", dm_list)
             print(fb.fil[0]['dm'])
@@ -238,8 +245,10 @@ class InputFilter(QtGui.QWidget):
             if self.DEBUG: 
                 print("dm_idx", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx)
+            self.cmbDesignMethod.blockSignals(False)
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
+            self.cmbDesignMethod.blockSignals(False)
 
             self.setDesignMethod()
 
