@@ -154,9 +154,9 @@ class FilterFactory(object):
     This class implements a filter facory that (re)creates the globally accessible
     filter instance "fil_inst" from module path and class name, passed as strings.
     """
-    def __init__(self):
+    def __init__(self, DEBUG = False):
         #--------------------------------------
-        pass
+        self.DEBUG = DEBUG
 
 
     def create_fil_inst(self, dm):
@@ -230,7 +230,7 @@ class FilterFactory(object):
             print("\nERROR in 'FilterFactory.create_fil_inst()':\n")
             print("Unknown design class '{0}', could not be created.".format(dm))
             err_code = 2
-        else:
+        elif self.DEBUG == True:
             print("FilterFactory.create_fil_inst(): created", dm)
         
         return err_code
@@ -266,7 +266,8 @@ class FilterFactory(object):
         passing the global filter dictionary fil[0] as the parameter.
     
         """
-        global fil_method  # this allows _WRITING_ to fil_method
+        global fil_method # this allows _WRITING_ to fil_method
+        fil_method = None
         # test whether 'method' is a string or unicode type under Py2 and Py3
         if not isinstance(method, six.string_types):
             err_string = "Method '{0}' is not a string.".format(method)
@@ -286,7 +287,7 @@ class FilterFactory(object):
                 err_code = 0
                 
         if err_code > 0:
-                print("\nERROR in 'FilterFactory.select_fil_method()':\n")
+                print("\nERROR in 'FilterFactory.select_fil_method()':")
                 print(err_string)
             
         return err_code
@@ -294,11 +295,10 @@ class FilterFactory(object):
 #------------------------------------------------------------------------------            
     def call_fil_method(self, method):
         """
-        Dynamically select, store and call the method passed as string "method" 
-        of the filter class instantiated as the global fil_inst. 
-
-        fil_method is a reference to the the selected filter design method and
-        can be called subsequently using fil_method(my_params)
+        Dynamically select and call the method passed as string "method" 
+        of the filter class instantiated as the global `fil_inst`. A reference
+        to the selected filter design method is stored as `fil_method` and can
+        be called subsequently using `fil_method(my_params)`.
         
         E.g.  call_method('LP'+'min')
     
@@ -317,14 +317,8 @@ class FilterFactory(object):
         global fil_method   # this allows _WRITING_ to fil_method
         # dynamically select the method given by  fil_inst.method:
         err_code = self.create_fil_method(method)
-        fil_method(fil[0])
-#        try:     
-# #           fil_method = getattr(fil_inst, method) # 
-#            fil_method(fil[0])
-#            err_code = 0
-#        except AttributeError as e: 
-#            print("\nERROR in FilterFactory.call_method():\n", e)
-#            err_code = 1
+        if err_code < 1:
+            fil_method(fil[0])
         return err_code
         
 #------------------------------------------------------------------------------
@@ -354,7 +348,8 @@ if __name__ == '__main__':
     print(fil_factory.create_fil_method("LPman"))
     print(fil_factory.create_fil_method("LPmax")) # doesn't exist
     print(fil_factory.create_fil_method(1)) # not a string
-    print(fil_factory.create_fil_method("LPmin")) # not a string
+    print(fil_factory.create_fil_method("LPmin")) # changed method
     
-    print(fil_factory.call_method("LPmin")) # 
+    print(fil_factory.call_fil_method("LPmin"))
+    print(fil_factory.call_fil_method("LP"))    # 
     
