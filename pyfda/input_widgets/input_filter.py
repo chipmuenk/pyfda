@@ -267,6 +267,9 @@ class InputFilter(QtGui.QWidget):
         if not isinstance(dm, str):
             dm = str(dm.toString()) # see explanation in setResponseType()
         fb.fil[0]['dm'] = dm
+        #-----
+        err = fb.fil_factory.create_fil_inst(dm)
+        #-----
         if self.DEBUG:
             print("InputFilter.setDesignMethod triggered:", dm)
         
