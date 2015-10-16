@@ -236,8 +236,7 @@ class InputCoeffs(QtGui.QWidget):
         if self.DEBUG:
             print("=====================\nInputCoeffs.save_coeffs")
         coeffs = []
-        num_rows, num_cols = self.tblCoeff.rowCount(),\
-                                        self.tblCoeff.columnCount()
+        num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
         if self.DEBUG: print("Tbl rows /  cols:", num_rows, num_cols)
 #        if num_cols > 1: # IIR
         for col in range(num_cols):
@@ -250,7 +249,10 @@ class InputCoeffs(QtGui.QWidget):
                 else:
                     rows.append(0.)
 #                    rows.append(float(item.text()) if item else 0.)
-            coeffs.append(rows)
+            if num_cols == 1:
+                coeffs = rows
+            else:
+                coeffs.append(rows) # type: list num_cols x num_rows
 
         fb.fil[0]["N"] = num_rows - 1
         save_fil(fb.fil[0], coeffs, 'ba', __name__)
@@ -267,11 +269,19 @@ class InputCoeffs(QtGui.QWidget):
         Create table from filter coeff dict
         """
         coeffs = fb.fil[0]['ba']
+        if fb.fil[0]['ft'] == 'FIR':
+            num_cols = 1
+            self.tblCoeff.setColumnCount(1)
+            self.tblCoeff.setHorizontalHeaderLabels(["b"])
+        else:
+            num_cols = 2
+            self.tblCoeff.setColumnCount(2)
+            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+            
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
-
         self.tblCoeff.setRowCount(max(np.shape(coeffs)))
-        self.tblCoeff.setColumnCount(2)
-        self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+        self.tblCoeff.setColumnCount(num_cols)
+
 
         if self.DEBUG:
             print("=====================\nInputCoeffs.show_coeffs")
@@ -280,7 +290,7 @@ class InputCoeffs(QtGui.QWidget):
             print ("len", len(coeffs))
             print("ndim", np.ndim(coeffs))
 
-        for col in range(2):
+        for col in range(num_cols):
             for row in range(np.shape(coeffs)[1]):
                 item = self.tblCoeff.item(row, col)
                 # copy content of zpk to corresponding table field, rounding 
