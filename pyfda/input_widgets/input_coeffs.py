@@ -270,7 +270,8 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 
         self.tblCoeff.setRowCount(max(np.shape(coeffs)))
-        self.tblCoeff.setColumnCount(2) 
+        self.tblCoeff.setColumnCount(2)
+        self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
 
         if self.DEBUG:
             print("=====================\nInputCoeffs.showCoeffs")
@@ -279,7 +280,6 @@ class InputCoeffs(QtGui.QWidget):
             print ("len", len(coeffs))
             print("ndim", np.ndim(coeffs))
 
-        self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
         for col in range(2):
             for row in range(np.shape(coeffs)[1]):
                 item = self.tblCoeff.item(row, col)
@@ -348,6 +348,12 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setRowCount(3)
 
         num_cols = self.tblCoeff.columnCount()
+        
+        if num_cols < 2:
+            self.tblCoeff.setHorizontalHeaderLabels(["b"])
+        else:
+            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+        
         for row in range(3):
             for col in range(num_cols):
                 if row == 0:
