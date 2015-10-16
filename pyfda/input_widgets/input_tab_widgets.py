@@ -134,7 +134,7 @@ class InputWidgets(QtGui.QWidget):
         self.inputSpecs.color_design_button("ok")      
         self.inputSpecs.loadAll()
         self.inputInfo.showInfo()
-        self.inputCoeffs.showCoeffs()
+        self.inputCoeffs.show_coeffs()
         self.inputPZ.showZPK()
 
         self.sigFilterDesigned.emit() # pyFDA -> plot_all.updateAll
