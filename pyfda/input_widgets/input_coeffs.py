@@ -204,37 +204,37 @@ class InputCoeffs(QtGui.QWidget):
         layVMain.addWidget(self.tblCoeff)
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
-        self.showCoeffs() # initialize table with default values from fb
+        self.show_coeffs() # initialize table with default values from fb
 
         # ============== Signals & Slots ================================
-#        self.tblCoeff.itemEntered.connect(self.saveCoeffs) # nothing happens
-#        self.tblCoeff.itemActivated.connect(self.saveCoeffs) # nothing happens
+#        self.tblCoeff.itemEntered.connect(self.save_coeffs) # nothing happens
+#        self.tblCoeff.itemActivated.connect(self.save_coeffs) # nothing happens
         # this works but fires multiple times _and_ fires every time cell is
         # changed by program as well!
-#        self.tblCoeff.itemChanged.connect(self.saveCoeffs)
-#        self.tblCoeff.clicked.connect(self.saveCoeffs)
-#        self.tblCoeff.selectionModel().currentChanged.connect(self.saveCoeffs)
+#        self.tblCoeff.itemChanged.connect(self.save_coeffs)
+#        self.tblCoeff.clicked.connect(self.save_coeffs)
+#        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
 
-        self.chkCoeffList.clicked.connect(self.showCoeffs)
-        self.butLoad.clicked.connect(self.showCoeffs)
+        self.chkCoeffList.clicked.connect(self.show_coeffs)
+        self.butLoad.clicked.connect(self.show_coeffs)
 
-        self.butSave.clicked.connect(self.saveCoeffs)
+        self.butSave.clicked.connect(self.save_coeffs)
 
-        self.butDelRow.clicked.connect(self.deleteRows)
-        self.butAddRow.clicked.connect(self.addRows)
+        self.butDelRow.clicked.connect(self.delete_rows)
+        self.butAddRow.clicked.connect(self.add_rows)
 
-        self.butClear.clicked.connect(self.clearTable)
-        self.butSetZero.clicked.connect(self.setCoeffsZero)
-        self.butQuant.clicked.connect(self.quantCoeffs)
+        self.butClear.clicked.connect(self.clear_table)
+        self.butSetZero.clicked.connect(self.set_coeffs_zero)
+        self.butQuant.clicked.connect(self.quant_coeffs)
 
-    def saveCoeffs(self):
+    def save_coeffs(self):
         """
         Read out coefficients table and save the values to filter 'coeffs'
         and 'zpk' dicts. Is called when clicking the <Save> button, triggers
         a recalculation and replot of all plot widgets.
         """
         if self.DEBUG:
-            print("=====================\nInputCoeffs.saveCoeffs")
+            print("=====================\nInputCoeffs.save_coeffs")
         coeffs = []
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
@@ -262,7 +262,7 @@ class InputCoeffs(QtGui.QWidget):
 
         self.sigFilterDesigned.emit()  # -> input_widgets -> pyFDA -> pltWidgets.updateAll()
 
-    def showCoeffs(self):
+    def show_coeffs(self):
         """
         Create table from filter coeff dict
         """
@@ -274,7 +274,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
 
         if self.DEBUG:
-            print("=====================\nInputCoeffs.showCoeffs")
+            print("=====================\nInputCoeffs.show_coeffs")
             print("Coeffs:\n",coeffs)
             print ("shape", np.shape(coeffs))
             print ("len", len(coeffs))
@@ -293,7 +293,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
 
-    def deleteRows(self):
+    def delete_rows(self):
         """
         Delete all selected rows by:
         - reading the indices of all selected cells
@@ -317,7 +317,7 @@ class InputCoeffs(QtGui.QWidget):
             self.tblCoeff.removeRow(r)
         self.tblCoeff.setRowCount(nrows - len(rows))
 
-    def addRows(self):
+    def add_rows(self):
         """
         Add the number of selected rows to the table and fill new cells with
         zeros. If nothing is selected, add 1 row.
@@ -339,7 +339,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.resizeRowsToContents()
 
 
-    def clearTable(self):
+    def clear_table(self):
         """
         Clear table & initialize coeff, zpk for two poles and zeros @ origin,
         a = b = [1; 0; 0]
@@ -361,7 +361,7 @@ class InputCoeffs(QtGui.QWidget):
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
-    def setCoeffsZero(self):
+    def set_coeffs_zero(self):
         """
         Set all coefficients = 0 in table with a magnitude less than eps
         """
@@ -377,7 +377,7 @@ class InputCoeffs(QtGui.QWidget):
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
-    def quantCoeffs(self):
+    def quant_coeffs(self):
         """
         Quantize all coefficients
         """
