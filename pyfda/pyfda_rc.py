@@ -75,7 +75,7 @@ css_dark = {'TopWidget':('QWidget{color:white;background: #222222;}'
                         'QPushButton{background-color:grey; color:white;}'
                         'QTableView{alternate-background-color:#222222;'
                              'background-color:black; gridline-color: white;}' 
-                        'QHeaderView::section{background-color:rgb(190,1,1);}'
+                        'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
                         'QLineEdit{background: #222222; color:white;}'),
           'LineEdit':'QLineEdit{background: #222222; color:white;}'
           }
@@ -88,7 +88,7 @@ css_light = {'TopWidget':('.QTabWidget>QWidget>QWidget{border: 1px solid grey}'
                         'QTabWidget>QWidget{border-right: 1px solid grey;}'
                         '.QWidget{color:black; background: white}'
                         'QPushButton{background-color:lightgrey; color:black;}'
-                        'QHeaderView::section{background-color:rgb(190,1,1);}'
+                        'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
                         'QLineEdit{background: white; color:black;}'),
             'LineEdit':''
 }
