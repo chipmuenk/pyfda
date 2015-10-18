@@ -76,8 +76,11 @@ class InputFilter(QtGui.QWidget):
         self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbDesignMethod.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
+        #----------------------------------------------------------------------
+        # Populate combo box with initial settings from fb.fil_tree
+        #----------------------------------------------------------------------
         # Translate short response type ("LP") to displayed names ("Lowpass")
-        # (correspondence is defined in filterbroker.py) and populate combo box:
+        # (correspondence is defined in pyfda_rc.py) and populate rt combo box:
         for rt in fb.fil_tree:
             self.cmbResponseType.addItem(rc.rt_names[rt], rt)
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
@@ -86,6 +89,12 @@ class InputFilter(QtGui.QWidget):
             idx = 0
 
         self.cmbResponseType.setCurrentIndex(idx) # set initial index
+        
+        for ft in fb.fil_tree[rt]:
+            self.cmbFilterType.addItem(rc.ft_names[ft], ft) 
+        
+        for dm in fb.fil_tree[rt][ft]:
+            self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
 
         #----------------------------------------------------------------------
         # LAYOUT
