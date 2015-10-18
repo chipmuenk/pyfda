@@ -108,7 +108,7 @@ class InputSpecs(QtGui.QWidget):
         # Changes requiring update of UI because number or kind of
         # input fields has changed:
         self.fil_ord.sigSpecsChanged.connect(self.updateAllUIs)
-        self.sel_fil.sigSpecsChanged.connect(self.updateAllUIs)
+#        self.sel_fil.sigFiltChanged.connect(self.updateAllUIs) # infinite loop!
 
         # Changes requiring recalculation of frequency specs
         self.f_units.sigSpecsChanged.connect(self.f_specs.loadEntries)

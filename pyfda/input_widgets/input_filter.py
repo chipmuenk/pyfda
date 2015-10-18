@@ -23,6 +23,7 @@ import pyfda.pyfda_rc as rc
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]
 # TODO: set_response_type is called 3 times every time filter is changed - why?
+# TODO: enable sigFiltChange in input_specs (creates infinite loop now)
 
 
 class InputFilter(QtGui.QWidget):
@@ -33,7 +34,7 @@ class InputFilter(QtGui.QWidget):
       - DesignMethod (Butterworth, ...)
     """
 
-    sigSpecsChanged = pyqtSignal()
+    sigFiltChanged = pyqtSignal()
 
     def __init__(self, DEBUG=False):
         super(InputFilter, self).__init__()
@@ -301,6 +302,7 @@ class InputFilter(QtGui.QWidget):
     
             self._update_dyn_widgets() # check for new subwidgets and update if needed
     
+        self.sigFiltChanged.emit() # -> input_specs
 
 
 #------------------------------------------------------------------------------
