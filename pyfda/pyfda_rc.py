@@ -173,6 +173,13 @@ rt_names = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
             "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
             "HIL":"Hilbert", "DIFF":"Differentiator"}
             
+# Dictionary with translations between short method names and long names for
+# response types
+ft_names = {"IIR":"IIR", "FIR":"FIR"}
+
+# Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
+# in filterbroker.py
+            
 ################## Some layout ideas ##########################################
 
 #self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
