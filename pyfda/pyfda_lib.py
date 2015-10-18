@@ -822,6 +822,9 @@ def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all available formats in the passed
     dictionary 'fil_dict'.
+    
+    Filter coefficients in FIR format (b, one dimensional) are automatically converted
+    to IIR format (b, a).
     """
     if DEBUG: print("saveFil: arg = ",arg)
     if out_format == 'zpk': # arg = [z,p,k]
@@ -829,19 +832,17 @@ def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
         zpk = arg
     elif out_format == 'ba': # arg = [b,a]
         if np.ndim(arg) == 1:
-#            print(len(arg))
             b = np.asarray(arg)
             a = np.zeros(len(arg))
             a[0] = 1
         else:
             b = arg[0]
             a = arg[1]
-#        print("saveFil: b, a = ",b , a)
         zpk = sig.tf2zpk(b, a)#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
     else:
         raise ValueError("Unknown output format {0:s}".format(out_format))
     fil_dict['ba'] = [b, a]
-    fil_dict['zpk'] = [zpk[0], zpk[1], zpk[2]]#zpk
+    fil_dict['zpk'] = [zpk[0], zpk[1], zpk[2]]
     fil_dict['sos'] = None
     fil_dict['creator'] = (out_format, sender)
 
