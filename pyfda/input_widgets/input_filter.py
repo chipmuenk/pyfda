@@ -22,7 +22,7 @@ import pyfda.pyfda_rc as rc
 # TODO:  index = myComboBox.findText('item02')
         # reverse dictionary lookup
         #key = [key for key,value in dict.items() if value=='value' ][0]
-# TODO: setResponseType is called 3 times every time filter is changed - why?
+# TODO: set_response_type is called 3 times every time filter is changed - why?
 
 
 class InputFilter(QtGui.QWidget):
@@ -43,12 +43,12 @@ class InputFilter(QtGui.QWidget):
         self.filter_initialized = False
         self.dm_last = '' # design method from last call
 
-        self.initUI()
+        self.init_UI()
 
-        self.setResponseType() # first time initialization
+        self.set_response_type() # first time initialization
 
 
-    def initUI(self):
+    def init_UI(self):
         """
         Initialize UI with comboboxes for selecting filter
         """
@@ -62,7 +62,7 @@ class InputFilter(QtGui.QWidget):
 		# - cmbFilterType for selection of filter type (IIR, FIR, ...)
 		# - cmbDesignMethod for selection of design method (Chebychev, ...)
 		# and populate them from the "filterTree" dict either directly or by
-		# calling setResponseType() :
+		# calling set_response_type() :
 
         self.cmbResponseType = QtGui.QComboBox(self)
         self.cmbResponseType.setToolTip("Select filter response type.")
@@ -89,12 +89,17 @@ class InputFilter(QtGui.QWidget):
             idx = 0
 
         self.cmbResponseType.setCurrentIndex(idx) # set initial index
-        
+        rt = str(self.cmbResponseType.itemData(idx))
+
         for ft in fb.fil_tree[rt]:
-            self.cmbFilterType.addItem(rc.ft_names[ft], ft) 
-        
+            self.cmbFilterType.addItem(rc.ft_names[ft], ft)
+        self.cmbFilterType.setCurrentIndex(0) # set initial index
+        ft = str(self.cmbFilterType.itemData(0))
+
         for dm in fb.fil_tree[rt][ft]:
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
+        self.cmbDesignMethod.setCurrentIndex(0) # set initial index
+
 
         #----------------------------------------------------------------------
         # LAYOUT
@@ -147,28 +152,28 @@ class InputFilter(QtGui.QWidget):
         # SIGNALS & SLOTS
         #------------------------------------------------------------
         # Connect comboBoxes and setters:
-        self.cmbResponseType.currentIndexChanged.connect(self.setResponseType) # 'LP'
+        self.cmbResponseType.currentIndexChanged.connect(self.set_response_type) # 'LP'
 #        self.cmbResponseType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
-        self.cmbFilterType.currentIndexChanged.connect(self.setFilterType) #'IIR'
+        self.cmbFilterType.currentIndexChanged.connect(self.set_filter_type) #'IIR'
 #        self.cmbFilterType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
-        self.cmbDesignMethod.currentIndexChanged.connect(self.setDesignMethod) #'cheby1'
+        self.cmbDesignMethod.currentIndexChanged.connect(self.set_design_method) #'cheby1'
 #        self.cmbDesignMethod.currentIndexChanged.connect(self.sigSpecsChanged.emit)
         #------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-    def loadEntries(self):
+    def load_entries(self):
         """
         Reload comboboxes from filter dictionary to update changed settings
         e.g. by loading filter design
         """
         idx_rt = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
         self.cmbResponseType.setCurrentIndex(idx_rt)
-        self.setResponseType()
+        self.set_response_type()
 
 
 #------------------------------------------------------------------------------
-    def setResponseType(self):
+    def set_response_type(self):
         """
         Triggered when cmbResponseType (LP, HP, ...) is changed:
         Copy selection to self.rt and fb.fil[0] and reconstruct filter type combo
@@ -209,11 +214,11 @@ class InputFilter(QtGui.QWidget):
 
         self.cmbFilterType.blockSignals(False)
         #---------------------------------------------------------------
-        
-        self.setFilterType()
+
+        self.set_filter_type()
 
 #------------------------------------------------------------------------------
-    def setFilterType(self):
+    def set_filter_type(self):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
         - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
@@ -226,13 +231,13 @@ class InputFilter(QtGui.QWidget):
         self.ft = str(self.cmbFilterType.currentText())
         fb.fil[0]['ft'] = self.ft
         if self.DEBUG:
-            print("InputFilter.setFilterType triggered:", self.ft)
+            print("InputFilter.set_filter_type triggered:", self.ft)
 
         #---------------------------------------------------------------
         # Get all available design methods for new ft from fil_tree and
         # - Collect them in list dm_list
         # - Rebuild design method combobox entries for new ft setting:
-        #    The combobox is populated with the "long name", 
+        #    The combobox is populated with the "long name",
         #    the internal name is stored in comboBox.itemData
         self.cmbDesignMethod.blockSignals(True)
         self.cmbDesignMethod.clear()
@@ -249,9 +254,9 @@ class InputFilter(QtGui.QWidget):
         # Is previous design method (e.g. ellip) in list for new ft?
         # And has the widget been initialized?
         if fb.fil[0]['dm'] in dm_list and self.filter_initialized:
-            # yes, set same dm as before, don't call setDesignMethod
+            # yes, set same dm as before, don't call set_design_method
             dm_idx = self.cmbDesignMethod.findText(fb.dm_names[fb.fil[0]['dm']])
-            if self.DEBUG: 
+            if self.DEBUG:
                 print("dm_idx", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx)
             self.cmbDesignMethod.blockSignals(False)
@@ -259,11 +264,11 @@ class InputFilter(QtGui.QWidget):
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
             self.cmbDesignMethod.blockSignals(False)
 
-            self.setDesignMethod()
+            self.set_design_method()
 
 
 #------------------------------------------------------------------------------
-    def setDesignMethod(self):
+    def set_design_method(self):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
         - read design method dm and copy it to fb.fil[0]
@@ -274,14 +279,14 @@ class InputFilter(QtGui.QWidget):
         dm_idx = self.cmbDesignMethod.currentIndex()
         dm = self.cmbDesignMethod.itemData(dm_idx)
         if not isinstance(dm, str):
-            dm = str(dm.toString()) # see explanation in setResponseType()
+            dm = str(dm.toString()) # see explanation in set_response_type()
         fb.fil[0]['dm'] = dm
         #-----
         err = fb.fil_factory.create_fil_inst(dm)
         #-----
         if self.DEBUG:
-            print("InputFilter.setDesignMethod triggered:", dm)
-        
+            print("InputFilter.set_design_method triggered:", dm)
+
         # Check whether new design method also provides the old filter order
         # method. If yes, don't change it, else set first available
         # filter order method
@@ -290,7 +295,7 @@ class InputFilter(QtGui.QWidget):
             fb.fil[0]['fo'] = fb.fil_tree[self.rt][self.ft][dm].keys()[0]
 
         if self.DEBUG:
-            print("=== InputFilter.setDesignMethod ===")
+            print("=== InputFilter.set_design_method ===")
             print("selFilter:", fb.fil[0])
             print("filterTree[dm] = ", fb.fil_tree[self.rt][self.ft][dm])
             print("filterTree[dm].keys() = ", fb.fil_tree[self.rt][self.ft]\
@@ -356,7 +361,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputFilter()
     form.show()
-    
+
 
     app.exec_()
 

@@ -229,7 +229,7 @@ class InputSpecs(QtGui.QWidget):
         Reload entries from global dict fb.fil[0]
         parameters, using the "loadEntries" methods of the classes
         """
-        self.sel_fil.loadEntries() # select filter widget
+        self.sel_fil.load_entries() # select filter widget
         self.f_units.loadEntries() # frequency units widget
         self.fil_ord.loadEntries() # filter order widget
         self.f_specs.loadEntries() # frequency specification widget
