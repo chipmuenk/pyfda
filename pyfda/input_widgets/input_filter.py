@@ -37,16 +37,15 @@ class InputFilter(QtGui.QWidget):
 
     def __init__(self, DEBUG=False):
         super(InputFilter, self).__init__()
-        print("initialized InputFilter!")
+
         self.DEBUG = DEBUG
 
-        self.filter_initialized = False
         self.dm_last = '' # design method from last call
 
         self.init_UI()
 
         self.set_response_type() # first time initialization
-
+        print("initialized InputFilter!")
 
     def init_UI(self):
         """
@@ -99,7 +98,6 @@ class InputFilter(QtGui.QWidget):
         for dm in fb.fil_tree[rt][ft]:
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
         self.cmbDesignMethod.setCurrentIndex(0) # set initial index
-
 
         #----------------------------------------------------------------------
         # LAYOUT
@@ -206,7 +204,7 @@ class InputFilter(QtGui.QWidget):
 
         # Is last filter type (e.g. IIR) in list for new rt?
         # And has the widget been initialized?
-        if fb.fil[0]['ft'] in ft_list and self.filter_initialized:
+        if fb.fil[0]['ft'] in ft_list:
             ft_idx = self.cmbFilterType.findText(fb.fil[0]['ft'])
             self.cmbFilterType.setCurrentIndex(ft_idx) # yes, set same ft as before
         else:
@@ -251,20 +249,19 @@ class InputFilter(QtGui.QWidget):
             print("dm_list", dm_list)
             print(fb.fil[0]['dm'])
 
-        # Is previous design method (e.g. ellip) in list for new ft?
-        # And has the widget been initialized?
-        if fb.fil[0]['dm'] in dm_list and self.filter_initialized:
-            # yes, set same dm as before, don't call set_design_method
+        # Does new ft also provide the previous design method (e.g. ellip)?
+        # Has filter been instantiated?
+        if fb.fil[0]['dm'] in dm_list and fb.fil_inst:
+            # yes, set same dm as before
             dm_idx = self.cmbDesignMethod.findText(fb.dm_names[fb.fil[0]['dm']])
             if self.DEBUG:
                 print("dm_idx", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx)
-            self.cmbDesignMethod.blockSignals(False)
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
-            self.cmbDesignMethod.blockSignals(False)
 
-            self.set_design_method()
+        self.cmbDesignMethod.blockSignals(False)
+        self.set_design_method()
 
 
 #------------------------------------------------------------------------------
@@ -281,31 +278,29 @@ class InputFilter(QtGui.QWidget):
         if not isinstance(dm, str):
             dm = str(dm.toString()) # see explanation in set_response_type()
         fb.fil[0]['dm'] = dm
-        #-----
-        err = fb.fil_factory.create_fil_inst(dm)
-        #-----
-        if self.DEBUG:
-            print("InputFilter.set_design_method triggered:", dm)
-
-        # Check whether new design method also provides the old filter order
-        # method. If yes, don't change it, else set first available
-        # filter order method
-        if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][dm].keys():
-            fb.fil[0].update({'fo':{}})
-            fb.fil[0]['fo'] = fb.fil_tree[self.rt][self.ft][dm].keys()[0]
-
-        if self.DEBUG:
-            print("=== InputFilter.set_design_method ===")
-            print("selFilter:", fb.fil[0])
-            print("filterTree[dm] = ", fb.fil_tree[self.rt][self.ft][dm])
-            print("filterTree[dm].keys() = ", fb.fil_tree[self.rt][self.ft]\
-                                                            [dm].keys())
-
-        self.filter_initialized = True
-
-        self._update_dyn_widgets() # check for new subwidgets and update if needed
-
-#        self.sigSpecsChanged.emit() # -> input_widgets
+        if dm != self.dm_last: # dm has changed, create new instance
+            #-----
+            err = fb.fil_factory.create_fil_inst(dm)
+            #-----
+            if self.DEBUG:
+                print("InputFilter.set_design_method triggered:", dm)
+    
+            # Check whether new design method also provides the old filter order
+            # method. If yes, don't change it, else set first available
+            # filter order method
+            if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][dm].keys():
+                fb.fil[0].update({'fo':{}})
+                fb.fil[0]['fo'] = fb.fil_tree[self.rt][self.ft][dm].keys()[0]
+    
+            if self.DEBUG:
+                print("=== InputFilter.set_design_method ===")
+                print("selFilter:", fb.fil[0])
+                print("filterTree[dm] = ", fb.fil_tree[self.rt][self.ft][dm])
+                print("filterTree[dm].keys() = ", fb.fil_tree[self.rt][self.ft]\
+                                                                [dm].keys())
+    
+            self._update_dyn_widgets() # check for new subwidgets and update if needed
+    
 
 
 #------------------------------------------------------------------------------
@@ -322,33 +317,32 @@ class InputFilter(QtGui.QWidget):
         """
 # TODO: see https://www.commandprompt.com/community/pyqt/x3410.htm
 
-        if fb.fil[0]['dm'] != self.dm_last:
 
-            # Find "old" dyn. subwidgets and delete them:
-            widgetList = self.frmDynWdg.findChildren(
-                (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
-    #       widgetListNames = [w.objectName() for w in widgetList]
+        # Find "old" dyn. subwidgets and delete them:
+        widgetList = self.frmDynWdg.findChildren(
+            (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
+#       widgetListNames = [w.objectName() for w in widgetList]
 
-            for w in widgetList:
-                self.layHDynWdg.removeWidget(w)   # remove widget from layout
-                w.deleteLater()             # tell Qt to delete object when the
-                                            # method has completed
+        for w in widgetList:
+            self.layHDynWdg.removeWidget(w)   # remove widget from layout
+            w.deleteLater()             # tell Qt to delete object when the
+                                        # method has completed
 #                del w                       # not really needed?
 
-            # Try to create "new" dyn. subwidgets:
-            if hasattr(fb.fil_inst, 'wdg'):
-                try:
-                    if 'sf' in fb.fil_inst.wdg:
-                        a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
-                        self.layHDynWdg.addWidget(a, stretch=1)
-                        self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
-                        self.frmDynWdg.setVisible(a != None)
+        # Try to create "new" dyn. subwidgets:
+        if hasattr(fb.fil_inst, 'wdg'):
+            try:
+                if 'sf' in fb.fil_inst.wdg:
+                    a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
+                    self.layHDynWdg.addWidget(a, stretch=1)
+                    self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
+                    self.frmDynWdg.setVisible(a != None)
 
-                except AttributeError as e:
-                    print("sf.updateWidgets:", e)
-                    self.frmDynWdg.setVisible(False)
-            else:
+            except AttributeError as e:
+                print("sf.updateWidgets:", e)
                 self.frmDynWdg.setVisible(False)
+        else:
+            self.frmDynWdg.setVisible(False)
 
         self.dm_last = fb.fil[0]['dm']
 
