@@ -139,11 +139,11 @@ class InputFilter(QtGui.QWidget):
         #------------------------------------------------------------
         # Connect comboBoxes and setters:
         self.cmbResponseType.currentIndexChanged.connect(self.setResponseType) # 'LP'
-        self.cmbResponseType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+#        self.cmbResponseType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
         self.cmbFilterType.currentIndexChanged.connect(self.setFilterType) #'IIR'
-        self.cmbFilterType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+#        self.cmbFilterType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
         self.cmbDesignMethod.currentIndexChanged.connect(self.setDesignMethod) #'cheby1'
-        self.cmbDesignMethod.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+#        self.cmbDesignMethod.currentIndexChanged.connect(self.sigSpecsChanged.emit)
         #------------------------------------------------------------
 
 
