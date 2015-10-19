@@ -18,13 +18,7 @@ from PyQt4.QtCore import pyqtSignal
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
-# TODO: Add subwidgets, depending on filterSel parameters
-# TODO:  index = myComboBox.findText('item02')
-        # reverse dictionary lookup
-        #key = [key for key,value in dict.items() if value=='value' ][0]
 # TODO: set_response_type is called 3 times every time filter is changed - why?
-# TODO: enable sigFiltChange in input_specs (creates infinite loop now)
-
 
 class InputFilter(QtGui.QWidget):
     """
@@ -80,7 +74,13 @@ class InputFilter(QtGui.QWidget):
         # Populate combo box with initial settings from fb.fil_tree
         #----------------------------------------------------------------------
         # Translate short response type ("LP") to displayed names ("Lowpass")
-        # (correspondence is defined in pyfda_rc.py) and populate rt combo box:
+        # (correspondence is defined in pyfda_rc.py) and populate rt combo box
+        #
+        # In Python 3, python objects are automatically converted to QVariant
+        # when stored as "data" e.g. in a QComboBox and converted back when
+        # retrieving. In Python 2, QVariant is returned when itemData is retrieved.
+        # This is first converted from the QVariant container format to a
+        # QString, next to a "normal" non-unicode string
         for rt in fb.fil_tree:
             self.cmbResponseType.addItem(rc.rt_names[rt], rt)
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
@@ -111,7 +111,8 @@ class InputFilter(QtGui.QWidget):
         self.layHDynWdg = QtGui.QHBoxLayout() # for additional dynamic subwidgets
         self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
         self.frmDynWdg.setObjectName("wdg_frmDynWdg")
-        self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Minimum)
+        self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
+                                     QtGui.QSizePolicy.Minimum)
 
         #Debugging: enable next line to show border of frmDnyWdg
         #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
@@ -185,18 +186,12 @@ class InputFilter(QtGui.QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-        # cmbBox.currentText() shows full text ('Lowpass'),
-        # itemData contains abbreviation ('LP')
+        # Read out current setting of comboBox and convert to string (see init_UI)
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)
 
-        # In Python 3, python objects are automatically converted to QVariant
-        # when stored as "data" e.g. in a QComboBox and converted back when
-        # retrieving. In Python 2, QVariant is returned when data is retrieved.
-        # This is first converted from the QVariant container format to a
-        # QString, next to a "normal" non-unicode string
         if not isinstance(self.rt, str):
-            self.rt = str(self.rt.toString()) # Why is QString -> str necessary?
+            self.rt = str(self.rt.toString()) # needed for Python 2
         fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
 
         # Get list of available filter types for new rt
