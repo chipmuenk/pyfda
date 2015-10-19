@@ -201,16 +201,16 @@ class InputFilter(QtGui.QWidget):
         # Rebuild filter type combobox entries for new rt setting
         self.cmbFilterType.blockSignals(True) # don't fire when changed programmatically
         self.cmbFilterType.clear()
-        self.cmbFilterType.addItems(ft_list)
+        for ft in fb.fil_tree[self.rt]:
+            self.cmbFilterType.addItem(rc.ft_names[ft], ft)
 
-        # Is last filter type (e.g. IIR) in list for new rt?
-        # And has the widget been initialized?
+        # Is current filter type (e.g. IIR) in list for new rt?
         if fb.fil[0]['ft'] in ft_list:
             ft_idx = self.cmbFilterType.findText(fb.fil[0]['ft'])
             self.cmbFilterType.setCurrentIndex(ft_idx) # yes, set same ft as before
         else:
             self.cmbFilterType.setCurrentIndex(0)     # no, set index 0
-
+            
         self.cmbFilterType.blockSignals(False)
         #---------------------------------------------------------------
 
@@ -224,11 +224,14 @@ class InputFilter(QtGui.QWidget):
         - (re)construct design method combo, adding
           displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
-        # cmbBox.currentText() has full text ('IIR'),
-        # cmbBox.itemData only abbreviation ('IIR') which is the same here
+        # Read out current setting of comboBox and convert to string (see init_UI)
+        ft_idx = self.cmbFilterType.currentIndex()
+        self.ft = self.cmbFilterType.itemData(ft_idx)
+        
+        if not isinstance(self.ft, str):
+            self.ft = str(self.ft.toString()) # needed for Python 2.x
+        fb.fil[0]['ft'] = self.ft # copy selected ft setting to filter dict
 
-        self.ft = str(self.cmbFilterType.currentText())
-        fb.fil[0]['ft'] = self.ft
         if self.DEBUG:
             print("InputFilter.set_filter_type triggered:", self.ft)
 
