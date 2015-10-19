@@ -302,9 +302,6 @@ class InputFilter(QtGui.QWidget):
     
             self._update_dyn_widgets() # check for new subwidgets and update if needed
     
-        self.sigFiltChanged.emit() # -> input_specs
-
-
 #------------------------------------------------------------------------------
     def _update_dyn_widgets(self):
         """
