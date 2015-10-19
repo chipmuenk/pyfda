@@ -150,13 +150,14 @@ class InputFilter(QtGui.QWidget):
         #------------------------------------------------------------
         # SIGNALS & SLOTS
         #------------------------------------------------------------
-        # Connect comboBoxes and setters:
+        # Connect comboBoxes and setters, generate the signal sigFiltChanged
+        # every time a combo box is changed
         self.cmbResponseType.currentIndexChanged.connect(self.set_response_type) # 'LP'
-#        self.cmbResponseType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+        self.cmbResponseType.currentIndexChanged.connect(self.sigFiltChanged.emit)
         self.cmbFilterType.currentIndexChanged.connect(self.set_filter_type) #'IIR'
-#        self.cmbFilterType.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+        self.cmbFilterType.currentIndexChanged.connect(self.sigFiltChanged.emit)
         self.cmbDesignMethod.currentIndexChanged.connect(self.set_design_method) #'cheby1'
-#        self.cmbDesignMethod.currentIndexChanged.connect(self.sigSpecsChanged.emit)
+        self.cmbDesignMethod.currentIndexChanged.connect(self.sigFiltChanged.emit)
         #------------------------------------------------------------
 
 
