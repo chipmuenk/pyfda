@@ -124,7 +124,7 @@ class InputSpecs(QtGui.QWidget):
 
         # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
-        self.butQuit.clicked.connect(QtGui.qApp.quit)
+        self.butQuit.clicked.connect(QtGui.qApp.quit) # which qApp is this??
         #----------------------------------------------------------------------
 
         self.updateAllUIs() # first time initialization
@@ -133,11 +133,13 @@ class InputSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def updateAllUIs(self):
         """
-        This method is called every time filter design method or order
-        (min / man) is changed. At this time, the actual filter object
+        This method is called every time the filter design method or order
+        (min / man) has been changed. This usually requires a different set of
+        frequency and amplitude specs.
+        At this time, the actual filter object
         instance has been created from design method and order
         (e.g. 'cheby1', 'min') in input_filter.py. Its handle has been stored
-        in fb.filobj.
+        in fb.fil_inst resp. fb.fil_method (?)
 
         fb.fil[0] (currently selected filter) is read, then general information
         for the selected filter type and order (min/man) is gathered from
