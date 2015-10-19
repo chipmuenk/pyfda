@@ -18,7 +18,9 @@ from PyQt4.QtCore import pyqtSignal
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
-# TODO: set_response_type is called 3 times every time filter is changed - why?
+# TODO: set_response_type is called 3 times by inputSpecs.loadAllSpecs every time 
+#       filter is changed - why? Eliminating set_response_type gives errors when
+#       changing the response type of FIR filters
 
 class InputFilter(QtGui.QWidget):
     """
@@ -40,7 +42,6 @@ class InputFilter(QtGui.QWidget):
         self.init_UI()
 
         self.set_response_type() # first time initialization
-        print("initialized InputFilter!")
 
     def init_UI(self):
         """
@@ -57,6 +58,7 @@ class InputFilter(QtGui.QWidget):
 		# - cmbDesignMethod for selection of design method (Chebychev, ...)
 		# and populate them from the "filterTree" dict either directly or by
 		# calling set_response_type() :
+        print("\n\ninitialize InputFilter!\n\n")
 
         self.cmbResponseType = QtGui.QComboBox(self)
         self.cmbResponseType.setToolTip("Select filter response type.")
