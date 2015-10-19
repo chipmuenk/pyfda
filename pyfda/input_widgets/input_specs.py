@@ -136,10 +136,10 @@ class InputSpecs(QtGui.QWidget):
         This method is called every time the filter design method or order
         (min / man) has been changed. This usually requires a different set of
         frequency and amplitude specs.
-        At this time, the actual filter object
-        instance has been created from design method and order
-        (e.g. 'cheby1', 'min') in input_filter.py. Its handle has been stored
-        in fb.fil_inst resp. fb.fil_method (?)
+        
+        At this time, the actual filter object instance has been created from 
+        the name of the design method (e.g. 'cheby1') in input_filter.py. 
+        Its handle has been stored in fb.fil_inst.
 
         fb.fil[0] (currently selected filter) is read, then general information
         for the selected filter type and order (min/man) is gathered from
@@ -216,7 +216,7 @@ class InputSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def storeAll(self):
+    def store_all_specs(self):
         """
         Store all entries of current filter design in global dict fb.fil[0]
         parameters, using the "storeEntries" methods of the classes
@@ -231,10 +231,10 @@ class InputSpecs(QtGui.QWidget):
         self.t_specs.storeEntries() # target specs
 
 #------------------------------------------------------------------------------
-    def loadAll(self):
+    def load_all_specs(self):
         """
-        Reload entries from global dict fb.fil[0]
-        parameters, using the "loadEntries" methods of the classes
+        Reload all specs/parameters from global dict fb.fil[0],
+        using the "loadEntries" methods of the classes
         """
         self.sel_fil.load_entries() # select filter widget
         self.f_units.loadEntries() # frequency units widget

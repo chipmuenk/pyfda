@@ -103,7 +103,8 @@ class InputWidgets(QtGui.QWidget):
         self.inputSpecs.sigFilterDesigned.connect(self.updateAll)
         self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
         self.inputPZ.sigFilterDesigned.connect(self.updateAll)
-        self.inputFiles.sigFilterDesigned.connect(self.updateAll)
+        
+        self.inputFiles.sigFilterLoaded.connect(self.loadAll)
         #----------------------------------------------------------------------
 
 
@@ -115,11 +116,22 @@ class InputWidgets(QtGui.QWidget):
         - Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
-        self.inputSpecs.color_design_button("changed")   
-        self.inputSpecs.loadAll()
+        self.inputSpecs.color_design_button("changed")
+        self.inputSpecs.load_all_specs()
         self.inputInfo.showInfo()
         self.sigSpecsChanged.emit() # pyFDA -> plot_widgets.updateSpecs
         
+    def loadAll(self):
+        """
+        Called when a new filter has been LOADED: 
+        Pass new filter data from the global filter dict
+        - Specifically call InputFilter.load_all_specs
+        - Update the input widgets that can / need to display filter data
+        - Update all plot widgets via the signal sigFilterDesigned
+        """
+        self.inputSpecs.sel_fil.load_entries() # update input_filters
+        self.updateAll()
+
     @pyqtSlot() # possible, but not neccessary
     def updateAll(self):
         """
@@ -132,7 +144,7 @@ class InputWidgets(QtGui.QWidget):
         if self.DEBUG: print("input_widgets.updateAll:\n",self.sender().objectName())
 
         self.inputSpecs.color_design_button("ok")      
-        self.inputSpecs.loadAll()
+        self.inputSpecs.load_all_specs()
         self.inputInfo.showInfo()
         self.inputCoeffs.show_coeffs()
         self.inputPZ.showZPK()

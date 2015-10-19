@@ -48,7 +48,7 @@ class InputFiles(QtGui.QWidget):
     Create the widget for entering exporting / importing / saving / loading data
     """
     
-    sigFilterDesigned = pyqtSignal()
+    sigFilterLoaded = pyqtSignal() # emitted when filter has been loaded successfully
     sigReadFilters = pyqtSignal()  # emitted when button "Read Filters" is pressed
 
     def __init__(self, DEBUG = True):
@@ -169,7 +169,7 @@ class InputFiles(QtGui.QWidget):
                     if not file_type_err:
                         print('Loaded filter "%s"' %file_name)
                          # emit signal -> pyFDA -> pltWidgets.updateAll() :
-                        self.sigFilterDesigned.emit()
+                        self.sigFilterLoaded.emit()
                         self.basedir = os.path.dirname(file_name)
             except IOError:
                 print("Failed loading %s!" %file_name)
