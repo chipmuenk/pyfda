@@ -280,7 +280,7 @@ class InputFilter(QtGui.QWidget):
         dm_idx = self.cmbDesignMethod.currentIndex()
         dm = self.cmbDesignMethod.itemData(dm_idx)
         if not isinstance(dm, str):
-            dm = str(dm.toString()) # see explanation in set_response_type()
+            dm = str(dm.toString()) # needed for Python 2.x (see init_UI)
         fb.fil[0]['dm'] = dm
         if dm != self.dm_last: # dm has changed, create new instance
             #-----
