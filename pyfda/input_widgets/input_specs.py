@@ -150,27 +150,20 @@ class InputSpecs(QtGui.QWidget):
         finally the signal 'sigSpecsChanged' is emitted.
         """
 
-        # Read freq / amp / weight labels for current filter design
-        rt = fb.fil[0]['rt']
-        ft = fb.fil[0]['ft']
-        dm = fb.fil[0]['dm']
-        fo = fb.fil[0]['fo']
-        all_params = fb.fil_tree[rt][ft][dm][fo]['par'] # all parameters e.g. 'F_SB'
-        min_params = man_params = []
-        if "min" in fb.fil_tree[rt][ft][dm]:
-            min_params = fb.fil_tree[rt][ft][dm]['min']['par']
-        if "man" in fb.fil_tree[rt][ft][dm]:
-            man_params = fb.fil_tree[rt][ft][dm]['man']['par']
+        rt = fb.fil[0]['rt'] # e.g. 'LP'
+        ft = fb.fil[0]['ft'] # e.g. 'FIR'
+        dm = fb.fil[0]['dm'] # e.g. 'equiripple'
+        fo = fb.fil[0]['fo'] # e.g. 'man'
+        # read all parameters for selected filter type, e.g. 'F_SB':
+        all_params = fb.fil_tree[rt][ft][dm][fo]['par']
 
         vis_wdgs = fb.fil_tree[rt][ft][dm][fo]['vis'] # visible widgets
         dis_wdgs = fb.fil_tree[rt][ft][dm][fo]['dis'] # disabled widgets
         msg      = fb.fil_tree[rt][ft][dm][fo]['msg'] # message
 
-        # build separate parameter lists according to the first letter
-        self.f_params = [l for l in all_params if l[0] == 'F']
-        self.f_min_params = [l for l in min_params if l[0] == 'F']
-        self.f_man_params = [l for l in man_params if l[0] == 'F']
-
+        # Read freq / amp / weight labels for current filter design, building
+        # separate parameter lists according to the first letter
+        self.f_params = [l for l in all_params if l[0] == 'F'] # curr. not used
         self.a_params = [l for l in all_params if l[0] == 'A']
         self.weightParams = [l for l in all_params if l[0] == 'W']
         if self.DEBUG:
@@ -185,13 +178,30 @@ class InputSpecs(QtGui.QWidget):
         # set widgets invisible if param list is empty
         self.fil_ord.loadEntries()
 
-        # always use parameters for manual filter order here,
+        # build separate parameters for min. and man. filter order        
+        min_params = man_params = []
+        
+        if "min" in fb.fil_tree[rt][ft][dm]:
+            min_params = fb.fil_tree[rt][ft][dm]['min']['par']
+            
+        if "man" in fb.fil_tree[rt][ft][dm]:
+            man_params = fb.fil_tree[rt][ft][dm]['man']['par']
+
+        # always use parameters for manual filter order for f_specs widget,
         # frequency specs for minimum order are displayed in target specs
+        self.f_man_params = [l for l in man_params if l[0] == 'F']
         self.f_specs.setVisible("fspecs" in vis_wdgs)
         self.f_specs.setEnabled("fspecs" not in dis_wdgs)
         self.f_specs.updateUI(newLabels=self.f_man_params)
 
-#        self.a_specs.setVisible(self.a_params != [])
+        # always use parameters for MINIMUM filter order for target frequency
+        # spec widget
+        self.f_min_params = [l for l in min_params if l[0] == 'F']
+        self.t_specs.setVisible("tspecs" in vis_wdgs)
+        self.t_specs.setEnabled("tspecs" not in dis_wdgs)
+        self.t_specs.updateUI(self.f_min_params, self.a_params)
+        
+        #        self.a_specs.setVisible(self.a_params != [])
         self.a_specs.setVisible("aspecs" in vis_wdgs)
         self.a_specs.setEnabled("aspecs" not in dis_wdgs)
         self.a_specs.updateUI(newLabels=self.a_params)
@@ -199,10 +209,6 @@ class InputSpecs(QtGui.QWidget):
         self.w_specs.setVisible("wspecs" in vis_wdgs)
         self.w_specs.setEnabled("wspecs" not in dis_wdgs)
         self.w_specs.updateUI(newLabels=self.weightParams)
-
-        self.t_specs.setVisible("tspecs" in vis_wdgs)
-        self.t_specs.setEnabled("tspecs" not in dis_wdgs)
-        self.t_specs.updateUI(self.f_min_params, self.a_params)
 
         self.lblMsg.setText(msg)
 
@@ -217,7 +223,6 @@ class InputSpecs(QtGui.QWidget):
         -- not used yet --
         """
         # collect data from widgets and write to fb.fil[0]
-        # self.f_units.storeEntries() # frequency units widget - not working yet
         self.fil_ord.storeEntries() # filter order widget
         self.f_specs.storeEntries() # frequency specification widget
         self.f_units.storeEntries() # frequency specification widget
@@ -272,7 +277,7 @@ class InputSpecs(QtGui.QWidget):
             print("\n---- InputSpecs.startDesignFilt ----")
             print(type(fb.fil_inst))
  
-            # Create / update global instance fb.fil_inst of selected filter dm class
+            # Create / update global instance fb.fil_inst of selected filter class dm 
             # instantiated in InputFilter.set_design_method
             # call the method specified as a string in the argument of the
             # filter instance defined previously in InputFilter.set_response_type
