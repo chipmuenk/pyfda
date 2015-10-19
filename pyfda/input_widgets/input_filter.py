@@ -89,13 +89,17 @@ class InputFilter(QtGui.QWidget):
             idx = 0
 
         self.cmbResponseType.setCurrentIndex(idx) # set initial index
-        rt = str(self.cmbResponseType.itemData(idx))
+        rt = self.cmbResponseType.itemData(idx)
+        if not isinstance(rt, str):
+            rt = str(rt.toString()) # needed for Python 2.x
 
         for ft in fb.fil_tree[rt]:
             self.cmbFilterType.addItem(rc.ft_names[ft], ft)
         self.cmbFilterType.setCurrentIndex(0) # set initial index
-        ft = str(self.cmbFilterType.itemData(0))
-
+        ft = self.cmbFilterType.itemData(0)
+        if not isinstance(ft, str):
+            ft = str(ft.toString()) # needed for Python 2.x
+            
         for dm in fb.fil_tree[rt][ft]:
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
         self.cmbDesignMethod.setCurrentIndex(0) # set initial index
