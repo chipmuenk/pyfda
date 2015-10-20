@@ -66,8 +66,17 @@ class InputFilter(QtGui.QWidget):
 		# - cmbDesignMethod for selection of design method (Chebychev, ...)
 		# and populate them from the "filterTree" dict either directly or by
 		# calling set_response_type() :
-        print("\n\ninitialize InputFilter!\n\n")
 
+        bfont = QtGui.QFont()
+        ifont = QtGui.QFont()
+  #      font.setPointSize(11)
+        bfont.setBold(True)
+        bfont.setWeight(75)
+        ifont.setItalic(True)
+
+        #----------------------------------------------------------------------
+        # Combo boxes for filter selection
+        #----------------------------------------------------------------------
         self.cmbResponseType = QtGui.QComboBox(self)
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType = QtGui.QComboBox(self)
@@ -129,26 +138,45 @@ class InputFilter(QtGui.QWidget):
 
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
-        layHStdWdg = QtGui.QHBoxLayout() # container for standard subwidgets
-
+        layHFilWdg = QtGui.QHBoxLayout() # container for standard subwidgets
         spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
                                          QtGui.QSizePolicy.Fixed)
+        layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbFilterType)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbDesignMethod)
 
-        layHStdWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        #----------------------------------------------------------------------
+        # Filter Order
+        #----------------------------------------------------------------------
+        self.lblOrder =  QtGui.QLabel("Order:")
+        self.lblOrder.setFont(bfont)
+        self.chkMinOrder = QtGui.QRadioButton("Minimum",self)
+        self.spacer = QtGui.QSpacerItem(20,0,
+                        QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.lblOrderN = QtGui.QLabel("N = ")
+        self.lblOrderN.setFont(ifont)
+        self.ledOrderN = QtGui.QLineEdit(str(fb.fil[0]['N']),self)
 
-        layHStdWdg.addItem(spacer)
+        #  All subwidgets, including dynamically created ones
+        self.layHOrdWdg = QtGui.QHBoxLayout()
+        self.layHOrdWdg.addWidget(self.lblOrder)
+        self.layHOrdWdg.addWidget(self.chkMinOrder)
+        self.layHOrdWdg.addItem(self.spacer)
+        self.layHOrdWdg.addWidget(self.lblOrderN)
+        self.layHOrdWdg.addWidget(self.ledOrderN)
+#        self.layHOrdWdg.addWidget(self.frmDynWdg)
 
-        layHStdWdg.addWidget(self.cmbFilterType)
 
-        layHStdWdg.addItem(spacer)
-
-        layHStdWdg.addWidget(self.cmbDesignMethod)
 
         # stack standard + dynamic subwidgets vertically:
         layVAllWdg = QtGui.QVBoxLayout()
 
-        layVAllWdg.addLayout(layHStdWdg)
+        layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
+        layVAllWdg.addWidget(self.HLine())
+        layVAllWdg.addLayout(self.layHOrdWdg)
 
 
         self.frmMain = QtGui.QFrame()
@@ -358,6 +386,17 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = fb.fil[0]['dm']
 
+#------------------------------------------------------------------------------
+    def HLine(self):
+        # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
+        # solution
+        """
+        Create a horizontal line
+        """
+        line = QtGui.QFrame()
+        line.setFrameShape(QtGui.QFrame.HLine)
+        line.setFrameShadow(QtGui.QFrame.Sunken)
+        return line
 
 #    def closeEvent(self, event):
 #        exit()
