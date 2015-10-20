@@ -37,11 +37,13 @@ class InputSpecs(QtGui.QWidget):
         """
         Create all subwidgets
         """
-        # Select filter with response type rt (LP, ...), filter type ft
-        # (IIR, ...) and design method dm (cheby1, ...)
+        # Subwidget for selecting filter with response type rt (LP, ...), 
+        # filter type ft (IIR, ...) and design method dm (cheby1, ...)
         self.sel_fil = input_filter.InputFilter(DEBUG=False)
+        self.sel_fil.setObjectName("select_filter")
         # subwidget for selecting filter order ['man' (numeric) or 'min']
         self.fil_ord = input_order.InputOrder(DEBUG=False)
+        self.fil_ord.setObjectName("filter_order")
         # subwidget for selecting the frequency unit and range
         self.f_units = input_freq_units.InputFreqUnits(DEBUG=False)
         self.f_units.setObjectName("freq_units")

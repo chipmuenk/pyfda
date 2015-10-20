@@ -24,10 +24,18 @@ import pyfda.pyfda_rc as rc
 
 class InputFilter(QtGui.QWidget):
     """
-    Construct combo boxes for selecting the filter, consisting of:
-      - Response Type (LP, HP, Hilbert, ...)
-      - Filter Type (IIR, FIR, CIC ...)
-      - DesignMethod (Butterworth, ...)
+    Construct and read combo boxes for selecting the filter, consisting of the 
+    following hierarchy:
+      1. Response Type rt (LP, HP, Hilbert, ...)
+      2. Filter Type ft (IIR, FIR, CIC ...)
+      3. Design Method dm (Butterworth, ...)
+      
+      Every time a combo box is changed manually, the filter tree for the selected
+      response resp. filter type is read and the combo box(es) further down in
+      the hierarchy are populated according to the available combinations.
+      
+      The signal sigFiltChanged is triggered and propagated to input_specs.py 
+      where it triggers the recreation of all subwidgets.
     """
 
     sigFiltChanged = pyqtSignal()
