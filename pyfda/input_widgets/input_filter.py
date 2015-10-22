@@ -215,8 +215,8 @@ class InputFilter(QtGui.QWidget):
         Reload comboboxes from filter dictionary to update changed settings
         e.g. by loading filter design
         """
-        idx_rt = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
-        self.cmbResponseType.setCurrentIndex(idx_rt)
+        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
+        self.cmbResponseType.setCurrentIndex(rt_idx)
         self.set_response_type()
 
 
