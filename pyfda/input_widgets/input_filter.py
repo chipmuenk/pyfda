@@ -21,6 +21,11 @@ import pyfda.pyfda_rc as rc
 # TODO: set_response_type is called 3 times by inputSpecs.loadAllSpecs every time 
 #       filter is changed - why? Eliminating set_response_type gives errors when
 #       changing the response type of FIR filters
+# TODO: Check for race conditions when clicking combo boxes: filter dict is modified
+#       and a sigFiltChanged is emitted at same time?!
+# TODO: Check for unneeded attributes self. ...
+# TODO: Filter order N has to be re-read and displayed after filter calculation
+# TODO: new methods: load_settings, store_settings, update_settings
 
 class InputFilter(QtGui.QWidget):
     """
