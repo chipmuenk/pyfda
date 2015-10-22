@@ -85,7 +85,7 @@ class InputSpecs(QtGui.QWidget):
                                        QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
         layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
-        layGMain.addWidget(self.fil_ord, 1, 0, 1, 2)  # Filter order
+#        layGMain.addWidget(self.fil_ord, 1, 0, 1, 2)  # Filter order
         layGMain.addWidget(self.f_units, 2, 0, 1, 2)  # Frequency units
         layGMain.addWidget(self.f_specs, 3, 0, 1, 2)  # Freq. specifications
         layGMain.addWidget(self.a_specs, 4, 0, 1, 2)  # Amplitude specs
