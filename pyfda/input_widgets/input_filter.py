@@ -206,6 +206,11 @@ class InputFilter(QtGui.QWidget):
         self.cmbFilterType.currentIndexChanged.connect(self.sigFiltChanged.emit)
         self.cmbDesignMethod.currentIndexChanged.connect(self.set_design_method) #'cheby1'
         self.cmbDesignMethod.currentIndexChanged.connect(self.sigFiltChanged.emit)
+        #
+        self.chkMinOrder.clicked.connect(self.set_filter_order)
+        self.chkMinOrder.clicked.connect(self.sigFiltChanged.emit)
+        self.ledOrderN.editingFinished.connect(self.set_filter_order)
+        self.ledOrderN.editingFinished.connect(self.sigFiltChanged.emit)
         #------------------------------------------------------------
 
 
@@ -213,7 +218,10 @@ class InputFilter(QtGui.QWidget):
     def load_entries(self):
         """
         Reload comboboxes from filter dictionary to update changed settings
-        e.g. by loading filter design
+        after loading a filter design from disk.
+        `load_entries` is based on the automatism of set_response_type etc. 
+        of checking whether the previously selected filter design method is 
+        also available for the new combination. 
         """
         rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
         self.cmbResponseType.setCurrentIndex(rt_idx)
@@ -347,6 +355,70 @@ class InputFilter(QtGui.QWidget):
                                                                 [dm].keys())
     
             self._update_dyn_widgets() # check for new subwidgets and update if needed
+        self.load_filter_order()
+        
+#------------------------------------------------------------------------------
+    def load_filter_order(self):
+        """
+        Called by set_design_method 
+        - load filter order setting from fb.fil[0] and set widgets
+
+        """                
+        # read list of available filter order [fo] methods for current 
+        # design method [dm] from fil_tree:
+        foList = fb.fil_tree[fb.fil[0]['rt']]\
+            [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
+
+        # is currently selected fo setting available for (new) dm ?
+        if fb.fil[0]['fo'] in foList:
+            self.fo = fb.fil[0]['fo'] # keep current setting
+        else:
+            self.fo = foList[0] # use first list entry from filterTree
+            fb.fil[0]['fo'] = self.fo # and update fo method
+
+        # Determine which subwidgets are __visible__
+        self.lblOrderN.setVisible('man' in foList)
+        self.ledOrderN.setVisible('man' in foList)
+        self.chkMinOrder.setVisible('min' in foList)
+
+        # Determine which subwidgets are __enabled__
+        self.chkMinOrder.setChecked(fb.fil[0]['fo'] == 'min')
+        self.ledOrderN.setText(str(fb.fil[0]['N']))
+        self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
+        self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
+
+#------------------------------------------------------------------------------    
+    def set_filter_order(self):
+        """
+        Triggered when either ledOrderN or chkMinOrder are edited:
+        - read settings and copy them to fb.fil[0]
+        - create / update global filter instance fb.fil_inst of dm class
+        - update dynamic widgets (if any)
+        - set filter_initialized = True
+        """
+        # Determine which subwidgets are _enabled_
+        if self.chkMinOrder.isVisible():
+            self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
+            self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
+            
+            if self.chkMinOrder.isChecked() == True:
+                # update in case N has been changed outside this class
+                self.ledOrderN.setText(str(fb.fil[0]['N']))
+                fb.fil[0].update({'fo' : 'min'})
+                
+            else:
+                fb.fil[0].update({'fo' : 'man'})
+                
+        else:
+            self.lblOrderN.setEnabled(self.fo == 'man')
+            self.ledOrderN.setEnabled(self.fo == 'man')
+
+        ordn = int(abs(float(self.ledOrderN.text())))
+        self.ledOrderN.setText(str(ordn))
+        fb.fil[0].update({'N' : ordn})
+        
+#        self.sigSpecsChanged.emit() # -> input_widgets
+
     
 #------------------------------------------------------------------------------
     def _update_dyn_widgets(self):
