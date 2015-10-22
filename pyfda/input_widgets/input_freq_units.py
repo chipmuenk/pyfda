@@ -191,6 +191,9 @@ class InputFreqUnits(QtGui.QWidget):
             senderName = ""
 
         rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
+        if not isinstance(rangeType, str):
+            rangeType = str(rangeType.toString()) # needed for Python 2.x
+
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
         if rangeType == 'whole':
             f_lim = [0, self.f_S]
