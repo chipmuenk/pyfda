@@ -42,8 +42,8 @@ class InputSpecs(QtGui.QWidget):
         self.sel_fil = input_filter.InputFilter(DEBUG=False)
         self.sel_fil.setObjectName("select_filter")
         # subwidget for selecting filter order ['man' (numeric) or 'min']
-        self.fil_ord = input_order.InputOrder(DEBUG=False)
-        self.fil_ord.setObjectName("filter_order")
+#        self.fil_ord = input_order.InputOrder(DEBUG=False)
+#        self.fil_ord.setObjectName("filter_order")
         # subwidget for selecting the frequency unit and range
         self.f_units = input_freq_units.InputFreqUnits(DEBUG=False)
         self.f_units.setObjectName("freq_units")
@@ -85,7 +85,6 @@ class InputSpecs(QtGui.QWidget):
                                        QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
         layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
-#        layGMain.addWidget(self.fil_ord, 1, 0, 1, 2)  # Filter order
         layGMain.addWidget(self.f_units, 2, 0, 1, 2)  # Frequency units
         layGMain.addWidget(self.f_specs, 3, 0, 1, 2)  # Freq. specifications
         layGMain.addWidget(self.a_specs, 4, 0, 1, 2)  # Amplitude specs
@@ -94,7 +93,6 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.t_specs, 7, 0, 1, 2)  # Target specs
         layGMain.addWidget(self.butDesignFilt, 8, 0)#, 1, 2)
         layGMain.addWidget(self.butQuit, 8, 1)#, 1, 2)
-#        layGMain.addWidget(self.butReadFiltTree, 8,1)
         layGMain.addItem(spcV, 9, 0, 1, 2)
 #        layGMain.addWidget(self.HLine(), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(0, 0, 0, 0)
@@ -109,7 +107,6 @@ class InputSpecs(QtGui.QWidget):
         #
         # Changes requiring update of UI because number or kind of
         # input fields has changed:
-        self.fil_ord.sigSpecsChanged.connect(self.updateAllUIs)
         self.sel_fil.sigFiltChanged.connect(self.updateAllUIs)
 
         # Changes requiring recalculation of frequency specs
@@ -176,11 +173,9 @@ class InputSpecs(QtGui.QWidget):
             print('freqLabels:', self.f_params)
             print('weightLabels:', self.weightParams)
 
-        # pass new labels to widgets and recreate UI
-        # set widgets invisible if param list is empty
-        self.fil_ord.loadEntries()
+        self.sel_fil.load_filter_order() # update filter order from dict
 
-        # build separate parameters for min. and man. filter order        
+        # build separate parameter lists for min. and man. filter order        
         min_params = man_params = []
         
         if "min" in fb.fil_tree[rt][ft][dm]:
@@ -225,7 +220,7 @@ class InputSpecs(QtGui.QWidget):
         -- not used yet --
         """
         # collect data from widgets and write to fb.fil[0]
-        self.fil_ord.storeEntries() # filter order widget
+#        self.sel_fil.storeEntries() # filter order widget
         self.f_specs.storeEntries() # frequency specification widget
         self.f_units.storeEntries() # frequency specification widget
         self.a_specs.storeEntries() # magnitude specs with unit
@@ -240,7 +235,6 @@ class InputSpecs(QtGui.QWidget):
         """
         self.sel_fil.load_entries() # select filter widget
         self.f_units.loadEntries() # frequency units widget
-        self.fil_ord.loadEntries() # filter order widget
         self.f_specs.loadEntries() # frequency specification widget
         self.a_specs.loadEntries() # magnitude specs with unit
         self.w_specs.loadEntries() # weight specification
@@ -275,27 +269,30 @@ class InputSpecs(QtGui.QWidget):
         # design the filter by passing current specs to the method, yielding
         # e.g. cheby1.LPman(fb.fil[0])
 
+        # Create / update global instance fb.fil_inst of selected filter class dm 
+        # instantiated in InputFilter.set_design_method
+        # call the method specified as a string in the argument of the
+        # filter instance defined previously in InputFilter.set_response_type
+
+        print("\n---- InputSpecs.startDesignFilt ----")
+        print(type(fb.fil_inst))
+
         try:
-            print("\n---- InputSpecs.startDesignFilt ----")
-            print(type(fb.fil_inst))
- 
-            # Create / update global instance fb.fil_inst of selected filter class dm 
-            # instantiated in InputFilter.set_design_method
-            # call the method specified as a string in the argument of the
-            # filter instance defined previously in InputFilter.set_response_type
+    
             err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
             # The called method writes coeffs, poles/zeros etc. back to
             # the global filter dict fb.fil[0]
             
             if err > 0:
-                raise AttributeError("Unknown design method.") 
-
+                raise AttributeError("Unknown design method.")
+                self.color_design_button("error")
+    
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
-            self.fil_ord.loadEntries()
+            self.sel_fil.load_entries()
             self.w_specs.loadEntries()
             self.f_specs.loadEntries()
-
+    
             self.sigFilterDesigned.emit() # emit signal -> input_widgets
 
         except Exception as e:
