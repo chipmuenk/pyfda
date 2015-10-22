@@ -360,7 +360,7 @@ class InputFilter(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def load_filter_order(self):
         """
-        Called by set_design_method 
+        Called by set_design_method or from InputSpecs
         - load filter order setting from fb.fil[0] and set widgets
 
         """                
