@@ -288,7 +288,7 @@ class InputFilter(QtGui.QWidget):
         self.cmbDesignMethod.clear()
         dm_list = []
 
-        for dm in fb.fil_tree[self.rt][self.ft]:
+        for dm in sorted(fb.fil_tree[self.rt][self.ft]):
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
             dm_list.append(dm)
 
