@@ -26,6 +26,8 @@ import pyfda.pyfda_rc as rc
 # TODO: Check for unneeded attributes self. ...
 # TODO: Filter order N has to be re-read and displayed after filter calculation
 # TODO: new methods: load_settings, store_settings, update_settings
+# TODO: Changing from ...[min] to bessel gives error "unhashable type: "dict"
+#         in input_specs updateAllUIs line 154 all_params = ... - ONLY Py3 !!!
 
 class InputFilter(QtGui.QWidget):
     """
@@ -171,9 +173,6 @@ class InputFilter(QtGui.QWidget):
         self.layHOrdWdg.addItem(self.spacer)
         self.layHOrdWdg.addWidget(self.lblOrderN)
         self.layHOrdWdg.addWidget(self.ledOrderN)
-#        self.layHOrdWdg.addWidget(self.frmDynWdg)
-
-
 
         # stack standard + dynamic subwidgets vertically:
         layVAllWdg = QtGui.QVBoxLayout()
@@ -364,8 +363,8 @@ class InputFilter(QtGui.QWidget):
         - load filter order setting from fb.fil[0] and set widgets
 
         """                
-        # read list of available filter order [fo] methods for current 
-        # design method [dm] from fil_tree:
+        # read list of available filter order [fo] methods for  
+        # current design method [dm] from fil_tree:
         foList = fb.fil_tree[fb.fil[0]['rt']]\
             [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
 
