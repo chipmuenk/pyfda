@@ -41,9 +41,6 @@ class InputSpecs(QtGui.QWidget):
         # filter type ft (IIR, ...) and design method dm (cheby1, ...)
         self.sel_fil = input_filter.InputFilter(DEBUG=False)
         self.sel_fil.setObjectName("select_filter")
-        # subwidget for selecting filter order ['man' (numeric) or 'min']
-#        self.fil_ord = input_order.InputOrder(DEBUG=False)
-#        self.fil_ord.setObjectName("filter_order")
         # subwidget for selecting the frequency unit and range
         self.f_units = input_freq_units.InputFreqUnits(DEBUG=False)
         self.f_units.setObjectName("freq_units")
@@ -132,7 +129,7 @@ class InputSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def updateAllUIs(self):
         """
-        This method is called every time the filter design method or order
+        updateAllUIs is called every time the filter design method or order
         (min / man) has been changed. This usually requires a different set of
         frequency and amplitude specs.
         
@@ -217,7 +214,8 @@ class InputSpecs(QtGui.QWidget):
         """
         Store all entries of current filter design in global dict fb.fil[0]
         parameters, using the "storeEntries" methods of the classes
-        -- not used yet --
+        -- not used yet & shouldn't be used as all UI changes are copied to 
+        the filter dict immediately.
         """
         # collect data from widgets and write to fb.fil[0]
 #        self.sel_fil.storeEntries() # filter order widget
