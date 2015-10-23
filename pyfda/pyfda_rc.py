@@ -76,7 +76,8 @@ css_dark = {'TopWidget':('QWidget{color:white;background: #222222;}'
                         'QTableView{alternate-background-color:#222222;'
                              'background-color:black; gridline-color: white;}' 
                         'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
-                        'QLineEdit{background: #222222; color:white;}'),
+                        'QLineEdit{background: #222222; color:white;}'
+                        'QLineEdit:disabled{background-color:darkgrey;}'),
           'LineEdit':'QLineEdit{background: #222222; color:white;}'
           }
           
@@ -89,7 +90,9 @@ css_light = {'TopWidget':('.QTabWidget>QWidget>QWidget{border: 1px solid grey}'
                         '.QWidget{color:black; background: white}'
                         'QPushButton{background-color:lightgrey; color:black;}'
                         'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
-                        'QLineEdit{background: white; color:black;}'),
+                        'QLineEdit{background: white; color:black;}'
+                        'QLineEdit:disabled{background-color:lightgrey;}'
+),
             'LineEdit':''
 }
 #            'TabBar':('QTabWidget::pane {border-top: 2px solid #C2C7CB;}' 
@@ -150,6 +153,7 @@ css_rc = {'TopWidget':('*[state="changed"]{background-color:yellow; color:black}
                       '*[state="ok"]{background-color:green; color:white}'
                       'QPushButton:pressed {background-color:black; color:white}'
                       'QWidget{font-size:12px; font-family: Tahoma;}'
+                      'QLineEdit{background-color:lightblue;}'
                       'QTabBar{font-size:13px; font-weight:bold;}') + TabBarCss,
           'LineEdit':''
           }
