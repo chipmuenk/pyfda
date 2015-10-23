@@ -11,7 +11,7 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
                           plot_3d)
 
 #------------------------------------------------------------------------------
-class PlotWidgets(QtGui.QWidget):
+class PlotTabWidgets(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
 #        css = """
@@ -73,7 +73,7 @@ class PlotWidgets(QtGui.QWidget):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotWidgets()
+    form = PlotTabWidgets()
     form.show()
     app.exec_()
 
