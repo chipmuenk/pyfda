@@ -149,7 +149,7 @@ TabBarCss = """
 """
 css_rc = {'TopWidget':('*[state="changed"]{background-color:yellow; color:black}'
                       '*[state="error"]{background-color:red; color:white}'
-                      '*[state="fail"]{background-color:orange; color:white}'
+                      '*[state="failed"]{background-color:orange; color:white}'
                       '*[state="ok"]{background-color:green; color:white}'
                       'QPushButton:pressed {background-color:black; color:white}'
                       'QWidget{font-size:12px; font-family: Tahoma;}'
