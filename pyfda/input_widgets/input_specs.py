@@ -124,6 +124,7 @@ class InputSpecs(QtGui.QWidget):
         #----------------------------------------------------------------------
 
         self.updateAllUIs() # first time initialization
+        self.startDesignFilt()
 
 
 #------------------------------------------------------------------------------
