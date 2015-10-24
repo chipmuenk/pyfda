@@ -292,6 +292,7 @@ class InputSpecs(QtGui.QWidget):
             self.sel_fil.load_entries()
             self.w_specs.loadEntries()
             self.f_specs.loadEntries()
+            self.color_design_button("ok")
     
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
