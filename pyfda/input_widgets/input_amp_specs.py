@@ -163,18 +163,18 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         if idx == 0: # Entry is in dBs, same as in dictionary
             for i in range(len(self.qlineedit)):
                 fb.fil[0].update(
-                    {self.qlineedit[i].objectName():
+                    {str(self.qlineedit[i].objectName()):
                         simple_eval(self.qlineedit[i].text())})
 
         elif idx == 1:  # Entries are voltages, convert to dBs
             for i in range(len(self.qlineedit)):
                 fb.fil[0].update(
-                   {self.qlineedit[i].objectName():round(
+                   {str(self.qlineedit[i].objectName()):round(
                       -20 * log10 (simple_eval(self.qlineedit[i].text())),8)})
         else:  # Entries are powers, convert to dBs
             for i in range(len(self.qlineedit)):
                 fb.fil[0].update(
-                    {self.qlineedit[i].objectName():round(
+                    {str(self.qlineedit[i].objectName()):round(
                        -10 * log10 (simple_eval(self.qlineedit[i].text())),8)})
                        
         self.sigSpecsChanged.emit() # -> input_widgets
