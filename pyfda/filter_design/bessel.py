@@ -9,6 +9,7 @@ is selected, calling the __init__ method.
 
 Author: Christian Muenker
 """
+# TODO: bandpass and bandstop designs are unstable???
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import buttord
