@@ -293,7 +293,7 @@ class InputSpecs(QtGui.QWidget):
             self.w_specs.loadEntries()
             self.f_specs.loadEntries()
     
-            self.sigFilterDesigned.emit() # emit signal -> input_widgets
+            self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
         except Exception as e:
             print("\n---- InputSpecs.startDesignFilt ----")
@@ -314,11 +314,17 @@ class InputSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def color_design_button(self, state):
         """
-        Color the >> DESIGN FILTER << button:
-        green:  filter has been designed, everything ok
-        yellow: filter specs have been changed
-        red:    an error has occurred during filter design
-        orange: filter does not meet target specs
+        Color the >> DESIGN FILTER << button according to the filter design state:
+        
+        "ok":  green, filter has been designed, everything ok
+
+        "changed": yellow, filter specs have been changed
+
+        "error" : red, an error has occurred during filter design
+
+        orange : orange, filter does not meet target specs
+
+        The actual colors are defined in pyfda_rc.py
         """
 
   #      print("state", state)
