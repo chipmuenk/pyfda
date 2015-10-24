@@ -78,7 +78,6 @@ class InputTargetSpecs(QtGui.QWidget):
 
         #----------------------------------------------------------------------
         # NO   SIGNALS & SLOTS
-
         self.updateUI() # first time initialization
         
 
@@ -98,7 +97,7 @@ class InputTargetSpecs(QtGui.QWidget):
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
-    def storeEntries(self):
+    def store_entries(self):
         """
         Update global dict fb.fil[0] with currently selected filter
         parameters, using the update methods of the classes
@@ -110,7 +109,7 @@ class InputTargetSpecs(QtGui.QWidget):
         if self.DEBUG: print(fb.fil[0])
 
 #------------------------------------------------------------------------------
-    def loadEntries(self):
+    def load_entries(self):
         """
         Update entries from global dict fb.fil[0]
         parameters, using the "load" methods of the classes
