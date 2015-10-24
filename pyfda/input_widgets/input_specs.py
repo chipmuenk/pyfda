@@ -108,7 +108,7 @@ class InputSpecs(QtGui.QWidget):
 
         # Changes requiring recalculation of frequency specs
         self.f_units.sigSpecsChanged.connect(self.f_specs.loadEntries)
-        self.f_units.sigSpecsChanged.connect(self.t_specs.loadEntries)
+        self.f_units.sigSpecsChanged.connect(self.t_specs.load_entries)
 
         # Connect sigSpecsChanged signal to next hierarchy level to propagate
         # changes requiring reload of parameters e.g. to the plot tabs
@@ -121,11 +121,12 @@ class InputSpecs(QtGui.QWidget):
         # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.startDesignFilt)
         self.butQuit.clicked.connect(QtGui.qApp.quit) # which qApp is this??
+        
+#        self.t_specs.changeEvent.connect(self.t_specs.load_entries)
         #----------------------------------------------------------------------
 
         self.updateAllUIs() # first time initialization
         self.startDesignFilt()
-
 
 #------------------------------------------------------------------------------
     def updateAllUIs(self):
@@ -219,12 +220,12 @@ class InputSpecs(QtGui.QWidget):
         the filter dict immediately.
         """
         # collect data from widgets and write to fb.fil[0]
-#        self.sel_fil.storeEntries() # filter order widget
+#        self.sel_fil.store_entries() # filter order widget
         self.f_specs.storeEntries() # frequency specification widget
         self.f_units.storeEntries() # frequency specification widget
         self.a_specs.storeEntries() # magnitude specs with unit
         self.w_specs.storeEntries() # weight specification
-        self.t_specs.storeEntries() # target specs
+        self.t_specs.store_entries() # target specs
 
 #------------------------------------------------------------------------------
     def load_all_specs(self):
@@ -237,7 +238,7 @@ class InputSpecs(QtGui.QWidget):
         self.f_specs.loadEntries() # frequency specification widget
         self.a_specs.loadEntries() # magnitude specs with unit
         self.w_specs.loadEntries() # weight specification
-        self.t_specs.loadEntries() # target specs
+        self.t_specs.load_entries() # target specs
 
         if self.DEBUG:
             print("=== input_specs.py : loadAll ===")
