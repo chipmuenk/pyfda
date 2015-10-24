@@ -323,13 +323,13 @@ class InputSpecs(QtGui.QWidget):
 
         "error" : red, an error has occurred during filter design
 
-        orange : orange, filter does not meet target specs
+        "failed" : orange, filter fails to meet target specs
 
         The actual colors are defined in pyfda_rc.py
         """
 
-  #      print("state", state)
         self.butDesignFilt.setProperty("state", str(state))
+        fb.design_filt_state = state
         self.butDesignFilt.style().unpolish(self.butDesignFilt)
         self.butDesignFilt.style().polish(self.butDesignFilt)
         self.butDesignFilt.update()
