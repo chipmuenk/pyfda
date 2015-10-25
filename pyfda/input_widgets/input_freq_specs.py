@@ -132,27 +132,7 @@ class InputFreqSpecs(QtGui.QWidget):
             f = fb.fil[0][str(self.qlineedit[i].objectName())] * fb.fil[0]['f_S']
             self.qlineedit[i].setText(str(round(f,11)))
 
-        self._sort_store_entries()
-
-#-------------------------------------------------------------
-    def storeEntries(self):
-        """
-        - Sort spec entries with ascending frequency if button is pressed
-        - Store specification entries in filter dictionary:
-          Entries are normalized with sampling frequency fb.fil[0]['f_S'] !
-          The unit scale factor (khz, ...) is contained neither in f_S nor in 
-          the specs, hence, it cancels out.
-        - Emit sigFilterChanged signal
-        """
-
-        self._sort_store_entries() 
-           
-        for i in range(len(self.qlineedit)):
-            fb.fil[0].update(
-                {str(self.qlineedit[i].objectName()):
-                    simple_eval(self.qlineedit[i].text())/fb.fil[0]['f_S']})
-                      
-        self.sigSpecsChanged.emit()
+        self.store_entries(signal = False)
 
 
 #-------------------------------------------------------------
@@ -206,25 +186,33 @@ class InputFreqSpecs(QtGui.QWidget):
         self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
 
-#-------------------------------------------------------------        
-    def _sort_store_entries(self):
+#-------------------------------------------------------------
+    def store_entries(self, signal = True):
         """
-        Sort visible spec entries with ascending frequency if "sort" button is
-        pressed and write the sorted freq. specs back into the lineedit widgets
-        and into the filter dict.
+        - Sort spec entries with ascending frequency if sort button is activated
+        - Store specification entries in filter dictionary:
+          Entries are normalized with sampling frequency fb.fil[0]['f_S'] !
+          The unit scale factor (khz, ...) is contained neither in f_S nor in 
+          the specs, hence, it cancels out.
+        - Emit sigSpecsChanged signal
         """
+
+#        self._sort_store_entries()
         if fb.fil[0]['freq_specs_sort']:
             fSpecs = [simple_eval(self.qlineedit[i].text())
                                             for i in range(len(self.qlineedit))]
             fSpecs.sort()
-    
+            
             for i in range(len(self.qlineedit)):
                 self.qlineedit[i].setText(str(fSpecs[i]))
-                
+           
         for i in range(len(self.qlineedit)):
             fb.fil[0].update(
                 {str(self.qlineedit[i].objectName()):round(
                     simple_eval(self.qlineedit[i].text())/fb.fil[0]['f_S'],11)})
+        if signal:
+            self.sigSpecsChanged.emit()
+        
 
 
 
