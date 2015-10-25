@@ -97,16 +97,17 @@ class InputTargetSpecs(QtGui.QWidget):
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
-    def store_entries(self):
-        """
-        Update global dict fb.fil[0] with currently selected filter
-        parameters, using the update methods of the classes
-        """
-        # collect data from widgets and write to fb.fil[0]
-        self.fspecs.storeEntries() # frequency specification widget
-        self.aspecs.storeEntries() # magnitude specs with unit
-
-        if self.DEBUG: print(fb.fil[0])
+# not needed yet
+#    def store_entries(self):
+#        """
+#        Update global dict fb.fil[0] with currently selected filter
+#        parameters, using the update methods of the classes
+#        """
+#        # collect data from widgets and write to fb.fil[0]
+#        self.fspecs.store_entries() # frequency specification widget
+#        self.aspecs.store_entries() # magnitude specs with unit
+#
+#        if self.DEBUG: print(fb.fil[0])
 
 #------------------------------------------------------------------------------
     def load_entries(self):
