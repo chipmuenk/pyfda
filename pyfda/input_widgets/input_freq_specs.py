@@ -73,7 +73,7 @@ class InputFreqSpecs(QtGui.QWidget):
         # =========== SIGNALS & SLOTS =======================================
         
         # DYNAMIC SIGNAL SLOT CONNECTION:
-        # Every time a field is edited, call self.storeEntries 
+        # Every time a field is edited, call self.store_entries 
         # This signal-slot connection is constructed in self._addEntry / 
         # destructed in self._delEntry each time the widget is updated, 
         # i.e. when a new filter design method is selected.
@@ -103,14 +103,14 @@ class InputFreqSpecs(QtGui.QWidget):
                         str(fb.fil[0][newLabels[i]] * fb.fil[0]['f_S']))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
-        self.storeEntries()         # sort & store values to dict for the case 
+        self.store_entries()         # sort & store values to dict for the case 
                                     # that the response type has been changed 
                                     # eg. from LP -> HP, changing the order 
                                     # of frequency entries
 
 
 #-------------------------------------------------------------        
-    def loadEntries(self):
+    def load_entries(self):
         """
         Reload textfields from filter dictionary 
         Transform the displayed frequency spec input fields according to the units
@@ -173,9 +173,9 @@ class InputFreqSpecs(QtGui.QWidget):
     def _delEntry(self,i):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit) and
-        disconnect the lineedit field from self._sort_storeEntries.
+        disconnect the lineedit field from self._sort_store_entries.
         """
-        self.qlineedit[i].editingFinished.disconnect(self.storeEntries) # needed?
+        self.qlineedit[i].editingFinished.disconnect(self.store_entries) # needed?
 
         self.layGSpecWdg.removeWidget(self.qlabels[i])
         self.layGSpecWdg.removeWidget(self.qlineedit[i])
@@ -190,7 +190,7 @@ class InputFreqSpecs(QtGui.QWidget):
     def _addEntry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and connect
-        QLineEdit widget to self._sort_storeEntries. This way, the central filter
+        QLineEdit widget to self._sort_store_entries. This way, the central filter
         dictionary is updated automatically when a QLineEdit field has been
         edited.
         """
@@ -201,7 +201,7 @@ class InputFreqSpecs(QtGui.QWidget):
                                     str(fb.fil[0][newLabel]*fb.fil[0]['f_S'])))
         self.qlineedit[i].setObjectName(newLabel) # update ID
         
-        self.qlineedit[i].editingFinished.connect(self.storeEntries)
+        self.qlineedit[i].editingFinished.connect(self.store_entries)
 
         self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)

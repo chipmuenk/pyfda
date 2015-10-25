@@ -107,7 +107,7 @@ class InputSpecs(QtGui.QWidget):
         self.sel_fil.sigFiltChanged.connect(self.updateAllUIs)
 
         # Changes requiring recalculation of frequency specs
-        self.f_units.sigSpecsChanged.connect(self.f_specs.loadEntries)
+        self.f_units.sigSpecsChanged.connect(self.f_specs.load_entries)
         self.f_units.sigSpecsChanged.connect(self.t_specs.load_entries)
 
         # Connect sigSpecsChanged signal to next hierarchy level to propagate
@@ -221,9 +221,9 @@ class InputSpecs(QtGui.QWidget):
         """
         # collect data from widgets and write to fb.fil[0]
 #        self.sel_fil.store_entries() # filter order widget
-        self.f_specs.storeEntries() # frequency specification widget
+        self.f_specs.store_entries() # frequency specification widget
         self.f_units.storeEntries() # frequency specification widget
-        self.a_specs.storeEntries() # magnitude specs with unit
+        self.a_specs.store_entries() # magnitude specs with unit
         self.w_specs.storeEntries() # weight specification
         self.t_specs.store_entries() # target specs
 
@@ -235,8 +235,8 @@ class InputSpecs(QtGui.QWidget):
         """
         self.sel_fil.load_entries() # select filter widget
         self.f_units.loadEntries() # frequency units widget
-        self.f_specs.loadEntries() # frequency specification widget
-        self.a_specs.loadEntries() # magnitude specs with unit
+        self.f_specs.load_entries() # frequency specification widget
+        self.a_specs.load_entries() # magnitude specs with unit
         self.w_specs.loadEntries() # weight specification
         self.t_specs.load_entries() # target specs
 
@@ -291,7 +291,7 @@ class InputSpecs(QtGui.QWidget):
             # have been changed by the design algorithm
             self.sel_fil.load_entries()
             self.w_specs.loadEntries()
-            self.f_specs.loadEntries()
+            self.f_specs.load_entries()
             self.color_design_button("ok")
     
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
@@ -327,7 +327,6 @@ class InputSpecs(QtGui.QWidget):
 
         The actual colors are defined in pyfda_rc.py
         """
-
         self.butDesignFilt.setProperty("state", str(state))
         fb.design_filt_state = state
         self.butDesignFilt.style().unpolish(self.butDesignFilt)

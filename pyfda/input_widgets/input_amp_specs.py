@@ -120,16 +120,16 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         if senderName == "cmbUnitsA" and idx != self.idxOld:
             # combo unit has changed -> change display of amplitude entries
-            self.loadEntries()
+            self.load_entries()
 
         else: # amplitude spec textfield has been changed
-            self.storeEntries()
+            self.store_entries()
             
         self.idxOld = idx
         
 
 #------------------------------------------------------------------------------
-    def loadEntries(self):
+    def load_entries(self):
         """
         Reload textfields from filter dictionary to reflect settings that
         may have been changed by the filter design algorithm
@@ -153,7 +153,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
 
 #------------------------------------------------------------------------------
-    def storeEntries(self):
+    def store_entries(self):
         """
         Store specification entries in filter dictionary
         Entries are always stored in dB (20 log10) !
