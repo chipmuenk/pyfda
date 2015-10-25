@@ -45,10 +45,10 @@ class pyFDA(QtGui.QMainWindow):
         """
 
         # Instantiate widget groups
-        self.inputWidgets = input_tab_widgets.InputWidgets() # input widgets
+        self.inputWidgets = input_tab_widgets.InputTabWidgets() # input widgets
         self.inputWidgets.setMaximumWidth(320) # comment out for splitter
 
-        self.pltWidgets = plot_tab_widgets.PlotWidgets() # plot widgets
+        self.pltWidgets = plot_tab_widgets.PlotTabWidgets() # plot widgets
 
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
@@ -208,6 +208,8 @@ def main():
  #                     pyfda_rc.css_rc['TabBar'])
     mainw = pyFDA()
 # http://stackoverflow.com/questions/5506781/pyqt4-application-on-windows-is-crashing-on-exit
+# http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
+# http://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
     app.setActiveWindow(mainw) #<---- This is what's probably missing
 
 

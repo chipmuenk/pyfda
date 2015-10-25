@@ -5,7 +5,7 @@ Widget for exporting / importing and saving / loading filter data
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys, os, io
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
@@ -15,11 +15,10 @@ import re
 #import json
 
 #import shelve
-#try:
-#    import cPickle as pickle
-#except:
-#    import pickle
-import pprint
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 try:
     import xlwt
@@ -42,6 +41,7 @@ import xlrd
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 # TODO: Save P/Z as well if possible
+# TODO: Line 192 in save_filter: Attribute Error: QString object has no attribute "endswith"
 
 class InputFiles(QtGui.QWidget):
     """
@@ -138,16 +138,17 @@ class InputFiles(QtGui.QWidget):
         Load filter from zipped binary numpy array or (c)pickled object to
         filter dictionary and update input and plot widgets
         """
-#        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
-        file_types = ("Zipped Binary Numpy Array (*.npz)")
+        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+#        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg=QtGui.QFileDialog( self )
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Load filter ", directory = self.basedir,
                 filter = file_types)
+        file_name = str(file_name) # QString is returned
         if file_name != "": # cancelled file operation returns empty string
             file_type_err = False              
             try:
-                with open(file_name, 'rb') as f:
+                with io.open(file_name, 'rb') as f:
                     if file_name.endswith('npz'):
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
                         a = np.load(f) # array containing dict, dtype 'object'
@@ -159,9 +160,12 @@ class InputFiles(QtGui.QWidget):
                             else:
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
-#                    elif file_name.endswith('pkl'):
-#                        # this only works for python >= 3.3
-#                        fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
+                    elif file_name.endswith('pkl'):
+                        if sys.version_info[0] < 3:
+                            fb.fil = pickle.load(f)
+                        else:
+                        # this only works for python >= 3.3
+                            fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
                     else:
                         print('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
@@ -171,29 +175,31 @@ class InputFiles(QtGui.QWidget):
                          # emit signal -> pyFDA -> pltWidgets.updateAll() :
                         self.sigFilterLoaded.emit()
                         self.basedir = os.path.dirname(file_name)
-            except IOError:
-                print("Failed loading %s!" %file_name)
-            
+            except IOError as e:
+                print("Failed loading %s!" %file_name, "\n", e)
+            except Exception as e:
+                print("Unexpected error:", e)
 #------------------------------------------------------------------------------
     def save_filter(self):
         """
         Save filter as zipped binary numpy array or pickle object
         """
-#        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl);;JSON (*.json)")
-        file_types = ("Zipped Binary Numpy Array (*.npz)")
+        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")# ;;JSON (*.json)")
+#        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg = QtGui.QFileDialog( self )
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save filter as", directory = self.basedir,
-                filter = file_types)                
+                filter = file_types)
+        file_name = str(file_name) # QString is returned              
         if file_name != "": # cancelled file operation returns empty string 
             file_type_err = False
             try:
-                with open(file_name, 'wb') as f:
+                with io.open(file_name, 'wb') as f:
                     if file_name.endswith('npz'):
                         np.savez(f, **fb.fil[0])
-#                    elif file_name.endswith('pkl'):
-#                        # save as a version compatible with Python 2.x
-#                        pickle.dump(fb.fil, f, protocol = 2)
+                    elif file_name.endswith('pkl'):
+                        # save as a version compatible with Python 2.x
+                        pickle.dump(fb.fil, f, protocol = 2)
 #                    elif file_name.endswith('json'):
 #                        json.dumps(fb.fil[0],f, sort_keys = True, indent = 4,
 #                                       ensure_ascii=False)
@@ -228,11 +234,12 @@ class InputFiles(QtGui.QWidget):
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Export filter coefficients as", 
                 directory = self.basedir, filter = file_types) 
+        file_name = str(file_name)
         if file_name != '': # cancelled file operation returns empty string   
             ba = fb.fil[0]['ba']
             file_type_err = False
             try:
-                with open(file_name, 'wb') as f:
+                with io.open(file_name, 'wb') as f:
                     if file_name.endswith('mat'):   
                         scipy.io.savemat(f, mdict={'ba':fb.fil[0]['ba']})
                     elif file_name.endswith('csv'):
@@ -316,7 +323,7 @@ class InputFiles(QtGui.QWidget):
         if file_name != '': # cancelled file operation returns empty string  
             file_type_err = False
             try:
-                with open(file_name, 'r') as f:
+                with io.open(file_name, 'r') as f:
                     if file_name.endswith('mat'):
                         data = scipy.io.loadmat(f)
                         fb.fil[0]['ba'] = data['ba']

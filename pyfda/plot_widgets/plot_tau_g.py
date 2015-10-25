@@ -23,12 +23,13 @@ class PlotTauG(QtGui.QMainWindow):
         self.DEBUG = DEBUG
 #
 #        self.lblWrap = QtGui.QLabel("Wrapped Phase")
-#        self.btnWrap = QtGui.QCheckBox()
-#        self.btnWrap.setChecked(False)
-#        self.btnWrap.setToolTip("Plot phase wrapped to +/- pi")
+        self.chkWarnings = QtGui.QCheckBox()
+        self.chkWarnings.setText("Enable Warnings")
+        self.chkWarnings.setChecked(False)
+        self.chkWarnings.setToolTip("Print warnings about singular group delay")
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
-#        self.layHChkBoxes.addWidget(self.cmbUnitsPhi)
+        self.layHChkBoxes.addWidget(self.chkWarnings)
 
         self.mplwidget = MplWidget()
 #        self.mplwidget.setParent(self)
@@ -46,7 +47,7 @@ class PlotTauG(QtGui.QMainWindow):
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-#        self.btnWrap.clicked.connect(self.draw)
+        self.chkWarnings.clicked.connect(self.draw)
 #        self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
 
     def initAxes(self):
@@ -64,6 +65,12 @@ class PlotTauG(QtGui.QMainWindow):
     def draw(self):
         if self.mplwidget.mplToolbar.enable_update:
             self.draw_taug()
+            
+    def update_specs(self):
+        """
+        Update frequency range etc. without recalculating group delay.
+        """
+        pass
 
     def draw_taug(self):
         """
@@ -77,7 +84,8 @@ class PlotTauG(QtGui.QMainWindow):
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
-        [tau_g, w] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF)
+        [tau_g, w] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF, 
+            verbose = self.chkWarnings.isChecked())
 
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':

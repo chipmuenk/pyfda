@@ -4,6 +4,7 @@ Widget for entering frequency specifications
 
 Author: Christian Münker
 """
+# TODO: using objectName is an ugly hack that causes problems in Python 2
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 from PyQt4 import QtGui
@@ -96,7 +97,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
             else:
                 # when entry has changed, update label and corresponding value
-                if self.qlineedit[i].objectName() != newLabels[i]:
+                if str(self.qlineedit[i].objectName()) != newLabels[i]:
                     self.qlabels[i].setText(self._rtLabel(newLabels[i]))
                     self.qlineedit[i].setText(
                         str(fb.fil[0][newLabels[i]] * fb.fil[0]['f_S']))
@@ -128,7 +129,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
         # recalculate displayed freq spec values for (maybe) changed f_S
         for i in range(len(self.qlineedit)):
-            f = fb.fil[0][self.qlineedit[i].objectName()] * fb.fil[0]['f_S']
+            f = fb.fil[0][str(self.qlineedit[i].objectName())] * fb.fil[0]['f_S']
             self.qlineedit[i].setText(str(round(f,11)))
 
         self._sort_store_entries()
@@ -148,7 +149,7 @@ class InputFreqSpecs(QtGui.QWidget):
            
         for i in range(len(self.qlineedit)):
             fb.fil[0].update(
-                {self.qlineedit[i].objectName():
+                {str(self.qlineedit[i].objectName()):
                     simple_eval(self.qlineedit[i].text())/fb.fil[0]['f_S']})
                       
         self.sigSpecsChanged.emit()
@@ -222,7 +223,7 @@ class InputFreqSpecs(QtGui.QWidget):
                 
         for i in range(len(self.qlineedit)):
             fb.fil[0].update(
-                {self.qlineedit[i].objectName():round(
+                {str(self.qlineedit[i].objectName()):round(
                     simple_eval(self.qlineedit[i].text())/fb.fil[0]['f_S'],11)})
 
 

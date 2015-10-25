@@ -38,11 +38,11 @@ class cheby2(object):
                     "<b><i>F<sub>SB</sub></i></b> .")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs'] # manual filter order
+        vis_man = ['fo','fspecs','tspecs','aspecs'] # manual filter order
         vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
+        dis_man = ['tspecs'] # manual filter order
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
