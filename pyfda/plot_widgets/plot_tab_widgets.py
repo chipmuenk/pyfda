@@ -14,14 +14,7 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
 class PlotTabWidgets(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
-#        css = """
-#QTabBar{
-#font-weight:normal;
-#}
-#
-#"""
 
-#        self.setStyleSheet(css)
         self.pltHf = plot_hf.PlotHf()
         self.pltPhi = plot_phi.PlotPhi()
         self.pltPZ = plot_pz.PlotPZ()
@@ -49,7 +42,6 @@ class PlotTabWidgets(QtGui.QWidget):
 #
         self.setLayout(layVMain)
 
-
 #------------------------------------------------------------------------------
     def updateData(self):
         """ Update and redraw all subplots with new filter DATA"""
@@ -59,11 +51,11 @@ class PlotTabWidgets(QtGui.QWidget):
         self.pltTauG.draw()
         self.pltImpz.draw()
         self.plt3D.draw()
-        
+
 #------------------------------------------------------------------------------
     def updateSpecs(self):
         """ Update and redraw all subplots with new filter SPECS"""
-        self.pltHf.draw()
+        self.pltHf.update_plot() # doesn't work flawlessly yet?
         self.pltPhi.draw()
         self.pltTauG.draw()
         self.pltImpz.draw()
