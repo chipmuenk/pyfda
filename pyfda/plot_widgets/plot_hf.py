@@ -22,6 +22,8 @@ class PlotHf(QtGui.QMainWindow):
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
 # TODO: position and size of inset plot should be selectable
+# TODO: draw_phase is only triggered by clicking the button; when frequency range
+#        is switched to +/- 1/2 the display doesn't follow
 
 
     def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
@@ -120,13 +122,16 @@ class PlotHf(QtGui.QMainWindow):
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw_phase)
 
+#------------------------------------------------------------------------------
     def initAxes(self):
-        """Initialize and clear the axes
+        """
+        Initialize and clear the axes
         """
 #        self.ax = self.mplwidget.ax
         self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.clear()
 
+#------------------------------------------------------------------------------
     def plotSpecLimits(self, specAxes):
         """
         Plot the specifications limits (F_SB, A_SB, ...) as lines and as
@@ -239,162 +244,7 @@ class PlotHf(QtGui.QMainWindow):
             ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
             ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
 
-    def draw(self):
-        if self.mplwidget.mplToolbar.enable_update:
-            self.draw_hf()
-
-    def draw_hf(self):
-        """
-        Re-calculate |H(f)| and draw the figure
-        """
-        self.unitA = self.cmbUnitsA.currentText()
-
-        # Linphase settings only makes sense for amplitude plot
-        self.chkLinphase.setCheckable(self.unitA == 'V')
-        self.chkLinphase.setEnabled(self.unitA == 'V')
-        self.lblLinphase.setEnabled(self.unitA == 'V')
-
-        self.specs = self.chkSpecs.isChecked()
-        self.phase = self.chkPhase.isChecked()
-        self.linphase = self.chkLinphase.isChecked()
-
-        self.bb = fb.fil[0]['ba'][0]
-        self.aa = fb.fil[0]['ba'][1]
-
-        self.f_S  = fb.fil[0]['f_S']
-        self.F_PB = fb.fil[0]['F_PB'] * self.f_S
-        self.F_SB = fb.fil[0]['F_SB'] * self.f_S
-
-        self.A_PB  = fb.fil[0]['A_PB']
-        self.A_PB2 = fb.fil[0]['A_PB2']
-        self.A_SB  = fb.fil[0]['A_SB']
-        self.A_SB2 = fb.fil[0]['A_SB2']
-
-        f_lim = fb.fil[0]['freqSpecsRange']
-        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
-
-
-        if self.DEBUG:
-            print("--- plotHf.draw() --- ")
-            print("b, a = ", self.bb, self.aa)
-
-        # calculate H_c(W) (complex) for W = 0 ... pi:
-        [W, self.H_c] = sig.freqz(self.bb, self.aa, worN = rc.params['N_FFT'],
-            whole = wholeF)
-        self.F = W / (2 * np.pi) * self.f_S
-
-        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-            self.H_c = np.fft.fftshift(self.H_c)
-            self.F = self.F - self.f_S/2.
-
-        if self.linphase: # remove the linear phase
-            self.H_c = self.H_c * np.exp(1j * W * fb.fil[0]["N"]/2.)
-
-        if self.cmbShowH.currentIndex() == 0: # show magnitude of H
-            H = abs(self.H_c)
-            H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
-        elif self.cmbShowH.currentIndex() == 1: # show real part of H
-            H = self.H_c.real
-            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
-        else:  # show imag. part of H
-            H = self.H_c.imag
-            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
-
-
-        # clear the axes and (re)draw the plot
-        #
-        if self.ax.get_navigate():
-
-            self.ax.clear()
-
-            #================ Main Plotting Routine =========================
-
-            if self.unitA == 'dB':
-                A_lim = [-self.A_SB -10, self.A_PB +1]
-                self.H_plt = 20*np.log10(abs(H))
-                H_str += ' in dB ' + r'$\rightarrow$'
-            elif self.unitA == 'V': #  'lin'
-                A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
-                self.H_plt = H
-                H_str +=' in V ' + r'$\rightarrow $'
-                self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
-            else: # unit is W
-                A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
-                self.H_plt = H * H.conj()
-                H_str += ' in W ' + r'$\rightarrow $'
-
-            plt_lim = f_lim + A_lim
-
-            #-----------------------------------------------------------
-            self.ax.plot(self.F, self.H_plt, label = 'H(f)')
-            #-----------------------------------------------------------
-            self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
-
-            self.ax.axis(plt_lim)
-
-            if self.specs: self.plotSpecLimits(specAxes = self.ax)
-
-            self.ax.set_title(r'Magnitude Frequency Response')
-            self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
-            self.ax.set_ylabel(H_str)
-
-        self.mplwidget.redraw()
-
-    def draw_phase(self):
-        self.phase = self.chkPhase.isChecked()
-        if self.phase:
-            self.ax_p = self.ax.twinx() # second axes system with same x-axis for phase
-
-            phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
-            if fb.fil[0]['plt_phiUnit'] == 'rad':
-                phi_str += ' in rad ' + r'$\rightarrow $'
-                scale = 1.
-            elif fb.fil[0]['plt_phiUnit'] == 'rad/pi':
-                phi_str += ' in rad' + r'$ / \pi \;\rightarrow $'
-                scale = 1./ np.pi
-            else:
-                phi_str += ' in deg ' + r'$\rightarrow $'
-                scale = 180./np.pi
-        #-----------------------------------------------------------
-            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
-                               'b--', label = "Phase")
-        #-----------------------------------------------------------
-            self.ax_p.set_ylabel(phi_str, color='blue')
-            nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
-            # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
-            # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
-            # http://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
-            # manual setting:
-            #self.ax_p.set_yticks( np.linspace(self.ax_p.get_ylim()[0],self.ax_p.get_ylim()[1],nbins) )
-            #ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 5))
-            #ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 5))
-            #http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
-            
-            # use helper functions from matplotlib.ticker:
-            #   MaxNLocator: set no more than nbins + 1 ticks
-            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.MaxNLocator(nbins = nbins) )
-            # further options: integer = False,
-            #                   prune = [‘lower’ | ‘upper’ | ‘both’ | None] Remove edge ticks
-            #   AutoLocator:
-            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.AutoLocator() )
-            #   LinearLocator:
-            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.LinearLocator(numticks = nbins -1 ) )
-
-#            self.ax_p.locator_params(axis = 'y', nbins = nbins)
-#
-#            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
-#                                             self.ax_p.get_ybound()[1],
-#                                             len(self.ax.get_yticks())-1))
-
-            #N = source_ax.xaxis.get_major_ticks()
-            #target_ax.xaxis.set_major_locator(LinearLocator(N))
-        else:
-            try:
-                self.mplwidget.fig.delaxes(self.ax_p)
-            except (KeyError, AttributeError):
-                pass
-        self.draw()
-
+#------------------------------------------------------------------------------
     def draw_inset(self):
         """
         Construct / destruct second axes for an inset second plot
@@ -447,6 +297,179 @@ class PlotHf(QtGui.QMainWindow):
 
         self.inset_idx = self.cmbInset.currentIndex() # update index
         self.draw()
+
+
+#------------------------------------------------------------------------------
+    def draw_phase(self):
+        if self.chkPhase.isChecked():
+            self.ax_p = self.ax.twinx() # second axes system with same x-axis for phase
+#
+            phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
+            if fb.fil[0]['plt_phiUnit'] == 'rad':
+                phi_str += ' in rad ' + r'$\rightarrow $'
+                scale = 1.
+            elif fb.fil[0]['plt_phiUnit'] == 'rad/pi':
+                phi_str += ' in rad' + r'$ / \pi \;\rightarrow $'
+                scale = 1./ np.pi
+            else:
+                phi_str += ' in deg ' + r'$\rightarrow $'
+                scale = 180./np.pi
+        #-----------------------------------------------------------
+            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
+                               'b--', label = "Phase")
+        #-----------------------------------------------------------
+            self.ax_p.set_ylabel(phi_str, color='blue')
+            nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
+            # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
+            # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
+            # http://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
+            # manual setting:
+            #self.ax_p.set_yticks( np.linspace(self.ax_p.get_ylim()[0],self.ax_p.get_ylim()[1],nbins) )
+            #ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 5))
+            #ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 5))
+            #http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
+            
+            # use helper functions from matplotlib.ticker:
+            #   MaxNLocator: set no more than nbins + 1 ticks
+            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.MaxNLocator(nbins = nbins) )
+            # further options: integer = False,
+            #                   prune = [‘lower’ | ‘upper’ | ‘both’ | None] Remove edge ticks
+            #   AutoLocator:
+            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.AutoLocator() )
+            #   LinearLocator:
+            #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.LinearLocator(numticks = nbins -1 ) )
+
+#            self.ax_p.locator_params(axis = 'y', nbins = nbins)
+#
+#            self.ax_p.set_yticks(np.linspace(self.ax_p.get_ybound()[0],
+#                                             self.ax_p.get_ybound()[1],
+#                                             len(self.ax.get_yticks())-1))
+
+            #N = source_ax.xaxis.get_major_ticks()
+            #target_ax.xaxis.set_major_locator(LinearLocator(N))
+        else:
+            try:
+                self.mplwidget.fig.delaxes(self.ax_p)
+            except (KeyError, AttributeError):
+                pass
+        self.draw()
+
+#------------------------------------------------------------------------------
+
+    def calc_hf(self):
+        """
+        (Re-)Calculate the complex frequency response H(f)
+        """
+
+#        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
+
+        if self.DEBUG:
+            print("--- plotHf.draw() --- ")
+            print("b, a = ", fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) 
+
+        # calculate H_c(W) (complex) for W = 0 ... 2 pi:
+        [self.W, self.H_c] = sig.freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1],
+            worN = rc.params['N_FFT'], whole = True) # bb, aa, N_FFT, 0 ... 2 pi
+
+#------------------------------------------------------------------------------
+    def draw(self):
+        """
+        Re-calculate |H(f)| and draw the figure
+        """
+        if self.mplwidget.mplToolbar.enable_update:
+            self.calc_hf()
+            self.update_plot()
+
+#------------------------------------------------------------------------------
+    def update_plot(self):
+        """
+        Draw the figure with new limits, scale etcs without recalculating H(f)
+        """
+        if np.all(self.W) == None: # H(f) has not been calculated yet
+            self.calc_hf()
+            
+        self.unitA = self.cmbUnitsA.currentText()
+
+        # Linphase settings only makes sense for amplitude plot
+        self.chkLinphase.setCheckable(self.unitA == 'V')
+        self.chkLinphase.setEnabled(self.unitA == 'V')
+        self.lblLinphase.setEnabled(self.unitA == 'V')
+
+        self.specs = self.chkSpecs.isChecked()
+        self.phase = self.chkPhase.isChecked()
+        self.linphase = self.chkLinphase.isChecked()
+
+        self.f_S  = fb.fil[0]['f_S']
+        self.F_PB = fb.fil[0]['F_PB'] * self.f_S
+        self.F_SB = fb.fil[0]['F_SB'] * self.f_S
+
+        self.A_PB  = fb.fil[0]['A_PB']
+        self.A_PB2 = fb.fil[0]['A_PB2']
+        self.A_SB  = fb.fil[0]['A_SB']
+        self.A_SB2 = fb.fil[0]['A_SB2']
+
+        f_lim = fb.fil[0]['freqSpecsRange']
+        
+        self.F = self.W / (2 * np.pi) * self.f_S
+
+        if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+            self.H_c = np.fft.fftshift(self.H_c)
+            self.F -= self.f_S/2.
+
+
+        if self.linphase: # remove the linear phase
+            self.H_c = self.H_c * np.exp(1j * self.W * fb.fil[0]["N"]/2.)
+
+        if self.cmbShowH.currentIndex() == 0: # show magnitude of H
+            H = abs(self.H_c)
+            H_str = r'$|H(\mathrm{e}^{\mathrm{j} \Omega})|$'
+        elif self.cmbShowH.currentIndex() == 1: # show real part of H
+            H = self.H_c.real
+            H_str = r'$\Re \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+        else:  # show imag. part of H
+            H = self.H_c.imag
+            H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
+
+
+        # clear the axes and (re)draw the plot
+        #
+        if self.ax.get_navigate():
+
+            self.ax.clear()
+
+            #================ Main Plotting Routine =========================
+
+            if self.unitA == 'dB':
+                A_lim = [-self.A_SB -10, self.A_PB +1]
+                self.H_plt = 20*np.log10(abs(H))
+                H_str += ' in dB ' + r'$\rightarrow$'
+            elif self.unitA == 'V': #  'lin'
+                A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
+                self.H_plt = H
+                H_str +=' in V ' + r'$\rightarrow $'
+                self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
+            else: # unit is W
+                A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
+                self.H_plt = H * H.conj()
+                H_str += ' in W ' + r'$\rightarrow $'
+
+            plt_lim = f_lim + A_lim
+
+            #-----------------------------------------------------------
+            self.ax.plot(self.F, self.H_plt, label = 'H(f)')
+            #-----------------------------------------------------------
+            self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
+
+            self.ax.axis(plt_lim)
+
+            if self.specs: self.plotSpecLimits(specAxes = self.ax)
+
+            self.ax.set_title(r'Magnitude Frequency Response')
+            self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
+            self.ax.set_ylabel(H_str)
+
+        self.mplwidget.redraw()
+
 
 
 #------------------------------------------------------------------------------
