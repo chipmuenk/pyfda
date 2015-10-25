@@ -77,7 +77,10 @@ class InputTargetSpecs(QtGui.QWidget):
         self.setLayout(layGMain)
 
         #----------------------------------------------------------------------
-        # NO   SIGNALS & SLOTS
+        #  SIGNALS & SLOTS
+        self.aspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        self.fspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        
         self.updateUI() # first time initialization
         
 
