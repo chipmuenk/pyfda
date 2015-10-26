@@ -19,12 +19,8 @@ import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
 # TODO: set_response_type is called 3 times by inputSpecs.loadAllSpecs every time 
-#       filter is changed - why? Eliminating set_response_type gives errors when
-#       changing the response type of FIR filters
-# TODO: Check for race conditions when clicking combo boxes: filter dict is modified
-#       and a sigFiltChanged is emitted at same time?!
+#       filter is changed - why? 
 # TODO: Check for unneeded attributes self. ...
-# TODO: Filter order N has to be re-read and displayed after filter calculation
 # TODO: new methods: load_settings, store_settings, update_settings
 # TODO: Changing from ...[min] to bessel gives error "unhashable type: "dict"
 #         in input_specs updateAllUIs line 154 all_params = ... - ONLY Py3 !!!
@@ -201,23 +197,19 @@ class InputFilter(QtGui.QWidget):
         #------------------------------------------------------------
         # SIGNALS & SLOTS
         #------------------------------------------------------------
-        # Connect comboBoxes and setters, generate the signal sigFiltChanged
-        # every time a combo box is changed
+        # Connect comboBoxes and setters, propgate change events hierarchically
+        #  through all widget methods and generate the signal sigFiltChanged
+        #  in the end.
         self.cmbResponseType.currentIndexChanged.connect(
                 lambda: self.set_response_type(enb_signal=True)) # 'LP'
-#        self.cmbResponseType.currentIndexChanged.connect(self.sigFiltChanged.emit)
         self.cmbFilterType.currentIndexChanged.connect(
                 lambda: self.set_filter_type(enb_signal=True)) #'IIR'
-#        self.cmbFilterType.currentIndexChanged.connect(self.sigFiltChanged.emit)
         self.cmbDesignMethod.currentIndexChanged.connect(
                 lambda: self.set_design_method(enb_signal=True)) #'cheby1'
-#        self.cmbDesignMethod.currentIndexChanged.connect(self.sigFiltChanged.emit)
         self.chkMinOrder.clicked.connect(
                 lambda: self.set_filter_order(enb_signal=True))
-#        self.chkMinOrder.clicked.connect(self.sigFiltChanged.emit)
         self.ledOrderN.editingFinished.connect(
                 lambda:self.set_filter_order(enb_signal=True))
-#        self.ledOrderN.editingFinished.connect(self.sigFiltChanged.emit)
         #------------------------------------------------------------
 
 
