@@ -349,7 +349,6 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputSpecs()
     form.show()
-    form.store_all_specs()
 
     app.exec_()
 
