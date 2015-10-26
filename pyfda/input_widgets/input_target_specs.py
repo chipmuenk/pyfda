@@ -81,11 +81,11 @@ class InputTargetSpecs(QtGui.QWidget):
         self.aspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.fspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         
-        self.updateUI() # first time initialization
+        self.update_UI() # first time initialization
         
 
 #------------------------------------------------------------------------------
-    def updateUI(self, freqParams = [], ampParams = []):
+    def update_UI(self, freqParams = [], ampParams = []):
         """
         Pass frequency and amplitude labels to the amplitude and frequency
         spec widgets and emit a specs changed signal
@@ -93,24 +93,25 @@ class InputTargetSpecs(QtGui.QWidget):
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.fspecs.updateUI(newLabels = freqParams) # update frequency spec labels
+        self.fspecs.update_UI(newLabels = freqParams) # update frequency spec labels
         self.aspecs.setVisible(ampParams != [])
-        self.aspecs.updateUI(newLabels = ampParams)
+        self.aspecs.update_UI(newLabels = ampParams)
 
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
-# not needed yet
-#    def store_entries(self):
-#        """
-#        Update global dict fb.fil[0] with currently selected filter
-#        parameters, using the update methods of the classes
-#        """
-#        # collect data from widgets and write to fb.fil[0]
-#        self.fspecs.store_entries() # frequency specification widget
-#        self.aspecs.store_entries() # magnitude specs with unit
-#
-#        if self.DEBUG: print(fb.fil[0])
+
+    def store_entries(self):
+        """
+        Update global dict fb.fil[0] with currently selected filter
+        parameters, using the update methods of the classes
+        [not needed?]
+        """
+        # collect data from widgets and write to fb.fil[0]
+        self.fspecs.store_entries() # frequency specification widget
+        self.aspecs.store_entries() # magnitude specs with unit
+
+        if self.DEBUG: print(fb.fil[0])
 
 #------------------------------------------------------------------------------
     def load_entries(self):
@@ -142,9 +143,9 @@ if __name__ == '__main__':
     ampParams = [l for l in myParams if l[0] == 'A']
 
     form = InputTargetSpecs(title = "Test Specs")
-    form.updateUI(freqParams, ampParams)
+    form.update_UI(freqParams, ampParams)
     form.show()
-    form.storeEntries()
+    form.store_entries()
 
     app.exec_()
 

@@ -28,9 +28,9 @@ class InputFreqUnits(QtGui.QWidget):
         self.DEBUG = DEBUG
         self.title = title
 
-        self.initUI()
+        self._init_UI()
 
-    def initUI(self):
+    def _init_UI(self):
         """
         Initialize the User Interface
         """
@@ -58,7 +58,7 @@ class InputFreqUnits(QtGui.QWidget):
         self.ledF_S.setObjectName("f_S")
 
         self.lblF_S = QtGui.QLabel(self)
-        self.lblF_S.setText(self._rtLabel("f_S"))
+        self.lblF_S.setText(self._rt_label("f_S"))
 
         self.cmbUnits = QtGui.QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")
@@ -113,16 +113,16 @@ class InputFreqUnits(QtGui.QWidget):
         self.setLayout(self.layVMain)
 
         # =========== SIGNALS & SLOTS =======================================
-        self.cmbUnits.currentIndexChanged.connect(self.updateUI)
-        self.ledF_S.editingFinished.connect(self.updateUI)
-        self.cmbFRange.currentIndexChanged.connect(self.freqRange)
+        self.cmbUnits.currentIndexChanged.connect(self.update_UI)
+        self.ledF_S.editingFinished.connect(self.update_UI)
+        self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort)
 
-        self.updateUI() # first time initialization
+        self.update_UI() # first time initialization
                
 
 #-------------------------------------------------------------
-    def updateUI(self):
+    def update_UI(self):
         """
         Transform the displayed frequency spec input fields according to the units
         setting. Spec entries are always stored normalized w.r.t. f_S in the
@@ -132,7 +132,7 @@ class InputFreqUnits(QtGui.QWidget):
         updateUI is called during init and when
         - the f_S lineedit field has been edited or the unit combobox is changed
         
-        Finally, store freqSpecsRange and emit sigFilterChanged signal via freqRange
+        Finally, store freqSpecsRange and emit sigFilterChanged signal via _freq_range
         """
         idx = self.cmbUnits.currentIndex() # read index of units combobox
         unit = str(self.cmbUnits.currentText())
@@ -174,10 +174,10 @@ class InputFreqUnits(QtGui.QWidget):
             fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
             self.ledF_S.setText(str(self.f_S))
 
-        self.freqRange() # update f_lim setting and emit sigSpecsChanged signal
+        self._freq_range() # update f_lim setting and emit sigSpecsChanged signal
         
     #-------------------------------------------------------------
-    def freqRange(self):
+    def _freq_range(self):
         """
         Set frequency range for single-sided spectrum up to f_S/2 or f_S or
         for double-sided spectrum between -f_S/2 and f_S/2 and emit
@@ -204,13 +204,13 @@ class InputFreqUnits(QtGui.QWidget):
 
         fb.fil[0]['freqSpecsRange'] = f_lim
         
-        # only emit signal when freqRange has been triggered by combobox
+        # only emit signal when _freq_range has been triggered by combobox
         if len(senderName) > 2:          
             self.sigSpecsChanged.emit() # -> input_widgets
 
 
     #-------------------------------------------------------------
-    def loadEntries(self):
+    def load_entries(self):
         """
         Reload settings and textfields from filter dictionary
         """
@@ -222,28 +222,26 @@ class InputFreqUnits(QtGui.QWidget):
 
         idx = self.cmbFRange.findData(fb.fil[0]['freqSpecsRangeType'])
         self.cmbFRange.setCurrentIndex(idx) # set frequency range
-#        print(fb.fil[0]['freqSpecsRangeType'])
-#        print("idx", idx)
         
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
 
 
     #-------------------------------------------------------------
-    def storeEntries(self):
+    def _store_entries(self):
+# TODO: not needed?
         """
         - Store cmbBox etc. settings in dictionary
         - Emit sigFilterChanged signal
         """
         # simply call updateUI? 
-#        self.updateUI()
         fb.fil[0].update({'freq_specs_unit':self.cmbUnits.currentText()})
         fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
         
 #-------------------------------------------------------------
-    def _rtLabel(self, label):
+    def _rt_label(self, label):
         """
-        Rich text label: Format label with HTML tags, replacing '_' by
-        HTML subscript tags
+        Rich text label: Format label with italic + bold HTML tags and
+         replace '_' by HTML subscript tags
         """
         #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
         if "_" in label:
@@ -268,7 +266,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputFreqUnits() #)
 
-    form.updateUI()
+    form.update_UI()
 #    form.updateUI(newLabels = ['F_PB','F_PB2'])
 
     form.show()

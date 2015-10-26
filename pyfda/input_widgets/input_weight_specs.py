@@ -31,10 +31,10 @@ class InputWeightSpecs(QtGui.QWidget):
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
-        self.initUI()
+        self._init_UI()
 
 #------------------------------------------------------------------------------
-    def initUI(self):
+    def _init_UI(self):
         """
         Initialize UI
         """
@@ -60,7 +60,7 @@ class InputWeightSpecs(QtGui.QWidget):
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         newLabels = [str(l) for l in fb.fil[0] if l[0] == 'W']
-        self.updateUI(newLabels = newLabels)
+        self.update_UI(newLabels = newLabels)
 
         frmMain = QtGui.QFrame()
         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -74,16 +74,16 @@ class InputWeightSpecs(QtGui.QWidget):
         self.setLayout(self.layVMain)
 
         # =========== SIGNALS & SLOTS =======================================
-        self.butReset.clicked.connect(self._resetWeights)
+        self.butReset.clicked.connect(self._reset_weights)
         # DYNAMIC SIGNAL SLOT CONNECTION:
-        # Every time a field is edited, call self.storeEntries - this signal-
+        # Every time a field is edited, call self._store_entries - this signal-
         # slot mechanism is constructed in self._addEntry/ destructed in 
         # self._delEntry each time the widget is updated, i.e. when a new 
         # filter design method is selected.
 
 
 #-------------------------------------------------------------
-    def updateUI(self, newLabels = []):
+    def update_UI(self, newLabels = []):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
@@ -106,7 +106,7 @@ class InputWeightSpecs(QtGui.QWidget):
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
 #------------------------------------------------------------------------------
-    def loadEntries(self):
+    def load_entries(self):
         """
         Reload textfields from filter dictionary to update changed settings
         """
@@ -115,7 +115,7 @@ class InputWeightSpecs(QtGui.QWidget):
                 str(fb.fil[0][str(self.qlineedit[i].objectName())]))
 
 #------------------------------------------------------------------------------
-    def storeEntries(self):
+    def _store_entries(self):
         """
         Store specification entries in filter dictionary
         """
@@ -131,9 +131,9 @@ class InputWeightSpecs(QtGui.QWidget):
     def _delEntry(self,i):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit) and
-        disconnect the lineedit field from self.storeEntries
+        disconnect the lineedit field from self._store_entries
         """
-        self.qlineedit[i].editingFinished.disconnect(self.storeEntries)
+        self.qlineedit[i].editingFinished.disconnect(self._store_entries)
         
         self.layGSpecWdg.removeWidget(self.qlabels[i])
         self.layGSpecWdg.removeWidget(self.qlineedit[i])
@@ -148,7 +148,7 @@ class InputWeightSpecs(QtGui.QWidget):
     def _addEntry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and
-        connect QLineEdit widget to self.storeEntries. This way, the central filter
+        connect QLineEdit widget to self._store_entries. This way, the central filter
         dictionary is updated automatically when a QLineEdit field has been
         edited.
         """
@@ -158,19 +158,19 @@ class InputWeightSpecs(QtGui.QWidget):
         self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
         self.qlineedit[i].setObjectName(newLabel) # update ID
         
-        self.qlineedit[i].editingFinished.connect(self.storeEntries)
+        self.qlineedit[i].editingFinished.connect(self._store_entries)
 
         self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
 
 #------------------------------------------------------------------------------
-    def _resetWeights(self):
+    def _reset_weights(self):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
         """
         for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText("1.0")
-        self.storeEntries()
+        self._store_entries()
 
 #-------------------------------------------------------------
     def _rtLabel(self, label):
