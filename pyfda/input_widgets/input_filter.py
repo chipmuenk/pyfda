@@ -94,7 +94,7 @@ class InputFilter(QtGui.QWidget):
         self.cmbDesignMethod.setObjectName("comboDesignMethod")
         self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
 
-        # Adapt combobox size dynamically to largest element
+        # Adapt comboboxes size dynamically to largest element
         self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbDesignMethod.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
@@ -111,7 +111,7 @@ class InputFilter(QtGui.QWidget):
         # This is first converted from the QVariant container format to a
         # QString, next to a "normal" non-unicode string
         rt_list = sorted(list(fb.fil_tree.keys()))
-        for rt in rt_list:#: fb.fil_tree:
+        for rt in rt_list:
             self.cmbResponseType.addItem(rc.rt_names[rt], rt)
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
 
