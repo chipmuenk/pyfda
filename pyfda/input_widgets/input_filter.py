@@ -54,11 +54,11 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = '' # design method from last call
 
-        self.init_UI()
+        self._init_UI()
 
         self.set_response_type() # first time initialization
 
-    def init_UI(self):
+    def _init_UI(self):
         """
         Initialize UI with comboboxes for selecting filter
         """
