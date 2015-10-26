@@ -85,10 +85,13 @@ class InputFilter(QtGui.QWidget):
         # Combo boxes for filter selection
         #----------------------------------------------------------------------
         self.cmbResponseType = QtGui.QComboBox(self)
+        self.cmbResponseType.setObjectName("comboResponseType")
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType = QtGui.QComboBox(self)
+        self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
         self.cmbDesignMethod = QtGui.QComboBox(self)
+        self.cmbDesignMethod.setObjectName("comboDesignMethod")
         self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
 
         # Adapt combobox size dynamically to largest element
