@@ -123,7 +123,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
             self.load_entries()
 
         else: # amplitude spec textfield has been changed
-            self.store_entries()
+            self._store_entries()
             
         self.idxOld = idx
         
@@ -153,7 +153,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
 
 #------------------------------------------------------------------------------
-    def store_entries(self):
+    def _store_entries(self):
         """
         Store specification entries in filter dictionary
         Entries are always stored in dB (20 log10) !

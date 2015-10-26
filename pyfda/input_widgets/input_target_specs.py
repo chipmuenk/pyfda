@@ -32,11 +32,11 @@ class InputTargetSpecs(QtGui.QWidget):
         self.DEBUG = DEBUG
         self.title = title
         
-        self.initUI()
+        self._initUI()
 
 
 #------------------------------------------------------------------------------
-    def initUI(self):
+    def _initUI(self):
         """
         Initialize user interface
         """
@@ -100,20 +100,6 @@ class InputTargetSpecs(QtGui.QWidget):
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
-
-    def store_entries(self):
-        """
-        Update global dict fb.fil[0] with currently selected filter
-        parameters, using the update methods of the classes
-        [not needed?]
-        """
-        # collect data from widgets and write to fb.fil[0]
-        self.fspecs.store_entries() # frequency specification widget
-        self.aspecs.store_entries() # magnitude specs with unit
-
-        if self.DEBUG: print(fb.fil[0])
-
-#------------------------------------------------------------------------------
     def load_entries(self):
         """
         Update entries from global dict fb.fil[0]
@@ -121,7 +107,6 @@ class InputTargetSpecs(QtGui.QWidget):
         """
         self.aspecs.load_entries() # magnitude specs with unit
         self.fspecs.load_entries() # weight specification
-
 
 #------------------------------------------------------------------------------
 
@@ -145,7 +130,6 @@ if __name__ == '__main__':
     form = InputTargetSpecs(title = "Test Specs")
     form.update_UI(freqParams, ampParams)
     form.show()
-    form.store_entries()
 
     app.exec_()
 
