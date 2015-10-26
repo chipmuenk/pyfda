@@ -203,17 +203,21 @@ class InputFilter(QtGui.QWidget):
         #------------------------------------------------------------
         # Connect comboBoxes and setters, generate the signal sigFiltChanged
         # every time a combo box is changed
-        self.cmbResponseType.currentIndexChanged.connect(self.set_response_type) # 'LP'
-        self.cmbResponseType.currentIndexChanged.connect(self.sigFiltChanged.emit)
-        self.cmbFilterType.currentIndexChanged.connect(self.set_filter_type) #'IIR'
-        self.cmbFilterType.currentIndexChanged.connect(self.sigFiltChanged.emit)
-        self.cmbDesignMethod.currentIndexChanged.connect(self.set_design_method) #'cheby1'
-        self.cmbDesignMethod.currentIndexChanged.connect(self.sigFiltChanged.emit)
-        #
-        self.chkMinOrder.clicked.connect(self.set_filter_order)
-        self.chkMinOrder.clicked.connect(self.sigFiltChanged.emit)
-        self.ledOrderN.editingFinished.connect(self.set_filter_order)
-        self.ledOrderN.editingFinished.connect(self.sigFiltChanged.emit)
+        self.cmbResponseType.currentIndexChanged.connect(
+                lambda: self.set_response_type(enb_signal=True)) # 'LP'
+#        self.cmbResponseType.currentIndexChanged.connect(self.sigFiltChanged.emit)
+        self.cmbFilterType.currentIndexChanged.connect(
+                lambda: self.set_filter_type(enb_signal=True)) #'IIR'
+#        self.cmbFilterType.currentIndexChanged.connect(self.sigFiltChanged.emit)
+        self.cmbDesignMethod.currentIndexChanged.connect(
+                lambda: self.set_design_method(enb_signal=True)) #'cheby1'
+#        self.cmbDesignMethod.currentIndexChanged.connect(self.sigFiltChanged.emit)
+        self.chkMinOrder.clicked.connect(
+                lambda: self.set_filter_order(enb_signal=True))
+#        self.chkMinOrder.clicked.connect(self.sigFiltChanged.emit)
+        self.ledOrderN.editingFinished.connect(
+                lambda:self.set_filter_order(enb_signal=True))
+#        self.ledOrderN.editingFinished.connect(self.sigFiltChanged.emit)
         #------------------------------------------------------------
 
 
@@ -232,7 +236,7 @@ class InputFilter(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def set_response_type(self):
+    def set_response_type(self, enb_signal=False):
         """
         Triggered when cmbResponseType (LP, HP, ...) is changed:
         Copy selection to self.rt and fb.fil[0] and reconstruct filter type combo
@@ -273,10 +277,10 @@ class InputFilter(QtGui.QWidget):
         self.cmbFilterType.blockSignals(False)
         #---------------------------------------------------------------
 
-        self.set_filter_type()
+        self.set_filter_type(enb_signal)
 
 #------------------------------------------------------------------------------
-    def set_filter_type(self):
+    def set_filter_type(self, enb_signal=False):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
         - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
@@ -324,11 +328,12 @@ class InputFilter(QtGui.QWidget):
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
 
         self.cmbDesignMethod.blockSignals(False)
-        self.set_design_method()
+
+        self.set_design_method(enb_signal)
 
 
 #------------------------------------------------------------------------------
-    def set_design_method(self):
+    def set_design_method(self, enb_signal=False):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
         - read design method dm and copy it to fb.fil[0]
@@ -363,13 +368,14 @@ class InputFilter(QtGui.QWidget):
                                                                 [dm].keys())
     
             self._update_dyn_widgets() # check for new subwidgets and update if needed
-        self.load_filter_order()
+
+        self.load_filter_order(enb_signal)
         
 #------------------------------------------------------------------------------
-    def load_filter_order(self):
+    def load_filter_order(self, enb_signal=False):
         """
-        Called by set_design_method or from InputSpecs
-        - load filter order setting from fb.fil[0] and set widgets
+        Called by set_design_method or from InputSpecs (with enb_signal = False),
+          load filter order setting from fb.fil[0] and update widgets
 
         """                
         # read list of available filter order [fo] methods for  
@@ -394,9 +400,12 @@ class InputFilter(QtGui.QWidget):
         self.ledOrderN.setText(str(fb.fil[0]['N']))
         self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
         self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
+        
+        if enb_signal:
+            self.sigFiltChanged.emit() # -> input_specs
 
 #------------------------------------------------------------------------------    
-    def set_filter_order(self):
+    def set_filter_order(self, enb_signal=False):
         """
         Triggered when either ledOrderN or chkMinOrder are edited:
         - read settings and copy them to fb.fil[0]
@@ -424,9 +433,9 @@ class InputFilter(QtGui.QWidget):
         ordn = int(abs(float(self.ledOrderN.text())))
         self.ledOrderN.setText(str(ordn))
         fb.fil[0].update({'N' : ordn})
-        
-#        self.sigSpecsChanged.emit() # -> input_widgets
 
+        if enb_signal:
+            self.sigFiltChanged.emit() # -> input_specs
     
 #------------------------------------------------------------------------------
     def _update_dyn_widgets(self):
