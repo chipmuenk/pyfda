@@ -110,7 +110,8 @@ class InputFilter(QtGui.QWidget):
         # retrieving. In Python 2, QVariant is returned when itemData is retrieved.
         # This is first converted from the QVariant container format to a
         # QString, next to a "normal" non-unicode string
-        for rt in fb.fil_tree:
+        rt_list = sorted(list(fb.fil_tree.keys()))
+        for rt in rt_list:#: fb.fil_tree:
             self.cmbResponseType.addItem(rc.rt_names[rt], rt)
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
 
