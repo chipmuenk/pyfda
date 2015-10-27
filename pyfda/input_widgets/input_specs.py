@@ -113,7 +113,7 @@ class InputSpecs(QtGui.QWidget):
         # Changing filter parameters / specs requires reloading of parameters
         # in other hierarchy levels, e.g. in the plot tabs
         # bundle sigSpecsChanged signals and propagate to next hierarchy level
-        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+#        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
