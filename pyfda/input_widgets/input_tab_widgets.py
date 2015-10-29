@@ -97,6 +97,8 @@ class InputTabWidgets(QtGui.QWidget):
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
         # requiring update of some plot widgets only:        
         self.inputSpecs.sigSpecsChanged.connect(self.updateSpecs)
+# TODO: connect to a specific slot
+        self.inputSpecs.sigViewChanged.connect(self.updateSpecs)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         # requiring update of all plot and some input widgets:        
