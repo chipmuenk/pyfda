@@ -12,7 +12,7 @@ from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
 
-from pyfda.input_widgets import (input_filter, input_order, input_amp_specs,
+from pyfda.input_widgets import (input_filter, input_amp_specs,
                                  input_freq_specs, input_freq_units,
                                  input_weight_specs, input_target_specs)
 
@@ -24,41 +24,40 @@ class InputSpecs(QtGui.QWidget):
     # class variables (shared between instances if more than one exists)
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
-
+    sigViewChanged = pyqtSignal() # emitted when view has changed
+    
 
     def __init__(self, DEBUG=True):
         super(InputSpecs, self).__init__()
 
         self.DEBUG = DEBUG
-#        self.ffb = fb.Fb() # instantiate Fb object
-        self.initUI()
+        self._init_UI()
 
-    def initUI(self):
+    def _init_UI(self):
         """
         Create all subwidgets
         """
-        # Select filter with response type rt (LP, ...), filter type ft
-        # (IIR, ...) and design method dm (cheby1, ...)
+        # Subwidget for selecting filter with response type rt (LP, ...), 
+        #    filter type ft (IIR, ...) and design method dm (cheby1, ...)
         self.sel_fil = input_filter.InputFilter(DEBUG=False)
-        # subwidget for selecting filter order ['man' (numeric) or 'min']
-        self.fil_ord = input_order.InputOrder(DEBUG=False)
-        # subwidget for selecting the frequency unit and range
+        self.sel_fil.setObjectName("select_filter")
+        # Subwidget for selecting the frequency unit and range
         self.f_units = input_freq_units.InputFreqUnits(DEBUG=False)
         self.f_units.setObjectName("freq_units")
-        # subwidget for Frequency Specs
+        # Subwidget for Frequency Specs
         self.f_specs = input_freq_specs.InputFreqSpecs(DEBUG=False)
         self.f_specs.setObjectName("freq_specs")
-        # subwidget for Amplitude Specs
+        # Subwidget for Amplitude Specs
         self.a_specs = input_amp_specs.InputAmpSpecs(DEBUG=False)
         self.a_specs.setObjectName("amp_specs")
-        # subwidget for Weight Specs
+        # Subwidget for Weight Specs
         self.w_specs = input_weight_specs.InputWeightSpecs(DEBUG=False)
         self.w_specs.setObjectName("weight_specs")
-        # subwidget for target specs (frequency and amplitude)
+        # Subwidget for target specs (frequency and amplitude)
         self.t_specs = input_target_specs.InputTargetSpecs(DEBUG=False,
                                             title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
-        # subwidget for displaying infos on the design method
+        # Subwidget for displaying infos on the design method
         self.lblMsg = QtGui.QLabel(self)
         self.lblMsg.setWordWrap(True)
 #        self.lblMsg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -73,7 +72,6 @@ class InputSpecs(QtGui.QWidget):
                              QtGui.QSizePolicy.Minimum)
 
         self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
-        self.color_design_button("changed")
         self.butQuit = QtGui.QPushButton("Quit", self)
 
         #----------------------------------------------------------------------
@@ -83,16 +81,14 @@ class InputSpecs(QtGui.QWidget):
                                        QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
         layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
-        layGMain.addWidget(self.fil_ord, 1, 0, 1, 2)  # Filter order
         layGMain.addWidget(self.f_units, 2, 0, 1, 2)  # Frequency units
         layGMain.addWidget(self.f_specs, 3, 0, 1, 2)  # Freq. specifications
         layGMain.addWidget(self.a_specs, 4, 0, 1, 2)  # Amplitude specs
         layGMain.addWidget(self.w_specs, 5, 0, 1, 2)  # Weight specs
         layGMain.addWidget(frmMsg, 6, 0, 1, 2)        # Text message
         layGMain.addWidget(self.t_specs, 7, 0, 1, 2)  # Target specs
-        layGMain.addWidget(self.butDesignFilt, 8, 0)#, 1, 2)
-        layGMain.addWidget(self.butQuit, 8, 1)#, 1, 2)
-#        layGMain.addWidget(self.butReadFiltTree, 8,1)
+        layGMain.addWidget(self.butDesignFilt, 8, 0)  # <Design Filter> button
+        layGMain.addWidget(self.butQuit, 8, 1)        # <Quit> button
         layGMain.addItem(spcV, 9, 0, 1, 2)
 #        layGMain.addWidget(self.HLine(), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(0, 0, 0, 0)
@@ -102,20 +98,21 @@ class InputSpecs(QtGui.QWidget):
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
-        # Call updateUI every time filter (order) method is changed
-        # updateUI emits sigFilterChanged when it's finished
         #
-        # Changes requiring update of UI because number or kind of
-        # input fields has changed:
-        self.fil_ord.sigSpecsChanged.connect(self.updateAllUIs)
-        self.sel_fil.sigFiltChanged.connect(self.updateAllUIs)
+        # Changing the filter design requires updating UI because number or 
+        # kind of input fields changes -> Call update_all_UIs, emitting 
+        # sigFilterChanged when it's finished
+        self.sel_fil.sigFiltChanged.connect(self.update_all_UIs)
 
-        # Changes requiring recalculation of frequency specs
-        self.f_units.sigSpecsChanged.connect(self.f_specs.loadEntries)
-        self.f_units.sigSpecsChanged.connect(self.t_specs.loadEntries)
+        # Changing the frequency unit requires re-display of frequency specs
+        # but it not influence the actual specs (no specsChanged )
+        self.f_units.sigSpecsChanged.connect(self.f_specs.load_entries)
+        self.f_units.sigSpecsChanged.connect(self.t_specs.load_entries)
+        self.f_units.sigSpecsChanged.connect(self.sigViewChanged.emit)
 
-        # Connect sigSpecsChanged signal to next hierarchy level to propagate
-        # changes requiring reload of parameters e.g. to the plot tabs
+        # Changing filter parameters / specs requires reloading of parameters
+        # in other hierarchy levels, e.g. in the plot tabs
+        # bundle sigSpecsChanged signals and propagate to next hierarchy level
         self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
@@ -123,17 +120,17 @@ class InputSpecs(QtGui.QWidget):
         self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
 
         # Other signal-slot connections
-        self.butDesignFilt.clicked.connect(self.startDesignFilt)
+        self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(QtGui.qApp.quit) # which qApp is this??
         #----------------------------------------------------------------------
 
-        self.updateAllUIs() # first time initialization
-
+        self.update_all_UIs() # first time initialization
+        self.start_design_filt() # design first filter using default values
 
 #------------------------------------------------------------------------------
-    def updateAllUIs(self):
+    def update_all_UIs(self):
         """
-        This method is called every time the filter design method or order
+        update_all_UIs is called every time the filter design method or order
         (min / man) has been changed. This usually requires a different set of
         frequency and amplitude specs.
         
@@ -174,11 +171,9 @@ class InputSpecs(QtGui.QWidget):
             print('freqLabels:', self.f_params)
             print('weightLabels:', self.weightParams)
 
-        # pass new labels to widgets and recreate UI
-        # set widgets invisible if param list is empty
-        self.fil_ord.loadEntries()
+        self.sel_fil.load_filter_order() # update filter order from dict
 
-        # build separate parameters for min. and man. filter order        
+        # build separate parameter lists for min. and man. filter order        
         min_params = man_params = []
         
         if "min" in fb.fil_tree[rt][ft][dm]:
@@ -187,28 +182,28 @@ class InputSpecs(QtGui.QWidget):
         if "man" in fb.fil_tree[rt][ft][dm]:
             man_params = fb.fil_tree[rt][ft][dm]['man']['par']
 
-        # always use parameters for manual filter order for f_specs widget,
+        # always use parameters for MANUAL filter order for f_specs widget,
         # frequency specs for minimum order are displayed in target specs
         self.f_man_params = [l for l in man_params if l[0] == 'F']
         self.f_specs.setVisible("fspecs" in vis_wdgs)
         self.f_specs.setEnabled("fspecs" not in dis_wdgs)
-        self.f_specs.updateUI(newLabels=self.f_man_params)
+        self.f_specs.update_UI(newLabels=self.f_man_params)
 
         # always use parameters for MINIMUM filter order for target frequency
         # spec widget
         self.f_min_params = [l for l in min_params if l[0] == 'F']
         self.t_specs.setVisible("tspecs" in vis_wdgs)
         self.t_specs.setEnabled("tspecs" not in dis_wdgs)
-        self.t_specs.updateUI(self.f_min_params, self.a_params)
+        self.t_specs.update_UI(self.f_min_params, self.a_params)
         
-        #        self.a_specs.setVisible(self.a_params != [])
+        # self.a_specs.setVisible(self.a_params != [])
         self.a_specs.setVisible("aspecs" in vis_wdgs)
         self.a_specs.setEnabled("aspecs" not in dis_wdgs)
-        self.a_specs.updateUI(newLabels=self.a_params)
+        self.a_specs.update_UI(newLabels=self.a_params)
 
         self.w_specs.setVisible("wspecs" in vis_wdgs)
         self.w_specs.setEnabled("wspecs" not in dis_wdgs)
-        self.w_specs.updateUI(newLabels=self.weightParams)
+        self.w_specs.update_UI(newLabels=self.weightParams)
 
         self.lblMsg.setText(msg)
 
@@ -216,19 +211,20 @@ class InputSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def store_all_specs(self):
-        """
-        Store all entries of current filter design in global dict fb.fil[0]
-        parameters, using the "storeEntries" methods of the classes
-        -- not used yet --
-        """
-        # collect data from widgets and write to fb.fil[0]
-        self.fil_ord.storeEntries() # filter order widget
-        self.f_specs.storeEntries() # frequency specification widget
-        self.f_units.storeEntries() # frequency specification widget
-        self.a_specs.storeEntries() # magnitude specs with unit
-        self.w_specs.storeEntries() # weight specification
-        self.t_specs.storeEntries() # target specs
+#    def store_all_specs(self):
+#        """
+#        Store all entries of current filter design in global dict fb.fil[0]
+#        parameters, using the "storeEntries" methods of the classes
+#        -- not used yet & shouldn't be used as all UI changes are copied to 
+#        the filter dict immediately.
+#        """
+#        # collect data from widgets and write to fb.fil[0]
+##        self.sel_fil.store_entries() # filter order widget
+#        self.f_specs.store_entries() # frequency specification widget
+#        self.f_units.storeEntries() # frequency specification widget
+#        self.a_specs.store_entries() # magnitude specs with unit
+#        self.w_specs.storeEntries() # weight specification
+#        self.t_specs.store_entries() # target specs
 
 #------------------------------------------------------------------------------
     def load_all_specs(self):
@@ -237,12 +233,11 @@ class InputSpecs(QtGui.QWidget):
         using the "loadEntries" methods of the classes
         """
         self.sel_fil.load_entries() # select filter widget
-        self.f_units.loadEntries() # frequency units widget
-        self.fil_ord.loadEntries() # filter order widget
-        self.f_specs.loadEntries() # frequency specification widget
-        self.a_specs.loadEntries() # magnitude specs with unit
-        self.w_specs.loadEntries() # weight specification
-        self.t_specs.loadEntries() # target specs
+        self.f_units.load_entries() # frequency units widget
+        self.f_specs.load_entries() # frequency specification widget
+        self.a_specs.load_entries() # magnitude specs with unit
+        self.w_specs.load_entries() # weight specification
+        self.t_specs.load_entries() # target specs
 
         if self.DEBUG:
             print("=== input_specs.py : loadAll ===")
@@ -250,7 +245,7 @@ class InputSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def startDesignFilt(self):
+    def start_design_filt(self):
         """
         Start the actual filter design process:
         - store the entries of all input widgets in the global filter dict.
@@ -273,28 +268,32 @@ class InputSpecs(QtGui.QWidget):
         # design the filter by passing current specs to the method, yielding
         # e.g. cheby1.LPman(fb.fil[0])
 
+        # Create / update global instance fb.fil_inst of selected filter class dm 
+        # instantiated in InputFilter.set_design_method
+        # call the method specified as a string in the argument of the
+        # filter instance defined previously in InputFilter.set_response_type
+
+        print("\n---- InputSpecs.startDesignFilt ----")
+        print(type(fb.fil_inst))
+
         try:
-            print("\n---- InputSpecs.startDesignFilt ----")
-            print(type(fb.fil_inst))
- 
-            # Create / update global instance fb.fil_inst of selected filter class dm 
-            # instantiated in InputFilter.set_design_method
-            # call the method specified as a string in the argument of the
-            # filter instance defined previously in InputFilter.set_response_type
+    
             err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
             # The called method writes coeffs, poles/zeros etc. back to
             # the global filter dict fb.fil[0]
             
             if err > 0:
-                raise AttributeError("Unknown design method.") 
-
+                raise AttributeError("Unknown design method.")
+                self.color_design_button("error")
+    
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
-            self.fil_ord.loadEntries()
-            self.w_specs.loadEntries()
-            self.f_specs.loadEntries()
-
-            self.sigFilterDesigned.emit() # emit signal -> input_widgets
+            self.sel_fil.load_entries()
+            self.w_specs.load_entries()
+            self.f_specs.load_entries()
+            self.color_design_button("ok")
+    
+            self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
         except Exception as e:
             print("\n---- InputSpecs.startDesignFilt ----")
@@ -315,15 +314,20 @@ class InputSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def color_design_button(self, state):
         """
-        Color the >> DESIGN FILTER << button:
-        green:  filter has been designed, everything ok
-        yellow: filter specs have been changed
-        red:    an error has occurred during filter design
-        orange: filter does not meet target specs
-        """
+        Color the >> DESIGN FILTER << button according to the filter design state:
+        
+        "ok":  green, filter has been designed, everything ok
 
-  #      print("state", state)
+        "changed": yellow, filter specs have been changed
+
+        "error" : red, an error has occurred during filter design
+
+        "failed" : orange, filter fails to meet target specs
+
+        The actual colors are defined in pyfda_rc.py
+        """
         self.butDesignFilt.setProperty("state", str(state))
+        fb.design_filt_state = state
         self.butDesignFilt.style().unpolish(self.butDesignFilt)
         self.butDesignFilt.style().polish(self.butDesignFilt)
         self.butDesignFilt.update()
@@ -345,7 +349,6 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputSpecs()
     form.show()
-    form.storeAll()
 
     app.exec_()
 
