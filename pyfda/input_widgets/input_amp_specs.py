@@ -143,13 +143,12 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         elif idx == 1:  # Entries are voltages, convert from dBs
             for i in range(len(self.qlineedit)):
-                self.qlineedit[i].setText(
-                    str(10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/20.)))
-
+                self.qlineedit[i].setText(str(round(
+                10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/20.),8)))
         else:  # Entries are powers, convert from dBs
             for i in range(len(self.qlineedit)):
-                self.qlineedit[i].setText(
-                    str(10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/10.)))
+                self.qlineedit[i].setText(str(round(
+                10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/10.),8)))
 
 
 #------------------------------------------------------------------------------
