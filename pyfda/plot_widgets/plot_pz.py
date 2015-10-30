@@ -9,6 +9,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 from PyQt4 import QtGui
 
 import pyfda.filterbroker as fb
+import pyfda.pyfda_rc as rc
+
 from pyfda.pyfda_lib import zplane
 
 from pyfda.plot_widgets.plot_utils import MplWidget#, MplCanvas
@@ -47,21 +49,34 @@ class PlotPZ(QtGui.QMainWindow):
 #        self.ax = self.mplwidget.ax
         self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.clear()
+        
+#------------------------------------------------------------------------------
+    def update_plot(self):
+        """
+        Draw the figure with new limits, scale etcs without recalculating H(f)
+        -- not yet implemented, just use draw() for the moment
+        """
+        self.draw()
 
+#------------------------------------------------------------------------------
     def draw(self):
         if self.mplwidget.mplToolbar.enable_update:
             self.draw_pz()
-
+            
+#------------------------------------------------------------------------------
     def draw_pz(self):
         """
         (re)draw P/Z plot
         """
-
+        p_marker = rc.params['P_Marker']
+        z_marker = rc.params['Z_Marker']
+        
         zpk = fb.fil[0]['zpk']
 
         self.ax.clear()
 
-        [z, p, k] = zplane(self.ax, zpk, verbose = False)
+        [z, p, k] = zplane(self.ax, zpk, verbose = False, 
+            mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
 
         self.ax.set_title(r'Pole / Zero Plot')
         self.ax.set_xlabel('Real axis')

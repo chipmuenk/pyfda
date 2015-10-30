@@ -32,11 +32,11 @@ class InputTargetSpecs(QtGui.QWidget):
         self.DEBUG = DEBUG
         self.title = title
         
-        self.initUI()
+        self._initUI()
 
 
 #------------------------------------------------------------------------------
-    def initUI(self):
+    def _initUI(self):
         """
         Initialize user interface
         """
@@ -77,13 +77,15 @@ class InputTargetSpecs(QtGui.QWidget):
         self.setLayout(layGMain)
 
         #----------------------------------------------------------------------
-        # NO   SIGNALS & SLOTS
-
-        self.updateUI() # first time initialization
+        #  SIGNALS & SLOTS
+        self.aspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        self.fspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        
+        self.update_UI() # first time initialization
         
 
 #------------------------------------------------------------------------------
-    def updateUI(self, freqParams = [], ampParams = []):
+    def update_UI(self, freqParams = [], ampParams = []):
         """
         Pass frequency and amplitude labels to the amplitude and frequency
         spec widgets and emit a specs changed signal
@@ -91,33 +93,20 @@ class InputTargetSpecs(QtGui.QWidget):
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.fspecs.updateUI(newLabels = freqParams) # update frequency spec labels
+        self.fspecs.update_UI(newLabels = freqParams) # update frequency spec labels
         self.aspecs.setVisible(ampParams != [])
-        self.aspecs.updateUI(newLabels = ampParams)
+        self.aspecs.update_UI(newLabels = ampParams)
 
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
-    def storeEntries(self):
-        """
-        Update global dict fb.fil[0] with currently selected filter
-        parameters, using the update methods of the classes
-        """
-        # collect data from widgets and write to fb.fil[0]
-        self.fspecs.storeEntries() # frequency specification widget
-        self.aspecs.storeEntries() # magnitude specs with unit
-
-        if self.DEBUG: print(fb.fil[0])
-
-#------------------------------------------------------------------------------
-    def loadEntries(self):
+    def load_entries(self):
         """
         Update entries from global dict fb.fil[0]
         parameters, using the "load" methods of the classes
         """
-        self.aspecs.loadEntries() # magnitude specs with unit
-        self.fspecs.loadEntries() # weight specification
-
+        self.aspecs.load_entries() # magnitude specs with unit
+        self.fspecs.load_entries() # weight specification
 
 #------------------------------------------------------------------------------
 
@@ -139,9 +128,8 @@ if __name__ == '__main__':
     ampParams = [l for l in myParams if l[0] == 'A']
 
     form = InputTargetSpecs(title = "Test Specs")
-    form.updateUI(freqParams, ampParams)
+    form.update_UI(freqParams, ampParams)
     form.show()
-    form.storeEntries()
 
     app.exec_()
 

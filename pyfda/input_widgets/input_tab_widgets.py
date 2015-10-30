@@ -22,7 +22,7 @@ if MYHDL:
     from pyfda.hdl_generation import hdl_specs
 
 
-class InputWidgets(QtGui.QWidget):
+class InputTabWidgets(QtGui.QWidget):
     """
     Create a tabbed widget for various input subwidgets
     """
@@ -33,7 +33,7 @@ class InputWidgets(QtGui.QWidget):
 
     def __init__(self, DEBUG = False):
         self.DEBUG = DEBUG
-        super(InputWidgets, self).__init__()
+        super(InputTabWidgets, self).__init__()
         css = """
         QTabBar{
         font-weight:bold;
@@ -97,6 +97,8 @@ class InputWidgets(QtGui.QWidget):
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
         # requiring update of some plot widgets only:        
         self.inputSpecs.sigSpecsChanged.connect(self.updateSpecs)
+# TODO: connect to a specific slot
+        self.inputSpecs.sigViewChanged.connect(self.updateSpecs)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         # requiring update of all plot and some input widgets:        
@@ -156,7 +158,7 @@ class InputWidgets(QtGui.QWidget):
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    form = InputWidgets()
+    form = InputTabWidgets()
     form.show()
     app.exec_()
 

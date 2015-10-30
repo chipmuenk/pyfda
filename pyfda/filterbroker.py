@@ -141,6 +141,8 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
 # Instance of current filter design class (e.g. "cheby1")
 fil_inst = ""
 
+# State of filter design: "ok", "changed", "error", "failed"
+design_filt_state = "changed"
 # Current method of current filter design class (e.g. cheby1.LPmin)
 fil_method = ""
 # return error codes for class instantiation and method 

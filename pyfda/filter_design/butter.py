@@ -39,11 +39,11 @@ class butter(object):
         vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
+        dis_man = ['tspecs'] # manual filter order
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C'] # manual filter order
+        par_man = ['N', 'f_S', 'F_C', 'A_PB', 'A_SB'] # manual filter order
         par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
 
         # Common data for all man. / min. filter order response types:

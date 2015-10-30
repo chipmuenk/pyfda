@@ -416,7 +416,7 @@ class MyMplToolbar(NavigationToolbar):
         Save current figure to temporary file and copy it to the clipboard.
         """
         try:
-            self.canvas.figure.savefig(self.tempPath)
+            self.canvas.figure.savefig(self.tempPath, dpi = 300, type = 'png')
             #  savefig(fname, dpi=None, facecolor='w', edgecolor='w',
             #  orientation='portrait', papertype=None, format=None,
             #  transparent=False):

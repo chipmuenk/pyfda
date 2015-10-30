@@ -19,15 +19,26 @@ import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
 # TODO: set_response_type is called 3 times by inputSpecs.loadAllSpecs every time 
-#       filter is changed - why? Eliminating set_response_type gives errors when
-#       changing the response type of FIR filters
+#       filter is changed - why? 
+# TODO: Check for unneeded attributes self. ...
+# TODO: new methods: load_settings, store_settings, update_settings
+# TODO: Changing from ...[min] to bessel gives error "unhashable type: "dict"
+#         in input_specs updateAllUIs line 154 all_params = ... - ONLY Py3 !!!
 
 class InputFilter(QtGui.QWidget):
     """
-    Construct combo boxes for selecting the filter, consisting of:
-      - Response Type (LP, HP, Hilbert, ...)
-      - Filter Type (IIR, FIR, CIC ...)
-      - DesignMethod (Butterworth, ...)
+    Construct and read combo boxes for selecting the filter, consisting of the 
+    following hierarchy:
+      1. Response Type rt (LP, HP, Hilbert, ...)
+      2. Filter Type ft (IIR, FIR, CIC ...)
+      3. Design Method dm (Butterworth, ...)
+      
+      Every time a combo box is changed manually, the filter tree for the selected
+      response resp. filter type is read and the combo box(es) further down in
+      the hierarchy are populated according to the available combinations.
+      
+      The signal sigFiltChanged is triggered and propagated to input_specs.py 
+      where it triggers the recreation of all subwidgets.
     """
 
     sigFiltChanged = pyqtSignal()
@@ -39,11 +50,11 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = '' # design method from last call
 
-        self.init_UI()
+        self._init_UI()
 
         self.set_response_type() # first time initialization
 
-    def init_UI(self):
+    def _init_UI(self):
         """
         Initialize UI with comboboxes for selecting filter
         """
@@ -58,16 +69,28 @@ class InputFilter(QtGui.QWidget):
 		# - cmbDesignMethod for selection of design method (Chebychev, ...)
 		# and populate them from the "filterTree" dict either directly or by
 		# calling set_response_type() :
-        print("\n\ninitialize InputFilter!\n\n")
 
+        bfont = QtGui.QFont()
+        ifont = QtGui.QFont()
+  #      font.setPointSize(11)
+        bfont.setBold(True)
+        bfont.setWeight(75)
+        ifont.setItalic(True)
+
+        #----------------------------------------------------------------------
+        # Combo boxes for filter selection
+        #----------------------------------------------------------------------
         self.cmbResponseType = QtGui.QComboBox(self)
+        self.cmbResponseType.setObjectName("comboResponseType")
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType = QtGui.QComboBox(self)
+        self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
         self.cmbDesignMethod = QtGui.QComboBox(self)
+        self.cmbDesignMethod.setObjectName("comboDesignMethod")
         self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
 
-        # Adapt combobox size dynamically to largest element
+        # Adapt comboboxes size dynamically to largest element
         self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbDesignMethod.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
@@ -83,7 +106,8 @@ class InputFilter(QtGui.QWidget):
         # retrieving. In Python 2, QVariant is returned when itemData is retrieved.
         # This is first converted from the QVariant container format to a
         # QString, next to a "normal" non-unicode string
-        for rt in fb.fil_tree:
+        rt_list = sorted(list(fb.fil_tree.keys()))
+        for rt in rt_list:
             self.cmbResponseType.addItem(rc.rt_names[rt], rt)
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
 
@@ -121,26 +145,42 @@ class InputFilter(QtGui.QWidget):
 
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
-        layHStdWdg = QtGui.QHBoxLayout() # container for standard subwidgets
-
+        layHFilWdg = QtGui.QHBoxLayout() # container for standard subwidgets
         spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
                                          QtGui.QSizePolicy.Fixed)
+        layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbFilterType)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbDesignMethod)
 
-        layHStdWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        #----------------------------------------------------------------------
+        # Filter Order
+        #----------------------------------------------------------------------
+        self.lblOrder =  QtGui.QLabel("Order:")
+        self.lblOrder.setFont(bfont)
+        self.chkMinOrder = QtGui.QRadioButton("Minimum",self)
+        self.spacer = QtGui.QSpacerItem(20,0,
+                        QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.lblOrderN = QtGui.QLabel("N = ")
+        self.lblOrderN.setFont(ifont)
+        self.ledOrderN = QtGui.QLineEdit(str(fb.fil[0]['N']),self)
 
-        layHStdWdg.addItem(spacer)
-
-        layHStdWdg.addWidget(self.cmbFilterType)
-
-        layHStdWdg.addItem(spacer)
-
-        layHStdWdg.addWidget(self.cmbDesignMethod)
+        #  All subwidgets, including dynamically created ones
+        self.layHOrdWdg = QtGui.QHBoxLayout()
+        self.layHOrdWdg.addWidget(self.lblOrder)
+        self.layHOrdWdg.addWidget(self.chkMinOrder)
+        self.layHOrdWdg.addItem(self.spacer)
+        self.layHOrdWdg.addWidget(self.lblOrderN)
+        self.layHOrdWdg.addWidget(self.ledOrderN)
 
         # stack standard + dynamic subwidgets vertically:
         layVAllWdg = QtGui.QVBoxLayout()
 
-        layVAllWdg.addLayout(layHStdWdg)
+        layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
+        layVAllWdg.addWidget(self.HLine())
+        layVAllWdg.addLayout(self.layHOrdWdg)
 
 
         self.frmMain = QtGui.QFrame()
@@ -157,14 +197,19 @@ class InputFilter(QtGui.QWidget):
         #------------------------------------------------------------
         # SIGNALS & SLOTS
         #------------------------------------------------------------
-        # Connect comboBoxes and setters, generate the signal sigFiltChanged
-        # every time a combo box is changed
-        self.cmbResponseType.currentIndexChanged.connect(self.set_response_type) # 'LP'
-        self.cmbResponseType.currentIndexChanged.connect(self.sigFiltChanged.emit)
-        self.cmbFilterType.currentIndexChanged.connect(self.set_filter_type) #'IIR'
-        self.cmbFilterType.currentIndexChanged.connect(self.sigFiltChanged.emit)
-        self.cmbDesignMethod.currentIndexChanged.connect(self.set_design_method) #'cheby1'
-        self.cmbDesignMethod.currentIndexChanged.connect(self.sigFiltChanged.emit)
+        # Connect comboBoxes and setters, propgate change events hierarchically
+        #  through all widget methods and generate the signal sigFiltChanged
+        #  in the end.
+        self.cmbResponseType.currentIndexChanged.connect(
+                lambda: self.set_response_type(enb_signal=True)) # 'LP'
+        self.cmbFilterType.currentIndexChanged.connect(
+                lambda: self.set_filter_type(enb_signal=True)) #'IIR'
+        self.cmbDesignMethod.currentIndexChanged.connect(
+                lambda: self.set_design_method(enb_signal=True)) #'cheby1'
+        self.chkMinOrder.clicked.connect(
+                lambda: self.set_filter_order(enb_signal=True))
+        self.ledOrderN.editingFinished.connect(
+                lambda:self.set_filter_order(enb_signal=True))
         #------------------------------------------------------------
 
 
@@ -172,15 +217,18 @@ class InputFilter(QtGui.QWidget):
     def load_entries(self):
         """
         Reload comboboxes from filter dictionary to update changed settings
-        e.g. by loading filter design
+        after loading a filter design from disk.
+        `load_entries` is based on the automatism of set_response_type etc. 
+        of checking whether the previously selected filter design method is 
+        also available for the new combination. 
         """
-        idx_rt = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
-        self.cmbResponseType.setCurrentIndex(idx_rt)
+        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
+        self.cmbResponseType.setCurrentIndex(rt_idx)
         self.set_response_type()
 
 
 #------------------------------------------------------------------------------
-    def set_response_type(self):
+    def set_response_type(self, enb_signal=False):
         """
         Triggered when cmbResponseType (LP, HP, ...) is changed:
         Copy selection to self.rt and fb.fil[0] and reconstruct filter type combo
@@ -188,6 +236,11 @@ class InputFilter(QtGui.QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
+        sender_name = ""
+        if self.sender(): # origin of signal that triggered the slot
+            sender_name = self.sender().objectName()
+#            if self.DEBUG: print(senderName + ' was triggered\n================')
+        print("\nInputFilter.set_response_type triggered by ", sender_name)
         # Read out current setting of comboBox and convert to string (see init_UI)
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)
@@ -216,10 +269,10 @@ class InputFilter(QtGui.QWidget):
         self.cmbFilterType.blockSignals(False)
         #---------------------------------------------------------------
 
-        self.set_filter_type()
+        self.set_filter_type(enb_signal)
 
 #------------------------------------------------------------------------------
-    def set_filter_type(self):
+    def set_filter_type(self, enb_signal=False):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
         - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
@@ -247,7 +300,7 @@ class InputFilter(QtGui.QWidget):
         self.cmbDesignMethod.clear()
         dm_list = []
 
-        for dm in fb.fil_tree[self.rt][self.ft]:
+        for dm in sorted(fb.fil_tree[self.rt][self.ft]):
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
             dm_list.append(dm)
 
@@ -267,11 +320,12 @@ class InputFilter(QtGui.QWidget):
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
 
         self.cmbDesignMethod.blockSignals(False)
-        self.set_design_method()
+
+        self.set_design_method(enb_signal)
 
 
 #------------------------------------------------------------------------------
-    def set_design_method(self):
+    def set_design_method(self, enb_signal=False):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
         - read design method dm and copy it to fb.fil[0]
@@ -306,6 +360,74 @@ class InputFilter(QtGui.QWidget):
                                                                 [dm].keys())
     
             self._update_dyn_widgets() # check for new subwidgets and update if needed
+
+        self.load_filter_order(enb_signal)
+        
+#------------------------------------------------------------------------------
+    def load_filter_order(self, enb_signal=False):
+        """
+        Called by set_design_method or from InputSpecs (with enb_signal = False),
+          load filter order setting from fb.fil[0] and update widgets
+
+        """                
+        # read list of available filter order [fo] methods for  
+        # current design method [dm] from fil_tree:
+        foList = fb.fil_tree[fb.fil[0]['rt']]\
+            [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
+
+        # is currently selected fo setting available for (new) dm ?
+        if fb.fil[0]['fo'] in foList:
+            self.fo = fb.fil[0]['fo'] # keep current setting
+        else:
+            self.fo = foList[0] # use first list entry from filterTree
+            fb.fil[0]['fo'] = self.fo # and update fo method
+
+        # Determine which subwidgets are __visible__
+        self.lblOrderN.setVisible('man' in foList)
+        self.ledOrderN.setVisible('man' in foList)
+        self.chkMinOrder.setVisible('min' in foList)
+
+        # Determine which subwidgets are __enabled__
+        self.chkMinOrder.setChecked(fb.fil[0]['fo'] == 'min')
+        self.ledOrderN.setText(str(fb.fil[0]['N']))
+        self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
+        self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
+        
+        if enb_signal:
+            self.sigFiltChanged.emit() # -> input_specs
+
+#------------------------------------------------------------------------------    
+    def set_filter_order(self, enb_signal=False):
+        """
+        Triggered when either ledOrderN or chkMinOrder are edited:
+        - read settings and copy them to fb.fil[0]
+        - create / update global filter instance fb.fil_inst of dm class
+        - update dynamic widgets (if any)
+        - set filter_initialized = True
+        """
+        # Determine which subwidgets are _enabled_
+        if self.chkMinOrder.isVisible():
+            self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
+            self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
+            
+            if self.chkMinOrder.isChecked() == True:
+                # update in case N has been changed outside this class
+                self.ledOrderN.setText(str(fb.fil[0]['N']))
+                fb.fil[0].update({'fo' : 'min'})
+                
+            else:
+                fb.fil[0].update({'fo' : 'man'})
+                
+        else:
+            self.lblOrderN.setEnabled(self.fo == 'man')
+            self.ledOrderN.setEnabled(self.fo == 'man')
+
+        ordn = int(abs(float(self.ledOrderN.text())))
+        self.ledOrderN.setText(str(ordn))
+        fb.fil[0].update({'N' : ordn})
+
+        if enb_signal:
+            self.sigFiltChanged.emit() # -> input_specs
     
 #------------------------------------------------------------------------------
     def _update_dyn_widgets(self):
@@ -350,6 +472,17 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = fb.fil[0]['dm']
 
+#------------------------------------------------------------------------------
+    def HLine(self):
+        # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
+        # solution
+        """
+        Create a horizontal line
+        """
+        line = QtGui.QFrame()
+        line.setFrameShape(QtGui.QFrame.HLine)
+        line.setFrameShadow(QtGui.QFrame.Sunken)
+        return line
 
 #    def closeEvent(self, event):
 #        exit()

@@ -20,7 +20,7 @@ class InputFreqUnits(QtGui.QWidget):
     """
 
     # class variables (shared between instances if more than one exists)
-    sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
+    sigUnitChanged = pyqtSignal() # emitted when frequency unit has been changed
 
     def __init__(self, DEBUG = True, title = "Frequency Units"):
 
@@ -206,7 +206,7 @@ class InputFreqUnits(QtGui.QWidget):
         
         # only emit signal when _freq_range has been triggered by combobox
         if len(senderName) > 2:          
-            self.sigSpecsChanged.emit() # -> input_widgets
+            self.sigUnitChanged.emit() # -> input_widgets
 
 
     #-------------------------------------------------------------
@@ -256,7 +256,7 @@ class InputFreqUnits(QtGui.QWidget):
         Store sort flag in filter dict and emit sigSpecsChanged
         """
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
-        self.sigSpecsChanged.emit() # -> input_widgets
+        self.sigUnitChanged.emit() # -> input_widgets
 
  
 #------------------------------------------------------------------------------

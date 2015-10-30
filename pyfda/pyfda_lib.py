@@ -554,7 +554,7 @@ Examples
     return hn, td
 
 #==================================================================
-def grpdelay(b, a=1, nfft=512, whole=False, analog=False, Fs=2.*pi):
+def grpdelay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi):
 #==================================================================
     """
 Calculate group delay of a discrete time filter, specified by
@@ -572,14 +572,17 @@ b :  array_like
 a :  array_like (optional, default = 1 for FIR-filter)
      Denominator coefficients (recursive part of filter)
 
-whole : string (optional, default : 'none')
-     Only when whole = 'whole' calculate group delay around
+whole : boolean (optional, default : False)
+     Only when True calculate group delay around
      the complete unit circle (0 ... 2 pi)
+     
+verbose : boolean (optional, default : True)
+    Print warnings about frequency point with undefined group delay (amplitude = 0)
 
-N :  integer (optional, default: 512)
+nfft :  integer (optional, default: 512)
      Number of FFT-points
 
-FS : float (optional, default: FS = 2*pi)
+fs : float (optional, default: fs = 2*pi)
      Sampling frequency.
 
 
@@ -722,7 +725,7 @@ Examples
     if not whole:
         nfft = 2*nfft
 #
-    w = Fs * np.arange(0, nfft)/nfft # create frequency vector
+    w = fs * np.arange(0, nfft)/nfft # create frequency vector
 
     try: len(a)
     except TypeError:
@@ -759,14 +762,14 @@ Examples
     minmag = 10. * np.spacing(1) # equivalent to matlab "eps"
     polebins = np.where(abs(den) < minmag)[0] # find zeros of denominator
 #    polebins = np.where(abs(num) < minmag)[0] # find zeros of numerator
-    if np.size(polebins) > 0:  # check whether polebins array is empty
+    if np.size(polebins) > 0 and verbose:  # check whether polebins array is empty
         print('*** grpdelay warning: group delay singular -> setting to 0 at:')
         for i in polebins:
-            print ('f = {0} '.format((Fs*i/nfft)))
+            print ('f = {0} '.format((fs*i/nfft)))
             num[i] = 0
             den[i] = 1
 
-    if analog:
+    if analog: # this doesn't work yet
         tau_g = np.real(num / den)
     else:
         tau_g = np.real(num / den) - oa

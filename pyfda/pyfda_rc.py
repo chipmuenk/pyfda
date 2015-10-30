@@ -76,7 +76,8 @@ css_dark = {'TopWidget':('QWidget{color:white;background: #222222;}'
                         'QTableView{alternate-background-color:#222222;'
                              'background-color:black; gridline-color: white;}' 
                         'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
-                        'QLineEdit{background: #222222; color:white;}'),
+                        'QLineEdit{background: #222222; color:white;}'
+                        'QLineEdit:disabled{background-color:darkgrey;}'),
           'LineEdit':'QLineEdit{background: #222222; color:white;}'
           }
           
@@ -89,7 +90,9 @@ css_light = {'TopWidget':('.QTabWidget>QWidget>QWidget{border: 1px solid grey}'
                         '.QWidget{color:black; background: white}'
                         'QPushButton{background-color:lightgrey; color:black;}'
                         'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
-                        'QLineEdit{background: white; color:black;}'),
+                        'QLineEdit{background: white; color:black;}'
+                        'QLineEdit:disabled{background-color:lightgrey;}'
+),
             'LineEdit':''
 }
 #            'TabBar':('QTabWidget::pane {border-top: 2px solid #C2C7CB;}' 
@@ -146,10 +149,11 @@ TabBarCss = """
 """
 css_rc = {'TopWidget':('*[state="changed"]{background-color:yellow; color:black}'
                       '*[state="error"]{background-color:red; color:white}'
-                      '*[state="fail"]{background-color:orange; color:white}'
+                      '*[state="failed"]{background-color:orange; color:white}'
                       '*[state="ok"]{background-color:green; color:white}'
                       'QPushButton:pressed {background-color:black; color:white}'
                       'QWidget{font-size:12px; font-family: Tahoma;}'
+                      'QLineEdit{background-color:lightblue;}'
                       'QTabBar{font-size:13px; font-weight:bold;}') + TabBarCss,
           'LineEdit':''
           }
@@ -165,7 +169,11 @@ else:
     for key in css_rc:
         css_rc[key]+= css_light[key]
     
-params = {'N_FFT':  2048} # number of FFT points for plot commands (freqz etc.)
+
+# Various parameters for calculation and plotting
+params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
+          'P_Marker': [12, 'r'], # size and color for poles' marker
+          'Z_Marker': [12, 'b']} # size and color for zeros' marker
 
 # Dictionary with translations between short method names and long names for
 # response types
