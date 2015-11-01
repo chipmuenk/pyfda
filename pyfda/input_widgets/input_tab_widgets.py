@@ -112,7 +112,7 @@ class InputTabWidgets(QtGui.QWidget):
 
     def updateSpecs(self):
         """
-        Propagate new filter SPECS from global filter dict to UIs
+        Propagate new filter SPECS from filter dict to UIs via pyfda.py
             
         - Update input widgets that can / need to display specs
         - Update plot widgets via sigSpecsChanged signal that need new
