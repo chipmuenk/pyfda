@@ -112,11 +112,15 @@ class InputFreqUnits(QtGui.QWidget):
 
         self.setLayout(self.layVMain)
 
-        # =========== SIGNALS & SLOTS =======================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.cmbUnits.currentIndexChanged.connect(self.update_UI)
         self.ledF_S.editingFinished.connect(self.update_UI)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort)
+        #----------------------------------------------------------------------
+
 
         self.update_UI() # first time initialization
                
@@ -128,6 +132,8 @@ class InputFreqUnits(QtGui.QWidget):
         setting. Spec entries are always stored normalized w.r.t. f_S in the
         dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
+        Signals are blocked before changing the value for f_S programmatically
+
 
         updateUI is called during init and when
         - the f_S lineedit field has been edited or the unit combobox is changed
@@ -183,7 +189,7 @@ class InputFreqUnits(QtGui.QWidget):
         """
         Set frequency range for single-sided spectrum up to f_S/2 or f_S or
         for double-sided spectrum between -f_S/2 and f_S/2 and emit
-        sigSpecsChanged signal
+        sigUnitChanged signal
         """
         # get ID of signal that triggered updateUI():
         if self.sender(): # origin of signal that triggered the slot
@@ -214,7 +220,8 @@ class InputFreqUnits(QtGui.QWidget):
     #-------------------------------------------------------------
     def load_entries(self):
         """
-        Reload settings and textfields from filter dictionary
+        Reload comboBox settings and textfields from filter dictionary
+        Block signals before each programmatic change
         """
 #        self.f_S = fb.fil[0]['f_S']  # read sampling frequency
         self.ledF_S.blockSignals(True)

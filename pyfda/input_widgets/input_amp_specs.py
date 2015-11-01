@@ -93,7 +93,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self._amp_units)
         # DYNAMIC SIGNAL SLOT CONNECTION:
-        # Every time a field is edited, call self.freqUnits - this signal-slot
+        # Every time a field is edited, call self._amp_units - this signal-slot
         # mechanism is constructed in self._add_entry/ destructed in 
         # self._del_entry each time the widget is updated, i.e. when a new 
         # filter design method is selected.
@@ -133,7 +133,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         """
         Reload textfields from filter dictionary to reflect settings that
         may have been changed by the filter design algorithm. Set blockSignals
-        True, i.e. don't fire when combobox is changed programmatically
+        True, i.e. don't fire when lineedit is changed programmatically
         """
         idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
         
@@ -185,7 +185,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                     {str(self.qlineedit[i].objectName()):round(
                        -10 * log10 (simple_eval(self.qlineedit[i].text())),8)})
                        
-        self.sigSpecsChanged.emit() # -> input_widgets
+        self.sigSpecsChanged.emit() # -> input_specs
 
 
 #------------------------------------------------------------------------------
