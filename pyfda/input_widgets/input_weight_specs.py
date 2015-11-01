@@ -73,14 +73,17 @@ class InputWeightSpecs(QtGui.QWidget):
 
         self.setLayout(self.layVMain)
 
-        # =========== SIGNALS & SLOTS =======================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.butReset.clicked.connect(self._reset_weights)
         # DYNAMIC SIGNAL SLOT CONNECTION:
         # Every time a field is edited, call self._store_entries - this signal-
-        # slot mechanism is constructed in self._addEntry/ destructed in 
-        # self._delEntry each time the widget is updated, i.e. when a new 
+        # slot mechanism is constructed in self.add_entry/ destructed in 
+        # self._del_entry each time the widget is updated, i.e. when a new 
         # filter design method is selected.
-
+        #----------------------------------------------------------------------
+        
 
 #-------------------------------------------------------------
     def update_UI(self, newLabels = []):
@@ -92,43 +95,50 @@ class InputWeightSpecs(QtGui.QWidget):
         for i in range(max(len(self.qlabels), len(newLabels))):
              # newLabels is shorter than qlabels -> delete the difference
             if (i > (len(newLabels)-1)):
-                self._delEntry(len(newLabels))
+                self._del_entry(len(newLabels))
 
             # newLabels is longer than existing qlabels -> create new ones!
             elif (i > (len(self.qlabels)-1)):
-             self._addEntry(i,newLabels[i])
+             self.add_entry(i, newLabels[i])
 
             else:
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
                     self.qlabels[i].setText(self._rtLabel(newLabels[i]))
+                    
+                    self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
+                    self.qlineedit[i].blockSignals(False)
 
 #------------------------------------------------------------------------------
     def load_entries(self):
         """
         Reload textfields from filter dictionary to update changed settings
+        Set blockSignals True, i.e. don't fire when lineedit is changed 
+        programmatically
         """
         for i in range(len(self.qlineedit)):
+            self.qlineedit[i].blockSignals(True)
             self.qlineedit[i].setText(
                 str(fb.fil[0][str(self.qlineedit[i].objectName())]))
+            self.qlineedit[i].blockSignals(False)
 
 #------------------------------------------------------------------------------
     def _store_entries(self):
         """
         Store specification entries in filter dictionary
         """
-        for i in range(len(self.qlabels)):
+        for i in range(len(self.qlineedit)):
             fb.fil[0].update(
                 {self.qlineedit[i].objectName():
                     simple_eval(self.qlineedit[i].text())})
                        
-        self.sigSpecsChanged.emit() # -> input_widgets
+        self.sigSpecsChanged.emit() # -> input_specs
         
         
 #------------------------------------------------------------------------------
-    def _delEntry(self,i):
+    def _del_entry(self,i):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit) and
         disconnect the lineedit field from self._store_entries
@@ -145,7 +155,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def _addEntry(self, i, newLabel):
+    def add_entry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and
         connect QLineEdit widget to self._store_entries. This way, the central filter
@@ -167,6 +177,7 @@ class InputWeightSpecs(QtGui.QWidget):
     def _reset_weights(self):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
+        Fire signal sigSpecsChanged as well
         """
         for i in range(len(self.qlineedit)):
             self.qlineedit[i].setText("1.0")
