@@ -132,10 +132,12 @@ class InputFreqUnits(QtGui.QWidget):
         updateUI is called during init and when
         - the f_S lineedit field has been edited or the unit combobox is changed
         
-        Finally, store freqSpecsRange and emit sigFilterChanged signal via _freq_range
+        Finally, store freqSpecsRange and emit sigUnitChanged signal via _freq_range
         """
         idx = self.cmbUnits.currentIndex() # read index of units combobox
-        unit = str(self.cmbUnits.currentText())
+        unit = str(self.cmbUnits.currentText()) # and the label
+        fb.fil[0].update({'freq_specs_unit':unit}) # and store it in dict
+        
         self.f_S = float(self.ledF_S.text()) # read sampling frequency
 
         self.ledF_S.setVisible(unit not in {"f_S", "f_Ny"}) # only vis. when
@@ -162,19 +164,19 @@ class InputFreqUnits(QtGui.QWidget):
                     self.f_S = 2.
                     f_label = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
                 t_label = r"$n \; \rightarrow$"
+                
+                self.ledF_S.blockSignals(True)
                 self.ledF_S.setText(str(self.f_S)) # update field for f_S
-
+                self.ledF_S.blockSignals(False)
+                fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
             else: # Hz, kHz, ...
                 f_label = r"$f$ in " + unit + r"$\; \rightarrow$"
                 t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
             fb.fil[0].update({"plt_fLabel":f_label}) # label for freq. axis
             fb.fil[0].update({"plt_tLabel":t_label}) # label for time axis
-            fb.fil[0].update({'freq_specs_unit':unit})
-            fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
-            self.ledF_S.setText(str(self.f_S))
 
-        self._freq_range() # update f_lim setting and emit sigSpecsChanged signal
+        self._freq_range() # update f_lim setting and emit sigUnitChanged signal
         
     #-------------------------------------------------------------
     def _freq_range(self):
@@ -214,28 +216,35 @@ class InputFreqUnits(QtGui.QWidget):
         """
         Reload settings and textfields from filter dictionary
         """
-        self.f_S = fb.fil[0]['f_S']  # read sampling frequency
-        self.ledF_S.setText(str(self.f_S))
+#        self.f_S = fb.fil[0]['f_S']  # read sampling frequency
+        self.ledF_S.blockSignals(True)
+        self.ledF_S.setText(str(fb.fil[0]['f_S']))
+        self.ledF_S.blockSignals(False)
 
+        self.cmbUnits.blockSignals(True)
         idx = self.cmbUnits.findText(fb.fil[0]['freq_specs_unit']) # get and set
         self.cmbUnits.setCurrentIndex(idx) # index for freq. unit combo box
+        self.cmbUnits.blockSignals(False)
 
+        self.cmbFRange.blockSignals(True)
         idx = self.cmbFRange.findData(fb.fil[0]['freqSpecsRangeType'])
         self.cmbFRange.setCurrentIndex(idx) # set frequency range
+        self.cmbFRange.blockSignals(False)
         
+        self.butSort.blockSignals(True)
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
-
+        self.butSort.blockSignals(False)
 
     #-------------------------------------------------------------
-    def _store_entries(self):
-# TODO: not needed?
-        """
-        - Store cmbBox etc. settings in dictionary
-        - Emit sigFilterChanged signal
-        """
-        # simply call updateUI? 
-        fb.fil[0].update({'freq_specs_unit':self.cmbUnits.currentText()})
-        fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
+#    def _store_entries(self):
+## TODO: not needed?
+#        """
+#        - Store cmbBox etc. settings in dictionary
+#        - Emit sigFilterChanged signal
+#        """
+#        # simply call updateUI? 
+#        fb.fil[0].update({'freq_specs_unit':self.cmbUnits.currentText()})
+#        fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
         
 #-------------------------------------------------------------
     def _rt_label(self, label):

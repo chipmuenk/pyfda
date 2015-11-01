@@ -132,23 +132,32 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     def load_entries(self):
         """
         Reload textfields from filter dictionary to reflect settings that
-        may have been changed by the filter design algorithm
+        may have been changed by the filter design algorithm. Set blockSignals
+        True, i.e. don't fire when combobox is changed programmatically
         """
         idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
-
-        if idx == 0: # Entry is in dBs, same as in dictionary
+        
+                
+        if idx == 0: # Entry is in dBs, same as in dictionary -> no conversion
             for i in range(len(self.qlineedit)):
-                self.qlineedit[i].setText(
-                    str(fb.fil[0][str(self.qlineedit[i].objectName())]))
+                self.qlineedit[i].blockSignals(True)
+                self.qlineedit[i].setText(str(
+                    fb.fil[0][str(self.qlineedit[i].objectName())]))
+                self.qlineedit[i].blockSignals(False)
 
         elif idx == 1:  # Entries are voltages, convert from dBs
             for i in range(len(self.qlineedit)):
+                self.qlineedit[i].blockSignals(True)
                 self.qlineedit[i].setText(str(round(
-                10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/20.),8)))
+                    10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/20.),8)))
+                self.qlineedit[i].blockSignals(False)
+                
         else:  # Entries are powers, convert from dBs
             for i in range(len(self.qlineedit)):
+                self.qlineedit[i].blockSignals(True)
                 self.qlineedit[i].setText(str(round(
-                10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/10.),8)))
+                    10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/10.),8)))
+                self.qlineedit[i].blockSignals(False)
 
 
 #------------------------------------------------------------------------------
@@ -200,8 +209,11 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
                     self.qlabels[i].setText(self._rt_label(newLabels[i]))
+                    
+                    self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
+                    self.qlineedit[i].blockSignals(False)
 
         
 #------------------------------------------------------------------------------
