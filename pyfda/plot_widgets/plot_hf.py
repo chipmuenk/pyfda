@@ -367,8 +367,8 @@ class PlotHf(QtGui.QMainWindow):
             print("--- plotHf.draw() --- ")
             print("b, a = ", fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) 
 
-        # calculate H_c(W) (complex) for W = 0 ... 2 pi:
-        [self.W, self.H_c] = sig.freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1],
+        # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
+        [self.W, self.H_cplx] = sig.freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1],
             worN = rc.params['N_FFT'], whole = True) # bb, aa, N_FFT, 0 ... 2 pi
 
 #------------------------------------------------------------------------------
@@ -409,14 +409,20 @@ class PlotHf(QtGui.QMainWindow):
         self.A_SB2 = fb.fil[0]['A_SB2']
 
         f_lim = fb.fil[0]['freqSpecsRange']
-        
+
+        # shift, scale and select frequency range to be displayed: 
+        # W -> F, H_cplx -> H_c        
+        self.H_c = self.H_cplx
         self.F = self.W / (2 * np.pi) * self.f_S
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-            self.H_c = np.fft.fftshift(self.H_c)
+            self.H_c = np.fft.fftshift(self.H_cplx)
             self.F -= self.f_S/2.
-
-
+        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+            self.H_c = self.H_cplx[0:rc.params['N_FFT']/2]
+            self.F = self.F[0:rc.params['N_FFT']/2]
+            
+        # now calculate mag / real / imaginary part of H_c:
         if self.linphase: # remove the linear phase
             self.H_c = self.H_c * np.exp(1j * self.W * fb.fil[0]["N"]/2.)
 
