@@ -90,11 +90,12 @@ class InputFreqSpecs(QtGui.QWidget):
         """
         # Check whether the number of entries has changed
         for i in range(max(len(self.qlabels), len(new_labels))):
-            # less new_labels than qlabels -> delete the difference
+
+            # less new_labels than qlabels -> delete superfluous labels + lineedits
             if (i > (len(new_labels)-1)):
                 self._del_entry(len(new_labels))
 
-            # more new_labels than existing qlabels -> create new ones!
+            # more new_labels than existing qlabels -> create new labels + lineedits
             elif (i > (len(self.qlabels)-1)):
              self._add_entry(i,new_labels[i])
 
@@ -120,14 +121,12 @@ class InputFreqSpecs(QtGui.QWidget):
         """
         Reload textfields from filter dictionary 
         Transform the displayed frequency spec input fields according to the units
-        setting. Spec entries are always stored normalized w.r.t. f_S in the
-        dictionary; when f_S or the unit are changed, only the displayed values
+        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
+        in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
-        
-        Finally, the frequency specs are sorted (when the corresponding button
-        is pressed) and stored in the filter dictionary.
 
-        loadEntries is called during init and when a lineedit field has been edited
+        loadEntries is called during init and when the frequency unit or the
+        sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
         at another place, indicating that a reload is required.
@@ -159,7 +158,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
 
 #-------------------------------------------------------------
-    def _add_entry(self, i, newLabel):
+    def _add_entry(self, i, new_label):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and connect
         QLineEdit widget to self._sort_store_entries. This way, the central filter
@@ -167,11 +166,11 @@ class InputFreqSpecs(QtGui.QWidget):
         edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(rt_label(newLabel))
+        self.qlabels[i].setText(rt_label(new_label))
 
         self.qlineedit.append(QtGui.QLineEdit(
-                                    str(fb.fil[0][newLabel]*fb.fil[0]['f_S'])))
-        self.qlineedit[i].setObjectName(newLabel) # update ID
+                                    str(fb.fil[0][new_label]*fb.fil[0]['f_S'])))
+        self.qlineedit[i].setObjectName(new_label) # update ID
         
         self.qlineedit[i].editingFinished.connect(self._sort_store_entries)
 
@@ -181,6 +180,11 @@ class InputFreqSpecs(QtGui.QWidget):
 #-------------------------------------------------------------
     def _sort_store_entries(self, signal = True):
         """
+        _sort_store_entries is called when:
+        - a lineedit field has been edited
+        - update_UI is called after changing the filter design method
+
+        It performs the following actions:
         - Sort spec entries with ascending frequency if sort button is activated
         - Store specification entries in filter dictionary:
           Entries are normalized with sampling frequency fb.fil[0]['f_S'] !
