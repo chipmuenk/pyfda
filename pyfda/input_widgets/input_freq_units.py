@@ -20,6 +20,8 @@ class InputFreqUnits(QtGui.QWidget):
 
     # class variables (shared between instances if more than one exists)
     sigUnitChanged = pyqtSignal() # emitted when frequency unit has been changed
+    sigSpecsChanged = pyqtSignal() # emitted when frequency specs have been changed
+                                  # (e.g. when the sort button has been pushed)
 
     def __init__(self, DEBUG = True, title = "Frequency Units"):
 
@@ -253,7 +255,8 @@ class InputFreqUnits(QtGui.QWidget):
         Store sort flag in filter dict and emit sigSpecsChanged
         """
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
-        self.sigUnitChanged.emit() # -> input_widgets
+        if self.butSort.isChecked():
+            self.sigSpecsChanged.emit() # -> input_widgets
 
  
 #------------------------------------------------------------------------------
