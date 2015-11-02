@@ -10,6 +10,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import rt_label
 from pyfda.simpleeval import simple_eval
 
 class InputWeightSpecs(QtGui.QWidget):
@@ -104,7 +105,7 @@ class InputWeightSpecs(QtGui.QWidget):
             else:
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
-                    self.qlabels[i].setText(self._rtLabel(newLabels[i]))
+                    self.qlabels[i].setText(rt_label(newLabels[i]))
                     
                     self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
@@ -163,7 +164,7 @@ class InputWeightSpecs(QtGui.QWidget):
         edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(self._rtLabel(newLabel))
+        self.qlabels[i].setText(rt_label(newLabel))
 
         self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
         self.qlineedit[i].setObjectName(newLabel) # update ID
@@ -177,24 +178,13 @@ class InputWeightSpecs(QtGui.QWidget):
     def _reset_weights(self):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
-        Fire signal sigSpecsChanged as well
         """
         for i in range(len(self.qlineedit)):
+            self.qlineedit[i].blockSignals(True)
             self.qlineedit[i].setText("1.0")
+            self.qlineedit[i].blockSignals(False)
         self._store_entries()
 
-#-------------------------------------------------------------
-    def _rtLabel(self, label):
-        """
-        Rich text label: Format label with HTML tags, replacing '_' by
-        HTML subscript tags
-        """
-        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
-        if "_" in label:
-            label = label.replace('_', '<sub>')
-            label += "</sub>"
-        htmlLabel = "<b><i>"+label+"</i></b>"
-        return htmlLabel
 
 #------------------------------------------------------------------------------
 

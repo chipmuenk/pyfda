@@ -103,7 +103,7 @@ class InputTargetSpecs(QtGui.QWidget):
     def load_entries(self):
         """
         Update entries from global dict fb.fil[0]
-        parameters, using the "load" methods of the classes
+        parameters, using the "load_entries" methods of the classes
         """
         self.aspecs.load_entries() # magnitude specs with unit
         self.fspecs.load_entries() # weight specification

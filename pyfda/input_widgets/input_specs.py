@@ -351,10 +351,3 @@ if __name__ == '__main__':
     form.show()
 
     app.exec_()
-
-
-
-
-
-
-
