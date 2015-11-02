@@ -93,7 +93,7 @@ class InputTargetSpecs(QtGui.QWidget):
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.fspecs.update_UI(newLabels = freqParams) # update frequency spec labels
+        self.fspecs.update_UI(new_labels = freqParams) # update frequency spec labels
         self.aspecs.setVisible(ampParams != [])
         self.aspecs.update_UI(newLabels = ampParams)
 

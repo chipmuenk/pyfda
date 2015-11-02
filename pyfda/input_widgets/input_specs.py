@@ -187,7 +187,7 @@ class InputSpecs(QtGui.QWidget):
         self.f_man_params = [l for l in man_params if l[0] == 'F']
         self.f_specs.setVisible("fspecs" in vis_wdgs)
         self.f_specs.setEnabled("fspecs" not in dis_wdgs)
-        self.f_specs.update_UI(newLabels=self.f_man_params)
+        self.f_specs.update_UI(new_labels=self.f_man_params)
 
         # always use parameters for MINIMUM filter order for target frequency
         # spec widget
