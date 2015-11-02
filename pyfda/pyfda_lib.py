@@ -131,59 +131,59 @@ def cmplx_sort(p):
 # TODO:  comparison of real values has several problems (5 * tol ???)
 def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
     """
-Determine unique roots and their multiplicities from a list of roots.
-
-Parameters
-----------
-p : array_like
-    The list of roots.
-tol : float, default tol = 1e-3
-    The tolerance for two roots to be considered equal. Default is 1e-3.
-magsort: Boolean, default = False
-    When magsort = True, use the root magnitude as a sorting criterium (as in
-    the version used in numpy < 1.8.2). This yields false results for roots
-    with similar magniudes (e.g. on the unit circle) but is signficantly
-    faster for a large number of roots (factor 20 for 500 double roots.)
-rtype : {'max', 'min, 'avg'}, optional
-    How to determine the returned root if multiple roots are within
-    `tol` of each other.
-    - 'max' or 'maximum': pick the maximum of those roots (magnitude ?).
-    - 'min' or 'minimum': pick the minimum of those roots (magnitude?).
-    - 'avg' or 'mean' : take the average of those roots.
-    - 'median' : take the median of those roots
-dist : {'manhattan', 'euclid'}, optional
-    How to measure the distance between roots: 'euclid' is the euclidian
-    distance. 'manhattan' is less common, giving the
-    sum of the differences of real and imaginary parts.
-
-Returns
--------
-pout : list
-    The list of unique roots, sorted from low to high (only for real roots).
-mult : list
-    The multiplicity of each root.
-
-Notes
------
-This utility function is not specific to roots but can be used for any
-sequence of values for which uniqueness and multiplicity has to be
-determined. For a more general routine, see `numpy.unique`.
-
-Examples
---------
->>> vals = [0, 1.3, 1.31, 2.8, 1.25, 2.2, 10.3]
->>> uniq, mult = unique_roots(vals, tol=2e-2, rtype='avg')
-
-Check which roots have multiplicity larger than 1:
-
->>> uniq[mult > 1]
-array([ 1.305])
-
-Find multiples of complex roots on the unit circle:
->>> vals = np.roots(1,2,3,2,1)
-uniq, mult = unique_roots(vals, rtype='avg')
-
-"""
+    Determine unique roots and their multiplicities from a list of roots.
+    
+    Parameters
+    ----------
+    p : array_like
+        The list of roots.
+    tol : float, default tol = 1e-3
+        The tolerance for two roots to be considered equal. Default is 1e-3.
+    magsort: Boolean, default = False
+        When magsort = True, use the root magnitude as a sorting criterium (as in
+        the version used in numpy < 1.8.2). This yields false results for roots
+        with similar magniudes (e.g. on the unit circle) but is signficantly
+        faster for a large number of roots (factor 20 for 500 double roots.)
+    rtype : {'max', 'min, 'avg'}, optional
+        How to determine the returned root if multiple roots are within
+        `tol` of each other.
+        - 'max' or 'maximum': pick the maximum of those roots (magnitude ?).
+        - 'min' or 'minimum': pick the minimum of those roots (magnitude?).
+        - 'avg' or 'mean' : take the average of those roots.
+        - 'median' : take the median of those roots
+    dist : {'manhattan', 'euclid'}, optional
+        How to measure the distance between roots: 'euclid' is the euclidian
+        distance. 'manhattan' is less common, giving the
+        sum of the differences of real and imaginary parts.
+    
+    Returns
+    -------
+    pout : list
+        The list of unique roots, sorted from low to high (only for real roots).
+    mult : list
+        The multiplicity of each root.
+    
+    Notes
+    -----
+    This utility function is not specific to roots but can be used for any
+    sequence of values for which uniqueness and multiplicity has to be
+    determined. For a more general routine, see `numpy.unique`.
+    
+    Examples
+    --------
+    >>> vals = [0, 1.3, 1.31, 2.8, 1.25, 2.2, 10.3]
+    >>> uniq, mult = unique_roots(vals, tol=2e-2, rtype='avg')
+    
+    Check which roots have multiplicity larger than 1:
+    
+    >>> uniq[mult > 1]
+    array([ 1.305])
+    
+    Find multiples of complex roots on the unit circle:
+    >>> vals = np.roots(1,2,3,2,1)
+    uniq, mult = unique_roots(vals, rtype='avg')
+    
+    """
 
     def manhattan(a,b):
         """
@@ -666,13 +666,18 @@ where::
 
 where :math:`H(e^{j\\omega T})` is calculated via the DFT at NFFT points and
 the derivative
-of the polynomial terms :math:`b_k z^-k` using :math:`\\partial / \\partial w b_k e^-jkwT` = -b_k jkT e^-jkwT.
+of the polynomial terms :math:`b_k z^{-k}` using 
+
+.. math::
+
+    \\frac{\\partial} {\\partial \\omega} b_k e^{-jk\\omega T} = -b_k jkT e^{-jk\\omega T}.
+    
 This is equivalent to muliplying the polynome with a ramp `k`,
-yielding the "ramped" function H_R(e^jwT).
+yielding the "ramped" function :math:`H_R(e^{j\\omega T})`.
 
 
 
-For analog functions with b_k s^k the procedure is analogous, but there is no
+For analog functions with :math:`b_k s^k` the procedure is analogous, but there is no
 sampling time and the exponent is positive.
 
 
@@ -783,7 +788,7 @@ Examples
 
 
 #==================================================================
-def format_ticks(xy, scale, format="%.1f"):
+def format_ticks(xy, scale=1., format="%.1f"):
 #==================================================================
     """
 Reformat numbers at x or y - axis. The scale can be changed to display
@@ -794,9 +799,10 @@ Parameters
 xy : string, either 'x', 'y' or 'xy'
      select corresponding axis (axes) for reformatting
 
-scale :  real,
+scale : real (default: 1.)
+        rescaling factor for the axes
 
-format : string,
+format : string (default: %.1f)
          define C-style number formats
 
 Returns
@@ -806,10 +812,14 @@ nothing
 
 Examples
 --------
+Scale all numbers of x-Axis by 1000, e.g. for displaying ms instead of s.
+
 >>> format_ticks('x',1000.)
-Scales all numbers of x-Axis by 1000, e.g. for displaying ms instead of s.
->>> format_ticks('xy',1., format = "%.2f")
+
 Two decimal places for numbers on x- and y-axis
+
+>>> format_ticks('xy',1., format = "%.2f")
+
 """
     if xy == 'x' or xy == 'xy':
         locx,labelx = plt.xticks() # get location and content of xticks
@@ -862,13 +872,13 @@ def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
     """
     Filter parameter selection for the Remez exchange algorithm.
 
-Calculate the parameters required by the Remez exchange algorithm to
-construct a finite impulse response (FIR) filter that approximately
-meets the specified design.
-
-Parameters
-----------
-
+    Calculate the parameters required by the Remez exchange algorithm to
+    construct a finite impulse response (FIR) filter that approximately
+    meets the specified design.
+    
+    Parameters
+    ----------
+    
     freqs : list
         A monotonic sequence of band edges specified in Hertz. All elements
         must be non-negative and less than 1/2 the sampling frequency as
@@ -891,20 +901,21 @@ Parameters
         Filter length approximation algorithm. May be either 'herrmann',
         'kaiser' or 'ichige'. Depending on the specifications, some of
         the algorithms may give better results than the others.
-
-Returns
--------
-
-numtaps,bands,desired,weight -- See help for the remez function.
-
-Examples
---------
+    
+    Returns
+    -------
+    
+    numtaps,bands,desired,weight -- See help for the remez function.
+    
+    Examples
+    --------
         We want to design a lowpass with the band edges of 40 resp. 50 Hz and a
         sampling frequency of 200 Hz, a passband peak ripple of 10%
         and a stop band ripple of 0.01 or 40 dB.
-    >>> (L, F, A, W) = remezord([40, 50], [1, 0], [0.1, 0.01], Hz = 200)
-
-"""
+        
+        >>> (L, F, A, W) = remezord([40, 50], [1, 0], [0.1, 0.01], Hz = 200)
+    
+    """
 
     # Make sure the parameters are floating point numpy arrays:
     freqs = np.asarray(freqs,'d')
@@ -989,17 +1000,17 @@ def ceil_even(x):
 
 def remlplen_herrmann(fp,fs,dp,ds):
     """
-Determine the length of the low pass filter with passband frequency
-fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
-fp and fs must be normalized with respect to the sampling frequency.
-Note that the filter order is one less than the filter length.
-
-Uses approximation algorithm described by Herrmann et al.:
-
-O. Herrmann, L.R. Raviner, and D.S.K. Chan, Practical Design Rules for
-Optimum Finite Impulse Response Low-Pass Digital Filters, Bell Syst. Tech.
-Jour., 52(6):769-799, Jul./Aug. 1973.
-"""
+    Determine the length of the low pass filter with passband frequency
+    fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
+    fp and fs must be normalized with respect to the sampling frequency.
+    Note that the filter order is one less than the filter length.
+    
+    Uses approximation algorithm described by Herrmann et al.:
+    
+    O. Herrmann, L.R. Raviner, and D.S.K. Chan, Practical Design Rules for
+    Optimum Finite Impulse Response Low-Pass Digital Filters, Bell Syst. Tech.
+    Jour., 52(6):769-799, Jul./Aug. 1973.
+    """
 
     dF = fs-fp
     a = [5.309e-3,7.114e-2,-4.761e-1,-2.66e-3,-5.941e-1,-4.278e-1]
@@ -1014,16 +1025,16 @@ Jour., 52(6):769-799, Jul./Aug. 1973.
 
 def remlplen_kaiser(fp,fs,dp,ds):
     """
-Determine the length of the low pass filter with passband frequency
-fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
-fp and fs must be normalized with respect to the sampling frequency.
-Note that the filter order is one less than the filter length.
-
-Uses approximation algorithm described by Kaiser:
-
-J.F. Kaiser, Nonrecursive Digital Filter Design Using I_0-sinh Window
-function, Proc. IEEE Int. Symp. Circuits and Systems, 20-23, April 1974.
-"""
+    Determine the length of the low pass filter with passband frequency
+    fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
+    fp and fs must be normalized with respect to the sampling frequency.
+    Note that the filter order is one less than the filter length.
+    
+    Uses approximation algorithm described by Kaiser:
+    
+    J.F. Kaiser, Nonrecursive Digital Filter Design Using I_0-sinh Window
+    function, Proc. IEEE Int. Symp. Circuits and Systems, 20-23, April 1974.
+    """
 
     dF = fs-fp
     N2 = (-20*log10(np.sqrt(dp*ds))-13.0)/(14.6*dF)+1.0
@@ -1033,15 +1044,15 @@ function, Proc. IEEE Int. Symp. Circuits and Systems, 20-23, April 1974.
 
 def remlplen_ichige(fp,fs,dp,ds):
     """
-Determine the length of the low pass filter with passband frequency
-fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
-fp and fs must be normalized with respect to the sampling frequency.
-Note that the filter order is one less than the filter length.
-Uses approximation algorithm described by Ichige et al.:
-K. Ichige, M. Iwaki, and R. Ishii, Accurate Estimation of Minimum
-Filter Length for Optimum FIR Digital Filters, IEEE Transactions on
-Circuits and Systems, 47(10):1008-1017, October 2000.
-"""
+    Determine the length of the low pass filter with passband frequency
+    fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
+    fp and fs must be normalized with respect to the sampling frequency.
+    Note that the filter order is one less than the filter length.
+    Uses approximation algorithm described by Ichige et al.:
+    K. Ichige, M. Iwaki, and R. Ishii, Accurate Estimation of Minimum
+    Filter Length for Optimum FIR Digital Filters, IEEE Transactions on
+    Circuits and Systems, 47(10):1008-1017, October 2000.
+    """
 #        dp_lin = (10**(dp/20.0)-1) / (10**(dp/20.0)+1)*2
     dF = fs-fp
     v = lambda dF,dp:2.325*((-log10(dp))**-0.445)*dF**(-1.39)
