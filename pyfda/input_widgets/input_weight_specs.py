@@ -177,10 +177,11 @@ class InputWeightSpecs(QtGui.QWidget):
     def _reset_weights(self):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
-        Fire signal sigSpecsChanged as well
         """
         for i in range(len(self.qlineedit)):
+            self.qlineedit[i].blockSignals(True)
             self.qlineedit[i].setText("1.0")
+            self.qlineedit[i].blockSignals(False)
         self._store_entries()
 
 #-------------------------------------------------------------
