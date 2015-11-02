@@ -140,8 +140,6 @@ class InputFreqSpecs(QtGui.QWidget):
             self.qlineedit[i].setText(str(round(f,11)))
             self.qlineedit[i].blockSignals(False)
 
-        self._sort_store_entries(signal = False)
-
 
 #-------------------------------------------------------------
     def _del_entry(self,i):
