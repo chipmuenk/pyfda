@@ -14,6 +14,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, Qt
 
 import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import rt_label
 from pyfda.simpleeval import simple_eval
 
 class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
@@ -208,26 +209,12 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
             else:
                 # when entry has changed, update label and corresponding value
                 if self.qlineedit[i].objectName() != newLabels[i]:
-                    self.qlabels[i].setText(self._rt_label(newLabels[i]))
+                    self.qlabels[i].setText(rt_label(newLabels[i]))
                     
                     self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
                     self.qlineedit[i].blockSignals(False)
-
-        
-#------------------------------------------------------------------------------
-    def _rt_label(self, label):
-        """
-        Rich text label: Format label with italic + bold HTML tags and
-         replace '_' by HTML subscript tags
-        """
-        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
-        if "_" in label:
-            label = label.replace('_', '<sub>')
-            label += "</sub>"
-        htmlLabel = "<b><i>"+label+"</i></b>"
-        return htmlLabel
 
 
 #------------------------------------------------------------------------------
@@ -256,7 +243,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         been edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(self._rt_label(newLabel))
+        self.qlabels[i].setText(rt_label(newLabel))
 
         self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
         self.qlineedit[i].setObjectName(newLabel) # update ID

@@ -9,7 +9,8 @@ import sys, os
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
-import pyfda.filterbroker as fb    
+import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import rt_label
 
 # TODO: self.cmbFRange is not updated when file is loaded from disk although
 #           fb.fil[0] is updated to correct setting?
@@ -41,12 +42,6 @@ class InputFreqUnits(QtGui.QWidget):
 
         bfont = QtGui.QFont()
         bfont.setBold(True)
-#            bfont.setWeight(75)
-#        self.lblTitle = QtGui.QLabel(self) # field for widget title
-#        self.lblTitle.setText(str(self.title))
-#        self.lblTitle.setFont(bfont)
-#        self.lblTitle.setWordWrap(True)
-#        self.layVMain.addWidget(self.lblTitle)
 
         self.lblUnits=QtGui.QLabel(self)
         self.lblUnits.setText("Freq. Unit:")
@@ -58,7 +53,7 @@ class InputFreqUnits(QtGui.QWidget):
         self.ledF_S.setObjectName("f_S")
 
         self.lblF_S = QtGui.QLabel(self)
-        self.lblF_S.setText(self._rt_label("f_S"))
+        self.lblF_S.setText(rt_label("f_S"))
 
         self.cmbUnits = QtGui.QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")
@@ -253,18 +248,6 @@ class InputFreqUnits(QtGui.QWidget):
 #        fb.fil[0].update({'freq_specs_unit':self.cmbUnits.currentText()})
 #        fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
         
-#-------------------------------------------------------------
-    def _rt_label(self, label):
-        """
-        Rich text label: Format label with italic + bold HTML tags and
-         replace '_' by HTML subscript tags
-        """
-        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
-        if "_" in label:
-            label = label.replace('_', '<sub>')
-            label += "</sub>"
-        htmlLabel = "<b><i>"+label+"</i></b>"
-        return htmlLabel
 
 #-------------------------------------------------------------
     def _store_sort(self):

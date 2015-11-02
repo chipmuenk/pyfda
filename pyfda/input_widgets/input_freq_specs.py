@@ -10,7 +10,8 @@ import sys, os
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
-import pyfda.filterbroker as fb    
+import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import rt_label
 from pyfda.simpleeval import simple_eval
 
 class InputFreqSpecs(QtGui.QWidget):
@@ -98,7 +99,7 @@ class InputFreqSpecs(QtGui.QWidget):
             else:
                 # when entry has changed, update label and corresponding value
                 if str(self.qlineedit[i].objectName()) != newLabels[i]:
-                    self.qlabels[i].setText(self._rt_label(newLabels[i]))
+                    self.qlabels[i].setText(rt_label(newLabels[i]))
                     self.qlineedit[i].setText(
                         str(fb.fil[0][newLabels[i]] * fb.fil[0]['f_S']))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
@@ -136,20 +137,6 @@ class InputFreqSpecs(QtGui.QWidget):
 
 
 #-------------------------------------------------------------
-    def _rt_label(self, label):
-        """
-        Rich text label: Format label with italic + bold HTML tags and
-         replace '_' by HTML subscript tags
-        """
-        #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
-        if "_" in label:
-            label = label.replace('_', '<sub>')
-            label += "</sub>"
-        htmlLabel = "<b><i>"+label+"</i></b>"
-        return htmlLabel
-
-
-#-------------------------------------------------------------
     def _del_entry(self,i):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit) and
@@ -175,7 +162,7 @@ class InputFreqSpecs(QtGui.QWidget):
         edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(self._rt_label(newLabel))
+        self.qlabels[i].setText(rt_label(newLabel))
 
         self.qlineedit.append(QtGui.QLineEdit(
                                     str(fb.fil[0][newLabel]*fb.fil[0]['f_S'])))

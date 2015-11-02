@@ -1054,6 +1054,39 @@ Circuits and Systems, 47(10):1008-1017, October 2000.
     N4 = N3+DN
 
     return int(N4)
+    
+#-------------------------------------------------------------
+def rt_label(label):
+    """
+    Rich text label: Format label with italic + bold HTML tags and
+     replace '_' by HTML subscript tags
+
+     Parameters
+     ----------
+
+    label : string
+        Name for the label to be converted, containing '_' for subsripts
+        
+    Returns
+    -------
+    
+    html_label
+    
+    Examples
+    --------
+        
+        >>> rt_label("F_SB")
+        <b><i>F<sub>SB</sub></i></b>
+         
+    """
+    #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
+    if "_" in label:
+        label = label.replace('_', '<sub>')
+        label += "</sub>"
+    html_label = "<b><i>"+label+"</i></b>"
+    return html_label
+
+
 
 #######################################
 # If called directly, do some example #
