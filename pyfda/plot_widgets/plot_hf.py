@@ -161,6 +161,8 @@ class PlotHf(QtGui.QMainWindow):
             A_PB_min = -self.A_PB
             A_PB2_min = -self.A_PB2
             A_PB_minx = min(A_PB_min, A_PB2_min) - 10# 20*log10(1-del_PB)
+            A_PB_maxx = max(A_PB_max, A_PB2_max) + 10# 20*log10(1-del_PB)
+
             A_SB = -self.A_SB
             A_SB2 = -self.A_SB2
             A_SBx = A_SB - 10
@@ -170,6 +172,7 @@ class PlotHf(QtGui.QMainWindow):
             A_PB_min = 10**(-self.A_PB/dBMul) #1 - del_PB
             A_PB2_min = 10**(-self.A_PB2/dBMul) #1 - del_PB
             A_PB_minx = A_PB_min / 2
+            A_PB_maxx = max(A_PB_max, A_PB2_max) + 1
             A_SB = 10**(-self.A_SB/dBMul)
             A_SB2 = 10**(-self.A_SB2/dBMul)
             A_SBx = A_SB / 5
@@ -180,69 +183,115 @@ class PlotHf(QtGui.QMainWindow):
         F_SB2 = fb.fil[0]['F_SB2'] * self.f_S
         F_PB2 = fb.fil[0]['F_PB2'] * self.f_S
 
-        y_min =  A_PB_minx
-        y_max = ax.get_ylim()[1]
+        y_min = A_PB_minx
+        y_max = A_PB_maxx#ax.get_ylim()[1]
 
-        F_lim_lor = []
-        A_lim_lor = []
+        F_lim_upl = F_lim_lol = [] # left side limits, lower and upper
+        A_lim_upl = A_lim_lol = []
+        
+        F_lim_upc = F_lim_loc = []
+        A_lim_upc = A_lim_loc = []
+
+        F_lim_upr = F_lim_lor = [] # right side limits, lower and upper
+        A_lim_upr = A_lim_lor = []
 
         if fb.fil[0]['rt'] == 'LP':
-            F_lim_up = [0,        F_SB,     F_SB, F_max]
-            A_lim_up = [A_PB_max, A_PB_max, A_SB, A_SB]
-            F_lim_lo = [0,        F_PB,     F_PB]
-            A_lim_lo = [A_PB_min, A_PB_min, A_PB_minx]
+            F_lim_upl = [0,        F_PB,     F_PB]
+            A_lim_upl = [A_PB_max, A_PB_max, A_PB_maxx]
+            F_lim_lol = F_lim_upl
+            A_lim_lol = [A_PB_min, A_PB_min, A_PB_minx]
+
+            F_lim_upr = [F_SB,     F_SB, F_max]
+            A_lim_upr = [A_PB_maxx, A_SB, A_SB]
 
         if fb.fil[0]['rt'] == 'HP':
-            F_lim_up = [0,    F_SB, F_SB,     F_max]
-            A_lim_up = [A_SB, A_SB, A_PB_max, A_PB_max]
-            F_lim_lo = [F_PB,      F_PB,     F_max]
-            A_lim_lo = [A_PB_minx, A_PB_min, A_PB_min]
-
+            F_lim_upl = [0,    F_SB, F_SB]
+            A_lim_upl = [A_SB, A_SB, A_PB_maxx]
+            
+            F_lim_upr = [F_PB,      F_PB,     F_max]
+            A_lim_upr = [A_PB_maxx, A_PB_max, A_PB_max]
+            F_lim_lor = F_lim_upr
+            A_lim_lor = [A_PB_minx, A_PB_min, A_PB_min]
+            
         if fb.fil[0]['rt'] == 'BS':
-            F_lim_up = [0,        F_SB,     F_SB, F_SB2, F_SB2,     F_max]
-            A_lim_up = [A_PB_max, A_PB_max, A_SB, A_SB,  A_PB2_max, A_PB2_max]
-            # lower limits left:
-            F_lim_lo = [0,        F_PB,     F_PB]
-            A_lim_lo = [A_PB_min, A_PB_min, A_PB_minx]
-            # lower limits right:
-            F_lim_lor = [F_PB2, F_PB2, F_max]
+            F_lim_upl = [0,        F_PB,     F_PB]
+            A_lim_upl = [A_PB_max, A_PB_max, A_PB_maxx]
+            F_lim_lol = F_lim_upl
+            A_lim_lol = [A_PB_min, A_PB_min, A_PB_minx]
+
+            F_lim_upc = [F_SB, F_SB, F_SB2, F_SB2]
+            A_lim_upc = [A_PB_maxx, A_SB, A_SB,  A_PB_maxx]
+
+            F_lim_upr = [F_PB2, F_PB2, F_max]
+            A_lim_upr = [A_PB_maxx, A_PB2_max, A_PB2_max]
+            F_lim_lor = F_lim_upr
             A_lim_lor = [A_PB_minx, A_PB2_min, A_PB2_min]
 
         if fb.fil[0]['rt'] in {"BP", "HIL"}:
-            F_lim_up = [0,    F_SB, F_SB,     F_SB2,    F_SB2, F_max]
-            A_lim_up = [A_SB, A_SB, A_PB_max, A_PB_max, A_SB2, A_SB2]
-            F_lim_lo = [F_PB,      F_PB,     F_PB2,    F_PB2]
-            A_lim_lo = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
+            F_lim_upl = [0,    F_SB, F_SB]
+            A_lim_upl = [A_SB, A_SB, A_PB_maxx]
 
-        F_lim_up = np.array(F_lim_up)
-        F_lim_lo = np.array(F_lim_lo)
+            F_lim_upc = [F_PB,      F_PB,     F_PB2,    F_PB2]
+            A_lim_upc = [A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx]
+            F_lim_loc = F_lim_upc
+            A_lim_loc = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
+            
+            F_lim_upr = [F_SB2,    F_SB2, F_max]
+            A_lim_upr = [A_PB_maxx, A_SB2, A_SB2]
+
+        F_lim_upr = np.array(F_lim_upr)
         F_lim_lor = np.array(F_lim_lor)
+        F_lim_upl = np.array(F_lim_upl)
+        F_lim_lol = np.array(F_lim_lol)
+        F_lim_upc = np.array(F_lim_upc)
+        F_lim_loc = np.array(F_lim_loc)
 
         # upper limits:
-        ax.plot(F_lim_up, A_lim_up, **line_params)
-        ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
+        ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **line_params)
+        ax.fill_between(F_lim_upl, y_max, A_lim_upl, **fill_params)
+        ax.fill_between(F_lim_upc, y_max, A_lim_upc, **fill_params)
+        ax.fill_between(F_lim_upr, y_max, A_lim_upr, **fill_params)
         # lower limits:
-        ax.plot(F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
-        ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
+        ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **line_params)
+        ax.fill_between(F_lim_lol, y_min, A_lim_lol, **fill_params)
+        ax.fill_between(F_lim_loc, y_min, A_lim_loc, **fill_params)
         ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
 
         if fb.fil[0]['freqSpecsRangeType'] != 'half': # frequency axis +/- f_S/2
             # plot limits for other half of the spectrum
             if fb.fil[0]['freqSpecsRangeType'] == 'sym': # frequency axis +/- f_S/2
-                F_lim_up = -F_lim_up
-                F_lim_lo = -F_lim_lo
+                F_lim_upl = -F_lim_upl
+                F_lim_lol = -F_lim_lol
+                F_lim_upc = -F_lim_upc
+                F_lim_loc = -F_lim_loc
+                F_lim_upr = -F_lim_upr
                 F_lim_lor = -F_lim_lor
             else: # -> 'whole'
-                F_lim_up = self.f_S - F_lim_up
-                F_lim_lo = self.f_S - F_lim_lo
+                F_lim_upl = self.f_S - F_lim_upl
+                F_lim_lol = self.f_S - F_lim_lol
+                F_lim_upc = self.f_S - F_lim_upc
+                F_lim_loc = self.f_S - F_lim_loc
+                F_lim_upr = self.f_S - F_lim_upr
                 F_lim_lor = self.f_S - F_lim_lor
-            # upper limits:
-            ax.plot(F_lim_up, A_lim_up, **line_params)
-            ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
-            # lower limits:
-            ax.plot(F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
-            ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
-            ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+
+        # upper limits:
+        ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **line_params)
+        ax.fill_between(F_lim_upl, y_max, A_lim_upl, **fill_params)
+        ax.fill_between(F_lim_upc, y_max, A_lim_upc, **fill_params)
+        ax.fill_between(F_lim_upr, y_max, A_lim_upr, **fill_params)
+        # lower limits:
+        ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **line_params)
+        ax.fill_between(F_lim_lol, y_min, A_lim_lol, **fill_params)
+        ax.fill_between(F_lim_loc, y_min, A_lim_loc, **fill_params)
+        ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+
+#            # upper limits:
+#            ax.plot(F_lim_up, A_lim_up, **line_params)
+#            ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
+#            # lower limits:
+#            ax.plot(F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
+#            ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
+#            ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
 
 #------------------------------------------------------------------------------
     def draw_inset(self):

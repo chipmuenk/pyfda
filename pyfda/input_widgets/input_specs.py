@@ -105,10 +105,13 @@ class InputSpecs(QtGui.QWidget):
         self.sel_fil.sigFiltChanged.connect(self.update_all_UIs)
 
         # Changing the frequency unit requires re-display of frequency specs
-        # but it not influence the actual specs (no specsChanged )
+        # but it does not influence the actual specs (no specsChanged )
         self.f_units.sigUnitChanged.connect(self.f_specs.load_entries)
         self.f_units.sigUnitChanged.connect(self.t_specs.load_entries)
         self.f_units.sigUnitChanged.connect(self.sigViewChanged.emit)
+        self.f_units.sigSpecsChanged.connect(self.f_specs._sort_store_entries)
+#        self.f_units.sigSpecsChanged.connect(self.t_specs._sort_store_entries)
+
 
         # Changing filter parameters / specs requires reloading of parameters
         # in other hierarchy levels, e.g. in the plot tabs
@@ -187,7 +190,7 @@ class InputSpecs(QtGui.QWidget):
         self.f_man_params = [l for l in man_params if l[0] == 'F']
         self.f_specs.setVisible("fspecs" in vis_wdgs)
         self.f_specs.setEnabled("fspecs" not in dis_wdgs)
-        self.f_specs.update_UI(newLabels=self.f_man_params)
+        self.f_specs.update_UI(new_labels=self.f_man_params)
 
         # always use parameters for MINIMUM filter order for target frequency
         # spec widget

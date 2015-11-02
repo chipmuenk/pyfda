@@ -12,8 +12,6 @@ from PyQt4.QtCore import pyqtSignal
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label
 
-# TODO: self.cmbFRange is not updated when file is loaded from disk although
-#           fb.fil[0] is updated to correct setting?
 
 class InputFreqUnits(QtGui.QWidget):
     """
@@ -22,6 +20,8 @@ class InputFreqUnits(QtGui.QWidget):
 
     # class variables (shared between instances if more than one exists)
     sigUnitChanged = pyqtSignal() # emitted when frequency unit has been changed
+    sigSpecsChanged = pyqtSignal() # emitted when frequency specs have been changed
+                                  # (e.g. when the sort button has been pushed)
 
     def __init__(self, DEBUG = True, title = "Frequency Units"):
 
@@ -74,7 +74,6 @@ class InputFreqUnits(QtGui.QWidget):
         self.cmbFRange.setToolTip("Select frequency range (whole or half).")
         self.cmbFRange.setCurrentIndex(0)
 
-
         # Combobox resizes with longest entry
         self.cmbUnits.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbFRange.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
@@ -113,12 +112,12 @@ class InputFreqUnits(QtGui.QWidget):
         self.cmbUnits.currentIndexChanged.connect(self.update_UI)
         self.ledF_S.editingFinished.connect(self.update_UI)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
-        self.butSort.clicked.connect(self._store_sort)
+        self.butSort.clicked.connect(self._store_sort_flag)
         #----------------------------------------------------------------------
 
 
         self.update_UI() # first time initialization
-               
+
 
 #-------------------------------------------------------------
     def update_UI(self):
@@ -237,25 +236,16 @@ class InputFreqUnits(QtGui.QWidget):
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
         self.butSort.blockSignals(False)
 
-    #-------------------------------------------------------------
-#    def _store_entries(self):
-## TODO: not needed?
-#        """
-#        - Store cmbBox etc. settings in dictionary
-#        - Emit sigFilterChanged signal
-#        """
-#        # simply call updateUI? 
-#        fb.fil[0].update({'freq_specs_unit':self.cmbUnits.currentText()})
-#        fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
-        
 
 #-------------------------------------------------------------
-    def _store_sort(self):
+    def _store_sort_flag(self):
         """
         Store sort flag in filter dict and emit sigSpecsChanged
+        when sort button is checked.
         """
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
-        self.sigUnitChanged.emit() # -> input_widgets
+        if self.butSort.isChecked():
+            self.sigSpecsChanged.emit() # -> input_widgets
 
  
 #------------------------------------------------------------------------------
