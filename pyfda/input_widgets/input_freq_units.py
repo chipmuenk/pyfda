@@ -12,8 +12,6 @@ from PyQt4.QtCore import pyqtSignal
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label
 
-# TODO: self.cmbFRange is not updated when file is loaded from disk although
-#           fb.fil[0] is updated to correct setting?
 
 class InputFreqUnits(QtGui.QWidget):
     """
