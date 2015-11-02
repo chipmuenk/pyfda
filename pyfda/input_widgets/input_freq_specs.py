@@ -197,7 +197,9 @@ class InputFreqSpecs(QtGui.QWidget):
             fSpecs.sort()
             
             for i in range(len(self.qlineedit)):
+                self.qlineedit[i].blockSignals(True)
                 self.qlineedit[i].setText(str(fSpecs[i]))
+                self.qlineedit[i].blockSignals(False)
            
         for i in range(len(self.qlineedit)):
             fb.fil[0].update(
