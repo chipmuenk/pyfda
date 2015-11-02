@@ -105,10 +105,13 @@ class InputSpecs(QtGui.QWidget):
         self.sel_fil.sigFiltChanged.connect(self.update_all_UIs)
 
         # Changing the frequency unit requires re-display of frequency specs
-        # but it not influence the actual specs (no specsChanged )
+        # but it does not influence the actual specs (no specsChanged )
         self.f_units.sigUnitChanged.connect(self.f_specs.load_entries)
         self.f_units.sigUnitChanged.connect(self.t_specs.load_entries)
         self.f_units.sigUnitChanged.connect(self.sigViewChanged.emit)
+        self.f_units.sigSpecsChanged.connect(self.f_specs._sort_store_entries)
+#        self.f_units.sigSpecsChanged.connect(self.t_specs._sort_store_entries)
+
 
         # Changing filter parameters / specs requires reloading of parameters
         # in other hierarchy levels, e.g. in the plot tabs
