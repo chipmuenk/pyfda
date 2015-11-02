@@ -75,7 +75,7 @@ class InputFreqSpecs(QtGui.QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # DYNAMIC SIGNAL SLOT CONNECTION:
-        # Every time a field is edited, call self._store_entries 
+        # Every time a field is edited, call self._sort_store_entries 
         # This signal-slot connection is constructed in self._add_entry / 
         # destructed in self._del_entry each time the widget is updated, 
         # i.e. when a new filter design method is selected.
@@ -102,11 +102,14 @@ class InputFreqSpecs(QtGui.QWidget):
                 # when entry has changed, update label and corresponding value
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
                     self.qlabels[i].setText(rt_label(new_labels[i]))
+
+                    self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(
                         str(fb.fil[0][new_labels[i]] * fb.fil[0]['f_S']))
                     self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+                    self.qlineedit[i].blockSignals(False)
 
-        self._store_entries()       # sort & store values to dict for the case 
+        self._sort_store_entries()  # sort & store values to dict for the case 
                                     # that the response type has been changed 
                                     # eg. from LP -> HP, changing the order 
                                     # of frequency entries
@@ -133,18 +136,20 @@ class InputFreqSpecs(QtGui.QWidget):
         # recalculate displayed freq spec values for (maybe) changed f_S
         for i in range(len(self.qlineedit)):
             f = fb.fil[0][str(self.qlineedit[i].objectName())] * fb.fil[0]['f_S']
+            self.qlineedit[i].blockSignals(True)
             self.qlineedit[i].setText(str(round(f,11)))
+            self.qlineedit[i].blockSignals(False)
 
-        self._store_entries(signal = False)
+        self._sort_store_entries(signal = False)
 
 
 #-------------------------------------------------------------
     def _del_entry(self,i):
         """
         Delete entry number i from subwidget (QLabel and QLineEdit) and
-        disconnect the lineedit field from self._sort_store_entries.
+        disconnect the editingFinished signal from self._sort_store_entries.
         """
-        self.qlineedit[i].editingFinished.disconnect(self._store_entries) # needed?
+        self.qlineedit[i].editingFinished.disconnect(self._sort_store_entries) # needed?
 
         self.layGSpecWdg.removeWidget(self.qlabels[i])
         self.layGSpecWdg.removeWidget(self.qlineedit[i])
@@ -170,13 +175,13 @@ class InputFreqSpecs(QtGui.QWidget):
                                     str(fb.fil[0][newLabel]*fb.fil[0]['f_S'])))
         self.qlineedit[i].setObjectName(newLabel) # update ID
         
-        self.qlineedit[i].editingFinished.connect(self._store_entries)
+        self.qlineedit[i].editingFinished.connect(self._sort_store_entries)
 
         self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
         self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
 
 #-------------------------------------------------------------
-    def _store_entries(self, signal = True):
+    def _sort_store_entries(self, signal = True):
         """
         - Sort spec entries with ascending frequency if sort button is activated
         - Store specification entries in filter dictionary:
