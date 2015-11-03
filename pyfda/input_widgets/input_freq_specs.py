@@ -181,16 +181,16 @@ class InputFreqSpecs(QtGui.QWidget):
     def _sort_store_entries(self, signal = True):
         """
         _sort_store_entries is called when:
-        - a lineedit field has been edited
-        - update_UI is called after changing the filter design method
+        * a lineedit field has been edited
+        * update_UI is called after changing the filter design method
 
         It performs the following actions:
-        - Sort spec entries with ascending frequency if sort button is activated
-        - Store specification entries in filter dictionary:
-          Entries are normalized with sampling frequency fb.fil[0]['f_S'] !
-          The unit scale factor (khz, ...) is contained neither in f_S nor in 
-          the specs, hence, it cancels out.
-        - Emit sigSpecsChanged signal
+        * Sort spec entries with ascending frequency if sort button is activated
+        * Store _normalized_ specification entries in filter dictionary:
+            - Entries are normalized with sampling frequency fb.fil[0]['f_S'] !
+            - The unit scale factor (khz, ...) only influences the display of
+              of f_S and the specs, it does not influence the normalized specs.
+        * Emit sigSpecsChanged signal
         """
 
         if fb.fil[0]['freq_specs_sort']:

@@ -81,6 +81,7 @@ class InputFreqUnits(QtGui.QWidget):
         self.butSort = QtGui.QToolButton(self)
         self.butSort.setText("Sort")
         self.butSort.setCheckable(True)
+        self.butSort.setChecked(True)
         self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
         self.butSort.setStyleSheet("QToolButton:checked {font-weight:bold}")
 
@@ -146,7 +147,7 @@ class InputFreqUnits(QtGui.QWidget):
         # get ID of signal that triggered updateUI():
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
-            if self.DEBUG: print(senderName + ' was triggered\n================')
+            if self.DEBUG: print(senderName + ' was triggered in update_UI\n================')
         else: # no sender, updateUI has been called from initUI or another method
             senderName = ""
 
@@ -188,7 +189,7 @@ class InputFreqUnits(QtGui.QWidget):
         # get ID of signal that triggered updateUI():
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
-            if self.DEBUG: print(senderName + ' was triggered\n================')
+            if self.DEBUG: print(senderName + ' was triggered in _freq_range\n================')
         else: # no sender, updateUI has been called from initUI or another method
             senderName = ""
 
@@ -215,7 +216,7 @@ class InputFreqUnits(QtGui.QWidget):
     def load_entries(self):
         """
         Reload comboBox settings and textfields from filter dictionary
-        Block signals before each programmatic change
+        Block signals during update of combobox / lineedit widgets
         """
 #        self.f_S = fb.fil[0]['f_S']  # read sampling frequency
         self.ledF_S.blockSignals(True)
