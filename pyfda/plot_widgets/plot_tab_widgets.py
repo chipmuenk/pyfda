@@ -55,10 +55,13 @@ class PlotTabWidgets(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def updateSpecs(self):
         """ Update and redraw all subplots with new filter SPECS"""
-        self.pltHf.update_plot() # doesn't work flawlessly yet?
+        self.pltHf.update_plot()
         self.pltPhi.draw()
         self.pltTauG.draw()
         self.pltImpz.draw()
+
+#        self.pltPZ.draw()
+#        self.plt3D.draw()
 
 #------------------------------------------------------------------------
 
