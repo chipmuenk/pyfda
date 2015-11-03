@@ -81,6 +81,7 @@ class InputFreqUnits(QtGui.QWidget):
         self.butSort = QtGui.QToolButton(self)
         self.butSort.setText("Sort")
         self.butSort.setCheckable(True)
+        self.butSort.setChecked(True)
         self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
         self.butSort.setStyleSheet("QToolButton:checked {font-weight:bold}")
 
