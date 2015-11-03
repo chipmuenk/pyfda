@@ -27,9 +27,14 @@ class PlotTauG(QtGui.QMainWindow):
         self.chkWarnings.setText("Enable Warnings")
         self.chkWarnings.setChecked(False)
         self.chkWarnings.setToolTip("Print warnings about singular group delay")
+        self.chkScipy = QtGui.QCheckBox()
+        self.chkScipy.setText("Scipy grpdelay")
+        self.chkScipy.setChecked(False)
+        self.chkScipy.setToolTip("Use group delay from scipy 0.16")
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkWarnings)
+        self.layHChkBoxes.addWidget(self.chkScipy)
 
         self.mplwidget = MplWidget()
 #        self.mplwidget.setParent(self)
@@ -48,6 +53,7 @@ class PlotTauG(QtGui.QMainWindow):
 #        # Signals & Slots
 #        #=============================================
         self.chkWarnings.clicked.connect(self.draw)
+        self.chkScipy.clicked.connect(self.draw)
 #        self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
 
     def initAxes(self):
@@ -84,8 +90,12 @@ class PlotTauG(QtGui.QMainWindow):
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
-        [tau_g, w] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF, 
-            verbose = self.chkWarnings.isChecked())
+        if self.chkScipy.isChecked():
+            [w, tau_g] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF, 
+            verbose = self.chkWarnings.isChecked(), use_scipy = True)
+        else:
+            [w, tau_g] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF, 
+            verbose = self.chkWarnings.isChecked(), use_scipy = False)
 
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':

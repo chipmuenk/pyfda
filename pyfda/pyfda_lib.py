@@ -39,6 +39,7 @@ matplotlib.use("Qt4Agg")
 import scipy.signal as sig
 import matplotlib.pyplot as plt
 from  matplotlib import patches
+import warnings
 
 
 def cround(x, n_dig = 0):
@@ -554,7 +555,7 @@ Examples
     return hn, td
 
 #==================================================================
-def grpdelay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi):
+def grpdelay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi, use_scipy = True):
 #==================================================================
     """
 Calculate group delay of a discrete time filter, specified by
@@ -731,60 +732,90 @@ Examples
         nfft = 2*nfft
 #
     w = fs * np.arange(0, nfft)/nfft # create frequency vector
-
-    try: len(a)
-    except TypeError:
-        a = 1; oa = 0 # a is a scalar or empty -> order of a = 0
-        c = b
-        try: len(b)
-        except TypeError: print('No proper filter coefficients: len(a) = len(b) = 1 !')
-    else:
-        oa = len(a)-1               # order of denom. a(z) resp. a(s)
-        c = np.convolve(b,a[::-1])  # a[::-1] reverses denominator coeffs a
-                                    # c(z) = b(z) * a(1/z)*z^(-oa)
-    try: len(b)
-    except TypeError: b=1; ob=0     # b is a scalar or empty -> order of b = 0
-    else:
-        ob = len(b)-1             # order of b(z)
-
-    if analog:
-        a_b = np.convolve(a,b)
-        if ob > 1:
-            br_a = np.convolve(b[1:] * np.arange(1,ob), a)
-        else:
-            br_a = 0
-        ar_b = np.convolve(a[1:] * np.arange(1,oa), b)
-
-        num = np.fft.fft(ar_b - br_a, nfft)
-        den = np.fft.fft(a_b,nfft)
-    else:
-        oc = oa + ob                  # order of c(z)
-        cr = c * np.arange(0,oc+1) # multiply with ramp -> derivative of c wrt 1/z
-
-        num = np.fft.fft(cr,nfft) #
-        den = np.fft.fft(c,nfft)  #
-#
     minmag = 10. * np.spacing(1) # equivalent to matlab "eps"
-    polebins = np.where(abs(den) < minmag)[0] # find zeros of denominator
-#    polebins = np.where(abs(num) < minmag)[0] # find zeros of numerator
-    if np.size(polebins) > 0 and verbose:  # check whether polebins array is empty
-        print('*** grpdelay warning: group delay singular -> setting to 0 at:')
-        for i in polebins:
-            print ('f = {0} '.format((fs*i/nfft)))
-            num[i] = 0
-            den[i] = 1
 
-    if analog: # this doesn't work yet
-        tau_g = np.real(num / den)
+    if not use_scipy:
+        try: len(a)
+        except TypeError:
+            a = 1; oa = 0 # a is a scalar or empty -> order of a = 0
+            c = b
+            try: len(b)
+            except TypeError: print('No proper filter coefficients: len(a) = len(b) = 1 !')
+        else:
+            oa = len(a)-1               # order of denom. a(z) resp. a(s)
+            c = np.convolve(b,a[::-1])  # a[::-1] reverses denominator coeffs a
+                                        # c(z) = b(z) * a(1/z)*z^(-oa)
+        try: len(b)
+        except TypeError: b=1; ob=0     # b is a scalar or empty -> order of b = 0
+        else:
+            ob = len(b)-1             # order of b(z)
+    
+        if analog:
+            a_b = np.convolve(a,b)
+            if ob > 1:
+                br_a = np.convolve(b[1:] * np.arange(1,ob), a)
+            else:
+                br_a = 0
+            ar_b = np.convolve(a[1:] * np.arange(1,oa), b)
+    
+            num = np.fft.fft(ar_b - br_a, nfft)
+            den = np.fft.fft(a_b,nfft)
+        else:
+            oc = oa + ob                  # order of c(z)
+            cr = c * np.arange(0,oc+1) # multiply with ramp -> derivative of c wrt 1/z
+    
+            num = np.fft.fft(cr,nfft) #
+            den = np.fft.fft(c,nfft)  #
+    #
+        polebins = np.where(abs(den) < minmag)[0] # find zeros of denominator
+    #    polebins = np.where(abs(num) < minmag)[0] # find zeros of numerator
+        if np.size(polebins) > 0 and verbose:  # check whether polebins array is empty
+            print('*** grpdelay warning: group delay singular -> setting to 0 at:')
+            for i in polebins:
+                print ('f = {0} '.format((fs*i/nfft)))
+                num[i] = 0
+                den[i] = 1
+    
+        if analog: # this doesn't work yet
+            tau_g = np.real(num / den)
+        else:
+            tau_g = np.real(num / den) - oa
+    #
+        if not whole:
+            nfft = nfft/2
+            tau_g = tau_g[0:nfft]
+            w = w[0:nfft]
+    
+        return w, tau_g
+
     else:
-        tau_g = np.real(num / den) - oa
-#
-    if not whole:
-        nfft = nfft/2
-        tau_g = tau_g[0:nfft]
-        w = w[0:nfft]
 
-    return tau_g, w
+        if w is None:
+            w = 512
+    
+        if isinstance(w, int):
+            if whole:
+                w = np.linspace(0, 2 * pi, w, endpoint=False)
+            else:
+                w = np.linspace(0, pi, w, endpoint=False)
+    
+        w = np.atleast_1d(w)
+        b, a = map(np.atleast_1d, (b, a))
+        c = np.convolve(b, a[::-1])
+        cr = c * np.arange(c.size)
+        z = np.exp(-1j * w)
+        num = np.polyval(cr[::-1], z)
+        den = np.polyval(c[::-1], z)
+        singular = np.absolute(den) < 10 * minmag
+        if np.any(singular):
+            warnings.warn(
+                "The group delay is singular at frequencies [{0}], setting to 0".
+                format(", ".join("{0:.3f}".format(ws) for ws in w[singular]))
+            )
+    
+        gd = np.zeros_like(w)
+        gd[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
+        return w, gd
 
 
 #==================================================================
