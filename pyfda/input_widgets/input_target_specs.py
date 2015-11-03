@@ -42,13 +42,13 @@ class InputTargetSpecs(QtGui.QWidget):
         """
 
         # subwidget for Frequency Specs
-        self.fspecs = input_freq_specs.InputFreqSpecs(DEBUG = False, 
+        self.f_specs = input_freq_specs.InputFreqSpecs(DEBUG = False, 
                                                       title = "Frequency")
         # subwidget for Amplitude Specs
-        self.aspecs = input_amp_specs.InputAmpSpecs(DEBUG = False, 
+        self.a_specs = input_amp_specs.InputAmpSpecs(DEBUG = False, 
                                                     title = "Amplitude")
 
-        self.aspecs.setVisible(True)
+        self.a_specs.setVisible(True)
         """
         LAYOUT
         """
@@ -60,11 +60,11 @@ class InputTargetSpecs(QtGui.QWidget):
         lblTitle.setFont(bfont)
         
         layVFreq = QtGui.QVBoxLayout()  # add stretch at bottom of ampSpecs
-        layVFreq.addWidget(self.fspecs) # to compensate for different number of 
+        layVFreq.addWidget(self.f_specs) # to compensate for different number of 
         layVFreq.addStretch()           # arguments
         
         layVAmp = QtGui.QVBoxLayout()  # add stretch at bottom of freqSpecs
-        layVAmp.addWidget(self.aspecs) # to compensate for different number of 
+        layVAmp.addWidget(self.a_specs) # to compensate for different number of 
         layVAmp.addStretch()           # arguments
         
         layGMain = QtGui.QGridLayout()
@@ -78,8 +78,8 @@ class InputTargetSpecs(QtGui.QWidget):
 
         #----------------------------------------------------------------------
         #  SIGNALS & SLOTS
-        self.aspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
-        self.fspecs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
         
         self.update_UI() # first time initialization
         
@@ -93,9 +93,9 @@ class InputTargetSpecs(QtGui.QWidget):
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.fspecs.update_UI(new_labels = freqParams) # update frequency spec labels
-        self.aspecs.setVisible(ampParams != [])
-        self.aspecs.update_UI(newLabels = ampParams)
+        self.f_specs.update_UI(new_labels = freqParams) # update frequency spec labels
+        self.a_specs.setVisible(ampParams != [])
+        self.a_specs.update_UI(newLabels = ampParams)
 
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
@@ -105,8 +105,8 @@ class InputTargetSpecs(QtGui.QWidget):
         Update entries from global dict fb.fil[0]
         parameters, using the "load_entries" methods of the classes
         """
-        self.aspecs.load_entries() # magnitude specs with unit
-        self.fspecs.load_entries() # weight specification
+        self.a_specs.load_entries() # magnitude specs with unit
+        self.f_specs.load_entries() # weight specification
 
 #------------------------------------------------------------------------------
 
