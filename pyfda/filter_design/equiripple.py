@@ -132,6 +132,7 @@ class equiripple(object):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.led_remez_1.editingFinished.connect(self.updateUI)
+        # fires when edited line looses focus or when RETURN is pressed
         #----------------------------------------------------------------------
 
         self.loadEntries() # get initial / last setting from dictionary
@@ -172,8 +173,8 @@ class equiripple(object):
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N'] # remez algorithms expects number of taps
-                                # which is larger by one than the order!!
+        self.N     = fil_dict['N'] + 1  # remez algorithms expects number of taps
+                                        # which is larger by one than the order!!
         self.F_PB  = fil_dict['F_PB']
         self.F_SB  = fil_dict['F_SB']
         self.F_PB2 = fil_dict['F_PB2']
@@ -199,7 +200,7 @@ class equiripple(object):
         save_fil(fil_dict, arg, frmt, __name__)
 
         try: # has the order been calculated by a "min" filter design?
-            fil_dict['N'] = self.N  # yes, update filterbroker
+            fil_dict['N'] = self.N - 1  # yes, update filterbroker
         except AttributeError:
             pass
         self.storeEntries()
