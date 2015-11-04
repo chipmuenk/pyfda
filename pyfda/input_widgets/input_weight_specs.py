@@ -22,9 +22,6 @@ class InputWeightSpecs(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal()
 
     def __init__(self, DEBUG = True):
-        """
-        Initialize
-        """
 
         super(InputWeightSpecs, self).__init__()
         self.DEBUG = DEBUG
@@ -107,23 +104,17 @@ class InputWeightSpecs(QtGui.QWidget):
                 if self.qlineedit[i].objectName() != newLabels[i]:
                     self.qlabels[i].setText(rt_label(newLabels[i]))
                     
-                    self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
-                    self.qlineedit[i].blockSignals(False)
 
 #------------------------------------------------------------------------------
     def load_entries(self):
         """
         Reload textfields from filter dictionary to update changed settings
-        Set blockSignals True, i.e. don't fire when lineedit is changed 
-        programmatically
         """
         for i in range(len(self.qlineedit)):
-            self.qlineedit[i].blockSignals(True)
             self.qlineedit[i].setText(
                 str(fb.fil[0][str(self.qlineedit[i].objectName())]))
-            self.qlineedit[i].blockSignals(False)
 
 #------------------------------------------------------------------------------
     def _store_entries(self):
@@ -180,9 +171,7 @@ class InputWeightSpecs(QtGui.QWidget):
         Reset all entries to "1.0" and store them in the filter dictionary
         """
         for i in range(len(self.qlineedit)):
-            self.qlineedit[i].blockSignals(True)
             self.qlineedit[i].setText("1.0")
-            self.qlineedit[i].blockSignals(False)
         self._store_entries()
 
 

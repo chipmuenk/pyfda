@@ -166,9 +166,7 @@ class InputFreqUnits(QtGui.QWidget):
                     f_label = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
                 t_label = r"$n \; \rightarrow$"
                 
-                self.ledF_S.blockSignals(True)
                 self.ledF_S.setText(str(self.f_S)) # update field for f_S
-                self.ledF_S.blockSignals(False)
                 fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
             else: # Hz, kHz, ...
                 f_label = r"$f$ in " + unit + r"$\; \rightarrow$"
@@ -218,10 +216,7 @@ class InputFreqUnits(QtGui.QWidget):
         Reload comboBox settings and textfields from filter dictionary
         Block signals during update of combobox / lineedit widgets
         """
-#        self.f_S = fb.fil[0]['f_S']  # read sampling frequency
-        self.ledF_S.blockSignals(True)
         self.ledF_S.setText(str(fb.fil[0]['f_S']))
-        self.ledF_S.blockSignals(False)
 
         self.cmbUnits.blockSignals(True)
         idx = self.cmbUnits.findText(fb.fil[0]['freq_specs_unit']) # get and set

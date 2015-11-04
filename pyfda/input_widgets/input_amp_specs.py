@@ -133,33 +133,25 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     def load_entries(self):
         """
         Reload textfields from filter dictionary to reflect settings that
-        may have been changed by the filter design algorithm. Set blockSignals
-        True, i.e. don't fire when lineedit is changed programmatically
+        may have been changed by the filter design algorithm.
         """
         idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
         
                 
         if idx == 0: # Entry is in dBs, same as in dictionary -> no conversion
             for i in range(len(self.qlineedit)):
-                self.qlineedit[i].blockSignals(True)
                 self.qlineedit[i].setText(str(
                     fb.fil[0][str(self.qlineedit[i].objectName())]))
-                self.qlineedit[i].blockSignals(False)
 
         elif idx == 1:  # Entries are voltages, convert from dBs
             for i in range(len(self.qlineedit)):
-                self.qlineedit[i].blockSignals(True)
                 self.qlineedit[i].setText(str(round(
                     10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/20.),8)))
-                self.qlineedit[i].blockSignals(False)
                 
         else:  # Entries are powers, convert from dBs
             for i in range(len(self.qlineedit)):
-                self.qlineedit[i].blockSignals(True)
                 self.qlineedit[i].setText(str(round(
                     10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/10.),8)))
-                self.qlineedit[i].blockSignals(False)
-
 
 #------------------------------------------------------------------------------
     def _store_entries(self):
@@ -211,10 +203,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                 if self.qlineedit[i].objectName() != newLabels[i]:
                     self.qlabels[i].setText(rt_label(newLabels[i]))
                     
-                    self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
                     self.qlineedit[i].setObjectName(newLabels[i])  # update ID
-                    self.qlineedit[i].blockSignals(False)
 
 
 #------------------------------------------------------------------------------
@@ -238,9 +228,9 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     def _add_entry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) in self.layGSpecs
-        and connect QLineEdit widget to self._amp_units. This way, the central
+        and connect QLineEdit.editingFinished to self._amp_units. This way, the
         filter dictionary is updated automatically when a QLineEdit field has 
-        been edited.
+        been edited (i.e. looses focus or when a return is entered).
         """
         self.qlabels.append(QtGui.QLabel(self))
         self.qlabels[i].setText(rt_label(newLabel))
