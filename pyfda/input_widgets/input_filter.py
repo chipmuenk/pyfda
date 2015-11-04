@@ -330,8 +330,8 @@ class InputFilter(QtGui.QWidget):
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
         - read design method dm and copy it to fb.fil[0]
         - create / update global filter instance fb.fil_inst of dm class
-        - update dynamic widgets (if any)
-        - set filter_initialized = True
+        - update dynamic widgets (if dm has changed and if there are any)
+        - call load filter order
         """
         dm_idx = self.cmbDesignMethod.currentIndex()
         dm = self.cmbDesignMethod.itemData(dm_idx)
@@ -401,9 +401,7 @@ class InputFilter(QtGui.QWidget):
         """
         Triggered when either ledOrderN or chkMinOrder are edited:
         - read settings and copy them to fb.fil[0]
-        - create / update global filter instance fb.fil_inst of dm class
-        - update dynamic widgets (if any)
-        - set filter_initialized = True
+        - emit sigFiltChanged if enb_signal is True
         """
         # Determine which subwidgets are _enabled_
         if self.chkMinOrder.isVisible():
@@ -422,6 +420,8 @@ class InputFilter(QtGui.QWidget):
             self.lblOrderN.setEnabled(self.fo == 'man')
             self.ledOrderN.setEnabled(self.fo == 'man')
 
+        # read manual filter order, convert to positive integer and store it 
+        # in filter dictionary.
         ordn = int(abs(float(self.ledOrderN.text())))
         self.ledOrderN.setText(str(ordn))
         fb.fil[0].update({'N' : ordn})
