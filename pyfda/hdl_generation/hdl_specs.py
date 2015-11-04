@@ -388,6 +388,8 @@ class HDLSpecs(QtGui.QWidget):
         hdl_file, hdl_filter = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save HDL as", directory="D:",
                 filter = file_types)
+        hdl_file = str(hdl_file)
+        hdl_filter = str(hdl_filter)
         print(hdl_file)
         hdl_filename = os.path.splitext(os.path.basename(hdl_file))[0]
         hdl_dirname = os.path.splitext(hdl_file)[0]
