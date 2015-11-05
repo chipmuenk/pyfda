@@ -144,7 +144,9 @@ class InputFiles(QtGui.QWidget):
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Load filter ", directory = self.basedir,
                 filter = file_types)
-        file_name = str(file_name) # QString is returned
+        file_name = str(file_name) # QString -> str
+        file_type = str(file_type) # needed for Python 2.x
+        
         if file_name != "": # cancelled file operation returns empty string
             file_type_err = False              
             try:
@@ -190,7 +192,9 @@ class InputFiles(QtGui.QWidget):
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save filter as", directory = self.basedir,
                 filter = file_types)
-        file_name = str(file_name) # QString is returned              
+        file_name = str(file_name) # QString -> str
+        file_type = str(file_type) # needed for Python 2.x
+        
         if file_name != "": # cancelled file operation returns empty string 
             file_type_err = False
             try:
@@ -234,7 +238,8 @@ class InputFiles(QtGui.QWidget):
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Export filter coefficients as", 
                 directory = self.basedir, filter = file_types) 
-        file_name = str(file_name)
+        file_name = str(file_name) # QString -> str
+        file_type = str(file_type) # needed for Python 2.x
         if file_name != '': # cancelled file operation returns empty string   
             ba = fb.fil[0]['ba']
             file_type_err = False
@@ -320,6 +325,9 @@ class InputFiles(QtGui.QWidget):
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Import filter coefficients ", 
                 directory = self.basedir, filter = file_types)
+        file_name = str(file_name) # QString -> str
+        file_type = str(file_type) # needed for Python 2.x
+        
         if file_name != '': # cancelled file operation returns empty string  
             file_type_err = False
             try:
@@ -361,7 +369,7 @@ class InputFiles(QtGui.QWidget):
         # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
         # '(' must be escaped as '\('
 
-        return re.sub('\([^\)]+\)', '', file_type) 
+        return re.sub('\([^\)]+\)', '', file_type)
 
 
 #------------------------------------------------------------------------------
