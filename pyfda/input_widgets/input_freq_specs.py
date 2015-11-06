@@ -104,11 +104,9 @@ class InputFreqSpecs(QtGui.QWidget):
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
                     self.qlabels[i].setText(rt_label(new_labels[i]))
 
-                    self.qlineedit[i].blockSignals(True)
                     self.qlineedit[i].setText(
                         str(fb.fil[0][new_labels[i]] * fb.fil[0]['f_S']))
                     self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-                    self.qlineedit[i].blockSignals(False)
 
         self._sort_store_entries()  # sort & store values to dict for the case 
                                     # that the response type has been changed 
@@ -135,9 +133,7 @@ class InputFreqSpecs(QtGui.QWidget):
         # recalculate displayed freq spec values for (maybe) changed f_S
         for i in range(len(self.qlineedit)):
             f = fb.fil[0][str(self.qlineedit[i].objectName())] * fb.fil[0]['f_S']
-            self.qlineedit[i].blockSignals(True)
             self.qlineedit[i].setText(str(round(f,11)))
-            self.qlineedit[i].blockSignals(False)
 
 
 #-------------------------------------------------------------
@@ -199,9 +195,7 @@ class InputFreqSpecs(QtGui.QWidget):
             fSpecs.sort()
             
             for i in range(len(self.qlineedit)):
-                self.qlineedit[i].blockSignals(True)
                 self.qlineedit[i].setText(str(fSpecs[i]))
-                self.qlineedit[i].blockSignals(False)
            
         for i in range(len(self.qlineedit)):
             fb.fil[0].update(
