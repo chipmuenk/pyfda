@@ -95,13 +95,13 @@ class InputTabWidgets(QtGui.QWidget):
         #http://www.pythoncentral.io/pysidepyqt-tutorial-creating-your-own-signals-and-slots/#custom-tab-2-pyqt
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
-        # requiring update of some plot widgets only:        
+        #       requiring update of some plot widgets only:        
         self.inputSpecs.sigSpecsChanged.connect(self.updateSpecs)
 # TODO: connect to a specific slot
         self.inputSpecs.sigViewChanged.connect(self.updateSpecs)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
-        # requiring update of all plot and some input widgets:        
+        #       requiring update of all plot and some input widgets:        
         self.inputSpecs.sigFilterDesigned.connect(self.updateAll)
         self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
         self.inputPZ.sigFilterDesigned.connect(self.updateAll)
@@ -112,12 +112,17 @@ class InputTabWidgets(QtGui.QWidget):
 
     def updateSpecs(self):
         """
-        Propagate new filter SPECS from filter dict to UIs via pyfda.py
+        Slot for InputSpecs.sigSpecsChanged and InputSpecs.sigViewChanged
+        
+        Propagate new filter SPECS from filter dict to other input widgets and 
+        to plot widgets via pyfda.py
             
-        - Update input widgets that can / need to display specs
+        - Update input widgets that can / need to display specs (except inputSpecs
+             - the origin of the signal !!)
         - Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
+# TODO: The button should be styled within InputSpecs
         self.inputSpecs.color_design_button("changed")
         self.inputInfo.showInfo()
         self.sigSpecsChanged.emit() # pyFDA -> plot_widgets.updateSpecs
@@ -133,9 +138,11 @@ class InputTabWidgets(QtGui.QWidget):
         self.inputSpecs.sel_fil.load_entries() # update input_filters
         self.updateAll()
 
-    @pyqtSlot() # possible, but not neccessary
+
     def updateAll(self):
         """
+        Slot for sigFilterDesigned from InputSpecs, InputCoeffs, InputPZ      
+        
         Called when a new filter has been DESIGNED: 
             Pass new filter data from the global filter dict
         - Update the input widgets that can / need to display filter data
@@ -144,7 +151,9 @@ class InputTabWidgets(QtGui.QWidget):
         """
         if self.DEBUG: print("input_widgets.updateAll:\n",self.sender().objectName())
 
-        self.inputSpecs.color_design_button("ok")      
+# TODO: The button should be styled within InputSpecs
+        self.inputSpecs.color_design_button("ok")  
+# TODO: The following should be handled within InputSpecs ?
         self.inputSpecs.load_all_specs()
         self.inputInfo.showInfo()
         self.inputCoeffs.show_coeffs()
