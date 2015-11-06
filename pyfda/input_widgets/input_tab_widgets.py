@@ -119,7 +119,6 @@ class InputTabWidgets(QtGui.QWidget):
             specs, e.g. plotHf widget for the filter regions
         """
         self.inputSpecs.color_design_button("changed")
-        self.inputSpecs.load_all_specs()
         self.inputInfo.showInfo()
         self.sigSpecsChanged.emit() # pyFDA -> plot_widgets.updateSpecs
         
