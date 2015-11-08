@@ -135,23 +135,37 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         Reload textfields from filter dictionary to reflect settings that
         may have been changed by the filter design algorithm.
         """
-        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
-        
-                
-        if idx == 0: # Entry is in dBs, same as in dictionary -> no conversion
-            for i in range(len(self.qlineedit)):
-                self.qlineedit[i].setText(str(
-                    fb.fil[0][str(self.qlineedit[i].objectName())]))
 
-        elif idx == 1:  # Entries are voltages, convert from dBs
-            for i in range(len(self.qlineedit)):
-                self.qlineedit[i].setText(str(round(
-                    10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/20.),8)))
-                
-        else:  # Entries are powers, convert from dBs
-            for i in range(len(self.qlineedit)):
-                self.qlineedit[i].setText(str(round(
-                    10.**(-fb.fil[0][str(self.qlineedit[i].objectName())]/10.),8)))
+        def dB2amp(amp_label, dB_pow=20):
+            """
+            Convert dB to amplitude or power ripple:
+            - passband: delta_PB = 1 - 10 ** (-A_PB/10 resp. 20) [IIR]
+                        delta_PB = (10 ** (A_PB / 20) - 1)/ (10 ** (A_PB / 20) + 1)[FIR]
+            - stopband: delta_SB = -10 ** (-A_SB/10 resp. 20)
+            """
+            amp_value = fb.fil[0][amp_label]
+            if "PB" in amp_label: # passband
+                if fb.fil[0]['ft'] == 'IIR':
+                    delta = round(1. - 10.**(-amp_value / dB_pow), 10)
+                else: 
+      #              delta = round(10.**(amp_value / (2 * dB_pow)) - 1, 10)
+                    delta = round((10.**(amp_value / dB_pow) - 1)/
+                                    (10.**(amp_value / dB_pow) + 1),10)
+            else: # stopband
+                delta = round(10.**(-amp_value / dB_pow), 10)
+            return delta
+
+        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
+ 
+        for i in range(len(self.qlineedit)):
+            amp_label = str(self.qlineedit[i].objectName())
+            
+            if idx == 0: # Entry is in dBs, same as in dictionary -> no conversion
+                self.qlineedit[i].setText(str(fb.fil[0][amp_label]))
+            elif idx == 1:  # Convert dBs to voltages
+                self.qlineedit[i].setText(str(dB2amp(amp_label, dB_pow = 20)))         
+            else:  # # Convert dBs to power
+                self.qlineedit[i].setText(str(dB2amp(amp_label, dB_pow = 10)))
 
 #------------------------------------------------------------------------------
     def _store_entries(self):
@@ -159,24 +173,37 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         Store specification entries in filter dictionary
         Entries are always stored in dB (20 log10) !
         """
-        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
+        
+        def amp2dB(amp_label, amp_value, dB_pow=20):
+            """
+            Convert amplitude or power ripple to dB:
+            - passband: A_PB = -10 resp. 20 * log10(1-ripple_PB) [IIR]
+                        A_PB = 20 log10((1+ripple_PB)/(1-ripple_PB)) [FIR]
+            - stopband: A_SB = -10 resp. 20 * log10(ripple_SB)
+            """
+            
+            if "PB" in amp_label: # passband
+                if fb.fil[0]['ft'] == 'IIR':
+                    A_dB = round(-dB_pow * log10(1. - amp_value), 10)
+                else:
+                    A_dB = round(dB_pow * log10((1. + amp_value)/(1 - amp_value)), 10)
+            else: # stopband
+                A_dB = round(-dB_pow * log10(amp_value),10)
+            return A_dB
 
-        if idx == 0: # Entry is in dBs, same as in dictionary
-            for i in range(len(self.qlineedit)):
-                fb.fil[0].update(
-                    {str(self.qlineedit[i].objectName()):
-                        simple_eval(self.qlineedit[i].text())})
-
-        elif idx == 1:  # Entries are voltages, convert to dBs
-            for i in range(len(self.qlineedit)):
-                fb.fil[0].update(
-                   {str(self.qlineedit[i].objectName()):round(
-                      -20 * log10 (simple_eval(self.qlineedit[i].text())),8)})
-        else:  # Entries are powers, convert to dBs
-            for i in range(len(self.qlineedit)):
-                fb.fil[0].update(
-                    {str(self.qlineedit[i].objectName()):round(
-                       -10 * log10 (simple_eval(self.qlineedit[i].text())),8)})
+        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox    
+        
+        for i in range(len(self.qlineedit)):
+            amp_label = str(self.qlineedit[i].objectName())
+            amp_value = simple_eval(self.qlineedit[i].text())
+            if idx == 0: # Entry is in dBs, same as in dictionary
+                fb.fil[0].update({amp_label:amp_value})
+            elif idx == 1:  # Entries are voltages, convert to dBs
+                    fb.fil[0].update(
+                       {amp_label:amp2dB(amp_label, amp_value, dB_pow=20)})          
+            else:  # Entries are powers, convert to dBs
+                    fb.fil[0].update(
+                       {amp_label:amp2dB(amp_label, amp_value, dB_pow=10)}) 
                        
         self.sigSpecsChanged.emit() # -> input_specs
 
