@@ -142,13 +142,9 @@ class PlotHf(QtGui.QMainWindow):
         line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
         ax = specAxes
 
-        # extract from filterTree the parameters that are actually used
-#        myParams = fb.fil_tree[rt][ft][dm][fo]['par']
-#        freqParams = [l for l in myParams if l[0] == 'F']
-
         if fb.fil[0]['ft'] == "FIR":
-            A_PB_max = self.A_PB # 20*log10(1+del_PB)
-            A_PB2_max = self.A_PB2
+            A_PB_max = self.A_PB/2 # 20*log10(1+del_PB)
+            A_PB2_max = self.A_PB2/2
         else: # IIR log
             A_PB_max = A_PB2_max = 0
 
@@ -156,7 +152,14 @@ class PlotHf(QtGui.QMainWindow):
             dBMul = 20.
         elif self.unitA == 'W':
             dBMul = 10.
-
+            
+#==============================================================================
+#         del_PB_max = 10**(self.A_PB/dBMul)     # 1 + del_PB
+#         del_PB2_max = 10**(self.A_PB2/dBMul)   # 1 + del_PB2
+#         del_PB_min = 10**(-self.A_PB/dBMul)   # 1 - del_PB
+#         del_PB2_min = 10**(-self.A_PB2/dBMul) # 1 - del_PB2
+# 
+#==============================================================================
         if self.unitA == 'dB':
             A_PB_min = -self.A_PB
             A_PB2_min = -self.A_PB2
@@ -165,17 +168,22 @@ class PlotHf(QtGui.QMainWindow):
 
             A_SB = -self.A_SB
             A_SB2 = -self.A_SB2
-            A_SBx = A_SB - 10
+#            A_SBx = min (A_SB, A_SB2) - 10
         else:
-            A_PB_max = 10**(A_PB_max/dBMul)# 1 + del_PB
-            A_PB2_max = 10**(A_PB2_max/dBMul)# 1 + del_PB
-            A_PB_min = 10**(-self.A_PB/dBMul) #1 - del_PB
-            A_PB2_min = 10**(-self.A_PB2/dBMul) #1 - del_PB
+            del_PB_max = 10**(self.A_PB/dBMul)     # 1 + del_PB
+            del_PB2_max = 10**(self.A_PB2/dBMul)   # 1 + del_PB2
+            del_PB_min = 10**(-self.A_PB/dBMul)   # 1 - del_PB
+            del_PB2_min = 10**(-self.A_PB2/dBMul) # 1 - del_PB2
+            
+            A_PB_max = del_PB_max# 1 + del_PB
+            A_PB2_max = del_PB2_max# 1 + del_PB
+            A_PB_min = del_PB_min  #1 - del_PB
+            A_PB2_min = del_PB2_min  #1 - del_PB
             A_PB_minx = A_PB_min / 2
             A_PB_maxx = max(A_PB_max, A_PB2_max) + 1
             A_SB = 10**(-self.A_SB/dBMul)
             A_SB2 = 10**(-self.A_SB2/dBMul)
-            A_SBx = A_SB / 5
+#            A_SBx = A_SB / 5
 
         F_max = self.f_S/2
         F_PB = self.F_PB
