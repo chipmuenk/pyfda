@@ -179,12 +179,16 @@ class equiripple(object):
         self.F_SB  = fil_dict['F_SB']
         self.F_PB2 = fil_dict['F_PB2']
         self.F_SB2 = fil_dict['F_SB2']
-        # remez amplitude specs are linear (not in dBs) and need to be
-        # multiplied by a factor of two to obtain a "tight fit" (why??)
-        self.A_PB  = (10.**(fil_dict['A_PB']/20.)-1) / (10**(fil_dict['A_PB']/20.)+1)*2
-        self.A_PB2 = (10.**(fil_dict['A_PB2']/20.)-1)/(10**(fil_dict['A_PB2']/20.)+1)*2
-        self.A_SB  = 10.**(-fil_dict['A_SB']/20.)
-        self.A_SB2 = 10.**(-fil_dict['A_SB2']/20.)
+        # remez amplitude specs are linear (not in dBs)
+        self.A_PB  = fil_dict['A_PB']
+        self.A_PB2 = fil_dict['A_PB2']
+        self.A_SB  = fil_dict['A_SB']
+        self.A_SB2 = fil_dict['A_SB2']
+        
+#        self.A_PB  = (10.**(fil_dict['A_PB']/20.)-1) / (10**(fil_dict['A_PB']/20.)+1)*2
+#        self.A_PB2 = (10.**(fil_dict['A_PB2']/20.)-1)/(10**(fil_dict['A_PB2']/20.)+1)*2
+#        self.A_SB  = 10.**(-fil_dict['A_SB']/20.)
+#        self.A_SB2 = 10.**(-fil_dict['A_SB2']/20.)
 
         self.alg = 'ichige'
 #        print("Ellip: F_PB - F_SB - F_SB2 - P_PB2\n", self.F_PB, self.F_SB, self.F_SB2, self.F_PB2 )

@@ -104,8 +104,8 @@ critical frequency from pass and stop band specifications.
         self.F_C2   = fil_dict['F_C2'] * 2 
         self.F_PBC = None
 
-        self.A_PB  = fil_dict['A_PB']
-        self.A_SB  = fil_dict['A_SB']
+        self.A_PB  = -20. * np.log10(1. - fil_dict['A_PB'])
+        self.A_SB  = -20. * np.log10(fil_dict['A_SB'])
 
     def save(self, fil_dict, arg):
         """

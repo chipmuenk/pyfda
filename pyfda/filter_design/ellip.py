@@ -99,7 +99,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        # Frequencies are normalized to f_Nyq
+        # Frequencies are normalized to f_Nyq, ripple specs are in dB
         self.analog = False # set to True for analog filters
         self.N     = fil_dict['N']
         self.F_PB  = fil_dict['F_PB'] * 2
@@ -107,11 +107,18 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self.F_PB2 = fil_dict['F_PB2'] * 2
         self.F_SB2 = fil_dict['F_SB2'] * 2
         self.F_PBC = None
-        self.A_PB  = fil_dict['A_PB']
-        self.A_SB  = fil_dict['A_SB']
-        self.A_PB2 = fil_dict['A_PB2']
-        self.A_SB2 = fil_dict['A_SB2']
 
+        self.A_PB  = -20. * np.log10(1. - fil_dict['A_PB'])
+        self.A_PB2 = -20. * np.log10(1 -  fil_dict['A_PB2'])
+        self.A_SB  = -20. * np.log10(fil_dict['A_SB'])
+        self.A_SB2 = -20. * np.log10(fil_dict['A_SB2'])
+
+
+#        self.A_PB  = fil_dict['A_PB']
+#        self.A_PB2 = fil_dict['A_PB2']
+#        self.A_SB  = fil_dict['A_SB']
+#        self.A_SB2 = fil_dict['A_SB2']
+#
 
     def save(self, fil_dict, arg):
         """

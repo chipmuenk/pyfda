@@ -287,12 +287,11 @@ class firwin(object):
         self.F_C   = fil_dict['F_C']
         self.F_C2  = fil_dict['F_C2']
         
-        # remez amplitude specs are linear (not in dBs) and need to be
-        # multiplied by a factor of two to obtain a "tight fit" (why??)
-        self.A_PB  = (10.**(fil_dict['A_PB']/20.)-1) / (10**(fil_dict['A_PB']/20.)+1)*2
-        self.A_PB2 = (10.**(fil_dict['A_PB2']/20.)-1)/(10**(fil_dict['A_PB2']/20.)+1)*2
-        self.A_SB  = 10.**(-fil_dict['A_SB']/20.)
-        self.A_SB2 = 10.**(-fil_dict['A_SB2']/20.)
+        # firwin amplitude specs are linear (not in dBs)
+        self.A_PB  = fil_dict['A_PB']
+        self.A_PB2 = fil_dict['A_PB2']
+        self.A_SB  = fil_dict['A_SB']
+        self.A_SB2 = fil_dict['A_SB2']
 
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.cmb_firwin_alg.currentText()
