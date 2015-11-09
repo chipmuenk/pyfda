@@ -15,7 +15,7 @@ from numpy import pi, log10
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-
+from pyfda.pyfda_lib import lin2unit
 # TODO: Passband and stopband info should show min / max values for each band
 
 class InputInfo(QtGui.QWidget):
@@ -183,19 +183,22 @@ class InputInfo(QtGui.QWidget):
         H_targ = []
         H_targ_pass = []
         
+        ft = fb.fil[0]['ft']
+        unit = fb.fil[0]['amp_specs_unit']
+        unit = 'dB' # fix this for the moment
         for i in range(len(F_test_lbls)):
             lbl = F_test_lbls[i]
             if lbl   == 'F_PB': 
-                H_targ.append(fb.fil[0]['A_PB'])
+                H_targ.append(lin2unit(fb.fil[0]['A_PB'], ft, 'A_PB', unit))
                 H_targ_pass.append(H_test_dB[i] <= H_targ[i])
             elif lbl == 'F_SB': 
-                H_targ.append(fb.fil[0]['A_SB'])
+                H_targ.append(lin2unit(fb.fil[0]['A_SB'], ft, 'A_SB', unit))
                 H_targ_pass.append(H_test_dB[i] >= H_targ[i])
             elif lbl == 'F_PB2':
-                H_targ.append(fb.fil[0]['A_PB2'])
+                H_targ.append(lin2unit(fb.fil[0]['A_PB2'], ft, 'A_PB2', unit))
                 H_targ_pass.append( H_test_dB[i] <= H_targ[i])
             elif lbl == 'F_SB2':
-                H_targ.append(fb.fil[0]['A_SB2'])
+                H_targ.append(lin2unit(fb.fil[0]['A_SB2'], ft, 'A_SB2', unit))
                 H_targ_pass.append( H_test_dB[i] >= H_targ[i])
             else: 
                 H_targ.append(np.nan)
