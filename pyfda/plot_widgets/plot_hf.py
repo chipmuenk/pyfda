@@ -42,7 +42,7 @@ class PlotHf(QtGui.QMainWindow):
 
         self.lblIn = QtGui.QLabel("in")
 
-        units = ["dB", "V", "W"]
+        units = ['dB', 'V', 'W', 'Auto']
         self.cmbUnitsA = QtGui.QComboBox(self)
         self.cmbUnitsA.addItems(units)
         self.cmbUnitsA.setObjectName("cmbUnitsA")
@@ -106,7 +106,7 @@ class PlotHf(QtGui.QMainWindow):
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
 
-        self.initAxes()
+        self.init_axes()
 
         self.draw() # calculate and draw |H(f)|
 
@@ -123,7 +123,7 @@ class PlotHf(QtGui.QMainWindow):
         self.chkPhase.clicked.connect(self.draw_phase)
 
 #------------------------------------------------------------------------------
-    def initAxes(self):
+    def init_axes(self):
         """
         Initialize and clear the axes
         """
@@ -132,64 +132,85 @@ class PlotHf(QtGui.QMainWindow):
         self.ax.clear()
 
 #------------------------------------------------------------------------------
-    def plotSpecLimits(self, specAxes):
+    def plot_spec_limits(self, specAxes):
         """
         Plot the specifications limits (F_SB, A_SB, ...) as lines and as
         hatched areas.
         """
+
+        def dB(lin):
+            return 20 * np.log10(lin)
+
+        def _plot_specs():
+            # upper limits:
+            ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **line_params)
+            if A_lim_upl:
+                ax.fill_between(F_lim_upl, max(A_lim_upl), A_lim_upl, **fill_params)
+            if A_lim_upc:
+                ax.fill_between(F_lim_upc, max(A_lim_upc), A_lim_upc, **fill_params)
+            if A_lim_upr:
+                ax.fill_between(F_lim_upr, max(A_lim_upr), A_lim_upr, **fill_params)
+            # lower limits:
+            ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **line_params)
+            if A_lim_lol:
+                ax.fill_between(F_lim_lol, min(A_lim_lol), A_lim_lol, **fill_params)
+            if A_lim_loc:
+                ax.fill_between(F_lim_loc, min(A_lim_loc), A_lim_loc, **fill_params)
+            if A_lim_lor:
+                ax.fill_between(F_lim_lor, min(A_lim_lor), A_lim_lor, **fill_params)
+
+
 #        fc = (0.8,0.8,0.8) # color for shaded areas
         fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
         line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
         ax = specAxes
 
-        # extract from filterTree the parameters that are actually used
-#        myParams = fb.fil_tree[rt][ft][dm][fo]['par']
-#        freqParams = [l for l in myParams if l[0] == 'F']
-
-        if fb.fil[0]['ft'] == "FIR":
-            A_PB_max = self.A_PB # 20*log10(1+del_PB)
-            A_PB2_max = self.A_PB2
-        else: # IIR log
-            A_PB_max = A_PB2_max = 0
-
         if self.unitA == 'V':
-            dBMul = 20.
+            exp = 1.
         elif self.unitA == 'W':
-            dBMul = 10.
+            exp = 2.
 
         if self.unitA == 'dB':
-            A_PB_min = -self.A_PB
-            A_PB2_min = -self.A_PB2
-            A_PB_minx = min(A_PB_min, A_PB2_min) - 10# 20*log10(1-del_PB)
-            A_PB_maxx = max(A_PB_max, A_PB2_max) + 10# 20*log10(1-del_PB)
+            if fb.fil[0]['ft'] == "FIR":
+                A_PB_max  = dB(1 + self.A_PB)
+                A_PB2_max = dB(1 + self.A_PB2)
+            else: # IIR dB
+                A_PB_max = A_PB2_max = 0
 
-            A_SB = -self.A_SB
-            A_SB2 = -self.A_SB2
-            A_SBx = A_SB - 10
-        else:
-            A_PB_max = 10**(A_PB_max/dBMul)# 1 + del_PB
-            A_PB2_max = 10**(A_PB2_max/dBMul)# 1 + del_PB
-            A_PB_min = 10**(-self.A_PB/dBMul) #1 - del_PB
-            A_PB2_min = 10**(-self.A_PB2/dBMul) #1 - del_PB
-            A_PB_minx = A_PB_min / 2
-            A_PB_maxx = max(A_PB_max, A_PB2_max) + 1
-            A_SB = 10**(-self.A_SB/dBMul)
-            A_SB2 = 10**(-self.A_SB2/dBMul)
-            A_SBx = A_SB / 5
+            A_PB_min  = dB(1 - self.A_PB)
+            A_PB2_min = dB(1 - self.A_PB2)
+            A_PB_minx = min(A_PB_min, A_PB2_min) - 5
+            A_PB_maxx = max(A_PB_max, A_PB2_max) + 5
+
+            A_SB  = dB(self.A_SB)
+            A_SB2 = dB(self.A_SB2)
+            A_SB_maxx = max(A_SB, A_SB2) + 10
+        else: # 'V' or 'W'
+            if fb.fil[0]['ft'] == "FIR":
+                A_PB_max  = (1 + self.A_PB)**exp
+                A_PB2_max = (1 + self.A_PB2)**exp
+            else: # IIR lin
+                A_PB_max = A_PB2_max = 1
+
+            A_PB_min  = (1 - self.A_PB)**exp
+            A_PB2_min = (1 - self.A_PB)**exp
+            A_PB_minx = A_PB_min  / 1.05
+            A_PB_maxx = max(A_PB_max, A_PB2_max) * 1.05
+
+            A_SB  = self.A_SB ** exp
+            A_SB2 = self.A_SB2 ** exp
+            A_SB_maxx = A_PB_min / 10.
 
         F_max = self.f_S/2
-        F_PB = self.F_PB
-        F_SB = fb.fil[0]['F_SB'] * self.f_S
+        F_PB  = self.F_PB
+        F_SB  = fb.fil[0]['F_SB'] * self.f_S
         F_SB2 = fb.fil[0]['F_SB2'] * self.f_S
         F_PB2 = fb.fil[0]['F_PB2'] * self.f_S
 
-        y_min = A_PB_minx
-        y_max = A_PB_maxx#ax.get_ylim()[1]
-
         F_lim_upl = F_lim_lol = [] # left side limits, lower and upper
         A_lim_upl = A_lim_lol = []
-        
-        F_lim_upc = F_lim_loc = []
+
+        F_lim_upc = F_lim_loc = [] # center limits, lower and upper
         A_lim_upc = A_lim_loc = []
 
         F_lim_upr = F_lim_lor = [] # right side limits, lower and upper
@@ -202,17 +223,17 @@ class PlotHf(QtGui.QMainWindow):
             A_lim_lol = [A_PB_min, A_PB_min, A_PB_minx]
 
             F_lim_upr = [F_SB,     F_SB, F_max]
-            A_lim_upr = [A_PB_maxx, A_SB, A_SB]
+            A_lim_upr = [A_SB_maxx, A_SB, A_SB]
 
         if fb.fil[0]['rt'] == 'HP':
             F_lim_upl = [0,    F_SB, F_SB]
-            A_lim_upl = [A_SB, A_SB, A_PB_maxx]
-            
+            A_lim_upl = [A_SB, A_SB, A_SB_maxx]
+
             F_lim_upr = [F_PB,      F_PB,     F_max]
             A_lim_upr = [A_PB_maxx, A_PB_max, A_PB_max]
             F_lim_lor = F_lim_upr
             A_lim_lor = [A_PB_minx, A_PB_min, A_PB_min]
-            
+
         if fb.fil[0]['rt'] == 'BS':
             F_lim_upl = [0,        F_PB,     F_PB]
             A_lim_upl = [A_PB_max, A_PB_max, A_PB_maxx]
@@ -220,7 +241,7 @@ class PlotHf(QtGui.QMainWindow):
             A_lim_lol = [A_PB_min, A_PB_min, A_PB_minx]
 
             F_lim_upc = [F_SB, F_SB, F_SB2, F_SB2]
-            A_lim_upc = [A_PB_maxx, A_SB, A_SB,  A_PB_maxx]
+            A_lim_upc = [A_SB_maxx, A_SB, A_SB,  A_SB_maxx]
 
             F_lim_upr = [F_PB2, F_PB2, F_max]
             A_lim_upr = [A_PB_maxx, A_PB2_max, A_PB2_max]
@@ -229,15 +250,15 @@ class PlotHf(QtGui.QMainWindow):
 
         if fb.fil[0]['rt'] in {"BP", "HIL"}:
             F_lim_upl = [0,    F_SB, F_SB]
-            A_lim_upl = [A_SB, A_SB, A_PB_maxx]
+            A_lim_upl = [A_SB, A_SB, A_SB_maxx]
 
             F_lim_upc = [F_PB,      F_PB,     F_PB2,    F_PB2]
             A_lim_upc = [A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx]
             F_lim_loc = F_lim_upc
             A_lim_loc = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
-            
+
             F_lim_upr = [F_SB2,    F_SB2, F_max]
-            A_lim_upr = [A_PB_maxx, A_SB2, A_SB2]
+            A_lim_upr = [A_SB_maxx, A_SB2, A_SB2]
 
         F_lim_upr = np.array(F_lim_upr)
         F_lim_lor = np.array(F_lim_lor)
@@ -246,19 +267,10 @@ class PlotHf(QtGui.QMainWindow):
         F_lim_upc = np.array(F_lim_upc)
         F_lim_loc = np.array(F_lim_loc)
 
-        # upper limits:
-        ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **line_params)
-        ax.fill_between(F_lim_upl, y_max, A_lim_upl, **fill_params)
-        ax.fill_between(F_lim_upc, y_max, A_lim_upc, **fill_params)
-        ax.fill_between(F_lim_upr, y_max, A_lim_upr, **fill_params)
-        # lower limits:
-        ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **line_params)
-        ax.fill_between(F_lim_lol, y_min, A_lim_lol, **fill_params)
-        ax.fill_between(F_lim_loc, y_min, A_lim_loc, **fill_params)
-        ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+        _plot_specs() # plot specs in the range 0 ... f_S/2
 
-        if fb.fil[0]['freqSpecsRangeType'] != 'half': # frequency axis +/- f_S/2
-            # plot limits for other half of the spectrum
+        if fb.fil[0]['freqSpecsRangeType'] != 'half':
+            # add plot limits for other half of the spectrum
             if fb.fil[0]['freqSpecsRangeType'] == 'sym': # frequency axis +/- f_S/2
                 F_lim_upl = -F_lim_upl
                 F_lim_lol = -F_lim_lol
@@ -274,24 +286,7 @@ class PlotHf(QtGui.QMainWindow):
                 F_lim_upr = self.f_S - F_lim_upr
                 F_lim_lor = self.f_S - F_lim_lor
 
-        # upper limits:
-        ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **line_params)
-        ax.fill_between(F_lim_upl, y_max, A_lim_upl, **fill_params)
-        ax.fill_between(F_lim_upc, y_max, A_lim_upc, **fill_params)
-        ax.fill_between(F_lim_upr, y_max, A_lim_upr, **fill_params)
-        # lower limits:
-        ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **line_params)
-        ax.fill_between(F_lim_lol, y_min, A_lim_lol, **fill_params)
-        ax.fill_between(F_lim_loc, y_min, A_lim_loc, **fill_params)
-        ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
-
-#            # upper limits:
-#            ax.plot(F_lim_up, A_lim_up, **line_params)
-#            ax.fill_between(F_lim_up, y_max, A_lim_up, **fill_params)
-#            # lower limits:
-#            ax.plot(F_lim_lo, A_lim_lo, F_lim_lor, A_lim_lor, **line_params)
-#            ax.fill_between(F_lim_lo, y_min, A_lim_lo, **fill_params)
-#            ax.fill_between(F_lim_lor, y_min, A_lim_lor, **fill_params)
+            _plot_specs()
 
 #------------------------------------------------------------------------------
     def draw_inset(self):
@@ -332,7 +327,7 @@ class PlotHf(QtGui.QMainWindow):
                 self.ax_i.set_navigate(True)
                 self.ax.set_navigate(False)
                 if self.specs:
-                    self.plotSpecLimits(specAxes = self.ax_i)
+                    self.plot_spec_limits(specAxes = self.ax_i)
             else: # edit / navigate main plot
                 self.ax_i.set_navigate(False)
                 self.ax.set_navigate(True)
@@ -377,7 +372,7 @@ class PlotHf(QtGui.QMainWindow):
             #ax1.set_yticks(np.linspace(ax1.get_ybound()[0], ax1.get_ybound()[1], 5))
             #ax2.set_yticks(np.linspace(ax2.get_ybound()[0], ax2.get_ybound()[1], 5))
             #http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
-            
+
             # use helper functions from matplotlib.ticker:
             #   MaxNLocator: set no more than nbins + 1 ticks
             #self.ax_p.yaxis.set_major_locator( matplotlib.ticker.MaxNLocator(nbins = nbins) )
@@ -414,7 +409,7 @@ class PlotHf(QtGui.QMainWindow):
 
         if self.DEBUG:
             print("--- plotHf.draw() --- ")
-            print("b, a = ", fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) 
+            print("b, a = ", fb.fil[0]['ba'][0], fb.fil[0]['ba'][1])
 
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
         [self.W, self.H_cplx] = sig.freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1],
@@ -436,8 +431,11 @@ class PlotHf(QtGui.QMainWindow):
         """
         if np.all(self.W) == None: # H(f) has not been calculated yet
             self.calc_hf()
-            
-        self.unitA = self.cmbUnitsA.currentText()
+
+        if self.cmbUnitsA.currentText() == 'Auto':
+            self.unitA = fb.fil[0]['amp_specs_unit']
+        else:
+            self.unitA = self.cmbUnitsA.currentText()
 
         # Linphase settings only makes sense for amplitude plot
         self.chkLinphase.setCheckable(self.unitA == 'V')
@@ -459,8 +457,8 @@ class PlotHf(QtGui.QMainWindow):
 
         f_lim = fb.fil[0]['freqSpecsRange']
 
-        # shift, scale and select frequency range to be displayed: 
-        # W -> F, H_cplx -> H_c        
+        # shift, scale and select frequency range to be displayed:
+        # W -> F, H_cplx -> H_c
         self.H_c = self.H_cplx
         self.F = self.W / (2 * np.pi) * self.f_S
 
@@ -470,7 +468,7 @@ class PlotHf(QtGui.QMainWindow):
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
             self.H_c = self.H_cplx[0:rc.params['N_FFT']/2]
             self.F = self.F[0:rc.params['N_FFT']/2]
-            
+
         # now calculate mag / real / imaginary part of H_c:
         if self.linphase: # remove the linear phase
             self.H_c = self.H_c * np.exp(1j * self.W * fb.fil[0]["N"]/2.)
@@ -495,16 +493,16 @@ class PlotHf(QtGui.QMainWindow):
             #================ Main Plotting Routine =========================
 
             if self.unitA == 'dB':
-                A_lim = [-self.A_SB -10, self.A_PB +1]
+                A_lim = [20*np.log10(self.A_SB) -10, 20*np.log10(1+self.A_PB) +1]
                 self.H_plt = 20*np.log10(abs(H))
                 H_str += ' in dB ' + r'$\rightarrow$'
             elif self.unitA == 'V': #  'lin'
-                A_lim = [10**((-self.A_SB-10)/20), 10**((self.A_PB+1)/20)]
+                A_lim = [0, (self.A_PB+1)]
                 self.H_plt = H
                 H_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
             else: # unit is W
-                A_lim = [10**((-self.A_SB-10)/10), 10**((self.A_PB+0.5)/10)]
+                A_lim = [0, (1 + self.A_PB)**2.]
                 self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
 
@@ -517,14 +515,13 @@ class PlotHf(QtGui.QMainWindow):
 
             self.ax.axis(plt_lim)
 
-            if self.specs: self.plotSpecLimits(specAxes = self.ax)
+            if self.specs: self.plot_spec_limits(specAxes = self.ax)
 
             self.ax.set_title(r'Magnitude Frequency Response')
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
 
         self.mplwidget.redraw()
-
 
 
 #------------------------------------------------------------------------------

@@ -293,7 +293,7 @@ class InputSpecs(QtGui.QWidget):
     
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
-            self.sel_fil.load_entries()
+            self.sel_fil.load_filter_order()
             self.w_specs.load_entries()
             self.f_specs.load_entries()
             self.color_design_button("ok")

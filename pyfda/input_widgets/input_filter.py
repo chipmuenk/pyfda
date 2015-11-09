@@ -18,12 +18,11 @@ from PyQt4.QtCore import pyqtSignal
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
-# TODO: set_response_type is called 3 times by inputSpecs.loadAllSpecs every time 
-#       filter is changed - why? 
 # TODO: Check for unneeded attributes self. ...
 # TODO: new methods: load_settings, store_settings, update_settings
 # TODO: Changing from ...[min] to bessel gives error "unhashable type: "dict"
 #         in input_specs updateAllUIs line 154 all_params = ... - ONLY Py3 !!!
+# TODO: Bessel filter has no access to target specs -> limits can't be set
 
 class InputFilter(QtGui.QWidget):
     """
