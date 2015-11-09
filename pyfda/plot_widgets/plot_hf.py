@@ -42,7 +42,7 @@ class PlotHf(QtGui.QMainWindow):
 
         self.lblIn = QtGui.QLabel("in")
 
-        units = ["dB", "V", "W"]
+        units = ['dB', 'V', 'W', 'Auto']
         self.cmbUnitsA = QtGui.QComboBox(self)
         self.cmbUnitsA.addItems(units)
         self.cmbUnitsA.setObjectName("cmbUnitsA")
@@ -432,7 +432,10 @@ class PlotHf(QtGui.QMainWindow):
         if np.all(self.W) == None: # H(f) has not been calculated yet
             self.calc_hf()
 
-        self.unitA = self.cmbUnitsA.currentText()
+        if self.cmbUnitsA.currentText() == 'Auto':
+            self.unitA = fb.fil[0]['amp_specs_unit']
+        else:
+            self.unitA = self.cmbUnitsA.currentText()
 
         # Linphase settings only makes sense for amplitude plot
         self.chkLinphase.setCheckable(self.unitA == 'V')

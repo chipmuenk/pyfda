@@ -66,7 +66,12 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
         self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         # fit size dynamically to largest element
-        self.cmbUnitsA.setCurrentIndex(0) # initialize for dBsg
+
+        # find index for default unit from dictionary and set the unit     
+        amp_idx = self.cmbUnitsA.findData(fb.fil[0]['amp_specs_unit'])
+        if amp_idx < 0:
+            amp_idx = 0
+        self.cmbUnitsA.setCurrentIndex(amp_idx) # initialize for dBsg
         
         self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields
         self.layGSpecs.addWidget(self.lblUnits,0,0)
@@ -75,7 +80,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "A" (= amplitude specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        # ATTENTION: Entries need to be converted to str first for Py 2 (???)
+        # ATTENTION: Entries need to be converted from QString to str for Py 2
         newLabels = [str(l) for l in fb.fil[0] if l[0] == 'A'] 
         self.update_UI(newLabels = newLabels)
 
@@ -105,12 +110,12 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     def load_entries(self):
         """
         Reload textfields from filter dictionary to reflect settings that
-        may have been changed by the filter design algorithm, convert to 
-        selected unit.
+        may have been changed by the filter design algorithm and convert to 
+        selected unit. Store the unit in the filter dictionary.
         """
 
-#        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox
         unit = str(self.cmbUnitsA.currentText())
+        fb.fil[0]['amp_specs_unit'] = unit
  
         for i in range(len(self.qlineedit)):
             amp_label = str(self.qlineedit[i].objectName())
@@ -129,9 +134,9 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         """
 
 
-        def dB2lin(amp_label, dB_value, Watt = False):
+        def unit2lin(amp_label, dB_value, unit = 'dB'):
             """
-            Convert dB to linear ripple:
+            Convert unit to linear ripple:
             - passband: delta_PB = 1 - 10 ** (-A_PB/10 resp. 20) [IIR]
                         delta_PB = (10 ** (A_PB / 20) - 1)/ (10 ** (A_PB / 20) + 1)[FIR]
             - stopband: delta_SB = -10 ** (-A_SB/10 resp. 20)
@@ -153,7 +158,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
             amp_label = str(self.qlineedit[i].objectName())
             amp_value = simple_eval(self.qlineedit[i].text())
             if idx == 0: # Entry is in dBs, convert to linear
-                fb.fil[0].update({amp_label:dB2lin(amp_label, amp_value)})
+                fb.fil[0].update({amp_label:unit2lin(amp_label, amp_value)})
             elif idx == 1:  # Entries are linear ripple, same as dictionary
                 fb.fil[0].update({amp_label:amp_value})
             else:  # Entries are powers, convert to lin

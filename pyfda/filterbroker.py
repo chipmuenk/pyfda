@@ -125,6 +125,7 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
             'sos': None,
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
+            'amp_specs_unit':'dB',
             'freqSpecsRangeType':'Half',
             'freqSpecsRange': [0,0.5],
             'freq_specs_sort' : True,
