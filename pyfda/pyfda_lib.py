@@ -40,6 +40,46 @@ import scipy.signal as sig
 import matplotlib.pyplot as plt
 from  matplotlib import patches
 
+def dB(lin, power = False):
+    """
+    Calculate dB from linear value. If power = True, calculate 10 log ...,
+    else calculate 20 log ...
+    """
+    if power:
+        return 10. * np.log10(lin)
+    else:
+        return 20 * np.log10(lin)
+        
+def lin2unit(lin, filt_type, amp_label, unit = 'dB'):
+    """
+    Convert linear specification to dB or W, depending on filter type ('FIR' or
+    'IIR') and passband 'PB' or stopband 'SB' :
+    
+    - Passband: 
+        A_dB = -20 * log10(1 - spec_PB) [IIR]
+        A_dB = 20 log10((1 + spec_PB)/(1 - spec_PB)) [FIR]
+                
+    - Stopband: 
+        A_dB = -20 * log10(spec_SB)
+    
+    Returns the value as a string.
+    """     
+    if unit == 'dB':
+        if "PB" in amp_label: # passband
+            if filt_type == 'IIR':
+                result = round(-20 * log10(1. - lin), 8)
+            else:
+                result = round(20 * log10((1. + lin)/(1 - lin)), 8)
+        else: # stopband
+            result = round(-20 * log10(lin), 8)
+    elif unit == 'W':
+        result = lin * lin
+    else:
+        result = lin
+            
+    return str(result)
+
+
 
 def cround(x, n_dig = 0):
     """
