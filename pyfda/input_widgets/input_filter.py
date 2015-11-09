@@ -349,7 +349,8 @@ class InputFilter(QtGui.QWidget):
             # filter order method
             if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][dm].keys():
                 fb.fil[0].update({'fo':{}})
-                fb.fil[0]['fo'] = fb.fil_tree[self.rt][self.ft][dm].keys()[0]
+                # explicit list(dict.keys()) needed for Python 3
+                fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][dm].keys())[0]
     
             if self.DEBUG:
                 print("=== InputFilter.set_design_method ===")
