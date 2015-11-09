@@ -78,7 +78,7 @@ def lin2unit(lin, filt_type, amp_label, unit = 'dB'):
     else:
         result = lin
             
-    return str(result)
+    return result
 
 
 

@@ -123,7 +123,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
             filt_type = fb.fil[0]['ft']
             
             self.qlineedit[i].setText(
-                lin2unit(value, filt_type, amp_label, unit = unit))
+                str(lin2unit(value, filt_type, amp_label, unit = unit)))
 
 #------------------------------------------------------------------------------
     def _store_entries(self):
