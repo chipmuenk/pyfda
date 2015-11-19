@@ -392,12 +392,12 @@ class InputCoeffs(QtGui.QWidget):
         """
         Quantize all coefficients
         """
-        qI = int(self.ledQuantI.text())
-        qF = int(self.ledQuantF.text())
-        qQuant = self.cmbQQuant.currentText()
-        qOvfl = self.cmbQOvfl.currentText()
-        q_obj =  {'QI':qI, 'QF': qF, 'quant': qQuant, 'ovfl': qOvfl}
-        myQ = fix.Fixed(q_obj) # instantiate fixed-point object
+        # define + instantiate fixed-point object
+        myQ = fix.Fixed({'QI':int(self.ledQuantI.text()),
+                         'QF':int(self.ledQuantF.text()),
+                         'quant': self.cmbQQuant.currentText(),
+                         'ovfl':self.cmbQOvfl.currentText()})
+                         
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
         for col in range(num_cols):
