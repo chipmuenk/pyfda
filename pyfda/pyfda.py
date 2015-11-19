@@ -13,7 +13,7 @@ from pyfda.filter_tree_builder import FilterTreeBuilder
 from .input_widgets import input_tab_widgets
 from .plot_widgets import plot_tab_widgets
 
-__version__ = "0.1a1"
+__version__ = "0.1a5"
 
 class pyFDA(QtGui.QMainWindow):
     """
@@ -201,12 +201,8 @@ def main():
     else:
         delta = 100
 
-    myFont = QtGui.QFont("Tahoma", fontsize)
-
-#    app.setFont(myFont)
     app.setStyleSheet(pyfda_rc.css_rc['TopWidget']) 
-#                      pyfda_rc.css_rc['LineEdit'] +
- #                     pyfda_rc.css_rc['TabBar'])
+
     mainw = pyFDA()
 # http://stackoverflow.com/questions/18416201/core-dump-with-pyqt4
 # http://stackoverflow.com/questions/11945183/what-are-good-practices-for-avoiding-crashes-hangs-in-pyqt
@@ -225,11 +221,7 @@ def main():
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     mainw.show()
-
-#    def fdaQuit():
-#        if blabla:
-#        app.quit()
-#        
+       
  #   app.lastWindowClosed.connect(mainw.closeEvent())
 
     #start the application's exec loop, return the exit code to the OS
