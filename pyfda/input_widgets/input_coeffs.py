@@ -218,7 +218,7 @@ class InputCoeffs(QtGui.QWidget):
         self.chkCoeffList.clicked.connect(self.load_entries)
         self.butLoad.clicked.connect(self.load_entries)
 
-        self.butSave.clicked.connect(self.save_coeffs)
+        self.butSave.clicked.connect(self.store_entries)
 
         self.butDelRow.clicked.connect(self.delete_rows)
         self.butAddRow.clicked.connect(self.add_rows)
@@ -227,7 +227,8 @@ class InputCoeffs(QtGui.QWidget):
         self.butSetZero.clicked.connect(self.set_coeffs_zero)
         self.butQuant.clicked.connect(self.quant_coeffs)
 
-    def save_coeffs(self):
+#------------------------------------------------------------------------------
+    def store_entries(self):
         """
         Read out coefficients table and save the values to filter 'coeffs'
         and 'zpk' dicts. Is called when clicking the <Save> button, triggers
