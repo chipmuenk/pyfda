@@ -23,7 +23,7 @@ from pyfda.simpleeval import simple_eval
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: IIR button functionality not yet implemented, needed?
 # TODO: Fill combobox for Wrap / Quant settings
-# TODO: Fix fixpoint lib: toggling between -MSB and + MSB is wrong
+# TODO: Fix fixpoint lib: ovfl = wrap toggles between -MSB and + MSB is wrong
 
 class InputCoeffs(QtGui.QWidget):
     """
@@ -272,6 +272,7 @@ class InputCoeffs(QtGui.QWidget):
 
         self.sigFilterDesigned.emit()  # -> input_widgets -> pyFDA -> pltWidgets.updateAll()
 
+#------------------------------------------------------------------------------
     def load_entries(self):
         """
         Create table from filter coeff dict
@@ -319,6 +320,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
 
+#------------------------------------------------------------------------------
     def delete_rows(self):
         """
         Delete all selected rows by:
@@ -343,6 +345,7 @@ class InputCoeffs(QtGui.QWidget):
             self.tblCoeff.removeRow(r)
         self.tblCoeff.setRowCount(nrows - len(rows))
 
+#------------------------------------------------------------------------------
     def add_rows(self):
         """
         Add the number of selected rows to the table and fill new cells with
@@ -364,7 +367,7 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
 
-
+#------------------------------------------------------------------------------
     def clear_table(self):
         """
         Clear table & initialize coeff, zpk for two poles and zeros @ origin,
@@ -387,6 +390,7 @@ class InputCoeffs(QtGui.QWidget):
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
+#------------------------------------------------------------------------------
     def set_coeffs_zero(self):
         """
         Set all coefficients = 0 in table with a magnitude less than eps
@@ -403,6 +407,7 @@ class InputCoeffs(QtGui.QWidget):
                 else:
                     self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
 
+#------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
         Quantize all coefficients
