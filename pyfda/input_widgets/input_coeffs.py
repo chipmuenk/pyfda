@@ -204,7 +204,7 @@ class InputCoeffs(QtGui.QWidget):
         layVMain.addWidget(self.tblCoeff)
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
-        self.show_coeffs() # initialize table with default values from fb
+        self.load_entries() # initialize table with default values from fb
 
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemEntered.connect(self.save_coeffs) # nothing happens
@@ -215,8 +215,8 @@ class InputCoeffs(QtGui.QWidget):
 #        self.tblCoeff.clicked.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
 
-        self.chkCoeffList.clicked.connect(self.show_coeffs)
-        self.butLoad.clicked.connect(self.show_coeffs)
+        self.chkCoeffList.clicked.connect(self.load_entries)
+        self.butLoad.clicked.connect(self.load_entries)
 
         self.butSave.clicked.connect(self.save_coeffs)
 
@@ -264,7 +264,7 @@ class InputCoeffs(QtGui.QWidget):
 
         self.sigFilterDesigned.emit()  # -> input_widgets -> pyFDA -> pltWidgets.updateAll()
 
-    def show_coeffs(self):
+    def load_entries(self):
         """
         Create table from filter coeff dict
         """

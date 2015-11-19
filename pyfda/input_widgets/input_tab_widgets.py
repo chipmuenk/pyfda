@@ -156,7 +156,7 @@ class InputTabWidgets(QtGui.QWidget):
 # TODO: The following should be handled within InputSpecs ?
         self.inputSpecs.load_all_specs()
         self.inputInfo.showInfo()
-        self.inputCoeffs.show_coeffs()
+        self.inputCoeffs.load_entries()
         self.inputPZ.showZPK()
 
         self.sigFilterDesigned.emit() # pyFDA -> plot_all.updateAll
