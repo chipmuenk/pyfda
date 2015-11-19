@@ -256,6 +256,13 @@ class InputCoeffs(QtGui.QWidget):
                 coeffs.append(rows) # type: list num_cols x num_rows
 
         fb.fil[0]["N"] = num_rows - 1
+        fb.fil[0]["q_coeff"] = {
+                'QI':int(self.ledQuantI.text()),
+                'QF':int(self.ledQuantF.text()),
+                'quant':self.cmbQQuant.currentText(),
+                'ovfl':self.cmbQOvfl.currentText()
+                }
+
         save_fil(fb.fil[0], coeffs, 'ba', __name__)
 
         if self.DEBUG:
@@ -270,6 +277,14 @@ class InputCoeffs(QtGui.QWidget):
         Create table from filter coeff dict
         """
         coeffs = fb.fil[0]['ba']
+        
+        q_coeff = fb.fil[0]['q_coeff']
+        self.ledQuantI.setText(str(q_coeff['QI']))
+        self.ledQuantF.setText(str(q_coeff['QF']))       
+        self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
+        self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
+
+        
         if fb.fil[0]['ft'] == 'FIR':
             num_cols = 1
             self.tblCoeff.setColumnCount(1)
