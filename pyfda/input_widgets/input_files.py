@@ -178,7 +178,7 @@ class InputFiles(QtGui.QWidget):
                         file_type_err = True
                     if not file_type_err:
                         print('Loaded filter "%s"' %file_name)
-                         # emit signal -> pyFDA -> pltWidgets.updateAll() :
+                         # emit signal -> InputTabWidgets.load_all:
                         self.sigFilterLoaded.emit()
                         self.basedir = os.path.dirname(file_name)
             except IOError as e:
