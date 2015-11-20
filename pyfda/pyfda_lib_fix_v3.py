@@ -1,41 +1,44 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-15 -*-
+# -*- coding: utf-8 -*-
 #===========================================================================
-# pyfda_lib_fix.py
+# dsp_fpga_fix_lib.py
 #
 # Fixpoint library for converting numpy scalars and arrays to quantized
 # numpy values
 #
-# (c) 2014-Feb-04 Christian Münker 
+# (c) 2015 Christian MÃ¼nker 
 #===========================================================================
 from __future__ import division, print_function, unicode_literals # v3line15
 
 import numpy as np
 #from numpy import (pi, log10, exp, sqrt, sin, cos, tan, angle, arange,
 #                   linspace, array, zeros, ones)
+__version__ = 0.4
 
 #------------------------------------------------------------------------
 class Fixed(object):    
     """
     Implement binary quantization of signed scalar or array-like objects 
-    in the form yq = IW.FW where IW and FW are the wordlength of integer resp. 
-    fractional part; total wordlength is W = IW + FW + 1 due to the sign bit.
+    in the form yq = QI.QF where QI and QF are the wordlength of integer resp. 
+    fractional part; total wordlength is W = QI + QF + 1 due to the sign bit.
     
     q_obj = {'QI':1, 'QF':14, 'ovfl':'sat', 'quant':'round'} or
+    
     q_obj = {'Q':'1.14', 'ovfl':'sat', 'quant':'round'}
+
     myQ = Fixed(q_obj) # instantiate fixed-point object
     
         
     Parameters
     ----------
     q_obj : dict 
-        with 2 ... 4 elements defining quantization operation with
+        with 2 ... 4 elements defining quantization operation with the keys
             
-      q_obj['QI']: IW; integer word length, default: 0
+      *'QI'*: integer word length, default: 0
       
-      q_obj['QW']: FW; fractional word length; default: 15; IW + FW + 1 = W (1 sign bit)
+      'QW': fractional word length; default: 15; QI + QF + 1 = W (1 sign bit)
       
-      q_obj['quant']: Quantization method, optional
+      'quant': Quantization method, optional
       
       - 'floor': (default) largest integer i such that i <= x (= binary truncation)
       - 'round': (binary) rounding
@@ -44,7 +47,7 @@ class Fixed(object):
       - 'rint': round towards nearest int 
       - 'none': no quantization (for debugging purposes)
       
-      q_obj['ovfl']: Overflow method, optional; default = 'wrap'
+      'ovfl': Overflow method, optional; default = 'wrap'
       
       - 'wrap': do a two's complement wrap-around
       - 'sat' : saturate at minimum / maximum value
@@ -57,11 +60,7 @@ class Fixed(object):
     -------
     yq : ndarray
         The quantized input value(s) as an ndarray with np.float64. If this is
-        not what you want, see examples:
-        
-    Attention: 
-    - For integer quantization, select 
-    - The returned value usually is 
+        not what you want, see examples.
     
     Notes
     -----
@@ -70,35 +69,34 @@ class Fixed(object):
     
     q_dsp = quantizer('fixed', 'round', [16 15], 'wrap'); % Matlab
     
-    q_dsp = (0, 15, 'round', 'wrap') # Python
+    q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
     
     
     Example:
     --------
-        Example:
-    
+      
+    >>> q_obj_a = {'QI':1, 'QF':6, 'ovfl':'sat', 'quant':'round'}
+    >>> myQa = Fixed(q_obj_a) # instantiate fixed-point object myQa
+    >>> myQa.resetN()  # reset overflow counter
+    >>> a = np.arange(0,5, 0.05) # create input signal
 
-    yq = myQ.fix(y)    # calculate fixed-point representation of y
-    print(myQ.N_over, "overflows!")
-    myQ.resetN()       # reset overflow counter
-    >>> q_obj_a = (1,2,'round','wrap')
-    >>> myQ = Fixed(q_obj) # instantiate fixed-point object
-    >>> a = np.arange(0,5,0.05)
+    >>> aq = myQa.fixed(a) # quantize input signal
+    >>> plt.plot(a, aq) # plot quantized vs. original signal
+    >>> print(myQa.N_over, "overflows!") # print number of overflows
 
-    >>> aq, N_over = fixed(q_obj_a, a)
-    >>> plt.plot(a,aq)
-    >>> print(N_over) # print number of overflows
-    Convert output to same format as input:
+    >>> # Convert output to same format as input:
     >>> b = np.arange(200, dtype = np.int16)
     >>> btype = np.result_type(b)
-    >>> q_obj_b = (7,-2,'round','wrap') # MSB = 2**7, LSB = 2**2
-    >>> bq, N_over = fixed(q_obj_b, b)
+    >>> # MSB = 2**7, LSB = 2**2:
+    >>> q_obj_b = {'QI':7, 'QF':-2, 'ovfl':'wrap', 'quant':'round'} 
+    >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
+    >>> bq = myQb.fixed(b)
     >>> bq = bq.astype(btype) # restore original variable type
     >>> 
     """
     def __init__(self, q_obj):
         """
-        Initialize fixed object with q_obj
+        Initialize fixed object with dict q_obj
         """
         # test if all passed keys of quantizer object are known
         self.setQobj(q_obj)
@@ -126,9 +124,9 @@ class Fixed(object):
         if 'quant' not in q_obj: q_obj['quant'] = 'floor'
         if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
         
-        self.q_obj    = q_obj # store quant. dict in instance      
-        self.requant  = q_obj['quant']
-        self.overflow = q_obj['ovfl']
+        self.q_obj = q_obj # store quant. dict in instance      
+        self.quant = q_obj['quant']
+        self.ovfl  = q_obj['ovfl']
         
         self.LSB  = 2. ** (-q_obj['QF']) # value of LSB = 2 ^ (-WF)
         self.MSB  = 2. ** q_obj['QI']    # value of MSB = 2 ^ WI        
@@ -149,21 +147,21 @@ class Fixed(object):
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)          
         # Quantize inputs
-        if   self.requant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
+        if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
              # largest integer i, such that i <= x (= binary truncation)
-        elif self.requant == 'round':  yq = self.LSB * np.round(y / self.LSB)
+        elif self.quant == 'round':  yq = self.LSB * np.round(y / self.LSB)
              # rounding, also = binary rounding
-        elif self.requant == 'fix':    yq = self.LSB * np.fix(y / self.LSB)
+        elif self.quant == 'fix':    yq = self.LSB * np.fix(y / self.LSB)
              # round to nearest integer towards zero ("Betragsschneiden")
-        elif self.requant == 'ceil':   yq = self.LSB * np.ceil(y / self.LSB)
+        elif self.quant == 'ceil':   yq = self.LSB * np.ceil(y / self.LSB)
              # smallest integer i, such that i >= x
-        elif self.requant == 'rint':   yq = self.LSB * np.rint(y / self.LSB)
+        elif self.quant == 'rint':   yq = self.LSB * np.rint(y / self.LSB)
              # round towards nearest int 
-        elif self.requant == 'none':   yq = y
-        else: raise Exception('Unknown Requantization type "%s"!'%(self.requant))
+        elif self.quant == 'none':   yq = y
+        else: raise Exception('Unknown Requantization type "%s"!'%(self.quant))
         
         # Handle Overflow / saturation        
-        if   self.overflow == 'none': pass
+        if   self.ovfl == 'none': pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -self.MSB)
@@ -174,13 +172,13 @@ class Fixed(object):
             self.N_over = self.N_over_neg + self.N_over_pos
 
             # Replace overflows with Min/Max-Values (saturation):           
-            if self.overflow == 'sat':
+            if self.ovfl == 'sat':
                 yq = np.where(over_pos, self.MSB-self.LSB, yq) # (cond, true, false)
                 yq = np.where(over_neg, -self.MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
-            elif self.overflow == 'wrap':
+            elif self.ovfl == 'wrap':
                 yq = yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB))
-            else: raise Exception('Unknown overflow type "%s"!'%(self.overflow))
+            else: raise Exception('Unknown overflow type "%s"!'%(self.overfl))
         return yq
         
     def resetN(self):
@@ -189,6 +187,75 @@ class Fixed(object):
         self.N_over_neg = 0
         self.N_over_pos = 0
             
+class FIX_filt_MA(Fixed):
+    """
+    Usage:
+    Q = FIX_filt_MA(q_mul, q_acc) # Instantiate fixpoint filter object 
+    x_bq = self.Q_mul.fxp_filt(x[k:k + len(bq)] * bq) 
+    
+    The fixpoint object has two different quantizers:
+    - q_mul describes requanitization after coefficient multiplication
+    - q_acc describes requanitization after each summation in the accumulator
+            (resp. in the common summation point)
+            
+    """
+    def __init__(self, q_mul, q_acc):
+        """
+        Initialize fixed object with q_obj
+        """
+        # test if all passed keys of quantizer object are known
+        self.Q_mul = Fixed(q_mul)
+        self.Q_mul.resetN() # reset overflow counter of Q_mul
+        self.Q_acc = Fixed(q_acc)
+        self.Q_acc.resetN() # reset overflow counter of Q_acc
+        self.resetN() # reset filter overflow-counter	
+	
+
+    def fxp_filt_df(self, x, bq, verbose = True):
+        """
+        Calculate filter (direct form) response via difference equation with 
+        quantization
+        
+        Parameters
+        ----------
+        x : scalar or array-like
+            input value(s)
+        
+        bq : array-like
+            filter coefficients
+            
+        Returns
+        -------
+        yq : ndarray
+            The quantized input value(s) as an ndarray with np.float64. If this is
+            not what you want, see examples.
+     
+        
+        """
+
+        # Initialize vectors (also speeds up calculation)
+        yq = accu_q = np.zeros(len(x))
+        x_bq = np.zeros(len(bq))
+        
+        for k in range(len(x) - len(bq)):
+            # weighted state-vector x at time k:
+            x_bq = self.Q_mul.fix(x[k:k + len(bq)] * bq) 
+            # sum up x_bq to get accu[k]
+            accu_q[k] = self.Q_acc.fix(sum(x_bq)) 
+        yq = accu_q # scaling at the output of the accumulator
+
+        if (self.Q_mul.N_over and verbose): print('Overflows in Multiplier:  ',
+                Fixed.Q_mul.N_over)
+        if (self.Q_acc.N_over and verbose): print('Overflows in Accumulator: ',
+                self.Q_acc.N_over)
+        self.N_over = self.Q_mul.N_over + self.Q_acc.N_over
+             
+        return yq
+    
+# nested loop would be much slower!
+#  for k in range(Nx - len(bq)):
+#	for i in len(bq):
+#	  accu_q[k] = fixed(q_acc, (accu_q[k] + fixed(q_mul, x[k+i]*bq[i+1])))
 
 #----------------------------------------------------------------------
 #============ not working yet =================================================
