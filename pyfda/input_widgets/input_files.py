@@ -232,8 +232,10 @@ class InputFiles(QtGui.QWidget):
         dlg=QtGui.QFileDialog( self )
 
         file_types = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
-            ";;Xilinx coefficient format (*.coe)"
             ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
+
+        if fb.fil[0]['ft'] == 'FIR':
+            file_types += ";;Xilinx coefficient format (*.coe)"
 
         # Add further file types if modules could be imported:
         if XLWT:
@@ -386,8 +388,15 @@ class InputFiles(QtGui.QWidget):
         Save filter coefficients in Xilinx coefficient format, specifying
         the number base and the quantized coefficients
         """
-        coe_radix = 16
-        coe_width = 18
+
+        frmt = fb.fil[0]['q_coeff']['frmt'] # store old format
+        fb.fil[0]['q_coeff']['frmt'] = 'dec'
+        qc = fix.Fixed(fb.fil[0]['q_coeff'])
+        b10 = qc.fix(fb.fil[0]['ba'][0]) # Quantize coefficients to integer format
+        fb.fil[0]['q_coeff']['frmt'] = frmt # restore old coefficient format
+
+        coe_width = qc.QF + qc.QI + 1 # quantized word length; Int. + Frac. + Sign bit
+        coe_radix = 10
         info_str = (
             "; #############################################################################\n"
              ";\n; XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) file\n"
@@ -401,19 +410,9 @@ class InputFiles(QtGui.QWidget):
         file_name.write("Radix = %d;\n" %coe_radix)
         file_name.write("Coefficient_width = %d;\n" %coe_width)
         coeff_str = "CoefData = "
-        for b in fb.fil[0]['ba'][0]:
+        for b in b10:
             coeff_str += str(b) + ",\n"
-#            coeff_str.join(str(b) + ",\n")
         file_name.write(coeff_str[:-2] + ";") # replace last "," by ";"
-     
-        # hex(x)
-#01a6f,
-#3f373,
-#02fe2,
-#029af;
-#Radix = 16; 
-#Coefficient_Width = 18; 
-#CoefData =
 
 
 #------------------------------------------------------------------------------
