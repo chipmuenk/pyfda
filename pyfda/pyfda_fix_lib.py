@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #===========================================================================
-# pyfda_fix_lib.py
+# dsp_fpga_fix_lib.py
 #
 # Fixpoint library for converting numpy scalars and arrays to quantized
 # numpy values
@@ -13,7 +13,7 @@ from __future__ import division, print_function, unicode_literals # v3line15
 import numpy as np
 #from numpy import (pi, log10, exp, sqrt, sin, cos, tan, angle, arange,
 #                   linspace, array, zeros, ones)
-__version__ = 0.5
+__version__ = 0.4
 
 #------------------------------------------------------------------------
 class Fixed(object):    
@@ -34,25 +34,32 @@ class Fixed(object):
     q_obj : dict 
         with 2 ... 4 elements defining quantization operation with the keys
             
-      *'QI'*: integer word length, default: 0
+    * **'QI'** : integer word length, default: 0
       
-      'QW': fractional word length; default: 15; QI + QF + 1 = W (1 sign bit)
+    * **'QF'** : fractional word length; default: 15; QI + QF + 1 = W (1 sign bit)
       
-      'quant': Quantization method, optional
+    * **'quant'** : Quantization method, optional; default = 'floor'
       
-      - 'floor': (default) largest integer i such that i <= x (= binary truncation)
+      - 'floor': (default) largest integer `I` such that :math:`I \\le x` (= binary truncation)
       - 'round': (binary) rounding
       - 'fix': round to nearest integer towards zero ('Betragsschneiden')
-      - 'ceil': smallest integer i, such that i >= x
+      - 'ceil': smallest integer `I`, such that :math:`I \\ge x`
       - 'rint': round towards nearest int 
-      - 'none': no quantization (for debugging purposes)
+      - 'none': no quantization
       
-      'ovfl': Overflow method, optional; default = 'wrap'
+    * **'ovfl'** : Overflow method, optional; default = 'wrap'
       
       - 'wrap': do a two's complement wrap-around
       - 'sat' : saturate at minimum / maximum value
-      - 'none': no overflow; the integer word length is ignored (for debugging)
-    
+      - 'none': no overflow; the integer word length is ignored
+
+    * **'format'** : Output format, optional; default = 'frac'
+
+      - 'frac' : (default) return result as a fraction
+      - 'dec'  : return result in decimal form, scaled by :math:`2^{WF}`
+      - 'bin'  : return result as binary string, scaled by :math:`2^{WF}`
+        
+
     Instance Attributes
     -------------------
     q_obj : dict
@@ -63,6 +70,9 @@ class Fixed(object):
 
     ovfl  : string
         Overflow behaviour ('wrap', 'sat', ...)
+        
+    format : string
+        target output format ('frac', 'dec', 'bin')
 
     N_over : integer
         total number of overflows
@@ -78,6 +88,7 @@ class Fixed(object):
         
     MSB : float
         value of most significant bit (MSB)
+        
     Notes
     -----
     class Fixed() can be used like Matlabs quantizer object / function from the
@@ -103,7 +114,7 @@ class Fixed(object):
         store it as instance attribute
         """
         for key in q_obj.keys():
-            if key not in ['Q','QF','QI','quant','ovfl','int_q']:
+            if key not in ['Q','QF','QI','quant','ovfl','frmt']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
         # set default values for parameters if undefined:
@@ -118,19 +129,18 @@ class Fixed(object):
             else: q_obj['QF'] = int(q_obj['QF'])
         if 'quant' not in q_obj: q_obj['quant'] = 'floor'
         if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
-        if 'int_q' not in q_obj: q_obj['int_q'] = False
+        if 'frmt' not in q_obj: q_obj['frmt'] = 'frac'
         
         self.q_obj = q_obj # store quant. dict in instance      
-        self.quant = q_obj['quant']
-        self.ovfl  = q_obj['ovfl']
-        self.int_q = q_obj['int_q']
+        self.quant = str(q_obj['quant']).lower()
+        self.ovfl  = str(q_obj['ovfl']).lower()
+        self.frmt = str(q_obj['frmt']).lower()
+        self.QF = q_obj['QF']
+        self.QI = q_obj['QI']
         
         self.LSB  = 2. ** (-q_obj['QF']) # value of LSB = 2 ^ (-WF)
         self.MSB  = 2. ** q_obj['QI']    # value of MSB = 2 ^ WI
         
-        if self.int_q:
-            self.LSB = 1
-            self.MSB = int(np.round(self.MSB * 2. ** (q_obj['QF'])))      
 
     def fix(self, y):
         """
@@ -193,7 +203,8 @@ class Fixed(object):
         elif self.quant == 'rint':   yq = self.LSB * np.rint(y / self.LSB)
              # round towards nearest int 
         elif self.quant == 'none':   yq = y
-        else: raise Exception('Unknown Requantization type "%s"!'%(self.quant))
+        else: 
+            raise Exception('Unknown Requantization type "%s"!'%(self.quant))
         
         # Handle Overflow / saturation        
         if   self.ovfl == 'none': pass
@@ -212,9 +223,35 @@ class Fixed(object):
                 yq = np.where(over_neg, -self.MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
-                yq = yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB))
-            else: raise Exception('Unknown overflow type "%s"!'%(self.overfl))
-        return yq
+                yq = np.where(over_pos or over_neg,
+                    yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB)),
+                    yq)
+#                yq = yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB))
+            else:
+                raise Exception('Unknown overflow type "%s"!'%(self.overfl))
+                return None
+
+        if self.frmt in {'dec', 'hex', 'bin'}:
+            yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
+#        if self.frmt == 'hex': # doesn't work yet
+#            return self.int2hex(np.int(yq))
+        elif self.frmt == 'bin':
+            return np.binary_repr(yq, width=(self.QF + self.QI + 1))
+        elif self.frmt in {'frac', 'dec'}:
+            return yq
+        else:
+            # float.hex() ?
+            raise Exception('Unknown output format "%s"!'%(self.format))
+            return None
+
+    def int2hex(self, x):
+        h = ""
+        x = np.atleast_1d(x)
+        for i in xrange(len(x)):
+            h += str('{0:X}'.format(x))
+        return h
+            
+        
         
     def resetN(self):
         """ Reset overflow-counters of Fixed object"""
@@ -292,6 +329,55 @@ class FIX_filt_MA(Fixed):
 #	for i in len(bq):
 #	  accu_q[k] = fixed(q_acc, (accu_q[k] + fixed(q_mul, x[k+i]*bq[i+1])))
 
+#----------------------------------------------------------------------
+#============ not working yet =================================================
+# class FIX_filt_MA(Fixed):
+#     """
+#     yq = FIX_filt_MA.fixFilt(x,aq,bq,gq)
+# 	FIR-Filter mit verschiedenen internen Quantisierungen: 
+# 	q_mul beschreibt Requantisierung nach Koeffizientenmultiplikation
+# 	q_acc beschreibt Requantisierung bei jeder Summation im Akkumulator 
+# 	(bzw. gemeinsamen Summenpunkt)
+#     """
+#     def __init__(self, q_mul, q_acc):
+#         """
+#         Initialize fixed object with q_obj
+#         """
+#         # test if all passed keys of quantizer object are known
+#         self.setQobj(q_mul)
+#         self.resetN() # initialize overflow-counter	
+# 
+# 	
+# # Calculate filter response via difference equation with quantization:
+# 
+#     def fixFilt(x, bq, aq, gq, q_mul, q_acc, verbose = True):
+#         
+#         # Initialize vectors (also speeds up calculation)
+#     #    Nx = len(x)
+#     #    s = zeros(Nx) # not needed in this filter
+#         yq = accu_q = np.zeros(len(x))
+#     #    bq_len = len(bq)
+#         x_bq = np.zeros(len(bq))
+#         
+#         for k in range(len(x) - len(bq)):
+#             # weighted state-vector x at time k:
+#             x_bq, N_over_m = Fixed.fix(q_mul, x[k:k + len(bq)] * bq)
+#             # sum up x_bq to get accu[k]
+#             accu_q[k], N_over_a = Fixed.fix(q_acc, sum(x_bq))
+#         yq = accu_q * gq # scaling at the output of the accumulator
+#         s = x # copy state-vector
+#         if (N_over_m and verbose): print('Overflows in Multiplier:  ', N_over_m)
+#         if (N_over_a and verbose): print('Overflows in Accumulator: ', N_over_a)
+#
+#       return yq
+#
+#==============================================================================
+             
+    
+# nested loop would be much slower!
+#  for k in range(Nx - len(bq)):
+#	for i in len(bq):
+#	  accu_q[k] = fixed(q_acc, (accu_q[k] + fixed(q_mul, x[k+i]*bq[i+1])))
 
 #######################################
 # If called directly, do some example #

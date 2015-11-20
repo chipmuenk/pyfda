@@ -23,6 +23,7 @@ from pyfda.simpleeval import simple_eval
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: IIR button functionality not yet implemented, needed?
 # TODO: Fill combobox for Wrap / Quant settings
+# TODO: Separate View and Storage of data
 # TODO: Fix fixpoint lib: ovfl = wrap toggles between -MSB and + MSB is wrong
 
 class InputCoeffs(QtGui.QWidget):
@@ -148,15 +149,24 @@ class InputCoeffs(QtGui.QWidget):
         self.cmbQQuant.addItems(qQuant)
         self.cmbQQuant.setCurrentIndex(1) # 'round'
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
+        
         self.cmbQOvfl = QtGui.QComboBox()
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
         self.cmbQOvfl.setCurrentIndex(2) # 'sat'
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
+        
+        self.cmbQFormat = QtGui.QComboBox()
+        qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
+        self.cmbQFormat.addItems(qFormat)
+        self.cmbQFormat.setCurrentIndex(0) # 'frac'
+        self.cmbQFormat.setToolTip('Set the output format.')
+
 
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbQFormat.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
@@ -193,6 +203,7 @@ class InputCoeffs(QtGui.QWidget):
         self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
         self.layHButtonsCoeffs4.addWidget(self.lblQuant)
         self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
+        self.layHButtonsCoeffs4.addWidget(self.cmbQFormat)
         self.layHButtonsCoeffs4.addItem(spacer)
 
         layVMain = QtGui.QVBoxLayout()
@@ -260,7 +271,8 @@ class InputCoeffs(QtGui.QWidget):
                 'QI':int(self.ledQuantI.text()),
                 'QF':int(self.ledQuantF.text()),
                 'quant':self.cmbQQuant.currentText(),
-                'ovfl':self.cmbQOvfl.currentText()
+                'ovfl':self.cmbQOvfl.currentText(),
+                'frmt':self.cmbQFormat.currentText()
                 }
 
         save_fil(fb.fil[0], coeffs, 'ba', __name__)
@@ -416,7 +428,8 @@ class InputCoeffs(QtGui.QWidget):
         myQ = fix.Fixed({'QI':int(self.ledQuantI.text()),
                          'QF':int(self.ledQuantF.text()),
                          'quant': self.cmbQQuant.currentText(),
-                         'ovfl':self.cmbQOvfl.currentText()})
+                         'ovfl':self.cmbQOvfl.currentText(),
+                         'frmt':self.cmbQFormat.currentText()})
                          
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()

@@ -123,7 +123,7 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'ba':([1, 1, 1], [3, 0, 2]), # tuple of bb, aa
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
-            'q_coeff':{'QI':0, 'QF': 15, 'quant': 'round', 'ovfl': 'sat'},
+            'q_coeff':{'QI':0, 'QF': 15, 'quant': 'round', 'ovfl': 'sat', 'frmt':'frac'},
             'sos': None,
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
             'amp_specs_unit':'dB',
