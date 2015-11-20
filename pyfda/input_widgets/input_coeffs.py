@@ -14,7 +14,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import cround, save_fil
-import pyfda.pyfda_lib_fix_v3 as fix
+import pyfda.pyfda_fix_lib as fix
 from pyfda.simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows

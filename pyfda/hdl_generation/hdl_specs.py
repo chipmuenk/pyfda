@@ -24,7 +24,7 @@ else:
     
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-import pyfda.pyfda_lib_fix_v3 as fix
+import pyfda.pyfda_fix_lib as fix
 
 from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
 

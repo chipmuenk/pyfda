@@ -40,6 +40,7 @@ else:
 import xlrd
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.pyfda_fix_lib as fix
 
 # TODO: Save P/Z as well if possible
 # TODO: Line 192 in save_filter: Attribute Error: QString object has no attribute "endswith"
