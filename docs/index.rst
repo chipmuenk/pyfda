@@ -25,11 +25,11 @@ Contents:
 :mod:`input_filter`
 -------------------
 
-.. automodule:: input_filter
+.. automodule:: input_widgets.input_filter
 	:members:
 	
 :mod:`pyfda.input_widgets`
-=========================
+==========================
 .. automodule:: pyfda.input_widgets
 	:members:
 	.. class:: InputSpecs
