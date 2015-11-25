@@ -13,19 +13,21 @@ Author: Christian Muenker
 from __future__ import division, unicode_literals, print_function, absolute_import
 import importlib
 import six
+import os
 
 
 
 #==============================================================================
 # The entries in this file are only used as initial / default entries and
-# demonstrate the structure of the global dicts and lists. 
+# demonstrate the structure of the global dicts and lists.
+
+basedir = os.path.dirname(os.path.abspath(__file__)) 
 
 #The actual entries are created resp. overwritten by
 #
 # ----- FilterTreeBuilder.__init__() ------
 # ------                 .buildFilTree()
 #
-
 # Dictionary with filter name and full module name
 design_methods = {"equiripple":"pyfda.filter_design.equiripple",
                   "cheby1":"pyfda.filter_design.cheby1",

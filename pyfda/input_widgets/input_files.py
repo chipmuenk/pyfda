@@ -57,7 +57,7 @@ class InputFiles(QtGui.QWidget):
         self.DEBUG = DEBUG
         super(InputFiles, self).__init__()
         
-        self.basedir = os.path.dirname(os.path.abspath(__file__))
+        fb.basedir = os.path.dirname(os.path.abspath(__file__))
 
         self.initUI()
 
@@ -147,7 +147,7 @@ class InputFiles(QtGui.QWidget):
 #        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg=QtGui.QFileDialog( self )
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
-                caption = "Load filter ", directory = self.basedir,
+                caption = "Load filter ", directory = fb.basedir,
                 filter = file_types)
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
@@ -181,7 +181,7 @@ class InputFiles(QtGui.QWidget):
                         print('Loaded filter "%s"' %file_name)
                          # emit signal -> InputTabWidgets.load_all:
                         self.sigFilterLoaded.emit()
-                        self.basedir = os.path.dirname(file_name)
+                        fb.basedir = os.path.dirname(file_name)
             except IOError as e:
                 print("Failed loading %s!" %file_name, "\n", e)
             except Exception as e:
@@ -195,7 +195,7 @@ class InputFiles(QtGui.QWidget):
 #        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg = QtGui.QFileDialog( self )
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
-                caption = "Save filter as", directory = self.basedir,
+                caption = "Save filter as", directory = fb.basedir,
                 filter = file_types)
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
@@ -218,7 +218,7 @@ class InputFiles(QtGui.QWidget):
                         file_type_err = True
                     if not file_type_err:
                         print('Filter saved as "%s"' %file_name)
-                        self.basedir = os.path.dirname(file_name)
+                        fb.basedir = os.path.dirname(file_name)
                             
             except IOError as e:
                     print('Failed saving "%s"!\n' %file_name, e)
@@ -245,7 +245,7 @@ class InputFiles(QtGui.QWidget):
 
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Export filter coefficients as", 
-                directory = self.basedir, filter = file_types) 
+                directory = fb.basedir, filter = file_types) 
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
         if file_name != '': # cancelled file operation returns empty string   
@@ -314,7 +314,7 @@ class InputFiles(QtGui.QWidget):
                     if not file_type_err:
                         print('Exported coefficients as %s - file\n"%s"' 
                                 %(self.del_file_ext(file_type), file_name))
-                        self.basedir = os.path.dirname(file_name)
+                        fb.basedir = os.path.dirname(file_name)
                     
             except IOError as e:
                 print('Failed saving "%s"!\n' %file_name, e)
@@ -334,7 +334,7 @@ class InputFiles(QtGui.QWidget):
         dlg=QtGui.QFileDialog( self )
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Import filter coefficients ", 
-                directory = self.basedir, filter = file_types)
+                directory = fb.basedir, filter = file_types)
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
         
@@ -359,7 +359,7 @@ class InputFiles(QtGui.QWidget):
                     if not file_type_err:
                         print('Loaded coefficient file\n"%s"' %file_name)
                         self.sigFilterDesigned.emit() # emit signal -> pyFDA                     
-                        self.basedir = os.path.dirname(file_name)
+                        fb.basedir = os.path.dirname(file_name)
             except IOError as e:
                 print("Failed loading %s!\n" %file_name, e)
 
