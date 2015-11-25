@@ -21,6 +21,7 @@ import os
 # The entries in this file are only used as initial / default entries and
 # demonstrate the structure of the global dicts and lists.
 
+# the basedir can be stored and referenced by all files
 basedir = os.path.dirname(os.path.abspath(__file__)) 
 
 #The actual entries are created resp. overwritten by
