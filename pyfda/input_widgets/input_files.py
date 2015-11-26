@@ -42,6 +42,7 @@ else:
 import xlrd
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.pyfda_rc as rc 
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: Save P/Z as well if possible
@@ -58,7 +59,7 @@ class InputFiles(QtGui.QWidget):
     def __init__(self):
         super(InputFiles, self).__init__()
         
-        fb.basedir = os.path.dirname(os.path.abspath(__file__))
+#        rc.basedir = os.path.dirname(os.path.abspath(__file__))
 
         self.initUI()
 
@@ -148,7 +149,7 @@ class InputFiles(QtGui.QWidget):
 #        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg=QtGui.QFileDialog( self )
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
-                caption = "Load filter ", directory = fb.basedir,
+                caption = "Load filter ", directory = rc.save_dir,
                 filter = file_types)
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
@@ -182,7 +183,7 @@ class InputFiles(QtGui.QWidget):
                         logger.info('Loaded filter "%s"' %file_name)
                          # emit signal -> InputTabWidgets.load_all:
                         self.sigFilterLoaded.emit()
-                        fb.basedir = os.path.dirname(file_name)
+                        rc.save_dir = os.path.dirname(file_name)
             except IOError as e:
                 logger.error("Failed loading %s!" %file_name, "\n", e)
             except Exception as e:
@@ -196,7 +197,7 @@ class InputFiles(QtGui.QWidget):
 #        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg = QtGui.QFileDialog( self )
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
-                caption = "Save filter as", directory = fb.basedir,
+                caption = "Save filter as", directory = rc.save_dir,
                 filter = file_types)
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
@@ -219,7 +220,7 @@ class InputFiles(QtGui.QWidget):
                         file_type_err = True
                     if not file_type_err:
                         logger.info('Filter saved as "%s"' %file_name)
-                        fb.basedir = os.path.dirname(file_name)
+                        rc.save_dir = os.path.dirname(file_name)
                             
             except IOError as e:
                     logger.error('Failed saving "%s"!\n' %file_name, e)
@@ -246,7 +247,7 @@ class InputFiles(QtGui.QWidget):
 
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Export filter coefficients as", 
-                directory = fb.basedir, filter = file_types) 
+                directory = rc.save_dir, filter = file_types) 
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
         if file_name != '': # cancelled file operation returns empty string   
@@ -313,9 +314,9 @@ class InputFiles(QtGui.QWidget):
                         file_type_err = True
                         
                     if not file_type_err:
-                        fb.basedir = os.path.dirname(file_name)
                         logger.info('Exported coefficients as %s - file\n"%s"' 
                                 %(self.prune_file_ext(file_type), file_name))
+                        rc.save_dir = os.path.dirname(file_name)
                     
             except IOError as e:
                 logger.error('Failed saving "%s"!\n' %file_name, e)
@@ -335,7 +336,7 @@ class InputFiles(QtGui.QWidget):
         dlg=QtGui.QFileDialog( self )
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Import filter coefficients ", 
-                directory = fb.basedir, filter = file_types)
+                directory = rc.save_dir, filter = file_types)
         file_name = str(file_name) # QString -> str
         file_type = str(file_type) # needed for Python 2.x
         
@@ -360,7 +361,7 @@ class InputFiles(QtGui.QWidget):
                     if not file_type_err:
                         logger.info('Loaded coefficient file\n"%s"' %file_name)
                         self.sigFilterDesigned.emit() # emit signal -> pyFDA                     
-                        fb.basedir = os.path.dirname(file_name)
+                        rc.save_dir = os.path.dirname(file_name)
             except IOError as e:
                 logger.error("Failed loading %s!\n" %file_name, e)
 

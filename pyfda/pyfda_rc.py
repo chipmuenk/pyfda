@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-pyfdarc.py
+pyfda_rc.py
 
 This file contains layout definitions for Qt and matplotlib widgets
 A dark and a light theme can be selected via a constant but this more a demonstration
 on how to set things than a finished layout yet.
+
+Default parameters, paths etc. are also defined at the end of the file.
+
+Importing pyfda_rc runs the module once, defining all module variables
+which are global (similar to class variables).
 
 See
 http://stackoverflow.com/questions/13034496/using-global-variables-between-files-in-python
@@ -23,9 +28,8 @@ from __future__ import division, unicode_literals
 import os, logging
 logger = logging.getLogger(__name__)
 
-#logging.basicConfig(format='%(levelname)s: %(name)s: \n\t%(message)s', 
-#                    level=logging.DEBUG)# importing pyfdarc runs the module once, defining all module variables
-# which are global (similar to class variables)
+logging.basicConfig(format='%(levelname)s: %(name)s: \n\t%(message)s', 
+                    level=logging.DEBUG)
 
 THEME = 'light'
 
@@ -191,6 +195,17 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 
 # Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
 # in filterbroker.py
+
+
+# the basedir can be stored and referenced by all files
+base_dir = os.path.dirname(os.path.abspath(__file__))
+save_dir = "D:/Daten1"
+
+if not os.path.exists(save_dir):
+    logger.warning('Specified save_dir "%s" doesn\'t exist, using "%s" instead.'
+        %(save_dir, base_dir ))
+    save_dir = base_dir
+
             
 ################## Some layout ideas ##########################################
 
