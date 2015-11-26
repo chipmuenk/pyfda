@@ -6,6 +6,8 @@ Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
+import logging
+logger = logging.getLogger(__name__)
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
 
@@ -15,7 +17,7 @@ except ImportError:
     MYHDL = False
 else:
     MYHDL = True
-    print("Info: Module myHDL found -> filter synthesis enabled!")
+    logger.info("Info: Module myHDL found -> filter synthesis enabled!")
 
 from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
 if MYHDL:
@@ -31,8 +33,7 @@ class InputTabWidgets(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
 
 
-    def __init__(self, DEBUG = False):
-        self.DEBUG = DEBUG
+    def __init__(self):
         super(InputTabWidgets, self).__init__()
         css = """
         QTabBar{
@@ -44,7 +45,7 @@ class InputTabWidgets(QtGui.QWidget):
 
         self.inputSpecs = input_specs.InputSpecs(DEBUG = False)
         self.inputSpecs.setObjectName("inputSpecs")
-        self.inputFiles = input_files.InputFiles(DEBUG = False)
+        self.inputFiles = input_files.InputFiles()
         self.inputFiles.setObjectName("inputFiles")
         self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
         self.inputCoeffs.setObjectName("inputCoeffs")
@@ -53,7 +54,7 @@ class InputTabWidgets(QtGui.QWidget):
         self.inputInfo = input_info.InputInfo(DEBUG = False)
         self.inputInfo.setObjectName("inputInfo")
         if MYHDL:
-            self.hdlSpecs = hdl_specs.HDLSpecs(DEBUG = False)
+            self.hdlSpecs = hdl_specs.HDLSpecs()
 
         self.initUI()
 
@@ -149,9 +150,8 @@ class InputTabWidgets(QtGui.QWidget):
         - Update all plot widgets via the signal sigFilterDesigned
         
         """
-        if self.DEBUG: print("input_widgets.updateAll:\n",self.sender().objectName())
+        logger.info("input_widgets.updateAll:\n",self.sender().objectName())
 
-# TODO: The button should be styled within InputSpecs
         self.inputSpecs.color_design_button("ok")  
 # TODO: The following should be handled within InputSpecs ?
         self.inputSpecs.load_all_specs()

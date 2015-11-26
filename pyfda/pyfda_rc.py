@@ -20,7 +20,11 @@ Author: Christian Muenker
 """
 
 from __future__ import division, unicode_literals
-# importing pyfdarc runs the module once, defining all module variables
+import os, logging
+logger = logging.getLogger(__name__)
+
+#logging.basicConfig(format='%(levelname)s: %(name)s: \n\t%(message)s', 
+#                    level=logging.DEBUG)# importing pyfdarc runs the module once, defining all module variables
 # which are global (similar to class variables)
 
 THEME = 'light'

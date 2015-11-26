@@ -6,6 +6,9 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
+import logging
+logger = logging.getLogger(__name__)
+import logging.config
 from PyQt4 import QtGui, QtCore
 
 from pyfda import pyfda_rc
@@ -193,7 +196,7 @@ def main():
     _desktop = QtGui.QDesktopWidget() # test the available desktop resolution
     screen_h = _desktop.availableGeometry().height()
     screen_w = _desktop.availableGeometry().width()
-    print("Available screen resolution:", screen_w, "x", screen_h)
+    logger.info("Available screen resolution: %d x %d" %(screen_w, screen_h))
 
     fontsize = 10
     if screen_h < 800:

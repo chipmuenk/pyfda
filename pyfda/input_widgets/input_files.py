@@ -6,6 +6,8 @@ Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os, io
+import logging
+logger = logging.getLogger(__name__)
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
@@ -25,7 +27,7 @@ try:
     import xlwt
 except ImportError:
     XLWT = False
-    print("Warning: Module xlwt not installed -> no *.xls import / export")
+    logger.info("Module xlwt not installed -> no *.xls import / export")
 else:
     XLWT = True
 
@@ -33,7 +35,7 @@ try:
     import XlsxWriter as xlsx
 except ImportError:
     XLSX = False
-    print("Warning: Module XlsxWriter not installed -> no *.xlsx import / export")
+    logger.info("Module XlsxWriter not installed -> no *.xlsx import / export")
 else:
     XLSX = True
 
@@ -53,8 +55,7 @@ class InputFiles(QtGui.QWidget):
     sigFilterLoaded = pyqtSignal() # emitted when filter has been loaded successfully
     sigReadFilters = pyqtSignal()  # emitted when button "Read Filters" is pressed
 
-    def __init__(self, DEBUG = True):
-        self.DEBUG = DEBUG
+    def __init__(self):
         super(InputFiles, self).__init__()
         
         fb.basedir = os.path.dirname(os.path.abspath(__file__))
@@ -174,18 +175,18 @@ class InputFiles(QtGui.QWidget):
                         # this only works for python >= 3.3
                             fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
                     else:
-                        print('Unknown file type "%s"' 
+                        logger.error('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
                         file_type_err = True
                     if not file_type_err:
-                        print('Loaded filter "%s"' %file_name)
+                        logger.info('Loaded filter "%s"' %file_name)
                          # emit signal -> InputTabWidgets.load_all:
                         self.sigFilterLoaded.emit()
                         fb.basedir = os.path.dirname(file_name)
             except IOError as e:
-                print("Failed loading %s!" %file_name, "\n", e)
+                logger.error("Failed loading %s!" %file_name, "\n", e)
             except Exception as e:
-                print("Unexpected error:", e)
+                logger.error("Unexpected error:", e)
 #------------------------------------------------------------------------------
     def save_filter(self):
         """
@@ -213,15 +214,15 @@ class InputFiles(QtGui.QWidget):
 #                        json.dumps(fb.fil[0],f, sort_keys = True, indent = 4,
 #                                       ensure_ascii=False)
                     else:
-                        print('Unknown file type "%s"' 
+                        logger.error('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
                         file_type_err = True
                     if not file_type_err:
-                        print('Filter saved as "%s"' %file_name)
+                        logger.info('Filter saved as "%s"' %file_name)
                         fb.basedir = os.path.dirname(file_name)
                             
             except IOError as e:
-                    print('Failed saving "%s"!\n' %file_name, e)
+                    logger.error('Failed saving "%s"!\n' %file_name, e)
 
 #------------------------------------------------------------------------------
     def export_coeffs(self):
@@ -307,17 +308,17 @@ class InputFiles(QtGui.QWidget):
                         workbook.close()
             
                     else:
-                        print('Unknown file type "%s"' 
+                        logger.error('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
                         file_type_err = True
                         
                     if not file_type_err:
-                        print('Exported coefficients as %s - file\n"%s"' 
-                                %(self.del_file_ext(file_type), file_name))
                         fb.basedir = os.path.dirname(file_name)
+                        logger.info('Exported coefficients as %s - file\n"%s"' 
+                                %(self.prune_file_ext(file_type), file_name))
                     
             except IOError as e:
-                print('Failed saving "%s"!\n' %file_name, e)
+                logger.error('Failed saving "%s"!\n' %file_name, e)
 
     
             # Download the Simple ods py module:
@@ -352,23 +353,23 @@ class InputFiles(QtGui.QWidget):
                         fb.fil[0]['ba'] = np.load(f)['ba']
                         # would be possible to store several arrays in one file
                     else:
-                        print('Unknown file type "%s"' 
+                        logger.error('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
                         file_type_err = True
                         
                     if not file_type_err:
-                        print('Loaded coefficient file\n"%s"' %file_name)
+                        logger.info('Loaded coefficient file\n"%s"' %file_name)
                         self.sigFilterDesigned.emit() # emit signal -> pyFDA                     
                         fb.basedir = os.path.dirname(file_name)
             except IOError as e:
-                print("Failed loading %s!\n" %file_name, e)
+                logger.error("Failed loading %s!\n" %file_name, e)
 
 
 
 #------------------------------------------------------------------------------
-    def del_file_ext(self, file_type):
+    def prune_file_ext(self, file_type):
         """
-        Delete file extension, e.g. '(*.txt)' from file type description
+        Prune file extension, e.g. '(*.txt)' from file type description
         """
         # regular expression: re.sub(pattern, repl, string) 
         #  Return the string obtained by replacing the leftmost non-overlapping 
