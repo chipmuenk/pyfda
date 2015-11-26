@@ -18,6 +18,10 @@ from .plot_widgets import plot_tab_widgets
 
 __version__ = "0.1a5"
 
+#logging.config.fileConfig('D:/Daten/design/python/git/pyFDA/pyfda/pyfda_log.conf')
+#logging.config.fileConfig('pyfda/pyfda_log.conf')
+
+
 class pyFDA(QtGui.QMainWindow):
     """
     Create the main window consisting of a tabbed widget for entering filter
