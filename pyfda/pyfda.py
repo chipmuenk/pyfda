@@ -34,9 +34,7 @@ class pyFDA(QtGui.QMainWindow):
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
-        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
-                                     comment_char='#', DEBUG=self.DEBUG)
-                                     
+        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt', comment_char='#')                                  
         self.initUI()
 
     def initUI(self):
