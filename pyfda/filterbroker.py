@@ -13,8 +13,24 @@ Author: Christian Muenker
 from __future__ import division, unicode_literals, print_function, absolute_import
 import importlib
 import six
-import os
 
+# Instance of current filter design class (e.g. "cheby1")
+fil_inst = ""
+
+# Current method of current filter design class (e.g. cheby1.LPmin)
+fil_method = ""
+
+# State of filter design: "ok", "changed", "error", "failed"
+design_filt_state = "changed"
+
+# return error codes for class instantiation and method 
+err_code = 99 # instantiated, not yet initialized
+
+# module myhdl found?
+MYHDL = False
+
+# see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
+# see http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
 
 #==============================================================================
@@ -140,20 +156,7 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'wdg_dyn':{'win':'hann'}
             }
 
-# Instance of current filter design class (e.g. "cheby1")
-fil_inst = ""
-
-# State of filter design: "ok", "changed", "error", "failed"
-design_filt_state = "changed"
-# Current method of current filter design class (e.g. cheby1.LPmin)
-fil_method = ""
-# return error codes for class instantiation and method 
-err_code = 99 # instantiated, not yet initialized
-
-
-# see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
-# see http://stackoverflow.com/questions/2447353/getattr-on-a-module
-
+#------------------------------------------------------------------------------
 class FilterFactory(object):
     """
     This class implements a filter facory that (re)creates the globally accessible

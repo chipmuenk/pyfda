@@ -10,17 +10,19 @@ import logging
 logger = logging.getLogger(__name__)
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
+import pyfda.filterbroker as fb
 
 try:
     import myhdl
 except ImportError:
-    MYHDL = False
+    fb.MYHDL = False
 else:
-    MYHDL = True
+    fb.MYHDL = True
     logger.info("Info: Module myHDL found -> filter synthesis enabled!")
 
 from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
-if MYHDL:
+
+if fb.MYHDL:
     from pyfda.hdl_generation import hdl_specs
 
 
@@ -53,7 +55,7 @@ class InputTabWidgets(QtGui.QWidget):
         self.inputPZ.setObjectName("inputPZ")
         self.inputInfo = input_info.InputInfo(DEBUG = False)
         self.inputInfo.setObjectName("inputInfo")
-        if MYHDL:
+        if fb.MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs()
 
         self.initUI()
@@ -70,7 +72,7 @@ class InputTabWidgets(QtGui.QWidget):
         tabWidget.addTab(self.inputCoeffs, 'b,a')
         tabWidget.addTab(self.inputPZ, 'P/Z')
         tabWidget.addTab(self.inputInfo, 'Info')
-        if MYHDL:
+        if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 #        QTabBar.setTabTextColor() 
 #        css = "QTabWidget { background-color: red; color: white}" 
