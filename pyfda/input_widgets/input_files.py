@@ -83,6 +83,7 @@ class InputFiles(QtGui.QWidget):
                                         "(For developing and debugging).")
 
         self.cmbSeparator = QtGui.QComboBox(self)
+        self.cmbSeparator.addItems(['","','";"','<TAB>','<CR>'])
         self.cmbSeparator.setToolTip("Specify separator for number fields.")
 
 
@@ -193,7 +194,7 @@ class InputFiles(QtGui.QWidget):
         """
         Save filter as zipped binary numpy array or pickle object
         """
-        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")# ;;JSON (*.json)")
+        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
 #        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg = QtGui.QFileDialog( self )
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
@@ -211,9 +212,6 @@ class InputFiles(QtGui.QWidget):
                     elif file_name.endswith('pkl'):
                         # save as a version compatible with Python 2.x
                         pickle.dump(fb.fil, f, protocol = 2)
-#                    elif file_name.endswith('json'):
-#                        json.dumps(fb.fil[0],f, sort_keys = True, indent = 4,
-#                                       ensure_ascii=False)
                     else:
                         logger.error('Unknown file type "%s"' 
                                             %os.path.splitext(file_name)[1])
