@@ -12,27 +12,21 @@ from PyQt4.QtCore import pyqtSignal
 
 import numpy as np
 
-try:
-    import myhdl
-    from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
-                   instance, instances, intbv, traceSignals, 
-                   Simulation, StopSimulation)
-except ImportError:
-    MYHDL = False
-else:
-    MYHDL = True
+#import myhdl
+from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
+               instance, instances, intbv, traceSignals, 
+               Simulation, StopSimulation)
     
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_fix_lib as fix
+import pyfda.pyfda_rc as rc
 
 from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
 
 
-
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
 #                 @ http://www.dsprelated.com/showcode/211.php
-
 
 #------------------------------------------------------------------------------
 class HDLSpecs(QtGui.QWidget):
@@ -42,11 +36,8 @@ class HDLSpecs(QtGui.QWidget):
     
     sigFilterDesigned = pyqtSignal()
 
-    def __init__(self, DEBUG = True):
-        self.DEBUG = DEBUG
+    def __init__(self):
         super(HDLSpecs, self).__init__()
-        
-        self.basedir = os.path.dirname(os.path.abspath(__file__))
 
         self.initUI()
 
