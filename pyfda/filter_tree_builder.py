@@ -8,6 +8,9 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os, sys
 import codecs
 import importlib
+import logging
+logger = logging.getLogger(__name__)
+
 import pyfda.filterbroker as fb
 
 

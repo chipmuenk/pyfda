@@ -26,10 +26,14 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals
 import os, logging
-logger = logging.getLogger(__name__)
+
 
 logging.basicConfig(format='%(levelname)s: %(name)s: \n\t%(message)s', 
                     level=logging.DEBUG)
+handler = logging.FileHandler('logging.log')
+
+logger = logging.getLogger(__name__)
+logger.addHandler(handler)
 
 THEME = 'light'
 
