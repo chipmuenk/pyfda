@@ -17,6 +17,7 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap
+from matplotlib.colors import LightSource
 
 class Plot3D(QtGui.QMainWindow):
     """
@@ -253,8 +254,10 @@ class Plot3D(QtGui.QMainWindow):
         OPT_3D_FORCE_ZMAX = True # Enforce absolute limit for 3D-Plot
         OPT_3D_MSTRIDE = 1 # Schrittweite für MESH und CONT3D
         OPT_3D_ALPHA = alpha#0.5 # Transparency for surface plot
-        cmap = cm.jet
-        # Colormaps: 'hsv', 'jet_r', 'bone', 'prism' 'gray', 'prism', 'coolwarm'
+        cmap = cm.RdYlBu_r
+        lighting = False
+        # Colormaps: 'hsv', 'jet', 'jet_r', 'bone', 'prism' 'gray', 'prism', 
+        # 'coolwarm', 'RdYlBu'
         # *_r colormaps reverse the color order
         #
         steps = 100               # number of steps for x, y, r, phi
@@ -339,7 +342,7 @@ class Plot3D(QtGui.QMainWindow):
         ## plot ||H(f)| along unit circle as 3D-lineplot
         #===============================================================
         if self.chkHf.isChecked():
-            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC)
+            self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, alpha = 0.5)
             # draw once more as dashed white line to improve visibility
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--')
 
@@ -376,8 +379,10 @@ class Plot3D(QtGui.QMainWindow):
         #===============================================================
         ## 3D-Plots of |H(z)| clipped between |H(z)| = top
         #===============================================================
-        #
-        ## Mesh plot
+
+        m_cb = cm.ScalarMappable(cmap=cmap)    # proxy object that is mappable
+        m_cb.set_array(Hmag)                   # for colorbar
+        
         if self.cmbMode3D.currentText() == 'Mesh':
         #    fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
         #    self.ax3d.set_zlim(0,2)
@@ -387,11 +392,22 @@ class Plot3D(QtGui.QMainWindow):
         #---------------------------------------------------------------
         ## 3D-surface plot;
         elif self.cmbMode3D.currentText() == 'Surf':
+            # TODO: normalize for log. values and lighting = False
+            if lighting:
+                ls = LightSource(azdeg=0, altdeg=65) # Create light source object
+                rgb = ls.shade(Hmag, cmap) # Shade data, creating an rgb array
+                cmap_surf = None
+            else:
+                rgb = cmap(Hmag)
+                cmap_surf = None
+            
+#            s = self.ax3d.plot_surface(x, y, Hmag,
+#                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
+#                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
+#            s.set_edgecolor('gray')
             s = self.ax3d.plot_surface(x, y, Hmag,
-                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
-                    linewidth=0, antialiased=False, shade=True) # facecolors= cmap ??
-            s.set_edgecolor('gray')
-
+                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1,
+                    linewidth=0, antialiased=False, facecolors = rgb, cmap = cmap_surf) # 
         #---------------------------------------------------------------
         ## 3D-Contour plot
         elif self.cmbMode3D.currentText() == 'Contour':
@@ -418,7 +434,7 @@ class Plot3D(QtGui.QMainWindow):
         if self.cmbMode3D.currentText() in {'Contour', 'Surf'}\
                     or self.chkContour2D.isChecked():
                         if self.chkColBar.isChecked():
-                            self.colb = self.mplwidget.fig.colorbar(s,
+                            self.colb = self.mplwidget.fig.colorbar(m_cb,
                                 ax=self.ax3d, shrink=0.8, aspect=20,
                                 pad=0.02, fraction=0.08)
 
