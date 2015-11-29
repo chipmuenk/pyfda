@@ -4,6 +4,8 @@
 Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+import logging
+logger = logging.getLogger(__name__)
 from PyQt4 import QtGui #, QtCore
 import numpy as np
 from numpy import pi, ones, zeros, sin, cos, log10
@@ -18,6 +20,13 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap
 from matplotlib.colors import LightSource
+
+try:
+    from mayavi import mlab
+    MLAB = True
+except ImportError:
+    MLAB = False
+        
 
 class Plot3D(QtGui.QMainWindow):
     """
@@ -36,44 +45,39 @@ class Plot3D(QtGui.QMainWindow):
         self.zmax = 4
         self.zmin_dB = -80
 
-        self.lblLog = QtGui.QLabel("Log.")
         self.chkLog = QtGui.QCheckBox(self)
+        self.chkLog.setText("Log.")
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("Logarithmic scale")
         self.chkLog.setChecked(False)
 
-        self.lblBottom = QtGui.QLabel("Bottom:")
-
+        self.lblBottom = QtGui.QLabel("Bottom =")
         self.ledBottom = QtGui.QLineEdit(self)
         self.ledBottom.setObjectName("ledBottom")
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setToolTip("Minimum display value.")
 
         self.lblTop = QtGui.QLabel("Top:")
-
         self.ledTop = QtGui.QLineEdit(self)
         self.ledTop.setObjectName("ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
 #        self.ledTop.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
 
-        self.lblUC = QtGui.QLabel(self)
-        self.lblUC.setText("UC")
         self.chkUC = QtGui.QCheckBox(self)
+        self.chkUC.setText("UC")
         self.chkUC.setObjectName("chkUC")
         self.chkUC.setToolTip("Plot unit circle")
         self.chkUC.setChecked(True)
 
-        self.lblPZ = QtGui.QLabel(self)
-        self.lblPZ.setText("P/Z")
         self.chkPZ = QtGui.QCheckBox(self)
+        self.chkPZ.setText("P/Z")
         self.chkPZ.setObjectName("chkPZ")
         self.chkPZ.setToolTip("Plot poles and zeros")
         self.chkPZ.setChecked(True)
 
-        self.lblHf = QtGui.QLabel(self)
-        self.lblHf.setText("H(f)")
         self.chkHf = QtGui.QCheckBox(self)
+        self.chkHf.setText("H(f)")
         self.chkHf.setObjectName("chkHf")
         self.chkHf.setToolTip("Plot H(f) along the unit circle")
         self.chkHf.setChecked(True)
@@ -86,12 +90,23 @@ class Plot3D(QtGui.QMainWindow):
         self.cmbMode3D.setCurrentIndex(0)
         self.cmbMode3D.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
-        self.lblColBar = QtGui.QLabel(self)
-        self.lblColBar.setText("Colorbar")
+        self.cmbColormap = QtGui.QComboBox(self)
+        cmaps = [m for m in cm.datad if m.endswith("_r")]
+        cmaps.sort()
+        self.cmbColormap.addItems(cmaps)
+        self.cmbColormap.setToolTip("Select colormap")
+        
         self.chkColBar = QtGui.QCheckBox(self)
+        self.chkColBar.setText("Colorbar")
         self.chkColBar.setObjectName("chkColBar")
         self.chkColBar.setToolTip("Show colorbar")
         self.chkColBar.setChecked(False)
+        
+        self.chkLighting = QtGui.QCheckBox(self)
+        self.chkLighting.setText("Lighting")
+        self.chkLighting.setObjectName("chkLighting")
+        self.chkLighting.setToolTip("Enable light source")
+        self.chkLighting.setChecked(False)
 
         self.diaAlpha = QtGui.QDial(self)
         self.diaAlpha.setRange(0., 10.)
@@ -111,17 +126,17 @@ class Plot3D(QtGui.QMainWindow):
         self.diaHatch.setWrapping(False)
         self.diaHatch.setToolTip("Set hatching for H(jw).")
 
-        self.lblContour2D = QtGui.QLabel(self)
-        self.lblContour2D.setText("Contour2D")
         self.chkContour2D = QtGui.QCheckBox(self)
+        self.chkContour2D.setText("Contour2D")
         self.chkContour2D.setObjectName("chkContour2D")
         self.chkContour2D.setToolTip("Plot 2D-contours for real and imaginary part")
         self.chkContour2D.setChecked(False)
 
+#        self.layGSelect = QtGui.QGridLayout()
+        
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
 
-        self.layHChkBoxes.addWidget(self.lblLog)
         self.layHChkBoxes.addWidget(self.chkLog)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblBottom)
@@ -130,24 +145,22 @@ class Plot3D(QtGui.QMainWindow):
         self.layHChkBoxes.addWidget(self.lblTop)
         self.layHChkBoxes.addWidget(self.ledTop)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblUC)
         self.layHChkBoxes.addWidget(self.chkUC)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblPZ)
         self.layHChkBoxes.addWidget(self.chkPZ)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblHf)
         self.layHChkBoxes.addWidget(self.chkHf)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.cmbMode3D)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblColBar)
+        self.layHChkBoxes.addWidget(self.chkLighting)
+
         self.layHChkBoxes.addWidget(self.chkColBar)
+        self.layHChkBoxes.addWidget(self.cmbColormap)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.diaAlpha)
         self.layHChkBoxes.addWidget(self.diaHatch)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblContour2D)
         self.layHChkBoxes.addWidget(self.chkContour2D)
 
         self.layHChkBoxes.addStretch(1)
@@ -179,6 +192,8 @@ class Plot3D(QtGui.QMainWindow):
         self.chkPZ.clicked.connect(self.draw)
         self.cmbMode3D.currentIndexChanged.connect(self.draw)
         self.chkColBar.clicked.connect(self.draw)
+        self.cmbColormap.currentIndexChanged.connect(self.draw)
+        self.chkLighting.clicked.connect(self.draw)
         self.diaAlpha.valueChanged.connect(self.draw)
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
@@ -245,16 +260,19 @@ class Plot3D(QtGui.QMainWindow):
         f_S = fb.fil[0]['f_S']
         N_FFT = rc.params['N_FFT']
         alpha = self.diaAlpha.value()/10.
+        cmap = cm.get_cmap(self.cmbColormap.currentText())
+#cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
+#scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
         #-----------------------------------------------------------------------------
         # Define 3D-Plotting Options
         #-----------------------------------------------------------------------------
 
-        OPT_3D_POLAR_SPEC = True # Plot circular range in 3D-Plot
+        OPT_3D_POLAR_SPEC = False # Plot circular range in 3D-Plot
         OPT_3D_FORCE_ZMAX = True # Enforce absolute limit for 3D-Plot
         OPT_3D_MSTRIDE = 1 # Schrittweite für MESH und CONT3D
         OPT_3D_ALPHA = alpha#0.5 # Transparency for surface plot
-        cmap = cm.RdYlBu_r
+        #cmap = cm.RdYlBu_r
         lighting = False
         # Colormaps: 'hsv', 'jet', 'jet_r', 'bone', 'prism' 'gray', 'prism', 
         # 'coolwarm', 'RdYlBu'
@@ -390,24 +408,34 @@ class Plot3D(QtGui.QMainWindow):
                     cstride=OPT_3D_MSTRIDE, linewidth=1, color='gray')
 
         #---------------------------------------------------------------
-        ## 3D-surface plot;
+        ## 3D-surface plot
+        # http://stackoverflow.com/questions/28232879/phong-shading-for-shiny-python-3d-surface-plots
         elif self.cmbMode3D.currentText() == 'Surf':
-            # TODO: normalize for log. values and lighting = False
-            if lighting:
-                ls = LightSource(azdeg=0, altdeg=65) # Create light source object
-                rgb = ls.shade(Hmag, cmap) # Shade data, creating an rgb array
-                cmap_surf = None
+            if MLAB:
+                ## Mayavi
+                surf = mlab.surf(x, y, H_mag, colormap='RdYlBu', warp_scale='auto')
+                # Change the visualization parameters.
+                surf.actor.property.interpolation = 'phong'
+                surf.actor.property.specular = 0.1
+                surf.actor.property.specular_power = 5
+                mlab.show()
             else:
-                rgb = cmap(Hmag)
-                cmap_surf = None
-            
-#            s = self.ax3d.plot_surface(x, y, Hmag,
-#                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
-#                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
-#            s.set_edgecolor('gray')
-            s = self.ax3d.plot_surface(x, y, Hmag,
-                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1,
-                    linewidth=0, antialiased=False, facecolors = rgb, cmap = cmap_surf) # 
+                # TODO: normalize for log. values and lighting = False
+                if self.chkLighting.isChecked():
+                    ls = LightSource(azdeg=0, altdeg=65) # Create light source object
+                    rgb = ls.shade(Hmag, cmap=cmap) # Shade data, creating an rgb array
+                    cmap_surf = None
+                else:
+                    rgb = cmap(Hmag)
+                    cmap_surf = None
+                
+    #            s = self.ax3d.plot_surface(x, y, Hmag,
+    #                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
+    #                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
+    #            s.set_edgecolor('gray')
+                s = self.ax3d.plot_surface(x, y, Hmag,
+                        alpha=OPT_3D_ALPHA, rstride=1, cstride=1,
+                        linewidth=0, antialiased=True, facecolors = rgb) # 
         #---------------------------------------------------------------
         ## 3D-Contour plot
         elif self.cmbMode3D.currentText() == 'Contour':
