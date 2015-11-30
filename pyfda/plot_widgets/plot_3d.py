@@ -24,9 +24,12 @@ from matplotlib.colors import LightSource
 try:
     from mayavi import mlab
     MLAB = True
+    logger.info("Module mayavi loaded, fast 3D-plots available.")
 except ImportError:
     MLAB = False
-        
+    logger.info("Module mayavi not found.")
+
+
 
 class Plot3D(QtGui.QMainWindow):
     """
@@ -36,20 +39,28 @@ class Plot3D(QtGui.QMainWindow):
     - optional display of poles / zeros
     """
 
-    def __init__(self, parent=None, DEBUG=False): # default parent = None -> top Window
+    def __init__(self, parent=None): # default parent = None -> top Window
         super(Plot3D, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
-        self.DEBUG = DEBUG
         self.zmin = 0
         self.zmax = 4
         self.zmin_dB = -80
+        self._init_UI()
 
+    def _init_UI(self):
         self.chkLog = QtGui.QCheckBox(self)
         self.chkLog.setText("Log.")
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("Logarithmic scale")
         self.chkLog.setChecked(False)
+
+        self.chkPolar = QtGui.QCheckBox(self)
+        self.chkPolar.setText("Polar")
+        self.chkPolar.setObjectName("chkPolar")
+        self.chkPolar.setToolTip("Polar coordinates")
+        self.chkPolar.setChecked(False)
+
 
         self.lblBottom = QtGui.QLabel("Bottom =")
         self.ledBottom = QtGui.QLineEdit(self)
@@ -90,36 +101,41 @@ class Plot3D(QtGui.QMainWindow):
         self.cmbMode3D.setCurrentIndex(0)
         self.cmbMode3D.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
+        self.chkColormap_r = QtGui.QCheckBox(self)
+        self.chkColormap_r.setText("reverse")
+        self.chkColormap_r.setToolTip("reverse colormap")
+        self.chkColormap_r.setChecked(True)
+
         self.cmbColormap = QtGui.QComboBox(self)
-        cmaps = [m for m in cm.datad if m.endswith("_r")]
-        cmaps.sort()
-        self.cmbColormap.addItems(cmaps)
+        self._init_cmb_colormap()
         self.cmbColormap.setToolTip("Select colormap")
-        
+
         self.chkColBar = QtGui.QCheckBox(self)
         self.chkColBar.setText("Colorbar")
         self.chkColBar.setObjectName("chkColBar")
         self.chkColBar.setToolTip("Show colorbar")
         self.chkColBar.setChecked(False)
-        
+
         self.chkLighting = QtGui.QCheckBox(self)
         self.chkLighting.setText("Lighting")
         self.chkLighting.setObjectName("chkLighting")
         self.chkLighting.setToolTip("Enable light source")
         self.chkLighting.setChecked(False)
 
+        self.lblAlpha = QtGui.QLabel("Alpha")
         self.diaAlpha = QtGui.QDial(self)
         self.diaAlpha.setRange(0., 10.)
-        self.diaAlpha.setValue(5)
+        self.diaAlpha.setValue(8)
         self.diaAlpha.setTracking(False) # produce less events when turning
         self.diaAlpha.setFixedHeight(30)
         self.diaAlpha.setFixedWidth(30)
         self.diaAlpha.setWrapping(False)
         self.diaAlpha.setToolTip("Set transparency for surf and contour plot.")
 
+        self.lblHatch = QtGui.QLabel("Stride")
         self.diaHatch = QtGui.QDial(self)
         self.diaHatch.setRange(0., 9.)
-        self.diaHatch.setValue(5)
+        self.diaHatch.setValue(7)
         self.diaHatch.setTracking(False) # produce less events when turning
         self.diaHatch.setFixedHeight(30)
         self.diaHatch.setFixedWidth(30)
@@ -132,54 +148,52 @@ class Plot3D(QtGui.QMainWindow):
         self.chkContour2D.setToolTip("Plot 2D-contours for real and imaginary part")
         self.chkContour2D.setChecked(False)
 
-#        self.layGSelect = QtGui.QGridLayout()
-        
-        self.layHChkBoxes = QtGui.QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
+        #----------------------------------------------------------------------
+        # LAYOUT for UI widgets
+        #----------------------------------------------------------------------
+        spc = QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Expanding,
+                                       QtGui.QSizePolicy.Minimum)
+        self.layGSelect = QtGui.QGridLayout()
+#        self.layGSelect.setS
+        self.layGSelect.addWidget(self.chkLog, 0, 0)
+        self.layGSelect.addWidget(self.chkPolar, 1, 0)
+        self.layGSelect.addWidget(self.lblTop, 0, 2)
+        self.layGSelect.addWidget(self.lblBottom, 1, 2)
+        self.layGSelect.addWidget(self.ledTop, 0, 4)
+        self.layGSelect.addWidget(self.ledBottom, 1, 4)
+        self.layGSelect.addItem(spc, 0,5)
 
-        self.layHChkBoxes.addWidget(self.chkLog)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblBottom)
-        self.layHChkBoxes.addWidget(self.ledBottom)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblTop)
-        self.layHChkBoxes.addWidget(self.ledTop)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkUC)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkPZ)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkHf)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.cmbMode3D)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkLighting)
+        self.layGSelect.addWidget(self.chkUC, 0, 6)
+        self.layGSelect.addWidget(self.chkHf, 1, 6)
+        self.layGSelect.addWidget(self.chkPZ, 0, 8)
+        self.layGSelect.addWidget(self.cmbColormap, 0,10,1,1)
+        self.layGSelect.addWidget(self.chkColormap_r, 1,10)
+        self.layGSelect.addWidget(self.cmbMode3D, 0, 12)
+        self.layGSelect.addWidget(self.chkContour2D, 1, 12)
+        self.layGSelect.addWidget(self.chkLighting, 0, 14)
+        self.layGSelect.addWidget(self.chkColBar, 1, 14)
 
-        self.layHChkBoxes.addWidget(self.chkColBar)
-        self.layHChkBoxes.addWidget(self.cmbColormap)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.diaAlpha)
-        self.layHChkBoxes.addWidget(self.diaHatch)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkContour2D)
+        self.layGSelect.addWidget(self.diaAlpha, 0, 16)
+        self.layGSelect.addWidget(self.lblAlpha, 0, 15)
+        self.layGSelect.addWidget(self.diaHatch, 1, 16)
+        self.layGSelect.addWidget(self.lblHatch, 1, 15)
 
-        self.layHChkBoxes.addStretch(1)
+
+#        self.layHChkBoxes.addStretch(1)
 
 
         self.mplwidget = MplWidget()
-#        self.mplwidget.setParent(self)
 
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
+#        self.mplwidget.layVMainMpl.addStretch(1)
+        self.mplwidget.layVMainMpl.addLayout(self.layGSelect)
 
 #        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
 
-        self.initAxes()
+        self._init_grid() # initialize grid and do initial plot
 
-        self.initCoord()
-
-        self.draw() # calculate and draw phi(f)
+#        self.draw()
 
 #        #=============================================
 #        # Signals & Slots
@@ -187,25 +201,77 @@ class Plot3D(QtGui.QMainWindow):
         self.chkLog.clicked.connect(self.logClicked)
         self.ledBottom.editingFinished.connect(self.logClicked)
         self.ledTop.editingFinished.connect(self.logClicked)
+
+        self.chkPolar.clicked.connect(self._init_grid)
         self.chkUC.clicked.connect(self.draw)
         self.chkHf.clicked.connect(self.draw)
         self.chkPZ.clicked.connect(self.draw)
         self.cmbMode3D.currentIndexChanged.connect(self.draw)
         self.chkColBar.clicked.connect(self.draw)
+
         self.cmbColormap.currentIndexChanged.connect(self.draw)
+        self.chkColormap_r.clicked.connect(self._init_cmb_colormap)
+
         self.chkLighting.clicked.connect(self.draw)
         self.diaAlpha.valueChanged.connect(self.draw)
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
+        logger.debug("UI initialized")
 
-    def initCoord(self):
-        """ Initialize coordinates for the unit circle """
-        # TODO: move creation of x,y-grid here as well
-        self.phi_EK = np.linspace(0, 2*pi, 400, endpoint=True)
-        self.xy_UC = np.exp(1j * self.phi_EK) # x,y coordinates of unity circle
 
-    def initAxes(self):
+#------------------------------------------------------------------------------
+    def _init_cmb_colormap(self):
+        """ (Re-)Load combobox with available colormaps"""
+        if self.chkColormap_r.isChecked():
+            cmap_list = [m for m in cm.datad if m.endswith("_r")]
+        else:
+            cmap_list = [m for m in cm.datad if not m.endswith("_r")]
+        # *_r colormaps reverse the color order
+        cmap_list.sort()
+        self.cmbColormap.blockSignals(True) # don't send signal "indexChanged"
+        self.cmbColormap.clear()
+        self.cmbColormap.addItems(cmap_list)
+        self.cmbColormap.blockSignals(False)
+        self.cmbColormap.setCurrentIndex(0)
+        # Colormaps: 'hsv', 'jet', 'jet_r', 'bone', 'prism' 'gray', 'prism',
+        # 'coolwarm', 'RdYlBu'        #cmap = cm.RdYlBu_r
+
+
+#------------------------------------------------------------------------------
+    def _init_grid(self):
+        """ Initialize (x,y,z) coordinate grid + (re)draw plot."""
+        phi_UC = np.linspace(0, 2*pi, 400, endpoint=True) # angles for unit circle
+        self.xy_UC = np.exp(1j * phi_UC) # x,y coordinates of unity circle
+
+        steps = 100              # number of steps for x, y, r, phi
+        rmin = 0;    rmax = 1.2  # polar range limits
+        #
+        self.xmin = -1.5; self.xmax = 1.5  # cartesian range limits
+        self.ymin = -1.5; self.ymax = 1.5
+        #
+        zmax_rel = 5 # Max. displayed z - value relative to max|H(f)|
+
+        # Calculate grids for 3D-Plots
+        dr = rmax / steps * 2 # grid size for polar range
+        dx = (self.xmax - self.xmin) / steps
+        dy = (self.ymax - self.ymin) / steps # grid size cartesian range
+
+        if self.chkPolar.isChecked(): # # Plot circular range in 3D-Plot
+            [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
+                            np.linspace(0, 2 * pi, steps, endpoint=True))
+            self.x = r * cos(phi)
+            self.y = r * sin(phi)
+        else: # cartesian grid
+            [self.x, self.y] = np.meshgrid(np.arange(self.xmin, self.xmax, dx),
+                                            np.arange(self.ymin, self.ymax, dy))
+
+        self.z = self.x + 1j*self.y # create coordinate grid for complex plan
+
+        self.draw()
+
+#------------------------------------------------------------------------------
+    def _init_axes(self):
         """Initialize and clear the axes
         see http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
         """
@@ -213,6 +279,7 @@ class Plot3D(QtGui.QMainWindow):
         self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
 
 
+#------------------------------------------------------------------------------
     def logClicked(self):
         """ Change scale and settings to log / lin """
         self.log = self.chkLog.isChecked()
@@ -237,17 +304,22 @@ class Plot3D(QtGui.QMainWindow):
         self.draw()
 
 
-
+#------------------------------------------------------------------------------
     def draw(self):
+        """
+        Main drawing entry point: Check whether updating is enabled in the
+        toolbar and then perform the actual plot
+        """
         if self.mplwidget.mplToolbar.enable_update:
             self.draw_3d()
 
 
+#------------------------------------------------------------------------------
     def draw_3d(self):
         """
         Draw various 3D plots
         """
-        self.initAxes() # needed to get rid of colormap
+        self._init_axes() # needed to get rid of colormap
 
 
         bb = fb.fil[0]['ba'][0]
@@ -260,46 +332,17 @@ class Plot3D(QtGui.QMainWindow):
         f_S = fb.fil[0]['f_S']
         N_FFT = rc.params['N_FFT']
         alpha = self.diaAlpha.value()/10.
-        cmap = cm.get_cmap(self.cmbColormap.currentText())
-#cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
-#scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
+        cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
+
+        #cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
+        #scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
         #-----------------------------------------------------------------------------
         # Define 3D-Plotting Options
         #-----------------------------------------------------------------------------
-
-        OPT_3D_POLAR_SPEC = False # Plot circular range in 3D-Plot
         OPT_3D_FORCE_ZMAX = True # Enforce absolute limit for 3D-Plot
-        OPT_3D_MSTRIDE = 1 # Schrittweite für MESH und CONT3D
-        OPT_3D_ALPHA = alpha#0.5 # Transparency for surface plot
-        #cmap = cm.RdYlBu_r
-        lighting = False
-        # Colormaps: 'hsv', 'jet', 'jet_r', 'bone', 'prism' 'gray', 'prism', 
-        # 'coolwarm', 'RdYlBu'
-        # *_r colormaps reverse the color order
-        #
-        steps = 100               # number of steps for x, y, r, phi
-        rmin = 0;    rmax = 1.2  # polar range definition
-        #
-        xmin = -1.5; xmax = 1.5  # cartesian range definition
-        ymin = -1.5; ymax = 1.5
-        #
-        zmax_rel = 5 # Max. displayed z - value relative to max|H(f)|
+        OPT_3D_MSTRIDE = 2 # step size for mesh and cont
 
-        # Calculate limits etc. for 3D-Plots
-        dr = rmax / steps * 2
-        dphi = pi / steps # grid size for polar range
-        dx = (xmax - xmin) / steps
-        dy = (ymax - ymin) / steps # grid size cartesian range
-        if OPT_3D_POLAR_SPEC == True: # polar grid
-            [r, phi] = np.meshgrid(np.arange(rmin, rmax, dr),
-                            np.linspace(0, 2 * pi, steps, endpoint=True))
-            x = r * cos(phi)
-            y = r * sin(phi)
-        else: # cartesian grid
-            [x, y] = np.meshgrid(np.arange(xmin, xmax, dx), np.arange(ymin, ymax, dy))
-
-        z = x + 1j*y # create coordinate grid for complex plane
 
         [w, H] = sig.freqz(bb, aa, N_FFT, wholeF) # calculate H(w) along the
                                                 # upper half of unity circle
@@ -329,14 +372,14 @@ class Plot3D(QtGui.QMainWindow):
             plevel_btm = top
             zlevel = bottom - (top - bottom) * (zlevel_rel)
             H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=True)
-            Hmag = H_mag(bb, aa, z, top, H_min=bottom, log=True)
+            Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=True)
 
         else:
             bottom = max(self.zmin, H_min)
             top = self.zmax
         #   top = zmax_rel * H_max # calculate display top from max. of H(f)
             H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom)
-            Hmag = H_mag(bb, aa, z, top, H_min=bottom)
+            Hmag = H_mag(bb, aa, self.z, top, H_min=bottom)
 
             zlevel = zlevel_rel * top # height of displayed zero position
 
@@ -400,20 +443,24 @@ class Plot3D(QtGui.QMainWindow):
 
         m_cb = cm.ScalarMappable(cmap=cmap)    # proxy object that is mappable
         m_cb.set_array(Hmag)                   # for colorbar
-        
+
+        #---------------------------------------------------------------
+        ## 3D-mesh plot
+        #---------------------------------------------------------------
         if self.cmbMode3D.currentText() == 'Mesh':
         #    fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
         #    self.ax3d.set_zlim(0,2)
-            self.ax3d.plot_wireframe(x, y, Hmag, rstride=5,
-                    cstride=OPT_3D_MSTRIDE, linewidth=1, color='gray')
+            self.ax3d.plot_wireframe(self.x, self.y, Hmag, rstride=5,
+                    cstride=NL, linewidth=1, color='gray')
 
         #---------------------------------------------------------------
         ## 3D-surface plot
+        #---------------------------------------------------------------
         # http://stackoverflow.com/questions/28232879/phong-shading-for-shiny-python-3d-surface-plots
         elif self.cmbMode3D.currentText() == 'Surf':
             if MLAB:
                 ## Mayavi
-                surf = mlab.surf(x, y, H_mag, colormap='RdYlBu', warp_scale='auto')
+                surf = mlab.surf(self.x, self.y, H_mag, colormap='RdYlBu', warp_scale='auto')
                 # Change the visualization parameters.
                 surf.actor.property.interpolation = 'phong'
                 surf.actor.property.specular = 0.1
@@ -428,19 +475,20 @@ class Plot3D(QtGui.QMainWindow):
                 else:
                     rgb = cmap(Hmag)
                     cmap_surf = None
-                
-    #            s = self.ax3d.plot_surface(x, y, Hmag,
+
+    #            s = self.ax3d.plot_surface(self.x, self.y, Hmag,
     #                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
     #                    linewidth=0, antialiased=False, shade=True, facecolors = rgb)
     #            s.set_edgecolor('gray')
-                s = self.ax3d.plot_surface(x, y, Hmag,
-                        alpha=OPT_3D_ALPHA, rstride=1, cstride=1,
-                        linewidth=0, antialiased=True, facecolors = rgb) # 
+                s = self.ax3d.plot_surface(self.x, self.y, Hmag,
+                        alpha=alpha, rstride=1, cstride=1,
+                        linewidth=0, antialiased=True, facecolors = rgb)
+                s.set_edgecolor(None)
         #---------------------------------------------------------------
         ## 3D-Contour plot
+        #---------------------------------------------------------------
         elif self.cmbMode3D.currentText() == 'Contour':
-            s = self.ax3d.contourf3D(x, y, Hmag, 20, alpha=alpha,
-                    rstride=OPT_3D_MSTRIDE, cstride=OPT_3D_MSTRIDE, cmap=cmap)
+            s = self.ax3d.contourf3D(self.x, self.y, Hmag, 20, alpha=alpha, cmap=cmap)
 
         #---------------------------------------------------------------
         ## 2D-Contour plot
@@ -455,7 +503,7 @@ class Plot3D(QtGui.QMainWindow):
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax,
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
-            s = self.ax3d.contourf(x, y, Hmag, 20, zdir='z',
+            s = self.ax3d.contourf(self.x, self.y, Hmag, 20, zdir='z',
                                offset=bottom - (top - bottom) * 0.05,
                                 cmap=cmap, alpha=alpha)
 
@@ -467,8 +515,8 @@ class Plot3D(QtGui.QMainWindow):
                                 pad=0.02, fraction=0.08)
 
 
-        self.ax3d.set_xlim3d(xmin, xmax)
-        self.ax3d.set_ylim3d(ymin, ymax)
+        self.ax3d.set_xlim3d(self.xmin, self.xmax)
+        self.ax3d.set_ylim3d(self.ymin, self.ymax)
         self.ax3d.set_zlim3d(bottom, top)
 
         self.ax3d.set_xlabel('Re')#(fb.fil[0]['plt_fLabel'])
