@@ -368,11 +368,16 @@ class Plot3D(QtGui.QMainWindow):
         if self.chkLog.isChecked():
             bottom = np.floor(max(self.zmin_dB, H_min_dB) / 10) * 10
             top = self.zmax_dB
-            plevel_top = top + (top - bottom) * (plevel_rel - 1)
-            plevel_btm = top
             zlevel = bottom - (top - bottom) * (zlevel_rel)
             H_UC = H_mag(bb, aa, self.xy_UC, top, H_min=bottom, log=True)
             Hmag = H_mag(bb, aa, self.z, top, H_min=bottom, log=True)
+
+            if self.cmbMode3D.currentText() == 'None': # "Poleposition" for H(f) plot only
+                plevel_top = 2 * bottom - zlevel # height of displayed pole position
+                plevel_btm = bottom
+            else:
+                plevel_top = top + (top - bottom) * (plevel_rel - 1)
+                plevel_btm = top
 
         else:
             bottom = max(self.zmin, H_min)
@@ -384,10 +389,10 @@ class Plot3D(QtGui.QMainWindow):
             zlevel = zlevel_rel * top # height of displayed zero position
 
             if self.cmbMode3D.currentText() == 'None': # "Poleposition" for H(f) plot only
-                plevel_top = H_max * 0.3 # plevel = H_max * 0.1 / zlevel = 0.1
+                plevel_top = H_max * 0.3 # height of displayed pole position
                 plevel_btm = bottom
             else:
-                plevel_top = plevel_rel * top # height of displayed pole position
+                plevel_top = plevel_rel * top
                 plevel_btm = top
 
         #===============================================================
