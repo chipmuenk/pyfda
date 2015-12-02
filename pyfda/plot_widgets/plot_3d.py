@@ -181,7 +181,6 @@ class Plot3D(QtGui.QMainWindow):
 
 #        self.layHChkBoxes.addStretch(1)
 
-
         self.mplwidget = MplWidget()
 
 #        self.mplwidget.layVMainMpl.addStretch(1)
@@ -190,14 +189,16 @@ class Plot3D(QtGui.QMainWindow):
 #        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
+        
+        self._init_axes()
 
         self._init_grid() # initialize grid and do initial plot
 
 #        self.draw()
 
-#        #=============================================
-#        # Signals & Slots
-#        #=============================================
+        #=============================================
+        # Signals & Slots
+        #=============================================
         self.chkLog.clicked.connect(self.logClicked)
         self.ledBottom.editingFinished.connect(self.logClicked)
         self.ledTop.editingFinished.connect(self.logClicked)
@@ -511,10 +512,10 @@ class Plot3D(QtGui.QMainWindow):
             s = self.ax3d.contourf(self.x, self.y, Hmag, 20, zdir='z',
                                offset=bottom - (top - bottom) * 0.05,
                                 cmap=cmap, alpha=alpha)
-
-        if self.cmbMode3D.currentText() in {'Contour', 'Surf'}\
-                    or self.chkContour2D.isChecked():
-                        if self.chkColBar.isChecked():
+            
+        # plot colorbar for suitable plot modes
+        if self.chkColBar.isChecked() and (self.chkContour2D.isChecked() or
+                str(self.cmbMode3D.currentText()) in {'Contour', 'Surf'}):
                             self.colb = self.mplwidget.fig.colorbar(m_cb,
                                 ax=self.ax3d, shrink=0.8, aspect=20,
                                 pad=0.02, fraction=0.08)
