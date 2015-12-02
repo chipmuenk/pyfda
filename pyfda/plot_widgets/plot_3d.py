@@ -154,7 +154,7 @@ class Plot3D(QtGui.QMainWindow):
         spc = QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Expanding,
                                        QtGui.QSizePolicy.Minimum)
         self.layGSelect = QtGui.QGridLayout()
-#        self.layGSelect.setS
+        self.layGSelect.setObjectName('plotSpecSelect')
         self.layGSelect.addWidget(self.chkLog, 0, 0)
         self.layGSelect.addWidget(self.chkPolar, 1, 0)
         self.layGSelect.addWidget(self.lblTop, 0, 2)

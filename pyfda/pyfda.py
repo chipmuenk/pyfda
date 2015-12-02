@@ -206,7 +206,7 @@ def main():
     else:
         delta = 100
 
-    app.setStyleSheet(pyfda_rc.css_rc['TopWidget']) 
+    app.setStyleSheet(pyfda_rc.css_rc) 
 
     mainw = pyFDA()
 # http://stackoverflow.com/questions/18416201/core-dump-with-pyqt4

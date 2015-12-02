@@ -29,6 +29,7 @@ class PlotTabWidgets(QtGui.QWidget):
     def initUI(self):
         """ Initialize UI with tabbed subplots """
         tabWidget = QtGui.QTabWidget()
+        tabWidget.setObjectName("plot_tabs")
         tabWidget.addTab(self.pltHf, '|H(f)|')
         tabWidget.addTab(self.pltPhi, 'phi(f)')
         tabWidget.addTab(self.pltPZ, 'P/Z')

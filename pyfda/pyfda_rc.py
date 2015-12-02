@@ -83,35 +83,42 @@ mpl_rc = {'lines.linewidth': 1.5,
 # ---------------------
 
 # dark theme            
-css_dark = {'TopWidget':('QWidget{color:white;background: #222222;}'
-                        'QPushButton{background-color:grey; color:white;}'
-                        'QTableView{alternate-background-color:#222222;'
-                             'background-color:black; gridline-color: white;}' 
-                        'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
-                        'QLineEdit{background: #222222; color:white;}'
-                        'QLineEdit:disabled{background-color:darkgrey;}'),
-          'LineEdit':'QLineEdit{background: #222222; color:white;}'
-          }
+css_dark = """
+                QWidget{color:white;background: #222222;}
+                QPushButton{background-color:grey; color:white;}
+                QTableView{alternate-background-color:#222222;
+                    background-color:black; gridline-color: white;}
+                QHeaderView::section{background-color:rgb(190,1,1);color:white}
+                
+                QLineEdit{background: #222222; color:white;}
+                QLineEdit:disabled{background-color:darkgrey;}
+            """
           
-#                                  'QTabBar{color:black;} QTabBar::tab{background:darkgrey;}'
-#                        'QTabBar::tab:selected{background:lightblue;}'
           
-# light theme          
-css_light = {'TopWidget':('.QTabWidget>QWidget>QWidget{border: 1px solid grey}'
-                        'QTabWidget>QWidget{border-right: 1px solid grey;}'
-                        '.QWidget{color:black; background: white}'
-                        'QPushButton{background-color:lightgrey; color:black;}'
-                        'QHeaderView::section{background-color:rgb(190,1,1);color:white}'
-                        'QLineEdit{background: white; color:black;}'
-                        'QLineEdit:disabled{background-color:lightgrey;}'
-),
-            'LineEdit':''
-}
-#            'TabBar':('QTabWidget::pane {border-top: 2px solid #C2C7CB;}' 
-#                      'QTabBar{color:black;}'
-#                       'QTabBar::tab:selected {background:lightblue;}'),
-#          'LineEdit':'QLineEdit{background: #EEFFFF; color:black;}'
-#          }
+# light theme /* 
+css_light = """
+                /* all QWidget instances that are direct children of QTabWidget: */
+                /* QTabWidget>QWidget>QWidget{border-left: } */
+                /* only QTabWidget with object name "plot_tabs" */
+                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
+
+                /* only match QWidget, not subclasses: */
+                .QWidget{color:black; background: white;}
+                
+                QLineEdit{background: white; color:black;}
+                QLineEdit:disabled{background-color:lightgrey;}
+                        
+                QPushButton{background-color:lightgrey; color:black;}
+                QHeaderView::section{background-color:rgb(190,1,1);color:white;}
+                
+                /* all QGridLayout instances whose object name is plotSpecSelect */
+                QGridLayout#plotSpecSelect{border: 3px solid red;}
+                /* QLineEdit{border: 3px solid red;} */
+                QGridLayout{border: 3px solid blue;}
+            """
+
+
+
 
 # common layout settings
 TabBarCss = """
@@ -121,9 +128,10 @@ TabBarCss = """
  QTabWidget::tab-bar {
      left: 1px; /* move to the right by 1px */
  }
- /* Style the tab using the tab sub-control. Note that
+ 
+ /* Style the TAB using the tab sub-control. Note that
      it reads QTabBar _not_ QTabWidget */
- QTabBar::tab{color:black;}
+ QTabBar::tab{color:black;font-size:13px; font-weight:bold;}
  QTabBar::tab {
      background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
@@ -159,27 +167,26 @@ TabBarCss = """
      margin: 0; /* if there is only one tab, we don't want overlapping margins */
  }
 """
-css_rc = {'TopWidget':('*[state="changed"]{background-color:yellow; color:black}'
-                      '*[state="error"]{background-color:red; color:white}'
-                      '*[state="failed"]{background-color:orange; color:white}'
-                      '*[state="ok"]{background-color:green; color:white}'
-                      'QPushButton:pressed {background-color:black; color:white}'
-                      'QWidget{font-size:12px; font-family: Tahoma;}'
-                      'QLineEdit{background-color:lightblue;}'
-                      'QTabBar{font-size:13px; font-weight:bold;}') + TabBarCss,
-          'LineEdit':''
-          }
+css_common = """
+                *[state="changed"]{background-color:yellow; color:black}
+                *[state="error"]{background-color:red; color:white}
+                *[state="failed"]{background-color:orange; color:white}
+                *[state="ok"]{background-color:green; color:white}
+                QPushButton:pressed {background-color:black; color:white}
+                
+                QWidget{font-size:12px; font-family: Tahoma;}
+                QLineEdit{background-color:lightblue;}
+            """\
+            + TabBarCss
 
 
 if THEME == 'dark':
 
     mpl_rc.update(mpl_dark)
-    for key in css_rc:
-        css_rc[key]+= css_dark[key]
+    css_rc = css_common + css_dark
 else:
     mpl_rc.update(mpl_light)
-    for key in css_rc:
-        css_rc[key]+= css_light[key]
+    css_rc = css_common + css_light
     
 
 # Various parameters for calculation and plotting
