@@ -273,11 +273,28 @@ class Plot3D(QtGui.QMainWindow):
 
 #------------------------------------------------------------------------------
     def _init_axes(self):
-        """Initialize and clear the axes
-        see http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
         """
-        self.mplwidget.fig.clf() # needed to get rid of colormap
+        Initialize and clear the axes to get rid of colorbar
+        The azimuth / elevation / distance settings of the camera are restored
+        after clearing the axes. See
+        http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
+        """
+                
+        try:
+            self.azim = self.ax3d.azim
+            self.elev = self.ax3d.elev
+            self.dist = self.ax3d.dist
+        except AttributeError: # not yet initialized, set standard values
+            self.azim = -65
+            self.elev = 30
+            self.dist = 10
+
+        self.mplwidget.fig.clf() # needed to get rid of colorbar
         self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
+                    
+        self.ax3d.azim = self.azim
+        self.ax3d.elev = self.elev
+        self.ax3d.dist = self.dist
 
 
 #------------------------------------------------------------------------------
