@@ -81,39 +81,41 @@ mpl_rc = {'lines.linewidth': 1.5,
 # ---------------------
 # Layout for Qt widgets
 # ---------------------
+            
+            
+
 
 # dark theme            
 css_dark = """
                 QWidget{color:white;background: #222222;}
+                
+                QLineEdit{background: #222222; color:white;}
+                QLineEdit:disabled{background-color:darkgrey;}
+                
+                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
+                
                 QPushButton{background-color:grey; color:white;}
+                
                 QTableView{alternate-background-color:#222222;
                     background-color:black; gridline-color: white;}
                 QHeaderView::section{background-color:rgb(190,1,1);color:white}
                 
-                QLineEdit{background: #222222; color:white;}
-                QLineEdit:disabled{background-color:darkgrey;}
             """
           
           
 # light theme /* 
-css_light = """
-                /* all QWidget instances that are direct children of QTabWidget: */
-                /* QTabWidget>QWidget>QWidget{border-left: } */
-                /* only QTabWidget with object name "plot_tabs" */
-                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
+css_light = """ .QWidget{color:black; background: white;}
 
-                /* only match QWidget, not subclasses: */
-                .QWidget{color:black; background: white;}
-                
                 QLineEdit{background: white; color:black;}
                 QLineEdit:disabled{background-color:lightgrey;}
+                
+                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
                         
                 QPushButton{background-color:lightgrey; color:black;}
-                QHeaderView::section{background-color:rgb(190,1,1);color:white;}
                 
-                /* all QGridLayout instances whose object name is plotSpecSelect */
+                QHeaderView::section{background-color:rgb(190,1,1); color:white;}
+                
                 QGridLayout#plotSpecSelect{border: 3px solid red;}
-                /* QLineEdit{border: 3px solid red;} */
                 QGridLayout{border: 3px solid blue;}
             """
 
@@ -224,6 +226,14 @@ if not os.path.exists(save_dir):
 
 #          'QWidget':('QWidget{Background: #CCCCCC; color:black; font-size:14px;'
 #                     'font-weight:bold; border-radius: 1px;}')
+#                /* all QWidget instances that are direct children of QTabWidget: */
+#                /* QTabWidget>QWidget{border-left: } */
+#                /* only QTabWidget with object name "plot_tabs" */
+#                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
+#                /* only match QWidget, not subclasses: */
+#                .QWidget{color:black; background: white;}
+
+
 
 """ QTabBar::tab:selected, QTabBar::tab:hover {
      background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
