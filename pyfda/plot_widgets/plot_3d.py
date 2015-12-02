@@ -199,9 +199,9 @@ class Plot3D(QtGui.QMainWindow):
         #=============================================
         # Signals & Slots
         #=============================================
-        self.chkLog.clicked.connect(self.logClicked)
-        self.ledBottom.editingFinished.connect(self.logClicked)
-        self.ledTop.editingFinished.connect(self.logClicked)
+        self.chkLog.clicked.connect(self._log_clicked)
+        self.ledBottom.editingFinished.connect(self._log_clicked)
+        self.ledTop.editingFinished.connect(self._log_clicked)
 
         self.chkPolar.clicked.connect(self._init_grid)
         self.chkUC.clicked.connect(self.draw)
@@ -281,12 +281,14 @@ class Plot3D(QtGui.QMainWindow):
 
 
 #------------------------------------------------------------------------------
-    def logClicked(self):
-        """ Change scale and settings to log / lin """
+    def _log_clicked(self):
+        """
+        Change scale and settings to log / lin when log setting is changed
+        Update min / max settings when lineEdits have been edited        
+        """
         self.log = self.chkLog.isChecked()
-        if self.sender().objectName() == 'chkLog': # origin of signal that triggered the slot
+        if self.sender().objectName() == 'chkLog': # clicking chkLog triggered the slot
             if self.log:
-
                 self.ledBottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * log10(self.zmax), 2)
                 self.ledTop.setText(str(self.zmax_dB))
@@ -294,7 +296,7 @@ class Plot3D(QtGui.QMainWindow):
                 self.ledBottom.setText(str(self.zmin))
                 self.zmax = np.round(10**(self.zmax_dB / 20), 2)
                 self.ledTop.setText(str(self.zmax))
-        else:
+        else: # finishing a lineEdit field triggered the slot
             if self.log:
                 self.zmin_dB = float(self.ledBottom.text())
                 self.zmax_dB = float(self.ledTop.text())
