@@ -495,14 +495,13 @@ class Plot3D(QtGui.QMainWindow):
                 surf.actor.property.specular_power = 5
                 mlab.show()
             else:
-                # TODO: normalize for log. values and lighting = False
                 if self.chkLighting.isChecked():
                     ls = LightSource(azdeg=0, altdeg=65) # Create light source object
                     rgb = ls.shade(Hmag, cmap=cmap) # Shade data, creating an rgb array
                     cmap_surf = None
                 else:
-                    rgb = cmap(Hmag)
-                    cmap_surf = None
+                    rgb = None
+                    cmap_surf = cmap
 
     #            s = self.ax3d.plot_surface(self.x, self.y, Hmag,
     #                    alpha=OPT_3D_ALPHA, rstride=1, cstride=1, cmap=cmap,
@@ -510,7 +509,7 @@ class Plot3D(QtGui.QMainWindow):
     #            s.set_edgecolor('gray')
                 s = self.ax3d.plot_surface(self.x, self.y, Hmag,
                         alpha=alpha, rstride=1, cstride=1,
-                        linewidth=0, antialiased=True, facecolors = rgb)
+                        linewidth=0, antialiased=False, facecolors=rgb, cmap=cmap_surf, shade=True)
                 s.set_edgecolor(None)
         #---------------------------------------------------------------
         ## 3D-Contour plot
