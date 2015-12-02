@@ -125,7 +125,7 @@ class Plot3D(QtGui.QMainWindow):
         self.lblAlpha = QtGui.QLabel("Alpha")
         self.diaAlpha = QtGui.QDial(self)
         self.diaAlpha.setRange(0., 10.)
-        self.diaAlpha.setValue(8)
+        self.diaAlpha.setValue(10)
         self.diaAlpha.setTracking(False) # produce less events when turning
         self.diaAlpha.setFixedHeight(30)
         self.diaAlpha.setFixedWidth(30)
@@ -178,23 +178,16 @@ class Plot3D(QtGui.QMainWindow):
         self.layGSelect.addWidget(self.diaHatch, 1, 16)
         self.layGSelect.addWidget(self.lblHatch, 1, 15)
 
-
-#        self.layHChkBoxes.addStretch(1)
-
         self.mplwidget = MplWidget()
 
-#        self.mplwidget.layVMainMpl.addStretch(1)
         self.mplwidget.layVMainMpl.addLayout(self.layGSelect)
 
 #        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
         
-        self._init_axes()
 
         self._init_grid() # initialize grid and do initial plot
-
-#        self.draw()
 
         #=============================================
         # Signals & Slots
@@ -234,9 +227,12 @@ class Plot3D(QtGui.QMainWindow):
         self.cmbColormap.clear()
         self.cmbColormap.addItems(cmap_list)
         self.cmbColormap.blockSignals(False)
-        self.cmbColormap.setCurrentIndex(0)
-        # Colormaps: 'hsv', 'jet', 'jet_r', 'bone', 'prism' 'gray', 'prism',
-        # 'coolwarm', 'RdYlBu'        #cmap = cm.RdYlBu_r
+        
+        idx = self.cmbColormap.findText('RdYlBu_r')
+        if idx == -1:
+            idx = 0
+        self.cmbColormap.setCurrentIndex(idx)
+        # cmap = cm.RdYlBu_r
 
 
 #------------------------------------------------------------------------------
@@ -250,8 +246,6 @@ class Plot3D(QtGui.QMainWindow):
         #
         self.xmin = -1.5; self.xmax = 1.5  # cartesian range limits
         self.ymin = -1.5; self.ymax = 1.5
-        #
-        zmax_rel = 5 # Max. displayed z - value relative to max|H(f)|
 
         # Calculate grids for 3D-Plots
         dr = rmax / steps * 2 # grid size for polar range
@@ -269,7 +263,7 @@ class Plot3D(QtGui.QMainWindow):
 
         self.z = self.x + 1j*self.y # create coordinate grid for complex plan
 
-        self.draw()
+        self.draw() # initial plot
 
 #------------------------------------------------------------------------------
     def _init_axes(self):
@@ -339,8 +333,7 @@ class Plot3D(QtGui.QMainWindow):
         """
         Draw various 3D plots
         """
-        self._init_axes() # needed to get rid of colormap
-
+        self._init_axes()
 
         bb = fb.fil[0]['ba'][0]
         aa = fb.fil[0]['ba'][1]
@@ -348,32 +341,29 @@ class Plot3D(QtGui.QMainWindow):
         zz = np.array(fb.fil[0]['zpk'][0])
         pp = np.array(fb.fil[0]['zpk'][1])
 
-        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
+        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half' # not used
         f_S = fb.fil[0]['f_S']
         N_FFT = rc.params['N_FFT']
+        
         alpha = self.diaAlpha.value()/10.
         cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
+        # Number of Lines /step size for H(f) stride, mesh, contour3d:
+        NL = 10 - self.diaHatch.value() 
 
         #cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
         #scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
         #-----------------------------------------------------------------------------
-        # Define 3D-Plotting Options
+        # Calculate H(w) along the upper half of unity circle
         #-----------------------------------------------------------------------------
-        OPT_3D_FORCE_ZMAX = True # Enforce absolute limit for 3D-Plot
-        OPT_3D_MSTRIDE = 2 # step size for mesh and cont
 
 
-        [w, H] = sig.freqz(bb, aa, N_FFT, wholeF) # calculate H(w) along the
-                                                # upper half of unity circle
+        [w, H] = sig.freqz(bb, aa, worN=N_FFT, whole=True) # 
                                                 # w runs from 0 ... pi, length = N_FFT
         f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
 
         H_abs = abs(H)
         H_max = max(H_abs)
-        H_max_dB = 20*log10(H_max)
-        F_max = f[np.argmax(H_abs)]
-
 
         H_min = min(H_abs)
         H_min_dB = 20*log10(H_min)
@@ -419,7 +409,7 @@ class Plot3D(QtGui.QMainWindow):
 
 
         #===============================================================
-        ## plot unit circle
+        ## plot Unit Circle (UC)
         #===============================================================
         if self.chkUC.isChecked():
         # Plot unit circle and marker at (1,0):
@@ -435,14 +425,13 @@ class Plot3D(QtGui.QMainWindow):
             # draw once more as dashed white line to improve visibility
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--')
 
-
-            NL = 10 - self.diaHatch.value() # plot line every NL points on the UC
-            if NL < 10:
+            if NL < 10:  # plot thin vertical line every NL points on the UC
                 for k in range(len(self.xy_UC[::NL])):
                     self.ax3d.plot([self.xy_UC.real[::NL][k], self.xy_UC.real[::NL][k]],
                         [self.xy_UC.imag[::NL][k], self.xy_UC.imag[::NL][k]],
                         [np.ones(len(self.xy_UC[::NL]))[k]*bottom, H_UC[::NL][k]],
                          linewidth=1, color=(0.5, 0.5, 0.5))
+                    
         #===============================================================
         ## plot Poles and Zeros
         #===============================================================
@@ -469,8 +458,8 @@ class Plot3D(QtGui.QMainWindow):
         ## 3D-Plots of |H(z)| clipped between |H(z)| = top
         #===============================================================
 
-        m_cb = cm.ScalarMappable(cmap=cmap)    # proxy object that is mappable
-        m_cb.set_array(Hmag)                   # for colorbar
+        m_cb = cm.ScalarMappable(cmap=cmap)  # normalized proxy object that is mappable
+        m_cb.set_array(Hmag)                 # for colorbar
 
         #---------------------------------------------------------------
         ## 3D-mesh plot
@@ -541,6 +530,9 @@ class Plot3D(QtGui.QMainWindow):
                                 ax=self.ax3d, shrink=0.8, aspect=20,
                                 pad=0.02, fraction=0.08)
 
+        #----------------------------------------------------------------------
+        ## Set view limits and labels
+        #----------------------------------------------------------------------
 
         self.ax3d.set_xlim3d(self.xmin, self.xmax)
         self.ax3d.set_ylim3d(self.ymin, self.ymax)
