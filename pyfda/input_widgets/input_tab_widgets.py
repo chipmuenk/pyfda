@@ -152,7 +152,11 @@ class InputTabWidgets(QtGui.QWidget):
         - Update all plot widgets via the signal sigFilterDesigned
         
         """
-        logger.info("input_widgets.updateAll:\n",self.sender().objectName())
+        sender_name = ""
+        if self.sender(): # origin of signal that triggered the slot
+            sender_name = self.sender().objectName()
+
+        logger.info("updateAll called by %s" %(sender_name))
 
         self.inputSpecs.color_design_button("ok")  
 # TODO: The following should be handled within InputSpecs ?
