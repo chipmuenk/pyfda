@@ -46,6 +46,7 @@ class Plot3D(QtGui.QMainWindow):
         self.zmin = 0
         self.zmax = 4
         self.zmin_dB = -80
+        self.cmap_default = 'RdYlBu_r'
         self._init_UI()
 
     def _init_UI(self):
@@ -228,11 +229,10 @@ class Plot3D(QtGui.QMainWindow):
         self.cmbColormap.addItems(cmap_list)
         self.cmbColormap.blockSignals(False)
         
-        idx = self.cmbColormap.findText('RdYlBu_r')
+        idx = self.cmbColormap.findText(self.cmap_default)
         if idx == -1:
             idx = 0
         self.cmbColormap.setCurrentIndex(idx)
-        # cmap = cm.RdYlBu_r
 
 
 #------------------------------------------------------------------------------
