@@ -6,6 +6,10 @@ Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
+import logging
+logger = logging.getLogger(__name__)
+import pprint
+
 import numpy as np
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
@@ -260,13 +264,12 @@ class InputSpecs(QtGui.QWidget):
           have been changed by the filter design method
         - the plots are updated via signal-slot connection
         """
-#        self.storeAll() # store entries of all input widgets -> fb.fil[0]
-#       this is not needed as individual subwidgets store results automatically
-        if self.DEBUG:
-            print("--- pyFDA.py : startDesignFilter: Specs ---")
-            print('Specs:', fb.fil[0])#params)
-            print("fb.fil[0]['dm']", fb.fil[0]['dm']+"."+
-                  fb.fil[0]['rt']+fb.fil[0]['fo'])
+#        if self.DEBUG:
+        logger.debug("start_design_filt - Specs:\n"
+            "fb.fil[0]: %s\n"
+            "fb.fil[0]['dm'] %s.%s%s"
+            %(pprint.pformat(fb.fil[0]), str(fb.fil[0]['dm']), str(fb.fil[0]['rt']), 
+                         str(fb.fil[0]['fo'])))
 
         # Now construct the instance method from the response type (e.g.
         # 'LP'+'man' -> cheby1.LPman) and
@@ -278,11 +281,9 @@ class InputSpecs(QtGui.QWidget):
         # call the method specified as a string in the argument of the
         # filter instance defined previously in InputFilter.set_response_type
 
-        print("\n---- InputSpecs.startDesignFilt ----")
-        print(type(fb.fil_inst))
+        logger.info("\tstartDesignFilt using %s" %str(type(fb.fil_inst)))
 
         try:
-    
             err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
             # The called method writes coeffs, poles/zeros etc. back to
             # the global filter dict fb.fil[0]
@@ -301,14 +302,14 @@ class InputSpecs(QtGui.QWidget):
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
         except Exception as e:
-            print("\n---- InputSpecs.startDesignFilt ----")
+            print("\n---- InputSpecs.start_design_filt ----")
             print(e)
             print(e.__doc__)
             self.color_design_button("error")
 
 
+        logger.debug("=== start_design_filt: Results ===")        
         if self.DEBUG:
-            print("=== pyFDA.py : startDesignFilter: Results ===")
             print("zpk:", fb.fil[0]['zpk'])
             print('ndim coeffs:', np.ndim(fb.fil[0]['ba']))
             print("b,a = ", fb.fil[0]['ba'])
