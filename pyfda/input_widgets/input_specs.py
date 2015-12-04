@@ -96,7 +96,7 @@ class InputSpecs(QtGui.QWidget):
         layGMain.setContentsMargins(0, 0, 0, 0)
 
 
-        self.setLayout(layGMain)
+        self.setLayout(layGMain) # main layout of widget
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
