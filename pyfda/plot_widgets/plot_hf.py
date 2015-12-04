@@ -471,7 +471,7 @@ class PlotHf(QtGui.QMainWindow):
 
         # now calculate mag / real / imaginary part of H_c:
         if self.linphase: # remove the linear phase
-            self.H_c = self.H_c * np.exp(1j * self.W * fb.fil[0]["N"]/2.)
+            self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
 
         if self.cmbShowH.currentIndex() == 0: # show magnitude of H
             H = abs(self.H_c)
