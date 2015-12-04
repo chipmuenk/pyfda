@@ -8,8 +8,8 @@ Author: Christian Münker
 # TODO: Check specs IIR / FIR A_PB <-> delta_PB
 
 from __future__ import print_function, division, unicode_literals
-from numpy import log10, sqrt
-import sys, os
+from numpy import sqrt
+import sys
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, Qt
 
@@ -25,12 +25,11 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     
     sigSpecsChanged = pyqtSignal()
     
-    def __init__(self, DEBUG = True,  title = "Amplitude Specs"):
+    def __init__(self, title = "Amplitude Specs"):
         """
         Initialize
         """
         super(InputAmpSpecs, self).__init__()
-        self.DEBUG = DEBUG
         self.title = title
 
         self.qlabels = [] # list with references to QLabel widgets
