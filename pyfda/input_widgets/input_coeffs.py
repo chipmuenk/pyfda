@@ -7,7 +7,11 @@ Created on Tue Nov 26 10:57:30 2013
 Tab-Widget for displaying and modifying filter coefficients
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys
+from pprint import pformat
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 import numpy as np
@@ -33,8 +37,7 @@ class InputCoeffs(QtGui.QWidget):
         # class variables (shared between instances if more than one exists)
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
                                     # manually
-    def __init__(self, DEBUG = True):
-        self.DEBUG = DEBUG
+    def __init__(self):
         super(InputCoeffs, self).__init__()
 
 #        self.nrows = 0 # keep track of number of rows
@@ -245,11 +248,10 @@ class InputCoeffs(QtGui.QWidget):
         and 'zpk' dicts. Is called when clicking the <Save> button, triggers
         a recalculation and replot of all plot widgets.
         """
-        if self.DEBUG:
-            print("=====================\nInputCoeffs.save_coeffs")
         coeffs = []
         num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
-        if self.DEBUG: print("Tbl rows /  cols:", num_rows, num_cols)
+        logger.debug("store_entries: \n%s rows x  %s cols" %(num_rows, num_cols))
+
 #        if num_cols > 1: # IIR
         for col in range(num_cols):
             rows = []
@@ -277,10 +279,11 @@ class InputCoeffs(QtGui.QWidget):
 
         save_fil(fb.fil[0], coeffs, 'ba', __name__)
 
-        if self.DEBUG:
-            print("Coeffs - ZPK:", fb.fil[0]["zpk"])
-            print("Coeffs - b,a:", fb.fil[0]["ba"])
-            print ("Coeffs updated!")
+        logger.debug("store_entries - coeffients / zpk updated:\n"
+            "b,a = %s\n\n"
+            "zpk = %s\n"
+            %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
+              ))
 
         self.sigFilterDesigned.emit()  # -> input_widgets -> pyFDA -> pltWidgets.updateAll()
 
@@ -312,12 +315,13 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setColumnCount(num_cols)
 
 
-        if self.DEBUG:
-            print("=====================\nInputCoeffs.show_coeffs")
-            print("Coeffs:\n",coeffs)
-            print ("shape", np.shape(coeffs))
-            print ("len", len(coeffs))
-            print("ndim", np.ndim(coeffs))
+        logger.debug("load_entries - coeffs:\n"
+            "Shape = %s\n"
+            "Len   = %d\n"
+            "NDim  = %d\n\n"
+            "Coeffs = %s"
+            %(np.shape(coeffs),len(coeffs), np.ndim(coeffs), pformat(coeffs))
+              )
 
         for col in range(num_cols):
             for row in range(np.shape(coeffs)[1]):
