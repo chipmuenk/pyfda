@@ -37,23 +37,16 @@ class InputTabWidgets(QtGui.QWidget):
 
     def __init__(self):
         super(InputTabWidgets, self).__init__()
-        css = """
-        QTabBar{
-        font-weight:bold;
-        }
-        """
 
-        self.setStyleSheet(css)
-
-        self.inputSpecs = input_specs.InputSpecs(DEBUG = False)
+        self.inputSpecs = input_specs.InputSpecs()
         self.inputSpecs.setObjectName("inputSpecs")
         self.inputFiles = input_files.InputFiles()
         self.inputFiles.setObjectName("inputFiles")
-        self.inputCoeffs = input_coeffs.InputCoeffs(DEBUG = False)
+        self.inputCoeffs = input_coeffs.InputCoeffs()
         self.inputCoeffs.setObjectName("inputCoeffs")
-        self.inputPZ = input_pz.InputPZ(DEBUG = False)
+        self.inputPZ = input_pz.InputPZ()
         self.inputPZ.setObjectName("inputPZ")
-        self.inputInfo = input_info.InputInfo(DEBUG = False)
+        self.inputInfo = input_info.InputInfo()
         self.inputInfo.setObjectName("inputInfo")
         if fb.MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs()
@@ -155,7 +148,6 @@ class InputTabWidgets(QtGui.QWidget):
         sender_name = ""
         if self.sender(): # origin of signal that triggered the slot
             sender_name = self.sender().objectName()
-
         logger.info("updateAll called by %s" %(sender_name))
 
         self.inputSpecs.color_design_button("ok")  
