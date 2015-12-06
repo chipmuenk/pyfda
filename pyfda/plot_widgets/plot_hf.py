@@ -429,7 +429,7 @@ class PlotHf(QtGui.QMainWindow):
         """
         Draw the figure with new limits, scale etcs without recalculating H(f)
         """
-        if np.all(self.W) == None: # H(f) has not been calculated yet
+        if np.all(self.W) is None: # H(f) has not been calculated yet
             self.calc_hf()
 
         if self.cmbUnitsA.currentText() == 'Auto':
