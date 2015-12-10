@@ -7,8 +7,7 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 import logging
-logger = logging.getLogger(__name__)
-import logging.config
+from logging.config import dictConfig
 from PyQt4 import QtGui, QtCore
 
 from pyfda import pyfda_rc
@@ -17,6 +16,49 @@ from .input_widgets import input_tab_widgets
 from .plot_widgets import plot_tab_widgets
 
 __version__ = "0.1a5"
+
+class Whitelist(logging.Filter):
+    def __init__(self, **whitelist):
+        self.whitelist = [logging.Filter(name) for name in whitelist]
+
+    def filter(self, record):
+        return any(f.filter(record) for f in self.whitelist)
+
+logfilename='D:/Daten/log.log'
+logging_config = dict(
+    version = 1,
+    # define format templates for loggers:
+    formatters = {
+        'f': {'format':
+              '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+        },
+    # define 
+    handlers = {
+        'h': {'class': 'logging.StreamHandler',
+              'formatter': 'f',
+              'level': logging.DEBUG},
+#        'fh': {'class': 'logging.FileHandler(logfilename)',
+#               'formatter':'f',
+#               'level': logging.DEBUG}
+        },
+    filters = {
+        'myfilter': {
+            '()': Whitelist,
+            'param': ['name1', 'name2']}
+            },
+    loggers = {
+        'root': {'handlers': ['h'],
+                 'filters': ['myfilter'],
+                 'level': logging.WARN},
+#        'root': {'handlers': ['fh'],
+#                 'level': logging.DEBUG}
+        }
+)
+
+dictConfig(logging_config)
+
+logger = logging.getLogger(__name__)
+#logger = logging.getLogger()
 
 #logging.config.fileConfig('D:/Daten/design/python/git/pyFDA/pyfda/pyfda_log.conf')
 #logging.config.fileConfig('pyfda/pyfda_log.conf')
