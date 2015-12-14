@@ -20,9 +20,16 @@ __version__ = "0.1a5"
 class Whitelist(logging.Filter):
     def __init__(self, **whitelist):
         self.whitelist = [logging.Filter(name) for name in whitelist]
+        print("filter intialized with", whitelist)
 
     def filter(self, record):
-        return any(f.filter(record) for f in self.whitelist)
+        """filter logging record"""
+        arg = any(f.filter(record) for f in self.whitelist)
+        # record.levelno == logging.ERROR
+        # arg = self.param not in record.msg
+        # record.msg = 'changed: ' + record.msg
+        print("filter_arg", arg)
+        return arg
 
 logfilename='D:/Daten/log.log'
 logging_config = dict(
@@ -32,26 +39,28 @@ logging_config = dict(
         'f': {'format':
               '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
         },
-    # define 
+    # define handlers
     handlers = {
         'h': {'class': 'logging.StreamHandler',
               'formatter': 'f',
               'level': logging.DEBUG},
-#        'fh': {'class': 'logging.FileHandler(logfilename)',
-#               'formatter':'f',
-#               'level': logging.DEBUG}
+        'fh': {'class': 'logging.FileHandler',
+               'formatter':'f',
+               'filename': logfilename,
+               'level': logging.DEBUG}
         },
     filters = {
         'myfilter': {
             '()': Whitelist,
-            'param': ['name1', 'name2']}
+            'filter_names': []}#['input_files', 'name2']}
             },
     loggers = {
         'root': {'handlers': ['h'],
                  'filters': ['myfilter'],
                  'level': logging.WARN},
-#        'root': {'handlers': ['fh'],
-#                 'level': logging.DEBUG}
+        'pyfda': {'handlers': ['fh'],
+                 'filters': ['myfilter'],
+                 'level': logging.INFO}
         }
 )
 
@@ -59,8 +68,9 @@ dictConfig(logging_config)
 
 logger = logging.getLogger(__name__)
 #logger = logging.getLogger()
+logging.Filter()
 
-#logging.config.fileConfig('D:/Daten/design/python/git/pyFDA/pyfda/pyfda_log.conf')
+#logging.config.fileConfig('D:/Daten/design/python/git/pyFDA/pyfda/my_log.conf')
 #logging.config.fileConfig('pyfda/pyfda_log.conf')
 
 
