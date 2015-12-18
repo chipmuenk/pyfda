@@ -7,15 +7,18 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 import logging
-from logging.config import dictConfig
+from logging.config import fileConfig #dictConfig
 from PyQt4 import QtGui, QtCore
 
 from pyfda import pyfda_rc
 from pyfda.filter_tree_builder import FilterTreeBuilder
+import pyfda.filterbroker as fb
 from .input_widgets import input_tab_widgets
 from .plot_widgets import plot_tab_widgets
 
 __version__ = "0.1a5"
+
+fb.root_dir = os.path.dirname(os.path.abspath(__file__))
 
 class Whitelist(logging.Filter):
     def __init__(self, **whitelist):
@@ -31,47 +34,46 @@ class Whitelist(logging.Filter):
         print("filter_arg", arg)
         return arg
 
-logfilename='D:/Daten/log.log'
-logging_config = dict(
-    version = 1,
-    # define format templates for loggers:
-    formatters = {
-        'f': {'format':
-              '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
-        },
-    # define handlers
-    handlers = {
-        'h': {'class': 'logging.StreamHandler',
-              'formatter': 'f',
-              'level': logging.DEBUG},
-        'fh': {'class': 'logging.FileHandler',
-               'formatter':'f',
-               'filename': logfilename,
-               'level': logging.DEBUG}
-        },
-    filters = {
-        'myfilter': {
-            '()': Whitelist,
-            'filter_names': []}#['input_files', 'name2']}
-            },
-    loggers = {
-        'root': {'handlers': ['h'],
-                 'filters': ['myfilter'],
-                 'level': logging.WARN},
-        'pyfda': {'handlers': ['fh'],
-                 'filters': ['myfilter'],
-                 'level': logging.INFO}
-        }
-)
-
-dictConfig(logging_config)
+logfilename="D:/Daten/log.log"
+log_config_file = "pyfda_log.conf"
+#logging_config = dict(
+#    version = 1,
+#    # define format templates for loggers:
+#    formatters = {
+#        'f': {'format':
+#              '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+#        },
+#    # define handlers
+#    handlers = {
+#        'h': {'class': 'logging.StreamHandler',
+#              'formatter': 'f',
+#              'level': logging.DEBUG},
+#        'fh': {'class': 'logging.FileHandler',
+#               'formatter':'f',
+#               'filename': logfilename,
+#               'level': logging.DEBUG}
+#        },
+#    filters = {
+#        'myfilter': {
+#            '()': Whitelist,
+#            'filter_names': []}#['input_files', 'name2']}
+#            },
+#    loggers = {
+#        'root': {'handlers': ['h'],
+#                 'filters': ['myfilter'],
+#                 'level': logging.WARN},
+#        'pyfda': {'handlers': ['fh'],
+#                 'filters': ['myfilter'],
+#                 'level': logging.INFO}
+#        }
+#)
+#
+#dictConfig(logging_config)
 
 logger = logging.getLogger(__name__)
-#logger = logging.getLogger()
-logging.Filter()
+#logging.Filter()
 
-#logging.config.fileConfig('D:/Daten/design/python/git/pyFDA/pyfda/my_log.conf')
-#logging.config.fileConfig('pyfda/pyfda_log.conf')
+logging.config.fileConfig(os.path.join(fb.root_dir, log_config_file))
 
 
 class pyFDA(QtGui.QMainWindow):
@@ -219,7 +221,7 @@ class pyFDA(QtGui.QMainWindow):
     def quitEvent(self): # reimplement QMainWindow.closeEvent
         pass
     
-    def closeEvent(self, event): # reimplement QMainWindow.closeEvent
+    def closeEvent(self, event): # reimplement QMainWindow.closeEvent von !pyFDA!
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
 
@@ -230,7 +232,7 @@ class pyFDA(QtGui.QMainWindow):
 
 #    combine with:
 #    self.btnExit.clicked.connect(self.close)
-
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 def main():
@@ -266,7 +268,7 @@ def main():
 # http://stackoverflow.com/questions/5506781/pyqt4-application-on-windows-is-crashing-on-exit
 # http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 # http://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
-    app.setActiveWindow(mainw) #<---- This is what's probably missing
+    app.setActiveWindow(mainw) #<---- Das macht keinen Unterschied!
 
 
     icon = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -278,12 +280,13 @@ def main():
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     mainw.show()
+#    app.show() # -> QApplication doesn't have an attribute "show"
+    
        
  #   app.lastWindowClosed.connect(mainw.closeEvent())
 
     #start the application's exec loop, return the exit code to the OS
-    sys.exit(app.exec_())
-#    app.exit()
+    sys.exit(app.exec_()) # same behavior as app.exec_()
 
 #------------------------------------------------------------------------------
 
