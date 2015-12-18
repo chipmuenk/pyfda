@@ -5,7 +5,7 @@ Widget for entering weight specifications
 Author: Julia Beike, Christian Münker
 """
 from __future__ import print_function, division, unicode_literals
-import sys, os
+import sys
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
@@ -21,10 +21,9 @@ class InputWeightSpecs(QtGui.QWidget):
            
     sigSpecsChanged = pyqtSignal()
 
-    def __init__(self, DEBUG = True):
+    def __init__(self):
 
         super(InputWeightSpecs, self).__init__()
-        self.DEBUG = DEBUG
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
