@@ -122,9 +122,9 @@ class InputWeightSpecs(QtGui.QWidget):
         Store specification entries in filter dictionary
         """
         for i in range(len(self.qlineedit)):
-            fb.fil[0].update(
-                {self.qlineedit[i].objectName():
-                    simple_eval(self.qlineedit[i].text())})
+            w_label = str(self.qlineedit[i].objectName())
+            w_value = simple_eval(self.qlineedit[i].text())
+            fb.fil[0].update({w_label:w_value})
                        
         self.sigSpecsChanged.emit() # -> input_specs
         
