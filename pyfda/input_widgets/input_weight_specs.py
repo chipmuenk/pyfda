@@ -97,7 +97,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
             # newLabels is longer than existing qlabels -> create new ones!
             elif (i > (len(self.qlabels)-1)):
-             self.add_entry(i, newLabels[i])
+             self._add_entry(i, newLabels[i])
 
             else:
                 # when entry has changed, update label and corresponding value
@@ -147,7 +147,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def add_entry(self, i, newLabel):
+    def _add_entry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and
         connect QLineEdit widget to self._store_entries. This way, the central filter
