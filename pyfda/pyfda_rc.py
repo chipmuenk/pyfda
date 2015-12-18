@@ -24,16 +24,7 @@ for qss styling
 Author: Christian Muenker
 """
 
-from __future__ import division, unicode_literals
-import os, logging
-
-
-logging.basicConfig(format='%(levelname)s: %(name)s: \n\t%(message)s', 
-                    level=logging.DEBUG)
-handler = logging.FileHandler('logging.log')
-
-logger = logging.getLogger(__name__)
-logger.addHandler(handler)
+from __future__ import division, unicode_literals, absolute_import
 
 THEME = 'light'
 
@@ -80,10 +71,7 @@ mpl_rc = {'lines.linewidth': 1.5,
             
 # ---------------------
 # Layout for Qt widgets
-# ---------------------
-            
-            
-
+# ---------------------       
 
 # dark theme            
 css_dark = """
@@ -118,8 +106,6 @@ css_light = """ .QWidget{color:black; background: white;}
                 QGridLayout#plotSpecSelect{border: 3px solid red;}
                 QGridLayout{border: 3px solid blue;}
             """
-
-
 
 
 # common layout settings
@@ -210,14 +196,11 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 # in filterbroker.py
 
 
-# the basedir can be stored and referenced by all files
-base_dir = os.path.dirname(os.path.abspath(__file__))
+# Default savedir for filter coefficients, filter dicts etc.
 save_dir = "D:/Daten1"
 
-if not os.path.exists(save_dir):
-    logger.warning('Specified save_dir "%s" doesn\'t exist, using "%s" instead.'
-        %(save_dir, base_dir ))
-    save_dir = base_dir
+# Config file for logger
+log_config_file = "pyfda_log.conf" 
 
             
 ################## Some layout ideas ##########################################

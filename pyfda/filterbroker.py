@@ -13,8 +13,9 @@ Author: Christian Muenker
 from __future__ import division, unicode_literals, print_function, absolute_import
 import importlib
 import six
-# Project root directory
-root_dir = ""
+# Project base directory
+base_dir = ""
+
 # Instance of current filter design class (e.g. "cheby1")
 fil_inst = ""
 
