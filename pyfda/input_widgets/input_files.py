@@ -39,7 +39,14 @@ except ImportError:
 else:
     XLSX = True
 
-import xlrd
+#try:
+#    import xlrd
+#except ImportError:
+#    XLRD = False
+#    logger.info("Module xlrd not installed -> no *.xls coefficient import")
+#else:
+#    XLRD = True
+    
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_rc as rc 
