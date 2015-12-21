@@ -6,10 +6,14 @@ Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
+import pprint
 import textwrap
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt4 import Qt, QtGui#, QtWebKit
 from docutils.core import publish_string #, publish_parts
-import pprint
+
 import numpy as np
 from numpy import pi, log10
 import scipy.signal as sig

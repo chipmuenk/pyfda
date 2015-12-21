@@ -10,6 +10,8 @@ Author: Christian Münker
 from __future__ import print_function, division, unicode_literals
 from numpy import sqrt
 import sys
+import logging
+logger = logging.getLogger(__name__)
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, Qt
 

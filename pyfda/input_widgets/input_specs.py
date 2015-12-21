@@ -6,9 +6,9 @@ Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
+from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
-from pprint import pformat
 
 import numpy as np
 from PyQt4 import QtGui
