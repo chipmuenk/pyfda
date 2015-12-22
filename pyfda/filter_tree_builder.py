@@ -6,9 +6,9 @@ Created on Mon Nov 24 10:00:14 2014
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys
+from pprint import pformat
 import codecs
 import importlib
-from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
@@ -17,28 +17,28 @@ import pyfda.filterbroker as fb
 
 class FilterTreeBuilder(object):
     """
-    Construct a tree with all the filter combinations from the contents of the
-    directory `filt_dir` and the file list `filt_list`.
+    Construct a tree with all the filter combinations
 
     Parameters
     ----------
 
     filt_dir: string
-        Name of the subdirectory containing the file filt_list and the
-        Python files to be read (needs to have __init__.py)
+        Name of the subdirectory containing the init-file and the
+        Python files to be read, needs to have __init__.py)
 
     filt_list: string
-        Name of the text file containing the filters to be used
+        Name of the init file
 
     comment_char: char
         comment character at the beginning of a comment line
+
     """
 
     def __init__(self, filt_dir, filt_list, comment_char='#'):
         cwd = os.path.dirname(os.path.abspath(__file__))
         self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list)
 
-        self.DEBUG = False
+        logger.debug("Filter file list: %s\n" %self.filt_dir_file)
         self.comment_char = comment_char
         self.filt_dir = filt_dir
 
@@ -125,14 +125,14 @@ class FilterTreeBuilder(object):
 
                 cur_line = fp.readline() # read next line
 
-            logger.info("Filter list read, {0} entries found in\n{1}\n"
-                                    .format(self.filt_dir_file ,num_filters))
+            logger.info("FilterTreeBuilder: Filter list read, {0} entries found!\n"
+                                                        .format(num_filters))
             fp.close()
 
         except IOError as e:
-            logger.critical("FATAL ERROR: Filter list file\n{0}\ncould not be found.\n"
-                  "I/O Error({1}): {2}".format(self.filt_dir_file, e.errno, e.strerror))
-            sys.exit()
+            print("FATAL ERROR in 'FilterTreeBuilder.readFiltFile':\n"
+                  "Init file {0} could not be found.".format(self.filt_dir_file))
+            print("I/O Error({0}): {1}".format(e.errno, e.strerror))
 
             filt_list_comments = self.filt_list_names = []
 
@@ -194,11 +194,12 @@ class FilterTreeBuilder(object):
                 print("ERROR in 'FilterTreeBuilder.dyn_filt_import()':")
                 print("Filter design '%s' could not be imported."%dm)
 
-        dm_list = ""
+        methods = ""
         for dm in fb.design_methods:
-            dm_list += dm + "\n"
-        logger.info("Imported successfully the following "
-                    "{0} filter designs:\n{1}".format(num_imports, dm_list))
+            methods += dm + "\n"
+
+        logger.info("FilterTreeBuilder: Imported successfully the following "
+                    "{0} filter designs:\n{1}".format(num_imports, methods))
 
 #==============================================================================
     def build_fil_tree(self):
@@ -252,7 +253,7 @@ class FilterTreeBuilder(object):
             try:
                 fb.dm_names.update(fb.fil_inst.name)
             except AttributeError:
-                logger.warn('Skipping design method "{0}" due to missing attribute "name".'.format(dm))
+                logger.warning('Skipping design method "{0}" due to missing attribute "name".'.format(dm))
                 continue # continue with next entry in design_methods
             ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
@@ -287,16 +288,15 @@ class FilterTreeBuilder(object):
                                 fb.fil_tree[rt][ft][dm][minman].update(\
                                                 {i:fb.fil_inst.com[minman][i]})
 
-                            logger.debug("{0} - {1} - {2}\n"
-                                "fb.fil_tree[rt][ft][dm][minman][i]: {3}"
-                                "fb.fil_inst.com[minman][i]: {4}"
-                                 .format(dm, minman, i,
-                                 str(fb.fil_tree[rt][ft][dm][minman][i]), 
-                                   str(fb.fil_inst.com[minman][i])))
+                            logger.debug("%s - %s - %s\n"
+                            "fb.fil_tree[minman][i]: %s\n"
+                            "fb.fil_inst.com[minman][i]: %s \n"
+                                  %(dm, minman, i, 
+                                    fb.fil_tree[rt][ft][dm][minman][i], fb.fil_inst.com[minman][i]))
 
 #            del cur_filter # delete obsolete filter object (needed?)
 
-        logger.debug("fb.fil_tree =\n{0}".format(pformat(fb.fil_tree)))
+        logger.debug("fb.fil_tree = %s" %(pformat(fb.fil_tree)))
 
 #==============================================================================
 if __name__ == "__main__":
@@ -313,9 +313,10 @@ if __name__ == "__main__":
     filt_file_name = "filter_list.txt"
     filt_dir = "filter_design"
     comment_char = '#'
+    DEBUG = False
 
     # Create a new FilterFileReader instance & initialize it
-    myTreeBuilder = FilterTreeBuilder(filt_dir, filt_file_name, comment_char)
+    myTreeBuilder = FilterTreeBuilder(filt_dir, filt_file_name, comment_char, DEBUG)
 
     print("\n===== Start Test ====")
     filterTree = myTreeBuilder.build_fil_tree()

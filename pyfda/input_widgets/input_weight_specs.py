@@ -5,7 +5,10 @@ Widget for entering weight specifications
 Author: Julia Beike, Christian Münker
 """
 from __future__ import print_function, division, unicode_literals
-import sys, os
+import sys
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
@@ -21,10 +24,9 @@ class InputWeightSpecs(QtGui.QWidget):
            
     sigSpecsChanged = pyqtSignal()
 
-    def __init__(self, DEBUG = True):
+    def __init__(self):
 
         super(InputWeightSpecs, self).__init__()
-        self.DEBUG = DEBUG
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -97,7 +99,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
             # newLabels is longer than existing qlabels -> create new ones!
             elif (i > (len(self.qlabels)-1)):
-             self.add_entry(i, newLabels[i])
+             self._add_entry(i, newLabels[i])
 
             else:
                 # when entry has changed, update label and corresponding value
@@ -122,9 +124,9 @@ class InputWeightSpecs(QtGui.QWidget):
         Store specification entries in filter dictionary
         """
         for i in range(len(self.qlineedit)):
-            fb.fil[0].update(
-                {self.qlineedit[i].objectName():
-                    simple_eval(self.qlineedit[i].text())})
+            w_label = str(self.qlineedit[i].objectName())
+            w_value = simple_eval(self.qlineedit[i].text())
+            fb.fil[0].update({w_label:w_value})
                        
         self.sigSpecsChanged.emit() # -> input_specs
         
@@ -147,7 +149,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def add_entry(self, i, newLabel):
+    def _add_entry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and
         connect QLineEdit widget to self._store_entries. This way, the central filter

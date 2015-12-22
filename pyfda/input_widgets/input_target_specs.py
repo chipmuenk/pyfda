@@ -6,8 +6,10 @@ only amplitude and frequency specs.)
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
-import numpy as np
+import sys
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
@@ -130,10 +132,3 @@ if __name__ == '__main__':
     form.show()
 
     app.exec_()
-
-
-
-
-
-
-

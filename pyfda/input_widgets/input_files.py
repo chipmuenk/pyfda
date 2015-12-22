@@ -8,6 +8,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
+
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
@@ -27,7 +28,7 @@ try:
     import xlwt
 except ImportError:
     XLWT = False
-    logger.info("Module xlwt not installed -> no *.xls import / export")
+    logger.info("Module xlwt not installed -> no *.xls coefficient export")
 else:
     XLWT = True
 
@@ -35,18 +36,24 @@ try:
     import XlsxWriter as xlsx
 except ImportError:
     XLSX = False
-    logger.info("Module XlsxWriter not installed -> no *.xlsx import / export")
+    logger.info("Module XlsxWriter not installed -> no *.xlsx coefficient export")
 else:
     XLSX = True
 
-import xlrd
+#try:
+#    import xlrd
+#except ImportError:
+#    XLRD = False
+#    logger.info("Module xlrd not installed -> no *.xls coefficient import")
+#else:
+#    XLRD = True
+    
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_rc as rc 
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: Save P/Z as well if possible
-# TODO: Line 192 in save_filter: Attribute Error: QString object has no attribute "endswith"
 
 class InputFiles(QtGui.QWidget):
     """

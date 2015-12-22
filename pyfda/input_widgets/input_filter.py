@@ -12,6 +12,9 @@ Datum: 4.12.2014
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
@@ -42,10 +45,8 @@ class InputFilter(QtGui.QWidget):
 
     sigFiltChanged = pyqtSignal()
 
-    def __init__(self, DEBUG=False):
+    def __init__(self):
         super(InputFilter, self).__init__()
-
-        self.DEBUG = DEBUG
 
         self.dm_last = '' # design method from last call
 
@@ -286,8 +287,7 @@ class InputFilter(QtGui.QWidget):
             self.ft = str(self.ft.toString()) # needed for Python 2.x
         fb.fil[0]['ft'] = self.ft # copy selected ft setting to filter dict
 
-        if self.DEBUG:
-            print("InputFilter.set_filter_type triggered:", self.ft)
+        logger.debug("InputFilter.set_filter_type triggered: {0}".format(self.ft))
 
         #---------------------------------------------------------------
         # Get all available design methods for new ft from fil_tree and
@@ -303,17 +303,14 @@ class InputFilter(QtGui.QWidget):
             self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
             dm_list.append(dm)
 
-        if self.DEBUG:
-            print("dm_list", dm_list)
-            print(fb.fil[0]['dm'])
+        logger.debug("dm_list: {0}\n{1}".format(dm_list, fb.fil[0]['dm']))
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
         if fb.fil[0]['dm'] in dm_list and fb.fil_inst:
             # yes, set same dm as before
             dm_idx = self.cmbDesignMethod.findText(fb.dm_names[fb.fil[0]['dm']])
-            if self.DEBUG:
-                print("dm_idx", dm_idx)
+            logger.debug("dm_idx : %s", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx)
         else:
             self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
@@ -341,8 +338,7 @@ class InputFilter(QtGui.QWidget):
             #-----
             err = fb.fil_factory.create_fil_inst(dm)
             #-----
-            if self.DEBUG:
-                print("InputFilter.set_design_method triggered:", dm)
+            logger.debug("InputFilter.set_design_method triggered: %s" %dm)
     
             # Check whether new design method also provides the old filter order
             # method. If yes, don't change it, else set first available
@@ -352,12 +348,12 @@ class InputFilter(QtGui.QWidget):
                 # explicit list(dict.keys()) needed for Python 3
                 fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][dm].keys())[0]
     
-            if self.DEBUG:
-                print("=== InputFilter.set_design_method ===")
-                print("selFilter:", fb.fil[0])
-                print("filterTree[dm] = ", fb.fil_tree[self.rt][self.ft][dm])
-                print("filterTree[dm].keys() = ", fb.fil_tree[self.rt][self.ft]\
-                                                                [dm].keys())
+            logger.debug("selFilter = %s"
+                   "filterTree[dm] = %s"
+                   "filterTree[dm].keys() = %s"
+                  %(fb.fil[0], fb.fil_tree[self.rt][self.ft][dm],\
+                    fb.fil_tree[self.rt][self.ft][dm].keys()
+                    ))
     
             self._update_dyn_widgets() # check for new subwidgets and update if needed
 
