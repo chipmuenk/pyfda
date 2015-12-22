@@ -26,10 +26,9 @@ class InputFreqUnits(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal() # emitted when frequency specs have been changed
                                   # (e.g. when the sort button has been pushed)
 
-    def __init__(self, DEBUG = True, title = "Frequency Units"):
+    def __init__(self, title = "Frequency Units"):
 
         super(InputFreqUnits, self).__init__()
-        self.DEBUG = DEBUG
         self.title = title
 
         self._init_UI()
@@ -150,7 +149,7 @@ class InputFreqUnits(QtGui.QWidget):
         # get ID of signal that triggered updateUI():
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
-            if self.DEBUG: print(senderName + ' was triggered in update_UI\n================')
+            logger.debug(senderName + ' was triggered\n================')
         else: # no sender, updateUI has been called from initUI or another method
             senderName = ""
 
@@ -190,7 +189,7 @@ class InputFreqUnits(QtGui.QWidget):
         # get ID of signal that triggered updateUI():
         if self.sender(): # origin of signal that triggered the slot
             senderName = self.sender().objectName()
-            if self.DEBUG: print(senderName + ' was triggered in _freq_range\n================')
+            logger.debug(senderName + ' was triggered\n================')
         else: # no sender, updateUI has been called from initUI or another method
             senderName = ""
 

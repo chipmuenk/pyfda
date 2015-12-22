@@ -288,15 +288,17 @@ class FilterTreeBuilder(object):
                                 fb.fil_tree[rt][ft][dm][minman].update(\
                                                 {i:fb.fil_inst.com[minman][i]})
 
-                            logger.debug("%s - %s - %s\n"
-                            "fb.fil_tree[minman][i]: %s\n"
-                            "fb.fil_inst.com[minman][i]: %s \n"
-                                  %(dm, minman, i, 
-                                    fb.fil_tree[rt][ft][dm][minman][i], fb.fil_inst.com[minman][i]))
+                            logger.debug("{0} - {1} - {2}\n"
+                                "fb.fil_tree[rt][ft][dm][minman][i]: {3}"
+                                "fb.fil_inst.com[minman][i]: {4}"
+                                 .format(dm, minman, i,
+                                 str(fb.fil_tree[rt][ft][dm][minman][i]), 
+                                   str(fb.fil_inst.com[minman][i])))
 
 #            del cur_filter # delete obsolete filter object (needed?)
 
-        logger.debug("fb.fil_tree = %s" %(pformat(fb.fil_tree)))
+        logger.debug("fb.fil_tree =\n{0}".format(pformat(fb.fil_tree)))
+
 
 #==============================================================================
 if __name__ == "__main__":
@@ -313,10 +315,9 @@ if __name__ == "__main__":
     filt_file_name = "filter_list.txt"
     filt_dir = "filter_design"
     comment_char = '#'
-    DEBUG = False
 
     # Create a new FilterFileReader instance & initialize it
-    myTreeBuilder = FilterTreeBuilder(filt_dir, filt_file_name, comment_char, DEBUG)
+    myTreeBuilder = FilterTreeBuilder(filt_dir, filt_file_name, comment_char)
 
     print("\n===== Start Test ====")
     filterTree = myTreeBuilder.build_fil_tree()

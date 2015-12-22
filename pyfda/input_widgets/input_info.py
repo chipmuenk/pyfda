@@ -26,8 +26,8 @@ class InputInfo(QtGui.QWidget):
     """
     Create widget for displaying infos about filter and filter design method
     """
-    def __init__(self, DEBUG = False):
-        self.DEBUG = DEBUG
+    def __init__(self):
+        self.DEBUG = False
         super(InputInfo, self).__init__()
         
 #        self.ffb = fb.Fb() # instantiate Fb object
@@ -153,7 +153,7 @@ class InputInfo(QtGui.QWidget):
         ## sort list of tuples using the LAST element of the tuple (= frequency)
         # F_test = sorted(F_test, key=lambda t: t[::-1])
 
-        if self.DEBUG: print("input_info.showFiltPerf\nF_test = ", F_test)
+        logger.debug("input_info.showFiltPerf\nF_test = %s" %F_test)
 
 
         # Vector with test frequencies of the labels above    

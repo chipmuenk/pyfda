@@ -239,8 +239,8 @@ class InputFilter(QtGui.QWidget):
 #        sender_name = ""
 #        if self.sender(): # origin of signal that triggered the slot
 #            sender_name = self.sender().objectName()
-#            if self.DEBUG: print(senderName + ' was triggered\n================')
-#        print("\nInputFilter.set_response_type triggered by ", sender_name)
+#            logging.debug(senderName + " was triggered\n================\n"
+#               "InputFilter.set_response_type triggered by %s " %sender_name)
         # Read out current setting of comboBox and convert to string (see init_UI)
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)

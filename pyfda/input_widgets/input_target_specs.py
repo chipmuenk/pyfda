@@ -30,12 +30,9 @@ class InputTargetSpecs(QtGui.QWidget):
     def __init__(self, title = "Target Specs"):
         super(InputTargetSpecs, self).__init__()
 
-
-        self.DEBUG = False
         self.title = title
         
         self._initUI()
-
 
 #------------------------------------------------------------------------------
     def _initUI(self):

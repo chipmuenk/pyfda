@@ -12,7 +12,10 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals, print_function, absolute_import
 import importlib
+import logging
 import six
+
+logger = logging.getLogger(__name__)
 # Project base directory
 base_dir = ""
 
@@ -164,9 +167,9 @@ class FilterFactory(object):
     This class implements a filter facory that (re)creates the globally accessible
     filter instance "fil_inst" from module path and class name, passed as strings.
     """
-    def __init__(self, DEBUG = False):
+    def __init__(self):
         #--------------------------------------
-        self.DEBUG = DEBUG
+        pass
 
 
 
@@ -252,8 +255,7 @@ class FilterFactory(object):
         else:
             self.err_string = ""
             err_code = 0
-            if self.DEBUG == True:
-                print("FilterFactory.create_fil_inst(): created", dm)
+            logger.debug("FilterFactory.create_fil_inst(): created %s" %dm)
         
         return err_code
 

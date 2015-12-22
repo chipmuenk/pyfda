@@ -211,13 +211,12 @@ class InputPZ(QtGui.QWidget):
         Read out table and save the values to the filter PZ dict
         """
             
-        if self.DEBUG:
-            print("=====================\nInputPZ.saveZPK")
+        logger.debug("=====================\nInputPZ.saveZPK called")
             
         zpk = [] 
         
         num_rows = self.tblPZ.rowCount()
-        if self.DEBUG: print("nrows:",num_rows)
+        logger.debug("nrows = %d" %num_rows)
 
         #iterate over both columns
         for col in range(2):
@@ -285,7 +284,7 @@ class InputPZ(QtGui.QWidget):
         self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
         for col in range(2):
             for row in range(len(zpk[col])):
-                if self.DEBUG: print("Len Row:", len(zpk[col]))
+                logger.debug("Len Row = %d" %len(zpk[col]))
                 item = self.tblPZ.item(row, col)
                 # copy content of zpk to corresponding table field, rounding 
                 # as specified and removing the brackets of complex arguments
