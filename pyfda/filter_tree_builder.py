@@ -6,6 +6,7 @@ Created on Mon Nov 24 10:00:14 2014
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys
+from pprint import pformat
 import codecs
 import importlib
 import logging
@@ -31,17 +32,13 @@ class FilterTreeBuilder(object):
     comment_char: char
         comment character at the beginning of a comment line
 
-    DEBUG: Boolean
-        True/False, for printing verbose debug messages
     """
 
-    def __init__(self, filt_dir, filt_list, comment_char='#', DEBUG=False):
+    def __init__(self, filt_dir, filt_list, comment_char='#'):
         cwd = os.path.dirname(os.path.abspath(__file__))
         self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list)
 
-        if DEBUG:
-            print(self.filt_dir_file)
-        self.DEBUG = DEBUG
+        logger.debug("Filter file list: %s\n" %self.filt_dir_file)
         self.comment_char = comment_char
         self.filt_dir = filt_dir
 
@@ -128,7 +125,7 @@ class FilterTreeBuilder(object):
 
                 cur_line = fp.readline() # read next line
 
-            print("FilterTreeBuilder: Filter list read, {0} entries found!\n"
+            logger.info("FilterTreeBuilder: Filter list read, {0} entries found!\n"
                                                         .format(num_filters))
             fp.close()
 
@@ -197,11 +194,12 @@ class FilterTreeBuilder(object):
                 print("ERROR in 'FilterTreeBuilder.dyn_filt_import()':")
                 print("Filter design '%s' could not be imported."%dm)
 
-        print("FilterTreeBuilder: Imported successfully the following "
-                    "{0} filter designs:".format(num_imports))
+        methods = ""
         for dm in fb.design_methods:
-            print(dm)
-        print("\n")
+            methods += dm + "\n"
+
+        logger.info("FilterTreeBuilder: Imported successfully the following "
+                    "{0} filter designs:\n{1}".format(num_imports, methods))
 
 #==============================================================================
     def build_fil_tree(self):
@@ -255,7 +253,7 @@ class FilterTreeBuilder(object):
             try:
                 fb.dm_names.update(fb.fil_inst.name)
             except AttributeError:
-                print('WARNING: Skipping design method "{0}" due to missing attribute "name".'.format(dm))
+                logger.warning('Skipping design method "{0}" due to missing attribute "name".'.format(dm))
                 continue # continue with next entry in design_methods
             ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
@@ -290,18 +288,15 @@ class FilterTreeBuilder(object):
                                 fb.fil_tree[rt][ft][dm][minman].update(\
                                                 {i:fb.fil_inst.com[minman][i]})
 
-                            if self.DEBUG:
-                                print('\n--- FilterFileReader.buildFilterTree ---')
-                                print(dm, minman, i)
-                                print("fb.fil_tree[minman][i]:",
-                                      fb.fil_tree[rt][ft][dm][minman][i])
-                                print("fb.fil_inst.com[minman][i]",
-                                  fb.fil_inst.com[minman][i])
+                            logger.debug("%s - %s - %s\n"
+                            "fb.fil_tree[minman][i]: %s\n"
+                            "fb.fil_inst.com[minman][i]: %s \n"
+                                  %(dm, minman, i, 
+                                    fb.fil_tree[rt][ft][dm][minman][i], fb.fil_inst.com[minman][i]))
 
 #            del cur_filter # delete obsolete filter object (needed?)
 
-        if self.DEBUG:
-            print("fb.fil_tree = ", fb.fil_tree)
+        logger.debug("fb.fil_tree = %s" %(pformat(fb.fil_tree)))
 
 #==============================================================================
 if __name__ == "__main__":

@@ -7,7 +7,9 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 import logging
-from logging.config import fileConfig #dictConfig
+import logging.config
+logger = logging.getLogger(__name__)
+
 from PyQt4 import QtGui, QtCore
 
 import pyfda.filterbroker as fb
@@ -22,8 +24,8 @@ __version__ = "0.1a5"
 # get dir for this file and store as base_dir in filterbroker
 fb.base_dir = os.path.dirname(os.path.abspath(__file__))
 
-logger = logging.getLogger(__name__)
-logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file))
+#logger = logging.getLogger(__name__)
+logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file), disable_existing_loggers=True)
 
 
 if not os.path.exists(rc.save_dir):
@@ -32,56 +34,21 @@ if not os.path.exists(rc.save_dir):
     rc.save_dir = fb.base_dir
 
 
-class Whitelist(logging.Filter):
-    def __init__(self, **whitelist):
-        self.whitelist = [logging.Filter(name) for name in whitelist]
-        print("filter intialized with", whitelist)
-
-    def filter(self, record):
-        """filter logging record"""
-        arg = any(f.filter(record) for f in self.whitelist)
-        # record.levelno == logging.ERROR
-        # arg = self.param not in record.msg
-        # record.msg = 'changed: ' + record.msg
-        print("filter_arg", arg)
-        return arg
+#class Whitelist(logging.Filter):
+#    def __init__(self, **whitelist):
+#        self.whitelist = [logging.Filter(name) for name in whitelist]
+#        print("filter intialized with", whitelist)
+#
+#    def filter(self, record):
+#        """filter logging record"""
+#        arg = any(f.filter(record) for f in self.whitelist)
+#        # record.levelno == logging.ERROR
+#        # arg = self.param not in record.msg
+#        # record.msg = 'changed: ' + record.msg
+#        print("filter_arg", arg)
+#        return arg
 
 logfilename="D:/Daten/log.log"
-
-#logging_config = dict(
-#    version = 1,
-#    # define format templates for loggers:
-#    formatters = {
-#        'f': {'format':
-#              '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
-#        },
-#    # define handlers
-#    handlers = {
-#        'h': {'class': 'logging.StreamHandler',
-#              'formatter': 'f',
-#              'level': logging.DEBUG},
-#        'fh': {'class': 'logging.FileHandler',
-#               'formatter':'f',
-#               'filename': logfilename,
-#               'level': logging.DEBUG}
-#        },
-#    filters = {
-#        'myfilter': {
-#            '()': Whitelist,
-#            'filter_names': []}#['input_files', 'name2']}
-#            },
-#    loggers = {
-#        'root': {'handlers': ['h'],
-#                 'filters': ['myfilter'],
-#                 'level': logging.WARN},
-#        'pyfda': {'handlers': ['fh'],
-#                 'filters': ['myfilter'],
-#                 'level': logging.INFO}
-#        }
-#)
-#
-#dictConfig(logging_config)
-
 
 #logging.Filter()
 
@@ -208,7 +175,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
 #####        self.closeEvent.connect(self.aboutToQuit)
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
-
+        logger.debug("Main routine initialized!")
 
 #------------------------------------------------------------------------------
     def aboutWindow(self):
