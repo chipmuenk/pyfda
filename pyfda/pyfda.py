@@ -29,8 +29,8 @@ logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file), disable
 
 
 if not os.path.exists(rc.save_dir):
-    logger.warning('Specified save_dir "%s" doesn\'t exist, using "%s" instead.'
-        %(rc.save_dir, fb.base_dir ))
+    logger.warning('Specified save_dir "%s" doesn\'t exist, using "%s" instead.\n',
+        rc.save_dir, fb.base_dir)
     rc.save_dir = fb.base_dir
 
 
@@ -228,7 +228,7 @@ def main():
     _desktop = QtGui.QDesktopWidget() # test the available desktop resolution
     screen_h = _desktop.availableGeometry().height()
     screen_w = _desktop.availableGeometry().width()
-    logger.info("Available screen resolution: %d x %d" %(screen_w, screen_h))
+    logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
 
     fontsize = 10
     if screen_h < 800:
