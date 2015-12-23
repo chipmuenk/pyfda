@@ -249,13 +249,13 @@ class FilterFactory(object):
 
         if not inst: # dm is not a class of dm_module
             self.err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                    "Unknown design class '{0}', could not be created.".format(dm))
+                    "Unknown design class '%s', could not be created.", dm)
             print(self.err_string)
             err_code = 2
         else:
             self.err_string = ""
             err_code = 0
-            logger.debug("FilterFactory.create_fil_inst(): created %s" %dm)
+            logger.debug("FilterFactory.create_fil_inst(): created %s", dm)
         
         return err_code
 
@@ -382,11 +382,11 @@ Alternative approaches for data persistence: Module shelve or pickleshare
 """
 if __name__ == '__main__':
     print("design_methods\n", design_methods)
-    print(fil_factory.create_fil_inst("aaa"), err_code) # class doesnt exist
+    print(fil_factory.create_fil_inst("aaa"), err_code) # class doesn't exist
     print(fil_factory.create_fil_inst("cheby1"), err_code) # first time inst.
     print(fil_factory.create_fil_inst("cheby1"), err_code) # second time inst.
     print(fil_factory.create_fil_inst("cheby2"), err_code) # new class
-    print(fil_factory.create_fil_inst("bbb"), err_code) # class doesnt exist
+    print(fil_factory.create_fil_inst("bbb"), err_code) # class doesn't exist
     
     
     print(fil_factory.create_fil_method("LPman", dm = "cheby2"), err_code)
