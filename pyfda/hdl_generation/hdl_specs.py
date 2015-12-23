@@ -7,12 +7,14 @@ Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import numpy as np
 
-#import myhdl
 from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
                instance, instances, intbv, traceSignals, 
                Simulation, StopSimulation)
@@ -308,7 +310,6 @@ class HDLSpecs(QtGui.QWidget):
         
 
 # -------------------------------------------------------------------
-
             
         self.setLayout(layVMain)
 
@@ -352,7 +353,6 @@ class HDLSpecs(QtGui.QWidget):
 
 
         self.W = (qI_i + qF_i + 1, 0) # Matlab format: (W,WF)
-        print("W = ", self.W)
         
         #       get filter coefficients etc. from filter dict    
         coeffs = fb.fil[0]['ba']
@@ -375,24 +375,23 @@ class HDLSpecs(QtGui.QWidget):
         
         file_types = "Verilog (*.v);;VHDL (*.vhd)"
 
-
         hdl_file, hdl_filter = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save HDL as", directory="D:",
                 filter = file_types)
         hdl_file = str(hdl_file)
         hdl_filter = str(hdl_filter)
-        print(hdl_file)
+        logger.info('Creating hdl_file "%s"', hdl_file)
         hdl_filename = os.path.splitext(os.path.basename(hdl_file))[0]
         hdl_dirname = os.path.splitext(hdl_file)[0]
-        print(hdl_filename)
-        print(hdl_dirname)
+        logger.info('Using hdl_filename "%s"', hdl_filename)
+        logger.info('Using hdl_dirname "%s"', hdl_dirname)
 
         self.setupHDL()
         self.flt.hdl_name = hdl_filename
         self.flt.hdl_directory = hdl_dirname
         self.flt.hdl_target = 'verilog' # or 'vhdl'
         self.flt.Convert()
-        print("HDL ConversionFinished!")
+        logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
     def simFixPoint(self):
@@ -401,7 +400,7 @@ class HDLSpecs(QtGui.QWidget):
         """
         # Setup the Testbench and run
         self.setupHDL()
-        print("Simulation")
+        logger.info("Fixpoint simulation called")
         tb = self.flt.TestFreqResponse(Nloops=3, Nfft=1024)
         clk = Signal(False)
         ts  = Signal(False)
@@ -409,11 +408,11 @@ class HDLSpecs(QtGui.QWidget):
         y   = Signal(intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
 
         sim = Simulation(tb)
-        print("Run Simulation")
+        logger.info("Fixpoint simulation started")
         sim.run()
-        print("Plot Response")
+        logger.info("Fixpoint plotting started")
         self.flt.PlotResponse()
-        print("Finished Plotting")
+        logger.info("Fixpoint plotting finished")
 
 #------------------------------------------------------------------------------
 
