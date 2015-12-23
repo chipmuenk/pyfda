@@ -38,7 +38,7 @@ class FilterTreeBuilder(object):
         cwd = os.path.dirname(os.path.abspath(__file__))
         self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list)
 
-        logger.debug("Filter file list: %s\n" %self.filt_dir_file)
+        logger.debug("Filter file list: %s\n", self.filt_dir_file)
         self.comment_char = comment_char
         self.filt_dir = filt_dir
 
@@ -125,17 +125,17 @@ class FilterTreeBuilder(object):
 
                 cur_line = fp.readline() # read next line
 
-            logger.info("FilterTreeBuilder: Filter list read, {0} entries found!\n"
-                                                        .format(num_filters))
+            logger.info("%d entries found in filter list!\n", num_filters)
             fp.close()
-
+            
         except IOError as e:
-            print("FATAL ERROR in 'FilterTreeBuilder.readFiltFile':\n"
-                  "Init file {0} could not be found.".format(self.filt_dir_file))
-            print("I/O Error({0}): {1}".format(e.errno, e.strerror))
-
+            logger.error('Init file "%s" could not be found.\n'
+                'I/O Error(%d): %s', self.filt_dir_file, e.errno, e.strerror)
             filt_list_comments = self.filt_list_names = []
-
+            
+        except Exception as e:
+            logger.error("Unexpected error: %s", e)
+            filt_list_comments = self.filt_list_names = []
 
 #==============================================================================
     def dyn_filt_import(self):
@@ -190,16 +190,17 @@ class FilterTreeBuilder(object):
                 del sys.modules[module_name]
 
             except ImportError as e:
-                print(e)
-                print("ERROR in 'FilterTreeBuilder.dyn_filt_import()':")
-                print("Filter design '%s' could not be imported."%dm)
+                logger.error('Filter design "%s" could not be imported.', dm)
+            except Exception as e:
+                logger.error("Unexpected error: %s", e)
+           
 
         methods = ""
         for dm in fb.design_methods:
             methods += dm + "\n"
 
-        logger.info("FilterTreeBuilder: Imported successfully the following "
-                    "{0} filter designs:\n{1}".format(num_imports, methods))
+        logger.info("Imported successfully the following %d filter designs:\n%s", 
+                    num_imports, methods)
 
 #==============================================================================
     def build_fil_tree(self):
@@ -253,7 +254,7 @@ class FilterTreeBuilder(object):
             try:
                 fb.dm_names.update(fb.fil_inst.name)
             except AttributeError:
-                logger.warning('Skipping design method "{0}" due to missing attribute "name".'.format(dm))
+                logger.warning('Skipping design method "%s" due to missing attribute "name"', dm)
                 continue # continue with next entry in design_methods
             ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
@@ -288,16 +289,16 @@ class FilterTreeBuilder(object):
                                 fb.fil_tree[rt][ft][dm][minman].update(\
                                                 {i:fb.fil_inst.com[minman][i]})
 
-                            logger.debug("{0} - {1} - {2}\n"
-                                "fb.fil_tree[rt][ft][dm][minman][i]: {3}"
-                                "fb.fil_inst.com[minman][i]: {4}"
-                                 .format(dm, minman, i,
-                                 str(fb.fil_tree[rt][ft][dm][minman][i]), 
-                                   str(fb.fil_inst.com[minman][i])))
+                            logger.debug("%s - %s - %s\n"
+                                "fb.fil_tree[rt][ft][dm][minman][i]: %s\n"
+                                "fb.fil_inst.com[minman][i]: %s",
+                                 dm, minman, i,
+                                 pformat(fb.fil_tree[rt][ft][dm][minman][i]), 
+                                 pformat(fb.fil_inst.com[minman][i]))
 
 #            del cur_filter # delete obsolete filter object (needed?)
 
-        logger.debug("fb.fil_tree =\n{0}".format(pformat(fb.fil_tree)))
+        logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
 
 #==============================================================================
