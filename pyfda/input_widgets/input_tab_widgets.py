@@ -13,6 +13,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
 import pyfda.filterbroker as fb
 
+from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
 try:
     import myhdl
 except ImportError:
@@ -20,10 +21,6 @@ except ImportError:
 else:
     fb.MYHDL = True
     logger.info("Info: Module myHDL found -> filter synthesis enabled!")
-
-from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
-
-if fb.MYHDL:
     from pyfda.hdl_generation import hdl_specs
 
 
@@ -149,7 +146,7 @@ class InputTabWidgets(QtGui.QWidget):
         sender_name = ""
         if self.sender(): # origin of signal that triggered the slot
             sender_name = self.sender().objectName()
-        logger.info("updateAll called by %s" %(sender_name))
+        logger.debug("updateAll called by %s", sender_name)
 
         self.inputSpecs.color_design_button("ok")  
 # TODO: The following should be handled within InputSpecs ?
