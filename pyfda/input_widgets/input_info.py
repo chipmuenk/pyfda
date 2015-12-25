@@ -27,14 +27,13 @@ class InputInfo(QtGui.QWidget):
     Create widget for displaying infos about filter and filter design method
     """
     def __init__(self):
-        self.DEBUG = False
         super(InputInfo, self).__init__()
         
 #        self.ffb = fb.Fb() # instantiate Fb object
-        self.initUI()
-        self.showInfo()
+        self._init_UI()
+        self.load_entries()
 
-    def initUI(self):
+    def _init_UI(self):
         """
         Intitialize the widget, consisting of:
         - Checkboxes for selecting the info to be displayed
@@ -109,22 +108,68 @@ class InputInfo(QtGui.QWidget):
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
-        self.chkFiltPerf.clicked.connect(self.showFiltPerf)
-        self.chkFiltDict.clicked.connect(self.showFiltDict)
-        self.chkDocstring.clicked.connect(self.showDocs)
-        self.chkRichText.clicked.connect(self.showDocs)
+        self.chkFiltPerf.clicked.connect(self._show_filt_perf)
+        self.chkFiltDict.clicked.connect(self._show_filt_dict)
+        self.chkDocstring.clicked.connect(self._show_doc)
+        self.chkRichText.clicked.connect(self._show_doc)
 
-    def showInfo(self):
+#------------------------------------------------------------------------------
+    def load_entries(self):
         """
         update docs and filter performance
         """
-        self.showDocs()
-        self.showFiltPerf()
-        self.showFiltDict()
+        self._show_doc()
+        self._show_filt_perf()
+        self._show_filt_dict()
 
-    def showFiltPerf(self):
+#------------------------------------------------------------------------------
+    def _show_doc(self):
         """
-        Print filter properties at frequencies of interest.
+        Display info from filter design file and docstring
+        """
+#        self.fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
+        if hasattr(fb.fil_inst,'info'):
+            if self.chkRichText.isChecked():
+                self.txtFiltInfoBox.setText(publish_string(
+                    self._clean_doc(fb.fil_inst.info), writer_name='html',
+                    settings_overrides={'output_encoding': 'unicode'}))
+            else:
+                self.txtFiltInfoBox.setText(textwrap.dedent(fb.fil_inst.info))
+        else:
+            self.txtFiltInfoBox.setText("")
+
+        if self.chkDocstring.isChecked() and hasattr(fb.fil_inst,'info_doc'):
+            if self.chkRichText.isChecked():
+                self.txtFiltInfoBox.append(
+                '<hr /><b>Python module docstring:</b>\n')
+                for doc in fb.fil_inst.info_doc:
+                    self.txtFiltInfoBox.append(publish_string(
+                     self._clean_doc(doc), writer_name='html',
+                        settings_overrides = {'output_encoding': 'unicode'}))
+            else:
+                self.txtFiltInfoBox.append('\nPython module docstring:\n')
+                for doc in fb.fil_inst.info_doc:
+                    self.txtFiltInfoBox.append(self.cleanDoc(doc))
+
+#        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect
+        self.txtFiltInfoBox.moveCursor(QtGui.QTextCursor.Start)
+
+    def _clean_doc(self, doc):
+        """
+        Remove uniform number of leading blanks from docstrings for subsequent
+        processing of rich text. The first line is treated differently, _all_
+        leading blanks are removed (if any). This allows for different formats
+        of docstrings.
+        """
+        lines = doc.splitlines()
+        result = lines[0].lstrip() + "\n" + textwrap.dedent("\n".join(lines[1:]))
+        return result
+
+#------------------------------------------------------------------------------
+    def _show_filt_perf(self):
+        """
+        Print filter properties in a table at frequencies of interest. When
+        specs are violated, colour the table entry in red.
         """
         self.tblFiltPerf.setVisible(self.chkFiltPerf.isChecked())
 
@@ -154,7 +199,6 @@ class InputInfo(QtGui.QWidget):
         # F_test = sorted(F_test, key=lambda t: t[::-1])
 
         logger.debug("input_info.showFiltPerf\nF_test = %s" %F_test)
-
 
         # Vector with test frequencies of the labels above    
         F_test_vals = np.array([item[0] for item in F_test]) / f_S
@@ -210,14 +254,12 @@ class InputInfo(QtGui.QWidget):
 
         self.targ_spec_passed = np.all(H_targ_pass)
 #            
-        if self.DEBUG:
-            print("input_info.showFiltPerf\n===================")
-            print("H_targ", H_targ)
-            print("H_test", H_test)
-            print("H_test_dB", H_test_dB)
-            print("F_test", F_test_vals)
-            print("H_targ_pass",H_targ_pass)
-            print("passed:", self.targ_spec_passed)
+        logger.debug("H_targ = %s\n", H_targ,
+            "H_test = %s\n", H_test,
+            "H_test_dB = %s\n", H_test_dB,
+            "F_test = %s\n", F_test_vals,
+            "H_targ_pass = %s\n", H_targ_pass,
+            "passed: %s\n", self.targ_spec_passed)
 
 #        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
 
@@ -242,53 +284,8 @@ class InputInfo(QtGui.QWidget):
         self.tblFiltPerf.resizeColumnsToContents()
         self.tblFiltPerf.resizeRowsToContents()
 
-
-    def showDocs(self):
-        """
-        Display info from filter design file and docstring
-        """
-#        self.fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
-        if hasattr(fb.fil_inst,'info'):
-            if self.chkRichText.isChecked():
-                self.txtFiltInfoBox.setText(publish_string(
-                    self.cleanDoc(fb.fil_inst.info), writer_name='html',
-                    settings_overrides={'output_encoding': 'unicode'}))
-            else:
-                self.txtFiltInfoBox.setText(textwrap.dedent(fb.fil_inst.info))
-
-        else:
-            self.txtFiltInfoBox.setText("")
-
-
-        if self.chkDocstring.isChecked() and hasattr(fb.fil_inst,'info_doc'):
-            if self.chkRichText.isChecked():
-                self.txtFiltInfoBox.append(
-                '<hr /><b>Python module docstring:</b>\n')
-                for doc in fb.fil_inst.info_doc:
-                    self.txtFiltInfoBox.append(publish_string(
-                     self.cleanDoc(doc), writer_name='html',
-                        settings_overrides = {'output_encoding': 'unicode'}))
-            else:
-                self.txtFiltInfoBox.append('\nPython module docstring:\n')
-                for doc in fb.fil_inst.info_doc:
-                    self.txtFiltInfoBox.append(self.cleanDoc(doc))
-
-#        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect
-        self.txtFiltInfoBox.moveCursor(QtGui.QTextCursor.Start)
-
-    def cleanDoc(self, doc):
-        """
-        Remove uniform number of leading blanks from docstrings for subsequent
-        processing of rich text. The first line is treated differently, _all_
-        leading blanks are removed (if any). This allows for different formats
-        of docstrings.
-        """
-        lines = doc.splitlines()
-        result = lines[0].lstrip() +\
-         "\n" + textwrap.dedent("\n".join(lines[1:]))
-        return result
-
-    def showFiltDict(self):
+#------------------------------------------------------------------------------
+    def _show_filt_dict(self):
         """
         Print filter dict for debugging
         """
