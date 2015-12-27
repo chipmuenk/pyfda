@@ -26,7 +26,7 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals, absolute_import
 
-THEME = 'light'
+THEME = 'light' # select dark or light theme
 
 # -----------------------------
 # Layout for matplotlib widgets
@@ -107,8 +107,7 @@ css_light = """ .QWidget{color:black; background: white;}
                 QGridLayout{border: 3px solid blue;}
             """
 
-
-# common layout settings
+# common layout settings for QTabWidget
 TabBarCss = """
  QTabWidget::pane { /* The tab widget frame */
      border-top: 2px solid #C2C7CB;
@@ -119,15 +118,18 @@ TabBarCss = """
  
  /* Style the TAB using the tab sub-control. Note that
      it reads QTabBar _not_ QTabWidget */
- QTabBar::tab{color:black;font-size:13px; font-weight:bold;}
- QTabBar::tab {
+ QTabBar {  font-weight: bold; font-size:13px; } /* hack to prevent truncation of labels */
+ QTabBar::tab{
+     color:black;
+     font-size:13px;
+     font-weight:bold;
      background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
      border: 1px solid #C4C4C3;
      border-bottom-color: #C2C7CB; /* same as the pane color */
      border-top-left-radius: 4px;
      border-top-right-radius: 4px;
-     min-width: 8ex;
+     min-width: 10ex;
      padding: 2px;
  }
  QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
@@ -154,6 +156,7 @@ TabBarCss = """
  QTabBar::tab:only-one {
      margin: 0; /* if there is only one tab, we don't want overlapping margins */
  }
+
 """
 css_common = """
                 *[state="changed"]{background-color:yellow; color:black}
@@ -197,7 +200,7 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 
 
 # Default savedir for filter coefficients, filter dicts etc.
-save_dir = "D:/Daten1"
+save_dir = "D:/Daten"
 
 # Config file for logger
 log_config_file = "pyfda_log.conf" 
@@ -217,16 +220,6 @@ log_config_file = "pyfda_log.conf"
 #                .QWidget{color:black; background: white;}
 
 
-
-""" QTabBar::tab:selected, QTabBar::tab:hover {
-     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
-                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
- QTabBar::tab {
-     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
-                                 stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
-                                 stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
- }
 """
 css = """
 /*height: 14px;*/
