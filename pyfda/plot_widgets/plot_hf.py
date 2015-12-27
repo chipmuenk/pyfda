@@ -427,7 +427,7 @@ class PlotHf(QtGui.QMainWindow):
 #------------------------------------------------------------------------------
     def update_plot(self):
         """
-        Draw the figure with new limits, scale etcs without recalculating H(f)
+        Draw the figure with new limits, scale etc without recalculating H(f)
         """
         if np.all(self.W) is None: # H(f) has not been calculated yet
             self.calc_hf()
