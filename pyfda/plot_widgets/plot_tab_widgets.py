@@ -22,11 +22,11 @@ class PlotTabWidgets(QtGui.QWidget):
         self.pltImpz = plot_impz.PlotImpz()
         self.plt3D = plot_3d.Plot3D()
 
-        self.initUI()
+        self._init_UI()
 
 
 #------------------------------------------------------------------------------
-    def initUI(self):
+    def _init_UI(self):
         """ Initialize UI with tabbed subplots """
         tabWidget = QtGui.QTabWidget()
         tabWidget.setObjectName("plot_tabs")
@@ -44,8 +44,8 @@ class PlotTabWidgets(QtGui.QWidget):
         self.setLayout(layVMain)
 
 #------------------------------------------------------------------------------
-    def updateData(self):
-        """ Update and redraw all subplots with new filter DATA"""
+    def update_data(self):
+        """ Calculate and redraw all subplots with new filter DATA"""
         self.pltHf.draw()
         self.pltPhi.draw()
         self.pltPZ.draw()
@@ -54,7 +54,7 @@ class PlotTabWidgets(QtGui.QWidget):
         self.plt3D.draw()
 
 #------------------------------------------------------------------------------
-    def updateSpecs(self):
+    def update_specs(self):
         """ Update and redraw all subplots with new filter SPECS"""
         self.pltHf.update_plot()
         self.pltPhi.draw()
