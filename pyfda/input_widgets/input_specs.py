@@ -104,7 +104,7 @@ class InputSpecs(QtGui.QWidget):
         # Changing the filter design requires updating UI because number or 
         # kind of input fields changes -> Call update_all_UIs, emitting 
         # sigFilterChanged when it's finished
-        self.sel_fil.sigFiltChanged.connect(self.update_all_UIs)
+        self.sel_fil.sigFiltChanged.connect(self.update_UI)
 
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -131,11 +131,11 @@ class InputSpecs(QtGui.QWidget):
         self.butQuit.clicked.connect(QtGui.qApp.quit) # which qApp is this??
         #----------------------------------------------------------------------
 
-        self.update_all_UIs() # first time initialization
+        self.update_UI() # first time initialization
         self.start_design_filt() # design first filter using default values
 
 #------------------------------------------------------------------------------
-    def update_all_UIs(self):
+    def update_UI(self):
         """
         update_all_UIs is called every time the filter design method or order
         (min / man) has been changed. This usually requires a different set of
@@ -216,10 +216,10 @@ class InputSpecs(QtGui.QWidget):
         self.sigSpecsChanged.emit()
 
 #------------------------------------------------------------------------------
-    def load_all_specs(self):
+    def load_entries(self):
         """
-        Reload all specs/parameters from global dict fb.fil[0],
-        using the "load_entries" methods of the classes
+        Reload all specs/parameters entries from global dict fb.fil[0],
+        using the "load_entries" methods of the individual classes
         """
         self.sel_fil.load_entries() # select filter widget
         self.f_units.load_entries() # frequency units widget

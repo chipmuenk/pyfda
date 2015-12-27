@@ -116,7 +116,7 @@ class InputTabWidgets(QtGui.QWidget):
         self.inputSpecs.color_design_button("changed")
         self.inputInfo.load_entries()
 
-        self.sigSpecsChanged.emit() # pyFDA -> plot_widgets.updateSpecs
+        self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
         
     def loadAll(self):
         """
@@ -147,12 +147,12 @@ class InputTabWidgets(QtGui.QWidget):
 
         self.inputSpecs.color_design_button("ok")  
 # TODO: The following should be handled within InputSpecs ?
-        self.inputSpecs.load_all_specs()
+        self.inputSpecs.load_entries()
         self.inputInfo.load_entries()
         self.inputCoeffs.load_entries()
         self.inputPZ.load_entries()
 
-        self.sigFilterDesigned.emit() # pyFDA -> plot_all.updateAll
+        self.sigFilterDesigned.emit() # pyFDA -> PlotTabWidgets.update_data
 
 
 #------------------------------------------------------------------------
