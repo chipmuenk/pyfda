@@ -26,6 +26,33 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals, absolute_import
 
+# Various parameters for calculation and plotting
+params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
+          'P_Marker': [12, 'r'], # size and color for poles' marker
+          'Z_Marker': [12, 'b']} # size and color for zeros' marker
+
+# Dictionary with translations between short method names and long names for
+# response types
+rt_names = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
+            "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
+            "HIL":"Hilbert", "DIFF":"Differentiator"}
+            
+# Dictionary with translations between short method names and long names for
+# response types
+ft_names = {"IIR":"IIR", "FIR":"FIR"}
+
+# Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
+# in filterbroker.py
+
+
+# Default savedir for filter coefficients, filter dicts etc.
+save_dir = "D:/Daten"
+
+# Config file for logger
+log_config_file = "pyfda_log.conf"
+
+# ======================== LAYOUT =============================================
+
 THEME = 'light' # select dark or light theme
 
 # -----------------------------
@@ -75,50 +102,56 @@ mpl_rc = {'lines.linewidth': 1.5,
 
 # dark theme            
 css_dark = """
-                QWidget{color:white;background: #222222;}
-                
-                QLineEdit{background: #222222; color:white;}
-                QLineEdit:disabled{background-color:darkgrey;}
-                
-                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
-                
-                QPushButton{background-color:grey; color:white;}
-                
-                QTableView{alternate-background-color:#222222;
-                    background-color:black; gridline-color: white;}
-                QHeaderView::section{background-color:rgb(190,1,1);color:white}
+    QWidget{color:white;background: #222222;}
+    
+    QLineEdit{background: #222222;
+                border-style: outset;
+                border-width: 2px;
+                border-color: darkgrey;
+    }
+    QLineEdit:disabled{background-color:darkgrey;}
+    
+    QPushButton{background-color:grey;}
+    
+    QTableView{alternate-background-color:#222222;
+        background-color:black; gridline-color: white;}
+    QHeaderView::section{background-color:rgb(190,1,1);}
                 
             """
           
-          
-# light theme /* 
-css_light = """ .QWidget{color:black; background: white;}
 
-                QLineEdit{background: white; color:black;}
-                QLineEdit:disabled{background-color:lightgrey;}
-                
-                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
-                        
-                QPushButton{background-color:lightgrey; color:black;}
-                
-                QHeaderView::section{background-color:rgb(190,1,1); color:white;}
-                
-                QGridLayout#plotSpecSelect{border: 3px solid red;}
-                QGridLayout{border: 3px solid blue;}
-            """
+# light theme /* 
+css_light = """
+    /* only match QWidget, not subclasses: */
+    QWidget{color:black; background: white;}
+
+    QLineEdit{background: white;
+                border-color: darkgrey;}
+    QLineEdit:disabled{background-color:lightgrey;}
+    
+    QPushButton{background-color:lightgrey; }
+    
+    QHeaderView::section{background-color:rgb(190,1,1); color:white;}
+    
+    QGridLayout#plotSpecSelect{border: 3px solid red;} /* doesnt work */
+    QGridLayout{border: 3px solid blue;} /* doesnt work */
+    """
 
 # common layout settings for QTabWidget
 TabBarCss = """
  QTabWidget::pane { /* The tab widget frame */
      border-top: 2px solid #C2C7CB;
  }
+ 
+ QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
+
  QTabWidget::tab-bar {
      left: 1px; /* move to the right by 1px */
  }
  
- /* Style the TAB using the tab sub-control. Note that
-     it reads QTabBar _not_ QTabWidget */
- QTabBar {  font-weight: bold; font-size:13px; } /* hack to prevent truncation of labels */
+ /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
+ /* hack to prevent truncation of labels (see QTBUG-6905): */
+ QTabBar {  font-weight: bold; font-size:13px; }
  QTabBar::tab{
      color:black;
      font-size:13px;
@@ -166,7 +199,9 @@ css_common = """
                 QPushButton:pressed {background-color:black; color:white}
                 
                 QWidget{font-size:12px; font-family: Tahoma;}
-                QLineEdit{background-color:lightblue;}
+                QLineEdit{background-color:lightblue;
+                                /* border-style: outset; */
+                                border-width: 2px;}
             """\
             + TabBarCss
 
@@ -179,60 +214,7 @@ else:
     mpl_rc.update(mpl_light)
     css_rc = css_common + css_light
     
-
-# Various parameters for calculation and plotting
-params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
-          'P_Marker': [12, 'r'], # size and color for poles' marker
-          'Z_Marker': [12, 'b']} # size and color for zeros' marker
-
-# Dictionary with translations between short method names and long names for
-# response types
-rt_names = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
-            "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
-            "HIL":"Hilbert", "DIFF":"Differentiator"}
-            
-# Dictionary with translations between short method names and long names for
-# response types
-ft_names = {"IIR":"IIR", "FIR":"FIR"}
-
-# Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
-# in filterbroker.py
+# /* Only the right QTabWidget (named plot_tabs) gets a dashed left border */
 
 
-# Default savedir for filter coefficients, filter dicts etc.
-save_dir = "D:/Daten"
 
-# Config file for logger
-log_config_file = "pyfda_log.conf" 
-
-            
-################## Some layout ideas ##########################################
-
-#self.em = QtGui.QFontMetricsF(QtGui.QLineEdit.font()).width('m')
-
-#          'QWidget':('QWidget{Background: #CCCCCC; color:black; font-size:14px;'
-#                     'font-weight:bold; border-radius: 1px;}')
-#                /* all QWidget instances that are direct children of QTabWidget: */
-#                /* QTabWidget>QWidget{border-left: } */
-#                /* only QTabWidget with object name "plot_tabs" */
-#                QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
-#                /* only match QWidget, not subclasses: */
-#                .QWidget{color:black; background: white;}
-
-
-"""
-css = """
-/*height: 14px;*/
-/*
-QDialog{
-Background-image:url('img/xxx.png');
-font-size:14px;
-color: black;
-}
-*/
-
-
-QToolButton:hover{
-Background: #DDEEFF;
-}
-"""
