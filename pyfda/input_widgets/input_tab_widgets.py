@@ -49,15 +49,14 @@ class InputTabWidgets(QtGui.QWidget):
         if fb.MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs()
 
-        self.initUI()
+        self._init_UI()
 
 
-    def initUI(self):
+    def _init_UI(self):
         """ Initialize UI with tabbed input widgets """
         tabWidget = QtGui.QTabWidget()
         tabWidget.setObjectName("TabWidg")
-#        tabWidget.setStyleSheet(user_settings.css_rc['QTabBar'])
-#        tabWidget.setTabShape(QtGui.QTabWidget.Triangular) # different look ....
+
         tabWidget.addTab(self.inputSpecs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')
         tabWidget.addTab(self.inputCoeffs, 'b,a')
@@ -65,9 +64,6 @@ class InputTabWidgets(QtGui.QWidget):
         tabWidget.addTab(self.inputInfo, 'Info')
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
-#        QTabBar.setTabTextColor() 
-#        css = "QTabWidget { background-color: red; color: white}" 
-#        self.inputInfo.setStyleSheet(css)#
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addWidget(tabWidget)
@@ -119,13 +115,14 @@ class InputTabWidgets(QtGui.QWidget):
 # TODO: The button should be styled within InputSpecs
         self.inputSpecs.color_design_button("changed")
         self.inputInfo.load_entries()
+
         self.sigSpecsChanged.emit() # pyFDA -> plot_widgets.updateSpecs
         
     def loadAll(self):
         """
         Called when a new filter has been LOADED: 
         Pass new filter data from the global filter dict
-        - Specifically call InputFilter.load_all_specs
+        - Specifically call InputFilter.load_entries
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         """
@@ -153,7 +150,7 @@ class InputTabWidgets(QtGui.QWidget):
         self.inputSpecs.load_all_specs()
         self.inputInfo.load_entries()
         self.inputCoeffs.load_entries()
-        self.inputPZ.showZPK()
+        self.inputPZ.load_entries()
 
         self.sigFilterDesigned.emit() # pyFDA -> plot_all.updateAll
 
