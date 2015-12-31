@@ -52,12 +52,11 @@ class PlotPhi(QtGui.QMainWindow):
         
         self.initAxes()
 
-        self.draw() # calculate and draw phi(f)
+        self.draw() # initial drawing
 
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-#        self.mplwidget.sldLw.valueChanged.connect(lambda:self.draw())
         self.btnWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         
@@ -69,7 +68,17 @@ class PlotPhi(QtGui.QMainWindow):
         self.ax.clear()
         self.ax.hold(False)
         
+    def update_specs(self):
+        """
+        place holder; should update only the limits without recalculating
+        the phase
+        """
+        self.draw()
+
     def draw(self):
+        """
+        main entry point for drawing the phase
+        """
         if self.mplwidget.mplToolbar.enable_update:
             self.draw_phi()
 

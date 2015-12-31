@@ -121,6 +121,7 @@ class MplWidget(QtGui.QWidget):
 
         self.setLayout(self.layVMainMpl)
 
+#------------------------------------------------------------------------------
     def save_limits(self):
         """
         Save x- and y-limits of all axes in self.limits when zoom is unlocked
@@ -129,6 +130,7 @@ class MplWidget(QtGui.QWidget):
             for ax in self.fig.axes:
                 self.limits = ax.axis() # save old limits        
 
+#------------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the figure with new properties (grid, linewidth)
@@ -147,6 +149,7 @@ class MplWidget(QtGui.QWidget):
         self.pltCanv.draw() # now (re-)draw the figure
 #
 
+#------------------------------------------------------------------------------
     def plt_full_view(self):
         """
         Zoom to full extent of data if axes is set to "navigationable"
@@ -159,6 +162,7 @@ class MplWidget(QtGui.QWidget):
                 ax.autoscale()
         self.redraw()
 
+#------------------------------------------------------------------------------
     def full_extent(self, ax, pad=0.0):
         """
         Get the full extent of an axes, including axes labels, tick labels, and
@@ -220,6 +224,7 @@ class MyMplToolbar(NavigationToolbar):
 #    def _icon(self, name):
 #        return QtGui.QIcon(os.path.join(self.basedir, name))
 #
+#------------------------------------------------------------------------------
     def _init_toolbar(self):
 #        self.basedir = os.path.join(rcParams[ 'datapath' ], 'images/icons')
         iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -408,6 +413,7 @@ class MyMplToolbar(NavigationToolbar):
 #                    self.set_message(s)
 #        else: self.set_message(self.mode)
 
+#------------------------------------------------------------------------------
     def toggle_grid(self):
         """Toggle the grid and redraw the figure."""
         self.grid = not self.grid
@@ -415,6 +421,7 @@ class MyMplToolbar(NavigationToolbar):
             ax.grid(self.grid)
         self.parent.pltCanv.draw() # don't use self.parent.redraw()      
         
+#------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
         """
         Toggle the lock zoom settings and save the plot limits in any case:
@@ -424,6 +431,7 @@ class MyMplToolbar(NavigationToolbar):
         self.parent.save_limits() # save limits in any case: when previously unlocked
         self.lock_zoom = not self.lock_zoom
 
+#------------------------------------------------------------------------------
     def enable_update(self):
         """
         Toggle the enable button and setting and enable / disable all 
@@ -443,6 +451,7 @@ class MyMplToolbar(NavigationToolbar):
         self.a_op.setEnabled(self.enable_update)
         
             
+#------------------------------------------------------------------------------
     def mpl2Clip(self):
         """
         Save current figure to temporary file and copy it to the clipboard.
