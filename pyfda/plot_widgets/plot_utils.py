@@ -121,6 +121,14 @@ class MplWidget(QtGui.QWidget):
 
         self.setLayout(self.layVMainMpl)
 
+    def save_limits(self):
+        """
+        Save x- and y-limits of all axes in self.limits when zoom is unlocked
+        """
+        if not self.mplToolbar.lock_zoom:
+            for ax in self.fig.axes:
+                self.limits = ax.axis() # save old limits        
+
     def redraw(self):
         """
         Redraw the figure with new properties (grid, linewidth)
@@ -139,7 +147,7 @@ class MplWidget(QtGui.QWidget):
         self.pltCanv.draw() # now (re-)draw the figure
 #
 
-    def pltFullView(self):
+    def plt_full_view(self):
         """
         Zoom to full extent of data if axes is set to "navigationable"
         by the navigation toolbar
@@ -267,7 +275,7 @@ class MyMplToolbar(NavigationToolbar):
 
         # FULL VIEW:
         self.a_fv = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
-            'Zoom full extent', self.parent.pltFullView)
+            'Zoom full extent', self.parent.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
         # LOCK VIEW:
@@ -405,13 +413,16 @@ class MyMplToolbar(NavigationToolbar):
         self.grid = not self.grid
         for ax in self.parent.fig.axes:
             ax.grid(self.grid)
-        self.parent.pltCanv.draw()
-#        self.parent.redraw()
+        self.parent.pltCanv.draw() # don't use self.parent.redraw()      
         
     def toggle_lock_zoom(self):
-        """Toggle the grid and redraw the figure."""
+        """
+        Toggle the lock zoom settings and save the plot limits in any case:
+            when previously unlocked, settings need to be saved
+            when previously locked, current settings can be saved without effect
+        """
+        self.parent.save_limits() # save limits in any case: when previously unlocked
         self.lock_zoom = not self.lock_zoom
-        self.parent.redraw()
 
     def enable_update(self):
         """

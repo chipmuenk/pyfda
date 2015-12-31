@@ -74,7 +74,7 @@ class PlotTauG(QtGui.QMainWindow):
         """
         Update frequency range etc. without recalculating group delay.
         """
-        pass
+        self.draw()
 
     def draw_taug(self):
         """

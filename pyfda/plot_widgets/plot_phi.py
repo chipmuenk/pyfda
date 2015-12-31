@@ -17,10 +17,8 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 
 class PlotPhi(QtGui.QMainWindow):
 
-    def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
+    def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotPhi, self).__init__(parent) # initialize QWidget base class
-
-        self.DEBUG = DEBUG
 
         self.cmbUnitsPhi = QtGui.QComboBox(self)
         units = ["rad", "rad/pi",  "deg"]
@@ -85,10 +83,6 @@ class PlotPhi(QtGui.QMainWindow):
         self.bb = fb.fil[0]['ba'][0]
         self.aa = fb.fil[0]['ba'][1]
 
-        if self.DEBUG:
-            print("--- plotPhi.draw() ---")
-            print("b,a = ", self.bb, self.aa)
-
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
@@ -119,7 +113,7 @@ class PlotPhi(QtGui.QMainWindow):
             phi_plt = np.angle(H) * scale
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
-                    
+
         self.ax.clear() # need to clear, doesn't overwrite 
         #---------------------------------------------------------
         line_phi, = self.ax.plot(F, phi_plt)

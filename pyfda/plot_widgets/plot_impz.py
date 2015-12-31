@@ -16,11 +16,10 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 
 class PlotImpz(QtGui.QMainWindow):
 
-    def __init__(self, parent=None, DEBUG=False): # default parent = None -> top Window
+    def __init__(self, parent=None): # default parent = None -> top Window
         super(PlotImpz, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
-        self.DEBUG = DEBUG
         self.ACTIVE_3D = False
 
         self.lblLog = QtGui.QLabel(self)
@@ -141,10 +140,6 @@ class PlotImpz(QtGui.QMainWindow):
         self.A_PB2 = fb.fil[0]['A_PB2']
         self.A_SB  = fb.fil[0]['A_SB']
         self.A_SB2 = fb.fil[0]['A_SB2']
-
-        if self.DEBUG:
-            print("--- plotHf.draw() --- ")
-            print("b, a = ", self.bb, self.aa)
 
         # calculate h[n]
         [h, t] = impz(self.bb, self.aa, self.f_S, step=step,
