@@ -102,15 +102,15 @@ class PlotPhi(QtGui.QMainWindow):
             F = F - f_S / 2.
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
-        y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
+        y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$ in '
         if self.unitPhi == 'rad':
-            y_str += ' in rad ' + r'$\rightarrow $'
+            y_str += 'rad ' + r'$\rightarrow $'
             scale = 1.
         elif self.unitPhi == 'rad/pi':
-            y_str += ' in rad' + r'$ / \pi \;\rightarrow $'
+            y_str += 'rad' + r'$ / \pi \;\rightarrow $'
             scale = 1./ np.pi
         else:
-            y_str += ' in deg ' + r'$\rightarrow $'
+            y_str += 'deg ' + r'$\rightarrow $'
             scale = 180./np.pi
         fb.fil[0]['plt_phiLabel'] = y_str
         fb.fil[0]['plt_phiUnit'] = self.unitPhi
@@ -119,8 +119,8 @@ class PlotPhi(QtGui.QMainWindow):
             phi_plt = np.angle(H) * scale
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
-
-        self.ax.clear()
+                    
+        self.ax.clear() # need to clear, doesn't overwrite 
         #---------------------------------------------------------
         line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------

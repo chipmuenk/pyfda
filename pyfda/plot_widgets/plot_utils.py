@@ -91,7 +91,6 @@ class MplWidget(QtGui.QWidget):
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
         self.pltCanv.setFocusPolicy( QtCore.Qt.ClickFocus )
-        #self.pltCanv.setFocusPolicy(QtCore.Qt.WheelFocus)
         self.pltCanv.setFocus()
 
         self.pltCanv.updateGeometry()
@@ -101,6 +100,7 @@ class MplWidget(QtGui.QWidget):
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MyMplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
+        self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_update = True
 
         #=============================================
@@ -129,6 +129,10 @@ class MplWidget(QtGui.QWidget):
         for ax in self.fig.axes:
             ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
 #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
+            if self.mplToolbar.lock_zoom:
+                ax.axis(self.limits) # restore old limits
+            else:
+                self.limits = ax.axis() # save old limits
         self.fig.tight_layout(pad = 0.2)
 #        self.pltCanv.updateGeometry()
 #        self.pltCanv.adjustSize() #  resize the parent widget to fit its content
@@ -148,8 +152,10 @@ class MplWidget(QtGui.QWidget):
         self.redraw()
 
     def full_extent(self, ax, pad=0.0):
-        """Get the full extent of an axes, including axes labels, tick labels, and
-        titles."""
+        """
+        Get the full extent of an axes, including axes labels, tick labels, and
+        titles.
+        """
         #http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
         # For text objects, we need to draw the figure first, otherwise the extents
         # are undefined.
@@ -263,6 +269,13 @@ class MyMplToolbar(NavigationToolbar):
         self.a_fv = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
             'Zoom full extent', self.parent.pltFullView)
         self.a_fv.setToolTip('Zoom to full extent')
+
+        # LOCK VIEW:
+        self.a_lk = self.addAction(QtGui.QIcon(iconDir + 'lock-locked.svg'), \
+            'Lock zoom', self.toggle_lock_zoom)                
+        self.a_lk.setCheckable(True)
+        self.a_lk.setChecked(False)
+        self.a_lk.setToolTip('Lock current zoom setting')
 
         # --------------------------------------
         self.addSeparator()
@@ -390,6 +403,14 @@ class MyMplToolbar(NavigationToolbar):
     def toggle_grid(self):
         """Toggle the grid and redraw the figure."""
         self.grid = not self.grid
+        for ax in self.parent.fig.axes:
+            ax.grid(self.grid)
+        self.parent.pltCanv.draw()
+#        self.parent.redraw()
+        
+    def toggle_lock_zoom(self):
+        """Toggle the grid and redraw the figure."""
+        self.lock_zoom = not self.lock_zoom
         self.parent.redraw()
 
     def enable_update(self):

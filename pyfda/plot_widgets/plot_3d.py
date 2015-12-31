@@ -274,18 +274,45 @@ class Plot3D(QtGui.QMainWindow):
         http://stackoverflow.com/questions/4575588/matplotlib-3d-plot-with-pyqt4-in-qtabwidget-mplwidget
         """
                 
+        self._save_axes()
+
+        self.mplwidget.fig.clf() # needed to get rid of colorbar
+        self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
+
+        self._restore_axes()
+
+#------------------------------------------------------------------------------
+    def _save_axes(self):
+        """
+        Store x/y/z - limits and camera position
+        """
+                
         try:
             self.azim = self.ax3d.azim
             self.elev = self.ax3d.elev
             self.dist = self.ax3d.dist
+            self.xlim = self.ax3d.get_xlim3d()
+            self.ylim = self.ax3d.get_ylim3d()
+            self.zlim = self.ax3d.get_zlim3d()
+ 
         except AttributeError: # not yet initialized, set standard values
             self.azim = -65
             self.elev = 30
             self.dist = 10
+            self.xlim = (self.xmin, self.xmax)
+            self.ylim = (self.ymin, self.ymax)
+            self.zlim = (self.zmin, self.zmax)
 
-        self.mplwidget.fig.clf() # needed to get rid of colorbar
-        self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
-                    
+
+#------------------------------------------------------------------------------
+    def _restore_axes(self):
+        """
+        Restore x/y/z - limits and camera position
+        """
+        if self.mplwidget.mplToolbar.lock_zoom:
+            self.ax3d.set_xlim3d(self.xlim)
+            self.ax3d.set_ylim3d(self.ylim)
+            self.ax3d.set_zlim3d(self.zlim)
         self.ax3d.azim = self.azim
         self.ax3d.elev = self.elev
         self.ax3d.dist = self.dist
@@ -533,10 +560,12 @@ class Plot3D(QtGui.QMainWindow):
         #----------------------------------------------------------------------
         ## Set view limits and labels
         #----------------------------------------------------------------------
-
-        self.ax3d.set_xlim3d(self.xmin, self.xmax)
-        self.ax3d.set_ylim3d(self.ymin, self.ymax)
-        self.ax3d.set_zlim3d(bottom, top)
+        if not self.mplwidget.mplToolbar.lock_zoom:
+            self.ax3d.set_xlim3d(self.xmin, self.xmax)
+            self.ax3d.set_ylim3d(self.ymin, self.ymax)
+            self.ax3d.set_zlim3d(bottom, top)
+        else:
+            self._restore_axes()
 
         self.ax3d.set_xlabel('Re')#(fb.fil[0]['plt_fLabel'])
         self.ax3d.set_ylabel('Im') #(r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $')
