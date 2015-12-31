@@ -17,10 +17,8 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 
 class PlotPhi(QtGui.QMainWindow):
 
-    def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
+    def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotPhi, self).__init__(parent) # initialize QWidget base class
-
-        self.DEBUG = DEBUG
 
         self.cmbUnitsPhi = QtGui.QComboBox(self)
         units = ["rad", "rad/pi",  "deg"]
@@ -54,12 +52,11 @@ class PlotPhi(QtGui.QMainWindow):
         
         self.initAxes()
 
-        self.draw() # calculate and draw phi(f)
+        self.draw() # initial drawing
 
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-#        self.mplwidget.sldLw.valueChanged.connect(lambda:self.draw())
         self.btnWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         
@@ -71,7 +68,17 @@ class PlotPhi(QtGui.QMainWindow):
         self.ax.clear()
         self.ax.hold(False)
         
+    def update_specs(self):
+        """
+        place holder; should update only the limits without recalculating
+        the phase
+        """
+        self.draw()
+
     def draw(self):
+        """
+        main entry point for drawing the phase
+        """
         if self.mplwidget.mplToolbar.enable_update:
             self.draw_phi()
 
@@ -84,10 +91,6 @@ class PlotPhi(QtGui.QMainWindow):
 
         self.bb = fb.fil[0]['ba'][0]
         self.aa = fb.fil[0]['ba'][1]
-
-        if self.DEBUG:
-            print("--- plotPhi.draw() ---")
-            print("b,a = ", self.bb, self.aa)
 
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
@@ -102,15 +105,15 @@ class PlotPhi(QtGui.QMainWindow):
             F = F - f_S / 2.
 
 #        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
-        y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
+        y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$ in '
         if self.unitPhi == 'rad':
-            y_str += ' in rad ' + r'$\rightarrow $'
+            y_str += 'rad ' + r'$\rightarrow $'
             scale = 1.
         elif self.unitPhi == 'rad/pi':
-            y_str += ' in rad' + r'$ / \pi \;\rightarrow $'
+            y_str += 'rad' + r'$ / \pi \;\rightarrow $'
             scale = 1./ np.pi
         else:
-            y_str += ' in deg ' + r'$\rightarrow $'
+            y_str += 'deg ' + r'$\rightarrow $'
             scale = 180./np.pi
         fb.fil[0]['plt_phiLabel'] = y_str
         fb.fil[0]['plt_phiUnit'] = self.unitPhi
@@ -120,7 +123,7 @@ class PlotPhi(QtGui.QMainWindow):
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
 
-        self.ax.clear()
+        self.ax.clear() # need to clear, doesn't overwrite 
         #---------------------------------------------------------
         line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------

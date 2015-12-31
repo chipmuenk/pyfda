@@ -12,15 +12,15 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import impz
 from pyfda.plot_widgets.plot_utils import MplWidget
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
 class PlotImpz(QtGui.QMainWindow):
 
-    def __init__(self, parent=None, DEBUG=False): # default parent = None -> top Window
+    def __init__(self, parent=None): # default parent = None -> top Window
         super(PlotImpz, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
 
-        self.DEBUG = DEBUG
         self.ACTIVE_3D = False
 
         self.lblLog = QtGui.QLabel(self)
@@ -48,11 +48,6 @@ class PlotImpz(QtGui.QMainWindow):
         self.chkStep.setChecked(False)
         self.chkStep.setToolTip("Show step response instead of impulse response.")
 
-#        self.lblLockZoom = QtGui.QLabel("Lock Zoom")
-#        self.chkLockZoom = QtGui.QCheckBox()
-#        self.chkLockZoom.setChecked(False)
-#        self.chkLockZoom.setToolTip("Lock zoom to current setting.")
-
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.lblLog)
@@ -63,27 +58,20 @@ class PlotImpz(QtGui.QMainWindow):
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblStep)
         self.layHChkBoxes.addWidget(self.chkStep)
-#        self.layHChkBoxes.addStretch(1)
-#        self.layHChkBoxes.addWidget(self.lblLockZoom)
-#        self.layHChkBoxes.addWidget(self.chkLockZoom)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblNPoints)
         self.layHChkBoxes.addWidget(self.ledNPoints)
         self.layHChkBoxes.addStretch(10)
 
         self.mplwidget = MplWidget()
-#        self.mplwidget.setParent(self)
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 #        self.mplwidget.layVMainMpl1.addWidget(self.mplwidget)
 
-#        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
 
 #        self.setLayout(self.layHChkBoxes)
-
-        self.draw() # calculate and draw |H(f)|
 
 #        #=============================================
 #        # Signals & Slots
@@ -93,7 +81,10 @@ class PlotImpz(QtGui.QMainWindow):
         self.ledNPoints.editingFinished.connect(self.draw)
         self.ledLogBottom.editingFinished.connect(self.draw)
 
-    def initAxes(self):
+        self.draw() # initial calculation and drawing
+
+#------------------------------------------------------------------------------
+    def _init_axes(self):
         # clear the axes and (re)draw the plot
         #
         try:
@@ -111,14 +102,23 @@ class PlotImpz(QtGui.QMainWindow):
             self.ax_r = self.mplwidget.fig.add_subplot(111)
             self.ax_r.clear()
 
-        if self.ACTIVE_3D:
-            self.ax3d = Axes3D(fig)
+        if self.ACTIVE_3D: # not implemented / tested yet
+            self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
 
+#------------------------------------------------------------------------------
+    def update_specs(self):
+        """
+        place holder; should update only the limits without recalculating
+        the impulse respons
+        """
+        self.draw()
 
+#------------------------------------------------------------------------------
     def draw(self):
         if self.mplwidget.mplToolbar.enable_update:
             self.draw_impz()
 
+#------------------------------------------------------------------------------
     def draw_impz(self):
         """
         (Re-)calculate h[n] and draw the figure
@@ -141,10 +141,6 @@ class PlotImpz(QtGui.QMainWindow):
         self.A_PB2 = fb.fil[0]['A_PB2']
         self.A_SB  = fb.fil[0]['A_SB']
         self.A_SB2 = fb.fil[0]['A_SB2']
-
-        if self.DEBUG:
-            print("--- plotHf.draw() --- ")
-            print("b, a = ", self.bb, self.aa)
 
         # calculate h[n]
         [h, t] = impz(self.bb, self.aa, self.f_S, step=step,
@@ -173,7 +169,7 @@ class PlotImpz(QtGui.QMainWindow):
         else:
             bottom = 0
 
-        self.initAxes()
+        self._init_axes()
 
 
         #================ Main Plotting Routine =========================
@@ -193,7 +189,7 @@ class PlotImpz(QtGui.QMainWindow):
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
 
 
-        if self.ACTIVE_3D: # not implemented yet
+        if self.ACTIVE_3D: # not implemented / tested yet
 
             # plotting the stems
             for i in range(len(t)):

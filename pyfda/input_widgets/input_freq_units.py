@@ -138,13 +138,13 @@ class InputFreqUnits(QtGui.QWidget):
         Finally, store freqSpecsRange and emit sigUnitChanged signal via _freq_range
         """
         idx = self.cmbUnits.currentIndex() # read index of units combobox
-        unit = str(self.cmbUnits.currentText()) # and the label
-        fb.fil[0].update({'freq_specs_unit':unit}) # and store it in dict
+        f_unit = str(self.cmbUnits.currentText()) # and the label
+        fb.fil[0].update({'freq_specs_unit':f_unit}) # and store it in dict
         
         self.f_S = float(self.ledF_S.text()) # read sampling frequency
 
-        self.ledF_S.setVisible(unit not in {"f_S", "f_Ny"}) # only vis. when
-        self.lblF_S.setVisible(unit not in {"f_S", "f_Ny"}) # not normalized
+        self.ledF_S.setVisible(f_unit not in {"f_S", "f_Ny"}) # only vis. when
+        self.lblF_S.setVisible(f_unit not in {"f_S", "f_Ny"}) # not normalized
 
         # get ID of signal that triggered updateUI():
         if self.sender(): # origin of signal that triggered the slot
@@ -159,8 +159,8 @@ class InputFreqUnits(QtGui.QWidget):
             fb.fil[0]['f_S'] = self.f_S
 
         else: # cmbUnitBox
-            if unit in {"f_S", "f_Ny"}: # normalized frequency
-                if unit == "f_S": # normalized to f_S
+            if f_unit in {"f_S", "f_Ny"}: # normalized frequency
+                if f_unit == "f_S": # normalized to f_S
                     self.f_S = 1.
                     f_label = r"$F = f/f_S = \Omega / 2 \pi \; \rightarrow$"
                 else:   # idx == 1: normalized to f_nyq = f_S / 2
@@ -171,11 +171,14 @@ class InputFreqUnits(QtGui.QWidget):
                 self.ledF_S.setText(str(self.f_S)) # update field for f_S
                 fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
             else: # Hz, kHz, ...
-                f_label = r"$f$ in " + unit + r"$\; \rightarrow$"
+                f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
                 t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
             fb.fil[0].update({"plt_fLabel":f_label}) # label for freq. axis
             fb.fil[0].update({"plt_tLabel":t_label}) # label for time axis
+            fb.fil[0].update({"plt_fUnit":f_unit}) # frequency unit as string
+            fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) # time unit as string
+
 
         self._freq_range() # update f_lim setting and emit sigUnitChanged signal
         

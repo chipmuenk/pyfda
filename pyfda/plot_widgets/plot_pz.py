@@ -17,11 +17,9 @@ from pyfda.plot_widgets.plot_utils import MplWidget#, MplCanvas
 
 class PlotPZ(QtGui.QMainWindow):
 
-    def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
+    def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotPZ, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
-
-        self.DEBUG = DEBUG
 
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
@@ -33,7 +31,7 @@ class PlotPZ(QtGui.QMainWindow):
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
         
-        self.initAxes()
+        self._init_axes()
 
         self.draw() # calculate and draw poles and zeros
 
@@ -42,8 +40,8 @@ class PlotPZ(QtGui.QMainWindow):
 #        #=============================================
 #        self.btnWhatever.clicked.connect(self.draw)
 
-
-    def initAxes(self):
+#------------------------------------------------------------------------------
+    def _init_axes(self):
         """Initialize and clear the axes
         """
 #        self.ax = self.mplwidget.ax
@@ -51,7 +49,7 @@ class PlotPZ(QtGui.QMainWindow):
         self.ax.clear()
         
 #------------------------------------------------------------------------------
-    def update_plot(self):
+    def update_specs(self):
         """
         Draw the figure with new limits, scale etcs without recalculating H(f)
         -- not yet implemented, just use draw() for the moment

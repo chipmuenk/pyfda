@@ -26,11 +26,9 @@ class PlotHf(QtGui.QMainWindow):
 #        is switched to +/- 1/2 the display doesn't follow
 
 
-    def __init__(self, parent = None, DEBUG = False): # default parent = None -> top Window
+    def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotHf, self).__init__(parent) # initialize QWidget base class
 #        QtGui.QMainWindow.__init__(self) # alternative syntax
-
-        self.DEBUG = DEBUG
 
         modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
@@ -405,11 +403,7 @@ class PlotHf(QtGui.QMainWindow):
         (Re-)Calculate the complex frequency response H(f)
         """
 
-#        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
-
-        if self.DEBUG:
-            print("--- plotHf.draw() --- ")
-            print("b, a = ", fb.fil[0]['ba'][0], fb.fil[0]['ba'][1])
+#        whole = fb.fil[0]['freqSpecsRangeType'] != 'half'
 
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
         [self.W, self.H_cplx] = sig.freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1],
@@ -422,10 +416,10 @@ class PlotHf(QtGui.QMainWindow):
         """
         if self.mplwidget.mplToolbar.enable_update:
             self.calc_hf()
-            self.update_plot()
+            self.update_specs()
 
 #------------------------------------------------------------------------------
-    def update_plot(self):
+    def update_specs(self):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
@@ -485,7 +479,6 @@ class PlotHf(QtGui.QMainWindow):
 
 
         # clear the axes and (re)draw the plot
-        #
         if self.ax.get_navigate():
 
             self.ax.clear()
