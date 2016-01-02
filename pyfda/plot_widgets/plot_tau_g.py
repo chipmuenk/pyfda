@@ -66,7 +66,7 @@ class PlotTauG(QtGui.QMainWindow):
             self.draw_taug()
             
 #------------------------------------------------------------------------------
-    def update_specs(self):
+    def update_view(self):
         """
         Update frequency range etc. without recalculating group delay.
         """
@@ -82,22 +82,6 @@ class PlotTauG(QtGui.QMainWindow):
 
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
-
-        self.unitPhi = fb.fil[0]['plt_phiUnit']   
-        y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
-        if self.unitPhi == 'rad':
-            y_str += ' in rad ' + r'$\rightarrow $'
-            scale = 1.
-        elif self.unitPhi == 'rad/pi':
-            y_str += ' in rad' + r'$ / \pi \;\rightarrow $'
-            scale = 1./ np.pi
-        else:
-            y_str += ' in deg ' + r'$\rightarrow $'
-            scale = 180./np.pi
-#        fb.fil[0]['plt_phiLabel'] = y_str
-
-
-#        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
 
         [w, tau_g] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF, 
             verbose = self.chkWarnings.isChecked())
@@ -123,8 +107,9 @@ class PlotTauG(QtGui.QMainWindow):
 
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(tau_str)
-        # widen limits to suppress numerical inaccuracies when tau_g = constant
-        self.ax.axis(fb.fil[0]['freqSpecsRange'] + [max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        # widen y-limits to suppress numerical inaccuracies when tau_g = constant
+        self.ax.set_ylim([max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
+        self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         self.mplwidget.redraw()
 #------------------------------------------------------------------------------

@@ -416,10 +416,10 @@ class PlotHf(QtGui.QMainWindow):
         """
         if self.mplwidget.mplToolbar.enable_update:
             self.calc_hf()
-            self.update_specs()
+            self.update_view()
 
 #------------------------------------------------------------------------------
-    def update_specs(self):
+    def update_view(self):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
         """

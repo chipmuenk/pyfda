@@ -106,7 +106,7 @@ class PlotImpz(QtGui.QMainWindow):
             self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
 
 #------------------------------------------------------------------------------
-    def update_specs(self):
+    def update_view(self):
         """
         place holder; should update only the limits without recalculating
         the impulse respons

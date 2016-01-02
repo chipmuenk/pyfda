@@ -50,7 +50,7 @@ class PlotPhi(QtGui.QMainWindow):
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
         
-        self.initAxes()
+        self._init_axes()
 
         self.draw() # initial drawing
 
@@ -60,7 +60,7 @@ class PlotPhi(QtGui.QMainWindow):
         self.btnWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         
-    def initAxes(self):
+    def _init_axes(self):
         """Initialize and clear the axes
         """
 #        self.ax = self.mplwidget.ax
@@ -68,7 +68,7 @@ class PlotPhi(QtGui.QMainWindow):
         self.ax.clear()
         self.ax.hold(False)
         
-    def update_specs(self):
+    def update_view(self):
         """
         place holder; should update only the limits without recalculating
         the phase
