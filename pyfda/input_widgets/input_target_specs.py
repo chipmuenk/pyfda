@@ -43,7 +43,7 @@ class InputTargetSpecs(QtGui.QWidget):
         # subwidget for Frequency Specs
         self.f_specs = input_freq_specs.InputFreqSpecs(title = "Frequency")
         # subwidget for Amplitude Specs
-        self.a_specs = input_amp_specs.InputAmpSpecs(title = "Amplitude")
+        self.a_specs = input_amp_specs.InputAmpSpecs(self, title = "Amplitude")
 
         self.a_specs.setVisible(True)
         """
