@@ -32,11 +32,18 @@ frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
 class equiripple(object):
 
     info ="""
-    Equiripple filter have a constant ripple in pass- and
-    stop band, the tolerance bands are fully used. 
+**Equiripple filters**
 
-    The minimum order to fulfill the target specifications is estimated
-    using Ichige's algorithm.
+have a constant ripple in pass- and
+stop band, the tolerance bands are fully used. 
+
+The minimum order to fulfill the target specifications is estimated
+using Ichige's algorithm.
+
+**Design routines:**
+
+``scipy.signal.remez()``
+``scipy.pyfda_lib.remezord()``
     """
 
     def __init__(self):
@@ -93,7 +100,8 @@ class equiripple(object):
         self.info_doc = []
         self.info_doc.append('remez()\n=======')
         self.info_doc.append(sig.remez.__doc__)
-
+        self.info_doc.append('remezord()\n==========')
+        self.info_doc.append(remezord.__doc__)
         # additional dynamic widgets that need to be set in the main widgets
         self.wdg = {'sf':'wdg_remez'}
         

@@ -174,8 +174,8 @@ class InputSpecs(QtGui.QWidget):
             "all_params = %s\n"
             "a_params = %s\n"
             "f_params = %s\n"
-            "w_params = %s\n"
-            %(all_params, a_params, f_params, w_params))
+            "w_params = %s\n",
+            all_params, a_params, f_params, w_params)
 
         self.sel_fil.load_filter_order() # update filter order from dict
 
@@ -241,9 +241,9 @@ class InputSpecs(QtGui.QWidget):
         """
         logger.debug("start_design_filt - Specs:\n"
             "fb.fil[0]: %s\n"
-            "fb.fil[0]['dm'] %s.%s%s"
-            %(pformat(fb.fil[0]), str(fb.fil[0]['dm']), str(fb.fil[0]['rt']), 
-                         str(fb.fil[0]['fo'])))
+            "fb.fil[0]['dm'] %s.%s%s", 
+            pformat(fb.fil[0]), str(fb.fil[0]['dm']), str(fb.fil[0]['rt']), 
+                         str(fb.fil[0]['fo']))
 
 
         # Now construct the instance method from the response type (e.g.
@@ -256,8 +256,8 @@ class InputSpecs(QtGui.QWidget):
         # call the method specified as a string in the argument of the
         # filter instance defined previously in InputFilter.set_response_type
 
-        logger.info("startDesignFilt using: %s\nmethod: %s\n" 
-            %(str(type(fb.fil_inst)), str(fb.fil_method)))
+        logger.info("startDesignFilt using: %s\nmethod: %s\n",
+            str(type(fb.fil_inst)), str(fb.fil_method))
 
         try:
             err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
@@ -278,7 +278,7 @@ class InputSpecs(QtGui.QWidget):
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
         except Exception as e:
-            logger.warning("start_design_filt:\n%s\n%s\n" %(e.__doc__, e))
+            logger.warning("start_design_filt:\n%s\n%s\n", e.__doc__, e)
             self.color_design_button("error")
 
         logger.debug("start_design_filt - Results:\n"
@@ -286,11 +286,11 @@ class InputSpecs(QtGui.QWidget):
             "Filter order N = %s\n"
             "NDim fil[0]['ba'] = %s\n\n"
             "b,a = %s\n\n"
-            "zpk = %s\n"
-            %(str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
-              str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
+            "zpk = %s\n",
+            str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
+            str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
                 pformat(fb.fil[0]['zpk'])
-              ))
+              )
 
 
 #------------------------------------------------------------------------------

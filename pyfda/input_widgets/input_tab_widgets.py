@@ -86,21 +86,21 @@ class InputTabWidgets(QtGui.QWidget):
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
         #       requiring update of some plot widgets only:        
-        self.inputSpecs.sigSpecsChanged.connect(self.updateSpecs)
+        self.inputSpecs.sigSpecsChanged.connect(self.update_view)
 # TODO: connect to a specific slot
-        self.inputSpecs.sigViewChanged.connect(self.updateSpecs)
+        self.inputSpecs.sigViewChanged.connect(self.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:        
-        self.inputSpecs.sigFilterDesigned.connect(self.updateAll)
-        self.inputCoeffs.sigFilterDesigned.connect(self.updateAll)
-        self.inputPZ.sigFilterDesigned.connect(self.updateAll)
+        self.inputSpecs.sigFilterDesigned.connect(self.update_all)
+        self.inputCoeffs.sigFilterDesigned.connect(self.update_all)
+        self.inputPZ.sigFilterDesigned.connect(self.update_all)
         
-        self.inputFiles.sigFilterLoaded.connect(self.loadAll)
+        self.inputFiles.sigFilterLoaded.connect(self.load_all)
         #----------------------------------------------------------------------
 
 
-    def updateSpecs(self):
+    def update_view(self):
         """
         Slot for InputSpecs.sigSpecsChanged and InputSpecs.sigViewChanged
         
@@ -118,7 +118,7 @@ class InputTabWidgets(QtGui.QWidget):
 
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
         
-    def loadAll(self):
+    def load_all(self):
         """
         Called when a new filter has been LOADED: 
         Pass new filter data from the global filter dict
@@ -130,7 +130,7 @@ class InputTabWidgets(QtGui.QWidget):
         self.updateAll()
 
 
-    def updateAll(self):
+    def update_all(self):
         """
         Slot for sigFilterDesigned from InputSpecs, InputCoeffs, InputPZ      
         

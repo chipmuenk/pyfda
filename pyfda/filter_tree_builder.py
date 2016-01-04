@@ -197,7 +197,7 @@ class FilterTreeBuilder(object):
 
         methods = ""
         for dm in fb.design_methods:
-            methods += dm + "\n"
+            methods += "\t" + dm + "\n"
 
         logger.info("Imported successfully the following %d filter designs:\n%s", 
                     num_imports, methods)
