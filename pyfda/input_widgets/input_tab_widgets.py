@@ -36,7 +36,7 @@ class InputTabWidgets(QtGui.QWidget):
     def __init__(self):
         super(InputTabWidgets, self).__init__()
 
-        self.inputSpecs = input_specs.InputSpecs()
+        self.inputSpecs = input_specs.InputSpecs(self)
         self.inputSpecs.setObjectName("inputSpecs")
         self.inputFiles = input_files.InputFiles()
         self.inputFiles.setObjectName("inputFiles")
@@ -156,6 +156,8 @@ class InputTabWidgets(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------
+
+
 
 def main():
     app = QtGui.QApplication(sys.argv)

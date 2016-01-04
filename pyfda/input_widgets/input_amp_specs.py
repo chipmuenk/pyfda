@@ -12,7 +12,7 @@ from numpy import sqrt
 import sys
 import logging
 logger = logging.getLogger(__name__)
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, Qt
 
 import pyfda.filterbroker as fb
@@ -82,8 +82,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         #   with "A" (= amplitude specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         # ATTENTION: Entries need to be converted from QString to str for Py 2
-        newLabels = [str(l) for l in fb.fil[0] if l[0] == 'A'] 
-        self.update_UI(newLabels = newLabels)
+        new_labels = [str(l) for l in fb.fil[0] if l[0] == 'A'] 
+        self.update_UI(new_labels = new_labels)
 
         frmMain = QtGui.QFrame()
         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -169,29 +169,29 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
 
 #------------------------------------------------------------------------------
-    def update_UI(self, newLabels = []):
+    def update_UI(self, new_labels = []):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt in
         self.layGSpecs.
         """
         # Check whether the number of entries has changed
-        for i in range(max(len(self.qlabels), len(newLabels))):
-             # newLabels is shorter than qlabels -> delete the difference
-            if (i > (len(newLabels)-1)):
-                self._del_entry(len(newLabels))
+        for i in range(max(len(self.qlabels), len(new_labels))):
+             # new_labels is shorter than qlabels -> delete the difference
+            if (i > (len(new_labels)-1)):
+                self._del_entry(len(new_labels))
 
-            # newLabels is longer than existing qlabels -> create new ones!
+            # new_labels is longer than existing qlabels -> create new ones!
             elif (i > (len(self.qlabels)-1)):
-             self._add_entry(i,newLabels[i])
+             self._add_entry(i,new_labels[i])
 
             else:
                 # when entry has changed, update label and corresponding value
-                if self.qlineedit[i].objectName() != newLabels[i]:
-                    self.qlabels[i].setText(rt_label(newLabels[i]))
+                if self.qlineedit[i].objectName() != new_labels[i]:
+                    self.qlabels[i].setText(rt_label(new_labels[i]))
                     
-                    self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
-                    self.qlineedit[i].setObjectName(newLabels[i])  # update ID
+                    self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+                    self.qlineedit[i].setObjectName(new_labels[i])  # update ID
 
         self.load_entries()
 
@@ -213,7 +213,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
 
 #------------------------------------------------------------------------------
-    def _add_entry(self, i, newLabel):
+    def _add_entry(self, i, new_label):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) in self.layGSpecs
         and connect QLineEdit.editingFinished to self._amp_text. This way, the
@@ -221,10 +221,10 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         been edited (i.e. looses focus or when a return is entered).
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(rt_label(newLabel))
+        self.qlabels[i].setText(rt_label(new_label))
 
-        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
-        self.qlineedit[i].setObjectName(newLabel) # update ID
+        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][new_label])))
+        self.qlineedit[i].setObjectName(new_label) # update ID
         
         self.qlineedit[i].editingFinished.connect(self._store_entries)
 
@@ -235,6 +235,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 
 if __name__ == '__main__':
     
+    from PyQt4 import QtCore
     
     class MainWindow(QtGui.QMainWindow):
         """
@@ -254,15 +255,15 @@ if __name__ == '__main__':
             self.setCentralWidget(self.main_widget)
             # Set the given widget to be the main window's central widget, QMainWindow
             #  takes ownership of the widget pointer and deletes it at the appropriate time.
-        def update_UI(self, newLabels):
-            self.amp_widget.update_UI(newLabels=newLabels)
+        def update_UI(self, new_labels):
+            self.test_widget.update_UI(new_labels=new_labels)
 #------------------------------------------------------------------------------
 
     app = QtGui.QApplication(sys.argv) # instantiate app, pass command line arguments
 
     main_window = MainWindow()
-    main_window.update_UI(newLabels = ['A_SB','A_SB2','A_PB','A_PB2'])
-    main_window.update_UI(newLabels = ['A_PB','A_SB'])
+    main_window.update_UI(new_labels = ['A_SB','A_SB2','A_PB','A_PB2'])
+    main_window.update_UI(new_labels = ['A_PB','A_SB'])
 
     app.setActiveWindow(main_window)
     # Sets the active window to the active widget in response to a system event.
@@ -275,8 +276,6 @@ if __name__ == '__main__':
     # Call QWidget.activateWindow() instead.
 
     main_window.show()
-
-
 
     ret = app.exec_()
     del main_window

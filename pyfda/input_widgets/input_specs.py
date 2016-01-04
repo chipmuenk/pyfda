@@ -33,7 +33,6 @@ class InputSpecs(QtGui.QWidget):
 
     def __init__(self, parent):
         super(InputSpecs, self).__init__(parent)
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self._init_UI()
 
@@ -46,19 +45,19 @@ class InputSpecs(QtGui.QWidget):
         self.sel_fil = input_filter.InputFilter(self)
         self.sel_fil.setObjectName("select_filter")
         # Subwidget for selecting the frequency unit and range
-        self.f_units = input_freq_units.InputFreqUnits()
+        self.f_units = input_freq_units.InputFreqUnits(self)
         self.f_units.setObjectName("freq_units")
         # Subwidget for Frequency Specs
-        self.f_specs = input_freq_specs.InputFreqSpecs()
+        self.f_specs = input_freq_specs.InputFreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
         # Subwidget for Amplitude Specs
         self.a_specs = input_amp_specs.InputAmpSpecs(self)
         self.a_specs.setObjectName("amp_specs")
         # Subwidget for Weight Specs
-        self.w_specs = input_weight_specs.InputWeightSpecs()
+        self.w_specs = input_weight_specs.InputWeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
         # Subwidget for target specs (frequency and amplitude)
-        self.t_specs = input_target_specs.InputTargetSpecs(title="Target Specifications")
+        self.t_specs = input_target_specs.InputTargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
         # Subwidget for displaying infos on the design method
         self.lblMsg = QtGui.QLabel(self)
@@ -206,11 +205,11 @@ class InputSpecs(QtGui.QWidget):
         # self.a_specs.setVisible(a_params != [])
         self.a_specs.setVisible("aspecs" in vis_wdgs)
         self.a_specs.setEnabled("aspecs" not in dis_wdgs)
-        self.a_specs.update_UI(newLabels=a_params)
+        self.a_specs.update_UI(new_labels=a_params)
 
         self.w_specs.setVisible("wspecs" in vis_wdgs)
         self.w_specs.setEnabled("wspecs" not in dis_wdgs)
-        self.w_specs.update_UI(newLabels=w_params)
+        self.w_specs.update_UI(new_labels=w_params)
 
         self.lblMsg.setText(msg)
 
@@ -373,12 +372,12 @@ if __name__ == '__main__':
     sys.exit(ret)
 
 
-if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
-    form = InputSpecs()
-    form.show()
-
-    ret = app.exec_()
-    del form
-    sys.exit(ret)
-    
+#if __name__ == '__main__':
+#    app = QtGui.QApplication(sys.argv)
+#    form = InputSpecs()
+#    form.show()
+#
+#    ret = app.exec_()
+#    del form
+#    sys.exit(ret)
+#    

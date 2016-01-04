@@ -26,9 +26,9 @@ class InputFreqSpecs(QtGui.QWidget):
     # class variables (shared between instances if more than one exists)
     sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
 
-    def __init__(self, title = "Frequency Specs"):
+    def __init__(self, parent, title = "Frequency Specs"):
 
-        super(InputFreqSpecs, self).__init__()
+        super(InputFreqSpecs, self).__init__(parent)
         self.title = title
 
         self.qlabels = []    # list with references to QLabel widgets
@@ -207,17 +207,65 @@ class InputFreqSpecs(QtGui.QWidget):
         if signal:
             self.sigSpecsChanged.emit()
 
-
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    
+    from PyQt4 import QtCore
+    
+    class MainWindow(QtGui.QMainWindow):
+        """
+        QMainWindow is used here as it is a class that understands GUI elements like
+        toolbar, statusbar, central widget, docking areas etc.
+        """
 
-    app = QtGui.QApplication(sys.argv)
-    form = InputFreqSpecs()
+        def __init__(self):
+            super(MainWindow, self).__init__()
+            self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+            self.main_widget = QtGui.QWidget()
+            self.test_widget = InputFreqSpecs(self)           # instantiate widget
 
-    form.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])
-    form.update_UI(new_labels = ['F_PB','F_PB2'])
+            layV = QtGui.QVBoxLayout(self.main_widget) # create layout manager
+            layV.addWidget(self.test_widget)                 # add widget to layout
+#            self.main_widget.setFocus()             # give keyboard focus to main_widget
+            self.setCentralWidget(self.main_widget)
+            # Set the given widget to be the main window's central widget, QMainWindow
+            #  takes ownership of the widget pointer and deletes it at the appropriate time.
+        def update_UI(self, new_labels):
+            self.test_widget.update_UI(new_labels=new_labels)
+#------------------------------------------------------------------------------
 
-    form.show()
+    app = QtGui.QApplication(sys.argv) # instantiate app, pass command line arguments
 
-    app.exec_()
+    main_window = MainWindow()
+    main_window.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])
+    main_window.update_UI(new_labels = ['F_PB','F_PB2'])
+
+    app.setActiveWindow(main_window)
+    # Sets the active window to the active widget in response to a system event.
+    # The function is called from the platform specific event handlers.
+    # It sets the activeWindow() and focusWidget() attributes and sends proper 
+    # WindowActivate/WindowDeactivate and FocusIn/FocusOut events to all appropriate 
+    # widgets. The window will then be painted in active state (e.g. cursors in 
+    # line edits will blink), and it will have tool tips enabled.
+    # Warning: This function does not set the keyboard focus to the active widget. 
+    # Call QWidget.activateWindow() instead.
+
+    main_window.show()
+
+    ret = app.exec_()
+    del main_window
+    sys.exit(ret)
+#------------------------------------------------------------------------------
+
+#if __name__ == '__main__':
+#
+#    app = QtGui.QApplication(sys.argv)
+#    form = InputFreqSpecs()
+#
+#    form.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])
+#    form.update_UI(new_labels = ['F_PB','F_PB2'])
+#
+#    form.show()
+#
+#    app.exec_()

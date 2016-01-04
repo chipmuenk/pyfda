@@ -26,9 +26,9 @@ class InputFreqUnits(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal() # emitted when frequency specs have been changed
                                   # (e.g. when the sort button has been pushed)
 
-    def __init__(self, title = "Frequency Units"):
+    def __init__(self, parent, title = "Frequency Units"):
 
-        super(InputFreqUnits, self).__init__()
+        super(InputFreqUnits, self).__init__(parent)
         self.title = title
 
         self._init_UI()
@@ -248,17 +248,62 @@ class InputFreqUnits(QtGui.QWidget):
         if self.butSort.isChecked():
             self.sigSpecsChanged.emit() # -> input_widgets
 
- 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    
+    from PyQt4 import QtCore
+    
+    class MainWindow(QtGui.QMainWindow):
+        """
+        QMainWindow is used here as it is a class that understands GUI elements like
+        toolbar, statusbar, central widget, docking areas etc.
+        """
 
-    app = QtGui.QApplication(sys.argv)
-    form = InputFreqUnits() #)
+        def __init__(self):
+            super(MainWindow, self).__init__()
+            self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+            self.main_widget = QtGui.QWidget()
+            self.test_widget = InputFreqUnits(self)           # instantiate widget
 
-    form.update_UI()
-#    form.updateUI(newLabels = ['F_PB','F_PB2'])
+            layV = QtGui.QVBoxLayout(self.main_widget) # create layout manager
+            layV.addWidget(self.test_widget)                 # add widget to layout
+#            self.main_widget.setFocus()             # give keyboard focus to main_widget
+            self.setCentralWidget(self.main_widget)
+            # Set the given widget to be the main window's central widget, QMainWindow
+            #  takes ownership of the widget pointer and deletes it at the appropriate time.
 
-    form.show()
+#------------------------------------------------------------------------------
 
-    app.exec_()
+    app = QtGui.QApplication(sys.argv) # instantiate app, pass command line arguments
+
+    main_window = MainWindow()
+
+    app.setActiveWindow(main_window)
+    # Sets the active window to the active widget in response to a system event.
+    # The function is called from the platform specific event handlers.
+    # It sets the activeWindow() and focusWidget() attributes and sends proper 
+    # WindowActivate/WindowDeactivate and FocusIn/FocusOut events to all appropriate 
+    # widgets. The window will then be painted in active state (e.g. cursors in 
+    # line edits will blink), and it will have tool tips enabled.
+    # Warning: This function does not set the keyboard focus to the active widget. 
+    # Call QWidget.activateWindow() instead.
+
+    main_window.show()
+
+    ret = app.exec_()
+    del main_window
+    sys.exit(ret)
+#------------------------------------------------------------------------------
+
+#if __name__ == '__main__':
+#
+#    app = QtGui.QApplication(sys.argv)
+#    form = InputFreqUnits() #)
+#
+#    form.update_UI()
+##    form.updateUI(newLabels = ['F_PB','F_PB2'])
+#
+#    form.show()
+#
+#    app.exec_()
