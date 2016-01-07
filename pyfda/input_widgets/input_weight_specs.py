@@ -24,9 +24,9 @@ class InputWeightSpecs(QtGui.QWidget):
            
     sigSpecsChanged = pyqtSignal()
 
-    def __init__(self, parent):
+    def __init__(self):
 
-        super(InputWeightSpecs, self).__init__(parent)
+        super(InputWeightSpecs, self).__init__()
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -59,8 +59,8 @@ class InputWeightSpecs(QtGui.QWidget):
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
-        new_labels = [str(l) for l in fb.fil[0] if l[0] == 'W']
-        self.update_UI(new_labels = new_labels)
+        newLabels = [str(l) for l in fb.fil[0] if l[0] == 'W']
+        self.update_UI(newLabels = newLabels)
 
         frmMain = QtGui.QFrame()
         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -86,28 +86,28 @@ class InputWeightSpecs(QtGui.QWidget):
         
 
 #-------------------------------------------------------------
-    def update_UI(self, new_labels = []):
+    def update_UI(self, newLabels = []):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
         """
         # Check whether the number of entries has changed
-        for i in range(max(len(self.qlabels), len(new_labels))):
-             # new_labels is shorter than qlabels -> delete the difference
-            if (i > (len(new_labels)-1)):
-                self._del_entry(len(new_labels))
+        for i in range(max(len(self.qlabels), len(newLabels))):
+             # newLabels is shorter than qlabels -> delete the difference
+            if (i > (len(newLabels)-1)):
+                self._del_entry(len(newLabels))
 
-            # new_labels is longer than existing qlabels -> create new ones!
+            # newLabels is longer than existing qlabels -> create new ones!
             elif (i > (len(self.qlabels)-1)):
-             self._add_entry(i, new_labels[i])
+             self._add_entry(i, newLabels[i])
 
             else:
                 # when entry has changed, update label and corresponding value
-                if self.qlineedit[i].objectName() != new_labels[i]:
-                    self.qlabels[i].setText(rt_label(new_labels[i]))
+                if self.qlineedit[i].objectName() != newLabels[i]:
+                    self.qlabels[i].setText(rt_label(newLabels[i]))
                     
-                    self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
-                    self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+                    self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
+                    self.qlineedit[i].setObjectName(newLabels[i])  # update ID
 
 #------------------------------------------------------------------------------
     def load_entries(self):
@@ -149,7 +149,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def _add_entry(self, i, new_label):
+    def _add_entry(self, i, newLabel):
         """
         Append entry number i to subwidget (QLabel und QLineEdit) and
         connect QLineEdit widget to self._store_entries. This way, the central filter
@@ -157,10 +157,10 @@ class InputWeightSpecs(QtGui.QWidget):
         edited.
         """
         self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(rt_label(new_label))
+        self.qlabels[i].setText(rt_label(newLabel))
 
-        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][new_label])))
-        self.qlineedit[i].setObjectName(new_label) # update ID
+        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
+        self.qlineedit[i].setObjectName(newLabel) # update ID
         
         self.qlineedit[i].editingFinished.connect(self._store_entries)
 
@@ -176,67 +176,17 @@ class InputWeightSpecs(QtGui.QWidget):
             self.qlineedit[i].setText("1.0")
         self._store_entries()
 
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    
-    from PyQt4 import QtCore
-    
-    class MainWindow(QtGui.QMainWindow):
-        """
-        QMainWindow is used here as it is a class that understands GUI elements like
-        toolbar, statusbar, central widget, docking areas etc.
-        """
 
-        def __init__(self):
-            super(MainWindow, self).__init__()
-            self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
-            self.main_widget = QtGui.QWidget()
-            self.test_widget = InputWeightSpecs(self)           # instantiate widget
+    app = QtGui.QApplication(sys.argv)
+    form = InputWeightSpecs()
 
-            layV = QtGui.QVBoxLayout(self.main_widget) # create layout manager
-            layV.addWidget(self.test_widget)                 # add widget to layout
-#            self.main_widget.setFocus()             # give keyboard focus to main_widget
-            self.setCentralWidget(self.main_widget)
-            # Set the given widget to be the main window's central widget, QMainWindow
-            #  takes ownership of the widget pointer and deletes it at the appropriate time.
-        def update_UI(self, new_labels):
-            self.test_widget.update_UI(new_labels=new_labels)
-#------------------------------------------------------------------------------
+    form.updateUI(newLabels = ['W_SB','W_SB2','W_PB','W_PB2'])
+    form.updateUI(newLabels = ['W_PB','W_PB2'])
 
-    app = QtGui.QApplication(sys.argv) # instantiate app, pass command line arguments
+    form.show()
 
-    main_window = MainWindow()
-    main_window.update_UI(new_labels = ['W_SB','W_SB2','W_PB','W_PB2'])
-    main_window.update_UI(new_labels = ['W_PB','W_PB2'])
-
-    app.setActiveWindow(main_window)
-    # Sets the active window to the active widget in response to a system event.
-    # The function is called from the platform specific event handlers.
-    # It sets the activeWindow() and focusWidget() attributes and sends proper 
-    # WindowActivate/WindowDeactivate and FocusIn/FocusOut events to all appropriate 
-    # widgets. The window will then be painted in active state (e.g. cursors in 
-    # line edits will blink), and it will have tool tips enabled.
-    # Warning: This function does not set the keyboard focus to the active widget. 
-    # Call QWidget.activateWindow() instead.
-
-    main_window.show()
-
-    ret = app.exec_()
-    del main_window
-    sys.exit(ret)
-
-
-##------------------------------------------------------------------------------
-#
-#if __name__ == '__main__':
-#
-#    app = QtGui.QApplication(sys.argv)
-#    form = InputWeightSpecs()
-#
-#    form.updateUI(new_labels = ['W_SB','W_SB2','W_PB','W_PB2'])
-#    form.updateUI(new_labels = ['W_PB','W_PB2'])
-#
-#    form.show()
-#
-#    app.exec_()
+    app.exec_()
