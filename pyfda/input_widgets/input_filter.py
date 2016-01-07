@@ -15,7 +15,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
@@ -45,8 +45,8 @@ class InputFilter(QtGui.QWidget):
 
     sigFiltChanged = pyqtSignal()
 
-    def __init__(self):
-        super(InputFilter, self).__init__()
+    def __init__(self, parent):
+        super(InputFilter, self).__init__(parent)
 
         self.dm_last = '' # design method from last call
 
@@ -485,10 +485,22 @@ class InputFilter(QtGui.QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    
+    class MainWindow(QtGui.QMainWindow):
+        """
+        QMainWindow is used here as it is a class that understands GUI elements like
+        toolbar, statusbar, central widget, docking areas etc.
+        """
+
+        def __init__(self):
+            super(MainWindow, self).__init__()
+            self.widget = InputFilter(self)
+            
     app = QtGui.QApplication(sys.argv)
-    form = InputFilter()
-    form.show()
+    window = MainWindow()
+    window.show()
 
-
-    app.exec_()
+    ret = app.exec_()
+#    del window
+    sys.exit(ret)
 
