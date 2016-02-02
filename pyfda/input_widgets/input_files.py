@@ -184,16 +184,16 @@ class InputFiles(QtGui.QWidget):
                         # this only works for python >= 3.3
                             fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
                     else:
-                        logger.error('Unknown file type "%s"' 
-                                            %os.path.splitext(file_name)[1])
+                        logger.error('Unknown file type "%s"',
+                                            os.path.splitext(file_name)[1])
                         file_type_err = True
                     if not file_type_err:
-                        logger.info('Loaded filter "%s"' %file_name)
+                        logger.info('Loaded filter "%s"', file_name)
                          # emit signal -> InputTabWidgets.load_all:
                         self.sigFilterLoaded.emit()
                         rc.save_dir = os.path.dirname(file_name)
             except IOError as e:
-                logger.error("Failed loading %s!" %file_name, "\n", e)
+                logger.error("Failed loading %s!\n%s", file_name, e)
             except Exception as e:
                 logger.error("Unexpected error:", e)
 #------------------------------------------------------------------------------
@@ -220,15 +220,15 @@ class InputFiles(QtGui.QWidget):
                         # save as a version compatible with Python 2.x
                         pickle.dump(fb.fil, f, protocol = 2)
                     else:
-                        logger.error('Unknown file type "%s"' 
-                                            %os.path.splitext(file_name)[1])
+                        logger.error('Unknown file type "%s"', 
+                                            os.path.splitext(file_name)[1])
                         file_type_err = True
                     if not file_type_err:
-                        logger.info('Filter saved as "%s"' %file_name)
+                        logger.info('Filter saved as "%s"', file_name)
                         rc.save_dir = os.path.dirname(file_name)
                             
             except IOError as e:
-                    logger.error('Failed saving "%s"!\n' %file_name, e)
+                    logger.error('Failed saving "%s"!\n%s\n', file_name, e)
 
 #------------------------------------------------------------------------------
     def export_coeffs(self):
@@ -314,17 +314,16 @@ class InputFiles(QtGui.QWidget):
                         workbook.close()
             
                     else:
-                        logger.error('Unknown file type "%s"' 
-                                            %os.path.splitext(file_name)[1])
+                        logger.error('Unknown file type "%s"', os.path.splitext(file_name)[1])
                         file_type_err = True
                         
                     if not file_type_err:
-                        logger.info('Exported coefficients as %s - file\n"%s"' 
-                                %(self.prune_file_ext(file_type), file_name))
+                        logger.info('Exported coefficients as %s - file\n"%s"', 
+                                self.prune_file_ext(file_type), file_name)
                         rc.save_dir = os.path.dirname(file_name)
                     
             except IOError as e:
-                logger.error('Failed saving "%s"!\n' %file_name, e)
+                logger.error('Failed saving "%s"!\n%s\n', file_name, e)
 
     
             # Download the Simple ods py module:
@@ -359,16 +358,15 @@ class InputFiles(QtGui.QWidget):
                         fb.fil[0]['ba'] = np.load(f)['ba']
                         # would be possible to store several arrays in one file
                     else:
-                        logger.error('Unknown file type "%s"' 
-                                            %os.path.splitext(file_name)[1])
+                        logger.error('Unknown file type "%s"', os.path.splitext(file_name)[1])
                         file_type_err = True
                         
                     if not file_type_err:
-                        logger.info('Loaded coefficient file\n"%s"' %file_name)
+                        logger.info('Loaded coefficient file\n"%s"', file_name)
                         self.sigFilterDesigned.emit() # emit signal -> pyFDA                     
                         rc.save_dir = os.path.dirname(file_name)
             except IOError as e:
-                logger.error("Failed loading %s!\n" %file_name, e)
+                logger.error("Failed loading %s!\n%s", file_name, e)
 
 
 

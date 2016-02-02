@@ -39,7 +39,7 @@ matplotlib.use("Qt4Agg")
 import scipy.signal as sig
 import matplotlib.pyplot as plt
 from  matplotlib import patches
-import warnings
+import logging
 
 def dB(lin, power = False):
     """
@@ -770,6 +770,7 @@ Examples
 ## is converted to the FIR filter conv(b,fliplr(conj(a))).
     if not whole:
         nfft = 2*nfft
+
 #
     w = fs * np.arange(0, nfft)/nfft # create frequency vector
     minmag = 10. * np.spacing(1) # equivalent to matlab "eps"
@@ -854,9 +855,9 @@ Examples
     den = np.polyval(c[::-1], z)
     singular = np.absolute(den) < 10 * minmag
     if np.any(singular) and verbose:
-        warnings.warn(
-            "The group delay is singular at frequencies [{0}], setting to 0".
-            format(", ".join("{0:.3f}".format(ws) for ws in w[singular]))
+        singularity_list = ", ".join("{0:.3f}".format(ws/(2*pi)) for ws in w[singular])
+        print("pyfda_lib.py:grpdelay:\n"
+            "The group delay is singular at F = [{0:s}], setting to 0".format(singularity_list)
         )
 
     gd = np.zeros_like(w)
