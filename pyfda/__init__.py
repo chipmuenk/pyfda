@@ -1,2 +1,1 @@
 #
-from .pyfda import main 
