@@ -17,11 +17,12 @@ setup(
     name = 'pyfda',
     # see PEP440 for versioning information
     version = __version__,
-    description = ('pyfda is a tool for designing and analysing discrete time '
+    description = ('pyFDA is a tool for designing and analysing discrete time '
                  'filters written in python with a graphical user interface.'),
     long_description = read('README.txt'),
+    keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
-    author = 'Christian Munker',
+    author = 'Christian Muenker',
     author_email = '',
     license = 'Apache',
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
@@ -40,7 +41,7 @@ setup(
 """
 On non-Windows platforms (using "setup.py install", "setup.py develop", 
 or by using EasyInstall), a "pyfdax" script will be installed that imports 
-"main" from module pyfda. main() is called with no arguments, and the
+"main" from pyfdax.py. main() is called with no arguments, and the
 return value is passed to sys.exit(), so an errorlevel or message to print 
 to stderr could be provided (not implemented yet).
 
