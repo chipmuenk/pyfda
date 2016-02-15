@@ -16,13 +16,13 @@ import pyfda.filterbroker as fb
 from pyfda import pyfda_rc as rc
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
-from .input_widgets import input_tab_widgets
-from .plot_widgets import plot_tab_widgets
+from pyfda.input_widgets import input_tab_widgets
+from pyfda.plot_widgets import plot_tab_widgets
 
 __version__ = "0.1a5"
 
 # get dir for this file and store as base_dir in filterbroker
-fb.base_dir = os.path.dirname(os.path.abspath(__file__))
+fb.base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pyfda')
 
 #logger = logging.getLogger(__name__)
 logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file), disable_existing_loggers=True)
@@ -247,8 +247,7 @@ def main():
     app.setActiveWindow(mainw) #<---- Das macht keinen Unterschied!
 
 
-    icon = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        'images', 'icons', "Logo_LST_4.svg")
+    icon = os.path.join(fb.base_dir, 'images', 'icons', "Logo_LST_4.svg")
 
     app.setWindowIcon(QtGui.QIcon(icon))
     mainw.setWindowIcon(QtGui.QIcon(icon))

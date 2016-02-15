@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from setuptools import setup, find_packages
-from pyfda.pyfda import __version__
+from pyfdax import __version__
 
 # @todo: WIP see https://packaging.python.org/en/latest/index.html
 
@@ -29,10 +29,10 @@ setup(
     data_files = [('pyfda/filter_design', ['pyfda/filter_design/filter_list.txt'])],
     entry_points = {
         'console_scripts': [
-            'pyfdax = pyfda:main',
+            'pyfdax = pyfdax:main',
         ],
         'gui_scripts': [
-            'pyfda_gui = pyfda:main',
+            'pyfda_gui = pyfdax:main',
         ]
     }
 )
