@@ -8,10 +8,11 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys, os
 from PyQt4 import QtGui, QtCore
 
-from pyfda import pyfda_rc
+from pyfda import pyfda_rc as rc
 from pyfda.filter_tree_builder import FilterTreeBuilder
-from .input_widgets import input_tab_widgets_crash
-#from .plot_widgets import plot_tab_widgets
+#from pyfda.input_widgets import input_tab_widgets_crash
+from pyfda.input_widgets import input_tab_widgets as input_tab_widgets_crash
+#from pyfda.plot_widgets import plot_tab_widgets
 
 __version__ = "0.1a1"
 
@@ -26,13 +27,12 @@ class pyFDA(QtGui.QMainWindow):
     """
 
     def __init__(self):
-        self.DEBUG = False
         super(pyFDA, self).__init__()
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
         self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt',
-                                     comment_char='#', DEBUG=self.DEBUG)
+                                     comment_char='#')
                                      
         self.initUI()
 
@@ -203,7 +203,7 @@ def main():
 
 #    myFont = QtGui.QFont("Tahoma", fontsize)
 #    app.setFont(myFont)
-    app.setStyleSheet(pyfda_rc.css_rc['TopWidget']) 
+    app.setStyleSheet(rc.css_rc) 
 #                      pyfda_rc.css_rc['LineEdit'] +
  #                     pyfda_rc.css_rc['TabBar'])
     mainw = pyFDA()
