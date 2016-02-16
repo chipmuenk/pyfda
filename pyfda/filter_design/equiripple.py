@@ -42,8 +42,8 @@ using Ichige's algorithm.
 
 **Design routines:**
 
-``scipy.signal.remez()``
-``scipy.pyfda_lib.remezord()``
+``scipy.signal.remez()``\n
+``pyfda_lib.remezord()``
     """
 
     def __init__(self):
