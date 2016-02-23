@@ -21,11 +21,25 @@ from pyfda.plot_widgets import plot_tab_widgets
 
 __version__ = "0.1a5"
 
-# get dir for this file and store as base_dir in filterbroker
+# get dir for this file, apppend 'pyfda' and store as base_dir in filterbroker
 fb.base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pyfda')
 
-#logger = logging.getLogger(__name__)
-logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file), disable_existing_loggers=True)
+class DynFileHandler(logging.FileHandler):
+    """
+    subclass FileHandler with a customized handler for dynamic definition of
+    the logging filepath and -name
+    """
+    def __init__(self, *args):
+        filename, mode = args
+        if not os.path.isabs(filename): # path to logging file given in config_file?
+            filename = os.path.join(fb.base_dir, filename) # no, use basedir
+        logging.FileHandler.__init__(self, filename, mode)
+
+# "register" custom class DynFileHandler as an attribute for the logging module
+# to use it inside the logging config file and pass file name / path and mode
+# as parameters:
+logging.DynFileHandler = DynFileHandler
+logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file))#, disable_existing_loggers=True)
 
 
 if not os.path.exists(rc.save_dir):
@@ -48,7 +62,6 @@ if not os.path.exists(rc.save_dir):
 #        print("filter_arg", arg)
 #        return arg
 
-logfilename="D:/Daten/log.log"
 
 #logging.Filter()
 
