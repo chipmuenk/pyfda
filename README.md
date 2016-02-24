@@ -16,6 +16,7 @@ Besides standard python libraries, the project builds on the following libraries
 * matplotlib
 * docutils
 * pyQt4
+
 Optional:
 * xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
 
@@ -41,6 +42,8 @@ or files from pyFDA using e.g.
     >> python -m pyfda.input_widgets.input_pz  # plain python interpreter
    
 ### Customization
+
+The layout and some default paths can be customized using the file `pyfda/pyfda_rc.py`.
 
 ### Why yet another filter design tool?
 * **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
