@@ -10,7 +10,14 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
 ### Prerequisites
-The project builds only on standard python libraries, libraries from the scipy stack (numpy, scipy, matplotlib) and the pyQt4 widget library. When the modules xlwt and / or XlsxWriter are installed, coefficients can be exported as *.xls(x) files.
+Besides standard python libraries, the project builds on the following libraries:
+* numpy
+* scipy
+* matplotlib
+* docutils
+* pyQt4
+Optional:
+* xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
 
 ### Installing and starting pyFDA
 Download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
@@ -33,7 +40,7 @@ or files from pyFDA using e.g.
     In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
     >> python -m pyfda.input_widgets.input_pz  # plain python interpreter
    
-
+### Customization
 
 ### Why yet another filter design tool?
 * **Education:** There is a very limited choice of user-friendly, license-free tools available to teach the influence of different filter design methods and specifications on time and frequency behaviour. It should be possible to run the tool without severe limitations also with the limited resolution of a beamer.
