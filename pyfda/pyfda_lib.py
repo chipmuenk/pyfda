@@ -489,7 +489,7 @@ def zplane(plt, b, a=1, pn_eps=1e-3, zpk=True, analog=False, pltLib='matplotlib'
 #                  markeredgecolor=mzc, markerfacecolor='none')
         # Plot the poles
         ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker = 'x',
-                   edgecolor = mpc, lw = lw, label=plabel)
+                   color = mpc, lw = lw, label=plabel)
 
          # Print multiplicity of poles / zeros
         for i in range(len(z)):
