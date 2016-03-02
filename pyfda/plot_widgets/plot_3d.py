@@ -131,7 +131,7 @@ class Plot3D(QtGui.QMainWindow):
         self.diaAlpha.setFixedHeight(30)
         self.diaAlpha.setFixedWidth(30)
         self.diaAlpha.setWrapping(False)
-        self.diaAlpha.setToolTip("Set transparency for surf and contour plot.")
+        self.diaAlpha.setToolTip("Set transparency for surf and 3D-contour plot.")
 
         self.lblHatch = QtGui.QLabel("Stride")
         self.diaHatch = QtGui.QDial(self)
@@ -146,7 +146,7 @@ class Plot3D(QtGui.QMainWindow):
         self.chkContour2D = QtGui.QCheckBox(self)
         self.chkContour2D.setText("Contour2D")
         self.chkContour2D.setObjectName("chkContour2D")
-        self.chkContour2D.setToolTip("Plot 2D-contours for real and imaginary part")
+        self.chkContour2D.setToolTip("Plot 2D-contours at z =0")
         self.chkContour2D.setChecked(False)
 
         #----------------------------------------------------------------------
@@ -548,7 +548,7 @@ class Plot3D(QtGui.QMainWindow):
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
             s = self.ax3d.contourf(self.x, self.y, Hmag, 20, zdir='z',
                                offset=bottom - (top - bottom) * 0.05,
-                                cmap=cmap, alpha=alpha)
+                                cmap=cmap, alpha=0.9)
             
         # plot colorbar for suitable plot modes
         if self.chkColBar.isChecked() and (self.chkContour2D.isChecked() or
