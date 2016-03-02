@@ -89,26 +89,42 @@ class InputFreqSpecs(QtGui.QWidget):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
+        
+        Connect new QLineEdit fields to _sort_store_entries so that the filter
+        dictionary is updated automatically when a QLineEdit field has been
+        edited.
         """
-        # Check whether the number of entries has changed
-        for i in range(max(len(self.qlabels), len(new_labels))):
+        # Check whether the number of entries has changed: 
+        #  self.qlabels is a list with references to existing QLabel widgets,
+        #  new_labels is a list of strings from the filter_dict for the current
+        #    filter design
+        print("\nupdate_UI\nnew_labels:", new_labels,"\nQLabels:", len(self.qlabels), "NewLabels:", len(new_labels))
 
-            # less new_labels than qlabels -> delete superfluous labels + lineedits
-            if (i > (len(new_labels)-1)):
-                self._del_entry(len(new_labels))
+        delta_new_labels = len(new_labels) - len(self.qlabels)
+        
+        if delta_new_labels < 0: # less new labels, delete old ones
+            self._del_entries(-delta_new_labels)
 
-            # more new_labels than existing qlabels -> create new labels + lineedits
-            elif (i > (len(self.qlabels)-1)):
-             self._add_entry(i,new_labels[i])
-
-            else:
-                # when entry has changed, update label and corresponding value
+        elif delta_new_labels > 0: # more new labels, create new ones
+            self._add_entries(delta_new_labels)
+            
+        print("New QLabels:", len(self.qlabels), "NewLabels:", len(new_labels))
+        
+        for i in range(len(new_labels)):        
+#            else:
+                # when entry has changed, update signal-slot connection, 
+                #  label and corresponding value
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
+                    try:
+                        self.qlineedit[i].editingFinished.disconnect(self._sort_store_entries)
+                    except TypeError:
+                        pass
                     self.qlabels[i].setText(rt_label(new_labels[i]))
-
+    
                     self.qlineedit[i].setText(
                         str(fb.fil[0][new_labels[i]] * fb.fil[0]['f_S']))
-                    self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+                    self.qlineedit[i].setObjectName(new_labels[i])  # update ID                      
+                    self.qlineedit[i].editingFinished.connect(self._sort_store_entries)
 
         self._sort_store_entries()  # sort & store values to dict for the case 
                                     # that the response type has been changed 
@@ -137,43 +153,47 @@ class InputFreqSpecs(QtGui.QWidget):
             f = fb.fil[0][str(self.qlineedit[i].objectName())] * fb.fil[0]['f_S']
             self.qlineedit[i].setText(str(round(f,11)))
 
-
 #-------------------------------------------------------------
-    def _del_entry(self,i):
+    def _del_entries(self, num):
         """
-        Delete entry number i from subwidget (QLabel and QLineEdit) and
-        disconnect the editingFinished signal from self._sort_store_entries.
+        Delete num subwidgets (QLabel and QLineEdit) from layout and memory and
+        disconnect the editingFinished signals from self._sort_store_entries.
         """
-        self.qlineedit[i].editingFinished.disconnect(self._sort_store_entries) # needed?
+        Nmax = len(self.qlabels)-1  # number of existing labels
+        print("\n_del_entries:\nNmax:", Nmax, "Delete:", num)
+        for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
+            
+            print(i, self.qlabels[i].text(), self.qlineedit[i].objectName())
 
-        self.layGSpecWdg.removeWidget(self.qlabels[i])
-        self.layGSpecWdg.removeWidget(self.qlineedit[i])
-
-        self.qlabels[i].deleteLater()
-        del self.qlabels[i]
-        self.qlineedit[i].deleteLater()
-        del self.qlineedit[i]
-
-
-#-------------------------------------------------------------
-    def _add_entry(self, i, new_label):
+            self.qlineedit[i].editingFinished.disconnect(self._sort_store_entries)
+    
+            self.layGSpecWdg.removeWidget(self.qlabels[i])
+            self.layGSpecWdg.removeWidget(self.qlineedit[i])
+    
+            self.qlabels[i].deleteLater()
+            del self.qlabels[i]
+            self.qlineedit[i].deleteLater()
+            del self.qlineedit[i]        
+                
+        #-------------------------------------------------------------
+    def _add_entries(self, num):
         """
-        Append entry number i to subwidget (QLabel und QLineEdit) and connect
-        QLineEdit widget to self._sort_store_entries. This way, the central filter
-        dictionary is updated automatically when a QLineEdit field has been
-        edited.
+        Append num subwidgets (QLabel und QLineEdit) to memory and layout and 
+        initialize them with dummy information.
         """
-        self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(rt_label(new_label))
+        Nmax = len(self.qlabels)-1 # number of existing labels
+        print("\n_add_entries:\nNmax:", Nmax, "Add:", num)
 
-        self.qlineedit.append(QtGui.QLineEdit(
-                                    str(fb.fil[0][new_label]*fb.fil[0]['f_S'])))
-        self.qlineedit[i].setObjectName(new_label) # update ID
-        
-        self.qlineedit[i].editingFinished.connect(self._sort_store_entries)
-
-        self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
-        self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)
+        # start with Nmax + 1, last element Nmax + num +1
+        for i in range(Nmax+1, Nmax+num+1, 1): 
+            self.qlabels.append(QtGui.QLabel(self))
+            self.qlabels[i].setText(rt_label("dummy"))
+    
+            self.qlineedit.append(QtGui.QLineEdit(""))
+            self.qlineedit[i].setObjectName("dummy")
+    
+            self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
+            self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)   
 
 #-------------------------------------------------------------
     def _sort_store_entries(self, signal = True):
@@ -216,7 +236,7 @@ if __name__ == '__main__':
     form = InputFreqSpecs()
 
     form.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])
-    form.update_UI(new_labels = ['F_PB','F_PB2'])
+#    form.update_UI(new_labels = ['F_PB','F_PB2'])
 
     form.show()
 
