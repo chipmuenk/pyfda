@@ -78,13 +78,6 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.layGSpecs.addWidget(self.lblUnits,0,0)
         self.layGSpecs.addWidget(self.cmbUnitsA,0,1, Qt.AlignLeft)
 
-        # - Build a list from all entries in the fil_dict dictionary starting
-        #   with "A" (= amplitude specifications of the current filter)
-        # - Pass the list to setEntries which recreates the widget
-        # ATTENTION: Entries need to be converted from QString to str for Py 2
-        newLabels = [str(l) for l in fb.fil[0] if l[0] == 'A'] 
-        self.update_UI(newLabels = newLabels)
-
         frmMain = QtGui.QFrame()
         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
         frmMain.setLayout(self.layGSpecs)
@@ -93,11 +86,19 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(self.layVMain)
+        
+        # - Build a list from all entries in the fil_dict dictionary starting
+        #   with "A" (= amplitude specifications of the current filter)
+        # - Pass the list to setEntries which recreates the widget
+        # ATTENTION: Entries need to be converted from QString to str for Py 2
+        new_labels = [str(l) for l in fb.fil[0] if l[0] == 'A'] 
+        self.update_UI(new_labels = new_labels)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self.load_entries)
+        #       ^ this also triggers the initial load_entries
         # DYNAMIC SIGNAL SLOT CONNECTION:
         # Every time a field is edited, call self.load_entries - this signal-slot
         # mechanism is constructed in self._add_entry/ destructed in 
@@ -105,8 +106,47 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         # filter design method is selected.
         #----------------------------------------------------------------------
 
-#        self.load_entries() # is executed by the statement above
+#-------------------------------------------------------------
+    def update_UI(self, new_labels = []):
+        """
+        Set labels and get corresponding values from filter dictionary.
+        When number of elements changes, the layout of subwidget is rebuilt.
+        
+        Connect new QLineEdit fields to _sort_store_entries so that the filter
+        dictionary is updated automatically when a QLineEdit field has been
+        edited.
+        """
+        # Check whether the number of entries has changed: 
+        #  self.qlabels is a list with references to existing QLabel widgets,
+        #  new_labels is a list of strings from the filter_dict for the current
+        #    filter design
 
+        delta_new_labels = len(new_labels) - len(self.qlabels)
+        
+        if delta_new_labels < 0: # less new labels, delete old ones
+            self._del_entries(-delta_new_labels)
+
+        elif delta_new_labels > 0: # more new labels, create new ones
+            self._add_entries(delta_new_labels)
+        
+        for i in range(len(new_labels)):        
+#            else:
+                # when entry has changed, update signal-slot connection, 
+                #  label and corresponding value
+                if str(self.qlineedit[i].objectName()) != new_labels[i]:
+                    try:
+                        self.qlineedit[i].editingFinished.disconnect(self._store_entries)
+                    except TypeError:
+                        pass
+                    
+                    self.qlabels[i].setText(rt_label(new_labels[i]))
+    
+                    self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+                    self.qlineedit[i].setObjectName(new_labels[i])  # update ID                      
+                    self.qlineedit[i].editingFinished.connect(self._store_entries)
+
+        self.load_entries() # convert filter dict entries to selected unit
+        
 #------------------------------------------------------------------------------
     def load_entries(self):
         """
@@ -142,6 +182,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                         delta_PB = (10 ** (A_PB / 20) - 1)/ (10 ** (A_PB / 20) + 1)[FIR]
             - stopband: delta_SB = -10 ** (-A_SB/10 resp. 20)
             """
+            dB_value = abs(dB_value)
             if "PB" in amp_label: # passband
                 if fb.fil[0]['ft'] == 'IIR':
                     delta = round(1. - 10.**(-dB_value / 20.), 10)
@@ -168,68 +209,47 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         self.sigSpecsChanged.emit() # -> input_specs
 
 
-#------------------------------------------------------------------------------
-    def update_UI(self, newLabels = []):
+#-------------------------------------------------------------
+    def _del_entries(self, num):
         """
-        Set labels and get corresponding values from filter dictionary.
-        When number of elements changes, the layout of subwidget is rebuilt in
-        self.layGSpecs.
+        Delete num subwidgets (QLabel and QLineEdit) from layout and memory and
+        disconnect the editingFinished signals from self._store_entries.
         """
-        # Check whether the number of entries has changed
-        for i in range(max(len(self.qlabels), len(newLabels))):
-             # newLabels is shorter than qlabels -> delete the difference
-            if (i > (len(newLabels)-1)):
-                self._del_entry(len(newLabels))
+        Nmax = len(self.qlabels)-1  # number of existing labels
 
-            # newLabels is longer than existing qlabels -> create new ones!
-            elif (i > (len(self.qlabels)-1)):
-             self._add_entry(i,newLabels[i])
+        for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
+            
+            self.qlineedit[i].editingFinished.disconnect(self._store_entries)
+    
+            self.layGSpecs.removeWidget(self.qlabels[i])
+            self.layGSpecs.removeWidget(self.qlineedit[i])
+    
+#            self.qlabels[i].deleteLater() # 
+            self.qlabels[i].setParent(None) # alternative: change ownership back to python
+            del self.qlabels[i]
+#            self.qlineedit[i].deleteLater()
+            self.qlineedit[i].setParent(None) # alternative: change ownership back to python
+            del self.qlineedit[i]        
 
-            else:
-                # when entry has changed, update label and corresponding value
-                if self.qlineedit[i].objectName() != newLabels[i]:
-                    self.qlabels[i].setText(rt_label(newLabels[i]))
-                    
-                    self.qlineedit[i].setText(str(fb.fil[0][newLabels[i]]))
-                    self.qlineedit[i].setObjectName(newLabels[i])  # update ID
-
-        self.load_entries()
-
-#------------------------------------------------------------------------------
-    def _del_entry(self,i):
+#------------------------------------------------------------------------
+    def _add_entries(self, num):
         """
-        Delete entry number i from subwidget (QLabel and QLineEdit) and
-        disconnect the lineedit field from self._amp_units
+        Append num subwidgets (QLabel und QLineEdit) to memory and layout and 
+        initialize them with dummy information.
         """
-        self.qlineedit[i].editingFinished.disconnect(self._store_entries) # needed?
-        
-        self.layGSpecs.removeWidget(self.qlabels[i])
-        self.layGSpecs.removeWidget(self.qlineedit[i])
+        Nmax = len(self.qlabels)-1 # number of existing labels
 
-        self.qlabels[i].deleteLater()
-        del self.qlabels[i]
-        self.qlineedit[i].deleteLater()
-        del self.qlineedit[i]
+        # start with Nmax + 1, last element Nmax + num +1
+        for i in range(Nmax+1, Nmax+num+1, 1): 
+            self.qlabels.append(QtGui.QLabel(self))
+            self.qlabels[i].setText(rt_label("dummy"))
+    
+            self.qlineedit.append(QtGui.QLineEdit(""))
+            self.qlineedit[i].setObjectName("dummy")
+    
+            self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
+            self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)   
 
-
-#------------------------------------------------------------------------------
-    def _add_entry(self, i, newLabel):
-        """
-        Append entry number i to subwidget (QLabel und QLineEdit) in self.layGSpecs
-        and connect QLineEdit.editingFinished to self._amp_text. This way, the
-        filter dictionary is updated automatically when a QLineEdit field has 
-        been edited (i.e. looses focus or when a return is entered).
-        """
-        self.qlabels.append(QtGui.QLabel(self))
-        self.qlabels[i].setText(rt_label(newLabel))
-
-        self.qlineedit.append(QtGui.QLineEdit(str(fb.fil[0][newLabel])))
-        self.qlineedit[i].setObjectName(newLabel) # update ID
-        
-        self.qlineedit[i].editingFinished.connect(self._store_entries)
-
-        self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
-        self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
 
 #------------------------------------------------------------------------------
 
@@ -238,8 +258,8 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     form = InputAmpSpecs()
 
-    form.update_UI(newLabels = ['A_SB','A_SB2','A_PB','A_PB2'])
-    form.update_UI(newLabels = ['A_PB','A_SB'])
+    form.update_UI(new_labels = ['A_SB','A_SB2','A_PB','A_PB2'])
+    form.update_UI(new_labels = ['A_PB','A_SB'])
 
     form.show()
 

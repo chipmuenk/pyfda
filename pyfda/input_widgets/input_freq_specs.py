@@ -55,11 +55,11 @@ class InputFreqSpecs(QtGui.QWidget):
         
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
-        self.layGSpecWdg = QtGui.QGridLayout() # sublayout for spec fields        
+        self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields        
 
         sfFrame = QtGui.QFrame()
         sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        sfFrame.setLayout(self.layGSpecWdg)
+        sfFrame.setLayout(self.layGSpecs)
 
         self.layVMain.addWidget(sfFrame)
         self.layVMain.setContentsMargins(1,1,1,1)
@@ -68,6 +68,7 @@ class InputFreqSpecs(QtGui.QWidget):
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "F" (= frequency specifications of the current filter)
         # - Pass the list to updateUI which recreates the widget
+        # ATTENTION: Entries need to be converted from QString to str for Py 2
         new_labels = [str(l) for l in fb.fil[0] if l[0] == 'F']
         
         self.update_UI(new_labels = new_labels)
@@ -77,7 +78,7 @@ class InputFreqSpecs(QtGui.QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # DYNAMIC SIGNAL SLOT CONNECTION:
-        # Every time a field is edited, call self._sort_store_entries 
+        # Every time a field is edited, call self._store_entries 
         # This signal-slot connection is constructed in self._add_entry / 
         # destructed in self._del_entry each time the widget is updated, 
         # i.e. when a new filter design method is selected.
@@ -90,7 +91,7 @@ class InputFreqSpecs(QtGui.QWidget):
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
         
-        Connect new QLineEdit fields to _sort_store_entries so that the filter
+        Connect new QLineEdit fields to _store_entries so that the filter
         dictionary is updated automatically when a QLineEdit field has been
         edited.
         """
@@ -98,7 +99,6 @@ class InputFreqSpecs(QtGui.QWidget):
         #  self.qlabels is a list with references to existing QLabel widgets,
         #  new_labels is a list of strings from the filter_dict for the current
         #    filter design
-        print("\nupdate_UI\nnew_labels:", new_labels,"\nQLabels:", len(self.qlabels), "NewLabels:", len(new_labels))
 
         delta_new_labels = len(new_labels) - len(self.qlabels)
         
@@ -108,15 +108,13 @@ class InputFreqSpecs(QtGui.QWidget):
         elif delta_new_labels > 0: # more new labels, create new ones
             self._add_entries(delta_new_labels)
             
-        print("New QLabels:", len(self.qlabels), "NewLabels:", len(new_labels))
-        
         for i in range(len(new_labels)):        
 #            else:
                 # when entry has changed, update signal-slot connection, 
                 #  label and corresponding value
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
                     try:
-                        self.qlineedit[i].editingFinished.disconnect(self._sort_store_entries)
+                        self.qlineedit[i].editingFinished.disconnect(self.store_entries)
                     except TypeError:
                         pass
                     self.qlabels[i].setText(rt_label(new_labels[i]))
@@ -124,12 +122,12 @@ class InputFreqSpecs(QtGui.QWidget):
                     self.qlineedit[i].setText(
                         str(fb.fil[0][new_labels[i]] * fb.fil[0]['f_S']))
                     self.qlineedit[i].setObjectName(new_labels[i])  # update ID                      
-                    self.qlineedit[i].editingFinished.connect(self._sort_store_entries)
+                    self.qlineedit[i].editingFinished.connect(self.store_entries)
 
-        self._sort_store_entries()  # sort & store values to dict for the case 
-                                    # that the response type has been changed 
-                                    # eg. from LP -> HP, changing the order 
-                                    # of frequency entries
+        self.store_entries()    # sort & store values to dict for the case 
+                                # that the response type has been changed 
+                                # eg. from LP -> HP, changing the order 
+                                # of frequency entries
 
 
 #-------------------------------------------------------------        
@@ -141,7 +139,7 @@ class InputFreqSpecs(QtGui.QWidget):
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
-        loadEntries is called during init and when the frequency unit or the
+        load_entries is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
@@ -157,32 +155,30 @@ class InputFreqSpecs(QtGui.QWidget):
     def _del_entries(self, num):
         """
         Delete num subwidgets (QLabel and QLineEdit) from layout and memory and
-        disconnect the editingFinished signals from self._sort_store_entries.
+        disconnect the editingFinished signals from self._store_entries.
         """
         Nmax = len(self.qlabels)-1  # number of existing labels
-        print("\n_del_entries:\nNmax:", Nmax, "Delete:", num)
         for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
             
-            print(i, self.qlabels[i].text(), self.qlineedit[i].objectName())
-
-            self.qlineedit[i].editingFinished.disconnect(self._sort_store_entries)
+            self.qlineedit[i].editingFinished.disconnect(self.store_entries)
     
-            self.layGSpecWdg.removeWidget(self.qlabels[i])
-            self.layGSpecWdg.removeWidget(self.qlineedit[i])
+            self.layGSpecs.removeWidget(self.qlabels[i])
+            self.layGSpecs.removeWidget(self.qlineedit[i])
     
-            self.qlabels[i].deleteLater()
+#            self.qlabels[i].deleteLater() # 
+            self.qlabels[i].setParent(None) # alternative: change ownership back to python
             del self.qlabels[i]
-            self.qlineedit[i].deleteLater()
+#            self.qlineedit[i].deleteLater()
+            self.qlineedit[i].setParent(None) # alternative: change ownership back to python
             del self.qlineedit[i]        
                 
-        #-------------------------------------------------------------
+#------------------------------------------------------------------------
     def _add_entries(self, num):
         """
         Append num subwidgets (QLabel und QLineEdit) to memory and layout and 
         initialize them with dummy information.
         """
         Nmax = len(self.qlabels)-1 # number of existing labels
-        print("\n_add_entries:\nNmax:", Nmax, "Add:", num)
 
         # start with Nmax + 1, last element Nmax + num +1
         for i in range(Nmax+1, Nmax+num+1, 1): 
@@ -192,13 +188,13 @@ class InputFreqSpecs(QtGui.QWidget):
             self.qlineedit.append(QtGui.QLineEdit(""))
             self.qlineedit[i].setObjectName("dummy")
     
-            self.layGSpecWdg.addWidget(self.qlabels[i],(i+2),0)
-            self.layGSpecWdg.addWidget(self.qlineedit[i],(i+2),1)   
+            self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
+            self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)   
 
 #-------------------------------------------------------------
-    def _sort_store_entries(self, signal = True):
+    def store_entries(self):
         """
-        _sort_store_entries is called when:
+        _store_entries is called when:
         * a lineedit field has been edited
         * update_UI is called after changing the filter design method
 
@@ -224,8 +220,8 @@ class InputFreqSpecs(QtGui.QWidget):
                 {str(self.qlineedit[i].objectName()):round(
                     simple_eval(self.qlineedit[i].text())/fb.fil[0]['f_S'],11)})
  
-        if signal:
-            self.sigSpecsChanged.emit()
+
+        self.sigSpecsChanged.emit()
 
 
 #------------------------------------------------------------------------------
