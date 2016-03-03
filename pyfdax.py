@@ -257,7 +257,10 @@ def main():
 # http://stackoverflow.com/questions/5506781/pyqt4-application-on-windows-is-crashing-on-exit
 # http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 # http://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
-    app.setActiveWindow(mainw) #<---- Das macht keinen Unterschied!
+
+    # Sets the active window to the active widget in response to a system event.
+    app.setActiveWindow(mainw) #<---- That makes no difference!
+
 
 
     icon = os.path.join(fb.base_dir, 'images', 'icons', "Logo_LST_4.svg")
