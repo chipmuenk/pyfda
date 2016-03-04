@@ -17,7 +17,7 @@ from pyfda import pyfda_rc as rc
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
-from pyfda.plot_widgets import plot_tab_widgets
+##from pyfda.plot_widgets import plot_tab_widgets
 
 __version__ = "0.1a5"
 
@@ -96,7 +96,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputWidgets = input_tab_widgets.InputTabWidgets() # input widgets
         self.inputWidgets.setMaximumWidth(320) # comment out for splitter
 
-        self.pltWidgets = plot_tab_widgets.PlotTabWidgets() # plot widgets
+##        self.pltWidgets = plot_tab_widgets.PlotTabWidgets() # plot widgets
 
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
@@ -105,7 +105,7 @@ class pyFDA(QtGui.QMainWindow):
 
         # comment out following 3 lines for splitter design
         layHMain.addWidget(self.inputWidgets)
-        layHMain.addWidget(self.pltWidgets)
+##        layHMain.addWidget(self.pltWidgets)
         layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
 
 
@@ -177,13 +177,13 @@ class pyFDA(QtGui.QMainWindow):
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed,
         # requiring partial update of some plot widgets:
-        self.inputWidgets.sigSpecsChanged.connect(self.pltWidgets.update_view)
+##        self.inputWidgets.sigSpecsChanged.connect(self.pltWidgets.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
-        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.update_data)
+##        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.update_data)
         #
-        # sigReadFilters: button has been pressed to rebuild filter tree:
+        # sigReadFilters: button has been pressed to rebuild filter tree:        
         self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
 #####        self.closeEvent.connect(self.aboutToQuit)
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
