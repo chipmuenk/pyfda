@@ -81,7 +81,7 @@ class pyFDA(QtGui.QMainWindow):
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
-        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt', comment_char='#')                                  
+#        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt', comment_char='#')                                  
         self.initUI()
 
     def initUI(self):
@@ -184,7 +184,7 @@ class pyFDA(QtGui.QMainWindow):
 ##        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.update_data)
         #
         # sigReadFilters: button has been pressed to rebuild filter tree:        
-        self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
+ #       self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
 #####        self.closeEvent.connect(self.aboutToQuit)
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
         logger.debug("Main routine initialized!")
