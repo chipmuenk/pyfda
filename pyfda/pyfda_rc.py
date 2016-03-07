@@ -120,7 +120,7 @@ css_dark = """
             """
           
 
-# light theme /* 
+# light theme 
 css_light = """
     /* only match QWidget, not subclasses: */
     QWidget{color:black; background: white;}
@@ -132,29 +132,29 @@ css_light = """
     QPushButton{background-color:lightgrey; }
     
     QHeaderView::section{background-color:rgb(190,1,1); color:white;}
-    
-    QGridLayout#plotSpecSelect{border: 3px solid red;} /* doesnt work */
-    QGridLayout{border: 3px solid blue;} /* doesnt work */
-    """
+    """    
+#    QGridLayout#plotSpecSelect{border: 3px solid red;} /* doesnt work */
+#    QGridLayout{border: 3px solid blue;} /* doesnt work */
+
 
 # common layout settings for QTabWidget
 TabBarCss = """
- QTabWidget::pane { /* The tab widget frame */
+ QTabWidget::pane { /* The tab _widget_ frame */
      border-top: 2px solid #C2C7CB;
  }
  
+ /* Only the right QTabWidget (named plot_tabs) gets a dashed left border */
  QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
 
  QTabWidget::tab-bar {
-     left: 1px; /* move to the right by 1px */
- }
- 
- /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
- /* hack to prevent truncation of labels (see QTBUG-6905): */
+     left: 0.3em; /* move bar to the right: hack to prevent truncation of labels (QTBUG-6905) */
+     }
+
+/* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
  QTabBar {  font-weight: bold; font-size:13px; }
  QTabBar::tab{
      color:black;
-     font-size:13px;
+     font-size:10pt;
      font-weight:bold;
      background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
@@ -162,35 +162,49 @@ TabBarCss = """
      border-bottom-color: #C2C7CB; /* same as the pane color */
      border-top-left-radius: 4px;
      border-top-right-radius: 4px;
-     min-width: 10ex;
-     padding: 2px;
+     min-width: 2em;
+     padding: 0.2em;
  }
- QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
 
+ QTabBar::tab:selected, QTabBar::tab:hover {background:lightblue;}
+ 
  QTabBar::tab:selected {
      border-color: #9B9B9B;
      border-bottom-color: #C2C7CB; /* same as pane color */
  }
+
  QTabBar::tab:!selected {
-     margin-top: 2px; /* make non-selected tabs look smaller */
+     margin-top: 0.2em; /* make non-selected tabs look smaller */
  }
- /* make use of negative margins for overlapping tabs */
+
+ /* make use of negative margins to produce overlapping selected tabs */
  QTabBar::tab:selected {
-     /* expand/overlap to the left and right by 4px */
-     margin-left: -4px;
-     margin-right: -4px;
+     /* expand/overlap to both sides by 0.2em */
+     margin-left: -0.2em;
+     margin-right: -0.2em;
  }
+ 
+ QTabBar::tab:first{
+    /* the first tab */
+}
+  
  QTabBar::tab:first:selected {
      margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
  }
+ 
+  QTabBar::tab:first:!selected {
+    margin-left: -0.2em; the first unselected tab gets extra margin to prevent truncation */
+ }
+
  QTabBar::tab:last:selected {
      margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
  }
- QTabBar::tab:only-one {
-     margin: 0; /* if there is only one tab, we don't want overlapping margins */
- }
+ """
+# QTabBar::tab:only-one {
+#     margin: 0; /* if there is only one tab, we don't want overlapping margins */
+# }
+#"""
 
-"""
 css_common = """
                 *[state="changed"]{background-color:yellow; color:black}
                 *[state="error"]{background-color:red; color:white}
@@ -198,7 +212,7 @@ css_common = """
                 *[state="ok"]{background-color:green; color:white}
                 QPushButton:pressed {background-color:black; color:white}
                 
-                QWidget{font-size:12px; font-family: Tahoma;}
+                QWidget{font-size:10pt; font-family: Tahoma;}
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
                                 border-width: 2px;}
@@ -214,7 +228,7 @@ else:
     mpl_rc.update(mpl_light)
     css_rc = css_common + css_light
     
-# /* Only the right QTabWidget (named plot_tabs) gets a dashed left border */
+
 
 
 
