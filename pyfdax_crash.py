@@ -17,7 +17,7 @@ from pyfda import pyfda_rc as rc
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
-from pyfda.plot_widgets import plot_tab_widgets
+from pyfda.plot_widgets import plot_tab_widgets_crash
 
 __version__ = "0.1a5"
 
@@ -46,24 +46,6 @@ if not os.path.exists(rc.save_dir):
     logger.warning('Specified save_dir "%s" doesn\'t exist, using "%s" instead.\n',
         rc.save_dir, fb.base_dir)
     rc.save_dir = fb.base_dir
-
-
-#class Whitelist(logging.Filter):
-#    def __init__(self, **whitelist):
-#        self.whitelist = [logging.Filter(name) for name in whitelist]
-#        print("filter intialized with", whitelist)
-#
-#    def filter(self, record):
-#        """filter logging record"""
-#        arg = any(f.filter(record) for f in self.whitelist)
-#        # record.levelno == logging.ERROR
-#        # arg = self.param not in record.msg
-#        # record.msg = 'changed: ' + record.msg
-#        print("filter_arg", arg)
-#        return arg
-
-
-#logging.Filter()
 
 
 class pyFDA(QtGui.QMainWindow):
@@ -96,7 +78,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputWidgets = input_tab_widgets.InputTabWidgets() # input widgets
         self.inputWidgets.setMaximumWidth(320) # comment out for splitter
 
-        self.pltWidgets = plot_tab_widgets.PlotTabWidgets() # plot widgets
+        self.pltWidgets = plot_tab_widgets_crash.PlotTabWidgets() # plot widgets
 
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
@@ -108,32 +90,7 @@ class pyFDA(QtGui.QMainWindow):
         layHMain.addWidget(self.pltWidgets)
         layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
 
-
-# variable size tabs (splitter)
-#        layVInput = QtGui.QVBoxLayout()
-#        layVInput.addWidget(self.inputWidgets)
-#        layVPlt = QtGui.QVBoxLayout()
-#        layVPlt.addWidget(self.pltWidgets)
-#
-#        frmInput = QtGui.QFrame()
-#        frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-#        frmInput.setLayout(layVInput)
-#        frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
-#                                 QtGui.QSizePolicy.Minimum)
-#
-#        frmPlt = QtGui.QFrame()
-#        frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-#        frmPlt.setLayout(layVPlt)
-#        frmPlt.setSizePolicy(QtGui.QSizePolicy.Minimum,
-#                                 QtGui.QSizePolicy.Minimum)
-#
-#        splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
-#        splitter.addWidget(frmInput)
-#        splitter.addWidget(frmPlt)
-#        layHMain.addWidget(splitter)
-
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
-
 
         # Create scroll area and "monitor" _widget whether scrollbars are needed
         scrollArea = QtGui.QScrollArea()
@@ -151,24 +108,8 @@ class pyFDA(QtGui.QMainWindow):
         scrollArea.setWidgetResizable(True)
 
 
-        # make ScrollArea occupy the main area of QMainWidget 
-        #   and make QMainWindow its parent !!!
+        # CentralWidget (focus of GUI?) is now the ScrollArea
         self.setCentralWidget(scrollArea)
-
-
-        #=============== Menubar =======================================
-
-#        aboutAction = QtGui.QAction('&About', self)
-#        aboutAction.setShortcut('Ctrl+A')
-#        aboutAction.setStatusTip('Info about pyFDA')
-#
-#        menubar = self.menuBar()
-#        fileMenu = menubar.addMenu('&About')
-#        fileMenu.addAction(aboutAction)
-
-#        self.statusMessage("Application is initialized.")
-
-
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -178,11 +119,11 @@ class pyFDA(QtGui.QMainWindow):
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed,
         # requiring partial update of some plot widgets:
-        self.inputWidgets.sigSpecsChanged.connect(self.pltWidgets.update_view)
+#        self.inputWidgets.sigSpecsChanged.connect(self.pltWidgets.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
-        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.update_data)
+#        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.update_data)
         #
         # sigReadFilters: button has been pressed to rebuild filter tree:
         self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
@@ -190,15 +131,6 @@ class pyFDA(QtGui.QMainWindow):
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
         logger.debug("Main routine initialized!")
 
-#------------------------------------------------------------------------------
-    def aboutWindow(self):
-        """
-        Display an "About" window
-        """
-        QtGui.QMessageBox.about(self, "About pyFDA",
-                                ("(c) 2013 - 15 Christian Münker\n\n"
-        "A graphical tool for designing, analyzing and synthesizing digital filters")
-        )
 
 #------------------------------------------------------------------------------
     def statusMessage(self, message):
@@ -208,21 +140,51 @@ class pyFDA(QtGui.QMainWindow):
         self.statusBar().showMessage(message)
 
 #------------------------------------------------------------------------------       
-    def quitEvent(self): # reimplement QMainWindow.closeEvent
-        pass
-    
+    def clean_up(self):
+        """
+        Clean up everything - only called when exiting application
+
+        See http://stackoverflow.com/questions/18732894/crash-on-close-and-quit
+        """
+        for i in self.__dict__:
+            item = self.__dict__[i]
+            clean(item)
+                
+            
     def closeEvent(self, event): # reimplement QMainWindow.closeEvent von !pyFDA!
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
 
         if reply == QtGui.QMessageBox.Yes:
+#            self.clean_up()
             event.accept()
         else:
             event.ignore()
 
 #    combine with:
 #    self.btnExit.clicked.connect(self.close)
+#    app.aboutToQuit.connect(mainw.clean_up)        
+#    app.lastWindowClosed.connect(mainw.closeEvent)
+
+
 #------------------------------------------------------------------------------
+
+def clean(item):
+    """
+    Clean up memory by closing and deleting item if possible
+    """
+    if isinstance(item, list) or isinstance(item, dict):
+        for _ in range(len(item)):
+            clean(item.pop())
+    else:
+        try:
+            item.close()
+        except(RuntimeError, AttributeError): # deleted or no close method
+            pass
+        try:
+            item.deleteLater()
+        except(RuntimeError, AttributeError): # deleted or no deleteLater method
+            pass
 
 #------------------------------------------------------------------------------
 def main():
@@ -267,15 +229,10 @@ def main():
     else:
         delta = 100
     desktop.deleteLater()
-
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     mainw.setFocus()
     mainw.show()
-#    app.show() # -> QApplication doesn't have an attribute "show"
-    
-       
- #   app.lastWindowClosed.connect(mainw.closeEvent())
 
     #start the application's exec loop, return the exit code to the OS
     app.exec_() # same behavior of sys.exit(app.exec_()) and app.exec_()
@@ -284,3 +241,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

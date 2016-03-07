@@ -91,16 +91,16 @@ fil_tree = {
     'BP':
         {'FIR':
             {'equiripple':
-                {'man': {"par":['N', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2'],
+                {'man': {"par":['N', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2'],
                          "vis":vis_man, "dis":dis_man, "msg":msg_man}}},
          'IIR':
              {'cheby1': {'man': {"par":['N', 'A_PB', 'F_PB', 'F_PB2'], 
                                  "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2'],
+                         'min': {"par":['A_PB', 'A_SB', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'],
                                  "vis":vis_min, "dis":dis_min, "msg":msg_min}},
               'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB', 'F_SB2'],
                                  "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_PB2', 'F_SB', 'F_SB2'],
+                         'min': {"par":['A_PB', 'A_SB','F_SB',  'F_PB', 'F_PB2', 'F_SB2'],
                                  "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
     'LP':
         {'FIR':
@@ -137,7 +137,7 @@ fil = [None] * 10 # create empty list with length 10 for multiple filter designs
 
 fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
             'N':10, 'f_S':1,
-            'A_PB':0.1, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
+            'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
             'A_SB':0.001, 'A_SB2': 0.0001, 'F_SB':0.2, 'F_SB2':0.3, 'F_C2': 0.4, 'F_N2': 0.4,
             'W_PB':1., 'W_PB2':1., 'W_SB':1., 'W_SB2':1.,
             #

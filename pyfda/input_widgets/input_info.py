@@ -88,6 +88,13 @@ class InputInfo(QtGui.QWidget):
         self.txtFiltDict.setSizePolicy(QtGui.QSizePolicy.Minimum,
                                           QtGui.QSizePolicy.Expanding)
 
+        self.chkFiltTree = QtGui.QCheckBox("FiltTree")
+        self.chkFiltTree.setToolTip("Show filter tree for debugging.")
+
+        self.txtFiltTree = QtGui.QTextBrowser()
+        self.txtFiltTree.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                          QtGui.QSizePolicy.Expanding)
+
 
         # ============== UI Layout =====================================
         self.layHChkBoxes = QtGui.QHBoxLayout()
@@ -98,18 +105,22 @@ class InputInfo(QtGui.QWidget):
         self.layHChkBoxes.addWidget(self.chkRichText)
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkFiltDict)
+        self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addWidget(self.chkFiltTree)
 
         layVMain = QtGui.QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
         layVMain.addWidget(self.tblFiltPerf)
         layVMain.addWidget(self.txtFiltInfoBox)
         layVMain.addWidget(self.txtFiltDict)
+        layVMain.addWidget(self.txtFiltTree)
 #        layVMain.addStretch(10)
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
         self.chkFiltPerf.clicked.connect(self._show_filt_perf)
         self.chkFiltDict.clicked.connect(self._show_filt_dict)
+        self.chkFiltTree.clicked.connect(self._show_filt_tree)
         self.chkDocstring.clicked.connect(self._show_doc)
         self.chkRichText.clicked.connect(self._show_doc)
 
@@ -297,6 +308,18 @@ class InputInfo(QtGui.QWidget):
         self.txtFiltDict.setText(dictstr)
 
 #        pprint.pprint(fb.fil[0])
+
+#------------------------------------------------------------------------------
+    def _show_filt_tree(self):
+        """
+        Print filter tree for debugging
+        """
+        self.txtFiltTree.setVisible(self.chkFiltTree.isChecked())
+
+        ftree_sorted = ['<b>' + str(key) +' : '+ '</b>' + str(fb.fil_tree[key]) for key in sorted(fb.fil_tree.keys())]
+        dictstr = pprint.pformat(ftree_sorted, indent = 4)
+#        dictstr = pprint.pformat(fb.fil[0])
+        self.txtFiltTree.setText(dictstr)
         
         
 #app = QtGui.QApplication([])
