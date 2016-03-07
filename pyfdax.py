@@ -19,7 +19,7 @@ from pyfda.filter_tree_builder import FilterTreeBuilder
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
-__version__ = "0.1a5"
+__version__ = "0.1a8"
 
 # get dir for this file, apppend 'pyfda' and store as base_dir in filterbroker
 fb.base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pyfda')
