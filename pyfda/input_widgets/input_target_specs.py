@@ -82,7 +82,7 @@ class InputTargetSpecs(QtGui.QWidget):
         
 
 #------------------------------------------------------------------------------
-    def update_UI(self, freqParams = [], ampParams = []):
+    def update_UI(self, freq_params = [], amp_params = []):
         """
         Pass frequency and amplitude labels to the amplitude and frequency
         spec widgets and emit a specs changed signal
@@ -90,9 +90,9 @@ class InputTargetSpecs(QtGui.QWidget):
 
         # pass new labels to widgets
         # set widgets invisible if param list is empty
-        self.f_specs.update_UI(new_labels = freqParams) # update frequency spec labels
-        self.a_specs.setVisible(ampParams != [])
-        self.a_specs.update_UI(newLabels = ampParams)
+        self.f_specs.update_UI(new_labels = freq_params) # update frequency spec labels
+        self.a_specs.setVisible(amp_params != [])
+        self.a_specs.update_UI(new_labels = amp_params)
 
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
@@ -116,16 +116,16 @@ if __name__ == '__main__':
     dm = fb.fil[0]['dm']
 
     if 'min' in fb.fil_tree[rt][ft][dm]:
-        myParams = fb.fil_tree[rt][ft][dm]['min']['par']
+        my_params = fb.fil_tree[rt][ft][dm]['min']['par']
     else:
-        myParams = {}
+        my_params = {}
 
     # build separate parameter lists according to the first letter
-    freqParams = [l for l in myParams if l[0] == 'F']
-    ampParams = [l for l in myParams if l[0] == 'A']
+    freq_params = [l for l in my_params if l[0] == 'F']
+    amp_params = [l for l in my_params if l[0] == 'A']
 
     form = InputTargetSpecs(title = "Test Specs")
-    form.update_UI(freqParams, ampParams)
+    form.update_UI(freq_params, amp_params)
     form.show()
 
     app.exec_()

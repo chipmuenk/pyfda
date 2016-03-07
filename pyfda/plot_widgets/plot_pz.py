@@ -73,14 +73,12 @@ class PlotPZ(QtGui.QMainWindow):
 
         self.ax.clear()
 
-        [z, p, k] = zplane(self.ax, zpk, verbose = False, 
+        [z, p, k] = zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax, verbose = False, 
             mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
 
         self.ax.set_title(r'Pole / Zero Plot')
         self.ax.set_xlabel('Real axis')
         self.ax.set_ylabel('Imaginary axis')
-
-        self.ax.axis([-1.1, 1.1, -1.1, 1.1])
 
         self.mplwidget.redraw()
 
