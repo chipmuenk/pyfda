@@ -151,7 +151,8 @@ class pyFDA(QtGui.QMainWindow):
         scrollArea.setWidgetResizable(True)
 
 
-        # CentralWidget (focus of GUI?) is now the ScrollArea
+        # make ScrollArea occupy the main area of QMainWidget 
+        #   and make QMainWindow its parent !!!
         self.setCentralWidget(scrollArea)
 
 
@@ -237,18 +238,10 @@ def main():
     """
     app = QtGui.QApplication(sys.argv) # instantiate QApplication object, passing ?
     app.setObjectName("TopApp")
+    
+    icon = os.path.join(fb.base_dir, 'images', 'icons', "Logo_LST_4.svg")
 
-    _desktop = QtGui.QDesktopWidget() # test the available desktop resolution
-    screen_h = _desktop.availableGeometry().height()
-    screen_w = _desktop.availableGeometry().width()
-    logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
-
-    fontsize = 10
-    if screen_h < 800:
-        delta = 50
-    else:
-        delta = 100
-
+    app.setWindowIcon(QtGui.QIcon(icon))
     app.setStyleSheet(rc.css_rc) 
 
     mainw = pyFDA()
@@ -258,18 +251,26 @@ def main():
 # http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 # http://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
 
-    # Sets the active window to the active widget in response to a system event.
+        # Sets the active window to the active widget in response to a system event.
     app.setActiveWindow(mainw) #<---- That makes no difference!
-
-
-
-    icon = os.path.join(fb.base_dir, 'images', 'icons', "Logo_LST_4.svg")
-
-    app.setWindowIcon(QtGui.QIcon(icon))
     mainw.setWindowIcon(QtGui.QIcon(icon))
+
+    desktop = QtGui.QDesktopWidget() # test the available desktop resolution
+    desktop.setParent(mainw)
+    screen_h = desktop.availableGeometry().height()
+    screen_w = desktop.availableGeometry().width()
+    logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
+
+    fontsize = 10
+    if screen_h < 800:
+        delta = 50
+    else:
+        delta = 100
+    desktop.deleteLater()
 
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
+    mainw.setFocus()
     mainw.show()
 #    app.show() # -> QApplication doesn't have an attribute "show"
     
@@ -277,7 +278,7 @@ def main():
  #   app.lastWindowClosed.connect(mainw.closeEvent())
 
     #start the application's exec loop, return the exit code to the OS
-    sys.exit(app.exec_()) # same behavior as app.exec_()
+    app.exec_() # same behavior of sys.exit(app.exec_()) and app.exec_()
 
 #------------------------------------------------------------------------------
 
