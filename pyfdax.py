@@ -187,7 +187,7 @@ class pyFDA(QtGui.QMainWindow):
         #
         # sigReadFilters: button has been pressed to rebuild filter tree:
         self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
-#####        self.closeEvent.connect(self.aboutToQuit)
+
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
         # trigger the close event in response to sigQuit generated in another subwidget:
         self.inputWidgets.inputSpecs.sigQuit.connect(self.close)
@@ -255,12 +255,14 @@ def main():
 # http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 # http://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
 
-        # Sets the active window to the active widget in response to a system event.
-    app.setActiveWindow(mainw)
+    # Sets the active window to the active widget in response to a system event.
+    app.setActiveWindow(mainw) 
     mainw.setWindowIcon(QtGui.QIcon(icon))
 
     desktop = QtGui.QDesktopWidget() # test the available desktop resolution
-    desktop.setParent(mainw)
+    # make pyFDA instance the parent for clean termination upon exit 
+    #  - otherwise the whole application will crash upon exit!
+    desktop.setParent(mainw) 
     screen_h = desktop.availableGeometry().height()
     screen_w = desktop.availableGeometry().width()
     logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
@@ -274,7 +276,9 @@ def main():
 
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
-    mainw.setFocus()
+    # Give the keyboard input focus to this widget if this widget 
+    # or one of its parents is the active window:
+    mainw.setFocus() 
     mainw.show()
 
     #start the application's exec loop, return the exit code to the OS
