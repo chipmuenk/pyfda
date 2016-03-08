@@ -29,6 +29,7 @@ class InputSpecs(QtGui.QWidget):
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
     sigViewChanged = pyqtSignal() # emitted when view has changed
+    sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
     
 
     def __init__(self):
@@ -128,7 +129,7 @@ class InputSpecs(QtGui.QWidget):
 
         # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.start_design_filt)
-        self.butQuit.clicked.connect(QtGui.qApp.quit) # which qApp is this??
+        self.butQuit.clicked.connect(self.sigQuit) # pass on to main application
         #----------------------------------------------------------------------
 
         self.update_UI() # first time initialization
