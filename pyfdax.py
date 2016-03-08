@@ -6,6 +6,7 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
+from sip import setdestroyonexit
 import logging
 import logging.config
 logger = logging.getLogger(__name__)
@@ -186,8 +187,12 @@ class pyFDA(QtGui.QMainWindow):
         #
         # sigReadFilters: button has been pressed to rebuild filter tree:
         self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
-#####        self.closeEvent.connect(self.aboutToQuit)
+
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
+        # trigger the close event in response to sigQuit generated in another subwidget:
+        self.inputWidgets.inputSpecs.sigQuit.connect(self.close)
+
+
         logger.debug("Main routine initialized!")
 
 #------------------------------------------------------------------------------
@@ -208,10 +213,11 @@ class pyFDA(QtGui.QMainWindow):
         self.statusBar().showMessage(message)
 
 #------------------------------------------------------------------------------       
-    def quitEvent(self): # reimplement QMainWindow.closeEvent
-        pass
     
-    def closeEvent(self, event): # reimplement QMainWindow.closeEvent von !pyFDA!
+    def closeEvent(self, event): 
+        """
+        reimplement QMainWindow.closeEvent() to prompt the user "Are you sure ..."
+        """
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
 
@@ -219,12 +225,38 @@ class pyFDA(QtGui.QMainWindow):
             event.accept()
         else:
             event.ignore()
+            
+#------------------------------------------------------------------------------       
+    def clean_up(self):
+        """
+        Clean up everything - may only be called when exiting application!!
 
-#    combine with:
-#    self.btnExit.clicked.connect(self.close)
-#------------------------------------------------------------------------------
+        See http://stackoverflow.com/questions/18732894/crash-on-close-and-quit
+        """
+        for i in self.__dict__:
+            item = self.__dict__[i]
+            clean_item(item)
 
 #------------------------------------------------------------------------------
+def clean_item(item):
+    """
+    Clean up memory by closing and deleting item recursively if possible
+    """
+    if isinstance(item, list) or isinstance(item, dict):
+        for _ in range(len(item)):
+            clean_item(item.pop())
+    else:
+        try:
+            item.close()
+        except(RuntimeError, AttributeError): # deleted or no close method
+            pass
+        try:
+            item.deleteLater()
+        except(RuntimeError, AttributeError): # deleted or no deleteLater method
+            pass
+
+
+#==============================================================================
 def main():
     """ 
     entry point for the pyfda application 
@@ -236,7 +268,8 @@ def main():
     Since the QApplication object does so much initialization, it must be created 
     *before* any other objects related to the user interface are created."     
     """
-    app = QtGui.QApplication(sys.argv) # instantiate QApplication object, passing ?
+     # instantiate QApplication object, passing command line arguments
+    app = QtGui.QApplication(sys.argv)
     app.setObjectName("TopApp")
     
     icon = os.path.join(fb.base_dir, 'images', 'icons', "Logo_LST_4.svg")
@@ -251,12 +284,14 @@ def main():
 # http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 # http://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
 
-        # Sets the active window to the active widget in response to a system event.
-    app.setActiveWindow(mainw) #<---- That makes no difference!
+    # Sets the active window to the active widget in response to a system event.
+    app.setActiveWindow(mainw) 
     mainw.setWindowIcon(QtGui.QIcon(icon))
 
     desktop = QtGui.QDesktopWidget() # test the available desktop resolution
-    desktop.setParent(mainw)
+    # make pyFDA instance the parent for clean termination upon exit 
+    #  - otherwise the whole application will crash upon exit!
+    desktop.setParent(mainw) 
     screen_h = desktop.availableGeometry().height()
     screen_w = desktop.availableGeometry().width()
     logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
@@ -266,21 +301,20 @@ def main():
         delta = 50
     else:
         delta = 100
-    desktop.deleteLater()
+    desktop.deleteLater() # without this instruction, the main app looses focus ?!
 
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
-    mainw.setFocus()
+    # Give the keyboard input focus to this widget if this widget 
+    # or one of its parents is the active window:
+    mainw.setFocus() 
     mainw.show()
-#    app.show() # -> QApplication doesn't have an attribute "show"
-    
-       
- #   app.lastWindowClosed.connect(mainw.closeEvent())
 
     #start the application's exec loop, return the exit code to the OS
-    app.exec_() # same behavior of sys.exit(app.exec_()) and app.exec_()
+    app.exec_() # sys.exit(app.exec_()) and app.exec_() have same behaviour
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    setdestroyonexit(False) # don't call the C++ destructor of wrapped instances
     main()
