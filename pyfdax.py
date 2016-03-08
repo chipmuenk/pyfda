@@ -208,10 +208,11 @@ class pyFDA(QtGui.QMainWindow):
         self.statusBar().showMessage(message)
 
 #------------------------------------------------------------------------------       
-    def quitEvent(self): # reimplement QMainWindow.closeEvent
-        pass
     
-    def closeEvent(self, event): # reimplement QMainWindow.closeEvent von !pyFDA!
+    def closeEvent(self, event): 
+        """
+        reimplement QMainWindow.closeEvent() to prompt the user "Are you sure ..."
+        """
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
 
@@ -220,10 +221,7 @@ class pyFDA(QtGui.QMainWindow):
         else:
             event.ignore()
 
-#    combine with:
-#    self.btnExit.clicked.connect(self.close)
 #------------------------------------------------------------------------------
-
 #------------------------------------------------------------------------------
 def main():
     """ 
@@ -236,7 +234,8 @@ def main():
     Since the QApplication object does so much initialization, it must be created 
     *before* any other objects related to the user interface are created."     
     """
-    app = QtGui.QApplication(sys.argv) # instantiate QApplication object, passing ?
+     # instantiate QApplication object, passing command line arguments
+    app = QtGui.QApplication(sys.argv)
     app.setObjectName("TopApp")
     
     icon = os.path.join(fb.base_dir, 'images', 'icons', "Logo_LST_4.svg")
@@ -252,7 +251,7 @@ def main():
 # http://stackoverflow.com/questions/4528347/clear-all-widgets-in-a-layout-in-pyqt
 
         # Sets the active window to the active widget in response to a system event.
-    app.setActiveWindow(mainw) #<---- That makes no difference!
+    app.setActiveWindow(mainw)
     mainw.setWindowIcon(QtGui.QIcon(icon))
 
     desktop = QtGui.QDesktopWidget() # test the available desktop resolution
@@ -266,19 +265,15 @@ def main():
         delta = 50
     else:
         delta = 100
-    desktop.deleteLater()
+    desktop.deleteLater() # without this instruction, the main app looses focus ?!
 
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     mainw.setFocus()
     mainw.show()
-#    app.show() # -> QApplication doesn't have an attribute "show"
-    
-       
- #   app.lastWindowClosed.connect(mainw.closeEvent())
 
     #start the application's exec loop, return the exit code to the OS
-    app.exec_() # same behavior of sys.exit(app.exec_()) and app.exec_()
+    app.exec_() # sys.exit(app.exec_()) and app.exec_() have same behaviour
 
 #------------------------------------------------------------------------------
 
