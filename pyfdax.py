@@ -189,6 +189,10 @@ class pyFDA(QtGui.QMainWindow):
         self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
 #####        self.closeEvent.connect(self.aboutToQuit)
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
+        # trigger the close event in response to sigQuit generated in another subwidget:
+        self.inputWidgets.inputSpecs.sigQuit.connect(self.close)
+
+
         logger.debug("Main routine initialized!")
 
 #------------------------------------------------------------------------------
