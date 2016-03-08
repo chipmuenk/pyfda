@@ -6,6 +6,7 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
+from sip import setdestroyonexit
 import logging
 import logging.config
 logger = logging.getLogger(__name__)
@@ -278,4 +279,5 @@ def main():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+    setdestroyonexit(False) # don't call the C++ destructor of wrapped instances
     main()
