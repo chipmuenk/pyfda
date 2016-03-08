@@ -225,9 +225,38 @@ class pyFDA(QtGui.QMainWindow):
             event.accept()
         else:
             event.ignore()
+            
+#------------------------------------------------------------------------------       
+    def clean_up(self):
+        """
+        Clean up everything - may only be called when exiting application!!
+
+        See http://stackoverflow.com/questions/18732894/crash-on-close-and-quit
+        """
+        for i in self.__dict__:
+            item = self.__dict__[i]
+            clean_item(item)
 
 #------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
+def clean_item(item):
+    """
+    Clean up memory by closing and deleting item recursively if possible
+    """
+    if isinstance(item, list) or isinstance(item, dict):
+        for _ in range(len(item)):
+            clean_item(item.pop())
+    else:
+        try:
+            item.close()
+        except(RuntimeError, AttributeError): # deleted or no close method
+            pass
+        try:
+            item.deleteLater()
+        except(RuntimeError, AttributeError): # deleted or no deleteLater method
+            pass
+
+
+#==============================================================================
 def main():
     """ 
     entry point for the pyfda application 
