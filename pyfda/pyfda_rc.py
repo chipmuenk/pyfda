@@ -187,23 +187,23 @@ TabBarCss = """
  QTabBar::tab:first{
     /* the first tab */
 }
+
+ QTabBar::tab:first:!selected {
+    /* the first unselected tab */
+ }
   
  QTabBar::tab:first:selected {
      margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
  }
  
-  QTabBar::tab:first:!selected {
-    margin-left: -0.2em; the first unselected tab gets extra margin to prevent truncation */
- }
-
  QTabBar::tab:last:selected {
      margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
  }
- """
-# QTabBar::tab:only-one {
-#     margin: 0; /* if there is only one tab, we don't want overlapping margins */
-# }
-#"""
+
+ QTabBar::tab:only-one {
+     margin: 0; /* if there is only one tab, we don't want overlapping margins */
+ }
+"""
 
 css_common = """
                 *[state="changed"]{background-color:yellow; color:black}
