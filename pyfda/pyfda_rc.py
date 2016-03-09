@@ -151,7 +151,7 @@ TabBarCss = """
      }
 
 /* Style the TAB using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
- QTabBar {  font-weight: bold; font-size:13px; }
+ QTabBar {  font-weight: bold; font-size:11pt; }
  QTabBar::tab{
      color:black;
      font-size:10pt;
