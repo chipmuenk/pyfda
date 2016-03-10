@@ -79,6 +79,8 @@ class pyFDA(QtGui.QMainWindow):
 
     def __init__(self):
         super(pyFDA, self).__init__()
+#        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
