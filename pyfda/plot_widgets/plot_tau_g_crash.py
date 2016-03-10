@@ -5,14 +5,54 @@ Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 import numpy as np
 
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import grpdelay
-from pyfda.plot_widgets.plot_utils import MplWidget
+#from pyfda.plot_widgets.plot_utils import MplWidget
 
+# from plot_utils
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+
+# http://matplotlib.org/examples/user_interfaces/embedding_in_qt4.html
+import os,sys
+
+progname = os.path.basename(sys.argv[0])
+
+class MyMplCanvas(FigureCanvas):
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        # We want the axes cleared every time plot() is called
+        self.axes.hold(False)
+
+        self.compute_initial_figure()
+
+        #
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+
+        FigureCanvas.setSizePolicy(self,
+                                   QtGui.QSizePolicy.Expanding,
+                                   QtGui.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+
+    def compute_initial_figure(self):
+        pass
+
+
+class MyStaticMplCanvas(MyMplCanvas):
+    """Simple canvas with a sine plot."""
+
+    def compute_initial_figure(self):
+        t = np.arange(0.0, 3.0, 0.01)
+        s = np.sin(2*np.pi*t)
+        self.axes.plot(t, s)
 
 class PlotTauG(QtGui.QMainWindow):
 
@@ -29,10 +69,36 @@ class PlotTauG(QtGui.QMainWindow):
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkWarnings)
 
-        self.mplwidget = MplWidget()
-        self.mplwidget.setParent(self)
+# from plot_utils  ----------------------------------------------------------- 
+ #       plt_canvas-> mplwidget      
+        self.fig = Figure() 
+
+        self.mplwidget = FigureCanvas(self.fig)
+        self.mplwidget.setSizePolicy(QtGui.QSizePolicy.Expanding,
+                                   QtGui.QSizePolicy.Expanding)
+
+        # Needed for mouse modifiers (x,y, <CTRL>, ...):
+        #    Key press events in general are not processed unless you
+        #    "activate the focus of Qt onto your mpl canvas"
+        # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
+        self.mplwidget.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.mplwidget.setFocus()
+
+        self.mplwidget.updateGeometry() 
         
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
+        self.layVMainMpl = QtGui.QVBoxLayout()
+#        self.layVMainMpl.addLayout(self.hbox)
+#        self.layVMainMpl.addWidget(self.mplToolbar)
+        self.layVMainMpl.addWidget(self.mplwidget)
+
+        self.setLayout(self.layVMainMpl)
+#------------------------------------------------        
+        
+
+#        self.mplwidget = MplWidget()
+#        self.mplwidget.setParent(self)
+        
+        self.layVMainMpl.addLayout(self.layHChkBoxes)
 
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
@@ -55,7 +121,7 @@ class PlotTauG(QtGui.QMainWindow):
         """Initialize and clear the axes
         """
 #        self.ax = self.mplwidget.ax
-        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax = self.fig.add_subplot(111)
         self.ax.clear()
         self.ax.set_title(r'Group Delay $ \tau_g$')
         self.ax.hold(False)      
@@ -114,15 +180,52 @@ class PlotTauG(QtGui.QMainWindow):
         self.ax.set_ylim([max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
         self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
-        self.mplwidget.redraw()
+#        self.mplwidget.redraw()
 #------------------------------------------------------------------------------
+#################################################################################
+class ApplicationWindow(QtGui.QMainWindow):
+    def __init__(self):
+        QtGui.QMainWindow.__init__(self)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setWindowTitle("application main window")
+
+
+        self.main_widget = QtGui.QWidget(self)
+
+        l = QtGui.QVBoxLayout(self.main_widget)
+        sc = MyStaticMplCanvas(self.main_widget, width=5, height=4, dpi=100)
+#        dc = MyDynamicMplCanvas(self.main_widget, width=5, height=4, dpi=100)
+#        mw = 
+        l.addWidget(sc)
+#        l.addWidget(dc)
+
+        self.main_widget.setFocus()
+        self.setCentralWidget(self.main_widget)
+
+#################################################################################
 
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotTauG()
-    form.show()
-    app.exec_()
+    mainw = PlotTauG()
+
+#    app = QtGui.QApplication(sys.argv)   
+#    mainw = ApplicationWindow()
+
+    mainw.setWindowTitle("%s" % progname)
+    app.setActiveWindow(mainw) 
+    mainw.show()
+#    app.exec_()
+    sys.exit(app.exec_())
+    
+
+#    app = QtGui.QApplication(sys.argv)
+#    
+#    mainw = ApplicationWindow()
+#    mainw.setWindowTitle("%s" % progname)
+#    aw.show()
+#    sys.exit(qApp.exec_())
+#qApp.exec_()    
 
 if __name__ == "__main__":
     main()
