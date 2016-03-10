@@ -35,8 +35,6 @@ from pyfda import pyfda_rc
 for key in pyfda_rc.mpl_rc:
     rcParams[key] = pyfda_rc.mpl_rc[key]
 
-DEBUG = True
-
 ####USED TO GET THE USERS HOME DIRECTORY FOR USE OF A TEMP FILE
 # taken from
 # http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
@@ -163,7 +161,7 @@ class MplWidget(QtGui.QWidget):
         self.redraw()
 
 #------------------------------------------------------------------------------
-    def full_extent(self, ax, pad=0.0):
+    def get_full_extent(self, ax, pad=0.0):
         """
         Get the full extent of an axes, including axes labels, tick labels, and
         titles.

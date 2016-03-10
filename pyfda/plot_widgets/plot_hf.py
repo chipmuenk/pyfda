@@ -309,7 +309,7 @@ class PlotHf(QtGui.QMainWindow):
                 # draw an opaque background with the extent of the inset plot:
 #                self.ax_i.patch.set_facecolor('green') # without label area
 #                self.mplwidget.fig.patch.set_facecolor('green') # whole figure
-                extent = self.mplwidget.full_extent(self.ax_i, pad = 0.0)
+                extent = self.mplwidget.get_full_extent(self.ax_i, pad = 0.0)
                 # Transform this back to figure coordinates - otherwise, it
                 #  won't behave correctly when the size of the plot is changed:
                 extent = extent.transformed(self.mplwidget.fig.transFigure.inverted())
@@ -522,9 +522,10 @@ class PlotHf(QtGui.QMainWindow):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotHf()
-    form.show()
-    app.exec_()
+    mainw = PlotHf()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
