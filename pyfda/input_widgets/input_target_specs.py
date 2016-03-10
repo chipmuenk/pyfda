@@ -124,8 +124,9 @@ if __name__ == '__main__':
     freq_params = [l for l in my_params if l[0] == 'F']
     amp_params = [l for l in my_params if l[0] == 'A']
 
-    form = InputTargetSpecs(title = "Test Specs")
-    form.update_UI(freq_params, amp_params)
-    form.show()
-
-    app.exec_()
+    mainw = InputTargetSpecs(title = "Test Specs")
+    mainw.update_UI(freq_params, amp_params)
+    
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())

@@ -66,16 +66,15 @@ class PlotImpz(QtGui.QMainWindow):
         self.mplwidget = MplWidget()
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-#        self.mplwidget.layVMainMpl1.addWidget(self.mplwidget)
 
         # make this the central widget, taking all available space:
         self.setCentralWidget(self.mplwidget)
 
 #        self.setLayout(self.layHChkBoxes)
 
-#        #=============================================
-#        # Signals & Slots
-#        #=============================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTS
+        #
         self.chkLog.clicked.connect(self.draw)
         self.chkStep.clicked.connect(self.draw)
         self.ledNPoints.editingFinished.connect(self.draw)
@@ -223,9 +222,10 @@ class PlotImpz(QtGui.QMainWindow):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotImpz()
-    form.show()
-    app.exec_()
+    mainw = PlotImpz()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

@@ -30,7 +30,6 @@ class PlotTauG(QtGui.QMainWindow):
         self.layHChkBoxes.addWidget(self.chkWarnings)
 
         self.mplwidget = MplWidget()
-#        self.mplwidget.setParent(self)
         
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
@@ -117,9 +116,10 @@ class PlotTauG(QtGui.QMainWindow):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotTauG()
-    form.show()
-    app.exec_()
+    mainw = PlotTauG()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

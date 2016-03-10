@@ -256,11 +256,11 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = InputAmpSpecs()
+    mainw = InputAmpSpecs()
 
-    form.update_UI(new_labels = ['A_SB','A_SB2','A_PB','A_PB2'])
-    form.update_UI(new_labels = ['A_PB','A_SB'])
+    mainw.update_UI(new_labels = ['A_SB','A_SB2','A_PB','A_PB2'])
+    mainw.update_UI(new_labels = ['A_PB','A_SB'])
 
-    form.show()
-
-    app.exec_()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())

@@ -326,7 +326,7 @@ class InputSpecs(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = InputSpecs()
-    form.show()
-
-    app.exec_()
+    mainw = InputSpecs()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())

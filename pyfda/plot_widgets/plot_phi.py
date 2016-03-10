@@ -140,9 +140,10 @@ class PlotPhi(QtGui.QMainWindow):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotPhi()
-    form.show()
-    app.exec_()
+    mainw = PlotPhi()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

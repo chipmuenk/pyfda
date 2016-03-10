@@ -579,9 +579,10 @@ class Plot3D(QtGui.QMainWindow):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = Plot3D()
-    form.show()
-    app.exec_()
+    mainw = Plot3D()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

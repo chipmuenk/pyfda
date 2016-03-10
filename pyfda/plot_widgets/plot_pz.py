@@ -19,7 +19,6 @@ class PlotPZ(QtGui.QMainWindow):
 
     def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotPZ, self).__init__(parent) # initialize QWidget base class
-#        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
@@ -87,9 +86,10 @@ class PlotPZ(QtGui.QMainWindow):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotPZ()
-    form.show()
-    app.exec_()
+    mainw = PlotPZ()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

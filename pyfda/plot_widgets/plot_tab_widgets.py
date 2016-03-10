@@ -69,9 +69,11 @@ class PlotTabWidgets(QtGui.QWidget):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    form = PlotTabWidgets()
-    form.show()
-    app.exec_()
-
+    mainw = PlotTabWidgets()
+    
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
+    
 if __name__ == "__main__":
     main()
