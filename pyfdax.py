@@ -96,10 +96,10 @@ class pyFDA(QtGui.QMainWindow):
         """
 
         # Instantiate widget groups
-        self.inputWidgets = input_tab_widgets.InputTabWidgets() # input widgets
-        self.inputWidgets.setMaximumWidth(420) # comment out for splitter
+        self.inputTabWidgets = input_tab_widgets.InputTabWidgets() # input widgets
+        self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
 
-        self.pltWidgets = plot_tab_widgets.PlotTabWidgets() # plot widgets
+        self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets() # plot widgets
 
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
@@ -107,8 +107,8 @@ class pyFDA(QtGui.QMainWindow):
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
 
         # comment out following 3 lines for splitter design
-        layHMain.addWidget(self.inputWidgets)
-        layHMain.addWidget(self.pltWidgets)
+        layHMain.addWidget(self.inputTabWidgets)
+        layHMain.addWidget(self.pltTabWidgets)
         layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
 
 
@@ -181,18 +181,18 @@ class pyFDA(QtGui.QMainWindow):
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed,
         # requiring partial update of some plot widgets:
-        self.inputWidgets.sigSpecsChanged.connect(self.pltWidgets.update_view)
+        self.inputTabWidgets.sigSpecsChanged.connect(self.pltTabWidgets.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
-        self.inputWidgets.sigFilterDesigned.connect(self.pltWidgets.update_data)
+        self.inputTabWidgets.sigFilterDesigned.connect(self.pltTabWidgets.update_data)
         #
         # sigReadFilters: button has been pressed to rebuild filter tree:
-        self.inputWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
+        self.inputTabWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
 
 #        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
         # trigger the close event in response to sigQuit generated in another subwidget:
-        self.inputWidgets.inputSpecs.sigQuit.connect(self.close)
+        self.inputTabWidgets.inputSpecs.sigQuit.connect(self.close)
 
 
         logger.debug("Main routine initialized!")
