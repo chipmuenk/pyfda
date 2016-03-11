@@ -84,8 +84,10 @@ class InputTargetSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def update_UI(self, freq_params = [], amp_params = []):
         """
+        Called when a new filter design algorithm has been selected
         Pass frequency and amplitude labels to the amplitude and frequency
-        spec widgets and emit a specs changed signal
+        spec widgets
+        The sigSpecsChanged signal is emitted already by input_filter.py
         """
 
         # pass new labels to widgets
@@ -94,7 +96,7 @@ class InputTargetSpecs(QtGui.QWidget):
         self.a_specs.setVisible(amp_params != [])
         self.a_specs.update_UI(new_labels = amp_params)
 
-        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
+#        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
     def load_entries(self):
