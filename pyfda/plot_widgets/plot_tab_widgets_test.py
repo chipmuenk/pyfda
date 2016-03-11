@@ -45,6 +45,7 @@ class PlotTabWidgets(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def update_data(self):
         """ Calculate subplots with new filter DATA and redraw them """
+        print("data!")
 #        self.pltHf.draw()
 #        self.pltPhi.draw()
 #        self.pltPZ.draw()
@@ -57,6 +58,7 @@ class PlotTabWidgets(QtGui.QWidget):
         """ Update plot limits with new filter SPECS and redraw all subplots """
 #        self.pltHf.update_view()
 #        self.pltPhi.update_view()
+        print("view!")
         self.pltTauG.update_view()
 #        self.pltImpz.update_view()
 
