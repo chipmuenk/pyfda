@@ -7,8 +7,7 @@ Author: Christian Münker
 from __future__ import print_function, division, unicode_literals, absolute_import
 from PyQt4 import QtGui
 
-from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g_crash, plot_impz,
-                          plot_3d)
+from pyfda.plot_widgets import plot_tau_g_test# , plot_impz
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QtGui.QWidget):
@@ -18,7 +17,7 @@ class PlotTabWidgets(QtGui.QWidget):
 #        self.pltHf = plot_hf.PlotHf()
 #        self.pltPhi = plot_phi.PlotPhi()
 #        self.pltPZ = plot_pz.PlotPZ()
-#        self.pltTauG = plot_tau_g_crash.PlotTauG()
+        self.pltTauG = plot_tau_g_test.PlotTauG()
 #        self.pltImpz = plot_impz.PlotImpz()
 #        self.plt3D = plot_3d.Plot3D()
 
@@ -33,7 +32,7 @@ class PlotTabWidgets(QtGui.QWidget):
 #        tabWidget.addTab(self.pltHf, '|H(f)|')
 #        tabWidget.addTab(self.pltPhi, 'phi(f)')
 #        tabWidget.addTab(self.pltPZ, 'P/Z')
-#        tabWidget.addTab(self.pltTauG, 'tau_g')
+        tabWidget.addTab(self.pltTauG, 'tau_g')
 #        tabWidget.addTab(self.pltImpz, 'h[n]')
 #        tabWidget.addTab(self.plt3D, '3D')
 
