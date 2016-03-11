@@ -55,17 +55,17 @@ class PlotTauG(QtGui.QMainWindow):
 
     def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotTauG, self).__init__(parent) # initialize QWidget base class
-#        QtGui.QMainWindow.__init__(self) # alternative syntax
+
+################# GUI Elements ################################################
+#        self.chkWarnings = QtGui.QCheckBox()
+#        self.chkWarnings.setText("Enable Warnings")
+#        self.chkWarnings.setChecked(False)
+#        self.chkWarnings.setToolTip("Print warnings about singular group delay")
 #
-        self.chkWarnings = QtGui.QCheckBox()
-        self.chkWarnings.setText("Enable Warnings")
-        self.chkWarnings.setChecked(False)
-        self.chkWarnings.setToolTip("Print warnings about singular group delay")
-
-        self.layHChkBoxes = QtGui.QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
-        self.layHChkBoxes.addWidget(self.chkWarnings)
-
+#        self.layHChkBoxes = QtGui.QHBoxLayout()
+#        self.layHChkBoxes.addStretch(10)
+#        self.layHChkBoxes.addWidget(self.chkWarnings)
+###############################################################################
 # from plot_utils  ----------------------------------------------------------- 
  #       plt_canvas-> mplwidget      
         self.fig = Figure() 
@@ -85,16 +85,16 @@ class PlotTauG(QtGui.QMainWindow):
         
         
         
-        ######################################
+############ combine UI elements ##############################################
         
-        _widget = QtGui.QWidget() # this widget contains all subwidget groups
+#        _widget = QtGui.QWidget() # this widget contains all subwidget groups
+#
+#        layVMain = QtGui.QVBoxLayout(_widget) # horizontal layout of all groups
+#
+#        layVMain.addWidget(self.mplwidget)
+#        layVMain.addLayout(self.layHChkBoxes)
 
-        layVMain = QtGui.QVBoxLayout(_widget) # horizontal layout of all groups
-
-        layVMain.addWidget(self.mplwidget)
-        layVMain.addLayout(self.layHChkBoxes)
-
-        #######################################
+###############################################################################
 
 #        self.setLayout(layVMain)
 #------------------------------------------------        
@@ -114,7 +114,7 @@ class PlotTauG(QtGui.QMainWindow):
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-        self.chkWarnings.clicked.connect(self.draw)
+#        self.chkWarnings.clicked.connect(self.draw)
 
 
 #------------------------------------------------------------------------------
@@ -153,8 +153,8 @@ class PlotTauG(QtGui.QMainWindow):
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
-        [w, tau_g] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF, 
-            verbose = self.chkWarnings.isChecked())
+        [w, tau_g] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF)#, 
+#            verbose = self.chkWarnings.isChecked())
 
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
 
