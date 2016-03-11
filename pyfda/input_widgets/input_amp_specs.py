@@ -112,7 +112,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
         
-        Connect new QLineEdit fields to _sort_store_entries so that the filter
+        Connect new QLineEdit fields to _store_entries so that the filter
         dictionary is updated automatically when a QLineEdit field has been
         edited.
         """
@@ -130,9 +130,8 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
             self._add_entries(delta_new_labels)
         
         for i in range(len(new_labels)):        
-#            else:
-                # when entry has changed, update signal-slot connection, 
-                #  label and corresponding value
+            # when entry has changed, update signal-slot connections, 
+            #  label and corresponding value
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
                     try:
                         self.qlineedit[i].editingFinished.disconnect(self._store_entries)
@@ -140,19 +139,21 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                         pass
                     
                     self.qlabels[i].setText(rt_label(new_labels[i]))
-    
+
                     self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
                     self.qlineedit[i].setObjectName(new_labels[i])  # update ID                      
                     self.qlineedit[i].editingFinished.connect(self._store_entries)
 
-        self.load_entries() # convert filter dict entries to selected unit
+        self.load_entries() # display filter dict entries in selected unit
         
 #------------------------------------------------------------------------------
     def load_entries(self):
         """
-        Reload textfields from filter dictionary to reflect settings that
-        may have been changed by the filter design algorithm and convert to 
-        selected unit. Store the unit in the filter dictionary.
+        Reload the amplitude textfields from filter dict, called when a new filter 
+        design algorithm is selected or when the user has changed the unit  (V / W / dB).
+        - Store the unit in the filter dictionary.
+        - Reload amplitude entries from filter dictionary to reflect changed settings
+        - Convert amplitude entries to selected unit and update the lineedit fields.          
         """
 
         unit = str(self.cmbUnitsA.currentText())
@@ -162,7 +163,7 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
             amp_label = str(self.qlineedit[i].objectName())
             value = fb.fil[0][amp_label]
             filt_type = fb.fil[0]['ft']
-            
+           
             self.qlineedit[i].setText(
                 str(lin2unit(value, filt_type, amp_label, unit = unit)))
 
@@ -170,7 +171,10 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
     def _store_entries(self):
         """
         Transform the amplitude spec input fields according to the Units
-        setting. Spec entries are *always* stored in linear units; only the 
+        setting and store in filter dict, called every time an amplitude field
+        is edited.
+        
+        Spec entries are *always* stored in linear units; only the 
         displayed values are adapted to the amplitude unit, not the dictionary!
         """
 
@@ -207,7 +211,6 @@ class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
                 fb.fil[0].update({amp_label:sqrt(amp_value)})
                        
         self.sigSpecsChanged.emit() # -> input_specs
-
 
 #-------------------------------------------------------------
     def _del_entries(self, num):
