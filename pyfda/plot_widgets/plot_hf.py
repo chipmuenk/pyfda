@@ -17,7 +17,7 @@ import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 from pyfda.plot_widgets.plot_utils import MplWidget
 
-class PlotHf(QtGui.QMainWindow):
+class PlotHf(QtGui.QWidget):
 
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
@@ -28,7 +28,6 @@ class PlotHf(QtGui.QMainWindow):
 
     def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotHf, self).__init__(parent) # initialize QWidget base class
-#        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
@@ -98,11 +97,13 @@ class PlotHf(QtGui.QMainWindow):
 #        self.mplwidget.setParent(self)
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-#        self.mplwidget.layVMainMpl1.addWidget(self.mplwidget)
+
+        self.setLayout(self.mplwidget.layVMainMpl)
 
 #        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
-        self.setCentralWidget(self.mplwidget)
+#        self.setCentralWidget(self.mplwidget)
+
 
         self.init_axes()
 

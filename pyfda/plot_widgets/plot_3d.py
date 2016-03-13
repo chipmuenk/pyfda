@@ -31,7 +31,7 @@ except ImportError:
 
 
 
-class Plot3D(QtGui.QMainWindow):
+class Plot3D(QtGui.QWidget):
     """
     Class for various 3D-plots:
     - lin / log line plot of H(f)
@@ -41,7 +41,6 @@ class Plot3D(QtGui.QMainWindow):
 
     def __init__(self, parent=None): # default parent = None -> top Window
         super(Plot3D, self).__init__(parent) # initialize QWidget base class
-#        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.zmin = 0
         self.zmax = 4
@@ -182,10 +181,12 @@ class Plot3D(QtGui.QMainWindow):
         self.mplwidget = MplWidget()
 
         self.mplwidget.layVMainMpl.addLayout(self.layGSelect)
+        
+        self.setLayout(self.mplwidget.layVMainMpl)
 
 #        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
-        self.setCentralWidget(self.mplwidget)
+#        self.setCentralWidget(self.mplwidget)
         
 
         self._init_grid() # initialize grid and do initial plot

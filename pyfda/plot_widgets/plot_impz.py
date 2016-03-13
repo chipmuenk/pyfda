@@ -15,11 +15,10 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
-class PlotImpz(QtGui.QMainWindow):
+class PlotImpz(QtGui.QWidget):
 
     def __init__(self, parent=None): # default parent = None -> top Window
         super(PlotImpz, self).__init__(parent) # initialize QWidget base class
-#        QtGui.QMainWindow.__init__(self) # alternative syntax
 
         self.ACTIVE_3D = False
 
@@ -67,10 +66,12 @@ class PlotImpz(QtGui.QMainWindow):
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
+        self.setLayout(self.mplwidget.layVMainMpl)
+        
         # make this the central widget, taking all available space:
-        self.setCentralWidget(self.mplwidget)
+#        self.setCentralWidget(self.mplwidget)
 
-#        self.setLayout(self.layHChkBoxes)
+
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS

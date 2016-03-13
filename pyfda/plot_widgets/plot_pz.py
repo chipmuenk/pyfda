@@ -15,7 +15,7 @@ from pyfda.pyfda_lib import zplane
 
 from pyfda.plot_widgets.plot_utils import MplWidget#, MplCanvas
 
-class PlotPZ(QtGui.QMainWindow):
+class PlotPZ(QtGui.QWidget):
 
     def __init__(self, parent = None): # default parent = None -> top Window
         super(PlotPZ, self).__init__(parent) # initialize QWidget base class
@@ -26,9 +26,11 @@ class PlotPZ(QtGui.QMainWindow):
         self.mplwidget = MplWidget()
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
+        
+        self.setLayout(self.mplwidget.layVMainMpl)
 
         # make this the central widget, taking all available space:
-        self.setCentralWidget(self.mplwidget)
+ #       self.setCentralWidget(self.mplwidget)
         
         self._init_axes()
 
