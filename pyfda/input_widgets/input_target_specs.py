@@ -27,8 +27,8 @@ class InputTargetSpecs(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
 
 
-    def __init__(self, title = "Target Specs"):
-        super(InputTargetSpecs, self).__init__()
+    def __init__(self, parent, title = "Target Specs"):
+        super(InputTargetSpecs, self).__init__(parent)
 
         self.title = title
         
@@ -41,9 +41,9 @@ class InputTargetSpecs(QtGui.QWidget):
         """
 
         # subwidget for Frequency Specs
-        self.f_specs = input_freq_specs.InputFreqSpecs(title = "Frequency")
+        self.f_specs = input_freq_specs.InputFreqSpecs(self, title = "Frequency")
         # subwidget for Amplitude Specs
-        self.a_specs = input_amp_specs.InputAmpSpecs(title = "Amplitude")
+        self.a_specs = input_amp_specs.InputAmpSpecs(self, title = "Amplitude")
 
         self.a_specs.setVisible(True)
         """

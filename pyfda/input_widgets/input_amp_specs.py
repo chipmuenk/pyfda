@@ -27,11 +27,11 @@ class InputAmpSpecs(QtGui.QWidget):
     
     sigSpecsChanged = pyqtSignal()
     
-    def __init__(self, title = "Amplitude Specs"):
+    def __init__(self, parent, title = "Amplitude Specs"):
         """
         Initialize
         """
-        super(InputAmpSpecs, self).__init__()
+        super(InputAmpSpecs, self).__init__(parent)
         self.title = title
 
         self.qlabels = [] # list with references to QLabel widgets

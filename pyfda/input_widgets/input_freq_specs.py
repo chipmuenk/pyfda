@@ -26,9 +26,9 @@ class InputFreqSpecs(QtGui.QWidget):
     # class variables (shared between instances if more than one exists)
     sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
 
-    def __init__(self, title = "Frequency Specs"):
+    def __init__(self, parent, title = "Frequency Specs"):
 
-        super(InputFreqSpecs, self).__init__()
+        super(InputFreqSpecs, self).__init__(parent)
         self.title = title
 
         self.qlabels = []    # list with references to QLabel widgets

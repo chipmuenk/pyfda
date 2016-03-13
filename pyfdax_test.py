@@ -96,10 +96,10 @@ class pyFDA(QtGui.QMainWindow):
         """
 
         # Instantiate widget groups
-        self.inputTabWidgets = input_tab_widgets.InputTabWidgets() # input widgets
+        self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
 
-        self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets() # plot widgets
+        self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
 
         # ============== UI Layout =====================================
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
