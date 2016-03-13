@@ -45,8 +45,8 @@ class InputFilter(QtGui.QWidget):
 
     sigFiltChanged = pyqtSignal()
 
-    def __init__(self):
-        super(InputFilter, self).__init__()
+    def __init__(self, parent):
+        super(InputFilter, self).__init__(parent)
 
         self.dm_last = '' # design method from last call
 

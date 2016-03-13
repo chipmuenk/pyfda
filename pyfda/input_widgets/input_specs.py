@@ -43,10 +43,10 @@ class InputSpecs(QtGui.QWidget):
         """
         # Subwidget for selecting filter with response type rt (LP, ...), 
         #    filter type ft (IIR, ...) and design method dm (cheby1, ...)
-        self.sel_fil = input_filter.InputFilter()
+        self.sel_fil = input_filter.InputFilter(self)
         self.sel_fil.setObjectName("select_filter")
         # Subwidget for selecting the frequency unit and range
-        self.f_units = input_freq_units.InputFreqUnits()
+        self.f_units = input_freq_units.InputFreqUnits(self)
         self.f_units.setObjectName("freq_units")
         # Subwidget for Frequency Specs
         self.f_specs = input_freq_specs.InputFreqSpecs(self)
@@ -55,7 +55,7 @@ class InputSpecs(QtGui.QWidget):
         self.a_specs = input_amp_specs.InputAmpSpecs(self)
         self.a_specs.setObjectName("amp_specs")
         # Subwidget for Weight Specs
-        self.w_specs = input_weight_specs.InputWeightSpecs()
+        self.w_specs = input_weight_specs.InputWeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = input_target_specs.InputTargetSpecs(self, title="Target Specifications")

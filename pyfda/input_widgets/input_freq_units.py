@@ -26,9 +26,9 @@ class InputFreqUnits(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal() # emitted when frequency specs have been changed
                                   # (e.g. when the sort button has been pushed)
 
-    def __init__(self, title = "Frequency Units"):
+    def __init__(self, parent, title = "Frequency Units"):
 
-        super(InputFreqUnits, self).__init__()
+        super(InputFreqUnits, self).__init__(parent)
         self.title = title
 
         self._init_UI()

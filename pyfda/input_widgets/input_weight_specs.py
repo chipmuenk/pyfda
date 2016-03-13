@@ -24,9 +24,9 @@ class InputWeightSpecs(QtGui.QWidget):
            
     sigSpecsChanged = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, parent):
 
-        super(InputWeightSpecs, self).__init__()
+        super(InputWeightSpecs, self).__init__(parent)
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
