@@ -72,10 +72,9 @@ class PlotImpz(QtGui.QWidget):
 #        self.setCentralWidget(self.mplwidget)
 
 
-
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTS
-        #
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.chkLog.clicked.connect(self.draw)
         self.chkStep.clicked.connect(self.draw)
         self.ledNPoints.editingFinished.connect(self.draw)

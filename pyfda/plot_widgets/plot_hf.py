@@ -100,7 +100,6 @@ class PlotHf(QtGui.QWidget):
 
         self.setLayout(self.mplwidget.layVMainMpl)
 
-#        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
 #        self.setCentralWidget(self.mplwidget)
 
@@ -109,9 +108,9 @@ class PlotHf(QtGui.QWidget):
 
         self.draw() # calculate and draw |H(f)|
 
-#        #=============================================
-#        # Signals & Slots
-#        #=============================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self.draw)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
 

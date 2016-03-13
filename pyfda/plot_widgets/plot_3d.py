@@ -191,9 +191,9 @@ class Plot3D(QtGui.QWidget):
 
         self._init_grid() # initialize grid and do initial plot
 
-        #=============================================
-        # Signals & Slots
-        #=============================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.chkLog.clicked.connect(self._log_clicked)
         self.ledBottom.editingFinished.connect(self._log_clicked)
         self.ledTop.editingFinished.connect(self._log_clicked)
