@@ -7,6 +7,10 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
+Version info:   
+    1.0: initial working release
+    1.1: mark private methods as private
+
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
@@ -27,7 +31,7 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
@@ -96,10 +100,10 @@ class firwin(object):
         
         self.hdl = None
         
-        self.initUI()
+        self._init_UI()
 
         
-    def initUI(self):
+    def _init_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
@@ -166,17 +170,17 @@ class firwin(object):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.cmb_firwin_win.activated.connect(self.updateUI)
-        self.led_firwin_1.editingFinished.connect(self.updateUI)
-        self.led_firwin_2.editingFinished.connect(self.updateUI)
-        self.cmb_firwin_alg.activated.connect(self.updateUI)
+        self.cmb_firwin_win.activated.connect(self._update_UI)
+        self.led_firwin_1.editingFinished.connect(self._update_UI)
+        self.led_firwin_2.editingFinished.connect(self._update_UI)
+        self.cmb_firwin_alg.activated.connect(self._update_UI)
         #----------------------------------------------------------------------
 
-        self.loadEntries() # get initial / last setting from dictionary
-        self.updateUI()
+        self._load_entries() # get initial / last setting from dictionary
+        self._update_UI()
 
 
-    def updateUI(self):
+    def _update_UI(self):
         """
         Update UI and info_doc when one of the comboboxes or line edits is 
         changed.
@@ -226,7 +230,7 @@ class firwin(object):
             self.firWindow = self.fir_window_name
         #print(self.firWindow)           
 
-    def loadEntries(self):
+    def _load_entries(self):
         """
         Reload window selection and parameters from filter dictionary
         and set UI elements accordingly (when filter is loaded from disk).
@@ -262,7 +266,7 @@ class firwin(object):
         self.cmb_firwin_win.setCurrentIndex(win_idx) # set index for window and
         self.cmb_firwin_alg.setCurrentIndex(alg_idx) # and algorithm cmbBox
 
-    def storeEntries(self):
+    def _store_entries(self):
         """
         Store window and alg. selection and parameter settings (part of 
         self.firWindow, if any) in filter dictionary.
@@ -273,7 +277,7 @@ class firwin(object):
                                  'alg':self.alg}})
 
 
-    def get_params(self, fil_dict):
+    def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
@@ -298,7 +302,7 @@ class firwin(object):
 #        print("===== firwin ====\n", self.alg)
 #        print(self.firWindow)
 
-    def save(self, fil_dict, arg):
+    def _save(self, fil_dict, arg):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
@@ -310,10 +314,10 @@ class firwin(object):
             fil_dict['N'] = self.N # yes, update filterbroker
         except AttributeError:
             pass
-        self.storeEntries()
+        self._store_entries()
         
         
-    def firwin_ord(self, F, W, A, alg):
+    def _firwin_ord(self, F, W, A, alg):
         #http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
         delta_f = abs(F[1] - F[0])
         delta_A = np.sqrt(A[0] * A[1])
@@ -322,7 +326,7 @@ class firwin(object):
             self.led_firwin_1.setText(str(beta))
             fb.fil[0]['wdg_dyn'][1] = beta
             self.firWindow[1] = beta
-            self.loadEntries()
+            self._load_entries()
             return N
         
         if self.firWindow == 'hann':
@@ -340,63 +344,63 @@ class firwin(object):
         return N
 
     def LPmin(self, fil_dict):
-        self.get_params(fil_dict)
-        self.N = self.firwin_ord([self.F_PB, self.F_SB], [1, 0],
+        self._get_params(fil_dict)
+        self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
                                  [self.A_PB, self.A_SB], alg = self.alg)
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                                        window = self.firWindow, nyq = 0.5))
 
     def LPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'],
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'],
                                        window = self.firWindow, nyq = 0.5))
 
     def HPmin(self, fil_dict):
-        self.get_params(fil_dict)
-        N = self.firwin_ord([self.F_SB, self.F_PB], [0, 1],
+        self._get_params(fil_dict)
+        N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
                             [self.A_SB, self.A_PB], alg = self.alg)
         self.N = round_odd(N)  # enforce odd order
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
-        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                     window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def HPman(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
-        self.save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
+        self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)[0]
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
-        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
     def BSmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
-        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
     def BSman(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
-        self.save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
+        self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
 

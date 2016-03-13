@@ -6,6 +6,12 @@ the filter design in coefficients format ('ba')
 Attention: 
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
+
+Version info:   
+    1.0: initial working release
+    1.1: mark private methods as private
+    
+Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
@@ -17,14 +23,14 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
 
 
 # TODO: min order for Hilbert & Differentiator
-# TODO: grid density is saved to dict / file but not reloaded from dictionary
+# TODO: changing grid_density does not trigger sigSpecsChanged
 # TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
 # TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
 #       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
 #         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
 #           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
              # currently, only 'ba' is supported for equiripple routines
@@ -108,15 +114,15 @@ using Ichige's algorithm.
         self.hdl = None
         #----------------------------------------------------------------------
 
-        self.initUI()
+        self._init_UI()
 
 
-    def initUI(self):
+    def _init_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
         These subwidgets are instantiated dynamically when needed in 
-        input_filter.py using the handle to the filter object, fb.filObj .
+        input_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 
         self.lbl_remez_1 = QtGui.QLabel("Grid Density")
@@ -139,14 +145,14 @@ using Ichige's algorithm.
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.led_remez_1.editingFinished.connect(self.updateUI)
+        self.led_remez_1.editingFinished.connect(self._update_UI)
         # fires when edited line looses focus or when RETURN is pressed
         #----------------------------------------------------------------------
 
-        self.loadEntries() # get initial / last setting from dictionary
-        self.updateUI()
+        self._load_entries() # get initial / last setting from dictionary
+        self._update_UI()
         
-    def updateUI(self):
+    def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
         and converted to integer.)
@@ -154,7 +160,7 @@ using Ichige's algorithm.
         self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
         self.led_remez_1.setText(str(self.grid_density))
         
-    def loadEntries(self):
+    def _load_entries(self):
         """
         Reload parameter(s) from filter dictionary and set UI elements 
         when filter is loaded from disk.
@@ -168,7 +174,7 @@ using Ichige's algorithm.
             print("Key Error:",e)
 
 
-    def storeEntries(self):
+    def _store_entries(self):
         """
         Store parameter settings in filter dictionary.
         """
@@ -176,7 +182,7 @@ using Ichige's algorithm.
 
 
 
-    def get_params(self, fil_dict):
+    def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
@@ -193,16 +199,10 @@ using Ichige's algorithm.
         self.A_SB  = fil_dict['A_SB']
         self.A_SB2 = fil_dict['A_SB2']
         
-#        self.A_PB  = (10.**(fil_dict['A_PB']/20.)-1) / (10**(fil_dict['A_PB']/20.)+1)*2
-#        self.A_PB2 = (10.**(fil_dict['A_PB2']/20.)-1)/(10**(fil_dict['A_PB2']/20.)+1)*2
-#        self.A_SB  = 10.**(-fil_dict['A_SB']/20.)
-#        self.A_SB2 = 10.**(-fil_dict['A_SB2']/20.)
-
         self.alg = 'ichige'
-#        print("Ellip: F_PB - F_SB - F_SB2 - P_PB2\n", self.F_PB, self.F_SB, self.F_SB2, self.F_PB2 )
+        
 
-
-    def save(self, fil_dict, arg):
+    def _save(self, fil_dict, arg):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
@@ -211,86 +211,85 @@ using Ichige's algorithm.
 
         save_fil(fil_dict, arg, frmt, __name__)
 
-        try: # has the order been calculated by a "min" filter design?
+        if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
-        except AttributeError:
-            pass
-        self.storeEntries()
+
+        self._store_entries()
 
     def LPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, 
+        self._get_params(fil_dict)
+        self._save(fil_dict, 
                   sig.remez(self.N,[0, self.F_PB, self.F_SB, 0.5], [1, 0],
                         weight = [fil_dict['W_PB'],fil_dict['W_SB']], Hz = 1,
                         grid_density = self.grid_density))
 
     def LPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
             [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
         fil_dict['W_PB'] = W[0]
         fil_dict['W_SB'] = W[1]
-        self.save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
+        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
                         grid_density = self.grid_density))
 
 
     def HPman(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         if (self.N % 2 == 0): # even order, use odd symmetry (type III)
-            self.save(fil_dict, 
+            self._save(fil_dict, 
                   sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], Hz = 1,
                         type = 'hilbert', grid_density = self.grid_density))
         else: # odd order, 
-            self.save(fil_dict, 
+            self._save(fil_dict, 
                   sig.remez(self.N,[0, self.F_SB, self.F_PB, 0.5], [0, 1],
                         weight = [fil_dict['W_SB'],fil_dict['W_PB']], Hz = 1,
                         type = 'bandpass', grid_density = self.grid_density))
 
     def HPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
             [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
 #        self.N = ceil_odd(N)  # enforce odd order
         fil_dict['W_SB'] = W[0]
         fil_dict['W_PB'] = W[1]
         if (self.N % 2 == 0): # even order
-            self.save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
                         type = 'hilbert', grid_density = self.grid_density))
         else:
-            self.save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
                         type = 'bandpass', grid_density = self.grid_density))
 
     # For BP and BS, F_PB and F_SB have two elements each
     def BPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict,
+        self._get_params(fil_dict)
+        self._save(fil_dict,
                  sig.remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
                 Hz = 1, grid_density = self.grid_density))
 
     def BPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         (self.N, F, A, W) = remezord([self.F_SB, self.F_PB,
                                 self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)
         fil_dict['W_SB']  = W[0]
         fil_dict['W_PB']  = W[1]
         fil_dict['W_SB2'] = W[2]
-        self.save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, Hz = 1,
+        self._save(fil_dict, sig.remez(self.N,F,[0, 1, 0], weight = W, Hz = 1,
                                       grid_density = self.grid_density))
 
     def BSman(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N = round_odd(self.N) # enforce odd order
-        self.save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
+        self._save(fil_dict, sig.remez(self.N,[0, self.F_PB, self.F_SB,
             self.F_SB2, self.F_PB2, 0.5],[1, 0, 1],
             weight = [fil_dict['W_PB'],fil_dict['W_SB'], fil_dict['W_PB2']],
             Hz = 1, grid_density = self.grid_density))
 
     def BSmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         (N, F, A, W) = remezord([self.F_PB, self.F_SB,
                                 self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)
@@ -298,20 +297,20 @@ using Ichige's algorithm.
         fil_dict['W_PB']  = W[0]
         fil_dict['W_SB']  = W[1]
         fil_dict['W_PB2'] = W[2]
-        self.save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1,
+        self._save(fil_dict, sig.remez(self.N,F,[1, 0, 1], weight = W, Hz = 1,
                                       grid_density = self.grid_density))
 
     def HILman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.remez(self.N,[0, self.F_SB, self.F_PB,
                 self.F_PB2, self.F_SB2, 0.5],[0, 1, 0],
                 weight = [fil_dict['W_SB'],fil_dict['W_PB'], fil_dict['W_SB2']],
                 Hz = 1, type = 'hilbert', grid_density = self.grid_density))
 
     def DIFFman(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N = ceil_even(self.N) # enforce even order
-        self.save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
+        self._save(fil_dict, sig.remez(self.N,[0, self.F_PB],[np.pi*fil_dict['W_PB']],
                 Hz = 1, type = 'differentiator', grid_density = self.grid_density))
 
 
