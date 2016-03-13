@@ -7,7 +7,7 @@ Author: Christian Münker
 from __future__ import print_function, division, unicode_literals, absolute_import
 from PyQt4 import QtGui
 
-from pyfda.plot_widgets import plot_tau_g_test# , plot_impz
+from pyfda.plot_widgets import plot_tau_g as plot_tau_g
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QtGui.QWidget):
@@ -17,7 +17,7 @@ class PlotTabWidgets(QtGui.QWidget):
 #        self.pltHf = plot_hf.PlotHf()
 #        self.pltPhi = plot_phi.PlotPhi()
 #        self.pltPZ = plot_pz.PlotPZ()
-        self.pltTauG = plot_tau_g_test.PlotTauG()
+        self.pltTauG = plot_tau_g.PlotTauG()
 #        self.pltImpz = plot_impz.PlotImpz()
 #        self.plt3D = plot_3d.Plot3D()
 
@@ -45,7 +45,6 @@ class PlotTabWidgets(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def update_data(self):
         """ Calculate subplots with new filter DATA and redraw them """
-        print("data!")
 #        self.pltHf.draw()
 #        self.pltPhi.draw()
 #        self.pltPZ.draw()
@@ -58,7 +57,6 @@ class PlotTabWidgets(QtGui.QWidget):
         """ Update plot limits with new filter SPECS and redraw all subplots """
 #        self.pltHf.update_view()
 #        self.pltPhi.update_view()
-        print("view!")
         self.pltTauG.update_view()
 #        self.pltImpz.update_view()
 
