@@ -37,8 +37,8 @@ class InputCoeffs(QtGui.QWidget):
         # class variables (shared between instances if more than one exists)
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
                                     # manually
-    def __init__(self):
-        super(InputCoeffs, self).__init__()
+    def __init__(self, parent):
+        super(InputCoeffs, self).__init__(parent)
 
 #        self.nrows = 0 # keep track of number of rows
 

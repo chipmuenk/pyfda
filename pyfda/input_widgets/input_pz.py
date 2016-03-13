@@ -34,9 +34,9 @@ class InputPZ(QtGui.QWidget):
     
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     
-    def __init__(self):
+    def __init__(self, parent):
         self.DEBUG = False
-        super(InputPZ, self).__init__()
+        super(InputPZ, self).__init__(parent)
 
         self._init_UI()
 

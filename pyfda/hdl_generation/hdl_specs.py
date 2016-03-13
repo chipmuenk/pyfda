@@ -38,8 +38,8 @@ class HDLSpecs(QtGui.QWidget):
     
     sigFilterDesigned = pyqtSignal()
 
-    def __init__(self):
-        super(HDLSpecs, self).__init__()
+    def __init__(self, parent):
+        super(HDLSpecs, self).__init__(parent)
 
         self.initUI()
 

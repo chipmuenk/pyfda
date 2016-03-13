@@ -63,8 +63,8 @@ class InputFiles(QtGui.QWidget):
     sigFilterLoaded = pyqtSignal() # emitted when filter has been loaded successfully
     sigReadFilters = pyqtSignal()  # emitted when button "Read Filters" is pressed
 
-    def __init__(self):
-        super(InputFiles, self).__init__()
+    def __init__(self, parent):
+        super(InputFiles, self).__init__(parent)
         
 #        rc.basedir = os.path.dirname(os.path.abspath(__file__))
 

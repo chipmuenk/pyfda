@@ -26,10 +26,9 @@ class InputInfo(QtGui.QWidget):
     """
     Create widget for displaying infos about filter and filter design method
     """
-    def __init__(self):
-        super(InputInfo, self).__init__()
+    def __init__(self, parent):
+        super(InputInfo, self).__init__(parent)
         
-#        self.ffb = fb.Fb() # instantiate Fb object
         self._init_UI()
         self.load_entries()
 

@@ -32,8 +32,8 @@ class InputSpecs(QtGui.QWidget):
     sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
     
 
-    def __init__(self):
-        super(InputSpecs, self).__init__()
+    def __init__(self, parent):
+        super(InputSpecs, self).__init__(parent)
 
         self._init_UI()
 

@@ -33,21 +33,21 @@ class InputTabWidgets(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
 
 
-    def __init__(self):
-        super(InputTabWidgets, self).__init__()
+    def __init__(self, parent):
+        super(InputTabWidgets, self).__init__(parent)
 
-        self.inputSpecs = input_specs.InputSpecs()
+        self.inputSpecs = input_specs.InputSpecs(self)
         self.inputSpecs.setObjectName("inputSpecs")
-        self.inputFiles = input_files.InputFiles()
+        self.inputFiles = input_files.InputFiles(self)
         self.inputFiles.setObjectName("inputFiles")
-        self.inputCoeffs = input_coeffs.InputCoeffs()
+        self.inputCoeffs = input_coeffs.InputCoeffs(self)
         self.inputCoeffs.setObjectName("inputCoeffs")
-        self.inputPZ = input_pz.InputPZ()
+        self.inputPZ = input_pz.InputPZ(self)
         self.inputPZ.setObjectName("inputPZ")
-        self.inputInfo = input_info.InputInfo()
+        self.inputInfo = input_info.InputInfo(self)
         self.inputInfo.setObjectName("inputInfo")
         if fb.MYHDL:
-            self.hdlSpecs = hdl_specs.HDLSpecs()
+            self.hdlSpecs = hdl_specs.HDLSpecs(self)
 
         self._init_UI()
 
