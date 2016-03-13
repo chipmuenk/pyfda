@@ -19,10 +19,10 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit
 from pyfda.simpleeval import simple_eval
 
-class InputAmpSpecs(QtGui.QWidget): #QtGui.QWidget,
+class InputAmpSpecs(QtGui.QWidget):
     """
     Build and update widget for entering the amplitude
-    specifications like A_sb, A_pb etc.
+    specifications like A_SB, A_PB etc.
     """
     
     sigSpecsChanged = pyqtSignal()
