@@ -93,8 +93,10 @@ class PlotHf(QtGui.QWidget):
         self.layHChkBoxes.addWidget(self.chkPhase)
         self.layHChkBoxes.addStretch(10)
 
-        self.mplwidget = MplWidget()
-#        self.mplwidget.setParent(self)
+        #----------------------------------------------------------------------
+        # mplwidget
+        #----------------------------------------------------------------------
+        self.mplwidget = MplWidget(self)
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 

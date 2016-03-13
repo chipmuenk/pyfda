@@ -70,8 +70,8 @@ class MplWidget(QtGui.QWidget):
     Construct a subwidget with Matplotlib canvas and NavigationToolbar
     """
 
-    def __init__(self, parent = None):
-        super(MplWidget, self).__init__() # initialize QWidget Base Class
+    def __init__(self, parent):
+        super(MplWidget, self).__init__(parent) 
         # Create the mpl figure and subplot (white bg, 100 dots-per-inch).
         # Construct the canvas with the figure
         #

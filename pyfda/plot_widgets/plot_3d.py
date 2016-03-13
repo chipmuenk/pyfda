@@ -177,7 +177,10 @@ class Plot3D(QtGui.QWidget):
         self.layGSelect.addWidget(self.diaHatch, 1, 16)
         self.layGSelect.addWidget(self.lblHatch, 1, 15)
 
-        self.mplwidget = MplWidget()
+        #----------------------------------------------------------------------
+        # mplwidget
+        #----------------------------------------------------------------------
+        self.mplwidget = MplWidget(self)
 
         self.mplwidget.layVMainMpl.addLayout(self.layGSelect)
         
@@ -187,7 +190,6 @@ class Plot3D(QtGui.QWidget):
         # make this the central widget, taking all available space:
 #        self.setCentralWidget(self.mplwidget)
         
-
         self._init_grid() # initialize grid and do initial plot
 
         #----------------------------------------------------------------------

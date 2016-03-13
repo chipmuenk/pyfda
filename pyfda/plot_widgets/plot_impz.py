@@ -62,7 +62,10 @@ class PlotImpz(QtGui.QWidget):
         self.layHChkBoxes.addWidget(self.ledNPoints)
         self.layHChkBoxes.addStretch(10)
 
-        self.mplwidget = MplWidget()
+        #----------------------------------------------------------------------
+        # mplwidget
+        #----------------------------------------------------------------------
+        self.mplwidget = MplWidget(self)
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
