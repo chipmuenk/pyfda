@@ -7,6 +7,12 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
+Version info:   
+    1.0: initial working release
+    1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
+         - mark private methods as private
+
+
 Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals
@@ -16,7 +22,7 @@ import numpy as np
     
 from pyfda.pyfda_lib import save_fil
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 frmt = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
@@ -95,7 +101,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.info_doc.append('cheb1ord()\n==========')
         self.info_doc.append(sig.cheb1ord.__doc__)
 
-    def get_params(self, fil_dict):
+    def _get_params(self, fil_dict):
         """
         Translate parameters from filter dictionary to instance
         parameters, scaling / transforming them if needed.
@@ -103,7 +109,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.analog = False # set to True for analog filters
 
         self.N     = fil_dict['N']
-        # Frequencies are normalized to f_Nyq = f_S/2 !
+        # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.F_PB  = fil_dict['F_PB'] * 2
         self.F_SB  = fil_dict['F_SB'] * 2
         self.F_C = fil_dict['F_C'] * 2
@@ -114,26 +120,36 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         
         self.A_PB  = -20. * np.log10(1. - fil_dict['A_PB'])
         self.A_SB  = -20. * np.log10(fil_dict['A_SB'])
+        
+        # cheby1 filter routines support only one amplitude spec for
+        # pass- and stop band each
+        if str(fil_dict['rt']) == 'BS':
+            fil_dict['A_PB2'] = fil_dict['A_PB']
+        elif str(fil_dict['rt']) == 'BP':
+            fil_dict['A_SB2'] = fil_dict['A_SB']
 
-    def save(self, fil_dict, arg):
+
+    def _save(self, fil_dict, arg):
         """
-        Convert between poles / zeros / gain, filter coefficients (polynomes)
-        and second-order sections and store all available formats in the global
-        database.
+        Convert results of filter design to all available formats (pz, ba, sos)
+        and store them in the global filter dictionary. 
+        
+        Corner frequencies and order calculated for minimum filter order are 
+        also stored to allow for an easy subsequent manual filter optimization.
         """
         save_fil(fil_dict, arg, frmt, __name__)
 
-        if self.F_PBC is not None: # has corner frequency been calculated?
-            fil_dict['N'] = self.N # yes, update filterbroker
-#            print("====== cheby1.save ========\nF_PBC = ", self.F_PBC, type(self.F_PBC))
-#            print("F_PBC vor", self.F_PBC, type(self.F_PBC))
-            if np.isscalar(self.F_PBC): # HP or LP - a single corner frequency
-                fil_dict['F_C'] = self.F_PBC / 2.
+        # For min. filter order algorithms, update filter dictionary with calculated
+        # new values for filter order N and corner frequency(s) F_PBC
+        if str(fil_dict['fo']) == 'min': 
+            fil_dict['N'] = self.N
+
+            if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
+                fil_dict['F_C'] = self.F_PBC / 2. # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies
                 fil_dict['F_C'] = self.F_PBC[0] / 2.
                 fil_dict['F_C2'] = self.F_PBC[1] / 2.
-
-
+                    
 #------------------------------------------------------------------------------
 #
 #         DESIGN ROUTINES
@@ -141,65 +157,65 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
 #------------------------------------------------------------------------------
 
 # HP & LP
-#        self.save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, 
+#        self._save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, 
 #                        self.A_SB, analog=False, ftype='cheby1', output=frmt))
 # BP & BS:
-#        self.save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
+#        self._save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
 #            self.A_PB, self.A_SB, analog=False, ftype='cheby1', output=frmt))
 
     # LP: F_PB < F_SB ---------------------------------------------------------
     def LPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                               analog = self.analog)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                             btype='low', analog = self.analog, output = frmt))
  
     def LPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
                             btype='low', analog = self.analog, output = frmt))
 
     # HP: F_SB < F_PB ---------------------------------------------------------
     def HPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                           analog = self.analog)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                         btype='highpass', analog = self.analog, output = frmt))
 
     def HPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
                         btype='highpass', analog = self.analog, output = frmt))
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each:
 
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1] --------------------------------
     def BPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                         btype='bandpass', analog = self.analog, output = frmt))
 
     def BPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB,[self.F_C,self.F_C2],
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB,[self.F_C,self.F_C2],
                         btype='bandpass', analog = self.analog, output = frmt))
 
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                         btype='bandstop', analog = self.analog, output = frmt))
 
     def BSman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.cheby1(self.N, self.A_PB, [self.F_C,self.F_C2],
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.cheby1(self.N, self.A_PB, [self.F_C,self.F_C2],
                         btype='bandstop', analog = self.analog, output = frmt))
 
 

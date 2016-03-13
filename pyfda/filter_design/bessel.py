@@ -7,6 +7,11 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
+Version info:   
+    1.0: initial working release
+    1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
+         - mark private methods as private
+
 Author: Christian Muenker
 """
 # TODO: bandpass and bandstop designs are unstable???
@@ -17,7 +22,7 @@ import numpy as np
 
 from pyfda.pyfda_lib import save_fil
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 frmt = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
@@ -94,7 +99,7 @@ order can be used for approximating the -3 dB frequency.
         self.info_doc.append('buttord()\n==========')
         self.info_doc.append(buttord.__doc__)
 
-    def get_params(self, fil_dict):
+    def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
@@ -110,86 +115,96 @@ order can be used for approximating the -3 dB frequency.
 
         
         self.A_PB  = -20. * np.log10(1. - fil_dict['A_PB'])
-        self.A_PB2 = -20. * np.log10(1 -  fil_dict['A_PB2'])
         self.A_SB  = -20. * np.log10(fil_dict['A_SB'])
-        self.A_SB2 = -20. * np.log10(fil_dict['A_SB2'])
+        
+        # bessel filter routines support only one amplitude spec for
+        # pass- and stop band each
+        if str(fil_dict['rt']) == 'BS':
+            fil_dict['A_PB2'] = fil_dict['A_PB']
+        elif str(fil_dict['rt']) == 'BP':
+            fil_dict['A_SB2'] = fil_dict['A_SB']
 
-    def save(self, fil_dict, arg):
+
+    def _save(self, fil_dict, arg):
         """
-        Convert between poles / zeros / gain, filter coefficients (polynomes)
-        and second-order sections and store all available formats in the global
-        database.
+        Convert results of filter design to all available formats (pz, ba, sos)
+        and store them in the global filter dictionary. 
+        
+        Corner frequencies and order calculated for minimum filter order are 
+        also stored to allow for an easy subsequent manual filter optimization.
         """
         save_fil(fil_dict, arg, frmt, __name__)
+        
+        # For min. filter order algorithms, update filter dictionary with calculated
+        # new values for filter order N and corner frequency(s) F_PBC
+        if str(fil_dict['fo']) == 'min': 
+            fil_dict['N'] = self.N
 
-        if self.F_PBC is not None: # has corner frequency been calculated?
-            fil_dict['N'] = self.N # yes, update filterbroker
-#            print("====== bessel.save ========\nF_PBC = ", self.F_PBC, type(self.F_PBC))
-#            print("F_PBC vor", self.F_PBC, type(self.F_PBC))
-            if np.isscalar(self.F_PBC): # HP or LP - a single corner frequency
-                fil_dict['F_C'] = self.F_PBC / 2.
+            if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
+                fil_dict['F_C'] = self.F_PBC / 2. # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies
                 fil_dict['F_C'] = self.F_PBC[0] / 2.
                 fil_dict['F_C2'] = self.F_PBC[1] / 2.
 
+
     def LPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.bessel(self.N, self.F_C,
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.bessel(self.N, self.F_C,
                             btype='low', analog = False, output = frmt))
 
     # LP: F_PB < F_stop
     def LPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
-        self.save(fil_dict, sig.bessel(self.N, self.F_PBC,
+        self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='low', analog = False, output = frmt))
 
-#        self.save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
+#        self._save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
 #                             analog=False, ftype='bessel', output=frmt))
 
     def HPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.bessel(self.N, self.F_C,
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.bessel(self.N, self.F_C,
                             btype='highpass', analog = False, output = frmt))
 
     # HP: F_stop < F_PB
     def HPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
-        self.save(fil_dict, sig.bessel(self.N, self.F_PBC,
+        self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='highpass', analog = False, output = frmt))
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each
 
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]
     def BPman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
                             btype='bandpass', analog = False, output = frmt))
 
 
     def BPmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
-        self.save(fil_dict, sig.bessel(self.N, self.F_PBC,
+        self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='bandpass', analog = False, output = frmt))
 
-#        self.save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
+#        self._save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
 #            self.A_PB, self.A_SB, analog=False, ftype='bessel', output=frmt))
 
 
     def BSman(self, fil_dict):
-        self.get_params(fil_dict)
-        self.save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
+        self._get_params(fil_dict)
+        self._save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
                             btype='bandstop', analog = False, output = frmt))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]
     def BSmin(self, fil_dict):
-        self.get_params(fil_dict)
+        self._get_params(fil_dict)
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
-        self.save(fil_dict, sig.bessel(self.N, self.F_PBC,
+        self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='bandstop', analog = False, output = frmt))
 #------------------------------------------------------------------------------
 

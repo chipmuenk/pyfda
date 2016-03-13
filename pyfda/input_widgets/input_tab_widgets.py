@@ -127,7 +127,7 @@ class InputTabWidgets(QtGui.QWidget):
         - Update all plot widgets via the signal sigFilterDesigned
         """
         self.inputSpecs.sel_fil.load_entries() # update input_filters
-        self.updateAll()
+        self.update_all()
 
 
     def update_all(self):
