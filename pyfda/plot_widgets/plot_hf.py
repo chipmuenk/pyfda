@@ -26,8 +26,8 @@ class PlotHf(QtGui.QWidget):
 #        is switched to +/- 1/2 the display doesn't follow
 
 
-    def __init__(self, parent = None): # default parent = None -> top Window
-        super(PlotHf, self).__init__(parent) # initialize QWidget base class
+    def __init__(self, parent): 
+        super(PlotHf, self).__init__(parent)
 
         modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QtGui.QComboBox(self)
@@ -294,11 +294,13 @@ class PlotHf(QtGui.QWidget):
         # TODO:  try   ax1 = zoomed_inset_axes(ax, 6, loc=1) # zoom = 6
         # TODO: choose size & position of inset, maybe dependent on filter type
         #        or specs (i.e. where is passband etc.)
-        if self.DEBUG:
-            print(self.cmbInset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
-            for ax in self.mplwidget.fig.axes:
-                print(ax)
-                print("cmbInset, inset_idx:",self.cmbInset.currentIndex(), self.inset_idx)
+
+# DEBUG
+#            print(self.cmbInset.currentIndex(), self.mplwidget.fig.axes) # list of axes in Figure
+#            for ax in self.mplwidget.fig.axes:
+#                print(ax)
+#                print("cmbInset, inset_idx:",self.cmbInset.currentIndex(), self.inset_idx)
+
         if self.cmbInset.currentIndex() > 0:
             if self.inset_idx == 0:
                 # Inset was turned off before, create a new one

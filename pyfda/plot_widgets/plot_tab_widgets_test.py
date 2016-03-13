@@ -11,15 +11,16 @@ from pyfda.plot_widgets import plot_tau_g as plot_tau_g
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QtGui.QWidget):
-    def __init__(self):
-        QtGui.QWidget.__init__(self)
+    def __init__(self, parent):
+        super(PlotTabWidgets, self).__init__(parent)
+#        QtGui.QWidget.__init__(self)
 
-#        self.pltHf = plot_hf.PlotHf()
-#        self.pltPhi = plot_phi.PlotPhi()
-#        self.pltPZ = plot_pz.PlotPZ()
-        self.pltTauG = plot_tau_g.PlotTauG()
-#        self.pltImpz = plot_impz.PlotImpz()
-#        self.plt3D = plot_3d.Plot3D()
+#        self.pltHf = plot_hf.PlotHf(self)
+#        self.pltPhi = plot_phi.PlotPhi(self)
+#        self.pltPZ = plot_pz.PlotPZ(self)
+        self.pltTauG = plot_tau_g.PlotTauG(self)
+#        self.pltImpz = plot_impz.PlotImpz(self)
+#        self.plt3D = plot_3d.Plot3D(self)
 
         self._init_UI()
 

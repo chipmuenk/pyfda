@@ -17,8 +17,8 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 class PlotImpz(QtGui.QWidget):
 
-    def __init__(self, parent=None): # default parent = None -> top Window
-        super(PlotImpz, self).__init__(parent) # initialize QWidget base class
+    def __init__(self, parent):
+        super(PlotImpz, self).__init__(parent)
 
         self.ACTIVE_3D = False
 

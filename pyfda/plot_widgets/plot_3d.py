@@ -39,9 +39,8 @@ class Plot3D(QtGui.QWidget):
     - optional display of poles / zeros
     """
 
-    def __init__(self, parent=None): # default parent = None -> top Window
-        super(Plot3D, self).__init__(parent) # initialize QWidget base class
-
+    def __init__(self, parent):
+        super(Plot3D, self).__init__(parent)
         self.zmin = 0
         self.zmax = 4
         self.zmin_dB = -80

@@ -15,10 +15,10 @@ import pyfda.pyfda_rc as rc
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 
-class PlotPhi(QtGui.QMainWindow):
+class PlotPhi(QtGui.QWidget):
 
-    def __init__(self, parent = None): # default parent = None -> top Window
-        super(PlotPhi, self).__init__(parent) # initialize QWidget base class
+    def __init__(self, parent):
+        super(PlotPhi, self).__init__(parent)
 
         self.cmbUnitsPhi = QtGui.QComboBox(self)
         units = ["rad", "rad/pi",  "deg"]
@@ -45,10 +45,13 @@ class PlotPhi(QtGui.QMainWindow):
 #        self.mplwidget.setParent(self)
 
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
+        
+        self.setLayout(self.mplwidget.layVMainMpl)
+
 
 #        self.mplwidget.setFocus()
         # make this the central widget, taking all available space:
-        self.setCentralWidget(self.mplwidget)
+#        self.setCentralWidget(self.mplwidget)
         
         self._init_axes()
 

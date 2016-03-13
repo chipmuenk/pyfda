@@ -17,8 +17,8 @@ from pyfda.plot_widgets.plot_utils import MplWidget#, MplCanvas
 
 class PlotPZ(QtGui.QWidget):
 
-    def __init__(self, parent = None): # default parent = None -> top Window
-        super(PlotPZ, self).__init__(parent) # initialize QWidget base class
+    def __init__(self, parent): 
+        super(PlotPZ, self).__init__(parent)
 
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)

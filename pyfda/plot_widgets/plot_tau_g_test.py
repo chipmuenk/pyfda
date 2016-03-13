@@ -53,8 +53,8 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 #
 class PlotTauG(QtGui.QMainWindow):
 
-    def __init__(self, parent = None): # default parent = None -> top Window
-        super(PlotTauG, self).__init__(parent) # initialize QWidget base class
+    def __init__(self, parent = None):
+        super(PlotTauG, self).__init__(parent)
 
 ################# GUI Elements ################################################
 #        self.chkWarnings = QtGui.QCheckBox()

@@ -16,10 +16,10 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 
 class PlotTauG(QtGui.QWidget):
 
-    def __init__(self, parent = None): # default parent = None -> top Window
-        super(PlotTauG, self).__init__(parent) # initialize QWidget base class
-#        QtGui.QMainWindow.__init__(self) # alternative syntax
-#
+    def __init__(self, parent):
+        super(PlotTauG, self).__init__(parent)
+
+
         self.chkWarnings = QtGui.QCheckBox()
         self.chkWarnings.setText("Enable Warnings")
         self.chkWarnings.setChecked(False)
@@ -43,9 +43,9 @@ class PlotTauG(QtGui.QWidget):
 
         self.draw() # initial drawing of tau_g
 
-#        #=============================================
-#        # Signals & Slots
-#        #=============================================
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.chkWarnings.clicked.connect(self.draw)
 
 
