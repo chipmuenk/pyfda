@@ -51,9 +51,9 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 #        s = np.sin(2*np.pi*t)
 #        self.axes.plot(t, s)
 #
-class PlotTauG(QtGui.QMainWindow):
+class PlotTauG(QtGui.QWidget):
 
-    def __init__(self, parent = None):
+    def __init__(self, parent):
         super(PlotTauG, self).__init__(parent)
 
 ################# GUI Elements ################################################
@@ -78,11 +78,12 @@ class PlotTauG(QtGui.QMainWindow):
         #    Key press events in general are not processed unless you
         #    "activate the focus of Qt onto your mpl canvas"
         # http://stackoverflow.com/questions/22043549/matplotlib-and-qt-mouse-press-event-key-is-always-none
-        self.mplwidget.setFocusPolicy(QtCore.Qt.ClickFocus)
-        self.mplwidget.setFocus()
+#        self.mplwidget.setFocusPolicy(QtCore.Qt.ClickFocus)
+#        self.mplwidget.setFocus()
 
         self.mplwidget.updateGeometry() 
         
+        self.setLayout(self.mplwidget.layVMainMpl)
         
         
 ############ combine UI elements ##############################################
@@ -98,10 +99,6 @@ class PlotTauG(QtGui.QMainWindow):
 
 #        self.setLayout(layVMain)
 #------------------------------------------------        
-
-        # make this the central widget, taking all available space:
-#        self.setCentralWidget(_widget)
-        self.setCentralWidget(self.mplwidget)
 
 
 #        _widget.setSizePolicy(QtGui.QSizePolicy.Expanding,
