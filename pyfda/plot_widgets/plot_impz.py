@@ -12,7 +12,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import impz
 from pyfda.plot_widgets.plot_utils import MplWidget
-from mpl_toolkits.mplot3d.axes3d import Axes3D
+#from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
 class PlotImpz(QtGui.QWidget):
@@ -70,10 +70,6 @@ class PlotImpz(QtGui.QWidget):
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
         self.setLayout(self.mplwidget.layVMainMpl)
-        
-        # make this the central widget, taking all available space:
-#        self.setCentralWidget(self.mplwidget)
-
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -98,11 +94,13 @@ class PlotImpz(QtGui.QWidget):
         if self.cmplx:
             self.ax_r = self.mplwidget.fig.add_subplot(211)
             self.ax_r.clear()
-            self.ax_i = self.mplwidget.fig.add_subplot(212)
+            self.ax_i = self.mplwidget.fig.add_subplot(212, sharex = self.ax_r)
             self.ax_i.clear()
         else:
             self.ax_r = self.mplwidget.fig.add_subplot(111)
             self.ax_r.clear()
+
+        self.mplwidget.fig.subplots_adjust(hspace = 0.5)  
 
         if self.ACTIVE_3D: # not implemented / tested yet
             self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
@@ -129,8 +127,6 @@ class PlotImpz(QtGui.QWidget):
         step = self.chkStep.isChecked()
         self.lblLogBottom.setEnabled(log)
         self.ledLogBottom.setEnabled(log)
-
-#        if np.ndim(fb.fil[0]['coeffs']) == 1: # FIR
 
         self.bb = fb.fil[0]['ba'][0]
         self.aa = fb.fil[0]['ba'][1]
@@ -184,6 +180,10 @@ class PlotImpz(QtGui.QWidget):
             [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=bottom,
                                                 markerfmt='rd', linefmt='b')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
+            # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
+            # plt.setp(ax_r.get_xticklabels(), visible=False) 
+            # is shorter but imports matplotlib, set property directly instead:
+            [label.set_visible(False) for label in self.ax_r.get_xticklabels()]
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
         else:
@@ -205,18 +205,6 @@ class PlotImpz(QtGui.QWidget):
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
-
-
-#        fig.setp(ml, 'markerfacecolor', 'r', 'markersize', 8)
- #       ax.setp(sl, ...)
-  #      print(self.mplwidget.plt_lim)
-  #      ax.axis(self.mplwidget.plt_lim)
-
-#        if self.mplwidget.plt_lim == [] or not self.chkLockZoom.isChecked():
-#
-#            self.mplwidget.plt_lim = t_lim + y_lim
-#            self.mplwidget.x_lim = t_lim
-
 
         self.mplwidget.redraw()
 
