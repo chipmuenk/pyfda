@@ -274,7 +274,7 @@ def main():
     app = QtGui.QApplication(sys.argv)
     app.setObjectName("TopApp")
     
-    icon = os.path.join(fb.base_dir, 'images', 'icons', "Logo_LST_4.svg")
+    icon = os.path.join(fb.base_dir, 'images', 'icons', "pyfda_icon.svg")
 
     app.setWindowIcon(QtGui.QIcon(icon))
     app.setStyleSheet(rc.css_rc) 
