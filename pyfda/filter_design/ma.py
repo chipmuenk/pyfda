@@ -32,8 +32,8 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
 
 __version__ = "1.1"
 
-frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
-             # currently, only 'ba' is supported for equiripple routines
+frmt = 'zpk' #output format of filter design routines 'zpk' / 'ba' / 'sos'
+            
 
 class ma(object):
 
@@ -65,7 +65,7 @@ a given frequency is calculated via the si function.
 
         # DISABLED widgets for all man. / min. filter order response types:
         dis_man = [] # manual filter order
-        dis_min = [''] # minimum filter order
+        dis_min = [] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_SB', 'A_SB'] # manual filter order
@@ -118,6 +118,7 @@ a given frequency is calculated via the si function.
         self.lbl_ma_2 = QtGui.QLabel("Normalize:")
         self.lbl_ma_2.setObjectName('wdg_lbl_ma_2')
         self.chk_ma_2 = QtGui.QCheckBox()
+        self.chk_ma_2.setChecked(True)
         self.chk_ma_2.setObjectName('wdg_chk_ma_2')
         self.chk_ma_2.setToolTip("Normalize to| H_max = 1|")
         
@@ -171,7 +172,8 @@ a given frequency is calculated via the si function.
         """
         Store parameter settings in filter dictionary.
         """
-        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages}})
+        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
+                                     'ma_normalize':self.chk_ma_2.isChecked()}})
 
 
 
@@ -202,24 +204,45 @@ a given frequency is calculated via the si function.
         
     def _create_ma(self, N, rt='LP'):
         b = 1.
+        k = 1.
         if rt == 'LP':
             b0 = np.ones(N + 1)
+            z0 = np.exp(-1j*np.pi*np.arange(1,N)/N)
         elif rt == 'HP':
             b0 = np.ones(N + 1)
             b0[::2] = -1.
+            #if (self.N % 2 == 0): # even order,
+            i = np.arange(1,N/2)
+            i = np.arange(-1,-N/2,-1)# np.concatenate(np.arange(1,N/2), )   
+            print(i)
+            z0 = np.exp(-1j*np.pi*i/N)
+            print(z0)
         for i in range(self.ma_stages):
             b = np.convolve(b0, b)
+        z = np.repeat(z0, self.ma_stages)
+        print("z0", z0, 'z',  z)
+        
         if self.chk_ma_2.isChecked():
             b = b / ((N +1) ** self.ma_stages)
+            k = 1./N ** self.ma_stages
+        p = np.zeros(N ** self.ma_stages)
         
         # if (self.N % 2 == 0): # even order, use odd symmetry (type III)
            # self.N = ceil_odd(N)  # enforce odd order
-        return b
+        if frmt == 'ba':        
+            return b
+            print('b', b)
+        elif frmt == 'zpk':
+            print('zpk', [z,p,k])
+            return [z,p,k]
             
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, self._create_ma(self.N))
+        print('ba', fil_dict['ba'])
+        print("shape", np.shape(fil_dict['ba']))
+        print('\nzpk', fil_dict['zpk'])
                    
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
