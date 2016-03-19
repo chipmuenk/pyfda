@@ -20,7 +20,7 @@ import scipy.signal as sig
 from scipy.signal import buttord
 import numpy as np
 
-from pyfda.pyfda_lib import save_fil
+from pyfda.pyfda_lib import save_fil, fil_convert
 
 __version__ = "1.1"
 
@@ -130,7 +130,14 @@ critical frequency from pass and stop band specifications.
         Corner frequencies and order calculated for minimum filter order are 
         also stored to allow for an easy subsequent manual filter optimization.
         """
-        save_fil(fil_dict, arg, frmt, __name__)
+        if frmt == 'zpk':
+            fil_dict['zpk'] = arg
+        elif frmt == 'ba':
+            fil_dict['ba'] = arg
+        print("\nzpk", arg)
+#        save_fil(fil_dict, arg, frmt, __name__)
+        fil_convert(fil_dict, frmt, __name__)
+        print("\nba", fil_dict['ba'], "\zpk", fil_dict['zpk'])
         
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC

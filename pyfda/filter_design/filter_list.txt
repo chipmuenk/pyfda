@@ -13,7 +13,7 @@ cheby2.py
 ellip.py
 butter.py
 bessel.py
-#ma.py
+ma.py
 
 # ======== Testing ==========
 .py

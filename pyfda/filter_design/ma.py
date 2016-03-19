@@ -19,7 +19,7 @@ from PyQt4 import QtGui
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
+from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remezord, 
 
 
 # TODO: min order for Hilbert & Differentiator
@@ -32,7 +32,7 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
 
 __version__ = "1.1"
 
-frmt = 'zpk' #output format of filter design routines 'zpk' / 'ba' / 'sos'
+frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
             
 
 class ma(object):
@@ -164,6 +164,7 @@ a given frequency is calculated via the si function.
             if 'ma_stages' in dyn_wdg_par:
                 self.ma_stages = dyn_wdg_par['ma_stages']
                 self.led_ma_1.setText(str(self.ma_stages))
+                self.chk_ma_2.setChecked(dyn_wdg_par['ma_normalize'])
         except KeyError as e:
             print("Key Error:",e)
 
@@ -187,14 +188,26 @@ a given frequency is calculated via the si function.
         self.A_SB  = fil_dict['A_SB']
         
 
-    def _save(self, fil_dict, arg):
+    def _save(self, fil_dict):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
+        fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
+        fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
 
-        save_fil(fil_dict, arg, frmt, __name__)
+        fil_convert(fil_dict, {'zpk','ba'}, __name__)
+#        print('\nzpk', fil_dict['zpk'])        
+#        print('\ba', fil_dict['ba'])
+#        print("arg shape", np.shape(arg))
+#        print("ba shape 1", np.shape(fil_dict['ba']))
+#        print('\nzpk', fil_dict['zpk'])
+
+#        save_fil(fil_dict, arg, frmt, __name__)
+
+        
+#        print("ba shape 2", np.shape(fil_dict['ba']))
 
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N  # yes, update filterbroker
@@ -207,67 +220,65 @@ a given frequency is calculated via the si function.
         k = 1.
         if rt == 'LP':
             b0 = np.ones(N + 1)
-            z0 = np.exp(-1j*np.pi*np.arange(1,N)/N)
+            z0 = np.exp(-2j*np.pi*np.arange(1,N)/N)
         elif rt == 'HP':
             b0 = np.ones(N + 1)
             b0[::2] = -1.
-            #if (self.N % 2 == 0): # even order,
-            i = np.arange(1,N/2)
-            i = np.arange(-1,-N/2,-1)# np.concatenate(np.arange(1,N/2), )   
-            print(i)
-            z0 = np.exp(-1j*np.pi*i/N)
-            print(z0)
+            i = np.arange(N)
+            if (self.N % 2 == 0): # even order, remove middle element
+                i = np.delete(i ,round(N/2.))
+            else:
+                i = np.delete(i, int(N/2.)) + 0.5
+            z0 = np.exp(-2j*np.pi*i/N)
+            
+        # calculate filter for multiple cascaded stages    
         for i in range(self.ma_stages):
             b = np.convolve(b0, b)
         z = np.repeat(z0, self.ma_stages)
-        print("z0", z0, 'z',  z)
+        print("z0", z0, '\nz',  z)
         
+        # normalize filter to |H_max| = 1 is checked:
         if self.chk_ma_2.isChecked():
             b = b / ((N +1) ** self.ma_stages)
             k = 1./N ** self.ma_stages
-        p = np.zeros(N ** self.ma_stages)
+        p = np.zeros(len(z))
         
         # if (self.N % 2 == 0): # even order, use odd symmetry (type III)
            # self.N = ceil_odd(N)  # enforce odd order
-        if frmt == 'ba':        
-            return b
-            print('b', b)
-        elif frmt == 'zpk':
-            print('zpk', [z,p,k])
-            return [z,p,k]
+        self.zpk = [z,p,k]
+        self.b = b
             
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._save(fil_dict, self._create_ma(self.N))
-        print('ba', fil_dict['ba'])
-        print("shape", np.shape(fil_dict['ba']))
-        print('\nzpk', fil_dict['zpk'])
+        self._create_ma(self.N)
+        self._save(fil_dict)
                    
-    def LPmin(self, fil_dict):
-        self._get_params(fil_dict)
-        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
-            [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
-
-        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
-                        grid_density = self.grid_density))
+#    def LPmin(self, fil_dict):
+#        self._get_params(fil_dict)
+#        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
+#            [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
+#
+#        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
+#                        grid_density = self.grid_density))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._save(fil_dict, self._create_ma(self.N, rt = 'HP'))
+        self._create_ma(self.N, rt = 'HP')
+        self._save(fil_dict)
 
-    def HPmin(self, fil_dict):
-        self._get_params(fil_dict)
-        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
-            [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-#        
-
-        if (self.N % 2 == 0): # even order
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
-                        type = 'hilbert', grid_density = self.grid_density))
-        else:
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
-                        type = 'bandpass', grid_density = self.grid_density))
+#    def HPmin(self, fil_dict):
+#        self._get_params(fil_dict)
+#        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
+#            [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
+##        
+#
+#        if (self.N % 2 == 0): # even order
+#            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+#                        type = 'hilbert', grid_density = self.grid_density))
+#        else:
+#            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+#                        type = 'bandpass', grid_density = self.grid_density))
 
 
 #------------------------------------------------------------------------------
