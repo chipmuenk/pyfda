@@ -10,6 +10,9 @@ is selected, calling the __init__ method.
 Version info:   
     1.0: initial working release
     1.1: mark private methods as private
+    1.2: - new API using fil_save & fil_convert (allow multiple formats, 
+                save 'ba' _and_ 'zpk' precisely)
+         - include method _store_entries in _update_UI
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -21,18 +24,9 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remezord, 
 
+__version__ = "1.2"
 
-# TODO: min order for Hilbert & Differentiator
-# TODO: changing grid_density does not trigger sigSpecsChanged
-# TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
-# TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
-#       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
-#         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
-#           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
-
-__version__ = "1.1"
-
-frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
+FRMT = {'zpk', 'ba'} #output format of filter design routines 'zpk' / 'ba' / 'sos'
             
 
 class ma(object):
@@ -78,14 +72,10 @@ a given frequency is calculated via the si function.
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-#            "LP": {"man":{"par":[]},
-#                   "min":{"par":[]}},
-#            "HP": {"man":{"par":[]},
-#                   "min":{"par":[]}}
-#                   }
             "LP": {"man":{"par":[]}},
             "HP": {"man":{"par":[]}}
-                   }                   
+                   } 
+
         self.info_doc = []
 #        self.info_doc.append('remez()\n=======')
 #        self.info_doc.append(sig.remez.__doc__)
@@ -153,6 +143,12 @@ a given frequency is calculated via the si function.
         """
         self.ma_stages = int(abs(round(float(self.led_ma_1.text()))))
         self.led_ma_1.setText(str(self.ma_stages))
+        """
+        Store parameter settings in filter dictionary.
+        """
+        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
+                                     'ma_normalize':self.chk_ma_2.isChecked()}})
+        
         
     def _load_entries(self):
         """
@@ -169,12 +165,12 @@ a given frequency is calculated via the si function.
             print("Key Error:",e)
 
 
-    def _store_entries(self):
-        """
-        Store parameter settings in filter dictionary.
-        """
-        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
-                                     'ma_normalize':self.chk_ma_2.isChecked()}})
+#    def _store_entries(self):
+#        """
+#        Store parameter settings in filter dictionary.
+#        """
+#        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
+#                                     'ma_normalize':self.chk_ma_2.isChecked()}})
 
 
 
@@ -183,7 +179,7 @@ a given frequency is calculated via the si function.
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N'] 
+        self.N     = fil_dict['N']
         self.F_SB  = fil_dict['F_SB']
         self.A_SB  = fil_dict['A_SB']
         
@@ -194,42 +190,39 @@ a given frequency is calculated via the si function.
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-        fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
-        fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
-
-        fil_convert(fil_dict, {'zpk','ba'}, __name__)
-#        print('\nzpk', fil_dict['zpk'])        
-#        print('\ba', fil_dict['ba'])
-#        print("arg shape", np.shape(arg))
-#        print("ba shape 1", np.shape(fil_dict['ba']))
-#        print('\nzpk', fil_dict['zpk'])
-
-#        save_fil(fil_dict, arg, frmt, __name__)
-
-        
-#        print("ba shape 2", np.shape(fil_dict['ba']))
+        if 'zpk' in FRMT:        
+            fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
+        if 'ba' in FRMT:
+            fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
+        fil_convert(fil_dict, FRMT)
 
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N  # yes, update filterbroker
 
-        self._store_entries()
+#        self._store_entries()
         
         
-    def _create_ma(self, N, rt='LP'):
+    def _create_ma(self, fil_dict, rt='LP'):
+        """
+        Calculate coefficients and P/Z for moving average filter based on
+        filter length L = N + 1 and number of cascaded stages and save the 
+        result in the filter dictionary.
+        """
         b = 1.
         k = 1.
+        L = self.N + 1
         if rt == 'LP':
-            b0 = np.ones(N + 1)
-            z0 = np.exp(-2j*np.pi*np.arange(1,N)/N)
+            b0 = np.ones(L)
+            z0 = np.exp(-2j*np.pi*np.arange(1,L)/L)
         elif rt == 'HP':
-            b0 = np.ones(N + 1)
+            b0 = np.ones(L)
             b0[::2] = -1.
-            i = np.arange(N)
-            if (self.N % 2 == 0): # even order, remove middle element
-                i = np.delete(i ,round(N/2.))
-            else:
-                i = np.delete(i, int(N/2.)) + 0.5
-            z0 = np.exp(-2j*np.pi*i/N)
+            i = np.arange(L)
+            if (L % 2 == 0): # even order, remove middle element
+                i = np.delete(i ,round(L/2.))
+            else: # odd order, shift by 0.5 and remove middle element
+                i = np.delete(i, int(L/2.)) + 0.5
+            z0 = np.exp(-2j*np.pi*i/L)
             
         # calculate filter for multiple cascaded stages    
         for i in range(self.ma_stages):
@@ -239,20 +232,19 @@ a given frequency is calculated via the si function.
         
         # normalize filter to |H_max| = 1 is checked:
         if self.chk_ma_2.isChecked():
-            b = b / ((N +1) ** self.ma_stages)
-            k = 1./N ** self.ma_stages
+            b = b / (L ** self.ma_stages)
+            k = 1./L ** self.ma_stages
         p = np.zeros(len(z))
         
-        # if (self.N % 2 == 0): # even order, use odd symmetry (type III)
-           # self.N = ceil_odd(N)  # enforce odd order
+        # store in class attributes for the _save method
         self.zpk = [z,p,k]
         self.b = b
+        self._save(fil_dict)
             
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._create_ma(self.N)
-        self._save(fil_dict)
+        self._create_ma(fil_dict)
                    
 #    def LPmin(self, fil_dict):
 #        self._get_params(fil_dict)
@@ -264,8 +256,7 @@ a given frequency is calculated via the si function.
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._create_ma(self.N, rt = 'HP')
-        self._save(fil_dict)
+        self._create_ma(fil_dict, rt = 'HP')
 
 #    def HPmin(self, fil_dict):
 #        self._get_params(fil_dict)
