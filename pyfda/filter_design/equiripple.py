@@ -159,6 +159,11 @@ using Ichige's algorithm.
         """
         self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
         self.led_remez_1.setText(str(self.grid_density))
+        """
+        Store parameter settings in filter dictionary.
+        """
+        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+
         
     def _load_entries(self):
         """
@@ -174,11 +179,11 @@ using Ichige's algorithm.
             print("Key Error:",e)
 
 
-    def _store_entries(self):
-        """
-        Store parameter settings in filter dictionary.
-        """
-        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+#    def _store_entries(self):
+#        """
+#        Store parameter settings in filter dictionary.
+#        """
+#        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
 
 
 
@@ -214,7 +219,7 @@ using Ichige's algorithm.
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
 
-        self._store_entries()
+#        self._store_entries()
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
