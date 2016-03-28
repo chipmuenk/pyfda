@@ -1023,7 +1023,8 @@ def fil_convert(fil_dict, format_in):
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         fil_dict['zpk'] = list(sig.tf2zpk(b,a))
-        fil_dict['sos'] = sig.tf2sos(b,a)
+        if SOS_AVAIL:
+            fil_dict['sos'] = sig.tf2sos(b,a)
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
