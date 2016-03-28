@@ -32,7 +32,7 @@ from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
    ceil, hstack, mod
 
 # Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
-# that default to pyQT5
+# that default to pyQT5 (but have pyQt4 installed as well)
 import matplotlib
 matplotlib.use("Qt4Agg")
 
@@ -40,11 +40,11 @@ import scipy.signal as sig
 from scipy import __version__ as _scipy_version
 
 from  matplotlib import patches # TODO: should not be imported here?!
-import logging
+#import logging
 from distutils.version import LooseVersion
 
 SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
-print(_scipy_version)
+#print("scipy:", _scipy_version)
 
 def dB(lin, power = False):
     """
@@ -175,6 +175,7 @@ def cmplx_sort(p):
 
 # adapted from scipy.signal.signaltools.py:
 # TODO:  comparison of real values has several problems (5 * tol ???)
+# TODO: speed improvements
 def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
     """
     Determine unique roots and their multiplicities from a list of roots.
