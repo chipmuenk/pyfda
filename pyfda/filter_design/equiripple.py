@@ -33,8 +33,8 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
 
 __version__ = "1.2"
 
-frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
-             # currently, only 'ba' is supported for equiripple routines
+frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+            # currently, only 'ba' is supported for equiripple routines
 
 class equiripple(object):
 
