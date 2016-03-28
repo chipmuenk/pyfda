@@ -26,7 +26,7 @@ from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remez
 
 __version__ = "1.2"
 
-FRMT = {'zpk', 'ba'} #output format of filter design routines 'zpk' / 'ba' / 'sos'
+FRMT = {'zpk', 'ba'} # output format of filter design routines 'zpk' / 'ba' / 'sos'
             
 
 class ma(object):
@@ -34,10 +34,10 @@ class ma(object):
     info ="""
 **Moving average filters**
 
-can only be specified via their length. 
+can only be specified via their length and the number of cascaded sections. 
 
 The minimum order to fulfill the target specifications (minimum attenuation at
-a given frequency is calculated via the si function.
+a given frequency can be calculated via the si function (not implemented yet).
 
 **Design routines:**
 
