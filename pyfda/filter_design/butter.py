@@ -11,7 +11,7 @@ Version info:
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
-    1.2: new API using fil_save (enable SOS features)
+    1.2: new API using fil_save (enable SOS features when available)
 
 
 Author: Christian Muenker
@@ -21,11 +21,14 @@ import scipy.signal as sig
 from scipy.signal import buttord
 import numpy as np
 
-from pyfda.pyfda_lib import fil_save #, fil_convert
+from pyfda.pyfda_lib import fil_save, SOS_AVAIL #, fil_convert
 
 __version__ = "1.2"
 
-FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+if SOS_AVAIL:
+    FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+else:
+    FRMT = 'zpk'
 
 class butter(object):
 
