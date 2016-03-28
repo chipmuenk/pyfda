@@ -38,8 +38,8 @@ matplotlib.use("Qt4Agg")
 
 import scipy.signal as sig
 from scipy import __version__ as _scipy_version
-import matplotlib.pyplot as plt
-from  matplotlib import patches
+
+from  matplotlib import patches # TODO: should not be imported here?!
 import logging
 from distutils.version import LooseVersion
 
@@ -887,7 +887,7 @@ Examples
 
 
 #==================================================================
-def format_ticks(xy, scale=1., format="%.1f"):
+def format_ticks(ax, xy, scale=1., format="%.1f"):
 #==================================================================
     """
 Reformat numbers at x or y - axis. The scale can be changed to display
@@ -895,6 +895,9 @@ e.g. MHz instead of Hz. The number format can be changed as well.
 
 Parameters
 ----------
+
+ax : axes object
+
 xy : string, either 'x', 'y' or 'xy'
      select corresponding axis (axes) for reformatting
 
@@ -921,11 +924,12 @@ Two decimal places for numbers on x- and y-axis
 
 """
     if xy == 'x' or xy == 'xy':
-        locx,labelx = plt.xticks() # get location and content of xticks
-        plt.xticks(locx, map(lambda x: format % x, locx*scale))
+#        locx,labelx = ax.get_xticks(), ax.get_xticklabels() # get location and content of xticks
+        locx = ax.get_xticks()
+        ax.set_xticks(locx, map(lambda x: format % x, locx*scale))
     if xy == 'y' or xy == 'xy':
-        locy,labely = plt.yticks() # get location and content of xticks
-        plt.yticks(locy, map(lambda y: format % y, locy*scale))
+        locy = ax.get_yticks() # get location and content of xticks
+        ax.set_yticks(locy, map(lambda y: format % y, locy*scale))
 
 #==============================================================================
 
@@ -1272,18 +1276,22 @@ def rt_label(label):
 # If called directly, do some example #
 #######################################
 if __name__=='__main__':
-    plt.figure(1)
-    print(zplane(b=[1,0,0,1], a = 1))
-    plt.figure(2)
-    print(zplane(z=1))
-    plt.figure(3)
-    print(zplane(b=[1,1]))
-    plt.figure(4)
-    print(zplane(b=[1,0]))
-    plt.figure(5)
-    print(zplane(b=[1,1,1,1,1]))
-    plt.figure(6)
-    print(zplane(b=np.convolve([1,1,1,1,1], [1,1,1,1,1]), a = [1,1]))
-#    plt.figure(7)
-#    print(zplane(b=1))
+    import matplotlib.pyplot as plt
+#    from matplotlib import patches
+    ax1 = plt.figure(1).add_subplot(111)
+    print(zplane(b=[1,0,0,1], a = 1, plt_ax = ax1))
+    ax2 = plt.figure(2).add_subplot(111)
+    print(zplane(z=1, plt_ax = ax2))
+    ax3 = plt.figure(3).add_subplot(111)
+    print(zplane(b=[1,1], plt_ax = ax3))
+    format_ticks(ax3, 'xy', format="%2.2f", scale = 5)
+    
+    ax4 = plt.figure(4).add_subplot(111)
+    print(zplane(b=[1,0], plt_ax = ax4))
+    ax5 = plt.figure(5).add_subplot(111)
+    print(zplane(b=[1,1,1,1,1], plt_ax = ax5))
+    ax6 = plt.figure(6).add_subplot(111)
+    print(zplane(b=np.convolve([1,1,1,1,1], [1,1,1,1,1]), a = [1,1], plt_ax = ax6))
+#    ax7 = plt.figure(7).add_subplot(111)
+#    print(zplane(b=1, plt_ax = ax7))
     plt.show()
