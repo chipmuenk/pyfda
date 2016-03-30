@@ -17,7 +17,7 @@ import numpy as np
 from scipy.signal import freqz
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import cround, save_fil
+from pyfda.pyfda_lib import cround, fil_save
 from pyfda.simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows
@@ -270,7 +270,7 @@ class InputPZ(QtGui.QWidget):
         zpk.append(simple_eval(self.ledGain.text())) # append k factor to zpk
 
         fb.fil[0]["N"] = num_rows
-        save_fil(fb.fil[0], zpk, 'zpk', __name__) # save & convert to 'ba'
+        fil_save(fb.fil[0], zpk, 'zpk', __name__) # save & convert to 'ba'
         
         if self.chkNorm.isChecked():
             # set gain factor k (zpk[2]) in such a way that the max. filter 
@@ -281,7 +281,7 @@ class InputPZ(QtGui.QWidget):
             if not np.isfinite(Hmax) or Hmax > 1e4:
                 Hmax = 1.
             zpk[2] = zpk[2] * self.Hmax_last / max(abs(H))
-            save_fil(fb.fil[0], zpk, 'zpk', __name__) # save with new gain '
+            fil_save(fb.fil[0], zpk, 'zpk', __name__) # save with new gain '
 
         if __name__ == '__main__':
             self.load_entries() # only needed for stand-alone test

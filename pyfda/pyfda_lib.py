@@ -28,18 +28,22 @@ Created on Mon Apr 30 10:29:42 2012
 from __future__ import division, print_function
 import numpy as np
 #import numpy.ma as ma
-from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
-   ceil, hstack, mod
+from numpy import pi, asarray, log10, arctan,  mod
 
 # Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
-# that default to pyQT5
+# that default to pyQT5 (but have pyQt4 installed as well)
 import matplotlib
 matplotlib.use("Qt4Agg")
 
 import scipy.signal as sig
-import matplotlib.pyplot as plt
-from  matplotlib import patches
-import logging
+from scipy import __version__ as _scipy_version
+
+from  matplotlib import patches # TODO: should not be imported here?!
+#import logging
+from distutils.version import LooseVersion
+
+SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
+#print("scipy:", _scipy_version)
 
 def dB(lin, power = False):
     """
@@ -170,6 +174,7 @@ def cmplx_sort(p):
 
 # adapted from scipy.signal.signaltools.py:
 # TODO:  comparison of real values has several problems (5 * tol ???)
+# TODO: speed improvements
 def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
     """
     Determine unique roots and their multiplicities from a list of roots.
@@ -882,7 +887,7 @@ Examples
 
 
 #==================================================================
-def format_ticks(xy, scale=1., format="%.1f"):
+def format_ticks(ax, xy, scale=1., format="%.1f"):
 #==================================================================
     """
 Reformat numbers at x or y - axis. The scale can be changed to display
@@ -890,6 +895,9 @@ e.g. MHz instead of Hz. The number format can be changed as well.
 
 Parameters
 ----------
+
+ax : axes object
+
 xy : string, either 'x', 'y' or 'xy'
      select corresponding axis (axes) for reformatting
 
@@ -916,15 +924,16 @@ Two decimal places for numbers on x- and y-axis
 
 """
     if xy == 'x' or xy == 'xy':
-        locx,labelx = plt.xticks() # get location and content of xticks
-        plt.xticks(locx, map(lambda x: format % x, locx*scale))
+#        locx,labelx = ax.get_xticks(), ax.get_xticklabels() # get location and content of xticks
+        locx = ax.get_xticks()
+        ax.set_xticks(locx, map(lambda x: format % x, locx*scale))
     if xy == 'y' or xy == 'xy':
-        locy,labely = plt.yticks() # get location and content of xticks
-        plt.yticks(locy, map(lambda y: format % y, locy*scale))
+        locy = ax.get_yticks() # get location and content of xticks
+        ax.set_yticks(locy, map(lambda y: format % y, locy*scale))
 
 #==============================================================================
 
-def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
+def fil_save(fil_dict, arg, format_in, sender, convert = True):
     """
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all available formats in the passed
@@ -933,27 +942,97 @@ def save_fil(fil_dict, arg, out_format, sender, DEBUG = False):
     Filter coefficients in FIR format (b, one dimensional) are automatically converted
     to IIR format (b, a).
     """
-    if DEBUG: print("saveFil: arg = ",arg)
-    if out_format == 'zpk': # arg = [z,p,k]
-        (b, a) = sig.zpk2tf(arg[0], arg[1], arg[2])
-        zpk = arg
-    elif out_format == 'ba': # arg = [b,a]
+#    print("fil_save: arg = ", arg)
+#    print("\nfil_save: shape(arg) = ", np.ndim(arg), np.shape(arg), len(arg))
+#    print("\nfil_save: arg[0]:", np.shape(arg[0]))
+    if format_in == 'zpk': # arg = [z,p,k]
+        format_error = False
         if np.ndim(arg) == 1:
-            b = np.asarray(arg)
-            a = np.zeros(len(arg))
-            a[0] = 1
+            if np.ndim(arg[0]) == 0: # list / array with z only
+                z = arg
+                p = np.zeros(len(z))
+                k = 1
+                fil_dict['zpk'] = [z, p, k]
+            elif np.ndim(arg[0]) == 1: # list of lists
+                if np.shape(arg)[0] == 3:
+                    fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+                else:
+                    format_error = True
+            else:
+                format_error = True
         else:
+            format_error = True
+
+        if format_error:        
+            raise ValueError("Unknown 'zpk' format {0}".format(arg))
+
+    elif 'sos' in format_in and SOS_AVAIL:
+            fil_dict['sos'] = arg
+            
+    elif format_in == 'ba': 
+        if np.ndim(arg) == 1: # arg = [b]
+            b = np.asarray(arg)
+            a = np.zeros(len(b))
+            a[0] = 1
+
+        else: # arg = [b,a]
             b = arg[0]
             a = arg[1]
-        zpk = sig.tf2zpk(b, a)#[np.roots(arg), [1, np.zeros(len(arg)-1)],1]
+
+        fil_dict['ba'] = [b, a]
+
     else:
-        raise ValueError("Unknown output format {0:s}".format(out_format))
-    fil_dict['ba'] = [b, a]
-    fil_dict['zpk'] = [zpk[0], zpk[1], zpk[2]]
-    fil_dict['sos'] = None
-    fil_dict['creator'] = (out_format, sender)
+        raise ValueError("Unknown input format {0:s}".format(format_in))
+    
+    fil_dict['creator'] = (format_in, sender)
+    
+    if convert:    
+        fil_convert(fil_dict, format_in)
 
 #==============================================================================
+def fil_convert(fil_dict, format_in):
+    """
+    Convert between poles / zeros / gain, filter coefficients (polynomes)
+    and second-order sections and store all formats not generated by the filter
+    design routine in the passed dictionary 'fil_dict'.
+
+    Parameters
+    ----------
+    fil_dict :  dictionary
+         filter dictionary
+    
+    format_in :  string or set of strings
+         format(s) generated by the filter design routine. Must be one of
+         'zpk': [z,p,k] where z is the array of zeros, p the array of poles and
+             k is a scalar with the gain
+         'ba' : [b, a] where b and a are the polynomial coefficients
+         'sos' : a list of second order sections
+    
+
+    """
+    
+    if 'zpk' in format_in: # z, p, k have been generated,convert to other formats
+        zpk = fil_dict['zpk']
+        if 'ba' not in format_in:
+            fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
+        if 'sos' not in format_in and SOS_AVAIL:
+            fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
+
+    elif 'sos' in format_in and SOS_AVAIL:
+        if 'zpk' not in format_in:
+            fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
+        if 'ba' not in format_in:
+            fil_dict['ba'] = sig.sos2tf(fil_dict['sos'])
+
+    elif 'ba' in format_in: # arg = [b,a]
+        b, a = fil_dict['ba'][0], fil_dict['ba'][1]
+        fil_dict['zpk'] = list(sig.tf2zpk(b,a))
+        if SOS_AVAIL:
+            fil_dict['sos'] = sig.tf2sos(b,a)
+
+    else:
+        raise ValueError("Unknown input format {0:s}".format(format_in))
+
 
 #========================================================
 """Supplies remezord method according to Scipy Ticket #475
@@ -1197,18 +1276,22 @@ def rt_label(label):
 # If called directly, do some example #
 #######################################
 if __name__=='__main__':
-    plt.figure(1)
-    print(zplane(b=[1,0,0,1], a = 1))
-    plt.figure(2)
-    print(zplane(z=1))
-    plt.figure(3)
-    print(zplane(b=[1,1]))
-    plt.figure(4)
-    print(zplane(b=[1,0]))
-    plt.figure(5)
-    print(zplane(b=[1,1,1,1,1]))
-    plt.figure(6)
-    print(zplane(b=np.convolve([1,1,1,1,1], [1,1,1,1,1]), a = [1,1]))
-#    plt.figure(7)
-#    print(zplane(b=1))
+    import matplotlib.pyplot as plt
+#    from matplotlib import patches
+    ax1 = plt.figure(1).add_subplot(111)
+    print(zplane(b=[1,0,0,1], a = 1, plt_ax = ax1))
+    ax2 = plt.figure(2).add_subplot(111)
+    print(zplane(z=1, plt_ax = ax2))
+    ax3 = plt.figure(3).add_subplot(111)
+    print(zplane(b=[1,1], plt_ax = ax3))
+    format_ticks(ax3, 'xy', format="%2.2f", scale = 5)
+    
+    ax4 = plt.figure(4).add_subplot(111)
+    print(zplane(b=[1,0], plt_ax = ax4))
+    ax5 = plt.figure(5).add_subplot(111)
+    print(zplane(b=[1,1,1,1,1], plt_ax = ax5))
+    ax6 = plt.figure(6).add_subplot(111)
+    print(zplane(b=np.convolve([1,1,1,1,1], [1,1,1,1,1]), a = [1,1], plt_ax = ax6))
+#    ax7 = plt.figure(7).add_subplot(111)
+#    print(zplane(b=1, plt_ax = ax7))
     plt.show()

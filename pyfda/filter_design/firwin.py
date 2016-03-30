@@ -10,6 +10,8 @@ is selected, calling the __init__ method.
 Version info:   
     1.0: initial working release
     1.1: mark private methods as private
+    1.2: new API using fil_save
+
 
 Author: Christian Muenker
 """
@@ -21,7 +23,7 @@ import inspect
 from PyQt4 import QtGui, QtCore
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import save_fil, remezord, round_odd
+from pyfda.pyfda_lib import fil_save, remezord, round_odd
 
 
 # TODO: Hilbert, differentiator, multiband are missing
@@ -30,18 +32,18 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd
 # TODO: Improve calculation of F_C and F_C2 using the weights
 # TODO: Automatic setting of density factor for remez calculation? 
 #       Automatic switching to Kaiser / Hermann?
+# TODO: Parameters for windows are not stored in fil_dict?
 
-__version__ = "1.1"
+__version__ = "1.2"
 
-frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
 
 class firwin(object):
 
     def __init__(self):
         
-        # The first part contains static information that is used to build
-        # the filter tree:
+        # This part contains static information for building the filter tree
         self.name = {'firwin':'Windowed FIR'}
 
         # common messages for all man. / min. filter order response types:
@@ -94,11 +96,15 @@ class firwin(object):
         """
         #self.info_doc = [] is set in self.updateWindow()
         
+        #------------------- end of static info for filter tree ---------------
+
+        
         # additional dynamic widgets that need to be set in the main widgets
         # input_filter ('sf') and input_order ('fo')
         self.wdg = {'fo':'cmb_firwin_alg', 'sf':'wdg_firwin_win'}
         
         self.hdl = None
+        
         
         self._init_UI()
 
@@ -171,6 +177,9 @@ class firwin(object):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmb_firwin_win.activated.connect(self._update_UI)
+#        self.led_firwin_1.editingFinished.connect(self._store_entries)
+#        self.led_firwin_2.editingFinished.connect(self._store_entries)
+
         self.led_firwin_1.editingFinished.connect(self._update_UI)
         self.led_firwin_2.editingFinished.connect(self._update_UI)
         self.cmb_firwin_alg.activated.connect(self._update_UI)
@@ -206,7 +215,7 @@ class firwin(object):
         # and remove common args for all window types ('sym' and 'M'):
         self.winArgs = [arg for arg in self.winArgs if arg not in {'sym', 'M'}]
 
-        # print(scipy.signal.window.boxcar.func_code.co_varnames) # also works
+        
         # make edit boxes and labels for additional parameters visible if needed
         # and construct self.firWindow as a tuple consisting of a string with 
         # the window name and optionally one or two float parameters. 
@@ -227,8 +236,7 @@ class firwin(object):
             self.firWindow = (self.fir_window_name,
                                       float(self.led_firwin_1.text()))
         else:
-            self.firWindow = self.fir_window_name
-        #print(self.firWindow)           
+            self.firWindow = self.fir_window_name          
 
     def _load_entries(self):
         """
@@ -308,13 +316,13 @@ class firwin(object):
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-        save_fil(fil_dict, arg, frmt, __name__)
+        fil_save(fil_dict, arg, FRMT, __name__)
 
         try: # has the order been calculated by a "min" filter design?
             fil_dict['N'] = self.N # yes, update filterbroker
         except AttributeError:
             pass
-        self._store_entries()
+#        self._store_entries()
         
         
     def _firwin_ord(self, F, W, A, alg):
@@ -421,7 +429,7 @@ if __name__ == '__main__':
     layVDynWdg.addWidget(filt_alg, stretch = 1)
     
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][frmt]) # return results in default format
+    print(fb.fil[0][FRMT]) # return results in default format
 
     frmDynWdg = QtGui.QFrame()
     frmDynWdg.setLayout(layVDynWdg)

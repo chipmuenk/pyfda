@@ -10,6 +10,9 @@ is selected, calling the __init__ method.
 Version info:   
     1.0: initial working release
     1.1: mark private methods as private
+    1.2: - new API using fil_save & fil_convert (allow multiple formats, 
+                save 'ba' _and_ 'zpk' precisely)
+         - include method _store_entries in _update_UI
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -19,31 +22,22 @@ from PyQt4 import QtGui
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
+from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remezord, 
 
+__version__ = "1.2"
 
-# TODO: min order for Hilbert & Differentiator
-# TODO: changing grid_density does not trigger sigSpecsChanged
-# TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
-# TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
-#       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
-#         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
-#           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
-
-__version__ = "1.1"
-
-frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
-             # currently, only 'ba' is supported for equiripple routines
+FRMT = {'zpk', 'ba'} # output format of filter design routines 'zpk' / 'ba' / 'sos'
+            
 
 class ma(object):
 
     info ="""
 **Moving average filters**
 
-can only be specified via their length. 
+can only be specified via their length and the number of cascaded sections. 
 
 The minimum order to fulfill the target specifications (minimum attenuation at
-a given frequency is calculated via the si function.
+a given frequency can be calculated via the si function (not implemented yet).
 
 **Design routines:**
 
@@ -65,7 +59,7 @@ a given frequency is calculated via the si function.
 
         # DISABLED widgets for all man. / min. filter order response types:
         dis_man = [] # manual filter order
-        dis_min = [''] # minimum filter order
+        dis_min = [] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_SB', 'A_SB'] # manual filter order
@@ -78,14 +72,10 @@ a given frequency is calculated via the si function.
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-#            "LP": {"man":{"par":[]},
-#                   "min":{"par":[]}},
-#            "HP": {"man":{"par":[]},
-#                   "min":{"par":[]}}
-#                   }
             "LP": {"man":{"par":[]}},
             "HP": {"man":{"par":[]}}
-                   }                   
+                   } 
+
         self.info_doc = []
 #        self.info_doc.append('remez()\n=======')
 #        self.info_doc.append(sig.remez.__doc__)
@@ -94,7 +84,7 @@ a given frequency is calculated via the si function.
         # additional dynamic widgets that need to be set in the main widgets
         self.wdg = {'sf':'wdg_ma'}
         
-        self.hdl = None
+        self.hdl = ['ma', 'cic']
         #----------------------------------------------------------------------
 
         self._init_UI()
@@ -118,6 +108,7 @@ a given frequency is calculated via the si function.
         self.lbl_ma_2 = QtGui.QLabel("Normalize:")
         self.lbl_ma_2.setObjectName('wdg_lbl_ma_2')
         self.chk_ma_2 = QtGui.QCheckBox()
+        self.chk_ma_2.setChecked(True)
         self.chk_ma_2.setObjectName('wdg_chk_ma_2')
         self.chk_ma_2.setToolTip("Normalize to| H_max = 1|")
         
@@ -152,6 +143,12 @@ a given frequency is calculated via the si function.
         """
         self.ma_stages = int(abs(round(float(self.led_ma_1.text()))))
         self.led_ma_1.setText(str(self.ma_stages))
+        """
+        Store parameter settings in filter dictionary.
+        """
+        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
+                                     'ma_normalize':self.chk_ma_2.isChecked()}})
+        
         
     def _load_entries(self):
         """
@@ -163,15 +160,17 @@ a given frequency is calculated via the si function.
             if 'ma_stages' in dyn_wdg_par:
                 self.ma_stages = dyn_wdg_par['ma_stages']
                 self.led_ma_1.setText(str(self.ma_stages))
+                self.chk_ma_2.setChecked(dyn_wdg_par['ma_normalize'])
         except KeyError as e:
             print("Key Error:",e)
 
 
-    def _store_entries(self):
-        """
-        Store parameter settings in filter dictionary.
-        """
-        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages}})
+#    def _store_entries(self):
+#        """
+#        Store parameter settings in filter dictionary.
+#        """
+#        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
+#                                     'ma_normalize':self.chk_ma_2.isChecked()}})
 
 
 
@@ -180,71 +179,97 @@ a given frequency is calculated via the si function.
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N'] 
+        self.N     = fil_dict['N']
         self.F_SB  = fil_dict['F_SB']
         self.A_SB  = fil_dict['A_SB']
         
 
-    def _save(self, fil_dict, arg):
+    def _save(self, fil_dict):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-
-        save_fil(fil_dict, arg, frmt, __name__)
+        if 'zpk' in FRMT:        
+            fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
+        if 'ba' in FRMT:
+            fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
+        fil_convert(fil_dict, FRMT)
 
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N  # yes, update filterbroker
 
-        self._store_entries()
+#        self._store_entries()
         
         
-    def _create_ma(self, N, rt='LP'):
+    def _create_ma(self, fil_dict, rt='LP'):
+        """
+        Calculate coefficients and P/Z for moving average filter based on
+        filter length L = N + 1 and number of cascaded stages and save the 
+        result in the filter dictionary.
+        """
         b = 1.
+        k = 1.
+        L = self.N + 1
         if rt == 'LP':
-            b0 = np.ones(N + 1)
+            b0 = np.ones(L)
+            z0 = np.exp(-2j*np.pi*np.arange(1,L)/L)
         elif rt == 'HP':
-            b0 = np.ones(N + 1)
+            b0 = np.ones(L)
             b0[::2] = -1.
+            i = np.arange(L)
+            if (L % 2 == 0): # even order, remove middle element
+                i = np.delete(i ,round(L/2.))
+            else: # odd order, shift by 0.5 and remove middle element
+                i = np.delete(i, int(L/2.)) + 0.5
+            z0 = np.exp(-2j*np.pi*i/L)
+            
+        # calculate filter for multiple cascaded stages    
         for i in range(self.ma_stages):
             b = np.convolve(b0, b)
-        if self.chk_ma_2.isChecked():
-            b = b / ((N +1) ** self.ma_stages)
+        z = np.repeat(z0, self.ma_stages)
+        print("z0", z0, '\nz',  z)
         
-        # if (self.N % 2 == 0): # even order, use odd symmetry (type III)
-           # self.N = ceil_odd(N)  # enforce odd order
-        return b
+        # normalize filter to |H_max| = 1 is checked:
+        if self.chk_ma_2.isChecked():
+            b = b / (L ** self.ma_stages)
+            k = 1./L ** self.ma_stages
+        p = np.zeros(len(z))
+        
+        # store in class attributes for the _save method
+        self.zpk = [z,p,k]
+        self.b = b
+        self._save(fil_dict)
             
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._save(fil_dict, self._create_ma(self.N))
+        self._create_ma(fil_dict)
                    
-    def LPmin(self, fil_dict):
-        self._get_params(fil_dict)
-        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
-            [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
-
-        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
-                        grid_density = self.grid_density))
+#    def LPmin(self, fil_dict):
+#        self._get_params(fil_dict)
+#        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
+#            [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
+#
+#        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
+#                        grid_density = self.grid_density))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._save(fil_dict, self._create_ma(self.N, rt = 'HP'))
+        self._create_ma(fil_dict, rt = 'HP')
 
-    def HPmin(self, fil_dict):
-        self._get_params(fil_dict)
-        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
-            [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-#        
-
-        if (self.N % 2 == 0): # even order
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
-                        type = 'hilbert', grid_density = self.grid_density))
-        else:
-            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
-                        type = 'bandpass', grid_density = self.grid_density))
+#    def HPmin(self, fil_dict):
+#        self._get_params(fil_dict)
+#        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
+#            [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
+##        
+#
+#        if (self.N % 2 == 0): # even order
+#            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+#                        type = 'hilbert', grid_density = self.grid_density))
+#        else:
+#            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
+#                        type = 'bandpass', grid_density = self.grid_density))
 
 
 #------------------------------------------------------------------------------

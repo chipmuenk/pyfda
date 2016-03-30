@@ -17,7 +17,7 @@ from PyQt4.QtCore import pyqtSignal
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import cround, save_fil
+from pyfda.pyfda_lib import cround, fil_save
 import pyfda.pyfda_fix_lib as fix
 from pyfda.simpleeval import simple_eval
 
@@ -277,7 +277,7 @@ class InputCoeffs(QtGui.QWidget):
                 'frmt':self.cmbQFormat.currentText()
                 }
 
-        save_fil(fb.fil[0], coeffs, 'ba', __name__)
+        fil_save(fb.fil[0], coeffs, 'ba', __name__)
 
         logger.debug("store_entries - coeffients / zpk updated:\n"
             "b,a = %s\n\n"

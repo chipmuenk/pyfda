@@ -10,6 +10,7 @@ is selected, calling the __init__ method.
 Version info:   
     1.0: initial working release
     1.1: mark private methods as private
+    1.2: new API using fil_save
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -19,7 +20,7 @@ from PyQt4 import QtGui
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
+from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
 
 
 # TODO: min order for Hilbert & Differentiator
@@ -30,10 +31,10 @@ from pyfda.pyfda_lib import save_fil, remezord, round_odd, ceil_even
 #         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
 #           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
 
-__version__ = "1.1"
+__version__ = "1.2"
 
-frmt = 'ba' #output format of filter design routines 'zpk' / 'ba' / 'sos'
-             # currently, only 'ba' is supported for equiripple routines
+frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+            # currently, only 'ba' is supported for equiripple routines
 
 class equiripple(object):
 
@@ -159,6 +160,11 @@ using Ichige's algorithm.
         """
         self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
         self.led_remez_1.setText(str(self.grid_density))
+        """
+        Store parameter settings in filter dictionary.
+        """
+        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+
         
     def _load_entries(self):
         """
@@ -174,11 +180,11 @@ using Ichige's algorithm.
             print("Key Error:",e)
 
 
-    def _store_entries(self):
-        """
-        Store parameter settings in filter dictionary.
-        """
-        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+#    def _store_entries(self):
+#        """
+#        Store parameter settings in filter dictionary.
+#        """
+#        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
 
 
 
@@ -209,12 +215,11 @@ using Ichige's algorithm.
         dictionary 'fil_dict'.
         """
 
-        save_fil(fil_dict, arg, frmt, __name__)
+        fil_save(fil_dict, arg, frmt, __name__)
 
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
 
-        self._store_entries()
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
