@@ -84,7 +84,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         # additional dynamic widgets that need to be set in the main widgets
         self.wdg = {'sf':'wdg_ma'}
         
-        self.hdl = None
+        self.hdl = ['ma', 'cic']
         #----------------------------------------------------------------------
 
         self._init_UI()
