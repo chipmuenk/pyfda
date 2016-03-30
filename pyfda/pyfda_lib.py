@@ -28,8 +28,7 @@ Created on Mon Apr 30 10:29:42 2012
 from __future__ import division, print_function
 import numpy as np
 #import numpy.ma as ma
-from numpy import pi, asarray, absolute, sqrt, log10, arctan,\
-   ceil, hstack, mod
+from numpy import pi, asarray, log10, arctan,  mod
 
 # Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
 # that default to pyQT5 (but have pyQt4 installed as well)
