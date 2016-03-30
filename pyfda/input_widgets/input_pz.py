@@ -294,6 +294,8 @@ class InputPZ(QtGui.QWidget):
         """
         self.tblPZ.clear()
         self.tblPZ.setRowCount(2)
+        self.tblPZ.setColumnCount(2)
+        self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
 
         self.ledGain.setText("1.0")
 
