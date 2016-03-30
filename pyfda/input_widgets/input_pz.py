@@ -206,7 +206,11 @@ class InputPZ(QtGui.QWidget):
         if self.chkNorm.isChecked():
             [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
             self.Hmax_last = max(abs(H)) # store current max. filter gain
+            if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
+                self.Hmax_last = 1.
 
+        if not np.isfinite(zpk[2]):
+            zpk[2] = 1.
         self.ledGain.setText(str(cround(zpk[2], n_digits)))
 
         self.tblPZ.setVisible(self.chkPZList.isChecked())
@@ -271,7 +275,11 @@ class InputPZ(QtGui.QWidget):
         if self.chkNorm.isChecked():
             # set gain factor k (zpk[2]) in such a way that the max. filter 
             # gain remains unchanged
+            # TODO: Comparison against Hmax is not robust, need to find another anchor
             [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
+            Hmax = max(abs(H))
+            if not np.isfinite(Hmax) or Hmax > 1e4:
+                Hmax = 1.
             zpk[2] = zpk[2] * self.Hmax_last / max(abs(H))
             save_fil(fb.fil[0], zpk, 'zpk', __name__) # save with new gain '
 
@@ -297,6 +305,7 @@ class InputPZ(QtGui.QWidget):
         self.tblPZ.setColumnCount(2)
         self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
 
+        self.Hmax_last = 1.0
         self.ledGain.setText("1.0")
 
         num_cols = self.tblPZ.columnCount()
