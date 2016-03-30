@@ -503,14 +503,12 @@ class PlotHf(QtGui.QWidget):
                 self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
 
-            plt_lim = f_lim + A_lim
-
             #-----------------------------------------------------------
             self.ax.plot(self.F, self.H_plt, label = 'H(f)')
             #-----------------------------------------------------------
-            self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
-
-            self.ax.axis(plt_lim)
+       #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
+            self.ax.set_xlim(f_lim)
+            self.ax.set_ylim(A_lim)
 
             if self.specs: self.plot_spec_limits(specAxes = self.ax)
 
@@ -519,6 +517,8 @@ class PlotHf(QtGui.QWidget):
             self.ax.set_ylabel(H_str)
 
         self.mplwidget.redraw()
+        
+       
 
 
 #------------------------------------------------------------------------------
