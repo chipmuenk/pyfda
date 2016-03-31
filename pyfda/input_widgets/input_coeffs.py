@@ -293,13 +293,14 @@ class InputCoeffs(QtGui.QWidget):
         Create table from filter coeff dict
         """
         coeffs = fb.fil[0]['ba']
+        num_rows = max(np.shape(coeffs))
         
         q_coeff = fb.fil[0]['q_coeff']
         self.ledQuantI.setText(str(q_coeff['QI']))
         self.ledQuantF.setText(str(q_coeff['QF']))       
         self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
         self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
-
+        
         # check whether filter is FIR and only needs one column 
         if fb.fil[0]['ft'] == 'FIR' and np.all(fb.fil[0]['zpk'][1]) == 0:
             num_cols = 1
@@ -311,8 +312,9 @@ class InputCoeffs(QtGui.QWidget):
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
             
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
-        self.tblCoeff.setRowCount(max(np.shape(coeffs)))
+        self.tblCoeff.setRowCount(num_rows)
         self.tblCoeff.setColumnCount(num_cols)
+        self.tblCoeff.setVerticalHeaderLabels(map(str,range(num_rows)))
 
 
         logger.debug("load_entries - coeffs:\n"
