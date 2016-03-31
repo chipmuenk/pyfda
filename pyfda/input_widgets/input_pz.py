@@ -70,7 +70,7 @@ class InputPZ(QtGui.QWidget):
         self.lblGain = QtGui.QLabel("k = ")
         
         self.chkNorm =  QtGui.QCheckBox()
-        self.chkNorm.setChecked(True)
+        self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
         self.chkNorm.setText("Normalize")
 
@@ -271,7 +271,7 @@ class InputPZ(QtGui.QWidget):
 
         fb.fil[0]["N"] = num_rows
         fil_save(fb.fil[0], zpk, 'zpk', __name__) # save & convert to 'ba'
-        
+
         if self.chkNorm.isChecked():
             # set gain factor k (zpk[2]) in such a way that the max. filter 
             # gain remains unchanged
@@ -281,7 +281,7 @@ class InputPZ(QtGui.QWidget):
             if not np.isfinite(Hmax) or Hmax > 1e4:
                 Hmax = 1.
             zpk[2] = zpk[2] * self.Hmax_last / max(abs(H))
-            fil_save(fb.fil[0], zpk, 'zpk', __name__) # save with new gain '
+            fil_save(fb.fil[0], zpk, 'zpk', __name__) # save with new gain
 
         if __name__ == '__main__':
             self.load_entries() # only needed for stand-alone test
