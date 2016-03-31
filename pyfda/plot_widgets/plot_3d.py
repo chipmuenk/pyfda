@@ -389,21 +389,21 @@ class Plot3D(QtGui.QWidget):
 
         [w, H] = sig.freqz(bb, aa, worN=N_FFT, whole=True) # 
                                                 # w runs from 0 ... pi, length = N_FFT
-        f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
+       
 
         H_abs = abs(H)
         H_max = max(H_abs)
 
         H_min = min(H_abs)
-        H_min_dB = 20*log10(H_min)
-        F_min = f[np.argmin(H_abs)]
+        #f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
+        #F_min = f[np.argmin(H_abs)]
 
         plevel_rel = 1.05 # height of plotted pole position relative to zmax
         zlevel_rel = 0.1 # height of plotted zero position relative to zmax
 
 
         if self.chkLog.isChecked(): # logarithmic scale
-            bottom = np.floor(max(self.zmin_dB, H_min_dB) / 10) * 10
+            bottom = np.floor(max(self.zmin_dB, 20*log10(H_min)) / 10) * 10
             top = self.zmax_dB
             top_bottom = top - bottom
             
