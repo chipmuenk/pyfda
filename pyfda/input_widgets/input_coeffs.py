@@ -300,8 +300,8 @@ class InputCoeffs(QtGui.QWidget):
         self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
         self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
 
-        
-        if fb.fil[0]['ft'] == 'FIR':
+        # check whether filter is FIR and only needs one column 
+        if fb.fil[0]['ft'] == 'FIR' and np.all(fb.fil[0]['zpk'][1]) == 0:
             num_cols = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
