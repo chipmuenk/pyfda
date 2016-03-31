@@ -360,8 +360,12 @@ class PlotHf(QtGui.QWidget):
             else:
                 phi_str += ' in deg ' + r'$\rightarrow $'
                 scale = 180./np.pi
+                
+            # replace nan and inf by finite values, otherwise np.unwrap yields
+            # an array full of nans
+            phi = np.angle(np.nan_to_num(self.H_c)) 
         #-----------------------------------------------------------
-            self.ax_p.plot(self.F,np.unwrap(np.angle(self.H_c))*scale,
+            self.ax_p.plot(self.F,np.unwrap(phi)*scale,
                                'b--', label = "Phase")
         #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str, color='blue')

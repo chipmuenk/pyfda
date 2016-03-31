@@ -122,7 +122,10 @@ class PlotPhi(QtGui.QWidget):
             scale = 180./np.pi
         fb.fil[0]['plt_phiLabel'] = y_str
         fb.fil[0]['plt_phiUnit'] = self.unitPhi
-
+        
+        # replace nan and inf by finite values, otherwise np.unwrap yields
+        # an array full of nans
+        H = np.nan_to_num(H) 
         if self.btnWrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:

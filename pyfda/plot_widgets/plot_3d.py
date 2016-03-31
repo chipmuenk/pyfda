@@ -387,8 +387,8 @@ class Plot3D(QtGui.QWidget):
         #-----------------------------------------------------------------------------
 
 
-        [w, H] = sig.freqz(bb, aa, worN=N_FFT, whole=True) # 
-                                                # w runs from 0 ... pi, length = N_FFT
+        [w, H] = sig.freqz(bb, aa, worN=N_FFT, whole=True)
+        H = np.nan_to_num(H) # replace nans and inf by finite numbers
        
 
         H_abs = abs(H)
