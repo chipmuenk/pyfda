@@ -314,8 +314,9 @@ class InputCoeffs(QtGui.QWidget):
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
         self.tblCoeff.setRowCount(num_rows)
         self.tblCoeff.setColumnCount(num_cols)
-        self.tblCoeff.setVerticalHeaderLabels(map(str,range(num_rows)))
-
+        # create index strings for column 0, starting with 0
+        idx_str = [str(n) for n in range(num_rows)]
+        self.tblCoeff.setVerticalHeaderLabels(idx_str)
 
         logger.debug("load_entries - coeffs:\n"
             "Shape = %s\n"
