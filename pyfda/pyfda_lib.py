@@ -151,10 +151,10 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
     # turn off divide by zero warnings, just return 'inf':
     np.seterr(divide = 'ignore')
 
+    H_val = np.nan_to_num(num_val / den_val) # remove nan and inf
     if log:
-        H_val = 20 * np.log10(num_val / den_val)
-    else:
-        H_val = num_val / den_val
+        H_val = 20 * np.log10(H_val)
+
 
     np.seterr(**olderr) # restore previous floating point error behaviour
 
