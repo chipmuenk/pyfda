@@ -390,10 +390,8 @@ class Plot3D(QtGui.QWidget):
         [w, H] = sig.freqz(bb, aa, worN=N_FFT, whole=True)
         H = np.nan_to_num(H) # replace nans and inf by finite numbers
        
-
         H_abs = abs(H)
         H_max = max(H_abs)
-
         H_min = min(H_abs)
         #f = w / (2 * pi) * f_S                  # translate w to absolute frequencies
         #F_min = f[np.argmin(H_abs)]
@@ -425,6 +423,7 @@ class Plot3D(QtGui.QWidget):
             zlevel = bottom + top_bottom * zlevel_rel # height of displayed zero position
 
             if self.cmbMode3D.currentText() == 'None': # "Poleposition" for H(f) plot only
+                H_max = np.clip(max(H_abs), 0, self.zmax)     
                 plevel_top = bottom + H_max * 0.3 # height of displayed pole position
                 plevel_btm = bottom
             else:
