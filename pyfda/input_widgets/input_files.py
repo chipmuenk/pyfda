@@ -51,7 +51,7 @@ else:
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_rc as rc 
-import pyfda.pyfda_fix_lib as fix
+import pyfda.pyfda_fix_lib as fix_lib
 
 # TODO: Save P/Z as well if possible
 
@@ -396,8 +396,9 @@ class InputFiles(QtGui.QWidget):
 
         frmt = fb.fil[0]['q_coeff']['frmt'] # store old format
         fb.fil[0]['q_coeff']['frmt'] = 'dec'
-        qc = fix.Fixed(fb.fil[0]['q_coeff'])
+        qc = fix_lib.Fixed(fb.fil[0]['q_coeff'])
         b10 = qc.fix(fb.fil[0]['ba'][0]) # Quantize coefficients to integer format
+
         fb.fil[0]['q_coeff']['frmt'] = frmt # restore old coefficient format
 
         coe_width = qc.QF + qc.QI + 1 # quantized word length; Int. + Frac. + Sign bit
