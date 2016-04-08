@@ -1016,7 +1016,11 @@ def fil_convert(fil_dict, format_in):
         if 'ba' not in format_in:
             fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
         if 'sos' not in format_in and SOS_AVAIL:
-            fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
+            try:
+                fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
+            except ValueError:
+                fil_dict['sos'] = 'None'
+                print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
 
     elif 'sos' in format_in and SOS_AVAIL:
         if 'zpk' not in format_in:
@@ -1028,7 +1032,12 @@ def fil_convert(fil_dict, format_in):
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         fil_dict['zpk'] = list(sig.tf2zpk(b,a))
         if SOS_AVAIL:
-            fil_dict['sos'] = sig.tf2sos(b,a)
+            try:
+                fil_dict['sos'] = sig.tf2sos(b,a)
+            except ValueError:
+                fil_dict['sos'] = 'None'
+                print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
+
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
