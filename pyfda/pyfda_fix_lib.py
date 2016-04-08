@@ -53,7 +53,7 @@ class Fixed(object):
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
 
-    * **'format'** : Output format, optional; default = 'frac'
+    * **'frmt'** : Output format, optional; default = 'frac'
 
       - 'frac' : (default) return result as a fraction
       - 'dec'  : return result in decimal form, scaled by :math:`2^{WF}`
@@ -71,7 +71,7 @@ class Fixed(object):
     ovfl  : string
         Overflow behaviour ('wrap', 'sat', ...)
         
-    format : string
+    frmt : string
         target output format ('frac', 'dec', 'bin')
 
     N_over : integer
@@ -235,7 +235,7 @@ class Fixed(object):
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
 #        if self.frmt == 'hex': # doesn't work yet
 #            return self.int2hex(np.int(yq))
-        elif self.frmt == 'bin':
+        if self.frmt == 'bin':
             return np.binary_repr(yq, width=(self.QF + self.QI + 1))
         elif self.frmt in {'frac', 'dec'}:
             return yq
