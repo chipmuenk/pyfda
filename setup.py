@@ -25,9 +25,12 @@ setup(
     author = 'Christian Muenker',
     author_email = '',
     license = 'Apache',
+    # automatically find sub-packages input_widgets, plot_widgets etc.:
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
     package_data = {'pyfda': ['images/icons/*']},
     data_files = [('pyfda/filter_design', ['pyfda/filter_design/filter_list.txt'])],
+    # link the executable pyfdax to running the python function main() in the
+    # pyfdax module:
     entry_points = {
         'console_scripts': [
             'pyfdax = pyfdax:main',
@@ -37,6 +40,7 @@ setup(
         ]
     }
 )
+
 
 """
 On non-Windows platforms (using "setup.py install", "setup.py develop", 
@@ -49,3 +53,5 @@ On Windows, a set of pyfdax.exe and pyfda_gui.exe launchers are created,
 alongside a set of pyfdax.py and pyfda_gui.pyw files. The .exe wrappers find 
 and execute the right version of Python to run the .py or .pyw file.
 """
+# http://locallyoptimal.com/blog/2014/03/14/executable-python-scripts-via-entry-points/
+
