@@ -114,7 +114,7 @@ class InputFreqSpecs(QtGui.QWidget):
                 #  label and corresponding value
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
                     try:
-                        self.qlineedit[i].editingFinished.disconnect(self._store_entries)
+                        self.qlineedit[i].editingFinished.disconnect()
                     except TypeError:
                         pass
                     self.qlabels[i].setText(rt_label(new_labels[i]))
@@ -160,7 +160,7 @@ class InputFreqSpecs(QtGui.QWidget):
         Nmax = len(self.qlabels)-1  # number of existing labels
         for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
             
-            self.qlineedit[i].editingFinished.disconnect(self._store_entries)
+            self.qlineedit[i].editingFinished.disconnect()
     
             self.layGSpecs.removeWidget(self.qlabels[i])
             self.layGSpecs.removeWidget(self.qlineedit[i])

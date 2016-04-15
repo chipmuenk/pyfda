@@ -134,7 +134,7 @@ class InputAmpSpecs(QtGui.QWidget):
             #  label and corresponding value
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
                     try:
-                        self.qlineedit[i].editingFinished.disconnect(self._store_entries)
+                        self.qlineedit[i].editingFinished.disconnect()
                     except TypeError:
                         pass
                     
@@ -222,7 +222,7 @@ class InputAmpSpecs(QtGui.QWidget):
 
         for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
             
-            self.qlineedit[i].editingFinished.disconnect(self._store_entries)
+            self.qlineedit[i].editingFinished.disconnect()
     
             self.layGSpecs.removeWidget(self.qlabels[i])
             self.layGSpecs.removeWidget(self.qlineedit[i])
