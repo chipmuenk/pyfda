@@ -336,6 +336,7 @@ class InputFilter(QtGui.QWidget):
         fb.fil[0]['dm'] = dm
         if dm != self.dm_last: # dm has changed, create new instance
             #-----
+            fb.fil_inst.destruct_UI() # disconnect signals from dyn. widget
             err = fb.fil_factory.create_fil_inst(dm)
             #-----
             logger.debug("InputFilter.set_design_method triggered: %s" %dm)
