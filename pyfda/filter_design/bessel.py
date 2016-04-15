@@ -93,6 +93,14 @@ order can be used for approximating the -3 dB frequency.
 ``scipy.signal.buttord()``
 """
 
+    def destruct_UI(self):
+        """
+        - Disconnect all signal-slot connections to avoid crashes upon exit
+        - Delete dynamic widgets
+        (empty method, nothing to do in this filter)
+        """
+        pass
+
 
         self.info_doc = []
         self.info_doc.append('bessel()\n========')

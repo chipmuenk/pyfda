@@ -148,6 +148,19 @@ a given frequency can be calculated via the si function (not implemented yet).
         """
         fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
                                      'ma_normalize':self.chk_ma_2.isChecked()}})
+                                     
+
+    def destruct_UI(self):
+        """
+        - Disconnect all signal-slot connections to avoid crashes upon exit
+        - Delete dynamic widgets
+        (empty method, nothing to do in this filter)
+        """
+        self.led_ma_1.editingFinished.disconnect()
+        self.chk_ma_2.clicked.disconnect()
+
+
+
         
         
     def _load_entries(self):

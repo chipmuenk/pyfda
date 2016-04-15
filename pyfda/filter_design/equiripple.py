@@ -165,6 +165,14 @@ using Ichige's algorithm.
         """
         fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
 
+    def destruct_UI(self):
+        """
+        - Disconnect all signal-slot connections to avoid crashes upon exit
+        - Delete dynamic widgets
+        """
+        self.led_remez_1.editingFinished.disconnect()
+
+
         
     def _load_entries(self):
         """

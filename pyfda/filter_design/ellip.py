@@ -103,6 +103,17 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self.info_doc.append(sig.ellip.__doc__)
         self.info_doc.append('ellipord()\n==========')
         self.info_doc.append(ellipord.__doc__)
+        
+
+    def destruct_UI(self):
+        """
+        - Disconnect all signal-slot connections to avoid crashes upon exit
+        - Delete dynamic widgets
+        (empty method, nothing to do in this filter)
+        """
+        pass
+
+
 
     def _get_params(self, fil_dict):
         """

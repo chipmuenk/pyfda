@@ -236,7 +236,18 @@ class firwin(object):
             self.firWindow = (self.fir_window_name,
                                       float(self.led_firwin_1.text()))
         else:
-            self.firWindow = self.fir_window_name          
+            self.firWindow = self.fir_window_name 
+            
+    def destruct_UI(self):
+        """
+        - Disconnect all signal-slot connections to avoid crashes upon exit
+        - Delete dynamic widgets
+        """
+        self.cmb_firwin_win.activated.disconnect()
+        self.led_firwin_1.editingFinished.disconnect()
+        self.led_firwin_2.editingFinished.disconnect()
+        self.cmb_firwin_alg.activated.disconnect()
+
 
     def _load_entries(self):
         """
