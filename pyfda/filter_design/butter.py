@@ -98,6 +98,16 @@ critical frequency from pass and stop band specifications.
         self.info_doc.append('buttord()\n==========')
         self.info_doc.append(buttord.__doc__)
 
+
+    def destruct_UI(self):
+        """
+        - Disconnect all signal-slot connections to avoid crashes upon exit
+        - Delete dynamic widgets
+        (empty method, nothing to do in this filter)
+        """
+        pass
+    
+
     def _get_params(self,fil_dict):
         """
         Translate parameters from the passed dictionary to instance

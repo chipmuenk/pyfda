@@ -105,6 +105,16 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.info_doc.append('cheb1ord()\n==========')
         self.info_doc.append(sig.cheb1ord.__doc__)
 
+
+    def destruct_UI(self):
+        """
+        - Disconnect all signal-slot connections to avoid crashes upon exit
+        - Delete dynamic widgets
+        (empty method, nothing to do in this filter)
+        """
+        pass
+
+
     def _get_params(self, fil_dict):
         """
         Translate parameters from filter dictionary to instance
