@@ -240,7 +240,7 @@ class InputFreqSpecs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputFreqSpecs()
+    mainw = InputFreqSpecs(None)
 
     mainw.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])
 #    mainw.update_UI(new_labels = ['F_PB','F_PB2'])
