@@ -107,8 +107,12 @@ class InputFreqSpecs(QtGui.QWidget):
 
         elif delta_new_labels > 0: # more new labels, create new ones
             self._add_entries(delta_new_labels)
-            
-        for i in range(len(new_labels)):        
+
+        logger.debug("Filter: {0}-{1}-{2}".format(
+                            fb.fil[0]["rt"],fb.fil[0]["dm"],fb.fil[0]["fo"]))
+
+        fparams = ""
+        for i in range(len(new_labels)):
 #            else:
                 # when entry has changed, update signal-slot connection, 
                 #  label and corresponding value
@@ -125,8 +129,11 @@ class InputFreqSpecs(QtGui.QWidget):
                     self.qlineedit[i].editingFinished.connect(
                                         lambda: self.store_entries(emit_sig = True))
                     
-                    print(str(self.qlineedit[i].objectName()), fb.fil[0][str(self.qlineedit[i].objectName())])
+                    fparams += str(self.qlineedit[i].objectName())\
+                         + str(fb.fil[0][str(self.qlineedit[i].objectName())]) + "\n"
 
+
+        logger.debug(fparams)
 
         self.store_entries()    # sort & store values to dict for the case 
                                 # that the response type has been changed 
