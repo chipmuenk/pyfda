@@ -1,42 +1,46 @@
 # -*- coding: utf-8 -*-
-import os
 from setuptools import setup, find_packages
-from pyfdax import __version__
+# To use a consistent encoding
+from codecs import open
+from os import path
+#from pyfdax import __version__
 
 # @todo: WIP see https://packaging.python.org/en/latest/index.html
 
-# Utility function to read the README file.
-# Used for the long_description.  It's nice, because now 1) we have a top level
-# README file and 2) it's easier to type in the README file than to put a raw
-# string in below ...
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+here = path.abspath(path.dirname(__file__))
+
+# Get the long description from the README file
+with open(path.join(here, 'README.txt'), encoding='utf-8') as f:
+    long_description = f.read()
+
+version_nr = {}
+with open("version.py") as fp:
+    exec(fp.read(), version_nr)
 
 setup(
     name = 'pyfda',
     # see PEP440 for versioning information
-    version = __version__,
+    version = version_nr['__version__'],
     description = ('pyFDA is a tool for designing and analysing discrete time '
                  'filters written in python with a graphical user interface.'),
-    long_description = read('README.txt'),
+    long_description = long_description,
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
     author = 'Christian Muenker',
     author_email = '',
     license = 'Apache',
-    # automatically find sub-packages input_widgets, plot_widgets etc.:
+    # automatically find top-level package and sub-packages input_widgets, 
+    # plot_widgets etc.:
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
     package_data = {'pyfda': ['images/icons/*']},
-    data_files = [('pyfda/filter_design', ['pyfda/filter_design/filter_list.txt'])],
+    data_files = [('pyfda',['pyfda/pyfda_log.conf']),
+        ('pyfda/filter_design', ['pyfda/filter_design/filter_list.txt'])],
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module:
     entry_points = {
         'console_scripts': [
-            'pyfdax = pyfdax:main',
-        ],
-        'gui_scripts': [
-            'pyfda_gui = pyfdax:main',
+            'pyfdax = pyfda.pyfdax:main',
         ]
     }
 )
