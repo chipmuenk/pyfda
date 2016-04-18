@@ -21,11 +21,7 @@ from PyQt4.QtCore import pyqtSignal
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
-# TODO: Check for unneeded attributes self. ...
-# TODO: new methods: load_settings, store_settings, update_settings
-# TODO: Changing from ...[min] to bessel gives error "unhashable type: "dict"
-#         in input_specs updateAllUIs line 154 all_params = ... - ONLY Py3 !!!
-# TODO: Bessel filter has no access to target specs -> limits can't be set
+# TODO: make more attributes local: self.my_attribute -> attribute
 
 class InputFilter(QtGui.QWidget):
     """
@@ -401,7 +397,7 @@ class InputFilter(QtGui.QWidget):
     def set_filter_order(self, enb_signal=False):
         """
         Triggered when either ledOrderN or chkMinOrder are edited:
-        - read settings and copy them to fb.fil[0]
+        - copy settings to fb.fil[0]
         - emit sigFiltChanged if enb_signal is True
         """
         # Determine which subwidgets are _enabled_
