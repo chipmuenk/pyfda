@@ -254,7 +254,7 @@ class InputFreqUnits(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = InputFreqUnits() #)
+    form = InputFreqUnits(None) #)
 
     form.update_UI()
 #    form.updateUI(newLabels = ['F_PB','F_PB2'])

@@ -487,9 +487,11 @@ class InputFilter(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    form = InputFilter()
-    form.show()
+    mainw = InputFilter(None)
+
+    app.setActiveWindow(mainw) 
+    mainw.show()
 
 
-    app.exec_()
+    sys.exit(app.exec_())
 

@@ -352,7 +352,9 @@ class InputInfo(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = InputInfo()
-    form.show()
+    mainw = InputInfo(None)
 
-    app.exec_()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+
+    sys.exit(app.exec_())

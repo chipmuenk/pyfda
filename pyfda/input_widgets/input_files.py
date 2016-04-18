@@ -426,7 +426,9 @@ class InputFiles(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = InputFiles()
-    form.show()
+    mainw = InputFiles(None)
 
-    app.exec_()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+
+    sys.exit(app.exec_())

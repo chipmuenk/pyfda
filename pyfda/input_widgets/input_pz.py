@@ -383,7 +383,9 @@ class InputPZ(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = InputPZ()
-    form.show()
+    mainw = InputPZ(None)
 
-    app.exec_()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+
+    sys.exit(app.exec_())

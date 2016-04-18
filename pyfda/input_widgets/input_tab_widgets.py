@@ -160,10 +160,12 @@ class InputTabWidgets(QtGui.QWidget):
 def main():
     from pyfda import pyfda_rc as rc
     app = QtGui.QApplication(sys.argv)
-    form = InputTabWidgets()
-    app.setStyleSheet(rc.css_rc) 
-    form.show()
-    app.exec_()
+    mainw = InputTabWidgets(None)
+    app.setStyleSheet(rc.css_rc)
+
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

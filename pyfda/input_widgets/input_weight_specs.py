@@ -201,11 +201,11 @@ class InputWeightSpecs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = InputWeightSpecs()
+    mainw = InputWeightSpecs(None)
 
-    form.update_UI(new_labels = ['W_SB','W_SB2','W_PB','W_PB2'])
-    form.update_UI(new_labels = ['W_PB','W_PB2'])
+    mainw.update_UI(new_labels = ['W_SB','W_SB2','W_PB','W_PB2'])
+    mainw.update_UI(new_labels = ['W_PB','W_PB2'])
 
-    form.show()
-
-    app.exec_()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+    sys.exit(app.exec_())

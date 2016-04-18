@@ -259,7 +259,7 @@ class InputAmpSpecs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputAmpSpecs()
+    mainw = InputAmpSpecs(None)
 
     mainw.update_UI(new_labels = ['A_SB','A_SB2','A_PB','A_PB2'])
     mainw.update_UI(new_labels = ['A_PB','A_SB'])

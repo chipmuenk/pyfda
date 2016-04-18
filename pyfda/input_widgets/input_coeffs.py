@@ -456,7 +456,9 @@ class InputCoeffs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    form = InputCoeffs()
-    form.show()
+    mainw = InputCoeffs(None)
 
-    app.exec_()
+    app.setActiveWindow(mainw) 
+    mainw.show()
+
+    sys.exit(app.exec_())

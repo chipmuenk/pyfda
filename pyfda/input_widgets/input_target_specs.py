@@ -126,7 +126,7 @@ if __name__ == '__main__':
     freq_params = [l for l in my_params if l[0] == 'F']
     amp_params = [l for l in my_params if l[0] == 'A']
 
-    mainw = InputTargetSpecs(title = "Test Specs")
+    mainw = InputTargetSpecs(None, title = "Test Specs")
     mainw.update_UI(freq_params, amp_params)
     
     app.setActiveWindow(mainw) 
