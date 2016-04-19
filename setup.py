@@ -68,6 +68,9 @@ setup(
     entry_points = {
         'console_scripts': [
             'pyfdax = pyfda.pyfdax:main',
+        ],
+        'gui_scripts': [
+            'pyfdax_gui = pyfda.pyfdax:main',
         ]
     }
 )
