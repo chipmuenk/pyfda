@@ -14,18 +14,15 @@ logger = logging.getLogger(__name__)
 from PyQt4 import QtGui, QtCore
 
 import pyfda.filterbroker as fb
+from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
-#__version__ = "0.1b2"
-
-# get dir for this file, apppend 'pyfda' and store as base_dir in filterbroker
-#fb.base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pyfda')
+# get dir for this file and store as base_dir in filterbroker
 fb.base_dir = os.path.dirname(os.path.abspath(__file__))
-print(fb.base_dir)
 
 class DynFileHandler(logging.FileHandler):
     """
@@ -46,9 +43,10 @@ logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file))#, disab
 
 
 if not os.path.exists(rc.save_dir):
-    logger.warning('Specified save_dir "%s" doesn\'t exist, using "%s" instead.\n',
-        rc.save_dir, fb.base_dir)
-    rc.save_dir = fb.base_dir
+    home_dir = pyfda_lib.get_home_dir()
+    logger.warning('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
+        rc.save_dir, home_dir) #fb.base_dir
+    rc.save_dir = home_dir #fb.base_dir
 
 
 #class Whitelist(logging.Filter):
