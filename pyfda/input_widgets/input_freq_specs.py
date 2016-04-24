@@ -129,7 +129,7 @@ class InputFreqSpecs(QtGui.QWidget):
                     self.qlineedit[i].editingFinished.connect(
                                         lambda: self.store_entries(emit_sig = True))
                     
-                    fparams += str(self.qlineedit[i].objectName())\
+                    fparams += str(self.qlineedit[i].objectName()) + " = "\
                          + str(fb.fil[0][str(self.qlineedit[i].objectName())]) + "\n"
 
 
