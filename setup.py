@@ -60,11 +60,20 @@ setup(
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
-    package_data = {'pyfda': ['images/icons/*']},
-    data_files = [('pyfda',['pyfda/pyfda_log.conf']),
-        ('pyfda/filter_design', ['pyfda/filter_design/filter_list.txt'])],
+
+    # add additional data files for package / subpackages relative to package
+    # directory
+    package_data={'pyfda': ['images/icons/*', 'pyfda_log.conf',
+                            'filter_design/filter_list.txt'],
+                  },
+
+    # include general non-python data files
+    data_files = [
+        ('', ['README.txt']),
+        ('', ['LICENSE'])
+        ],
     # link the executable pyfdax to running the python function main() in the
-    # pyfdax module:
+    # pyfdax module, with and without an attached console:
     entry_points = {
         'console_scripts': [
             'pyfdax = pyfda.pyfdax:main',
