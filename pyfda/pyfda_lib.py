@@ -26,8 +26,8 @@ Created on Mon Apr 30 10:29:42 2012
 # CSLU / OHSU, Spring Term 2011.
 
 from __future__ import division, print_function
+import os, sys
 import numpy as np
-#import numpy.ma as ma
 from numpy import pi, asarray, log10, arctan,  mod
 
 # Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
@@ -44,6 +44,38 @@ from distutils.version import LooseVersion
 
 SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
 #print("scipy:", _scipy_version)
+
+#### General functions ########################################################
+# taken from
+# http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
+def valid(path):
+    """ Check whether path is valid"""
+    if path and os.path.isdir(path):
+        return True
+    return False
+ 
+def env(name):
+    """Get value for environment variable"""
+    return os.environ.get( name, '' )
+ 
+def get_home_dir():
+    """Return the user's home directory"""
+    if sys.platform != 'win32':
+        return os.path.expanduser( '~' )
+ 
+    homeDir = env( 'USERPROFILE' )
+    if not valid(homeDir):
+        homeDir = env( 'HOME' )
+        if not valid(homeDir) :
+            homeDir = '%s%s' % (env('HOMEDRIVE'),env('HOMEPATH'))
+            if not valid(homeDir) :
+                homeDir = env( 'SYSTEMDRIVE' )
+                if homeDir and (not homeDir.endswith('\\')) :
+                    homeDir += '\\'
+                if not valid(homeDir) :
+                    homeDir = 'C:\\'
+    return homeDir
+
 
 def dB(lin, power = False):
     """
