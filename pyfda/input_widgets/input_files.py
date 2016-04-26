@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtGui import QFileDialog as QFD
 
 import scipy.io
 import numpy as np
@@ -153,20 +154,27 @@ class InputFiles(QtGui.QWidget):
         Load filter from zipped binary numpy array or (c)pickled object to
         filter dictionary and update input and plot widgets
         """
-        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+        file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
 #        file_types = ("Zipped Binary Numpy Array (*.npz)")
-        dlg=QtGui.QFileDialog( self )
+        dlg = QFD(self)
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Load filter ", directory = rc.save_dir,
-                filter = file_types)
+                filter = file_filters)
         file_name = str(file_name) # QString -> str
-        file_type = str(file_type) # needed for Python 2.x
+
+        for t in self.extract_file_ext(file_filters): # get a list of file extensions
+            if t in str(file_type):
+                file_type = t
         
         if file_name != "": # cancelled file operation returns empty string
+        
+            # strip extension from returned file name (if any) + append file type:
+            file_name = os.path.splitext(file_name)[0] + '.' + file_type   
+
             file_type_err = False              
             try:
                 with io.open(file_name, 'rb') as f:
-                    if file_name.endswith('npz'):
+                    if file_type == 'npz':
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
                         a = np.load(f) # array containing dict, dtype 'object'
                         
@@ -177,15 +185,14 @@ class InputFiles(QtGui.QWidget):
                             else:
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
-                    elif file_name.endswith('pkl'):
+                    elif file_type == 'pkl':
                         if sys.version_info[0] < 3:
                             fb.fil = pickle.load(f)
                         else:
                         # this only works for python >= 3.3
                             fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
                     else:
-                        logger.error('Unknown file type "%s"',
-                                            os.path.splitext(file_name)[1])
+                        logger.error('Unknown file type "%s"', file_type)
                         file_type_err = True
                     if not file_type_err:
                         logger.info('Loaded filter "%s"', file_name)
@@ -201,31 +208,41 @@ class InputFiles(QtGui.QWidget):
         """
         Save filter as zipped binary numpy array or pickle object
         """
-        file_types = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
-#        file_types = ("Zipped Binary Numpy Array (*.npz)")
-        dlg = QtGui.QFileDialog( self )
+        file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
+        dlg = QFD(self)
+        # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save filter as", directory = rc.save_dir,
-                filter = file_types)
-        file_name = str(file_name) # QString -> str
-        file_type = str(file_type) # needed for Python 2.x
+                filter = file_filters, options=QtGui.QFileDialog.DontUseNativeDialog)
         
+        file_name = str(file_name)  # QString -> str() needed for Python 2.x
+        # Qt5 has QFileDialog.mimeTypeFilters(), but under Qt4 the mime type cannot
+        # be extracted reproducibly across file systems, so it is done manually:
+
+        for t in self.extract_file_ext(file_filters): # get a list of file extensions
+            if t in str(file_type):
+                file_type = t
+
         if file_name != "": # cancelled file operation returns empty string 
-            file_type_err = False
+
+            # strip extension from returned file name (if any) + append file type:
+            file_name = os.path.splitext(file_name)[0] + '.' + file_type   
+            
+            file_type_err = False        
             try:
                 with io.open(file_name, 'wb') as f:
-                    if file_name.endswith('npz'):
+                    if file_type == 'npz':
                         np.savez(f, **fb.fil[0])
-                    elif file_name.endswith('pkl'):
-                        # save as a version compatible with Python 2.x
+                    elif file_type == 'pkl':
+                        # save as a pickle version compatible with Python 2.x
                         pickle.dump(fb.fil, f, protocol = 2)
                     else:
-                        logger.error('Unknown file type "%s"', 
-                                            os.path.splitext(file_name)[1])
                         file_type_err = True
+                        logger.error('Unknown file type "%s"', file_type)
+
                     if not file_type_err:
                         logger.info('Filter saved as "%s"', file_name)
-                        rc.save_dir = os.path.dirname(file_name)
+                        rc.save_dir = os.path.dirname(file_name) # save new dir
                             
             except IOError as e:
                     logger.error('Failed saving "%s"!\n%s\n', file_name, e)
@@ -236,44 +253,51 @@ class InputFiles(QtGui.QWidget):
         Export filter coefficients in various formats - see also
         Summerfield p. 192 ff
         """
-        dlg=QtGui.QFileDialog( self )
+        dlg = QFD(self)
 
-        file_types = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
+        file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
             ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
 
         if fb.fil[0]['ft'] == 'FIR':
-            file_types += ";;Xilinx coefficient format (*.coe)"
+            file_filters += ";;Xilinx coefficient format (*.coe)"
 
         # Add further file types if modules could be imported:
         if XLWT:
-            file_types += ";;Excel Worksheet (.xls)"
+            file_filters += ";;Excel Worksheet (.xls)"
         if XLSX:
-            file_types += ";;Excel 2007 Worksheet (.xlsx)"
+            file_filters += ";;Excel 2007 Worksheet (.xlsx)"
 
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Export filter coefficients as", 
-                directory = rc.save_dir, filter = file_types) 
-        file_name = str(file_name) # QString -> str
-        file_type = str(file_type) # needed for Python 2.x
-        if file_name != '': # cancelled file operation returns empty string   
+                directory = rc.save_dir, filter = file_filters) 
+        file_name = str(file_name) # QString -> str needed for Python 2
+
+        for t in self.extract_file_ext(file_filters): # extract the list of file extensions
+            if t in str(file_type):
+                file_type = t
+       
+        if file_name != '': # cancelled file operation returns empty string  
+            # strip extension from returned file name (if any) + append file type:
+            file_name = os.path.splitext(file_name)[0] + '.' + file_type 
+            
             ba = fb.fil[0]['ba']
             file_type_err = False
             try:
                 with io.open(file_name, 'wb') as f:
-                    if file_name.endswith('mat'):   
+                    if file_type == 'mat':   
                         scipy.io.savemat(f, mdict={'ba':fb.fil[0]['ba']})
-                    elif file_name.endswith('csv'):
+                    elif file_type == 'csv':
                         np.savetxt(f, ba, delimiter = ', ')
                         # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
-                    elif file_name.endswith('npy'):
+                    elif file_type == 'npy':
                         # can only store one array in the file:
                         np.save(f, ba)
-                    elif file_name.endswith('npz'):
+                    elif file_type == 'npz':
                         # would be possible to store multiple array in the file
                         np.savez(f, ba = ba)
-                    elif file_name.endswith('coe'):
+                    elif file_type == 'coe':
                         self.save_file_coe(f)
-                    elif file_name.endswith('xls'):
+                    elif file_type == 'xls':
                         # see
                         # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
                         # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
@@ -288,7 +312,7 @@ class InputFiles(QtGui.QWidget):
                                 worksheet.write(row+1, col, ba[col][row]) # vertical
                         workbook.save(f)
             
-                    elif file_name.endswith('xlsx'):
+                    elif file_type == 'xlsx':
                         # from https://pypi.python.org/pypi/XlsxWriter
                         # Create an new Excel file and add a worksheet.
                         workbook = xlsx.Workbook(f)
@@ -314,13 +338,12 @@ class InputFiles(QtGui.QWidget):
                         workbook.close()
             
                     else:
-                        logger.error('Unknown file type "%s"', os.path.splitext(file_name)[1])
+                        logger.error('Unknown file type "%s"', file_type)
                         file_type_err = True
                         
                     if not file_type_err:
-                        logger.info('Exported coefficients as %s - file\n"%s"', 
-                                self.prune_file_ext(file_type), file_name)
-                        rc.save_dir = os.path.dirname(file_name)
+                        logger.info('Filter saved as "%s"', file_name)
+                        rc.save_dir = os.path.dirname(file_name) # save new dir
                     
             except IOError as e:
                 logger.error('Failed saving "%s"!\n%s\n', file_name, e)
@@ -335,39 +358,46 @@ class InputFiles(QtGui.QWidget):
         """
         Import filter coefficients from a file
         """
-        file_types = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
+        file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
         "Zipped Binary Numpy Array(*.npz)")
-        dlg=QtGui.QFileDialog( self )
+#        print('file_filters', self.extract_file_ext(file_filters))
+        dlg = QFD(self)
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Import filter coefficients ", 
-                directory = rc.save_dir, filter = file_types)
+                directory = rc.save_dir, filter = file_filters)
         file_name = str(file_name) # QString -> str
-        file_type = str(file_type) # needed for Python 2.x
+
+        for t in self.extract_file_ext(file_filters): # extract the list of file extensions
+            if t in str(file_type):
+                file_type = t
         
-        if file_name != '': # cancelled file operation returns empty string  
+        if file_name != '': # cancelled file operation returns empty string 
+        
+            # strip extension from returned file name (if any) + append file type:
+            file_name = os.path.splitext(file_name)[0] + '.' + file_type   
+
             file_type_err = False
             try:
-                with io.open(file_name, 'r') as f:
-                    if file_name.endswith('mat'):
+                with io.open(file_name, 'rb') as f:
+                    if file_type == 'mat':
                         data = scipy.io.loadmat(f)
                         fb.fil[0]['ba'] = data['ba']
-                    elif file_name.endswith('npy'):
+                    elif file_type == 'npy':
                         fb.fil[0]['ba'] = np.load(f)
                         # can only store one array in the file
-                    elif file_name.endswith('npz'):
+                    elif file_type == 'npz':
                         fb.fil[0]['ba'] = np.load(f)['ba']
                         # would be possible to store several arrays in one file
                     else:
-                        logger.error('Unknown file type "%s"', os.path.splitext(file_name)[1])
+                        logger.error('Unknown file type "%s"', file_type)
                         file_type_err = True
                         
                     if not file_type_err:
                         logger.info('Loaded coefficient file\n"%s"', file_name)
-                        self.sigFilterDesigned.emit() # emit signal -> pyFDA                     
+                        self.sigFilterLoaded.emit()
                         rc.save_dir = os.path.dirname(file_name)
             except IOError as e:
                 logger.error("Failed loading %s!\n%s", file_name, e)
-
 
 
 #------------------------------------------------------------------------------
@@ -385,6 +415,19 @@ class InputFiles(QtGui.QWidget):
         # '(' must be escaped as '\('
 
         return re.sub('\([^\)]+\)', '', file_type)
+
+#------------------------------------------------------------------------------        
+    def extract_file_ext(self, file_type):
+        """
+        Extract list with file extension(s), e.g. 'txt' from '(*.txt)' from file
+        type description
+        """
+
+        ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
+        ext_list = [t.strip('(*.)') for t in ext_list] # remove '(*.)'
+               
+        return ext_list
+        
 
 
 #------------------------------------------------------------------------------
