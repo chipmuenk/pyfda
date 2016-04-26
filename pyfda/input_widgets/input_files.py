@@ -213,7 +213,7 @@ class InputFiles(QtGui.QWidget):
         # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Save filter as", directory = rc.save_dir,
-                filter = file_filters, options=QtGui.QFileDialog.DontUseNativeDialog)
+                filter = file_filters)
         
         file_name = str(file_name)  # QString -> str() needed for Python 2.x
         # Qt5 has QFileDialog.mimeTypeFilters(), but under Qt4 the mime type cannot
