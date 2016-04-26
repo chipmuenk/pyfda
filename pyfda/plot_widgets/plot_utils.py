@@ -30,38 +30,11 @@ except ImportError:
     figureoptions = None
 
 from pyfda import pyfda_rc
+from pyfda import pyfda_lib
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
 for key in pyfda_rc.mpl_rc:
     rcParams[key] = pyfda_rc.mpl_rc[key]
-
-####USED TO GET THE USERS HOME DIRECTORY FOR USE OF A TEMP FILE
-# taken from
-# http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
-def valid(path):
-    if path and os.path.isdir(path):
-        return True
-    return False
- 
-def env(name):
-    return os.environ.get( name, '' )
- 
-def getHomeDir():
-    if sys.platform != 'win32':
-        return os.path.expanduser( '~' )
- 
-    homeDir = env( 'USERPROFILE' )
-    if not valid(homeDir):
-        homeDir = env( 'HOME' )
-        if not valid(homeDir) :
-            homeDir = '%s%s' % (env('HOMEDRIVE'),env('HOMEPATH'))
-            if not valid(homeDir) :
-                homeDir = env( 'SYSTEMDRIVE' )
-                if homeDir and (not homeDir.endswith('\\')) :
-                    homeDir += '\\'
-                if not valid(homeDir) :
-                    homeDir = 'C:\\'
-    return homeDir
 
 
 #------------------------------------------------------------------------------
@@ -310,8 +283,7 @@ class MyMplToolbar(NavigationToolbar):
         self.a_sv.setToolTip('Save the figure')
         
         self.cb = None #will be used for the clipboard
-        self.tempPath = getHomeDir()
-        self.tempPath = os.path.join(self.tempPath,'tempMPL.png')
+        self.temp_file = os.path.join(pyfda_lib.get_home_dir(), 'tempMPL.png')
  
         self.a_cb = self.addAction(QtGui.QIcon(iconDir + 'camera-slr.svg'), \
                            'Save', self.mpl2Clip)
@@ -455,13 +427,13 @@ class MyMplToolbar(NavigationToolbar):
         Save current figure to temporary file and copy it to the clipboard.
         """
         try:
-            self.canvas.figure.savefig(self.tempPath, dpi = 300, type = 'png')
+            self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
             #  savefig(fname, dpi=None, facecolor='w', edgecolor='w',
             #  orientation='portrait', papertype=None, format=None,
             #  transparent=False):
-            tempImg = QtGui.QImage(self.tempPath)
+            temp_img = QtGui.QImage(self.temp_file)
             self.cb = QtGui.QApplication.clipboard()
-            self.cb.setImage(tempImg)
+            self.cb.setImage(temp_img)
         except:
             print('Error copying figure to clipboard')
             errorMsg = "Sorry: %s\n\n:%s\n"%(sys.exc_type, sys.exc_value)
