@@ -129,13 +129,14 @@ class FilterTreeBuilder(object):
             fp.close()
             
         except IOError as e:
-            logger.error('Init file "%s" could not be found.\n'
-                'I/O Error(%d): %s', self.filt_dir_file, e.errno, e.strerror)
-            filt_list_comments = self.filt_list_names = []
+            logger.critical( 'Init file "%s" could not be found.\n\
+                I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
+            sys.exit( 'Init file "%s" could not be found.\n\
+                I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
             
         except Exception as e:
-            logger.error("Unexpected error: %s", e)
-            filt_list_comments = self.filt_list_names = []
+            logger.error( "Unexpected error: %s", e)
+            sys.exit( "Unexpected error: %s", e)
 
 #==============================================================================
     def dyn_filt_import(self):
