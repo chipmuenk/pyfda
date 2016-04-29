@@ -11,7 +11,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.txt'), encoding='utf-8') as f:
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 version_nr = {}
@@ -28,8 +28,9 @@ setup(
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
     author = 'Christian Muenker',
-    author_email = '',
+    author_email = 'mail07@chipmuenk.de',
     license = 'MIT',
+    platforms = ['any'],
 
      # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -70,6 +71,7 @@ setup(
     # include general non-python data files
     data_files = [
         ('', ['README.txt']),
+        ('', ['README.rst']),
         ('', ['LICENSE'])
         ],
     # link the executable pyfdax to running the python function main() in the
