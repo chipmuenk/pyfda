@@ -58,6 +58,7 @@ class Fixed(object):
       - 'frac' : (default) return result as a fraction
       - 'dec'  : return result in decimal form, scaled by :math:`2^{WF}`
       - 'bin'  : return result as binary string, scaled by :math:`2^{WF}`
+      - 'hex'  : return result as hex string, scaled by :math:`2^{WF}`
         
 
     Instance Attributes
@@ -232,8 +233,9 @@ class Fixed(object):
 
         if self.frmt in {'dec', 'hex', 'bin'}:
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
-#        if self.frmt == 'hex': # doesn't work yet
-#            return self.int2hex(np.int(yq))
+        if self.frmt == 'hex':
+            vhex = np.vectorize(hex) # vectorize python hex function for use with numpy array
+            return vhex(yq)
         if self.frmt == 'bin':
             return np.binary_repr(yq, width=(self.QF + self.QI + 1))
         elif self.frmt in {'frac', 'dec'}:
@@ -242,16 +244,8 @@ class Fixed(object):
             # float.hex() ?
             raise Exception('Unknown output format "%s"!'%(self.format))
             return None
-
-    def int2hex(self, x):
-        h = ""
-        x = np.atleast_1d(x)
-        for i in xrange(len(x)):
-            h += str('{0:X}'.format(x))
-        return h
             
-        
-        
+            
     def resetN(self):
         """ Reset overflow-counters of Fixed object"""
         self.N_over = 0
