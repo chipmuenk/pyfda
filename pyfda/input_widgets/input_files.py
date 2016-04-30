@@ -438,14 +438,17 @@ class InputFiles(QtGui.QWidget):
         """
 
         frmt = fb.fil[0]['q_coeff']['frmt'] # store old format
-        fb.fil[0]['q_coeff']['frmt'] = 'dec'
+        fb.fil[0]['q_coeff']['frmt'] = 'dec' # 'hex'
         qc = fix_lib.Fixed(fb.fil[0]['q_coeff'])
-        b10 = qc.fix(fb.fil[0]['ba'][0]) # Quantize coefficients to integer format
+        bq = qc.fix(fb.fil[0]['ba'][0]) # Quantize coefficients to integer format
+        coe_width = qc.QF + qc.QI + 1 # quantized word length; Int. + Frac. + Sign bit
+        if fb.fil[0]['q_coeff']['frmt'] == 'dec':
+            coe_radix = 10
+        else:
+            coe_radix = 16
 
         fb.fil[0]['q_coeff']['frmt'] = frmt # restore old coefficient format
 
-        coe_width = qc.QF + qc.QI + 1 # quantized word length; Int. + Frac. + Sign bit
-        coe_radix = 10
         info_str = (
             "; #############################################################################\n"
              ";\n; XILINX CORE Generator(tm) Distributed Arithmetic FIR filter coefficient (.COE) file\n"
@@ -459,7 +462,7 @@ class InputFiles(QtGui.QWidget):
         file_name.write("Radix = %d;\n" %coe_radix)
         file_name.write("Coefficient_width = %d;\n" %coe_width)
         coeff_str = "CoefData = "
-        for b in b10:
+        for b in bq:
             coeff_str += str(b) + ",\n"
         file_name.write(coeff_str[:-2] + ";") # replace last "," by ";"
 
