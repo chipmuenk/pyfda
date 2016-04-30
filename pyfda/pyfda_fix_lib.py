@@ -223,10 +223,9 @@ class Fixed(object):
                 yq = np.where(over_neg, -self.MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
-                yq = np.where(over_pos or over_neg,
+                yq = np.where(over_pos | over_neg,
                     yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB)),
                     yq)
-#                yq = yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB))
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.overfl))
                 return None
