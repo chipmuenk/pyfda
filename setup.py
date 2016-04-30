@@ -21,7 +21,7 @@ with open("version.py") as fp:
 setup(
     name = 'pyfda',
     # see PEP440 for versioning information
-    version = version_nr['__version__'],
+    version = version_nr['__version__'],   
     description = ('pyFDA is a tool for designing and analysing discrete time '
                  'filters written in python with a graphical user interface.'),
     long_description = long_description,
@@ -68,9 +68,8 @@ setup(
                             'filter_design/filter_list.txt'],
                   },
 
-    # include general non-python data files
+    # include general data files
     data_files = [
-        ('', ['README.txt']),
         ('', ['README.rst']),
         ('', ['LICENSE'])
         ],
