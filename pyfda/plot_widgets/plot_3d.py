@@ -21,6 +21,9 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap
 from matplotlib.colors import LightSource
 
+#http://docs.enthought.com/mayavi/mayavi/mlab_running_scripts.html#running-mlab-scripts
+#http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html
+#http://docs.enthought.com/mayavi/mayavi/mlab.html#simple-scripting-with-mlab
 try:
     from mayavi import mlab
     MLAB = True
@@ -510,7 +513,10 @@ class Plot3D(QtGui.QWidget):
                 surf.actor.property.interpolation = 'phong'
                 surf.actor.property.specular = 0.1
                 surf.actor.property.specular_power = 5
+#                s = mlab.contour_surf(self.x, self.y, Hmag, contour_z=0)
                 mlab.show()
+                
+
             else:
                 if self.chkLighting.isChecked():
                     ls = LightSource(azdeg=0, altdeg=65) # Create light source object
