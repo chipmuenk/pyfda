@@ -235,6 +235,8 @@ class Fixed(object):
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
         if self.frmt == 'hex':
             vhex = np.vectorize(hex) # vectorize python hex function for use with numpy array
+ # TODO           not quite: neg. hex numbers should be written as twos complemente
+            # http://stackoverflow.com/questions/16427073/signed-integer-to-twos-complement-hexadecimal
             return vhex(yq)
         if self.frmt == 'bin':
             return np.binary_repr(yq, width=(self.QF + self.QI + 1))
