@@ -155,7 +155,6 @@ class InputFiles(QtGui.QWidget):
         filter dictionary and update input and plot widgets
         """
         file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
-#        file_types = ("Zipped Binary Numpy Array (*.npz)")
         dlg = QFD(self)
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Load filter ", directory = rc.save_dir,
@@ -169,12 +168,12 @@ class InputFiles(QtGui.QWidget):
         if file_name != "": # cancelled file operation returns empty string
         
             # strip extension from returned file name (if any) + append file type:
-            file_name = os.path.splitext(file_name)[0] + '.' + file_type   
+            file_name = os.path.splitext(file_name)[0] + file_type   
 
             file_type_err = False              
             try:
                 with io.open(file_name, 'rb') as f:
-                    if file_type == 'npz':
+                    if file_type == '.npz':
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
                         a = np.load(f) # array containing dict, dtype 'object'
                         
@@ -185,7 +184,7 @@ class InputFiles(QtGui.QWidget):
                             else:
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
-                    elif file_type == 'pkl':
+                    elif file_type == '.pkl':
                         if sys.version_info[0] < 3:
                             fb.fil = pickle.load(f)
                         else:
@@ -221,19 +220,19 @@ class InputFiles(QtGui.QWidget):
 
         for t in self.extract_file_ext(file_filters): # get a list of file extensions
             if t in str(file_type):
-                file_type = t
+                file_type = t           # return the last matching extension
 
         if file_name != "": # cancelled file operation returns empty string 
 
             # strip extension from returned file name (if any) + append file type:
-            file_name = os.path.splitext(file_name)[0] + '.' + file_type   
+            file_name = os.path.splitext(file_name)[0] + file_type   
             
             file_type_err = False        
             try:
                 with io.open(file_name, 'wb') as f:
-                    if file_type == 'npz':
+                    if file_type == '.npz':
                         np.savez(f, **fb.fil[0])
-                    elif file_type == 'pkl':
+                    elif file_type == '.pkl':
                         # save as a pickle version compatible with Python 2.x
                         pickle.dump(fb.fil, f, protocol = 2)
                     else:
@@ -261,12 +260,13 @@ class InputFiles(QtGui.QWidget):
         if fb.fil[0]['ft'] == 'FIR':
             file_filters += ";;Xilinx coefficient format (*.coe)"
 
-        # Add further file types if modules could be imported:
+        # Add further file types when modules are available:
         if XLWT:
             file_filters += ";;Excel Worksheet (.xls)"
         if XLSX:
             file_filters += ";;Excel 2007 Worksheet (.xlsx)"
 
+        # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileNameAndFilter(self,
                 caption = "Export filter coefficients as", 
                 directory = rc.save_dir, filter = file_filters) 
@@ -278,72 +278,74 @@ class InputFiles(QtGui.QWidget):
        
         if file_name != '': # cancelled file operation returns empty string  
             # strip extension from returned file name (if any) + append file type:
-            file_name = os.path.splitext(file_name)[0] + '.' + file_type 
-            
+            file_name = os.path.splitext(file_name)[0] +  file_type 
+         
             ba = fb.fil[0]['ba']
             file_type_err = False
             try:
-                with io.open(file_name, 'wb') as f:
-                    if file_type == 'mat':   
-                        scipy.io.savemat(f, mdict={'ba':fb.fil[0]['ba']})
-                    elif file_type == 'csv':
-                        np.savetxt(f, ba, delimiter = ', ')
-                        # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
-                    elif file_type == 'npy':
-                        # can only store one array in the file:
-                        np.save(f, ba)
-                    elif file_type == 'npz':
-                        # would be possible to store multiple array in the file
-                        np.savez(f, ba = ba)
-                    elif file_type == 'coe':
+                if file_type == '.coe': # text / string format
+                    with io.open(file_name, 'w', encoding="utf8") as f:
                         self.save_file_coe(f)
-                    elif file_type == 'xls':
-                        # see
-                        # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
-                        # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
-                        # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
-                        workbook = xlwt.Workbook(encoding="utf-8")
-                        worksheet = workbook.add_sheet("Python Sheet 1")
-                        bold = xlwt.easyxf('font: bold 1')
-                        worksheet.write(0, 0, 'b', bold)
-                        worksheet.write(0, 1, 'a', bold)
-                        for col in range(2):
-                            for row in range(np.shape(ba)[1]):
-                                worksheet.write(row+1, col, ba[col][row]) # vertical
-                        workbook.save(f)
-            
-                    elif file_type == 'xlsx':
-                        # from https://pypi.python.org/pypi/XlsxWriter
-                        # Create an new Excel file and add a worksheet.
-                        workbook = xlsx.Workbook(f)
-                        worksheet = workbook.add_worksheet()
-                        # Widen the first column to make the text clearer.
-                        worksheet.set_column('A:A', 20)
-                        # Add a bold format to use to highlight cells.
-                        bold = workbook.add_format({'bold': True})
-                        # Write labels with formatting.
-                        worksheet.write('A1', 'b', bold)
-                        worksheet.write('B1', 'a', bold)
-            
-                        # Write some numbers, with row/column notation.
-                        for col in range(2):
-                            for row in range(np.shape(ba)[1]):
-                                worksheet.write(row+1, col, ba[col][row]) # vertical
-            #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
-            
-            
-                        # Insert an image - useful for documentation export ?!.
-            #            worksheet.insert_image('B5', 'logo.png')
-            
-                        workbook.close()
-            
-                    else:
-                        logger.error('Unknown file type "%s"', file_type)
-                        file_type_err = True
-                        
-                    if not file_type_err:
-                        logger.info('Filter saved as "%s"', file_name)
-                        rc.save_dir = os.path.dirname(file_name) # save new dir
+                else: # binary format
+                    with io.open(file_name, 'wb') as f: 
+                        if file_type == '.mat':   
+                            scipy.io.savemat(f, mdict={'ba':fb.fil[0]['ba']})
+                        elif file_type == '.csv':
+                            np.savetxt(f, ba, delimiter = ', ')
+                            # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
+                        elif file_type == '.npy':
+                            # can only store one array in the file:
+                            np.save(f, ba)
+                        elif file_type == '.npz':
+                            # would be possible to store multiple arrays in the file
+                            np.savez(f, ba = ba)
+                        elif file_type == '.xls':
+                            # see
+                            # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
+                            # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
+                            # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
+                            workbook = xlwt.Workbook(encoding="utf-8")
+                            worksheet = workbook.add_sheet("Python Sheet 1")
+                            bold = xlwt.easyxf('font: bold 1')
+                            worksheet.write(0, 0, 'b', bold)
+                            worksheet.write(0, 1, 'a', bold)
+                            for col in range(2):
+                                for row in range(np.shape(ba)[1]):
+                                    worksheet.write(row+1, col, ba[col][row]) # vertical
+                            workbook.save(f)
+                
+                        elif file_type == '.xlsx':
+                            # from https://pypi.python.org/pypi/XlsxWriter
+                            # Create an new Excel file and add a worksheet.
+                            workbook = xlsx.Workbook(f)
+                            worksheet = workbook.add_worksheet()
+                            # Widen the first column to make the text clearer.
+                            worksheet.set_column('A:A', 20)
+                            # Add a bold format to use to highlight cells.
+                            bold = workbook.add_format({'bold': True})
+                            # Write labels with formatting.
+                            worksheet.write('A1', 'b', bold)
+                            worksheet.write('B1', 'a', bold)
+                
+                            # Write some numbers, with row/column notation.
+                            for col in range(2):
+                                for row in range(np.shape(ba)[1]):
+                                    worksheet.write(row+1, col, ba[col][row]) # vertical
+                #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
+                
+                
+                            # Insert an image - useful for documentation export ?!.
+                #            worksheet.insert_image('B5', 'logo.png')
+                
+                            workbook.close()
+                
+                        else:
+                            logger.error('Unknown file type "%s"', file_type)
+                            file_type_err = True
+                            
+                        if not file_type_err:
+                            logger.info('Filter saved as "%s"', file_name)
+                            rc.save_dir = os.path.dirname(file_name) # save new dir
                     
             except IOError as e:
                 logger.error('Failed saving "%s"!\n%s\n', file_name, e)
@@ -360,7 +362,6 @@ class InputFiles(QtGui.QWidget):
         """
         file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
         "Zipped Binary Numpy Array(*.npz)")
-#        print('file_filters', self.extract_file_ext(file_filters))
         dlg = QFD(self)
         file_name, file_type = dlg.getOpenFileNameAndFilter(self,
                 caption = "Import filter coefficients ", 
@@ -374,18 +375,18 @@ class InputFiles(QtGui.QWidget):
         if file_name != '': # cancelled file operation returns empty string 
         
             # strip extension from returned file name (if any) + append file type:
-            file_name = os.path.splitext(file_name)[0] + '.' + file_type   
+            file_name = os.path.splitext(file_name)[0] + file_type   
 
             file_type_err = False
             try:
                 with io.open(file_name, 'rb') as f:
-                    if file_type == 'mat':
+                    if file_type == '.mat':
                         data = scipy.io.loadmat(f)
                         fb.fil[0]['ba'] = data['ba']
-                    elif file_type == 'npy':
+                    elif file_type == '.npy':
                         fb.fil[0]['ba'] = np.load(f)
                         # can only store one array in the file
-                    elif file_type == 'npz':
+                    elif file_type == '.npz':
                         fb.fil[0]['ba'] = np.load(f)['ba']
                         # would be possible to store several arrays in one file
                     else:
@@ -424,11 +425,10 @@ class InputFiles(QtGui.QWidget):
         """
 
         ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
-        ext_list = [t.strip('(*.)') for t in ext_list] # remove '(*.)'
+        ext_list = [t.strip('(*)') for t in ext_list] # remove '(*)'
                
         return ext_list
         
-
 
 #------------------------------------------------------------------------------
     def save_file_coe(self, file_name):
