@@ -332,8 +332,9 @@ class InputFilter(QtGui.QWidget):
         fb.fil[0]['dm'] = dm
         if dm != self.dm_last: # dm has changed, create new instance
             #-----
-            try:            
-                fb.fil_inst.destruct_UI() # disconnect signals from dyn. widget
+            try:
+                pass
+#                fb.fil_inst.destruct_UI() # disconnect signals from dyn. widget
             except AttributeError:
                 pass
                 
