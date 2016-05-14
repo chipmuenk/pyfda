@@ -3,7 +3,6 @@ from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
-#from pyfdax import __version__
 
 # @todo: WIP see https://packaging.python.org/en/latest/index.html
 
@@ -14,16 +13,17 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+# VERSION contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
-with open("version.py") as fp:
+with open("VERSION") as fp:
     exec(fp.read(), version_nr)
 
 setup(
     name = 'pyfda',
     # see PEP440 for versioning information
     version = version_nr['__version__'],   
-    description = ('pyFDA is a tool for designing and analysing discrete time '
-                 'filters written in python with a graphical user interface.'),
+    description = ('pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time '
+                 'filters.'),
     long_description = long_description,
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
@@ -73,6 +73,9 @@ setup(
         ('', ['README.rst']),
         ('', ['LICENSE'])
         ],
+    install_requires = [
+        'numpy', 'scipy', 'matplotlib', 'PyQt4', 'docutils'
+        ])
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached console:
     entry_points = {
