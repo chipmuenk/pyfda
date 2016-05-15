@@ -68,14 +68,15 @@ setup(
                             'filter_design/filter_list.txt'],
                   },
 
-    # include general data files
+    # include non-python files
     data_files = [
         ('', ['README.rst']),
-        ('', ['LICENSE'])
+        ('', ['LICENSE']),
+        ('', ['VERSION'])
         ],
     install_requires = [
         'numpy', 'scipy', 'matplotlib', 'PyQt4', 'docutils'
-        ])
+        ],
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached console:
     entry_points = {
@@ -83,7 +84,7 @@ setup(
             'pyfdax = pyfda.pyfdax:main',
         ],
         'gui_scripts': [
-            'pyfdax_gui = pyfda.pyfdax:main',
+            'pyfdax_no_term = pyfda.pyfdax:main',
         ]
     }
 )
@@ -91,13 +92,15 @@ setup(
 
 """
 On non-Windows platforms (using "setup.py install", "setup.py develop",
-or by using EasyInstall), a "pyfdax" script will be installed that imports
-"main" from pyfdax.py. main() is called with no arguments, and the
-return value is passed to sys.exit(), so an errorlevel or message to print
+or by using EasyInstall), a "pyfdax" script will be installed that opens up
+a terminal and imports "main" from pyfdax.py. 
+main() is called with no arguments, and the return value is passed to sys.exit(), so an errorlevel or message to print
 to stderr could be provided (not implemented yet).
 
-On Windows, a set of pyfdax.exe and pyfda_gui.exe launchers are created,
-alongside a set of pyfdax.py and pyfda_gui.pyw files. The .exe wrappers find
+pyfdax_no_term does essentially the same but it starts no terminal.
+
+On Windows, a set of pyfdax.exe and pyfdax_no_term.exe launchers are created,
+alongside a set of pyfdax.py and pyfdax_no_term.pyw files. The .exe wrappers find
 and execute the right version of Python to run the .py or .pyw file.
 """
 # http://locallyoptimal.com/blog/2014/03/14/executable-python-scripts-via-entry-points/
