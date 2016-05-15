@@ -15,7 +15,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 # VERSION contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
-with open("VERSION") as fp:
+with open("version.py") as fp:
     exec(fp.read(), version_nr)
 
 setup(
@@ -72,7 +72,7 @@ setup(
     data_files = [
         ('', ['README.rst']),
         ('', ['LICENSE']),
-        ('', ['VERSION'])
+        ('', ['version.py'])
         ],
     install_requires = [
         'numpy', 'scipy', 'matplotlib', 'PyQt4', 'docutils'
