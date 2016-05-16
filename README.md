@@ -24,8 +24,9 @@ Optional:
 #### pip
 This is the most comfortable variant:
 
-
     pip install pyfda
+
+#### setup.py
     
 Download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
 
@@ -35,12 +36,13 @@ or run it where you have installed the python source files using (for testing / 
 
     >> python setup.py develop
 
+#### Executing
 In both cases, start scripts `pyfda*` are created in `<python>/Scripts`.
 
 For development, you can also run pyFDA using
 
-    In [1]: %run -m pyfda.pyfda # IPython or
-    >> python -m pyfda.pyfda    # plain python interpreter
+    In [1]: %run -m pyfda.pyfdax :# IPython or
+    >> python -m pyfda.pyfdax    # plain python interpreter
     
 or files from pyFDA using e.g.
 
