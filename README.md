@@ -21,6 +21,12 @@ Optional:
 * xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
 
 ### Installing and starting pyFDA
+#### pip
+This is the most comfortable variant:
+
+
+    pip install pyfda
+    
 Download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
 
     >> python setup.py install
