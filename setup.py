@@ -15,7 +15,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 # VERSION contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
-with open("version.py") as fp:
+with open("pyfda/version.py") as fp:
     exec(fp.read(), version_nr)
 
 setup(
@@ -69,11 +69,10 @@ setup(
                             'filter_design/filter_list.txt'],
                   },
 
-    # include non-python files
+    # include files that get installed OUTSIDE the package
     data_files = [
-        ('', ['README.rst']),
-        ('', ['LICENSE']),
-        ('', ['version.py'])
+#        ('', ['README.rst']),
+#        ('', ['LICENSE'])
         ],
     install_requires = [
         'numpy >= 1.9', 'scipy >= 0.15', 'matplotlib >= 1.1', 'docutils'
