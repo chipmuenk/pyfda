@@ -16,6 +16,7 @@ from PyQt4 import QtGui, QtCore
 import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
+from pyfda import qrc_resources # contains all icons
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
@@ -274,9 +275,9 @@ def main():
     app = QtGui.QApplication(sys.argv)
     app.setObjectName("TopApp")
     
-    icon = os.path.join(fb.base_dir, 'images', 'icons', "pyfda_icon.svg")
+#    icon = os.path.join(fb.base_dir, 'images', 'icons', "pyfda_icon.svg")
 
-    app.setWindowIcon(QtGui.QIcon(icon))
+    app.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
     app.setStyleSheet(rc.css_rc) 
 
     mainw = pyFDA()
@@ -288,7 +289,7 @@ def main():
 
     # Sets the active window to the active widget in response to a system event.
     app.setActiveWindow(mainw) 
-    mainw.setWindowIcon(QtGui.QIcon(icon))
+    mainw.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
 
     desktop = QtGui.QDesktopWidget() # test the available desktop resolution
     # make pyFDA instance the parent for clean termination upon exit 
