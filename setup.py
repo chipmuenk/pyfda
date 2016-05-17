@@ -63,9 +63,9 @@ setup(
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
 
     # add additional data files for package / subpackages relative to package
-    # directory, include qrc_resources.py instead of 'images/icons/*', 
-    package_data={'pyfda': ['qrc_resources.py',
-                            'pyfda_log.conf',
+    # directory, include 'qrc_resources.py' instead of 'images/icons/*',
+    # 'qrc_resources.py','version.py' are automatically installed
+    package_data={'pyfda': ['pyfda_log.conf', 'pyfda_log_debug.conf',
                             'filter_design/filter_list.txt'],
                   },
 
