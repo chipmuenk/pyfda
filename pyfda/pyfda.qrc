@@ -1,0 +1,47 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="action-redo.svg">images/icons/action-redo.svg</file>
+    <file alias="action-undo.svg">images/icons/action-undo.svg</file>
+    <file alias="brush.svg">images/icons/brush.svg</file>
+    <file alias="camera-slr.svg">images/icons/camera-slr.svg</file>
+    <file alias="circle-check.svg">images/icons/circle-check.svg</file>
+    <file alias="cog.svg">images/icons/cog.svg</file>
+    <file alias="file.svg">images/icons/file.svg</file>
+    <file alias="fullscreen-enter.svg">images/icons/fullscreen-enter.svg</file>
+    <file alias="grid-four-up.svg">images/icons/grid-four-up.svg</file>
+    <file alias="home.svg">images/icons/home.svg</file>
+    <file alias="lock-locked.svg">images/icons/lock-locked.svg</file>
+    <file alias="magnifying-glass.svg">images/icons/magnifying-glass.svg</file>
+    <file alias="move.svg">images/icons/move.svg</file>
+    
+    <file alias="pyfda_icon.svg">images/icons/pyfda_icon.svg</file>
+</qresource>
+</RCC>
+
+<!--
+Available for future extensions:
+
+arrow-left.svg
+arrow-right.svg
+audio-spectrum.svg
+audio.svg
+bookmark.svg
+check.svg
+folder.svg
+fullscreen-enter.svg
+fullscreen-exit.svg
+graph.svg
+grid-four-up.svg
+headphones.svg
+lock-unlocked.svg
+microphone.svg
+minus.svg
+move.svg
+plus.svg
+reload.svg
+resize-both.svg
+resize-height.svg
+resize-width.svg
+star.svg
+wrench.svg
+-->
