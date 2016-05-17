@@ -468,8 +468,8 @@ class PlotHf(QtGui.QWidget):
             self.H_c = np.fft.fftshift(self.H_cplx)
             self.F -= self.f_S/2.
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-            self.H_c = self.H_cplx[0:rc.params['N_FFT']/2]
-            self.F = self.F[0:rc.params['N_FFT']/2]
+            self.H_c = self.H_cplx[0:rc.params['N_FFT']//2]
+            self.F = self.F[0:rc.params['N_FFT']//2]
 
         # now calculate mag / real / imaginary part of H_c:
         if self.linphase: # remove the linear phase
