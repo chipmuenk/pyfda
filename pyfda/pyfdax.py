@@ -17,6 +17,7 @@ import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
 from pyfda import qrc_resources # contains all icons
+# create with pyrcc4 pyfda.qrc -o qrc_resources.py -py3
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
