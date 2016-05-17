@@ -31,6 +31,7 @@ except ImportError:
 
 from pyfda import pyfda_rc
 from pyfda import pyfda_lib
+from pyfda import qrc_resources # contains all icons
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
 for key in pyfda_rc.mpl_rc:
@@ -197,20 +198,15 @@ class MyMplToolbar(NavigationToolbar):
 #
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
-#        self.basedir = os.path.join(rcParams[ 'datapath' ], 'images/icons')
-        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-           '..','images','icons', '')
-
-# org        self.basedir = os.path.join(rcParams['datapath'], 'images')
-        self.basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-           '..','images', 'icons', '')
-
+#        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+#           '..','images','icons', '')
+#        self.basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+#           '..','images', 'icons', '')
 
 #---------------- Construct Toolbar ---------------------------------------
 
         # ENABLE:
-        a = self.addAction(QtGui.QIcon(iconDir + 'circle-check.svg'), \
-                           'Enable Plot', self.enable_update)
+        a = self.addAction(QtGui.QIcon(':/circle-check.svg'), 'Enable Plot', self.enable_update)
         a.setToolTip('Enable plot update')
         a.setCheckable(True)
         a.setChecked(True)
@@ -219,44 +215,39 @@ class MyMplToolbar(NavigationToolbar):
         self.addSeparator() #---------------------------------------------
 
         # HOME:
-        self.a_ho = self.addAction(QtGui.QIcon(iconDir + 'home.svg'), \
-                           'Home', self.home)
+        self.a_ho = self.addAction(QtGui.QIcon(':/home.svg'), 'Home', self.home)
         self.a_ho.setToolTip('Reset original view')
         # BACK:
-        self.a_ba = self.addAction(QtGui.QIcon(iconDir + 'action-undo.svg'), \
-                           'Back', self.back)
+        self.a_ba = self.addAction(QtGui.QIcon(':/action-undo.svg'), 'Back', self.back)
         self.a_ba.setToolTip('Back to previous view')
         # FORWARD:
-        self.a_fw = self.addAction(QtGui.QIcon(iconDir + 'action-redo.svg'), \
-                           'Forward', self.forward)
+        self.a_fw = self.addAction(QtGui.QIcon(':/action-redo.svg'), 'Forward', self.forward)
         self.a_fw.setToolTip('Forward to next view')
 
         self.addSeparator() #---------------------------------------------
 
         # PAN:
-        self.a_pa = self.addAction(QtGui.QIcon(iconDir + 'move.svg'), \
-                           'Pan', self.pan)
+        self.a_pa = self.addAction(QtGui.QIcon(':/move.svg'), 'Pan', self.pan)
         self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
         "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
 
         # ZOOM RECTANGLE:
-        self.a_zo = self.addAction(QtGui.QIcon(iconDir + 'magnifying-glass.svg'), \
-                           'Zoom', self.zoom)
+        self.a_zo = self.addAction(QtGui.QIcon(':/magnifying-glass.svg'), 'Zoom', self.zoom)
         self.a_zo.setToolTip("Zoom in / out to rectangle with left / right mouse button,\n"
         "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
 
         # FULL VIEW:
-        self.a_fv = self.addAction(QtGui.QIcon(iconDir + 'fullscreen-enter.svg'), \
+        self.a_fv = self.addAction(QtGui.QIcon(':/fullscreen-enter.svg'), \
             'Zoom full extent', self.parent.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
         # LOCK VIEW:
-        self.a_lk = self.addAction(QtGui.QIcon(iconDir + 'lock-locked.svg'), \
-            'Lock zoom', self.toggle_lock_zoom)                
+        self.a_lk = self.addAction(QtGui.QIcon(':/lock-locked.svg'), \
+                                   'Lock zoom', self.toggle_lock_zoom)                
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
         self.a_lk.setToolTip('Lock current zoom setting')
@@ -266,27 +257,23 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         # GRID:
-        self.a_gr = self.addAction(QtGui.QIcon(iconDir + 'grid-four-up.svg'), \
-                           'Grid', self.toggle_grid)
+        self.a_gr = self.addAction(QtGui.QIcon(':/grid-four-up.svg'), 'Grid', self.toggle_grid)
         self.a_gr.setToolTip('Toggle Grid')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
 
         # REDRAW:
-        self.a_rd = self.addAction(QtGui.QIcon(iconDir + 'brush.svg'), \
-                           'Redraw', self.parent.redraw)
+        self.a_rd = self.addAction(QtGui.QIcon(':/brush.svg'), 'Redraw', self.parent.redraw)
         self.a_rd.setToolTip('Redraw Plot')
 
         # SAVE:
-        self.a_sv = self.addAction(QtGui.QIcon(iconDir + 'file.svg'), \
-                           'Save', self.save_figure)
+        self.a_sv = self.addAction(QtGui.QIcon(':/file.svg'), 'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
         
         self.cb = None #will be used for the clipboard
         self.temp_file = os.path.join(pyfda_lib.get_home_dir(), 'tempMPL.png')
  
-        self.a_cb = self.addAction(QtGui.QIcon(iconDir + 'camera-slr.svg'), \
-                           'Save', self.mpl2Clip)
+        self.a_cb = self.addAction(QtGui.QIcon(':/camera-slr.svg'), 'Save', self.mpl2Clip)
         self.a_cb.setToolTip('Copy to clipboard')
         self.a_cb.setShortcut("Ctrl+C")
 
@@ -295,8 +282,7 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         if figureoptions is not None:
-            self.a_op = self.addAction(QtGui.QIcon(iconDir + 'cog.svg'),
-                               'Customize', self.edit_parameters)
+            self.a_op = self.addAction(QtGui.QIcon(':/cog.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip('Edit curves line and axes parameters')
 
         self.buttons = {}
