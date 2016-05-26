@@ -334,7 +334,7 @@ class HDLSpecs(QtGui.QWidget):
         return line
 
 #------------------------------------------------------------------------------
-    def setupHDL(self):
+    def setupHDL(self, filename = ""):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
@@ -386,7 +386,7 @@ class HDLSpecs(QtGui.QWidget):
         logger.info('Using hdl_filename "%s"', hdl_filename)
         logger.info('Using hdl_dirname "%s"', hdl_dirname)
 
-        self.setupHDL()
+        self.setupHDL(filename = os.path.join(hdl_dirname, hdl_filename))
         self.flt.hdl_name = hdl_filename
         self.flt.hdl_directory = hdl_dirname
         self.flt.hdl_target = 'verilog' # or 'vhdl'
@@ -399,6 +399,31 @@ class HDLSpecs(QtGui.QWidget):
         Simulate filter in fix-point description
         """
         # Setup the Testbench and run
+
+        # This does not work yet: file name is currently fixed to "siir_hdl" via the 
+        # function with the same name
+        dlg=QtGui.QFileDialog( self )
+        
+        plt_types = "png (*.png);;svg (*.svg)"
+
+        plt_file, plt_type = dlg.getSaveFileNameAndFilter(self,
+                caption = "Save plots as", directory="D:",
+                filter = plt_types)
+        plt_file = str(plt_file)
+        plt_type = str(plt_type)
+        logger.info('Using plot filename "%s"', plt_file)
+        plot_filename = os.path.splitext(os.path.basename(plt_file))[0]
+        plot_dirname = os.path.splitext(plt_file)[0]
+        logger.info('Using plot filename "%s"', plot_filename)
+        logger.info('Using plot directory "%s"', plot_dirname)
+
+        self.flt.plt_type = plt_type
+        self.flt.plt_file = plt_file
+
+
+        self.setupHDL(filename = os.path.join(plot_dirname, plot_filename))
+
+        
         self.setupHDL()
         logger.info("Fixpoint simulation called")
         tb = self.flt.TestFreqResponse(Nloops=3, Nfft=1024)
