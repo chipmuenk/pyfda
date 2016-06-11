@@ -75,7 +75,7 @@ setup(
 #        ('', ['LICENSE'])
         ],
     install_requires = [
-        'numpy >= 1.9', 'scipy >= 0.15', 'matplotlib >= 1.1', 'docutils'
+        'numpy', 'scipy', 'matplotlib', 'docutils'
         ],
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached terminal:
