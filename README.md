@@ -22,9 +22,10 @@ Optional:
 
 ### Installing and starting pyFDA
 #### pip
-This is the most comfortable variant:
+This is the most convenient variant:
 
     pip install pyfda
+    pyfdax
 
 #### setup.py
     
@@ -37,7 +38,7 @@ or run it where you have installed the python source files using (for testing / 
     >> python setup.py develop
 
 #### Executing
-In both cases, start scripts `pyfda*` are created in `<python>/Scripts`.
+In both cases, start scripts `pyfdax` and `pyfdax_noterm`are created in `<python>/Scripts`.
 
 For development, you can also run pyFDA using
 
@@ -104,13 +105,12 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
     </tr>
 </table>
 
-### Release 0.1 (target: end of <s>May</s> July 2015)
+### Release 0.1
 
 The following features are still missing for the first release. 
 * Fix issue #8 (pyFDA doesn't shut down properly)
-* Documentation
 
-### Release 0.2 (target: end of 2015) - Help is very welcome!
+### Release 0.2
 * **scipy 0.16 SOS features**
 * **myHDL support**
     * Export of VHDL / Verilog netlists for basic filter topologies
