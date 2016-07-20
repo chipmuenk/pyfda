@@ -16,7 +16,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal, Qt
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, lin2unit
+from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin
 from pyfda.simpleeval import simple_eval
 
 class InputAmpSpecs(QtGui.QWidget):
@@ -112,7 +112,7 @@ class InputAmpSpecs(QtGui.QWidget):
         Set labels and get corresponding values from filter dictionary.
         When number of elements changes, the layout of subwidget is rebuilt.
         
-        Connect new QLineEdit fields to _store_entries so that the filter
+        Connect new QLineEdit fields to `_store_entries` so that the filter
         dictionary is updated automatically when a QLineEdit field has been
         edited.
         """
@@ -158,14 +158,15 @@ class InputAmpSpecs(QtGui.QWidget):
 
         unit = str(self.cmbUnitsA.currentText())
         fb.fil[0]['amp_specs_unit'] = unit
- 
+        
+        filt_type = fb.fil[0]['ft']
+
         for i in range(len(self.qlineedit)):
             amp_label = str(self.qlineedit[i].objectName())
-            value = fb.fil[0][amp_label]
-            filt_type = fb.fil[0]['ft']
+            amp_value = fb.fil[0][amp_label]
            
             self.qlineedit[i].setText(
-                str(lin2unit(value, filt_type, amp_label, unit = unit)))
+                str(lin2unit(amp_value, filt_type, amp_label, unit = unit)))
 
 #------------------------------------------------------------------------------
     def _store_entries(self):
@@ -178,37 +179,22 @@ class InputAmpSpecs(QtGui.QWidget):
         displayed values are adapted to the amplitude unit, not the dictionary!
         """
 
-
-        def unit2lin(amp_label, dB_value, unit = 'dB'):
-            """
-            Convert unit to linear ripple:
-            - passband: delta_PB = 1 - 10 ** (-A_PB/10 resp. 20) [IIR]
-                        delta_PB = (10 ** (A_PB / 20) - 1)/ (10 ** (A_PB / 20) + 1)[FIR]
-            - stopband: delta_SB = -10 ** (-A_SB/10 resp. 20)
-            """
-            dB_value = abs(dB_value)
-            if "PB" in amp_label: # passband
-                if fb.fil[0]['ft'] == 'IIR':
-                    delta = round(1. - 10.**(-dB_value / 20.), 10)
-                else: 
-                    delta = round((10.**(dB_value / 20.) - 1)/
-                                    (10.**(dB_value / 20.) + 1),10)
-            else: # stopband
-                delta = round(10.**(-dB_value / 20), 10)
-            return delta
-
         idx = self.cmbUnitsA.currentIndex()  # read index of units combobox  
         unit = str(self.cmbUnitsA.currentText())
+        
+        filt_type = fb.fil[0]['ft']
         
         for i in range(len(self.qlineedit)):
             amp_label = str(self.qlineedit[i].objectName())
             amp_value = simple_eval(self.qlineedit[i].text())
-            if idx == 0: # Entry is in dBs, convert to linear
-                fb.fil[0].update({amp_label:unit2lin(amp_label, amp_value)})
-            elif idx == 1:  # Entries are linear ripple, same as dictionary
-                fb.fil[0].update({amp_label:amp_value})
-            else:  # Entries are powers, convert to lin
-                fb.fil[0].update({amp_label:sqrt(amp_value)})
+            fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
+            
+#            if idx == 0: # Entry is in dBs, convert to linear
+#                fb.fil[0].update({amp_label:unit2lin(amp_value, amp_label, unit)})
+#            elif idx == 1:  # Entries are linear ripple, same as dictionary
+#                fb.fil[0].update({amp_label:amp_value})
+#            else:  # Entries are powers, convert to lin
+#                fb.fil[0].update({amp_label:unit2lin(amp_label, amp_value, unit)})
                        
         self.sigSpecsChanged.emit() # -> input_specs
 
