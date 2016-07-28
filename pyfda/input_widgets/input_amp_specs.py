@@ -8,7 +8,6 @@ Author: Christian Münker
 # TODO: Check specs IIR / FIR A_PB <-> delta_PB
 
 from __future__ import print_function, division, unicode_literals
-from numpy import sqrt
 import sys
 import logging
 logger = logging.getLogger(__name__)
@@ -38,6 +37,7 @@ class InputAmpSpecs(QtGui.QWidget):
         self.qlineedit = [] # list with references to QLineEdit widgets
 
         self.FMT = '{:.3g}' # rounding format for QLineEdit fields
+        self.spec_edited = False # flag whether QLineEdit field has been edited
         self._init_UI()
 
     def _init_UI(self):
@@ -101,10 +101,9 @@ class InputAmpSpecs(QtGui.QWidget):
         self.cmbUnitsA.currentIndexChanged.connect(self.load_entries)
         #       ^ this also triggers the initial load_entries
         # DYNAMIC SIGNAL SLOT CONNECTION:
-        # Every time a field is edited, call self.load_entries - this signal-slot
-        # mechanism is constructed in self._add_entry/ destructed in 
-        # self._del_entry each time the widget is updated, i.e. when a new 
-        # filter design method is selected.
+        # Every time a field is edited, call self._store_entry and 
+        # self.load_entries - this achieved with an event filter that monitors
+        # the focus of the input fields. 
         #----------------------------------------------------------------------
 
 #-------------------------------------------------------------
@@ -118,9 +117,8 @@ class InputAmpSpecs(QtGui.QWidget):
         - `new_labels`, a list of strings from the filter_dict for the current
           filter design
 
-        Connect new QLineEdit editingFinished events to the eventFilter so 
-        that the filter dictionary is updated automatically when a QLineEdit 
-        field has been edited.
+        Install eventFilter for new QLineEdit widgets so that the filter dictionary 
+        is updated automatically when a QLineEdit field has been edited.
         """
 
         delta_new_labels = len(new_labels) - len(self.qlabels)
@@ -156,16 +154,21 @@ class InputAmpSpecs(QtGui.QWidget):
 
         - When a QLineEdit widget gains input focus (QEvent.FocusIn`), display 
           the stored value from filter dict with full precision
-        - When editing has finished (`qlineedit.editingFinished`), store 
-          current value in linear format with full precision
-        - When a QLineEdit widget loses input focus, display the stored value rounded
+        - When a key is pressed inside the text field, set the `spec_edited` flag
+          to True.
+        - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store 
+          current value in linear format with full precision (only if 
+          `spec_edited`== True) and display the stored value in selected format
    
     """
         if isinstance(source, QtGui.QLineEdit):
             if event.type() == QEvent.FocusOut:      
-                self._store_entries(source)
-            if event.type() == QEvent.FocusIn:            
+                self._store_entry(source)
+            if event.type() == QEvent.FocusIn:
+                self.spec_edited = False
                 self.load_entries()
+            if event.type() == QEvent.KeyPress:
+                self.spec_edited = True
                 
         return super(InputAmpSpecs, self).eventFilter(source, event)
 
@@ -177,7 +180,8 @@ class InputAmpSpecs(QtGui.QWidget):
         design algorithm is selected or when the user has changed the unit  (V / W / dB):
         - Store the unit in the filter dictionary.
         - Reload amplitude entries from filter dictionary and convert to selected to reflect changed settings
-          unit. Update the lineedit fields, rounded to specified format.          
+          unit. 
+        - Update the lineedit fields, rounded to specified format.          
         """
         unit = str(self.cmbUnitsA.currentText())
         fb.fil[0]['amp_specs_unit'] = unit
@@ -195,11 +199,12 @@ class InputAmpSpecs(QtGui.QWidget):
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(amp_value))
 #------------------------------------------------------------------------------
-    def _store_entries(self, source = None):
+    def _store_entry(self, source):
         """
-        When editing of an amplitude field has finished, transform the amplitude        
-        spec back to linear unit setting and store it in filter dict. 
-        This is triggered by signal `editingFinished`.
+        When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
+        transform the amplitude spec back to linear unit setting and store it 
+        in filter dict. 
+        This is triggered by `QEvent.focusOut`
         
         Spec entries are *always* stored in linear units; only the 
         displayed values are adapted to the amplitude unit, not the dictionary!
@@ -207,7 +212,7 @@ class InputAmpSpecs(QtGui.QWidget):
         unit = str(self.cmbUnitsA.currentText())
         filt_type = fb.fil[0]['ft']
         
-        if source:
+        if self.spec_edited:
             amp_label = str(source.objectName())
             amp_value = simple_eval(source.text())
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
