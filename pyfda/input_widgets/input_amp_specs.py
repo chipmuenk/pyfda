@@ -13,7 +13,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal, Qt
+from PyQt4.QtCore import pyqtSignal, Qt, QEvent
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin
@@ -37,6 +37,7 @@ class InputAmpSpecs(QtGui.QWidget):
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
+        self.FMT = '{:.3g}' # rounding format for QLineEdit fields
         self._init_UI()
 
     def _init_UI(self):
@@ -110,16 +111,17 @@ class InputAmpSpecs(QtGui.QWidget):
     def update_UI(self, new_labels = []):
         """
         Set labels and get corresponding values from filter dictionary.
-        When number of elements changes, the layout of subwidget is rebuilt.
-        
-        Connect new QLineEdit fields to `_store_entries` so that the filter
-        dictionary is updated automatically when a QLineEdit field has been
-        edited.
+        When number of entries has changed, the layout of subwidget is rebuilt,
+        using
+
+        - `self.qlabels`, a list with references to existing QLabel widgets,
+        - `new_labels`, a list of strings from the filter_dict for the current
+          filter design
+
+        Connect new QLineEdit editingFinished events to the eventFilter so 
+        that the filter dictionary is updated automatically when a QLineEdit 
+        field has been edited.
         """
-        # Check whether the number of entries has changed: 
-        #  self.qlabels is a list with references to existing QLabel widgets,
-        #  new_labels is a list of strings from the filter_dict for the current
-        #    filter design
 
         delta_new_labels = len(new_labels) - len(self.qlabels)
         
@@ -134,28 +136,49 @@ class InputAmpSpecs(QtGui.QWidget):
             #  label and corresponding value
                 if str(self.qlineedit[i].objectName()) != new_labels[i]:
                     try:
-                        self.qlineedit[i].editingFinished.disconnect()
+                        self.qlineedit[i].removeEventFilter(self)
                     except TypeError:
                         pass
                     
                     self.qlabels[i].setText(rt_label(new_labels[i]))
 
                     self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
-                    self.qlineedit[i].setObjectName(new_labels[i])  # update ID                      
-                    self.qlineedit[i].editingFinished.connect(self._store_entries)
+                    self.qlineedit[i].setObjectName(new_labels[i])  # update ID                    
+                    self.qlineedit[i].installEventFilter(self)  # filter events 
 
         self.load_entries() # display filter dict entries in selected unit
         
 #------------------------------------------------------------------------------
+
+    def eventFilter(self, source, event):
+        """ 
+        When the focus on a QLineEdit widget changes, do the following:
+
+        - When a QLineEdit widget gains input focus (QEvent.FocusIn`), display 
+          the stored value from filter dict with full precision
+        - When editing has finished (`qlineedit.editingFinished`), store 
+          current value in linear format with full precision
+        - When a QLineEdit widget loses input focus, display the stored value rounded
+   
+    """
+        if isinstance(source, QtGui.QLineEdit):
+            if event.type() == QEvent.FocusOut:      
+                self._store_entries(source)
+            if event.type() == QEvent.FocusIn:            
+                self.load_entries()
+                
+        return super(InputAmpSpecs, self).eventFilter(source, event)
+
+        
+#------------------------------------------------------------------------------
     def load_entries(self):
         """
-        Reload the amplitude textfields from filter dict, called when a new filter 
-        design algorithm is selected or when the user has changed the unit  (V / W / dB).
+        Reload and reformat the amplitude textfields from filter dict when a new filter 
+        design algorithm is selected or when the user has changed the unit  (V / W / dB):
         - Store the unit in the filter dictionary.
-        - Reload amplitude entries from filter dictionary to reflect changed settings
-        - Convert amplitude entries to selected unit and update the lineedit fields.          
+        - Reload amplitude entries from filter dictionary and convert to selected to reflect changed settings
+          unit. Update the lineedit fields, rounded to specified format.          
         """
-
         unit = str(self.cmbUnitsA.currentText())
         fb.fil[0]['amp_specs_unit'] = unit
         
@@ -163,53 +186,42 @@ class InputAmpSpecs(QtGui.QWidget):
 
         for i in range(len(self.qlineedit)):
             amp_label = str(self.qlineedit[i].objectName())
-            amp_value = fb.fil[0][amp_label]
-           
-            self.qlineedit[i].setText(
-                str(lin2unit(amp_value, filt_type, amp_label, unit = unit)))
-
+            amp_value = lin2unit(fb.fil[0][amp_label], filt_type, amp_label, unit = unit)
+            
+            if not self.qlineedit[i].hasFocus():
+                # widget has no focus, round the display
+                self.qlineedit[i].setText(self.FMT.format(amp_value))
+            else:
+                # widget has focus, show full precision
+                self.qlineedit[i].setText(str(amp_value))
 #------------------------------------------------------------------------------
-    def _store_entries(self):
+    def _store_entries(self, source = None):
         """
-        Transform the amplitude spec input fields according to the Units
-        setting and store in filter dict, called every time an amplitude field
-        is edited.
+        When editing of an amplitude field has finished, transform the amplitude        
+        spec back to linear unit setting and store it in filter dict. 
+        This is triggered by signal `editingFinished`.
         
         Spec entries are *always* stored in linear units; only the 
         displayed values are adapted to the amplitude unit, not the dictionary!
         """
-
-        idx = self.cmbUnitsA.currentIndex()  # read index of units combobox  
         unit = str(self.cmbUnitsA.currentText())
-        
         filt_type = fb.fil[0]['ft']
         
-        for i in range(len(self.qlineedit)):
-            amp_label = str(self.qlineedit[i].objectName())
-            amp_value = simple_eval(self.qlineedit[i].text())
+        if source:
+            amp_label = str(source.objectName())
+            amp_value = simple_eval(source.text())
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
-            
-#            if idx == 0: # Entry is in dBs, convert to linear
-#                fb.fil[0].update({amp_label:unit2lin(amp_value, amp_label, unit)})
-#            elif idx == 1:  # Entries are linear ripple, same as dictionary
-#                fb.fil[0].update({amp_label:amp_value})
-#            else:  # Entries are powers, convert to lin
-#                fb.fil[0].update({amp_label:unit2lin(amp_label, amp_value, unit)})
-                       
-        self.sigSpecsChanged.emit() # -> input_specs
+            self.load_entries()                                  
+            self.sigSpecsChanged.emit() # -> input_specs
 
 #-------------------------------------------------------------
     def _del_entries(self, num):
         """
-        Delete num subwidgets (QLabel and QLineEdit) from layout and memory and
-        disconnect the editingFinished signals from self._store_entries.
+        Delete num subwidgets (QLabel and QLineEdit) from layout and memory
         """
         Nmax = len(self.qlabels)-1  # number of existing labels
 
         for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
-            
-            self.qlineedit[i].editingFinished.disconnect()
-    
             self.layGSpecs.removeWidget(self.qlabels[i])
             self.layGSpecs.removeWidget(self.qlineedit[i])
     
