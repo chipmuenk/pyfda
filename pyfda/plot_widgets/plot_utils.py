@@ -198,12 +198,14 @@ class MyMplToolbar(NavigationToolbar):
 #
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
+#       Using the following path to the icons seems to fail in some cases, we
+#       rather rely on qrc files containing all icons
 #        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 #           '..','images','icons', '')
 #        self.basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 #           '..','images', 'icons', '')
 
-#---------------- Construct Toolbar ---------------------------------------
+#---------------- Construct Toolbar using QRC icons ---------------------------
 
         # ENABLE:
         a = self.addAction(QtGui.QIcon(':/circle-check.svg'), 'Enable Plot', self.enable_update)
