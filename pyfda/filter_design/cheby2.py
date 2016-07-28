@@ -21,7 +21,7 @@ import scipy.signal as sig
 from scipy.signal import cheb2ord
 import numpy as np
 
-from pyfda.pyfda_lib import fil_save, SOS_AVAIL
+from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
 __version__ = "1.2"
 
@@ -82,12 +82,12 @@ class cheby2(object):
 **Chebyshev Type 2 filters**
 
 have a constant ripple :math:`A_SB` in the stop band(s) only, the pass band
-drops monotonously. This is achieved by placing :math:`N/2` zeros along the stop
+drops monotonously. This is achieved by placing :math:`N` zeros along the stop
 band.
 
-The order :math:`N`, stop band ripple :math:`A_SB` and
-the critical frequency / frequencies :math:`F_C` where the stop band attenuation
-:math:`A_SB` is reached have to be specified for filter design.
+Order :math:`N`, stop band ripple :math:`A_SB` and
+critical frequency / frequencies :math:`F_C` where the stop band attenuation
+:math:`A_SB` is first reached have to be specified for filter design.
 
 The corner frequency/ies of the pass band can only be controlled indirectly
 by the filter order and by slightly adapting the value(s) of :math:`F_C`.
@@ -135,8 +135,9 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         self.F_C2 = fil_dict['F_C2'] * 2
         self.F_SBC = None
         
-        self.A_PB  = -20. * np.log10(1. - fil_dict['A_PB'])
-        self.A_SB  = -20. * np.log10(fil_dict['A_SB'])
+        self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
+        self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
+
         
         # cheby2 filter routines support only one amplitude spec for
         # pass- and stop band each

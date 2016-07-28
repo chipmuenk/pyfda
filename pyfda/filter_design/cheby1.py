@@ -21,7 +21,7 @@ import scipy.signal as sig
 from scipy.signal import cheb1ord
 import numpy as np
     
-from pyfda.pyfda_lib import fil_save, SOS_AVAIL
+from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
 __version__ = "1.2"
 
@@ -131,9 +131,10 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.F_SB2 = fil_dict['F_SB2'] * 2
         self.F_C2 = fil_dict['F_C2'] * 2
         self.F_PBC = None
-        
-        self.A_PB  = -20. * np.log10(1. - fil_dict['A_PB'])
-        self.A_SB  = -20. * np.log10(fil_dict['A_SB'])
+
+        self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
+        self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
+
         
         # cheby1 filter routines support only one amplitude spec for
         # pass- and stop band each
