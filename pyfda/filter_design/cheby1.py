@@ -19,7 +19,6 @@ Author: Christian Münker
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import cheb1ord
-import numpy as np
     
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 

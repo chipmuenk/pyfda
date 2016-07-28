@@ -19,9 +19,8 @@ Author: Christian Muenker
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import buttord
-import numpy as np
 
-from pyfda.pyfda_lib import fil_save
+from pyfda.pyfda_lib import fil_save, lin2unit
 
 __version__ = "1.2"
 
@@ -121,10 +120,9 @@ order can be used for approximating the -3 dB frequency.
         self.F_PBC = None
         self.F_C   = fil_dict['F_C'] * 2
         self.F_C2  = fil_dict['F_C2'] * 2
-
         
-        self.A_PB  = -20. * np.log10(1. - fil_dict['A_PB'])
-        self.A_SB  = -20. * np.log10(fil_dict['A_SB'])
+        self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
+        self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
         
         # bessel filter routines support only one amplitude spec for
         # pass- and stop band each
