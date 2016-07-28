@@ -28,7 +28,7 @@ Created on Mon Apr 30 10:29:42 2012
 from __future__ import division, print_function
 import os, sys
 import numpy as np
-from numpy import pi, asarray, log10, arctan,  mod
+from numpy import pi, asarray, log10, arctan
 
 # Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
 # that default to pyQT5 (but have pyQt4 installed as well)
@@ -87,34 +87,67 @@ def dB(lin, power = False):
     else:
         return 20 * np.log10(lin)
         
-def lin2unit(lin, filt_type, amp_label, unit = 'dB'):
+def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
     """
-    Convert linear specification to dB or W, depending on filter type ('FIR' or
-    'IIR') and passband 'PB' or stopband 'SB' :
+    Convert linear amplitude specification to dB or W, depending on filter 
+    type ('FIR' or 'IIR') and whether the specifications belong to passband
+    or stopband. This is determined by checking whether amp_label contains
+    the strings 'PB' or 'SB' :
     
     - Passband: 
-        A_dB = -20 * log10(1 - spec_PB) [IIR]
-        A_dB = 20 log10((1 + spec_PB)/(1 - spec_PB)) [FIR]
+       IIR: A_dB = -20 log10(1 - lin_value) 
+       
+       FIR: A_dB =  20 log10((1 + lin_value)/(1 - lin_value)) 
                 
     - Stopband: 
-        A_dB = -20 * log10(spec_SB)
+        A_dB = -20 log10(lin_value)
     
-    Returns the value as a string.
+    Returns the result as a float.
     """     
     if unit == 'dB':
         if "PB" in amp_label: # passband
             if filt_type == 'IIR':
-                result = round(-20 * log10(1. - lin), 8)
+                unit_value = -20 * log10(1. - lin_value)
             else:
-                result = round(20 * log10((1. + lin)/(1 - lin)), 8)
+                unit_value = 20 * log10((1. + lin_value)/(1 - lin_value))
         else: # stopband
-            result = round(-20 * log10(lin), 8)
+            unit_value = -20 * log10(lin_value)
     elif unit == 'W':
-        result = lin * lin
+        unit_value = lin_value * lin_value
     else:
-        result = lin
+        unit_value = lin_value
             
-    return result
+    return unit_value
+
+
+def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
+    """
+    Convert amplitude specification in dB or W to linear specs:
+    
+    - Passband: 
+       IIR: A_PB_lin = 1 - 10 ** (-unit_value/20)
+       
+       FIR: A_PB_lin = (10 ** (unit_value/20) - 1)/ (10 ** (unit_value/20) + 1)
+       
+    - Stopband: 
+       A_SB_lin = -10 ** (-unit_value/20)
+       
+    Returns the result as a float.
+    """
+    unit_value = abs(unit_value)
+    if unit == 'dB':
+        if "PB" in amp_label: # passband
+            if filt_type == 'IIR':
+                lin_value = 1. - 10.**(-unit_value / 20.)
+            else: 
+                lin_value = (10.**(unit_value / 20.) - 1) / (10.**(unit_value / 20.) + 1)
+        else: # stopband
+            lin_value = 10.**(-unit_value / 20)
+    elif unit == 'W':
+        lin_value = np.sqrt(unit_value)
+    else:
+        lin_value = unit_value
+    return lin_value
 
 
 

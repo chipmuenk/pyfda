@@ -137,7 +137,7 @@ class Plot3D(QtGui.QWidget):
         self.lblHatch = QtGui.QLabel("Stride")
         self.diaHatch = QtGui.QDial(self)
         self.diaHatch.setRange(0., 9.)
-        self.diaHatch.setValue(7)
+        self.diaHatch.setValue(5)
         self.diaHatch.setTracking(False) # produce less events when turning
         self.diaHatch.setFixedHeight(30)
         self.diaHatch.setFixedWidth(30)
@@ -247,10 +247,11 @@ class Plot3D(QtGui.QWidget):
         self.xy_UC = np.exp(1j * phi_UC) # x,y coordinates of unity circle
 
         steps = 100              # number of steps for x, y, r, phi
-        rmin = 0;    rmax = 1.2  # polar range limits
         #
         self.xmin = -1.5; self.xmax = 1.5  # cartesian range limits
         self.ymin = -1.5; self.ymax = 1.5
+        
+        rmin = 0;    rmax = self.xmin  # polar range limits
 
         # Calculate grids for 3D-Plots
         dr = rmax / steps * 2 # grid size for polar range
@@ -266,7 +267,7 @@ class Plot3D(QtGui.QWidget):
             [self.x, self.y] = np.meshgrid(np.arange(self.xmin, self.xmax, dx),
                                             np.arange(self.ymin, self.ymax, dy))
 
-        self.z = self.x + 1j*self.y # create coordinate grid for complex plan
+        self.z = self.x + 1j*self.y # create coordinate grid for complex plane
 
         self.draw() # initial plot
 
@@ -380,7 +381,10 @@ class Plot3D(QtGui.QWidget):
         alpha = self.diaAlpha.value()/10.
         cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
         # Number of Lines /step size for H(f) stride, mesh, contour3d:
-        NL = 10 - self.diaHatch.value() 
+
+        stride = 10 - self.diaHatch.value() 
+        NL = 3 * self.diaHatch.value() + 5
+        
 
         #cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
         #scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
@@ -418,16 +422,17 @@ class Plot3D(QtGui.QWidget):
                 plevel_btm = top
 
         else: # linear scale
-            bottom = max(self.zmin, H_min)
-            top = self.zmax
+            bottom = max(self.zmin, H_min)  # min. display value
+            top = self.zmax                 # max. display value
             top_bottom = top - bottom
         #   top = zmax_rel * H_max # calculate display top from max. of H(f)
 
             zlevel = bottom + top_bottom * zlevel_rel # height of displayed zero position
 
             if self.cmbMode3D.currentText() == 'None': # "Poleposition" for H(f) plot only
-                H_max = np.clip(max(H_abs), 0, self.zmax)     
-                plevel_top = bottom + H_max * 0.3 # height of displayed pole position
+                #H_max = np.clip(max(H_abs), 0, self.zmax)     
+                # make height of displayed poles same to zeros
+                plevel_top = bottom + top_bottom * zlevel_rel 
                 plevel_btm = bottom
             else:
                 plevel_top = plevel_rel * top
@@ -456,11 +461,11 @@ class Plot3D(QtGui.QWidget):
             # draw once more as dashed white line to improve visibility
             self.ax3d.plot(self.xy_UC.real, self.xy_UC.imag, H_UC, 'w--')
 
-            if NL < 10:  # plot thin vertical line every NL points on the UC
-                for k in range(len(self.xy_UC[::NL])):
-                    self.ax3d.plot([self.xy_UC.real[::NL][k], self.xy_UC.real[::NL][k]],
-                        [self.xy_UC.imag[::NL][k], self.xy_UC.imag[::NL][k]],
-                        [np.ones(len(self.xy_UC[::NL]))[k]*bottom, H_UC[::NL][k]],
+            if stride < 10:  # plot thin vertical line every stride points on the UC
+                for k in range(len(self.xy_UC[::stride])):
+                    self.ax3d.plot([self.xy_UC.real[::stride][k], self.xy_UC.real[::stride][k]],
+                        [self.xy_UC.imag[::stride][k], self.xy_UC.imag[::stride][k]],
+                        [np.ones(len(self.xy_UC[::stride]))[k]*bottom, H_UC[::stride][k]],
                          linewidth=1, color=(0.5, 0.5, 0.5))
                     
         #===============================================================
@@ -499,7 +504,7 @@ class Plot3D(QtGui.QWidget):
         #    fig_mlab = mlab.figure(fgcolor=(0., 0., 0.), bgcolor=(1, 1, 1))
         #    self.ax3d.set_zlim(0,2)
             self.ax3d.plot_wireframe(self.x, self.y, Hmag, rstride=5,
-                    cstride=NL, linewidth=1, color='gray')
+                    cstride=stride, linewidth=1, color='gray')
 
         #---------------------------------------------------------------
         ## 3D-surface plot
@@ -538,7 +543,7 @@ class Plot3D(QtGui.QWidget):
         ## 3D-Contour plot
         #---------------------------------------------------------------
         elif self.cmbMode3D.currentText() == 'Contour':
-            s = self.ax3d.contourf3D(self.x, self.y, Hmag, 20, alpha=alpha, cmap=cmap)
+            s = self.ax3d.contourf3D(self.x, self.y, Hmag, NL, alpha=alpha, cmap=cmap)
 
         #---------------------------------------------------------------
         ## 2D-Contour plot
@@ -553,9 +558,9 @@ class Plot3D(QtGui.QWidget):
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
 #            self.ax3d.contourf(x, y, Hmag, 20, zdir='y', offset=ymax,
 #                         cmap=cmap, alpha = alpha)#, vmin = bottom)#, vmax = top, vmin = bottom)
-            s = self.ax3d.contourf(self.x, self.y, Hmag, 20, zdir='z',
+            s = self.ax3d.contourf(self.x, self.y, Hmag, NL, zdir='z',
                                offset=bottom - (top - bottom) * 0.05,
-                                cmap=cmap, alpha=0.9)
+                                cmap=cmap, alpha=alpha)
             
         # plot colorbar for suitable plot modes
         if self.chkColBar.isChecked() and (self.chkContour2D.isChecked() or
