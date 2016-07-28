@@ -162,13 +162,13 @@ class InputAmpSpecs(QtGui.QWidget):
    
     """
         if isinstance(source, QtGui.QLineEdit):
-            if event.type() == QEvent.FocusOut:      
-                self._store_entry(source)
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_entries()
-            if event.type() == QEvent.KeyPress:
+            elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True
+            elif event.type() == QEvent.FocusOut:      
+                self._store_entry(source)                
                 
         return super(InputAmpSpecs, self).eventFilter(source, event)
 
@@ -209,15 +209,14 @@ class InputAmpSpecs(QtGui.QWidget):
         Spec entries are *always* stored in linear units; only the 
         displayed values are adapted to the amplitude unit, not the dictionary!
         """
-        unit = str(self.cmbUnitsA.currentText())
-        filt_type = fb.fil[0]['ft']
-        
         if self.spec_edited:
+            unit = str(self.cmbUnitsA.currentText())
+            filt_type = fb.fil[0]['ft']      
             amp_label = str(source.objectName())
             amp_value = simple_eval(source.text())
-            fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
-            self.load_entries()                                  
+            fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})                                 
             self.sigSpecsChanged.emit() # -> input_specs
+        self.load_entries() 
 
 #-------------------------------------------------------------
     def _del_entries(self, num):
