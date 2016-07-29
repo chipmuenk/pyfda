@@ -144,9 +144,6 @@ class InputAmpSpecs(QtGui.QWidget):
         - `self.qlabels`, a list with references to existing QLabel widgets,
         - `new_labels`, a list of strings from the filter_dict for the current
           filter design
-
-        Install eventFilter for new QLineEdit widgets so that the filter dictionary 
-        is updated automatically when a QLineEdit field has been edited.
         """
 
         delta_new_labels = len(new_labels) - len(self.qlabels)
@@ -158,18 +155,12 @@ class InputAmpSpecs(QtGui.QWidget):
             self._add_entries(delta_new_labels)
         
         for i in range(len(new_labels)):        
-            # when entry has changed, update label and corresponding value,
-            # and install eventFilter            if str(self.qlineedit[i].objectName()) != new_labels[i]:
-                try:
-                    self.qlineedit[i].removeEventFilter(self)
-                except TypeError:
-                    pass
-                
-                self.qlabels[i].setText(rt_label(new_labels[i]))
+            # Update labels and corresponding values
+            self.qlabels[i].setText(rt_label(new_labels[i]))
 
-                self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
-                self.qlineedit[i].setObjectName(new_labels[i])  # update ID                    
-                self.qlineedit[i].installEventFilter(self)  # filter events 
+            self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+            self.qlineedit[i].setObjectName(new_labels[i])  # update ID                    
+      
 
         self.load_entries() # display filter dict entries in selected unit
         
@@ -222,12 +213,14 @@ class InputAmpSpecs(QtGui.QWidget):
 #-------------------------------------------------------------
     def _del_entries(self, num):
         """
-        Delete num subwidgets (QLabel and QLineEdit) from layout and memory
+        Delete `num` subwidgets (QLabel and QLineEdit) from layout and memory and
+        remove their eventFilters
         """
         Nmax = len(self.qlabels)-1  # number of existing labels
 
         for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
             self.layGSpecs.removeWidget(self.qlabels[i])
+            self.qlineedit[i].removeEventFilter(self)
             self.layGSpecs.removeWidget(self.qlineedit[i])
     
 #            self.qlabels[i].deleteLater() # 
@@ -240,8 +233,10 @@ class InputAmpSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------
     def _add_entries(self, num):
         """
-        Append num subwidgets (QLabel und QLineEdit) to memory and layout and 
-        initialize them with dummy information.
+        - create `num` subwidgets (QLabel und QLineEdit) and add them to layout
+        - initialize them with dummy information
+        - install eventFilter for new QLineEdit widgets so that the filter dictionary 
+          is updated automatically when a QLineEdit field has been edited.
         """
         Nmax = len(self.qlabels)-1 # number of existing labels
 
@@ -252,6 +247,7 @@ class InputAmpSpecs(QtGui.QWidget):
     
             self.qlineedit.append(QtGui.QLineEdit(""))
             self.qlineedit[i].setObjectName("dummy")
+            self.qlineedit[i].installEventFilter(self)  # filter events 
     
             self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
             self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)   
