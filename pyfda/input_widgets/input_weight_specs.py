@@ -127,9 +127,6 @@ class InputWeightSpecs(QtGui.QWidget):
         - `self.qlabels`, a list with references to existing QLabel widgets,
         - `new_labels`, a list of strings from the filter_dict for the current
           filter design
-
-        Install eventFilter for new QLineEdit widgets so that the filter dictionary 
-        is updated automatically when a QLineEdit field has been edited.
         """
 
         delta_new_labels = len(new_labels) - len(self.qlabels)
@@ -141,13 +138,13 @@ class InputWeightSpecs(QtGui.QWidget):
             self._add_entries(delta_new_labels)
 
         for i in range(len(new_labels)):
-            # Update labels and corresponding values, install eventFilter
+            # Update labels and corresponding values
             self.qlabels[i].setText(rt_label(new_labels[i]))
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
 
-        self.load_entries() # display roounded filter dict entries
+        self.load_entries() # display rounded filter dict entries
 
 
 #------------------------------------------------------------------------------
@@ -182,8 +179,8 @@ class InputWeightSpecs(QtGui.QWidget):
 #-------------------------------------------------------------
     def _del_entries(self, num):
         """
-        Delete num subwidgets (QLabel and QLineEdit) from layout and memory and
-        disconnect the editingFinished signals from self._store_entries.
+        Delete `num` subwidgets (QLabel and QLineEdit) from layout and memory and
+        remove their eventFilters
         """
         Nmax = len(self.qlabels)-1  # number of existing labels
         for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
@@ -202,8 +199,10 @@ class InputWeightSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------
     def _add_entries(self, num):
         """
-        Append num subwidgets (QLabel und QLineEdit) to memory and layout and
-        initialize them with dummy information, install eventFilter.
+        - create `num` subwidgets (QLabel und QLineEdit) and add them to layout
+        - initialize them with dummy information
+        - install eventFilter for new QLineEdit widgets so that the filter dictionary 
+          is updated automatically when a QLineEdit field has been edited.
         """
         Nmax = len(self.qlabels)-1 # number of existing labels
         # start with Nmax + 1, last element Nmax + num +1
@@ -214,7 +213,6 @@ class InputWeightSpecs(QtGui.QWidget):
             self.qlineedit.append(QtGui.QLineEdit(""))
             self.qlineedit[i].setObjectName("dummy")
             self.qlineedit[i].installEventFilter(self)  # filter events
-
 
             self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
             self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
