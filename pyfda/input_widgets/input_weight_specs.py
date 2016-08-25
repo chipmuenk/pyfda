@@ -34,12 +34,12 @@ class InputWeightSpecs(QtGui.QWidget):
         self.FMT = '{:.3g}' # rounding format for QLineEdit fields
         self.spec_edited = False # flag whether QLineEdit field has been edited
 
-        self._init_UI()
+        self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def _init_UI(self):
+    def _construct_UI(self):
         """
-        Initialize UI
+        Construct User Interface  
         """
         self.layVMain = QtGui.QVBoxLayout() # Widget vertical layout
         self.layGSpecs   = QtGui.QGridLayout() # sublayout for spec fields
