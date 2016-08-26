@@ -280,7 +280,7 @@ class InputFreqSpecs(QtGui.QWidget):
         """
         if self.spec_edited:
             f_label = str(widget.objectName())
-            f_value = simple_eval(widget.text())
+            f_value = simple_eval(widget.text()) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self._sort_entries()
             self.sigSpecsChanged.emit() # -> input_specs
