@@ -33,7 +33,7 @@ class InputAmpSpecs(QtGui.QWidget):
         super(InputAmpSpecs, self).__init__(parent)
         self.title = title
 
-        self.qlabels = [] # list with references to QLabel widgets
+        self.qlabels = []   # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
         self.FMT = '{:.3g}' # rounding format for QLineEdit fields
@@ -216,24 +216,11 @@ class InputAmpSpecs(QtGui.QWidget):
 #-------------------------------------------------------------
     def _hide_entries(self, num_new_labels):
         """
-        Hide subwidgets so that only `len_new_labels` subwidgets are visible
+        Hide subwidgets so that only `num_new_labels` subwidgets are visible
         """
         for i in range (num_new_labels, len(self.qlabels)):
             self.qlabels[i].hide()
             self.qlineedit[i].hide()
-#         """
-#         Delete `num` subwidgets (QLabel and QLineEdit) from layout and memory and
-#         remove their eventFilters
-#         """
-#         Nmax = len(self.qlabels)-1  # number of existing labels
-# 
-#         for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
-#             self.qlineedit[i].removeEventFilter(self)
-#             self.layGSpecs.removeWidget(self.qlineedit[i])
-# 
-# #            self.qlineedit[i].deleteLater()
-#             self.qlineedit[i].setParent(None) # alternative: change ownership back to python
-#             del self.qlineedit[i]
 # 
 #------------------------------------------------------------------------
     def _show_entries(self, num_new_labels):
