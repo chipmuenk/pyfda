@@ -16,6 +16,7 @@ from PyQt4.QtCore import pyqtSignal, Qt, QEvent
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin
+from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
 class InputAmpSpecs(QtGui.QWidget):
@@ -36,7 +37,6 @@ class InputAmpSpecs(QtGui.QWidget):
         self.qlabels = []   # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
-        self.FMT = '{:.3g}' # rounding format for QLineEdit fields
         self.spec_edited = False # flag whether QLineEdit field has been edited
         self._construct_UI()
 
@@ -189,7 +189,7 @@ class InputAmpSpecs(QtGui.QWidget):
 
             if not self.qlineedit[i].hasFocus():
                 # widget has no focus, round the display
-                self.qlineedit[i].setText(self.FMT.format(amp_value))
+                self.qlineedit[i].setText(params['FMT'].format(amp_value))
             else:
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(amp_value))
