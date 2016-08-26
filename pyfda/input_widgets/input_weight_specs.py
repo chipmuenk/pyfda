@@ -128,25 +128,26 @@ class InputWeightSpecs(QtGui.QWidget):
         - `self.qlabels`, a list with references to existing QLabel widgets,
         - `new_labels`, a list of strings from the filter_dict for the current
                   filter design
+        - 'num_new_labels`, their number
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
 
-        len_new_labels = len(new_labels)
-        if len_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
-            self._hide_entries(len_new_labels)
+        num_new_labels = len(new_labels)
+        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
+            self._hide_entries(num_new_labels)
 
-        elif len_new_labels > self.n_cur_labels: # more new labels, create / show new ones
-            self._show_entries(len_new_labels)
+        elif num_new_labels > self.n_cur_labels: # more new labels, create / show new ones
+            self._show_entries(num_new_labels)
 
-        for i in range(len_new_labels):
+        for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
 
-        self.n_cur_labels = len_new_labels # update number of currently visible labels
+        self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.load_entries() # display rounded filter dict entries
 
 
@@ -181,20 +182,20 @@ class InputWeightSpecs(QtGui.QWidget):
         
 
 #-------------------------------------------------------------
-    def _hide_entries(self, len_new_labels):
+    def _hide_entries(self, num_new_labels):
         """
         Hide subwidgets so that only `len_new_labels` subwidgets are visible
         """
-        for i in range (len_new_labels, len(self.qlabels),1):
+        for i in range (num_new_labels, len(self.qlabels)):
             self.qlabels[i].hide()
             self.qlineedit[i].hide()
             
 
 #------------------------------------------------------------------------
-    def _show_entries(self, len_new_labels):
+    def _show_entries(self, num_new_labels):
         """
         - check whether enough subwidgets (QLabel und QLineEdit) exist for the 
-          the required number of `len_new_labels`: 
+          the required number of `num_new_labels`: 
               - create new ones if required 
               - initialize them with dummy information
               - install eventFilter for new QLineEdit widgets so that the filter 
@@ -203,10 +204,10 @@ class InputWeightSpecs(QtGui.QWidget):
         - if enough subwidgets exist already, make enough of them visible to
           show all spec fields
         """
-        Nmax = len(self.qlabels) # number of existing labels / qlineedit fields
+        num_tot_labels = len(self.qlabels) # number of existing labels / qlineedit fields
 
-        if Nmax < len_new_labels: # new widgets need to be generated
-            for i in range(Nmax, len_new_labels, 1):                   
+        if num_tot_labels < num_new_labels: # new widgets need to be generated
+            for i in range(num_tot_labels, num_new_labels):                   
                 self.qlabels.append(QtGui.QLabel(self))
                 self.qlabels[i].setText(rt_label("dummy"))
     
@@ -218,7 +219,7 @@ class InputWeightSpecs(QtGui.QWidget):
                 self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
 
         else: # make the right number of widgets visible
-            for i in range(self.n_cur_labels, len_new_labels, 1):
+            for i in range(self.n_cur_labels, num_new_labels):
                 self.qlabels[i].show()
                 self.qlineedit[i].show()
                 
