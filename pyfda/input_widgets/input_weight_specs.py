@@ -80,7 +80,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs / EVENTS
+        # SIGNALS & SLOTs / EVENT FILTER
         #----------------------------------------------------------------------
         self.butReset.clicked.connect(self._reset_weights)
         #       ^ this also initializes the weight text fields
