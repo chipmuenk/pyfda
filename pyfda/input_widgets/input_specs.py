@@ -114,8 +114,8 @@ class InputSpecs(QtGui.QWidget):
         self.f_units.sigUnitChanged.connect(self.sigViewChanged.emit)
         # Activating the "Sort" button triggers sigSpecsChanged, requiring 
         # sorting and storing the frequency entries
-        self.f_units.sigSpecsChanged.connect(self.f_specs.store_entries)
-        self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.store_entries)
+        self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
+        self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
 
 
         # Changing filter parameters / specs requires reloading of parameters
