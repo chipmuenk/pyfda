@@ -4,7 +4,6 @@ Widget for entering frequency specifications
 
 Author: Christian Münker
 """
-# TODO: using objectName is an ugly hack that causes problems in Python 2
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import logging
@@ -108,6 +107,20 @@ class InputFreqSpecs(QtGui.QWidget):
         return super(InputFreqSpecs, self).eventFilter(source, event)
 
 
+#------------------------------------------------------------------------------
+    def _store_entry(self, widget):
+        """
+        When the textfield of `widget` has been edited (`self.spec_edited` =  True),
+        sort and store all entries in filter dict. This is triggered by `QEvent.focusOut`.
+        Finally, reload all entries.
+        """
+        if self.spec_edited:
+            f_label = str(widget.objectName())
+            f_value = simple_eval(widget.text()) / fb.fil[0]['f_S']
+            fb.fil[0].update({f_label:f_value})
+            self.sort_dict_freqs()
+            self.sigSpecsChanged.emit() # -> input_specs
+
 #-------------------------------------------------------------
     def update_UI(self, new_labels = []):
         """
@@ -142,49 +155,8 @@ class InputFreqSpecs(QtGui.QWidget):
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
-        self._sort_entries()
-        self.load_entries() # display rounded filter dict entries
-    
-#==============================================================================
-#         fparams = ""
-#         for i in range(len(new_labels)):
-#             # when entry has changed, update signal-slot connection, 
-#             #  label and corresponding value
-#             if str(self.qlineedit[i].objectName()) != new_labels[i]:
-#                 try:
-#                     self.qlineedit[i].editingFinished.disconnect()
-#                 except TypeError:
-#                     pass
-#                 self.qlabels[i].setText(rt_label(new_labels[i]))
-# 
-#                 self.qlineedit[i].setText(
-#                     str(fb.fil[0][new_labels[i]] * fb.fil[0]['f_S']))
-#                 self.qlineedit[i].setObjectName(new_labels[i])  # update ID                      
-#                 self.qlineedit[i].editingFinished.connect(
-#                                     lambda: self.store_entries(emit_sig = True))
-#                 
-#                 fparams += str(self.qlineedit[i].objectName()) + " = "\
-#                      + str(fb.fil[0][str(self.qlineedit[i].objectName())]) + "\n"
-# 
-#        logger.debug(fparams)
-#        #---------------------------- logging -----------------------------
+        self.sort_dict_freqs() # sort frequency entries in dictionary and update display
 
-#==============================================================================
-        
-        for i in range(num_new_labels):
-            # Update ALL labels and corresponding values 
-            self.qlabels[i].setText(rt_label(new_labels[i]))
-
-            self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
-            self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-
-        self.n_cur_labels = num_new_labels # update number of currently visible labels
-
-        self.load_entries()
-#        self.store_entries()    # sort & store values to dict for the case 
-                                # that the response type has been changed 
-                                # eg. from LP -> HP, changing the order 
-                                # of frequency entries
 
 #-------------------------------------------------------------        
     def load_entries(self):
@@ -259,11 +231,18 @@ class InputFreqSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def _sort_entries(self):
+    def sort_dict_freqs(self):
         """
-        Sort filter dict frequency spec entries with ascending frequency if 
-        sort button is activated and store them to filter dict.
+        - Sort filter dict frequency spec entries with ascending frequency if 
+        - Update the QLineEdit frequency widgets
+
+        The method is called when:
+        - update_UI has been called after changing the filter design algorithm                                # that the response type has been changed 
+          eg. from LP -> HP, requiring a different order of frequency entries
+        - a frequency spec field has been edited
+        - the sort button has been clicked (from input_specs.py)
         """
+        
         if fb.fil[0]['freq_specs_sort']:
             fSpecs = [fb.fil[0][str(self.qlineedit[i].objectName())]
                                             for i in range(len(self.qlineedit))]
@@ -271,42 +250,8 @@ class InputFreqSpecs(QtGui.QWidget):
             
             for i in range(len(self.qlineedit)):
                 fb.fil[0][str(self.qlineedit[i].objectName())] = fSpecs[i]
-
-#------------------------------------------------------------------------------
-    def _store_entry(self, widget):
-        """
-        When the textfield of `widget` has been edited (`self.spec_edited` =  True),
-        store the weight spec in filter dict. This is triggered by `QEvent.focusOut`
-        """
-        if self.spec_edited:
-            f_label = str(widget.objectName())
-            f_value = simple_eval(widget.text()) / fb.fil[0]['f_S']
-            fb.fil[0].update({f_label:f_value})
-            self._sort_entries()
-            self.sigSpecsChanged.emit() # -> input_specs
+                
         self.load_entries()
-
-
-#------------------------------------------------------------------------------
-    def store_entries(self, emit_sig = False):
-        # TODO: is this method really needed  anymore?
-        """
-        store_entries is called when:
-        * update_UI has been called after changing the filter design algorithm
-
-        It performs the following actions:
-        * Sort spec entries with ascending frequency if sort button is activated
-              
-        sigSpecsChanged is _not_ fired normally as this signal is already 
-        generated by input_filter. If needed, emit_sig can be set to True (e.g. 
-        when a line_edit field has been changed).
-        """
-        logger.debug("exec store_entries")
-        self._sort_entries()
-
-        if emit_sig:
-            logger.debug("sigSpecsChanged emitted")
-            self.sigSpecsChanged.emit()
 
 
 #------------------------------------------------------------------------------
