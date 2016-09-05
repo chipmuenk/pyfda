@@ -35,11 +35,11 @@ class InputSpecs(QtGui.QWidget):
     def __init__(self, parent):
         super(InputSpecs, self).__init__(parent)
 
-        self._init_UI()
+        self._construct_UI()
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """
-        Create all subwidgets
+        Construct User Interface from all input subwidgets
         """
         # Subwidget for selecting filter with response type rt (LP, ...), 
         #    filter type ft (IIR, ...) and design method dm (cheby1, ...)
@@ -114,8 +114,8 @@ class InputSpecs(QtGui.QWidget):
         self.f_units.sigUnitChanged.connect(self.sigViewChanged.emit)
         # Activating the "Sort" button triggers sigSpecsChanged, requiring 
         # sorting and storing the frequency entries
-        self.f_units.sigSpecsChanged.connect(self.f_specs.store_entries)
-        self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.store_entries)
+        self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
+        self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
 
 
         # Changing filter parameters / specs requires reloading of parameters
