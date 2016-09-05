@@ -110,9 +110,10 @@ class InputFreqSpecs(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def _store_entry(self, widget):
         """
+        _store_entry is triggered by `QEvent.focusOut` in the eventFilter:        
         When the textfield of `widget` has been edited (`self.spec_edited` =  True),
-        sort and store all entries in filter dict. This is triggered by `QEvent.focusOut`.
-        Finally, reload all entries.
+        sort and store all entries in filter dict, then reload the text fields. 
+        Finally, emit a SpecsChanged signal.
         """
         if self.spec_edited:
             f_label = str(widget.objectName())
