@@ -136,7 +136,7 @@ class InputFreqUnits(QtGui.QWidget):
         update_UI is called
         - during init
         - when the unit combobox is changed
-        
+
         Finally, store freqSpecsRange and emit sigUnitChanged signal via _freq_range
         """
         idx = self.cmbUnits.currentIndex() # read index of units combobox
@@ -154,14 +154,14 @@ class InputFreqUnits(QtGui.QWidget):
                 fb.fil[0]['f_S'] = 2.
                 f_label = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
             t_label = r"$n \; \rightarrow$"
-            
-            self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))                
+
+            self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         else: # Hz, kHz, ...
             if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}: # previous setting
                 fb.fil[0]['f_S'] = self.fs_old # restore prev. sampling frequency
                 self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
-                
+
             f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
             t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
@@ -172,7 +172,7 @@ class InputFreqUnits(QtGui.QWidget):
         fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) # time unit as string
 
         self._freq_range() # update f_lim setting and emit sigUnitChanged signal
-        
+
 #------------------------------------------------------------------------------
 
     def eventFilter(self, source, event):
@@ -201,11 +201,11 @@ class InputFreqUnits(QtGui.QWidget):
                 fb.fil[0].update({'f_S':simple_eval(source.text())})
                 source.setText(params['FMT'].format(fb.fil[0]['f_S']))
                 self._freq_range(emit_sig_range = False) # update plotting range
-                self.sigSpecsChanged.emit() # -> input_widgets                
-                
+                self.sigSpecsChanged.emit() # -> input_widgets
+
         # Call base class method to continue normal event processing:
         return super(InputFreqUnits, self).eventFilter(source, event)
-    
+
 
     #-------------------------------------------------------------
     def _freq_range(self, emit_sig_range = True):
@@ -228,7 +228,7 @@ class InputFreqUnits(QtGui.QWidget):
             f_lim = [0, fb.fil[0]["f_S"]/2.]
 
         fb.fil[0]['freqSpecsRange'] = f_lim # store settings in dict
-        
+
         self.sigUnitChanged.emit() # -> input_widgets
 
 
@@ -249,7 +249,7 @@ class InputFreqUnits(QtGui.QWidget):
         idx = self.cmbFRange.findData(fb.fil[0]['freqSpecsRangeType'])
         self.cmbFRange.setCurrentIndex(idx) # set frequency range
         self.cmbFRange.blockSignals(False)
-        
+
         self.butSort.blockSignals(True)
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
         self.butSort.blockSignals(False)
@@ -265,7 +265,7 @@ class InputFreqUnits(QtGui.QWidget):
         if self.butSort.isChecked():
             self.sigSpecsChanged.emit() # -> input_widgets
 
- 
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
