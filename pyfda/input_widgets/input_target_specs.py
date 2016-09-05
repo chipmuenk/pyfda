@@ -32,12 +32,12 @@ class InputTargetSpecs(QtGui.QWidget):
 
         self.title = title
         
-        self._initUI()
+        self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def _initUI(self):
+    def _construct_UI(self):
         """
-        Initialize user interface
+        Construct user interface
         """
 
         # subwidget for Frequency Specs
