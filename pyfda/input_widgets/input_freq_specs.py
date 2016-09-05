@@ -108,7 +108,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def _store_entry(self, widget):
+    def _store_entry(self, event_source):
         """
         _store_entry is triggered by `QEvent.focusOut` in the eventFilter:        
         When the textfield of `widget` has been edited (`self.spec_edited` =  True),
@@ -116,8 +116,8 @@ class InputFreqSpecs(QtGui.QWidget):
         Finally, emit a SpecsChanged signal.
         """
         if self.spec_edited:
-            f_label = str(widget.objectName())
-            f_value = simple_eval(widget.text()) / fb.fil[0]['f_S']
+            f_label = str(event_source.objectName())
+            f_value = simple_eval(event_source.text()) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
             self.sigSpecsChanged.emit() # -> input_specs
