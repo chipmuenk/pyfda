@@ -10,10 +10,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtCore import pyqtSignal, QEvent
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
+from pyfda.simpleeval import simple_eval
 
 
 class InputFreqUnits(QtGui.QWidget):
@@ -30,12 +32,13 @@ class InputFreqUnits(QtGui.QWidget):
 
         super(InputFreqUnits, self).__init__(parent)
         self.title = title
+        self.spec_edited = False # flag whether QLineEdit field has been edited
 
-        self._init_UI()
+        self._construct_UI()
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """
-        Initialize the User Interface
+        Construct the User Interface
         """
         self.layVMain = QtGui.QVBoxLayout() # Widget main layout
 
@@ -49,10 +52,11 @@ class InputFreqUnits(QtGui.QWidget):
         self.lblUnits.setText("Freq. Unit:")
         self.lblUnits.setFont(bfont)
 
-        self.f_S = fb.fil[0]["f_S"]
+        self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
         self.ledF_S = QtGui.QLineEdit()
-        self.ledF_S.setText(str(self.f_S))
+        self.ledF_S.setText(str(fb.fil[0]["f_S"]))
         self.ledF_S.setObjectName("f_S")
+        self.ledF_S.installEventFilter(self)  # filter events
 
         self.lblF_S = QtGui.QLabel(self)
         self.lblF_S.setText(rt_label("f_S"))
@@ -113,13 +117,11 @@ class InputFreqUnits(QtGui.QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnits.currentIndexChanged.connect(self.update_UI)
-        self.ledF_S.editingFinished.connect(self.update_UI)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
         self.butSort.clicked.connect(self._store_sort_flag)
         #----------------------------------------------------------------------
 
-
-        self.update_UI() # first time initialization
+        self.update_UI() # first-time initialization
 
 
 #-------------------------------------------------------------
@@ -131,70 +133,87 @@ class InputFreqUnits(QtGui.QWidget):
         of the frequency entries are updated, not the dictionary!
         Signals are blocked before changing the value for f_S programmatically
 
-
-        updateUI is called during init and when
-        - the f_S lineedit field has been edited or the unit combobox is changed
+        update_UI is called
+        - during init
+        - when the unit combobox is changed
         
         Finally, store freqSpecsRange and emit sigUnitChanged signal via _freq_range
         """
         idx = self.cmbUnits.currentIndex() # read index of units combobox
         f_unit = str(self.cmbUnits.currentText()) # and the label
-        fb.fil[0].update({'freq_specs_unit':f_unit}) # and store it in dict
-        
-        self.f_S = float(self.ledF_S.text()) # read sampling frequency
 
         self.ledF_S.setVisible(f_unit not in {"f_S", "f_Ny"}) # only vis. when
         self.lblF_S.setVisible(f_unit not in {"f_S", "f_Ny"}) # not normalized
 
-        # get ID of signal that triggered updateUI():
-        if self.sender(): # origin of signal that triggered the slot
-            senderName = self.sender().objectName()
-            logger.debug(senderName + ' was triggered\n================')
-        else: # no sender, updateUI has been called from initUI or another method
-            senderName = ""
+        if f_unit in {"f_S", "f_Ny"}: # normalized frequency
+            self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
+            if f_unit == "f_S": # normalized to f_S
+                fb.fil[0]['f_S'] = 1.
+                f_label = r"$F = f/f_S = \Omega / 2 \pi \; \rightarrow$"
+            else:   # idx == 1: normalized to f_nyq = f_S / 2
+                fb.fil[0]['f_S'] = 2.
+                f_label = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
+            t_label = r"$n \; \rightarrow$"
+            
+            self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))                
 
-        if senderName == "f_S" and self.f_S != 0:
-            # f_S has been edited -> update dictionary entry for f_S and
-            # change display of frequency entries via sigSpecsChanged
-            fb.fil[0]['f_S'] = self.f_S
-
-        else: # cmbUnitBox
-            if f_unit in {"f_S", "f_Ny"}: # normalized frequency
-                if f_unit == "f_S": # normalized to f_S
-                    self.f_S = 1.
-                    f_label = r"$F = f/f_S = \Omega / 2 \pi \; \rightarrow$"
-                else:   # idx == 1: normalized to f_nyq = f_S / 2
-                    self.f_S = 2.
-                    f_label = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
-                t_label = r"$n \; \rightarrow$"
+        else: # Hz, kHz, ...
+            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}: # previous setting
+                fb.fil[0]['f_S'] = self.fs_old # restore prev. sampling frequency
+                self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
                 
-                self.ledF_S.setText(str(self.f_S)) # update field for f_S
-                fb.fil[0]['f_S'] = self.f_S # store f_S in dictionary
-            else: # Hz, kHz, ...
-                f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
-                t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
+            f_label = r"$f$ in " + f_unit + r"$\; \rightarrow$"
+            t_label = r"$t$ in " + self.t_units[idx] + r"$\; \rightarrow$"
 
-            fb.fil[0].update({"plt_fLabel":f_label}) # label for freq. axis
-            fb.fil[0].update({"plt_tLabel":t_label}) # label for time axis
-            fb.fil[0].update({"plt_fUnit":f_unit}) # frequency unit as string
-            fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) # time unit as string
-
+        fb.fil[0].update({'freq_specs_unit':f_unit}) # frequency unit
+        fb.fil[0].update({"plt_fLabel":f_label}) # label for freq. axis
+        fb.fil[0].update({"plt_tLabel":t_label}) # label for time axis
+        fb.fil[0].update({"plt_fUnit":f_unit}) # frequency unit as string
+        fb.fil[0].update({"plt_tUnit":self.t_units[idx]}) # time unit as string
 
         self._freq_range() # update f_lim setting and emit sigUnitChanged signal
         
-    #-------------------------------------------------------------
-    def _freq_range(self):
+#------------------------------------------------------------------------------
+
+    def eventFilter(self, source, event):
         """
-        Set frequency range for single-sided spectrum up to f_S/2 or f_S or
-        for double-sided spectrum between -f_S/2 and f_S/2 and emit
+        Filter all events generated by the QLineEdit widgets. Source and type
+        of all events generated by monitored objects are passed to this eventFilter,
+        evaluated and passed on to the next hierarchy level.
+
+        - When a QLineEdit widget gains input focus (QEvent.FocusIn`), display
+          the stored value from filter dict with full precision
+        - When a key is pressed inside the text field, set the `spec_edited` flag
+          to True.
+        - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
+          current value with full precision (only if `spec_edited`== True) and
+          display the stored value in selected format. Emit sigSpecsChanged
+          signal and a sigUnitsChanged signals
+        """
+
+        if source.objectName() == 'f_S':
+            if event.type() == QEvent.FocusIn:
+                self.spec_edited = False
+                source.setText(str(fb.fil[0]['f_S'])) # full precision
+            elif event.type() == QEvent.KeyPress:
+                self.spec_edited = True
+            elif event.type() == QEvent.FocusOut:
+                fb.fil[0].update({'f_S':simple_eval(source.text())})
+                source.setText(params['FMT'].format(fb.fil[0]['f_S']))
+                self._freq_range(emit_sig_range = False) # update plotting range
+                self.sigSpecsChanged.emit() # -> input_widgets                
+                
+        # Call base class method to continue normal event processing:
+        return super(InputFreqUnits, self).eventFilter(source, event)
+    
+
+    #-------------------------------------------------------------
+    def _freq_range(self, emit_sig_range = True):
+        """
+        Set frequency plotting range for single-sided spectrum up to f_S/2 or f_S
+        or for double-sided spectrum between -f_S/2 and f_S/2 and emit
         sigUnitChanged signal
         """
-        # get ID of signal that triggered updateUI():
-        if self.sender(): # origin of signal that triggered the slot
-            senderName = self.sender().objectName()
-            logger.debug(senderName + ' was triggered\n================')
-        else: # no sender, updateUI has been called from initUI or another method
-            senderName = ""
 
         rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
         if not isinstance(rangeType, str):
@@ -202,17 +221,15 @@ class InputFreqUnits(QtGui.QWidget):
 
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
         if rangeType == 'whole':
-            f_lim = [0, self.f_S]
+            f_lim = [0, fb.fil[0]["f_S"]]
         elif rangeType == 'sym':
-            f_lim = [-self.f_S/2, self.f_S/2]
+            f_lim = [-fb.fil[0]["f_S"]/2., fb.fil[0]["f_S"]/2.]
         else:
-            f_lim = [0, self.f_S/2]
+            f_lim = [0, fb.fil[0]["f_S"]/2.]
 
-        fb.fil[0]['freqSpecsRange'] = f_lim
+        fb.fil[0]['freqSpecsRange'] = f_lim # store settings in dict
         
-        # only emit signal when _freq_range has been triggered by combobox
-        if len(senderName) > 2:          
-            self.sigUnitChanged.emit() # -> input_widgets
+        self.sigUnitChanged.emit() # -> input_widgets
 
 
     #-------------------------------------------------------------
@@ -221,7 +238,7 @@ class InputFreqUnits(QtGui.QWidget):
         Reload comboBox settings and textfields from filter dictionary
         Block signals during update of combobox / lineedit widgets
         """
-        self.ledF_S.setText(str(fb.fil[0]['f_S']))
+        self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
 
         self.cmbUnits.blockSignals(True)
         idx = self.cmbUnits.findText(fb.fil[0]['freq_specs_unit']) # get and set
