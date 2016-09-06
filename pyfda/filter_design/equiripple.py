@@ -11,6 +11,7 @@ Version info:
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -166,9 +167,15 @@ using Ichige's algorithm.
         """
         - Disconnect all signal-slot connections to avoid crashes upon exit
         - Delete dynamic widgets
+see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
         """
+        print("Destructing equiripple UI")
         self.led_remez_1.editingFinished.disconnect()
-
+        self.layHWin.removeWidget(self.led_remez_l)
+        self.led_remez_1.deleteLater()
+        self.layHWin.removeWidget(self.lbl_remez_l)
+        self.lbl_remez_1.deleteLater()
+#        self.wdg_remez.deleteLater()
 
         
     def _load_entries(self):
