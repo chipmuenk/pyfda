@@ -11,6 +11,7 @@ Version info:
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
 
 
 Author: Christian Muenker
@@ -34,7 +35,7 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in fil_dict?
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
@@ -105,9 +106,6 @@ class firwin(object):
         
         self.hdl = None
         
-        
-#        self.construct_UI()
-
         
     def construct_UI(self):
         """

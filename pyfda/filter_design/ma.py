@@ -24,7 +24,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remezord, 
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 FRMT = {'zpk', 'ba'} # output format of filter design routines 'zpk' / 'ba' / 'sos'
             

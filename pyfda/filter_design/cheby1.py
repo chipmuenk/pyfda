@@ -12,7 +12,7 @@ Version info:
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
     1.2: new API using fil_save (enable SOS features when available)
-
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
 
 Author: Christian Münker
 """
@@ -22,7 +22,7 @@ from scipy.signal import cheb1ord
     
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 if SOS_AVAIL:
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
