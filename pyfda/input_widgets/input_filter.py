@@ -336,16 +336,18 @@ class InputFilter(QtGui.QWidget):
         if not isinstance(dm, str):
             dm = str(dm.toString()) # needed for Python 2.x (see init_UI)
         fb.fil[0]['dm'] = dm
-        if dm != self.dm_last: # dm has changed, create new instance
-            #-----
-            try:
-                pass
-#                fb.fil_inst.destruct_UI() # disconnect signals from dyn. widget
-            except AttributeError:
-                pass
+        if dm != self.dm_last: # dm has changed:
+
+            # destruct dyn. subwidgets of old filter instance if available     
+            if hasattr(fb.fil_inst, 'wdg'):        
+                self._destruct_dyn_widgets() 
+
+            """
+            create new instance
+            """
                 
             err = fb.fil_factory.create_fil_inst(dm)
-            #-----
+            #------------------------------------------------------------------
             logger.debug("InputFilter.set_design_method triggered: %s" %dm)
     
             # Check whether new design method also provides the old filter order
@@ -362,8 +364,14 @@ class InputFilter(QtGui.QWidget):
                   %(fb.fil[0], fb.fil_tree[self.rt][self.ft][dm],\
                     fb.fil_tree[self.rt][self.ft][dm].keys()
                     ))
-    
-            self._update_dyn_widgets() # check for new subwidgets and update if needed
+
+            if hasattr(fb.fil_inst, 'wdg'): # construct dyn. subwidgets if available
+                self._construct_dyn_widgets()
+            else:
+                self.frmDynWdg.setVisible(False)
+
+            self.dm_last = fb.fil[0]['dm']
+
 
         self.load_filter_order(enb_signal)
         
@@ -432,13 +440,12 @@ class InputFilter(QtGui.QWidget):
 
         if enb_signal:
             self.sigFiltChanged.emit() # -> input_specs
-    
+            
 #------------------------------------------------------------------------------
-    def _update_dyn_widgets(self):
+    def _destruct_dyn_widgets(self):
         """
         Delete dynamically (i.e. within filter design routine) created subwidgets
         and create new ones, depending on requirements of filter design algorithm
-
 
         This does NOT work when the subwidgets to be deleted and created are
         identical, as the deletion is only performed when the current scope has
@@ -447,34 +454,46 @@ class InputFilter(QtGui.QWidget):
         """
 # TODO: see https://www.commandprompt.com/community/pyqt/x3410.htm
 
+        #------------------------------------------------------------------
+        try:
+            fb.fil_inst.destruct_UI() # disconnect signals from old dyn. widget
+        except AttributeError as e:
+            print("Could not destruct_UI!\n", e)
+            pass
 
         # Find "old" dyn. subwidgets and delete them:
         widgetList = self.frmDynWdg.findChildren(
             (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
-#       widgetListNames = [w.objectName() for w in widgetList]
+        
+        widgetListNames = [w.objectName() for w in widgetList]
+        print(widgetListNames)
+        
 
         for w in widgetList:
             self.layHDynWdg.removeWidget(w)   # remove widget from layout
             w.deleteLater()             # tell Qt to delete object when the
                                         # method has completed
-#                del w                       # not really needed?
+
+    
+#------------------------------------------------------------------------------
+    def _construct_dyn_widgets(self):
+        """
+        Create filter widget UI dynamically 
+        """
 
         # Try to create "new" dyn. subwidgets:
-        if hasattr(fb.fil_inst, 'wdg'):
-            try:
-                if 'sf' in fb.fil_inst.wdg:
-                    a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
-                    self.layHDynWdg.addWidget(a, stretch=1)
-                    self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
-                    self.frmDynWdg.setVisible(a != None)
+        fb.fil_inst.construct_UI()            
 
-            except AttributeError as e:
-                print("sf.updateWidgets:", e)
-                self.frmDynWdg.setVisible(False)
-        else:
+        try:
+            if 'sf' in fb.fil_inst.wdg:
+                a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
+                self.layHDynWdg.addWidget(a, stretch=1)
+                self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
+                self.frmDynWdg.setVisible(a != None)
+
+        except AttributeError as e:
+            print("sf.updateWidgets:", e)
             self.frmDynWdg.setVisible(False)
-
-        self.dm_last = fb.fil[0]['dm']
 
 #------------------------------------------------------------------------------
     def HLine(self):
