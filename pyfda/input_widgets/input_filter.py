@@ -127,7 +127,21 @@ class InputFilter(QtGui.QWidget):
         self.cmbDesignMethod.setCurrentIndex(0) # set initial index
 
         #----------------------------------------------------------------------
-        # LAYOUT
+        # Layout for Filter Type Subwidgets
+        #----------------------------------------------------------------------
+ 
+        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
+                                         QtGui.QSizePolicy.Fixed)
+
+        layHFilWdg = QtGui.QHBoxLayout() # container for filter subwidgets
+        layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbFilterType)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbDesignMethod)
+
+        #----------------------------------------------------------------------
+        # Layout for dynamic filter subwidgets (empty frame)
         #----------------------------------------------------------------------
         # see Summerfield p. 278
         self.layHDynWdg = QtGui.QHBoxLayout() # for additional dynamic subwidgets
@@ -138,20 +152,10 @@ class InputFilter(QtGui.QWidget):
 
         #Debugging: enable next line to show border of frmDnyWdg
         #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
-
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
-        layHFilWdg = QtGui.QHBoxLayout() # container for standard subwidgets
-        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
-                                         QtGui.QSizePolicy.Fixed)
-        layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
-        layHFilWdg.addItem(spacer)
-        layHFilWdg.addWidget(self.cmbFilterType)
-        layHFilWdg.addItem(spacer)
-        layHFilWdg.addWidget(self.cmbDesignMethod)
-
         #----------------------------------------------------------------------
-        # Filter Order
+        # Filter Order Subwidgets
         #----------------------------------------------------------------------
         self.lblOrder =  QtGui.QLabel("Order:")
         self.lblOrder.setFont(bfont)
@@ -162,7 +166,8 @@ class InputFilter(QtGui.QWidget):
         self.lblOrderN.setFont(ifont)
         self.ledOrderN = QtGui.QLineEdit(str(fb.fil[0]['N']),self)
 
-        #  All subwidgets, including dynamically created ones
+        #--------------------------------------------------
+        #  Layout for filter order subwidgets
         self.layHOrdWdg = QtGui.QHBoxLayout()
         self.layHOrdWdg.addWidget(self.lblOrder)
         self.layHOrdWdg.addWidget(self.chkMinOrder)
@@ -170,14 +175,15 @@ class InputFilter(QtGui.QWidget):
         self.layHOrdWdg.addWidget(self.lblOrderN)
         self.layHOrdWdg.addWidget(self.ledOrderN)
 
-        # stack standard + dynamic subwidgets vertically:
-        layVAllWdg = QtGui.QVBoxLayout()
+        #----------------------------------------------------------------------
+        # OVERALL LAYOUT (stack standard + dynamic subwidgets vertically)
+        #----------------------------------------------------------------------
 
+        layVAllWdg = QtGui.QVBoxLayout()
         layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
         layVAllWdg.addWidget(self.HLine())
         layVAllWdg.addLayout(self.layHOrdWdg)
-
 
         self.frmMain = QtGui.QFrame()
         self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
