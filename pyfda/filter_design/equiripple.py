@@ -115,17 +115,14 @@ using Ichige's algorithm.
         self.hdl = None
         #----------------------------------------------------------------------
 
-        self._init_UI()
-
-
-    def _init_UI(self):
+    def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
         These subwidgets are instantiated dynamically when needed in 
         input_filter.py using the handle to the filter instance, fb.fil_inst.
         """
-
+        print("Constructing Equiripple UI")
         self.lbl_remez_1 = QtGui.QLabel("Grid Density")
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
         self.led_remez_1 = QtGui.QLineEdit()
