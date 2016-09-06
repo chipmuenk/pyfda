@@ -13,6 +13,7 @@ Version info:
     1.2: - new API using fil_save & fil_convert (allow multiple formats, 
                 save 'ba' _and_ 'zpk' precisely)
          - include method _store_entries in _update_UI
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)         
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -86,9 +87,6 @@ a given frequency can be calculated via the si function (not implemented yet).
         
         self.hdl = ['ma', 'cic']
         #----------------------------------------------------------------------
-
-        self.construct_UI()
-
 
     def construct_UI(self):
         """
