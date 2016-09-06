@@ -105,6 +105,18 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         self.info_doc.append(sig.cheby2.__doc__)
         self.info_doc.append('cheb2ord()\n==========')
         self.info_doc.append(sig.cheb2ord.__doc__)
+
+
+    def construct_UI(self):
+        """
+        Create additional subwidget(s) needed for filter design with the 
+        names given in self.wdg :
+        These subwidgets are instantiated dynamically when needed in 
+        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        (empty method, nothing to do in this filter)
+        """
+        print("constructing cheby2 UI")
+        pass
         
 
     def destruct_UI(self):
@@ -113,8 +125,8 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         - Delete dynamic widgets
         (empty method, nothing to do in this filter)
         """
+        print("destructing cheby2 UI")
         pass
-
 
 
     def _get_params(self, fil_dict):

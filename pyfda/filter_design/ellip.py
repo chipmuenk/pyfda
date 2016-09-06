@@ -102,6 +102,16 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self.info_doc.append(sig.ellip.__doc__)
         self.info_doc.append('ellipord()\n==========')
         self.info_doc.append(ellipord.__doc__)
+
+    def construct_UI(self):
+        """
+        Create additional subwidget(s) needed for filter design with the 
+        names given in self.wdg :
+        These subwidgets are instantiated dynamically when needed in 
+        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        (empty method, nothing to do in this filter)
+        """
+        pass
         
 
     def destruct_UI(self):

@@ -92,6 +92,16 @@ order can be used for approximating the -3 dB frequency.
 ``scipy.signal.buttord()``
 """
 
+    def construct_UI(self):
+        """
+        Create additional subwidget(s) needed for filter design with the 
+        names given in self.wdg :
+        These subwidgets are instantiated dynamically when needed in 
+        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        (empty method, nothing to do in this filter)
+        """
+        pass
+
     def destruct_UI(self):
         """
         - Disconnect all signal-slot connections to avoid crashes upon exit
