@@ -46,13 +46,13 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = '' # design method from last call
 
-        self._init_UI()
+        self._construct_UI()
 
         self.set_response_type() # first time initialization
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """
-        Initialize UI with comboboxes for selecting filter
+        Construct UI with comboboxes for selecting filter
         """
 #-----------------------------------------------------------------------------
 #        see filterbroker.py for structure and content of "filterTree" dict
