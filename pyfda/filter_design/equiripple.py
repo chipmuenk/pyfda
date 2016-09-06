@@ -168,6 +168,7 @@ using Ichige's algorithm.
         - Disconnect all signal-slot connections to avoid crashes upon exit
         - Delete dynamic widgets
 see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
+    http://python-camelot.s3.amazonaws.com/default/2.7/doc/advanced/development.html
         """
         print("Destructing equiripple UI")
         self.led_remez_1.editingFinished.disconnect()
