@@ -87,10 +87,10 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.hdl = ['ma', 'cic']
         #----------------------------------------------------------------------
 
-        self._init_UI()
+        self.construct_UI()
 
 
-    def _init_UI(self):
+    def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
