@@ -7,18 +7,23 @@ Author: Christian Münker
 from __future__ import print_function, division, unicode_literals, absolute_import
 from PyQt4 import QtGui
 
-from pyfda.plot_widgets import plot_tau_g_test as plot_tau_g
+#from pyfda.plot_widgets import plot_tau_g_test as plot_tau_g
+#from pyfda.plot_widgets import plot_tau_g
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QtGui.QWidget):
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
-#        QtGui.QWidget.__init__(self)
+        QtGui.QWidget.__init__(self)
 
 #        self.pltHf = plot_hf.PlotHf(self)
 #        self.pltPhi = plot_phi.PlotPhi(self)
 #        self.pltPZ = plot_pz.PlotPZ(self)
-        self.pltTauG = plot_tau_g.PlotTauG(self)
+
+
+###        self.pltTauG = plot_tau_g.PlotTauG(self)
+        
+        
 #        self.pltImpz = plot_impz.PlotImpz(self)
 #        self.plt3D = plot_3d.Plot3D(self)
 
@@ -33,7 +38,9 @@ class PlotTabWidgets(QtGui.QWidget):
 #        tabWidget.addTab(self.pltHf, '|H(f)|')
 #        tabWidget.addTab(self.pltPhi, 'phi(f)')
 #        tabWidget.addTab(self.pltPZ, 'P/Z')
-        tabWidget.addTab(self.pltTauG, 'tau_g')
+
+###        tabWidget.addTab(self.pltTauG, 'tau_g')
+        
 #        tabWidget.addTab(self.pltImpz, 'h[n]')
 #        tabWidget.addTab(self.plt3D, '3D')
 
@@ -49,9 +56,12 @@ class PlotTabWidgets(QtGui.QWidget):
 #        self.pltHf.draw()
 #        self.pltPhi.draw()
 #        self.pltPZ.draw()
-        self.pltTauG.draw()
+
+###        self.pltTauG.draw()
+
 #        self.pltImpz.draw()
 #        self.plt3D.draw()
+        pass
 
 #------------------------------------------------------------------------------
     def update_view(self):
@@ -63,6 +73,7 @@ class PlotTabWidgets(QtGui.QWidget):
 
 #        self.pltPZ.draw()
 #        self.plt3D.draw()
+        pass
 
 #------------------------------------------------------------------------
 
