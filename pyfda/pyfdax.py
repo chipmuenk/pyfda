@@ -21,7 +21,8 @@ from pyfda import qrc_resources # contains all icons
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
-from pyfda.plot_widgets import plot_tab_widgets
+#from pyfda.plot_widgets import plot_tab_widgets
+from pyfda.plot_widgets import plot_tab_widgets_test as plot_tab_widgets
 
 # get dir for this file and store as base_dir in filterbroker
 fb.base_dir = os.path.dirname(os.path.abspath(__file__))
