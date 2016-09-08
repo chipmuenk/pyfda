@@ -14,6 +14,7 @@ from PyQt4.QtCore import pyqtSignal, QEvent
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
 class InputWeightSpecs(QtGui.QWidget):
@@ -31,15 +32,14 @@ class InputWeightSpecs(QtGui.QWidget):
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
 
-        self.FMT = '{:.3g}' # rounding format for QLineEdit fields
         self.spec_edited = False # flag whether QLineEdit field has been edited
 
-        self._init_UI()
+        self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def _init_UI(self):
+    def _construct_UI(self):
         """
-        Initialize UI
+        Construct User Interface  
         """
         self.layVMain = QtGui.QVBoxLayout() # Widget vertical layout
         self.layGSpecs   = QtGui.QGridLayout() # sublayout for spec fields
@@ -74,12 +74,13 @@ class InputWeightSpecs(QtGui.QWidget):
         #   with "W" (= weight specifications of the current filter)
         # - Pass the list to setEntries which recreates the widget
         # ATTENTION: Entries need to be converted from QString to str for Py 2
+        self.n_cur_labels = 0 # number of currently visible labels / qlineedits
         new_labels = [str(l) for l in fb.fil[0] if l[0] == 'W']
         self.update_UI(new_labels = new_labels)
 
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs / EVENTS
+        # SIGNALS & SLOTs / EVENT FILTER
         #----------------------------------------------------------------------
         self.butReset.clicked.connect(self._reset_weights)
         #       ^ this also initializes the weight text fields
@@ -126,24 +127,27 @@ class InputWeightSpecs(QtGui.QWidget):
 
         - `self.qlabels`, a list with references to existing QLabel widgets,
         - `new_labels`, a list of strings from the filter_dict for the current
-          filter design
+                  filter design
+        - 'num_new_labels`, their number
+        - `self.n_cur_labels`, the number of currently visible labels / qlineedit
+          fields
         """
 
-        delta_new_labels = len(new_labels) - len(self.qlabels)
+        num_new_labels = len(new_labels)
+        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
+            self._hide_entries(num_new_labels)
 
-        if delta_new_labels < 0: # less new labels, delete old ones
-            self._del_entries(-delta_new_labels)
+        elif num_new_labels > self.n_cur_labels: # more new labels, create / show new ones
+            self._show_entries(num_new_labels)
 
-        elif delta_new_labels > 0: # more new labels, create new ones
-            self._add_entries(delta_new_labels)
-
-        for i in range(len(new_labels)):
-            # Update labels and corresponding values
+        for i in range(num_new_labels):
+            # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
 
+        self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.load_entries() # display rounded filter dict entries
 
 
@@ -157,7 +161,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
             if not self.qlineedit[i].hasFocus():
                 # widget has no focus, round the display
-                self.qlineedit[i].setText(self.FMT.format(weight_value))
+                self.qlineedit[i].setText(params['FMT'].format(weight_value))
             else:
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(weight_value))
@@ -175,59 +179,60 @@ class InputWeightSpecs(QtGui.QWidget):
             fb.fil[0].update({w_label:w_value})
             self.sigSpecsChanged.emit() # -> input_specs
         self.load_entries()
+        
 
 #-------------------------------------------------------------
-    def _del_entries(self, num):
+    def _hide_entries(self, num_new_labels):
         """
-        Delete `num` subwidgets (QLabel and QLineEdit) from layout and memory and
-        remove their eventFilters
+        Hide subwidgets so that only `len_new_labels` subwidgets are visible
         """
-        Nmax = len(self.qlabels)-1  # number of existing labels
-        for i in range(Nmax, Nmax-num, -1):  # start with len, last element len - num
-
-            self.layGSpecs.removeWidget(self.qlabels[i])
-            self.qlineedit[i].removeEventFilter(self)
-            self.layGSpecs.removeWidget(self.qlineedit[i])
-
-#            self.qlabels[i].deleteLater() #
-            self.qlabels[i].setParent(None) # alternative: change ownership back to python
-            del self.qlabels[i]
-#            self.qlineedit[i].deleteLater()
-            self.qlineedit[i].setParent(None) # alternative: change ownership back to python
-            del self.qlineedit[i]
+        for i in range (num_new_labels, len(self.qlabels)):
+            self.qlabels[i].hide()
+            self.qlineedit[i].hide()
+            
 
 #------------------------------------------------------------------------
-    def _add_entries(self, num):
+    def _show_entries(self, num_new_labels):
         """
-        - create `num` subwidgets (QLabel und QLineEdit) and add them to layout
-        - initialize them with dummy information
-        - install eventFilter for new QLineEdit widgets so that the filter dictionary
-          is updated automatically when a QLineEdit field has been edited.
+        - check whether enough subwidgets (QLabel und QLineEdit) exist for the 
+          the required number of `num_new_labels`: 
+              - create new ones if required 
+              - initialize them with dummy information
+              - install eventFilter for new QLineEdit widgets so that the filter 
+                  dict is updated automatically when a QLineEdit field has been 
+                  edited.
+        - if enough subwidgets exist already, make enough of them visible to
+          show all spec fields
         """
-        Nmax = len(self.qlabels)-1 # number of existing labels
-        # start with Nmax + 1, last element Nmax + num +1
-        for i in range(Nmax+1, Nmax+num+1, 1):
-            self.qlabels.append(QtGui.QLabel(self))
-            self.qlabels[i].setText(rt_label("dummy"))
+        num_tot_labels = len(self.qlabels) # number of existing labels / qlineedit fields
 
-            self.qlineedit.append(QtGui.QLineEdit(""))
-            self.qlineedit[i].setObjectName("dummy")
-            self.qlineedit[i].installEventFilter(self)  # filter events
+        if num_tot_labels < num_new_labels: # new widgets need to be generated
+            for i in range(num_tot_labels, num_new_labels):                   
+                self.qlabels.append(QtGui.QLabel(self))
+                self.qlabels[i].setText(rt_label("dummy"))
+    
+                self.qlineedit.append(QtGui.QLineEdit(""))
+                self.qlineedit[i].setObjectName("dummy")
+                self.qlineedit[i].installEventFilter(self)  # filter events
+    
+                self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
+                self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
 
-            self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
-            self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
-
-
+        else: # make the right number of widgets visible
+            for i in range(self.n_cur_labels, num_new_labels):
+                self.qlabels[i].show()
+                self.qlineedit[i].show()
+                
 #------------------------------------------------------------------------------
     def _reset_weights(self):
         """
         Reset all entries to "1.0" and store them in the filter dictionary
         """
         for i in range(len(self.qlineedit)):
-            self.qlineedit[i].setText("1.0")
+            self.qlineedit[i].setText("1")
 
             w_label = str(self.qlineedit[i].objectName())
-            fb.fil[0].update({w_label:1.0})
+            fb.fil[0].update({w_label:1})
 
         self.load_entries() # -> input_specs
         self.sigSpecsChanged.emit() # -> input_specs

@@ -35,11 +35,11 @@ class InputSpecs(QtGui.QWidget):
     def __init__(self, parent):
         super(InputSpecs, self).__init__(parent)
 
-        self._init_UI()
+        self._construct_UI()
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """
-        Create all subwidgets
+        Construct User Interface from all input subwidgets
         """
         # Subwidget for selecting filter with response type rt (LP, ...), 
         #    filter type ft (IIR, ...) and design method dm (cheby1, ...)
