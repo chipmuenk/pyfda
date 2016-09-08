@@ -154,21 +154,18 @@ using Ichige's algorithm.
     def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
-        and converted to integer.)
+        and converted to integer) and store parameter settings in filter 
+        dictionary
         """
         self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
         self.led_remez_1.setText(str(self.grid_density))
-        """
-        Store parameter settings in filter dictionary.
-        """
+
         fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
 
     def destruct_UI(self):
         """
         - Disconnect all signal-slot connections to avoid crashes upon exit
         - Delete dynamic widgets
-see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
-    http://python-camelot.s3.amazonaws.com/default/2.7/doc/advanced/development.html
         """
         print("Destructing equiripple UI")
 #==============================================================================

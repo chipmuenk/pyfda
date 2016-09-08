@@ -334,7 +334,7 @@ class InputFilter(QtGui.QWidget):
         fb.fil[0]['dm'] = dm
         if dm != self.dm_last: # dm has changed:
 
-            # destruct dyn. subwidgets of old filter instance if available     
+            # when old filter instance has a dyn. subwidget, destroy it
             if hasattr(fb.fil_inst, 'wdg'):        
                 self._destruct_dyn_widgets() 
 
@@ -365,7 +365,7 @@ class InputFilter(QtGui.QWidget):
             if hasattr(fb.fil_inst, 'wdg'): # construct dyn. subwidgets if available
                 self._construct_dyn_widgets()
             else:
-                self.frmDynWdg.setVisible(False)
+                self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame
 
             self.dm_last = fb.fil[0]['dm']
 
@@ -441,21 +441,20 @@ class InputFilter(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
         """
-        Delete dynamically (i.e. within filter design routine) created subwidgets
-        and create new ones, depending on requirements of filter design algorithm
+        Delete the dynamically created filter design subwidget (if the 
+        filter design routine has a UI).
+        
+        see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 
         This does NOT work when the subwidgets to be deleted and created are
         identical, as the deletion is only performed when the current scope has
         been left (?)! Hence, it is necessary to skip this method when the new
         design method is the same as the old one.
         """
-# TODO: see https://www.commandprompt.com/community/pyqt/x3410.htm
-
-        #------------------------------------------------------------------
         try:
-            fb.fil_inst.destruct_UI() # disconnect signals from old dyn. widget
-            self.layHDynWdg.removeWidget(self.dyn_fil_wdg)
-            self.dyn_fil_wdg.deleteLater()
+            fb.fil_inst.destruct_UI() # local operations like disconnecting signals
+            self.layHDynWdg.removeWidget(self.dyn_fil_wdg) # remove widget from layout
+            self.dyn_fil_wdg.deleteLater() # delete widget when scope has been left
         except AttributeError as e:
             print("Could not destruct_UI!\n", e)
 
@@ -471,10 +470,9 @@ class InputFilter(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
         """
-        Create filter widget UI dynamically 
+        Create filter widget UI dynamically (if the filter routine has one)
         """
 
-        # Try to create "new" dyn. subwidgets:
         fb.fil_inst.construct_UI()            
 
         try:
