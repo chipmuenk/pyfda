@@ -203,15 +203,15 @@ class InputFilter(QtGui.QWidget):
         #  through all widget methods and generate the signal sigFiltChanged
         #  in the end.
         self.cmbResponseType.currentIndexChanged.connect(
-                lambda: self.set_response_type(enb_signal=True)) # 'LP'
+                lambda: self.set_response_type(enb_signal=True))# 'LP'
         self.cmbFilterType.currentIndexChanged.connect(
-                lambda: self.set_filter_type(enb_signal=True)) #'IIR'
+                lambda: self.set_filter_type(enb_signal=True))  #'IIR'
         self.cmbDesignMethod.currentIndexChanged.connect(
-                lambda: self.set_design_method(enb_signal=True)) #'cheby1'
+                lambda: self.set_design_method(enb_signal=True))#'cheby1'
         self.chkMinOrder.clicked.connect(
-                lambda: self.set_filter_order(enb_signal=True))
+                lambda: self.set_filter_order(enb_signal=True)) # Min. Order
         self.ledOrderN.editingFinished.connect(
-                lambda:self.set_filter_order(enb_signal=True))
+                lambda:self.set_filter_order(enb_signal=True))  # Manual Order
         #------------------------------------------------------------
 
 
@@ -220,11 +220,11 @@ class InputFilter(QtGui.QWidget):
         """
         Reload comboboxes from filter dictionary to update changed settings
         after loading a filter design from disk.
-        `load_entries` is based on the automatism of set_response_type etc. 
+        `load_entries` uses the automatism of set_response_type etc. 
         of checking whether the previously selected filter design method is 
         also available for the new combination. 
         """
-        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
+        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for response type
         self.cmbResponseType.setCurrentIndex(rt_idx)
         self.set_response_type()
 
@@ -238,11 +238,7 @@ class InputFilter(QtGui.QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-#        sender_name = ""
-#        if self.sender(): # origin of signal that triggered the slot
-#            sender_name = self.sender().objectName()
-#            logging.debug(senderName + " was triggered\n================\n"
-#               "InputFilter.set_response_type triggered by %s " %sender_name)
+
         # Read out current setting of comboBox and convert to string (see init_UI)
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)
@@ -457,24 +453,20 @@ class InputFilter(QtGui.QWidget):
         #------------------------------------------------------------------
         try:
             fb.fil_inst.destruct_UI() # disconnect signals from old dyn. widget
+            self.layHDynWdg.removeWidget(self.dyn_fil_wdg)
+            self.dyn_fil_wdg.deleteLater()
         except AttributeError as e:
             print("Could not destruct_UI!\n", e)
-            pass
 
-        # Find "old" dyn. subwidgets and delete them:
-        widgetList = self.frmDynWdg.findChildren(
-            (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
-        
-        widgetListNames = [w.objectName() for w in widgetList]
-        print(widgetListNames)
-        
-
-        for w in widgetList:
-            self.layHDynWdg.removeWidget(w)   # remove widget from layout
-            w.deleteLater()             # tell Qt to delete object when the
-                                        # method has completed
-
-    
+#==============================================================================
+#         # Find "old" dyn. subwidgets and delete them:
+#         widgetList = self.frmDynWdg.findChildren(
+#             (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
+#         
+#         widgetListNames = [w.objectName() for w in widgetList]
+#         print(widgetListNames)
+#             
+#==============================================================================
 #------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
         """
@@ -507,8 +499,6 @@ class InputFilter(QtGui.QWidget):
         line.setFrameShadow(QtGui.QFrame.Sunken)
         return line
 
-#    def closeEvent(self, event):
-#        exit()
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
