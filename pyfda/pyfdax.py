@@ -321,5 +321,5 @@ def main():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    setdestroyonexit(False) # don't call the C++ destructor of wrapped instances
+#    setdestroyonexit(False) # don't call the C++ destructor of wrapped instances
     main()
