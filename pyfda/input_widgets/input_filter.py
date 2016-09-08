@@ -479,10 +479,10 @@ class InputFilter(QtGui.QWidget):
 
         try:
             if 'sf' in fb.fil_inst.wdg:
-                a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
-                self.layHDynWdg.addWidget(a, stretch=1)
+                self.dyn_fil_wdg = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
+                self.layHDynWdg.addWidget(self.dyn_fil_wdg, stretch=1)
                 self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
-                self.frmDynWdg.setVisible(a != None)
+                self.frmDynWdg.setVisible(self.dyn_fil_wdg != None)
 
         except AttributeError as e:
             print("input_filter._construct_input_filter:", e)
