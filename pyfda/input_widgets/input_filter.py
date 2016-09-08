@@ -485,8 +485,8 @@ class InputFilter(QtGui.QWidget):
                 self.frmDynWdg.setVisible(a != None)
 
         except AttributeError as e:
-            print("sf.updateWidgets:", e)
-            self.frmDynWdg.setVisible(False)
+            print("input_filter._construct_input_filter:", e)
+
 
 #------------------------------------------------------------------------------
     def HLine(self):
