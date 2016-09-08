@@ -344,7 +344,8 @@ class InputFilter(QtGui.QWidget):
                 
             err = fb.fil_factory.create_fil_inst(dm)
             #------------------------------------------------------------------
-            logger.debug("InputFilter.set_design_method triggered: %s" %dm)
+            logger.debug("InputFilter.set_design_method triggered: %s\n"
+                        "Returned error code %d" %(dm, err))
     
             # Check whether new design method also provides the old filter order
             # method. If yes, don't change it, else set first available
