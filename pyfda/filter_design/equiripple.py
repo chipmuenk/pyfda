@@ -171,12 +171,14 @@ see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in
     http://python-camelot.s3.amazonaws.com/default/2.7/doc/advanced/development.html
         """
         print("Destructing equiripple UI")
-        self.led_remez_1.editingFinished.disconnect()
-        self.layHWin.removeWidget(self.led_remez_l)
-        self.led_remez_1.deleteLater()
-        self.layHWin.removeWidget(self.lbl_remez_l)
-        self.lbl_remez_1.deleteLater()
-#        self.wdg_remez.deleteLater()
+#==============================================================================
+#         self.led_remez_1.editingFinished.disconnect()
+#         self.layHWin.removeWidget(self.led_remez_l)
+#         self.led_remez_1.deleteLater()
+#         self.layHWin.removeWidget(self.lbl_remez_l)
+#         self.lbl_remez_1.deleteLater()
+# #        self.wdg_remez.deleteLater()
+#==============================================================================
 
         
     def _load_entries(self):
