@@ -124,6 +124,7 @@ class firwin(object):
         self.cmb_firwin_alg.addItems(['ichige','kaiser','herrmann'])
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         self.cmb_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmb_firwin_alg.hide()
 
         # Combobox for selecting the window used for filter design
         self.cmb_firwin_win = QtGui.QComboBox()
@@ -162,7 +163,8 @@ class firwin(object):
 
         self.layGWin = QtGui.QGridLayout()
         self.layGWin.setObjectName('wdg_layGWin')
-        self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,4)
+        self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,2)
+        self.layGWin.addWidget(self.cmb_firwin_alg,0,2,1,2)
         self.layGWin.addWidget(self.lbl_firwin_1,1,0)
         self.layGWin.addWidget(self.led_firwin_1,1,1)
         self.layGWin.addWidget(self.lbl_firwin_2,1,2)
