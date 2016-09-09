@@ -85,9 +85,10 @@ class InputTabWidgets(QtGui.QWidget):
         #http://www.pythoncentral.io/pysidepyqt-tutorial-creating-your-own-signals-and-slots/#custom-tab-2-pyqt
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
+        #       requiring update of some plot widgets and input widgets:        
+        self.inputSpecs.sigSpecsChanged.connect(self.update_specs)
+        # sigViewChanged: signal indicating that PLOT VIEW has changed, 
         #       requiring update of some plot widgets only:        
-        self.inputSpecs.sigSpecsChanged.connect(self.update_view)
-# TODO: connect to a specific slot
         self.inputSpecs.sigViewChanged.connect(self.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
@@ -99,10 +100,23 @@ class InputTabWidgets(QtGui.QWidget):
         self.inputFiles.sigFilterLoaded.connect(self.load_all)
         #----------------------------------------------------------------------
 
-
     def update_view(self):
         """
-        Slot for InputSpecs.sigSpecsChanged and InputSpecs.sigViewChanged
+        Slot for InputSpecs.sigViewChanged
+        
+        Propagate new PLOT VIEW (e.g. log scale) to plot widgets via pyfda.py
+            
+        Update plot widgets via sigSpecsChanged signal that need new
+            specs, e.g. plotHf widget for the filter regions
+        """
+
+#        self.inputInfo.load_entries() # could update log. / lin. units (not implemented)
+        self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
+
+
+    def update_specs(self):
+        """
+        Slot for InputSpecs.sigSpecsChanged
         
         Propagate new filter SPECS from filter dict to other input widgets and 
         to plot widgets via pyfda.py
@@ -146,7 +160,7 @@ class InputTabWidgets(QtGui.QWidget):
         logger.debug("updateAll called by %s", sender_name)
 
         self.inputSpecs.color_design_button("ok")  
-# TODO: The following should be handled within InputSpecs ?
+        # TODO: The following should be handled within InputSpecs ?
         self.inputSpecs.load_entries()
         self.inputInfo.load_entries()
         self.inputCoeffs.load_entries()
