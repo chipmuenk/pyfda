@@ -127,7 +127,7 @@ using Ichige's algorithm.
         These subwidgets are instantiated dynamically when needed in 
         input_filter.py using the handle to the filter instance, fb.fil_inst.
         """
-        print("Constructing Equiripple UI")
+#        print("Constructing Equiripple UI")
         self.lbl_remez_1 = QtGui.QLabel("Grid Density")
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
         self.led_remez_1 = QtGui.QLineEdit()
@@ -173,7 +173,8 @@ using Ichige's algorithm.
         - Disconnect all signal-slot connections to avoid crashes upon exit
         - Delete dynamic widgets
         """
-        print("Destructing equiripple UI")
+        pass
+#        print("Destructing equiripple UI")
 #==============================================================================
 #         self.led_remez_1.editingFinished.disconnect()
 #         self.layHWin.removeWidget(self.led_remez_l)

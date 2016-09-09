@@ -178,9 +178,6 @@ class firwin(object):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmb_firwin_win.activated.connect(self._update_UI)
-#        self.led_firwin_1.editingFinished.connect(self._store_entries)
-#        self.led_firwin_2.editingFinished.connect(self._store_entries)
-
         self.led_firwin_1.editingFinished.connect(self._update_UI)
         self.led_firwin_2.editingFinished.connect(self._update_UI)
         self.cmb_firwin_alg.activated.connect(self._update_UI)

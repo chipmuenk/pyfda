@@ -18,7 +18,7 @@ Version info:
 Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import scipy.signal as sig
+#import scipy.signal as sig
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 import numpy as np
@@ -130,8 +130,8 @@ a given frequency can be calculated via the si function (not implemented yet).
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.led_ma_1.editingFinished.connect(self._update_UI)
-        self.chk_ma_2.clicked.connect(self._update_UI)
         # fires when edited line looses focus or when RETURN is pressed
+        self.chk_ma_2.clicked.connect(self._update_UI)
         #----------------------------------------------------------------------
 
         self._load_entries() # get initial / last setting from dictionary
@@ -160,9 +160,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.led_ma_1.editingFinished.disconnect()
         self.chk_ma_2.clicked.disconnect()
 
-
-
-        
+      
         
     def _load_entries(self):
         """
