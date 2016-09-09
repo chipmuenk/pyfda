@@ -159,7 +159,7 @@ class InputFilter(QtGui.QWidget):
         #----------------------------------------------------------------------
         self.lblOrder =  QtGui.QLabel("Order:")
         self.lblOrder.setFont(bfont)
-        self.chkMinOrder = QtGui.QRadioButton("Minimum",self)
+        self.chkMinOrder = QtGui.QCheckBox("Minimum", self)
         self.spacer = QtGui.QSpacerItem(20,0,
                         QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.lblOrderN = QtGui.QLabel("N = ")
@@ -368,7 +368,6 @@ class InputFilter(QtGui.QWidget):
                 self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame
 
             self.dm_last = fb.fil[0]['dm']
-
 
         self.load_filter_order(enb_signal)
         
