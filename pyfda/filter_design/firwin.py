@@ -41,11 +41,12 @@ __version__ = "1.3"
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
 
-class firwin(object):
+class firwin(QtGui.QWidget):
     
     sigFiltChanged = pyqtSignal()
 
     def __init__(self):
+        QtGui.QWidget.__init__(self)
         
         # This part contains static information for building the filter tree
         self.name = {'firwin':'Windowed FIR'}
@@ -105,7 +106,7 @@ class firwin(object):
         
         # additional dynamic widgets that need to be set in the main widgets
         # input_filter ('sf') and input_order ('fo')
-        self.wdg = {'sf':'wdg_fil'}
+        self.wdg = True
         
         self.hdl = None
         
@@ -237,7 +238,7 @@ class firwin(object):
         else:
             self.firWindow = self.fir_window_name
 
-#        self.sigFiltChanged.emit() # -> input_filt -> input_specs
+        self.sigFiltChanged.emit() # -> input_filt -> input_specs
             
     def destruct_UI(self):
         """

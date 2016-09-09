@@ -26,7 +26,6 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
 
 
 # TODO: min order for Hilbert & Differentiator
-# TODO: changing grid_density does not trigger sigSpecsChanged
 # TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
 # TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
 #       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
@@ -38,7 +37,7 @@ __version__ = "1.3"
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for equiripple routines
 
-class equiripple(object):
+class equiripple(QtGui.QWidget):
 
     info ="""
 **Equiripple filters**
@@ -59,6 +58,8 @@ using Ichige's algorithm.
 
 
     def __init__(self):
+        QtGui.QWidget.__init__(self)
+#        super(equiripple, self).__init__(parent)
         self.name = {'equiripple':'Equiripple'}
 
         # common messages for all man. / min. filter order response types:
@@ -115,7 +116,7 @@ using Ichige's algorithm.
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
         # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = {'sf':'wdg_fil'}
+        self.wdg = True
         
         self.hdl = None
         #----------------------------------------------------------------------
@@ -166,7 +167,7 @@ using Ichige's algorithm.
 
         fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
         
-#        self.sigFiltChanged.emit() # -> input_filt -> input_specs
+        self.sigFiltChanged.emit() # -> input_filt -> input_specs
 
     def destruct_UI(self):
         """

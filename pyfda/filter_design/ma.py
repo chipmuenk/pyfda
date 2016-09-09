@@ -31,7 +31,7 @@ __version__ = "1.3"
 FRMT = {'zpk', 'ba'} # output format of filter design routines 'zpk' / 'ba' / 'sos'
             
 
-class ma(object):
+class ma(QtGui.QWidget):
 
     info ="""
 **Moving average filters**
@@ -49,10 +49,13 @@ a given frequency can be calculated via the si function (not implemented yet).
     sigFiltChanged = pyqtSignal()
 
     def __init__(self):
+        QtGui.QWidget.__init__(self)       
+        
         self.name = {'ma':'Moving Average'}
 
         # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter desired filter order <b><i>N</i></b>.")
+        msg_man = ("Enter desired order (= delays) <b><i>N</i></b> per stage and "
+                    " and the number of stages.")
         msg_min = ("Enter the minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
                     "and the corresponding corner frequency of the stop band, "
                     "<b><i>F<sub>SB</sub></i></b> .")
@@ -63,7 +66,7 @@ a given frequency can be calculated via the si function (not implemented yet).
 
         # DISABLED widgets for all man. / min. filter order response types:
         dis_man = [] # manual filter order
-        dis_min = [] # minimum filter order
+        dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_SB', 'A_SB'] # manual filter order
@@ -86,7 +89,7 @@ a given frequency can be calculated via the si function (not implemented yet).
 #        self.info_doc.append('remezord()\n==========')
 #        self.info_doc.append(remezord.__doc__)
         # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = {'sf':'wdg_fil'}
+        self.wdg = True
         
         self.hdl = ['ma', 'cic']
         #----------------------------------------------------------------------
@@ -148,7 +151,8 @@ a given frequency can be calculated via the si function (not implemented yet).
         """
         fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
                                      'ma_normalize':self.chk_ma_2.isChecked()}})
-#        self.sigFiltChanged.emit() # -> input_filt -> input_specs                                     
+        self.sigFiltChanged.emit() # -> input_filt -> input_specs                                     
+
 
     def destruct_UI(self):
         """
@@ -159,7 +163,6 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.led_ma_1.editingFinished.disconnect()
         self.chk_ma_2.clicked.disconnect()
 
-      
         
     def _load_entries(self):
         """
@@ -239,7 +242,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         for i in range(self.ma_stages):
             b = np.convolve(b0, b)
         z = np.repeat(z0, self.ma_stages)
-        print("z0", z0, '\nz',  z)
+#       print("z0", z0, '\nz',  z)
         
         # normalize filter to |H_max| = 1 is checked:
         if self.chk_ma_2.isChecked():
