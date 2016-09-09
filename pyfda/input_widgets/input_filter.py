@@ -451,6 +451,10 @@ class InputFilter(QtGui.QWidget):
         design method is the same as the old one.
         """
         try:
+            fb.fil_inst.sigFiltChanged.disconnect() # disconnect signal
+        except TypeError as e:
+            print("Could not disconnect signal!\n", e)
+            
         try:
             fb.fil_inst.destruct_UI() # local operations like disconnecting signals
             self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
@@ -474,7 +478,9 @@ class InputFilter(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
         """
-        Create filter widget UI dynamically (if the filter routine has one)
+        Create filter widget UI dynamically (if the filter routine has one) and 
+        connect its sigFiltChanged signal to the signal with the same name 
+        in this scope.
         """
 
         fb.fil_inst.construct_UI()            
@@ -486,9 +492,10 @@ class InputFilter(QtGui.QWidget):
                 self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
                 self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
 
-        except AttributeError as e:
-            print("input_filter._construct_input_filter:", e)
+                fb.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
+        except AttributeError as e:
+            print("input_filter._construct_dyn_widgets:", e)
 
 #------------------------------------------------------------------------------
     def HLine(self):
