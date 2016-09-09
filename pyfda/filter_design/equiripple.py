@@ -18,6 +18,7 @@ Author: Christian Muenker 2014 - 2016
 from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 import numpy as np
 
 import pyfda.filterbroker as fb
@@ -53,6 +54,9 @@ using Ichige's algorithm.
 ``scipy.signal.remez()``\n
 ``pyfda_lib.remezord()``
     """
+
+    sigFiltChanged = pyqtSignal()
+
 
     def __init__(self):
         self.name = {'equiripple':'Equiripple'}
@@ -161,6 +165,8 @@ using Ichige's algorithm.
         self.led_remez_1.setText(str(self.grid_density))
 
         fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+        
+#        self.sigFiltChanged.emit() # -> input_filt -> input_specs
 
     def destruct_UI(self):
         """

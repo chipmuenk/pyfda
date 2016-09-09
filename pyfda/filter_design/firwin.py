@@ -22,6 +22,7 @@ import scipy.signal as sig
 from importlib import import_module
 import inspect
 from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, remezord, round_odd
@@ -41,6 +42,8 @@ FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
 
 class firwin(object):
+    
+    sigFiltChanged = pyqtSignal()
 
     def __init__(self):
         
@@ -234,7 +237,9 @@ class firwin(object):
             self.firWindow = (self.fir_window_name,
                                       float(self.led_firwin_1.text()))
         else:
-            self.firWindow = self.fir_window_name 
+            self.firWindow = self.fir_window_name
+
+#        self.sigFiltChanged.emit() # -> input_filt -> input_specs
             
     def destruct_UI(self):
         """

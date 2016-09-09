@@ -20,6 +20,7 @@ Author: Christian Muenker 2014 - 2016
 from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 import numpy as np
 
 import pyfda.filterbroker as fb
@@ -44,6 +45,8 @@ a given frequency can be calculated via the si function (not implemented yet).
 
 ``ma.calc()``\n
     """
+
+    sigFiltChanged = pyqtSignal()
 
     def __init__(self):
         self.name = {'ma':'Moving Average'}
@@ -146,7 +149,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         """
         fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
                                      'ma_normalize':self.chk_ma_2.isChecked()}})
-                                     
+#        self.sigFiltChanged.emit() # -> input_filt -> input_specs                                     
 
     def destruct_UI(self):
         """
