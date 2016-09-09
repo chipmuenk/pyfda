@@ -451,9 +451,11 @@ class InputFilter(QtGui.QWidget):
         design method is the same as the old one.
         """
         try:
+        try:
             fb.fil_inst.destruct_UI() # local operations like disconnecting signals
-            self.layHDynWdg.removeWidget(self.dyn_fil_wdg) # remove widget from layout
-            self.dyn_fil_wdg.deleteLater() # delete widget when scope has been left
+            self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
+            self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
+
         except AttributeError as e:
             print("Could not destruct_UI!\n", e)
             
@@ -478,11 +480,11 @@ class InputFilter(QtGui.QWidget):
         fb.fil_inst.construct_UI()            
 
         try:
-            if 'sf' in fb.fil_inst.wdg:
-                self.dyn_fil_wdg = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
-                self.layHDynWdg.addWidget(self.dyn_fil_wdg, stretch=1)
+            if fb.fil_inst.wdg:
+                self.dyn_wdg_fil = getattr(fb.fil_inst, 'wdg_fil')
+                self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
                 self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
-                self.frmDynWdg.setVisible(self.dyn_fil_wdg != None)
+                self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
 
         except AttributeError as e:
             print("input_filter._construct_input_filter:", e)
