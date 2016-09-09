@@ -456,6 +456,9 @@ class InputFilter(QtGui.QWidget):
             self.dyn_fil_wdg.deleteLater() # delete widget when scope has been left
         except AttributeError as e:
             print("Could not destruct_UI!\n", e)
+            
+        fb.fil_inst.deleteLater() # delete QWidget when scope has been left
+            
 
 #==============================================================================
 #         # Find "old" dyn. subwidgets and delete them:
