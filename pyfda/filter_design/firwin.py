@@ -105,7 +105,7 @@ class firwin(object):
         
         # additional dynamic widgets that need to be set in the main widgets
         # input_filter ('sf') and input_order ('fo')
-        self.wdg = {'fo':'cmb_firwin_alg', 'sf':'wdg_firwin_win'}
+        self.wdg = {'sf':'wdg_fil'}
         
         self.hdl = None
         
@@ -160,9 +160,6 @@ class firwin(object):
         self.led_firwin_2.setVisible(False)
         self.lbl_firwin_2.setVisible(False)
 
-        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
-        self.wdg_firwin_win = QtGui.QWidget()
-        self.wdg_firwin_win.setObjectName('wdg_firwin_win')
         self.layGWin = QtGui.QGridLayout()
         self.layGWin.setObjectName('wdg_layGWin')
         self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,4)
@@ -171,8 +168,10 @@ class firwin(object):
         self.layGWin.addWidget(self.lbl_firwin_2,1,2)
         self.layGWin.addWidget(self.led_firwin_2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
-        self.wdg_firwin_win.setLayout(self.layGWin)
-
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layGWin)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs

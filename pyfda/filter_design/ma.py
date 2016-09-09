@@ -86,7 +86,7 @@ a given frequency can be calculated via the si function (not implemented yet).
 #        self.info_doc.append('remezord()\n==========')
 #        self.info_doc.append(remezord.__doc__)
         # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = {'sf':'wdg_ma'}
+        self.wdg = {'sf':'wdg_fil'}
         
         self.hdl = ['ma', 'cic']
         #----------------------------------------------------------------------
@@ -113,10 +113,6 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.chk_ma_2.setObjectName('wdg_chk_ma_2')
         self.chk_ma_2.setToolTip("Normalize to| H_max = 1|")
         
-               
-        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
-        self.wdg_ma = QtGui.QWidget()
-        self.wdg_ma.setObjectName('wdg_ma')
         self.layHWin = QtGui.QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
         self.layHWin.addWidget(self.lbl_ma_1)
@@ -124,7 +120,10 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.layHWin.addWidget(self.lbl_ma_2)
         self.layHWin.addWidget(self.chk_ma_2)
         self.layHWin.setContentsMargins(0,0,0,0)
-        self.wdg_ma.setLayout(self.layHWin)
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layHWin)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs

@@ -115,7 +115,7 @@ using Ichige's algorithm.
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
         # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = {'sf':'wdg_remez'}
+        self.wdg = {'sf':'wdg_fil'}
         
         self.hdl = None
         #----------------------------------------------------------------------
@@ -134,16 +134,16 @@ using Ichige's algorithm.
         self.led_remez_1.setText("16")
         self.led_remez_1.setObjectName('wdg_led_remez_1')
         self.led_remez_1.setToolTip("Set number of frequency grid points for ")
-               
-        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
-        self.wdg_remez = QtGui.QWidget()
-        self.wdg_remez.setObjectName('wdg_remez')
+
         self.layHWin = QtGui.QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
         self.layHWin.addWidget(self.lbl_remez_1)
         self.layHWin.addWidget(self.led_remez_1)
         self.layHWin.setContentsMargins(0,0,0,0)
-        self.wdg_remez.setLayout(self.layHWin)
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layHWin)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
