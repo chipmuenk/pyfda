@@ -12,7 +12,7 @@ Version info:
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
     1.2: new API using fil_save (enable SOS features when available)
-
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
 
 Author: Christian Münker
 """
@@ -22,7 +22,7 @@ from scipy.signal import cheb1ord
     
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 if SOS_AVAIL:
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
@@ -105,12 +105,25 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.info_doc.append(sig.cheb1ord.__doc__)
 
 
+    def construct_UI(self):
+        """
+        Create additional subwidget(s) needed for filter design with the 
+        names given in self.wdg :
+        These subwidgets are instantiated dynamically when needed in 
+        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        (empty method, nothing to do in this filter)
+        """
+        print("constructing cheby1 UI")
+        pass
+
+        
     def destruct_UI(self):
         """
         - Disconnect all signal-slot connections to avoid crashes upon exit
         - Delete dynamic widgets
         (empty method, nothing to do in this filter)
         """
+        print("destructing cheby1 UI")
         pass
 
 

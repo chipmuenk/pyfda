@@ -46,13 +46,13 @@ class InputFilter(QtGui.QWidget):
 
         self.dm_last = '' # design method from last call
 
-        self._init_UI()
+        self._construct_UI()
 
         self.set_response_type() # first time initialization
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """
-        Initialize UI with comboboxes for selecting filter
+        Construct UI with comboboxes for selecting filter
         """
 #-----------------------------------------------------------------------------
 #        see filterbroker.py for structure and content of "filterTree" dict
@@ -127,7 +127,21 @@ class InputFilter(QtGui.QWidget):
         self.cmbDesignMethod.setCurrentIndex(0) # set initial index
 
         #----------------------------------------------------------------------
-        # LAYOUT
+        # Layout for Filter Type Subwidgets
+        #----------------------------------------------------------------------
+ 
+        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
+                                         QtGui.QSizePolicy.Fixed)
+
+        layHFilWdg = QtGui.QHBoxLayout() # container for filter subwidgets
+        layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbFilterType)
+        layHFilWdg.addItem(spacer)
+        layHFilWdg.addWidget(self.cmbDesignMethod)
+
+        #----------------------------------------------------------------------
+        # Layout for dynamic filter subwidgets (empty frame)
         #----------------------------------------------------------------------
         # see Summerfield p. 278
         self.layHDynWdg = QtGui.QHBoxLayout() # for additional dynamic subwidgets
@@ -138,31 +152,22 @@ class InputFilter(QtGui.QWidget):
 
         #Debugging: enable next line to show border of frmDnyWdg
         #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
-
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
-        layHFilWdg = QtGui.QHBoxLayout() # container for standard subwidgets
-        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
-                                         QtGui.QSizePolicy.Fixed)
-        layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
-        layHFilWdg.addItem(spacer)
-        layHFilWdg.addWidget(self.cmbFilterType)
-        layHFilWdg.addItem(spacer)
-        layHFilWdg.addWidget(self.cmbDesignMethod)
-
         #----------------------------------------------------------------------
-        # Filter Order
+        # Filter Order Subwidgets
         #----------------------------------------------------------------------
         self.lblOrder =  QtGui.QLabel("Order:")
         self.lblOrder.setFont(bfont)
-        self.chkMinOrder = QtGui.QRadioButton("Minimum",self)
+        self.chkMinOrder = QtGui.QCheckBox("Minimum", self)
         self.spacer = QtGui.QSpacerItem(20,0,
                         QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.lblOrderN = QtGui.QLabel("N = ")
         self.lblOrderN.setFont(ifont)
         self.ledOrderN = QtGui.QLineEdit(str(fb.fil[0]['N']),self)
 
-        #  All subwidgets, including dynamically created ones
+        #--------------------------------------------------
+        #  Layout for filter order subwidgets
         self.layHOrdWdg = QtGui.QHBoxLayout()
         self.layHOrdWdg.addWidget(self.lblOrder)
         self.layHOrdWdg.addWidget(self.chkMinOrder)
@@ -170,14 +175,15 @@ class InputFilter(QtGui.QWidget):
         self.layHOrdWdg.addWidget(self.lblOrderN)
         self.layHOrdWdg.addWidget(self.ledOrderN)
 
-        # stack standard + dynamic subwidgets vertically:
-        layVAllWdg = QtGui.QVBoxLayout()
+        #----------------------------------------------------------------------
+        # OVERALL LAYOUT (stack standard + dynamic subwidgets vertically)
+        #----------------------------------------------------------------------
 
+        layVAllWdg = QtGui.QVBoxLayout()
         layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
         layVAllWdg.addWidget(self.HLine())
         layVAllWdg.addLayout(self.layHOrdWdg)
-
 
         self.frmMain = QtGui.QFrame()
         self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
@@ -197,15 +203,15 @@ class InputFilter(QtGui.QWidget):
         #  through all widget methods and generate the signal sigFiltChanged
         #  in the end.
         self.cmbResponseType.currentIndexChanged.connect(
-                lambda: self.set_response_type(enb_signal=True)) # 'LP'
+                lambda: self.set_response_type(enb_signal=True))# 'LP'
         self.cmbFilterType.currentIndexChanged.connect(
-                lambda: self.set_filter_type(enb_signal=True)) #'IIR'
+                lambda: self.set_filter_type(enb_signal=True))  #'IIR'
         self.cmbDesignMethod.currentIndexChanged.connect(
-                lambda: self.set_design_method(enb_signal=True)) #'cheby1'
+                lambda: self.set_design_method(enb_signal=True))#'cheby1'
         self.chkMinOrder.clicked.connect(
-                lambda: self.set_filter_order(enb_signal=True))
+                lambda: self.set_filter_order(enb_signal=True)) # Min. Order
         self.ledOrderN.editingFinished.connect(
-                lambda:self.set_filter_order(enb_signal=True))
+                lambda:self.set_filter_order(enb_signal=True))  # Manual Order
         #------------------------------------------------------------
 
 
@@ -214,11 +220,11 @@ class InputFilter(QtGui.QWidget):
         """
         Reload comboboxes from filter dictionary to update changed settings
         after loading a filter design from disk.
-        `load_entries` is based on the automatism of set_response_type etc. 
+        `load_entries` uses the automatism of set_response_type etc. 
         of checking whether the previously selected filter design method is 
         also available for the new combination. 
         """
-        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for 'LP'
+        rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for response type
         self.cmbResponseType.setCurrentIndex(rt_idx)
         self.set_response_type()
 
@@ -232,11 +238,7 @@ class InputFilter(QtGui.QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-#        sender_name = ""
-#        if self.sender(): # origin of signal that triggered the slot
-#            sender_name = self.sender().objectName()
-#            logging.debug(senderName + " was triggered\n================\n"
-#               "InputFilter.set_response_type triggered by %s " %sender_name)
+
         # Read out current setting of comboBox and convert to string (see init_UI)
         rt_idx = self.cmbResponseType.currentIndex()
         self.rt = self.cmbResponseType.itemData(rt_idx)
@@ -330,17 +332,20 @@ class InputFilter(QtGui.QWidget):
         if not isinstance(dm, str):
             dm = str(dm.toString()) # needed for Python 2.x (see init_UI)
         fb.fil[0]['dm'] = dm
-        if dm != self.dm_last: # dm has changed, create new instance
-            #-----
-            try:
-                pass
-#                fb.fil_inst.destruct_UI() # disconnect signals from dyn. widget
-            except AttributeError:
-                pass
+        if dm != self.dm_last: # dm has changed:
+
+            # when old filter instance has a dyn. subwidget, destroy it
+            if hasattr(fb.fil_inst, 'wdg'):        
+                self._destruct_dyn_widgets() 
+
+            """
+            create new instance
+            """
                 
             err = fb.fil_factory.create_fil_inst(dm)
-            #-----
-            logger.debug("InputFilter.set_design_method triggered: %s" %dm)
+            #------------------------------------------------------------------
+            logger.debug("InputFilter.set_design_method triggered: %s\n"
+                        "Returned error code %d" %(dm, err))
     
             # Check whether new design method also provides the old filter order
             # method. If yes, don't change it, else set first available
@@ -356,8 +361,13 @@ class InputFilter(QtGui.QWidget):
                   %(fb.fil[0], fb.fil_tree[self.rt][self.ft][dm],\
                     fb.fil_tree[self.rt][self.ft][dm].keys()
                     ))
-    
-            self._update_dyn_widgets() # check for new subwidgets and update if needed
+
+            if hasattr(fb.fil_inst, 'wdg'): # construct dyn. subwidgets if available
+                self._construct_dyn_widgets()
+            else:
+                self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame
+
+            self.dm_last = fb.fil[0]['dm']
 
         self.load_filter_order(enb_signal)
         
@@ -426,49 +436,66 @@ class InputFilter(QtGui.QWidget):
 
         if enb_signal:
             self.sigFiltChanged.emit() # -> input_specs
-    
+            
 #------------------------------------------------------------------------------
-    def _update_dyn_widgets(self):
+    def _destruct_dyn_widgets(self):
         """
-        Delete dynamically (i.e. within filter design routine) created subwidgets
-        and create new ones, depending on requirements of filter design algorithm
-
+        Delete the dynamically created filter design subwidget (if the 
+        filter design routine has a UI).
+        
+        see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 
         This does NOT work when the subwidgets to be deleted and created are
         identical, as the deletion is only performed when the current scope has
         been left (?)! Hence, it is necessary to skip this method when the new
         design method is the same as the old one.
         """
-# TODO: see https://www.commandprompt.com/community/pyqt/x3410.htm
+        try:
+            fb.fil_inst.sigFiltChanged.disconnect() # disconnect signal
+        except TypeError as e:
+            print("Could not disconnect signal!\n", e)
+            
+        try:
+            fb.fil_inst.destruct_UI() # local operations like disconnecting signals
+            self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
+            self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
 
+        except AttributeError as e:
+            print("Could not destruct_UI!\n", e)
+            
+        fb.fil_inst.deleteLater() # delete QWidget when scope has been left
+            
 
-        # Find "old" dyn. subwidgets and delete them:
-        widgetList = self.frmDynWdg.findChildren(
-            (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
-#       widgetListNames = [w.objectName() for w in widgetList]
+#==============================================================================
+#         # Find "old" dyn. subwidgets and delete them:
+#         widgetList = self.frmDynWdg.findChildren(
+#             (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
+#         
+#         widgetListNames = [w.objectName() for w in widgetList]
+#         print(widgetListNames)
+#             
+#==============================================================================
+#------------------------------------------------------------------------------
+    def _construct_dyn_widgets(self):
+        """
+        Create filter widget UI dynamically (if the filter routine has one) and 
+        connect its sigFiltChanged signal to the signal with the same name 
+        in this scope.
+        """
 
-        for w in widgetList:
-            self.layHDynWdg.removeWidget(w)   # remove widget from layout
-            w.deleteLater()             # tell Qt to delete object when the
-                                        # method has completed
-#                del w                       # not really needed?
+        fb.fil_inst.construct_UI()            
 
-        # Try to create "new" dyn. subwidgets:
-        if hasattr(fb.fil_inst, 'wdg'):
-            try:
-                if 'sf' in fb.fil_inst.wdg:
-                    a = getattr(fb.fil_inst, fb.fil_inst.wdg['sf'])
-                    self.layHDynWdg.addWidget(a, stretch=1)
-                    self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
-                    self.frmDynWdg.setVisible(a != None)
+        try:
+            if fb.fil_inst.wdg:
+                self.dyn_wdg_fil = getattr(fb.fil_inst, 'wdg_fil')
+                self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
+                self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
+                self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
 
-            except AttributeError as e:
-                print("sf.updateWidgets:", e)
-                self.frmDynWdg.setVisible(False)
-        else:
-            self.frmDynWdg.setVisible(False)
+                fb.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
-        self.dm_last = fb.fil[0]['dm']
+        except AttributeError as e:
+            print("input_filter._construct_dyn_widgets:", e)
 
 #------------------------------------------------------------------------------
     def HLine(self):
@@ -482,8 +509,6 @@ class InputFilter(QtGui.QWidget):
         line.setFrameShadow(QtGui.QFrame.Sunken)
         return line
 
-#    def closeEvent(self, event):
-#        exit()
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':

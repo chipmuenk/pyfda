@@ -13,23 +13,25 @@ Version info:
     1.2: - new API using fil_save & fil_convert (allow multiple formats, 
                 save 'ba' _and_ 'zpk' precisely)
          - include method _store_entries in _update_UI
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)         
     
 Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import scipy.signal as sig
+#import scipy.signal as sig
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remezord, 
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 FRMT = {'zpk', 'ba'} # output format of filter design routines 'zpk' / 'ba' / 'sos'
             
 
-class ma(object):
+class ma(QtGui.QWidget):
 
     info ="""
 **Moving average filters**
@@ -44,11 +46,16 @@ a given frequency can be calculated via the si function (not implemented yet).
 ``ma.calc()``\n
     """
 
+    sigFiltChanged = pyqtSignal()
+
     def __init__(self):
+        QtGui.QWidget.__init__(self)       
+        
         self.name = {'ma':'Moving Average'}
 
         # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter desired filter order <b><i>N</i></b>.")
+        msg_man = ("Enter desired order (= delays) <b><i>N</i></b> per stage and "
+                    " and the number of stages.")
         msg_min = ("Enter the minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
                     "and the corresponding corner frequency of the stop band, "
                     "<b><i>F<sub>SB</sub></i></b> .")
@@ -59,7 +66,7 @@ a given frequency can be calculated via the si function (not implemented yet).
 
         # DISABLED widgets for all man. / min. filter order response types:
         dis_man = [] # manual filter order
-        dis_min = [] # minimum filter order
+        dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
         par_man = ['N', 'f_S', 'F_SB', 'A_SB'] # manual filter order
@@ -82,15 +89,12 @@ a given frequency can be calculated via the si function (not implemented yet).
 #        self.info_doc.append('remezord()\n==========')
 #        self.info_doc.append(remezord.__doc__)
         # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = {'sf':'wdg_ma'}
+        self.wdg = True
         
         self.hdl = ['ma', 'cic']
         #----------------------------------------------------------------------
 
-        self._init_UI()
-
-
-    def _init_UI(self):
+    def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
@@ -112,10 +116,6 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.chk_ma_2.setObjectName('wdg_chk_ma_2')
         self.chk_ma_2.setToolTip("Normalize to| H_max = 1|")
         
-               
-        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
-        self.wdg_ma = QtGui.QWidget()
-        self.wdg_ma.setObjectName('wdg_ma')
         self.layHWin = QtGui.QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
         self.layHWin.addWidget(self.lbl_ma_1)
@@ -123,14 +123,17 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.layHWin.addWidget(self.lbl_ma_2)
         self.layHWin.addWidget(self.chk_ma_2)
         self.layHWin.setContentsMargins(0,0,0,0)
-        self.wdg_ma.setLayout(self.layHWin)
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layHWin)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.led_ma_1.editingFinished.connect(self._update_UI)
-        self.chk_ma_2.clicked.connect(self._update_UI)
         # fires when edited line looses focus or when RETURN is pressed
+        self.chk_ma_2.clicked.connect(self._update_UI)
         #----------------------------------------------------------------------
 
         self._load_entries() # get initial / last setting from dictionary
@@ -148,7 +151,8 @@ a given frequency can be calculated via the si function (not implemented yet).
         """
         fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
                                      'ma_normalize':self.chk_ma_2.isChecked()}})
-                                     
+        self.sigFiltChanged.emit() # -> input_filt -> input_specs                                     
+
 
     def destruct_UI(self):
         """
@@ -159,9 +163,6 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.led_ma_1.editingFinished.disconnect()
         self.chk_ma_2.clicked.disconnect()
 
-
-
-        
         
     def _load_entries(self):
         """
@@ -241,7 +242,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         for i in range(self.ma_stages):
             b = np.convolve(b0, b)
         z = np.repeat(z0, self.ma_stages)
-        print("z0", z0, '\nz',  z)
+#       print("z0", z0, '\nz',  z)
         
         # normalize filter to |H_max| = 1 is checked:
         if self.chk_ma_2.isChecked():

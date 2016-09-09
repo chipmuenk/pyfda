@@ -111,7 +111,7 @@ class InputSpecs(QtGui.QWidget):
         # but it does not influence the actual specs (no specsChanged )
         self.f_units.sigUnitChanged.connect(self.f_specs.load_entries)
         self.f_units.sigUnitChanged.connect(self.t_specs.load_entries)
-        self.f_units.sigUnitChanged.connect(self.sigViewChanged.emit)
+        self.f_units.sigUnitChanged.connect(self.sigViewChanged)
         # Activating the "Sort" button triggers sigSpecsChanged, requiring 
         # sorting and storing the frequency entries
         self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
@@ -121,11 +121,11 @@ class InputSpecs(QtGui.QWidget):
         # Changing filter parameters / specs requires reloading of parameters
         # in other hierarchy levels, e.g. in the plot tabs
         # bundle sigSpecsChanged signals and propagate to next hierarchy level
-#        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
-        self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
-        self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
-        self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
-        self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+#        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged)
+        self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
+        self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
+        self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
+        self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
 
         # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.start_design_filt)

@@ -11,12 +11,14 @@ Version info:
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
     
 Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
 from PyQt4 import QtGui
+from PyQt4.QtCore import pyqtSignal
 import numpy as np
 
 import pyfda.filterbroker as fb
@@ -24,19 +26,18 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
 
 
 # TODO: min order for Hilbert & Differentiator
-# TODO: changing grid_density does not trigger sigSpecsChanged
 # TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
 # TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
 #       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
 #         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
 #           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for equiripple routines
 
-class equiripple(object):
+class equiripple(QtGui.QWidget):
 
     info ="""
 **Equiripple filters**
@@ -53,7 +54,12 @@ using Ichige's algorithm.
 ``pyfda_lib.remezord()``
     """
 
+    sigFiltChanged = pyqtSignal()
+
+
     def __init__(self):
+        QtGui.QWidget.__init__(self)
+#        super(equiripple, self).__init__(parent)
         self.name = {'equiripple':'Equiripple'}
 
         # common messages for all man. / min. filter order response types:
@@ -110,38 +116,35 @@ using Ichige's algorithm.
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
         # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = {'sf':'wdg_remez'}
+        self.wdg = True
         
         self.hdl = None
         #----------------------------------------------------------------------
 
-        self._init_UI()
-
-
-    def _init_UI(self):
+    def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
         These subwidgets are instantiated dynamically when needed in 
         input_filter.py using the handle to the filter instance, fb.fil_inst.
         """
-
+#        print("Constructing Equiripple UI")
         self.lbl_remez_1 = QtGui.QLabel("Grid Density")
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
         self.led_remez_1 = QtGui.QLineEdit()
         self.led_remez_1.setText("16")
         self.led_remez_1.setObjectName('wdg_led_remez_1')
         self.led_remez_1.setToolTip("Set number of frequency grid points for ")
-               
-        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
-        self.wdg_remez = QtGui.QWidget()
-        self.wdg_remez.setObjectName('wdg_remez')
+
         self.layHWin = QtGui.QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
         self.layHWin.addWidget(self.lbl_remez_1)
         self.layHWin.addWidget(self.led_remez_1)
         self.layHWin.setContentsMargins(0,0,0,0)
-        self.wdg_remez.setLayout(self.layHWin)
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layHWin)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -156,22 +159,31 @@ using Ichige's algorithm.
     def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
-        and converted to integer.)
+        and converted to integer) and store parameter settings in filter 
+        dictionary
         """
         self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
         self.led_remez_1.setText(str(self.grid_density))
-        """
-        Store parameter settings in filter dictionary.
-        """
+
         fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+        
+        self.sigFiltChanged.emit() # -> input_filt -> input_specs
 
     def destruct_UI(self):
         """
         - Disconnect all signal-slot connections to avoid crashes upon exit
         - Delete dynamic widgets
         """
-        self.led_remez_1.editingFinished.disconnect()
-
+        pass
+#        print("Destructing equiripple UI")
+#==============================================================================
+#         self.led_remez_1.editingFinished.disconnect()
+#         self.layHWin.removeWidget(self.led_remez_l)
+#         self.led_remez_1.deleteLater()
+#         self.layHWin.removeWidget(self.lbl_remez_l)
+#         self.lbl_remez_1.deleteLater()
+# #        self.wdg_remez.deleteLater()
+#==============================================================================
 
         
     def _load_entries(self):

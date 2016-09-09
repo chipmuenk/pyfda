@@ -11,6 +11,7 @@ Version info:
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
 
 
 Author: Christian Muenker
@@ -21,6 +22,7 @@ import scipy.signal as sig
 from importlib import import_module
 import inspect
 from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, remezord, round_odd
@@ -34,14 +36,17 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in fil_dict?
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
 
-class firwin(object):
+class firwin(QtGui.QWidget):
+    
+    sigFiltChanged = pyqtSignal()
 
     def __init__(self):
+        QtGui.QWidget.__init__(self)
         
         # This part contains static information for building the filter tree
         self.name = {'firwin':'Windowed FIR'}
@@ -101,15 +106,12 @@ class firwin(object):
         
         # additional dynamic widgets that need to be set in the main widgets
         # input_filter ('sf') and input_order ('fo')
-        self.wdg = {'fo':'cmb_firwin_alg', 'sf':'wdg_firwin_win'}
+        self.wdg = True
         
         self.hdl = None
         
         
-        self._init_UI()
-
-        
-    def _init_UI(self):
+    def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
@@ -123,6 +125,7 @@ class firwin(object):
         self.cmb_firwin_alg.addItems(['ichige','kaiser','herrmann'])
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         self.cmb_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmb_firwin_alg.hide()
 
         # Combobox for selecting the window used for filter design
         self.cmb_firwin_win = QtGui.QComboBox()
@@ -159,27 +162,24 @@ class firwin(object):
         self.led_firwin_2.setVisible(False)
         self.lbl_firwin_2.setVisible(False)
 
-        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)        
-        self.wdg_firwin_win = QtGui.QWidget()
-        self.wdg_firwin_win.setObjectName('wdg_firwin_win')
         self.layGWin = QtGui.QGridLayout()
         self.layGWin.setObjectName('wdg_layGWin')
-        self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,4)
+        self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,2)
+        self.layGWin.addWidget(self.cmb_firwin_alg,0,2,1,2)
         self.layGWin.addWidget(self.lbl_firwin_1,1,0)
         self.layGWin.addWidget(self.led_firwin_1,1,1)
         self.layGWin.addWidget(self.lbl_firwin_2,1,2)
         self.layGWin.addWidget(self.led_firwin_2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
-        self.wdg_firwin_win.setLayout(self.layGWin)
-
+        # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
+        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layGWin)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmb_firwin_win.activated.connect(self._update_UI)
-#        self.led_firwin_1.editingFinished.connect(self._store_entries)
-#        self.led_firwin_2.editingFinished.connect(self._store_entries)
-
         self.led_firwin_1.editingFinished.connect(self._update_UI)
         self.led_firwin_2.editingFinished.connect(self._update_UI)
         self.cmb_firwin_alg.activated.connect(self._update_UI)
@@ -236,7 +236,9 @@ class firwin(object):
             self.firWindow = (self.fir_window_name,
                                       float(self.led_firwin_1.text()))
         else:
-            self.firWindow = self.fir_window_name 
+            self.firWindow = self.fir_window_name
+
+        self.sigFiltChanged.emit() # -> input_filt -> input_specs
             
     def destruct_UI(self):
         """

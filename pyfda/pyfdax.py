@@ -6,7 +6,7 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-from sip import setdestroyonexit
+#from sip import setdestroyonexit
 import logging
 import logging.config
 logger = logging.getLogger(__name__)
@@ -22,6 +22,7 @@ from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
+#from pyfda.plot_widgets import plot_tab_widgets_test as plot_tab_widgets
 
 # get dir for this file and store as base_dir in filterbroker
 fb.base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -320,5 +321,5 @@ def main():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    setdestroyonexit(False) # don't call the C++ destructor of wrapped instances
+#    setdestroyonexit(False) # don't call the C++ destructor of wrapped instances
     main()

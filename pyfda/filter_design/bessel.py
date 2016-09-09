@@ -12,8 +12,9 @@ Version info:
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
     1.2: new API using fil_save (enable SOS features)
-
-Author: Christian Muenker
+    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
+    
+    Author: Christian Muenker
 """
 # TODO: bandpass and bandstop designs are unstable???
 from __future__ import print_function, division, unicode_literals
@@ -22,7 +23,7 @@ from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, lin2unit
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 FRMT = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
@@ -91,6 +92,16 @@ order can be used for approximating the -3 dB frequency.
 ``scipy.signal.bessel()``
 ``scipy.signal.buttord()``
 """
+
+    def construct_UI(self):
+        """
+        Create additional subwidget(s) needed for filter design with the 
+        names given in self.wdg :
+        These subwidgets are instantiated dynamically when needed in 
+        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        (empty method, nothing to do in this filter)
+        """
+        pass
 
     def destruct_UI(self):
         """
