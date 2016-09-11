@@ -25,6 +25,7 @@ class InputAmpSpecs(QtGui.QWidget):
     specifications like A_SB, A_PB etc.
     """
 
+    sigUnitChanged = pyqtSignal() # emitted when amplitude unit has been changed
     sigSpecsChanged = pyqtSignal()
 
     def __init__(self, parent, title = "Amplitude Specs"):
@@ -99,7 +100,7 @@ class InputAmpSpecs(QtGui.QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs / EVENT MONITORING
         #----------------------------------------------------------------------
-        self.cmbUnitsA.currentIndexChanged.connect(self.load_entries)
+        self.cmbUnitsA.currentIndexChanged.connect(self._set_amp_unit)
         #       ^ this also triggers the initial load_entries
         # DYNAMIC EVENT MONITORING
         # Every time a field is edited, call self._store_entry and
@@ -173,13 +174,12 @@ class InputAmpSpecs(QtGui.QWidget):
         """
         Reload and reformat the amplitude textfields from filter dict when a new filter
         design algorithm is selected or when the user has changed the unit  (V / W / dB):
-        - Store the unit in the filter dictionary.
+
         - Reload amplitude entries from filter dictionary and convert to selected to reflect changed settings
           unit.
         - Update the lineedit fields, rounded to specified format.
         """
-        unit = str(self.cmbUnitsA.currentText())
-        fb.fil[0]['amp_specs_unit'] = unit
+        unit = fb.fil[0]['amp_specs_unit']
 
         filt_type = fb.fil[0]['ft']
 
@@ -193,6 +193,18 @@ class InputAmpSpecs(QtGui.QWidget):
             else:
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(amp_value))
+
+#------------------------------------------------------------------------------
+    def _set_amp_unit(self, source):
+        """
+        Store unit for amplitude in filter dictionary, reload amplitude spec 
+        entries via load_entries and fire a sigUnitChanged signal
+        """
+        fb.fil[0]['amp_specs_unit'] = str(self.cmbUnitsA.currentText())
+        self.load_entries()
+
+        self.sigUnitChanged.emit() # -> input_widgets
+
 #------------------------------------------------------------------------------
     def _store_entry(self, source):
         """

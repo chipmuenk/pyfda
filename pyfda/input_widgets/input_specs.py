@@ -125,6 +125,7 @@ class InputSpecs(QtGui.QWidget):
         self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
         self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
         self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
+        self.a_specs.sigUnitChanged.connect(self.sigViewChanged)
         self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
 
         # Other signal-slot connections
