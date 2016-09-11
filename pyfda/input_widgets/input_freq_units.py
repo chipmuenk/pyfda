@@ -211,6 +211,10 @@ class InputFreqUnits(QtGui.QWidget):
                 key = event.key()
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:
                     _store_entry()
+                elif key == QtCore.Qt.Key_Escape: # revert changes
+                    self.spec_edited = False                    
+                    source.setText(str(fb.fil[0]['f_S'])) # full precision
+
             elif event.type() == QEvent.FocusOut:
                 _store_entry()
                 source.setText(params['FMT'].format(fb.fil[0]['f_S'])) # reduced precision

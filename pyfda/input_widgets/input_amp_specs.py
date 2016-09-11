@@ -131,8 +131,11 @@ class InputAmpSpecs(QtGui.QWidget):
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
-                if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:
+                if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}: # store entry
                     self._store_entry(source)
+                elif key == QtCore.Qt.Key_Escape: # revert changes
+                    self.spec_edited = False                    
+                    self.load_entries()
 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)

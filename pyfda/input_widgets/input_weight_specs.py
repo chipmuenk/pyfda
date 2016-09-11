@@ -115,6 +115,9 @@ class InputWeightSpecs(QtGui.QWidget):
                 key = event.key()
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:
                     self._store_entry(source)
+                elif key == QtCore.Qt.Key_Escape: # revert changes
+                    self.spec_edited = False                    
+                    self.load_entries()
 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
