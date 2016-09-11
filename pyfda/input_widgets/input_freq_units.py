@@ -202,8 +202,6 @@ class InputFreqUnits(QtGui.QWidget):
                 self.sigSpecsChanged.emit() # -> input_widgets
                 self.spec_edited = False # reset flag, changed entry has been saved
 
-            source.setText(params['FMT'].format(fb.fil[0]['f_S'])) # reduced precision
-
         if source.objectName() == 'f_S':
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
@@ -215,6 +213,7 @@ class InputFreqUnits(QtGui.QWidget):
                     _store_entry()
             elif event.type() == QEvent.FocusOut:
                 _store_entry()
+                source.setText(params['FMT'].format(fb.fil[0]['f_S'])) # reduced precision
         # Call base class method to continue normal event processing:
         return super(InputFreqUnits, self).eventFilter(source, event)
 
