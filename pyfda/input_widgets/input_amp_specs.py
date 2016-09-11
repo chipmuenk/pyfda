@@ -11,7 +11,7 @@ from __future__ import print_function, division, unicode_literals
 import sys
 import logging
 logger = logging.getLogger(__name__)
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal, Qt, QEvent
 
 import pyfda.filterbroker as fb
@@ -129,7 +129,11 @@ class InputAmpSpecs(QtGui.QWidget):
                 self.spec_edited = False
                 self.load_entries()
             elif event.type() == QEvent.KeyPress:
-                self.spec_edited = True
+                self.spec_edited = True # entry has been changed
+                key = event.key()
+                if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:
+                    self._store_entry(source)
+
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
@@ -223,6 +227,7 @@ class InputAmpSpecs(QtGui.QWidget):
             amp_value = simple_eval(source.text())
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
             self.sigSpecsChanged.emit() # -> input_specs
+            self.spec_edited = False # reset flag
         self.load_entries()
 
 #-------------------------------------------------------------

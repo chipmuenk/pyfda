@@ -9,7 +9,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal, QEvent
 
 import pyfda.filterbroker as fb
@@ -100,7 +100,11 @@ class InputFreqSpecs(QtGui.QWidget):
                 self.spec_edited = False
                 self.load_entries()
             elif event.type() == QEvent.KeyPress:
-                self.spec_edited = True
+                self.spec_edited = True # entry has been changed
+                key = event.key()
+                if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}:
+                    self._store_entry(source)
+                
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
@@ -121,6 +125,7 @@ class InputFreqSpecs(QtGui.QWidget):
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
             self.sigSpecsChanged.emit() # -> input_specs
+            self.spec_edited = False # reset flag
 
 #-------------------------------------------------------------
     def update_UI(self, new_labels = []):
