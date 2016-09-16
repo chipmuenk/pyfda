@@ -19,42 +19,50 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 # http://matplotlib.org/examples/user_interfaces/embedding_in_qt4.html
 
+class PlotTauG(FigureCanvas):
 #class MyMplCanvas(FigureCanvas):
 #    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 #
-#    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        # We want the axes cleared every time plot() is called
+        self.axes.hold(False)
+
+        self.compute_initial_figure()
+
+        #
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+
+        FigureCanvas.setSizePolicy(self,
+                                   QtGui.QSizePolicy.Expanding,
+                                   QtGui.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+
+    def compute_initial_figure(self):
+        pass
+
+
+class MyStaticMplCanvas(PlotTauG):
+    """Simple canvas with a sine plot."""
+
+    def compute_initial_figure(self):
+        t = np.arange(0.0, 3.0, 0.01)
+        s = np.sin(2*np.pi*t)
+        self.axes.plot(t, s)
+#
+#class PlotTauG(QtGui.QWidget):
+#
+#    def __init__(self, parent):
+#        super(PlotTauG, self).__init__(parent)
+#        width = 5
+#        height = 4
+#        dpi = 100
 #        fig = Figure(figsize=(width, height), dpi=dpi)
 #        self.axes = fig.add_subplot(111)
 #        # We want the axes cleared every time plot() is called
 #        self.axes.hold(False)
-#
-#        self.compute_initial_figure()
-#
-#        #
-#        FigureCanvas.__init__(self, fig)
-#        self.setParent(parent)
-#
-#        FigureCanvas.setSizePolicy(self,
-#                                   QtGui.QSizePolicy.Expanding,
-#                                   QtGui.QSizePolicy.Expanding)
-#        FigureCanvas.updateGeometry(self)
-#
-#    def compute_initial_figure(self):
-#        pass
-#
-#
-#class MyStaticMplCanvas(MyMplCanvas):
-#    """Simple canvas with a sine plot."""
-#
-#    def compute_initial_figure(self):
-#        t = np.arange(0.0, 3.0, 0.01)
-#        s = np.sin(2*np.pi*t)
-#        self.axes.plot(t, s)
-#
-class PlotTauG(QtGui.QWidget):
-
-    def __init__(self, parent):
-        super(PlotTauG, self).__init__(parent)
 
 ################# GUI Elements ################################################
 #        self.chkWarnings = QtGui.QCheckBox()
@@ -70,9 +78,11 @@ class PlotTauG(QtGui.QWidget):
  #       plt_canvas-> mplwidget      
         self.fig = Figure() 
 
-        self.mplwidget = FigureCanvas(self.fig)
-        self.mplwidget.setSizePolicy(QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
+#        self.mplwidget = FigureCanvas(self.fig)
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+#        self.mplwidget.setSizePolicy(QtGui.QSizePolicy.Expanding,
+#                                   QtGui.QSizePolicy.Expanding)
 
         # Needed for mouse modifiers (x,y, <CTRL>, ...):
         #    Key press events in general are not processed unless you
@@ -81,9 +91,9 @@ class PlotTauG(QtGui.QWidget):
 #        self.mplwidget.setFocusPolicy(QtCore.Qt.ClickFocus)
 #        self.mplwidget.setFocus()
 
-        self.mplwidget.updateGeometry() 
+#        self.mplwidget.updateGeometry() 
         
-        self.setLayout(self.mplwidget.layVMainMpl)
+#        self.setLayout(self.mplwidget.layVMainMpl)
         
         
 ############ combine UI elements ##############################################
