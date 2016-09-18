@@ -6,6 +6,7 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 SPLITTER = True
+SCROLL = True
 import sys, os
 #from sip import setdestroyonexit
 import logging
@@ -155,27 +156,27 @@ class pyFDA(QtGui.QMainWindow):
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
 
-
-        # Create scroll area and "monitor" _widget whether scrollbars are needed
-        scrollArea = QtGui.QScrollArea()
-        scrollArea.setWidget(_widget) # splitter for var. size tabs?
-
-        #============= Set behaviour of scroll area ======================
-        # scroll bars appear when the scroll area shrinks below this size:
-        scrollArea.setMinimumSize(QtCore.QSize(800, 500))
-#        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
-#        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
-        scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                 QtGui.QSizePolicy.MinimumExpanding)
-
-        # Size of monitored widget is allowed to grow:
-        scrollArea.setWidgetResizable(True)
-
-
-        # make ScrollArea occupy the main area of QMainWidget 
-        #   and make QMainWindow its parent !!!
-        self.setCentralWidget(scrollArea)
-
+        if SCROLL:
+            # Create scroll area and "monitor" _widget whether scrollbars are needed
+            scrollArea = QtGui.QScrollArea()
+            scrollArea.setWidget(_widget) # make main widget "scrollable"
+    
+            #============= Set behaviour of scroll area ======================
+            # scroll bars appear when the scroll area shrinks below this size:
+            scrollArea.setMinimumSize(QtCore.QSize(800, 500))
+    #        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
+    #        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
+            scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                                     QtGui.QSizePolicy.MinimumExpanding)
+    
+            # Size of monitored widget is allowed to grow:
+            scrollArea.setWidgetResizable(True)
+    
+            # make ScrollArea occupy the main area of QMainWidget 
+            #   and make QMainWindow its parent !!!
+            self.setCentralWidget(_widget)
+        else:
+            self.setCentralWidget(_widget)
 
         #=============== Menubar =======================================
 
