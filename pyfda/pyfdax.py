@@ -5,6 +5,7 @@ Mainwindow  for the pyFDA app, initializes UI
 Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+SPLITTER = True
 import sys, os
 #from sip import setdestroyonexit
 import logging
@@ -98,10 +99,8 @@ class pyFDA(QtGui.QMainWindow):
         - Plot Window [-> plotAll.plotAll()]
         """
 
-        # Instantiate widget groups
+        # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
-        self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
-
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
 
         # ============== UI Layout =====================================
@@ -109,34 +108,50 @@ class pyFDA(QtGui.QMainWindow):
 
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
 
-        # comment out following 3 lines for splitter design
-        layHMain.addWidget(self.inputTabWidgets)
-        layHMain.addWidget(self.pltTabWidgets)
-        layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
+        if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
+            layVInput = QtGui.QVBoxLayout()
+            layVInput.addWidget(self.inputTabWidgets)
+            layVPlt = QtGui.QVBoxLayout()
+            layVPlt.addWidget(self.pltTabWidgets)
+    
+            frmInput = QtGui.QFrame()
+            frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+            frmInput.setLayout(layVInput)
+            frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                     QtGui.QSizePolicy.Minimum)
+    
+            frmPlt = QtGui.QFrame()
+            frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+            frmPlt.setLayout(layVPlt)
+            frmPlt.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                     QtGui.QSizePolicy.Minimum)
+    
+            splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
+            splitter.addWidget(frmInput)
+            splitter.addWidget(frmPlt)
+#            splitter.setStretchFactor(1,4) # factors for the initial sizes of subwidgets
+            splitter.setSizes([250,600])
 
+            layHMain.addWidget(splitter)
 
-# variable size tabs (splitter)
-#        layVInput = QtGui.QVBoxLayout()
-#        layVInput.addWidget(self.inputWidgets)
-#        layVPlt = QtGui.QVBoxLayout()
-#        layVPlt.addWidget(self.pltWidgets)
-#
-#        frmInput = QtGui.QFrame()
-#        frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-#        frmInput.setLayout(layVInput)
-#        frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
-#                                 QtGui.QSizePolicy.Minimum)
-#
-#        frmPlt = QtGui.QFrame()
-#        frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-#        frmPlt.setLayout(layVPlt)
-#        frmPlt.setSizePolicy(QtGui.QSizePolicy.Minimum,
-#                                 QtGui.QSizePolicy.Minimum)
-#
-#        splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
-#        splitter.addWidget(frmInput)
-#        splitter.addWidget(frmPlt)
-#        layHMain.addWidget(splitter)
+#==============================================================================
+#             QSplitter::handle {
+#                 image: url(images/splitter.png);
+#                 }
+# 
+#             QSplitter::handle:horizontal {
+#                 width: 2px;
+#                 }
+# 
+#             QSplitter::handle:vertical {
+#                 height: 2px;
+#                 }          
+#==============================================================================
+        else: # no splitter design, only use layHMain layout
+            self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
+            layHMain.addWidget(self.inputTabWidgets)
+            layHMain.addWidget(self.pltTabWidgets)
+            layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
 
