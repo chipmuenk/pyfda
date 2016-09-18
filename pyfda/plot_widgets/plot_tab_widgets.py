@@ -11,7 +11,7 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
                           plot_3d)
 
 #------------------------------------------------------------------------------
-class PlotTabWidgets(QtGui.QWidget):
+class PlotTabWidgets(QtGui.QTabWidget):
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
