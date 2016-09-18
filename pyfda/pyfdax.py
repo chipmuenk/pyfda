@@ -308,12 +308,8 @@ def main():
     app.setActiveWindow(mainw) 
     mainw.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
 
-    desktop = QtGui.QDesktopWidget() # test the available desktop resolution
-    # make pyFDA instance the parent for clean termination upon exit 
-    #  - otherwise the whole application will crash upon exit!
-    desktop.setParent(mainw) 
-    screen_h = desktop.availableGeometry().height()
-    screen_w = desktop.availableGeometry().width()
+    screen_resolution = app.desktop().screenGeometry()
+    screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
     logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
 
     fontsize = 10
@@ -321,8 +317,6 @@ def main():
         delta = 50
     else:
         delta = 100
-    desktop.deleteLater() # without this instruction, the main app looses focus ?!
-
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     # Give the keyboard input focus to this widget if this widget 
