@@ -174,7 +174,7 @@ class pyFDA(QtGui.QMainWindow):
     
             # make ScrollArea occupy the main area of QMainWidget 
             #   and make QMainWindow its parent !!!
-            self.setCentralWidget(_widget)
+            self.setCentralWidget(scrollArea)
         else:
             self.setCentralWidget(_widget)
 
