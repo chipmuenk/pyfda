@@ -105,9 +105,12 @@ class pyFDA(QtGui.QMainWindow):
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
 
         # ============== UI Layout =====================================
-        _widget = QtGui.QWidget() # this widget contains all subwidget groups
+#        _widget = QtGui.QMainWindow() # this widget contains all subwidget groups
+#        _widget = QtGui.QDialog() # this widget contains all subwidget groups
+        _widget = QtGui.QWidget(self) # this widget contains all subwidget groups
 
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
+#        layHMain = QtGui.QHBoxLayout(self) # horizontal layout of all groups
 
         if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
             layVInput = QtGui.QVBoxLayout()
