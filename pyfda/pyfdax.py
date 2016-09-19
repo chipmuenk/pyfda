@@ -315,7 +315,7 @@ def main():
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     # Give the keyboard input focus to this widget if this widget 
     # or one of its parents is the active window:
-    mainw.setFocus() 
+#    mainw.setFocus() 
     mainw.show()
 
     #start the application's exec loop, return the exit code to the OS
