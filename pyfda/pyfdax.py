@@ -162,11 +162,9 @@ class pyFDA(QtGui.QMainWindow):
             # Size of monitored widget is allowed to grow:
             scrollArea.setWidgetResizable(True)
     
-            # make ScrollArea occupy the main area of QMainWidget 
-            #   and make QMainWindow its parent !!!
-            self.setCentralWidget(scrollArea)
-        else:
-            self.setCentralWidget(_widget)
+        # make _widget occupy the main area of QMainWidget 
+        #   and make QMainWindow its parent !!!
+        self.setCentralWidget(_widget)
 
         #=============== Menubar =======================================
 
