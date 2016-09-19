@@ -35,6 +35,23 @@ class PlotImpz(QtGui.QWidget):
         self.ledLogBottom.setText("-80")
         self.ledLogBottom.setToolTip("Minimum display value for log. scale.")
 
+        self.lblPltStim = QtGui.QLabel(self)
+        self.lblPltStim.setText("Plot Stimulus")
+        self.chkPltStim = QtGui.QCheckBox(self)
+        self.chkPltStim.setChecked(False)
+        
+        self.lblStimulus = QtGui.QLabel("Signal Type")
+        self.cmbStimulus = QtGui.QComboBox(self)
+        self.cmbStimulus.addItems(["Impulse","Step","Sine", "Rect", "Sawtooth"])
+        self.cmbStimulus.setToolTip("Select stimulus type.")
+        
+        self.lblFreq = QtGui.QLabel("Freq.")
+
+        self.ledFreq = QtGui.QLineEdit(self)
+        self.ledFreq.setText("0.02")
+        self.ledFreq.setToolTip("Stimulus frequency.")
+
+
         self.lblNPoints = QtGui.QLabel("<i>N</i> =")
 
         self.ledNPoints = QtGui.QLineEdit(self)
@@ -42,24 +59,27 @@ class PlotImpz(QtGui.QWidget):
         self.ledNPoints.setToolTip("Number of points to calculate and display.\n"
                                    "N = 0 chooses automatically.")
 
-        self.lblStep = QtGui.QLabel("Step Response")
-        self.chkStep = QtGui.QCheckBox()
-        self.chkStep.setChecked(False)
-        self.chkStep.setToolTip("Show step response instead of impulse response.")
-
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
+        
+        self.layHChkBoxes.addWidget(self.lblNPoints)
+        self.layHChkBoxes.addWidget(self.ledNPoints)
+        self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLog)
         self.layHChkBoxes.addWidget(self.chkLog)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLogBottom)
         self.layHChkBoxes.addWidget(self.ledLogBottom)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblStep)
-        self.layHChkBoxes.addWidget(self.chkStep)
+        self.layHChkBoxes.addWidget(self.lblPltStim)
+        self.layHChkBoxes.addWidget(self.chkPltStim)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblNPoints)
-        self.layHChkBoxes.addWidget(self.ledNPoints)
+        self.layHChkBoxes.addWidget(self.lblStimulus)
+        self.layHChkBoxes.addWidget(self.cmbStimulus)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.lblFreq)
+        self.layHChkBoxes.addWidget(self.ledFreq)
+
         self.layHChkBoxes.addStretch(10)
 
         #----------------------------------------------------------------------
@@ -75,9 +95,11 @@ class PlotImpz(QtGui.QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.chkLog.clicked.connect(self.draw)
-        self.chkStep.clicked.connect(self.draw)
         self.ledNPoints.editingFinished.connect(self.draw)
         self.ledLogBottom.editingFinished.connect(self.draw)
+        self.chkPltStim.clicked.connect(self.draw)
+        self.cmbStimulus.currentIndexChanged.connect(self.draw)
+        self.ledFreq.editingFinished.connect(self.draw)
 
         self.draw() # initial calculation and drawing
 
