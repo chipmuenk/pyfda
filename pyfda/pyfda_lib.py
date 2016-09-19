@@ -1120,6 +1120,13 @@ def fil_convert(fil_dict, format_in):
     elif 'sos' in format_in and SOS_AVAIL:
         if 'zpk' not in format_in:
             fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
+            # check whether sos conversion has created a additional (superfluous)
+            # pole and zero at the origin and delete them:
+            z_0 = np.where(fil_dict['zpk'][0] == 0)[0]
+            p_0 = np.where(fil_dict['zpk'][1] == 0)[0]
+            if p_0 and z_0: # eliminate z = 0 and p = 0 from list:
+                fil_dict['zpk'][0] = np.delete(fil_dict['zpk'][0],z_0)
+                fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1],p_0)
         if 'ba' not in format_in:
             fil_dict['ba'] = sig.sos2tf(fil_dict['sos'])
 
