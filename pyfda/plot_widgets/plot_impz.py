@@ -8,9 +8,10 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 
 from PyQt4 import QtGui
 import numpy as np
+import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import impz
+from pyfda.pyfda_lib import expand_lim
 from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 
@@ -146,26 +147,49 @@ class PlotImpz(QtGui.QWidget):
         (Re-)calculate h[n] and draw the figure
         """
         log = self.chkLog.isChecked()
-        step = self.chkStep.isChecked()
+        stim = self.cmbStimulus.currentText()
+        periodic_sig = stim not in {"Impulse","Step"}
         self.lblLogBottom.setEnabled(log)
         self.ledLogBottom.setEnabled(log)
-
-        self.bb = fb.fil[0]['ba'][0]
-        self.aa = fb.fil[0]['ba'][1]
+        self.lblFreq.setEnabled(periodic_sig)
+        self.ledFreq.setEnabled(periodic_sig)
+        
+        
+        self.bb = np.asarray(fb.fil[0]['ba'][0])
+        self.aa = np.asarray(fb.fil[0]['ba'][1])
 
         self.f_S  = fb.fil[0]['f_S']
         
+        N = self.calc_n_points(abs(int(self.ledNPoints.text())))
 
+        t = np.linspace(0, N/self.f_S, N, endpoint=False)
         # calculate h[n]
-        [h, t] = impz(self.bb, self.aa, self.f_S, step=step,
-                      N=int(self.ledNPoints.text()))
-
-        if step:
-            title_str = r'Step Response'
-            H_str = r'$h_{\epsilon}[n]$'
-        else:
+        if stim == "Impulse":
+            x = np.zeros(N)
+            x[0] =1.0 # create dirac impulse as input signal
             title_str = r'Impulse Response'
             H_str = r'$h[n]$'
+        elif stim == "Step":
+            x = np.ones(N) # create step function
+            title_str = r'Step Response'
+            H_str = r'$h_{\epsilon}[n]$'
+        elif stim in {"Sine", "Rect"}:
+            x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
+            if stim == "Sine":
+                title_str = r'Response to Sine Signal'
+                H_str = r'$h_{\sin}[n]$'
+            else:
+                x = np.sign(x)
+                title_str = r'Response to Rect. Signal'
+                H_str = r'$h_{rect}[n]$'
+        else:
+            x = sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
+            title_str = r'Response to Sawtooth Signal'
+            H_str = r'$h_{saw}[n]$'
+
+            
+        h = sig.lfilter(self.bb, self.aa, x)
+
 
         self.cmplx = np.any(np.iscomplex(h))
         if self.cmplx:
@@ -187,9 +211,11 @@ class PlotImpz(QtGui.QWidget):
 
 
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom,
-                                      markerfmt='bo', linefmt='r')
-        self.ax_r.set_xlim([min(t), max(t)])
+        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='bo', linefmt='r')
+        if self.chkPltStim.isChecked():
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='k')
+            [stem.set_linewidth(0.5) for stem in ss]
+            bs.set_visible(False) # invisible bottomline
         expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
 
