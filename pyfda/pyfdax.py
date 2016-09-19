@@ -82,8 +82,8 @@ class pyFDA(QtGui.QMainWindow):
     toolbar, statusbar, central widget, docking areas etc.
     """
 
-    def __init__(self):
-        super(pyFDA, self).__init__()
+    def __init__(self, parent=None):
+        super(pyFDA, self).__init__(parent)
 #        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
         # initialize the FilterTreeBuilder class with the filter directory and
