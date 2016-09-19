@@ -225,6 +225,44 @@ class PlotImpz(QtGui.QWidget):
 
         self.mplwidget.redraw()
 
+#------------------------------------------------------------------------------        
+    def calc_n_points(self, N_user = 0):
+        """
+        Calculate number of points to be displayed, depending on type of filter 
+        (FIR, IIR) and user input. If the user selects 0 points, the number is
+        calculated automatically.
+        
+        An improvement would be to calculate the dominant pole and the corresponding
+        settling time.
+        """
+
+        if len(self.aa) == 1:
+            if len(self.bb) == 1:
+                raise TypeError(
+                'No proper filter coefficients: len(a) = len(b) = 1 !')
+            else:
+                IIR = False
+        else:
+            if len(self.bb) == 1:
+                IIR = True
+            # Test whether all elements except first are zero
+            elif not np.any(self.aa[1:]) and self.aa[0] != 0:
+                #  same as:   elif np.all(a[1:] == 0) and a[0] <> 0:
+                IIR = False
+            else:
+                IIR = True
+    
+        if N_user == 0: # set number of data points automatically
+            if IIR:
+                N = 100 # TODO: IIR: more intelligent algorithm needed
+            else:
+                N = min(len(self.bb),  100) # FIR: N = number of coefficients (max. 100)
+        else:
+            N = N_user
+    
+        return N
+
+
 #------------------------------------------------------------------------------
 
 def main():
