@@ -174,6 +174,7 @@ class PlotImpz(QtGui.QWidget):
         [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom,
                                       markerfmt='bo', linefmt='r')
         self.ax_r.set_xlim([min(t), max(t)])
+        expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
 
         if self.cmplx:

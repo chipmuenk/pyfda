@@ -950,6 +950,36 @@ Examples
     gd[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
     return w, gd
 
+#==================================================================     
+def expand_lim(ax, eps_x, eps_y = None):
+#==================================================================
+    """
+    Expand the xlim and ylim-values of passed axis by eps
+    
+    Parameters
+    ----------
+    
+    ax : axes object
+    
+    eps_x : float
+            factor by which x-axis limits are expanded
+            
+    eps_y : float
+            factor by which y-axis limits are expanded. If eps_y is None, eps_x
+            is used for eps_y as well.
+    
+    
+    Returns
+    -------
+    nothing
+    """
+    
+    if not eps_y:
+        eps_y = eps_x
+    xmin,xmax,ymin,ymax = ax.axis()                            
+    dx = (xmax - xmin) * eps_x
+    dy = (ymax - ymin) * eps_y
+    ax.axis((xmin-dx,xmax+dx,ymin-dy,ymax+dy))      
 
 #==================================================================
 def format_ticks(ax, xy, scale=1., format="%.1f"):
