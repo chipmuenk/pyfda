@@ -92,7 +92,7 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.t_specs, 7, 0, 1, 2)  # Target specs
         layGMain.addWidget(self.butDesignFilt, 8, 0)  # <Design Filter> button
         layGMain.addWidget(self.butQuit, 8, 1)        # <Quit> button
-#        layGMain.addItem(spcV, 9, 0, 1, 2) # spacer to allow for expansion
+        layGMain.addItem(spcV, 9, 0, 1, 2) # spacer to allow for vert. expansion
 #        layGMain.addWidget(self.HLine(), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(0, 0, 0, 0)
 #        layGMain.setRowStretch(1,1)
