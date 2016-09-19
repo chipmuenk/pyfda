@@ -199,31 +199,35 @@ class pyFDA(QtGui.QMainWindow):
         # sigReadFilters: button has been pressed to rebuild filter tree:
         self.inputTabWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
 
-#        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
+        # open pop-up "about" window
+        #aboutAction.triggered.connect(self.aboutWindow) 
+
         # trigger the close event in response to sigQuit generated in another subwidget:
         self.inputTabWidgets.inputSpecs.sigQuit.connect(self.close)
 
 
         logger.debug("Main routine initialized!")
 
-#------------------------------------------------------------------------------
-    def aboutWindow(self):
-        """
-        Display an "About" window
-        """
-        QtGui.QMessageBox.about(self, "About pyFDA",
-                                ("(c) 2013 - 15 Christian Münker\n\n"
-        "A graphical tool for designing, analyzing and synthesizing digital filters")
-        )
-
-#------------------------------------------------------------------------------
-    def statusMessage(self, message):
-        """
-        Display a message in the statusbar.
-        """
-        self.statusBar().showMessage(message)
-
-#------------------------------------------------------------------------------       
+#==============================================================================
+# #------------------------------------------------------------------------------
+#     def aboutWindow(self):
+#         """
+#         Display an "About" window
+#         """
+#         QtGui.QMessageBox.about(self, "About pyFDA",
+#                                 ("(c) 2013 - 15 Christian Münker\n\n"
+#         "A graphical tool for designing, analyzing and synthesizing digital filters")
+#         )
+# 
+# #------------------------------------------------------------------------------
+#     def statusMessage(self, message):
+#         """
+#         Display a message in the statusbar.
+#         """
+#         self.statusBar().showMessage(message)
+# 
+# #------------------------------------------------------------------------------       
+#==============================================================================
     
     def closeEvent(self, event): 
         """
