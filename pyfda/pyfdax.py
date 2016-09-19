@@ -133,8 +133,8 @@ class pyFDA(QtGui.QMainWindow):
             splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
             splitter.addWidget(frmInput)
             splitter.addWidget(frmPlt)
-#            splitter.setStretchFactor(1,4) # factors for the initial sizes of subwidgets
-            splitter.setSizes([250,600])
+            splitter.setStretchFactor(1,4) # factors for the initial sizes of subwidgets
+#            splitter.setSizes([200,600])
 
             layHMain.addWidget(splitter)
 
