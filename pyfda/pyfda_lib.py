@@ -1127,9 +1127,16 @@ def fil_convert(fil_dict, format_in):
             if p_0 and z_0: # eliminate z = 0 and p = 0 from list:
                 fil_dict['zpk'][0] = np.delete(fil_dict['zpk'][0],z_0)
                 fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1],p_0)
-        if 'ba' not in format_in:
-            fil_dict['ba'] = sig.sos2tf(fil_dict['sos'])
 
+        if 'ba' not in format_in:
+            fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
+            # check whether sos conversion has created additional (superfluous)
+            # highest order polynomial with coefficient 0 and delete them
+            if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
+                fil_dict['ba'][0] = np.delete(fil_dict['ba'][0],-1) 
+                fil_dict['ba'][1] = np.delete(fil_dict['ba'][1],-1) 
+
+                
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         fil_dict['zpk'] = list(sig.tf2zpk(b,a))
@@ -1139,7 +1146,6 @@ def fil_convert(fil_dict, format_in):
             except ValueError:
                 fil_dict['sos'] = 'None'
                 print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
-
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
