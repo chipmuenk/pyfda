@@ -287,7 +287,6 @@ def main():
     """
      # instantiate QApplication object, passing command line arguments
     app = QtGui.QApplication(sys.argv)
-    app.setObjectName("TopApp")
     app.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
     app.setStyleSheet(rc.css_rc) 
 
