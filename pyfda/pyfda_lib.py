@@ -985,39 +985,39 @@ def expand_lim(ax, eps_x, eps_y = None):
 def format_ticks(ax, xy, scale=1., format="%.1f"):
 #==================================================================
     """
-Reformat numbers at x or y - axis. The scale can be changed to display
-e.g. MHz instead of Hz. The number format can be changed as well.
-
-Parameters
-----------
-
-ax : axes object
-
-xy : string, either 'x', 'y' or 'xy'
-     select corresponding axis (axes) for reformatting
-
-scale : real (default: 1.)
-        rescaling factor for the axes
-
-format : string (default: %.1f)
-         define C-style number formats
-
-Returns
--------
-nothing
-
-
-Examples
---------
-Scale all numbers of x-Axis by 1000, e.g. for displaying ms instead of s.
-
->>> format_ticks('x',1000.)
-
-Two decimal places for numbers on x- and y-axis
-
->>> format_ticks('xy',1., format = "%.2f")
-
-"""
+    Reformat numbers at x or y - axis. The scale can be changed to display
+    e.g. MHz instead of Hz. The number format can be changed as well.
+    
+    Parameters
+    ----------
+    
+    ax : axes object
+    
+    xy : string, either 'x', 'y' or 'xy'
+         select corresponding axis (axes) for reformatting
+    
+    scale : real (default: 1.)
+            rescaling factor for the axes
+    
+    format : string (default: %.1f)
+             define C-style number formats
+    
+    Returns
+    -------
+    nothing
+    
+    
+    Examples
+    --------
+    Scale all numbers of x-Axis by 1000, e.g. for displaying ms instead of s.
+    
+    >>> format_ticks('x',1000.)
+    
+    Two decimal places for numbers on x- and y-axis
+    
+    >>> format_ticks('xy',1., format = "%.2f")
+    
+    """
     if xy == 'x' or xy == 'xy':
 #        locx,labelx = ax.get_xticks(), ax.get_xticklabels() # get location and content of xticks
         locx = ax.get_xticks()
