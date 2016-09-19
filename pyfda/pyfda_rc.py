@@ -217,6 +217,18 @@ css_common = """
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
                                 border-width: 2px;}
+                QSplitter::handle {
+                    image: url(pyfda/images/icons/resize-width.svg);  /* splitter.png);*/
+                    }
+    
+                QSplitter::handle:horizontal {
+                    width: 10px;
+                    }
+    
+                QSplitter::handle:vertical {
+                    height: 10px;
+                    }          
+                                
             """\
             + TabBarCss
 
