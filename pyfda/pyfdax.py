@@ -6,7 +6,7 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 SPLITTER = True
-SCROLL = True
+SCROLL = False
 import sys, os
 #from sip import setdestroyonexit
 import logging
