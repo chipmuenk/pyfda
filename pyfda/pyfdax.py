@@ -138,19 +138,6 @@ class pyFDA(QtGui.QMainWindow):
 
             layHMain.addWidget(splitter)
 
-#==============================================================================
-#             QSplitter::handle {
-#                 image: url(images/splitter.png);
-#                 }
-# 
-#             QSplitter::handle:horizontal {
-#                 width: 2px;
-#                 }
-# 
-#             QSplitter::handle:vertical {
-#                 height: 2px;
-#                 }          
-#==============================================================================
         else: # no splitter design, only use layHMain layout
             self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
             layHMain.addWidget(self.inputTabWidgets)
