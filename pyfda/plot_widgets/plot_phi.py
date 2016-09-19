@@ -148,7 +148,7 @@ class PlotPhi(QtGui.QWidget):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    mainw = PlotPhi()
+    mainw = PlotPhi(None)
     app.setActiveWindow(mainw) 
     mainw.show()
     sys.exit(app.exec_())

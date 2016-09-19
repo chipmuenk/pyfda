@@ -591,7 +591,7 @@ class Plot3D(QtGui.QWidget):
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    mainw = Plot3D()
+    mainw = Plot3D(None)
     app.setActiveWindow(mainw) 
     mainw.show()
     sys.exit(app.exec_())

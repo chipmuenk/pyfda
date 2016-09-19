@@ -68,11 +68,14 @@ class PlotTabWidgets(QtGui.QTabWidget):
 
 def main():
     import sys
+    from pyfda import pyfda_rc as rc
     app = QtGui.QApplication(sys.argv)
-    mainw = PlotTabWidgets()
-    
+    app.setStyleSheet(rc.css_rc)
+
+    mainw = PlotTabWidgets(None)
     app.setActiveWindow(mainw) 
     mainw.show()
+    
     sys.exit(app.exec_())
     
 if __name__ == "__main__":
