@@ -107,7 +107,7 @@ class pyFDA(QtGui.QMainWindow):
         # ============== UI Layout =====================================
 #        _widget = QtGui.QMainWindow() # this widget contains all subwidget groups
 #        _widget = QtGui.QDialog() # this widget contains all subwidget groups
-        _widget = QtGui.QWidget(self) # this widget contains all subwidget groups
+        _widget = QtGui.QWidget() # this widget contains all subwidget groups
 
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
 #        layHMain = QtGui.QHBoxLayout(self) # horizontal layout of all groups
