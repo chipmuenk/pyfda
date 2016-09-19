@@ -80,8 +80,8 @@ class InputSpecs(QtGui.QWidget):
         #----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
         #----------------------------------------------------------------------
-#        spcV = QtGui.QSpacerItem(10, 10, QtGui.QSizePolicy.Minimum,
-#                                      QtGui.QSizePolicy.Expanding)
+        spcV = QtGui.QSpacerItem(10, 10, QtGui.QSizePolicy.Minimum,
+                                      QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
         layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
         layGMain.addWidget(self.f_units, 2, 0, 1, 2)  # Frequency units
