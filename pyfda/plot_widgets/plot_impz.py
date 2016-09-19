@@ -154,13 +154,7 @@ class PlotImpz(QtGui.QWidget):
         self.aa = fb.fil[0]['ba'][1]
 
         self.f_S  = fb.fil[0]['f_S']
-        self.F_PB = fb.fil[0]['F_PB'] * self.f_S
-        self.F_SB = fb.fil[0]['F_SB'] * self.f_S
-
-        self.A_PB  = fb.fil[0]['A_PB']
-        self.A_PB2 = fb.fil[0]['A_PB2']
-        self.A_SB  = fb.fil[0]['A_SB']
-        self.A_SB2 = fb.fil[0]['A_SB2']
+        
 
         # calculate h[n]
         [h, t] = impz(self.bb, self.aa, self.f_S, step=step,
