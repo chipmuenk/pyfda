@@ -5,6 +5,8 @@ Widget for plotting impulse response
 Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+import logging
+logger = logging.getLogger(__name__)
 
 from PyQt4 import QtGui
 from PyQt4.QtCore import QEvent, Qt
@@ -139,7 +141,7 @@ class PlotImpz(QtGui.QWidget):
         if isinstance(source, QtGui.QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                source.setText(str(self.stim_freq * fb.fil[0]['f_S'])) # full precision
+                self.load_entry()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -155,6 +157,31 @@ class PlotImpz(QtGui.QWidget):
         # Call base class method to continue normal event processing:
         return super(PlotImpz, self).eventFilter(source, event)
 
+#-------------------------------------------------------------        
+    def load_entry(self):
+        """
+        Reload textfields from filter dictionary 
+        Transform the displayed frequency spec input fields according to the units
+        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
+        in the dictionary; when f_S or the unit are changed, only the displayed values
+        of the frequency entries are updated, not the dictionary!
+
+        load_entries is called during init and when the frequency unit or the
+        sampling frequency have been changed.
+
+        It should be called when sigSpecsChanged or sigFilterDesigned is emitted
+        at another place, indicating that a reload is required.
+        """
+
+        # recalculate displayed freq spec values for (maybe) changed f_S
+        logger.debug("exec load_entry")
+        if not self.ledFreq.hasFocus():
+            # widget has no focus, round the display
+            self.ledFreq.setText(
+                str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+        else:
+            # widget has focus, show full precision
+            self.ledFreq.setText(str(self.stim_freq * fb.fil[0]['f_S']))
 
 #------------------------------------------------------------------------------
     def _init_axes(self):
@@ -212,6 +239,7 @@ class PlotImpz(QtGui.QWidget):
         
 #        self.lblFreqUnit.setVisible(fb.fil[0]['freq_specs_unit'] == 'f_S')
         self.lblFreqUnit.setText(rt_label(fb.fil[0]['freq_specs_unit']))
+        self.load_entry()
         
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
