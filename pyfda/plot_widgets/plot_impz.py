@@ -11,7 +11,7 @@ import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import expand_lim
+from pyfda.pyfda_lib import expand_lim, rt_label
 from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 
@@ -24,36 +24,37 @@ class PlotImpz(QtGui.QWidget):
         self.ACTIVE_3D = False
 
         self.lblLog = QtGui.QLabel(self)
-        self.lblLog.setText("Log.")
+        self.lblLog.setText("Log:")
         self.chkLog = QtGui.QCheckBox(self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("Show logarithmic impulse / step response.")
         self.chkLog.setChecked(False)
 
-        self.lblLogBottom = QtGui.QLabel("Log. bottom:")
-
+        self.lblLogBottom = QtGui.QLabel("Bottom = ")
         self.ledLogBottom = QtGui.QLineEdit(self)
         self.ledLogBottom.setText("-80")
         self.ledLogBottom.setToolTip("Minimum display value for log. scale.")
-
+        self.lbldB = QtGui.QLabel("dB")
+        
         self.lblPltStim = QtGui.QLabel(self)
-        self.lblPltStim.setText("Plot Stimulus")
+        self.lblPltStim.setText("Stimulus:  Show")
         self.chkPltStim = QtGui.QCheckBox(self)
         self.chkPltStim.setChecked(False)
         
-        self.lblStimulus = QtGui.QLabel("Signal Type")
+        self.lblStimulus = QtGui.QLabel("Type = ")
         self.cmbStimulus = QtGui.QComboBox(self)
-        self.cmbStimulus.addItems(["Impulse","Step","Sine", "Rect", "Sawtooth"])
+        self.cmbStimulus.addItems(["Pulse","Step","Sine", "Rect", "Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         
-        self.lblFreq = QtGui.QLabel("Freq.")
+        self.lblFreq = QtGui.QLabel("<i>f</i>&nbsp; =")
 
         self.ledFreq = QtGui.QLineEdit(self)
         self.ledFreq.setText("0.02")
         self.ledFreq.setToolTip("Stimulus frequency.")
+        
+        self.lblFreqUnit = QtGui.QLabel("f_S")
 
-
-        self.lblNPoints = QtGui.QLabel("<i>N</i> =")
+        self.lblNPoints = QtGui.QLabel("<i>N</i>&nbsp; =")
 
         self.ledNPoints = QtGui.QLineEdit(self)
         self.ledNPoints.setText("0")
@@ -65,21 +66,23 @@ class PlotImpz(QtGui.QWidget):
         
         self.layHChkBoxes.addWidget(self.lblNPoints)
         self.layHChkBoxes.addWidget(self.ledNPoints)
-        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addStretch(2)
         self.layHChkBoxes.addWidget(self.lblLog)
         self.layHChkBoxes.addWidget(self.chkLog)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLogBottom)
         self.layHChkBoxes.addWidget(self.ledLogBottom)
-        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.lbldB)
+        self.layHChkBoxes.addStretch(2)
         self.layHChkBoxes.addWidget(self.lblPltStim)
         self.layHChkBoxes.addWidget(self.chkPltStim)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblStimulus)
         self.layHChkBoxes.addWidget(self.cmbStimulus)
-        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addStretch(2)
         self.layHChkBoxes.addWidget(self.lblFreq)
         self.layHChkBoxes.addWidget(self.ledFreq)
+        self.layHChkBoxes.addWidget(self.lblFreqUnit)
 
         self.layHChkBoxes.addStretch(10)
 
@@ -103,6 +106,8 @@ class PlotImpz(QtGui.QWidget):
         self.ledFreq.editingFinished.connect(self.draw)
 
         self.draw() # initial calculation and drawing
+
+
 
 #------------------------------------------------------------------------------
     def _init_axes(self):
@@ -147,12 +152,19 @@ class PlotImpz(QtGui.QWidget):
         (Re-)calculate h[n] and draw the figure
         """
         log = self.chkLog.isChecked()
-        stim = self.cmbStimulus.currentText()
-        periodic_sig = stim not in {"Impulse","Step"}
-        self.lblLogBottom.setEnabled(log)
-        self.ledLogBottom.setEnabled(log)
-        self.lblFreq.setEnabled(periodic_sig)
-        self.ledFreq.setEnabled(periodic_sig)
+        stim = str(self.cmbStimulus.currentText())
+        periodic_sig = stim in {"Sine","Rect", "Saw"}
+        self.lblLogBottom.setVisible(log)
+        self.ledLogBottom.setVisible(log)
+        self.lbldB.setVisible(log)
+        
+        self.lblFreq.setVisible(periodic_sig)
+        self.ledFreq.setVisible(periodic_sig)
+        self.lblFreqUnit.setVisible(periodic_sig)
+
+        
+#        self.lblFreqUnit.setVisible(fb.fil[0]['freq_specs_unit'] == 'f_S')
+        self.lblFreqUnit.setText(rt_label(fb.fil[0]['freq_specs_unit']))
         
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -164,7 +176,7 @@ class PlotImpz(QtGui.QWidget):
 
         t = np.linspace(0, N/self.f_S, N, endpoint=False)
         # calculate h[n]
-        if stim == "Impulse":
+        if stim == "Pulse":
             x = np.zeros(N)
             x[0] =1.0 # create dirac impulse as input signal
             title_str = r'Impulse Response'
@@ -199,7 +211,7 @@ class PlotImpz(QtGui.QWidget):
             H_str = r'$\Re\{$' + H_str + '$\}$'
         if log:
             bottom = float(self.ledLogBottom.text())
-            H_str = r'$\log$ ' + H_str + ' in dB'
+            H_str = r'$|$ ' + H_str + '$|$ in dB'
             h = np.maximum(20 * np.log10(abs(h)), bottom)
             if self.cmplx:
                 h_i = np.maximum(20 * np.log10(abs(h_i)), bottom)
