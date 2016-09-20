@@ -92,7 +92,7 @@ class InputFreqSpecs(QtGui.QWidget):
         - When a key is pressed inside the text field, set the `spec_edited` flag
           to True.
         - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
-          current value in linear format with full precision (only if
+          current value normalized to f_S with full precision (only if
           `spec_edited`== True) and display the stored value in selected format
         """
         if isinstance(source, QtGui.QLineEdit): # could be extended for other widgets
