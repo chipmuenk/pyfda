@@ -134,7 +134,8 @@ using Ichige's algorithm.
         self.led_remez_1 = QtGui.QLineEdit()
         self.led_remez_1.setText("16")
         self.led_remez_1.setObjectName('wdg_led_remez_1')
-        self.led_remez_1.setToolTip("Set number of frequency grid points for ")
+        self.led_remez_1.setToolTip("Number of frequency points for Remez algorithm. Increase the\n"
+                                    "number to reduce frequency overshoot in the transition region.")
 
         self.layHWin = QtGui.QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
