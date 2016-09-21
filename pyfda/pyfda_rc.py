@@ -25,6 +25,7 @@ Author: Christian Muenker
 """
 
 from __future__ import division, unicode_literals, absolute_import
+from pyfda import qrc_resources # contains all icons
 
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
@@ -217,6 +218,18 @@ css_common = """
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
                                 border-width: 2px;}
+                QSplitter::handle {
+                    image: url(':/grid-four-up.svg');
+                    }
+    
+                QSplitter::handle:horizontal {
+                    width: 10px;
+                    }
+    
+                QSplitter::handle:vertical {
+                    height: 10px;
+                    }          
+                                
             """\
             + TabBarCss
 

@@ -950,44 +950,74 @@ Examples
     gd[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
     return w, gd
 
+#==================================================================     
+def expand_lim(ax, eps_x, eps_y = None):
+#==================================================================
+    """
+    Expand the xlim and ylim-values of passed axis by eps
+    
+    Parameters
+    ----------
+    
+    ax : axes object
+    
+    eps_x : float
+            factor by which x-axis limits are expanded
+            
+    eps_y : float
+            factor by which y-axis limits are expanded. If eps_y is None, eps_x
+            is used for eps_y as well.
+    
+    
+    Returns
+    -------
+    nothing
+    """
+    
+    if not eps_y:
+        eps_y = eps_x
+    xmin,xmax,ymin,ymax = ax.axis()                            
+    dx = (xmax - xmin) * eps_x
+    dy = (ymax - ymin) * eps_y
+    ax.axis((xmin-dx,xmax+dx,ymin-dy,ymax+dy))      
 
 #==================================================================
 def format_ticks(ax, xy, scale=1., format="%.1f"):
 #==================================================================
     """
-Reformat numbers at x or y - axis. The scale can be changed to display
-e.g. MHz instead of Hz. The number format can be changed as well.
-
-Parameters
-----------
-
-ax : axes object
-
-xy : string, either 'x', 'y' or 'xy'
-     select corresponding axis (axes) for reformatting
-
-scale : real (default: 1.)
-        rescaling factor for the axes
-
-format : string (default: %.1f)
-         define C-style number formats
-
-Returns
--------
-nothing
-
-
-Examples
---------
-Scale all numbers of x-Axis by 1000, e.g. for displaying ms instead of s.
-
->>> format_ticks('x',1000.)
-
-Two decimal places for numbers on x- and y-axis
-
->>> format_ticks('xy',1., format = "%.2f")
-
-"""
+    Reformat numbers at x or y - axis. The scale can be changed to display
+    e.g. MHz instead of Hz. The number format can be changed as well.
+    
+    Parameters
+    ----------
+    
+    ax : axes object
+    
+    xy : string, either 'x', 'y' or 'xy'
+         select corresponding axis (axes) for reformatting
+    
+    scale : real (default: 1.)
+            rescaling factor for the axes
+    
+    format : string (default: %.1f)
+             define C-style number formats
+    
+    Returns
+    -------
+    nothing
+    
+    
+    Examples
+    --------
+    Scale all numbers of x-Axis by 1000, e.g. for displaying ms instead of s.
+    
+    >>> format_ticks('x',1000.)
+    
+    Two decimal places for numbers on x- and y-axis
+    
+    >>> format_ticks('xy',1., format = "%.2f")
+    
+    """
     if xy == 'x' or xy == 'xy':
 #        locx,labelx = ax.get_xticks(), ax.get_xticklabels() # get location and content of xticks
         locx = ax.get_xticks()
@@ -1090,9 +1120,23 @@ def fil_convert(fil_dict, format_in):
     elif 'sos' in format_in and SOS_AVAIL:
         if 'zpk' not in format_in:
             fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
-        if 'ba' not in format_in:
-            fil_dict['ba'] = sig.sos2tf(fil_dict['sos'])
+            # check whether sos conversion has created a additional (superfluous)
+            # pole and zero at the origin and delete them:
+            z_0 = np.where(fil_dict['zpk'][0] == 0)[0]
+            p_0 = np.where(fil_dict['zpk'][1] == 0)[0]
+            if p_0 and z_0: # eliminate z = 0 and p = 0 from list:
+                fil_dict['zpk'][0] = np.delete(fil_dict['zpk'][0],z_0)
+                fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1],p_0)
 
+        if 'ba' not in format_in:
+            fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
+            # check whether sos conversion has created additional (superfluous)
+            # highest order polynomial with coefficient 0 and delete them
+            if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
+                fil_dict['ba'][0] = np.delete(fil_dict['ba'][0],-1) 
+                fil_dict['ba'][1] = np.delete(fil_dict['ba'][1],-1) 
+
+                
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         fil_dict['zpk'] = list(sig.tf2zpk(b,a))
@@ -1103,9 +1147,50 @@ def fil_convert(fil_dict, format_in):
                 fil_dict['sos'] = 'None'
                 print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
 
-
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
+
+
+
+def sos2zpk(sos):
+    """
+    - Taken from scipy/signal/filter_design.py - edit to eliminate first 
+    order section 
+    
+    Return zeros, poles, and gain of a series of second-order sections
+    Parameters
+    ----------
+    sos : array_like
+        Array of second-order filter coefficients, must have shape
+        ``(n_sections, 6)``. See `sosfilt` for the SOS filter format
+        specification.
+    Returns
+    -------
+    z : ndarray
+        Zeros of the transfer function.
+    p : ndarray
+        Poles of the transfer function.
+    k : float
+        System gain.
+    Notes
+    -----
+    .. versionadded:: 0.16.0
+    """
+    sos = np.asarray(sos)
+    n_sections = sos.shape[0]
+    z = np.empty(n_sections*2, np.complex128)
+    p = np.empty(n_sections*2, np.complex128)
+    k = 1.
+    for section in range(n_sections):
+        print(sos[section])
+        zpk = sig.tf2zpk(sos[section, :3], sos[section, 3:])
+#        if sos[section, 3] == 0: # first order section
+        z[2*section:2*(section+1)] = zpk[0]
+#        if sos[section, -1] == 0: # first order section
+        p[2*section:2*(section+1)] = zpk[1]
+        k *= zpk[2]
+        
+    return z, p, k
 
 
 #========================================================

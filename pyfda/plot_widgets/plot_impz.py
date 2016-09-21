@@ -5,12 +5,18 @@ Widget for plotting impulse response
 Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+import logging
+logger = logging.getLogger(__name__)
 
 from PyQt4 import QtGui
+from PyQt4.QtCore import QEvent, Qt
 import numpy as np
+import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import impz
+from pyfda.pyfda_lib import expand_lim, rt_label
+from pyfda.simpleeval import simple_eval
+from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 
@@ -21,45 +27,71 @@ class PlotImpz(QtGui.QWidget):
         super(PlotImpz, self).__init__(parent)
 
         self.ACTIVE_3D = False
+        self.stim_freq = 0.02
+        self._init_UI()
 
+    def _init_UI(self):
         self.lblLog = QtGui.QLabel(self)
-        self.lblLog.setText("Log.")
+        self.lblLog.setText("Log:")
         self.chkLog = QtGui.QCheckBox(self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("Show logarithmic impulse / step response.")
         self.chkLog.setChecked(False)
 
-        self.lblLogBottom = QtGui.QLabel("Log. bottom:")
-
+        self.lblLogBottom = QtGui.QLabel("Bottom = ")
         self.ledLogBottom = QtGui.QLineEdit(self)
         self.ledLogBottom.setText("-80")
         self.ledLogBottom.setToolTip("Minimum display value for log. scale.")
+        self.lbldB = QtGui.QLabel("dB")
+        
+        self.lblPltStim = QtGui.QLabel(self)
+        self.lblPltStim.setText("Stimulus:  Show")
+        self.chkPltStim = QtGui.QCheckBox(self)
+        self.chkPltStim.setChecked(False)
+        
+        self.lblStimulus = QtGui.QLabel("Type = ")
+        self.cmbStimulus = QtGui.QComboBox(self)
+        self.cmbStimulus.addItems(["Pulse","Step","Sine", "Rect", "Saw"])
+        self.cmbStimulus.setToolTip("Select stimulus type.")
+        
+        self.lblFreq = QtGui.QLabel("<i>f</i>&nbsp; =")
 
-        self.lblNPoints = QtGui.QLabel("<i>N</i> =")
+        self.ledFreq = QtGui.QLineEdit(self)
+        self.ledFreq.setText(str(self.stim_freq))
+        self.ledFreq.setToolTip("Stimulus frequency.")
+        
+        self.lblFreqUnit = QtGui.QLabel("f_S")
+
+        self.lblNPoints = QtGui.QLabel("<i>N</i>&nbsp; =")
 
         self.ledNPoints = QtGui.QLineEdit(self)
         self.ledNPoints.setText("0")
         self.ledNPoints.setToolTip("Number of points to calculate and display.\n"
                                    "N = 0 chooses automatically.")
 
-        self.lblStep = QtGui.QLabel("Step Response")
-        self.chkStep = QtGui.QCheckBox()
-        self.chkStep.setChecked(False)
-        self.chkStep.setToolTip("Show step response instead of impulse response.")
-
         self.layHChkBoxes = QtGui.QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
+        
+        self.layHChkBoxes.addWidget(self.lblNPoints)
+        self.layHChkBoxes.addWidget(self.ledNPoints)
+        self.layHChkBoxes.addStretch(2)
         self.layHChkBoxes.addWidget(self.lblLog)
         self.layHChkBoxes.addWidget(self.chkLog)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLogBottom)
         self.layHChkBoxes.addWidget(self.ledLogBottom)
+        self.layHChkBoxes.addWidget(self.lbldB)
+        self.layHChkBoxes.addStretch(2)
+        self.layHChkBoxes.addWidget(self.lblPltStim)
+        self.layHChkBoxes.addWidget(self.chkPltStim)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblStep)
-        self.layHChkBoxes.addWidget(self.chkStep)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblNPoints)
-        self.layHChkBoxes.addWidget(self.ledNPoints)
+        self.layHChkBoxes.addWidget(self.lblStimulus)
+        self.layHChkBoxes.addWidget(self.cmbStimulus)
+        self.layHChkBoxes.addStretch(2)
+        self.layHChkBoxes.addWidget(self.lblFreq)
+        self.layHChkBoxes.addWidget(self.ledFreq)
+        self.layHChkBoxes.addWidget(self.lblFreqUnit)
+
         self.layHChkBoxes.addStretch(10)
 
         #----------------------------------------------------------------------
@@ -75,11 +107,81 @@ class PlotImpz(QtGui.QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.chkLog.clicked.connect(self.draw)
-        self.chkStep.clicked.connect(self.draw)
         self.ledNPoints.editingFinished.connect(self.draw)
         self.ledLogBottom.editingFinished.connect(self.draw)
+        self.chkPltStim.clicked.connect(self.draw)
+        self.cmbStimulus.currentIndexChanged.connect(self.draw)
+        self.ledFreq.installEventFilter(self) 
+#        self.ledFreq.editingFinished.connect(self.draw)
 
         self.draw() # initial calculation and drawing
+
+#------------------------------------------------------------------------------
+    def eventFilter(self, source, event):
+        """
+        Filter all events generated by the QLineEdit widgets. Source and type
+        of all events generated by monitored objects are passed to this eventFilter,
+        evaluated and passed on to the next hierarchy level.
+
+        - When a QLineEdit widget gains input focus (QEvent.FocusIn`), display
+          the stored value from filter dict with full precision
+        - When a key is pressed inside the text field, set the `spec_edited` flag
+          to True.
+        - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
+          current value normalized to f_S with full precision (only if
+          `spec_edited`== True) and display the stored value in selected format
+        """
+
+        def _store_entry(source):
+            if self.spec_edited:
+                self.stim_freq = simple_eval(source.text()) / fb.fil[0]['f_S']
+                self.spec_edited = False # reset flag
+                self.draw()
+                
+        if isinstance(source, QtGui.QLineEdit): # could be extended for other widgets
+            if event.type() == QEvent.FocusIn:
+                self.spec_edited = False
+                self.load_entry()
+            elif event.type() == QEvent.KeyPress:
+                self.spec_edited = True # entry has been changed
+                key = event.key()
+                if key in {Qt.Key_Return, Qt.Key_Enter}:
+                    _store_entry(source)
+                elif key == Qt.Key_Escape: # revert changes
+                    self.spec_edited = False                    
+                    source.setText(str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+                
+            elif event.type() == QEvent.FocusOut:
+                _store_entry(source)
+                source.setText(str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+        # Call base class method to continue normal event processing:
+        return super(PlotImpz, self).eventFilter(source, event)
+
+#-------------------------------------------------------------        
+    def load_entry(self):
+        """
+        Reload textfields from filter dictionary 
+        Transform the displayed frequency spec input fields according to the units
+        setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
+        in the dictionary; when f_S or the unit are changed, only the displayed values
+        of the frequency entries are updated, not the dictionary!
+
+        load_entries is called during init and when the frequency unit or the
+        sampling frequency have been changed.
+
+        It should be called when sigSpecsChanged or sigFilterDesigned is emitted
+        at another place, indicating that a reload is required.
+        """
+
+        # recalculate displayed freq spec values for (maybe) changed f_S
+        logger.debug("exec load_entry")
+        if not self.ledFreq.hasFocus():
+            # widget has no focus, round the display
+            self.ledFreq.setText(
+                str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+        else:
+            # widget has focus, show full precision
+            self.ledFreq.setText(str(self.stim_freq * fb.fil[0]['f_S']))
 
 #------------------------------------------------------------------------------
     def _init_axes(self):
@@ -124,32 +226,57 @@ class PlotImpz(QtGui.QWidget):
         (Re-)calculate h[n] and draw the figure
         """
         log = self.chkLog.isChecked()
-        step = self.chkStep.isChecked()
-        self.lblLogBottom.setEnabled(log)
-        self.ledLogBottom.setEnabled(log)
+        stim = str(self.cmbStimulus.currentText())
+        periodic_sig = stim in {"Sine","Rect", "Saw"}
+        self.lblLogBottom.setVisible(log)
+        self.ledLogBottom.setVisible(log)
+        self.lbldB.setVisible(log)
+        
+        self.lblFreq.setVisible(periodic_sig)
+        self.ledFreq.setVisible(periodic_sig)
+        self.lblFreqUnit.setVisible(periodic_sig)
 
-        self.bb = fb.fil[0]['ba'][0]
-        self.aa = fb.fil[0]['ba'][1]
+        
+#        self.lblFreqUnit.setVisible(fb.fil[0]['freq_specs_unit'] == 'f_S')
+        self.lblFreqUnit.setText(rt_label(fb.fil[0]['freq_specs_unit']))
+        self.load_entry()
+        
+        
+        self.bb = np.asarray(fb.fil[0]['ba'][0])
+        self.aa = np.asarray(fb.fil[0]['ba'][1])
 
         self.f_S  = fb.fil[0]['f_S']
-        self.F_PB = fb.fil[0]['F_PB'] * self.f_S
-        self.F_SB = fb.fil[0]['F_SB'] * self.f_S
+        
+        N = self.calc_n_points(abs(int(self.ledNPoints.text())))
 
-        self.A_PB  = fb.fil[0]['A_PB']
-        self.A_PB2 = fb.fil[0]['A_PB2']
-        self.A_SB  = fb.fil[0]['A_SB']
-        self.A_SB2 = fb.fil[0]['A_SB2']
-
+        t = np.linspace(0, N/self.f_S, N, endpoint=False)
         # calculate h[n]
-        [h, t] = impz(self.bb, self.aa, self.f_S, step=step,
-                      N=int(self.ledNPoints.text()))
-
-        if step:
-            title_str = r'Step Response'
-            H_str = r'$h_{\epsilon}[n]$'
-        else:
+        if stim == "Pulse":
+            x = np.zeros(N)
+            x[0] =1.0 # create dirac impulse as input signal
             title_str = r'Impulse Response'
             H_str = r'$h[n]$'
+        elif stim == "Step":
+            x = np.ones(N) # create step function
+            title_str = r'Step Response'
+            H_str = r'$h_{\epsilon}[n]$'
+        elif stim in {"Sine", "Rect"}:
+            x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
+            if stim == "Sine":
+                title_str = r'Response to Sine Signal'
+                H_str = r'$h_{\sin}[n]$'
+            else:
+                x = np.sign(x)
+                title_str = r'Response to Rect. Signal'
+                H_str = r'$h_{rect}[n]$'
+        else:
+            x = sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
+            title_str = r'Response to Sawtooth Signal'
+            H_str = r'$h_{saw}[n]$'
+
+            
+        h = sig.lfilter(self.bb, self.aa, x)
+
 
         self.cmplx = np.any(np.iscomplex(h))
         if self.cmplx:
@@ -159,7 +286,7 @@ class PlotImpz(QtGui.QWidget):
             H_str = r'$\Re\{$' + H_str + '$\}$'
         if log:
             bottom = float(self.ledLogBottom.text())
-            H_str = r'$\log$ ' + H_str + ' in dB'
+            H_str = r'$|$ ' + H_str + '$|$ in dB'
             h = np.maximum(20 * np.log10(abs(h)), bottom)
             if self.cmplx:
                 h_i = np.maximum(20 * np.log10(abs(h_i)), bottom)
@@ -171,9 +298,12 @@ class PlotImpz(QtGui.QWidget):
 
 
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom,
-                                      markerfmt='bo', linefmt='r')
-        self.ax_r.set_xlim([min(t), max(t)])
+        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='bo', linefmt='r')
+        if self.chkPltStim.isChecked():
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='k')
+            [stem.set_linewidth(0.5) for stem in ss]
+            bs.set_visible(False) # invisible bottomline
+        expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
 
         if self.cmplx:
@@ -208,12 +338,50 @@ class PlotImpz(QtGui.QWidget):
 
         self.mplwidget.redraw()
 
+#------------------------------------------------------------------------------        
+    def calc_n_points(self, N_user = 0):
+        """
+        Calculate number of points to be displayed, depending on type of filter 
+        (FIR, IIR) and user input. If the user selects 0 points, the number is
+        calculated automatically.
+        
+        An improvement would be to calculate the dominant pole and the corresponding
+        settling time.
+        """
+
+        if len(self.aa) == 1:
+            if len(self.bb) == 1:
+                raise TypeError(
+                'No proper filter coefficients: len(a) = len(b) = 1 !')
+            else:
+                IIR = False
+        else:
+            if len(self.bb) == 1:
+                IIR = True
+            # Test whether all elements except first are zero
+            elif not np.any(self.aa[1:]) and self.aa[0] != 0:
+                #  same as:   elif np.all(a[1:] == 0) and a[0] <> 0:
+                IIR = False
+            else:
+                IIR = True
+    
+        if N_user == 0: # set number of data points automatically
+            if IIR:
+                N = 100 # TODO: IIR: more intelligent algorithm needed
+            else:
+                N = min(len(self.bb),  100) # FIR: N = number of coefficients (max. 100)
+        else:
+            N = N_user
+    
+        return N
+
+
 #------------------------------------------------------------------------------
 
 def main():
     import sys
     app = QtGui.QApplication(sys.argv)
-    mainw = PlotImpz()
+    mainw = PlotImpz(None)
     app.setActiveWindow(mainw) 
     mainw.show()
     sys.exit(app.exec_())

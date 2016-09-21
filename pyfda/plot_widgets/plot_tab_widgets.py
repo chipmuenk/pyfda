@@ -11,7 +11,7 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
                           plot_3d)
 
 #------------------------------------------------------------------------------
-class PlotTabWidgets(QtGui.QWidget):
+class PlotTabWidgets(QtGui.QTabWidget):
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
@@ -68,11 +68,14 @@ class PlotTabWidgets(QtGui.QWidget):
 
 def main():
     import sys
+    from pyfda import pyfda_rc as rc
     app = QtGui.QApplication(sys.argv)
-    mainw = PlotTabWidgets()
-    
+    app.setStyleSheet(rc.css_rc)
+
+    mainw = PlotTabWidgets(None)
     app.setActiveWindow(mainw) 
     mainw.show()
+    
     sys.exit(app.exec_())
     
 if __name__ == "__main__":

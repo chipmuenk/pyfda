@@ -174,9 +174,9 @@ class InputTabWidgets(QtGui.QWidget):
 def main():
     from pyfda import pyfda_rc as rc
     app = QtGui.QApplication(sys.argv)
-    mainw = InputTabWidgets(None)
     app.setStyleSheet(rc.css_rc)
 
+    mainw = InputTabWidgets(None)
     app.setActiveWindow(mainw) 
     mainw.show()
     sys.exit(app.exec_())

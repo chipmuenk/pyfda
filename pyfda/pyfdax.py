@@ -5,6 +5,8 @@ Mainwindow  for the pyFDA app, initializes UI
 Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+SPLITTER = True
+SCROLL = False
 import sys, os
 #from sip import setdestroyonexit
 import logging
@@ -80,8 +82,8 @@ class pyFDA(QtGui.QMainWindow):
     toolbar, statusbar, central widget, docking areas etc.
     """
 
-    def __init__(self):
-        super(pyFDA, self).__init__()
+    def __init__(self, parent=None):
+        super(pyFDA, self).__init__(parent)
 #        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
         # initialize the FilterTreeBuilder class with the filter directory and
@@ -98,69 +100,71 @@ class pyFDA(QtGui.QMainWindow):
         - Plot Window [-> plotAll.plotAll()]
         """
 
-        # Instantiate widget groups
+        # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
-        self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
-
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
 
         # ============== UI Layout =====================================
+#        _widget = QtGui.QMainWindow() # this widget contains all subwidget groups
+#        _widget = QtGui.QDialog() # this widget contains all subwidget groups
         _widget = QtGui.QWidget() # this widget contains all subwidget groups
 
         layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
+#        layHMain = QtGui.QHBoxLayout(self) # horizontal layout of all groups
 
-        # comment out following 3 lines for splitter design
-        layHMain.addWidget(self.inputTabWidgets)
-        layHMain.addWidget(self.pltTabWidgets)
-        layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
+        if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
+            layVInput = QtGui.QVBoxLayout()
+            layVInput.addWidget(self.inputTabWidgets)
+            layVPlt = QtGui.QVBoxLayout()
+            layVPlt.addWidget(self.pltTabWidgets)
+    
+            frmInput = QtGui.QFrame()
+            frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+            frmInput.setLayout(layVInput)
+            frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                     QtGui.QSizePolicy.Minimum)
+    
+            frmPlt = QtGui.QFrame()
+            frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+            frmPlt.setLayout(layVPlt)
+            frmPlt.setSizePolicy(QtGui.QSizePolicy.Minimum,
+                                     QtGui.QSizePolicy.Minimum)
+    
+            splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
+            splitter.addWidget(frmInput)
+            splitter.addWidget(frmPlt)
+            splitter.setStretchFactor(1,4) # factors for the initial sizes of subwidgets
+#            splitter.setSizes([200,600])
 
+            layHMain.addWidget(splitter)
 
-# variable size tabs (splitter)
-#        layVInput = QtGui.QVBoxLayout()
-#        layVInput.addWidget(self.inputWidgets)
-#        layVPlt = QtGui.QVBoxLayout()
-#        layVPlt.addWidget(self.pltWidgets)
-#
-#        frmInput = QtGui.QFrame()
-#        frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-#        frmInput.setLayout(layVInput)
-#        frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
-#                                 QtGui.QSizePolicy.Minimum)
-#
-#        frmPlt = QtGui.QFrame()
-#        frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-#        frmPlt.setLayout(layVPlt)
-#        frmPlt.setSizePolicy(QtGui.QSizePolicy.Minimum,
-#                                 QtGui.QSizePolicy.Minimum)
-#
-#        splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
-#        splitter.addWidget(frmInput)
-#        splitter.addWidget(frmPlt)
-#        layHMain.addWidget(splitter)
+        else: # no splitter design, only use layHMain layout
+            self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
+            layHMain.addWidget(self.inputTabWidgets)
+            layHMain.addWidget(self.pltTabWidgets)
+            layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
 
-
-        # Create scroll area and "monitor" _widget whether scrollbars are needed
-        scrollArea = QtGui.QScrollArea()
-        scrollArea.setWidget(_widget) # splitter for var. size tabs?
-
-        #============= Set behaviour of scroll area ======================
-        # scroll bars appear when the scroll area shrinks below this size:
-        scrollArea.setMinimumSize(QtCore.QSize(800, 500))
-#        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
-#        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
-        scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                 QtGui.QSizePolicy.MinimumExpanding)
-
-        # Size of monitored widget is allowed to grow:
-        scrollArea.setWidgetResizable(True)
-
-
-        # make ScrollArea occupy the main area of QMainWidget 
+        if SCROLL:
+            # Create scroll area and "monitor" _widget whether scrollbars are needed
+            scrollArea = QtGui.QScrollArea()
+            scrollArea.setWidget(_widget) # make main widget "scrollable"
+    
+            #============= Set behaviour of scroll area ======================
+            # scroll bars appear when the scroll area shrinks below this size:
+            scrollArea.setMinimumSize(QtCore.QSize(800, 500))
+    #        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
+    #        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
+            scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
+                                     QtGui.QSizePolicy.MinimumExpanding)
+    
+            # Size of monitored widget is allowed to grow:
+            scrollArea.setWidgetResizable(True)
+    
+        # make _widget occupy the main area of QMainWidget 
         #   and make QMainWindow its parent !!!
-        self.setCentralWidget(scrollArea)
-
+        self.setCentralWidget(_widget)
 
         #=============== Menubar =======================================
 
@@ -193,31 +197,35 @@ class pyFDA(QtGui.QMainWindow):
         # sigReadFilters: button has been pressed to rebuild filter tree:
         self.inputTabWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
 
-#        aboutAction.triggered.connect(self.aboutWindow) # open pop-up window
+        # open pop-up "about" window
+        #aboutAction.triggered.connect(self.aboutWindow) 
+
         # trigger the close event in response to sigQuit generated in another subwidget:
         self.inputTabWidgets.inputSpecs.sigQuit.connect(self.close)
 
 
         logger.debug("Main routine initialized!")
 
-#------------------------------------------------------------------------------
-    def aboutWindow(self):
-        """
-        Display an "About" window
-        """
-        QtGui.QMessageBox.about(self, "About pyFDA",
-                                ("(c) 2013 - 15 Christian Münker\n\n"
-        "A graphical tool for designing, analyzing and synthesizing digital filters")
-        )
-
-#------------------------------------------------------------------------------
-    def statusMessage(self, message):
-        """
-        Display a message in the statusbar.
-        """
-        self.statusBar().showMessage(message)
-
-#------------------------------------------------------------------------------       
+#==============================================================================
+# #------------------------------------------------------------------------------
+#     def aboutWindow(self):
+#         """
+#         Display an "About" window
+#         """
+#         QtGui.QMessageBox.about(self, "About pyFDA",
+#                                 ("(c) 2013 - 15 Christian Münker\n\n"
+#         "A graphical tool for designing, analyzing and synthesizing digital filters")
+#         )
+# 
+# #------------------------------------------------------------------------------
+#     def statusMessage(self, message):
+#         """
+#         Display a message in the statusbar.
+#         """
+#         self.statusBar().showMessage(message)
+# 
+# #------------------------------------------------------------------------------       
+#==============================================================================
     
     def closeEvent(self, event): 
         """
@@ -232,34 +240,36 @@ class pyFDA(QtGui.QMainWindow):
             event.ignore()
             
 #------------------------------------------------------------------------------       
-    def clean_up(self):
-        """
-        Clean up everything - may only be called when exiting application!!
-
-        See http://stackoverflow.com/questions/18732894/crash-on-close-and-quit
-        """
-        for i in self.__dict__:
-            item = self.__dict__[i]
-            clean_item(item)
-
-#------------------------------------------------------------------------------
-def clean_item(item):
-    """
-    Clean up memory by closing and deleting item recursively if possible
-    """
-    if isinstance(item, list) or isinstance(item, dict):
-        for _ in range(len(item)):
-            clean_item(item.pop())
-    else:
-        try:
-            item.close()
-        except(RuntimeError, AttributeError): # deleted or no close method
-            pass
-        try:
-            item.deleteLater()
-        except(RuntimeError, AttributeError): # deleted or no deleteLater method
-            pass
-
+#==============================================================================
+#     def closeEvent(self):
+#         """
+#         Clean up everything - may only be called when exiting application!!
+# 
+#         See http://stackoverflow.com/questions/18732894/crash-on-close-and-quit
+#         """
+#         for i in self.__dict__:
+#             item = self.__dict__[i]
+#             clean_item(item)
+# 
+# #------------------------------------------------------------------------------
+# def clean_item(item):
+#     """
+#     Clean up memory by closing and deleting item recursively if possible
+#     """
+#     if isinstance(item, list) or isinstance(item, dict):
+#         for _ in range(len(item)):
+#             clean_item(item.pop())
+#     else:
+#         try:
+#             item.close()
+#         except(RuntimeError, AttributeError): # deleted or no close method
+#             pass
+#         try:
+#             item.deleteLater()
+#         except(RuntimeError, AttributeError): # deleted or no deleteLater method
+#             pass
+# 
+#==============================================================================
 
 #==============================================================================
 def main():
@@ -275,10 +285,6 @@ def main():
     """
      # instantiate QApplication object, passing command line arguments
     app = QtGui.QApplication(sys.argv)
-    app.setObjectName("TopApp")
-    
-#    icon = os.path.join(fb.base_dir, 'images', 'icons', "pyfda_icon.svg")
-
     app.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
     app.setStyleSheet(rc.css_rc) 
 
@@ -293,12 +299,8 @@ def main():
     app.setActiveWindow(mainw) 
     mainw.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
 
-    desktop = QtGui.QDesktopWidget() # test the available desktop resolution
-    # make pyFDA instance the parent for clean termination upon exit 
-    #  - otherwise the whole application will crash upon exit!
-    desktop.setParent(mainw) 
-    screen_h = desktop.availableGeometry().height()
-    screen_w = desktop.availableGeometry().width()
+    screen_resolution = app.desktop().screenGeometry()
+    screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
     logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
 
     fontsize = 10
@@ -306,13 +308,11 @@ def main():
         delta = 50
     else:
         delta = 100
-    desktop.deleteLater() # without this instruction, the main app looses focus ?!
-
     # set position + size of main window on desktop
     mainw.setGeometry(20, 20, screen_w - delta, screen_h - delta) # top L / top R, dx, dy
     # Give the keyboard input focus to this widget if this widget 
     # or one of its parents is the active window:
-    mainw.setFocus() 
+#    mainw.setFocus() 
     mainw.show()
 
     #start the application's exec loop, return the exit code to the OS
