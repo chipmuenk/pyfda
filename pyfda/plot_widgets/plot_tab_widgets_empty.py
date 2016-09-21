@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-This normally contains all tabbed plot subwidgets; for test purposes it is 
-completely empty here except ONE Matplotlib canvas / figure
-
+This normally contains all tabbed plot subwidgets, for test purposes it is 
+completely empty here WITHOUT Matplotlib canvas / figure
 
 Author: Christian Münker
 """
@@ -18,7 +17,7 @@ class PlotTabWidgets(QtGui.QWidget):
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
-        self.pltTauG = PlotTauG(self)
+#        self.pltTauG = PlotTauG(self) # instantiating this causes a crash upon exit
         
         
         """ Initialize UI with tabbed subplots """
@@ -27,24 +26,26 @@ class PlotTabWidgets(QtGui.QWidget):
 #        tabWidget.addTab(self.pltTauG, 'tau_g')
 
         layVMain = QtGui.QVBoxLayout()
-        layVMain.addWidget(self.pltTauG)        
+#        layVMain.addWidget(self.pltTauG)        
 #        layVMain.addWidget(tabWidget)
         layVMain.setContentsMargins(1,1,1,1)
-        
+#
         self.setLayout(layVMain)
 
 #------------------------------------------------------------------------------
     def update_data(self):
         """ Calculate subplots with new filter DATA and redraw them """
 
-        self.pltTauG.draw_taug()
+#        self.pltTauG.draw_taug()
+        pass
 
 #------------------------------------------------------------------------------
     def update_view(self):
         """ Update plot limits with new filter SPECS and redraw all subplots """
 
-        self.pltTauG.draw_taug()
-
+#        self.pltTauG.draw_taug()
+        pass
+    
 
 class PlotTauG(QtGui.QWidget):
 
