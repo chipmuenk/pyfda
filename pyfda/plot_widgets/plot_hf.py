@@ -120,7 +120,7 @@ class PlotHf(QtGui.QWidget):
         self.cmbInset.currentIndexChanged.connect(self.draw_inset)
 
         self.chkSpecs.clicked.connect(self.draw)
-        self.chkPhase.clicked.connect(self.draw_phase)
+        self.chkPhase.clicked.connect(self.draw)
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -345,9 +345,17 @@ class PlotHf(QtGui.QWidget):
 
 
 #------------------------------------------------------------------------------
-    def draw_phase(self):
+    def draw_phase(self, ax):
+        """
+        Draw phase on second y-axis
+        """
+        try:
+            self.mplwidget.fig.delaxes(self.ax_p)
+        except (KeyError, AttributeError):
+            pass
+
         if self.chkPhase.isChecked():
-            self.ax_p = self.ax.twinx() # second axes system with same x-axis for phase
+            self.ax_p = ax.twinx() # second axes system with same x-axis for phase
 #
             phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
             if fb.fil[0]['plt_phiUnit'] == 'rad':
@@ -396,12 +404,12 @@ class PlotHf(QtGui.QWidget):
 
             #N = source_ax.xaxis.get_major_ticks()
             #target_ax.xaxis.set_major_locator(LinearLocator(N))
-        else:
-            try:
-                self.mplwidget.fig.delaxes(self.ax_p)
-            except (KeyError, AttributeError):
-                pass
-        self.draw()
+#        else:
+#            try:
+#                self.mplwidget.fig.delaxes(self.ax_p)
+#            except (KeyError, AttributeError):
+#                pass
+#        self.draw()
 
 #------------------------------------------------------------------------------
 
@@ -444,7 +452,6 @@ class PlotHf(QtGui.QWidget):
         self.lblLinphase.setEnabled(self.unitA == 'V')
 
         self.specs = self.chkSpecs.isChecked()
-        self.phase = self.chkPhase.isChecked()
         self.linphase = self.chkLinphase.isChecked()
 
         self.f_S  = fb.fil[0]['f_S']
@@ -508,6 +515,7 @@ class PlotHf(QtGui.QWidget):
 
             #-----------------------------------------------------------
             self.ax.plot(self.F, self.H_plt, label = 'H(f)')
+            self.draw_phase(self.ax)
             #-----------------------------------------------------------
        #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
             self.ax.set_xlim(f_lim)
