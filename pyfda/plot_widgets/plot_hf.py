@@ -132,7 +132,7 @@ class PlotHf(QtGui.QWidget):
         self.ax.clear()
 
 #------------------------------------------------------------------------------
-    def plot_spec_limits(self, specAxes):
+    def plot_spec_limits(self, ax):
         """
         Plot the specifications limits (F_SB, A_SB, ...) as lines and as
         hatched areas.
@@ -163,7 +163,6 @@ class PlotHf(QtGui.QWidget):
 #        fc = (0.8,0.8,0.8) # color for shaded areas
         fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
         line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
-        ax = specAxes
 
         if self.unitA == 'V':
             exp = 1.
@@ -329,7 +328,7 @@ class PlotHf(QtGui.QWidget):
                 self.ax_i.set_navigate(True)
                 self.ax.set_navigate(False)
                 if self.specs:
-                    self.plot_spec_limits(specAxes = self.ax_i)
+                    self.plot_spec_limits(self.ax_i)
             else: # edit / navigate main plot
                 self.ax_i.set_navigate(False)
                 self.ax.set_navigate(True)
@@ -514,7 +513,7 @@ class PlotHf(QtGui.QWidget):
             self.ax.set_xlim(f_lim)
             self.ax.set_ylim(A_lim)
 
-            if self.specs: self.plot_spec_limits(specAxes = self.ax)
+            if self.specs: self.plot_spec_limits(self.ax)
 
             self.ax.set_title(r'Magnitude Frequency Response')
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
