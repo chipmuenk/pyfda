@@ -22,8 +22,6 @@ class PlotHf(QtGui.QWidget):
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
 # TODO: position and size of inset plot should be selectable
-# TODO: draw_phase is only triggered by clicking the button; when frequency range
-#        is switched to +/- 1/2 the display doesn't follow
 
 
     def __init__(self, parent): 
@@ -101,10 +99,6 @@ class PlotHf(QtGui.QWidget):
         self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
 
         self.setLayout(self.mplwidget.layVMainMpl)
-
-        # make this the central widget, taking all available space:
-#        self.setCentralWidget(self.mplwidget)
-
 
         self.init_axes()
 
