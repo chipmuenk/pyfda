@@ -23,6 +23,7 @@ from pyfda import qrc_resources # contains all icons
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
+#from pyfda.input_widgets import input_tab_widgets_test as input_tab_widgets
 
 from pyfda.plot_widgets import plot_tab_widgets
 #from pyfda.plot_widgets import plot_tab_widgets_test as plot_tab_widgets
