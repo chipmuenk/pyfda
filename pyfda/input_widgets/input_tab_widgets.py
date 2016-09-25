@@ -5,12 +5,12 @@ Tabbed container with all input widgets
 Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal, pyqtSlot
+from PyQt4.QtCore import pyqtSignal# , pyqtSlot
 import pyfda.filterbroker as fb
 
 from pyfda.input_widgets import input_specs_test as input_specs 
