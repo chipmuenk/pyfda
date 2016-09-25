@@ -52,19 +52,20 @@ class InputFilter(QtGui.QWidget):
 
     def _construct_UI(self):
         """
-        Construct UI with comboboxes for selecting filter
-        """
-#-----------------------------------------------------------------------------
-#        see filterbroker.py for structure and content of "filterTree" dict
-#-----------------------------------------------------------------------------
+        Construct UI with comboboxes for selecting filter:
+        
+        - cmbResponseType for selecting response type rt (LP, HP, ...)
+        
+        - cmbFilterType for selection of filter type (IIR, FIR, ...)
+        
+        - cmbDesignMethod for selection of design method (Chebychev, ...)
+        
+        and populate them from the "filterTree" dict during the initial run.
+        Later, calling set_response_type() updates the three combo boxes.
+        
+        See filterbroker.py for structure and content of "filterTree" dict        
 
-        #----------------------------------------------------------------------
-        # Create combo boxes
-        # - cmbResponseType for selecting response type rt (LP, HP, ...)
-		# - cmbFilterType for selection of filter type (IIR, FIR, ...)
-		# - cmbDesignMethod for selection of design method (Chebychev, ...)
-		# and populate them from the "filterTree" dict either directly or by
-		# calling set_response_type() :
+        """
 
         bfont = QtGui.QFont()
         ifont = QtGui.QFont()
@@ -338,14 +339,15 @@ class InputFilter(QtGui.QWidget):
             if hasattr(fb.fil_inst, 'wdg') and self.dm_last:      
                 self._destruct_dyn_widgets() 
 
-            #------------------------------------------------------------------
+            #==================================================================
             """
             create new instance
             """
             err = fb.fil_factory.create_fil_inst(dm)
-            #------------------------------------------------------------------
             logger.debug("InputFilter.set_design_method triggered: %s\n"
                         "Returned error code %d" %(dm, err))
+            #==================================================================
+
     
             # Check whether new design method also provides the old filter order
             # method. If yes, don't change it, else set first available
