@@ -334,14 +334,14 @@ class InputFilter(QtGui.QWidget):
         fb.fil[0]['dm'] = dm
         if dm != self.dm_last: # dm has changed:
 
-            # when old filter instance has a dyn. subwidget, destroy it
-            if hasattr(fb.fil_inst, 'wdg'):        
+            # when old filter instance has a dyn. subwidget, try to destroy it
+            if hasattr(fb.fil_inst, 'wdg') and self.dm_last:      
                 self._destruct_dyn_widgets() 
 
+            #------------------------------------------------------------------
             """
             create new instance
             """
-                
             err = fb.fil_factory.create_fil_inst(dm)
             #------------------------------------------------------------------
             logger.debug("InputFilter.set_design_method triggered: %s\n"
@@ -440,8 +440,7 @@ class InputFilter(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
         """
-        Delete the dynamically created filter design subwidget (if the 
-        filter design routine has a UI).
+        Delete the dynamically created filter design subwidget (if there is one)
         
         see http://stackoverflow.com/questions/13827798/proper-way-to-cleanup-widgets-in-pyqt
 
@@ -450,6 +449,7 @@ class InputFilter(QtGui.QWidget):
         been left (?)! Hence, it is necessary to skip this method when the new
         design method is the same as the old one.
         """
+  
         try:
             fb.fil_inst.sigFiltChanged.disconnect() # disconnect signal
         except TypeError as e:
