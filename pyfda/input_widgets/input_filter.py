@@ -47,7 +47,7 @@ class InputFilter(QtGui.QWidget):
 
         self._construct_UI()
 
-        self.set_response_type() # first time initialization
+        self._set_response_type() # first time initialization
 
     def _construct_UI(self):
         """
@@ -60,7 +60,7 @@ class InputFilter(QtGui.QWidget):
         - cmbDesignMethod for selection of design method (Chebychev, ...)
         
         and populate them from the "filterTree" dict during the initial run.
-        Later, calling set_response_type() updates the three combo boxes.
+        Later, calling _set_response_type() updates the three combo boxes.
         
         See filterbroker.py for structure and content of "filterTree" dict        
 
@@ -202,7 +202,7 @@ class InputFilter(QtGui.QWidget):
         #  through all widget methods and generate the signal sigFiltChanged
         #  in the end.
         self.cmbResponseType.currentIndexChanged.connect(
-                lambda: self.set_response_type(enb_signal=True))# 'LP'
+                lambda: self._set_response_type(enb_signal=True))# 'LP'
         self.cmbFilterType.currentIndexChanged.connect(
                 lambda: self.set_filter_type(enb_signal=True))  #'IIR'
         self.cmbDesignMethod.currentIndexChanged.connect(
@@ -219,17 +219,36 @@ class InputFilter(QtGui.QWidget):
         """
         Reload comboboxes from filter dictionary to update changed settings
         after loading a filter design from disk.
-        `load_entries` uses the automatism of set_response_type etc. 
+        `load_entries` uses the automatism of _set_response_type etc. 
         of checking whether the previously selected filter design method is 
         also available for the new combination. 
         """
         rt_idx = self.cmbResponseType.findData(fb.fil[0]['rt']) # find index for response type
         self.cmbResponseType.setCurrentIndex(rt_idx)
-        self.set_response_type()
+        self._set_response_type()
 
 
 #------------------------------------------------------------------------------
-    def set_response_type(self, enb_signal=False):
+    def _read_cmb_box(self, cmb_box, tag):
+        """
+        Read out current setting of comboBox, convert to string (see 
+        _construct_UI for details) and store in fb.fil[0][tag]
+        
+        Returns:
+        
+        The current setting of combobox as string
+        """
+        idx = cmb_box.currentIndex()
+        cmb_data = cmb_box.itemData(idx)
+
+        if not isinstance(cmb_data, str):
+            cmb_data = str(cmb_data.toString()) # needed for Python 2
+        fb.fil[0][tag] = cmb_data # copy selected rt setting to filter dict
+
+        return cmb_data
+
+#------------------------------------------------------------------------------
+    def _set_response_type(self, enb_signal=False):
         """
         Triggered when cmbResponseType (LP, HP, ...) is changed:
         Copy selection to self.rt and fb.fil[0] and reconstruct filter type combo
@@ -237,18 +256,11 @@ class InputFilter(QtGui.QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-
-        # Read out current setting of comboBox and convert to string (see init_UI)
-        rt_idx = self.cmbResponseType.currentIndex()
-        self.rt = self.cmbResponseType.itemData(rt_idx)
-
-        if not isinstance(self.rt, str):
-            self.rt = str(self.rt.toString()) # needed for Python 2
-        fb.fil[0]['rt'] = self.rt # copy selected rt setting to filter dict
+        # Read out current setting of comboBox and convert to string
+        self.rt = self._read_cmb_box(self.cmbResponseType, 'rt')
 
         # Get list of available filter types for new rt
         ft_list = list(fb.fil_tree[self.rt].keys()) # explicit list() needed for Py3
-
         #---------------------------------------------------------------
         # Rebuild filter type combobox entries for new rt setting
         self.cmbFilterType.blockSignals(True) # don't fire when changed programmatically
@@ -276,14 +288,9 @@ class InputFilter(QtGui.QWidget):
         - (re)construct design method combo, adding
           displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
-        # Read out current setting of comboBox and convert to string (see init_UI)
-        ft_idx = self.cmbFilterType.currentIndex()
-        self.ft = self.cmbFilterType.itemData(ft_idx)
-        
-        if not isinstance(self.ft, str):
-            self.ft = str(self.ft.toString()) # needed for Python 2.x
-        fb.fil[0]['ft'] = self.ft # copy selected ft setting to filter dict
-
+        # Read out current setting of comboBox and convert to string
+        self.ft = self._read_cmb_box(self.cmbFilterType, 'ft')
+#
         logger.debug("InputFilter.set_filter_type triggered: {0}".format(self.ft))
 
         #---------------------------------------------------------------
@@ -325,12 +332,9 @@ class InputFilter(QtGui.QWidget):
         - create / update global filter instance fb.fil_inst of dm class
         - update dynamic widgets (if dm has changed and if there are any)
         - call load filter order
-        """
-        dm_idx = self.cmbDesignMethod.currentIndex()
-        dm = self.cmbDesignMethod.itemData(dm_idx)
-        if not isinstance(dm, str):
-            dm = str(dm.toString()) # needed for Python 2.x (see init_UI)
-        fb.fil[0]['dm'] = dm
+        """        
+        dm = self._read_cmb_box(self.cmbDesignMethod, 'dm')
+        
         if dm != self.dm_last: # dm has changed:
 
             # when old filter instance has a dyn. subwidget, try to destroy it
