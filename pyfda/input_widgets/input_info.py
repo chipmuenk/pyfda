@@ -29,10 +29,10 @@ class InputInfo(QtGui.QWidget):
     def __init__(self, parent):
         super(InputInfo, self).__init__(parent)
         
-        self._init_UI()
+        self._construct_UI()
         self.load_entries()
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
         - Checkboxes for selecting the info to be displayed
@@ -137,7 +137,6 @@ class InputInfo(QtGui.QWidget):
         """
         Display info from filter design file and docstring
         """
-#        self.fil_inst = self.ffb.create_instance(fb.fil[0]['dm'])
         if hasattr(fb.fil_inst,'info'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
