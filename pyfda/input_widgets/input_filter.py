@@ -21,7 +21,6 @@ from PyQt4.QtCore import pyqtSignal
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 
-# TODO: make more attributes local: self.my_attribute -> attribute
 
 class InputFilter(QtGui.QWidget):
     """
@@ -69,7 +68,6 @@ class InputFilter(QtGui.QWidget):
 
         bfont = QtGui.QFont()
         ifont = QtGui.QFont()
-  #      font.setPointSize(11)
         bfont.setBold(True)
         bfont.setWeight(75)
         ifont.setItalic(True)
@@ -161,7 +159,7 @@ class InputFilter(QtGui.QWidget):
         self.lblOrder =  QtGui.QLabel("Order:")
         self.lblOrder.setFont(bfont)
         self.chkMinOrder = QtGui.QCheckBox("Minimum", self)
-        self.spacer = QtGui.QSpacerItem(20,0,
+        spacer = QtGui.QSpacerItem(20,0,
                         QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.lblOrderN = QtGui.QLabel("N = ")
         self.lblOrderN.setFont(ifont)
@@ -169,12 +167,12 @@ class InputFilter(QtGui.QWidget):
 
         #--------------------------------------------------
         #  Layout for filter order subwidgets
-        self.layHOrdWdg = QtGui.QHBoxLayout()
-        self.layHOrdWdg.addWidget(self.lblOrder)
-        self.layHOrdWdg.addWidget(self.chkMinOrder)
-        self.layHOrdWdg.addItem(self.spacer)
-        self.layHOrdWdg.addWidget(self.lblOrderN)
-        self.layHOrdWdg.addWidget(self.ledOrderN)
+        layHOrdWdg = QtGui.QHBoxLayout()
+        layHOrdWdg.addWidget(self.lblOrder)
+        layHOrdWdg.addWidget(self.chkMinOrder)
+        layHOrdWdg.addItem(spacer)
+        layHOrdWdg.addWidget(self.lblOrderN)
+        layHOrdWdg.addWidget(self.ledOrderN)
 
         #----------------------------------------------------------------------
         # OVERALL LAYOUT (stack standard + dynamic subwidgets vertically)
@@ -184,14 +182,14 @@ class InputFilter(QtGui.QWidget):
         layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
         layVAllWdg.addWidget(self.HLine())
-        layVAllWdg.addLayout(self.layHOrdWdg)
+        layVAllWdg.addLayout(layHOrdWdg)
 
-        self.frmMain = QtGui.QFrame()
-        self.frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        self.frmMain.setLayout(layVAllWdg)
+        frmMain = QtGui.QFrame()
+        frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        frmMain.setLayout(layVAllWdg)
 
         layHMain = QtGui.QHBoxLayout()
-        layHMain.addWidget(self.frmMain)
+        layHMain.addWidget(frmMain)
         layHMain.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(layHMain)
