@@ -13,7 +13,8 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal# , pyqtSlot
 import pyfda.filterbroker as fb
 
-from pyfda.input_widgets import input_specs_test as input_specs 
+#from pyfda.input_widgets import input_specs_test as input_specs
+from pyfda.input_widgets import input_specs as input_specs 
 from pyfda.input_widgets import input_files, input_coeffs, input_info, input_pz
 try:
     import myhdl
