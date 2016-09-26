@@ -204,13 +204,13 @@ class InputFilter(QtGui.QWidget):
         self.cmbResponseType.currentIndexChanged.connect(
                 lambda: self._set_response_type(enb_signal=True))# 'LP'
         self.cmbFilterType.currentIndexChanged.connect(
-                lambda: self.set_filter_type(enb_signal=True))  #'IIR'
+                lambda: self._set_filter_type(enb_signal=True))  #'IIR'
         self.cmbDesignMethod.currentIndexChanged.connect(
-                lambda: self.set_design_method(enb_signal=True))#'cheby1'
+                lambda: self._set_design_method(enb_signal=True))#'cheby1'
         self.chkMinOrder.clicked.connect(
-                lambda: self.set_filter_order(enb_signal=True)) # Min. Order
+                lambda: self._set_filter_order(enb_signal=True)) # Min. Order
         self.ledOrderN.editingFinished.connect(
-                lambda:self.set_filter_order(enb_signal=True))  # Manual Order
+                lambda:self._set_filter_order(enb_signal=True))  # Manual Order
         #------------------------------------------------------------
 
 
@@ -278,10 +278,10 @@ class InputFilter(QtGui.QWidget):
         self.cmbFilterType.blockSignals(False)
         #---------------------------------------------------------------
 
-        self.set_filter_type(enb_signal)
+        self._set_filter_type(enb_signal)
 
 #------------------------------------------------------------------------------
-    def set_filter_type(self, enb_signal=False):
+    def _set_filter_type(self, enb_signal=False):
         """"
         Triggered when cmbFilterType (IIR, FIR, ...) is changed:
         - read filter type ft and copy it to fb.fil[0]['ft'] and self.ft
@@ -321,11 +321,11 @@ class InputFilter(QtGui.QWidget):
 
         self.cmbDesignMethod.blockSignals(False)
 
-        self.set_design_method(enb_signal)
+        self._set_design_method(enb_signal)
 
 
 #------------------------------------------------------------------------------
-    def set_design_method(self, enb_signal=False):
+    def _set_design_method(self, enb_signal=False):
         """
         Triggered when cmbDesignMethod (cheby1, ...) is changed:
         - read design method dm and copy it to fb.fil[0]
@@ -409,7 +409,7 @@ class InputFilter(QtGui.QWidget):
             self.sigFiltChanged.emit() # -> input_specs
 
 #------------------------------------------------------------------------------    
-    def set_filter_order(self, enb_signal=False):
+    def _set_filter_order(self, enb_signal=False):
         """
         Triggered when either ledOrderN or chkMinOrder are edited:
         - copy settings to fb.fil[0]
