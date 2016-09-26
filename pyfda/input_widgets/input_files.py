@@ -67,8 +67,6 @@ class InputFiles(QtGui.QWidget):
 
     def __init__(self, parent):
         super(InputFiles, self).__init__(parent)
-        
-#        rc.basedir = os.path.dirname(os.path.abspath(__file__))
 
         self._construct_UI()
 
