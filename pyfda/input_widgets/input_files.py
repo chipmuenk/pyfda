@@ -53,6 +53,7 @@ else:
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_rc as rc 
 import pyfda.pyfda_fix_lib as fix_lib
+from pyfda.pyfda_lib import HLine
 
 # TODO: Save P/Z as well if possible
 
@@ -111,16 +112,16 @@ class InputFiles(QtGui.QWidget):
 
         layVIO.addWidget(self.butSave) # save filter dict -> various formats
         layVIO.addWidget(self.butLoad) # load filter dict -> various formats
-        layVIO.addWidget(self.HLine())
+        layVIO.addWidget(HLine(self))
         layVIO.addWidget(self.butExport) # export coeffs -> various formats
         layVIO.addWidget(self.butImport) # export coeffs -> various formats
-        layVIO.addWidget(self.HLine())
+        layVIO.addWidget(HLine(self))
 
         layHIO = QtGui.QHBoxLayout()        
         layHIO.addWidget(lblSeparator)
         layHIO.addWidget(self.cmbSeparator)        
         layVIO.addLayout(layHIO)
-        layVIO.addWidget(self.HLine())
+        layVIO.addWidget(HLine(self))
         layVIO.addStretch(1)
         
         layVIO.addWidget(self.butReadFiltTree) # re-read filter tree (for debugging)
@@ -140,19 +141,6 @@ class InputFiles(QtGui.QWidget):
         self.butLoad.clicked.connect(self.load_filter)
         
         self.butReadFiltTree.clicked.connect(self.sigReadFilters.emit)
-
-
-#------------------------------------------------------------------------------
-    def HLine(self):
-        # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-        # solution 
-        """
-        Create a horizontal line
-        """
-        line = QtGui.QFrame()
-        line.setFrameShape(QtGui.QFrame.HLine)
-        line.setFrameShadow(QtGui.QFrame.Sunken)
-        return line
 
 #------------------------------------------------------------------------------        
     def load_filter(self):

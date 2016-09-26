@@ -43,6 +43,8 @@ from  matplotlib import patches # TODO: should not be imported here?!
 from distutils.version import LooseVersion
 
 SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
+
+from PyQt4 import QtGui
 #print("scipy:", _scipy_version)
 
 #### General functions ########################################################
@@ -1428,6 +1430,18 @@ def rt_label(label):
         label += "</sub>"
     html_label = "<b><i>"+label+"</i></b>"
     return html_label
+
+#------------------------------------------------------------------------------
+def HLine(widget):
+    # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
+    # solution 
+    """
+    Create a horizontal line
+    """
+    line = QtGui.QFrame(widget)
+    line.setFrameShape(QtGui.QFrame.HLine)
+    line.setFrameShadow(QtGui.QFrame.Sunken)
+    return line
 
 
 
