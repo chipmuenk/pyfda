@@ -15,6 +15,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
+#from pyfda.pyfda_lib import HLine
 
 from pyfda.input_widgets import (input_filter, input_amp_specs,
                                  input_freq_specs, input_freq_units,
@@ -93,7 +94,7 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.butDesignFilt, 8, 0)  # <Design Filter> button
         layGMain.addWidget(self.butQuit, 8, 1)        # <Quit> button
         layGMain.addItem(spcV, 9, 0, 1, 2) # spacer to allow for vert. expansion
-#        layGMain.addWidget(self.HLine(), 9,0,1,2) # create HLine
+#        layGMain.addWidget(HLine(self), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(0, 0, 0, 0)
 #        layGMain.setRowStretch(1,1)
 
@@ -312,17 +313,6 @@ class InputSpecs(QtGui.QWidget):
         self.butDesignFilt.style().polish(self.butDesignFilt)
         self.butDesignFilt.update()
 
-#------------------------------------------------------------------------------
-    def HLine(self):
-        # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-        # solution
-        """
-        Create a horizontal line
-        """
-        line = QtGui.QFrame()
-        line.setFrameShape(QtGui.QFrame.HLine)
-        line.setFrameShadow(QtGui.QFrame.Sunken)
-        return line
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':

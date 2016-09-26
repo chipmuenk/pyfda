@@ -22,7 +22,8 @@ from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_fix_lib as fix
-import pyfda.pyfda_rc as rc
+from pyfda.pyfda_lib import HLine
+#import pyfda.pyfda_rc as rc
 
 from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
 
@@ -288,11 +289,10 @@ class HDLSpecs(QtGui.QWidget):
         self.layHButtonsHDL_h.addWidget(self.butExportHDL)
 # -------------------------------------------------------------------
 
-
         layVMain.addWidget(self.lblMyhdl1)
-        layVMain.addWidget(self.HLine())
+        layVMain.addWidget(HLine(self))
         layVMain.addWidget(self.lblMyhdl2)
-        layVMain.addWidget(self.HLine())
+        layVMain.addWidget(HLine(self))
         layVMain.addLayout(self.layHButtonsHDL_i)
         
         layVMain.addLayout(self.layHButtonsHDL_c)
@@ -319,19 +319,6 @@ class HDLSpecs(QtGui.QWidget):
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-    def HLine(self):
-        # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-        # solution 
-        """
-        Create a horizontal line
-        """
-        line = QtGui.QFrame()
-        line.setFrameShape(QtGui.QFrame.HLine)
-        line.setFrameShadow(QtGui.QFrame.Sunken)
-        return line
 
 #------------------------------------------------------------------------------
     def setupHDL(self, filename = ""):

@@ -20,6 +20,7 @@ from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
+from pyfda.pyfda_lib import HLine
 
 
 class InputFilter(QtGui.QWidget):
@@ -181,7 +182,7 @@ class InputFilter(QtGui.QWidget):
         layVAllWdg = QtGui.QVBoxLayout()
         layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
-        layVAllWdg.addWidget(self.HLine())
+        layVAllWdg.addWidget(HLine(self))
         layVAllWdg.addLayout(layHOrdWdg)
 
         frmMain = QtGui.QFrame()
@@ -500,18 +501,6 @@ class InputFilter(QtGui.QWidget):
 
         except AttributeError as e:
             print("input_filter._construct_dyn_widgets:", e)
-
-#------------------------------------------------------------------------------
-    def HLine(self):
-        # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-        # solution
-        """
-        Create a horizontal line
-        """
-        line = QtGui.QFrame()
-        line.setFrameShape(QtGui.QFrame.HLine)
-        line.setFrameShadow(QtGui.QFrame.Sunken)
-        return line
 
 #------------------------------------------------------------------------------
 
