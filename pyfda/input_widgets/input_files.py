@@ -69,9 +69,9 @@ class InputFiles(QtGui.QWidget):
         
 #        rc.basedir = os.path.dirname(os.path.abspath(__file__))
 
-        self.initUI()
+        self._construct_UI()
 
-    def initUI(self):
+    def _construct_UI(self):
         """
         Intitialize the user interface
         -
@@ -90,6 +90,7 @@ class InputFiles(QtGui.QWidget):
         self.butReadFiltTree.setToolTip("Re-read filter design directory and build filter design tree.\n"
                                         "(For developing and debugging).")
 
+        lblSeparator = QtGui.QLabel("CSV-Separator:")
         self.cmbSeparator = QtGui.QComboBox(self)
         self.cmbSeparator.addItems(['","','";"','<TAB>','<CR>'])
         self.cmbSeparator.setToolTip("Specify separator for number fields.")
@@ -106,22 +107,27 @@ class InputFiles(QtGui.QWidget):
         ifont = QtGui.QFont()
         ifont.setItalic(True)
 
-        self.layVIO = QtGui.QVBoxLayout()
-        self.layVIO.addWidget(self.butSave) # save filter dict -> various formats
-        self.layVIO.addWidget(self.butLoad) # load filter dict -> various formats
-        self.layVIO.addWidget(self.HLine())
-        self.layVIO.addWidget(self.butExport) # export coeffs -> various formats
-        self.layVIO.addWidget(self.butImport) # export coeffs -> various formats
-        self.layVIO.addWidget(self.HLine())
-        self.layVIO.addWidget(self.cmbSeparator)
-        self.layVIO.addWidget(self.HLine())
-        self.layVIO.addStretch(1)
+        layVIO = QtGui.QVBoxLayout()
+
+        layVIO.addWidget(self.butSave) # save filter dict -> various formats
+        layVIO.addWidget(self.butLoad) # load filter dict -> various formats
+        layVIO.addWidget(self.HLine())
+        layVIO.addWidget(self.butExport) # export coeffs -> various formats
+        layVIO.addWidget(self.butImport) # export coeffs -> various formats
+        layVIO.addWidget(self.HLine())
+
+        layHIO = QtGui.QHBoxLayout()        
+        layHIO.addWidget(lblSeparator)
+        layHIO.addWidget(self.cmbSeparator)        
+        layVIO.addLayout(layHIO)
+        layVIO.addWidget(self.HLine())
+        layVIO.addStretch(1)
         
-        self.layVIO.addWidget(self.butReadFiltTree) # re-read filter tree (for debugging)
+        layVIO.addWidget(self.butReadFiltTree) # re-read filter tree (for debugging)
 
 
         layVMain = QtGui.QVBoxLayout()
-        layVMain.addLayout(self.layVIO)
+        layVMain.addLayout(layVIO)
             
         self.setLayout(layVMain)
 
