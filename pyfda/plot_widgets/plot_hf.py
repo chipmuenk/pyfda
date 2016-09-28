@@ -341,7 +341,7 @@ class PlotHf(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def draw_phase(self, ax):
         """
-        Draw phase on second y-axis
+        Draw phase on second y-axis in the axes system passed as the argument
         """
         try:
             self.mplwidget.fig.delaxes(self.ax_p)
