@@ -231,17 +231,13 @@ class FilterFactory(object):
             print(err_string)
             return self.err_code
 
-        
-        from pyfda.filter_design.ellip import ellip as fil_class
-            
         # Check whether create_fil_inst is called for the first time (= no filter object exists). 
         # or whether the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
         if (not hasattr(fil_inst, 'name') or dm != fil_inst.name):
             # get named attribute from dm_module, here, this returns a class
-#            fil_class = getattr(dm_module, dm, None)
-            print(type(fil_class))
+            fil_class = getattr(dm_module, dm, None)
             fil_inst = fil_class() # instantiate an object         
             self.err_code = -1 # filter instance has been created / changed
 
