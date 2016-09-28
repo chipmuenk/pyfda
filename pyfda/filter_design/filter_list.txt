@@ -7,13 +7,13 @@
 # This file should be encoded as UTF-8 without BOM or standard ASCII
 
 cheby1.py
-equiripple.py
-firwin.py
+#equiripple.py
+#firwin.py
 cheby2.py
 ellip.py
 butter.py
 bessel.py
-ma.py
+#ma.py
 
 # ======== Testing ==========
 .py
