@@ -263,9 +263,11 @@ class InputSpecs(QtGui.QWidget):
             str(type(fb.fil_inst)), str(fb.fil[0]['dm']))
 
         try:
+            #----------------------------------------------------------------------
             err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
             # The called method writes coeffs, poles/zeros etc. back to
             # the global filter dict fb.fil[0]
+            #-----------------------------------------------------------------------
             
             if err > 0:
                 raise AttributeError("Unknown design method.")

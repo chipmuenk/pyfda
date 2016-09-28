@@ -344,7 +344,8 @@ class InputFilter(QtGui.QWidget):
 
             #==================================================================
             """
-            create new instance
+            Create new instance of the selected filter class, accessible via
+            its handle fb.fil_inst
             """
             err = fb.fil_factory.create_fil_inst(dm)
             logger.debug("InputFilter.set_design_method triggered: %s\n"
