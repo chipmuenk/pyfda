@@ -36,6 +36,7 @@ MYHDL = False
 #==============================================================================
 # The entries in this file are only used as initial / default entries and
 # demonstrate the structure of the global dicts and lists.
+# They are also handy for module-level testing.
 
 #The actual entries are created resp. overwritten by
 #
@@ -120,7 +121,6 @@ fil_tree = {
     }
 
 
-
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
 # auxiliary information, it is automatically overwritten by input widgets
@@ -159,7 +159,7 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
 #------------------------------------------------------------------------------
 class FilterFactory(object):
     """
-    This class implements a filter facory that (re)creates the globally accessible
+    This class implements a filter factory that (re)creates the globally accessible
     filter instance "fil_inst" from module path and class name, passed as strings.
     """
     def __init__(self):
@@ -208,8 +208,10 @@ class FilterFactory(object):
         try:
             # Try to dynamically import the module dm from package 'filter_design'
             # i.e. do the following
-            # import pyfda.filter_design.<dm> as dm_module        
+            # import pyfda.filter_design.<dm> as dm_module  
+            #------------------------------------------------------------------
             dm_module = importlib.import_module(design_methods[dm])
+            #------------------------------------------------------------------
 #            import pyfda.filter_design.ellip as dm_module        
 
         except (KeyError) as e:
@@ -334,7 +336,9 @@ class FilterFactory(object):
                     
 #------------------------------------------------------------------------------
         
-# This instance of FilterFactory is globally visible!
+# This *class instance* of FilterFactory can be accessed in other modules using
+# import filterbroker as fb
+# fb.fil_factory. ...
 fil_factory = FilterFactory()
 
 ###############################################################################
