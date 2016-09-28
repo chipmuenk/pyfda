@@ -14,6 +14,7 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 import importlib
 import logging
 import six
+import pyfda.filter_design.ellip as ellip
 
 logger = logging.getLogger(__name__)
 # Project base directory
@@ -215,10 +216,13 @@ class FilterFactory(object):
    
         global fil_inst  # this allows _WRITING_ to fil_inst
         global err_code
-        
+               
         try:
             # Try to dynamically import the module dm from package 'filter_design'
+            # i.e. do the following
+            # import pyfda.filter_design.<dm> as dm_module        
             dm_module = importlib.import_module(design_methods[dm])
+#            import pyfda.filter_design.ellip as dm_module        
 
         except (ImportError, KeyError) as e:
             # Filter class dm is not in dictionary 'design_methods', 
@@ -230,24 +234,22 @@ class FilterFactory(object):
             print(self.err_string)
             return err_code
             
-        # Check whether create_fil_inst is called for the first time
-        #    (= no filter object exists, AttributeError is raised). 
-        # If not, check whether the design method has been changed. 
+        # Check whether create_fil_inst is called for the first time (= no filter object exists). 
+        # If not, check whether the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
-        try: # has a filter object been instantiated yet?           
-            if dm != fil_inst.name: # Yes (if no error occurs), check name
-                inst = getattr(dm_module, dm, None)
-                fil_inst = inst()
-                err_code = -2 # design class has been changed
-                return err_code
-
-        except AttributeError as e: # No, create a filter instance
-            inst = getattr(dm_module, dm, None)
-            fil_inst = inst()
+        if not hasattr(fil_inst, 'name'): # no filter object has been instantiated yet
+            # get named attribute from dm_module, here, this returns a class
+            fil_class = getattr(dm_module, dm, None)
+            fil_inst = fil_class() # instantiate an object         
             err_code = -1 # filter instance has been created for the first time
+          
+        elif dm != fil_inst.name: # filter object exists, check whether it has been changed
+            fil_class = getattr(dm_module, dm, None)
+            fil_inst = fil_class()
+            err_code = -2 # design class has been changed
 
-        if not inst: # dm is not a class of dm_module
+        elif not fil_class: # dm is not a class of dm_module
             self.err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
                     "Unknown design class '%s', could not be created.", dm)
             print(self.err_string)
