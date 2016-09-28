@@ -14,7 +14,6 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 import importlib
 import logging
 import six
-import pyfda.filter_design.ellip as ellip
 
 logger = logging.getLogger(__name__)
 # Project base directory
@@ -188,8 +187,9 @@ class FilterFactory(object):
             -2: new filter instance was created sucessfully
             -1: filter instance was created for the first time
              0: filter instance exists, no re-instantiation necessary
-             1: filter class (module) could not be imported
-             2: filter class was imported, but could not be instantiated.
+             1: filter class not found in dict 'design_methods'
+             2: filter class could not be imported
+             3: unknown error during instantiation
         
         Example
         -------
@@ -212,7 +212,6 @@ class FilterFactory(object):
             #------------------------------------------------------------------
             dm_module = importlib.import_module(design_methods[dm])
             #------------------------------------------------------------------
-#            import pyfda.filter_design.ellip as dm_module        
 
         except (KeyError) as e:
             # Filter class dm is not in dictionary 'design_methods', 
@@ -224,35 +223,33 @@ class FilterFactory(object):
             return self.err_code
             
         except (ImportError) as e:
-            # Filter class dm is not in dictionary 'design_methods', 
-            # i.e. it was not found by FilterTreeBuilder.
+            # Filter class dm is in dictionary 'design_methods', 
+            # but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
                   "Filter design class '%s' could not be imported."%dm)
-            self.err_code = 1
+            self.err_code = 2
             print(err_string)
             return self.err_code
 
+        
+        from pyfda.filter_design.ellip import ellip as fil_class
             
         # Check whether create_fil_inst is called for the first time (= no filter object exists). 
-        # If not, check whether the design method has been changed since last time. 
+        # or whether the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
-        if not hasattr(fil_inst, 'name'): # no filter object has been instantiated yet
+        if (not hasattr(fil_inst, 'name') or dm != fil_inst.name):
             # get named attribute from dm_module, here, this returns a class
-            fil_class = getattr(dm_module, dm, None)
+#            fil_class = getattr(dm_module, dm, None)
+            print(type(fil_class))
             fil_inst = fil_class() # instantiate an object         
-            self.err_code = -1 # filter instance has been created for the first time
-          
-        elif dm != fil_inst.name: # filter object exists, check whether it has been changed
-            fil_class = getattr(dm_module, dm, None)
-            fil_inst = fil_class()
-            self.err_code = -2 # design class has been changed
+            self.err_code = -1 # filter instance has been created / changed
 
         elif not fil_class: # dm is not a class of dm_module
             err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
                     "Unknown design class '%s', could not be created.", dm)
             print(err_string)
-            self.err_code = 2
+            self.err_code = 3
         else:
             err_string = ""
             self.err_code = 0
