@@ -260,7 +260,7 @@ class InputSpecs(QtGui.QWidget):
         # filter instance defined previously in InputFilter.set_response_type
 
         logger.info("startDesignFilt using: %s\nmethod: %s\n",
-            str(type(fb.fil_inst)), str(fb.fil_method))
+            str(type(fb.fil_inst)), str(fb.fil[0]['dm']))
 
         try:
             err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])

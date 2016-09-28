@@ -23,14 +23,8 @@ base_dir = ""
 # Instance of current filter design class (e.g. "cheby1")
 fil_inst = ""
 
-# Current method of current filter design class (e.g. cheby1.LPmin)
-fil_method = ""
-
 # State of filter design: "ok", "changed", "error", "failed"
 design_filt_state = "changed"
-
-# return error codes for class instantiation and method 
-err_code = 99 # instantiated, not yet initialized
 
 # module myhdl found?
 MYHDL = False
@@ -170,8 +164,8 @@ class FilterFactory(object):
     """
     def __init__(self):
         #--------------------------------------
-        pass
-
+        # return error codes for class instantiation and method 
+        self.err_code = 0
 
 
     def create_fil_inst(self, dm):
@@ -196,11 +190,6 @@ class FilterFactory(object):
              0: filter instance exists, no re-instantiation necessary
              1: filter class (module) could not be imported
              2: filter class was imported, but could not be instantiated.
-
-             17: filter method in argument is not a string
-             18: filter method does not exist in class 
-             19: filter method is not callable
-             
         
         Example
         -------
@@ -215,7 +204,6 @@ class FilterFactory(object):
         """
    
         global fil_inst  # this allows _WRITING_ to fil_inst
-        global err_code
                
         try:
             # Try to dynamically import the module dm from package 'filter_design'
@@ -224,15 +212,24 @@ class FilterFactory(object):
             dm_module = importlib.import_module(design_methods[dm])
 #            import pyfda.filter_design.ellip as dm_module        
 
-        except (ImportError, KeyError) as e:
+        except (KeyError) as e:
             # Filter class dm is not in dictionary 'design_methods', 
             # i.e. it was not found by FilterTreeBuilder.
-            print("Exception:", e)
-            self.err_string =("\nERROR in 'FilterFactory.create_fil_inst()':\n"
+            err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
+                  "Filter design class '%s' not found in dict 'design_methods'."%dm)
+            self.err_code = 1
+            print(err_string)
+            return self.err_code
+            
+        except (ImportError) as e:
+            # Filter class dm is not in dictionary 'design_methods', 
+            # i.e. it was not found by FilterTreeBuilder.
+            err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
                   "Filter design class '%s' could not be imported."%dm)
-            err_code = 1
-            print(self.err_string)
-            return err_code
+            self.err_code = 1
+            print(err_string)
+            return self.err_code
+
             
         # Check whether create_fil_inst is called for the first time (= no filter object exists). 
         # If not, check whether the design method has been changed since last time. 
@@ -242,27 +239,27 @@ class FilterFactory(object):
             # get named attribute from dm_module, here, this returns a class
             fil_class = getattr(dm_module, dm, None)
             fil_inst = fil_class() # instantiate an object         
-            err_code = -1 # filter instance has been created for the first time
+            self.err_code = -1 # filter instance has been created for the first time
           
         elif dm != fil_inst.name: # filter object exists, check whether it has been changed
             fil_class = getattr(dm_module, dm, None)
             fil_inst = fil_class()
-            err_code = -2 # design class has been changed
+            self.err_code = -2 # design class has been changed
 
         elif not fil_class: # dm is not a class of dm_module
-            self.err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
+            err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
                     "Unknown design class '%s', could not be created.", dm)
-            print(self.err_string)
-            err_code = 2
+            print(err_string)
+            self.err_code = 2
         else:
-            self.err_string = ""
-            err_code = 0
-            logger.debug("FilterFactory.create_fil_inst(): created %s", dm)
+            err_string = ""
+            self.err_code = 0
+            logger.debug("FilterFactory.create_fil_inst(): successfully created %s", dm)
         
-        return err_code
+        return self.err_code
 
 #------------------------------------------------------------------------------      
-    def create_fil_method(self, method, dm = None):
+    def call_fil_method(self, method, dm = None):
         """
         Create a global reference `fil_method` to the method passed as string `method`
         of the filter class instantiated before as `fil_inst` (global).         . 
@@ -282,9 +279,9 @@ class FilterFactory(object):
         -------
         err_code: integer
              0: filter method exists and is callable
-             17: passed argument is not a string
-             18: filter does not exist in class 
-             19: filter class was imported, but could not be instantiated..
+             16: passed argument is not a string
+             17: filter does not exist in class 
+             18: filter class was imported, but could not be instantiated..
         
         Example
         -------
@@ -296,77 +293,45 @@ class FilterFactory(object):
         then performs the actual filter design by calling the method 'LPmin',
         passing the global filter dictionary fil[0] as the parameter.
     
-        """
-        global fil_method # this allows _WRITING_ to fil_method
-        global err_code
-        
-        fil_method = None
-        
-        if dm:
+        """                
+        if dm: # design method (class) was part of the argument, (re-)create class instance
             self.create_fil_inst(dm)
-        if err_code > 0 and err_code < 17: # class dm could not be instantiated
-            return err_code
-        # test whether 'method' is a string or unicode type under Py2 and Py3
-        if not isinstance(method, six.string_types):
-            self.err_string = "Method '{0}' is not a string.".format(method)
-            err_code = 17
-        else:
-            #------------------------------------------------------------------
-            fil_method = getattr(fil_inst, method, None) # returns None if attribute doesn't exist
-            #------------------------------------------------------------------
-            if not fil_method:
-                self.err_string = "Method '{0}' doesn't exist in class '{1}'.".format(method, fil_inst)
-                err_code = 18
-    
-            elif not callable(fil_method):
-                self.err_string = "Method '{0}' of class '{1}' is not callable.".format(method, fil_inst)
-                err_code = 19
-            else:
-                err_code = 0 # no error
-                self.err_string = ""
-                
-        if err_code > 0:
-                print("\nERROR in 'FilterFactory.select_fil_method()':")
-                print(self.err_string)
+
+        # Error in dyn. class instantiation (class dm could not be instantiated)           
+        if self.err_code > 0 and self.err_code < 16:
+            err_string = "Filter design class could not be instantiated, see previous error message."
             
-        return err_code
+        # test whether 'method' is a string or unicode type under Py2 and Py3:
+        elif not isinstance(method, six.string_types):
+            err_string = "Method name '{0}' is not a string.".format(method)
+            self.err_code = 16
+            
+        # method does not exist in filter class:           
+        elif not hasattr(fil_inst, method):
+            err_string = "Method '{0}' doesn't exist in class '{1}'.".format(method, fil_inst)
+            self.err_code = 17
+ 
+        else:
+            try:
+                #------------------------------------------------------------------
+                getattr(fil_inst, method)(fil[0])
+                #------------------------------------------------------------------
+            except Exception as e:
+                err_string =("\Error calling %s':\n"%method, e)
+                self.err_code = 18
+            else:
+                self.err_code = 0 # no error
+                err_string = ""
+                
+        if self.err_code > 0:
+                logger.error(err_string)
+                print("\nERROR in 'FilterFactory.select_fil_method()':")
+                print(err_string)
+            
+        return self.err_code
         
 # TODO:      Generate Signal in filter_design: finished, error, ...
-        
-#------------------------------------------------------------------------------            
-    def call_fil_method(self, *method, **dm): 
-    # pass positional and keyword arguments to create_fil_method
-        """
-        Dynamically select and call the method passed as string "method" 
-        of the filter class instantiated as the global `fil_inst`. A reference
-        to the selected filter design method is stored as `fil_method` and can
-        be called subsequently using `fil_method(my_params)`.
-        
-        E.g.  call_method('LP'+'min')
-    
-        Parameters
-        ----------
-        method: string
-    
-            The name of the design method to be called (e.g. 'LPmin')
-            
-        dm: string (optional, default: None)
-    
-            The name of the design class to be instantiated
-            
-        Returns
-        -------
-        Error code
-    
-        """
-   
-        global fil_method   # this allows _WRITING_ to fil_method
-        # dynamically select the method given by  fil_inst.method:
-        err_code = self.create_fil_method(*method, **dm) 
-        if err_code < 1:
-            fil_method(fil[0])
-        return err_code
-        
+                    
 #------------------------------------------------------------------------------
         
 # This instance of FilterFactory is globally visible!
@@ -383,21 +348,18 @@ Alternative approaches for data persistence: Module shelve or pickleshare
 
 """
 if __name__ == '__main__':
-    print("design_methods\n", design_methods)
-    print(fil_factory.create_fil_inst("aaa"), err_code) # class doesn't exist
-    print(fil_factory.create_fil_inst("cheby1"), err_code) # first time inst.
-    print(fil_factory.create_fil_inst("cheby1"), err_code) # second time inst.
-    print(fil_factory.create_fil_inst("cheby2"), err_code) # new class
-    print(fil_factory.create_fil_inst("bbb"), err_code) # class doesn't exist
+    print("\ndesign_methods\n", design_methods)
+    print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
+    print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
+    print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.
+    print("cheby2:", fil_factory.create_fil_inst("cheby2"),"\n") # new class
+    print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
     
+    print("LPman, dm = cheby2:", fil_factory.call_fil_method("LPman", dm = "cheby2"),"\n")
+    print("LPmax:", fil_factory.call_fil_method("LPmax"),"\n") # doesn't exist
+    print("Int 1:", fil_factory.call_fil_method(1),"\n") # not a string
+    print("LPmin:", fil_factory.call_fil_method("LPmin"),"\n") # changed method
     
-    print(fil_factory.create_fil_method("LPman", dm = "cheby2"), err_code)
-    print(fil_factory.create_fil_method("LPmax"), err_code) # doesn't exist
-    print(fil_factory.create_fil_method(1), err_code) # not a string
-    print(fil_factory.create_fil_method("LPmin"), err_code) # changed method
-    
-    print(fil_factory.call_fil_method("LPmin"), err_code)
-    print(fil_factory.call_fil_method("LP"), err_code)
-    print(fil_factory.call_fil_method("LPman", dm = "cheby1"), err_code)
-    # 
-    
+    print("LPmin:", fil_factory.call_fil_method("LPmin"),"\n")
+    print("LP:", fil_factory.call_fil_method("LP"),"\n")
+    print("LPman, dm = cheby1:", fil_factory.call_fil_method("LPman", dm = "cheby1"),"\n")
