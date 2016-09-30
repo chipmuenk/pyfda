@@ -169,11 +169,11 @@ class FilterFactory(object):
 
     def create_fil_inst(self, dm):
         """
-        Create an instance of "dm" from the module found in design_methods[dm].
-        from the module found in design_methods[dm].
+        Create an instance of the filter design method passed as string "fd" 
+        from the module found in ``fd_module_names[fd]``.
         This dictionary has been collected by filter_tree_builder.py. 
         
-        The instance can then be referenced as the global `fil_inst`.
+        The instance can then be referenced as the global ``fil_inst``.
 
     
         Parameters
@@ -190,9 +190,9 @@ class FilterFactory(object):
             
             :0: filter instance exists, no re-instantiation necessary
              
-            :1: filter class not found in dict 'design_methods'
+            :1: filter class name not found in dict 'fd_module_names'
              
-            :2: filter class could not be imported
+            :2: filter class could not be imported 
              
             :3: unknown error during instantiation
         
@@ -211,26 +211,26 @@ class FilterFactory(object):
         global fil_inst  # this allows _WRITING_ to fil_inst
                
         try:
+            # Try to dynamically import the module fd from package 'filter_design'
             # i.e. do the following
-            # import pyfda.filter_design.<dm> as dm_module  
+            # import pyfda.filter_design.<fd> as fd_module  
             #------------------------------------------------------------------
-            dm_module = importlib.import_module(design_methods[dm])
+            fd_module = importlib.import_module(fd_module_names[fd])
             #------------------------------------------------------------------
 
-        except (KeyError) as e:
-            # Filter class dm is not in dictionary 'design_methods', 
-            # i.e. it was not found by FilterTreeBuilder.
+        except KeyError as e:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design class '%s' not found in dict 'design_methods'."%dm)
+                  "Filter design module '%s' not in dict 'fd_module_names',\n"
+                  "i.e. it was not found by 'FilterTreeBuilder'."%fd)
             self.err_code = 1
             print(err_string)
             return self.err_code
             
-        except (ImportError) as e:
-            # Filter class dm is in dictionary 'design_methods', 
+        except ImportError as e:
+            # Filter module fd is in dictionary 'fd_module_names', 
             # but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design class '%s' could not be imported."%dm)
+                  "Filter design module '%s' could not be imported."%fd)
             self.err_code = 2
             print(err_string)
             return self.err_code
