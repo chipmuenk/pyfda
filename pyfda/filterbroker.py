@@ -42,8 +42,8 @@ MYHDL = False
 # ----- FilterTreeBuilder.__init__() ------
 # ------                 .buildFilTree()
 #
-# Dictionary with filter name and full module name
-design_methods = {"equiripple":"pyfda.filter_design.equiripple",
+# Dictionary with filter design class name and full module name
+fd_module_names = {"equiripple":"pyfda.filter_design.equiripple",
                   "cheby1":"pyfda.filter_design.cheby1",
                   "cheby2":"pyfda.filter_design.cheby2"}
 

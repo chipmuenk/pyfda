@@ -61,7 +61,7 @@ class FilterTreeBuilder(object):
         self.read_filt_file()
 
         # Try to import all filter modules found in filter_list, store names and
-        # modules in the dict self.design_methods as {filterName:filterModule}:
+        # modules in the dict fb.fd_module_names as {filterName:filterModule}:
         self.dyn_filt_import()
 
         # Build a hierarchical dict fb.fil_tree with all valid filter designs
@@ -164,13 +164,13 @@ class FilterTreeBuilder(object):
 
         None, results are stored in
 
-        fb.design_methods: dict  containing entries (for SUCCESSFUL imports)
+        fb.fd_module_names: dict  containing entries (for SUCCESSFUL imports)
 
             {file name without .py (= class name):full module name}
              e.g. {"cheby1":"pyfda.filter_design.cheby1"}
 
         """
-        fb.design_methods = {} # clear global dict
+        fb.fd_module_names = {} # clear global dict with module names
         num_imports = 0   # initialize number of successful filter imports
 
         for dm in self.filt_list_names:
@@ -184,7 +184,7 @@ class FilterTreeBuilder(object):
                 # when successful, add the filename without '.py' and the
                 # full module name to the dict 'imports', e.g.
                 #      {'cheby1': 'pyfda.filter_design.cheby1'}
-                fb.design_methods.update({dm:module_name})
+                fb.fd_module_names.update({dm:module_name})
                 num_imports += 1
 
                 #  Now, module should be deleted to free memory (?)
@@ -197,7 +197,7 @@ class FilterTreeBuilder(object):
            
 
         methods = ""
-        for dm in fb.design_methods:
+        for dm in fb.fd_module_names:
             methods += "\t" + dm + "\n"
 
         logger.info("Imported successfully the following %d filter designs:\n%s", 
@@ -248,15 +248,15 @@ class FilterTreeBuilder(object):
 
         fb.fil_tree = {}
         fb.dm_names = {}
-        for dm in fb.design_methods:  # iterate over keys in designMethods (= dm)
+        for dm in fb.fd_module_names:  # iterate over keys in designMethods (= dm)
 
             # instantiate / update global instance of filter class dm
             fb.fil_factory.create_fil_inst(dm)
             try:
-                fb.dm_names.update(fb.fil_inst.name)
+                fb.fd_names.update(fb.fil_inst.name)
             except AttributeError:
                 logger.warning('Skipping design method "%s" due to missing attribute "name"', dm)
-                continue # continue with next entry in design_methods
+                continue # continue with next entry in fd_module_names
             ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in fb.fil_inst.rt:            # iterate over response types
