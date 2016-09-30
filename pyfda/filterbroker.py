@@ -166,7 +166,7 @@ class FilterFactory(object):
         self.err_code = 0
 
 
-    def create_fil_inst(self, dm):
+    def create_fil_inst(self, fd):
         """
         Create an instance of the filter design method passed as string "fd" 
         from the module found in ``fd_module_names[fd]``.
@@ -239,40 +239,42 @@ class FilterFactory(object):
         # the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
-        if (not hasattr(fil_inst, 'name') or dm != fil_inst.name):
+        if (not hasattr(fil_inst, 'name') or fd != fil_inst.name):
             # get named attribute from dm_module, here, this returns a class
-            fil_class = getattr(dm_module, dm, None)
+            fil_class = getattr(fd_module, fd, None)
             fil_inst = fil_class() # instantiate an object         
             self.err_code = -1 # filter instance has been created / changed successfully
 
         elif not fil_class: # dm is not a class of dm_module
             err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                    "Unknown design class '%s', could not be created.", dm)
+                    "Unknown design class '%s', could not be created.", fd)
             print(err_string)
             self.err_code = 3
         else:
             err_string = ""
             self.err_code = 0
-            logger.debug("FilterFactory.create_fil_inst(): successfully created %s", dm)
+            logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fd)
         
         return self.err_code
 
 #------------------------------------------------------------------------------      
-    def call_fil_method(self, method, dm = None):
+    def call_fil_method(self, method, fd = None):
         """
-        Create a global reference `fil_method` to the method passed as string `method`
-        of the filter class instantiated before as `fil_inst` (global).         . 
-
+        Instantiate the filter design class passed  as string `fd` with the 
+        globally accessible handle `fil_inst`. If `fd = None`, use the previously
+        instantiated filter design class. 
+        
+        Next, call the method passed as string `method` of the instantiated
+        filter design class.
     
         Parameters
         ----------
-        method: string
-    
-            The name of the design method to be constructed (e.g. 'LPmin')
+        
+        method : string
+            The name of the design method to be called (e.g. 'LPmin')
 
-        dm: string (optional, default: None)
-    
-            The name of the design class to be instantiated
+        fd : string (optional, default: None)
+            The name of the filter design class to be instantiated
     
         Returns
         -------
@@ -297,12 +299,13 @@ class FilterFactory(object):
         passing the global filter dictionary fil[0] as the parameter.
     
         """                
-        if dm: # design method (class) was part of the argument, (re-)create class instance
-            self.create_fil_inst(dm)
+        if fd: # filter design class was part of the argument, (re-)create class instance
+            self.create_fil_inst(fd)
 
-        # Error in dyn. class instantiation (class dm could not be instantiated)           
+        # Error during filter design class instantiation (class fd could not be instantiated)           
         if self.err_code > 0 and self.err_code < 16:
             err_string = "Filter design class could not be instantiated, see previous error message."
+            return self.err_code
             
         # test whether 'method' is a string or unicode type under Py2 and Py3:
         elif not isinstance(method, six.string_types):
@@ -322,8 +325,7 @@ class FilterFactory(object):
             except Exception as e:
                 err_string =("\Error calling %s':\n"%method, e)
                 self.err_code = 18
-            else:
-                self.err_code = 0 # no error
+            else: # no error, keep old error code
                 err_string = ""
                 
         if self.err_code > 0:
@@ -353,18 +355,18 @@ Alternative approaches for data persistence: Module shelve or pickleshare
 
 """
 if __name__ == '__main__':
-    print("\ndesign_methods\n", design_methods)
+    print("\nfd_module_names\n", fd_module_names)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.
     print("cheby2:", fil_factory.create_fil_inst("cheby2"),"\n") # new class
     print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
     
-    print("LPman, dm = cheby2:", fil_factory.call_fil_method("LPman", dm = "cheby2"),"\n")
+    print("LPman, fd = cheby2:", fil_factory.call_fil_method("LPman", fd = "cheby2"),"\n")
     print("LPmax:", fil_factory.call_fil_method("LPmax"),"\n") # doesn't exist
     print("Int 1:", fil_factory.call_fil_method(1),"\n") # not a string
     print("LPmin:", fil_factory.call_fil_method("LPmin"),"\n") # changed method
     
     print("LPmin:", fil_factory.call_fil_method("LPmin"),"\n")
     print("LP:", fil_factory.call_fil_method("LP"),"\n")
-    print("LPman, dm = cheby1:", fil_factory.call_fil_method("LPman", dm = "cheby1"),"\n")
+    print("LPman, fd = cheby1:", fil_factory.call_fil_method("LPman", fd = "cheby1"),"\n")
