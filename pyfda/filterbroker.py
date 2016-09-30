@@ -231,15 +231,16 @@ class FilterFactory(object):
             print(err_string)
             return self.err_code
 
-        # Check whether create_fil_inst is called for the first time (= no filter object exists). 
-        # or whether the design method has been changed since last time. 
+        # Check whether create_fil_inst has been called for the first time . 
+        # (= no filter object and hence no attribute 'name' exists) or whether 
+        # the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
         if (not hasattr(fil_inst, 'name') or dm != fil_inst.name):
             # get named attribute from dm_module, here, this returns a class
             fil_class = getattr(dm_module, dm, None)
             fil_inst = fil_class() # instantiate an object         
-            self.err_code = -1 # filter instance has been created / changed
+            self.err_code = -1 # filter instance has been created / changed successfully
 
         elif not fil_class: # dm is not a class of dm_module
             err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
