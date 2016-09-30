@@ -11,7 +11,6 @@ import codecs
 import importlib
 import logging
 logger = logging.getLogger(__name__)
-
 import pyfda.filterbroker as fb
 
 
@@ -309,8 +308,8 @@ if __name__ == "__main__":
     #  "QWidget: Must construct a QApplication before a QPaintDevice"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
 
-    from PyQt4 import QtGui
-    app = QtGui.QApplication(sys.argv)
+#    from PyQt4 import QtGui
+#    app = QtGui.QApplication(sys.argv)
 #    import pyfda.filterbroker as fb
     print("===== Initialize FilterReader ====")
 
