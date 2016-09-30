@@ -182,7 +182,7 @@ class InputFilter(QtGui.QWidget):
         layVAllWdg = QtGui.QVBoxLayout()
         layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
-        layVAllWdg.addWidget(HLine(self))
+        layVAllWdg.addWidget(HLine(QtGui, self))
         layVAllWdg.addLayout(layHOrdWdg)
 
         frmMain = QtGui.QFrame()
