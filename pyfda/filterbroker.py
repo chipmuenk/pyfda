@@ -170,31 +170,36 @@ class FilterFactory(object):
     def create_fil_inst(self, dm):
         """
         Create an instance of "dm" from the module found in design_methods[dm].
+        from the module found in design_methods[dm].
         This dictionary has been collected by filter_tree_builder.py. 
         
-        The instance can then be referenced as the global 'fil_inst'.
+        The instance can then be referenced as the global `fil_inst`.
 
     
         Parameters
         ----------
-        dm: string
-    
-            The name of the design method to be constructed (e.g. 'cheby1' or 'equiripple')
+        
+        fd : string
+            The name of the filter design class to be instantiated (e.g. 'cheby1' or 'equiripple')
     
         Returns
         -------
-        err_code: integer
-            -2: new filter instance was created sucessfully
-            -1: filter instance was created for the first time
-             0: filter instance exists, no re-instantiation necessary
-             1: filter class not found in dict 'design_methods'
-             2: filter class could not be imported
-             3: unknown error during instantiation
+        
+        err_code : integer
+            :-1: filter design class was instantiated successfully
+            
+            :0: filter instance exists, no re-instantiation necessary
+             
+            :1: filter class not found in dict 'design_methods'
+             
+            :2: filter class could not be imported
+             
+            :3: unknown error during instantiation
         
         Example
         -------
             
-        >>> create_instance('cheby1')
+        >>> create_fil_instance('cheby1')
         >>> fil_inst.LPmin(fil[0])
         
         The example first creates an instance of the filter class 'cheby1' and 
@@ -206,7 +211,6 @@ class FilterFactory(object):
         global fil_inst  # this allows _WRITING_ to fil_inst
                
         try:
-            # Try to dynamically import the module dm from package 'filter_design'
             # i.e. do the following
             # import pyfda.filter_design.<dm> as dm_module  
             #------------------------------------------------------------------
@@ -273,17 +277,21 @@ class FilterFactory(object):
     
         Returns
         -------
-        err_code: integer
-             0: filter method exists and is callable
-             16: passed argument is not a string
-             17: filter does not exist in class 
-             18: filter class was imported, but could not be instantiated..
+        
+        err_code : integer
+             :00: filter design method exists and is callable
+             
+             :16: passed method name is not a string
+             
+             :17: filter design method does not exist in class
+             
+             :18: filter design method is not callable
+             
         
         Example
         -------
             
-        >>> create_instance('cheby1')
-        >>> fil_inst.LPmin(fil[0])
+        >>> call_fil_method("LPmin", fd = "cheby1")(fil[0])
         
         The example first creates an instance of the filter class 'cheby1' and 
         then performs the actual filter design by calling the method 'LPmin',
