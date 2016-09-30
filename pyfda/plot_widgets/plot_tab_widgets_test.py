@@ -7,71 +7,74 @@ completely empty here except ONE Matplotlib canvas / figure
 Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
-from pyfda.pyfda_lib import grpdelay
+import numpy as np
+import random
+
 import pyfda.filterbroker as fb
-from matplotlib.figure import Figure
+
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 #------------------------------------------------------------------------------
-class PlotTabWidgets(QtGui.QWidget):
-    def __init__(self, parent):
-        super(PlotTabWidgets, self).__init__(parent)
+class MyMplCanvas(FigureCanvas):
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
-        self.pltTauG = PlotTauG(self)
-        
-        
-        """ Initialize UI with tabbed subplots """
-#        tabWidget = QtGui.QTabWidget()
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        # We want the axes cleared every time plot() is called
+        self.axes.hold(False)
 
-#        tabWidget.addTab(self.pltTauG, 'tau_g')
+        self.compute_initial_figure()
 
-        layVMain = QtGui.QVBoxLayout()
-        layVMain.addWidget(self.pltTauG)        
-#        layVMain.addWidget(tabWidget)
-        layVMain.setContentsMargins(1,1,1,1)
-        
-        self.setLayout(layVMain)
+        #
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
 
-#------------------------------------------------------------------------------
-    def update_data(self):
-        """ Calculate subplots with new filter DATA and redraw them """
+        FigureCanvas.setSizePolicy(self,
+                                   QtGui.QSizePolicy.Expanding,
+                                   QtGui.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
 
-        self.pltTauG.draw_taug()
-
-#------------------------------------------------------------------------------
+    def compute_initial_figure(self):
+        pass
     def update_view(self):
-        """ Update plot limits with new filter SPECS and redraw all subplots """
+        pass
+    
+    def update_data(self):
+        pass
 
-        self.pltTauG.draw_taug()
 
 
-class PlotTauG(QtGui.QWidget):
+class MyStaticMplCanvas(MyMplCanvas):
+    """Simple canvas with a sine plot."""
 
-    def __init__(self, parent=None):
-        super(PlotTauG, self).__init__(parent)
+    def compute_initial_figure(self):
+        t = np.arange(0.0, 3.0, 0.01)
+        s = np.sin(2*np.pi*t)
+        self.axes.plot(t, s)
 
-        self.figure = Figure(figsize=(10,5))
-        self.resize(800,480)
-        self.canvas = FigureCanvas(self.figure)
 
-        layout = QtGui.QVBoxLayout()
-        layout.addWidget(self.canvas)
-        self.setLayout(layout)
-        self.draw_taug()
+class MyDynamicMplCanvas(MyMplCanvas):
+    """A canvas that updates itself every second with a new plot."""
 
-    def draw_taug(self):
-        bb = fb.fil[0]['ba'][0]
-        aa = fb.fil[0]['ba'][1]
+    def __init__(self, *args, **kwargs):
+        MyMplCanvas.__init__(self, *args, **kwargs)
+        timer = QtCore.QTimer(self)
+        timer.timeout.connect(self.update_figure)
+        timer.start(1000)
 
-        [w, tau_g] = grpdelay(bb,aa, 2048, whole = True)
+    def compute_initial_figure(self):
+        self.axes.plot([0, 1, 2, 3], [1, 2, 0, 4], 'r')
 
-        F = w * fb.fil[0]['f_S']
+    def update_figure(self):
+        # Build a list of 4 random integers between 0 and 10 (both inclusive)
+        l = [random.randint(0, 10) for i in range(4)]
 
-        self.ax = self.figure.add_subplot(111)
-        self.ax.hold(False)
-        self.ax.plot(F, tau_g)
-        self.canvas.draw()
+        self.axes.plot([0, 1, 2, 3], l, 'r')
+        self.draw()
+
 
 #------------------------------------------------------------------------
 
