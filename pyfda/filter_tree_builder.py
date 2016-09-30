@@ -247,7 +247,7 @@ class FilterTreeBuilder(object):
         """
 
         fb.fil_tree = {}
-        fb.dm_names = {}
+        fb.fd_names = {}
         for dm in fb.fd_module_names:  # iterate over keys in designMethods (= dm)
 
             # instantiate / update global instance of filter class dm
