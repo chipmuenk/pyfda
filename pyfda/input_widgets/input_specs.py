@@ -20,8 +20,7 @@ import pyfda.filterbroker as fb
 from pyfda.input_widgets import (input_filter, input_amp_specs,
                                  input_freq_specs, input_freq_units,
                                  input_weight_specs, input_target_specs)
-
-
+                                 
 class InputSpecs(QtGui.QWidget):
     """
     Build widget for entering all filter specs
@@ -248,25 +247,26 @@ class InputSpecs(QtGui.QWidget):
             pformat(fb.fil[0]), str(fb.fil[0]['dm']), str(fb.fil[0]['rt']), 
                          str(fb.fil[0]['fo']))
 
-
-        # Now construct the instance method from the response type (e.g.
-        # 'LP'+'man' -> cheby1.LPman) and
-        # design the filter by passing current specs to the method, yielding
-        # e.g. cheby1.LPman(fb.fil[0])
-
-        # Create / update global instance fb.fil_inst of selected filter class dm 
-        # instantiated in InputFilter.set_design_method
-        # call the method specified as a string in the argument of the
-        # filter instance defined previously in InputFilter.set_response_type
-
         logger.info("startDesignFilt using: %s\nmethod: %s\n",
             str(type(fb.fil_inst)), str(fb.fil[0]['dm']))
 
         try:
             #----------------------------------------------------------------------
-            err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
-            # The called method writes coeffs, poles/zeros etc. back to
-            # the global filter dict fb.fil[0]
+            # A globally accessible instance fb.fil_inst of selected filter class dm 
+            # has been instantiated in InputFilter.set_design_method, now
+            # call the method specified in the filter dict fil[0].
+    
+            # The name of the instance method is constructed from the response 
+            # type (e.g. 'LP') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
+            # The filter is designed by passing the specs in fil[0] to the method, 
+            # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
+            # P/Z etc. back to fil[0].
+
+            err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'], fb.fil[0])
+            # this is the same as e.g.
+            # from pyfda.filter_design import ellip
+            # inst = ellip.ellip()
+            # inst.LPmin(fb.fil[0])
             #-----------------------------------------------------------------------
             
             if err > 0:

@@ -258,7 +258,7 @@ class FilterFactory(object):
         return self.err_code
 
 #------------------------------------------------------------------------------      
-    def call_fil_method(self, method, fd = None):
+    def call_fil_method(self, method, fil_dict, fd = None):
         """
         Instantiate the filter design class passed  as string `fd` with the 
         globally accessible handle `fil_inst`. If `fd = None`, use the previously
@@ -272,6 +272,11 @@ class FilterFactory(object):
         
         method : string
             The name of the design method to be called (e.g. 'LPmin')
+            
+        fil_dict : dictionary
+            A dictionary with all the filter specs that is passed to the actual
+            filter design routine. This is usually a copy of fil[0]
+            The results of the filter design routine are written back to the same dict.
 
         fd : string (optional, default: None)
             The name of the filter design class to be instantiated
@@ -320,7 +325,7 @@ class FilterFactory(object):
         else:
             try:
                 #------------------------------------------------------------------
-                getattr(fil_inst, method)(fil[0])
+                getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
                 err_string =("\Error calling %s':\n"%method, e)
