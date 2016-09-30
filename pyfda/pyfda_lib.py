@@ -32,8 +32,8 @@ from numpy import pi, asarray, log10, arctan
 
 # Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
 # that default to pyQT5 (but have pyQt4 installed as well)
-import matplotlib
-matplotlib.use("Qt4Agg")
+#import matplotlib
+#matplotlib.use("Qt4Agg")
 
 import scipy.signal as sig
 from scipy import __version__ as _scipy_version
