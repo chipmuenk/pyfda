@@ -15,6 +15,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
 #from pyfda.pyfda_lib import HLine
 
 from pyfda.input_widgets import (input_filter, input_amp_specs,
@@ -248,7 +249,7 @@ class InputSpecs(QtGui.QWidget):
                          str(fb.fil[0]['fo']))
 
         logger.info("startDesignFilt using: %s\nmethod: %s\n",
-            str(type(fb.fil_inst)), str(fb.fil[0]['dm']))
+            str(type(ff.fil_inst)), str(fb.fil[0]['dm']))
 
         try:
             #----------------------------------------------------------------------
@@ -262,7 +263,7 @@ class InputSpecs(QtGui.QWidget):
             # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
             # P/Z etc. back to fil[0].
 
-            err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'], fb.fil[0])
+            err = ff.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'], fb.fil[0])
             # this is the same as e.g.
             # from pyfda.filter_design import ellip
             # inst = ellip.ellip()

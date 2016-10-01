@@ -19,6 +19,7 @@ from numpy import pi, log10
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import lin2unit
 # TODO: Passband and stopband info should show min / max values for each band
 
@@ -137,27 +138,27 @@ class InputInfo(QtGui.QWidget):
         """
         Display info from filter design file and docstring
         """
-        if hasattr(fb.fil_inst,'info'):
+        if hasattr(ff.fil_inst,'info'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
-                    self._clean_doc(fb.fil_inst.info), writer_name='html',
+                    self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
             else:
-                self.txtFiltInfoBox.setText(textwrap.dedent(fb.fil_inst.info))
+                self.txtFiltInfoBox.setText(textwrap.dedent(ff.fil_inst.info))
         else:
             self.txtFiltInfoBox.setText("")
 
-        if self.chkDocstring.isChecked() and hasattr(fb.fil_inst,'info_doc'):
+        if self.chkDocstring.isChecked() and hasattr(ff.fil_inst,'info_doc'):
             if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.append(
                 '<hr /><b>Python module docstring:</b>\n')
-                for doc in fb.fil_inst.info_doc:
+                for doc in ff.fil_inst.info_doc:
                     self.txtFiltInfoBox.append(publish_string(
                      self._clean_doc(doc), writer_name='html',
                         settings_overrides = {'output_encoding': 'unicode'}))
             else:
                 self.txtFiltInfoBox.append('\nPython module docstring:\n')
-                for doc in fb.fil_inst.info_doc:
+                for doc in ff.fil_inst.info_doc:
                     self.txtFiltInfoBox.append(self.cleanDoc(doc))
 
 #        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect

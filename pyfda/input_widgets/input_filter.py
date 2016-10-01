@@ -19,6 +19,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
 import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import HLine
 
@@ -312,7 +313,7 @@ class InputFilter(QtGui.QWidget):
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
-        if fb.fil[0]['dm'] in dm_list and fb.fil_inst:
+        if fb.fil[0]['dm'] in dm_list and ff.fil_inst:
             # yes, set same dm as before
             dm_idx = self.cmbDesignMethod.findText(fb.fd_names[fb.fil[0]['dm']])
             logger.debug("dm_idx : %s", dm_idx)
@@ -339,7 +340,7 @@ class InputFilter(QtGui.QWidget):
         if dm != self.dm_last: # dm has changed:
 
             # when old filter instance has a dyn. subwidget, try to destroy it
-            if hasattr(fb.fil_inst, 'wdg') and self.dm_last:      
+            if hasattr(ff.fil_inst, 'wdg') and self.dm_last:      
                 self._destruct_dyn_widgets() 
 
             #==================================================================
@@ -347,7 +348,7 @@ class InputFilter(QtGui.QWidget):
             Create new instance of the selected filter class, accessible via
             its handle fb.fil_inst
             """
-            err = fb.fil_factory.create_fil_inst(dm)
+            err = ff.fil_factory.create_fil_inst(dm)
             logger.debug("InputFilter.set_design_method triggered: %s\n"
                         "Returned error code %d" %(dm, err))
             #==================================================================
@@ -368,7 +369,7 @@ class InputFilter(QtGui.QWidget):
                     fb.fil_tree[self.rt][self.ft][dm].keys()
                     ))
 
-            if hasattr(fb.fil_inst, 'wdg'): # construct dyn. subwidgets if available
+            if hasattr(ff.fil_inst, 'wdg'): # construct dyn. subwidgets if available
                 self._construct_dyn_widgets()
             else:
                 self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame

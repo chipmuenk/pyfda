@@ -12,6 +12,7 @@ import importlib
 import logging
 logger = logging.getLogger(__name__)
 import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
 
 
 class FilterTreeBuilder(object):
@@ -250,15 +251,15 @@ class FilterTreeBuilder(object):
         for dm in fb.fd_module_names:  # iterate over keys in designMethods (= dm)
 
             # instantiate / update global instance of filter class dm
-            fb.fil_factory.create_fil_inst(dm)
+            ff.fil_factory.create_fil_inst(dm)
             try:
-                fb.fd_names.update(fb.fil_inst.name)
+                fb.fd_names.update(ff.fil_inst.name)
             except AttributeError:
                 logger.warning('Skipping design method "%s" due to missing attribute "name"', dm)
                 continue # continue with next entry in fd_module_names
-            ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
+            ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
-            for rt in fb.fil_inst.rt:            # iterate over response types
+            for rt in ff.fil_inst.rt:            # iterate over response types
                 if rt not in fb.fil_tree:           # is rt key already in dict?
                     fb.fil_tree.update({rt:{}})     # no, create it
 
@@ -268,33 +269,33 @@ class FilterTreeBuilder(object):
                 # finally append all the individual 'min' / 'man' info
                 # to dm in fb.fil_tree. These are e.g. the params for 'min' and /or
                 # 'man' filter order
-                fb.fil_tree[rt][ft][dm].update(fb.fil_inst.rt[rt])
+                fb.fil_tree[rt][ft][dm].update(ff.fil_inst.rt[rt])
 
                 # combine common info for all response types
                 #     com = {'man':{...}, 'min':{...}}
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}}
 
-                for minman in fb.fil_inst.com:
+                for minman in ff.fil_inst.com:
                     # add info only when 'man' / 'min' exists in fb.fil_tree
                     if minman in fb.fil_tree[rt][ft][dm]:
-                        for i in fb.fil_inst.com[minman]:
+                        for i in ff.fil_inst.com[minman]:
                             # Test whether entry exists in fb.fil_tree:
                             if i in fb.fil_tree[rt][ft][dm][minman]:
                                 # yes, prepend common data
                                 fb.fil_tree[rt][ft][dm][minman][i] =\
-                                fb.fil_inst.com[minman][i] + fb.fil_tree[rt][ft][dm][minman][i]
+                                ff.fil_inst.com[minman][i] + fb.fil_tree[rt][ft][dm][minman][i]
                             else:
                                 # no, create new entry
                                 fb.fil_tree[rt][ft][dm][minman].update(\
-                                                {i:fb.fil_inst.com[minman][i]})
+                                                {i:ff.fil_inst.com[minman][i]})
 
                             logger.debug("%s - %s - %s\n"
                                 "fb.fil_tree[rt][ft][dm][minman][i]: %s\n"
                                 "fb.fil_inst.com[minman][i]: %s",
                                  dm, minman, i,
                                  pformat(fb.fil_tree[rt][ft][dm][minman][i]), 
-                                 pformat(fb.fil_inst.com[minman][i]))
+                                 pformat(ff.fil_inst.com[minman][i]))
 
 #            del cur_filter # delete obsolete filter object (needed?)
 
