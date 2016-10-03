@@ -24,13 +24,13 @@ import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import HLine
 
 
-class InputFilter(QtGui.QWidget):
+class SelectFilter(QtGui.QWidget):
     """
     Construct and read combo boxes for selecting the filter, consisting of the 
     following hierarchy:
       1. Response Type rt (LP, HP, Hilbert, ...)
       2. Filter Type ft (IIR, FIR, CIC ...)
-      3. Design Method dm (Butterworth, ...)
+      3. Filter Class (Butterworth, ...)
       
       Every time a combo box is changed manually, the filter tree for the selected
       response resp. filter type is read and the combo box(es) further down in
@@ -43,9 +43,9 @@ class InputFilter(QtGui.QWidget):
     sigFiltChanged = pyqtSignal()
 
     def __init__(self, parent):
-        super(InputFilter, self).__init__(parent)
+        super(SelectFilter, self).__init__(parent)
 
-        self.dm_last = '' # design method from last call
+        self.fc_last = '' # previous filter class
 
         self._construct_UI()
 
@@ -59,7 +59,7 @@ class InputFilter(QtGui.QWidget):
         
         - cmbFilterType for selection of filter type (IIR, FIR, ...)
         
-        - cmbDesignMethod for selection of design method (Chebychev, ...)
+        - cmbFilterClass for selection of design design class (Chebychev, ...)
         
         and populate them from the "filterTree" dict during the initial run.
         Later, calling _set_response_type() updates the three combo boxes.
@@ -83,14 +83,14 @@ class InputFilter(QtGui.QWidget):
         self.cmbFilterType = QtGui.QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
-        self.cmbDesignMethod = QtGui.QComboBox(self)
-        self.cmbDesignMethod.setObjectName("comboDesignMethod")
-        self.cmbDesignMethod.setToolTip("Select the actual filter design method.")
+        self.cmbFilterClass = QtGui.QComboBox(self)
+        self.cmbFilterClass.setObjectName("comboFilterClass")
+        self.cmbFilterClass.setToolTip("Select the filter design class.")
 
         # Adapt comboboxes size dynamically to largest element
         self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbDesignMethod.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbFilterClass.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
 
         #----------------------------------------------------------------------
         # Populate combo box with initial settings from fb.fil_tree
@@ -123,9 +123,9 @@ class InputFilter(QtGui.QWidget):
         if not isinstance(ft, str):
             ft = str(ft.toString()) # needed for Python 2.x
             
-        for dm in fb.fil_tree[rt][ft]:
-            self.cmbDesignMethod.addItem(fb.fc_names[dm], dm)
-        self.cmbDesignMethod.setCurrentIndex(0) # set initial index
+        for fc in fb.fil_tree[rt][ft]:
+            self.cmbFilterClass.addItem(fb.fc_names[fc], fc)
+        self.cmbFilterClass.setCurrentIndex(0) # set initial index
 
         #----------------------------------------------------------------------
         # Layout for Filter Type Subwidgets
@@ -139,7 +139,7 @@ class InputFilter(QtGui.QWidget):
 #        layHFilWdg.addItem(spacer)
         layHFilWdg.addWidget(self.cmbFilterType)
 #        layHFilWdg.addItem(spacer)
-        layHFilWdg.addWidget(self.cmbDesignMethod)
+        layHFilWdg.addWidget(self.cmbFilterClass)
 
         #----------------------------------------------------------------------
         # Layout for dynamic filter subwidgets (empty frame)
@@ -211,7 +211,7 @@ class InputFilter(QtGui.QWidget):
                 lambda: self._set_response_type(enb_signal=True))# 'LP'
         self.cmbFilterType.currentIndexChanged.connect(
                 lambda: self._set_filter_type(enb_signal=True))  #'IIR'
-        self.cmbDesignMethod.currentIndexChanged.connect(
+        self.cmbFilterClass.currentIndexChanged.connect(
                 lambda: self._set_design_method(enb_signal=True))#'cheby1'
         self.chkMinOrder.clicked.connect(
                 lambda: self._set_filter_order(enb_signal=True)) # Min. Order
@@ -301,31 +301,31 @@ class InputFilter(QtGui.QWidget):
 
         #---------------------------------------------------------------
         # Get all available design methods for new ft from fil_tree and
-        # - Collect them in list dm_list
+        # - Collect them in fc_list
         # - Rebuild design method combobox entries for new ft setting:
         #    The combobox is populated with the "long name",
         #    the internal name is stored in comboBox.itemData
-        self.cmbDesignMethod.blockSignals(True)
-        self.cmbDesignMethod.clear()
-        dm_list = []
+        self.cmbFilterClass.blockSignals(True)
+        self.cmbFilterClass.clear()
+        fc_list = []
 
-        for dm in sorted(fb.fil_tree[self.rt][self.ft]):
-            self.cmbDesignMethod.addItem(fb.fc_names[dm], dm)
-            dm_list.append(dm)
+        for fc in sorted(fb.fil_tree[self.rt][self.ft]):
+            self.cmbFilterClass.addItem(fb.fc_names[fc], fc)
+            fc_list.append(fc)
 
-        logger.debug("dm_list: {0}\n{1}".format(dm_list, fb.fil[0]['dm']))
+        logger.debug("fc_list: {0}\n{1}".format(fc_list, fb.fil[0]['dm']))
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
-        if fb.fil[0]['dm'] in dm_list and ff.fil_inst:
-            # yes, set same dm as before
-            dm_idx = self.cmbDesignMethod.findText(fb.fc_names[fb.fil[0]['dm']])
-            logger.debug("dm_idx : %s", dm_idx)
-            self.cmbDesignMethod.setCurrentIndex(dm_idx)
+        if fb.fil[0]['dm'] in fc_list and ff.fil_inst:
+            # yes, set same fc as before
+            fc_idx = self.cmbFilterClass.findText(fb.fc_names[fb.fil[0]['dm']])
+            logger.debug("fc_idx : %s", fc_idx)
+            self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:
-            self.cmbDesignMethod.setCurrentIndex(0)     # no, set index 0
+            self.cmbFilterClass.setCurrentIndex(0)     # no, set index 0
 
-        self.cmbDesignMethod.blockSignals(False)
+        self.cmbFilterClass.blockSignals(False)
 
         self._set_design_method(enb_signal)
 
@@ -333,18 +333,18 @@ class InputFilter(QtGui.QWidget):
 #------------------------------------------------------------------------------
     def _set_design_method(self, enb_signal=False):
         """
-        Triggered when cmbDesignMethod (cheby1, ...) is changed:
-        - read design method dm and copy it to fb.fil[0]
-        - create / update global filter instance fb.fil_inst of dm class
-        - update dynamic widgets (if dm has changed and if there are any)
+        Triggered when cmbFilterClass (cheby1, ...) is changed:
+        - read design method fc and copy it to fb.fil[0]
+        - create / update global filter instance fb.fil_inst of fc class
+        - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """        
-        dm = self._read_cmb_box(self.cmbDesignMethod, 'dm')
+        fc = self._read_cmb_box(self.cmbFilterClass, 'dm')
         
-        if dm != self.dm_last: # dm has changed:
+        if fc != self.fc_last: # fc has changed:
 
             # when old filter instance has a dyn. subwidget, try to destroy it
-            if hasattr(ff.fil_inst, 'wdg') and self.dm_last:      
+            if hasattr(ff.fil_inst, 'wdg') and self.fc_last:      
                 self._destruct_dyn_widgets() 
 
             #==================================================================
@@ -352,25 +352,25 @@ class InputFilter(QtGui.QWidget):
             Create new instance of the selected filter class, accessible via
             its handle fb.fil_inst
             """
-            err = ff.fil_factory.create_fil_inst(dm)
+            err = ff.fil_factory.create_fil_inst(fc)
             logger.debug("InputFilter.set_design_method triggered: %s\n"
-                        "Returned error code %d" %(dm, err))
+                        "Returned error code %d" %(fc, err))
             #==================================================================
 
     
             # Check whether new design method also provides the old filter order
             # method. If yes, don't change it, else set first available
             # filter order method
-            if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][dm].keys():
+            if fb.fil[0]['fo'] not in fb.fil_tree[self.rt][self.ft][fc].keys():
                 fb.fil[0].update({'fo':{}})
                 # explicit list(dict.keys()) needed for Python 3
-                fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][dm].keys())[0]
+                fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][fc].keys())[0]
     
             logger.debug("selFilter = %s"
-                   "filterTree[dm] = %s"
-                   "filterTree[dm].keys() = %s"
-                  %(fb.fil[0], fb.fil_tree[self.rt][self.ft][dm],\
-                    fb.fil_tree[self.rt][self.ft][dm].keys()
+                   "filterTree[fc] = %s"
+                   "filterTree[fc].keys() = %s"
+                  %(fb.fil[0], fb.fil_tree[self.rt][self.ft][fc],\
+                    fb.fil_tree[self.rt][self.ft][fc].keys()
                     ))
 
             if hasattr(ff.fil_inst, 'wdg'): # construct dyn. subwidgets if available
@@ -378,7 +378,7 @@ class InputFilter(QtGui.QWidget):
             else:
                 self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame
 
-            self.dm_last = fb.fil[0]['dm']
+            self.fc_last = fb.fil[0]['dm']
 
         self.load_filter_order(enb_signal)
         
@@ -390,11 +390,11 @@ class InputFilter(QtGui.QWidget):
 
         """                
         # read list of available filter order [fo] methods for  
-        # current design method [dm] from fil_tree:
+        # current design method [fc] from fil_tree:
         foList = fb.fil_tree[fb.fil[0]['rt']]\
             [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
 
-        # is currently selected fo setting available for (new) dm ?
+        # is currently selected fo setting available for (new) fc ?
         if fb.fil[0]['fo'] in foList:
             self.fo = fb.fil[0]['fo'] # keep current setting
         else:
@@ -477,15 +477,6 @@ class InputFilter(QtGui.QWidget):
         ff.fil_inst.deleteLater() # delete QWidget when scope has been left
             
 
-#==============================================================================
-#         # Find "old" dyn. subwidgets and delete them:
-#         widgetList = self.frmDynWdg.findChildren(
-#             (QtGui.QComboBox, QtGui.QLineEdit, QtGui.QLabel, QtGui.QWidget))
-#         
-#         widgetListNames = [w.objectName() for w in widgetList]
-#         print(widgetListNames)
-#             
-#==============================================================================
 #------------------------------------------------------------------------------
     def _construct_dyn_widgets(self):
         """
@@ -512,7 +503,7 @@ class InputFilter(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    mainw = InputFilter(None)
+    mainw = SelectFilter(None)
 
     app.setActiveWindow(mainw) 
     mainw.show()
