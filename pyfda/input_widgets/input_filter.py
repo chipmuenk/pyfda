@@ -124,7 +124,7 @@ class InputFilter(QtGui.QWidget):
             ft = str(ft.toString()) # needed for Python 2.x
             
         for dm in fb.fil_tree[rt][ft]:
-            self.cmbDesignMethod.addItem(fb.fd_names[dm], dm)
+            self.cmbDesignMethod.addItem(fb.fc_names[dm], dm)
         self.cmbDesignMethod.setCurrentIndex(0) # set initial index
 
         #----------------------------------------------------------------------
@@ -306,7 +306,7 @@ class InputFilter(QtGui.QWidget):
         dm_list = []
 
         for dm in sorted(fb.fil_tree[self.rt][self.ft]):
-            self.cmbDesignMethod.addItem(fb.fd_names[dm], dm)
+            self.cmbDesignMethod.addItem(fb.fc_names[dm], dm)
             dm_list.append(dm)
 
         logger.debug("dm_list: {0}\n{1}".format(dm_list, fb.fil[0]['dm']))
@@ -315,7 +315,7 @@ class InputFilter(QtGui.QWidget):
         # Has filter been instantiated?
         if fb.fil[0]['dm'] in dm_list and ff.fil_inst:
             # yes, set same dm as before
-            dm_idx = self.cmbDesignMethod.findText(fb.fd_names[fb.fil[0]['dm']])
+            dm_idx = self.cmbDesignMethod.findText(fb.fc_names[fb.fil[0]['dm']])
             logger.debug("dm_idx : %s", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx)
         else:

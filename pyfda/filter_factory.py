@@ -33,19 +33,19 @@ class FilterFactory(object):
         self.err_code = 0
 
 
-    def create_fil_inst(self, fd):
+    def create_fil_inst(self, fc):
         """
-        Create an instance of the filter design method passed as string "fd" 
-        from the module found in ``fd_module_names[fd]``.
+        Create an instance of the filter design class passed as string "fc" 
+        from the module found in ``fc_module_names[fc]``.
         This dictionary has been collected by filter_tree_builder.py. 
         
-        The instance can then be referenced as the global ``fil_inst``.
+        The instance can afterwards be referenced as the global ``fil_inst``.
 
     
         Parameters
         ----------
         
-        fd : string
+        fc : string
             The name of the filter design class to be instantiated (e.g. 'cheby1' or 'equiripple')
     
         Returns
@@ -56,7 +56,7 @@ class FilterFactory(object):
             
             :0: filter instance exists, no re-instantiation necessary
              
-            :1: filter class name not found in dict 'fd_module_names'
+            :1: filter class name not found in dict 'fc_module_names'
              
             :2: filter class could not be imported 
              
@@ -74,28 +74,36 @@ class FilterFactory(object):
     
         """
         global fil_inst # allow writing to variable
+
+# Moved from filter_tree_builder: useless and possibly dangerous
+#        try:
+#            # Delete previously loaded module from memory
+#            del sys.modules[fc_module]
+#        except:
+#            print("Could not delete module!")
+
               
         try:
-            # Try to dynamically import the module fd from package 'filter_design'
+            # Try to dynamically import the module fc from package 'filter_design'
             # i.e. do the following
-            # import pyfda.filter_design.<fd> as fd_module  
+            # import pyfda.filter_design.<fc> as fc_module  
             #------------------------------------------------------------------
-            fd_module = importlib.import_module(fb.fd_module_names[fd])
+            fc_module = importlib.import_module(fb.fc_module_names[fc])
             #------------------------------------------------------------------
 
         except KeyError as e:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design module '%s' not in dict 'fd_module_names',\n"
-                  "i.e. it was not found by 'FilterTreeBuilder'."%fd)
+                  "Filter design module '%s' not in dict 'fc_module_names',\n"
+                  "i.e. it was not found by 'FilterTreeBuilder'."%fc)
             self.err_code = 1
             print(err_string)
             return self.err_code
             
         except ImportError as e:
-            # Filter module fd is in dictionary 'fd_module_names', 
+            # Filter module fc is in dictionary 'fc_module_names', 
             # but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design module '%s' could not be imported."%fd)
+                  "Filter design module '%s' could not be imported."%fc)
             self.err_code = 2
             print(err_string)
             return self.err_code
@@ -105,29 +113,29 @@ class FilterFactory(object):
         # the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
-        if (not hasattr(fil_inst, 'name') or fd != fil_inst.name):
+        if (not hasattr(fil_inst, 'name') or fc != fil_inst.name):
             # get named attribute from dm_module, here, this returns a class
-            fil_class = getattr(fd_module, fd, None)
+            fil_class = getattr(fc_module, fc, None)
             fil_inst = fil_class() # instantiate an object         
             self.err_code = -1 # filter instance has been created / changed successfully
 
         elif not fil_class: # dm is not a class of dm_module
             err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                    "Unknown design class '%s', could not be created.", fd)
+                    "Unknown design class '%s', could not be created.", fc)
             print(err_string)
             self.err_code = 3
         else:
             err_string = ""
             self.err_code = 0
-            logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fd)
+            logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
         
         return self.err_code
 
 #------------------------------------------------------------------------------      
-    def call_fil_method(self, method, fil_dict, fd = None):
+    def call_fil_method(self, method, fil_dict, fc = None):
         """
-        Instantiate the filter design class passed  as string `fd` with the 
-        globally accessible handle `fil_inst`. If `fd = None`, use the previously
+        Instantiate the filter design class passed  as string `fc` with the 
+        globally accessible handle `fil_inst`. If `fc = None`, use the previously
         instantiated filter design class. 
         
         Next, call the method passed as string `method` of the instantiated
@@ -144,7 +152,7 @@ class FilterFactory(object):
             filter design routine. This is usually a copy of fb.fil[0]
             The results of the filter design routine are written back to the same dict.
 
-        fd : string (optional, default: None)
+        fc : string (optional, default: None)
             The name of the filter design class to be instantiated. When nothing
             is specified, the last filter selection is used.
     
@@ -164,17 +172,17 @@ class FilterFactory(object):
         Example
         -------
             
-        >>> call_fil_method("LPmin", fd = "cheby1")(fil[0])
+        >>> call_fil_method("LPmin", fc = "cheby1")(fil[0])
         
         The example first creates an instance of the filter class 'cheby1' and 
         then performs the actual filter design by calling the method 'LPmin',
         passing the global filter dictionary fil[0] as the parameter.
     
         """                
-        if fd: # filter design class was part of the argument, (re-)create class instance
-            self.create_fil_inst(fd)
+        if fc: # filter design class was part of the argument, (re-)create class instance
+            self.create_fil_inst(fc)
 
-        # Error during filter design class instantiation (class fd could not be instantiated)           
+        # Error during filter design class instantiation (class fc could not be instantiated)           
         if self.err_code > 0 and self.err_code < 16:
             err_string = "Filter design class could not be instantiated, see previous error message."
             return self.err_code
@@ -227,21 +235,21 @@ Alternative approaches for data persistence: Module shelve or pickleshare
 
 """
 if __name__ == '__main__':
-    print("\nfd_module_names\n", fb.fd_module_names)
+    print("\nfd_module_names\n", fb.fc_module_names)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.
     print("cheby2:", fil_factory.create_fil_inst("cheby2"),"\n") # new class
     print("bbb:", fil_factory.create_fil_inst("bbb"),"\n") # class doesn't exist
     
-    print("LPman, fd = cheby2:", fil_factory.call_fil_method("LPman", fb.fil[0], fd = "cheby2"),"\n")
+    print("LPman, fc = cheby2:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby2"),"\n")
     print("LPmax:", fil_factory.call_fil_method("LPmax", fb.fil[0]),"\n") # doesn't exist
     print("Int 1:", fil_factory.call_fil_method(1, fb.fil[0]),"\n") # not a string
     print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n") # changed method
     
     print("LPmin:", fil_factory.call_fil_method("LPmin", fb.fil[0]),"\n")
     print("LP:", fil_factory.call_fil_method("LP", fb.fil[0]),"\n")
-    print("LPman, fd = cheby1:", fil_factory.call_fil_method("LPman", fb.fil[0], fd = "cheby1"),"\n")
+    print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby1"),"\n")
     
-    print("LPman, fd = cheby1:", fil_factory.call_fil_method("LPman", fd = "cheby1"),"\n")
+    print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n")
    

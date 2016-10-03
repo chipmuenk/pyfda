@@ -40,12 +40,12 @@ MYHDL = False
 # ------                 .buildFilTree()
 #
 # Dictionary with filter design class name and full module name
-fd_module_names = {"equiripple":"pyfda.filter_design.equiripple",
+fc_module_names = {"equiripple":"pyfda.filter_design.equiripple",
                   "cheby1":"pyfda.filter_design.cheby1",
                   "cheby2":"pyfda.filter_design.cheby2"}
 
 # Dictionary with translations between short and long names for filter design classes
-fd_names = {# IIR:
+fc_names = {# IIR:
             "butter":"Butterworth", "cheby1":"Chebychev 1",
             "bessel":"Bessel", "cheby2":"Chebychev 2",
             # FIR:
