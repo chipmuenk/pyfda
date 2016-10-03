@@ -110,16 +110,16 @@ class InputFiles(QtGui.QWidget):
 
         layVIO.addWidget(self.butSave) # save filter dict -> various formats
         layVIO.addWidget(self.butLoad) # load filter dict -> various formats
-        layVIO.addWidget(HLine(self))
+        layVIO.addWidget(HLine(QtGui, self))
         layVIO.addWidget(self.butExport) # export coeffs -> various formats
         layVIO.addWidget(self.butImport) # export coeffs -> various formats
-        layVIO.addWidget(HLine(self))
+        layVIO.addWidget(HLine(QtGui, self))
 
         layHIO = QtGui.QHBoxLayout()        
         layHIO.addWidget(lblSeparator)
         layHIO.addWidget(self.cmbSeparator)        
         layVIO.addLayout(layHIO)
-        layVIO.addWidget(HLine(self))
+        layVIO.addWidget(HLine(QtGui, self))
         layVIO.addStretch(1)
         
         layVIO.addWidget(self.butReadFiltTree) # re-read filter tree (for debugging)

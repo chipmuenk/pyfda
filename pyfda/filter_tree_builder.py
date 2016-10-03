@@ -2,7 +2,6 @@
 """
 Created on Mon Nov 24 10:00:14 2014
 
-@author: Michael Winkler, Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys
@@ -11,8 +10,8 @@ import codecs
 import importlib
 import logging
 logger = logging.getLogger(__name__)
-
 import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
 
 
 class FilterTreeBuilder(object):
@@ -61,7 +60,7 @@ class FilterTreeBuilder(object):
         self.read_filt_file()
 
         # Try to import all filter modules found in filter_list, store names and
-        # modules in the dict self.design_methods as {filterName:filterModule}:
+        # modules in the dict fb.fc_module_names as {filterName:filterModule}:
         self.dyn_filt_import()
 
         # Build a hierarchical dict fb.fil_tree with all valid filter designs
@@ -164,50 +163,52 @@ class FilterTreeBuilder(object):
 
         None, results are stored in
 
-        fb.design_methods: dict  containing entries (for SUCCESSFUL imports)
+        fb.fc_module_names: dict  containing entries (for SUCCESSFUL imports)
 
             {file name without .py (= class name):full module name}
              e.g. {"cheby1":"pyfda.filter_design.cheby1"}
 
         """
-        fb.design_methods = {} # clear global dict
+        fb.fc_module_names = {} # clear global dict with module names
         num_imports = 0   # initialize number of successful filter imports
 
-        for dm in self.filt_list_names:
+        for fc in self.filt_list_names:
             try:
                 # Try to import the module from the  package)
                 # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
-                module_name = 'pyfda.' + self.filt_dir + '.' + dm
+                module_name = 'pyfda.' + self.filt_dir + '.' + fc
 
                 importlib.import_module(module_name)
 
                 # when successful, add the filename without '.py' and the
                 # full module name to the dict 'imports', e.g.
                 #      {'cheby1': 'pyfda.filter_design.cheby1'}
-                fb.design_methods.update({dm:module_name})
+                fb.fc_module_names.update({fc:module_name})
                 num_imports += 1
 
-                #  Now, module should be deleted to free memory (?)
-                del sys.modules[module_name]
-
             except ImportError as e:
-                logger.error('Filter design "%s" could not be imported.', dm)
+                logger.error('Filter design "%s" could not be imported.', fc)
             except Exception as e:
                 logger.error("Unexpected error: %s", e)
            
 
-        methods = ""
-        for dm in fb.design_methods:
-            methods += "\t" + dm + "\n"
+        imported_fil_classes = ""
+        for fc in fb.fc_module_names:
+            imported_fil_classes += "\t" + fc + "\n"
+            
+        if num_imports < 1:
+            logger.critical("No filter class could be imported - shutting down.")
+            sys.exit("No filter class could be imported - shutting down.")
 
-        logger.info("Imported successfully the following %d filter designs:\n%s", 
-                    num_imports, methods)
+        else:
+            logger.info("Imported successfully the following %d filter classes:\n%s", 
+                    num_imports, imported_fil_classes)
 
 #==============================================================================
     def build_fil_tree(self):
         """
-        Read attributes (ft, rt, rt:fo) from all design method (dm) classes
-        listed in the global dict fb.gD['imports']. Attributes are stored in
+        Read attributes (ft, rt, rt:fo) from all filter classes (fc)
+        listed in the global dict ``fb.fc_module_names``. Attributes are stored in
         the design method classes in the format (example from cheby1.py)
 
         self.ft = 'IIR'
@@ -222,13 +223,13 @@ class FilterTreeBuilder(object):
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
-        Build a dictionary of all filter combinations with the hierarchy:
+        Build a dictionary of all filter combinations with the following hierarchy:
 
-        response types -> filter types -> design methods  -> filter order
-        rt (e.g. 'LP')    ft (e.g. 'IIR') dm (e.g. 'cheby1') fo ('min' or 'man')
+        response types -> filter types -> filter classes  -> filter order
+        rt (e.g. 'LP')    ft (e.g. 'IIR') fc (e.g. 'cheby1') fo ('min' or 'man')
 
-        Additionally, all the attributes found in each filter branch ()
-        corresponding design method class are stored, e.g.
+        Additionally, all the attributes found in each filter branch (e.g. cheby1.LPmin)
+        are stored, e.g.
         'par':['f_S', 'F_PB', 'F_SB', 'A_PB', 'A_SB']   # required parameters
         'msg':r"<br /><b>Note:</b> Order needs to be even!" # message
         'dis':['fo','fspecs','wspecs']  # disabled widgets
@@ -247,57 +248,55 @@ class FilterTreeBuilder(object):
         """
 
         fb.fil_tree = {}
-        fb.dm_names = {}
-        for dm in fb.design_methods:  # iterate over keys in designMethods (= dm)
+        fb.fc_names = {}
+        for fc in fb.fc_module_names:  # iterate over keys in fc_module_names (= fc)
 
-            # instantiate / update global instance of filter class dm
-            fb.fil_factory.create_fil_inst(dm)
+            # instantiate / update global instance of filter class fc
+            ff.fil_factory.create_fil_inst(fc)
             try:
-                fb.dm_names.update(fb.fil_inst.name)
+                fb.fc_names.update(ff.fil_inst.name)
             except AttributeError:
-                logger.warning('Skipping design method "%s" due to missing attribute "name"', dm)
-                continue # continue with next entry in design_methods
-            ft = fb.fil_inst.ft                  # get filter type (e.g. 'FIR')
+                logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
+                continue # continue with next entry in fc_module_names
+            ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
-            for rt in fb.fil_inst.rt:            # iterate over response types
+            for rt in ff.fil_inst.rt:            # iterate over response types
                 if rt not in fb.fil_tree:           # is rt key already in dict?
                     fb.fil_tree.update({rt:{}})     # no, create it
 
                 if ft not in fb.fil_tree[rt]:  # is ft key already in dict[rt]?
                     fb.fil_tree[rt].update({ft:{}}) # no, create it
-                fb.fil_tree[rt][ft].update({dm:{}}) # append dm to list dict[rt][ft]
+                fb.fil_tree[rt][ft].update({fc:{}}) # append fc to list dict[rt][ft]
                 # finally append all the individual 'min' / 'man' info
-                # to dm in fb.fil_tree. These are e.g. the params for 'min' and /or
+                # to fc in fb.fil_tree. These are e.g. the params for 'min' and /or
                 # 'man' filter order
-                fb.fil_tree[rt][ft][dm].update(fb.fil_inst.rt[rt])
+                fb.fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
                 # combine common info for all response types
                 #     com = {'man':{...}, 'min':{...}}
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}}
 
-                for minman in fb.fil_inst.com:
+                for minman in ff.fil_inst.com:
                     # add info only when 'man' / 'min' exists in fb.fil_tree
-                    if minman in fb.fil_tree[rt][ft][dm]:
-                        for i in fb.fil_inst.com[minman]:
+                    if minman in fb.fil_tree[rt][ft][fc]:
+                        for i in ff.fil_inst.com[minman]:
                             # Test whether entry exists in fb.fil_tree:
-                            if i in fb.fil_tree[rt][ft][dm][minman]:
+                            if i in fb.fil_tree[rt][ft][fc][minman]:
                                 # yes, prepend common data
-                                fb.fil_tree[rt][ft][dm][minman][i] =\
-                                fb.fil_inst.com[minman][i] + fb.fil_tree[rt][ft][dm][minman][i]
+                                fb.fil_tree[rt][ft][fc][minman][i] =\
+                                ff.fil_inst.com[minman][i] + fb.fil_tree[rt][ft][fc][minman][i]
                             else:
                                 # no, create new entry
-                                fb.fil_tree[rt][ft][dm][minman].update(\
-                                                {i:fb.fil_inst.com[minman][i]})
+                                fb.fil_tree[rt][ft][fc][minman].update(\
+                                                {i:ff.fil_inst.com[minman][i]})
 
                             logger.debug("%s - %s - %s\n"
-                                "fb.fil_tree[rt][ft][dm][minman][i]: %s\n"
+                                "fb.fil_tree[rt][ft][fc][minman][i]: %s\n"
                                 "fb.fil_inst.com[minman][i]: %s",
-                                 dm, minman, i,
-                                 pformat(fb.fil_tree[rt][ft][dm][minman][i]), 
-                                 pformat(fb.fil_inst.com[minman][i]))
-
-#            del cur_filter # delete obsolete filter object (needed?)
+                                 fc, minman, i,
+                                 pformat(fb.fil_tree[rt][ft][fc][minman][i]), 
+                                 pformat(ff.fil_inst.com[minman][i]))
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
@@ -308,10 +307,9 @@ if __name__ == "__main__":
     # Need to start a QApplication to avoid the error
     #  "QWidget: Must construct a QApplication before a QPaintDevice"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
-
     from PyQt4 import QtGui
     app = QtGui.QApplication(sys.argv)
-#    import pyfda.filterbroker as fb
+
     print("===== Initialize FilterReader ====")
 
     filt_file_name = "filter_list.txt"

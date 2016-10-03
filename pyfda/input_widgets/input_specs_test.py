@@ -15,12 +15,14 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
+#from pyfda.pyfda_lib import HLine
 
-from pyfda.input_widgets import (input_filter, input_amp_specs,
+from pyfda.input_widgets import (input_amp_specs,
                                  input_freq_specs, input_freq_units,
-                                 input_weight_specs, input_target_specs)
-
-
+                                 input_weight_specs, input_target_specs, 
+                                 input_filter)
+                                 
 class InputSpecs(QtGui.QWidget):
     """
     Build widget for entering all filter specs
@@ -43,8 +45,8 @@ class InputSpecs(QtGui.QWidget):
         """
         # Subwidget for selecting filter with response type rt (LP, ...), 
         #    filter type ft (IIR, ...) and design method dm (cheby1, ...)
-#        self.sel_fil = input_filter.InputFilter(self)
-#        self.sel_fil.setObjectName("select_filter")
+        self.sel_fil = input_filter.InputFilter(self)
+        self.sel_fil.setObjectName("select_filter")
         # Subwidget for selecting the frequency unit and range
         self.f_units = input_freq_units.InputFreqUnits(self)
         self.f_units.setObjectName("freq_units")
@@ -83,7 +85,7 @@ class InputSpecs(QtGui.QWidget):
         spcV = QtGui.QSpacerItem(10, 10, QtGui.QSizePolicy.Minimum,
                                       QtGui.QSizePolicy.Expanding)
         layGMain = QtGui.QGridLayout()
-#        layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
+        layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
         layGMain.addWidget(self.f_units, 2, 0, 1, 2)  # Frequency units
         layGMain.addWidget(self.f_specs, 3, 0, 1, 2)  # Freq. specifications
         layGMain.addWidget(self.a_specs, 4, 0, 1, 2)  # Amplitude specs
@@ -93,7 +95,7 @@ class InputSpecs(QtGui.QWidget):
         layGMain.addWidget(self.butDesignFilt, 8, 0)  # <Design Filter> button
         layGMain.addWidget(self.butQuit, 8, 1)        # <Quit> button
         layGMain.addItem(spcV, 9, 0, 1, 2) # spacer to allow for vert. expansion
-#        layGMain.addWidget(self.HLine(), 9,0,1,2) # create HLine
+#        layGMain.addWidget(HLine(self), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(0, 0, 0, 0)
 #        layGMain.setRowStretch(1,1)
 
@@ -105,7 +107,7 @@ class InputSpecs(QtGui.QWidget):
         # Changing the filter design requires updating UI because number or 
         # kind of input fields changes -> Call update_all_UIs, emitting 
         # sigFilterChanged when it's finished
-#        self.sel_fil.sigFiltChanged.connect(self.update_UI)
+        self.sel_fil.sigFiltChanged.connect(self.update_UI)
 
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -223,7 +225,7 @@ class InputSpecs(QtGui.QWidget):
         Reload all specs/parameters entries from global dict fb.fil[0],
         using the "load_entries" methods of the individual classes
         """
-#        self.sel_fil.load_entries() # select filter widget
+        self.sel_fil.load_entries() # select filter widget
         self.f_units.load_entries() # frequency units widget
         self.f_specs.load_entries() # frequency specification widget
         self.a_specs.load_entries() # magnitude specs with unit
@@ -247,24 +249,27 @@ class InputSpecs(QtGui.QWidget):
             pformat(fb.fil[0]), str(fb.fil[0]['dm']), str(fb.fil[0]['rt']), 
                          str(fb.fil[0]['fo']))
 
-
-        # Now construct the instance method from the response type (e.g.
-        # 'LP'+'man' -> cheby1.LPman) and
-        # design the filter by passing current specs to the method, yielding
-        # e.g. cheby1.LPman(fb.fil[0])
-
-        # Create / update global instance fb.fil_inst of selected filter class dm 
-        # instantiated in InputFilter.set_design_method
-        # call the method specified as a string in the argument of the
-        # filter instance defined previously in InputFilter.set_response_type
-
         logger.info("startDesignFilt using: %s\nmethod: %s\n",
-            str(type(fb.fil_inst)), str(fb.fil_method))
+             str(type(ff.fil_inst)), str(fb.fil[0]['dm']))
 
         try:
-            err = fb.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'])
-            # The called method writes coeffs, poles/zeros etc. back to
-            # the global filter dict fb.fil[0]
+            #----------------------------------------------------------------------
+            # A globally accessible instance fb.fil_inst of selected filter class dm 
+            # has been instantiated in InputFilter.set_design_method, now
+            # call the method specified in the filter dict fil[0].
+    
+            # The name of the instance method is constructed from the response 
+            # type (e.g. 'LP') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
+            # The filter is designed by passing the specs in fil[0] to the method, 
+            # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
+            # P/Z etc. back to fil[0].
+
+            err = ff.fil_factory.call_fil_method(fb.fil[0]['rt'] + fb.fil[0]['fo'], fb.fil[0])
+            # this is the same as e.g.
+            # from pyfda.filter_design import ellip
+            # inst = ellip.ellip()
+            # inst.LPmin(fb.fil[0])
+            #-----------------------------------------------------------------------
             
             if err > 0:
                 raise AttributeError("Unknown design method.")
@@ -272,7 +277,7 @@ class InputSpecs(QtGui.QWidget):
     
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
-#            self.sel_fil.load_filter_order()
+            self.sel_fil.load_filter_order()
             self.w_specs.load_entries()
             self.f_specs.load_entries()
             self.color_design_button("ok")
@@ -312,17 +317,6 @@ class InputSpecs(QtGui.QWidget):
         self.butDesignFilt.style().polish(self.butDesignFilt)
         self.butDesignFilt.update()
 
-#------------------------------------------------------------------------------
-    def HLine(self):
-        # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-        # solution
-        """
-        Create a horizontal line
-        """
-        line = QtGui.QFrame()
-        line.setFrameShape(QtGui.QFrame.HLine)
-        line.setFrameShadow(QtGui.QFrame.Sunken)
-        return line
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':

@@ -54,8 +54,8 @@ logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file))#, disab
 if not os.path.exists(rc.save_dir):
     home_dir = pyfda_lib.get_home_dir()
     logger.warning('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
-        rc.save_dir, home_dir) #fb.base_dir
-    rc.save_dir = home_dir #fb.base_dir
+        rc.save_dir, home_dir)
+    rc.save_dir = home_dir
 
 
 #class Whitelist(logging.Filter):
@@ -87,34 +87,35 @@ class pyFDA(QtGui.QMainWindow):
     """
 
     def __init__(self, parent=None):
-        super(pyFDA, self).__init__(parent)
-#        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        QtGui.QMainWindow.__init__(self)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        
         
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
         self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt', comment_char='#')                                  
-        self.initUI()
+        self._construct_UI()
 
-    def initUI(self):
+    def _construct_UI(self):
         """
-        Intitialize the main GUI, consisting of:
+        Construct the main GUI, consisting of:
         - Subwindow for parameter selection [-> ChooseParams.ChooseParams()]
         - Filter Design button [-> self.startDesignFilt()]
         - Plot Window [-> plotAll.plotAll()]
         """
 
-        # Instantiate subwidget groups
-        self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
-        self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-
         # ============== UI Layout =====================================
 #        _widget = QtGui.QMainWindow() # this widget contains all subwidget groups
 #        _widget = QtGui.QDialog() # this widget contains all subwidget groups
-        _widget = QtGui.QWidget() # this widget contains all subwidget groups
+        self.main_widget = QtGui.QWidget(self) # this widget contains all subwidget groups
 
-        layHMain = QtGui.QHBoxLayout(_widget) # horizontal layout of all groups
-#        layHMain = QtGui.QHBoxLayout(self) # horizontal layout of all groups
+        layHMain = QtGui.QHBoxLayout(self.main_widget) # horizontal layout of all groups
+
+        # Instantiate subwidget groups
+        self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
+        self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
+# Test        self.pltTabWidgets = plot_tab_widgets.MyStaticMplCanvas(self.main_widget, width=5, height=4, dpi=100)
 
         if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
             layVInput = QtGui.QVBoxLayout()
@@ -153,7 +154,7 @@ class pyFDA(QtGui.QMainWindow):
         if SCROLL:
             # Create scroll area and "monitor" _widget whether scrollbars are needed
             scrollArea = QtGui.QScrollArea()
-            scrollArea.setWidget(_widget) # make main widget "scrollable"
+            scrollArea.setWidget(self.main_widget) # make main widget "scrollable"
     
             #============= Set behaviour of scroll area ======================
             # scroll bars appear when the scroll area shrinks below this size:
@@ -166,9 +167,10 @@ class pyFDA(QtGui.QMainWindow):
             # Size of monitored widget is allowed to grow:
             scrollArea.setWidgetResizable(True)
     
-        # make _widget occupy the main area of QMainWidget 
+        self.main_widget.setFocus()
+        # make main_widget occupy the main area of QMainWidget 
         #   and make QMainWindow its parent !!!
-        self.setCentralWidget(_widget)
+        self.setCentralWidget(self.main_widget)
 
         #=============== Menubar =======================================
 

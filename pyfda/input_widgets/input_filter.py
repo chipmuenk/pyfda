@@ -19,6 +19,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
+import pyfda.filter_factory as ff
 import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import HLine
 
@@ -123,21 +124,21 @@ class InputFilter(QtGui.QWidget):
             ft = str(ft.toString()) # needed for Python 2.x
             
         for dm in fb.fil_tree[rt][ft]:
-            self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
+            self.cmbDesignMethod.addItem(fb.fc_names[dm], dm)
         self.cmbDesignMethod.setCurrentIndex(0) # set initial index
 
         #----------------------------------------------------------------------
         # Layout for Filter Type Subwidgets
         #----------------------------------------------------------------------
  
-        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
-                                         QtGui.QSizePolicy.Fixed)
+#        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
+#                                         QtGui.QSizePolicy.Fixed)
 
         layHFilWdg = QtGui.QHBoxLayout() # container for filter subwidgets
         layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
-        layHFilWdg.addItem(spacer)
+#        layHFilWdg.addItem(spacer)
         layHFilWdg.addWidget(self.cmbFilterType)
-        layHFilWdg.addItem(spacer)
+#        layHFilWdg.addItem(spacer)
         layHFilWdg.addWidget(self.cmbDesignMethod)
 
         #----------------------------------------------------------------------
@@ -160,8 +161,8 @@ class InputFilter(QtGui.QWidget):
         self.lblOrder =  QtGui.QLabel("Order:")
         self.lblOrder.setFont(bfont)
         self.chkMinOrder = QtGui.QCheckBox("Minimum", self)
-        spacer = QtGui.QSpacerItem(20,0,
-                        QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+#        spacer1 = QtGui.QSpacerItem(20,0,
+#                        QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.lblOrderN = QtGui.QLabel("N = ")
         self.lblOrderN.setFont(ifont)
         self.ledOrderN = QtGui.QLineEdit(str(fb.fil[0]['N']),self)
@@ -171,7 +172,7 @@ class InputFilter(QtGui.QWidget):
         layHOrdWdg = QtGui.QHBoxLayout()
         layHOrdWdg.addWidget(self.lblOrder)
         layHOrdWdg.addWidget(self.chkMinOrder)
-        layHOrdWdg.addItem(spacer)
+#        layHOrdWdg.addItem(spacer1)
         layHOrdWdg.addWidget(self.lblOrderN)
         layHOrdWdg.addWidget(self.ledOrderN)
 
@@ -182,19 +183,23 @@ class InputFilter(QtGui.QWidget):
         layVAllWdg = QtGui.QVBoxLayout()
         layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
-        layVAllWdg.addWidget(HLine(self))
+        layVAllWdg.addWidget(HLine(QtGui, self))
         layVAllWdg.addLayout(layHOrdWdg)
 
-        frmMain = QtGui.QFrame()
-        frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        frmMain.setLayout(layVAllWdg)
-
-        layHMain = QtGui.QHBoxLayout()
-        layHMain.addWidget(frmMain)
-        layHMain.setContentsMargins(0, 0, 0, 0)
-
-        self.setLayout(layHMain)
-#        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+#==============================================================================
+#         frmMain = QtGui.QFrame()
+#         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+#         frmMain.setLayout(layVAllWdg)
+# 
+#         layHMain = QtGui.QHBoxLayout()
+#         layHMain.addWidget(frmMain)
+#         layHMain.setContentsMargins(0, 0, 0, 0)
+# 
+#         self.setLayout(layHMain)
+# #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+# 
+#==============================================================================
+        self.setLayout(layVAllWdg)
 
         #------------------------------------------------------------
         # SIGNALS & SLOTS
@@ -305,16 +310,16 @@ class InputFilter(QtGui.QWidget):
         dm_list = []
 
         for dm in sorted(fb.fil_tree[self.rt][self.ft]):
-            self.cmbDesignMethod.addItem(fb.dm_names[dm], dm)
+            self.cmbDesignMethod.addItem(fb.fc_names[dm], dm)
             dm_list.append(dm)
 
         logger.debug("dm_list: {0}\n{1}".format(dm_list, fb.fil[0]['dm']))
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
-        if fb.fil[0]['dm'] in dm_list and fb.fil_inst:
+        if fb.fil[0]['dm'] in dm_list and ff.fil_inst:
             # yes, set same dm as before
-            dm_idx = self.cmbDesignMethod.findText(fb.dm_names[fb.fil[0]['dm']])
+            dm_idx = self.cmbDesignMethod.findText(fb.fc_names[fb.fil[0]['dm']])
             logger.debug("dm_idx : %s", dm_idx)
             self.cmbDesignMethod.setCurrentIndex(dm_idx)
         else:
@@ -339,14 +344,15 @@ class InputFilter(QtGui.QWidget):
         if dm != self.dm_last: # dm has changed:
 
             # when old filter instance has a dyn. subwidget, try to destroy it
-            if hasattr(fb.fil_inst, 'wdg') and self.dm_last:      
+            if hasattr(ff.fil_inst, 'wdg') and self.dm_last:      
                 self._destruct_dyn_widgets() 
 
             #==================================================================
             """
-            create new instance
+            Create new instance of the selected filter class, accessible via
+            its handle fb.fil_inst
             """
-            err = fb.fil_factory.create_fil_inst(dm)
+            err = ff.fil_factory.create_fil_inst(dm)
             logger.debug("InputFilter.set_design_method triggered: %s\n"
                         "Returned error code %d" %(dm, err))
             #==================================================================
@@ -367,7 +373,7 @@ class InputFilter(QtGui.QWidget):
                     fb.fil_tree[self.rt][self.ft][dm].keys()
                     ))
 
-            if hasattr(fb.fil_inst, 'wdg'): # construct dyn. subwidgets if available
+            if hasattr(ff.fil_inst, 'wdg'): # construct dyn. subwidgets if available
                 self._construct_dyn_widgets()
             else:
                 self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame
@@ -456,19 +462,19 @@ class InputFilter(QtGui.QWidget):
         """
   
         try:
-            fb.fil_inst.sigFiltChanged.disconnect() # disconnect signal
+            ff.fil_inst.sigFiltChanged.disconnect() # disconnect signal
         except TypeError as e:
             print("Could not disconnect signal!\n", e)
             
         try:
-            fb.fil_inst.destruct_UI() # local operations like disconnecting signals
+            ff.fil_inst.destruct_UI() # local operations like disconnecting signals
             self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
             self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
 
         except AttributeError as e:
             print("Could not destruct_UI!\n", e)
             
-        fb.fil_inst.deleteLater() # delete QWidget when scope has been left
+        ff.fil_inst.deleteLater() # delete QWidget when scope has been left
             
 
 #==============================================================================
@@ -488,16 +494,16 @@ class InputFilter(QtGui.QWidget):
         in this scope.
         """
 
-        fb.fil_inst.construct_UI()            
+        ff.fil_inst.construct_UI()            
 
         try:
-            if fb.fil_inst.wdg:
-                self.dyn_wdg_fil = getattr(fb.fil_inst, 'wdg_fil')
+            if ff.fil_inst.wdg:
+                self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
                 self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
                 self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
 
-                fb.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
+                ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
         except AttributeError as e:
             print("input_filter._construct_dyn_widgets:", e)
