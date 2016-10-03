@@ -159,7 +159,7 @@ class FilterSpecs(QtGui.QWidget):
 
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
-        fc = fb.fil[0]['dm'] # e.g. 'equiripple'
+        fc = fb.fil[0]['fc'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
         # read all parameters for selected filter type, e.g. 'F_SB':
         all_params = fb.fil_tree[rt][ft][fc][fo]['par']
@@ -244,12 +244,12 @@ class FilterSpecs(QtGui.QWidget):
         """
         logger.debug("start_design_filt - Specs:\n"
             "fb.fil[0]: %s\n"
-            "fb.fil[0]['dm'] %s.%s%s", 
-            pformat(fb.fil[0]), str(fb.fil[0]['dm']), str(fb.fil[0]['rt']), 
+            "fb.fil[0]['fc'] %s.%s%s", 
+            pformat(fb.fil[0]), str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), 
                          str(fb.fil[0]['fo']))
 
         logger.info("startDesignFilt using: %s\nmethod: %s\n",
-            str(type(ff.fil_inst)), str(fb.fil[0]['dm']))
+            str(type(ff.fil_inst)), str(fb.fil[0]['fc']))
 
         try:
             #----------------------------------------------------------------------

@@ -115,7 +115,7 @@ if __name__ == '__main__':
     # Read freq / amp / weight labels for current filter design
     rt = fb.fil[0]['rt']
     ft = fb.fil[0]['ft']
-    fc = fb.fil[0]['dm']
+    fc = fb.fil[0]['fc']
 
     if 'min' in fb.fil_tree[rt][ft][fc]:
         my_params = fb.fil_tree[rt][ft][fc]['min']['par']

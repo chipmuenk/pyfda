@@ -125,7 +125,7 @@ fil_tree = {
 fil = [None] * 10 # create empty list with length 10 for multiple filter designs
 # This functionality is not implemented yet, currently only fil[0] is used
 
-fil[0] = {'rt':'LP', 'ft':'FIR', 'dm':'equiripple', 'fo':'man',
+fil[0] = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'N':10, 'f_S':1,
             'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
             'A_SB':0.001, 'A_SB2': 0.0001, 'F_SB':0.2, 'F_SB2':0.3, 'F_C2': 0.4, 'F_N2': 0.4,

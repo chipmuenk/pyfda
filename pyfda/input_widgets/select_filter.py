@@ -313,13 +313,13 @@ class SelectFilter(QtGui.QWidget):
             self.cmbFilterClass.addItem(fb.fc_names[fc], fc)
             fc_list.append(fc)
 
-        logger.debug("fc_list: {0}\n{1}".format(fc_list, fb.fil[0]['dm']))
+        logger.debug("fc_list: {0}\n{1}".format(fc_list, fb.fil[0]['fc']))
 
         # Does new ft also provide the previous design method (e.g. ellip)?
         # Has filter been instantiated?
-        if fb.fil[0]['dm'] in fc_list and ff.fil_inst:
+        if fb.fil[0]['fc'] in fc_list and ff.fil_inst:
             # yes, set same fc as before
-            fc_idx = self.cmbFilterClass.findText(fb.fc_names[fb.fil[0]['dm']])
+            fc_idx = self.cmbFilterClass.findText(fb.fc_names[fb.fil[0]['fc']])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:
@@ -339,7 +339,7 @@ class SelectFilter(QtGui.QWidget):
         - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """        
-        fc = self._read_cmb_box(self.cmbFilterClass, 'dm')
+        fc = self._read_cmb_box(self.cmbFilterClass, 'fc')
         
         if fc != self.fc_last: # fc has changed:
 
@@ -378,7 +378,7 @@ class SelectFilter(QtGui.QWidget):
             else:
                 self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame
 
-            self.fc_last = fb.fil[0]['dm']
+            self.fc_last = fb.fil[0]['fc']
 
         self.load_filter_order(enb_signal)
         
@@ -392,7 +392,7 @@ class SelectFilter(QtGui.QWidget):
         # read list of available filter order [fo] methods for  
         # current design method [fc] from fil_tree:
         foList = fb.fil_tree[fb.fil[0]['rt']]\
-            [fb.fil[0]['ft']][fb.fil[0]['dm']].keys()
+            [fb.fil[0]['ft']][fb.fil[0]['fc']].keys()
 
         # is currently selected fo setting available for (new) fc ?
         if fb.fil[0]['fo'] in foList:
