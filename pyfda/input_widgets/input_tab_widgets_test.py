@@ -5,23 +5,17 @@ Tabbed container with all input widgets
 Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal, pyqtSlot
-import pyfda.filterbroker as fb
+from PyQt4.QtCore import pyqtSignal
+#import pyfda.filterbroker as fb
 
-from pyfda.input_widgets import input_specs, input_files, input_coeffs, input_info, input_pz
-try:
-    import myhdl
-except ImportError:
-    fb.MYHDL = False
-else:
-    fb.MYHDL = True
-    logger.info("Info: Module myHDL found -> filter synthesis enabled!")
-    from pyfda.hdl_generation import hdl_specs
+from pyfda.input_widgets import input_specs_test as input_specs#, input_pz#, input_info
+
+#from pyfda.input_widgets import input_specs#, input_pz#, input_info
 
 
 class InputTabWidgets(QtGui.QWidget):
@@ -40,14 +34,14 @@ class InputTabWidgets(QtGui.QWidget):
         self.inputSpecs.setObjectName("inputSpecs")
 
 
-        self.inputFiles = input_files.InputFiles(self)
-        self.inputFiles.setObjectName("inputFiles")
+#        self.inputFiles = input_files.InputFiles(self)
+ #       self.inputFiles.setObjectName("inputFiles")
 
-        self.inputCoeffs = input_coeffs.InputCoeffs(self)
-        self.inputCoeffs.setObjectName("inputCoeffs")
+#        self.inputCoeffs = input_coeffs.InputCoeffs(self)
+#        self.inputCoeffs.setObjectName("inputCoeffs")
 
-        self.inputPZ = input_pz.InputPZ(self)
-        self.inputPZ.setObjectName("inputPZ")
+#        self.inputPZ = input_pz.InputPZ(self)
+#        self.inputPZ.setObjectName("inputPZ")
 
         self._init_UI()
 
@@ -58,9 +52,9 @@ class InputTabWidgets(QtGui.QWidget):
         tabWidget.setObjectName("TabWidg")
 
         tabWidget.addTab(self.inputSpecs, 'Specs')
-        tabWidget.addTab(self.inputFiles, 'Files')
-        tabWidget.addTab(self.inputCoeffs, 'b,a')
-        tabWidget.addTab(self.inputPZ, 'P/Z')
+#        tabWidget.addTab(self.inputFiles, 'Files')
+#        tabWidget.addTab(self.inputCoeffs, 'b,a')
+#        tabWidget.addTab(self.inputPZ, 'P/Z')
 
 
         layVMain = QtGui.QVBoxLayout()
@@ -84,10 +78,10 @@ class InputTabWidgets(QtGui.QWidget):
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
         #       requiring update of some plot widgets and input widgets:        
-        self.inputCoeffs.sigFilterDesigned.connect(self.update_all)
-        self.inputPZ.sigFilterDesigned.connect(self.update_all)
+#        self.inputCoeffs.sigFilterDesigned.connect(self.update_all)
+#        self.inputPZ.sigFilterDesigned.connect(self.update_all)
         
-        self.inputFiles.sigFilterLoaded.connect(self.load_all)
+#        self.inputFiles.sigFilterLoaded.connect(self.load_all)
 
         #----------------------------------------------------------------------
 
@@ -140,8 +134,8 @@ class InputTabWidgets(QtGui.QWidget):
         - Update all plot widgets via the signal sigFilterDesigned
         
         """
-        self.inputCoeffs.load_entries()
-        self.inputPZ.load_entries()
+#        self.inputCoeffs.load_entries()
+#        self.inputPZ.load_entries()
 
 
         self.sigFilterDesigned.emit() # pyFDA -> PlotTabWidgets.update_data
