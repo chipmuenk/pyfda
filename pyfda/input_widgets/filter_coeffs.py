@@ -30,7 +30,7 @@ from pyfda.simpleeval import simple_eval
 # TODO: Separate View and Storage of data
 # TODO: Fix fixpoint lib: ovfl = wrap toggles between -MSB and + MSB is wrong
 
-class InputCoeffs(QtGui.QWidget):
+class FilterCoeffs(QtGui.QWidget):
     """
     Create widget for viewing / editing / entering data
     """
@@ -38,7 +38,7 @@ class InputCoeffs(QtGui.QWidget):
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
                                     # manually
     def __init__(self, parent):
-        super(InputCoeffs, self).__init__(parent)
+        super(FilterCoeffs, self).__init__(parent)
 
 #        self.nrows = 0 # keep track of number of rows
 
@@ -456,7 +456,7 @@ class InputCoeffs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputCoeffs(None)
+    mainw = FilterCoeffs(None)
 
     app.setActiveWindow(mainw) 
     mainw.show()

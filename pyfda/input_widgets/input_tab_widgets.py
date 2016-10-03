@@ -14,7 +14,7 @@ from PyQt4.QtCore import pyqtSignal# , pyqtSlot
 import pyfda.filterbroker as fb
 
 #from pyfda.input_widgets import input_specs_test as input_specs
-from pyfda.input_widgets import (filter_specs, input_files, input_coeffs, 
+from pyfda.input_widgets import (filter_specs, input_files, filter_coeffs, 
                                 filter_info, input_pz)
 try:
     import myhdl
@@ -42,8 +42,8 @@ class InputTabWidgets(QtGui.QWidget):
         self.filter_specs.setObjectName("filter_specs")
         self.inputFiles = input_files.InputFiles(self)
         self.inputFiles.setObjectName("inputFiles")
-        self.inputCoeffs = input_coeffs.InputCoeffs(self)
-        self.inputCoeffs.setObjectName("inputCoeffs")
+        self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
+        self.filter_coeffs.setObjectName("filter_coeffs")
         self.inputPZ = input_pz.InputPZ(self)
         self.inputPZ.setObjectName("inputPZ")
         self.filter_info = filter_info.FilterInfo(self)
@@ -51,17 +51,17 @@ class InputTabWidgets(QtGui.QWidget):
         if fb.MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs(self)
 
-        self._init_UI()
+        self._construct_UI()
 
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """ Initialize UI with tabbed input widgets """
         tabWidget = QtGui.QTabWidget()
         tabWidget.setObjectName("TabWidg")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')
-        tabWidget.addTab(self.inputCoeffs, 'b,a')
+        tabWidget.addTab(self.filter_coeffs, 'b,a')
         tabWidget.addTab(self.inputPZ, 'P/Z')
         tabWidget.addTab(self.filter_info, 'Info')
         if fb.MYHDL:
@@ -96,7 +96,7 @@ class InputTabWidgets(QtGui.QWidget):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:        
         self.filter_specs.sigFilterDesigned.connect(self.update_all)
-        self.inputCoeffs.sigFilterDesigned.connect(self.update_all)
+        self.filter_coeffs.sigFilterDesigned.connect(self.update_all)
         self.inputPZ.sigFilterDesigned.connect(self.update_all)
         
         self.inputFiles.sigFilterLoaded.connect(self.load_all)
@@ -148,7 +148,7 @@ class InputTabWidgets(QtGui.QWidget):
 
     def update_all(self):
         """
-        Slot for sigFilterDesigned from InputSpecs, InputCoeffs, InputPZ      
+        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, InputPZ      
         
         Called when a new filter has been DESIGNED: 
             Pass new filter data from the global filter dict
@@ -165,7 +165,7 @@ class InputTabWidgets(QtGui.QWidget):
         # TODO: The following should be handled within InputSpecs ?
         self.filter_specs.load_entries()
         self.filter_info.load_entries()
-        self.inputCoeffs.load_entries()
+        self.filter_coeffs.load_entries()
         self.inputPZ.load_entries()
 
         self.sigFilterDesigned.emit() # pyFDA -> PlotTabWidgets.update_data
