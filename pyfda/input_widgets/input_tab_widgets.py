@@ -14,8 +14,8 @@ from PyQt4.QtCore import pyqtSignal# , pyqtSlot
 import pyfda.filterbroker as fb
 
 #from pyfda.input_widgets import input_specs_test as input_specs
-from pyfda.input_widgets import input_specs as input_specs 
-from pyfda.input_widgets import input_files, input_coeffs, input_info, input_pz
+from pyfda.input_widgets import (filter_specs, input_files, input_coeffs, 
+                                filter_info, input_pz)
 try:
     import myhdl
 except ImportError:
@@ -38,16 +38,16 @@ class InputTabWidgets(QtGui.QWidget):
     def __init__(self, parent):
         super(InputTabWidgets, self).__init__(parent)
 
-        self.inputSpecs = input_specs.InputSpecs(self)
-        self.inputSpecs.setObjectName("inputSpecs")
+        self.filter_specs = filter_specs.FilterSpecs(self)
+        self.filter_specs.setObjectName("filter_specs")
         self.inputFiles = input_files.InputFiles(self)
         self.inputFiles.setObjectName("inputFiles")
         self.inputCoeffs = input_coeffs.InputCoeffs(self)
         self.inputCoeffs.setObjectName("inputCoeffs")
         self.inputPZ = input_pz.InputPZ(self)
         self.inputPZ.setObjectName("inputPZ")
-        self.inputInfo = input_info.InputInfo(self)
-        self.inputInfo.setObjectName("inputInfo")
+        self.filter_info = filter_info.FilterInfo(self)
+        self.filter_info.setObjectName("filter_info")
         if fb.MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs(self)
 
@@ -59,11 +59,11 @@ class InputTabWidgets(QtGui.QWidget):
         tabWidget = QtGui.QTabWidget()
         tabWidget.setObjectName("TabWidg")
 
-        tabWidget.addTab(self.inputSpecs, 'Specs')
+        tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.addTab(self.inputFiles, 'Files')
         tabWidget.addTab(self.inputCoeffs, 'b,a')
         tabWidget.addTab(self.inputPZ, 'P/Z')
-        tabWidget.addTab(self.inputInfo, 'Info')
+        tabWidget.addTab(self.filter_info, 'Info')
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
@@ -88,14 +88,14 @@ class InputTabWidgets(QtGui.QWidget):
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed, 
         #       requiring update of some plot widgets and input widgets:        
-        self.inputSpecs.sigSpecsChanged.connect(self.update_specs)
+        self.filter_specs.sigSpecsChanged.connect(self.update_specs)
         # sigViewChanged: signal indicating that PLOT VIEW has changed, 
         #       requiring update of some plot widgets only:        
-        self.inputSpecs.sigViewChanged.connect(self.update_view)
+        self.filter_specs.sigViewChanged.connect(self.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:        
-        self.inputSpecs.sigFilterDesigned.connect(self.update_all)
+        self.filter_specs.sigFilterDesigned.connect(self.update_all)
         self.inputCoeffs.sigFilterDesigned.connect(self.update_all)
         self.inputPZ.sigFilterDesigned.connect(self.update_all)
         
@@ -112,7 +112,7 @@ class InputTabWidgets(QtGui.QWidget):
             specs, e.g. plotHf widget for the filter regions
         """
 
-#        self.inputInfo.load_entries() # could update log. / lin. units (not implemented)
+#        self.filter_info.load_entries() # could update log. / lin. units (not implemented)
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
 
 
@@ -129,8 +129,8 @@ class InputTabWidgets(QtGui.QWidget):
             specs, e.g. plotHf widget for the filter regions
         """
 # TODO: The button should be styled within InputSpecs
-        self.inputSpecs.color_design_button("changed")
-        self.inputInfo.load_entries()
+        self.filter_specs.color_design_button("changed")
+        self.filter_info.load_entries()
 
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
         
@@ -142,7 +142,7 @@ class InputTabWidgets(QtGui.QWidget):
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         """
-        self.inputSpecs.sel_fil.load_entries() # update input_filters
+        self.filter_specs.sel_fil.load_entries() # update input_filters
         self.update_all()
 
 
@@ -161,10 +161,10 @@ class InputTabWidgets(QtGui.QWidget):
             sender_name = self.sender().objectName()
         logger.debug("updateAll called by %s", sender_name)
 
-        self.inputSpecs.color_design_button("ok")  
+        self.filter_specs.color_design_button("ok")  
         # TODO: The following should be handled within InputSpecs ?
-        self.inputSpecs.load_entries()
-        self.inputInfo.load_entries()
+        self.filter_specs.load_entries()
+        self.filter_info.load_entries()
         self.inputCoeffs.load_entries()
         self.inputPZ.load_entries()
 
