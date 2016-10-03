@@ -106,8 +106,6 @@ class pyFDA(QtGui.QMainWindow):
         """
 
         # ============== UI Layout =====================================
-#        _widget = QtGui.QMainWindow() # this widget contains all subwidget groups
-#        _widget = QtGui.QDialog() # this widget contains all subwidget groups
         self.main_widget = QtGui.QWidget(self) # this widget contains all subwidget groups
 
         layHMain = QtGui.QHBoxLayout(self.main_widget) # horizontal layout of all groups
@@ -201,7 +199,7 @@ class pyFDA(QtGui.QMainWindow):
         self.inputTabWidgets.sigFilterDesigned.connect(self.pltTabWidgets.update_data)
         #
         # sigReadFilters: button has been pressed to rebuild filter tree:
-        self.inputTabWidgets.inputFiles.sigReadFilters.connect(self.ftb.init_filters)
+        self.inputTabWidgets.file_io.sigReadFilters.connect(self.ftb.init_filters)
 
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 
@@ -245,37 +243,6 @@ class pyFDA(QtGui.QMainWindow):
         else:
             event.ignore()
             
-#------------------------------------------------------------------------------       
-#==============================================================================
-#     def closeEvent(self):
-#         """
-#         Clean up everything - may only be called when exiting application!!
-# 
-#         See http://stackoverflow.com/questions/18732894/crash-on-close-and-quit
-#         """
-#         for i in self.__dict__:
-#             item = self.__dict__[i]
-#             clean_item(item)
-# 
-# #------------------------------------------------------------------------------
-# def clean_item(item):
-#     """
-#     Clean up memory by closing and deleting item recursively if possible
-#     """
-#     if isinstance(item, list) or isinstance(item, dict):
-#         for _ in range(len(item)):
-#             clean_item(item.pop())
-#     else:
-#         try:
-#             item.close()
-#         except(RuntimeError, AttributeError): # deleted or no close method
-#             pass
-#         try:
-#             item.deleteLater()
-#         except(RuntimeError, AttributeError): # deleted or no deleteLater method
-#             pass
-# 
-#==============================================================================
 
 #==============================================================================
 def main():
