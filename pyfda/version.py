@@ -7,4 +7,4 @@ Store the version number here for setup.py and pyfdax.py
 @author: Christian Muenker
 """
 
-__version__ = 'v0.1rc1'
+__version__ = '0.1rc1'
