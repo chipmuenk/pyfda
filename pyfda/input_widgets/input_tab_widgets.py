@@ -14,7 +14,7 @@ from PyQt4.QtCore import pyqtSignal# , pyqtSlot
 import pyfda.filterbroker as fb
 
 #from pyfda.input_widgets import input_specs_test as input_specs
-from pyfda.input_widgets import (filter_specs, input_files, filter_coeffs, 
+from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs, 
                                 filter_info, input_pz)
 try:
     import myhdl
@@ -40,8 +40,8 @@ class InputTabWidgets(QtGui.QWidget):
 
         self.filter_specs = filter_specs.FilterSpecs(self)
         self.filter_specs.setObjectName("filter_specs")
-        self.inputFiles = input_files.InputFiles(self)
-        self.inputFiles.setObjectName("inputFiles")
+        self.file_io = file_io.File_IO(self)
+        self.file_io.setObjectName("inputFiles")
         self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
         self.filter_coeffs.setObjectName("filter_coeffs")
         self.inputPZ = input_pz.InputPZ(self)
@@ -60,7 +60,7 @@ class InputTabWidgets(QtGui.QWidget):
         tabWidget.setObjectName("TabWidg")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
-        tabWidget.addTab(self.inputFiles, 'Files')
+        tabWidget.addTab(self.file_io, 'Files')
         tabWidget.addTab(self.filter_coeffs, 'b,a')
         tabWidget.addTab(self.inputPZ, 'P/Z')
         tabWidget.addTab(self.filter_info, 'Info')
@@ -99,7 +99,7 @@ class InputTabWidgets(QtGui.QWidget):
         self.filter_coeffs.sigFilterDesigned.connect(self.update_all)
         self.inputPZ.sigFilterDesigned.connect(self.update_all)
         
-        self.inputFiles.sigFilterLoaded.connect(self.load_all)
+        self.file_io.sigFilterLoaded.connect(self.load_all)
         #----------------------------------------------------------------------
 
     def update_view(self):

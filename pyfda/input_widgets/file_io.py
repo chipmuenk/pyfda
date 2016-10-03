@@ -57,7 +57,7 @@ from pyfda.pyfda_lib import HLine
 
 # TODO: Save P/Z as well if possible
 
-class InputFiles(QtGui.QWidget):
+class File_IO(QtGui.QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
@@ -66,7 +66,7 @@ class InputFiles(QtGui.QWidget):
     sigReadFilters = pyqtSignal()  # emitted when button "Read Filters" is pressed
 
     def __init__(self, parent):
-        super(InputFiles, self).__init__(parent)
+        super(File_IO, self).__init__(parent)
 
         self._construct_UI()
 
@@ -464,7 +464,7 @@ class InputFiles(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputFiles(None)
+    mainw = File_IO(None)
 
     app.setActiveWindow(mainw) 
     mainw.show()
