@@ -131,14 +131,14 @@ class InputFilter(QtGui.QWidget):
         # Layout for Filter Type Subwidgets
         #----------------------------------------------------------------------
  
-        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
-                                         QtGui.QSizePolicy.Fixed)
+#        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
+#                                         QtGui.QSizePolicy.Fixed)
 
         layHFilWdg = QtGui.QHBoxLayout() # container for filter subwidgets
         layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
-        layHFilWdg.addItem(spacer)
+#        layHFilWdg.addItem(spacer)
         layHFilWdg.addWidget(self.cmbFilterType)
-        layHFilWdg.addItem(spacer)
+#        layHFilWdg.addItem(spacer)
         layHFilWdg.addWidget(self.cmbDesignMethod)
 
         #----------------------------------------------------------------------
@@ -161,8 +161,8 @@ class InputFilter(QtGui.QWidget):
         self.lblOrder =  QtGui.QLabel("Order:")
         self.lblOrder.setFont(bfont)
         self.chkMinOrder = QtGui.QCheckBox("Minimum", self)
-        spacer = QtGui.QSpacerItem(20,0,
-                        QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+#        spacer1 = QtGui.QSpacerItem(20,0,
+#                        QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.lblOrderN = QtGui.QLabel("N = ")
         self.lblOrderN.setFont(ifont)
         self.ledOrderN = QtGui.QLineEdit(str(fb.fil[0]['N']),self)
@@ -172,7 +172,7 @@ class InputFilter(QtGui.QWidget):
         layHOrdWdg = QtGui.QHBoxLayout()
         layHOrdWdg.addWidget(self.lblOrder)
         layHOrdWdg.addWidget(self.chkMinOrder)
-        layHOrdWdg.addItem(spacer)
+#        layHOrdWdg.addItem(spacer1)
         layHOrdWdg.addWidget(self.lblOrderN)
         layHOrdWdg.addWidget(self.ledOrderN)
 
