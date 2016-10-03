@@ -54,8 +54,8 @@ logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file))#, disab
 if not os.path.exists(rc.save_dir):
     home_dir = pyfda_lib.get_home_dir()
     logger.warning('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
-        rc.save_dir, home_dir) #fb.base_dir
-    rc.save_dir = home_dir #fb.base_dir
+        rc.save_dir, home_dir)
+    rc.save_dir = home_dir
 
 
 #class Whitelist(logging.Filter):
