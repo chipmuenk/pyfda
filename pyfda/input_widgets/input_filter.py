@@ -186,16 +186,20 @@ class InputFilter(QtGui.QWidget):
         layVAllWdg.addWidget(HLine(QtGui, self))
         layVAllWdg.addLayout(layHOrdWdg)
 
-        frmMain = QtGui.QFrame()
-        frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-        frmMain.setLayout(layVAllWdg)
-
-        layHMain = QtGui.QHBoxLayout()
-        layHMain.addWidget(frmMain)
-        layHMain.setContentsMargins(0, 0, 0, 0)
-
-        self.setLayout(layHMain)
-#        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+#==============================================================================
+#         frmMain = QtGui.QFrame()
+#         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+#         frmMain.setLayout(layVAllWdg)
+# 
+#         layHMain = QtGui.QHBoxLayout()
+#         layHMain.addWidget(frmMain)
+#         layHMain.setContentsMargins(0, 0, 0, 0)
+# 
+#         self.setLayout(layHMain)
+# #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+# 
+#==============================================================================
+        self.setLayout(layVAllWdg)
 
         #------------------------------------------------------------
         # SIGNALS & SLOTS
