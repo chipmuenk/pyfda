@@ -18,11 +18,11 @@ import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 #from pyfda.pyfda_lib import HLine
 
-from pyfda.input_widgets import (input_filter, input_amp_specs,
-                                 input_freq_specs, input_freq_units,
-                                 input_weight_specs, input_target_specs)
+from pyfda.input_widgets import (select_filter, amplitude_specs,
+                                 freq_specs, freq_units,
+                                 weight_specs, target_specs)
                                  
-class InputSpecs(QtGui.QWidget):
+class FilterSpecs(QtGui.QWidget):
     """
     Build widget for entering all filter specs
     """
@@ -34,7 +34,7 @@ class InputSpecs(QtGui.QWidget):
     
 
     def __init__(self, parent):
-        super(InputSpecs, self).__init__(parent)
+        super(FilterSpecs, self).__init__(parent)
 
         self._construct_UI()
 
@@ -43,23 +43,23 @@ class InputSpecs(QtGui.QWidget):
         Construct User Interface from all input subwidgets
         """
         # Subwidget for selecting filter with response type rt (LP, ...), 
-        #    filter type ft (IIR, ...) and design method dm (cheby1, ...)
-        self.sel_fil = input_filter.InputFilter(self)
+        #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
+        self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
         # Subwidget for selecting the frequency unit and range
-        self.f_units = input_freq_units.InputFreqUnits(self)
+        self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
         # Subwidget for Frequency Specs
-        self.f_specs = input_freq_specs.InputFreqSpecs(self)
+        self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
         # Subwidget for Amplitude Specs
-        self.a_specs = input_amp_specs.InputAmpSpecs(self)
-        self.a_specs.setObjectName("amp_specs")
+        self.a_specs = amplitude_specs.AmplitudeSpecs(self)
+        self.a_specs.setObjectName("amplitude_specs")
         # Subwidget for Weight Specs
-        self.w_specs = input_weight_specs.InputWeightSpecs(self)
+        self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
         # Subwidget for target specs (frequency and amplitude)
-        self.t_specs = input_target_specs.InputTargetSpecs(self, title="Target Specifications")
+        self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
         # Subwidget for displaying infos on the design method
         self.lblMsg = QtGui.QLabel(self)
@@ -159,14 +159,14 @@ class InputSpecs(QtGui.QWidget):
 
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
-        dm = fb.fil[0]['dm'] # e.g. 'equiripple'
+        fc = fb.fil[0]['dm'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
         # read all parameters for selected filter type, e.g. 'F_SB':
-        all_params = fb.fil_tree[rt][ft][dm][fo]['par']
+        all_params = fb.fil_tree[rt][ft][fc][fo]['par']
 
-        vis_wdgs = fb.fil_tree[rt][ft][dm][fo]['vis'] # visible widgets
-        dis_wdgs = fb.fil_tree[rt][ft][dm][fo]['dis'] # disabled widgets
-        msg      = fb.fil_tree[rt][ft][dm][fo]['msg'] # message
+        vis_wdgs = fb.fil_tree[rt][ft][fc][fo]['vis'] # visible widgets
+        dis_wdgs = fb.fil_tree[rt][ft][fc][fo]['dis'] # disabled widgets
+        msg      = fb.fil_tree[rt][ft][fc][fo]['msg'] # message
 
         # Read freq / amp / weight labels for current filter design, building
         # separate parameter lists according to the first letter
@@ -185,11 +185,11 @@ class InputSpecs(QtGui.QWidget):
         # build separate parameter lists for min. and man. filter order        
         min_params = man_params = []
         
-        if "min" in fb.fil_tree[rt][ft][dm]:
-            min_params = fb.fil_tree[rt][ft][dm]['min']['par']
+        if "min" in fb.fil_tree[rt][ft][fc]:
+            min_params = fb.fil_tree[rt][ft][fc]['min']['par']
             
-        if "man" in fb.fil_tree[rt][ft][dm]:
-            man_params = fb.fil_tree[rt][ft][dm]['man']['par']
+        if "man" in fb.fil_tree[rt][ft][fc]:
+            man_params = fb.fil_tree[rt][ft][fc]['man']['par']
 
         # always use parameters for MANUAL filter order for f_specs widget,
         # frequency specs for minimum order are displayed in target specs
@@ -253,7 +253,7 @@ class InputSpecs(QtGui.QWidget):
 
         try:
             #----------------------------------------------------------------------
-            # A globally accessible instance fb.fil_inst of selected filter class dm 
+            # A globally accessible instance fb.fil_inst of selected filter class fc 
             # has been instantiated in InputFilter.set_design_method, now
             # call the method specified in the filter dict fil[0].
     
@@ -320,7 +320,7 @@ class InputSpecs(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    mainw = InputSpecs(None)
+    mainw = FilterSpecs(None)
     app.setActiveWindow(mainw) 
     mainw.show()
 
