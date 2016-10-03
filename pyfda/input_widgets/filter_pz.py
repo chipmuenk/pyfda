@@ -27,7 +27,7 @@ from pyfda.simpleeval import simple_eval
 # TODO: eliminate trailing zeros for filter order calculation
 
 
-class InputPZ(QtGui.QWidget):
+class FilterPZ(QtGui.QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
@@ -36,11 +36,11 @@ class InputPZ(QtGui.QWidget):
     
     def __init__(self, parent):
         self.DEBUG = False
-        super(InputPZ, self).__init__(parent)
+        super(FilterPZ, self).__init__(parent)
 
-        self._init_UI()
+        self._construct_UI()
 
-    def _init_UI(self):
+    def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
         """
@@ -383,7 +383,7 @@ class InputPZ(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputPZ(None)
+    mainw = FilterPZ(None)
 
     app.setActiveWindow(mainw) 
     mainw.show()

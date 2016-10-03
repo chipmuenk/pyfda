@@ -15,7 +15,7 @@ import pyfda.filterbroker as fb
 
 #from pyfda.input_widgets import input_specs_test as input_specs
 from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs, 
-                                filter_info, input_pz)
+                                filter_info, filter_pz)
 try:
     import myhdl
 except ImportError:
@@ -44,8 +44,8 @@ class InputTabWidgets(QtGui.QWidget):
         self.file_io.setObjectName("inputFiles")
         self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
         self.filter_coeffs.setObjectName("filter_coeffs")
-        self.inputPZ = input_pz.InputPZ(self)
-        self.inputPZ.setObjectName("inputPZ")
+        self.filter_pz = filter_pz.FilterPZ(self)
+        self.filter_pz.setObjectName("filter_pz")
         self.filter_info = filter_info.FilterInfo(self)
         self.filter_info.setObjectName("filter_info")
         if fb.MYHDL:
@@ -62,7 +62,7 @@ class InputTabWidgets(QtGui.QWidget):
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.addTab(self.file_io, 'Files')
         tabWidget.addTab(self.filter_coeffs, 'b,a')
-        tabWidget.addTab(self.inputPZ, 'P/Z')
+        tabWidget.addTab(self.filter_pz, 'P/Z')
         tabWidget.addTab(self.filter_info, 'Info')
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
@@ -97,7 +97,7 @@ class InputTabWidgets(QtGui.QWidget):
         #       requiring update of all plot and some input widgets:        
         self.filter_specs.sigFilterDesigned.connect(self.update_all)
         self.filter_coeffs.sigFilterDesigned.connect(self.update_all)
-        self.inputPZ.sigFilterDesigned.connect(self.update_all)
+        self.filter_pz.sigFilterDesigned.connect(self.update_all)
         
         self.file_io.sigFilterLoaded.connect(self.load_all)
         #----------------------------------------------------------------------
@@ -148,7 +148,7 @@ class InputTabWidgets(QtGui.QWidget):
 
     def update_all(self):
         """
-        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, InputPZ      
+        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ      
         
         Called when a new filter has been DESIGNED: 
             Pass new filter data from the global filter dict
@@ -166,7 +166,7 @@ class InputTabWidgets(QtGui.QWidget):
         self.filter_specs.load_entries()
         self.filter_info.load_entries()
         self.filter_coeffs.load_entries()
-        self.inputPZ.load_entries()
+        self.filter_pz.load_entries()
 
         self.sigFilterDesigned.emit() # pyFDA -> PlotTabWidgets.update_data
 
