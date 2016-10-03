@@ -19,7 +19,7 @@ from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
-class InputAmpSpecs(QtGui.QWidget):
+class AmplitudeSpecs(QtGui.QWidget):
     """
     Build and update widget for entering the amplitude
     specifications like A_SB, A_PB etc.
@@ -32,7 +32,7 @@ class InputAmpSpecs(QtGui.QWidget):
         """
         Initialize
         """
-        super(InputAmpSpecs, self).__init__(parent)
+        super(AmplitudeSpecs, self).__init__(parent)
         self.title = title
 
         self.qlabels = []   # list with references to QLabel widgets
@@ -140,7 +140,7 @@ class InputAmpSpecs(QtGui.QWidget):
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
-        return super(InputAmpSpecs, self).eventFilter(source, event)
+        return super(AmplitudeSpecs, self).eventFilter(source, event)
 
 
 #-------------------------------------------------------------
@@ -294,7 +294,7 @@ class InputAmpSpecs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputAmpSpecs(None)
+    mainw = AmplitudeSpecs(None)
 
     mainw.update_UI(new_labels = ['A_SB','A_SB2','A_PB','A_PB2'])
     mainw.update_UI(new_labels = ['A_PB','A_SB'])
