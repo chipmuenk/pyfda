@@ -23,12 +23,12 @@ import pyfda.filter_factory as ff # importing filterbroker initializes all its g
 from pyfda.pyfda_lib import lin2unit
 # TODO: Passband and stopband info should show min / max values for each band
 
-class InputInfo(QtGui.QWidget):
+class FilterInfo(QtGui.QWidget):
     """
     Create widget for displaying infos about filter and filter design method
     """
     def __init__(self, parent):
-        super(InputInfo, self).__init__(parent)
+        super(FilterInfo, self).__init__(parent)
         
         self._construct_UI()
         self.load_entries()
@@ -352,7 +352,7 @@ class InputInfo(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputInfo(None)
+    mainw = FilterInfo(None)
 
     app.setActiveWindow(mainw) 
     mainw.show()
