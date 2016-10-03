@@ -17,7 +17,7 @@ from pyfda.pyfda_lib import rt_label
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
-class InputWeightSpecs(QtGui.QWidget):
+class WeightSpecs(QtGui.QWidget):
     """
     Build and update widget for entering the weight
     specifications like W_SB, W_PB etc.
@@ -27,7 +27,7 @@ class InputWeightSpecs(QtGui.QWidget):
 
     def __init__(self, parent):
 
-        super(InputWeightSpecs, self).__init__(parent)
+        super(WeightSpecs, self).__init__(parent)
 
         self.qlabels = [] # list with references to QLabel widgets
         self.qlineedit = [] # list with references to QLineEdit widgets
@@ -122,7 +122,7 @@ class InputWeightSpecs(QtGui.QWidget):
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
-        return super(InputWeightSpecs, self).eventFilter(source, event)
+        return super(WeightSpecs, self).eventFilter(source, event)
 
 
 #-------------------------------------------------------------
@@ -251,7 +251,7 @@ class InputWeightSpecs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputWeightSpecs(None)
+    mainw = WeightSpecs(None)
 
     mainw.update_UI(new_labels = ['W_SB','W_SB2','W_PB','W_PB2'])
     mainw.update_UI(new_labels = ['W_PB','W_PB2'])
