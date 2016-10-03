@@ -17,7 +17,7 @@ from pyfda.pyfda_lib import rt_label
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
-class InputFreqSpecs(QtGui.QWidget):
+class FreqSpecs(QtGui.QWidget):
     """
     Build and update widget for entering the frequency
     specifications like F_sb, F_pb etc.
@@ -28,7 +28,7 @@ class InputFreqSpecs(QtGui.QWidget):
 
     def __init__(self, parent, title = "Frequency Specs"):
 
-        super(InputFreqSpecs, self).__init__(parent)
+        super(FreqSpecs, self).__init__(parent)
         self.title = title
 
         self.qlabels = []    # list with references to QLabel widgets
@@ -111,7 +111,7 @@ class InputFreqSpecs(QtGui.QWidget):
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
         # Call base class method to continue normal event processing:
-        return super(InputFreqSpecs, self).eventFilter(source, event)
+        return super(FreqSpecs, self).eventFilter(source, event)
 
 
 #------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ class InputFreqSpecs(QtGui.QWidget):
 if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
-    mainw = InputFreqSpecs(None)
+    mainw = FreqSpecs(None)
 
     mainw.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])
 #    mainw.update_UI(new_labels = ['F_PB','F_PB2'])
