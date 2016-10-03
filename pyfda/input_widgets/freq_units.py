@@ -18,7 +18,7 @@ from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g
 from pyfda.simpleeval import simple_eval
 
 
-class InputFreqUnits(QtGui.QWidget):
+class FreqUnits(QtGui.QWidget):
     """
     Build and update widget for entering the frequency units
     """
@@ -30,7 +30,7 @@ class InputFreqUnits(QtGui.QWidget):
 
     def __init__(self, parent, title = "Frequency Units"):
 
-        super(InputFreqUnits, self).__init__(parent)
+        super(FreqUnits, self).__init__(parent)
         self.title = title
         self.spec_edited = False # flag whether QLineEdit field has been edited
 
@@ -219,7 +219,7 @@ class InputFreqUnits(QtGui.QWidget):
                 _store_entry()
                 source.setText(params['FMT'].format(fb.fil[0]['f_S'])) # reduced precision
         # Call base class method to continue normal event processing:
-        return super(InputFreqUnits, self).eventFilter(source, event)
+        return super(FreqUnits, self).eventFilter(source, event)
 
 
     #-------------------------------------------------------------
