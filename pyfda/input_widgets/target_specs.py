@@ -14,10 +14,10 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb
-from pyfda.input_widgets import input_amp_specs, input_freq_specs
+from pyfda.input_widgets import amplitude_specs, freq_specs
 
 
-class InputTargetSpecs(QtGui.QWidget):
+class TargetSpecs(QtGui.QWidget):
     """
     Build and update widget for entering the target specifications (frequencies
     and amplitudes) like F_sb, F_pb, A_SB, etc.
@@ -28,7 +28,7 @@ class InputTargetSpecs(QtGui.QWidget):
 
 
     def __init__(self, parent, title = "Target Specs"):
-        super(InputTargetSpecs, self).__init__(parent)
+        super(TargetSpecs, self).__init__(parent)
 
         self.title = title
         
@@ -41,9 +41,9 @@ class InputTargetSpecs(QtGui.QWidget):
         """
 
         # subwidget for Frequency Specs
-        self.f_specs = input_freq_specs.InputFreqSpecs(self, title = "Frequency")
+        self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
         # subwidget for Amplitude Specs
-        self.a_specs = input_amp_specs.InputAmpSpecs(self, title = "Amplitude")
+        self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
 
         self.a_specs.setVisible(True)
         """
@@ -115,10 +115,10 @@ if __name__ == '__main__':
     # Read freq / amp / weight labels for current filter design
     rt = fb.fil[0]['rt']
     ft = fb.fil[0]['ft']
-    dm = fb.fil[0]['dm']
+    fc = fb.fil[0]['dm']
 
-    if 'min' in fb.fil_tree[rt][ft][dm]:
-        my_params = fb.fil_tree[rt][ft][dm]['min']['par']
+    if 'min' in fb.fil_tree[rt][ft][fc]:
+        my_params = fb.fil_tree[rt][ft][fc]['min']['par']
     else:
         my_params = {}
 
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     freq_params = [l for l in my_params if l[0] == 'F']
     amp_params = [l for l in my_params if l[0] == 'A']
 
-    mainw = InputTargetSpecs(None, title = "Test Specs")
+    mainw = TargetSpecs(None, title = "Test Specs")
     mainw.update_UI(freq_params, amp_params)
     
     app.setActiveWindow(mainw) 
