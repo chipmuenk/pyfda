@@ -154,7 +154,7 @@ class FreqSpecs(QtGui.QWidget):
 
         #---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
-                            fb.fil[0]["rt"],fb.fil[0]["dm"],fb.fil[0]["fo"]))
+                            fb.fil[0]['rt'],fb.fil[0]['fc'],fb.fil[0]['fo']))
 
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
