@@ -462,19 +462,19 @@ class InputFilter(QtGui.QWidget):
         """
   
         try:
-            fb.fil_inst.sigFiltChanged.disconnect() # disconnect signal
+            ff.fil_inst.sigFiltChanged.disconnect() # disconnect signal
         except TypeError as e:
             print("Could not disconnect signal!\n", e)
             
         try:
-            fb.fil_inst.destruct_UI() # local operations like disconnecting signals
+            ff.fil_inst.destruct_UI() # local operations like disconnecting signals
             self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
             self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
 
         except AttributeError as e:
             print("Could not destruct_UI!\n", e)
             
-        fb.fil_inst.deleteLater() # delete QWidget when scope has been left
+        ff.fil_inst.deleteLater() # delete QWidget when scope has been left
             
 
 #==============================================================================
@@ -494,16 +494,16 @@ class InputFilter(QtGui.QWidget):
         in this scope.
         """
 
-        fb.fil_inst.construct_UI()            
+        ff.fil_inst.construct_UI()            
 
         try:
-            if fb.fil_inst.wdg:
-                self.dyn_wdg_fil = getattr(fb.fil_inst, 'wdg_fil')
+            if ff.fil_inst.wdg:
+                self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
                 self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
                 self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
 
-                fb.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
+                ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
         except AttributeError as e:
             print("input_filter._construct_dyn_widgets:", e)
