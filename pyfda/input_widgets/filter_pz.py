@@ -11,8 +11,9 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+
 import numpy as np
 from scipy.signal import freqz
 
@@ -27,7 +28,7 @@ from pyfda.simpleeval import simple_eval
 # TODO: eliminate trailing zeros for filter order calculation
 
 
-class FilterPZ(QtGui.QWidget):
+class FilterPZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """

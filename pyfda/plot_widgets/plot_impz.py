@@ -8,8 +8,9 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import QEvent, Qt
+from ..compat import QtGui, QtCore, QWidget
+QEvent, Qt = QtCore.QEvent, QtCore.Qt
+
 import numpy as np
 import scipy.signal as sig
 
@@ -21,7 +22,7 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
-class PlotImpz(QtGui.QWidget):
+class PlotImpz(QWidget):
 
     def __init__(self, parent):
         super(PlotImpz, self).__init__(parent)

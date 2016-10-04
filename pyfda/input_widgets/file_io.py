@@ -9,9 +9,9 @@ import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QFileDialog as QFD
+from ..compat import QtGui, QtCore, QWidget, QFileDialog
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+QFD = QFileDialog
 
 import scipy.io
 import numpy as np
@@ -57,7 +57,7 @@ from pyfda.pyfda_lib import HLine
 
 # TODO: Save P/Z as well if possible
 
-class File_IO(QtGui.QWidget):
+class File_IO(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """

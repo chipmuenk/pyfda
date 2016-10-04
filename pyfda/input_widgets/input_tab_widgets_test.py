@@ -9,8 +9,9 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+
 #import pyfda.filterbroker as fb
 
 from pyfda.input_widgets import input_specs_test as input_specs#, input_pz#, input_info
@@ -18,7 +19,7 @@ from pyfda.input_widgets import input_specs_test as input_specs#, input_pz#, inp
 #from pyfda.input_widgets import input_specs#, input_pz#, input_info
 
 
-class InputTabWidgets(QtGui.QWidget):
+class InputTabWidgets(QWidget):
     """
     Create a tabbed widget for various input subwidgets
     """

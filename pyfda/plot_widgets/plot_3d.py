@@ -6,7 +6,9 @@ Edited by Christian Münker, 2013
 from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
-from PyQt4 import QtGui #, QtCore
+
+from ..compat import QtGui, QWidget
+
 import numpy as np
 from numpy import pi, ones, zeros, sin, cos, log10
 import scipy.signal as sig
@@ -34,7 +36,7 @@ except ImportError:
 
 
 
-class Plot3D(QtGui.QWidget):
+class Plot3D(QWidget):
     """
     Class for various 3D-plots:
     - lin / log line plot of H(f)

@@ -15,8 +15,8 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal = QtCore.pyqtSignal
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -24,7 +24,7 @@ import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import HLine
 
 
-class SelectFilter(QtGui.QWidget):
+class SelectFilter(QWidget):
     """
     Construct and read combo boxes for selecting the filter, consisting of the 
     following hierarchy:
