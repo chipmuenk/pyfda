@@ -51,7 +51,7 @@ class PlotImpz(QtGui.QWidget):
         
         self.lblStimulus = QtGui.QLabel("Type = ")
         self.cmbStimulus = QtGui.QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","Sine", "Rect", "Saw"])
+        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         
         self.lblFreq = QtGui.QLabel("<i>f</i>&nbsp; =")
@@ -260,6 +260,11 @@ class PlotImpz(QtGui.QWidget):
             x = np.ones(N) # create step function
             title_str = r'Step Response'
             H_str = r'$h_{\epsilon}[n]$'
+        elif stim == "StepErr":
+            x = np.ones(N) # create step function
+            title_str = r'Settling Error'
+            H_str = r'$H(0) - h_{\epsilon}[n]$'
+            
         elif stim in {"Sine", "Rect"}:
             x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
             if stim == "Sine":
@@ -276,6 +281,10 @@ class PlotImpz(QtGui.QWidget):
 
             
         h = sig.lfilter(self.bb, self.aa, x)
+        
+        if stim == "StepErr":
+            dc = sig.freqz(self.bb, self.aa, [0])
+            h = h - abs(dc[1])
 
 
         self.cmplx = np.any(np.iscomplex(h))
@@ -300,8 +309,9 @@ class PlotImpz(QtGui.QWidget):
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='bo', linefmt='r')
         if self.chkPltStim.isChecked():
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='k')
-            [stem.set_linewidth(0.5) for stem in ss]
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='0.5')
+            for stem in ss:
+                stem.set_linewidth(0.5)
             bs.set_visible(False) # invisible bottomline
         expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
