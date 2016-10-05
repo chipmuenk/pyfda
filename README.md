@@ -10,12 +10,13 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
 ### Prerequisites
+Python versions: 2.7 ... 3.5
 Besides standard python libraries, the project builds on the following libraries:
 * numpy
 * scipy
 * matplotlib
 * docutils
-* pyQt4
+* pyQt4 (pyQt5 supported real soon)
 
 Optional:
 * xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
@@ -108,17 +109,17 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### Release 0.1
 
 The following features are still missing for the first release. 
-* Fix issue #8 (pyFDA doesn't shut down properly)
+* Issue #8 (pyFDA doesn't shut down properly) is fixed in v0.1rc1
+* **scipy 0.16 SOS features**: implemented for filter design and frequency domain representation, time domain (sosfilt) is still missing
+* pyQt5 compatibility has become a must since it has become the default version in Anaconda and WinPython
 
 ### Release 0.2
-* **scipy 0.16 SOS features**
 * **myHDL support**
     * Export of VHDL / Verilog netlists for basic filter topologies
-    * Fixpoint simulation
-* **Filter coefficients and poles / zeros**<br />
-Implement model-view controller architecture for the following features:
+    * Fixpoint simulation results in pyFDA widgets
+* **Filter coefficients and poles / zeros**
   * Display coefficients / poles and zeros with fewer digits while keeping full precision internally
-  * Group multiple poles / zeros
+  * Group multiple poles / zeros (SOS)
   * Load coefficients / poles and zeros in various formats 
 * **Filter Manager**
   * Store multiple designs in one filter dict
