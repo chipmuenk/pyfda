@@ -13,7 +13,8 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from .compat import QtGui, QtCore, QWidget, QMainWindow, QApplication
+from .compat import (QtGui, QtCore, QWidget, QMainWindow, QApplication,
+                     QHBoxLayout,)
 
 import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
@@ -108,7 +109,7 @@ class pyFDA(QMainWindow):
         # ============== UI Layout =====================================
         self.main_widget = QWidget(self) # this widget contains all subwidget groups
 
-        layHMain = QtGui.QHBoxLayout(self.main_widget) # horizontal layout of all groups
+        layHMain = QHBoxLayout(self.main_widget) # horizontal layout of all groups
 
         # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets

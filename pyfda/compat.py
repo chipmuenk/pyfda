@@ -8,7 +8,9 @@ try:
     from PyQt5.QtWidgets import QSizePolicy, QLabel, QInputDialog
     from PyQt5.QtWidgets import QTabWidget
     from PyQt5.QtWidgets import QMainWindow, QApplication
-except Exception:
+    from PyQt5.QtWidgets import QHBoxLayout, QComboBox
+except Exception as err:
+    print(err)
     import PyQt4
     from PyQt4 import QtGui, QtCore
     from PyQt4.QtGui import QWidget
@@ -17,6 +19,7 @@ except Exception:
     from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
     from PyQt4.QtGui import QTabWidget
     from PyQt4.QtGui import QMainWindow, QApplication
+    from PyQt4.QtGui import QHBoxLayout, QComboBox
 
 
 
