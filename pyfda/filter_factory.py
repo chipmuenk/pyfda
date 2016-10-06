@@ -179,13 +179,16 @@ class FilterFactory(object):
         passing the global filter dictionary fil[0] as the parameter.
     
         """                
+        if self.err_code >= 16:
+            self.err_code = 0 #  # clear previous method call error
+            err_string = ""
+
         if fc: # filter design class was part of the argument, (re-)create class instance
-            self.create_fil_inst(fc)
+            self.err_code = self.create_fil_inst(fc)
 
         # Error during filter design class instantiation (class fc could not be instantiated)           
-        if self.err_code > 0 and self.err_code < 16:
+        if self.err_code > 0:
             err_string = "Filter design class could not be instantiated, see previous error message."
-            return self.err_code
             
         # Test whether 'method' is a string or unicode type under Py2 and Py3:
         elif not isinstance(method, six.string_types):
@@ -205,8 +208,6 @@ class FilterFactory(object):
             except Exception as e:
                 err_string =("\Error calling %s':\n"%method, e)
                 self.err_code = 18
-            else: # no error, keep old error code
-                err_string = ""
                 
         if self.err_code > 0:
                 logger.error(err_string)
