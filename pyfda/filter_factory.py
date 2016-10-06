@@ -114,12 +114,12 @@ class FilterFactory(object):
         # In both cases, a (new) filter object is instantiated.
 
         if (not hasattr(fil_inst, 'name') or fc != fil_inst.name):
-            # get named attribute from dm_module, here, this returns a class
+            # get named attribute from fc_module, here, this returns a class
             fil_class = getattr(fc_module, fc, None)
             fil_inst = fil_class() # instantiate an object         
             self.err_code = -1 # filter instance has been created / changed successfully
 
-        elif not fil_class: # dm is not a class of dm_module
+        if fil_class is None: # fc is not a class of dm_module
             err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
                     "Unknown design class '%s', could not be created.", fc)
             print(err_string)
@@ -187,7 +187,7 @@ class FilterFactory(object):
             err_string = "Filter design class could not be instantiated, see previous error message."
             return self.err_code
             
-        # test whether 'method' is a string or unicode type under Py2 and Py3:
+        # Test whether 'method' is a string or unicode type under Py2 and Py3:
         elif not isinstance(method, six.string_types):
             err_string = "Method name '{0}' is not a string.".format(method)
             self.err_code = 16
@@ -197,7 +197,7 @@ class FilterFactory(object):
             err_string = "Method '{0}' doesn't exist in class '{1}'.".format(method, fil_inst)
             self.err_code = 17
  
-        else:
+        else: # everything ok so far, try calling method with the filter dict as argument
             try:
                 #------------------------------------------------------------------
                 getattr(fil_inst, method)(fil_dict)
@@ -210,7 +210,7 @@ class FilterFactory(object):
                 
         if self.err_code > 0:
                 logger.error(err_string)
-                print("\nERROR in 'FilterFactory.select_fil_method()':")
+                print("\nERROR %d in 'FilterFactory.select_fil_method()':" %self.err_code)
                 print(err_string)
             
         return self.err_code
