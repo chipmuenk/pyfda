@@ -244,6 +244,7 @@ class PlotImpz(QtGui.QWidget):
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
+        sos = np.asarray(fb.fil[0]['sos'])
 
         self.f_S  = fb.fil[0]['f_S']
         
@@ -280,11 +281,16 @@ class PlotImpz(QtGui.QWidget):
             H_str = r'$h_{saw}[n]$'
 
             
-        h = sig.lfilter(self.bb, self.aa, x)
+        if not np.any(sos): # no second order sections for current filter          
+            h = sig.lfilter(self.bb, self.aa, x)
+            dc = sig.freqz(self.bb, self.aa, [0])
+        else:
+#            print(sos)
+            h = sig.sosfilt(sos, x)
+            dc = sig.freqz(self.bb, self.aa, [0])
         
         if stim == "StepErr":
-            dc = sig.freqz(self.bb, self.aa, [0])
-            h = h - abs(dc[1])
+            h = h - abs(dc[1]) # subtract DC value from response
 
 
         self.cmplx = np.any(np.iscomplex(h))
