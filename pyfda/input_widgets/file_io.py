@@ -9,8 +9,11 @@ import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtGui, QtCore, QWidget, QFileDialog
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+from ..compat import (QtGui, QtCore,
+                      QWidget, QPushButton, QComboBox, QLabel, QFont, QFrame,
+                      QVBoxLayout, QHBoxLayout,
+                      QFileDialog)
+
 QFD = QFileDialog
 
 import scipy.io
@@ -76,56 +79,56 @@ class File_IO(QWidget):
         -
         """
         # widget / subwindow for parameter selection
-        self.butExport = QtGui.QPushButton("Export Coefficients", self)
+        self.butExport = QPushButton("Export Coefficients", self)
         self.butExport.setToolTip("Export Coefficients in various formats.")
 
-        self.butImport = QtGui.QPushButton("Import Coefficients", self)
+        self.butImport = QPushButton("Import Coefficients", self)
         self.butImport.setToolTip("Import Coefficients in various formats.")
 
-        self.butSave = QtGui.QPushButton("Save Filter", self)
-        self.butLoad = QtGui.QPushButton("Load Filter", self)
+        self.butSave = QPushButton("Save Filter", self)
+        self.butLoad = QPushButton("Load Filter", self)
         
-        self.butReadFiltTree = QtGui.QPushButton("Read Filters", self)
+        self.butReadFiltTree = QPushButton("Read Filters", self)
         self.butReadFiltTree.setToolTip("Re-read filter design directory and build filter design tree.\n"
                                         "(For developing and debugging).")
 
-        lblSeparator = QtGui.QLabel("CSV-Separator:")
-        self.cmbSeparator = QtGui.QComboBox(self)
+        lblSeparator = QLabel("CSV-Separator:")
+        self.cmbSeparator = QComboBox(self)
         self.cmbSeparator.addItems(['","','";"','<TAB>','<CR>'])
         self.cmbSeparator.setToolTip("Specify separator for number fields.")
 
 
         # ============== UI Layout =====================================
-        bfont = QtGui.QFont()
+        bfont = QFont()
         bfont.setBold(True)
         
-        bifont = QtGui.QFont()
+        bifont = QFont()
         bifont.setBold(True)
         bifont.setItalic(True)
 
-        ifont = QtGui.QFont()
+        ifont = QFont()
         ifont.setItalic(True)
 
-        layVIO = QtGui.QVBoxLayout()
+        layVIO = QVBoxLayout()
 
         layVIO.addWidget(self.butSave) # save filter dict -> various formats
         layVIO.addWidget(self.butLoad) # load filter dict -> various formats
-        layVIO.addWidget(HLine(QtGui, self))
+        layVIO.addWidget(HLine(QFrame, self))
         layVIO.addWidget(self.butExport) # export coeffs -> various formats
         layVIO.addWidget(self.butImport) # export coeffs -> various formats
-        layVIO.addWidget(HLine(QtGui, self))
+        layVIO.addWidget(HLine(QFrame, self))
 
-        layHIO = QtGui.QHBoxLayout()        
+        layHIO = QHBoxLayout()        
         layHIO.addWidget(lblSeparator)
         layHIO.addWidget(self.cmbSeparator)        
         layVIO.addLayout(layHIO)
-        layVIO.addWidget(HLine(QtGui, self))
+        layVIO.addWidget(HLine(QFrame, self))
         layVIO.addStretch(1)
         
         layVIO.addWidget(self.butReadFiltTree) # re-read filter tree (for debugging)
 
 
-        layVMain = QtGui.QVBoxLayout()
+        layVMain = QVBoxLayout()
         layVMain.addLayout(layVIO)
             
         self.setLayout(layVMain)
@@ -463,7 +466,8 @@ class File_IO(QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = File_IO(None)
 
     app.setActiveWindow(mainw) 

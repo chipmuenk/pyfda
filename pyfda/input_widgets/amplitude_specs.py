@@ -12,7 +12,9 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtGui, QtCore, QWidget
+from ..compat import (QtGui, QtCore, 
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame,
+                      QVBoxLayout, QHBoxLayout, QGridLayout)
 pyqtSignal, Qt, QEvent = QtCore.pyqtSignal, QtCore.Qt, QtCore.QEvent
 
 import pyfda.filterbroker as fb
@@ -46,29 +48,29 @@ class AmplitudeSpecs(QWidget):
         """
         Construct User Interface
         """
-        self.layVMain = QtGui.QVBoxLayout() # Widget vertical layout
+        self.layVMain = QVBoxLayout() # Widget vertical layout
 
         amp_units = ["dB", "V", "W"]
 
         bfont = QtGui.QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        self.lblTitle = QtGui.QLabel(self) # field for widget title
+        self.lblTitle = QLabel(self) # field for widget title
         self.lblTitle.setText(str(self.title))
         self.lblTitle.setFont(bfont)
         self.lblTitle.setWordWrap(True)
         self.layVMain.addWidget(self.lblTitle)
 
-        self.lblUnits = QtGui.QLabel(self)
+        self.lblUnits = QLabel(self)
         self.lblUnits.setText("Unit:")
 
-        self.cmbUnitsA = QtGui.QComboBox(self)
+        self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(amp_units)
         self.cmbUnitsA.setObjectName("cmbUnitsA")
         self.cmbUnitsA.setToolTip("Set unit for amplitude specifications:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
 
-        self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         # fit size dynamically to largest element
 
         # find index for default unit from dictionary and set the unit
@@ -77,12 +79,12 @@ class AmplitudeSpecs(QWidget):
             amp_idx = 0
         self.cmbUnitsA.setCurrentIndex(amp_idx) # initialize for dBsg
 
-        self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields
+        self.layGSpecs = QGridLayout() # sublayout for spec fields
         self.layGSpecs.addWidget(self.lblUnits,0,0)
         self.layGSpecs.addWidget(self.cmbUnitsA,0,1, Qt.AlignLeft)
 
-        frmMain = QtGui.QFrame()
-        frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        frmMain = QFrame()
+        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(self.layGSpecs)
 
         self.layVMain.addWidget(frmMain)
@@ -125,7 +127,7 @@ class AmplitudeSpecs(QWidget):
           current value in linear format with full precision (only if
           `spec_edited`== True) and display the stored value in selected format
         """
-        if isinstance(source, QtGui.QLineEdit): # could be extended for other widgets
+        if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_entries()
@@ -260,10 +262,10 @@ class AmplitudeSpecs(QWidget):
 
         if num_tot_labels < num_new_labels: # new widgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
-                self.qlabels.append(QtGui.QLabel(self))
+                self.qlabels.append(QLabel(self))
                 self.qlabels[i].setText(rt_label("dummy"))
     
-                self.qlineedit.append(QtGui.QLineEdit(""))
+                self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
     
@@ -294,7 +296,8 @@ class AmplitudeSpecs(QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = AmplitudeSpecs(None)
 
     mainw.update_UI(new_labels = ['A_SB','A_SB2','A_PB','A_PB2'])
