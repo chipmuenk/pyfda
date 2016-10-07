@@ -6,8 +6,8 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout
+
 
 import numpy as np
 
@@ -26,7 +26,7 @@ class PlotPZ(QWidget):
     def __init__(self, parent): 
         super(PlotPZ, self).__init__(parent)
 
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
 
         #----------------------------------------------------------------------
@@ -302,7 +302,9 @@ class PlotPZ(QWidget):
 
 def main():
     import sys
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+
+    app = QApplication(sys.argv)
     mainw = PlotPZ(None)
     app.setActiveWindow(mainw) 
     mainw.show()

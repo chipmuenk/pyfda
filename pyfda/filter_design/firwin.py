@@ -17,12 +17,14 @@ Version info:
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
+
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QComboBox,
+                      QVBoxLayout, QGridLayout)
+
 import numpy as np
 import scipy.signal as sig
 from importlib import import_module
 import inspect
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import pyqtSignal
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, remezord, round_odd
@@ -41,12 +43,12 @@ __version__ = "1.3"
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
 
-class firwin(QtGui.QWidget):
+class firwin(QWidget):
     
     sigFiltChanged = pyqtSignal()
 
     def __init__(self):
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
         
         # This part contains static information for building the filter tree
         self.name = {'firwin':'Windowed FIR'}
@@ -120,15 +122,15 @@ class firwin(QtGui.QWidget):
         """
 
         # Combobox for selecting the algorithm to estimate minimum filter order
-        self.cmb_firwin_alg = QtGui.QComboBox()
+        self.cmb_firwin_alg = QComboBox()
         self.cmb_firwin_alg.setObjectName('wdg_cmb_firwin_alg')
         self.cmb_firwin_alg.addItems(['ichige','kaiser','herrmann'])
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
-        self.cmb_firwin_alg.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmb_firwin_alg.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmb_firwin_alg.hide()
 
         # Combobox for selecting the window used for filter design
-        self.cmb_firwin_win = QtGui.QComboBox()
+        self.cmb_firwin_win = QComboBox()
         self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
 
         windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
@@ -144,25 +146,25 @@ class firwin(QtGui.QWidget):
 
         self.cmb_firwin_win.addItems(windows)
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
-        self.cmb_firwin_win.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lbl_firwin_1 = QtGui.QLabel("a")
+        self.lbl_firwin_1 = QLabel("a")
         self.lbl_firwin_1.setObjectName('wdg_lbl_firwin_1')
-        self.led_firwin_1 = QtGui.QLineEdit()
+        self.led_firwin_1 = QLineEdit()
         self.led_firwin_1.setText("0.5")
         self.led_firwin_1.setObjectName('wdg_led_firwin_1')
         self.lbl_firwin_1.setVisible(False)
         self.led_firwin_1.setVisible(False)
                
-        self.lbl_firwin_2 = QtGui.QLabel("b")
+        self.lbl_firwin_2 = QLabel("b")
         self.lbl_firwin_2.setObjectName('wdg_lbl_firwin_2')
-        self.led_firwin_2 = QtGui.QLineEdit()
+        self.led_firwin_2 = QLineEdit()
         self.led_firwin_2.setText("0.5")
         self.led_firwin_2.setObjectName('wdg_led_firwin_2')
         self.led_firwin_2.setVisible(False)
         self.lbl_firwin_2.setVisible(False)
 
-        self.layGWin = QtGui.QGridLayout()
+        self.layGWin = QGridLayout()
         self.layGWin.setObjectName('wdg_layGWin')
         self.layGWin.addWidget(self.cmb_firwin_win,0,0,1,2)
         self.layGWin.addWidget(self.cmb_firwin_alg,0,2,1,2)
@@ -172,7 +174,7 @@ class firwin(QtGui.QWidget):
         self.layGWin.addWidget(self.led_firwin_2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil = QWidget()
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layGWin)
 
@@ -271,13 +273,13 @@ class firwin(QtGui.QWidget):
 
                 # find index for window string
                 win_idx = self.cmb_firwin_win.findText(window, 
-                                QtCore.Qt.MatchFixedString) # case insensitive flag
+                                Qt.MatchFixedString) # case insensitive flag
                 if win_idx == -1: # Key does not exist, use first entry instead
                     win_idx = 0
                     
             if 'alg' in dyn_wdg_par:
                 alg_idx = self.cmb_firwin_alg.findText(dyn_wdg_par['alg'], 
-                                QtCore.Qt.MatchFixedString)
+                                Qt.MatchFixedString)
                 if alg_idx == -1: # Key does not exist, use first entry instead
                     alg_idx = 0
                 
@@ -428,31 +430,25 @@ class firwin(QtGui.QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import sys
-    app = QtGui.QApplication(sys.argv)
-  
-    filt = firwin()  # instantiate filter
-    win_type = getattr(filt, filt.wdg['sf'])
- #   print(filt.firWindow)
-#
-    filt_alg = getattr(filt, filt.wdg['fo'])
+    import sys 
+    from ..compat import QApplication
+
+    app = QApplication(sys.argv)
     
-    layVDynWdg = QtGui.QVBoxLayout()
-    layVDynWdg.addWidget(win_type, stretch = 1)
-    layVDynWdg.addWidget(filt_alg, stretch = 1)
-    
+    # instantiate filter widget
+    filt = firwin()
+    filt.construct_UI()
+    wdg_firwin = getattr(filt, 'wdg_fil')
+
+    layVDynWdg = QVBoxLayout()
+    layVDynWdg.addWidget(wdg_firwin, stretch = 1)
+
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][FRMT]) # return results in default format
 
-    frmDynWdg = QtGui.QFrame()
-    frmDynWdg.setLayout(layVDynWdg)
-    
-    layVAllWdg = QtGui.QVBoxLayout()
-    layVAllWdg.addWidget(frmDynWdg)
-
-    frmMain = QtGui.QFrame()
-    frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-    frmMain.setLayout(layVAllWdg)    
+    frmMain = QFrame()
+    frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+    frmMain.setLayout(layVDynWdg)    
 
     form = frmMain
 

@@ -6,8 +6,8 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout
+
 
 import numpy as np
 import scipy.signal as sig
@@ -22,7 +22,7 @@ class PlotPhi(QWidget):
     def __init__(self, parent):
         super(PlotPhi, self).__init__(parent)
 
-        self.cmbUnitsPhi = QtGui.QComboBox(self)
+        self.cmbUnitsPhi = QComboBox(self)
         units = ["rad", "rad/pi",  "deg"]
         scales = [1.,   1./ np.pi, 180./np.pi]
         for unit, scale in zip(units, scales):
@@ -30,13 +30,13 @@ class PlotPhi(QWidget):
         self.cmbUnitsPhi.setObjectName("cmbUnitsA")
         self.cmbUnitsPhi.setToolTip("Set unit for phase.")
         self.cmbUnitsPhi.setCurrentIndex(0)
-        self.cmbUnitsPhi.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbUnitsPhi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lblWrap = QtGui.QLabel("Wrapped Phase")
-        self.btnWrap = QtGui.QCheckBox()
+        self.lblWrap = QLabel("Wrapped Phase")
+        self.btnWrap = QCheckBox()
         self.btnWrap.setChecked(False)
         self.btnWrap.setToolTip("Plot phase wrapped to +/- pi")
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.cmbUnitsPhi)
         self.layHChkBoxes.addWidget(self.lblWrap)
@@ -149,7 +149,9 @@ class PlotPhi(QWidget):
 
 def main():
     import sys
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    
+    app = QApplication(sys.argv)
     mainw = PlotPhi(None)
     app.setActiveWindow(mainw) 
     mainw.show()

@@ -8,20 +8,14 @@ Tab-Widget for displaying and modifying filter Poles and Zeros
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
+from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
-
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton, QPushButton, QSpinBox,
-                      QAbstractItemView,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
-
+from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal,
+                      QCheckBox, QPushButton, QSpinBox,
+                      QTableWidget, QTableWidgetItem, QAbstractItemView,
+                      QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import numpy as np
 from scipy.signal import freqz
@@ -45,7 +39,6 @@ class FilterPZ(QWidget):
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     
     def __init__(self, parent):
-        self.DEBUG = False
         super(FilterPZ, self).__init__(parent)
 
         self._construct_UI()
@@ -226,12 +219,13 @@ class FilterPZ(QWidget):
         self.tblPZ.setVisible(self.chkPZList.isChecked())
         self.tblPZ.setRowCount(max(len(zpk[0]),len(zpk[1])))
 
-        if self.DEBUG:
-            print("=====================\nInputPZ.load_entries")
-            print("ZPK:\n",zpk)
-            print ("shape", np.shape(zpk))
-            print ("len", len(zpk))
-            print("ndim", np.ndim(zpk))
+        logger.debug("load_entries - pz:\n"
+            "Shape = %s\n"
+            "Len   = %d\n"
+            "NDim  = %d\n\n"
+            "ZPK = %s"
+            %(np.shape(zpk),len(zpk), np.ndim(zpk), pformat(zpk))
+              )
 
         self.tblPZ.setColumnCount(2)
         self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
@@ -298,11 +292,11 @@ class FilterPZ(QWidget):
             
         self.sigFilterDesigned.emit()
 
-        if self.DEBUG:
-            print("ZPK - coeffs:",  fb.fil[0]['ba'])
-            print("ZPK - zpk:",  fb.fil[0]['zpk'])
-            print("ZPK updated!")
-
+        logger.debug("_save_entries - coeffients / zpk updated:\n"
+            "b,a = %s\n\n"
+            "zpk = %s\n"
+            %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
+              ))
 
 #------------------------------------------------------------------------------
     def _clear_table(self):

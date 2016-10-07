@@ -13,8 +13,10 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from .compat import (QtGui, QtCore, QWidget, QMainWindow, QApplication,
-                     QHBoxLayout,)
+from .compat import (QtCore, QMainWindow, QApplication,
+                     QSplitter, QScrollArea, QIcon, QMessageBox,
+                     QWidget, QFrame,
+                     QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
@@ -117,24 +119,24 @@ class pyFDA(QMainWindow):
 # Test        self.pltTabWidgets = plot_tab_widgets.MyStaticMplCanvas(self.main_widget, width=5, height=4, dpi=100)
 
         if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
-            layVInput = QtGui.QVBoxLayout()
+            layVInput = QVBoxLayout()
             layVInput.addWidget(self.inputTabWidgets)
-            layVPlt = QtGui.QVBoxLayout()
+            layVPlt = QVBoxLayout()
             layVPlt.addWidget(self.pltTabWidgets)
     
-            frmInput = QtGui.QFrame()
-            frmInput.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+            frmInput = QFrame()
+            frmInput.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
             frmInput.setLayout(layVInput)
-            frmInput.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                     QtGui.QSizePolicy.Minimum)
+            frmInput.setSizePolicy(QSizePolicy.Minimum,
+                                     QSizePolicy.Minimum)
     
-            frmPlt = QtGui.QFrame()
-            frmPlt.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+            frmPlt = QFrame()
+            frmPlt.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
             frmPlt.setLayout(layVPlt)
-            frmPlt.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                     QtGui.QSizePolicy.Minimum)
+            frmPlt.setSizePolicy(QSizePolicy.Minimum,
+                                     QSizePolicy.Minimum)
     
-            splitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
+            splitter = QSplitter(QtCore.Qt.Horizontal)
             splitter.addWidget(frmInput)
             splitter.addWidget(frmPlt)
             splitter.setStretchFactor(1,4) # factors for the initial sizes of subwidgets
@@ -152,7 +154,7 @@ class pyFDA(QMainWindow):
 
         if SCROLL:
             # Create scroll area and "monitor" _widget whether scrollbars are needed
-            scrollArea = QtGui.QScrollArea()
+            scrollArea = QScrollArea()
             scrollArea.setWidget(self.main_widget) # make main widget "scrollable"
     
             #============= Set behaviour of scroll area ======================
@@ -160,8 +162,8 @@ class pyFDA(QMainWindow):
             scrollArea.setMinimumSize(QtCore.QSize(800, 500))
     #        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
     #        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
-            scrollArea.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                     QtGui.QSizePolicy.MinimumExpanding)
+            scrollArea.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                     QSizePolicy.MinimumExpanding)
     
             # Size of monitored widget is allowed to grow:
             scrollArea.setWidgetResizable(True)
@@ -173,7 +175,7 @@ class pyFDA(QMainWindow):
 
         #=============== Menubar =======================================
 
-#        aboutAction = QtGui.QAction('&About', self)
+#        aboutAction = QAction('&About', self)
 #        aboutAction.setShortcut('Ctrl+A')
 #        aboutAction.setStatusTip('Info about pyFDA')
 #
@@ -217,7 +219,7 @@ class pyFDA(QMainWindow):
 #         """
 #         Display an "About" window
 #         """
-#         QtGui.QMessageBox.about(self, "About pyFDA",
+#         QMessageBox.about(self, "About pyFDA",
 #                                 ("(c) 2013 - 15 Christian Münker\n\n"
 #         "A graphical tool for designing, analyzing and synthesizing digital filters")
 #         )
@@ -236,10 +238,10 @@ class pyFDA(QMainWindow):
         """
         reimplement QMainWindow.closeEvent() to prompt the user "Are you sure ..."
         """
-        reply = QtGui.QMessageBox.question(self, 'Message',
-            "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+        reply = QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 
-        if reply == QtGui.QMessageBox.Yes:
+        if reply == QMessageBox.Yes:
             event.accept()
         else:
             event.ignore()
@@ -259,14 +261,14 @@ def main():
     """
      # instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
+    app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
     app.setStyleSheet(rc.css_rc) 
 
     mainw = pyFDA()
 
     # Sets the active window to the active widget in response to a system event.
     app.setActiveWindow(mainw) 
-    mainw.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
+    mainw.setWindowIcon(QIcon(':/pyfda_icon.svg'))
 
     screen_resolution = app.desktop().screenGeometry()
     screen_h, screen_w = screen_resolution.height(), screen_resolution.width()

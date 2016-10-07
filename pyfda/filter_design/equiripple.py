@@ -16,9 +16,11 @@ Version info:
 Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+
+from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame,
+                      QVBoxLayout, QHBoxLayout)
+
 import scipy.signal as sig
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
 import numpy as np
 
 import pyfda.filterbroker as fb
@@ -37,7 +39,7 @@ __version__ = "1.3"
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for equiripple routines
 
-class equiripple(QtGui.QWidget):
+class equiripple(QWidget):
 
     info ="""
 **Equiripple filters**
@@ -58,7 +60,7 @@ using Ichige's algorithm.
 
 
     def __init__(self):
-        QtGui.QWidget.__init__(self)
+        QWidget.__init__(self)
 #        super(equiripple, self).__init__(parent)
         self.name = {'equiripple':'Equiripple'}
 
@@ -129,21 +131,21 @@ using Ichige's algorithm.
         input_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 #        print("Constructing Equiripple UI")
-        self.lbl_remez_1 = QtGui.QLabel("Grid Density")
+        self.lbl_remez_1 = QLabel("Grid Density")
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
-        self.led_remez_1 = QtGui.QLineEdit()
+        self.led_remez_1 = QLineEdit()
         self.led_remez_1.setText("16")
         self.led_remez_1.setObjectName('wdg_led_remez_1')
         self.led_remez_1.setToolTip("Number of frequency points for Remez algorithm. Increase the\n"
                                     "number to reduce frequency overshoot in the transition region.")
 
-        self.layHWin = QtGui.QHBoxLayout()
+        self.layHWin = QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
         self.layHWin.addWidget(self.lbl_remez_1)
         self.layHWin.addWidget(self.led_remez_1)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil = QWidget()
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layHWin)
 
@@ -344,30 +346,28 @@ using Ichige's algorithm.
 
 if __name__ == '__main__':
     import sys
-    app = QtGui.QApplication(sys.argv)
-    filt = equiripple()        # instantiate filter
-    grid_density = getattr(filt, filt.wdg['sf'])
+    from ..compat import QApplication
 
-    layVDynWdg = QtGui.QVBoxLayout()
-    layVDynWdg.addWidget(grid_density, stretch = 1)
+    app = QApplication(sys.argv)
+    
+    # instantiate filter widget
+    filt = equiripple()
+    filt.construct_UI()
+    wdg_equiripple = getattr(filt, 'wdg_fil')
+
+    layVDynWdg = QVBoxLayout()
+    layVDynWdg.addWidget(wdg_equiripple, stretch = 1)
     
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][frmt]) # return results in default format
 
-    frmDynWdg = QtGui.QFrame()
-    frmDynWdg.setLayout(layVDynWdg)
-    
-    layVAllWdg = QtGui.QVBoxLayout()
-    layVAllWdg.addWidget(frmDynWdg)
-
-    frmMain = QtGui.QFrame()
-    frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-    frmMain.setLayout(layVAllWdg)    
+    frmMain = QFrame()
+    frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+    frmMain.setLayout(layVDynWdg)    
 
     form = frmMain
 
     form.show()
-    
 
     app.exec_()
     #------------------------------------------------------------------------------
