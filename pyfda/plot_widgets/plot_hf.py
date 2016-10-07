@@ -6,7 +6,8 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from PyQt4 import QtGui
+from ..compat import QtGui, QWidget
+
 import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
@@ -17,7 +18,7 @@ import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 from pyfda.plot_widgets.plot_utils import MplWidget
 
-class PlotHf(QtGui.QWidget):
+class PlotHf(QWidget):
 
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale

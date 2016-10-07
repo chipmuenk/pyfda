@@ -5,13 +5,15 @@ Tabbed container with all plot widgets
 Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-from PyQt4 import QtGui
+
+from ..compat import QtGui, QtCore, QWidget, QTabWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
 
 from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
 
 #------------------------------------------------------------------------------
-class PlotTabWidgets(QtGui.QTabWidget):
+class PlotTabWidgets(QTabWidget):
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 

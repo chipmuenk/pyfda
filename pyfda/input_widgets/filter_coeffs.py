@@ -12,8 +12,9 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -30,7 +31,7 @@ from pyfda.simpleeval import simple_eval
 # TODO: Separate View and Storage of data
 # TODO: Fix fixpoint lib: ovfl = wrap toggles between -MSB and + MSB is wrong
 
-class FilterCoeffs(QtGui.QWidget):
+class FilterCoeffs(QWidget):
     """
     Create widget for viewing / editing / entering data
     """

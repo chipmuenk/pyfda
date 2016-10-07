@@ -9,15 +9,16 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import pyqtSignal, QEvent
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
-class WeightSpecs(QtGui.QWidget):
+
+class WeightSpecs(QWidget):
     """
     Build and update widget for entering the weight
     specifications like W_SB, W_PB etc.

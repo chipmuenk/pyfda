@@ -6,12 +6,16 @@ completely empty here WITHOUT Matplotlib canvas / figure
 Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-from PyQt4 import QtGui
+
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
 
 from pyfda.pyfda_lib import grpdelay
 import pyfda.filterbroker as fb
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+
+
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QtGui.QWidget):
     def __init__(self, parent):

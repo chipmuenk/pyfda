@@ -6,7 +6,9 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from PyQt4 import QtGui
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+
 import numpy as np
 
 import pyfda.filterbroker as fb
@@ -18,7 +20,8 @@ from pyfda.plot_widgets.plot_utils import MplWidget#, MplCanvas
 
 from  matplotlib import patches # TODO: should not be imported here?!
 
-class PlotPZ(QtGui.QWidget):
+
+class PlotPZ(QWidget):
 
     def __init__(self, parent): 
         super(PlotPZ, self).__init__(parent)

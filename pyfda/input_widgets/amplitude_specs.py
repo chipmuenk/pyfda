@@ -11,15 +11,16 @@ from __future__ import print_function, division, unicode_literals
 import sys
 import logging
 logger = logging.getLogger(__name__)
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import pyqtSignal, Qt, QEvent
+
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, Qt, QEvent = QtCore.pyqtSignal, QtCore.Qt, QtCore.QEvent
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
-class AmplitudeSpecs(QtGui.QWidget):
+class AmplitudeSpecs(QWidget):
     """
     Build and update widget for entering the amplitude
     specifications like A_SB, A_PB etc.

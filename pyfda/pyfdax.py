@@ -13,7 +13,8 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui, QtCore
+from .compat import (QtGui, QtCore, QWidget, QMainWindow, QApplication,
+                     QHBoxLayout,)
 
 import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
@@ -76,7 +77,7 @@ if not os.path.exists(rc.save_dir):
 #logging.Filter()
 
 
-class pyFDA(QtGui.QMainWindow):
+class pyFDA(QMainWindow):
     """
     Create the main window consisting of a tabbed widget for entering filter
     specifications, poles / zeros etc. and another tabbed widget for plotting
@@ -87,7 +88,7 @@ class pyFDA(QtGui.QMainWindow):
     """
 
     def __init__(self, parent=None):
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
         
@@ -106,9 +107,9 @@ class pyFDA(QtGui.QMainWindow):
         """
 
         # ============== UI Layout =====================================
-        self.main_widget = QtGui.QWidget(self) # this widget contains all subwidget groups
+        self.main_widget = QWidget(self) # this widget contains all subwidget groups
 
-        layHMain = QtGui.QHBoxLayout(self.main_widget) # horizontal layout of all groups
+        layHMain = QHBoxLayout(self.main_widget) # horizontal layout of all groups
 
         # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
@@ -257,7 +258,7 @@ def main():
     *before* any other objects related to the user interface are created."     
     """
      # instantiate QApplication object, passing command line arguments
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon(':/pyfda_icon.svg'))
     app.setStyleSheet(rc.css_rc) 
 
