@@ -5,8 +5,10 @@ Edited by Christian Münker, 2013
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+
+from ..compat import (QtCore, QCheckBox, QWidget,
+                      QVBoxLayout, QHBoxLayout, 
+                      pyqtSignal, Qt, QEvent)
 
 import numpy as np
 
@@ -22,12 +24,12 @@ class PlotTauG(QWidget):
         super(PlotTauG, self).__init__(parent)
 
 
-        self.chkWarnings = QtGui.QCheckBox()
+        self.chkWarnings = QCheckBox()
         self.chkWarnings.setText("Enable Warnings")
         self.chkWarnings.setChecked(False)
         self.chkWarnings.setToolTip("Print warnings about singular group delay")
 
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkWarnings)
 
@@ -120,7 +122,8 @@ class PlotTauG(QWidget):
 
 def main():
     import sys
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = PlotTauG(None)
     app.setActiveWindow(mainw) 
     mainw.show()
