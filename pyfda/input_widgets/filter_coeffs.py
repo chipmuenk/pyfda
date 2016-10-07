@@ -12,8 +12,14 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QToolButton, QPushButton,
+                      QAbstractItemView,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
 
 import numpy as np
 
@@ -66,101 +72,101 @@ class FilterCoeffs(QWidget):
                 longestText = item
 
 
-        self.chkCoeffList =  QtGui.QCheckBox()
+        self.chkCoeffList =  QCheckBox()
         self.chkCoeffList.setChecked(True)
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
-        self.lblCoeffList = QtGui.QLabel()
+        self.lblCoeffList = QLabel()
         self.lblCoeffList.setText("Show Coefficients")
 
-        self.tblCoeff = QtGui.QTableWidget()
-        self.tblCoeff.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
+        self.tblCoeff = QTableWidget()
+        self.tblCoeff.setEditTriggers(QTableWidget.AllEditTriggers)
         self.tblCoeff.setAlternatingRowColors(True)
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
-        self.tblCoeff.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
-        self.tblCoeff.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                          QtGui.QSizePolicy.MinimumExpanding)
+        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
+        self.tblCoeff.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                          QSizePolicy.MinimumExpanding)
 
-        self.butAddRow = QtGui.QPushButton()
+        self.butAddRow = QPushButton()
         self.butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
         self.butAddRow.setText(butTexts[0])
         #Calculate the length for the buttons based on the longest ButtonText
         ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
         self.butAddRow.setMaximumWidth(ButLength)
 
-        self.butDelRow = QtGui.QPushButton()
+        self.butDelRow = QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
                 "Multiple rows can be selected using <SHIFT> or <CTRL>.\n"
                 "When noting is selected, delete last row.")
         self.butDelRow.setText(butTexts[1])
         self.butDelRow.setMaximumWidth(ButLength)
 
-        self.butSave = QtGui.QPushButton()
+        self.butSave = QPushButton()
         self.butSave.setToolTip("Save coefficients & update filter plots.")
         self.butSave.setText(butTexts[2])
         self.butSave.setMaximumWidth(ButLength)
 
-        self.butLoad = QtGui.QPushButton()
+        self.butLoad = QPushButton()
         self.butLoad.setToolTip("Reload coefficients.")
         self.butLoad.setText(butTexts[3])
         self.butLoad.setMaximumWidth(ButLength)
 
-        self.butClear = QtGui.QPushButton()
+        self.butClear = QPushButton()
         self.butClear.setToolTip("Clear all entries.")
         self.butClear.setText(butTexts[4])
         self.butClear.setMaximumWidth(ButLength)
 
 
-        self.butSetZero = QtGui.QPushButton()
+        self.butSetZero = QPushButton()
         self.butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
         self.butSetZero.setText(butTexts[5])
         self.butSetZero.setMaximumWidth(ButLength)
 
-        self.lblEps = QtGui.QLabel()
+        self.lblEps = QLabel()
         self.lblEps.setText("for b, a <")
 
-        self.ledSetEps = QtGui.QLineEdit()
+        self.ledSetEps = QLineEdit()
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
 
-        self.butQuant = QtGui.QPushButton()
+        self.butQuant = QPushButton()
         self.butQuant.setToolTip("Quantize coefficients = 0 with a magnitude < eps.")
         self.butQuant.setText(butTexts[6])
         self.butQuant.setMaximumWidth(ButLength)
 
-        self.lblQIQF  = QtGui.QLabel("QI.QF = ")
-        self.lblQOvfl = QtGui.QLabel("Ovfl.:")
-        self.lblQuant = QtGui.QLabel("Quant.:")
+        self.lblQIQF  = QLabel("QI.QF = ")
+        self.lblQOvfl = QLabel("Ovfl.:")
+        self.lblQuant = QLabel("Quant.:")
 
-        self.ledQuantI = QtGui.QLineEdit()
+        self.ledQuantI = QLineEdit()
         self.ledQuantI.setToolTip("Specify number of integer bits.")
         self.ledQuantI.setText("0")
         self.ledQuantI.setMaxLength(2) # maximum of 2 digits
         self.ledQuantI.setFixedWidth(30) # width of lineedit in points(?)
 
-        self.lblDot = QtGui.QLabel()
+        self.lblDot = QLabel()
         self.lblDot.setText(".")
 
-        self.ledQuantF = QtGui.QLineEdit()
+        self.ledQuantF = QLineEdit()
         self.ledQuantF.setToolTip("Specify number of fractional bits.")
         self.ledQuantF.setText("15")
         self.ledQuantF.setMaxLength(2) # maximum of 2 digits
 #        self.ledQuantF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledQuantF.setMaximumWidth(30)
 
-        self.cmbQQuant = QtGui.QComboBox()
+        self.cmbQQuant = QComboBox()
         qQuant = ['none', 'round', 'fix', 'floor']
         self.cmbQQuant.addItems(qQuant)
         self.cmbQQuant.setCurrentIndex(1) # 'round'
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
         
-        self.cmbQOvfl = QtGui.QComboBox()
+        self.cmbQOvfl = QComboBox()
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
         self.cmbQOvfl.setCurrentIndex(2) # 'sat'
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
         
-        self.cmbQFormat = QtGui.QComboBox()
+        self.cmbQFormat = QComboBox()
         qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
         self.cmbQFormat.addItems(qFormat)
         self.cmbQFormat.setCurrentIndex(0) # 'frac'
@@ -168,31 +174,31 @@ class FilterCoeffs(QWidget):
 
 
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQQuant.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbQOvfl.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbQFormat.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbQQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbQFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # ============== UI Layout =====================================
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkCoeffList)
         self.layHChkBoxes.addWidget(self.lblCoeffList)
         self.layHChkBoxes.addStretch(1)
 
-        self.layHButtonsCoeffs1 = QtGui.QHBoxLayout()
+        self.layHButtonsCoeffs1 = QHBoxLayout()
         self.layHButtonsCoeffs1.addWidget(self.butAddRow)
         self.layHButtonsCoeffs1.addWidget(self.butDelRow)
         self.layHButtonsCoeffs1.addWidget(self.butSave)
         self.layHButtonsCoeffs1.addWidget(self.butLoad)
         self.layHButtonsCoeffs1.addStretch()
 
-        self.layHButtonsCoeffs2 = QtGui.QHBoxLayout()
+        self.layHButtonsCoeffs2 = QHBoxLayout()
         self.layHButtonsCoeffs2.addWidget(self.butClear)
         self.layHButtonsCoeffs2.addWidget(self.butSetZero)
         self.layHButtonsCoeffs2.addWidget(self.lblEps)
         self.layHButtonsCoeffs2.addWidget(self.ledSetEps)
         self.layHButtonsCoeffs2.addStretch()
 
-        self.layHButtonsCoeffs3 = QtGui.QHBoxLayout()
+        self.layHButtonsCoeffs3 = QHBoxLayout()
         self.layHButtonsCoeffs3.addWidget(self.butQuant)
         self.layHButtonsCoeffs3.addWidget(self.lblQIQF)
         self.layHButtonsCoeffs3.addWidget(self.ledQuantI)
@@ -201,16 +207,17 @@ class FilterCoeffs(QWidget):
 
         self.layHButtonsCoeffs3.addStretch()
 
-        self.layHButtonsCoeffs4 = QtGui.QHBoxLayout()
-        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        self.layHButtonsCoeffs4 = QHBoxLayout()
+
         self.layHButtonsCoeffs4.addWidget(self.lblQOvfl)
         self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
         self.layHButtonsCoeffs4.addWidget(self.lblQuant)
         self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
         self.layHButtonsCoeffs4.addWidget(self.cmbQFormat)
-        self.layHButtonsCoeffs4.addItem(spacer)
+        self.layHButtonsCoeffs4.addStretch()
 
-        layVMain = QtGui.QVBoxLayout()
+
+        layVMain = QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
         layVMain.addLayout(self.layHButtonsCoeffs1)
         layVMain.addLayout(self.layHButtonsCoeffs2)
@@ -335,7 +342,7 @@ class FilterCoeffs(QWidget):
                 if item:
                     item.setText(str(cround(coeffs[col][row])).strip('()'))
                 else:
-                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem(
+                    self.tblCoeff.setItem(row,col,QTableWidgetItem(
                                 str(cround(coeffs[col][row])).strip('()')))
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
@@ -382,7 +389,7 @@ class FilterCoeffs(QWidget):
 
         for col in range(2):
             for row in range(old_rows, new_rows):
-                self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
@@ -406,9 +413,9 @@ class FilterCoeffs(QWidget):
         for row in range(3):
             for col in range(num_cols):
                 if row == 0:
-                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("1.0"))
+                    self.tblCoeff.setItem(row,col,QTableWidgetItem("1.0"))
                 else:
-                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 
 #------------------------------------------------------------------------------
     def set_coeffs_zero(self):
@@ -425,7 +432,7 @@ class FilterCoeffs(QWidget):
                     if abs(simple_eval(item.text())) < eps:
                         item.setText(str(0.))
                 else:
-                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 
 #------------------------------------------------------------------------------
     def quant_coeffs(self):
@@ -447,7 +454,7 @@ class FilterCoeffs(QWidget):
                 if item:
                     item.setText(str(myQ.fix(simple_eval(item.text()))))
                 else:
-                    self.tblCoeff.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 
         self.tblCoeff.resizeColumnsToContents()
         self.tblCoeff.resizeRowsToContents()
@@ -456,7 +463,8 @@ class FilterCoeffs(QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = FilterCoeffs(None)
 
     app.setActiveWindow(mainw) 

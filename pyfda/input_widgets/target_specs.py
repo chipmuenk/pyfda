@@ -10,8 +10,12 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QCheckBox,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
 
 import pyfda.filterbroker as fb
 from pyfda.input_widgets import amplitude_specs, freq_specs
@@ -49,22 +53,22 @@ class TargetSpecs(QWidget):
         """
         LAYOUT
         """
-        bfont = QtGui.QFont()
+        bfont = QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        lblTitle = QtGui.QLabel(self) # field for widget title
+        lblTitle = QLabel(self) # field for widget title
         lblTitle.setText(self.title)
         lblTitle.setFont(bfont)
         
-        layVFreq = QtGui.QVBoxLayout()  # add stretch at bottom of ampSpecs
+        layVFreq = QVBoxLayout()  # add stretch at bottom of ampSpecs
         layVFreq.addWidget(self.f_specs) # to compensate for different number of 
         layVFreq.addStretch()           # arguments
         
-        layVAmp = QtGui.QVBoxLayout()  # add stretch at bottom of freqSpecs
+        layVAmp = QVBoxLayout()  # add stretch at bottom of freqSpecs
         layVAmp.addWidget(self.a_specs) # to compensate for different number of 
         layVAmp.addStretch()           # arguments
         
-        layGMain = QtGui.QGridLayout()
+        layGMain = QGridLayout()
         layGMain.addWidget(lblTitle,0,0,1,2)# title
         layGMain.addLayout(layVFreq,1,0)  # frequency specifications
         layGMain.addLayout(layVAmp,1,1)  # amplitude specifications
@@ -110,7 +114,9 @@ class TargetSpecs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
+
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
 
     # Read freq / amp / weight labels for current filter design
     rt = fb.fil[0]['rt']

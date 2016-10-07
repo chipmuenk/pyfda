@@ -9,8 +9,16 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal = QtCore.pyqtSignal
+#from ..compat import QtGui, QtCore, QWidget
+#pyqtSignal = QtCore.pyqtSignal
+
+from ..compat import (QtCore, QtGui, QTabWidget,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QToolButton,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
 
 import pyfda.filterbroker as fb
 
@@ -57,7 +65,7 @@ class InputTabWidgets(QWidget):
 
     def _construct_UI(self):
         """ Initialize UI with tabbed input widgets """
-        tabWidget = QtGui.QTabWidget()
+        tabWidget = QTabWidget()
         tabWidget.setObjectName("TabWidg")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
@@ -68,15 +76,15 @@ class InputTabWidgets(QWidget):
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
-        layVMain = QtGui.QVBoxLayout()
+        layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
         
         #setContentsMargins -> number of pixels between frame window border
         layVMain.setContentsMargins(1,1,1,1) # R, T, L, B
 #
         self.setLayout(layVMain)
-        tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                 QtGui.QSizePolicy.Expanding)
+        tabWidget.setSizePolicy(QSizePolicy.Minimum,
+                                 QSizePolicy.Expanding)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -176,7 +184,8 @@ class InputTabWidgets(QWidget):
 
 def main():
     from pyfda import pyfda_rc as rc
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     app.setStyleSheet(rc.css_rc)
 
     mainw = InputTabWidgets(None)

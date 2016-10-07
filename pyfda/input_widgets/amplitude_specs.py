@@ -12,10 +12,10 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtGui, QtCore, 
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QVBoxLayout, QHBoxLayout, QGridLayout)
-pyqtSignal, Qt, QEvent = QtCore.pyqtSignal, QtCore.Qt, QtCore.QEvent
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont,
+                      QVBoxLayout, QHBoxLayout, QGridLayout,
+                      pyqtSignal, Qt, QEvent)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin
@@ -28,8 +28,8 @@ class AmplitudeSpecs(QWidget):
     specifications like A_SB, A_PB etc.
     """
 
-    sigUnitChanged = QtCore.pyqtSignal() # emitted when amplitude unit has been changed
-    sigSpecsChanged = QtCore.pyqtSignal()
+    sigUnitChanged = pyqtSignal() # emitted when amplitude unit has been changed
+    sigSpecsChanged = pyqtSignal()
 
     def __init__(self, parent, title = "Amplitude Specs"):
         """
@@ -52,7 +52,7 @@ class AmplitudeSpecs(QWidget):
 
         amp_units = ["dB", "V", "W"]
 
-        bfont = QtGui.QFont()
+        bfont = QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
         self.lblTitle = QLabel(self) # field for widget title
@@ -277,20 +277,6 @@ class AmplitudeSpecs(QWidget):
                 self.qlabels[i].show()
                 self.qlineedit[i].show()
 
-#==============================================================================
-#         # start with Nmax + 1, last element Nmax + num +1
-#         for i in range(Nmax+1, Nmax+num+1, 1):
-#             self.qlabels.append(QtGui.QLabel(self))
-#             self.qlabels[i].setText(rt_label("dummy"))
-# 
-#             self.qlineedit.append(QtGui.QLineEdit(""))
-#             self.qlineedit[i].setObjectName("dummy")
-#             self.qlineedit[i].installEventFilter(self)  # filter events
-# 
-#             self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
-#             self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
-# 
-#==============================================================================
 
 #------------------------------------------------------------------------------
 

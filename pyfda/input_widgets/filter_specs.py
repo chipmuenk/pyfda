@@ -12,9 +12,13 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 
-from ..compat import QtGui, QtCore, QWidget
-pyqtSignal = QtCore.pyqtSignal
-
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QToolButton, QPushButton,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+                      
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 #from pyfda.pyfda_lib import HLine
@@ -63,28 +67,28 @@ class FilterSpecs(QWidget):
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
         # Subwidget for displaying infos on the design method
-        self.lblMsg = QtGui.QLabel(self)
+        self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
-#        self.lblMsg.setFrameShape(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+#        self.lblMsg.setFrameShape(QFrame.StyledPanel|QFrame.Sunken)
 
-        layVMsg = QtGui.QVBoxLayout()
+        layVMsg = QVBoxLayout()
         layVMsg.addWidget(self.lblMsg)
 
-        frmMsg = QtGui.QFrame()
-        frmMsg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        frmMsg = QFrame()
+        frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMsg.setLayout(layVMsg)
-        frmMsg.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                             QtGui.QSizePolicy.Minimum)
+        frmMsg.setSizePolicy(QSizePolicy.Minimum,
+                             QSizePolicy.Minimum)
 
-        self.butDesignFilt = QtGui.QPushButton("DESIGN FILTER", self)
-        self.butQuit = QtGui.QPushButton("Quit", self)
+        self.butDesignFilt = QPushButton("DESIGN FILTER", self)
+        self.butQuit = QPushButton("Quit", self)
 
         #----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
         #----------------------------------------------------------------------
-        spcV = QtGui.QSpacerItem(10, 10, QtGui.QSizePolicy.Minimum,
-                                      QtGui.QSizePolicy.Expanding)
-        layGMain = QtGui.QGridLayout()
+#        spcV = QSpacerItem(10, 10, QSizePolicy.Minimum,
+#                                      QSizePolicy.Expanding)
+        layGMain = QGridLayout()
         layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
         layGMain.addWidget(self.f_units, 2, 0, 1, 2)  # Frequency units
         layGMain.addWidget(self.f_specs, 3, 0, 1, 2)  # Freq. specifications
@@ -94,7 +98,7 @@ class FilterSpecs(QWidget):
         layGMain.addWidget(self.t_specs, 7, 0, 1, 2)  # Target specs
         layGMain.addWidget(self.butDesignFilt, 8, 0)  # <Design Filter> button
         layGMain.addWidget(self.butQuit, 8, 1)        # <Quit> button
-        layGMain.addItem(spcV, 9, 0, 1, 2) # spacer to allow for vert. expansion
+ #       layGMain.addItem(spcV, 9, 0, 1, 2) # spacer to allow for vert. expansion
 #        layGMain.addWidget(HLine(self), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(0, 0, 0, 0)
 #        layGMain.setRowStretch(1,1)
@@ -320,7 +324,8 @@ class FilterSpecs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = FilterSpecs(None)
     app.setActiveWindow(mainw) 
     mainw.show()

@@ -15,8 +15,13 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtGui, QtCore, QWidget, QComboBox
-pyqtSignal = QtCore.pyqtSignal
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QToolButton,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -68,8 +73,8 @@ class SelectFilter(QWidget):
 
         """
 
-        bfont = QtGui.QFont()
-        ifont = QtGui.QFont()
+        bfont = QFont()
+        ifont = QFont()
         bfont.setBold(True)
         bfont.setWeight(75)
         ifont.setItalic(True)
@@ -88,9 +93,9 @@ class SelectFilter(QWidget):
         self.cmbFilterClass.setToolTip("Select the filter design class.")
 
         # Adapt comboboxes size dynamically to largest element
-        self.cmbResponseType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbFilterType.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbFilterClass.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbResponseType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbFilterClass.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         #----------------------------------------------------------------------
         # Populate combo box with initial settings from fb.fil_tree
@@ -131,48 +136,43 @@ class SelectFilter(QWidget):
         # Layout for Filter Type Subwidgets
         #----------------------------------------------------------------------
  
-#        spacer = QtGui.QSpacerItem(1, 0, QtGui.QSizePolicy.Expanding,
-#                                         QtGui.QSizePolicy.Fixed)
-
-        layHFilWdg = QtGui.QHBoxLayout() # container for filter subwidgets
+        layHFilWdg = QHBoxLayout() # container for filter subwidgets
         layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
-#        layHFilWdg.addItem(spacer)
+        layHFilWdg.addStretch()
         layHFilWdg.addWidget(self.cmbFilterType)
-#        layHFilWdg.addItem(spacer)
+        layHFilWdg.addStretch()
         layHFilWdg.addWidget(self.cmbFilterClass)
 
         #----------------------------------------------------------------------
         # Layout for dynamic filter subwidgets (empty frame)
         #----------------------------------------------------------------------
         # see Summerfield p. 278
-        self.layHDynWdg = QtGui.QHBoxLayout() # for additional dynamic subwidgets
-        self.frmDynWdg = QtGui.QFrame() # collect subwidgets in frame (no border)
+        self.layHDynWdg = QHBoxLayout() # for additional dynamic subwidgets
+        self.frmDynWdg = QFrame() # collect subwidgets in frame (no border)
         self.frmDynWdg.setObjectName("wdg_frmDynWdg")
-        self.frmDynWdg.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, 
-                                     QtGui.QSizePolicy.Minimum)
+        self.frmDynWdg.setSizePolicy(QSizePolicy.MinimumExpanding, 
+                                     QSizePolicy.Minimum)
 
         #Debugging: enable next line to show border of frmDnyWdg
-        #self.frmDynWdg.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Raised)
+        #self.frmDynWdg.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
         self.frmDynWdg.setLayout(self.layHDynWdg)
 
         #----------------------------------------------------------------------
         # Filter Order Subwidgets
         #----------------------------------------------------------------------
-        self.lblOrder =  QtGui.QLabel("Order:")
+        self.lblOrder =  QLabel("Order:")
         self.lblOrder.setFont(bfont)
-        self.chkMinOrder = QtGui.QCheckBox("Minimum", self)
-#        spacer1 = QtGui.QSpacerItem(20,0,
-#                        QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
-        self.lblOrderN = QtGui.QLabel("N = ")
+        self.chkMinOrder = QCheckBox("Minimum", self)
+        self.lblOrderN = QLabel("N = ")
         self.lblOrderN.setFont(ifont)
-        self.ledOrderN = QtGui.QLineEdit(str(fb.fil[0]['N']),self)
+        self.ledOrderN = QLineEdit(str(fb.fil[0]['N']),self)
 
         #--------------------------------------------------
         #  Layout for filter order subwidgets
-        layHOrdWdg = QtGui.QHBoxLayout()
+        layHOrdWdg = QHBoxLayout()
         layHOrdWdg.addWidget(self.lblOrder)
         layHOrdWdg.addWidget(self.chkMinOrder)
-#        layHOrdWdg.addItem(spacer1)
+        layHOrdWdg.addStretch()
         layHOrdWdg.addWidget(self.lblOrderN)
         layHOrdWdg.addWidget(self.ledOrderN)
 
@@ -180,23 +180,23 @@ class SelectFilter(QWidget):
         # OVERALL LAYOUT (stack standard + dynamic subwidgets vertically)
         #----------------------------------------------------------------------
 
-        layVAllWdg = QtGui.QVBoxLayout()
+        layVAllWdg = QVBoxLayout()
         layVAllWdg.addLayout(layHFilWdg)
         layVAllWdg.addWidget(self.frmDynWdg)
-        layVAllWdg.addWidget(HLine(QtGui, self))
+        layVAllWdg.addWidget(HLine(QFrame, self))
         layVAllWdg.addLayout(layHOrdWdg)
 
 #==============================================================================
-#         frmMain = QtGui.QFrame()
-#         frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+#         frmMain = QFrame()
+#         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
 #         frmMain.setLayout(layVAllWdg)
 # 
-#         layHMain = QtGui.QHBoxLayout()
+#         layHMain = QHBoxLayout()
 #         layHMain.addWidget(frmMain)
 #         layHMain.setContentsMargins(0, 0, 0, 0)
 # 
 #         self.setLayout(layHMain)
-# #        layHMain.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+# #        layHMain.setSizeConstraint(QLayout.SetFixedSize)
 # 
 #==============================================================================
         self.setLayout(layVAllWdg)
@@ -389,10 +389,10 @@ class SelectFilter(QWidget):
           load filter order setting from fb.fil[0] and update widgets
 
         """                
-        # read list of available filter order [fo] methods for  
-        # current design method [fc] from fil_tree:
-        foList = fb.fil_tree[fb.fil[0]['rt']]\
-            [fb.fil[0]['ft']][fb.fil[0]['fc']].keys()
+        # read dict_keys of available filter order [fo] methods for  
+        # current design method [fc] from fil_tree. Explicit list() needed for py3.
+        foList = list(fb.fil_tree[fb.fil[0]['rt']]\
+            [fb.fil[0]['ft']][fb.fil[0]['fc']].keys())
 
         # is currently selected fo setting available for (new) fc ?
         if fb.fil[0]['fo'] in foList:
@@ -502,7 +502,9 @@ class SelectFilter(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
+    
     mainw = SelectFilter(None)
 
     app.setActiveWindow(mainw) 

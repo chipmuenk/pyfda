@@ -14,6 +14,15 @@ logger = logging.getLogger(__name__)
 from ..compat import QtGui, QtCore, QWidget
 pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
 
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QToolButton, QPushButton, QSpinBox,
+                      QAbstractItemView,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
+
 import numpy as np
 from scipy.signal import freqz
 
@@ -57,37 +66,37 @@ class FilterPZ(QWidget):
                 MaxTextlen = len(item)
                 longestText = item        
 
-        self.chkPZList =  QtGui.QCheckBox()
+        self.chkPZList =  QCheckBox()
         self.chkPZList.setChecked(True)
         self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable list.")
         self.chkPZList.setText("Show Poles / Zeros")
 
-        self.lblRound = QtGui.QLabel("Digits = ")
-        self.spnRound = QtGui.QSpinBox()
+        self.lblRound = QLabel("Digits = ")
+        self.spnRound = QSpinBox()
         self.spnRound.setRange(0,9)
         self.spnRound.setValue(0)
         self.spnRound.setToolTip("Round to d digits.")
 
-        self.lblGain = QtGui.QLabel("k = ")
+        self.lblGain = QLabel("k = ")
         
-        self.chkNorm =  QtGui.QCheckBox()
+        self.chkNorm =  QCheckBox()
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
         self.chkNorm.setText("Normalize")
 
-        self.ledGain = QtGui.QLineEdit()
+        self.ledGain = QLineEdit()
         self.ledGain.setToolTip("Specify gain factor k.")
         self.ledGain.setText(str(1.))
 
-        self.tblPZ = QtGui.QTableWidget()
-        self.tblPZ.setEditTriggers(QtGui.QTableWidget.AllEditTriggers)
+        self.tblPZ = QTableWidget()
+        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers)
         self.tblPZ.setAlternatingRowColors(True)
         self.tblPZ.setDragEnabled(True)
-        self.tblPZ.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
-        self.tblPZ.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                          QtGui.QSizePolicy.Expanding)
+        self.tblPZ.setDragDropMode(QAbstractItemView.InternalMove)
+        self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                          QSizePolicy.Expanding)
 
-        self.butAddRow = QtGui.QPushButton()
+        self.butAddRow = QPushButton()
         self.butAddRow.setToolTip("Add row to PZ table.\n"
                                 "Select n existing rows to append n new rows.")
         self.butAddRow.setText(butTexts[0])
@@ -95,69 +104,69 @@ class FilterPZ(QWidget):
         ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
         self.butAddRow.setMaximumWidth(ButLength)
 
-        self.butDelRow = QtGui.QPushButton()
+        self.butDelRow = QPushButton()
         self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
                 "Multiple rows can be selected using <SHIFT> or <CTRL>."
                 "If nothing is selected, delete last row.")
         self.butDelRow.setText(butTexts[1])
         self.butDelRow.setMaximumWidth(ButLength)
 
-        self.butClear = QtGui.QPushButton()
+        self.butClear = QPushButton()
         self.butClear.setToolTip("Clear all entries.")
         self.butClear.setText(butTexts[4])
         self.butClear.setMaximumWidth(ButLength)              
 
-        self.butSave = QtGui.QPushButton()
+        self.butSave = QPushButton()
         self.butSave.setToolTip("Save P/Z & update all plots.\n"
                                 "No modifications are saved before!")
         self.butSave.setText(butTexts[2])
         self.butSave.setMaximumWidth(ButLength)
 
-        self.butLoad = QtGui.QPushButton()
+        self.butLoad = QPushButton()
         self.butLoad.setToolTip("Reload P / Z.")
         self.butLoad.setText(butTexts[3])
         self.butLoad.setMaximumWidth(ButLength)              
 
-        self.butSetZero = QtGui.QPushButton()
+        self.butSetZero = QPushButton()
         self.butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
         self.butSetZero.setText(butTexts[5])
         self.butSetZero.setMaximumWidth(ButLength)              
 
-        self.lblEps = QtGui.QLabel("for P, Z <")
+        self.lblEps = QLabel("for P, Z <")
 
-        self.ledSetEps = QtGui.QLineEdit()
+        self.ledSetEps = QLineEdit()
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
 
         # ============== UI Layout =====================================
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkPZList)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblRound)
         self.layHChkBoxes.addWidget(self.spnRound)
 
-        self.layHGain = QtGui.QHBoxLayout()
+        self.layHGain = QHBoxLayout()
         self.layHGain.addWidget(self.lblGain)
         self.layHGain.addWidget(self.ledGain)
         self.layHChkBoxes.addStretch(1)
         self.layHGain.addWidget(self.chkNorm)
         self.layHGain.addStretch()
 
-        self.layHButtonsPZs1 = QtGui.QHBoxLayout()
+        self.layHButtonsPZs1 = QHBoxLayout()
         self.layHButtonsPZs1.addWidget(self.butAddRow)
         self.layHButtonsPZs1.addWidget(self.butDelRow)
         self.layHButtonsPZs1.addWidget(self.butSave)
         self.layHButtonsPZs1.addWidget(self.butLoad)
         self.layHButtonsPZs1.addStretch()
 
-        self.layHButtonsPZs2 = QtGui.QHBoxLayout()
+        self.layHButtonsPZs2 = QHBoxLayout()
         self.layHButtonsPZs2.addWidget(self.butClear)
         self.layHButtonsPZs2.addWidget(self.butSetZero)
         self.layHButtonsPZs2.addWidget(self.lblEps)
         self.layHButtonsPZs2.addWidget(self.ledSetEps)
         self.layHButtonsPZs2.addStretch()
 
-        layVMain = QtGui.QVBoxLayout()
+        layVMain = QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
         layVMain.addLayout(self.layHGain)
         layVMain.addLayout(self.layHButtonsPZs1)
@@ -235,7 +244,7 @@ class FilterPZ(QWidget):
                 if item: # does item exist?
                     item.setText(str(cround(zpk[col][row], n_digits)).strip('()'))
                 else: # no construct it
-                    self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem(
+                    self.tblPZ.setItem(row,col,QTableWidgetItem(
                           str(cround(zpk[col][row], n_digits)).strip('()')))
 
         self.tblPZ.resizeColumnsToContents()
@@ -312,7 +321,7 @@ class FilterPZ(QWidget):
         num_cols = self.tblPZ.columnCount()
         for row in range(2):
             for col in range(num_cols):
-                self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
 
 
 #------------------------------------------------------------------------------
@@ -356,7 +365,7 @@ class FilterPZ(QWidget):
 
         for col in range(2):
             for row in range(old_rows, new_rows):
-                self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
 
         self.tblPZ.resizeColumnsToContents()
         self.tblPZ.resizeRowsToContents()
@@ -377,13 +386,14 @@ class FilterPZ(QWidget):
                     if abs(simple_eval(item.text())) < eps:
                         item.setText(str(0.))
                 else:
-                    self.tblPZ.setItem(row,col,QtGui.QTableWidgetItem("0.0"))
+                    self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = FilterPZ(None)
 
     app.setActiveWindow(mainw) 
