@@ -6,8 +6,8 @@ Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QtGui, QtCore, QWidget, QTabWidget
-pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
+from ..compat import QTabWidget,QVBoxLayout
+
 
 from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
@@ -30,7 +30,7 @@ class PlotTabWidgets(QTabWidget):
 #------------------------------------------------------------------------------
     def _init_UI(self):
         """ Initialize UI with tabbed subplots """
-        tabWidget = QtGui.QTabWidget()
+        tabWidget = QTabWidget()
         tabWidget.setObjectName("plot_tabs")
         tabWidget.addTab(self.pltHf, '|H(f)|')
         tabWidget.addTab(self.pltPhi, 'phi(f)')
@@ -39,7 +39,7 @@ class PlotTabWidgets(QTabWidget):
         tabWidget.addTab(self.pltImpz, 'h[n]')
         tabWidget.addTab(self.plt3D, '3D')
 
-        layVMain = QtGui.QVBoxLayout()
+        layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
         layVMain.setContentsMargins(1,1,1,1)#(left, top, right, bottom)
 #
@@ -71,7 +71,9 @@ class PlotTabWidgets(QTabWidget):
 def main():
     import sys
     from pyfda import pyfda_rc as rc
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    
+    app = QApplication(sys.argv)
     app.setStyleSheet(rc.css_rc)
 
     mainw = PlotTabWidgets(None)
