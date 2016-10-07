@@ -62,8 +62,8 @@ class File_IO(QWidget):
     Create the widget for entering exporting / importing / saving / loading data
     """
     
-    sigFilterLoaded = pyqtSignal() # emitted when filter has been loaded successfully
-    sigReadFilters = pyqtSignal()  # emitted when button "Read Filters" is pressed
+    sigFilterLoaded = QtCore.pyqtSignal() # emitted when filter has been loaded successfully
+    sigReadFilters = QtCore.pyqtSignal()  # emitted when button "Read Filters" is pressed
 
     def __init__(self, parent):
         super(File_IO, self).__init__(parent)

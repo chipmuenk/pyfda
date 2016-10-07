@@ -26,8 +26,8 @@ class AmplitudeSpecs(QWidget):
     specifications like A_SB, A_PB etc.
     """
 
-    sigUnitChanged = pyqtSignal() # emitted when amplitude unit has been changed
-    sigSpecsChanged = pyqtSignal()
+    sigUnitChanged = QtCore.pyqtSignal() # emitted when amplitude unit has been changed
+    sigSpecsChanged = QtCore.pyqtSignal()
 
     def __init__(self, parent, title = "Amplitude Specs"):
         """
