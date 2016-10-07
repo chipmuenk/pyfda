@@ -28,7 +28,7 @@ Created on Mon Apr 30 10:29:42 2012
 from __future__ import division, print_function
 import os, sys
 import numpy as np
-from numpy import pi, asarray, log10, arctan
+from numpy import pi, log10, arctan
 
 # Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
 # that default to pyQT5 (but have pyQt4 installed as well)
@@ -1228,15 +1228,15 @@ def rt_label(label):
     return html_label
 
 #------------------------------------------------------------------------------
-def HLine(Gui, widget):
+def HLine(QFrame, widget):
     # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
     # solution 
     """
     Create a horizontal line
     """
-    line = Gui.QFrame(widget)
-    line.setFrameShape(Gui.QFrame.HLine)
-    line.setFrameShadow(Gui.QFrame.Sunken)
+    line = QFrame(widget)
+    line.setFrameShape(QFrame.HLine)
+    line.setFrameShadow(QFrame.Sunken)
     return line
 
 
