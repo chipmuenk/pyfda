@@ -11,8 +11,14 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import Qt, QtGui#, QtWebKit
-from docutils.core import publish_string #, publish_parts
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QCheckBox,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
+
+from docutils.core import publish_string 
 
 import numpy as np
 from numpy import pi, log10
@@ -23,7 +29,7 @@ import pyfda.filter_factory as ff # importing filterbroker initializes all its g
 from pyfda.pyfda_lib import lin2unit
 # TODO: Passband and stopband info should show min / max values for each band
 
-class FilterInfo(QtGui.QWidget):
+class FilterInfo(QWidget):
     """
     Create widget for displaying infos about filter and filter design method
     """
@@ -40,16 +46,16 @@ class FilterInfo(QtGui.QWidget):
         - A large text window for displaying infos about the filter design
           algorithm
         """
-        self.chkFiltPerf = QtGui.QCheckBox("H(f)")
+        self.chkFiltPerf = QCheckBox("H(f)")
         self.chkFiltPerf.setChecked(True)
         self.chkFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.txtFiltPerf = QtGui.QTextBrowser()
-        self.txtFiltDict = QtGui.QTextBrowser()
+        self.txtFiltPerf = QTextBrowser()
+        self.txtFiltDict = QTextBrowser()
 
-        bfont = QtGui.QFont()
+        bfont = QFont()
         bfont.setBold(True)
-        self.tblFiltPerf = QtGui.QTableWidget()
+        self.tblFiltPerf = QTableWidget()
         self.tblFiltPerf.setColumnCount(4)
         self.tblFiltPerf.setAlternatingRowColors(True)
 #        self.tblFiltPerf.verticalHeader().setVisible(False)
@@ -60,44 +66,44 @@ class FilterInfo(QtGui.QWidget):
         
 #        self.tblCoeff.QItemSelectionModel.Clear
 #        self.tblCoeff.setDragEnabled(True)
-#        self.tblCoeff.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
-        self.tblFiltPerf.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                          QtGui.QSizePolicy.MinimumExpanding)
+#        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
+        self.tblFiltPerf.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                          QSizePolicy.MinimumExpanding)
 
-#        self.tblFiltPerf = QtGui.QTextTable(self.txtFiltPerf)
+#        self.tblFiltPerf = QTextTable(self.txtFiltPerf)
 #        QTextBrowser()
-#        self.txtFiltPerf.setSizePolicy(QtGui.QSizePolicy.Minimum,
-#                                          QtGui.QSizePolicy.Expanding)
+#        self.txtFiltPerf.setSizePolicy(QSizePolicy.Minimum,
+#                                          QSizePolicy.Expanding)
         # widget / subwindow for filter infos
-        self.chkDocstring = QtGui.QCheckBox("Doc$")
+        self.chkDocstring = QCheckBox("Doc$")
         self.chkDocstring.setChecked(False)
         self.chkDocstring.setToolTip("Display docstring from python filter method.")
 
-        self.chkRichText = QtGui.QCheckBox("RTF")
+        self.chkRichText = QCheckBox("RTF")
         self.chkRichText.setChecked(True)
         self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.txtFiltInfoBox = QtGui.QTextBrowser()
-        self.txtFiltInfoBox.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding,
-                                          QtGui.QSizePolicy.Expanding)
+        self.txtFiltInfoBox = QTextBrowser()
+        self.txtFiltInfoBox.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                          QSizePolicy.Expanding)
                                           
-        self.chkFiltDict = QtGui.QCheckBox("FiltDict")
+        self.chkFiltDict = QCheckBox("FiltDict")
         self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")
 
-        self.txtFiltDict = QtGui.QTextBrowser()
-        self.txtFiltDict.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                          QtGui.QSizePolicy.Expanding)
+        self.txtFiltDict = QTextBrowser()
+        self.txtFiltDict.setSizePolicy(QSizePolicy.Minimum,
+                                          QSizePolicy.Expanding)
 
-        self.chkFiltTree = QtGui.QCheckBox("FiltTree")
+        self.chkFiltTree = QCheckBox("FiltTree")
         self.chkFiltTree.setToolTip("Show filter tree for debugging.")
 
-        self.txtFiltTree = QtGui.QTextBrowser()
-        self.txtFiltTree.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                          QtGui.QSizePolicy.Expanding)
+        self.txtFiltTree = QTextBrowser()
+        self.txtFiltTree.setSizePolicy(QSizePolicy.Minimum,
+                                          QSizePolicy.Expanding)
 
 
         # ============== UI Layout =====================================
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkFiltPerf)
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkDocstring)
@@ -108,7 +114,7 @@ class FilterInfo(QtGui.QWidget):
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.chkFiltTree)
 
-        layVMain = QtGui.QVBoxLayout()
+        layVMain = QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
         layVMain.addWidget(self.tblFiltPerf)
         layVMain.addWidget(self.txtFiltInfoBox)
@@ -162,7 +168,7 @@ class FilterInfo(QtGui.QWidget):
                     self.txtFiltInfoBox.append(self.cleanDoc(doc))
 
 #        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect
-        self.txtFiltInfoBox.moveCursor(QtGui.QTextCursor.Start)
+        self.txtFiltInfoBox.moveCursor(QTextCursor.Start)
 
     def _clean_doc(self, doc):
         """
@@ -280,14 +286,14 @@ class FilterInfo(QtGui.QWidget):
         'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'|H(f)|','|H(f)| (dB)', 'Spec'] )
         self.tblFiltPerf.setVerticalHeaderLabels(F_test_lbls)
         for row in range(len(H_test)):
-#            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(F_test_lbls[row]))
-            self.tblFiltPerf.setItem(row,0,QtGui.QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]*f_S))))
-            self.tblFiltPerf.setItem(row,1,QtGui.QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
-            self.tblFiltPerf.setItem(row,2,QtGui.QTableWidgetItem(str('%2.3f'%(H_test_dB[row]))))
+#            self.tblFiltPerf.setItem(row,0,QTableWidgetItem(F_test_lbls[row]))
+            self.tblFiltPerf.setItem(row,0,QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]*f_S))))
+            self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
+            self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3f'%(H_test_dB[row]))))
             if not H_targ_pass[row]:
-                self.tblFiltPerf.item(row,1).setBackgroundColor(Qt.QColor('red'))
-                self.tblFiltPerf.item(row,2).setBackgroundColor(Qt.QColor('red'))
-            self.tblFiltPerf.setItem(row,3,QtGui.QTableWidgetItem(str('%2.3f'%(H_targ[row]))))
+                self.tblFiltPerf.item(row,1).setBackground(QtGui.QColor('red'))
+                self.tblFiltPerf.item(row,2).setBackground(QtGui.QColor('red'))
+            self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%2.3f'%(H_targ[row]))))
 
 
     #    self.tblFiltPerf.item(1,1).setBackgroundColor(Qt.QColor('red'))
@@ -321,7 +327,7 @@ class FilterInfo(QtGui.QWidget):
         self.txtFiltTree.setText(dictstr)
         
         
-#app = QtGui.QApplication([])
+#app = QApplication([])
 #view = QtWebKit.QWebView()
 #
 #class MyWebPage(QtWebKit.QWebPage):
@@ -351,7 +357,8 @@ class FilterInfo(QtGui.QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = FilterInfo(None)
 
     app.setActiveWindow(mainw) 

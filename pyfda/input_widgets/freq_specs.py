@@ -9,15 +9,19 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import pyqtSignal, QEvent
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QCheckBox,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label
-from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
+from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
-class FreqSpecs(QtGui.QWidget):
+
+class FreqSpecs(QWidget):
     """
     Build and update widget for entering the frequency
     specifications like F_sb, F_pb etc.
@@ -45,12 +49,12 @@ class FreqSpecs(QtGui.QWidget):
         """
         Construct the User Interface
         """
-        self.layVMain = QtGui.QVBoxLayout() # Widget main layout
+        self.layVMain = QVBoxLayout() # Widget main layout
 
-        bfont = QtGui.QFont()
+        bfont = QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        self.lblTitle = QtGui.QLabel(self) # field for widget title
+        self.lblTitle = QLabel(self) # field for widget title
         self.lblTitle.setText(str(self.title))
         self.lblTitle.setFont(bfont)
         self.lblTitle.setWordWrap(True)
@@ -58,10 +62,10 @@ class FreqSpecs(QtGui.QWidget):
         
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
-        self.layGSpecs = QtGui.QGridLayout() # sublayout for spec fields        
+        self.layGSpecs = QGridLayout() # sublayout for spec fields        
 
-        sfFrame = QtGui.QFrame()
-        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        sfFrame = QFrame()
+        sfFrame.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         sfFrame.setLayout(self.layGSpecs)
 
         self.layVMain.addWidget(sfFrame)
@@ -95,7 +99,7 @@ class FreqSpecs(QtGui.QWidget):
           current value normalized to f_S with full precision (only if
           `spec_edited`== True) and display the stored value in selected format
         """
-        if isinstance(source, QtGui.QLineEdit): # could be extended for other widgets
+        if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_entries()
@@ -223,10 +227,10 @@ class FreqSpecs(QtGui.QWidget):
 
         if num_tot_labels < num_new_labels: # new widgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
-                self.qlabels.append(QtGui.QLabel(self))
+                self.qlabels.append(QLabel(self))
                 self.qlabels[i].setText(rt_label("dummy"))
     
-                self.qlineedit.append(QtGui.QLineEdit(""))
+                self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
     
@@ -267,7 +271,8 @@ class FreqSpecs(QtGui.QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = FreqSpecs(None)
 
     mainw.update_UI(new_labels = ['F_SB','F_SB2','F_PB','F_PB2'])

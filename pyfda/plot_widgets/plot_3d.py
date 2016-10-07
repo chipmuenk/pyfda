@@ -6,7 +6,10 @@ Edited by Christian Münker, 2013
 from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
-from PyQt4 import QtGui #, QtCore
+
+from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QDial,
+                      QGridLayout, QSizePolicy)
+
 import numpy as np
 from numpy import pi, ones, zeros, sin, cos, log10
 import scipy.signal as sig
@@ -34,7 +37,7 @@ except ImportError:
 
 
 
-class Plot3D(QtGui.QWidget):
+class Plot3D(QWidget):
     """
     Class for various 3D-plots:
     - lin / log line plot of H(f)
@@ -51,81 +54,81 @@ class Plot3D(QtGui.QWidget):
         self._init_UI()
 
     def _init_UI(self):
-        self.chkLog = QtGui.QCheckBox(self)
+        self.chkLog = QCheckBox(self)
         self.chkLog.setText("Log.")
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("Logarithmic scale")
         self.chkLog.setChecked(False)
 
-        self.chkPolar = QtGui.QCheckBox(self)
+        self.chkPolar = QCheckBox(self)
         self.chkPolar.setText("Polar")
         self.chkPolar.setObjectName("chkPolar")
         self.chkPolar.setToolTip("Polar coordinates")
         self.chkPolar.setChecked(False)
 
 
-        self.lblBottom = QtGui.QLabel("Bottom =")
-        self.ledBottom = QtGui.QLineEdit(self)
+        self.lblBottom = QLabel("Bottom =")
+        self.ledBottom = QLineEdit(self)
         self.ledBottom.setObjectName("ledBottom")
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setToolTip("Minimum display value.")
 
-        self.lblTop = QtGui.QLabel("Top:")
-        self.ledTop = QtGui.QLineEdit(self)
+        self.lblTop = QLabel("Top:")
+        self.ledTop = QLineEdit(self)
         self.ledTop.setObjectName("ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
-#        self.ledTop.setSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Maximum)
+#        self.ledTop.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
 
-        self.chkUC = QtGui.QCheckBox(self)
+        self.chkUC = QCheckBox(self)
         self.chkUC.setText("UC")
         self.chkUC.setObjectName("chkUC")
         self.chkUC.setToolTip("Plot unit circle")
         self.chkUC.setChecked(True)
 
-        self.chkPZ = QtGui.QCheckBox(self)
+        self.chkPZ = QCheckBox(self)
         self.chkPZ.setText("P/Z")
         self.chkPZ.setObjectName("chkPZ")
         self.chkPZ.setToolTip("Plot poles and zeros")
         self.chkPZ.setChecked(True)
 
-        self.chkHf = QtGui.QCheckBox(self)
+        self.chkHf = QCheckBox(self)
         self.chkHf.setText("H(f)")
         self.chkHf.setObjectName("chkHf")
         self.chkHf.setToolTip("Plot H(f) along the unit circle")
         self.chkHf.setChecked(True)
 
         modes = ['None', 'Mesh', 'Surf', 'Contour']
-        self.cmbMode3D = QtGui.QComboBox(self)
+        self.cmbMode3D = QComboBox(self)
         self.cmbMode3D.addItems(modes)
         self.cmbMode3D.setObjectName("cmbShow3D")
         self.cmbMode3D.setToolTip("Select 3D-plot mode.")
         self.cmbMode3D.setCurrentIndex(0)
-        self.cmbMode3D.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbMode3D.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkColormap_r = QtGui.QCheckBox(self)
+        self.chkColormap_r = QCheckBox(self)
         self.chkColormap_r.setText("reverse")
         self.chkColormap_r.setToolTip("reverse colormap")
         self.chkColormap_r.setChecked(True)
 
-        self.cmbColormap = QtGui.QComboBox(self)
+        self.cmbColormap = QComboBox(self)
         self._init_cmb_colormap()
         self.cmbColormap.setToolTip("Select colormap")
 
-        self.chkColBar = QtGui.QCheckBox(self)
+        self.chkColBar = QCheckBox(self)
         self.chkColBar.setText("Colorbar")
         self.chkColBar.setObjectName("chkColBar")
         self.chkColBar.setToolTip("Show colorbar")
         self.chkColBar.setChecked(False)
 
-        self.chkLighting = QtGui.QCheckBox(self)
+        self.chkLighting = QCheckBox(self)
         self.chkLighting.setText("Lighting")
         self.chkLighting.setObjectName("chkLighting")
         self.chkLighting.setToolTip("Enable light source")
         self.chkLighting.setChecked(False)
 
-        self.lblAlpha = QtGui.QLabel("Alpha")
-        self.diaAlpha = QtGui.QDial(self)
+        self.lblAlpha = QLabel("Alpha")
+        self.diaAlpha = QDial(self)
         self.diaAlpha.setRange(0., 10.)
         self.diaAlpha.setValue(10)
         self.diaAlpha.setTracking(False) # produce less events when turning
@@ -134,8 +137,8 @@ class Plot3D(QtGui.QWidget):
         self.diaAlpha.setWrapping(False)
         self.diaAlpha.setToolTip("Set transparency for surf and 3D-contour plot.")
 
-        self.lblHatch = QtGui.QLabel("Stride")
-        self.diaHatch = QtGui.QDial(self)
+        self.lblHatch = QLabel("Stride")
+        self.diaHatch = QDial(self)
         self.diaHatch.setRange(0., 9.)
         self.diaHatch.setValue(5)
         self.diaHatch.setTracking(False) # produce less events when turning
@@ -144,7 +147,7 @@ class Plot3D(QtGui.QWidget):
         self.diaHatch.setWrapping(False)
         self.diaHatch.setToolTip("Set hatching for H(jw).")
 
-        self.chkContour2D = QtGui.QCheckBox(self)
+        self.chkContour2D = QCheckBox(self)
         self.chkContour2D.setText("Contour2D")
         self.chkContour2D.setObjectName("chkContour2D")
         self.chkContour2D.setToolTip("Plot 2D-contours at z =0")
@@ -153,9 +156,8 @@ class Plot3D(QtGui.QWidget):
         #----------------------------------------------------------------------
         # LAYOUT for UI widgets
         #----------------------------------------------------------------------
-        spc = QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Expanding,
-                                       QtGui.QSizePolicy.Minimum)
-        self.layGSelect = QtGui.QGridLayout()
+
+        self.layGSelect = QGridLayout()
         self.layGSelect.setObjectName('plotSpecSelect')
         self.layGSelect.addWidget(self.chkLog, 0, 0)
         self.layGSelect.addWidget(self.chkPolar, 1, 0)
@@ -163,7 +165,7 @@ class Plot3D(QtGui.QWidget):
         self.layGSelect.addWidget(self.lblBottom, 1, 2)
         self.layGSelect.addWidget(self.ledTop, 0, 4)
         self.layGSelect.addWidget(self.ledBottom, 1, 4)
-        self.layGSelect.addItem(spc, 0,5)
+        self.layGSelect.setColumnStretch(5,1)
 
         self.layGSelect.addWidget(self.chkUC, 0, 6)
         self.layGSelect.addWidget(self.chkHf, 1, 6)
@@ -590,7 +592,8 @@ class Plot3D(QtGui.QWidget):
 
 def main():
     import sys
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     mainw = Plot3D(None)
     app.setActiveWindow(mainw) 
     mainw.show()

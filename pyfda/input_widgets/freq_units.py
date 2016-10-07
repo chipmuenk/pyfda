@@ -9,8 +9,13 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import pyqtSignal, QEvent
+from ..compat import (QtCore, QtGui,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QToolButton,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label
@@ -18,7 +23,7 @@ from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g
 from pyfda.simpleeval import simple_eval
 
 
-class FreqUnits(QtGui.QWidget):
+class FreqUnits(QWidget):
     """
     Build and update widget for entering the frequency units
     """
@@ -40,28 +45,28 @@ class FreqUnits(QtGui.QWidget):
         """
         Construct the User Interface
         """
-        self.layVMain = QtGui.QVBoxLayout() # Widget main layout
+        self.layVMain = QVBoxLayout() # Widget main layout
 
         f_units = ['f_S', 'f_Ny', 'Hz', 'kHz', 'MHz', 'GHz']
         self.t_units = ['', '', 's', 'ms', r'$\mu$s', 'ns']
 
-        bfont = QtGui.QFont()
+        bfont = QFont()
         bfont.setBold(True)
 
-        self.lblUnits=QtGui.QLabel(self)
+        self.lblUnits=QLabel(self)
         self.lblUnits.setText("Freq. Unit:")
         self.lblUnits.setFont(bfont)
 
         self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
-        self.ledF_S = QtGui.QLineEdit()
+        self.ledF_S = QLineEdit()
         self.ledF_S.setText(str(fb.fil[0]["f_S"]))
         self.ledF_S.setObjectName("f_S")
         self.ledF_S.installEventFilter(self)  # filter events
 
-        self.lblF_S = QtGui.QLabel(self)
+        self.lblF_S = QLabel(self)
         self.lblF_S.setText(rt_label("f_S"))
 
-        self.cmbUnits = QtGui.QComboBox(self)
+        self.cmbUnits = QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")
         self.cmbUnits.addItems(f_units)
         self.cmbUnits.setToolTip(
@@ -69,11 +74,11 @@ class FreqUnits(QtGui.QWidget):
         "the sampling frequency f_S, to the Nyquist frequency \n"
         "f_Ny = f_S/2 or as absolute values.")
         self.cmbUnits.setCurrentIndex(0)
-#        self.cmbUnits.setItemData(0, (0,QtGui.QColor("#FF333D"),Qt.BackgroundColorRole))#
-#        self.cmbUnits.setItemData(0, (QtGui.QFont('Verdana', bold=True), Qt.FontRole)
+#        self.cmbUnits.setItemData(0, (0,QColor("#FF333D"),Qt.BackgroundColorRole))#
+#        self.cmbUnits.setItemData(0, (QFont('Verdana', bold=True), Qt.FontRole)
 
         fRanges = [("0...½", "half"), ("0...1","whole"), ("-½...½", "sym")]
-        self.cmbFRange = QtGui.QComboBox(self)
+        self.cmbFRange = QComboBox(self)
         self.cmbFRange.setObjectName("cmbFRange")
         for f in fRanges:
             self.cmbFRange.addItem(f[0],f[1])
@@ -81,31 +86,31 @@ class FreqUnits(QtGui.QWidget):
         self.cmbFRange.setCurrentIndex(0)
 
         # Combobox resizes with longest entry
-        self.cmbUnits.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbFRange.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbUnits.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbFRange.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.butSort = QtGui.QToolButton(self)
+        self.butSort = QToolButton(self)
         self.butSort.setText("Sort")
         self.butSort.setCheckable(True)
         self.butSort.setChecked(True)
         self.butSort.setToolTip("Sort frequencies in ascending order when pushed.")
         self.butSort.setStyleSheet("QToolButton:checked {font-weight:bold}")
 
-        self.layHUnits = QtGui.QHBoxLayout()
+        self.layHUnits = QHBoxLayout()
         self.layHUnits.addWidget(self.cmbUnits)
         self.layHUnits.addWidget(self.cmbFRange)
         self.layHUnits.addWidget(self.butSort)
 
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for setting f_S, the units and the actual frequency specs:
-        self.layGSpecWdg = QtGui.QGridLayout() # sublayout for spec fields
+        self.layGSpecWdg = QGridLayout() # sublayout for spec fields
         self.layGSpecWdg.addWidget(self.lblF_S,1,0)
         self.layGSpecWdg.addWidget(self.ledF_S,1,1)
         self.layGSpecWdg.addWidget(self.lblUnits,0,0)
         self.layGSpecWdg.addLayout(self.layHUnits,0,1)
 
-        sfFrame = QtGui.QFrame()
-        sfFrame.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
+        sfFrame = QFrame()
+        sfFrame.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         sfFrame.setLayout(self.layGSpecWdg)
 
         self.layVMain.addWidget(sfFrame)
@@ -285,8 +290,9 @@ class FreqUnits(QtGui.QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
-    form = InputFreqUnits(None) #)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
+    form = FreqUnits(None)
 
     form.update_UI()
 #    form.updateUI(newLabels = ['F_PB','F_PB2'])

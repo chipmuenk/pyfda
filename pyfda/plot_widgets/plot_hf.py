@@ -6,7 +6,8 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from PyQt4 import QtGui
+from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout
+
 import numpy as np
 import scipy.signal as sig
 from matplotlib.patches import Rectangle
@@ -17,7 +18,7 @@ import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 from pyfda.plot_widgets.plot_utils import MplWidget
 
-class PlotHf(QtGui.QWidget):
+class PlotHf(QWidget):
 
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
@@ -28,51 +29,51 @@ class PlotHf(QtGui.QWidget):
         super(PlotHf, self).__init__(parent)
 
         modes = ['| H |', 're{H}', 'im{H}']
-        self.cmbShowH = QtGui.QComboBox(self)
+        self.cmbShowH = QComboBox(self)
         self.cmbShowH.addItems(modes)
         self.cmbShowH.setObjectName("cmbUnitsH")
         self.cmbShowH.setToolTip("Show magnitude, real / imag. part of H or H \n"
         "without linear phase (acausal system).")
         self.cmbShowH.setCurrentIndex(0)
 
-        self.lblIn = QtGui.QLabel("in")
+        self.lblIn = QLabel("in")
 
         units = ['dB', 'V', 'W', 'Auto']
-        self.cmbUnitsA = QtGui.QComboBox(self)
+        self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(units)
         self.cmbUnitsA.setObjectName("cmbUnitsA")
         self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
         self.cmbUnitsA.setCurrentIndex(0)
 
-        self.cmbShowH.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbUnitsA.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lblLinphase = QtGui.QLabel("Acausal system")
-        self.chkLinphase = QtGui.QCheckBox()
+        self.lblLinphase = QLabel("Acausal system")
+        self.chkLinphase = QCheckBox()
         self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
            "Attention: this makes no sense for a non-linear phase system!")
 
-        self.lblInset = QtGui.QLabel("Inset")
+        self.lblInset = QLabel("Inset")
 
-        self.cmbInset = QtGui.QComboBox(self)
+        self.cmbInset = QComboBox(self)
         self.cmbInset.addItems(['off', 'edit', 'fixed'])
         self.cmbInset.setObjectName("cmbInset")
         self.cmbInset.setToolTip("Display/edit second inset plot")
         self.cmbInset.setCurrentIndex(0)
         self.inset_idx = 0 # store previous index for comparison
 
-        self.lblSpecs = QtGui.QLabel("Show Specs")
-        self.chkSpecs = QtGui.QCheckBox()
+        self.lblSpecs = QLabel("Show Specs")
+        self.chkSpecs = QCheckBox()
         self.chkSpecs.setChecked(False)
         self.chkSpecs.setToolTip("Display filter specs as hatched regions")
 
-        self.lblPhase = QtGui.QLabel("Phase")
-        self.chkPhase = QtGui.QCheckBox()
+        self.lblPhase = QLabel("Phase")
+        self.chkPhase = QCheckBox()
         self.chkPhase.setToolTip("Overlay phase")
 
 
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.cmbShowH)
         self.layHChkBoxes.addWidget(self.lblIn)
@@ -530,7 +531,9 @@ class PlotHf(QtGui.QWidget):
 
 def main():
     import sys
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    
+    app = QApplication(sys.argv)
     mainw = PlotHf(None)
     app.setActiveWindow(mainw) 
     mainw.show()

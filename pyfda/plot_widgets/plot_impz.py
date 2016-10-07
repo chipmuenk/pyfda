@@ -8,8 +8,9 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import QEvent, Qt
+from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QEvent,
+                      Qt, QHBoxLayout)
+
 import numpy as np
 import scipy.signal as sig
 
@@ -21,7 +22,7 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
-class PlotImpz(QtGui.QWidget):
+class PlotImpz(QWidget):
 
     def __init__(self, parent):
         super(PlotImpz, self).__init__(parent)
@@ -31,45 +32,45 @@ class PlotImpz(QtGui.QWidget):
         self._init_UI()
 
     def _init_UI(self):
-        self.lblLog = QtGui.QLabel(self)
+        self.lblLog = QLabel(self)
         self.lblLog.setText("Log:")
-        self.chkLog = QtGui.QCheckBox(self)
+        self.chkLog = QCheckBox(self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("Show logarithmic impulse / step response.")
         self.chkLog.setChecked(False)
 
-        self.lblLogBottom = QtGui.QLabel("Bottom = ")
-        self.ledLogBottom = QtGui.QLineEdit(self)
+        self.lblLogBottom = QLabel("Bottom = ")
+        self.ledLogBottom = QLineEdit(self)
         self.ledLogBottom.setText("-80")
         self.ledLogBottom.setToolTip("Minimum display value for log. scale.")
-        self.lbldB = QtGui.QLabel("dB")
+        self.lbldB = QLabel("dB")
         
-        self.lblPltStim = QtGui.QLabel(self)
+        self.lblPltStim = QLabel(self)
         self.lblPltStim.setText("Stimulus:  Show")
-        self.chkPltStim = QtGui.QCheckBox(self)
+        self.chkPltStim = QCheckBox(self)
         self.chkPltStim.setChecked(False)
         
-        self.lblStimulus = QtGui.QLabel("Type = ")
-        self.cmbStimulus = QtGui.QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","Sine", "Rect", "Saw"])
+        self.lblStimulus = QLabel("Type = ")
+        self.cmbStimulus = QComboBox(self)
+        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         
-        self.lblFreq = QtGui.QLabel("<i>f</i>&nbsp; =")
+        self.lblFreq = QLabel("<i>f</i>&nbsp; =")
 
-        self.ledFreq = QtGui.QLineEdit(self)
+        self.ledFreq = QLineEdit(self)
         self.ledFreq.setText(str(self.stim_freq))
         self.ledFreq.setToolTip("Stimulus frequency.")
         
-        self.lblFreqUnit = QtGui.QLabel("f_S")
+        self.lblFreqUnit = QLabel("f_S")
 
-        self.lblNPoints = QtGui.QLabel("<i>N</i>&nbsp; =")
+        self.lblNPoints = QLabel("<i>N</i>&nbsp; =")
 
-        self.ledNPoints = QtGui.QLineEdit(self)
+        self.ledNPoints = QLineEdit(self)
         self.ledNPoints.setText("0")
         self.ledNPoints.setToolTip("Number of points to calculate and display.\n"
                                    "N = 0 chooses automatically.")
 
-        self.layHChkBoxes = QtGui.QHBoxLayout()
+        self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         
         self.layHChkBoxes.addWidget(self.lblNPoints)
@@ -138,7 +139,7 @@ class PlotImpz(QtGui.QWidget):
                 self.spec_edited = False # reset flag
                 self.draw()
                 
-        if isinstance(source, QtGui.QLineEdit): # could be extended for other widgets
+        if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_entry()
@@ -244,6 +245,7 @@ class PlotImpz(QtGui.QWidget):
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
+        sos = np.asarray(fb.fil[0]['sos'])
 
         self.f_S  = fb.fil[0]['f_S']
         
@@ -260,6 +262,11 @@ class PlotImpz(QtGui.QWidget):
             x = np.ones(N) # create step function
             title_str = r'Step Response'
             H_str = r'$h_{\epsilon}[n]$'
+        elif stim == "StepErr":
+            x = np.ones(N) # create step function
+            title_str = r'Settling Error'
+            H_str = r'$H(0) - h_{\epsilon}[n]$'
+            
         elif stim in {"Sine", "Rect"}:
             x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
             if stim == "Sine":
@@ -275,7 +282,16 @@ class PlotImpz(QtGui.QWidget):
             H_str = r'$h_{saw}[n]$'
 
             
-        h = sig.lfilter(self.bb, self.aa, x)
+        if not np.any(sos): # no second order sections for current filter          
+            h = sig.lfilter(self.bb, self.aa, x)
+            dc = sig.freqz(self.bb, self.aa, [0])
+        else:
+#            print(sos)
+            h = sig.sosfilt(sos, x)
+            dc = sig.freqz(self.bb, self.aa, [0])
+        
+        if stim == "StepErr":
+            h = h - abs(dc[1]) # subtract DC value from response
 
 
         self.cmplx = np.any(np.iscomplex(h))
@@ -300,8 +316,9 @@ class PlotImpz(QtGui.QWidget):
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='bo', linefmt='r')
         if self.chkPltStim.isChecked():
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='k')
-            [stem.set_linewidth(0.5) for stem in ss]
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='0.5')
+            for stem in ss:
+                stem.set_linewidth(0.5)
             bs.set_visible(False) # invisible bottomline
         expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
@@ -380,7 +397,9 @@ class PlotImpz(QtGui.QWidget):
 
 def main():
     import sys
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+
+    app = QApplication(sys.argv)
     mainw = PlotImpz(None)
     app.setActiveWindow(mainw) 
     mainw.show()

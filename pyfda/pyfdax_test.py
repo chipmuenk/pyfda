@@ -13,7 +13,7 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui, QtCore
+from .compat import QtGui, QtCore
 
 import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
