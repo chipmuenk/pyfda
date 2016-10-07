@@ -9,22 +9,14 @@ http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-r
 """
 from __future__ import print_function, division, unicode_literals
 
-from ..compat import (QtCore, QtGui, QApplication,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton, QPushButton,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent,
-                      QIcon, QImage,
+from ..compat import (QtCore, QApplication, QWidget, QLabel,
+                      QSizePolicy, QIcon, QImage, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
-
 
 import os, sys
 import six
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
-#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-#from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 #from matplotlib.backend_bases import cursors as mplCursors
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
