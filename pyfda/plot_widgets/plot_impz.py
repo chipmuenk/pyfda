@@ -52,7 +52,7 @@ class PlotImpz(QWidget):
         
         self.lblStimulus = QtGui.QLabel("Type = ")
         self.cmbStimulus = QtGui.QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","Sine", "Rect", "Saw"])
+        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         
         self.lblFreq = QtGui.QLabel("<i>f</i>&nbsp; =")
@@ -245,6 +245,7 @@ class PlotImpz(QWidget):
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
+        sos = np.asarray(fb.fil[0]['sos'])
 
         self.f_S  = fb.fil[0]['f_S']
         
@@ -261,6 +262,11 @@ class PlotImpz(QWidget):
             x = np.ones(N) # create step function
             title_str = r'Step Response'
             H_str = r'$h_{\epsilon}[n]$'
+        elif stim == "StepErr":
+            x = np.ones(N) # create step function
+            title_str = r'Settling Error'
+            H_str = r'$H(0) - h_{\epsilon}[n]$'
+            
         elif stim in {"Sine", "Rect"}:
             x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
             if stim == "Sine":
@@ -276,7 +282,16 @@ class PlotImpz(QWidget):
             H_str = r'$h_{saw}[n]$'
 
             
-        h = sig.lfilter(self.bb, self.aa, x)
+        if not np.any(sos): # no second order sections for current filter          
+            h = sig.lfilter(self.bb, self.aa, x)
+            dc = sig.freqz(self.bb, self.aa, [0])
+        else:
+#            print(sos)
+            h = sig.sosfilt(sos, x)
+            dc = sig.freqz(self.bb, self.aa, [0])
+        
+        if stim == "StepErr":
+            h = h - abs(dc[1]) # subtract DC value from response
 
 
         self.cmplx = np.any(np.iscomplex(h))
@@ -301,8 +316,9 @@ class PlotImpz(QWidget):
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='bo', linefmt='r')
         if self.chkPltStim.isChecked():
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='k')
-            [stem.set_linewidth(0.5) for stem in ss]
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='0.5')
+            for stem in ss:
+                stem.set_linewidth(0.5)
             bs.set_visible(False) # invisible bottomline
         expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
