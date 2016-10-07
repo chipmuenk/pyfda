@@ -9,8 +9,9 @@ http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-r
 """
 from __future__ import print_function, division, unicode_literals
 
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
+from ..compat import QtGui, QtCore, QWidget
+from ..compat import QSizePolicy, QLabel, QInputDialog
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
 
 import os, sys
 import six
@@ -39,7 +40,7 @@ for key in pyfda_rc.mpl_rc:
 
 
 #------------------------------------------------------------------------------
-class MplWidget(QtGui.QWidget):
+class MplWidget(QWidget):
     """
     Construct a subwidget with Matplotlib canvas and NavigationToolbar
     """

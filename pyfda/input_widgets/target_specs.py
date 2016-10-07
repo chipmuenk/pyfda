@@ -10,14 +10,14 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal, QEvent = QtCore.pyqtSignal, QtCore.QEvent
 
 import pyfda.filterbroker as fb
 from pyfda.input_widgets import amplitude_specs, freq_specs
 
 
-class TargetSpecs(QtGui.QWidget):
+class TargetSpecs(QWidget):
     """
     Build and update widget for entering the target specifications (frequencies
     and amplitudes) like F_sb, F_pb, A_SB, etc.

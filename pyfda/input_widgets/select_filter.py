@@ -15,8 +15,8 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from ..compat import QtGui, QtCore, QWidget, QComboBox
+pyqtSignal = QtCore.pyqtSignal
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -24,7 +24,7 @@ import pyfda.pyfda_rc as rc
 from pyfda.pyfda_lib import HLine
 
 
-class SelectFilter(QtGui.QWidget):
+class SelectFilter(QWidget):
     """
     Construct and read combo boxes for selecting the filter, consisting of the 
     following hierarchy:
@@ -77,13 +77,13 @@ class SelectFilter(QtGui.QWidget):
         #----------------------------------------------------------------------
         # Combo boxes for filter selection
         #----------------------------------------------------------------------
-        self.cmbResponseType = QtGui.QComboBox(self)
+        self.cmbResponseType = QComboBox(self)
         self.cmbResponseType.setObjectName("comboResponseType")
         self.cmbResponseType.setToolTip("Select filter response type.")
-        self.cmbFilterType = QtGui.QComboBox(self)
+        self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
-        self.cmbFilterClass = QtGui.QComboBox(self)
+        self.cmbFilterClass = QComboBox(self)
         self.cmbFilterClass.setObjectName("comboFilterClass")
         self.cmbFilterClass.setToolTip("Select the filter design class.")
 

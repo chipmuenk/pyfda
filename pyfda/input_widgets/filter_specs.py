@@ -11,8 +11,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+
+from ..compat import QtGui, QtCore, QWidget
+pyqtSignal = QtCore.pyqtSignal
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -21,8 +22,9 @@ import pyfda.filter_factory as ff
 from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
-                                 
-class FilterSpecs(QtGui.QWidget):
+
+
+class FilterSpecs(QWidget):
     """
     Build widget for entering all filter specs
     """
@@ -31,7 +33,6 @@ class FilterSpecs(QtGui.QWidget):
     sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
     sigViewChanged = pyqtSignal() # emitted when view has changed
     sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
-    
 
     def __init__(self, parent):
         super(FilterSpecs, self).__init__(parent)

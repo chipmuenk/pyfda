@@ -11,7 +11,8 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import Qt, QtGui#, QtWebKit
+from ..compat import QtGui, QtCore, QWidget, Qt
+
 from docutils.core import publish_string #, publish_parts
 
 import numpy as np
@@ -23,7 +24,7 @@ import pyfda.filter_factory as ff # importing filterbroker initializes all its g
 from pyfda.pyfda_lib import lin2unit
 # TODO: Passband and stopband info should show min / max values for each band
 
-class FilterInfo(QtGui.QWidget):
+class FilterInfo(QWidget):
     """
     Create widget for displaying infos about filter and filter design method
     """
