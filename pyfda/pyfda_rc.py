@@ -228,16 +228,18 @@ css_common = """
     
                 QSplitter::handle:vertical {
                     height: 10px;
-                    }          
+                    } 
 
             """\
             + TabBarCss
+            
 """
-Or if you want to provide a guaranteed fallback for platforms that do not support theme icons, you can use the second argument:
-
-     QIcon undoicon = QIcon.fromTheme("edit-undo", QIcon(":/undo.png"));
-
+            Or if you want to provide a guaranteed fallback for platforms 
+            that do not support theme icons, you can use the second argument:
+            
+            QIcon undoicon = QIcon.fromTheme("edit-undo", QIcon(":/undo.png"));
 """
+
 
 if THEME == 'dark':
 
