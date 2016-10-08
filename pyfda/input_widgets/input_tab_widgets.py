@@ -9,8 +9,17 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal# , pyqtSlot
+#from ..compat import QtGui, QtCore, QWidget
+#pyqtSignal = QtCore.pyqtSignal
+
+from ..compat import (QtCore, QtGui, QTabWidget,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QToolButton,
+                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal, Qt, QEvent)
+
+
 import pyfda.filterbroker as fb
 
 #from pyfda.input_widgets import input_specs_test as input_specs
@@ -26,7 +35,7 @@ else:
     from pyfda.hdl_generation import hdl_specs
 
 
-class InputTabWidgets(QtGui.QWidget):
+class InputTabWidgets(QWidget):
     """
     Create a tabbed widget for various input subwidgets
     """
@@ -56,7 +65,7 @@ class InputTabWidgets(QtGui.QWidget):
 
     def _construct_UI(self):
         """ Initialize UI with tabbed input widgets """
-        tabWidget = QtGui.QTabWidget()
+        tabWidget = QTabWidget()
         tabWidget.setObjectName("TabWidg")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
@@ -67,15 +76,15 @@ class InputTabWidgets(QtGui.QWidget):
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
-        layVMain = QtGui.QVBoxLayout()
+        layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
         
         #setContentsMargins -> number of pixels between frame window border
         layVMain.setContentsMargins(1,1,1,1) # R, T, L, B
 #
         self.setLayout(layVMain)
-        tabWidget.setSizePolicy(QtGui.QSizePolicy.Minimum,
-                                 QtGui.QSizePolicy.Expanding)
+        tabWidget.setSizePolicy(QSizePolicy.Minimum,
+                                 QSizePolicy.Expanding)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -175,7 +184,8 @@ class InputTabWidgets(QtGui.QWidget):
 
 def main():
     from pyfda import pyfda_rc as rc
-    app = QtGui.QApplication(sys.argv)
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
     app.setStyleSheet(rc.css_rc)
 
     mainw = InputTabWidgets(None)

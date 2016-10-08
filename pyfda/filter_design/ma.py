@@ -18,9 +18,11 @@ Version info:
 Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-#import scipy.signal as sig
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+
+from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
+                      QVBoxLayout, QHBoxLayout)
+
+
 import numpy as np
 
 import pyfda.filterbroker as fb
@@ -31,7 +33,7 @@ __version__ = "1.3"
 FRMT = {'zpk', 'ba'} # output format of filter design routines 'zpk' / 'ba' / 'sos'
             
 
-class ma(QtGui.QWidget):
+class ma(QWidget):
 
     info ="""
 **Moving average filters**
@@ -49,7 +51,7 @@ a given frequency can be calculated via the si function (not implemented yet).
     sigFiltChanged = pyqtSignal()
 
     def __init__(self):
-        QtGui.QWidget.__init__(self)       
+        QWidget.__init__(self)       
         
         self.name = {'ma':'Moving Average'}
 
@@ -102,21 +104,21 @@ a given frequency can be calculated via the si function (not implemented yet).
         input_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 
-        self.lbl_ma_1 = QtGui.QLabel("Stages:")
+        self.lbl_ma_1 = QLabel("Stages:")
         self.lbl_ma_1.setObjectName('wdg_lbl_ma_1')
-        self.led_ma_1 = QtGui.QLineEdit()
+        self.led_ma_1 = QLineEdit()
         self.led_ma_1.setText("1")
         self.led_ma_1.setObjectName('wdg_led_ma_1')
         self.led_ma_1.setToolTip("Set number of stages ")
         
-        self.lbl_ma_2 = QtGui.QLabel("Normalize:")
+        self.lbl_ma_2 = QLabel("Normalize:")
         self.lbl_ma_2.setObjectName('wdg_lbl_ma_2')
-        self.chk_ma_2 = QtGui.QCheckBox()
+        self.chk_ma_2 = QCheckBox()
         self.chk_ma_2.setChecked(True)
         self.chk_ma_2.setObjectName('wdg_chk_ma_2')
         self.chk_ma_2.setToolTip("Normalize to| H_max = 1|")
         
-        self.layHWin = QtGui.QHBoxLayout()
+        self.layHWin = QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
         self.layHWin.addWidget(self.lbl_ma_1)
         self.layHWin.addWidget(self.led_ma_1)
@@ -124,7 +126,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         self.layHWin.addWidget(self.chk_ma_2)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QtGui.QWidget()
+        self.wdg_fil = QWidget()
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layHWin)
 
@@ -290,26 +292,24 @@ a given frequency can be calculated via the si function (not implemented yet).
 
 if __name__ == '__main__':
     import sys
-    app = QtGui.QApplication(sys.argv)
-    filt = ma()        # instantiate filter
-
-    layVDynWdg = QtGui.QVBoxLayout()
-#    layVDynWdg.addWidget(ma_order, stretch = 1)
+    from ..compat import QApplication
+   
+    app = QApplication(sys.argv)
     
+    # instantiate filter widget
+    filt = ma()
+    filt.construct_UI()
+    wdg_ma = getattr(filt, 'wdg_fil')
+
+    layVDynWdg = QVBoxLayout()
+    layVDynWdg.addWidget(wdg_ma, stretch = 1)
+
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][frmt]) # return results in default format
+    print(fb.fil[0]['zpk']) # return results in default format
 
-    frmDynWdg = QtGui.QFrame()
-    frmDynWdg.setLayout(layVDynWdg)
-    
-    layVAllWdg = QtGui.QVBoxLayout()
-    layVAllWdg.addWidget(frmDynWdg)
-
-    frmMain = QtGui.QFrame()
-    frmMain.setFrameStyle(QtGui.QFrame.StyledPanel|QtGui.QFrame.Sunken)
-    frmMain.setLayout(layVAllWdg)    
-
-    form = frmMain
+    form = QFrame()
+    form.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+    form.setLayout(layVDynWdg)    
 
     form.show()
     

@@ -9,15 +9,14 @@ http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-r
 """
 from __future__ import print_function, division, unicode_literals
 
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import QSizePolicy, QLabel, QInputDialog
+from ..compat import (QtCore, QApplication, QWidget, QLabel,
+                      QSizePolicy, QIcon, QImage, QVBoxLayout,
+                      QInputDialog, FigureCanvas, NavigationToolbar)
 
 import os, sys
 import six
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 #from matplotlib.backend_bases import cursors as mplCursors
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
@@ -39,7 +38,7 @@ for key in pyfda_rc.mpl_rc:
 
 
 #------------------------------------------------------------------------------
-class MplWidget(QtGui.QWidget):
+class MplWidget(QWidget):
     """
     Construct a subwidget with Matplotlib canvas and NavigationToolbar
     """
@@ -79,14 +78,14 @@ class MplWidget(QtGui.QWidget):
         # Widget layout with QHBox / QVBox
         #=============================================
 
-#        self.hbox = QtGui.QHBoxLayout()
+#        self.hbox = QHBoxLayout()
 #
 #        for w in [self.mpl_toolbar, self.butDraw, self.cboxGrid]:
 #            self.hbox.addWidget(w)
 #            self.hbox.setAlignment(w, QtCore.Qt.AlignVCenter)
-#        self.hbox.setSizeConstraint(QtGui.QLayout.SetFixedSize)
+#        self.hbox.setSizeConstraint(QLayout.SetFixedSize)
 
-        self.layVMainMpl = QtGui.QVBoxLayout()
+        self.layVMainMpl = QVBoxLayout()
 #        self.layVMainMpl.addLayout(self.hbox)
         self.layVMainMpl.addWidget(self.mplToolbar)
         self.layVMainMpl.addWidget(self.pltCanv)
@@ -194,7 +193,7 @@ class MyMplToolbar(NavigationToolbar):
 #        QtWidgets.QToolBar.__init__(self, parent)
 
 #    def _icon(self, name):
-#        return QtGui.QIcon(os.path.join(self.basedir, name))
+#        return QIcon(os.path.join(self.basedir, name))
 #
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
@@ -208,7 +207,7 @@ class MyMplToolbar(NavigationToolbar):
 #---------------- Construct Toolbar using QRC icons ---------------------------
 
         # ENABLE:
-        a = self.addAction(QtGui.QIcon(':/circle-check.svg'), 'Enable Plot', self.enable_update)
+        a = self.addAction(QIcon(':/circle-check.svg'), 'Enable Plot', self.enable_update)
         a.setToolTip('Enable plot update')
         a.setCheckable(True)
         a.setChecked(True)
@@ -217,38 +216,38 @@ class MyMplToolbar(NavigationToolbar):
         self.addSeparator() #---------------------------------------------
 
         # HOME:
-        self.a_ho = self.addAction(QtGui.QIcon(':/home.svg'), 'Home', self.home)
+        self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
         self.a_ho.setToolTip('Reset original view')
         # BACK:
-        self.a_ba = self.addAction(QtGui.QIcon(':/action-undo.svg'), 'Back', self.back)
+        self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
         self.a_ba.setToolTip('Back to previous view')
         # FORWARD:
-        self.a_fw = self.addAction(QtGui.QIcon(':/action-redo.svg'), 'Forward', self.forward)
+        self.a_fw = self.addAction(QIcon(':/action-redo.svg'), 'Forward', self.forward)
         self.a_fw.setToolTip('Forward to next view')
 
         self.addSeparator() #---------------------------------------------
 
         # PAN:
-        self.a_pa = self.addAction(QtGui.QIcon(':/move.svg'), 'Pan', self.pan)
+        self.a_pa = self.addAction(QIcon(':/move.svg'), 'Pan', self.pan)
         self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
         "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
 
         # ZOOM RECTANGLE:
-        self.a_zo = self.addAction(QtGui.QIcon(':/magnifying-glass.svg'), 'Zoom', self.zoom)
+        self.a_zo = self.addAction(QIcon(':/magnifying-glass.svg'), 'Zoom', self.zoom)
         self.a_zo.setToolTip("Zoom in / out to rectangle with left / right mouse button,\n"
         "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
 
         # FULL VIEW:
-        self.a_fv = self.addAction(QtGui.QIcon(':/fullscreen-enter.svg'), \
+        self.a_fv = self.addAction(QIcon(':/fullscreen-enter.svg'), \
             'Zoom full extent', self.parent.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
         # LOCK VIEW:
-        self.a_lk = self.addAction(QtGui.QIcon(':/lock-locked.svg'), \
+        self.a_lk = self.addAction(QIcon(':/lock-locked.svg'), \
                                    'Lock zoom', self.toggle_lock_zoom)                
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
@@ -259,23 +258,23 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         # GRID:
-        self.a_gr = self.addAction(QtGui.QIcon(':/grid-four-up.svg'), 'Grid', self.toggle_grid)
+        self.a_gr = self.addAction(QIcon(':/grid-four-up.svg'), 'Grid', self.toggle_grid)
         self.a_gr.setToolTip('Toggle Grid')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
 
         # REDRAW:
-        self.a_rd = self.addAction(QtGui.QIcon(':/brush.svg'), 'Redraw', self.parent.redraw)
+        self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.parent.redraw)
         self.a_rd.setToolTip('Redraw Plot')
 
         # SAVE:
-        self.a_sv = self.addAction(QtGui.QIcon(':/file.svg'), 'Save', self.save_figure)
+        self.a_sv = self.addAction(QIcon(':/file.svg'), 'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
         
         self.cb = None #will be used for the clipboard
         self.temp_file = os.path.join(pyfda_lib.get_home_dir(), 'tempMPL.png')
  
-        self.a_cb = self.addAction(QtGui.QIcon(':/camera-slr.svg'), 'Save', self.mpl2Clip)
+        self.a_cb = self.addAction(QIcon(':/camera-slr.svg'), 'Save', self.mpl2Clip)
         self.a_cb.setToolTip('Copy to clipboard')
         self.a_cb.setShortcut("Ctrl+C")
 
@@ -284,7 +283,7 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         if figureoptions is not None:
-            self.a_op = self.addAction(QtGui.QIcon(':/cog.svg'), 'Customize', self.edit_parameters)
+            self.a_op = self.addAction(QIcon(':/cog.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip('Edit curves line and axes parameters')
 
         self.buttons = {}
@@ -419,8 +418,8 @@ class MyMplToolbar(NavigationToolbar):
             #  savefig(fname, dpi=None, facecolor='w', edgecolor='w',
             #  orientation='portrait', papertype=None, format=None,
             #  transparent=False):
-            temp_img = QtGui.QImage(self.temp_file)
-            self.cb = QtGui.QApplication.clipboard()
+            temp_img = QImage(self.temp_file)
+            self.cb = QApplication.clipboard()
             self.cb.setImage(temp_img)
         except:
             print('Error copying figure to clipboard')
