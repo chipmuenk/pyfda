@@ -9,12 +9,39 @@ import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtGui, QtCore,
+from ..compat import (QtGui, QtCore, HAS_QT5,
                       QWidget, QPushButton, QComboBox, QLabel, QFont, QFrame,
                       QVBoxLayout, QHBoxLayout,
                       QFileDialog)
 
-QFD = QFileDialog
+class QFD(QFileDialog):
+    """
+    subclass methods whose names changed between PyQt4 and PyQt5 and provide
+    a common API
+    """
+    def __init__(self, parent):
+        super(QFD, self).__init__(parent)
+    
+    def getOpenFile(self, **kwarg):
+        if HAS_QT5:
+            return self.getOpenFileName(**kwarg)
+        else:
+            return self.getOpenFileNameAndFilter(**kwarg)
+            
+    def getOpenFiles(self, **kwarg):
+        if HAS_QT5:
+            return self.getOpenFileNames(**kwarg)
+        else:
+            return self.getOpenFileNamesAndFilter(**kwarg)
+
+    def getSaveFile(self, **kwarg):
+        if HAS_QT5:
+            return self.getSaveFileName(**kwarg)
+        else:
+            return self.getSaveFileNameAndFilter(**kwarg)
+            
+            
+
 
 import scipy.io
 import numpy as np
@@ -151,7 +178,7 @@ class File_IO(QWidget):
         """
         file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
         dlg = QFD(self)
-        file_name, file_type = dlg.getOpenFileNameAndFilter(self,
+        file_name, file_type = dlg.getOpenFile(
                 caption = "Load filter ", directory = rc.save_dir,
                 filter = file_filters)
         file_name = str(file_name) # QString -> str
@@ -205,7 +232,7 @@ class File_IO(QWidget):
         file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
         dlg = QFD(self)
         # return selected file name (with or without extension) and filter (Linux: full text)
-        file_name, file_type = dlg.getSaveFileNameAndFilter(self,
+        file_name, file_type = dlg.getSaveFile(
                 caption = "Save filter as", directory = rc.save_dir,
                 filter = file_filters)
         
@@ -262,7 +289,7 @@ class File_IO(QWidget):
             file_filters += ";;Excel 2007 Worksheet (.xlsx)"
 
         # return selected file name (with or without extension) and filter (Linux: full text)
-        file_name, file_type = dlg.getSaveFileNameAndFilter(self,
+        file_name, file_type = dlg.getSaveFileName(
                 caption = "Export filter coefficients as", 
                 directory = rc.save_dir, filter = file_filters) 
         file_name = str(file_name) # QString -> str needed for Python 2
@@ -358,7 +385,7 @@ class File_IO(QWidget):
         file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
         "Zipped Binary Numpy Array(*.npz)")
         dlg = QFD(self)
-        file_name, file_type = dlg.getOpenFileNameAndFilter(self,
+        file_name, file_type = dlg.getOpenFileName(
                 caption = "Import filter coefficients ", 
                 directory = rc.save_dir, filter = file_filters)
         file_name = str(file_name) # QString -> str
