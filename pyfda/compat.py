@@ -15,6 +15,7 @@ try:
                                  QHBoxLayout, QVBoxLayout, QGridLayout)
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+    HAS_QT5 = True
 
 
 except ImportError as err:
@@ -35,6 +36,7 @@ except ImportError as err:
 
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+    HAS_QT5 = False
 
 
 
