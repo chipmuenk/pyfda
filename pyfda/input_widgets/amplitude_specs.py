@@ -49,20 +49,20 @@ class AmplitudeSpecs(QWidget):
         Construct User Interface
         """
         self.layVMain = QVBoxLayout() # Widget vertical layout
+        layHTitle = QHBoxLayout() # layout for title and unit
 
         amp_units = ["dB", "V", "W"]
 
         bfont = QFont()
         bfont.setBold(True)
-#            bfont.setWeight(75)
-        self.lblTitle = QLabel(self) # field for widget title
-        self.lblTitle.setText(str(self.title))
-        self.lblTitle.setFont(bfont)
-        self.lblTitle.setWordWrap(True)
-        self.layVMain.addWidget(self.lblTitle)
+        lblTitle = QLabel(self) # field for widget title
+        lblTitle.setText(str(self.title))
+        lblTitle.setFont(bfont)
+        lblTitle.setWordWrap(True)
+#        self.layVMain.addWidget(self.lblTitle)
 
-        self.lblUnits = QLabel(self)
-        self.lblUnits.setText("Unit:")
+        lblUnits = QLabel(self)
+        lblUnits.setText(" in ")
 
         self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(amp_units)
@@ -70,23 +70,27 @@ class AmplitudeSpecs(QWidget):
         self.cmbUnitsA.setToolTip("Set unit for amplitude specifications:\n"
         "dB is attenuation (positive values)\nV and W are less than 1.")
 
+        # fit size dynamically to largest element:
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        # fit size dynamically to largest element
 
         # find index for default unit from dictionary and set the unit
         amp_idx = self.cmbUnitsA.findData(fb.fil[0]['amp_specs_unit'])
         if amp_idx < 0:
             amp_idx = 0
-        self.cmbUnitsA.setCurrentIndex(amp_idx) # initialize for dBsg
-
+        self.cmbUnitsA.setCurrentIndex(amp_idx) # initialize for dBs
+        
+        layHTitle.addWidget(lblTitle)
+        layHTitle.addWidget(lblUnits, Qt.AlignLeft)
+        layHTitle.addWidget(self.cmbUnitsA, Qt.AlignLeft)
+        layHTitle.addStretch(2)
+        
         self.layGSpecs = QGridLayout() # sublayout for spec fields
-        self.layGSpecs.addWidget(self.lblUnits,0,0)
-        self.layGSpecs.addWidget(self.cmbUnitsA,0,1, Qt.AlignLeft)
-
+        
         frmMain = QFrame()
         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(self.layGSpecs)
 
+        self.layVMain.addLayout(layHTitle)
         self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(1,1,1,1)
 
@@ -269,8 +273,8 @@ class AmplitudeSpecs(QWidget):
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
     
-                self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
-                self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
+                self.layGSpecs.addWidget(self.qlabels[i],(i+0),0)
+                self.layGSpecs.addWidget(self.qlineedit[i],(i+0),1)
 
         else: # make the right number of widgets visible
             for i in range(self.n_cur_labels, num_new_labels):
