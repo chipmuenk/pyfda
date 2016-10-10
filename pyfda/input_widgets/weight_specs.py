@@ -46,31 +46,32 @@ class WeightSpecs(QWidget):
         """
         Construct User Interface  
         """
-        self.layVMain = QVBoxLayout() # Widget vertical layout
-        self.layGSpecs   = QGridLayout() # sublayout for spec fields
+        self.layVMain = QVBoxLayout()   # Widget vertical layout
+        layHTitle = QHBoxLayout()       # Layout for title and reset button
+        self.layGSpecs   = QGridLayout()# Sublayout for spec fields
 
         title = "Weight Specifications"
         bfont = QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        self.lblTitle = QLabel(self) # field for widget title
-        self.lblTitle.setText(str(title))
-        self.lblTitle.setFont(bfont)
-        self.lblTitle.setWordWrap(True)
-        self.layVMain.addWidget(self.lblTitle)
+        lblTitle = QLabel(self) # field for widget title
+        lblTitle.setText(str(title))
+        lblTitle.setFont(bfont)
+        lblTitle.setWordWrap(True)
 
         self.butReset = QPushButton("Reset", self)
         self.butReset.setToolTip("Reset weights to 1")
-
-        self.layGSpecs.addWidget(self.butReset, 1, 1) # span two columns
-
+        
+                
+        layHTitle.addWidget(lblTitle)
+        layHTitle.addWidget(self.butReset)
 
         frmMain = QFrame()
         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(self.layGSpecs)
 
+        self.layVMain.addLayout(layHTitle)
         self.layVMain.addWidget(frmMain)
-#        self.layVMain.addLayout(self.layGSpecs)
         self.layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(self.layVMain)
@@ -228,8 +229,8 @@ class WeightSpecs(QWidget):
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
     
-                self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
-                self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
+                self.layGSpecs.addWidget(self.qlabels[i],i,0)
+                self.layGSpecs.addWidget(self.qlineedit[i],i,1)
 
         else: # make the right number of widgets visible
             for i in range(self.n_cur_labels, num_new_labels):

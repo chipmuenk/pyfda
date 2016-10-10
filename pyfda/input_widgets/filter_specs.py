@@ -12,12 +12,9 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton, QPushButton,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
+from ..compat import (QWidget, QLabel, QFrame, QPushButton,
+                      QVBoxLayout, QGridLayout, QSizePolicy,
+                      pyqtSignal)
                       
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -86,22 +83,20 @@ class FilterSpecs(QWidget):
         #----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
         #----------------------------------------------------------------------
-#        spcV = QSpacerItem(10, 10, QSizePolicy.Minimum,
-#                                      QSizePolicy.Expanding)
         layGMain = QGridLayout()
         layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
-        layGMain.addWidget(self.f_units, 2, 0, 1, 2)  # Frequency units
-        layGMain.addWidget(self.f_specs, 3, 0, 1, 2)  # Freq. specifications
-        layGMain.addWidget(self.a_specs, 4, 0, 1, 2)  # Amplitude specs
-        layGMain.addWidget(self.w_specs, 5, 0, 1, 2)  # Weight specs
-        layGMain.addWidget(frmMsg, 6, 0, 1, 2)        # Text message
-        layGMain.addWidget(self.t_specs, 7, 0, 1, 2)  # Target specs
+        layGMain.addWidget(self.f_units, 1, 0, 1, 2)  # Frequency units
+        layGMain.addWidget(self.f_specs, 2, 0, 1, 2)  # Freq. specifications
+        layGMain.addWidget(self.a_specs, 3, 0, 1, 2)  # Amplitude specs
+        layGMain.addWidget(self.w_specs, 4, 0, 1, 2)  # Weight specs
+        layGMain.addWidget(frmMsg, 5, 0, 1, 2)        # Text message
+        layGMain.addWidget(self.t_specs, 6, 0, 1, 2)  # Target specs
+        layGMain.setRowStretch(7,1)
+#        layGMain.addWidget(HLine(QFrame, self), 7,0,1,2) # create HLine
+
         layGMain.addWidget(self.butDesignFilt, 8, 0)  # <Design Filter> button
         layGMain.addWidget(self.butQuit, 8, 1)        # <Quit> button
- #       layGMain.addItem(spcV, 9, 0, 1, 2) # spacer to allow for vert. expansion
-#        layGMain.addWidget(HLine(self), 9,0,1,2) # create HLine
         layGMain.setContentsMargins(0, 0, 0, 0)
-#        layGMain.setRowStretch(1,1)
 
         self.setLayout(layGMain) # main layout of widget
 
