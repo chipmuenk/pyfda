@@ -50,15 +50,21 @@ class FreqSpecs(QWidget):
         Construct the User Interface
         """
         self.layVMain = QVBoxLayout() # Widget main layout
-
+        layHTitle = QHBoxLayout()
+        
         bfont = QFont()
         bfont.setBold(True)
 #            bfont.setWeight(75)
-        self.lblTitle = QLabel(self) # field for widget title
-        self.lblTitle.setText(str(self.title))
-        self.lblTitle.setFont(bfont)
-        self.lblTitle.setWordWrap(True)
-        self.layVMain.addWidget(self.lblTitle)
+        lblTitle = QLabel() # field for widget title
+        lblTitle.setText(str(self.title))
+        lblTitle.setFont(bfont)
+        lblTitle.setWordWrap(True)
+        self.lblUnit = QLabel()
+        self.lblUnit.setText(" in " + rt_label(fb.fil[0]['freq_specs_unit']))
+
+        layHTitle.addWidget(lblTitle)
+        layHTitle.addWidget(self.lblUnit)
+        layHTitle.addStretch(100)
         
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
@@ -68,6 +74,7 @@ class FreqSpecs(QWidget):
         sfFrame.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         sfFrame.setLayout(self.layGSpecs)
 
+        self.layVMain.addLayout(layHTitle)
         self.layVMain.addWidget(sfFrame)
         self.layVMain.setContentsMargins(1,1,1,1)
         self.setLayout(self.layVMain)
@@ -148,6 +155,7 @@ class FreqSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
+        self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
         self.new_labels = new_labels
         num_new_labels = len(new_labels)
         if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
@@ -234,8 +242,8 @@ class FreqSpecs(QWidget):
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
     
-                self.layGSpecs.addWidget(self.qlabels[i],(i+2),0)
-                self.layGSpecs.addWidget(self.qlineedit[i],(i+2),1)
+                self.layGSpecs.addWidget(self.qlabels[i],i,0)
+                self.layGSpecs.addWidget(self.qlineedit[i],i,1)
 
         else: # make the right number of widgets visible
             for i in range(self.n_cur_labels, num_new_labels):
