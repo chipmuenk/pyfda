@@ -1,5 +1,4 @@
 
-
 try:
     import PyQt5
     from PyQt5 import QtGui, QtCore
@@ -18,8 +17,7 @@ try:
     HAS_QT5 = True
 
 
-except ImportError as err:
-    print(err)
+except ImportError:
     import PyQt4
 
     from PyQt4 import QtGui, QtCore
@@ -38,6 +36,32 @@ except ImportError as err:
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
     HAS_QT5 = False
 
+
+class QFD(QFileDialog):
+    """
+    Subclass methods whose names changed between PyQt4 and PyQt5 and provide
+    a common API.
+    """
+    def __init__(self, parent):
+        super(QFD, self).__init__(parent)
+    
+    def getOpenFileName_(self, **kwarg):
+        if HAS_QT5:
+            return self.getOpenFileName(**kwarg)
+        else:
+            return self.getOpenFileNameAndFilter(**kwarg)
+            
+    def getOpenFileNames_(self, **kwarg):
+        if HAS_QT5:
+            return self.getOpenFileNames(**kwarg)
+        else:
+            return self.getOpenFileNamesAndFilter(**kwarg)
+
+    def getSaveFileName_(self, **kwarg):
+        if HAS_QT5:
+            return self.getSaveFileName(**kwarg)
+        else:
+            return self.getSaveFileNameAndFilter(**kwarg)
 
 
 
