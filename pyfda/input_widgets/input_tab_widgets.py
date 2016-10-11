@@ -121,7 +121,7 @@ class InputTabWidgets(QWidget):
             specs, e.g. plotHf widget for the filter regions
         """
 
-#        self.filter_info.load_entries() # could update log. / lin. units (not implemented)
+        self.filter_info.load_entries() # also update frequency unit
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
 
 
