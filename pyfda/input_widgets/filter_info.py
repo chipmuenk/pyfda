@@ -187,6 +187,28 @@ class FilterInfo(QWidget):
         Print filter properties in a table at frequencies of interest. When
         specs are violated, colour the table entry in red.
         """
+        
+        def _find_min_max(self, f_start, f_stop, unit = 'dB'):
+            """
+            Find minimum and maximum magnitude and the corresponding frequencies
+            for the filter defined in the filter dict in a given frequency band
+            [f_start, f_stop].
+            """
+            w = np.linspace(f_start, f_stop, 2048)*2*np.pi            
+            [w, H] = sig.freqz(bb, aa)
+            f = w / (2.0 * pi) # frequency normalized to f_S
+            H_abs = abs(H)
+            H_max = max(H_abs)
+            H_min = min(H_abs)
+            F_max = f[np.argmax(H_abs)] # find the frequency where H_abs 
+            F_min = f[np.argmin(H_abs)] # becomes max resp. min
+            if unit == 'dB':
+                H_max = 20*log10(H_max)
+                H_min = 20*log10(H_min)
+            return F_min, H_min, F_max, H_max
+
+            
+            
         self.tblFiltPerf.setVisible(self.chkFiltPerf.isChecked())
         if self.chkFiltPerf.isChecked():
 
@@ -216,7 +238,10 @@ class FilterInfo(QWidget):
             # F_test = sorted(F_test, key=lambda t: t[::-1])
     
     
-    
+            f_lbls = []
+            f_vals = []
+            a_lbls = []
+            a_targs = []
             ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR')
             unit = fb.fil[0]['amp_specs_unit']
             unit = 'dB' # fix this for the moment
@@ -235,6 +260,9 @@ class FilterInfo(QWidget):
                     f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
                     a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
 
+            # Try to construct lists of frequency / amplitude labels and specs
+            # When one of the labels doesn't exist in the filter dict, delete 
+            # all corresponding amplitude and frequency entries
                 err = [False] * len(f_lbls) # initialize error list  
                 f_vals = []
                 a_targs = []
@@ -263,22 +291,13 @@ class FilterInfo(QWidget):
     
                 f_vals = np.asarray(f_vals) # convert to numpy array
     
-            logger.debug("input_info.showFiltPerf\nF_test = %s" %f_lbls)
+                logger.debug("input_info.showFiltPerf\nF_test = %s" %f_lbls)
                                
-            # Calculate frequency response at test frequencies and over the whole range:
-            [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(np.float))
-            [w, H] = sig.freqz(bb, aa)
-    
-            f = w / (2.0 * pi) # frequency normalized to f_S
-            H_abs = abs(H)
-            H_max = max(H_abs);
-            H_max_dB = 20*log10(H_max);
-            F_max = f[np.argmax(H_abs)] # find the frequency where H_abs becomes max.
-            #
-            H_min = min(H_abs)
-            H_min_dB = 20*log10(H_min)
-            F_min = f[np.argmin(H_abs)] # find the frequency where H_abs becomes min.
-              
+                # Calculate frequency response at test frequencies
+                [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(np.float))
+                
+            
+            (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit = 'V')    
             # append frequencies and values for min. and max. filter reponse to 
             # test vector
             f_lbls += ['Min.','Max.']
@@ -290,18 +309,18 @@ class FilterInfo(QWidget):
             a_test_dB = np.round(-20*log10(abs(a_test)),5)
             
             
-            ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR')
-            unit = fb.fil[0]['amp_specs_unit']
+            ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR') for dB <-> lin conversion
+#            unit = fb.fil[0]['amp_specs_unit']
             unit = 'dB' # fix this for the moment
     
-                    # build a list with the corresponding target specs:
+            # build a list with the corresponding target specs:
             a_targs_pass = []
             eps = 1e-3
             for i in range(len(f_lbls)):
                 if 'PB' in f_lbls[i]:
-                    a_targs_pass.append(a_test_dB[i] <= a_targs[i])
+                    a_targs_pass.append(a_test[i] <= a_targs[i])
                 elif 'SB' in f_lbls[i]:
-                    a_targs_pass.append(a_test_dB[i] > a_targs[i]) 
+                    a_targs_pass.append(a_test[i] >= a_targs[i]) 
                 else:
                     a_targs_pass.append(True)
     
@@ -313,8 +332,6 @@ class FilterInfo(QWidget):
                 "F_test = %s\n", f_vals,
                 "H_targ_pass = %s\n", a_targs_pass,
                 "passed: %s\n", self.targs_spec_passed)
-    
-    #        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
     
             self.tblFiltPerf.setRowCount(len(a_test))
     
