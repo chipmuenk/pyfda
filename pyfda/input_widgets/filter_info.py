@@ -187,118 +187,168 @@ class FilterInfo(QWidget):
         Print filter properties in a table at frequencies of interest. When
         specs are violated, colour the table entry in red.
         """
+        
+        def _find_min_max(self, f_start, f_stop, unit = 'dB'):
+            """
+            Find minimum and maximum magnitude and the corresponding frequencies
+            for the filter defined in the filter dict in a given frequency band
+            [f_start, f_stop].
+            """
+            w = np.linspace(f_start, f_stop, 2048)*2*np.pi            
+            [w, H] = sig.freqz(bb, aa)
+            f = w / (2.0 * pi) # frequency normalized to f_S
+            H_abs = abs(H)
+            H_max = max(H_abs)
+            H_min = min(H_abs)
+            F_max = f[np.argmax(H_abs)] # find the frequency where H_abs 
+            F_min = f[np.argmin(H_abs)] # becomes max resp. min
+            if unit == 'dB':
+                H_max = 20*log10(H_max)
+                H_min = 20*log10(H_min)
+            return F_min, H_min, F_max, H_max
+
+            
+            
         self.tblFiltPerf.setVisible(self.chkFiltPerf.isChecked())
+        if self.chkFiltPerf.isChecked():
 
-        bb = fb.fil[0]['ba'][0]
-        aa = fb.fil[0]['ba'][1]
+            bb = fb.fil[0]['ba'][0]
+            aa = fb.fil[0]['ba'][1]
+    
+            f_S  = fb.fil[0]['f_S']
+    
+            # Build a list with all frequency related labels:
+            #--------------------------------------------------------------------
+            # First, extract the dicts for min / man filter order of the selected
+            # filter class from filter tree:
+            fil_dict = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]
+            # Now, extract the parameter lists (key 'par'), yielding a nested list:
+            fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
+            # Finally, flatten the list of lists and convert it into a set to 
+            # eliminate double entries:
+            fil_set = set([item for sublist in fil_list for item in sublist])
+            # extract all labels starting with 'F':
+    #        F_test_lbls = [lbl for lbl in fil_set if lbl[0] == 'F']
+            # construct a list of lists [frequency, label], sorted by frequency:
+    #        F_test = sorted([[fb.fil[0][lbl]*f_S, lbl] for lbl in F_test_lbls])
+    
+            # construct a list of lists consisting of [label, frequency]:
+            # F_test = [[lbl, fb.fil[0][lbl]*f_S] for lbl in F_test_lbls]
+            ## sort list of tuples using the LAST element of the tuple (= frequency)
+            # F_test = sorted(F_test, key=lambda t: t[::-1])
+    
+    
+            f_lbls = []
+            f_vals = []
+            a_lbls = []
+            a_targs = []
+            ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR')
+            unit = fb.fil[0]['amp_specs_unit']
+            unit = 'dB' # fix this for the moment
+            # read specifications from filter dict and sort them depending on the response type        
+            if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS'}:
+                if fb.fil[0]['rt'] == 'LP':
+                    f_lbls = ['F_PB', 'F_SB'] 
+                    a_lbls = ['A_PB', 'A_SB']
+                elif fb.fil[0]['rt'] == 'HP':
+                    f_lbls = ['F_SB', 'F_PB']
+                    a_lbls = ['A_SB', 'A_PB']
+                elif fb.fil[0]['rt'] == 'BP':
+                    f_lbls = ['F_SB', 'F_PB', 'F_PB2', 'F_SB2']
+                    a_lbls = ['A_SB', 'A_PB', 'A_PB', 'A_SB2']
+                elif fb.fil[0]['rt'] == 'BS':
+                    f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
+                    a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
 
-        f_S  = fb.fil[0]['f_S']
+            # Try to construct lists of frequency / amplitude labels and specs
+            # When one of the labels doesn't exist in the filter dict, delete 
+            # all corresponding amplitude and frequency entries
+                err = [False] * len(f_lbls) # initialize error list  
+                f_vals = []
+                a_targs = []
+                for i in range(len(f_lbls)):
+                    try:
+                        f = fb.fil[0][f_lbls[i]]
+                        f_vals.append(f)
+                    except KeyError as e:
+                        f_vals.append('')
+                        err[i] = True
+                        logger.debug(e)
+                    try:
+                        a = lin2unit(fb.fil[0][a_lbls[i]], ft, a_lbls[i], unit)
+                        a_targs.append(a)
+                    except KeyError as e:
+                        a_targs.append('')
+                        err[i] = True
+                        logger.debug(e)
 
-        # Build a list with all frequency related labels:
-        #--------------------------------------------------------------------
-        # First, extract the dicts for min / man filter order of the selected
-        # design method from filter tree:
-        fil_dict = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]
-        # Now, extract the parameter lists (key 'par'), yielding a nested list:
-        fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
-        # Finally, flatten the list of lists and convert it into a set to 
-        # eliminate double entries:
-        fil_set = set([item for sublist in fil_list for item in sublist])
-        # extract all labels starting with 'F':
-        F_test_lbls = [lbl for lbl in fil_set if lbl[0] == 'F']
-        # construct a list of lists [frequency, label], sorted by frequency:
-        F_test = sorted([[fb.fil[0][lbl]*f_S, lbl] for lbl in F_test_lbls])
-
-        # construct a list of lists consisting of [label, frequency]:
-        # F_test = [[lbl, fb.fil[0][lbl]*f_S] for lbl in F_test_lbls]
-        ## sort list of tuples using the LAST element of the tuple (= frequency)
-        # F_test = sorted(F_test, key=lambda t: t[::-1])
-
-        logger.debug("input_info.showFiltPerf\nF_test = %s" %F_test)
-
-        # Vector with test frequencies of the labels above    
-        F_test_vals = np.array([item[0] for item in F_test]) / f_S
-        F_test_lbls = [item[1] for item in F_test]
-        
-        # Calculate frequency response at test frequencies and over the whole range:
-        [w_test, H_test] = sig.freqz(bb, aa, F_test_vals * 2.0 * pi)
-        [w, H] = sig.freqz(bb, aa)
-
-        f = w / (2.0 * pi) # frequency normalized to f_S
-        H_abs = abs(H)
-        H_max = max(H_abs);
-        H_max_dB = 20*log10(H_max);
-        F_max = f[np.argmax(H_abs)]
-        #
-        H_min = min(H_abs)
-        H_min_dB = 20*log10(H_min)
-        F_min = f[np.argmin(H_abs)]
-        
-#        f = f * f_S 
-
-        F_test_lbls += ['Min.','Max.']
-        F_test_vals = np.append(F_test_vals, [F_min, F_max])
-        H_test = np.append(H_test, [H_min, H_max])
-        # calculate response of test frequencies and round to 5 digits to 
-        # suppress fails due to numerical inaccuracies:
-        H_test_dB = np.round(-20*log10(abs(H_test)),5)
-        
-        # build a list with the corresponding target specs:
-        H_targ = []
-        H_targ_pass = []
-        
-        ft = fb.fil[0]['ft']
-        unit = fb.fil[0]['amp_specs_unit']
-        unit = 'dB' # fix this for the moment
-        for i in range(len(F_test_lbls)):
-            lbl = F_test_lbls[i]
-            if lbl   == 'F_PB': 
-                H_targ.append(lin2unit(fb.fil[0]['A_PB'], ft, 'A_PB', unit))
-                H_targ_pass.append(H_test_dB[i] <= H_targ[i])
-            elif lbl == 'F_SB': 
-                H_targ.append(lin2unit(fb.fil[0]['A_SB'], ft, 'A_SB', unit))
-                H_targ_pass.append(H_test_dB[i] >= H_targ[i])
-            elif lbl == 'F_PB2':
-                H_targ.append(lin2unit(fb.fil[0]['A_PB2'], ft, 'A_PB2', unit))
-                H_targ_pass.append( H_test_dB[i] <= H_targ[i])
-            elif lbl == 'F_SB2':
-                H_targ.append(lin2unit(fb.fil[0]['A_SB2'], ft, 'A_SB2', unit))
-                H_targ_pass.append( H_test_dB[i] >= H_targ[i])
-            else: 
-                H_targ.append(np.nan)
-                H_targ_pass.append(True)
-
-        self.targ_spec_passed = np.all(H_targ_pass)
-#            
-        logger.debug("H_targ = %s\n", H_targ,
-            "H_test = %s\n", H_test,
-            "H_test_dB = %s\n", H_test_dB,
-            "F_test = %s\n", F_test_vals,
-            "H_targ_pass = %s\n", H_targ_pass,
-            "passed: %s\n", self.targ_spec_passed)
-
-#        min_dB = np.floor(max(PLT_min_dB, H_min_dB) / 10) * 10
-
-        self.tblFiltPerf.setRowCount(len(H_test))
-        self.target_spec_passed = False
-
-        self.tblFiltPerf.setHorizontalHeaderLabels([
-        'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'|H(f)|','|H(f)| (dB)', 'Spec'] )
-        self.tblFiltPerf.setVerticalHeaderLabels(F_test_lbls)
-        for row in range(len(H_test)):
-#            self.tblFiltPerf.setItem(row,0,QTableWidgetItem(F_test_lbls[row]))
-            self.tblFiltPerf.setItem(row,0,QTableWidgetItem(str('{0:.4g}'.format(F_test_vals[row]*f_S))))
-            self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%.4g'%(abs(H_test[row])))))
-            self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3f'%(H_test_dB[row]))))
-            if not H_targ_pass[row]:
-                self.tblFiltPerf.item(row,1).setBackground(QtGui.QColor('red'))
-                self.tblFiltPerf.item(row,2).setBackground(QtGui.QColor('red'))
-            self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%2.3f'%(H_targ[row]))))
-
-
-    #    self.tblFiltPerf.item(1,1).setBackgroundColor(Qt.QColor('red'))
-        self.tblFiltPerf.resizeColumnsToContents()
-        self.tblFiltPerf.resizeRowsToContents()
+                for i in range(len(f_lbls)):
+                    if err[i]:
+                        del f_lbls[i]
+                        del f_vals[i]
+                        del a_lbls[i]
+                        del a_targs[i]
+    
+                f_vals = np.asarray(f_vals) # convert to numpy array
+    
+                logger.debug("input_info.showFiltPerf\nF_test = %s" %f_lbls)
+                               
+                # Calculate frequency response at test frequencies
+                [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(np.float))
+                
+            
+            (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit = 'V')    
+            # append frequencies and values for min. and max. filter reponse to 
+            # test vector
+            f_lbls += ['Min.','Max.']
+            f_vals = np.append(f_vals, [F_min, F_max])
+            a_targs = np.append(a_targs, [np.nan, np.nan])
+            a_test = np.append(a_test, [H_min, H_max])
+            # calculate response of test frequencies and round to 5 digits to 
+            # suppress fails due to numerical inaccuracies:
+            a_test_dB = np.round(-20*log10(abs(a_test)),5)
+            
+            
+            ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR') for dB <-> lin conversion
+#            unit = fb.fil[0]['amp_specs_unit']
+            unit = 'dB' # fix this for the moment
+    
+            # build a list with the corresponding target specs:
+            a_targs_pass = []
+            eps = 1e-3
+            for i in range(len(f_lbls)):
+                if 'PB' in f_lbls[i]:
+                    a_targs_pass.append(a_test[i] <= a_targs[i])
+                elif 'SB' in f_lbls[i]:
+                    a_targs_pass.append(a_test[i] >= a_targs[i]) 
+                else:
+                    a_targs_pass.append(True)
+    
+            self.targs_spec_passed = np.all(a_targs_pass)
+            
+            logger.debug("H_targ = %s\n", a_targs,
+                "H_test = %s\n", a_test,
+                "H_test_dB = %s\n", a_test_dB,
+                "F_test = %s\n", f_vals,
+                "H_targ_pass = %s\n", a_targs_pass,
+                "passed: %s\n", self.targs_spec_passed)
+    
+            self.tblFiltPerf.setRowCount(len(a_test))
+    
+            self.tblFiltPerf.setHorizontalHeaderLabels([
+            'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'|H(f)|','|H(f)| (dB)', 'Spec'] )
+            self.tblFiltPerf.setVerticalHeaderLabels(f_lbls)
+            for row in range(len(a_test)):
+                self.tblFiltPerf.setItem(row,0,QTableWidgetItem(str('{0:.4g}'.format(f_vals[row]*f_S))))
+                self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%.4g'%(abs(a_test[row])))))
+                self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3f'%(a_test_dB[row]))))
+                if not a_targs_pass[row]:
+                    self.tblFiltPerf.item(row,1).setBackground(QtGui.QColor('red'))
+                    self.tblFiltPerf.item(row,2).setBackground(QtGui.QColor('red'))
+                self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%2.3f'%(a_targs[row]))))
+    
+            self.tblFiltPerf.resizeColumnsToContents()
+            self.tblFiltPerf.resizeRowsToContents()
 
 #------------------------------------------------------------------------------
     def _show_filt_dict(self):
