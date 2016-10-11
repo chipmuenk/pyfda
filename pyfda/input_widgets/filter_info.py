@@ -242,6 +242,7 @@ class FilterInfo(QWidget):
             f_vals = []
             a_lbls = []
             a_targs = []
+            a_targs_dB = []
             ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR')
             unit = fb.fil[0]['amp_specs_unit']
             unit = 'dB' # fix this for the moment
@@ -275,10 +276,13 @@ class FilterInfo(QWidget):
                         err[i] = True
                         logger.debug(e)
                     try:
-                        a = lin2unit(fb.fil[0][a_lbls[i]], ft, a_lbls[i], unit)
+                        a = fb.fil[0][a_lbls[i]]
+                        a_dB = lin2unit(fb.fil[0][a_lbls[i]], ft, a_lbls[i], unit)
                         a_targs.append(a)
+                        a_targs_dB.append(a_dB)
                     except KeyError as e:
                         a_targs.append('')
+                        a_targs_dB.append('')
                         err[i] = True
                         logger.debug(e)
 
@@ -288,6 +292,7 @@ class FilterInfo(QWidget):
                         del f_vals[i]
                         del a_lbls[i]
                         del a_targs[i]
+                        del a_targs_dB[i]
     
                 f_vals = np.asarray(f_vals) # convert to numpy array
     
@@ -303,10 +308,10 @@ class FilterInfo(QWidget):
             f_lbls += ['Min.','Max.']
             f_vals = np.append(f_vals, [F_min, F_max])
             a_targs = np.append(a_targs, [np.nan, np.nan])
+            a_targs_dB = np.append(a_targs_dB, [np.nan, np.nan])
             a_test = np.append(a_test, [H_min, H_max])
-            # calculate response of test frequencies and round to 5 digits to 
-            # suppress fails due to numerical inaccuracies:
-            a_test_dB = np.round(-20*log10(abs(a_test)),5)
+            # calculate response of test frequencies in dB
+            a_test_dB = -20*log10(abs(a_test))
             
             
             ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR') for dB <-> lin conversion
@@ -320,7 +325,7 @@ class FilterInfo(QWidget):
                 if 'PB' in f_lbls[i]:
                     a_targs_pass.append(a_test[i] <= a_targs[i])
                 elif 'SB' in f_lbls[i]:
-                    a_targs_pass.append(a_test[i] >= a_targs[i]) 
+                    a_targs_pass.append(a_test_dB[i] >= a_targs_dB[i]) 
                 else:
                     a_targs_pass.append(True)
     
@@ -340,12 +345,12 @@ class FilterInfo(QWidget):
             self.tblFiltPerf.setVerticalHeaderLabels(f_lbls)
             for row in range(len(a_test)):
                 self.tblFiltPerf.setItem(row,0,QTableWidgetItem(str('{0:.4g}'.format(f_vals[row]*f_S))))
-                self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%.4g'%(abs(a_test[row])))))
+                self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%.3g'%(abs(a_test[row])))))
                 self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3f'%(a_test_dB[row]))))
                 if not a_targs_pass[row]:
                     self.tblFiltPerf.item(row,1).setBackground(QtGui.QColor('red'))
                     self.tblFiltPerf.item(row,2).setBackground(QtGui.QColor('red'))
-                self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%2.3f'%(a_targs[row]))))
+                self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%2.3f'%(a_targs_dB[row]))))
     
             self.tblFiltPerf.resizeColumnsToContents()
             self.tblFiltPerf.resizeRowsToContents()
