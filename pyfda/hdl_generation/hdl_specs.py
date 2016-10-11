@@ -10,8 +10,8 @@ import sys, os
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSignal
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
+                      QVBoxLayout, QHBoxLayout, pyqtSignal)
 
 import numpy as np
 
@@ -32,7 +32,11 @@ from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter obje
 #                 @ http://www.dsprelated.com/showcode/211.php
 
 #------------------------------------------------------------------------------
-class HDLSpecs(QtGui.QWidget):
+
+
+#------------------------------------------------------------------------------
+
+class HDLSpecs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
@@ -50,24 +54,24 @@ class HDLSpecs(QtGui.QWidget):
         """
         
         # ============== UI Layout =====================================
-        bfont = QtGui.QFont()
+        bfont = QFont()
 #        font.setPointSize(11)
         bfont.setBold(True)
         
-        bifont = QtGui.QFont()
+        bifont = QFont()
         bifont.setBold(True)
         bifont.setItalic(True)
 
-        ifont = QtGui.QFont()
+        ifont = QFont()
         ifont.setItalic(True)
 
-        self.lblMyhdl1 = QtGui.QLabel("Warning! This feature is only experimental, "
+        self.lblMyhdl1 = QLabel("Warning! This feature is only experimental, "
         "only HDL code for second order IIR filters under the name siir_hdl.v "
         " resp. siir_hdl.vhd are created at the moment. Files are saved "
         " in the pyFDA root directory.")
         self.lblMyhdl1.setWordWrap(True)
 #        self.lblMyhdl1.setFont(bfont)
-        self.lblMyhdl2 = QtGui.QLabel("Enter fixpoint signal formats as QI.QF:")
+        self.lblMyhdl2 = QLabel("Enter fixpoint signal formats as QI.QF:")
 
         
         ledMaxWid = 30 # Max. Width of QLineEdit fields
@@ -81,38 +85,38 @@ class HDLSpecs(QtGui.QWidget):
         lblOv = "Ovfl.:"
         
 
-        layVMain = QtGui.QVBoxLayout()
+        layVMain = QVBoxLayout()
 
 
-        self.lblQIQF  = QtGui.QLabel("QI.QF = ")
-        self.lblDot_c = QtGui.QLabel(".")
+        self.lblQIQF  = QLabel("QI.QF = ")
+        self.lblDot_c = QLabel(".")
 #        self.lblDot_c.setEnabled(enb_coeff)
 
-        self.lblDot_i = QtGui.QLabel(".")
+        self.lblDot_i = QLabel(".")
 
-        self.lblDot_a = QtGui.QLabel(".")
-        self.lblQuant_a = QtGui.QLabel(lblQ)
-        self.lblQOvfl_a = QtGui.QLabel(lblOv)
+        self.lblDot_a = QLabel(".")
+        self.lblQuant_a = QLabel(lblQ)
+        self.lblQOvfl_a = QLabel(lblOv)
 
 
 # -------------------------------------------------------------------
 # UI for input format 
 # -------------------------------------------------------------------
-        self.lblQInput = QtGui.QLabel("Input Format:")
+        self.lblQInput = QLabel("Input Format:")
         self.lblQInput.setFont(bifont)
-        self.ledQIInput = QtGui.QLineEdit()
+        self.ledQIInput = QLineEdit()
         self.ledQIInput.setToolTip(tipQI)
         self.ledQIInput.setText("0")
         self.ledQIInput.setMaxLength(2) # maximum of 2 digits
         self.ledQIInput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
 
-        self.ledQFInput = QtGui.QLineEdit()
+        self.ledQFInput = QLineEdit()
         self.ledQFInput.setToolTip(tipQF)
         self.ledQFInput.setText("15")
         self.ledQFInput.setMaxLength(2) # maximum of 2 digits
         self.ledQFInput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
 
-        self.layHButtonsHDL_i = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_i = QHBoxLayout()
         self.layHButtonsHDL_i.addWidget(self.lblQInput)
         self.layHButtonsHDL_i.addStretch()
         self.layHButtonsHDL_i.addWidget(self.ledQIInput)
@@ -122,17 +126,17 @@ class HDLSpecs(QtGui.QWidget):
 # UI for output format 
 # -------------------------------------------------------------------
         enb_coeff = False
-        self.lblQCoeff = QtGui.QLabel("Coeff. Format:")
+        self.lblQCoeff = QLabel("Coeff. Format:")
         self.lblQCoeff.setFont(bifont)
         self.lblQCoeff.setEnabled(enb_coeff)
-        self.ledQICoeff = QtGui.QLineEdit()
+        self.ledQICoeff = QLineEdit()
         self.ledQICoeff.setToolTip(tipQI)
         self.ledQICoeff.setText("0")
         self.ledQICoeff.setMaxLength(2) # maximum of 2 digits
         self.ledQICoeff.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
         self.ledQICoeff.setEnabled(enb_coeff)
 
-        self.ledQFCoeff = QtGui.QLineEdit()
+        self.ledQFCoeff = QLineEdit()
         self.ledQFCoeff.setToolTip(tipQF)
         self.ledQFCoeff.setText("15")
         self.ledQFCoeff.setMaxLength(2) # maximum of 2 digits
@@ -140,7 +144,7 @@ class HDLSpecs(QtGui.QWidget):
         self.ledQFCoeff.setMaximumWidth(ledMaxWid)
         self.ledQFCoeff.setEnabled(enb_coeff)
 
-        self.layHButtonsHDL_c = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_c = QHBoxLayout()
         self.layHButtonsHDL_c.addWidget(self.lblQCoeff)
         self.layHButtonsHDL_c.addStretch()
         self.layHButtonsHDL_c.addWidget(self.ledQICoeff)
@@ -148,25 +152,25 @@ class HDLSpecs(QtGui.QWidget):
         self.layHButtonsHDL_c.addWidget(self.ledQFCoeff)
  
 
-        self.lblQuant_c = QtGui.QLabel(lblQ)
+        self.lblQuant_c = QLabel(lblQ)
         self.lblQuant_c.setEnabled(enb_coeff)
-        self.cmbQuant_c = QtGui.QComboBox()
+        self.cmbQuant_c = QComboBox()
         self.cmbQuant_c.addItems(qQuant)
         self.cmbQuant_c.setToolTip(tipQuant)
         self.cmbQuant_c.setEnabled(enb_coeff)
         
-        self.lblQOvfl_c = QtGui.QLabel(lblOv)
+        self.lblQOvfl_c = QLabel(lblOv)
         self.lblQOvfl_c.setEnabled(enb_coeff)   
-        self.cmbOvfl_c = QtGui.QComboBox()
+        self.cmbOvfl_c = QComboBox()
         self.cmbOvfl_c.addItems(qOvfl)
         self.cmbOvfl_c.setToolTip(tipOvfl)
         self.cmbOvfl_c.setEnabled(enb_coeff)   
 
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant_c.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbOvfl_c.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbQuant_c.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbOvfl_c.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.layHButtonsHDL_cc = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_cc = QHBoxLayout()
         self.layHButtonsHDL_cc.addWidget(self.lblQOvfl_c)            
         self.layHButtonsHDL_cc.addWidget(self.cmbOvfl_c)
         self.layHButtonsHDL_cc.addStretch()
@@ -174,39 +178,39 @@ class HDLSpecs(QtGui.QWidget):
         self.layHButtonsHDL_cc.addWidget(self.cmbQuant_c)
         self.layHButtonsHDL_cc.setEnabled(False)
 # -----------------------------------------------------------------------------
-        self.lblQAccu = QtGui.QLabel("Accumulator Format:")
+        self.lblQAccu = QLabel("Accumulator Format:")
         self.lblQAccu.setFont(bifont)
-        self.ledQIAccu = QtGui.QLineEdit()
+        self.ledQIAccu = QLineEdit()
         self.ledQIAccu.setToolTip(tipQI)
         self.ledQIAccu.setText("0")
         self.ledQIAccu.setMaxLength(2) # maximum of 2 digits
         self.ledQIAccu.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
 
-        self.ledQFAccu = QtGui.QLineEdit()
+        self.ledQFAccu = QLineEdit()
         self.ledQFAccu.setToolTip(tipQF)
         self.ledQFAccu.setText("15")
         self.ledQFAccu.setMaxLength(2) # maximum of 2 digits
         self.ledQFAccu.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
 
-        self.layHButtonsHDL_a = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_a = QHBoxLayout()
         self.layHButtonsHDL_a.addWidget(self.lblQAccu)
         self.layHButtonsHDL_a.addStretch()
         self.layHButtonsHDL_a.addWidget(self.ledQIAccu)
         self.layHButtonsHDL_a.addWidget(self.lblDot_a)
         self.layHButtonsHDL_a.addWidget(self.ledQFAccu)
 # -------------------------------------------------------------------
-        self.cmbQuant_a = QtGui.QComboBox()
+        self.cmbQuant_a = QComboBox()
         self.cmbQuant_a.addItems(qQuant)
         self.cmbQuant_a.setToolTip(tipQuant)
-        self.cmbOvfl_a = QtGui.QComboBox()
+        self.cmbOvfl_a = QComboBox()
         self.cmbOvfl_a.addItems(qOvfl)
         self.cmbOvfl_a.setToolTip(tipOvfl)
 
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant_a.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbOvfl_a.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbQuant_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbOvfl_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.layHButtonsHDL_ac = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_ac = QHBoxLayout()
         self.layHButtonsHDL_ac.addWidget(self.lblQOvfl_a)            
         self.layHButtonsHDL_ac.addWidget(self.cmbOvfl_a)
         self.layHButtonsHDL_ac.addStretch()
@@ -216,27 +220,27 @@ class HDLSpecs(QtGui.QWidget):
 # -------------------------------------------------------------------
 
         enb_o_ui = False
-        self.lblQOutput = QtGui.QLabel("Output Format:")
+        self.lblQOutput = QLabel("Output Format:")
         self.lblQOutput.setFont(bifont)
         self.lblQOutput.setEnabled(enb_o_ui)
-        self.ledQIOutput = QtGui.QLineEdit()
+        self.ledQIOutput = QLineEdit()
         self.ledQIOutput.setToolTip(tipQI)
         self.ledQIOutput.setText("0")
         self.ledQIOutput.setMaxLength(2) # maximum of 2 digits
         self.ledQIOutput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
         self.ledQIOutput.setEnabled(enb_o_ui)
         
-        self.lblDot_o = QtGui.QLabel(".")
+        self.lblDot_o = QLabel(".")
         self.lblDot_o.setEnabled(enb_o_ui)
 
-        self.ledQFOutput = QtGui.QLineEdit()
+        self.ledQFOutput = QLineEdit()
         self.ledQFOutput.setToolTip(tipQF)
         self.ledQFOutput.setText("15")
         self.ledQFOutput.setMaxLength(2) # maximum of 2 digits
         self.ledQFOutput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
         self.ledQFOutput.setEnabled(enb_o_ui)
 
-        self.layHButtonsHDL_o = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_o = QHBoxLayout()
         self.layHButtonsHDL_o.addWidget(self.lblQOutput)
         self.layHButtonsHDL_o.addStretch()
         self.layHButtonsHDL_o.addWidget(self.ledQIOutput)
@@ -244,47 +248,47 @@ class HDLSpecs(QtGui.QWidget):
         self.layHButtonsHDL_o.addWidget(self.ledQFOutput)
 # -------------------------------------------------------------------
 
-        self.lblQOvfl_o = QtGui.QLabel(lblOv)
+        self.lblQOvfl_o = QLabel(lblOv)
         self.lblQOvfl_o.setEnabled(enb_o_ui)
-        self.lblQuant_o = QtGui.QLabel(lblQ)
+        self.lblQuant_o = QLabel(lblQ)
         self.lblQuant_o.setEnabled(enb_o_ui)
         
-        self.cmbQuant_o = QtGui.QComboBox()
+        self.cmbQuant_o = QComboBox()
         self.cmbQuant_o.addItems(qQuant)
         self.cmbQuant_o.setToolTip(tipQuant)
         self.cmbQuant_o.setEnabled(enb_o_ui)
         
-        self.cmbOvfl_o = QtGui.QComboBox()
+        self.cmbOvfl_o = QComboBox()
         self.cmbOvfl_o.addItems(qOvfl)
         self.cmbOvfl_o.setToolTip(tipOvfl)
         self.cmbOvfl_o.setEnabled(enb_o_ui)
 
 
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant_o.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
-        self.cmbOvfl_o.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        self.cmbQuant_o.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbOvfl_o.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.layHButtonsHDL_oc = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_oc = QHBoxLayout()
         self.layHButtonsHDL_oc.addWidget(self.lblQOvfl_o)            
         self.layHButtonsHDL_oc.addWidget(self.cmbOvfl_o)
         self.layHButtonsHDL_oc.addStretch()
         self.layHButtonsHDL_oc.addWidget(self.lblQuant_o)
         self.layHButtonsHDL_oc.addWidget(self.cmbQuant_o)
 
-        self.cmbHDL = QtGui.QComboBox()
+        self.cmbHDL = QComboBox()
         self.cmbHDL.addItems(['Verilog','VHDL'])
         self.cmbHDL.setToolTip("Select type of HDL for filter synthesis.")
 
-        self.butExportHDL = QtGui.QPushButton()
+        self.butExportHDL = QPushButton()
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
         self.butExportHDL.setText("Create HDL")
         
-        self.butSimFixPoint = QtGui.QPushButton()
+        self.butSimFixPoint = QPushButton()
         self.butSimFixPoint.setToolTip("Simulate filter with fixpoint effects.")
         self.butSimFixPoint.setText("Simulate")
 
         
-        self.layHButtonsHDL_h = QtGui.QHBoxLayout()
+        self.layHButtonsHDL_h = QHBoxLayout()
         self.layHButtonsHDL_h.addWidget(self.butSimFixPoint)            
         self.layHButtonsHDL_h.addWidget(self.butExportHDL)
 # -------------------------------------------------------------------
@@ -356,13 +360,13 @@ class HDLSpecs(QtGui.QWidget):
         """
         Synthesize HDL description of filter using myHDL module
         """
-        # This does not work yet: file name is currently fixed to "siir_hdl" via the 
-        # function with the same name
-        dlg=QtGui.QFileDialog( self )
+        # Passing the file name doesn't work yet, itis currently fixed to 
+        # "siir_hdl" via the function with the same name
+        dlg = QFD(self)
         
         file_types = "Verilog (*.v);;VHDL (*.vhd)"
 
-        hdl_file, hdl_filter = dlg.getSaveFileNameAndFilter(self,
+        hdl_file, hdl_filter = dlg.getSaveFileName_(self,
                 caption = "Save HDL as", directory="D:",
                 filter = file_types)
         hdl_file = str(hdl_file)
@@ -387,13 +391,13 @@ class HDLSpecs(QtGui.QWidget):
         """
         # Setup the Testbench and run
 
-        # This does not work yet: file name is currently fixed to "siir_hdl" via the 
-        # function with the same name
-        dlg=QtGui.QFileDialog( self )
+        # Passing the file name doesn't work yet, itis currently fixed to 
+        # "siir_hdl" via the function with the same name
+        dlg = QFD(self)
         
         plt_types = "png (*.png);;svg (*.svg)"
 
-        plt_file, plt_type = dlg.getSaveFileNameAndFilter(self,
+        plt_file, plt_type = dlg.getSaveFileName_(self,
                 caption = "Save plots as", directory="D:",
                 filter = plt_types)
         plt_file = str(plt_file)
@@ -430,8 +434,9 @@ class HDLSpecs(QtGui.QWidget):
 
 if __name__ == '__main__':
 
-    app = QtGui.QApplication(sys.argv)
-    form = HDLSpecs()
-    form.show()
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
+    mainw = HDLSpecs(None)
+    mainw.show()
 
     app.exec_()
