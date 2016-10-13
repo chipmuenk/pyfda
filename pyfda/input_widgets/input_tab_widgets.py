@@ -9,16 +9,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-#from ..compat import QtGui, QtCore, QWidget
-#pyqtSignal = QtCore.pyqtSignal
-
-from ..compat import (QtCore, QtGui, QTabWidget,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
-
+from ..compat import QTabWidget, QWidget, QVBoxLayout, QSizePolicy, pyqtSignal
 
 import pyfda.filterbroker as fb
 
@@ -137,7 +128,7 @@ class InputTabWidgets(QWidget):
         - Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
-# TODO: The button should be styled within InputSpecs
+
         self.filter_specs.color_design_button("changed")
         self.filter_info.load_entries()
 
