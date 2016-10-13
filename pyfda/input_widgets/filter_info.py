@@ -26,7 +26,7 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import lin2unit
+from pyfda.pyfda_lib import lin2unit, rt_label
 # TODO: Passband and stopband info should show min / max values for each band
 
 class FilterInfo(QWidget):
@@ -305,6 +305,8 @@ class FilterInfo(QWidget):
             # append frequencies and values for min. and max. filter reponse to 
             # test vector
             f_lbls += ['Min.','Max.']
+            # QTableView does not support direct formatting, use QLabel
+            # f_lbls = [rt_label(l) for l in f_lbls] 
             f_vals = np.append(f_vals, [F_min, F_max])
             a_targs = np.append(a_targs, [np.nan, np.nan])
             a_targs_dB = np.append(a_targs_dB, [np.nan, np.nan])
