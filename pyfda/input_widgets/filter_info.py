@@ -370,8 +370,6 @@ class FilterInfo(QWidget):
 #        dictstr = pprint.pformat(fb.fil[0])
         self.txtFiltDict.setText(dictstr)
 
-#        pprint.pprint(fb.fil[0])
-
 #------------------------------------------------------------------------------
     def _show_filt_tree(self):
         """
