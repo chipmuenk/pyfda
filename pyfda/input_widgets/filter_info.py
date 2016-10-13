@@ -56,7 +56,6 @@ class FilterInfo(QWidget):
         bfont = QFont()
         bfont.setBold(True)
         self.tblFiltPerf = QTableWidget()
-        self.tblFiltPerf.setColumnCount(4)
         self.tblFiltPerf.setAlternatingRowColors(True)
 #        self.tblFiltPerf.verticalHeader().setVisible(False)
         self.tblFiltPerf.horizontalHeader().setHighlightSections(False)
@@ -323,7 +322,7 @@ class FilterInfo(QWidget):
             eps = 1e-3
             for i in range(len(f_lbls)):
                 if 'PB' in f_lbls[i]:
-                    a_targs_pass.append(a_test[i] <= a_targs[i])
+                    a_targs_pass.append(a_test_dB[i] <= a_targs_dB[i])
                 elif 'SB' in f_lbls[i]:
                     a_targs_pass.append(a_test_dB[i] >= a_targs_dB[i]) 
                 else:
@@ -338,19 +337,21 @@ class FilterInfo(QWidget):
                 "H_targ_pass = %s\n", a_targs_pass,
                 "passed: %s\n", self.targs_spec_passed)
     
-            self.tblFiltPerf.setRowCount(len(a_test))
+            self.tblFiltPerf.setRowCount(len(a_test)) # number of table rows
+            self.tblFiltPerf.setColumnCount(5) # number of table columns
     
             self.tblFiltPerf.setHorizontalHeaderLabels([
-            'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'|H(f)|','|H(f)| (dB)', 'Spec'] )
+            'f/{0:s}'.format(fb.fil[0]['freq_specs_unit']),'|H(f)|','|H(f)| (dB)', 'Spec', 'Spec (dB)'] )
             self.tblFiltPerf.setVerticalHeaderLabels(f_lbls)
             for row in range(len(a_test)):
                 self.tblFiltPerf.setItem(row,0,QTableWidgetItem(str('{0:.4g}'.format(f_vals[row]*f_S))))
-                self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%.3g'%(abs(a_test[row])))))
-                self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3f'%(a_test_dB[row]))))
+                self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%2.3f'%(a_test_dB[row]))))
+                self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3g'%(a_targs[row]))))
+                self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%.3g'%(abs(a_test[row])))))
+                self.tblFiltPerf.setItem(row,4,QTableWidgetItem(str('%2.3f'%(a_targs_dB[row]))))
                 if not a_targs_pass[row]:
                     self.tblFiltPerf.item(row,1).setBackground(QtGui.QColor('red'))
-                    self.tblFiltPerf.item(row,2).setBackground(QtGui.QColor('red'))
-                self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%2.3f'%(a_targs_dB[row]))))
+                    self.tblFiltPerf.item(row,3).setBackground(QtGui.QColor('red'))
     
             self.tblFiltPerf.resizeColumnsToContents()
             self.tblFiltPerf.resizeRowsToContents()
