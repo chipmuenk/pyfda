@@ -15,13 +15,9 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
-
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
+                      QCheckBox, QVBoxLayout, QHBoxLayout, QSizePolicy,
+                      pyqtSignal)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
