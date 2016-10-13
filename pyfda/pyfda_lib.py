@@ -1197,7 +1197,7 @@ def remlplen_ichige(fp,fs,dp,ds):
     return int(N4)
     
 #-------------------------------------------------------------
-def rt_label(label):
+def rt_label(label, it = True):
     """
     Rich text label: Format label with italic + bold HTML tags and
      replace '_' by HTML subscript tags
@@ -1206,12 +1206,13 @@ def rt_label(label):
      ----------
 
     label : string
-        Name for the label to be converted, containing '_' for subsripts
+        Name for the label to be converted, containing '_' for subscripts
         
     Returns
     -------
     
-    html_label
+    html_label : string
+        HTML - formatted label
     
     Examples
     --------
@@ -1220,11 +1221,13 @@ def rt_label(label):
         <b><i>F<sub>SB</sub></i></b>
          
     """
-    #"<b><i>{0}</i></b>".format(newLabels[i])) # update label
     if "_" in label:
         label = label.replace('_', '<sub>')
         label += "</sub>"
-    html_label = "<b><i>"+label+"</i></b>"
+    if it:    
+        html_label = "<b><i>"+label+"</i></b>"
+    else:
+        html_label = "<b>"+label+"</b>"
     return html_label
 
 #------------------------------------------------------------------------------
