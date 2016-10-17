@@ -77,6 +77,13 @@ class FilterCoeffs(QWidget):
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
         self.lblCoeffList = QLabel()
         self.lblCoeffList.setText("Show Coefficients")
+        
+        self.cmbFilterType = QComboBox(self)
+        self.cmbFilterType.setObjectName("comboFilterType")
+        self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
+        self.cmbFilterType.addItems(["FIR","IIR"])
+        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
 
         self.tblCoeff = QTableWidget()
         self.tblCoeff.setEditTriggers(QTableWidget.AllEditTriggers)
@@ -189,6 +196,7 @@ class FilterCoeffs(QWidget):
         self.layHButtonsCoeffs1.addWidget(self.butDelRow)
         self.layHButtonsCoeffs1.addWidget(self.butSave)
         self.layHButtonsCoeffs1.addWidget(self.butLoad)
+        self.layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         self.layHButtonsCoeffs1.addStretch()
 
         self.layHButtonsCoeffs2 = QHBoxLayout()
@@ -238,6 +246,7 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
 
         self.chkCoeffList.clicked.connect(self.load_entries)
+        self.cmbFilterType.currentIndexChanged.connect(self.load_entries)
         self.butLoad.clicked.connect(self.load_entries)
 
         self.butSave.clicked.connect(self.store_entries)
@@ -314,10 +323,14 @@ class FilterCoeffs(QWidget):
             num_cols = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
+            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"     
+            
         else:
             num_cols = 2
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"       
+
             
         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
         self.tblCoeff.setRowCount(num_rows)
