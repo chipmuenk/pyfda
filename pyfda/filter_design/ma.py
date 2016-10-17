@@ -57,23 +57,27 @@ a given frequency can be calculated via the si function (not implemented yet).
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter desired order (= delays) <b><i>N</i></b> per stage and "
-                    " and the number of stages.")
-        msg_min = ("Enter the minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                    "and the corresponding corner frequency of the stop band, "
-                    "<b><i>F<sub>SB</sub></i></b> .")
+                    " and the number of stages. Target frequencies and amplitudes"
+                    " are only used for comparison, not for the design.")
+                    
+        msg_min = ""
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','tspecs'] # manual filter order
-        vis_min = ['fo','tspecs'] # minimum filter order
+        vis_man = ['fo', 'tspecs'] # manual filter order
+        vis_min = [] # minimum filter order
+
+        # INFORMATIONAL widgets for all response types, these widgets are coloured,
+        # signalling that they can be edited but only for informational purposes:
+        info_man = ['tspecs']
 
         # DISABLED widgets for all man. / min. filter order response types:
         dis_man = [] # manual filter order
-        dis_min = ['fspecs'] # minimum filter order
+        dis_min = [] # manual filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_SB', 'A_SB'] # manual filter order
-        par_min = ['f_S', 'F_SB', 'A_SB'] # minimum filter order
-
+        par_man = ['N', 'f_S'] # manual filter order
+        par_min = []
+        
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
@@ -81,8 +85,10 @@ a given frequency can be calculated via the si function (not implemented yet).
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":[]}},
-            "HP": {"man":{"par":[]}}
+            "LP": {"man":{"par":['F_PB', 'A_PB', 'F_SB', 'A_SB']},
+                   "targ":{"par":['F_PB', 'F_SB', 'A_PB', 'A_SB']}},
+            "HP": {"man":{"par":['F_SB', 'A_SB', 'F_PB', 'A_PB']},
+                   "targ":{"par":['F_SB', 'F_PB', 'A_SB', 'A_PB']}},
                    } 
 
         self.info_doc = []
