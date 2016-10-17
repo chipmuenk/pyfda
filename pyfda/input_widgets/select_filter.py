@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-input_filter.py
+select_filter.py
 ---------------
 Subwidget for selecting the filter, consisting of combo boxes for:
 - Response Type (LP, HP, Hilbert, ...)
 - Filter Type (IIR, FIR, CIC ...)
-- Design Method (Butterworth, ...)
+- Filter Class (Butterworth, ...)
 
-@author: Julia Beike, Christian Münker, Michael Winkler
-Datum: 4.12.2014
+@author: Julia Beike, Christian Münker, Michael Winkler 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
