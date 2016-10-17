@@ -114,19 +114,19 @@ class FilterFactory(object):
         # In both cases, a (new) filter object is instantiated.
 
         if (not hasattr(fil_inst, 'name') or fc != fil_inst.name):
-            # get named attribute from fc_module, here, this returns a class
-            fil_class = getattr(fc_module, fc, None)
-            fil_inst = fil_class() # instantiate an object         
-            self.err_code = -1 # filter instance has been created / changed successfully
-
-        if fil_class is None: # fc is not a class of dm_module
-            err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                    "Unknown design class '%s', could not be created.", fc)
-            print(err_string)
-            self.err_code = 3
-        else:
+            # get attribute fc from fc_module, here, this returns the class fc
             err_string = ""
             self.err_code = 0
+            fil_class = getattr(fc_module, fc, None) # or None if not in fc_module 
+
+            if fil_class is None: # fc is not a class of fc_module
+                err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
+                        "Unknown design class '%s', could not be created.", fc)
+                print(err_string)
+                self.err_code = 3
+            else:
+                fil_inst = fil_class() # instantiate an object         
+                self.err_code = -1 # filter instance has been created / changed successfully
             logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
         
         return self.err_code
