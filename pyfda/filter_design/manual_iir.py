@@ -25,6 +25,7 @@ __version__ = "1.3"
 
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
+filter_classes = 'Manual'
 
 class Manual():
     
