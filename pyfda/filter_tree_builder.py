@@ -274,35 +274,35 @@ class FilterTreeBuilder(object):
                     fb.fil_tree[rt].update({ft:{}}) # no, create it
                 fb.fil_tree[rt][ft].update({fc:{}}) # append fc to list dict[rt][ft]
                 # finally append all the individual 'min' / 'man' info
-                # to fc in fb.fil_tree. These are e.g. the params for 'min' and /or
-                # 'man' filter order
+                # to fc in fb.fil_tree. These are e.g. the params for 'min' / 'man' 
+                # filter order and 'targ' specifications
                 fb.fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
                 # combine common info for all response types
-                #     com = {'man':{...}, 'min':{...}}
+                #     com = {'man':{...}, 'min':{...}, 'targ':{...}}
                 # with individual info from the last step
-                #      e.g. {..., 'LP':{'man':{...}, 'min':{...}}
+                #      e.g. {..., 'LP':{'man':{...}, 'min':{...}, 'targ':{...}}
 
-                for minman in ff.fil_inst.com:
-                    # add info only when 'man' / 'min' exists in fb.fil_tree
-                    if minman in fb.fil_tree[rt][ft][fc]:
-                        for i in ff.fil_inst.com[minman]:
-                            # Test whether entry exists in fb.fil_tree:
-                            if i in fb.fil_tree[rt][ft][fc][minman]:
+                for par in ff.fil_inst.com: # read common parameters
+                    # add info only when 'man' / 'min' / 'targ' exists in fb.fil_tree
+                    if par in fb.fil_tree[rt][ft][fc]:
+                        for i in ff.fil_inst.com[par]:
+                            # Test whether entry exists already in fb.fil_tree:
+                            if i in fb.fil_tree[rt][ft][fc][par]:
                                 # yes, prepend common data
-                                fb.fil_tree[rt][ft][fc][minman][i] =\
-                                ff.fil_inst.com[minman][i] + fb.fil_tree[rt][ft][fc][minman][i]
+                                fb.fil_tree[rt][ft][fc][par][i] =\
+                                ff.fil_inst.com[par][i] + fb.fil_tree[rt][ft][fc][par][i]
                             else:
                                 # no, create new entry
-                                fb.fil_tree[rt][ft][fc][minman].update(\
-                                                {i:ff.fil_inst.com[minman][i]})
+                                fb.fil_tree[rt][ft][fc][par].update(\
+                                                {i:ff.fil_inst.com[par][i]})
 
                             logger.debug("%s - %s - %s\n"
-                                "fb.fil_tree[rt][ft][fc][minman][i]: %s\n"
-                                "fb.fil_inst.com[minman][i]: %s",
-                                 fc, minman, i,
-                                 pformat(fb.fil_tree[rt][ft][fc][minman][i]), 
-                                 pformat(ff.fil_inst.com[minman][i]))
+                                "fb.fil_tree[rt][ft][fc][par][i]: %s\n"
+                                "fb.fil_inst.com[par][i]: %s",
+                                 fc, par, i,
+                                 pformat(fb.fil_tree[rt][ft][fc][par][i]), 
+                                 pformat(ff.fil_inst.com[par][i]))
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
