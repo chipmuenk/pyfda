@@ -273,7 +273,7 @@ class FilterTreeBuilder(object):
                 if ft not in fb.fil_tree[rt]:  # is ft key already in dict[rt]?
                     fb.fil_tree[rt].update({ft:{}}) # no, create it
                 fb.fil_tree[rt][ft].update({fc:{}}) # append fc to list dict[rt][ft]
-                # finally append all the individual 'min' / 'man' info
+                # finally append all the individual 'min' / 'man' / ' targ' info
                 # to fc in fb.fil_tree. These are e.g. the params for 'min' / 'man' 
                 # filter order and 'targ' specifications
                 fb.fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
