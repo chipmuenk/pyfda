@@ -85,19 +85,17 @@ class FilterTreeBuilder(object):
 
         Returns
         -------
-        None
+        None, the results are stored in self.filt_list_names
         """
 
-        filt_list_comments = []     # comment lines from filt_list
-        # List with design method file names (= class names) in filt_list
-        # (without .py suffix):
+        filt_list_comments = []     # comment lines from the filt_list file
+        # List with design class file names in filt_list without .py suffix:
         self.filt_list_names = []
 
         num_filters = 0           # number of filter design files found
 
         try:
             # Try to open filt_dir_file in read mode:
- #           fp = open(self.initDirFile,'rU', 1) # 1 = line buffered
             fp = codecs.open(self.filt_dir_file, 'rU', encoding='utf-8')
             cur_line = fp.readline()
 
