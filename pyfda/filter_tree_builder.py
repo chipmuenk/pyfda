@@ -171,22 +171,22 @@ class FilterTreeBuilder(object):
         num_imports = 0   # initialize number of successful filter module imports
         imported_fil_modules = "" # names of successful filter module imports
 
-        for fc in self.filt_list_names:
+        for filt_mod in self.filt_list_names:
             try:
                 # Try to import the module from the  package)
                 # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
-                module_name = 'pyfda.' + self.filt_dir + '.' + fc
+                module_name = 'pyfda.' + self.filt_dir + '.' + filt_mod
 
                 importlib.import_module(module_name)
 
                 # when successful, add the filename without '.py' and the
                 # full module name to the dict 'imports', e.g.
                 #      {'cheby1': 'pyfda.filter_design.cheby1'}
-                fb.fc_module_names.update({fc:module_name})
+                fb.fc_module_names.update({filt_mod:module_name})
                 num_imports += 1
 
             except ImportError as e:
-                logger.error('Filter design "%s" could not be imported.', fc)
+                logger.error('Filter design "%s" could not be imported.', filt_mod)
             except Exception as e:
                 logger.error("Unexpected error: %s", e)
            
