@@ -105,11 +105,13 @@ class FilterFactory(object):
         # the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
-            # get attribute fc from fc_module, here, this returns the class fc
+        if hasattr(fc_module, 'filter_classes'):
+            fc = fc_module.filter_classes # else use method parameter fc as class name    
 
         if fil_inst is None or fc != fil_inst.name:
             err_string = ""
             self.err_code = -1
+            # get attribute fc from fc_module, here, this returns the class fc
             fil_class = getattr(fc_module, fc, None) # or None if not in fc_module 
 
             if fil_class is None: # fc is not a class of fc_module
