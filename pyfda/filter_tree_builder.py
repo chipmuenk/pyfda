@@ -187,13 +187,13 @@ class FilterTreeBuilder(object):
                 imported_fil_modules += "\t" + filt_mod + "\n"
 
             except ImportError as e:
-                logger.error('Filter design "%s" could not be imported.', filt_mod)
+                logger.error('Filter module "%s" could not be imported.', filt_mod)
             except Exception as e:
                 logger.error("Unexpected error: %s", e)           
             
         if num_imports < 1:
-            logger.critical("No filter class could be imported - shutting down.")
-            sys.exit("No filter class could be imported - shutting down.")
+            logger.critical("No filter module could be imported - shutting down.")
+            sys.exit("No filter module could be imported - shutting down.")
 
         else:
             logger.info("Imported successfully the following %d filter modules:\n%s", 
