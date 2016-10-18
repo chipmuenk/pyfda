@@ -121,7 +121,7 @@ class FilterFactory(object):
 
             if fil_class is None: # fc is not a class of fc_module
                 err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                        "Unknown design class '%s', could not be created.", fc)
+                        "Unknown design class '%s', could not be created." %fc)
                 print(err_string)
                 self.err_code = 3
             else:
