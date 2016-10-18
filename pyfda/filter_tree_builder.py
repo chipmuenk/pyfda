@@ -286,23 +286,23 @@ class FilterTreeBuilder(object):
                 for par in ff.fil_inst.com: # read common parameters
                     # add info only when 'man' / 'min' / 'targ' exists in fb.fil_tree
                     if par in fb.fil_tree[rt][ft][fc]:
-                        for i in ff.fil_inst.com[par]:
+                        for p in ff.fil_inst.com[par]:
                             # Test whether entry exists already in fb.fil_tree:
-                            if i in fb.fil_tree[rt][ft][fc][par]:
+                            if p in fb.fil_tree[rt][ft][fc][par]:
                                 # yes, prepend common data
-                                fb.fil_tree[rt][ft][fc][par][i] =\
-                                ff.fil_inst.com[par][i] + fb.fil_tree[rt][ft][fc][par][i]
+                                fb.fil_tree[rt][ft][fc][par][p] =\
+                                ff.fil_inst.com[par][p] + fb.fil_tree[rt][ft][fc][par][p]
                             else:
                                 # no, create new entry
                                 fb.fil_tree[rt][ft][fc][par].update(\
-                                                {i:ff.fil_inst.com[par][i]})
+                                                {p:ff.fil_inst.com[par][p]})
 
                             logger.debug("%s - %s - %s\n"
                                 "fb.fil_tree[rt][ft][fc][par][i]: %s\n"
                                 "fb.fil_inst.com[par][i]: %s",
-                                 fc, par, i,
-                                 pformat(fb.fil_tree[rt][ft][fc][par][i]), 
-                                 pformat(ff.fil_inst.com[par][i]))
+                                 fc, par, p,
+                                 pformat(fb.fil_tree[rt][ft][fc][par][p]), 
+                                 pformat(ff.fil_inst.com[par][p]))
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
