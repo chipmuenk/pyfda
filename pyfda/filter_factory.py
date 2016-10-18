@@ -19,7 +19,7 @@ from . import filterbroker as fb
 logger = logging.getLogger(__name__)
 
 # Instance of current filter design class (e.g. "cheby1")
-fil_inst = ""
+fil_inst = None
 
 #------------------------------------------------------------------------------
 class FilterFactory(object):
@@ -105,8 +105,9 @@ class FilterFactory(object):
         # the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
-        if (not hasattr(fil_inst, 'name') or fc != fil_inst.name):
             # get attribute fc from fc_module, here, this returns the class fc
+
+        if fil_inst is None or fc != fil_inst.name:
             err_string = ""
             self.err_code = -1
             fil_class = getattr(fc_module, fc, None) # or None if not in fc_module 
