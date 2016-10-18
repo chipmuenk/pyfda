@@ -182,14 +182,19 @@ class FilterSpecs(QWidget):
 
         self.sel_fil.load_filter_order() # update filter order from dict
 
-        # build separate parameter lists for min. and man. filter order        
-        min_params = man_params = []
+        # build separate parameter lists for min. and man. filter order 
+        # and target specs   
+        min_params = man_params = targ_params = []
         
         if "min" in fb.fil_tree[rt][ft][fc]:
             min_params = fb.fil_tree[rt][ft][fc]['min']['par']
             
         if "man" in fb.fil_tree[rt][ft][fc]:
             man_params = fb.fil_tree[rt][ft][fc]['man']['par']
+
+        if "targ" in fb.fil_tree[rt][ft][fc]:
+            targ_params = fb.fil_tree[rt][ft][fc]['targ']['par']
+
 
         # always use parameters for MANUAL filter order for f_specs widget,
         # frequency specs for minimum order are displayed in target specs
@@ -201,6 +206,8 @@ class FilterSpecs(QWidget):
         # always use parameters for MINIMUM filter order for target frequency
         # spec widget
         f_min_params = [l for l in min_params if l[0] == 'F']
+        f_targ_params = [l for l in targ_params if l[0] == 'F']
+
         self.t_specs.setVisible("tspecs" in vis_wdgs)
         self.t_specs.setEnabled("tspecs" not in dis_wdgs)
         self.t_specs.update_UI(f_min_params, a_params)
