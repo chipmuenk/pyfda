@@ -126,9 +126,9 @@ class FilterTreeBuilder(object):
             fp.close()
             
         except IOError as e:
-            logger.critical( 'Init file "%s" could not be found.\n\
+            logger.critical( 'Filter list file "%s" could not be found.\n\
                 I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
-            sys.exit( 'Init file "%s" could not be found.\n\
+            sys.exit( 'Filter list file "%s" could not be found.\n\
                 I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
             
         except Exception as e:
@@ -138,7 +138,7 @@ class FilterTreeBuilder(object):
 #==============================================================================
     def dyn_filt_import(self):
         """
-        Try to import all modules / classes found by readFiltFile() from
+        Try to import all modules / classes found by read_filt_file() in
         self.filt_dir (= subdirectory with filter design algorithms + __init__.py).
 
         The class names (= file name without .py) and the corresponding modules
@@ -168,7 +168,8 @@ class FilterTreeBuilder(object):
 
         """
         fb.fc_module_names = {} # clear global dict with module names
-        num_imports = 0   # initialize number of successful filter imports
+        num_imports = 0   # initialize number of successful filter module imports
+        imported_fil_modules = "" # names of successful filter module imports
 
         for fc in self.filt_list_names:
             try:
@@ -199,8 +200,8 @@ class FilterTreeBuilder(object):
             sys.exit("No filter class could be imported - shutting down.")
 
         else:
-            logger.info("Imported successfully the following %d filter classes:\n%s", 
-                    num_imports, imported_fil_classes)
+            logger.info("Imported successfully the following %d filter modules:\n%s", 
+                    num_imports, imported_fil_modules)
 
 #==============================================================================
     def build_fil_tree(self):
