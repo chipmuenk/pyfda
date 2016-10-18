@@ -246,13 +246,24 @@ class FilterTreeBuilder(object):
         fb.fc_names = {}
         for fc in fb.fc_module_names:  # iterate over keys in fc_module_names (= fc)
 
-            # instantiate / update global instance of filter class fc
-            ff.fil_factory.create_fil_inst(fc)
-            try:
-                fb.fc_names.update(ff.fil_inst.name)
-            except AttributeError:
-                logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
+            # instantiate / update global instance ff.fil_inst() of filter class fc
+            err_code = ff.fil_factory.create_fil_inst(fc)
+            if err_code > 0:
+                logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fc_module_names
+            else:
+                if hasattr(ff.fil_inst, 'name'):
+                    fc_name = ff.fil_inst.name
+                    try:
+                        fb.fc_names.update(ff.fil_inst.name)
+                    except AttributeError:
+                        logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
+                        continue # continue with next entry in fc_module_names
+                else:
+                    logger.warning('Missing attribute "name" - Skipping filter class "%s"' , fc)
+                    continue # continue with next entry in fc_module_names
+                    
+                
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
