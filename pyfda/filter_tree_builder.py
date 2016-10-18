@@ -184,16 +184,12 @@ class FilterTreeBuilder(object):
                 #      {'cheby1': 'pyfda.filter_design.cheby1'}
                 fb.fc_module_names.update({filt_mod:module_name})
                 num_imports += 1
+                imported_fil_modules += "\t" + filt_mod + "\n"
 
             except ImportError as e:
                 logger.error('Filter design "%s" could not be imported.', filt_mod)
             except Exception as e:
-                logger.error("Unexpected error: %s", e)
-           
-
-        imported_fil_classes = ""
-        for fc in fb.fc_module_names:
-            imported_fil_classes += "\t" + fc + "\n"
+                logger.error("Unexpected error: %s", e)           
             
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
