@@ -56,9 +56,9 @@ class FilterFactory(object):
             
             :0: filter instance exists, no re-instantiation necessary
              
-            :1: filter class name not found in dict 'fc_module_names'
+            :1: filter module not found by FilterTreeBuilder
              
-            :2: filter class could not be imported 
+            :2: filter module found by FilterTreeBuilder but could not be imported 
              
             :3: unknown error during instantiation
         
@@ -74,14 +74,6 @@ class FilterFactory(object):
     
         """
         global fil_inst # allow writing to variable
-
-# Moved from filter_tree_builder: useless and possibly dangerous
-#        try:
-#            # Delete previously loaded module from memory
-#            del sys.modules[fc_module]
-#        except:
-#            print("Could not delete module!")
-
               
         try:
             # Try to dynamically import the module fc from package 'filter_design'
@@ -89,7 +81,7 @@ class FilterFactory(object):
             # import pyfda.filter_design.<fc> as fc_module  
             #------------------------------------------------------------------
             fc_module = importlib.import_module(fb.fc_module_names[fc])
-            #------------------------------------------------------------------
+            #------------------------------------------------------------------                
 
         except KeyError as e:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
@@ -116,7 +108,7 @@ class FilterFactory(object):
         if (not hasattr(fil_inst, 'name') or fc != fil_inst.name):
             # get attribute fc from fc_module, here, this returns the class fc
             err_string = ""
-            self.err_code = 0
+            self.err_code = -1
             fil_class = getattr(fc_module, fc, None) # or None if not in fc_module 
 
             if fil_class is None: # fc is not a class of fc_module
@@ -126,7 +118,7 @@ class FilterFactory(object):
                 self.err_code = 3
             else:
                 fil_inst = fil_class() # instantiate an object         
-                self.err_code = -1 # filter instance has been created / changed successfully
+                self.err_code = 0 # filter instance has been created / changed successfully
             logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
         
         return self.err_code
