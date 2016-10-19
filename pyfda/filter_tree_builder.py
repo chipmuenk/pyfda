@@ -242,8 +242,8 @@ class FilterTreeBuilder(object):
 
         """
 
-        fb.fil_tree = {}
-        fb.fc_names = {}
+        fb.fil_tree = {} # Dict with a hierarical tree fc-ft-
+        fb.fc_names = {} # Dict with the names of filter classes and their display names
         for fc in fb.fc_module_names:  # iterate over keys in fc_module_names (= fc)
 
             # instantiate / update global instance ff.fil_inst() of filter class fc
