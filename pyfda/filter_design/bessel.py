@@ -27,6 +27,8 @@ __version__ = "1.3"
 
 FRMT = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
+filter_classes = {'bessel':'Bessel'}
+
 class bessel(object):
 
     def __init__(self):
