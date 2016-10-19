@@ -25,14 +25,14 @@ __version__ = "1.3"
 
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for firwin routines
-filter_classes = 'Manual'
+filter_classes = {'Manual':'Manual'}
 
 class Manual():
     
     def __init__(self):
 
         # This part contains static information for building the filter tree
-        self.name = {'Manual':'Manual'}
+#        self.name = {'Manual':'Manual'}
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter filter design using the P/Z or the b/a widget.")
