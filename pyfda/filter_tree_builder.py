@@ -251,17 +251,17 @@ class FilterTreeBuilder(object):
             if err_code > 0:
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fc_module_names
-            else:
-                if hasattr(ff.fil_inst, 'name'):
-                    fc_name = ff.fil_inst.name
-                    try:
-                        fb.fc_names.update(ff.fil_inst.name)
-                    except AttributeError:
-                        logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
-                        continue # continue with next entry in fc_module_names
-                else:
-                    logger.warning('Missing attribute "name" - Skipping filter class "%s"' , fc)
+
+            elif hasattr(ff.fil_inst, 'name'):
+                fc_name = ff.fil_inst.name
+                try:
+                    fb.fc_names.update(ff.fil_inst.name)
+                except AttributeError:
+                    logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
                     continue # continue with next entry in fc_module_names
+            else:
+                logger.warning('Missing attribute "name" - Skipping filter class "%s"' , fc)
+                continue # continue with next entry in fc_module_names
                     
                 
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
