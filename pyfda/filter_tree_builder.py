@@ -252,6 +252,14 @@ class FilterTreeBuilder(object):
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fc_module_names
 
+            elif hasattr(fc, 'filter_classes'):
+                fc_name = fc.filter_classes
+                try:
+                    fb.fc_names.update(ff.fil_inst.fc_name)
+                except AttributeError:
+                    logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
+                    continue # continue with next entry in fc_module_names
+                    
             elif hasattr(ff.fil_inst, 'name'):
                 fc_name = ff.fil_inst.name
                 try:
