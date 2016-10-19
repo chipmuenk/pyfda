@@ -34,6 +34,7 @@ class FilterFactory(object):
 
 
     def create_fil_inst(self, fc):
+        # TODO: need to pass both module and class name for more flexibility
         """
         Create an instance of the filter design class passed as string "fc" 
         from the module found in ``fc_module_names[fc]``.
@@ -105,8 +106,8 @@ class FilterFactory(object):
         # the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
 
-        if hasattr(fc_module, 'filter_classes'):
-            fc = fc_module.filter_classes # else use method parameter fc as class name    
+#        if hasattr(fc_module, 'filter_classes'):
+#            fc = fc_module.filter_classes # else use method parameter fc as class name    
 
         if fil_inst is None or fc != fil_inst.name:
             err_string = ""
