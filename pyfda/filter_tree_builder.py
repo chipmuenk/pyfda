@@ -167,16 +167,16 @@ class FilterTreeBuilder(object):
         Returns
         -------
 
-        None, results are stored in
+        None, results are stored in the global dict
 
-        fb.fc_module_names: dict  containing entries (for SUCCESSFUL imports)
+        fb.fil_module_names: dict  containing entries (for SUCCESSFUL imports)
 
             {file name without .py (= class name):full module name}
              e.g. {"cheby1":"pyfda.filter_design.cheby1"}
 
         """
-        fb.fc_module_names = {} # clear global dict with module names
-        num_imports = 0   # initialize number of successful filter module imports
+        fb.fil_module_names = {}   # clear global dict containing module names
+        num_imports = 0           # number of successful filter module imports
         imported_fil_modules = "" # names of successful filter module imports
 
         for filt_mod in filt_list_names:
@@ -190,7 +190,7 @@ class FilterTreeBuilder(object):
                 # when successful, add the filename without '.py' and the
                 # full module name to the dict 'imports', e.g.
                 #      {'cheby1': 'pyfda.filter_design.cheby1'}
-                fb.fc_module_names.update({filt_mod:module_name})
+                fb.fil_module_names.update({filt_mod:module_name})
                 num_imports += 1
                 imported_fil_modules += "\t" + filt_mod + "\n"
 
@@ -211,7 +211,7 @@ class FilterTreeBuilder(object):
     def build_fil_tree(self):
         """
         Read attributes (ft, rt, rt:fo) from all filter classes (fc)
-        listed in the global dict ``fb.fc_module_names``. Attributes are stored in
+        listed in the global dict ``fb.fil_module_names``. Attributes are stored in
         the design method classes in the format (example from cheby1.py)
 
         self.ft = 'IIR'
@@ -252,7 +252,7 @@ class FilterTreeBuilder(object):
 
         fb.fil_tree = {} # Dict with a hierarical tree fc-ft-
         fb.fc_names = {} # Dict with the names of filter classes and their display names
-        for fc in fb.fc_module_names:  # iterate over keys in fc_module_names (= fc)
+        for fc in fb.fil_module_names:  # iterate over keys in c (= fc)
 
             # instantiate / update global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
