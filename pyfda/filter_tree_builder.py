@@ -25,7 +25,7 @@ class FilterTreeBuilder(object):
         Name of the subdirectory containing the init-file and the
         Python files to be read, needs to have __init__.py)
 
-    filt_list: string
+    filt_list_file: string
         Name of the init file
 
     comment_char: char
@@ -33,9 +33,9 @@ class FilterTreeBuilder(object):
 
     """
 
-    def __init__(self, filt_dir, filt_list, comment_char='#'):
+    def __init__(self, filt_dir, filt_list_file, comment_char='#'):
         cwd = os.path.dirname(os.path.abspath(__file__))
-        self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list)
+        self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list_file)
 
         logger.debug("Filter file list: %s\n", self.filt_dir_file)
         self.comment_char = comment_char
@@ -57,11 +57,11 @@ class FilterTreeBuilder(object):
         filter directory
         """
         # Scan filter_list.txt for python file names and extract them
-        self.read_filt_file()
+        filt_list_names = self.read_filt_file()
 
         # Try to import all filter modules found in filter_list, store names and
-        # modules in the dict fb.fc_module_names as {filterName:filterModule}:
-        self.dyn_filt_import()
+        # modules in the dict fb.fil_module_names as {filterName:filterModule}:
+        self.dyn_filt_import(filt_list_names)
 
         # Build a hierarchical dict fb.fil_tree with all valid filter designs
         # and response types:
@@ -69,15 +69,18 @@ class FilterTreeBuilder(object):
 
 #==============================================================================
     def read_filt_file(self):
+        # TODO: file name shouldn't have to be identical to class name, 
+        #       multiple classes per file should be possible.
         """
         Extract all file names = class names from self.filt_dir_file:
+
         - Lines that don't begin with commentCh are stripped from Newline
           character, whitespace, '.py' and everything after it and returned as
           a list.
         - Lines starting with self.comment_char are stripped of newline,
           whitespace and comment chars and written to list 'filt_list_comments'
         - All other lines are discarded (for now)
-        - Collect valid file names (without .py) self.filt_list_names
+        - Collect and return valid file names (without .py) as `filt_list_names`.
 
         Parameters
         ----------
@@ -85,12 +88,12 @@ class FilterTreeBuilder(object):
 
         Returns
         -------
-        None, the results are stored in self.filt_list_names
+        List `filt_list_names` with the names of all design files
         """
 
-        filt_list_comments = []     # comment lines from the filt_list file
-        # List with design class file names in filt_list without .py suffix:
-        self.filt_list_names = []
+        filt_list_comments = []     # comment lines from filt_list_file
+        # List with filter design file names in filt_list_file without .py suffix:
+        filt_list_names = []
 
         num_filters = 0           # number of filter design files found
 
@@ -117,13 +120,15 @@ class FilterTreeBuilder(object):
                             # Yes, strip '.py' and all characters after,
                             # append the file name to the lines list,
                             # otherwise discard the line
-                            self.filt_list_names.append(cur_line[0:suffix_pos])
+                            filt_list_names.append(cur_line[0:suffix_pos])
                             num_filters += 1
 
                 cur_line = fp.readline() # read next line
 
             logger.info("%d entries found in filter list!\n", num_filters)
             fp.close()
+            
+            return filt_list_names
             
         except IOError as e:
             logger.critical( 'Filter list file "%s" could not be found.\n\
@@ -136,25 +141,28 @@ class FilterTreeBuilder(object):
             sys.exit( "Unexpected error: %s", e)
 
 #==============================================================================
-    def dyn_filt_import(self):
+    def dyn_filt_import(self, filt_list_names):
         """
-        Try to import all modules / classes found by read_filt_file() in
-        self.filt_dir (= subdirectory with filter design algorithms + __init__.py).
+        Try to import from all filter files found by read_filt_file(),
+        auto-detecting available modules / classes:
 
-        The class names (= file name without .py) and the corresponding modules
-        with full name (e.g. ' filter_design.cheby1') are returned as dict
-        'imports'.
+        - The design classes in a module are specified in the class attribute 
+          `filter_classes` as a dictionary {"Cheby":"Chebychev Filter"} where the
+          key is the class name in the module and the value the corresponding name
+          for e.g. the combo box.
+        
+        - When the class attribute is not given, use the base name of the filter
+          (= file name without .py) as module and class name.
+        
+        The detected modules with full name (e.g. ' filter_design.cheby1') 
+        are stored in the global dict `fb.fil_module_names`.
 
-        Reads:
+        Parameters
         ----------
 
-        self.filt_dir
-            Subdirectory filt_dir with the Python-Files to import from
-            IMPORTANT: filt_dir has to contain an __init__.py File
-
-        self.filt_list_names
+        filt_list_names
             List with the classes to be imported, contained in the
-            Python files (ending with .py !!) in pyPackage
+            Python files (ending with .py !!) in the file filt_list_file
 
         Returns
         -------
@@ -171,7 +179,7 @@ class FilterTreeBuilder(object):
         num_imports = 0   # initialize number of successful filter module imports
         imported_fil_modules = "" # names of successful filter module imports
 
-        for filt_mod in self.filt_list_names:
+        for filt_mod in filt_list_names:
             try:
                 # Try to import the module from the  package)
                 # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
