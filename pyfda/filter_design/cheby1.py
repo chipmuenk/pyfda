@@ -23,6 +23,7 @@ from scipy.signal import cheb1ord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
 __version__ = "1.3"
+filter_classes = {'cheby1':'Chebychev 1'}
 
 if SOS_AVAIL:
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
@@ -32,7 +33,7 @@ else:
 class cheby1(object):
 
     def __init__(self):
-        self.name = {'cheby1':'Chebychev 1'}
+#        self.name = {'cheby1':'Chebychev 1'}
  
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the critical frequency "
