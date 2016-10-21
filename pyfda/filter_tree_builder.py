@@ -299,26 +299,26 @@ class FilterTreeBuilder(object):
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}, 'targ':{...}}
 
-                for par in ff.fil_inst.com: # read common parameters
-                    # add info only when 'man' / 'min' / 'targ' exists in fb.fil_tree
-                    if par in fb.fil_tree[rt][ft][fc]:
-                        for p in ff.fil_inst.com[par]:
+                for mmt in ff.fil_inst.com: # read common parameters Min/Man/Targ
+                    # add info only when 'man'/'min'/'targ' exists for the rt-fc combination
+                    if mmt in fb.fil_tree[rt][ft][fc]:
+                        for p in ff.fil_inst.com[mmt]: # yes, add all info in mmt
                             # Test whether entry exists already in fb.fil_tree:
-                            if p in fb.fil_tree[rt][ft][fc][par]:
+                            if p in fb.fil_tree[rt][ft][fc][mmt]:
                                 # yes, prepend common data
-                                fb.fil_tree[rt][ft][fc][par][p] =\
-                                ff.fil_inst.com[par][p] + fb.fil_tree[rt][ft][fc][par][p]
+                                fb.fil_tree[rt][ft][fc][mmt][p] =\
+                                ff.fil_inst.com[mmt][p] + fb.fil_tree[rt][ft][fc][mmt][p]
                             else:
                                 # no, create new entry
-                                fb.fil_tree[rt][ft][fc][par].update(\
-                                                {p:ff.fil_inst.com[par][p]})
+                                fb.fil_tree[rt][ft][fc][mmt].update(\
+                                                {p:ff.fil_inst.com[mmt][p]})
 
                             logger.debug("%s - %s - %s\n"
                                 "fb.fil_tree[rt][ft][fc][par][i]: %s\n"
                                 "fb.fil_inst.com[par][i]: %s",
-                                 fc, par, p,
-                                 pformat(fb.fil_tree[rt][ft][fc][par][p]), 
-                                 pformat(ff.fil_inst.com[par][p]))
+                                 fc, mmt, p,
+                                 pformat(fb.fil_tree[rt][ft][fc][mmt][p]), 
+                                 pformat(ff.fil_inst.com[mmt][p]))
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
