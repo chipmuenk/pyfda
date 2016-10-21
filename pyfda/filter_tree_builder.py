@@ -91,7 +91,7 @@ class FilterTreeBuilder(object):
         List `filt_list_names` with the names of all design files
         """
 
-        filt_list_comments = []     # comment lines from filt_list_file
+        filt_list_comments = []     # comment lines from filt_list_file (not used yet)
         # List with filter design file names in filt_list_file without .py suffix:
         filt_list_names = []
 
@@ -175,7 +175,8 @@ class FilterTreeBuilder(object):
              e.g. {"cheby1":"pyfda.filter_design.cheby1"}
 
         """
-        fb.fil_module_names = {}   # clear global dict containing module names
+        fb.fil_module_names = {}   # clear global dict containing {module name:fully qualified name}
+        fb.fil_class_names = {}
         num_imports = 0           # number of successful filter module imports
         imported_fil_modules = "" # names of successful filter module imports
 
@@ -188,7 +189,7 @@ class FilterTreeBuilder(object):
                 importlib.import_module(module_name)
 
                 # when successful, add the filename without '.py' and the
-                # full module name to the dict 'imports', e.g.
+                # full module name to the dict 'fb.fil_module_names', e.g.
                 #      {'cheby1': 'pyfda.filter_design.cheby1'}
                 fb.fil_module_names.update({filt_mod:module_name})
                 num_imports += 1
@@ -252,9 +253,9 @@ class FilterTreeBuilder(object):
 
         fb.fil_tree = {} # Dict with a hierarical tree fc-ft-
         fb.fc_names = {} # Dict with the names of filter classes and their display names
-        for fc in fb.fil_module_names:  # iterate over keys in c (= fc)
+        for fc in fb.fil_module_names:  # iterate over keys (= fc)
 
-            # instantiate / update global instance ff.fil_inst() of filter class fc
+            # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
