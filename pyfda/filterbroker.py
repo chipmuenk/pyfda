@@ -40,7 +40,7 @@ MYHDL = False
 # ------                 .buildFilTree()
 #
 # Dictionary with filter design class name and full module name
-fc_module_names = {"equiripple":"pyfda.filter_design.equiripple",
+fil_module_names = {"equiripple":"pyfda.filter_design.equiripple",
                   "cheby1":"pyfda.filter_design.cheby1",
                   "cheby2":"pyfda.filter_design.cheby2"}
 
@@ -51,6 +51,8 @@ fc_names = {# IIR:
             # FIR:
             "equiripple":"Equiripple", "firls":"Least-Square",
             "firwin":"Windowed"}
+
+fil_class_names = {}
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
