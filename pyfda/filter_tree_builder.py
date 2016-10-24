@@ -186,12 +186,21 @@ class FilterTreeBuilder(object):
                 # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
                 module_name = 'pyfda.' + self.filt_dir + '.' + filt_mod
 
-                importlib.import_module(module_name)
+                mod = importlib.import_module(module_name) # get handle of imported module
 
                 # when successful, add the filename without '.py' and the
                 # full module name to the dict 'fb.fil_module_names', e.g.
                 #      {'cheby1': 'pyfda.filter_design.cheby1'}
                 fb.fil_module_names.update({filt_mod:module_name})
+                if hasattr(mod, 'filter_classes'):
+                    fc = mod.filter_classes
+                    if isinstance(fc, dict): # is attribute of correct type?
+                        fb.fil_class_names.update(fc)
+                        print("imported", filt_mod, fc)
+                    else:
+                        print("Attribute 'filter_classes' in module %s has the wrong type '%s'." 
+                        %(str(mod), type(fc).__name__))
+
                 num_imports += 1
                 imported_fil_modules += "\t" + filt_mod + "\n"
 
@@ -261,16 +270,15 @@ class FilterTreeBuilder(object):
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fc_module_names
 
-            elif hasattr(fc, 'filter_classes'):
-                fc_name = fc.filter_classes
+            elif hasattr(fb.fil_module_names[fc], 'filter_classes'):
                 try:
-                    fb.fc_names.update(ff.fil_inst.fc_name)
-                except AttributeError:
-                    logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
+                    fb.fc_names.update(fc.filter_classes.key())
+                except KeyError:
+                    logger.warning('Skipping filter class "%s" due to wrong format "%s"\n'
+                    'of attribute "filter_classes"', str(type(fc.filter_classes)), fc)
                     continue # continue with next entry in fc_module_names
                     
             elif hasattr(ff.fil_inst, 'name'):
-                fc_name = ff.fil_inst.name
                 try:
                     fb.fc_names.update(ff.fil_inst.name)
                 except AttributeError:

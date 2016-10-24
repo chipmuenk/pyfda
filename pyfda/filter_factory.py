@@ -81,7 +81,7 @@ class FilterFactory(object):
             # i.e. do the following
             # import pyfda.filter_design.<fc> as fc_module  
             #------------------------------------------------------------------
-            fc_module = importlib.import_module(fb.fc_module_names[fc])
+            fc_module = importlib.import_module(fb.fil_module_names[fc])
             #------------------------------------------------------------------                
 
         except KeyError as e:
@@ -107,9 +107,9 @@ class FilterFactory(object):
         # In both cases, a (new) filter object is instantiated.
 
 #        if hasattr(fc_module, 'filter_classes'):
-#            fc = fc_module.filter_classes # else use method parameter fc as class name    
+#            fc = fc_module.filter_classes # else use method parameter fc as class name
 
-        if fil_inst is None or fc != fil_inst.name:
+        if fil_inst is None or fc != fil_inst.__class__.__name__: 
             err_string = ""
             self.err_code = -1
             # get attribute fc from fc_module, here, this returns the class fc
@@ -232,7 +232,7 @@ Alternative approaches for data persistence: Module shelve or pickleshare
 
 """
 if __name__ == '__main__':
-    print("\nfd_module_names\n", fb.fc_module_names)
+    print("\nfd_module_names\n", fb.fil_module_names)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.
