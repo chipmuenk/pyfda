@@ -492,7 +492,7 @@ class SelectFilter(QWidget):
                 ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
         except AttributeError as e:
-            print("input_filter._construct_dyn_widgets:", e)
+            print("select_filter._construct_dyn_widgets:", e)
 
 #------------------------------------------------------------------------------
 

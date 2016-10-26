@@ -145,7 +145,7 @@ class FilterSpecs(QWidget):
         frequency and amplitude specs.
         
         At this time, the actual filter object instance has been created from 
-        the name of the design method (e.g. 'cheby1') in input_filter.py. 
+        the name of the design method (e.g. 'cheby1') in select_filter.py. 
         Its handle has been stored in fb.fil_inst.
 
         fb.fil[0] (currently selected filter) is read, then general information

@@ -91,7 +91,7 @@ class TargetSpecs(QWidget):
         Called when a new filter design algorithm has been selected
         Pass frequency and amplitude labels to the amplitude and frequency
         spec widgets
-        The sigSpecsChanged signal is emitted already by input_filter.py
+        The sigSpecsChanged signal is emitted already by select_filter.py
         """
 
         # pass new labels to widgets
