@@ -17,8 +17,11 @@ from ..compat import (QtCore, QtGui,
                       QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
                       pyqtSignal, Qt, QEvent)
 
-
-from docutils.core import publish_string 
+try:
+    from docutils.core import publish_string 
+    HAS_DOCUTILS = True
+except ImportError:
+    HAS_DOCUTILS = False
 
 import numpy as np
 from numpy import pi, log10
@@ -143,8 +146,10 @@ class FilterInfo(QWidget):
         """
         Display info from filter design file and docstring
         """
+        use_rich_text = self.chkRichText.isChecked() and HAS_DOCUTILS
+        
         if hasattr(ff.fil_inst,'info'):
-            if self.chkRichText.isChecked():
+            if use_rich_text:
                 self.txtFiltInfoBox.setText(publish_string(
                     self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
@@ -154,7 +159,7 @@ class FilterInfo(QWidget):
             self.txtFiltInfoBox.setText("")
 
         if self.chkDocstring.isChecked() and hasattr(ff.fil_inst,'info_doc'):
-            if self.chkRichText.isChecked():
+            if use_rich_text:
                 self.txtFiltInfoBox.append(
                 '<hr /><b>Python module docstring:</b>\n')
                 for doc in ff.fil_inst.info_doc:
