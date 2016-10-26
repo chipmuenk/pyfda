@@ -13,6 +13,9 @@ Version info:
          - mark private methods as private
     1.2: new API using fil_save (enable SOS features when available)
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
+    1.4: module attribute `filter_classes` contains class name and combo box name
+         instead of class attribute `name`
+
 
 Author: Christian Münker
 """
@@ -33,7 +36,7 @@ else:
 class cheby1(object):
 
     def __init__(self):
-#        self.name = {'cheby1':'Chebychev 1'}
+        self.name = {'cheby1':'Chebychev 1'}
  
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the critical frequency "
@@ -111,10 +114,9 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
         These subwidgets are instantiated dynamically when needed in 
-        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        select_filter.py using the handle to the filter instance, fb.fil_inst.
         (empty method, nothing to do in this filter)
         """
-        print("constructing cheby1 UI")
         pass
 
         
@@ -124,7 +126,6 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         - Delete dynamic widgets
         (empty method, nothing to do in this filter)
         """
-        print("destructing cheby1 UI")
         pass
 
 

@@ -13,6 +13,8 @@ Version info:
          - mark private methods as private
     1.2: new API using fil_save (enable SOS features when available)
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
+    1.4: module attribute `filter_classes` contains class name and combo box name
+         instead of class attribute `name`
 
 Author: Christian Muenker
 """
@@ -23,6 +25,7 @@ from scipy.signal import buttord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
 __version__ = "1.3"
+filter_classes = 13
 
 if SOS_AVAIL:
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
@@ -102,7 +105,7 @@ critical frequency from pass and stop band specifications.
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
         These subwidgets are instantiated dynamically when needed in 
-        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        select_filter.py using the handle to the filter instance, fb.fil_inst.
         (empty method, nothing to do in this filter)
         """
         pass

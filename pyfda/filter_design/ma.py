@@ -14,6 +14,8 @@ Version info:
                 save 'ba' _and_ 'zpk' precisely)
          - include method _store_entries in _update_UI
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)         
+    1.4: module attribute `filter_classes` contains class name and combo box name
+         instead of class attribute `name`
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -107,7 +109,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         Create additional subwidget(s) needed for filter design with the 
         names given in self.wdg :
         These subwidgets are instantiated dynamically when needed in 
-        input_filter.py using the handle to the filter instance, fb.fil_inst.
+        select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 
         self.lbl_ma_1 = QLabel("Stages:")
