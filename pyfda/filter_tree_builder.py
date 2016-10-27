@@ -146,12 +146,13 @@ class FilterTreeBuilder(object):
         Try to import from all filter files found by read_filt_file(),
         auto-detecting available modules / classes:
 
-        - The design classes in a module are specified in the class attribute 
-          `filter_classes` as a dictionary {"Cheby":"Chebychev Filter"} where the
+        - The design classes in a module are specified in the module attribute 
+          `filter_classes` as a dictionary {"Cheby":"Chebychev 1"} where the
           key is the class name in the module and the value the corresponding name
-          for e.g. the combo box.
+          for e.g. the combo box. When filter_classes is a string, use the string
+          for both class and combo box name.
         
-        - When the class attribute is not given, use the base name of the filter
+        - When the module attribute is not given, use the base name of the filter
           (= file name without .py) as module and class name.
         
         The detected modules with full name (e.g. ' filter_design.cheby1') 
@@ -175,7 +176,7 @@ class FilterTreeBuilder(object):
              e.g. {"cheby1":"pyfda.filter_design.cheby1"}
 
         """
-        fb.fil_module_names = {}   # clear global dict containing {module name:fully qualified name}
+        fb.fil_module_names = {}  # initialize global dict containing {module name:fully qualified name}
         fb.fil_class_names = {}
         num_imports = 0           # number of successful filter module imports
         imported_fil_modules = "" # names of successful filter module imports
@@ -188,26 +189,33 @@ class FilterTreeBuilder(object):
 
                 mod = importlib.import_module(module_name) # get handle of imported module
 
-                # when successful, add the filename without '.py' and the
-                # full module name to the dict 'fb.fil_module_names', e.g.
-                #      {'cheby1': 'pyfda.filter_design.cheby1'}
-                fb.fil_module_names.update({filt_mod:module_name})
                 if hasattr(mod, 'filter_classes'):
-                    fc = mod.filter_classes
-                    if isinstance(fc, dict): # is attribute of correct type?
-                        fb.fil_class_names.update(fc)
-                        print("imported", filt_mod, fc)
+                    fc = mod.filter_classes # read module attribute, then check type:
+                    if isinstance(fc, dict): # dict {class name : combo box name}
+                        fdict = fc
+                    elif isinstance(fc, str): # String, convert to dict
+                        fdict = {fc:fc}
                     else:
-                        print("Attribute 'filter_classes' in module %s has the wrong type '%s'." 
-                        %(str(mod), type(fc).__name__))
-
+                        print("Skipping module '%s', its attribute 'filter_classes' has the wrong type '%s'." 
+                        %(str(filt_mod), str(type(fc).__name__)))
+                        continue
+                else:
+                    fdict = {filt_mod:filt_mod} # no filter_class attribute, use
+                                                # the module name as fallback
+                # when module import was successful, add the filename without
+                #  '.py' and the full module name to the dict 'fb.fil_module_names',
+                #     e.g. {'cheby1': 'pyfda.filter_design.cheby1'}
+                fb.fil_module_names.update({filt_mod:module_name})
+                
+                print("imported", filt_mod, fdict)
+                fb.fil_class_names.update(fdict)
                 num_imports += 1
                 imported_fil_modules += "\t" + filt_mod + "\n"
 
             except ImportError as e:
                 logger.error('Filter module "%s" could not be imported.', filt_mod)
             except Exception as e:
-                logger.error("Unexpected error: %s", e)           
+                logger.error("Unexpected error during module import:\n%s", e)
             
         if num_imports < 1:
             logger.critical("No filter module could be imported - shutting down.")
@@ -216,6 +224,10 @@ class FilterTreeBuilder(object):
         else:
             logger.info("Imported successfully the following %d filter modules:\n%s", 
                     num_imports, imported_fil_modules)
+                    
+        # Dummy routine to demonstrate deleting dict elements
+        remove = [k for k in fb.fil_class_names if k == ""]
+        for k in remove: del fb.fil_class_names[k]
 
 #==============================================================================
     def build_fil_tree(self):
