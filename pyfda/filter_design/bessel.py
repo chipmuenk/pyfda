@@ -25,11 +25,11 @@ from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, lin2unit
 
+filter_classes = {'Bessel':'Bessel'}
+
 __version__ = "1.3"
 
 FRMT = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-
-filter_classes = {'Bessel':'Bessel'}
 
 class bessel(object):
 

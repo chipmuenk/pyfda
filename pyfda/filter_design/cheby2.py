@@ -24,8 +24,9 @@ from scipy.signal import cheb2ord
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
-__version__ = "1.3"
 filter_classes = "Cheby2"
+
+__version__ = "1.3"
 
 if SOS_AVAIL:
     FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'

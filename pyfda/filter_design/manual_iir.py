@@ -13,6 +13,8 @@ Version info:
     1.1: mark private methods as private
     1.2: new API using fil_save
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
+    1.4: module attribute `filter_classes` contains class name and combo box name
+         instead of class attribute `name`
 
 
 Author: Christian Muenker
@@ -21,18 +23,17 @@ from __future__ import print_function, division, unicode_literals
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
+filter_classes = {'Manual':'Manual'}
+
 __version__ = "1.3"
 
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-            # currently, only 'ba' is supported for firwin routines
-filter_classes = {'Manual':'Manual'}
 
-class Manual():
+class Manual(object):
     
     def __init__(self):
 
         # This part contains static information for building the filter tree
-#        self.name = {'Manual':'Manual'}
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter filter design using the P/Z or the b/a widget.")

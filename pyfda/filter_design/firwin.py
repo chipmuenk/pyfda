@@ -39,6 +39,8 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in fil_dict?
 
+filter_classes = {'firwin':'Windowed FIR'}
+
 __version__ = "1.3"
 
 FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'

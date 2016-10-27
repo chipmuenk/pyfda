@@ -25,6 +25,8 @@ from scipy.signal import ellipord
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
+filter_classes = {'ellip':'Elliptic'}
+
 __version__ = "1.3"
 
 if SOS_AVAIL:

@@ -36,6 +36,8 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
 #         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
 #           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
 
+filter_classes = {'equiripple':'Equiripple'}
+
 __version__ = "1.3"
 
 frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
