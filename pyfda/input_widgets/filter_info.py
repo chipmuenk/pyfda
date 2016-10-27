@@ -170,7 +170,6 @@ class FilterInfo(QWidget):
                 for doc in ff.fil_inst.info_doc:
                     self.txtFiltInfoBox.append(self.cleanDoc(doc))
 
-#        self.txtFiltInfoBox.textCursor().setPosition(pos) # no effect
         self.txtFiltInfoBox.moveCursor(QTextCursor.Start)
 
     def _clean_doc(self, doc):
@@ -328,7 +327,7 @@ class FilterInfo(QWidget):
             eps = 1e-3
             for i in range(len(f_lbls)):
                 if 'PB' in f_lbls[i]:
-                    a_targs_pass.append(a_test_dB[i] <= a_targs_dB[i])
+                    a_targs_pass.append((a_test_dB[i] - a_targs_dB[i])< eps)
                 elif 'SB' in f_lbls[i]:
                     a_targs_pass.append(a_test_dB[i] >= a_targs_dB[i]) 
                 else:
