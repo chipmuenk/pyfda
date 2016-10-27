@@ -29,7 +29,7 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import lin2unit, rt_label
+from pyfda.pyfda_lib import lin2unit# , rt_label
 # TODO: Passband and stopband info should show min / max values for each band
 
 class FilterInfo(QWidget):
@@ -82,7 +82,8 @@ class FilterInfo(QWidget):
         self.chkDocstring.setToolTip("Display docstring from python filter method.")
 
         self.chkRichText = QCheckBox("RTF")
-        self.chkRichText.setChecked(True)
+        self.chkRichText.setChecked(HAS_DOCUTILS)
+        self.chkRichText.setEnabled(HAS_DOCUTILS)
         self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
 
         self.txtFiltInfoBox = QTextBrowser()
@@ -146,10 +147,8 @@ class FilterInfo(QWidget):
         """
         Display info from filter design file and docstring
         """
-        use_rich_text = self.chkRichText.isChecked() and HAS_DOCUTILS
-        
         if hasattr(ff.fil_inst,'info'):
-            if use_rich_text:
+            if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.setText(publish_string(
                     self._clean_doc(ff.fil_inst.info), writer_name='html',
                     settings_overrides={'output_encoding': 'unicode'}))
@@ -159,7 +158,7 @@ class FilterInfo(QWidget):
             self.txtFiltInfoBox.setText("")
 
         if self.chkDocstring.isChecked() and hasattr(ff.fil_inst,'info_doc'):
-            if use_rich_text:
+            if self.chkRichText.isChecked():
                 self.txtFiltInfoBox.append(
                 '<hr /><b>Python module docstring:</b>\n')
                 for doc in ff.fil_inst.info_doc:
