@@ -458,8 +458,8 @@ class SelectFilter(QWidget):
   
         try:
             ff.fil_inst.sigFiltChanged.disconnect() # disconnect signal
-        except TypeError as e:
-            print("Could not disconnect signal!\n", e)
+        except (TypeError, AttributeError) as e:
+            logger.warning("Could not disconnect signal!\n", e)
             
         try:
             ff.fil_inst.destruct_UI() # local operations like disconnecting signals
