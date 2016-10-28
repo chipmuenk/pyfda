@@ -34,25 +34,21 @@ MYHDL = False
 # demonstrate the structure of the global dicts and lists.
 # They are also handy for module-level testing.
 
-#The actual entries are created resp. overwritten by
-#
-# ----- FilterTreeBuilder.__init__() ------
-# ------                 .buildFilTree()
-#
-# Dictionary with filter design class name and full module name
-fil_module_names = {"equiripple":"pyfda.filter_design.equiripple",
-                  "cheby1":"pyfda.filter_design.cheby1",
-                  "cheby2":"pyfda.filter_design.cheby2"}
+# The keys of this dictionary are all found class names, the values are the name
+# to be displayed e.g. in the comboboxes and the fully qualified name of the module
+# containing the class
+fil_class_names = {# IIR:
+            'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'},
+            'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_design.cheby1'},
+            'Cheby2':{'name':'Chebychev 2', 'mod':'pyfda.filter_design.cheby2'},
+            'Bessel':{'name':'Bessel',      'mod':'pyfda.filter_design.bessel'},
+            'Ellip' :{'name':'Elliptic',    'mod':'pyfda.filter_design.ellip'},
 
-# Dictionary with translations between short and long names for filter design classes
-fc_names = {# IIR:
-            "butter":"Butterworth", "cheby1":"Chebychev 1",
-            "bessel":"Bessel", "cheby2":"Chebychev 2",
             # FIR:
-            "equiripple":"Equiripple", "firls":"Least-Square",
-            "firwin":"Windowed"}
-
-fil_class_names = {}
+            'Equiripple':{'name':'Equiripple',  'mod':'pyfda.filter_design.equiripple'},
+            'MA'      :{'name':'Moving Average','mod':'pyfda.filter_design.ma'},
+            'Firwin'    :{'name':'Windowed FIR','mod':'pyfda.filter_design.firwin'}
+            }
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
