@@ -33,11 +33,11 @@ class FilterFactory(object):
         self.err_code = 0
 
 
-    def create_fil_inst(self, fc):
+    def create_fil_inst(self, fc, mod = None):
         # TODO: need to pass both module and class name for more flexibility
         """
         Create an instance of the filter design class passed as string "fc" 
-        from the module found in ``fc_module_names[fc]``.
+        from the module found in ``fil_class_names[fc]``.
         This dictionary has been collected by filter_tree_builder.py. 
         
         The instance can afterwards be referenced as the global ``fil_inst``.
@@ -48,7 +48,11 @@ class FilterFactory(object):
         
         fc : string
             The name of the filter design class to be instantiated (e.g. 'cheby1' or 'equiripple')
-    
+
+        mod : string (optional, default = None)
+            Fully qualified name of the filter module. When not specified, it is
+            read from the global dict ``fil_class_names``
+            
         Returns
         -------
         
@@ -75,28 +79,28 @@ class FilterFactory(object):
     
         """
         global fil_inst # allow writing to variable
-              
+
         try:
-            # Try to dynamically import the module fc from package 'filter_design'
-            # i.e. do the following
-            # import pyfda.filter_design.<fc> as fc_module  
+            # Try to dynamically import the module fc, i.e. do the following
+            # import pyfda.<filter_package>.<fc> as fc_module  
+            if not mod:            
+                mod = fb.fil_class_names[fc]['mod']
             #------------------------------------------------------------------
-            fc_module = importlib.import_module(fb.fil_module_names[fc])
+            fc_module = importlib.import_module(mod)                
             #------------------------------------------------------------------                
 
         except KeyError as e:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design module '%s' not in dict 'fc_module_names',\n"
+                  "Filter design class '%s' is not in dict 'fb.fil_class_names',\n"
                   "i.e. it was not found by 'FilterTreeBuilder'."%fc)
             self.err_code = 1
             logger.warning(err_string)
             return self.err_code
             
         except ImportError as e:
-            # Filter module fc is in dictionary 'fc_module_names', 
-            # but could not be imported.
+            # Filter module mod is in dictionary 'fb.fil_class_names', but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design module '%s' could not be imported."%fc)
+                  "Filter design module '%s' could not be imported."%str(mod))
             self.err_code = 2
             logger.warning(err_string)
             return self.err_code
