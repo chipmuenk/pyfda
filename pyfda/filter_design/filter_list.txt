@@ -14,8 +14,8 @@ ellip.py
 butter.py
 bessel.py
 ma.py
-#manual_iir.py
-#manual.py
+
+manual.py
 
 # ======== Testing ==========
 .py
