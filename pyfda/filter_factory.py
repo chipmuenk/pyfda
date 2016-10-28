@@ -89,7 +89,7 @@ class FilterFactory(object):
                   "Filter design module '%s' not in dict 'fc_module_names',\n"
                   "i.e. it was not found by 'FilterTreeBuilder'."%fc)
             self.err_code = 1
-            print(err_string)
+            logger.warning(err_string)
             return self.err_code
             
         except ImportError as e:
@@ -98,16 +98,13 @@ class FilterFactory(object):
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
                   "Filter design module '%s' could not be imported."%fc)
             self.err_code = 2
-            print(err_string)
+            logger.warning(err_string)
             return self.err_code
 
         # Check whether create_fil_inst has been called for the first time . 
         # (= no filter object and hence no attribute 'name' exists) or whether 
         # the design method has been changed since last time. 
         # In both cases, a (new) filter object is instantiated.
-
-#        if hasattr(fc_module, 'filter_classes'):
-#            fc = fc_module.filter_classes # else use method parameter fc as class name
 
         if fil_inst is None or fc != fil_inst.__class__.__name__: 
             err_string = ""
@@ -118,7 +115,7 @@ class FilterFactory(object):
             if fil_class is None: # fc is not a class of fc_module
                 err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
                         "Unknown design class '%s', could not be created." %fc)
-                print(err_string)
+                logger.warning(err_string)
                 self.err_code = 3
             else:
                 fil_inst = fil_class() # instantiate an object         
@@ -202,13 +199,11 @@ class FilterFactory(object):
                 getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
-                err_string =("\Error calling %s':\n"%method, e)
+                err_string = "\Error calling {0} of {1}':\n{2}.".format(method, fil_inst, e)
                 self.err_code = 18
                 
         if self.err_code > 0:
                 logger.error(err_string)
-                print("\nERROR %d in 'FilterFactory.select_fil_method()':" %self.err_code)
-                print(err_string)
             
         return self.err_code
         
@@ -232,7 +227,7 @@ Alternative approaches for data persistence: Module shelve or pickleshare
 
 """
 if __name__ == '__main__':
-    print("\nfd_module_names\n", fb.fil_module_names)
+    print("\nfil_class_names\n", fb.fil_class_names)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.
@@ -248,5 +243,5 @@ if __name__ == '__main__':
     print("LP:", fil_factory.call_fil_method("LP", fb.fil[0]),"\n")
     print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby1"),"\n")
     
-    print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n")
+    print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n") # fails
    
