@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Design Chebychev 1 filters (LP, HP, BP, BS) with fixed or minimum order, return
-the filter design in zpk (zeros, poles, gain) format
+the filter design in zpk (zeros, poles, gain) or second-order sections (sos) format.
 
 Attention:
 This class is re-instantiated dynamically everytime the filter design method
@@ -15,7 +15,7 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
-
+         `FRMT` is now a class attribute
 
 Author: Christian Münker
 """
@@ -25,18 +25,17 @@ from scipy.signal import cheb1ord
     
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
-__version__ = "1.3"
-filter_classes = {'cheby1':'Chebychev 1'}
+__version__ = "1.4"
 
-if SOS_AVAIL:
-    FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-else:
-    FRMT = 'zpk'
+filter_classes = {'Cheby1':'Chebychev 1'}
+
+class Cheby1(object):
+    if SOS_AVAIL:
+        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+    else:
+        FRMT = 'zpk'
     
-class cheby1(object):
-
     def __init__(self):
-        self.name = {'cheby1':'Chebychev 1'}
  
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the critical frequency "
@@ -166,7 +165,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         Corner frequencies and order calculated for minimum filter order are 
         also stored to allow for an easy subsequent manual filter optimization.
         """
-        fil_save(fil_dict, arg, FRMT, __name__)
+        fil_save(fil_dict, arg, self.FRMT, __name__)
 
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC
@@ -185,38 +184,31 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
 #
 #------------------------------------------------------------------------------
 
-# HP & LP
-#        self._save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, 
-#                        self.A_SB, analog=False, ftype='cheby1', output=FRMT))
-# BP & BS:
-#        self._save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
-#            self.A_PB, self.A_SB, analog=False, ftype='cheby1', output=FRMT))
-
     # LP: F_PB < F_SB ---------------------------------------------------------
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
-                                              analog = self.analog)
+                                              analog=self.analog)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                            btype='low', analog = self.analog, output = FRMT))
+                            btype='low', analog=self.analog, output=self.FRMT))
  
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
-                            btype='low', analog = self.analog, output = FRMT))
+                            btype='low', analog=self.analog, output=self.FRMT))
 
     # HP: F_SB < F_PB ---------------------------------------------------------
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
-                                                          analog = self.analog)
+                                                          analog=self.analog)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                        btype='highpass', analog = self.analog, output = FRMT))
+                        btype='highpass', analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
-                        btype='highpass', analog = self.analog, output = FRMT))
+                        btype='highpass', analog=self.analog, output=self.FRMT))
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each:
 
@@ -224,14 +216,14 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
     def BPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
-            [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
+            [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog=self.analog)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                        btype='bandpass', analog = self.analog, output = FRMT))
+                        btype='bandpass', analog=self.analog, output=self.FRMT))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB,[self.F_C,self.F_C2],
-                        btype='bandpass', analog = self.analog, output = FRMT))
+                        btype='bandpass', analog=self.analog, output=self.FRMT))
 
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
@@ -240,18 +232,18 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
-                        btype='bandstop', analog = self.analog, output = FRMT))
+                        btype='bandstop', analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, [self.F_C,self.F_C2],
-                        btype='bandstop', analog = self.analog, output = FRMT))
+                        btype='bandstop', analog=self.analog, output=self.FRMT))
 
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    filt = cheby1()        # instantiate filter
+    filt = Cheby1()        # instantiate filter
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][FRMT]) # return results in default format
+    print(fb.fil[0][filt.FRMT]) # return results in default format

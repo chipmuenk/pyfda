@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Design Bessel-Filters (LP, HP, BP, BS) with fixed or minimum order, return
+Design Bessel filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
 Attention:
@@ -15,6 +15,7 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
+         `FRMT` is now a class attribute
     
     Author: Christian Muenker
 """
@@ -25,16 +26,15 @@ from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, lin2unit
 
+__version__ = "1.4"
+
 filter_classes = {'Bessel':'Bessel'}
 
-__version__ = "1.3"
+class Bessel(object):
 
-FRMT = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-
-class bessel(object):
+    FRMT = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
 
     def __init__(self):
-        self.name = {'bessel':'Bessel'}
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the critical "
@@ -155,7 +155,7 @@ order can be used for approximating the -3 dB frequency.
         Corner frequencies and order calculated for minimum filter order are 
         also stored to allow for an easy subsequent manual filter optimization.
         """
-        fil_save(fil_dict, arg, FRMT, __name__)
+        fil_save(fil_dict, arg, self.FRMT, __name__)
         
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC
@@ -172,29 +172,29 @@ order can be used for approximating the -3 dB frequency.
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.bessel(self.N, self.F_C,
-                            btype='low', analog = False, output = FRMT))
+                            btype='low', analog=False, output=self.FRMT))
 
     # LP: F_PB < F_stop
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
-                            btype='low', analog = False, output = FRMT))
+                            btype='low', analog=False, output=self.FRMT))
 
 #        self._save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, self.A_SB,
-#                             analog=False, ftype='bessel', output=FRMT))
+#                             analog=False, ftype='bessel', output=self.FRMT))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.bessel(self.N, self.F_C,
-                            btype='highpass', analog = False, output = FRMT))
+                            btype='highpass', analog=False, output=self.FRMT))
 
     # HP: F_stop < F_PB
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
-                            btype='highpass', analog = False, output = FRMT))
+                            btype='highpass', analog=False, output=self.FRMT))
 
     # For BP and BS, A_PB, F_PB and F_stop have two elements each
 
@@ -202,7 +202,7 @@ order can be used for approximating the -3 dB frequency.
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
-                            btype='bandpass', analog = False, output = FRMT))
+                            btype='bandpass', analog=False, output=self.FRMT))
 
 
     def BPmin(self, fil_dict):
@@ -210,7 +210,7 @@ order can be used for approximating the -3 dB frequency.
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
-                            btype='bandpass', analog = False, output = FRMT))
+                            btype='bandpass', analog=False, output=self.FRMT))
 
 #        self._save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
 #            self.A_PB, self.A_SB, analog=False, ftype='bessel', output=FRMT))
@@ -219,7 +219,7 @@ order can be used for approximating the -3 dB frequency.
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
-                            btype='bandstop', analog = False, output = FRMT))
+                            btype='bandstop', analog=False, output=self.FRMT))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1]
     def BSmin(self, fil_dict):
@@ -227,11 +227,11 @@ order can be used for approximating the -3 dB frequency.
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
-                            btype='bandstop', analog = False, output = FRMT))
+                            btype='bandstop', analog=False, output=self.FRMT))
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-    filt = bessel()        # instantiate filter
+    filt = Bessel()        # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][FRMT]) # return results in default format
+    print(fb.fil[0][filt.FRMT]) # return results in default format

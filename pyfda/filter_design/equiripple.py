@@ -14,6 +14,7 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
+         `FRMT` is now a class attribute
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -36,14 +37,15 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
 #         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
 #           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
 
-filter_classes = {'equiripple':'Equiripple'}
 
-__version__ = "1.3"
+__version__ = "1.4"
 
-frmt = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+filter_classes = {'Equiripple':'Equiripple'}
+
+class Equiripple(QWidget):
+
+    FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
             # currently, only 'ba' is supported for equiripple routines
-
-class equiripple(QWidget):
 
     info ="""
 **Equiripple filters**
@@ -62,11 +64,8 @@ using Ichige's algorithm.
 
     sigFiltChanged = pyqtSignal()
 
-
     def __init__(self):
         QWidget.__init__(self)
-#        super(equiripple, self).__init__(parent)
-        self.name = {'equiripple':'Equiripple'}
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter desired filter order <b><i>N</i></b>, corner "
@@ -249,7 +248,7 @@ using Ichige's algorithm.
         dictionary 'fil_dict'.
         """
 
-        fil_save(fil_dict, arg, frmt, __name__)
+        fil_save(fil_dict, arg, self.FRMT, __name__)
 
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N - 1  # yes, update filterbroker
@@ -362,7 +361,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     
     # instantiate filter widget
-    filt = equiripple()
+    filt = Equiripple()
     filt.construct_UI()
     wdg_equiripple = getattr(filt, 'wdg_fil')
 
@@ -370,7 +369,7 @@ if __name__ == '__main__':
     layVDynWdg.addWidget(wdg_equiripple, stretch = 1)
     
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][frmt]) # return results in default format
+    print(fb.fil[0][filt.FRMT]) # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)

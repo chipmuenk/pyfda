@@ -14,6 +14,7 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
+         `FRMT` is now a class attribute
 
 Author: Christian Muenker
 """
@@ -39,23 +40,20 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in fil_dict?
 
-filter_classes = {'firwin':'Windowed FIR'}
+__version__ = "1.4"
 
-__version__ = "1.3"
+filter_classes = {'Firwin':'Windowed FIR'}
 
-FRMT = 'ba' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-            # currently, only 'ba' is supported for firwin routines
+class Firwin(QWidget):
 
-class firwin(QWidget):
+    FRMT = 'ba' # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
+                # currently, only 'ba' is supported for firwin routines
     
     sigFiltChanged = pyqtSignal()
 
     def __init__(self):
         QWidget.__init__(self)
         
-        # This part contains static information for building the filter tree
-        self.name = {'firwin':'Windowed FIR'}
-
         # common messages for all man. / min. filter order response types:
         msg_man = (r"Enter desired filter order <b><i>N</i></b> and <b>-6 dB</b> pass band corner "
                     "frequency(ies) <b><i>F<sub>C</sub></i></b> .")
@@ -334,7 +332,7 @@ class firwin(QWidget):
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-        fil_save(fil_dict, arg, FRMT, __name__)
+        fil_save(fil_dict, arg, self.FRMT, __name__)
 
         try: # has the order been calculated by a "min" filter design?
             fil_dict['N'] = self.N # yes, update filterbroker
@@ -439,7 +437,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     
     # instantiate filter widget
-    filt = firwin()
+    filt = Firwin()
     filt.construct_UI()
     wdg_firwin = getattr(filt, 'wdg_fil')
 
@@ -447,7 +445,7 @@ if __name__ == '__main__':
     layVDynWdg.addWidget(wdg_firwin, stretch = 1)
 
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][FRMT]) # return results in default format
+    print(fb.fil[0][filt.FRMT]) # return results in default format
 
     frmMain = QFrame()
     frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)

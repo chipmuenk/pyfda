@@ -15,7 +15,7 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
-
+         `FRMT` is now a class attribute
 
 Author: Christian Muenker
 """
@@ -25,19 +25,39 @@ from scipy.signal import ellipord
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
-filter_classes = {'ellip':'Elliptic'}
+__version__ = "1.4"
 
-__version__ = "1.3"
-
-if SOS_AVAIL:
-    FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-else:
-    FRMT = 'zpk'
+filter_classes = {'Ellip':'Elliptic'}
     
-class ellip(object):
+class Ellip(object):
+
+    if SOS_AVAIL:
+        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+    else:
+        FRMT = 'zpk'
+        
+    info = """
+**Elliptic filters**
+
+(also known as Cauer filters) have a constant ripple :math:`A_PB` resp.
+:math:`A_SB` in both pass- and stopband(s).
+
+For the filter design, the order :math:`N`, minimum stopband attenuation
+:math:`A_SB` and
+the critical frequency / frequencies :math:`F_PB` where the gain first drops below
+the maximum passband ripple :math:`-A_PB` have to be specified.
+
+The ``ellipord()`` helper routine calculates the minimum order :math:`N` and the 
+critical passband frequency :math:`F_C` from pass and stop band specifications.
+
+**Design routines:**
+
+``scipy.signal.ellip()``
+``scipy.signal.ellipord()``
+
+        """
 
     def __init__(self):
-        self.name = {'ellip':'Elliptic'}
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b>, the minimum stop "
@@ -81,26 +101,6 @@ class ellip(object):
                  "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
                  }
 
-        self.info = """
-**Elliptic filters**
-
-(also known as Cauer filters) have a constant ripple :math:`A_PB` resp.
-:math:`A_SB` in both pass- and stopband(s).
-
-For the filter design, the order :math:`N`, minimum stopband attenuation
-:math:`A_SB` and
-the critical frequency / frequencies :math:`F_PB` where the gain first drops below
-the maximum passband ripple :math:`-A_PB` have to be specified.
-
-The ``ellipord()`` helper routine calculates the minimum order :math:`N` and the 
-critical passband frequency :math:`F_C` from pass and stop band specifications.
-
-**Design routines:**
-
-``scipy.signal.ellip()``
-``scipy.signal.ellipord()``
-
-        """
 
         self.info_doc = []
         self.info_doc.append('ellip()\n========')
@@ -126,7 +126,6 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         (empty method, nothing to do in this filter)
         """
         pass
-
 
 
     def _get_params(self, fil_dict):
@@ -162,7 +161,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         Corner frequencies and order calculated for minimum filter order are 
         also stored to allow for an easy subsequent manual filter optimization.
         """
-        fil_save(fil_dict, arg, FRMT, __name__)
+        fil_save(fil_dict, arg, self.FRMT, __name__)
 
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC
@@ -181,43 +180,35 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 #
 #------------------------------------------------------------------------------
 
-# HP & LP
-#        self._save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, 
-#                        self.A_SB, analog=False, ftype='ellip', output=FRMT))
-# BP & BS:
-#        self._save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
-#            self.A_PB, self.A_SB, analog=False, ftype='ellip', output=FRMT))
-
-
     # LP: F_PB < F_stop -------------------------------------------------------
     def LPmin(self, fil_dict):
         """Elliptic LP filter, minimum order"""
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
-                                                          analog = self.analog)
+                                                          analog=self.analog)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
-                            btype='low', analog = self.analog, output = FRMT))
+                            btype='low', analog=self.analog, output=self.FRMT))
                             
     def LPman(self, fil_dict):
         """Elliptic LP filter, manual order"""
         self._get_params(fil_dict)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
-                            btype='low', analog = self.analog, output = FRMT))
+                            btype='low', analog=self.analog, output=self.FRMT))
 
     # HP: F_stop < F_PB -------------------------------------------------------
     def HPmin(self, fil_dict):
         """Elliptic HP filter, minimum order"""
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
-                                                          analog = self.analog)
+                                                          analog=self.analog)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
-                        btype='highpass', analog = self.analog, output = FRMT))
+                        btype='highpass', analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         """Elliptic HP filter, manual order"""
         self._get_params(fil_dict)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
-                        btype='highpass', analog = self.analog, output = FRMT))
+                        btype='highpass', analog=self.analog, output=self.FRMT))
 
     # For BP and BS, F_XX have two elements each, A_XX has only one
 
@@ -226,16 +217,16 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         """Elliptic BP filter, minimum order"""
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2],
-            [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog = self.analog)
+            [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog=self.analog)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
-                        btype='bandpass', analog = self.analog, output = FRMT))
+                        btype='bandpass', analog=self.analog, output=self.FRMT))
                             
     def BPman(self, fil_dict):
         """Elliptic BP filter, manual order"""
         self._get_params(fil_dict)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, 
-            [self.F_PB,self.F_PB2], btype='bandpass', analog = self.analog, 
-                                                                output = FRMT))
+            [self.F_PB,self.F_PB2], btype='bandpass', analog=self.analog, 
+                                                                output=self.FRMT))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict):
@@ -243,22 +234,21 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB,
-                                                        analog = self.analog)
+                                                        analog=self.analog)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
-                        btype='bandstop', analog = self.analog, output = FRMT))
+                        btype='bandstop', analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         """Elliptic BS filter, manual order"""
         self._get_params(fil_dict)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, 
-            [self.F_PB,self.F_PB2], btype='bandstop', analog = self.analog, 
-                                                                output = FRMT))
-
+            [self.F_PB,self.F_PB2], btype='bandstop', analog=self.analog, 
+                                                                output=self.FRMT))
                             
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals 
-    filt = ellip()        # instantiate filter
+    filt = Ellip()        # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][FRMT]) # return results in default format
+    print(fb.fil[0][filt.FRMT]) # return results in default format

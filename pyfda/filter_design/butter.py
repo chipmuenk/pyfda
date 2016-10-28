@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Design butterworth-Filters (LP, HP, BP, BS) with fixed or minimum order,
-return the filter design in zeros, poles, gain (zpk) format
+Design Butterworth filters (LP, HP, BP, BS) with fixed or minimum order,
+return the filter design in zeros, poles, gain (zpk) or second-order sections
+(sos) format
 
 Attention:
 This class is re-instantiated dynamically everytime the filter design method
@@ -15,7 +16,8 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
-
+         `FRMT` is now a class attribute
+         
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
@@ -24,18 +26,18 @@ from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
-__version__ = "1.3"
-filter_classes = 13
+__version__ = "1.4"
 
-if SOS_AVAIL:
-    FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-else:
-    FRMT = 'zpk'
+filter_classes = {'Butter':'Butterworth'}
 
-class butter(object):
+class Butter(object):
+    
+    if SOS_AVAIL:
+        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+    else:
+        FRMT = 'zpk'
 
     def __init__(self):
-        self.name = {'butter':'Butterworth'}
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b> and the -3 dB corner "
@@ -156,7 +158,7 @@ critical frequency from pass and stop band specifications.
         also stored to allow for an easy subsequent manual filter optimization.
         """
         
-        fil_save(fil_dict, arg, FRMT, __name__) # save & convert
+        fil_save(fil_dict, arg, self.FRMT, __name__) # save & convert
 
         
         # For min. filter order algorithms, update filter dictionary with calculated
@@ -176,13 +178,6 @@ critical frequency from pass and stop band specifications.
 #
 #------------------------------------------------------------------------------
 
-# HP & LP
-#        self._save(fil_dict, iirdesign(self.F_PB, self.F_SB, self.A_PB, 
-#                        self.A_SB, analog=False, ftype='butter', output=FRMT))
-# BP & BS:
-#        self._save(fil_dict, iirdesign([self.F_PB,self.F_PB2], [self.F_SB,self.F_SB2],
-#            self.A_PB, self.A_SB, analog=False, ftype='butter', output=FRMT))
-
 
     # LP: F_PB < F_SB  -------------------------------------------------------- 
     def LPmin(self, fil_dict):
@@ -190,12 +185,12 @@ critical frequency from pass and stop band specifications.
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                      analog = self.analog)
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='low',
-                                       analog = self.analog, output = FRMT))
+                                       analog=self.analog, output=self.FRMT))
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.butter(self.N, self.F_C,
-                            btype='low', analog = self.analog, output = FRMT))
+                            btype='low', analog=self.analog, output=self.FRMT))
 
     # HP: F_SB < F_PB -------------------------------------------------------
     def HPmin(self, fil_dict):
@@ -203,12 +198,12 @@ critical frequency from pass and stop band specifications.
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                          analog = self.analog)
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='highpass',
-                                      analog = self.analog, output = FRMT))
+                                      analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.butter(self.N, self.F_PB, btype='highpass',
-                                      analog = self.analog, output = FRMT))
+                                      analog=self.analog, output=self.FRMT))
 
 
     # For BP and BS, F_xx have two elements each,  A_xx only have one element
@@ -219,12 +214,12 @@ critical frequency from pass and stop band specifications.
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog = self.analog)
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='bandpass',
-                                       analog = self.analog, output = FRMT))
+                                       analog=self.analog, output=self.FRMT))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.butter(self.N, [self.F_C,self.F_C2],
-                    btype='bandpass', analog = self.analog, output = FRMT))
+                    btype='bandpass', analog=self.analog, output=self.FRMT))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict):
@@ -232,17 +227,17 @@ critical frequency from pass and stop band specifications.
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='bandstop',
-                                       analog = self.analog, output = FRMT))
+                                       analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self._save(fil_dict, sig.butter(self.N, [self.F_C,self.F_C2],
-                        btype='bandstop', analog = self.analog, output = FRMT))
+                        btype='bandstop', analog=self.analog, output=self.FRMT))
                            
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals 
-    filt = butter()        # instantiate filter
+    filt = Butter()        # instantiate filter
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
-    print(fb.fil[0][FRMT]) # return results in default format
+    print(fb.fil[0][filt.FRMT]) # return results in default format

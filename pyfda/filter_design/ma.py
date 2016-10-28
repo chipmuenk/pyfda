@@ -16,6 +16,7 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)         
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
+        `FRMT` is now a class attribute
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -30,13 +31,14 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remezord, 
 
-filter_classes = {'ma':'Moving Average'}   
+__version__ = "1.4"
 
-__version__ = "1.3"
-
-FRMT = {'zpk', 'ba'} # output format of filter design routines 'zpk' / 'ba' / 'sos'
+filter_classes = {'MA':'Moving Average'}   
          
-class ma(QWidget):
+class MA(QWidget):
+        
+    FRMT = {'zpk', 'ba'} # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
+
 
     info ="""
 **Moving average filters**
@@ -55,8 +57,6 @@ a given frequency can be calculated via the si function (not implemented yet).
 
     def __init__(self):
         QWidget.__init__(self)       
-        
-        self.name = {'ma':'Moving Average'}
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter desired order (= delays) <b><i>N</i></b> per stage and "
@@ -215,11 +215,11 @@ a given frequency can be calculated via the si function (not implemented yet).
         and second-order sections and store all available formats in the passed
         dictionary 'fil_dict'.
         """
-        if 'zpk' in FRMT:        
+        if 'zpk' in self.FRMT:        
             fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
-        if 'ba' in FRMT:
+        if 'ba' in self.FRMT:
             fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
-        fil_convert(fil_dict, FRMT)
+        fil_convert(fil_dict, self.FRMT)
 
         if str(fil_dict['fo']) == 'min': 
             fil_dict['N'] = self.N  # yes, update filterbroker
@@ -306,7 +306,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     
     # instantiate filter widget
-    filt = ma()
+    filt = MA()
     filt.construct_UI()
     wdg_ma = getattr(filt, 'wdg_fil')
 
