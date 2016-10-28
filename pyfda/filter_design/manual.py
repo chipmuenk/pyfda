@@ -37,40 +37,32 @@ class Manual_FIR(object):
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter filter design using the P/Z or the b/a widget.")
-        msg_min = ("")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
+        vis_man = ['fspecs','tspecs'] # manual filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
         dis_man = ['fo'] # manual filter order
-        dis_min = ['fo', 'fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
         par_man = ['f_S']     #  manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] #  minimum filter order
 
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
-                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
+        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man}}
                     
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":[]},
-                   "min":{"par":['F_PB','F_SB']}},
+            "LP": {"man":{"par":[]}},
             "HP": {"man":{"par":[],
-                          "msg":r"<br /><b>Note:</b> Be careful!"},
-                   "min":{"par":['F_SB','F_PB']}},
-            "BP": {"man":{"par":['F_C2']},
-                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
+                          "msg":r"<br /><b>Note:</b> Be careful!"}},
+            "BP": {"man":{"par":['F_C2']}},
             "BS": {"man":{"par":['F_C2'],
-                      "msg":r"<br /><b>Note:</b> Be extra careful!"},
-                   "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}},
+                      "msg":r"<br /><b>Note:</b> Be extra careful!"}},
             "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
                    }
+
         
         self.info = """
         Manual entry of filters is great.
@@ -78,16 +70,15 @@ class Manual_FIR(object):
         
         #------------------- end of static info for filter tree ---------------
 
-        self.wdg = False
-        
         self.hdl = None
         
         
     def construct_UI(self):
+        """
+        No UI, nothing to construct here
+        """
+        pass
 
-        self._load_entries() # get initial / last setting from dictionary
-        self.info_doc = []
-        self.info_doc.append('manual()\n========')
 
             
     def destruct_UI(self):
@@ -138,38 +129,29 @@ class Manual_IIR(object):
 
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter filter design using the P/Z or the b/a widget.")
-        msg_min = ("")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
+        vis_man = ['fspecs','tspecs'] # manual filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = ['fo'] # manual filter order
-        dis_min = ['fo', 'fspecs'] # minimum filter order
+        dis_man = [] # manual filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
         par_man = ['f_S']     #  manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] #  minimum filter order
 
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
-                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
+        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man}}
                     
         self.ft = 'IIR'
         self.rt = {
-            "LP": {"man":{"par":[]},
-                   "min":{"par":['F_PB','F_SB']}},
+            "LP": {"man":{"par":[]}},
             "HP": {"man":{"par":[],
-                          "msg":r"<br /><b>Note:</b> Be careful!"},
-                   "min":{"par":['F_SB','F_PB']}},
-            "BP": {"man":{"par":['F_C2']},
-                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
+                          "msg":r"<br /><b>Note:</b> Be careful!"}},
+            "BP": {"man":{"par":['F_C2']}},
             "BS": {"man":{"par":['F_C2'],
-                      "msg":r"<br /><b>Note:</b> Be extra careful!"},
-                   "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}},
+                      "msg":r"<br /><b>Note:</b> Be extra careful!"}},
             "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
                    }
         
@@ -180,18 +162,14 @@ class Manual_IIR(object):
         self.info_doc.append('manual()\n========')
         
         #------------------- end of static info for filter tree ---------------
-
-        self.wdg = False
         
-        self.hdl = None
-        
+        self.hdl = None       
         
     def construct_UI(self):
         """
         No UI, nothing to construct here
         """
         pass
-
 
             
     def destruct_UI(self):
