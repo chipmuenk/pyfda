@@ -12,14 +12,11 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton, QPushButton,
-                      QAbstractItemView,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
+                      QCheckBox, QQPushButton,
+                      QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
-
+                      pyqtSignal, QEvent)
 
 import numpy as np
 
@@ -30,9 +27,9 @@ from pyfda.simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows
 # TODO: drag & drop doesn't work
+# TODO: IIR combobox has no functionality yet
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
-# TODO: IIR button functionality not yet implemented, needed?
 # TODO: Fill combobox for Wrap / Quant settings
 # TODO: Separate View and Storage of data
 # TODO: Fix fixpoint lib: ovfl = wrap toggles between -MSB and + MSB is wrong
