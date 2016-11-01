@@ -124,7 +124,7 @@ class SelectFilter(QWidget):
             ft = str(ft.toString()) # needed for Python 2.x
             
         for fc in fb.fil_tree[rt][ft]:
-            self.cmbFilterClass.addItem(fb.fil_class_names[fc]['name'], fc)
+            self.cmbFilterClass.addItem(fb.fil_classes[fc]['name'], fc)
         self.cmbFilterClass.setCurrentIndex(0) # set initial index
 
         #----------------------------------------------------------------------
@@ -305,7 +305,7 @@ class SelectFilter(QWidget):
         fc_list = []
 
         for fc in sorted(fb.fil_tree[self.rt][self.ft]):
-            self.cmbFilterClass.addItem(fb.fil_class_names[fc]['name'], fc)
+            self.cmbFilterClass.addItem(fb.fil_classes[fc]['name'], fc)
             fc_list.append(fc)
 
         logger.debug("fc_list: {0}\n{1}".format(fc_list, fb.fil[0]['fc']))
@@ -314,7 +314,7 @@ class SelectFilter(QWidget):
         # Has filter been instantiated?
         if fb.fil[0]['fc'] in fc_list and ff.fil_inst:
             # yes, set same fc as before
-            fc_idx = self.cmbFilterClass.findText(fb.fil_class_names[fb.fil[0]['fc']]['name'])
+            fc_idx = self.cmbFilterClass.findText(fb.fil_classes[fb.fil[0]['fc']]['name'])
             logger.debug("fc_idx : %s", fc_idx)
             self.cmbFilterClass.setCurrentIndex(fc_idx)
         else:

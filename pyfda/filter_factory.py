@@ -37,7 +37,7 @@ class FilterFactory(object):
         # TODO: need to pass both module and class name for more flexibility
         """
         Create an instance of the filter design class passed as string "fc" 
-        from the module found in ``fil_class_names[fc]``.
+        from the module found in ``fb.fil_classes[fc]``.
         This dictionary has been collected by filter_tree_builder.py. 
         
         The instance can afterwards be referenced as the global ``fil_inst``.
@@ -51,7 +51,7 @@ class FilterFactory(object):
 
         mod : string (optional, default = None)
             Fully qualified name of the filter module. When not specified, it is
-            read from the global dict ``fil_class_names``
+            read from the global dict ``fb.fil_classes``
             
         Returns
         -------
@@ -84,21 +84,21 @@ class FilterFactory(object):
             # Try to dynamically import the module fc, i.e. do the following
             # import pyfda.<filter_package>.<fc> as fc_module  
             if not mod:            
-                mod = fb.fil_class_names[fc]['mod']
+                mod = fb.fil_classes[fc]['mod']
             #------------------------------------------------------------------
             fc_module = importlib.import_module(mod)                
             #------------------------------------------------------------------                
 
         except KeyError as e:
             err_string =("\nKeyError in 'FilterFactory.create_fil_inst()':\n"
-                  "Filter design class '%s' is not in dict 'fb.fil_class_names',\n"
+                  "Filter design class '%s' is not in dict 'fb.fil_classes',\n"
                   "i.e. it was not found by 'FilterTreeBuilder'."%fc)
             self.err_code = 1
             logger.warning(err_string)
             return self.err_code
             
         except ImportError as e:
-            # Filter module mod is in dictionary 'fb.fil_class_names', but could not be imported.
+            # Filter module mod is in dictionary 'fb.fil_classes', but could not be imported.
             err_string =("\nImportError in 'FilterFactory.create_fil_inst()':\n"
                   "Filter design module '%s' could not be imported."%str(mod))
             self.err_code = 2
@@ -231,7 +231,7 @@ Alternative approaches for data persistence: Module shelve or pickleshare
 
 """
 if __name__ == '__main__':
-    print("\nfil_class_names\n", fb.fil_class_names)
+    print("\nfb.fil_classes\n", fb.fil_classes)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # first time inst.
     print("cheby1:", fil_factory.create_fil_inst("cheby1"),"\n") # second time inst.

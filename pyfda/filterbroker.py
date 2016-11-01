@@ -37,7 +37,7 @@ MYHDL = False
 # The keys of this dictionary are all found class names, the values are the name
 # to be displayed e.g. in the comboboxes and the fully qualified name of the module
 # containing the class
-fil_class_names = {# IIR:
+fil_classes = {# IIR:
             'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'},
             'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_design.cheby1'},
             'Cheby2':{'name':'Chebychev 2', 'mod':'pyfda.filter_design.cheby2'},

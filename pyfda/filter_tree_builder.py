@@ -62,7 +62,7 @@ class FilterTreeBuilder(object):
         filt_list_names = self.read_filt_file()
 
         # Try to import all filter modules and classes found in filter_list, 
-        # store names and modules in the dict fb.fil_class_names as {filterName:filterModule}:
+        # store names and modules in the dict fb.fil_classes as {filterName:filterModule}:
         self.dyn_filt_import(filt_list_names)
 
         # Build a hierarchical dict fb.fil_tree with all valid filter designs
@@ -157,7 +157,7 @@ class FilterTreeBuilder(object):
           for both class and combo box name.
         
         Filter class, display name and module path are stored in the global 
-        dict `fb.fil_class_names`.
+        dict `fb.fil_classes`.
 
         Parameters
         ----------
@@ -169,14 +169,14 @@ class FilterTreeBuilder(object):
         Returns
         -------
 
-        None, results are stored in the global dict fb.fil_class_names, 
+        None, results are stored in the global dict fb.fil_classes, 
         containing entries (for SUCCESSFUL imports) with:
 
             {<class name>:{'name':<display name>, 'mod':<full module name>}
              e.g. {'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_design.cheby1'}
 
         """
-        fb.fil_class_names = {}   # initialize global dict for filter classes
+        fb.fil_classes = {}   # initialize global dict for filter classes
         num_imports = 0           # number of successful filter module imports
         imported_fil_classes = "" # names of successful filter module imports
 
@@ -213,7 +213,7 @@ class FilterTreeBuilder(object):
                     logger.warning("Skipping filter class '%s', it doesn't exist in module '%s'." %(fc, module_name))
                     continue # continue with next entry in fdict
                 else:
-                    fb.fil_class_names.update({fc:{'name':fdict[fc],'mod':module_name}})
+                    fb.fil_classes.update({fc:{'name':fdict[fc],'mod':module_name}})
                     # when module + class import was successful, add a new entry 
                     # to the dict with the class name as key and display name and
                     # and fully qualified module path as values, e.g.
@@ -234,7 +234,7 @@ class FilterTreeBuilder(object):
     def build_fil_tree(self):
         """
         Read attributes (ft, rt, rt:fo) from all filter classes (fc)
-        listed in the global dict ``fb.fil_class_names``. Attributes are stored in
+        listed in the global dict ``fb.fil_classes``. Attributes are stored in
         the design method classes in the format (example from cheby1.py)
 
         self.ft = 'IIR'
@@ -274,13 +274,13 @@ class FilterTreeBuilder(object):
 
         fb.fil_tree = {} # Dict with a hierarical tree fc-ft- ...
 
-        for fc in fb.fil_class_names:  # iterate over keys (= fc)
+        for fc in fb.fil_classes:  # iterate over keys (= fc)
 
             # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
-                continue # continue with next entry in fil_class_names
+                continue # continue with next entry in fb.fil_classes
                 
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
