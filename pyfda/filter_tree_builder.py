@@ -176,19 +176,16 @@ class FilterTreeBuilder(object):
              e.g. {'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_design.cheby1'}
 
         """
-        fb.fil_module_names = {}  # initialize global dict containing {module name:fully qualified name}
-        fb.fil_class_names = {}
+        fb.fil_class_names = {}   # initialize global dict for filter classes
         num_imports = 0           # number of successful filter module imports
-        imported_fil_modules = "" # names of successful filter module imports
+        imported_fil_classes = "" # names of successful filter module imports
 
         for filt_mod in filt_list_names:
-            try:
-                # Try to import the module from the  package)
-                # http://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
-                module_name = 'pyfda.' + self.filt_dir + '.' + filt_mod
-
-                mod = importlib.import_module(module_name) # get handle of imported module
-
+            module_name = 'pyfda.' + self.filt_dir + '.' + filt_mod
+            try:  # Try to import the module from the  package and get a handle:
+                ################################################
+                mod = importlib.import_module(module_name)
+                ################################################
                 if hasattr(mod, 'filter_classes'):
                     # check type of module attribute 'filter_classes'
                     if isinstance(mod.filter_classes, dict): # dict {class name : combo box name}
@@ -200,22 +197,30 @@ class FilterTreeBuilder(object):
                         %(str(filt_mod), str(type(mod.filter_classes).__name__)))
                         continue # with next entry in filt_list_names
                 else:
-                    fdict = {filt_mod:filt_mod} # no filter_class attribute, use
-                                                # the module name as fallback
-                # when module import was successful, add the filename without
-                #  '.py' and the full module name to the dict 'fb.fil_module_names',
-                #     e.g. {'cheby1': 'pyfda.filter_design.cheby1'}
-                fb.fil_module_names.update({filt_mod:module_name})
-                
-                print("imported", filt_mod, fdict)
-                fb.fil_class_names.update(fdict)
-                num_imports += 1
-                imported_fil_modules += "\t" + filt_mod + "\n"
+                    # no filter_class attribute, use the module name as fallback:
+                    logger.warning('Skipping filter module "%s" due to missing attribute "filter_classes".', filt_mod)
+                    continue
 
             except ImportError as e:
-                logger.error('Filter module "%s" could not be imported.', filt_mod)
+                logger.warning('Filter module "%s" could not be imported.', filt_mod)
+                continue
             except Exception as e:
-                logger.error("Unexpected error during module import:\n%s", e)
+                logger.warning("Unexpected error during module import:\n%s", e)
+                continue
+            # Now, try to instantiate an instance ff.fil_inst() of filter class fc
+            for fc in fdict:
+                if not hasattr(mod, fc): # class k doesn't exist in filter module
+                    logger.warning("Skipping filter class '%s', it doesn't exist in module '%s'." %(fc, module_name))
+                    continue # continue with next entry in fdict
+                else:
+                    fb.fil_class_names.update({fc:{'name':fdict[fc],'mod':module_name}})
+                    # when module + class import was successful, add a new entry 
+                    # to the dict with the class name as key and display name and
+                    # and fully qualified module path as values, e.g.
+                    # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
+
+                    num_imports += 1
+                    imported_fil_classes += "\t" + filt_mod + "."+ fc + "\n"
             
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
@@ -260,7 +265,6 @@ class FilterTreeBuilder(object):
         -----
 
 
-
         Returns
         -------
 
@@ -268,34 +272,15 @@ class FilterTreeBuilder(object):
 
         """
 
-        fb.fil_tree = {} # Dict with a hierarical tree fc-ft-
-        fb.fc_names = {} # Dict with the names of filter classes and their display names
-        for fc in fb.fil_module_names:  # iterate over keys (= fc)
+        fb.fil_tree = {} # Dict with a hierarical tree fc-ft- ...
+
+        for fc in fb.fil_class_names:  # iterate over keys (= fc)
 
             # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
-                continue # continue with next entry in fc_module_names
-
-            elif hasattr(fb.fil_module_names[fc], 'filter_classes'):
-                try:
-                    fb.fc_names.update(fc.filter_classes.key())
-                except KeyError:
-                    logger.warning('Skipping filter class "%s" due to wrong format "%s"\n'
-                    'of attribute "filter_classes"', str(type(fc.filter_classes)), fc)
-                    continue # continue with next entry in fc_module_names
-                    
-            elif hasattr(ff.fil_inst, 'name'):
-                try:
-                    fb.fc_names.update(ff.fil_inst.name)
-                except AttributeError:
-                    logger.warning('Skipping filter class "%s" due to missing attribute "name"', fc)
-                    continue # continue with next entry in fc_module_names
-            else:
-                logger.warning('Missing attribute "name" - Skipping filter class "%s"' , fc)
-                continue # continue with next entry in fc_module_names
-                    
+                continue # continue with next entry in fil_class_names
                 
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
