@@ -97,8 +97,11 @@ class InputTabWidgets(QWidget):
         #       requiring update of all plot and some input widgets:        
         self.filter_specs.sigFilterDesigned.connect(self.update_all)
         self.filter_coeffs.sigFilterDesigned.connect(self.update_all)
-        self.filter_pz.sigFilterDesigned.connect(self.update_all)
-        
+
+        # The following three widgets require a reloading of the select_filter
+        # widget to update the filter selection:
+        self.filter_coeffs.sigFilterDesigned.connect(self.load_all)
+        self.filter_pz.sigFilterDesigned.connect(self.load_all)        
         self.file_io.sigFilterLoaded.connect(self.load_all)
         #----------------------------------------------------------------------
 
@@ -138,11 +141,11 @@ class InputTabWidgets(QWidget):
         """
         Called when a new filter has been LOADED: 
         Pass new filter data from the global filter dict
-        - Specifically call InputFilter.load_entries
+        - Specifically call SelectFilter.load_entries
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         """
-        self.filter_specs.sel_fil.load_entries() # update select_filter
+        self.filter_specs.sel_fil.load_entries() # update select_filter widget
         self.update_all()
 
 
@@ -151,7 +154,7 @@ class InputTabWidgets(QWidget):
         Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ      
         
         Called when a new filter has been DESIGNED: 
-            Pass new filter data from the global filter dict
+        - Pass new filter data from the global filter dict
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         

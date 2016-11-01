@@ -29,7 +29,8 @@ from pyfda.simpleeval import simple_eval
 # TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
-# TODO: IIR combobox has no functionality yet
+# TODO: order P/Z depending on frequency or magnitude
+# TODO: display SOS graphically
 
 class FilterPZ(QWidget):
     """
@@ -191,7 +192,7 @@ class FilterPZ(QWidget):
 #        self.ledGain.editingFinished.connect(self.saveZPK)
 
         self.spnRound.editingFinished.connect(self.load_entries)
-        self.cmbFilterType.currentIndexChanged.connect(self.load_entries)
+        self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
         self.butLoad.clicked.connect(self.load_entries)
         self.chkPZList.clicked.connect(self.load_entries)
 
@@ -204,7 +205,16 @@ class FilterPZ(QWidget):
         self.butSetZero.clicked.connect(self._zero_PZ)
         #----------------------------------------------------------------------
 
-
+#------------------------------------------------------------------------------
+    def _set_filter_type(self):
+        """
+        Change between FIR and IIR filter setting
+        """
+        
+        if self.cmbFilterType.currentText() == 'FIR':
+            fb.fil[0]['ft'] = 'FIR'            
+        else:
+            fb.fil[0]['ft'] = 'IIR'
 
 #------------------------------------------------------------------------------
     def load_entries(self):
@@ -291,15 +301,18 @@ class FilterPZ(QWidget):
 
         zpk.append(simple_eval(self.ledGain.text())) # append k factor to zpk
 
-        fb.fil[0]["N"] = num_rows
-        fil_save(fb.fil[0], zpk, 'zpk', __name__) # save & convert to 'ba'
-        fb.fil[0]['fc'] = 'Manual'
-
-        if np.all(fb.fil[0]['zpk'][1]) == 0:
-            fb.fil[0]['ft'] = 'FIR'
-        else:
+        fb.fil[0]['N'] = num_rows
+     
+        if np.any(zpk[1]):
             fb.fil[0]['ft'] = 'IIR'
-           
+            fb.fil[0]['fc'] = 'Manual_IIR'
+            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+        else:
+            fb.fil[0]['ft'] = 'FIR'
+            fb.fil[0]['fc'] = 'Manual_FIR'
+            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+
+        fil_save(fb.fil[0], zpk, 'zpk', __name__) # save & convert to 'ba'
 
         if self.chkNorm.isChecked():
             # set gain factor k (zpk[2]) in such a way that the max. filter 
@@ -314,7 +327,7 @@ class FilterPZ(QWidget):
 
         if __name__ == '__main__':
             self.load_entries() # only needed for stand-alone test
-            
+         
         self.sigFilterDesigned.emit()
 
         logger.debug("_save_entries - coeffients / zpk updated:\n"
