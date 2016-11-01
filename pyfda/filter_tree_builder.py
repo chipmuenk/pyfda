@@ -4,12 +4,14 @@ Created on Mon Nov 24 10:00:14 2014
 
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import os, sys
+import os, sys, six
 from pprint import pformat
 import codecs
 import importlib
+
 import logging
 logger = logging.getLogger(__name__)
+
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 
@@ -188,11 +190,11 @@ class FilterTreeBuilder(object):
                 mod = importlib.import_module(module_name) # get handle of imported module
 
                 if hasattr(mod, 'filter_classes'):
-                    fc = mod.filter_classes # read module attribute, then check type:
-                    if isinstance(fc, dict): # dict {class name : combo box name}
-                        fdict = fc
-                    elif isinstance(fc, str): # String, convert to dict
-                        fdict = {fc:fc}
+                    # check type of module attribute 'filter_classes'
+                    if isinstance(mod.filter_classes, dict): # dict {class name : combo box name}
+                        fdict = mod.filter_classes
+                    elif isinstance(mod.filter_classes, six.string_types): # String, convert to dict
+                        fdict = {mod.filter_classes:mod.filter_classes}
                     else:
                         logger.warning("Skipping module '%s', its attribute 'filter_classes' has the wrong type '%s'." 
                         %(str(filt_mod), str(type(mod.filter_classes).__name__)))
