@@ -27,12 +27,10 @@ from pyfda.simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows
 # TODO: drag & drop doesn't work
-# TODO: IIR combobox has no functionality yet
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: Fill combobox for Wrap / Quant settings
-# TODO: Separate View and Storage of data
-# TODO: Fix fixpoint lib: ovfl = wrap toggles between -MSB and + MSB is wrong
+# TODO: Separate View and Storage of data for selecting number of displayed digits
 
 class FilterCoeffs(QWidget):
     """
@@ -243,7 +241,7 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
 
         self.chkCoeffList.clicked.connect(self.load_entries)
-        self.cmbFilterType.currentIndexChanged.connect(self.load_entries)
+        self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
         self.butLoad.clicked.connect(self.load_entries)
 
         self.butSave.clicked.connect(self.store_entries)
@@ -251,9 +249,22 @@ class FilterCoeffs(QWidget):
         self.butDelRow.clicked.connect(self.delete_rows)
         self.butAddRow.clicked.connect(self.add_rows)
 
-        self.butClear.clicked.connect(self.clear_table)
-        self.butSetZero.clicked.connect(self.set_coeffs_zero)
+        self.butClear.clicked.connect(self._clear_table)
+        self.butSetZero.clicked.connect(self._set_coeffs_zero)
         self.butQuant.clicked.connect(self.quant_coeffs)
+
+#------------------------------------------------------------------------------
+    def _set_filter_type(self):
+        """
+        Change between FIR and IIR filter setting
+        """
+        
+        if self.cmbFilterType.currentText() == 'FIR':
+            fb.fil[0]['ft'] = 'FIR'            
+        else:
+            fb.fil[0]['ft'] = 'IIR'
+            
+        self.load_entries()
 
 #------------------------------------------------------------------------------
     def store_entries(self):
@@ -265,6 +276,16 @@ class FilterCoeffs(QWidget):
         coeffs = []
         num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
         logger.debug("store_entries: \n%s rows x  %s cols" %(num_rows, num_cols))
+
+        if self.cmbFilterType.currentText() ==  'IIR':
+            fb.fil[0]['ft'] = 'IIR'
+            fb.fil[0]['fc'] = 'Manual_IIR'
+            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+        else:
+            fb.fil[0]['ft'] = 'FIR'
+            fb.fil[0]['fc'] = 'Manual_FIR'
+            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+
 
 #        if num_cols > 1: # IIR
         for col in range(num_cols):
@@ -316,7 +337,7 @@ class FilterCoeffs(QWidget):
         self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
         
         # check whether filter is FIR and only needs one column 
-        if fb.fil[0]['ft'] == 'FIR' and np.all(fb.fil[0]['zpk'][1]) == 0:
+        if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
             num_cols = 1
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
@@ -405,7 +426,7 @@ class FilterCoeffs(QWidget):
         self.tblCoeff.resizeRowsToContents()
 
 #------------------------------------------------------------------------------
-    def clear_table(self):
+    def _clear_table(self):
         """
         Clear table & initialize coeff, zpk for two poles and zeros @ origin,
         a = b = [1; 0; 0]
@@ -428,7 +449,7 @@ class FilterCoeffs(QWidget):
                     self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 
 #------------------------------------------------------------------------------
-    def set_coeffs_zero(self):
+    def _set_coeffs_zero(self):
         """
         Set all coefficients = 0 in table with a magnitude less than eps
         """
