@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal,
-                      QCheckBox, QPushButton, QSpinBox,
+                      QCheckBox, QPushButton, QSpinBox, QComboBox,
                       QTableWidget, QTableWidgetItem, QAbstractItemView,
                       QVBoxLayout, QHBoxLayout, QSizePolicy)
 
@@ -29,7 +29,7 @@ from pyfda.simpleeval import simple_eval
 # TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
-
+# TODO: IIR combobox has no functionality yet
 
 class FilterPZ(QWidget):
     """
@@ -40,6 +40,8 @@ class FilterPZ(QWidget):
     
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
+
+        self.Hmax_last = 1
 
         self._construct_UI()
 
@@ -59,7 +61,7 @@ class FilterPZ(QWidget):
                 MaxTextlen = len(item)
                 longestText = item        
 
-        self.chkPZList =  QCheckBox()
+        self.chkPZList = QCheckBox()
         self.chkPZList.setChecked(True)
         self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable list.")
         self.chkPZList.setText("Show Poles / Zeros")
@@ -69,6 +71,12 @@ class FilterPZ(QWidget):
         self.spnRound.setRange(0,9)
         self.spnRound.setValue(0)
         self.spnRound.setToolTip("Round to d digits.")
+
+        self.cmbFilterType = QComboBox(self)
+        self.cmbFilterType.setObjectName("comboFilterType")
+        self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
+        self.cmbFilterType.addItems(["FIR","IIR"])
+        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.lblGain = QLabel("k = ")
         
@@ -135,6 +143,8 @@ class FilterPZ(QWidget):
         self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkPZList)
         self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.cmbFilterType)
+        self.layHChkBoxes.addStretch(1)        
         self.layHChkBoxes.addWidget(self.lblRound)
         self.layHChkBoxes.addWidget(self.spnRound)
 
@@ -181,6 +191,7 @@ class FilterPZ(QWidget):
 #        self.ledGain.editingFinished.connect(self.saveZPK)
 
         self.spnRound.editingFinished.connect(self.load_entries)
+        self.cmbFilterType.currentIndexChanged.connect(self.load_entries)
         self.butLoad.clicked.connect(self.load_entries)
         self.chkPZList.clicked.connect(self.load_entries)
 
@@ -198,8 +209,15 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def load_entries(self):
         """
-        Create table from filter zpk dict, overwriting all previous entries.
+        Update all entries from filter dict,
+        create table from filter zpk dict, overwriting all previous entries.
         """
+        
+        if fb.fil[0]['ft'] == 'FIR':
+            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+        else:
+            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+
         zpk = fb.fil[0]['zpk']
         n_digits = int(self.spnRound.text())
         self.ledGain.setVisible(self.chkPZList.isChecked())
@@ -275,6 +293,13 @@ class FilterPZ(QWidget):
 
         fb.fil[0]["N"] = num_rows
         fil_save(fb.fil[0], zpk, 'zpk', __name__) # save & convert to 'ba'
+        fb.fil[0]['fc'] = 'Manual'
+
+        if np.all(fb.fil[0]['zpk'][1]) == 0:
+            fb.fil[0]['ft'] = 'FIR'
+        else:
+            fb.fil[0]['ft'] = 'IIR'
+           
 
         if self.chkNorm.isChecked():
             # set gain factor k (zpk[2]) in such a way that the max. filter 
