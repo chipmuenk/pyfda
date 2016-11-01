@@ -59,8 +59,8 @@ class FilterTreeBuilder(object):
         # Scan filter_list.txt for python file names and extract them
         filt_list_names = self.read_filt_file()
 
-        # Try to import all filter modules found in filter_list, store names and
-        # modules in the dict fb.fil_module_names as {filterName:filterModule}:
+        # Try to import all filter modules and classes found in filter_list, 
+        # store names and modules in the dict fb.fil_class_names as {filterName:filterModule}:
         self.dyn_filt_import(filt_list_names)
 
         # Build a hierarchical dict fb.fil_tree with all valid filter designs
@@ -143,20 +143,19 @@ class FilterTreeBuilder(object):
 #==============================================================================
     def dyn_filt_import(self, filt_list_names):
         """
-        Try to import from all filter files found by read_filt_file(),
+        Try to import from all filter files found by ``read_filt_file()``,
         auto-detecting available modules / classes:
 
         - The design classes in a module are specified in the module attribute 
-          `filter_classes` as a dictionary {"Cheby":"Chebychev 1"} where the
+          ``filter_classes`` as a dictionary ``{"Cheby":"Chebychev 1"}`` where the
           key is the class name in the module and the value the corresponding name
-          for e.g. the combo box. When filter_classes is a string, use the string
+          for display. 
+          
+        - When ``filter_classes`` is a string, use the string
           for both class and combo box name.
         
-        - When the module attribute is not given, use the base name of the filter
-          (= file name without .py) as module and class name.
-        
-        The detected modules with full name (e.g. ' filter_design.cheby1') 
-        are stored in the global dict `fb.fil_module_names`.
+        Filter class, display name and module path are stored in the global 
+        dict `fb.fil_class_names`.
 
         Parameters
         ----------
@@ -168,12 +167,11 @@ class FilterTreeBuilder(object):
         Returns
         -------
 
-        None, results are stored in the global dict
+        None, results are stored in the global dict fb.fil_class_names, 
+        containing entries (for SUCCESSFUL imports) with:
 
-        fb.fil_module_names: dict  containing entries (for SUCCESSFUL imports)
-
-            {file name without .py (= class name):full module name}
-             e.g. {"cheby1":"pyfda.filter_design.cheby1"}
+            {<class name>:{'name':<display name>, 'mod':<full module name>}
+             e.g. {'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_design.cheby1'}
 
         """
         fb.fil_module_names = {}  # initialize global dict containing {module name:fully qualified name}
@@ -196,9 +194,9 @@ class FilterTreeBuilder(object):
                     elif isinstance(fc, str): # String, convert to dict
                         fdict = {fc:fc}
                     else:
-                        print("Skipping module '%s', its attribute 'filter_classes' has the wrong type '%s'." 
-                        %(str(filt_mod), str(type(fc).__name__)))
-                        continue
+                        logger.warning("Skipping module '%s', its attribute 'filter_classes' has the wrong type '%s'." 
+                        %(str(filt_mod), str(type(mod.filter_classes).__name__)))
+                        continue # with next entry in filt_list_names
                 else:
                     fdict = {filt_mod:filt_mod} # no filter_class attribute, use
                                                 # the module name as fallback
@@ -218,22 +216,18 @@ class FilterTreeBuilder(object):
                 logger.error("Unexpected error during module import:\n%s", e)
             
         if num_imports < 1:
-            logger.critical("No filter module could be imported - shutting down.")
-            sys.exit("No filter module could be imported - shutting down.")
+            logger.critical("No filter class could be imported - shutting down.")
+            sys.exit("No filter class could be imported - shutting down.")
 
         else:
-            logger.info("Imported successfully the following %d filter modules:\n%s", 
-                    num_imports, imported_fil_modules)
-                    
-        # Dummy routine to demonstrate deleting dict elements
-        remove = [k for k in fb.fil_class_names if k == ""]
-        for k in remove: del fb.fil_class_names[k]
+            logger.info("Imported successfully the following %d filter classes:\n%s", 
+                    num_imports, imported_fil_classes)
 
 #==============================================================================
     def build_fil_tree(self):
         """
         Read attributes (ft, rt, rt:fo) from all filter classes (fc)
-        listed in the global dict ``fb.fil_module_names``. Attributes are stored in
+        listed in the global dict ``fb.fil_class_names``. Attributes are stored in
         the design method classes in the format (example from cheby1.py)
 
         self.ft = 'IIR'
