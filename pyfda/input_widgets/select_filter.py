@@ -10,7 +10,7 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 @author: Julia Beike, Christian Münker, Michael Winkler 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
+import sys, six
 import logging
 logger = logging.getLogger(__name__)
 
@@ -113,14 +113,16 @@ class SelectFilter(QWidget):
 
         self.cmbResponseType.setCurrentIndex(idx) # set initial index
         rt = self.cmbResponseType.itemData(idx)
-        if not isinstance(rt, str):
+        if not isinstance(rt, six.string_types):
+#        if not isinstance(rt, str):
             rt = str(rt.toString()) # needed for Python 2.x
 
         for ft in fb.fil_tree[rt]:
             self.cmbFilterType.addItem(rc.ft_names[ft], ft)
         self.cmbFilterType.setCurrentIndex(0) # set initial index
         ft = self.cmbFilterType.itemData(0)
-        if not isinstance(ft, str):
+        if not isinstance(ft, six.string_types):
+#        if not isinstance(ft, str):
             ft = str(ft.toString()) # needed for Python 2.x
             
         for fc in fb.fil_tree[rt][ft]:
@@ -242,7 +244,8 @@ class SelectFilter(QWidget):
         idx = cmb_box.currentIndex()
         cmb_data = cmb_box.itemData(idx)
 
-        if not isinstance(cmb_data, str):
+        if not isinstance(cmb_data, six.string_types):
+#        if not isinstance(cmb_data, str):
             cmb_data = str(cmb_data.toString()) # needed for Python 2
         fb.fil[0][tag] = cmb_data # copy selected rt setting to filter dict
 

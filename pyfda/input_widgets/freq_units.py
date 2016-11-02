@@ -5,16 +5,14 @@ Widget for entering frequency units
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
+import sys, six
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
+from ..compat import (QtCore,
+                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QToolButton,
+                      QVBoxLayout, QHBoxLayout, QGridLayout,
+                      pyqtSignal, QEvent)
 
 
 import pyfda.filterbroker as fb
@@ -236,7 +234,8 @@ class FreqUnits(QWidget):
         """
 
         rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
-        if not isinstance(rangeType, str):
+        if not isinstance(rangeType, six.string_types):
+#        if not isinstance(rangeType, str):
             rangeType = str(rangeType.toString()) # needed for Python 2.x
 
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
