@@ -111,7 +111,6 @@ class PlotPhi(QWidget):
             H = np.fft.fftshift(H)
             F = F - f_S / 2.
 
-#        scale = self.cmbUnitsPhi.itemData(self.cmbUnitsPhi.currentIndex())
         y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$ in '
         if self.unitPhi == 'rad':
             y_str += 'rad ' + r'$\rightarrow $'
