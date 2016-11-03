@@ -26,7 +26,7 @@ Created on Mon Apr 30 10:29:42 2012
 # CSLU / OHSU, Spring Term 2011.
 
 from __future__ import division, print_function
-import os, sys
+import os, sys, six
 import numpy as np
 from numpy import pi, log10, arctan
 
@@ -76,6 +76,33 @@ def get_home_dir():
                 if not valid(homeDir) :
                     homeDir = 'C:\\'
     return homeDir
+
+#------------------------------------------------------------------------------
+def read_cmb_box(cmb_box):
+    """
+    Read out current setting of comboBox and convert it to string.
+
+    In Python 3, python Qt objects are automatically converted to QVariant
+    when stored as "data" e.g. in a QComboBox and converted back when
+    retrieving. In Python 2, QVariant is returned when itemData is retrieved.
+    This is first converted from the QVariant container format to a
+    QString, next to a "normal" non-unicode string.
+
+    
+    Returns:
+    
+    The current setting of combobox as string
+    """
+    idx = cmb_box.currentIndex()
+    cmb_data = cmb_box.itemData(idx)
+#        if hasattr(cmb_data, Qt.QVariant):
+    if not isinstance(cmb_data, six.text_type):
+#        if not isinstance(cmb_data, six.string_types):
+#        if not isinstance(cmb_data, str):
+        cmb_data = cmb_data.toString() # needed for Python 2
+    cmb_data = str(cmb_data)
+
+    return cmb_data
 
 
 def dB(lin, power = False):

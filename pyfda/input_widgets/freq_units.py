@@ -5,7 +5,7 @@ Widget for entering frequency units
 Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, six
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ from ..compat import (QtCore,
 
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_lib import rt_label, read_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
@@ -233,10 +233,7 @@ class FreqUnits(QWidget):
         sigUnitChanged signal
         """
 
-        rangeType = self.cmbFRange.itemData(self.cmbFRange.currentIndex())
-        if not isinstance(rangeType, six.string_types):
-#        if not isinstance(rangeType, str):
-            rangeType = str(rangeType.toString()) # needed for Python 2.x
+        rangeType = read_cmb_box(self.cmbFRange)
 
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
         if rangeType == 'whole':

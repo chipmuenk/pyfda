@@ -10,7 +10,7 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 @author: Julia Beike, Christian Münker, Michael Winkler 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, six
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont,
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 import pyfda.pyfda_rc as rc
-from pyfda.pyfda_lib import HLine
+from pyfda.pyfda_lib import HLine, read_cmb_box
 
 
 class SelectFilter(QWidget):
@@ -98,11 +98,6 @@ class SelectFilter(QWidget):
         # Translate short response type ("LP") to displayed names ("Lowpass")
         # (correspondence is defined in pyfda_rc.py) and populate rt combo box
         #
-        # In Python 3, python objects are automatically converted to QVariant
-        # when stored as "data" e.g. in a QComboBox and converted back when
-        # retrieving. In Python 2, QVariant is returned when itemData is retrieved.
-        # This is first converted from the QVariant container format to a
-        # QString, next to a "normal" non-unicode string
         rt_list = sorted(list(fb.fil_tree.keys()))
         for rt in rt_list:
             self.cmbResponseType.addItem(rc.rt_names[rt], rt)
@@ -112,18 +107,12 @@ class SelectFilter(QWidget):
             idx = 0
 
         self.cmbResponseType.setCurrentIndex(idx) # set initial index
-        rt = self.cmbResponseType.itemData(idx)
-        if not isinstance(rt, six.string_types):
-#        if not isinstance(rt, str):
-            rt = str(rt.toString()) # needed for Python 2.x
+        rt = read_cmb_box(self.cmbResponseType)
 
         for ft in fb.fil_tree[rt]:
             self.cmbFilterType.addItem(rc.ft_names[ft], ft)
         self.cmbFilterType.setCurrentIndex(0) # set initial index
-        ft = self.cmbFilterType.itemData(0)
-        if not isinstance(ft, six.string_types):
-#        if not isinstance(ft, str):
-            ft = str(ft.toString()) # needed for Python 2.x
+        ft = read_cmb_box(self.cmbFilterType)
             
         for fc in fb.fil_tree[rt][ft]:
             self.cmbFilterClass.addItem(fb.fil_classes[fc]['name'], fc)
@@ -230,27 +219,6 @@ class SelectFilter(QWidget):
         self.cmbResponseType.setCurrentIndex(rt_idx)
         self._set_response_type()
 
-
-#------------------------------------------------------------------------------
-    def _read_cmb_box(self, cmb_box, tag):
-        """
-        Read out current setting of comboBox, convert to string (see 
-        _construct_UI for details) and store in fb.fil[0][tag]
-        
-        Returns:
-        
-        The current setting of combobox as string
-        """
-        idx = cmb_box.currentIndex()
-        cmb_data = cmb_box.itemData(idx)
-
-        if not isinstance(cmb_data, six.string_types):
-#        if not isinstance(cmb_data, str):
-            cmb_data = str(cmb_data.toString()) # needed for Python 2
-        fb.fil[0][tag] = cmb_data # copy selected rt setting to filter dict
-
-        return cmb_data
-
 #------------------------------------------------------------------------------
     def _set_response_type(self, enb_signal=False):
         """
@@ -260,8 +228,8 @@ class SelectFilter(QWidget):
         If previous filter type (FIR, IIR, ...) exists for new rt, set the
         filter type combo box to the old setting
         """
-        # Read out current setting of comboBox and convert to string
-        self.rt = self._read_cmb_box(self.cmbResponseType, 'rt')
+        # Read current setting of comboBox as string and store it in the filter dict
+        fb.fil[0]['rt'] = self.rt = read_cmb_box(self.cmbResponseType)
 
         # Get list of available filter types for new rt
         ft_list = list(fb.fil_tree[self.rt].keys()) # explicit list() needed for Py3
@@ -293,7 +261,7 @@ class SelectFilter(QWidget):
           displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
         # Read out current setting of comboBox and convert to string
-        self.ft = self._read_cmb_box(self.cmbFilterType, 'ft')
+        fb.fil[0]['ft'] = self.ft = read_cmb_box(self.cmbFilterType)
 #
         logger.debug("InputFilter.set_filter_type triggered: {0}".format(self.ft))
 
@@ -337,7 +305,7 @@ class SelectFilter(QWidget):
         - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """        
-        fc = self._read_cmb_box(self.cmbFilterClass, 'fc')
+        fb.fil[0]['fc'] = fc = read_cmb_box(self.cmbFilterClass)
         
         if fc != self.fc_last: # fc has changed:
 
