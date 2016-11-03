@@ -131,7 +131,7 @@ class Manual_IIR(object):
         msg_man = ("Enter filter design using the P/Z or the b/a widget.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fspecs','tspecs'] # manual filter order
+        vis_man = ['tspecs'] # manual filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
         dis_man = [] # manual filter order
