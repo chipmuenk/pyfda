@@ -78,7 +78,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         dis_min = [] # manual filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S'] # manual filter order
+        par_man = ['N'] # manual filter order
         par_min = []
         
         # Common data for all man. / min. filter order response types:
@@ -88,11 +88,11 @@ a given frequency can be calculated via the si function (not implemented yet).
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par": par_min}}
         self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":['F_PB', 'A_PB', 'F_SB', 'A_SB']},
-                   #"targ":{"par":['F_PB', 'F_SB', 'A_PB', 'A_SB']}
+            "LP": {"man":{"par":[]},
+                   "_targ":{"par":['F_PB', 'F_SB', 'A_PB', 'A_SB']}
                    },
-            "HP": {"man":{"par":['F_SB', 'A_SB', 'F_PB', 'A_PB']},
-                   #"targ":{"par":['F_SB', 'F_PB', 'A_SB', 'A_PB']}
+            "HP": {"man":{"par":[]},
+                   "_targ":{"par":['F_SB', 'F_PB', 'A_SB', 'A_PB']}
                    }} 
 
         self.info_doc = []
