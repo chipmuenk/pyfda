@@ -16,7 +16,7 @@ from ..compat import (QtCore, QtGui,
                       pyqtSignal, Qt, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_lib import rt_label, style_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
@@ -142,7 +142,7 @@ class FreqSpecs(QWidget):
             self.spec_edited = False # reset flag
 
 #-------------------------------------------------------------
-    def update_UI(self, new_labels = []):
+    def update_UI(self, new_labels = [], state = "normal"):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
@@ -174,6 +174,7 @@ class FreqSpecs(QWidget):
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+            style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
