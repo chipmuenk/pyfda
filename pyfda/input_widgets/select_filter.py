@@ -355,10 +355,12 @@ class SelectFilter(QWidget):
           load filter order setting from fb.fil[0] and update widgets
 
         """                
-        # read dict_keys of available filter order [fo] methods for  
-        # current design method [fc] from fil_tree. Explicit list() needed for py3.
-        foList = list(fb.fil_tree[fb.fil[0]['rt']]\
-            [fb.fil[0]['ft']][fb.fil[0]['fc']].keys())
+        # collect dict_keys of available filter order [fo] methods for current 
+        # design method [fc] from fil_tree in a list, except for when the key starts
+        # with "_" (e.g. '_targ')
+
+        foList = [l for l in fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']].keys()\
+                             if l[0] != '_']
 
         # is currently selected fo setting available for (new) fc ?
         if fb.fil[0]['fo'] in foList:
