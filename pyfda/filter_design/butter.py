@@ -57,8 +57,8 @@ class Butter(object):
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C', 'A_PB', 'A_SB'] # manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
+        par_man = ['N', 'F_C', 'A_PB', 'A_SB'] # manual filter order
+        par_min = ['A_PB', 'A_SB'] # minimum filter order
 
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
