@@ -161,7 +161,7 @@ class FilterSpecs(QWidget):
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
-        # read all parameters for selected filter type, e.g. 'F_SB':
+        # read ALL parameters for selected filter type, e.g. ['F_SB', 'A_CB']:
         all_params = fb.fil_tree[rt][ft][fc][fo]['par']
 
         vis_wdgs = fb.fil_tree[rt][ft][fc][fo]['vis'] # visible widgets
@@ -192,31 +192,55 @@ class FilterSpecs(QWidget):
         if "man" in fb.fil_tree[rt][ft][fc]:
             man_params = fb.fil_tree[rt][ft][fc]['man']['par']
 
-        if "targ" in fb.fil_tree[rt][ft][fc]:
-            targ_params = fb.fil_tree[rt][ft][fc]['targ']['par']
+        if "_targ" in fb.fil_tree[rt][ft][fc]:
+            targ_params = fb.fil_tree[rt][ft][fc]['_targ']['par']
 
+        # Create lists for amp- and freq-parameters for target specs
+        f_targ_params = [l for l in targ_params if l[0] == 'F']
+        a_targ_params = [l for l in targ_params if l[0] == 'A']
 
-        # always use parameters for MANUAL filter order for f_specs widget,
-        # frequency specs for minimum order are displayed in target specs
+        # Create lists for amp- and freq-parameters for minimum filter order 
+        f_min_params = [l for l in min_params if l[0] == 'F']
+        a_min_params = [l for l in min_params if l[0] == 'A']
+
+        # Create lists for amp- and freq-parameters for manual filter order    
         f_man_params = [l for l in man_params if l[0] == 'F']
+        a_man_params = [l for l in man_params if l[0] == 'A']
+        
+        if fo == 'man':
+            a_params = a_man_params
+            f_params = f_man_params
+        else:
+            a_params = a_min_params
+            f_params = f_min_params
+
+        self.t_specs.setVisible("tspecs" in vis_wdgs and targ_params != [])
+        self.t_specs.setEnabled("tspecs" not in dis_wdgs)
+        if targ_params:
+            if a_params != []:
+                amp_state = 'normal'
+            else:
+                amp_state = 'unused'
+            if f_params != []:
+                freq_state = 'normal'
+            else:
+                freq_state = 'unused'
+            self.t_specs.update_UI(f_targ_params, a_targ_params, 
+                                   freq_state = freq_state, amp_state = amp_state)
+        else:
+            self.t_specs.update_UI(f_min_params, a_min_params)
+        
+        self.f_specs.setVisible(f_params != [])
         self.f_specs.setVisible("fspecs" in vis_wdgs)
         self.f_specs.setEnabled("fspecs" not in dis_wdgs)
-        self.f_specs.update_UI(new_labels=f_man_params)
+        self.f_specs.update_UI(new_labels=f_params)
 
-        # always use parameters for MINIMUM filter order for target frequency
-        # spec widget
-        f_min_params = [l for l in min_params if l[0] == 'F']
-        f_targ_params = [l for l in targ_params if l[0] == 'F']
-
-        self.t_specs.setVisible("tspecs" in vis_wdgs)
-        self.t_specs.setEnabled("tspecs" not in dis_wdgs)
-        self.t_specs.update_UI(f_min_params, a_params)
-        
-        # self.a_specs.setVisible(a_params != [])
+        self.a_specs.setVisible(a_params != [])
         self.a_specs.setVisible("aspecs" in vis_wdgs)
         self.a_specs.setEnabled("aspecs" not in dis_wdgs)
         self.a_specs.update_UI(new_labels=a_params)
 
+        self.w_specs.setVisible(w_params != [])
         self.w_specs.setVisible("wspecs" in vis_wdgs)
         self.w_specs.setEnabled("wspecs" not in dis_wdgs)
         self.w_specs.update_UI(new_labels=w_params)
