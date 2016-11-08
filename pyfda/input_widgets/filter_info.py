@@ -208,9 +208,8 @@ class FilterInfo(QWidget):
                 H_max = 20*log10(H_max)
                 H_min = 20*log10(H_min)
             return F_min, H_min, F_max, H_max
+        #------------------------------------------------------------------
 
-            
-            
         self.tblFiltPerf.setVisible(self.chkFiltPerf.isChecked())
         if self.chkFiltPerf.isChecked():
 
@@ -222,15 +221,11 @@ class FilterInfo(QWidget):
             # Build a list with all frequency related labels:
             #--------------------------------------------------------------------
             # First, extract the list with target specs of the selected
-            # filter class from filter tree:
-            try:
-                fil_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]['_targ']['par']
-            except KeyError:
-                fil_list = []
-                print("No target parameters!")
-                
-            # Now, extract the parameter lists (key 'par'), yielding a nested list:
-#            fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
+            # filter class from filter tree. This is not needed currently?
+            #try:
+            #    fil_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]['_targ']['par']
+            #except KeyError:
+            #    fil_list = []
     
             f_lbls = []
             f_vals = []
@@ -244,7 +239,6 @@ class FilterInfo(QWidget):
             # construct pairs of corner frequency and corresponding amplitude
             # labels in ascending frequency for each response type        
             if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS'}:
-                show_specs = True
                 if fb.fil[0]['rt'] == 'LP':
                     f_lbls = ['F_PB', 'F_SB'] 
                     a_lbls = ['A_PB', 'A_SB']
@@ -313,10 +307,9 @@ class FilterInfo(QWidget):
             # calculate response of test frequencies in dB
             a_test_dB = -20*log10(abs(a_test))
             
-            
             ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR') for dB <-> lin conversion
 #            unit = fb.fil[0]['amp_specs_unit']
-            unit = 'dB' # fix this for the moment
+            unit = 'dB' # make this fixed for the moment
     
             # build a list with the corresponding target specs:
             a_targs_pass = []
@@ -346,8 +339,8 @@ class FilterInfo(QWidget):
             self.tblFiltPerf.setVerticalHeaderLabels(f_lbls)
             for row in range(len(a_test)):
                 self.tblFiltPerf.setItem(row,0,QTableWidgetItem(str('{0:.4g}'.format(f_vals[row]*f_S))))
-                self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%2.3f'%(a_test_dB[row]))))
-                self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3g'%(a_targs_dB[row]))))
+                self.tblFiltPerf.setItem(row,1,QTableWidgetItem(str('%2.3f'%(-a_test_dB[row]))))
+                self.tblFiltPerf.setItem(row,2,QTableWidgetItem(str('%2.3g'%(-a_targs_dB[row]))))
                 self.tblFiltPerf.setItem(row,3,QTableWidgetItem(str('%.3g'%(abs(a_test[row])))))
                 self.tblFiltPerf.setItem(row,4,QTableWidgetItem(str('%2.3f'%(a_targs[row]))))
                 if not a_targs_pass[row]:
