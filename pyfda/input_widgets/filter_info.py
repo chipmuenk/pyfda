@@ -221,35 +221,30 @@ class FilterInfo(QWidget):
     
             # Build a list with all frequency related labels:
             #--------------------------------------------------------------------
-            # First, extract the dicts for min / man filter order of the selected
+            # First, extract the list with target specs of the selected
             # filter class from filter tree:
-            fil_dict = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]
+            try:
+                fil_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]['_targ']['par']
+            except KeyError:
+                fil_list = []
+                print("No target parameters!")
+                
             # Now, extract the parameter lists (key 'par'), yielding a nested list:
-            fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
-            # Finally, flatten the list of lists and convert it into a set to 
-            # eliminate double entries:
-            fil_set = set([item for sublist in fil_list for item in sublist])
-            # extract all labels starting with 'F':
-    #        F_test_lbls = [lbl for lbl in fil_set if lbl[0] == 'F']
-            # construct a list of lists [frequency, label], sorted by frequency:
-    #        F_test = sorted([[fb.fil[0][lbl]*f_S, lbl] for lbl in F_test_lbls])
-    
-            # construct a list of lists consisting of [label, frequency]:
-            # F_test = [[lbl, fb.fil[0][lbl]*f_S] for lbl in F_test_lbls]
-            ## sort list of tuples using the LAST element of the tuple (= frequency)
-            # F_test = sorted(F_test, key=lambda t: t[::-1])
-    
+#            fil_list = [fil_dict[k]['par'] for k in fil_dict.keys()]
     
             f_lbls = []
             f_vals = []
             a_lbls = []
             a_targs = []
             a_targs_dB = []
+            a_test = []
             ft = fb.fil[0]['ft'] # get filter type ('IIR', 'FIR')
             unit = fb.fil[0]['amp_specs_unit']
             unit = 'dB' # fix this for the moment
-            # read specifications from filter dict and sort them depending on the response type        
+            # construct pairs of corner frequency and corresponding amplitude
+            # labels in ascending frequency for each response type        
             if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS'}:
+                show_specs = True
                 if fb.fil[0]['rt'] == 'LP':
                     f_lbls = ['F_PB', 'F_SB'] 
                     a_lbls = ['A_PB', 'A_SB']
@@ -263,9 +258,10 @@ class FilterInfo(QWidget):
                     f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
                     a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
 
-            # Try to construct lists of frequency / amplitude labels and specs
+            # Try to get lists of frequency / amplitude specs from the filter dict
+            # that correspond to the f_lbls / a_lbls pairs defined above
             # When one of the labels doesn't exist in the filter dict, delete 
-            # all corresponding amplitude and frequency entries
+            # all corresponding amplitude and frequency entries.
                 err = [False] * len(f_lbls) # initialize error list  
                 f_vals = []
                 a_targs = []
