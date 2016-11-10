@@ -451,8 +451,14 @@ class PlotHf(QWidget):
         SB = [l for l in param_list if 'A_SB' in l]
         PB = [l for l in param_list if 'A_PB' in l]
         
-        A_min = min([fb.fil[0][l] for l in SB])
-        A_max = max([fb.fil[0][l] for l in PB])
+        if SB:      
+            A_min = min([fb.fil[0][l] for l in SB])
+        else:
+            A_min = 5e-4
+        if PB:
+            A_max = max([fb.fil[0][l] for l in PB])
+        else:
+            A_max = 1
 
         if np.all(self.W) is None: # H(f) has not been calculated yet
             self.calc_hf()
