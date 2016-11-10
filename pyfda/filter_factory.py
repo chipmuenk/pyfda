@@ -65,7 +65,9 @@ class FilterFactory(object):
              
             :2: filter module found by FilterTreeBuilder but could not be imported 
              
-            :3: unknown error during instantiation
+            :3: filter class could not be instantiated
+
+            :4: unknown error during instantiation
         
         Example
         -------
@@ -122,10 +124,13 @@ class FilterFactory(object):
                 logger.warning(err_string)
                 self.err_code = 3
             else:
-                fil_inst = fil_class() # instantiate an object         
-                self.err_code = 0 # filter instance has been created / changed successfully
-            logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
-        
+                try:
+                    fil_inst = fil_class() # instantiate an object         
+                    self.err_code = 0 # filter instance has been created / changed successfully
+                    logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
+                except Exception as e:
+                    self.err_code = 4
+                    logger.warning("Error during instantiation of filter class {0}:\n{1}".format(fc,e))                    
         return self.err_code
 
 #------------------------------------------------------------------------------      
