@@ -202,7 +202,7 @@ class FilterTreeBuilder(object):
                     continue
 
             except ImportError as e:
-                logger.warning('Filter module "%s" could not be imported.', filt_mod)
+                logger.warning('Filter module "{0}" could not be imported.\n{1}'.format(filt_mod, e))
                 continue
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n%s", e)
