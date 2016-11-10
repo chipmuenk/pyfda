@@ -13,7 +13,7 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from .compat import (QtCore, QMainWindow, QApplication,
+from .compat import (QtCore, QT_VERSION_STR, QMainWindow, QApplication,
                      QSplitter, QScrollArea, QIcon, QMessageBox,
                      QWidget, QFrame,
                      QVBoxLayout, QHBoxLayout, QSizePolicy)
@@ -211,7 +211,7 @@ class pyFDA(QMainWindow):
         self.inputTabWidgets.filter_specs.sigQuit.connect(self.close)
 
 
-        logger.debug("Main routine initialized!")
+        logger.info("Main routine initialized, using Qt {0}".format(QT_VERSION_STR))
 
 #==============================================================================
 # #------------------------------------------------------------------------------
