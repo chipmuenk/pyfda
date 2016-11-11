@@ -281,7 +281,8 @@ class FilterTreeBuilder(object):
             if err_code > 0:
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fb.fil_classes
-                
+
+            self.join_dicts(ff.fil_inst, ['com'])               
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
@@ -301,28 +302,36 @@ class FilterTreeBuilder(object):
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}, 'targ':{...}}
 
-                for mmt in ff.fil_inst.com: # read common parameters Min/Man/Targ
-                    # add info only when 'man'/'min'/'targ' exists for the rt-fc combination
-                    if mmt in fb.fil_tree[rt][ft][fc]:
-                        for p in ff.fil_inst.com[mmt]: # yes, add all info in mmt
-                            # Test whether entry exists already in fb.fil_tree:
-                            if p in fb.fil_tree[rt][ft][fc][mmt]:
-                                # yes, prepend common data
-                                fb.fil_tree[rt][ft][fc][mmt][p] =\
-                                ff.fil_inst.com[mmt][p] + fb.fil_tree[rt][ft][fc][mmt][p]
-                            else:
-                                # no, create new entry
-                                fb.fil_tree[rt][ft][fc][mmt].update(\
-                                                {p:ff.fil_inst.com[mmt][p]})
-
-                            logger.debug("%s - %s - %s\n"
-                                "fb.fil_tree[rt][ft][fc][par][i]: %s\n"
-                                "fb.fil_inst.com[par][i]: %s",
-                                 fc, mmt, p,
-                                 pformat(fb.fil_tree[rt][ft][fc][mmt][p]), 
-                                 pformat(ff.fil_inst.com[mmt][p]))
+   
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
+
+    def join_dicts(self, fc, dict_list):
+        print("dict_list = ", dict_list)
+        _dict = [getattr(fc, d) for d in dict_list]
+        print("\n_dict = ", _dict)
+        for d in _dict:
+            print("\nd = ", d)
+            for mmt in d: # read common parameters Min/Man/Targ
+                print("\nmmt = ", mmt)
+                for rt in fc.rt:
+                    # add info only when the rt entry has a 'man'/'min'/'targ' key:
+                    if mmt in fc.rt[rt]:
+                        for p in d[mmt]: # yes, add all info in mmt
+                            # Test whether entry exists already in rt:
+                            if p in fc.rt[rt][mmt]:
+                                # yes, prepend common data
+                                fc.rt[rt][mmt][p] =\
+                                    d[mmt][p] + fc.rt[rt][mmt][p]
+                            else:
+                                # no, create new entry
+                                fc.rt[rt][mmt].update(\
+                                                {p:d[mmt][p]})
+                            print(fc.rt[rt][mmt])
+                            logger.debug("{0}.{1}.{2}\n"
+                                "fc.rt[rt][mmt]: {3}\n".format(
+                                 fc, rt, mmt,
+                                 pformat(fc.rt[rt][mmt])))
 
 
 #==============================================================================
