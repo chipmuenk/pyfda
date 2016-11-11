@@ -8,30 +8,26 @@ Author: Christian Muenker 2014 - 2016
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
-
-class Common(object):
 
 
-    def __init__(self):
+rt_base = {
+    'LP': {'man':{'par':['F_PB','F_SB']},
+           'min':{'par':['F_PB','F_SB','A_PB','A_SB']},
+           '_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
+    'HP': {'man':{'par':['F_SB','F_PB']},
+           'min':{'par':['F_SB','F_PB','A_SB','A_PB']},
+           '_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
+    'BP': {'man':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2']},
+           'min':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+                         'A_SB','A_PB','A_SB2']},
+           '_targ':{'par':['F_SB', 'F_PB','F_PB2','F_SB2',
+                           'A_SB', 'A_PB','A_SB2']}},
+    'BS': {'man':{'par':['F_PB','F_SB','F_SB2','F_PB2']},
+           'min':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB','A_PB2']},
+           '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2',
+                         'A_PB','A_SB','A_PB2',]}}
+           }
 
-        self.rt = {
-            'LP': {'man':{'par':['F_PB','F_SB']},
-                   'min':{'par':['F_PB','F_SB','A_PB','A_SB']},
-                   '_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
-            'HP': {'man':{'par':['F_SB','F_PB']},
-                   'min':{'par':['F_SB','F_PB','A_SB','A_PB']},
-                   '_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
-            'BP': {'man':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2']},
-                   'min':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'A_SB','A_PB','A_SB2']},
-                   '_targ':{'par':['F_SB', 'F_PB','F_PB2','F_SB2',
-                                   'A_SB', 'A_PB','A_SB2']}},
-            'BS': {'man':{'par':['F_PB','F_SB','F_SB2','F_PB2']},
-                   'min':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB','A_PB2']},
-                   '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2',
-                                 'A_PB','A_SB','A_PB2',]}}
-                   }
 
 #------------------------------------------------------------------------------
 
