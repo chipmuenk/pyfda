@@ -22,7 +22,7 @@ Author: Christian Muenker
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import ellipord
-
+from .common import rt_base
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
 __version__ = "1.4"
@@ -80,8 +80,8 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         dis_min = [] # minimum filter order
 
         # parameters for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'A_PB', 'A_SB']
-        par_min = ['f_S', 'A_PB', 'A_SB']
+        par_man = ['N', 'A_PB', 'A_SB']
+        par_min = []#['A_PB', 'A_SB']
 
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
@@ -90,16 +90,17 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
 
         self.ft = 'IIR'
-        self.rt = {
-          "LP": {"man":{"par":[]},
-                 "min":{"par":['F_PB','F_SB']}},
-          "HP": {"man":{"par":[]},
-                 "min":{"par":['F_SB','F_PB']}},
-          "BP": {"man":{"par":[]},
-                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-          "BS": {"man":{"par":[]},
-                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
-                 }
+        self.rt = rt_base
+#        self.rt = {
+#          "LP": {"man":{"par":[]},
+#                 "min":{"par":['F_PB','F_SB']}},
+#          "HP": {"man":{"par":[]},
+#                 "min":{"par":['F_SB','F_PB']}},
+#          "BP": {"man":{"par":[]},
+#                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
+#          "BS": {"man":{"par":[]},
+#                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
+#                 }
 
 
         self.info_doc = []

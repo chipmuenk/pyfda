@@ -23,6 +23,7 @@ Author: Christian Muenker
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import buttord
+from .common import rt_base
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
@@ -57,26 +58,35 @@ class Butter(object):
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'F_C', 'A_PB', 'A_SB'] # manual filter order
-        par_min = ['A_PB', 'A_SB'] # minimum filter order
+        par_man = ['N', 'F_C'] # manual filter order
+        par_min = [] # minimum filter order
 
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
+        self.dicts = ['rt', 'rtx', 'com']
         self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
 
         self.ft = 'IIR'
-        self.rt = {
-          "LP": {"man":{"par":[]},
-                 "min":{"par":['F_PB','F_SB']}},
-          "HP": {"man":{"par":[]},
-                 "min":{"par":['F_SB','F_PB']}},
-          "BP": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-          "BS": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
+        self.rt = rt_base
+        self.rtx = {
+          "LP": {"man":{"par":[]}},
+          "HP": {"man":{"par":[]}},
+          "BP": {"man":{"par":['F_C2']}},
+          "BS": {"man":{"par":['F_C2']}},
                  }
+#        self.rt = {
+#          "LP": {"man":{"par":[]},
+#                 "min":{"par":['F_PB','F_SB']}},
+#          "HP": {"man":{"par":[]},
+#                 "min":{"par":['F_SB','F_PB']}},
+#          "BP": {"man":{"par":['F_C2']},
+#                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
+#          "BS": {"man":{"par":['F_C2']},
+#                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
+#                 }
+
 
         self.info = """
 **Butterworth filters**
