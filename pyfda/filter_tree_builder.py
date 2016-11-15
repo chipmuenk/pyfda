@@ -282,7 +282,7 @@ class FilterTreeBuilder(object):
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fb.fil_classes
 
-            self.join_dicts(ff.fil_inst, ['com'])               
+            self.join_dicts(ff.fil_inst, ['com', 'rtx'])               
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
