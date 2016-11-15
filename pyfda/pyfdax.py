@@ -13,11 +13,19 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from .compat import (QtCore, QMainWindow, QApplication,
+from .compat import (HAS_QT5, QtCore, QMainWindow, QApplication,
                      QSplitter, QScrollArea, QIcon, QMessageBox,
                      QWidget, QFrame,
                      QVBoxLayout, QHBoxLayout, QSizePolicy)
-
+import matplotlib
+# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
+# to avoid 
+# "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
+if HAS_QT5:
+    matplotlib.use("Qt5Agg")
+else:
+    matplotlib.use("Qt4Agg")
+    
 import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
