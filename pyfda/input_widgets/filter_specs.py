@@ -168,11 +168,11 @@ class FilterSpecs(QWidget):
         dis_wdgs = fb.fil_tree[rt][ft][fc][fo]['dis'] # disabled widgets
         msg      = fb.fil_tree[rt][ft][fc][fo]['msg'] # message
 
-        # Read freq / amp / weight labels for current filter design, building
-        # separate parameter lists according to the first letter
-        f_params = [l for l in all_params if l[0] == 'F'] # curr. not used
-        a_params = [l for l in all_params if l[0] == 'A']
-        w_params = [l for l in all_params if l[0] == 'W']
+        # Read freq / amp / weight labels for *current filter design*, building
+        # separate parameter lists according to the first letter of the label
+        f_params = [l for l in all_params if l[:2] == 'F_']
+        a_params = [l for l in all_params if l[:2] == 'A_']
+        w_params = [l for l in all_params if l[:2] == 'W_']
         logger.debug("update_all_UIs\n"
             "all_params = %s\n"
             "a_params = %s\n"
@@ -196,16 +196,16 @@ class FilterSpecs(QWidget):
             targ_params = fb.fil_tree[rt][ft][fc]['_targ']['par']
 
         # Create lists for amp- and freq-parameters for target specs
-        f_targ_params = [l for l in targ_params if l[0] == 'F']
-        a_targ_params = [l for l in targ_params if l[0] == 'A']
+        f_targ_params = [l for l in targ_params if l[:2] == 'F_']
+        a_targ_params = [l for l in targ_params if l[:2] == 'A_']
 
         # Create lists for amp- and freq-parameters for minimum filter order 
-        f_min_params = [l for l in min_params if l[0] == 'F']
-        a_min_params = [l for l in min_params if l[0] == 'A']
+        f_min_params = [l for l in min_params if l[:2] == 'F_']
+        a_min_params = [l for l in min_params if l[:2] == 'A_']
 
         # Create lists for amp- and freq-parameters for manual filter order    
-        f_man_params = [l for l in man_params if l[0] == 'F']
-        a_man_params = [l for l in man_params if l[0] == 'A']
+        f_man_params = [l for l in man_params if l[:2] == 'F_']
+        a_man_params = [l for l in man_params if l[:2] == 'A_']
         
         if fo == 'man':
             a_params = a_man_params
