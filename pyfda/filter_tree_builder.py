@@ -307,8 +307,9 @@ class FilterTreeBuilder(object):
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
     def join_dicts(self, fc, dict_list):
+        
         print("dict_list = ", dict_list)
-        _dict = [getattr(fc, d) for d in dict_list]
+        _dict = [getattr(fc,d) for d in dict_list if hasattr(fc,d)]
         print("\n_dict = ", _dict)
         for d in _dict:
             print("\nd = ", d)
