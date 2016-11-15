@@ -161,7 +161,7 @@ class FilterSpecs(QWidget):
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
-        # read ALL parameters for selected filter type, e.g. ['F_SB', 'A_CB']:
+        # read ALL parameters for *current filter design*, e.g. ['F_SB', 'A_SB']:
         all_params = fb.fil_tree[rt][ft][fc][fo]['par']
 
         vis_wdgs = fb.fil_tree[rt][ft][fc][fo]['vis'] # visible widgets
@@ -182,8 +182,8 @@ class FilterSpecs(QWidget):
 
         self.sel_fil.load_filter_order() # update filter order from dict
 
-        # build separate parameter lists for min. and man. filter order 
-        # and target specs   
+        # build separate parameter lists for min., man. filter order 
+        # and target specs of current filter   
         min_params = man_params = targ_params = []
         
         if "min" in fb.fil_tree[rt][ft][fc]:
