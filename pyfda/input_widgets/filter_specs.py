@@ -227,8 +227,6 @@ class FilterSpecs(QWidget):
                 freq_state = 'unused'
             self.t_specs.update_UI(f_targ_params, a_targ_params, 
                                    freq_state = freq_state, amp_state = amp_state)
-        else:
-            self.t_specs.update_UI(f_min_params, a_min_params)
         
         self.f_specs.setVisible(f_params != [])
         self.f_specs.setVisible("fspecs" in vis_wdgs)
