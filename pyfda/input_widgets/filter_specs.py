@@ -228,18 +228,15 @@ class FilterSpecs(QWidget):
             self.t_specs.update_UI(f_targ_params, a_targ_params, 
                                    freq_state = freq_state, amp_state = amp_state)
         
-        self.f_specs.setVisible(f_params != [])
-        self.f_specs.setVisible("fspecs" in vis_wdgs)
+        self.f_specs.setVisible("fspecs" in vis_wdgs and f_params != [])
         self.f_specs.setEnabled("fspecs" not in dis_wdgs)
         self.f_specs.update_UI(new_labels=f_params)
 
-        self.a_specs.setVisible(a_params != [])
-        self.a_specs.setVisible("aspecs" in vis_wdgs)
+        self.a_specs.setVisible("aspecs" in vis_wdgs and a_params != [])
         self.a_specs.setEnabled("aspecs" not in dis_wdgs)
         self.a_specs.update_UI(new_labels=a_params)
 
-        self.w_specs.setVisible(w_params != [])
-        self.w_specs.setVisible("wspecs" in vis_wdgs)
+        self.w_specs.setVisible("wspecs" in vis_wdgs and w_params != [])
         self.w_specs.setEnabled("wspecs" not in dis_wdgs)
         self.w_specs.update_UI(new_labels=w_params)
 
