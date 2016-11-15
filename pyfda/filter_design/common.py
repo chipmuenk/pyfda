@@ -7,7 +7,7 @@ Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-import pyfda.filterbroker as fb
+#import pyfda.filterbroker as fb
 
 
 rt_base = {
