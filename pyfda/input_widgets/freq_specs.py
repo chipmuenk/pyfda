@@ -255,8 +255,9 @@ class FreqSpecs(QWidget):
 #------------------------------------------------------------------------------
     def sort_dict_freqs(self):
         """
-        - Sort filter dict frequency spec entries with ascending frequency if 
-        - Update the QLineEdit frequency widgets
+        - Sort visible filter dict frequency spec entries with ascending frequency if 
+             the sort button is activated
+        - Update the visible QLineEdit frequency widgets
 
         The method is called when:
         - update_UI has been called after changing the filter design algorithm                                # that the response type has been changed 
