@@ -267,12 +267,11 @@ class FreqSpecs(QWidget):
         """
         
         if fb.fil[0]['freq_specs_sort']:
-            fSpecs = [fb.fil[0][str(self.qlineedit[i].objectName())]
+            f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
                                             for i in range(self.n_cur_labels)]
-            fSpecs.sort()
-            
+            f_specs.sort()
             for i in range(self.n_cur_labels):
-                fb.fil[0][str(self.qlineedit[i].objectName())] = fSpecs[i]
+                fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
                 
         self.load_entries()
 
