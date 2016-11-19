@@ -10,19 +10,26 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
 ### Prerequisites
-Python versions: 2.7 ... 3.5
+* Python versions: 2.7 or 3.3 ... 3.5
+* Operating systems: Tested on Windows, Linux and OS X - there should be no OS specific requirements.
+* (Py)Qt4 or Qt5, when both libraries are installed, PyQt5 is used.
 
 Besides standard python libraries, the project builds on the following libraries:
 * numpy
 * scipy
 * matplotlib
-* docutils
-* pyQt4 (pyQt5 supported real soon)
 
 Optional:
+* docutils for rich text in documentation
 * xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
 
 ### Installing and starting pyFDA
+There is only one version of pyfda for all supported operating systems, Python and Qt versions. Unfortunately, some of the installers insist of providing specific versions. You can also install directly from source.
+#### conda
+If you use the Anaconda distribution, you can install pyfda directly from my channel Chipmuenk/pyfda using
+
+    conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
+
 #### pip
 This is the most convenient variant:
 
@@ -110,9 +117,7 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### Release 0.1
 
 The following features are still missing for the first release. 
-* Issue #8 (pyFDA doesn't shut down properly) is fixed in v0.1rc1
 * **scipy 0.16 SOS features**: implemented for filter design and frequency domain representation, time domain (sosfilt) is still missing
-* pyQt5 compatibility has become a must since it has become the default version in Anaconda and WinPython
 
 ### Release 0.2
 * **myHDL support**
