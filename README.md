@@ -26,7 +26,7 @@ Optional:
 ### Installing and starting pyFDA
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. Unfortunately, some of the installers insist of providing specific versions. You can also install directly from source.
 #### conda
-If you use the Anaconda distribution, you can install pyfda directly from my channel Chipmuenk/pyfda using
+If you use the Anaconda distribution, you can install pyfda directly from my Anaconda channel Chipmuenk using
 
     conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
 
