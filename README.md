@@ -10,16 +10,15 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
 ### Prerequisites
-* Python versions: 2.7 or 3.3 ... 3.5
-* Operating systems: Tested on Windows, Linux and OS X - there should be no OS specific requirements.
-* (Py)Qt4 or Qt5, when both libraries are installed, PyQt5 is used.
+* Python versions: **2.7** or **3.3 ... 3.5**
+* All operating systems - there should be no OS specific requirements.
+* Libraries:
+  * (Py)Qt4 or Qt5, when both libraries are installed, PyQt5 is used.
+  * numpy
+  * scipy
+  * matplotlib
 
-Besides standard python libraries, the project builds on the following libraries:
-* numpy
-* scipy
-* matplotlib
-
-Optional:
+Optional libraries:
 * docutils for rich text in documentation
 * xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
 
