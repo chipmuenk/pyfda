@@ -23,7 +23,7 @@ Optional:
 * docutils for rich text in documentation
 * xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
 
-### Installing and starting pyFDA
+### Installing pyFDA
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. Unfortunately, some of the installers insist of providing specific versions. You can also install directly from source.
 #### conda
 If you use the Anaconda distribution, you can install pyfda directly from my Anaconda channel Chipmuenk using
@@ -31,7 +31,7 @@ If you use the Anaconda distribution, you can install pyfda directly from my Ana
     conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
 
 #### pip
-This is the most convenient variant:
+This is the most convenient way:
 
     pip install pyfda
     pyfdax
@@ -42,19 +42,21 @@ Download the zip file and extract it to a directory of your choice. Install it e
 
     >> python setup.py install
 
-or run it where you have installed the python source files using (for testing / development)
+or just create a link to where you have copied the python source files (for testing / development) using
 
     >> python setup.py develop
 
 #### Executing
-In both cases, start scripts `pyfdax` and `pyfdax_noterm`are created in `<python>/Scripts`.
+In both cases, the start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
+
+    >> pyfdax
 
 For development, you can also run pyFDA using
 
     In [1]: %run -m pyfda.pyfdax :# IPython or
     >> python -m pyfda.pyfdax    # plain python interpreter
     
-or files from pyFDA using e.g.
+or individual files from pyFDA using e.g.
 
     In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
     >> python -m pyfda.input_widgets.input_pz  # plain python interpreter
@@ -73,7 +75,8 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### The following features are currently implemented:
 
 * **Filter design**
-    * **Design methods** from scipy.signal: Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 
+    * **Design methods** from scipy.signal: Equiripple, Firwin, Movine Average, Bessel, Butterworth, Elliptic, Chebychev 1 and Chebychev 2
+    * **Second-Order Sections** are used in the filter design when available for more robust filter design and analysis
     * **Remember all specifications** when changing filter design methods
     * **Fine-tune** manually the filter order and corner frequencies calculated by minimum order algorithms
     * **Compare filter designs** for a given set of specifications and different design methods
@@ -95,12 +98,10 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
  * Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. 
  * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
- * Filter design files can be added and edited *without* changing or even restarting the program
 * **Saving and loading**
  * Save and load filter designs in pickled and in numpy's NPZ-format
  * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format
-* **Display help files** (own / Python docstrings) as rich text
-* **Runs under Python 2.7 and Python 3.4** 
+* **Display help files** (own / Python docstrings) as rich text 
 
 **More screenshots from the current version:**
 <table>
@@ -117,7 +118,8 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### Release 0.1
 
 The following features are still missing for the first release. 
-* **scipy 0.16 SOS features**: implemented for filter design and frequency domain representation, time domain (sosfilt) is still missing
+* Not all filter specifications are handled properly (issues #36 and #40), this is addressed currently and will be fixed in 0.1rc4
+* Scrolling and resizing of widgets has some flaws creating problems with small screens
 
 ### Release 0.2
 * **myHDL support**
