@@ -23,16 +23,19 @@ Optional libraries:
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
 ### Installing pyFDA
-There is only one version of pyfda for all supported operating systems, Python and Qt versions. Unfortunately, some of the installers insist of providing specific versions. You can also install directly from source.
-#### conda
-If you use the Anaconda distribution, you can install pyfda directly from my Anaconda channel Chipmuenk using
-
-    conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
+There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
 
 #### pip
 This is the most convenient way:
 
     pip install pyfda
+
+#### conda
+If you use the Anaconda distribution, you can install pyfda from my Anaconda channel `Chipmuenk` using
+
+    conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
+
+Unfortunately, Anaconda insists on providing OS- and Python-specific versions for `pyfda`. I'm working on that, help is appreciated ...
 
 #### setup.py
     
