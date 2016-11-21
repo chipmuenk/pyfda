@@ -208,11 +208,11 @@ class FilterFactory(object):
                 getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
-                err_string = "\Error calling {0} of {1}':\n{2}.".format(method, fil_inst, e)
+                err_string = "\nError calling {0} of {1}':\n{2}.".format(method, fil_inst, e)
                 self.err_code = 18
                 
         if self.err_code > 0:
-                logger.error(err_string)
+                logger.error("Err. Code {0}\n".format(self.err_code),err_string)
             
         return self.err_code
         
