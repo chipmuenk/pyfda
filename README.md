@@ -2,6 +2,7 @@ pyFDA
 ======
 ## Python Filter Design Analysis Tool
 
+[![PyPI version](https://badge.fury.io/py/pyfda.svg)](https://badge.fury.io/py/pyfda)
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.
@@ -47,17 +48,17 @@ or just create a link to where you have copied the python source files (for test
 
     >> python setup.py develop
 
-#### Executing
-In both cases, the start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
+### Starting pyFDA
+In any case, the start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
     >> pyfdax
 
-For development, you can also run pyFDA using
+For development and debugging, you can also run pyFDA using
 
     In [1]: %run -m pyfda.pyfdax :# IPython or
     >> python -m pyfda.pyfdax    # plain python interpreter
     
-or individual files from pyFDA using e.g.
+All individual files from pyFDA can be run using e.g.
 
     In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
     >> python -m pyfda.input_widgets.input_pz  # plain python interpreter
