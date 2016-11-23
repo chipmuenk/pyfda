@@ -87,15 +87,18 @@ using Ichige's algorithm.
         dis_min = ['wspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N'] # manual filter order
+        par_man = [] # manual filter order
         par_min = [] # minimum filter order
 
+        self.ft = 'FIR'
+        
+        self.rt_dicts = ['com']
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
         self.com = {'man':{'vis':vis_man, 'dis':dis_man, 'msg':msg_man, 'par': par_man},
                     'min':{'vis':vis_min, 'dis':dis_min, 'msg':msg_min, 'par': par_min}}
-        self.ft = 'FIR'
+
         self.rt = {
             'LP': {'man':{'par':['W_PB','W_SB','F_PB','F_SB']},
                    'min':{'par':['F_PB','F_SB','W_PB','W_SB', 'A_PB', 'A_SB']},
