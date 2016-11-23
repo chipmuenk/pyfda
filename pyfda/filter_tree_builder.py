@@ -281,8 +281,13 @@ class FilterTreeBuilder(object):
             if err_code > 0:
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fb.fil_classes
-
-            self.join_dicts(ff.fil_inst, ['com', 'rtx'])               
+            
+            if hasattr(ff.fil_inst, 'rt_dicts'):
+                all_rt_dicts = ff.fil_inst.rt_dicts
+#                if isinstance(all_rt_dicts, list):
+                self.join_dicts(ff.fil_inst, all_rt_dicts)
+            else:
+                self.join_dicts(ff.fil_inst, ['com'])               
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
