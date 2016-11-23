@@ -162,7 +162,10 @@ class FilterSpecs(QWidget):
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
         # read ALL parameters for *current filter design*, e.g. ['F_SB', 'A_SB']:
-        all_params = fb.fil_tree[rt][ft][fc][fo]['par']
+        all_params = fb.fil_tree[rt][ft][fc][fo]['par'].copy()
+
+        logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
+        logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
 
         vis_wdgs = fb.fil_tree[rt][ft][fc][fo]['vis'] # visible widgets
         dis_wdgs = fb.fil_tree[rt][ft][fc][fo]['dis'] # disabled widgets
@@ -197,7 +200,7 @@ class FilterSpecs(QWidget):
 
         # Create lists for amp- and freq-parameters for target specs
         f_targ_params = [l for l in targ_params if l[:2] == 'F_']
-        a_targ_params = [l for l in targ_params if l[:2] == 'A_']
+        a_targ_params = [l for l in targ_params if l[:2] == 'A_']       
 
         # Create lists for amp- and freq-parameters for minimum filter order 
         f_min_params = [l for l in min_params if l[:2] == 'F_']
