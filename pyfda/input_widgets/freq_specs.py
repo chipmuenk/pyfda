@@ -234,6 +234,9 @@ class FreqSpecs(QWidget):
         """
         num_tot_labels = len(self.qlabels) # number of existing labels (vis. + invis.)
 
+# TODO: join _hide_entries (misleading name!) into _show_entries
+#        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
+#            self._hide_entries(num_new_labels)
         if num_tot_labels < num_new_labels: # new widgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
                 self.qlabels.append(QLabel(self))
