@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Mainwindow  for the pyFDA app, initializes UI
+Mainwindow  for the pyFDA app
 
 Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
@@ -13,11 +13,19 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from .compat import (QtCore, QT_VERSION_STR, QMainWindow, QApplication,
+from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
                      QSplitter, QScrollArea, QIcon, QMessageBox,
                      QWidget, QFrame,
                      QVBoxLayout, QHBoxLayout, QSizePolicy)
-
+import matplotlib
+# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
+# to avoid 
+# "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
+if HAS_QT5:
+    matplotlib.use("Qt5Agg")
+else:
+    matplotlib.use("Qt4Agg")
+    
 import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
@@ -26,12 +34,7 @@ from pyfda import qrc_resources # contains all icons
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
-#from pyfda.input_widgets import input_tab_widgets_test as input_tab_widgets
-
 from pyfda.plot_widgets import plot_tab_widgets
-#from pyfda.plot_widgets import plot_tab_widgets_test as plot_tab_widgets
-#from pyfda.plot_widgets import plot_tab_widgets_empty as plot_tab_widgets
-
 
 # get dir for this file and store as base_dir in filterbroker
 fb.base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -59,24 +62,6 @@ if not os.path.exists(rc.save_dir):
     logger.warning('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
         rc.save_dir, home_dir)
     rc.save_dir = home_dir
-
-
-#class Whitelist(logging.Filter):
-#    def __init__(self, **whitelist):
-#        self.whitelist = [logging.Filter(name) for name in whitelist]
-#        print("filter intialized with", whitelist)
-#
-#    def filter(self, record):
-#        """filter logging record"""
-#        arg = any(f.filter(record) for f in self.whitelist)
-#        # record.levelno == logging.ERROR
-#        # arg = self.param not in record.msg
-#        # record.msg = 'changed: ' + record.msg
-#        print("filter_arg", arg)
-#        return arg
-
-
-#logging.Filter()
 
 
 class pyFDA(QMainWindow):
@@ -116,7 +101,6 @@ class pyFDA(QMainWindow):
         # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-# Test        self.pltTabWidgets = plot_tab_widgets.MyStaticMplCanvas(self.main_widget, width=5, height=4, dpi=100)
 
         if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
             layVInput = QVBoxLayout()
