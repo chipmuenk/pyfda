@@ -25,6 +25,7 @@ import scipy.signal as sig
 from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, lin2unit
+from .common import Common
 
 __version__ = "1.4"
 
@@ -54,31 +55,36 @@ class Bessel(object):
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C'] # manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
+        par_man = ['F_C'] # manual filter order
+        par_min = ['A_PB', 'A_SB'] # minimum filter order
 
+        self.ft = 'IIR'
+
+        self.rt_dicts = ['com']  # additional parameter dicts for rt
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
         self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
+        c = Common()
+        self.rt = c.rt_base_iir
 
-        self.ft = 'IIR'
-        self.rt = {
-          "LP": {"man":{"par":[]},
-                 "min":{"par":['F_PB','F_SB']}
-                 },
-          "HP": {"man":{"par":[]},
-                 "min":{"par":['F_SB','F_PB']}
-                 },
-          "BP": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}
-                 },
-          "BS": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}
-                 }
-                 }
 
+#        self.rt = {
+#          "LP": {"man":{"par":[]},
+#                 "min":{"par":['F_PB','F_SB']}
+#                 },
+#          "HP": {"man":{"par":[]},
+#                 "min":{"par":['F_SB','F_PB']}
+#                 },
+#          "BP": {"man":{"par":['F_C2']},
+#                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}
+#                 },
+#          "BS": {"man":{"par":['F_C2']},
+#                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}
+#                 }
+#                 }
+#
         self.info = """
 **Bessel filters**
 

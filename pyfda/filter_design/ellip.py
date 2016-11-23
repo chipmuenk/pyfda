@@ -22,8 +22,8 @@ Author: Christian Muenker
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import ellipord
-from .common import rt_base
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from .common import Common
 
 __version__ = "1.4"
 
@@ -62,45 +62,63 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter the filter order <b><i>N</i></b>, the minimum stop "
             "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
-            "frequencies <b><i>F<sub>PB</sub></i></b>  where the gain first "
-            "drops below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> ."
-            "Stop band corner frequency(ies) <b><i>F<sub>SB</sub></i></b>&nbsp;"
-            "are not regarded.")
+            "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first "
+            "drops below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")
         msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
                     "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
                     "&nbsp;and the corresponding corner frequencies of pass and "
                     "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
                     "<b><i>F<sub>SB</sub></i></b> .")
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','tspecs'] # manual filter order
-        vis_min = ['fo','tspecs'] # minimum filter order
+        vis_man = ['fo','tspecs','fspecs'] # manual filter order
+        vis_min = ['fo','tspecs','fspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
-        dis_min = [] # minimum filter order
+        dis_man = ['tspecs'] # manual filter order
+        dis_min = ['fspecs'] # minimum filter order
 
         # parameters for all man. / min. filter order response types:
-        par_man = ['N', 'A_PB', 'A_SB']
-        par_min = []#['A_PB', 'A_SB']
+        par_man = ['N']
+        par_min = ['N']#['A_PB', 'A_SB']
 
+
+        self.ft = 'IIR'
+
+        self.rt_dicts = ['com', 'rtx'] # additional parameter dicts for rt        
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
         self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
 
-        self.ft = 'IIR'
-        self.rt = rt_base
-#        self.rt = {
-#          "LP": {"man":{"par":[]},
-#                 "min":{"par":['F_PB','F_SB']}},
-#          "HP": {"man":{"par":[]},
-#                 "min":{"par":['F_SB','F_PB']}},
-#          "BP": {"man":{"par":[]},
-#                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-#          "BS": {"man":{"par":[]},
-#                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
-#                 }
+        self.rtx = {
+            'LP': {'man':{'par':['F_PB','F_SB']},
+                   'min':{'par':['F_PB','F_SB','A_PB', 'A_SB']}},
+            'HP': {'man':{'par':['F_SB','F_PB']},
+                   'min':{'par':['F_SB','F_PB','A_SB','A_PB']}},
+            'BP': {'man':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2']},
+                   'min':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}},
+            'BS': {'man':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'W_SB','W_PB','W_SB2']},
+                   'min':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB','A_PB2']}}
+                                 }
+        
+#        rt_base_iir = {
+#            'LP': {'man':{'par':['F_C']},
+#                   'min':{'par':['F_C']},
+#                   '_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
+#            'HP': {'man':{'par':['F_C']},
+#                   'min':{'par':['F_C']},
+#                   '_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
+#            'BP': {'man':{'par':['F_C', 'F_C2']},
+#                   'min':{'par':['F_C', 'F_C2']},
+#                   '_targ':{'par':['F_SB', 'F_PB','F_PB2','F_SB2',
+#                                   'A_SB', 'A_PB']}},
+#            'BS': {'man':{'par':['F_C', 'F_C2']},
+#                   'min':{'par':['F_C', 'F_C2']},
+#                   '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB']}}
+#                   }
+        c = Common()                   
+        self.rt = c.rt_base_iir
 
 
         self.info_doc = []

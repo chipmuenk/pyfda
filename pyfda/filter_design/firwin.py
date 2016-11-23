@@ -30,6 +30,7 @@ import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, remezord, round_odd
+from .common import Common
 
 
 # TODO: Hilbert, differentiator, multiband are missing
@@ -72,30 +73,58 @@ class Firwin(QWidget):
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C']     #  manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] #  minimum filter order
+        par_man = ['N']     #  manual filter order
+        par_min = ['A_PB', 'A_SB'] #  minimum filter order
 
+        self.ft = 'FIR'
+
+        self.rt_dicts = ['com', 'rtx']
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
         self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
                     
-        self.ft = 'FIR'
-        self.rt = {
-            "LP": {"man":{"par":[]},
-                   "min":{"par":['F_PB','F_SB']}},
-            "HP": {"man":{"par":[],
-                          "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
-                   "min":{"par":['F_SB','F_PB']}},
-            "BP": {"man":{"par":['F_C2']},
-                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
-            "BS": {"man":{"par":['F_C2'],
-                      "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
-                   "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
-#            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
-          #"DIFF":
-                   }
+        
+#        self.rt =  {
+#        'LP': {'man':{'par':['F_C']},
+#               'min':{'par':['F_C']},
+#               '_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
+#        'HP': {'man':{'par':['F_C']},
+#               'min':{'par':['F_C']},
+#               '_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
+#        'BP': {'man':{'par':['F_C', 'F_C2']},
+#               'min':{'par':['F_C', 'F_C2']},
+#               '_targ':{'par':['F_SB', 'F_PB','F_PB2','F_SB2',
+#                               'A_SB', 'A_PB']}},
+#        'BS': {'man':{'par':['F_C', 'F_C2']},
+#               'min':{'par':['F_C', 'F_C2']},
+#               '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB']}}
+#               }
+
+        c = Common()
+
+        self.rt = c.rt_base_iir
+        
+        self.rtx = {
+            "HP": {"man":{"msg":r"<br /><b>Note:</b> Order needs to be odd!"}},
+            "BS": {"man":{"msg":r"<br /><b>Note:</b> Order needs to be odd!"}}
+            }
+            
+#        self.rt = {
+#            "LP": {"man":{"par":[]},
+#                   "min":{"par":['F_PB','F_SB']}},
+#            "HP": {"man":{"par":[],
+#                          "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
+#                   "min":{"par":['F_SB','F_PB']}},
+#            "BP": {"man":{"par":['F_C2']},
+#                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
+#            "BS": {"man":{"par":['F_C2'],
+#                      "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
+#                   "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
+##            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
+#          #"DIFF":
+#                   }
         
         self.info = """Windowed FIR filters are designed by truncating the
         infinite impulse response of an ideal filter with a window function.
