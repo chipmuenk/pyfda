@@ -71,8 +71,6 @@ class FilterTreeBuilder(object):
 
 #==============================================================================
     def read_filt_file(self):
-        # TODO: file name shouldn't have to be identical to class name, 
-        #       multiple classes per file should be possible.
         """
         Extract all file names = class names from self.filt_dir_file:
 
@@ -314,8 +312,9 @@ class FilterTreeBuilder(object):
     def join_dicts(self, fc, dict_list):
         
         print("dict_list = ", dict_list)
+        print("fc = ", fc)
         _dict = [getattr(fc,d) for d in dict_list if hasattr(fc,d)]
-        print("\n_dict = ", _dict)
+        #print("\n_dict = ", _dict)
         for d in _dict:
             print("\nd = ", d)
             for mmt in d: # read common parameters Min/Man/Targ
@@ -333,7 +332,7 @@ class FilterTreeBuilder(object):
                                 # no, create new entry
                                 fc.rt[rt][mmt].update(\
                                                 {p:d[mmt][p]})
-                            print(fc.rt[rt][mmt])
+                            #print(fc.rt[rt][mmt])
                             logger.debug("{0}.{1}.{2}\n"
                                 "fc.rt[rt][mmt]: {3}\n".format(
                                  fc, rt, mmt,
