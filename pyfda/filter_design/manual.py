@@ -45,7 +45,7 @@ class Manual_FIR(object):
         dis_man = ['fo'] # manual filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['f_S']     #  manual filter order
+        par_man = []     #  manual filter order
 
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
@@ -135,13 +135,13 @@ class Manual_IIR(object):
         msg_man = ("Enter filter design using the P/Z or the b/a widget.")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['tspecs'] # manual filter order
+        vis_man = ['tspecs', 'fo'] # manual filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
+        dis_man = ['fo'] # manual filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['f_S']     #  manual filter order
+        par_man = []     #  manual filter order
 
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
@@ -150,13 +150,17 @@ class Manual_IIR(object):
                     
         self.ft = 'IIR'
         self.rt = {
-            'LP': {'man':{'par':[]}},
+            'LP': {'man':{'par':[]},
+                   '_targ':{'par':['F_PB', 'F_SB', 'A_PB', 'A_SB']}},
             'HP': {'man':{'par':[],
-                          'msg':r'<br /><b>Note:</b> Be careful!'}},
-            'BP': {'man':{'par':['F_C2']}},
+                          'msg':r'<br /><b>Note:</b> Be careful!'},
+                    '_targ':{'par':['F_SB', 'F_PB', 'A_SB', 'A_PB']}},
+            'BP': {'man':{'par':['F_C2']},
+                   '_targ':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}},
             'BS': {'man':{'par':['F_C2'],
-                      'msg':r'<br /><b>Note:</b> Be extra careful!'}},
-            'HIL': {'man':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
+                      'msg':r'<br /><b>Note:</b> Be extra careful!'},
+                      '_targ':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}},
+            'HIL': {'man':{'par':[]}}
                    }
         
         self.info = """
