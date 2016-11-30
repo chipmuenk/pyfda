@@ -59,8 +59,8 @@ class Cheby1(object):
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_min = [] # minimum filter order
         par_man = [] # manual filter order
+        par_min = ['F_A:a'] # minimum filter order
 
         self.ft = 'IIR'
 
