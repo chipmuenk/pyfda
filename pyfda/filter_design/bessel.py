@@ -60,7 +60,7 @@ class Bessel(object):
 
         self.ft = 'IIR'
 
-        self.rt_dicts = ['com']  # additional parameter dicts for rt
+        self.rt_dicts = ['com', 'targ']  # additional parameter dicts for rt
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
