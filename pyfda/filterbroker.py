@@ -148,3 +148,5 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $',
             'wdg_dyn':{'win':'hann'}
             }
+fil[0].setdefault("0.123") # provide a default if key (=label) doesn't exist
+# TODO: This doesn't work yet!
