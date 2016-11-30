@@ -158,7 +158,7 @@ class FreqSpecs(QWidget):
         self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
         self.new_labels = new_labels
         num_new_labels = len(new_labels)
-        # hide / show labels
+        # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
 
         #---------------------------- logging -----------------------------
