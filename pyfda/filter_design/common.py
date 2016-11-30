@@ -81,6 +81,43 @@ class Common(object):
                    'min':{'par':['F_C', 'F_C2', 'A_PB','A_SB']},
                    '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB']}}
                    }
+
+                   
+        self.base_iir_new = {
+            'COM':{'man':{'fo':       ['a', 'N']},
+                   'min':{'fo':       ['d', 'N']},
+                   'msg':
+                   "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                    "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
+                    "&nbsp;and the corresponding corner frequencies of pass and "
+                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+                    "<b><i>F<sub>SB</sub></i></b> ."
+                       },
+            'LP': {'man':{'fspecs':   ['a','F_C'],
+                          'ftargs:f': ['u','F_PB','F_SB'],
+                          'ftargs:a': ['u','A_PB','A_SB']},
+                   'min':{'fspecs':   ['d','F_C'],
+                          'ftargs:f': ['a','F_PB','F_SB'],
+                          'ftargs:a': ['a','A_PB','A_SB']}},
+            'HP': {'man':{'fspecs':   ['a','F_C'],
+                          'ftargs:f': ['u','F_SB','F_PB'],
+                          'ftargs:a': ['u','A_SB','A_PB']},
+                   'min':{'fspecs':   ['d','F_C'],
+                          'ftargs:f': ['a','F_SB','F_PB'],
+                          'ftargs:a': ['a','A_SB','A_PB']}},
+            'BP': {'man':{'fspecs':   ['a','F_C', 'F_C2'],
+                          'ftargs:f': ['u','F_SB','F_PB','F_PB2','F_SB2'],
+                          'ftargs:a': ['u','A_SB','A_PB']},
+                   'min':{'fspecs':   ['d','F_C'],
+                          'ftargs:f': ['a','F_SB', 'F_PB','F_PB2','F_SB2'],
+                          'ftargs:a': ['a','A_SB', 'A_PB']}},
+            'BS': {'man':{'fspecs':   ['a','F_C', 'F_C2'],
+                          'ftargs:f': ['u','F_PB','F_SB','F_SB2','F_PB2'],
+                          'ftargs:a': ['u','A_PB','A_SB']},
+                   'min':{'fspecs':   ['d','F_C'],
+                          'ftargs:f': ['a','F_PB','F_SB','F_SB2','F_PB2'],
+                          'ftargs:a': ['a','A_PB', 'A_SB']}}
+            }
         
 
 
