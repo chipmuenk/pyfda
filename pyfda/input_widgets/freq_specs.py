@@ -196,7 +196,12 @@ class FreqSpecs(QWidget):
         # recalculate displayed freq spec values for (maybe) changed f_S
         logger.debug("exec load_entries")
         for i in range(len(self.qlineedit)):
-            f_label = str(self.qlineedit[i].objectName())
+            f_name = str(self.qlineedit[i].objectName()).split(":",1)
+            f_label = f_name[0]
+            if len(f_name) > 1:         
+                f_attr  = f_name[1]
+            else:
+                f_attr = 'a' # default attribute: "active"
             f_value = fb.fil[0][f_label] * fb.fil[0]['f_S']
 
             if not self.qlineedit[i].hasFocus():
