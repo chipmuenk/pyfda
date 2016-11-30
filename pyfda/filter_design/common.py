@@ -58,7 +58,12 @@ class Common(object):
                    }
 
 
-
+        self.rt_targ = {
+            'LP': {'_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
+            'HP': {'_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
+            'BP': {'_targ':{'par':['F_SB','F_PB','F_PB2','F_SB2','A_SB','A_PB']}},
+            'BS': {'_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2','A_PB','A_SB']}}
+                   }
 
                    
         self.rt_base_iir = {
