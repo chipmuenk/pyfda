@@ -69,22 +69,6 @@ class Bessel(object):
         c = Common()
         self.rt = c.rt_base_iir
 
-
-#        self.rt = {
-#          "LP": {"man":{"par":[]},
-#                 "min":{"par":['F_PB','F_SB']}
-#                 },
-#          "HP": {"man":{"par":[]},
-#                 "min":{"par":['F_SB','F_PB']}
-#                 },
-#          "BP": {"man":{"par":['F_C2']},
-#                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}
-#                 },
-#          "BS": {"man":{"par":['F_C2']},
-#                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}
-#                 }
-#                 }
-#
         self.info = """
 **Bessel filters**
 
