@@ -47,7 +47,7 @@ class Bessel(object):
                     "<b><i>F<sub>SB</sub></i></b>&nbsp; (only a rough approximation).")
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs'] # manual filter order
+        vis_man = ['fo','fspecs','tspecs'] # manual filter order
         vis_min = ['fo','fspecs','tspecs'] # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
@@ -55,8 +55,8 @@ class Bessel(object):
         dis_min = ['fspecs'] # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['F_C'] # manual filter order
-        par_min = ['A_PB', 'A_SB'] # minimum filter order
+        par_man = [] # manual filter order
+        par_min = [] # minimum filter order
 
         self.ft = 'IIR'
 
