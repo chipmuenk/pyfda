@@ -62,18 +62,18 @@ class Common(object):
 
                    
         self.rt_base_iir = {
-            'LP': {'man':{'par':['F_C']},
-                   'min':{'par':['F_C']},
+            'LP': {'man':{'par':['F_C','A_PB','A_SB']},
+                   'min':{'par':['F_C','A_PB','A_SB']},
                    '_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
-            'HP': {'man':{'par':['F_C']},
-                   'min':{'par':['F_C']},
+            'HP': {'man':{'par':['F_C','A_SB','A_PB']},
+                   'min':{'par':['F_C','A_SB','A_PB']},
                    '_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
-            'BP': {'man':{'par':['F_C', 'F_C2']},
-                   'min':{'par':['F_C', 'F_C2']},
+            'BP': {'man':{'par':['F_C', 'F_C2','A_SB', 'A_PB']},
+                   'min':{'par':['F_C', 'F_C2','A_SB', 'A_PB']},
                    '_targ':{'par':['F_SB', 'F_PB','F_PB2','F_SB2',
                                    'A_SB', 'A_PB']}},
-            'BS': {'man':{'par':['F_C', 'F_C2']},
-                   'min':{'par':['F_C', 'F_C2']},
+            'BS': {'man':{'par':['F_C', 'F_C2', 'A_PB','A_SB']},
+                   'min':{'par':['F_C', 'F_C2', 'A_PB','A_SB']},
                    '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB']}}
                    }
         
