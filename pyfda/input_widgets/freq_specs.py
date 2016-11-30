@@ -158,11 +158,8 @@ class FreqSpecs(QWidget):
         self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
         self.new_labels = new_labels
         num_new_labels = len(new_labels)
-        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
-            self._hide_entries(num_new_labels)
-
-        elif num_new_labels > self.n_cur_labels: # more new labels, create / show new ones
-            self._show_entries(num_new_labels)
+        # hide / show labels
+        self._show_entries(num_new_labels)
 
         #---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
@@ -209,19 +206,10 @@ class FreqSpecs(QWidget):
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(f_value))
 
-
-#-------------------------------------------------------------
-    def _hide_entries(self, num_new_labels):
-        """
-        Hide subwidgets so that only `num_new_labels` subwidgets are visible
-        """
-        for i in range (num_new_labels, len(self.qlabels)):
-            self.qlabels[i].hide()
-            self.qlineedit[i].hide()
-
 #------------------------------------------------------------------------
     def _show_entries(self, num_new_labels):
         """
+        - check whether subwidgets need to be shown or hidden       
         - check whether enough subwidgets (QLabel und QLineEdit) exist for the 
           the required number of `num_new_labels`: 
               - create new ones if required 
@@ -232,12 +220,21 @@ class FreqSpecs(QWidget):
         - if enough subwidgets exist already, make enough of them visible to
           show all spec fields
         """
+
         num_tot_labels = len(self.qlabels) # number of existing labels (vis. + invis.)
 
-# TODO: join _hide_entries (misleading name!) into _show_entries
-#        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
-#            self._hide_entries(num_new_labels)
-        if num_tot_labels < num_new_labels: # new widgets need to be generated
+        # less new subwidgets than currently displayed -> _hide some
+        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
+            for i in range (num_new_labels, num_tot_labels):
+                self.qlabels[i].hide()
+                self.qlineedit[i].hide()
+        # enough hidden subwidgets but need to make more labels visible
+        elif num_tot_labels >= num_new_labels:
+            for i in range(self.n_cur_labels, num_new_labels):
+                self.qlabels[i].show()
+                self.qlineedit[i].show()
+
+        else: # new subwidgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
                 self.qlabels.append(QLabel(self))
                 self.qlabels[i].setText(rt_label("dummy"))
@@ -248,12 +245,6 @@ class FreqSpecs(QWidget):
     
                 self.layGSpecs.addWidget(self.qlabels[i],i,0)
                 self.layGSpecs.addWidget(self.qlineedit[i],i,1)
-
-        else: # make the right number of widgets visible
-            for i in range(self.n_cur_labels, num_new_labels):
-                self.qlabels[i].show()
-                self.qlineedit[i].show()
-
 
 #------------------------------------------------------------------------------
     def sort_dict_freqs(self):
