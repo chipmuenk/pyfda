@@ -162,7 +162,7 @@ class FilterSpecs(QWidget):
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
         # read ALL parameters for *current filter design*, e.g. ['F_SB', 'A_SB']:
-        all_params = fb.fil_tree[rt][ft][fc][fo]['par'].copy()
+        all_params = fb.fil_tree[rt][ft][fc][fo]['par']
 
         logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
         logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
