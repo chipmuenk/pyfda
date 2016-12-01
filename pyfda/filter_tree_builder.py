@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 
+from .frozendict import FrozenDict
+
 
 class FilterTreeBuilder(object):
     """
@@ -270,7 +272,7 @@ class FilterTreeBuilder(object):
 
         """
 
-        fb.fil_tree = {} # Dict with a hierarical tree fc-ft- ...
+        fil_tree = {} # Dict with a hierarical tree fc-ft- ...
 
         for fc in fb.fil_classes:  # iterate over keys (= fc)
 
@@ -289,23 +291,24 @@ class FilterTreeBuilder(object):
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
-                if rt not in fb.fil_tree:           # is rt key already in dict?
-                    fb.fil_tree.update({rt:{}})     # no, create it
+                if rt not in fil_tree:           # is rt key already in dict?
+                    fil_tree.update({rt:{}})     # no, create it
 
-                if ft not in fb.fil_tree[rt]:  # is ft key already in dict[rt]?
-                    fb.fil_tree[rt].update({ft:{}}) # no, create it
-                fb.fil_tree[rt][ft].update({fc:{}}) # append fc to list dict[rt][ft]
+                if ft not in fil_tree[rt]:  # is ft key already in dict[rt]?
+                    fil_tree[rt].update({ft:{}}) # no, create it
+                fil_tree[rt][ft].update({fc:{}}) # append fc to list dict[rt][ft]
                 # finally append all the individual 'min' / 'man' / ' targ' info
-                # to fc in fb.fil_tree. These are e.g. the params for 'min' / 'man' 
+                # to fc in fil_tree. These are e.g. the params for 'min' / 'man' 
                 # filter order and 'targ' specifications
-                fb.fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
+                fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
                 # combine common info for all response types
                 #     com = {'man':{...}, 'min':{...}, 'targ':{...}}
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}, 'targ':{...}}
 
-   
+        fb.fil_tree = FrozenDict(fil_tree) 
+#        fb.fil_tree = fil_tree
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
