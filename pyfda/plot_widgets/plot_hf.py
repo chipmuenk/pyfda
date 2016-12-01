@@ -432,22 +432,21 @@ class PlotHf(QWidget):
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
         
-        # Merge target parameters and parameters for selected filter order 
-        # ('man' / 'min') using a deep copy - otherwise fb.fil_tree is modified!
+        # Merge target parameters and parameters for selected filter order ('man' / 'min') 
         param_list = []
         try:
-            param_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
-                                            [fb.fil[0]['fc']]['_targ']['par'].copy()
+            param_list1 = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
+                                            [fb.fil[0]['fc']]['_targ']['par']
         except KeyError:
-            pass
+            param_list1 = []
         try:
             param_list2 = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
                                     [fb.fil[0]['fc']][fb.fil[0]['fo']]['par']
-            # only add parameters not contained in param_list
-            param_list += [l for l in param_list2 if l not in param_list]
         except KeyError:
-            pass
-        
+            param_list2 = []
+        # only add parameters from targ list not contained in min/man param_list
+        param_list += [l for l in param_list2 if l not in param_list1]
+
         SB = [l for l in param_list if 'A_SB' in l]
         PB = [l for l in param_list if 'A_PB' in l]
         
