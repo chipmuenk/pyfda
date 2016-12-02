@@ -20,6 +20,7 @@ from pyfda.pyfda_lib import rt_label, style_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
+FIL_DEFAULT = '0.123'
 
 class FreqSpecs(QWidget):
     """
@@ -169,13 +170,17 @@ class FreqSpecs(QWidget):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
 
-            self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+            self.qlineedit[i].setText(str(fb.fil[0].get(new_labels[i],params['F_default'])))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
 
+
+#-------------------------------------------------------------        
+    def val(self, ddict, label):
+        pass
 
 #-------------------------------------------------------------        
     def load_entries(self):
@@ -266,7 +271,7 @@ class FreqSpecs(QWidget):
         """
         
         if fb.fil[0]['freq_specs_sort']:
-            f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
+            f_specs = [fb.fil[0].get(str(self.qlineedit[i].objectName()), params['F_default'])
                                             for i in range(self.n_cur_labels)]
             f_specs.sort()
             for i in range(self.n_cur_labels):
