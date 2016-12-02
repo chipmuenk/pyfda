@@ -28,9 +28,7 @@ from __future__ import division, unicode_literals, absolute_import
 from pyfda import qrc_resources # contains all icons
 
 # Various parameters for calculation and plotting
-params = {'F_default': 0.123,
-          'A_default': '0.11',
-          'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
+params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}', # format string for QLineEdit fields
           'P_Marker': [12, 'r'], # size and color for poles' marker
           'Z_Marker': [12, 'b']} # size and color for zeros' marker

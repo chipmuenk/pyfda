@@ -11,6 +11,7 @@ Author: Christian Muenker
 """
 
 from __future__ import division, unicode_literals, print_function, absolute_import
+from collections import defaultdict
 #import importlib
 #import logging
 #import six
@@ -120,10 +121,9 @@ fil_tree = {
 # and design routines
 #------------------------------------------------------------------------------
 
-fil = [None] * 10 # create empty list with length 10 for multiple filter designs
-# This functionality is not implemented yet, currently only fil[0] is used
 
-fil[0] = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
+# Initial filter dictionary
+fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'N':10, 'f_S':1,
             'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
             'A_SB':0.001, 'A_SB2': 0.0001, 'F_SB':0.2, 'F_SB2':0.3, 'F_C2': 0.4, 'F_N2': 0.4,
@@ -148,5 +148,17 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $',
             'wdg_dyn':{'win':'hann'}
             }
-fil[0].setdefault("0.123") # provide a default if key (=label) doesn't exist
-# TODO: This doesn't work yet!
+
+
+fil = [None] * 10 # create empty list with length 10 for multiple filter designs
+# This functionality is not implemented yet, currently only fil[0] is used
+
+# define fil[0] as a dict with "built-in" default. The argument defines the default
+# factory that is called when a key is missing. Here, lambda simply returns a float.
+# When e.g. list is given as the default_factory, an empty list is returned.
+fil[0] = defaultdict(lambda: 0.123) 
+
+# Now, copy each key-value pair into the defaultdict
+for k in fil_init:
+    fil[0].update({k:fil_init[k]})
+
