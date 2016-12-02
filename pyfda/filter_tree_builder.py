@@ -307,8 +307,14 @@ class FilterTreeBuilder(object):
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}, 'targ':{...}}
 
-        fb.fil_tree = FrozenDict(fil_tree) 
-#        fb.fil_tree = fil_tree
+#       Frozendict doesn't work yet, mutable lists are still changed when a 
+#       copy-by-reference object is changed
+#        fb.fil_tree = FrozenDict(fil_tree) 
+        fb.fil_tree = fil_tree
+
+        # Test Immutatbility
+        # fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
+        # fil_tree_ref.update({'par':'hallo'}) # this changes  fb.fil_tree !!
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
