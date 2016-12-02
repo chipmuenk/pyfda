@@ -114,6 +114,92 @@ fil_tree = {
         }
     }
 
+fil_tree_new = {
+    'LP':{
+        'FIR':{
+            'equiripple':{
+                 'man':{'fo':       ['a','N'],
+                        'fspecs':   ['a','F_C'],
+                        'ftargs:f': ['u','F_PB','F_SB'],
+                        'ftargs:a': ['u','A_PB','A_SB'],
+                        'msg':      ['a',"Enter manual values."]
+                        },
+                 'min':{'fo':       ['d','N'],
+                        'fspecs':   ['d','F_C'],
+                        'ftargs:f': ['a','F_PB','F_SB'],
+                        'ftargs:a': ['a','A_PB','A_SB'],
+                        'msg':      ['a',
+           "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+            "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
+            "&nbsp;and the corresponding corner frequencies of pass and "
+            "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+            "<b><i>F<sub>SB</sub></i></b> ."
+                                    ]
+                       },
+                }
+            },
+        'IIR':{
+             'cheby1':{
+                 'man':{'fo':       ['a','N'],
+                        'fspecs':   ['a','F_C'],
+                        'ftargs:f': ['u','F_PB','F_SB'],
+                        'ftargs:a': ['u','A_PB','A_SB']},
+                 'min':{'fo':       ['d','N'],
+                        'fspecs':   ['d','F_C'],
+                        'ftargs:f': ['a','F_PB','F_SB'],
+                        'ftargs:a': ['a','A_PB','A_SB']}
+                }
+            }  
+        },
+    'HP':{
+        'FIR':{
+            'equiripple':{
+                 'man':{'fo':       ['a','N'],
+                        'fspecs':   ['a','F_C'],
+                        'ftargs:f': ['u','F_SB','F_PB'],
+                        'ftargs:a': ['u','A_SB','A_PB']},
+                 'min':{'fo':       ['d','N'],
+                        'fspecs':   ['d','F_C'],
+                        'ftargs:f': ['a','F_SB','F_PB'],
+                        'ftargs:a': ['a','A_SB','A_PB']}
+                }
+            },
+        'IIR':
+            {'cheby1':
+                {'man':{'fo':       ['a','N'],
+                        'fspecs':   ['a','F_C'],
+                        'ftargs:f': ['u','F_SB','F_PB'],
+                        'ftargs:a': ['u','A_SB','A_PB']},
+                 'min':{'fo':       ['d','N'],
+                        'fspecs':   ['d','F_C'],
+                        'ftargs:f': ['a','F_SB','F_PB'],
+                        'ftargs:a': ['a','A_SB','A_PB']}
+                }
+            }  
+        },
+    'BP': {
+            'equiripple':{
+                'man':{ 'fo':       ['a','N'],
+                        'fspecs':   ['a','F_C', 'F_C2'],
+                        'ftargs:f': ['u','F_SB','F_PB','F_PB2','F_SB2'],
+                        'ftargs:a': ['u','A_SB','A_PB']},
+                'min':{ 'fo':       ['d','N'],
+                        'fspecs':   ['d','F_C'],
+                        'ftargs:f': ['a','F_SB', 'F_PB','F_PB2','F_SB2'],
+                        'ftargs:a': ['a','A_SB', 'A_PB']}
+                }
+        },
+    'BS': {
+                'man':{'fo':      ['a','N'],
+                       'fspecs':  ['a','F_C', 'F_C2'],
+                      'ftargs:f': ['u','F_PB','F_SB','F_SB2','F_PB2'],
+                      'ftargs:a': ['u','A_PB','A_SB']},
+               'min':{'fo':       ['d','N'],
+                      'fspecs':   ['d','F_C'],
+                      'ftargs:f': ['a','F_PB','F_SB','F_SB2','F_PB2'],
+                      'ftargs:a': ['a','A_PB', 'A_SB']}
+        }
+    }
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
