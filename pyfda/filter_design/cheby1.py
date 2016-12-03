@@ -43,28 +43,28 @@ class Cheby1(object):
             " or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
             "the maximum ripple "
             "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
-            " passband.")
+            " passband.",)
         msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b> , "
                     "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
                     "&nbsp;and the corresponding corner frequencies of pass and "
                     "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                    "<b><i>F<sub>SB</sub></i></b> .")
+                    "<b><i>F<sub>SB</sub></i></b> .",)
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs','aspecs'] # manual filter order
-        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
+        vis_man = ('fo','fspecs','tspecs','aspecs') # manual filter order
+        vis_min = ('fo','fspecs','tspecs') # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = ['tspecs'] # manual filter order
-        dis_min = ['fspecs'] # minimum filter order
+        dis_man = ('tspecs',) # manual filter order
+        dis_min = ('fspecs',) # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = [] # manual filter order
-        par_min = ['F_A:a'] # minimum filter order
+        par_man = () # manual filter order
+        par_min = ('F_A:a',) # minimum filter order
 
         self.ft = 'IIR'
 
-        self.rt_dicts = ['com'] # additional parameter dicts for rt
+        self.rt_dicts = ('com',) # additional parameter dicts for rt
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):

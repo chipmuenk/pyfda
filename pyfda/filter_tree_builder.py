@@ -287,7 +287,7 @@ class FilterTreeBuilder(object):
 #                if isinstance(all_rt_dicts, list):
                 self.join_dicts(ff.fil_inst, all_rt_dicts)
             else:
-                self.join_dicts(ff.fil_inst, ['com'])               
+                self.join_dicts(ff.fil_inst, ('com',))            
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
