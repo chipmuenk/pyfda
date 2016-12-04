@@ -57,28 +57,28 @@ class Firwin(QWidget):
         
         # common messages for all man. / min. filter order response types:
         msg_man = (r"Enter desired filter order <b><i>N</i></b> and <b>-6 dB</b> pass band corner "
-                    "frequency(ies) <b><i>F<sub>C</sub></i></b> .")
+                    "frequency(ies) <b><i>F<sub>C</sub></i></b> .",)
         msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
                 "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
                 "and the corresponding frequencies <b><i>F<sub>PB</sub></i></b>"
                 "&nbsp; and <b><i>F<sub>SB</sub></i></b> ."
-                "<br /><b>Note:</b> This is only a rough approximation!")
+                "<br /><b>Note:</b> This is only a rough approximation!",)
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
+        vis_man = ('fo','fspecs','tspecs') # manual filter order
+        vis_min = ('fo','fspecs','tspecs') # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
-        dis_min = ['fspecs'] # minimum filter order
+        dis_man = () # manual filter order
+        dis_min = ('fspecs',) # minimum filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N']     #  manual filter order
-        par_min = ['A_PB', 'A_SB'] #  minimum filter order
+        par_man = ('N',)     #  manual filter order
+        par_min = ('A_PB', 'A_SB') #  minimum filter order
 
         self.ft = 'FIR'
 
-        self.rt_dicts = ['com', 'rtx']
+        self.rt_dicts = ('com', 'rtx')
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
@@ -107,8 +107,8 @@ class Firwin(QWidget):
         self.rt = c.rt_base_iir
         
         self.rtx = {
-            "HP": {"man":{"msg":r"<br /><b>Note:</b> Order needs to be odd!"}},
-            "BS": {"man":{"msg":r"<br /><b>Note:</b> Order needs to be odd!"}}
+            "HP": {"man":{"msg":(r"<br /><b>Note:</b> Order needs to be odd!",)}},
+            "BS": {"man":{"msg":(r"<br /><b>Note:</b> Order needs to be odd!",)}}
             }
             
 #        self.rt = {

@@ -61,38 +61,36 @@ a given frequency can be calculated via the si function (not implemented yet).
         # common messages for all man. / min. filter order response types:
         msg_man = ("Enter desired order (= delays) <b><i>N</i></b> per stage and "
                     " and the number of stages. Target frequencies and amplitudes"
-                    " are only used for comparison, not for the design.")
+                    " are only used for comparison, not for the design.",)
                     
         msg_min = ""
 
         # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo', 'tspecs'] # manual filter order
-        vis_min = [] # minimum filter order
-
-        # INFORMATIONAL widgets for all response types, these widgets are coloured,
-        # signalling that they can be edited but only for informational purposes:
-        info_man = ['tspecs']
+        vis_man = ('fo', 'tspecs') # manual filter order
+        vis_min = () # minimum filter order
 
         # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
-        dis_min = [] # manual filter order
+        dis_man = () # manual filter order
+        dis_min = () # manual filter order
 
         # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N'] # manual filter order
-        par_min = []
+        par_man = ('N',) # manual filter order
+        par_min = ()
         
-        # Common data for all man. / min. filter order response types:
+        self.ft = 'FIR'
+
+        self.rt_dicts = ('com',)
+        # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
         self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par": par_man},
                     "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par": par_min}}
-        self.ft = 'FIR'
         self.rt = {
-            "LP": {"man":{"par":[]},
-                   "_targ":{"par":['F_PB', 'F_SB', 'A_PB', 'A_SB']}
+            "LP": {"man":{"par":()},
+                   "_targ":{"par":('F_PB', 'F_SB', 'A_PB', 'A_SB')}
                    },
-            "HP": {"man":{"par":[]},
-                   "_targ":{"par":['F_SB', 'F_PB', 'A_SB', 'A_PB']}
+            "HP": {"man":{"par":()},
+                   "_targ":{"par":('F_SB', 'F_PB', 'A_SB', 'A_PB')}
                    }} 
 
         self.info_doc = []
@@ -103,7 +101,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         # additional dynamic widgets that need to be set in the main widgets
         self.wdg = True
         
-        self.hdl = ['ma', 'cic']
+        self.hdl = ('ma', 'cic')
         #----------------------------------------------------------------------
 
     def construct_UI(self):

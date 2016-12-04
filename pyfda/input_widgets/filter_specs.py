@@ -169,7 +169,7 @@ class FilterSpecs(QWidget):
 
         vis_wdgs = fb.fil_tree[rt][ft][fc][fo]['vis'] # visible widgets
         dis_wdgs = fb.fil_tree[rt][ft][fc][fo]['dis'] # disabled widgets
-        msg      = fb.fil_tree[rt][ft][fc][fo]['msg'] # message
+        msg      = fb.fil_tree[rt][ft][fc][fo]['msg'][0] # message
 
         # Read freq / amp / weight labels for *current filter design*, building
         # separate parameter lists according to the first letter of the label
