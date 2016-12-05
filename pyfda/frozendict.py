@@ -17,6 +17,22 @@ def col(i):
     def _col(self):
         return g(self,i)
     return _col
+    
+#--------------------------------------------------------------------------
+def freeze_hierarchical(hier_dict):
+    """
+    Return the argumenent as a FrozenDict where all nested dicts have also been
+    converted to FrozenDicts recursively. When the argument is not a dict, 
+    return the argument unchanged.
+    """
+    if isinstance(hier_dict, dict):
+        for k in hier_dict:
+            if isinstance(hier_dict[k], dict):
+                hier_dict[k] = freeze_hierarchical(hier_dict[k])
+        return FrozenDict(hier_dict)
+    else:
+        return(hier_dict)
+
 
 class Item(tuple):
     ''' Designed for storing key-value pairs inside
@@ -170,6 +186,7 @@ class FrozenDict(frozenset):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
 
 
 if version == 2:

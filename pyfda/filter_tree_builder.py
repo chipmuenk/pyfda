@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 
-from .frozendict import FrozenDict
+from .frozendict import FrozenDict, freeze_hierarchical
 
 
 class FilterTreeBuilder(object):
@@ -302,12 +302,7 @@ class FilterTreeBuilder(object):
                 # filter order and 'targ' specifications
                 fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
-                # combine common info for all response types
-                #     com = {'man':{...}, 'min':{...}, 'targ':{...}}
-                # with individual info from the last step
-                #      e.g. {..., 'LP':{'man':{...}, 'min':{...}, 'targ':{...}}
-
-        fb.fil_tree = self.freeze_hierarchical(fil_tree) 
+        fb.fil_tree = freeze_hierarchical(fil_tree) # convert to hierarchical frozendict
 
         # Test Immutatbility
 #        fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
@@ -345,22 +340,6 @@ class FilterTreeBuilder(object):
                                 "fc.rt[rt][mmt]: {3}\n".format(
                                  fc, rt, mmt,
                                  pformat(fc.rt[rt][mmt])))
-                                 
-    #--------------------------------------------------------------------------
-    def freeze_hierarchical(self, hier_dict):
-        """
-        Return the argumenent as a FrozenDict where all nested dicts have also been
-        converted to FrozenDicts recursively. When the argument is not a dict, 
-        return the argument unchanged.
-        """
-        if isinstance(hier_dict, dict):
-            for k in hier_dict:
-                if isinstance(hier_dict[k], dict):
-                    hier_dict[k] = self.freeze_hierarchical(hier_dict[k])
-            return FrozenDict(hier_dict)
-        else:
-            return(hier_dict)
-
 
 #==============================================================================
 if __name__ == "__main__":
