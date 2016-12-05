@@ -138,7 +138,7 @@ class FreqSpecs(QWidget):
             self.spec_edited = False # reset flag
 
 #-------------------------------------------------------------
-    def update_UI(self, new_labels = [], state = "normal"):
+    def update_UI(self, new_labels = ()):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
@@ -151,6 +151,9 @@ class FreqSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
+        state = new_labels[0]
+        new_labels = new_labels[1:]
+            
         self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:

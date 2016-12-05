@@ -150,7 +150,7 @@ class AmplitudeSpecs(QWidget):
 
 
 #-------------------------------------------------------------
-    def update_UI(self, new_labels = [], state = "normal"):
+    def update_UI(self, new_labels = ()):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
@@ -163,6 +163,8 @@ class AmplitudeSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
+        state = new_labels[0]        
+        new_labels = new_labels[1:]
 
         num_new_labels = len(new_labels)
         if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before

@@ -115,7 +115,14 @@ def style_widget(widget, state):
     "failed" : orange, filter fails to meet target specs
     "unused": grey
     """
-    widget.setProperty("state", str(state))
+    state = str(state)
+    if state == 'u':
+        state = "unused"
+    elif state == 'a':
+        state = "active"
+    elif state == 'd':
+        state = "disabled"
+    widget.setProperty("state", state)
     #fb.design_filt_state = state
     widget.style().unpolish(widget)
     widget.style().polish(widget)

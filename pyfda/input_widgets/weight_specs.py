@@ -17,7 +17,7 @@ from ..compat import (QtCore, QtGui,
                       pyqtSignal, Qt, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_lib import rt_label, style_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
 
@@ -145,6 +145,8 @@ class WeightSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
+        state = new_labels[0]
+        new_labels = new_labels[1:]
 
         num_new_labels = len(new_labels)
         if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
@@ -159,6 +161,8 @@ class WeightSpecs(QWidget):
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+            style_widget(self.qlineedit[i], state)
+
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.load_entries() # display rounded filter dict entries

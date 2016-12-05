@@ -86,8 +86,7 @@ class TargetSpecs(QWidget):
         
 
 #------------------------------------------------------------------------------
-    def update_UI(self, freq_params = [], amp_params = [], 
-                  freq_state = "normal", amp_state = "normal"):
+    def update_UI(self, new_labels = ()):
         """
         Called when a new filter design algorithm has been selected
         Pass frequency and amplitude labels to the amplitude and frequency
@@ -95,14 +94,24 @@ class TargetSpecs(QWidget):
         The sigSpecsChanged signal is emitted already by select_filter.py
         """
 
-        # pass new labels and state (normal / unused) to widgets
-        # set widgets invisible if param list is empty
-        self.f_specs.setVisible(freq_params != [])
-        self.f_specs.update_UI(new_labels = freq_params, state = freq_state)
-        self.a_specs.setVisible(amp_params != [])
-        self.a_specs.update_UI(new_labels = amp_params, state = amp_state)
+        # pass new labels to widgets. The first element of the 'amp' and the
+        # 'freq' tuple is the state, 'u' is for 'unused', 'd' is for disabled
 
-#        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
+        if 'frq' in new_labels and len(new_labels['frq']) > 1:
+            self.f_specs.show()
+            self.f_specs.setEnabled(new_labels['frq'][0] != 'd')
+            self.f_specs.update_UI(new_labels=new_labels['frq'])
+        else:
+            self.f_specs.hide()
+            
+        if 'amp' in new_labels and len(new_labels['amp']) > 1:
+            self.a_specs.show()
+            self.a_specs.setEnabled(new_labels['amp'][0] != 'd')
+            self.a_specs.update_UI(new_labels=new_labels['amp'])
+        else:
+            self.a_specs.hide()
+#
+        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
     def load_entries(self):
