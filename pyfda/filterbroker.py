@@ -12,6 +12,7 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals, print_function, absolute_import
 from collections import defaultdict
+from .frozendict import freeze_hierarchical
 #import importlib
 #import logging
 #import six
@@ -53,153 +54,164 @@ fil_classes = {# IIR:
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
-vis_man = ['fo','fspecs','tspecs'] # manual filter order
-vis_min = ['fo','fspecs','tspecs'] # minimum filter order
-dis_man = [] # manual filter order
-dis_min = ['fspecs'] # minimum filter order
-msg_min = "minimum"
-msg_man = "maximum"
-fil_tree = {
+vis_man = ('fo','fspecs','tspecs') # manual filter order
+vis_min = ('fo','fspecs','tspecs') # minimum filter order
+dis_man = () # manual filter order
+dis_min = ('fspecs') # minimum filter order
+msg_min = ("minimum",)
+msg_man = ("maximum",)
+fil_tree = freeze_hierarchical({
     'HP':
         {'FIR':
-            {'equiripple':
-                {'man': {"par":['N', 'A_PB', 'F_PB'],
+            {'Equiripple':
+                {'man': {"par":('N', 'A_PB', 'F_PB'),
                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                 'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
+                 'min': {"par":('A_SB', 'A_PB', 'F_SB', 'F_PB'),
                          "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
          'IIR':
-             {'cheby1':
-                 {'man': {"par":['N', 'A_PB', 'F_PB'],
+             {'Cheby1':
+                 {'man': {"par":('N', 'A_PB', 'F_PB'),
                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                  'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
+                  'min': {"par":('A_SB', 'A_PB', 'F_SB', 'F_PB'),
                           "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-              'cheby2':
-                  {'man': {"par":['N', 'A_SB', 'F_SB'],
+              'Cheby2':
+                  {'man': {"par":('N', 'A_SB', 'F_SB'),
                            "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                   'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
+                   'min': {"par":('A_SB', 'A_PB', 'F_SB', 'F_PB'),
                            "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
     'BP':
         {'FIR':
-            {'equiripple':
-                {'man': {"par":['N', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2'],
+            {'Equiripple':
+                {'man': {"par":('N', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2'),
                          "vis":vis_man, "dis":dis_man, "msg":msg_man}}},
          'IIR':
-             {'cheby1': {'man': {"par":['N', 'A_PB', 'F_PB', 'F_PB2'], 
+             {'Cheby1': {'man': {"par":('N', 'A_PB', 'F_PB', 'F_PB2'), 
                                  "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":['A_PB', 'A_SB', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'],
+                         'min': {"par":('A_PB', 'A_SB', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'),
                                  "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-              'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB', 'F_SB2'],
+              'Cheby2': {'man': {"par":('N', 'A_SB', 'F_SB', 'F_SB2'),
                                  "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":['A_PB', 'A_SB','F_SB',  'F_PB', 'F_PB2', 'F_SB2'],
+                         'min': {"par":('A_PB', 'A_SB','F_SB',  'F_PB', 'F_PB2', 'F_SB2'),
                                  "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
     'LP':
         {'FIR':
-            {'equiripple':
-                {'man': {"par":['N', 'A_PB', 'F_PB'], 
+            {'Equiripple':
+                {'man': {"par":('N', 'A_PB', 'F_PB'), 
                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                 'min': {"par":('A_PB', 'A_SB', 'F_PB', 'F_SB'),
                          "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
          'IIR':
-             {'cheby1':
-                 {'man': {"par":['N', 'A_PB', 'F_PB'],
+             {'Cheby1':
+                 {'man': {"par":('N', 'A_PB', 'F_PB'),
                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'], 
+                  'min': {"par":('A_PB', 'A_SB', 'F_PB', 'F_SB'), 
                           "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-             'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB'],
+             'Cheby2': {'man': {"par":('N', 'A_SB', 'F_SB'),
                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                        'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
+                        'min': {"par":('A_PB', 'A_SB', 'F_PB', 'F_SB'),
                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}
                         }
             }
         }
-    }
+    })
 
-fil_tree_new = {
+fil_tree_new = freeze_hierarchical({
     'LP':{
         'FIR':{
-            'equiripple':{
-                 'man':{'fo':       ['a','N'],
-                        'fspecs':   ['a','F_C'],
-                        'ftargs:f': ['u','F_PB','F_SB'],
-                        'ftargs:a': ['u','A_PB','A_SB'],
-                        'msg':      ['a',"Enter manual values."]
+            'Equiripple':{
+                 'man':{'fo':       ('a','N'),
+                        'fspecs':   ('a','F_C'),
+                        'ftargs:f': ('u','F_PB','F_SB'),
+                        'ftargs:a': ('u','A_PB','A_SB'),
+                        'msg':      ('a',
+                                     "Enter desired filter order <b><i>N</i></b>, corner "
+        "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
+        "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
+        "value <b><i>W</i></b>&nbsp; for each band."
+                                    )
                         },
-                 'min':{'fo':       ['d','N'],
-                        'fspecs':   ['d','F_C'],
-                        'ftargs:f': ['a','F_PB','F_SB'],
-                        'ftargs:a': ['a','A_PB','A_SB'],
-                        'msg':      ['a',
+                 'min':{'fo':       ('d','N'),
+                        'fspecs':   ('d','F_C'),
+                        'ftargs:f': ('a','F_PB','F_SB'),
+                        'ftargs:a': ('a','A_PB','A_SB'),
+                        'msg':      ('a',
            "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
             "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
             "&nbsp;and the corresponding corner frequencies of pass and "
             "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
             "<b><i>F<sub>SB</sub></i></b> ."
-                                    ]
+                                    )
                        },
                 }
             },
         'IIR':{
-             'cheby1':{
-                 'man':{'fo':       ['a','N'],
-                        'fspecs':   ['a','F_C'],
-                        'ftargs:f': ['u','F_PB','F_SB'],
-                        'ftargs:a': ['u','A_PB','A_SB']},
-                 'min':{'fo':       ['d','N'],
-                        'fspecs':   ['d','F_C'],
-                        'ftargs:f': ['a','F_PB','F_SB'],
-                        'ftargs:a': ['a','A_PB','A_SB']}
+             'Cheby1':{
+                 'man':{'fo':       ('a','N'),
+                        'fspecs':   ('a','F_C'),
+                        'ftargs:f': ('u','F_PB','F_SB'),
+                        'ftargs:a': ('u','A_PB','A_SB')},
+                 'min':{'fo':       ('d','N'),
+                        'fspecs':   ('d','F_C'),
+                        'ftargs:f': ('a','F_PB','F_SB'),
+                        'ftargs:a': ('a','A_PB','A_SB')}
                 }
             }  
         },
     'HP':{
         'FIR':{
-            'equiripple':{
-                 'man':{'fo':       ['a','N'],
-                        'fspecs':   ['a','F_C'],
-                        'ftargs:f': ['u','F_SB','F_PB'],
-                        'ftargs:a': ['u','A_SB','A_PB']},
-                 'min':{'fo':       ['d','N'],
-                        'fspecs':   ['d','F_C'],
-                        'ftargs:f': ['a','F_SB','F_PB'],
-                        'ftargs:a': ['a','A_SB','A_PB']}
+            'Equiripple':{
+                 'man':{'fo':       ('a','N'),
+                        'fspecs':   ('a','F_C'),
+                        'ftargs:f': ('u','F_SB','F_PB'),
+                        'ftargs:a': ('u','A_SB','A_PB')},
+                 'min':{'fo':       ('d','N'),
+                        'fspecs':   ('d','F_C'),
+                        'ftargs:f': ('a','F_SB','F_PB'),
+                        'ftargs:a': ('a','A_SB','A_PB')}
+                        }
+              },
+        'IIR':{
+            'Cheby1':{
+                 'man':{'fo':       ('a','N'),
+                        'fspecs':   ('a','F_C'),
+                        'ftargs:f': ('u','F_SB','F_PB'),
+                        'ftargs:a': ('u','A_SB','A_PB')},
+                 'min':{'fo':       ('d','N'),
+                        'fspecs':   ('d','F_C'),
+                        'ftargs:f': ('a','F_SB','F_PB'),
+                        'ftargs:a': ('a','A_SB','A_PB')}
+                        }
+                }  
+         },
+    'BP':{
+        'FIR':{
+            'Equiripple':{
+                'man':{ 'fo':       ('a','N'),
+                        'fspecs':   ('a','F_C', 'F_C2'),
+                        'ftargs:f': ('u','F_SB','F_PB','F_PB2','F_SB2'),
+                        'ftargs:a': ('u','A_SB','A_PB')},
+                'min':{ 'fo':       ('d','N'),
+                        'fspecs':   ('d','F_C'),
+                        'ftargs:f': ('a','F_SB', 'F_PB','F_PB2','F_SB2'),
+                        'ftargs:a': ('a','A_SB', 'A_PB')}
+                        }
                 }
-            },
-        'IIR':
-            {'cheby1':
-                {'man':{'fo':       ['a','N'],
-                        'fspecs':   ['a','F_C'],
-                        'ftargs:f': ['u','F_SB','F_PB'],
-                        'ftargs:a': ['u','A_SB','A_PB']},
-                 'min':{'fo':       ['d','N'],
-                        'fspecs':   ['d','F_C'],
-                        'ftargs:f': ['a','F_SB','F_PB'],
-                        'ftargs:a': ['a','A_SB','A_PB']}
-                }
-            }  
-        },
-    'BP': {
-            'equiripple':{
-                'man':{ 'fo':       ['a','N'],
-                        'fspecs':   ['a','F_C', 'F_C2'],
-                        'ftargs:f': ['u','F_SB','F_PB','F_PB2','F_SB2'],
-                        'ftargs:a': ['u','A_SB','A_PB']},
-                'min':{ 'fo':       ['d','N'],
-                        'fspecs':   ['d','F_C'],
-                        'ftargs:f': ['a','F_SB', 'F_PB','F_PB2','F_SB2'],
-                        'ftargs:a': ['a','A_SB', 'A_PB']}
-                }
-        },
-    'BS': {
-                'man':{'fo':      ['a','N'],
-                       'fspecs':  ['a','F_C', 'F_C2'],
-                      'ftargs:f': ['u','F_PB','F_SB','F_SB2','F_PB2'],
-                      'ftargs:a': ['u','A_PB','A_SB']},
-               'min':{'fo':       ['d','N'],
-                      'fspecs':   ['d','F_C'],
-                      'ftargs:f': ['a','F_PB','F_SB','F_SB2','F_PB2'],
-                      'ftargs:a': ['a','A_PB', 'A_SB']}
+          },
+    'BS':{
+        'FIR':{
+            'Equiripple':{
+                'man':{'fo':      ('a','N'),
+                       'fspecs':  ('a','F_C', 'F_C2'),
+                      'ftargs:f': ('u','F_PB','F_SB','F_SB2','F_PB2'),
+                      'ftargs:a': ('u','A_PB','A_SB')},
+                'min':{'fo':      ('d','N'),
+                      'fspecs':   ('d','F_C'),
+                      'ftargs:f': ('a','F_PB','F_SB','F_SB2','F_PB2'),
+                      'ftargs:a': ('a','A_PB', 'A_SB')}
+                      }
+             }
         }
-    }
+    })
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
