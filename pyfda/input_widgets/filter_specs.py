@@ -140,7 +140,7 @@ class FilterSpecs(QWidget):
 #------------------------------------------------------------------------------
     def update_UI(self):
         """
-        update_all_UIs is called every time the filter design method or order
+        update_UI is called every time the filter design method or order
         (min / man) has been changed. This usually requires a different set of
         frequency and amplitude specs.
         
@@ -153,7 +153,7 @@ class FilterSpecs(QWidget):
         the filter tree [fb.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
-        Then, the UIs of all subwidgets are updated using their "updateUI" method,
+        Then, the UIs of all subwidgets are updated using their "update_UI" method,
         finally the signal 'sigSpecsChanged' is emitted.
         """
 
