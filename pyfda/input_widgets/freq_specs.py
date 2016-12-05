@@ -34,9 +34,7 @@ class FreqSpecs(QWidget):
         self.title = title
 
         self.qlabels = []    # list with references to QLabel widgets
-        self.qlineedit = []  # list with references to QLineEdit widgets
-        
-        self.new_labels = [] # list with actual labels
+        self.qlineedit = []  # list with references to QLineEdit widgetss
 
         self.spec_edited = False # flag whether QLineEdit field has been edited
 
@@ -154,7 +152,6 @@ class FreqSpecs(QWidget):
           fields
         """
         self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
-        self.new_labels = new_labels
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
