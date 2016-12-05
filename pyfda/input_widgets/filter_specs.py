@@ -71,10 +71,10 @@ class FilterSpecs(QWidget):
         layVMsg = QVBoxLayout()
         layVMsg.addWidget(self.lblMsg)
 
-        frmMsg = QFrame()
-        frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmMsg.setLayout(layVMsg)
-        frmMsg.setSizePolicy(QSizePolicy.Minimum,
+        self.frmMsg = QFrame()
+        self.frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmMsg.setLayout(layVMsg)
+        self.frmMsg.setSizePolicy(QSizePolicy.Minimum,
                              QSizePolicy.Minimum)
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
@@ -89,7 +89,7 @@ class FilterSpecs(QWidget):
         layGMain.addWidget(self.f_specs, 2, 0, 1, 2)  # Freq. specifications
         layGMain.addWidget(self.a_specs, 3, 0, 1, 2)  # Amplitude specs
         layGMain.addWidget(self.w_specs, 4, 0, 1, 2)  # Weight specs
-        layGMain.addWidget(frmMsg, 5, 0, 1, 2)        # Text message
+        layGMain.addWidget(self.frmMsg, 5, 0, 1, 2)        # Text message
         layGMain.addWidget(self.t_specs, 6, 0, 1, 2)  # Target specs
         layGMain.setRowStretch(7,1)
 #        layGMain.addWidget(HLine(QFrame, self), 7,0,1,2) # create HLine
@@ -161,89 +161,56 @@ class FilterSpecs(QWidget):
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
-        # read ALL parameters for *current filter design*, e.g. ['F_SB', 'A_SB']:
-        all_params = fb.fil_tree[rt][ft][fc][fo]['par']
+
+        # the keys of the all_widgets dict are the names of the subwidgets,
+        # the values are a tuple with the corresponding parameters
+        all_widgets = fb.fil_tree[rt][ft][fc][fo]
+
 
         logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
         logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
 
-        vis_wdgs = fb.fil_tree[rt][ft][fc][fo]['vis'] # visible widgets
-        dis_wdgs = fb.fil_tree[rt][ft][fc][fo]['dis'] # disabled widgets
-        msg      = fb.fil_tree[rt][ft][fc][fo]['msg'][0] # message
-
-        # Read freq / amp / weight labels for *current filter design*, building
-        # separate parameter lists according to the first letter of the label
-        f_params = [l for l in all_params if l[:2] == 'F_']
-        a_params = [l for l in all_params if l[:2] == 'A_']
-        w_params = [l for l in all_params if l[:2] == 'W_']
-        logger.debug("update_all_UIs\n"
-            "all_params = %s\n"
-            "a_params = %s\n"
-            "f_params = %s\n"
-            "w_params = %s\n",
-            all_params, a_params, f_params, w_params)
-
         self.sel_fil.load_filter_order() # update filter order from dict
 
-        # build separate parameter lists for min., man. filter order 
-        # and target specs of current filter   
-        min_params = man_params = targ_params = []
-        
-        if "min" in fb.fil_tree[rt][ft][fc]:
-            min_params = fb.fil_tree[rt][ft][fc]['min']['par']
-            
-        if "man" in fb.fil_tree[rt][ft][fc]:
-            man_params = fb.fil_tree[rt][ft][fc]['man']['par']
 
-        if "_targ" in fb.fil_tree[rt][ft][fc]:
-            targ_params = fb.fil_tree[rt][ft][fc]['_targ']['par']
+        # not used currently, could be used to hide / disable filter order
+        self.fo_enabled = 'fo' in all_widgets and len(all_widgets['fo']) > 1
 
-        # Create lists for amp- and freq-parameters for target specs
-        f_targ_params = [l for l in targ_params if l[:2] == 'F_']
-        a_targ_params = [l for l in targ_params if l[:2] == 'A_']       
-
-        # Create lists for amp- and freq-parameters for minimum filter order 
-        f_min_params = [l for l in min_params if l[:2] == 'F_']
-        a_min_params = [l for l in min_params if l[:2] == 'A_']
-
-        # Create lists for amp- and freq-parameters for manual filter order    
-        f_man_params = [l for l in man_params if l[:2] == 'F_']
-        a_man_params = [l for l in man_params if l[:2] == 'A_']
-        
-        if fo == 'man':
-            a_params = a_man_params
-            f_params = f_man_params
+        if 'tspecs' in all_widgets and len(all_widgets['tspecs']) > 1:
+            self.t_specs.setVisible(True)
+            self.t_specs.setEnabled(all_widgets['tspecs'][0] != 'd')
+            self.t_specs.update_UI(new_labels=all_widgets['tspecs'][1])
         else:
-            a_params = a_min_params
-            f_params = f_min_params
+            self.t_specs.hide()
 
-        self.t_specs.setVisible("tspecs" in vis_wdgs and targ_params != [])
-        self.t_specs.setEnabled("tspecs" not in dis_wdgs)
-        if targ_params:
-            if a_params != []:
-                amp_state = 'normal'
-            else:
-                amp_state = 'unused'
-            if f_params != []:
-                freq_state = 'normal'
-            else:
-                freq_state = 'unused'
-            self.t_specs.update_UI(f_targ_params, a_targ_params, 
-                                   freq_state = freq_state, amp_state = amp_state)
-        
-        self.f_specs.setVisible("fspecs" in vis_wdgs and f_params != [])
-        self.f_specs.setEnabled("fspecs" not in dis_wdgs)
-        self.f_specs.update_UI(new_labels=f_params)
+        if 'fspecs' in all_widgets and len(all_widgets['fspecs']) > 1:
+            self.f_specs.setVisible(True)
+            self.f_specs.setEnabled(all_widgets['fspecs'][0] != 'd')
+            self.f_specs.update_UI(new_labels=all_widgets['fspecs'])
+        else:
+            self.f_specs.hide()
 
-        self.a_specs.setVisible("aspecs" in vis_wdgs and a_params != [])
-        self.a_specs.setEnabled("aspecs" not in dis_wdgs)
-        self.a_specs.update_UI(new_labels=a_params)
+        if 'aspecs' in all_widgets and len(all_widgets['aspecs']) > 1:
+            self.a_specs.setVisible(True)
+            self.a_specs.setEnabled(all_widgets['aspecs'][0] != 'd')
+            self.a_specs.update_UI(new_labels=all_widgets['aspecs'])
+        else:
+            self.a_specs.hide()
+            
+        if 'wspecs' in all_widgets and len(all_widgets['wspecs']) > 1:
+            self.w_specs.setVisible(True)
+            self.w_specs.setEnabled(all_widgets['wspecs'][0] != 'd')
+            self.w_specs.update_UI(new_labels=all_widgets['wspecs'])
+        else:
+            self.w_specs.hide()
 
-        self.w_specs.setVisible("wspecs" in vis_wdgs and w_params != [])
-        self.w_specs.setEnabled("wspecs" not in dis_wdgs)
-        self.w_specs.update_UI(new_labels=w_params)
+        if 'msg' in all_widgets and len(all_widgets['msg']) > 1:
+            self.frmMsg.setVisible(True)
+            self.frmMsg.setEnabled(all_widgets['msg'][0] != 'd')           
+            self.lblMsg.setText(all_widgets['msg'][1:][0])
+        else:
+            self.frmMsg.hide()
 
-        self.lblMsg.setText(msg)
 
         self.sigSpecsChanged.emit()
 
