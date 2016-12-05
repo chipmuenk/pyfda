@@ -307,14 +307,13 @@ class FilterTreeBuilder(object):
                 # with individual info from the last step
                 #      e.g. {..., 'LP':{'man':{...}, 'min':{...}, 'targ':{...}}
 
-#       Frozendict doesn't work yet, mutable lists are still changed when a 
-#       copy-by-reference object is changed
-#        fb.fil_tree = FrozenDict(fil_tree) 
-        fb.fil_tree = fil_tree
+        fb.fil_tree = self.freeze_hierarchical(fil_tree) 
 
         # Test Immutatbility
-        # fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
-        # fil_tree_ref.update({'par':'hallo'}) # this changes  fb.fil_tree !!
+#        fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
+#        fil_tree_ref.update({'msg':("hallo",)}) # this changes  fb.fil_tree !!
+#        fb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+#        print(type(fb.fil_tree['LP']['FIR']['Equiripple']))
 
         logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
 
@@ -346,6 +345,21 @@ class FilterTreeBuilder(object):
                                 "fc.rt[rt][mmt]: {3}\n".format(
                                  fc, rt, mmt,
                                  pformat(fc.rt[rt][mmt])))
+                                 
+    #--------------------------------------------------------------------------
+    def freeze_hierarchical(self, hier_dict):
+        """
+        Return the argumenent as a FrozenDict where all nested dicts have also been
+        converted to FrozenDicts recursively. When the argument is not a dict, 
+        return the argument unchanged.
+        """
+        if isinstance(hier_dict, dict):
+            for k in hier_dict:
+                if isinstance(hier_dict[k], dict):
+                    hier_dict[k] = self.freeze_hierarchical(hier_dict[k])
+            return FrozenDict(hier_dict)
+        else:
+            return(hier_dict)
 
 
 #==============================================================================
