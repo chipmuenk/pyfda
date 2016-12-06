@@ -86,12 +86,12 @@ class Common(object):
         self.rt_base_iir = {
             'COM':{'man':{'fo': ('a', 'N')},
                    'min':{'fo': ('d', 'N'),
-                          'msg':(
+                          'msg':('a',
                    "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
                     "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
                     "&nbsp;and the corresponding corner frequencies of pass and "
                     "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                    "<b><i>F<sub>SB</sub></i></b> .",)
+                    "<b><i>F<sub>SB</sub></i></b> .")
                         }
                     },
             'LP': {'man':{'fspecs': ('a','F_C'),
