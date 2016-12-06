@@ -55,7 +55,7 @@ class DynFileHandler(logging.FileHandler):
 # as parameters:
 logging.DynFileHandler = DynFileHandler
 logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file))#, disable_existing_loggers=True)
-
+logging.info("Using logging config file {0}.".format(rc.log_config_file))
 
 if not os.path.exists(rc.save_dir):
     home_dir = pyfda_lib.get_home_dir()
