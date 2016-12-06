@@ -51,8 +51,8 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 save_dir = "D:/Daten"
 
 # Config file for logger
-#log_config_file = "pyfda_log.conf"
-log_config_file = "pyfda_log_debug.conf"
+log_config_file = "pyfda_log.conf"
+#log_config_file = "pyfda_log_debug.conf"
 
 
 # ======================== LAYOUT =============================================
