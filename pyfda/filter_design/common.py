@@ -83,7 +83,7 @@ class Common(object):
                    }
 
                    
-        self.base_iir = {
+        self.rt_base_iir = {
             'COM':{'man':{'fo': ('a', 'N')},
                    'min':{'fo': ('d', 'N'),
                           'msg':(
