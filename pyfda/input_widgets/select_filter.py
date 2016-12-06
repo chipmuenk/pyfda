@@ -99,8 +99,12 @@ class SelectFilter(QWidget):
         # (correspondence is defined in pyfda_rc.py) and populate rt combo box
         #
         rt_list = sorted(list(fb.fil_tree.keys()))
+      
         for rt in rt_list:
-            self.cmbResponseType.addItem(rc.rt_names[rt], rt)
+            try:
+                self.cmbResponseType.addItem(rc.rt_names[rt], rt)
+            except KeyError as e:
+                logger.warn("KeyError: {0} has no corresponding full name in rc.rt_names.".format(e))
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
 
         if idx == -1: # Key 'LP' does not exist, use first entry instead
