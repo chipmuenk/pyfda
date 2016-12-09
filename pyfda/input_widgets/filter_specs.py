@@ -176,35 +176,40 @@ class FilterSpecs(QWidget):
         # not used currently, could be used to hide / disable filter order
         self.fo_enabled = 'fo' in all_widgets and len(all_widgets['fo']) > 1
 
-        if 'tspecs' in all_widgets and len(all_widgets['tspecs']) > 1:
+        if ('tspecs' in all_widgets and len(all_widgets['tspecs']) > 1 and
+                                              all_widgets['tspecs'][0] != 'i'):
             self.t_specs.setVisible(True)
             self.t_specs.setEnabled(all_widgets['tspecs'][0] != 'd')
             self.t_specs.update_UI(new_labels=all_widgets['tspecs'][1])
         else:
             self.t_specs.hide()
 
-        if 'fspecs' in all_widgets and len(all_widgets['fspecs']) > 1:
+        if ('fspecs' in all_widgets and len(all_widgets['fspecs']) > 1 and
+                                              all_widgets['fspecs'][0] != 'i'):
             self.f_specs.setVisible(True)
             self.f_specs.setEnabled(all_widgets['fspecs'][0] != 'd')
             self.f_specs.update_UI(new_labels=all_widgets['fspecs'])
         else:
             self.f_specs.hide()
 
-        if 'aspecs' in all_widgets and len(all_widgets['aspecs']) > 1:
+        if ('aspecs' in all_widgets and len(all_widgets['aspecs']) > 1 and
+                                              all_widgets['aspecs'][0] != 'i'):
             self.a_specs.setVisible(True)
             self.a_specs.setEnabled(all_widgets['aspecs'][0] != 'd')
             self.a_specs.update_UI(new_labels=all_widgets['aspecs'])
         else:
             self.a_specs.hide()
             
-        if 'wspecs' in all_widgets and len(all_widgets['wspecs']) > 1:
+        if ('wspecs' in all_widgets and len(all_widgets['wspecs']) > 1 and
+                                              all_widgets['wspecs'][0] != 'i'):
             self.w_specs.setVisible(True)
             self.w_specs.setEnabled(all_widgets['wspecs'][0] != 'd')
             self.w_specs.update_UI(new_labels=all_widgets['wspecs'])
         else:
             self.w_specs.hide()
 
-        if 'msg' in all_widgets and len(all_widgets['msg']) > 1:
+        if ('msg' in all_widgets and len(all_widgets['msg']) > 1  and
+                                              all_widgets['msg'][0] != 'i'):
             self.frmMsg.setVisible(True)
             self.frmMsg.setEnabled(all_widgets['msg'][0] != 'd')           
             self.lblMsg.setText(all_widgets['msg'][1:][0])

@@ -97,14 +97,16 @@ class TargetSpecs(QWidget):
         # pass new labels to widgets. The first element of the 'amp' and the
         # 'freq' tuple is the state, 'u' is for 'unused', 'd' is for disabled
 
-        if 'frq' in new_labels and len(new_labels['frq']) > 1:
+        if ('frq' in new_labels and len(new_labels['frq']) > 1 and
+                                              new_labels['frq'][0] != 'i'):
             self.f_specs.show()
             self.f_specs.setEnabled(new_labels['frq'][0] != 'd')
             self.f_specs.update_UI(new_labels=new_labels['frq'])
         else:
             self.f_specs.hide()
             
-        if 'amp' in new_labels and len(new_labels['amp']) > 1:
+        if ('amp' in new_labels and len(new_labels['amp']) > 1 and
+                                              new_labels['amp'][0] != 'i'):
             self.a_specs.show()
             self.a_specs.setEnabled(new_labels['amp'][0] != 'd')
             self.a_specs.update_UI(new_labels=new_labels['amp'])
