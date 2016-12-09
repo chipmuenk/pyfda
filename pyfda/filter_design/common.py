@@ -12,77 +12,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 class Common(object):
     
     def __init__(self):
-    
-        self.rt_base_fir = {
-            'LP': {'man':{'par':('F_PB','F_SB')},
-                   'min':{'par':('F_PB','F_SB','A_PB','A_SB')},
-                   '_targ':{'par':('F_PB','F_SB','A_PB','A_SB')}},
-            'HP': {'man':{'par':('F_SB','F_PB')},
-                   'min':{'par':('F_SB','F_PB','A_SB','A_PB')},
-                   '_targ':{'par':('F_SB','F_PB','A_SB','A_PB')}},
-            'BP': {'man':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2')},
-                   'min':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'A_SB','A_PB','A_SB2')},
-                   '_targ':{'par':('F_SB', 'F_PB','F_PB2','F_SB2',
-                                   'A_SB', 'A_PB','A_SB2')}},
-            'BS': {'man':{'par':('F_PB','F_SB','F_SB2','F_PB2')},
-                   'min':{'par':('F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB','A_PB2')},
-                   '_targ':{'par':('F_PB','F_SB','F_SB2','F_PB2',
-                                 'A_PB','A_SB','A_PB2',)}}
-                   }
-
-        self.rt_equiripple = {
-            'LP': {'man':{'par':('W_PB','W_SB','F_PB','F_SB')},
-                   'min':{'par':('F_PB','F_SB','W_PB','W_SB', 'A_PB', 'A_SB')},
-                   '_targ':{'par':('F_PB','F_SB','A_PB','A_SB')}},
-            'HP': {'man':{'par':('W_SB','W_PB','F_SB','F_PB')},
-                   'min':{'par':('F_SB','F_PB','W_SB','W_PB','A_SB','A_PB')},
-                   '_targ':{'par':('F_SB','F_PB','A_SB','A_PB')}},
-            'BP': {'man':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB','W_PB','W_SB2')},
-                   'min':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB', 'W_PB','W_SB2','A_SB','A_PB','A_SB2')},
-                   '_targ':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'A_SB', 'A_PB','A_SB2')}},
-            'BS': {'man':{'par':('F_PB','F_SB','F_SB2','F_PB2', 'W_SB','W_PB','W_SB2'),
-                          'msg':(r"<br /><b>Note:</b> Order needs to be odd for a bandstop!",)},
-                   'min':{'par':('W_PB','W_SB','W_PB2',
-                                 'F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB','A_PB2')},
-                   '_targ':{'par':('F_PB','F_SB','F_SB2','F_PB2',
-                                 'A_PB','A_SB','A_PB2',)}},
-            'HIL': {'man':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB', 'W_PB', 'W_SB2'),
-                           'vis':("fspecs",)}},
-            'DIFF': {'man':{'par':('F_PB', 'W_PB'), 
-                            'vis':("fspecs",)}}
-                   }
-
-
-        self.rt_targ = {
-            'LP': {'_targ':{'par':('F_PB','F_SB','A_PB','A_SB')}},
-            'HP': {'_targ':{'par':('F_SB','F_PB','A_SB','A_PB')}},
-            'BP': {'_targ':{'par':('F_SB','F_PB','F_PB2','F_SB2','A_SB','A_PB')}},
-            'BS': {'_targ':{'par':('F_PB','F_SB','F_SB2','F_PB2','A_PB','A_SB')}}
-                   }
-
-                   
-        self.rt_base_iir_old = {
-            'LP': {'man':{'par':('F_C','A_PB','A_SB')},
-                   'min':{'par':('F_C','A_PB','A_SB')},
-                   '_targ':{'par':('F_PB','F_SB','A_PB','A_SB')}},
-            'HP': {'man':{'par':('F_C','A_SB','A_PB')},
-                   'min':{'par':('F_C','A_SB','A_PB')},
-                   '_targ':{'par':('F_SB','F_PB','A_SB','A_PB')}},
-            'BP': {'man':{'par':('F_C', 'F_C2','A_SB', 'A_PB')},
-                   'min':{'par':('F_C', 'F_C2','A_SB', 'A_PB')},
-                   '_targ':{'par':('F_SB', 'F_PB','F_PB2','F_SB2',
-                                   'A_SB', 'A_PB')}},
-            'BS': {'man':{'par':('F_C', 'F_C2', 'A_PB','A_SB')},
-                   'min':{'par':('F_C', 'F_C2', 'A_PB','A_SB')},
-                   '_targ':{'par':('F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB')}}
-                   }
-
-                   
+                      
         self.rt_base_iir = {
             'COM':{'man':{'fo': ('a', 'N')},
                    'min':{'fo': ('d', 'N'),
@@ -94,38 +24,46 @@ class Common(object):
                     "<b><i>F<sub>SB</sub></i></b> .")
                         }
                     },
-            'LP': {'man':{'fspecs': ('a','F_C'),
+            'LP': {'man':{'fo':     ('a','N'),
+                          'fspecs': ('a','F_C'),
                           'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
                                            'amp':('u','A_PB','A_SB')})
                           },
-                   'min':{'fspecs': ('d','F_C'),
+                   'min':{'fo':     ('d','N'),
+                          'fspecs': ('d','F_C'),
                           'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
                                            'amp':('a','A_PB','A_SB')})
                         }
                 },
-            'HP': {'man':{'fspecs': ('a','F_C'),
+            'HP': {'man':{'fo':     ('a','N'),
+                          'fspecs': ('a','F_C'),
                           'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
                                            'amp':('u','A_SB','A_PB')})
                          },
-                   'min':{'fspecs': ('d','F_C'),
+                   'min':{'fo':     ('d','N'),
+                          'fspecs': ('d','F_C'),
                           'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
                                            'amp':('a','A_SB','A_PB')})
                          }
                     },
-            'BP': {'man':{'fspecs': ('a','F_C', 'F_C2'),
+            'BP': {'man':{'fo':     ('a','N'),
+                          'fspecs': ('a','F_C', 'F_C2'),
                           'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                          },
-                   'min':{'fspecs': ('d','F_C','F_C2'),
+                   'min':{'fo':     ('d','N'),
+                          'fspecs': ('d','F_C','F_C2'),
                           'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
                                            'amp':('a','A_SB','A_PB','A_SB2')})
                          },
                     },
-            'BS': {'man':{'fspecs': ('a','F_C','F_C2'),
+            'BS': {'man':{'fo':     ('a','N'),
+                          'fspecs': ('a','F_C','F_C2'),
                           'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
                                            'amp':('u','A_PB','A_SB','A_PB2')})
                           },
-                   'min':{'fspecs': ('d','F_C','F_C2'),
+                   'min':{'fo':     ('d','N'),
+                          'fspecs': ('d','F_C','F_C2'),
                           'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
                                            'amp':('a','A_PB','A_SB','A_PB2')})
                         }
