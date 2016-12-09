@@ -43,25 +43,8 @@ class Butter(object):
     def __init__(self):
 
         # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter the filter order <b><i>N</i></b> and the -3 dB corner "
-            "frequency(ies) <b><i>F<sub>C</sub></i></b> .",)
-        msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
-                    "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
-                    "&nbsp;and the corresponding corner frequencies of pass and "
-                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                    "<b><i>F<sub>SB</sub></i></b> .",)
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ('fo','fspecs','tspecs') # manual filter order
-        vis_min = ('fo','fspecs','tspecs') # minimum filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = ('tspecs',) # manual filter order
-        dis_min = ('fspecs',) # minimum filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ('N',) # manual filter order
-        par_min = ('N',) # minimum filter order
+        msg_man = ('a', "Enter the filter order <b><i>N</i></b> and the -3 dB corner "
+            "frequency(ies) <b><i>F<sub>C</sub></i></b> .")
 
         self.ft = 'IIR'
 
@@ -69,8 +52,7 @@ class Butter(object):
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
-                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
+        self.com = {"man":{"msg":msg_man}}
 
         c = Common()
         self.rt = c.rt_base_iir

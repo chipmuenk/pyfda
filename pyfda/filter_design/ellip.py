@@ -63,31 +63,15 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         msg_man = ("Enter the filter order <b><i>N</i></b>, the minimum stop "
             "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
             "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first "
-            "drops below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .",)
-        msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
-                    "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
-                    "&nbsp;and the corresponding corner frequencies of pass and "
-                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                    "<b><i>F<sub>SB</sub></i></b> .",)
+            "drops below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")
 
         self.ft = 'IIR'
 
-        self.rt_dicts = ('com', 'rtx') # additional parameter dicts for rt        
-
-        self.rtx = {
-            'LP': {'man':{'par':('F_PB','F_SB')},
-                   'min':{'par':('F_PB','F_SB','A_PB', 'A_SB')}},
-            'HP': {'man':{'par':('F_SB','F_PB')},
-                   'min':{'par':('F_SB','F_PB','A_SB','A_PB')}},
-            'BP': {'man':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2')},
-                   'min':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2')}},
-            'BS': {'man':{'par':('F_PB','F_SB','F_SB2','F_PB2', 'W_SB','W_PB','W_SB2')},
-                   'min':{'par':('F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB','A_PB2')}}
-                                 }
+        self.rt_dicts = ('com',) # additional parameter dicts for rt
 
         c = Common()                   
         self.rt = c.rt_base_iir
-
+        self.com = {'man':{'msg':msg_man}}
 
         self.info_doc = []
         self.info_doc.append('ellip()\n========')
