@@ -338,6 +338,8 @@ class FilterTreeBuilder(object):
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
+                if rt == 'COM':                  # handle common info later
+                    continue
                 if rt not in fil_tree:           # is rt key already in dict?
                     fil_tree.update({rt:{}})     # no, create it
 
