@@ -355,26 +355,26 @@ class FilterTreeBuilder(object):
         #print("\n_dict = ", _dict)
         for d in _dict:
             print("\nd = ", d)
-            for mmt in d: # read common parameters Min/Man/Targ
-                print("\nmmt = ", mmt)
+            for minmax in d: # read common parameters Min/Man/Targ
+                print("\nminmax = ", minmax)
                 for rt in fc.rt:
-                    # add info only when the rt entry has a 'man'/'min'/'targ' key:
-                    if mmt in fc.rt[rt]:
-                        for p in d[mmt]: # yes, add all info in mmt
+                    # add info only when the rt entry has a 'man' or 'min' key:
+                    if minmax in fc.rt[rt]:
+                        for p in d[minmax]: # yes, add all info in minmax
                             # Test whether entry exists already in rt:
-                            if p in fc.rt[rt][mmt]:
+                            if p in fc.rt[rt][minmax]:
                                 # yes, prepend common data
-                                fc.rt[rt][mmt][p] =\
-                                    d[mmt][p] + fc.rt[rt][mmt][p]
+                                fc.rt[rt][minmax][p] =\
+                                    d[minmax][p] + fc.rt[rt][minmax][p]
                             else:
                                 # no, create new entry
-                                fc.rt[rt][mmt].update(\
-                                                {p:d[mmt][p]})
-                            #print(fc.rt[rt][mmt])
+                                fc.rt[rt][minmax].update(\
+                                                {p:d[minmax][p]})
+                            #print(fc.rt[rt][minmax])
                             logger.debug("{0}.{1}.{2}\n"
-                                "fc.rt[rt][mmt]: {3}\n".format(
-                                 fc, rt, mmt,
-                                 pformat(fc.rt[rt][mmt])))
+                                "fc.rt[rt][minmax]: {3}\n".format(
+                                 fc, rt, minmax,
+                                 pformat(fc.rt[rt][minmax])))
 
 #==============================================================================
 if __name__ == "__main__":
