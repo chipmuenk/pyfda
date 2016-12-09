@@ -343,10 +343,10 @@ class FilterTreeBuilder(object):
 
                 if ft not in fil_tree[rt]:  # is ft key already in dict[rt]?
                     fil_tree[rt].update({ft:{}}) # no, create it
-                fil_tree[rt][ft].update({fc:{}}) # append fc to list dict[rt][ft]
-                # finally append all the individual 'min' / 'man' / ' targ' info
-                # to fc in fil_tree. These are e.g. the params for 'min' / 'man' 
-                # filter order and 'targ' specifications
+                    
+                if fc not in fil_tree[rt][ft]:  # is filter class already in dict[rt][ft]?
+                    fil_tree[rt][ft].update({fc:{}}) # no, create it
+                # now append all the individual 'min' / 'man'  subwidget infos to fc:
                 fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
             if 'COM' in ff.fil_inst.rt:
