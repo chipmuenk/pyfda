@@ -351,9 +351,20 @@ class FilterTreeBuilder(object):
                 # now append all the individual 'min' / 'man'  subwidget infos to fc:
                 fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
-            if 'COM' in ff.fil_inst.rt:
-                for minmax in ff.fil_inst.rt['COM']:
-
+            if 'COM' in ff.fil_inst.rt: # now join common parameters with all rt keys
+                for minmax in ff.fil_inst.rt['COM']: # read 'min' and / or 'max' keys
+                    for rt in fil_tree: # iterate over all response types in fil_tree
+                        if ft in fil_tree[rt] and minmax in fil_tree[rt][ft][fc]:
+                            for p in ff.fil_inst.rt['COM'][minmax]:
+                                # Test whether entry exists already in rt:
+                                if p in fil_tree[rt][ft][fc][minmax]:
+                                    # yes, prepend common data
+                                    fil_tree[rt][ft][fc][minmax][p] =\
+                                        ff.fil_inst.rt['COM'][minmax][p] + fil_tree[rt][ft][fc][minmax][p]
+                                else:
+                                    # no, create new entry
+                                    fil_tree[rt][ft][fc][minmax].update(\
+                                                    {p:ff.fil_inst.rt['COM'][minmax][p]})
         return fil_tree
 
     #--------------------------------------------------------------------------
