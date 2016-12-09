@@ -320,11 +320,9 @@ class FilterTreeBuilder(object):
                 continue # continue with next entry in fb.fil_classes
             
             if hasattr(ff.fil_inst, 'rt_dicts'):
-                all_rt_dicts = ff.fil_inst.rt_dicts
-#                if isinstance(all_rt_dicts, list):
-                self.join_dicts(ff.fil_inst, all_rt_dicts)
-            else:
-                self.join_dicts(ff.fil_inst, ('com',))            
+#                all_rt_dicts = ff.fil_inst.rt_dicts
+                self.join_dicts(ff.fil_inst, ff.fil_inst.rt_dicts)
+            
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
             for rt in ff.fil_inst.rt:            # iterate over response types
