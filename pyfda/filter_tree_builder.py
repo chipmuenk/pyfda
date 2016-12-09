@@ -235,31 +235,68 @@ class FilterTreeBuilder(object):
         """
         Read attributes (ft, rt, rt:fo) from all filter classes (fc)
         listed in the global dict ``fb.fil_classes``. Attributes are stored in
-        the design method classes in the format (example from cheby1.py)
+        the design method classes in the format (example from common.py)
 
         self.ft = 'IIR'
         self.rt = {
-          "LP": {"man":{"par":[]},
-                 "min":{"par":['F_PB','F_SB']}},
-          "HP": {"man":{"par":[]},
-                 "min":{"par":['F_SB','F_PB']}},
-          "BP": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-          "BS": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
-                 }
+                 'LP': {'man':{'fo':     ('a','N'),
+                               'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
+                               'fspecs': ('a','F_C'),
+                               'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                               'amp':('u','A_PB','A_SB')})
+                              },
+                       'min':{'fo':     ('d','N'),
+                              'fspecs': ('d','F_C'),
+                              'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                                               'amp':('a','A_PB','A_SB')})
+                            }
+                      },
+                'HP': {'man':{'fo':     ('a','N'),
+                              'fspecs': ('a','F_C'),
+                              'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                               'amp':('u','A_SB','A_PB')})
+                             },
+                       'min':{'fo':     ('d','N'),
+                              'fspecs': ('d','F_C'),
+                              'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                                               'amp':('a','A_SB','A_PB')})
+                             }
+                      }
+                }
 
         Build a dictionary of all filter combinations with the following hierarchy:
 
         response types -> filter types -> filter classes  -> filter order
         rt (e.g. 'LP')    ft (e.g. 'IIR') fc (e.g. 'cheby1') fo ('min' or 'man')
 
-        Additionally, all the attributes found in each filter branch (e.g. cheby1.LPmin)
-        are stored, e.g.
-        'par':['f_S', 'F_PB', 'F_SB', 'A_PB', 'A_SB']   # required parameters
-        'msg':r"<br /><b>Note:</b> Order needs to be even!" # message
-        'dis':['fo','fspecs','wspecs']  # disabled widgets
-        'vis':['fo','fspecs']           # visible widgets
+        All attributes found for each filter branch are arranged in a dict, e.g.
+        for ``cheby1.LPman`` and ``cheby1.LPmin``, listing the parameters to be
+        displayed and whether they are active, unused, disabled or invisible for
+        each subwidget:
+        
+        'LP':{
+            'IIR':{
+                 'Cheby1':{
+                     'man':{'fo':     ('a','N'),
+                            'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
+                            'fspecs': ('a','F_C'),
+                            'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                             'amp':('u','A_PB','A_SB')})
+                            },
+                     'min':{'fo':     ('d','N'),
+                            'fspecs': ('d','F_C'),
+                            'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                                             'amp':('a','A_PB','A_SB')})
+                            }
+                         }
+                   }  
+             }, ...
+             
+        Finally, the whole structure is frozen recursively to avoid inadvertedly
+        changing the filter tree.
+
+        For a full example, see the default filter tree ``fb.fil_tree`` defined
+        in ``filter_broker.py``.
 
         Reads
         -----
