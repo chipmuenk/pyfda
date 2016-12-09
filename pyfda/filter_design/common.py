@@ -27,7 +27,7 @@ class Common(object):
             'LP': {'man':{'fo':     ('a','N'),
                           'fspecs': ('a','F_C'),
                           'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
-                                           'amp':('u','A_PB','A_SB')})
+                                           'amp':('a','A_PB','A_SB')})
                           },
                    'min':{'fo':     ('d','N'),
                           'fspecs': ('d','F_C'),
@@ -38,7 +38,7 @@ class Common(object):
             'HP': {'man':{'fo':     ('a','N'),
                           'fspecs': ('a','F_C'),
                           'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
-                                           'amp':('u','A_SB','A_PB')})
+                                           'amp':('a','A_SB','A_PB')})
                          },
                    'min':{'fo':     ('d','N'),
                           'fspecs': ('d','F_C'),
@@ -48,24 +48,24 @@ class Common(object):
                     },
             'BP': {'man':{'fo':     ('a','N'),
                           'fspecs': ('a','F_C', 'F_C2'),
-                          'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                          'tspecs': ('a', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
+                                           'amp':('a','A_SB','A_PB')})
                          },
                    'min':{'fo':     ('d','N'),
                           'fspecs': ('d','F_C','F_C2'),
                           'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
-                                           'amp':('a','A_SB','A_PB','A_SB2')})
+                                           'amp':('a','A_SB','A_PB')})
                          },
                     },
             'BS': {'man':{'fo':     ('a','N'),
                           'fspecs': ('a','F_C','F_C2'),
-                          'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
-                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                          'tspecs': ('a', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
+                                           'amp':('a','A_PB','A_SB')})
                           },
                    'min':{'fo':     ('d','N'),
                           'fspecs': ('d','F_C','F_C2'),
                           'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
-                                           'amp':('a','A_PB','A_SB','A_PB2')})
+                                           'amp':('a','A_PB','A_SB')})
                         }
                 }
             }
