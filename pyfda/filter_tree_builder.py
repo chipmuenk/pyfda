@@ -67,9 +67,21 @@ class FilterTreeBuilder(object):
         # store names and modules in the dict fb.fil_classes as {filterName:filterModule}:
         self.dyn_filt_import(filt_list_names)
 
-        # Build a hierarchical dict fb.fil_tree with all valid filter designs
-        # and response types:
-        self.build_fil_tree()
+        # Build a hierarchical filter tree dictionary with all valid filter 
+        # design methods and response types:
+        fil_tree = self.build_fil_tree()
+
+        # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):       
+        fb.fil_tree = freeze_hierarchical(fil_tree) 
+
+        # Test Immutatbility
+#        fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
+#        fil_tree_ref.update({'msg':("hallo",)}) # this changes  fb.fil_tree !!
+#        fb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
+#        print(type(fb.fil_tree['LP']['FIR']['Equiripple']))
+
+        logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
+
 
 #==============================================================================
     def read_filt_file(self):
@@ -337,16 +349,12 @@ class FilterTreeBuilder(object):
                 # filter order and 'targ' specifications
                 fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
-        fb.fil_tree = freeze_hierarchical(fil_tree) # convert to hierarchical frozendict
+            if 'COM' in ff.fil_inst.rt:
+                for minmax in ff.fil_inst.rt['COM']:
 
-        # Test Immutatbility
-#        fil_tree_ref = fb.fil_tree['LP']['FIR']['Equiripple']['min']
-#        fil_tree_ref.update({'msg':("hallo",)}) # this changes  fb.fil_tree !!
-#        fb.fil_tree['LP']['FIR']['Equiripple']['min']['par'] = ("A_1","F_1")
-#        print(type(fb.fil_tree['LP']['FIR']['Equiripple']))
+        return fil_tree
 
-        logger.debug("\nfb.fil_tree =\n%s", pformat(fb.fil_tree))
-
+    #--------------------------------------------------------------------------
     def join_dicts(self, fc, dict_list):
         
         print("dict_list = ", dict_list)
