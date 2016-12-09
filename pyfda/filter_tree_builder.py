@@ -337,16 +337,16 @@ class FilterTreeBuilder(object):
             
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
-            for rt in ff.fil_inst.rt:            # iterate over response types
+            for rt in ff.fil_inst.rt:            # iterate over all response types
                 if rt == 'COM':                  # handle common info later
                     continue
-                if rt not in fil_tree:           # is rt key already in dict?
+                if rt not in fil_tree:           # is response type already in dict?
                     fil_tree.update({rt:{}})     # no, create it
 
-                if ft not in fil_tree[rt]:  # is ft key already in dict[rt]?
+                if ft not in fil_tree[rt]:       # filter type already in dict[rt]?
                     fil_tree[rt].update({ft:{}}) # no, create it
                     
-                if fc not in fil_tree[rt][ft]:  # is filter class already in dict[rt][ft]?
+                if fc not in fil_tree[rt][ft]:       # filter class already in dict[rt][ft]?
                     fil_tree[rt][ft].update({fc:{}}) # no, create it
                 # now append all the individual 'min' / 'man'  subwidget infos to fc:
                 fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
