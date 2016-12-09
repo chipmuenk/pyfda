@@ -317,13 +317,13 @@ class FilterTreeBuilder(object):
         Returns
         -------
 
-        fil_tree : dict with filter tree
+        fil_tree : frozendict with filter tree
 
         """
 
         fil_tree = {} # Dict with a hierarical tree fc-ft- ...
 
-        for fc in fb.fil_classes:  # iterate over keys (= fc)
+        for fc in fb.fil_classes:  # iterate over keys (= all filter classes fc)
 
             # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
