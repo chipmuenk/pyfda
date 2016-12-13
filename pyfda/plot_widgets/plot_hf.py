@@ -431,29 +431,21 @@ class PlotHf(QWidget):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
-        
-        # Merge target parameters and parameters for selected filter order ('man' / 'min') 
-        param_list = []
+        # Get corners for spec display from the parameters of the target specs subwidget       
         try:
-            param_list1 = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
-                                            [fb.fil[0]['fc']]['_targ']['par']
+            param_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
+                                    [fb.fil[0]['fc']][fb.fil[0]['fo']]['tspecs'][1]['amp']
         except KeyError:
-            param_list1 = []
-        try:
-            param_list2 = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
-                                    [fb.fil[0]['fc']][fb.fil[0]['fo']]['par']
-        except KeyError:
-            param_list2 = []
-        # only add parameters from targ list not contained in min/man param_list
-        param_list += [l for l in param_list2 if l not in param_list1]
+            param_list = []
 
         SB = [l for l in param_list if 'A_SB' in l]
         PB = [l for l in param_list if 'A_PB' in l]
         
-        if SB:      
+        if SB:
             A_min = min([fb.fil[0][l] for l in SB])
         else:
             A_min = 5e-4
+
         if PB:
             A_max = max([fb.fil[0][l] for l in PB])
         else:
