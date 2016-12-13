@@ -351,19 +351,19 @@ class FilterTreeBuilder(object):
                 fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
             if 'COM' in ff.fil_inst.rt: # now join common parameters with all rt keys
-                for minmax in ff.fil_inst.rt['COM']: # read 'min' and / or 'max' keys
+                for fo in ff.fil_inst.rt['COM']: # iterate over filter order ('min'/'max')
                     for rt in fil_tree: # iterate over all response types in fil_tree
-                        if ft in fil_tree[rt] and minmax in fil_tree[rt][ft][fc]:
-                            for p in ff.fil_inst.rt['COM'][minmax]:
+                        if ft in fil_tree[rt] and fc in fil_tree[rt][ft]\
+                                                and fo in fil_tree[rt][ft][fc]:
+                            for s in ff.fil_inst.rt['COM'][fo]: # iterate over subwidgets
                                 # Test whether entry exists already in rt:
-                                if p in fil_tree[rt][ft][fc][minmax]:
-                                    # yes, prepend common data
-                                    fil_tree[rt][ft][fc][minmax][p] =\
-                                        ff.fil_inst.rt['COM'][minmax][p] + fil_tree[rt][ft][fc][minmax][p]
+                                if s in fil_tree[rt][ft][fc][fo]:
+                                    # yes, overwrite subwidget parameters
+                                    fil_tree[rt][ft][fc][fo][s] = ff.fil_inst.rt['COM'][fo][s]
                                 else:
-                                    # no, create new entry
-                                    fil_tree[rt][ft][fc][minmax].update(\
-                                                    {p:ff.fil_inst.rt['COM'][minmax][p]})
+                                    # no, create new subwidget:parameters entry
+                                    fil_tree[rt][ft][fc][fo].update(\
+                                                    {s:ff.fil_inst.rt['COM'][fo][s]})
         return fil_tree
 
     #--------------------------------------------------------------------------
