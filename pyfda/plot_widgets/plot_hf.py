@@ -531,7 +531,7 @@ class PlotHf(QWidget):
                 H_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
             else: # unit is W
-                A_lim = [0, (1.05 + 2*A_max)**2.]
+                A_lim = [0, (1.03 + A_max)**2.]
                 self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
 
