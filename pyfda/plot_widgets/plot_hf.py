@@ -185,8 +185,8 @@ class PlotHf(QWidget):
                 A_PB_max = A_PB2_max = 1
 
             A_PB_min  = (1 - self.A_PB)**exp
-            A_PB2_min = (1 - self.A_PB)**exp
-            A_PB_minx = A_PB_min  / 1.05
+            A_PB2_min = (1 - self.A_PB2)**exp
+            A_PB_minx = min(A_PB_min, A_PB2_min) / 1.05
             A_PB_maxx = max(A_PB_max, A_PB2_max) * 1.05
 
             A_SB  = self.A_SB ** exp
