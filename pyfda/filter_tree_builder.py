@@ -332,7 +332,6 @@ class FilterTreeBuilder(object):
                 continue # continue with next entry in fb.fil_classes
             
             if hasattr(ff.fil_inst, 'rt_dicts'):
-#                all_rt_dicts = ff.fil_inst.rt_dicts
                 self.join_dicts(ff.fil_inst, ff.fil_inst.rt_dicts)
             
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
@@ -370,32 +369,26 @@ class FilterTreeBuilder(object):
     #--------------------------------------------------------------------------
     def join_dicts(self, fc, dict_list):
         
-        print("dict_list = ", dict_list)
-        print("fc = ", fc)
         _dict = [getattr(fc,d) for d in dict_list if hasattr(fc,d)]
-        #print("\n_dict = ", _dict)
         for d in _dict:
-            print("\nd = ", d)
-            for minmax in d: # read common parameters Min/Man/Targ
-                print("\nminmax = ", minmax)
+            for fo in d: # iterate over filter order ('min' or 'max')
                 for rt in fc.rt:
                     # add info only when the rt entry has a 'man' or 'min' key:
-                    if minmax in fc.rt[rt]:
-                        for p in d[minmax]: # yes, add all info in minmax
-                            # Test whether entry exists already in rt:
-                            if p in fc.rt[rt][minmax]:
+                    if fo in fc.rt[rt]:
+                        for s in d[fo]: # iterate over all subwidgets in fo
+                            # Test whether subwidget exists already in rt:
+                            if s in fc.rt[rt][fo]:
                                 # yes, prepend common data
-                                fc.rt[rt][minmax][p] =\
-                                    d[minmax][p] + fc.rt[rt][minmax][p]
+                                fc.rt[rt][fo][s] =\
+                                    d[fo][s] + fc.rt[rt][fo][s]
                             else:
-                                # no, create new entry
-                                fc.rt[rt][minmax].update(\
-                                                {p:d[minmax][p]})
-                            #print(fc.rt[rt][minmax])
+                                # no, create new subwidget
+                                fc.rt[rt][fo].update({s:d[fo][s]})
+
                             logger.debug("{0}.{1}.{2}\n"
-                                "fc.rt[rt][minmax]: {3}\n".format(
-                                 fc, rt, minmax,
-                                 pformat(fc.rt[rt][minmax])))
+                                "fc.rt[rt][fo]: {3}\n".format(
+                                 fc, rt, fo,
+                                 pformat(fc.rt[rt][fo])))
 
 #==============================================================================
 if __name__ == "__main__":
