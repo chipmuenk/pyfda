@@ -35,38 +35,37 @@ class Manual_FIR(object):
 
         # This part contains static information for building the filter tree
 
-        # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter filter design using the P/Z or the b/a widget.",)
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ('tspecs',) # manual filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = ('fo',) # manual filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ()     #  manual filter order
-
         self.ft = 'FIR'
 
         self.rt_dicts = ('com',) # additional parameter dicts for rt
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {'man':{'vis':vis_man,'dis':dis_man,'msg':msg_man,'par':par_man},
-                    'targ':{'vis':vis_man,'dis':dis_man,'msg':msg_man,'par':par_man}}
-                    
+
         self.rt = {
-            'LP': {'man':{'par':()},
-                   '_targ':{'par':('F_PB', 'F_SB', 'A_PB', 'A_SB')}},
-            'HP': {'man':{'par':(), 'msg':(r"<br /><b>Note:</b> Be careful!",)},
-                   '_targ':{'par':('F_SB', 'F_PB', 'A_SB', 'A_PB')}},
-            'BP': {'man':{'par':('F_C2',)},
-                   '_targ':{'par':('A_SB', 'A_PB')}},
-            'BS': {'man':{'par':('F_C2',),
-                      'msg':(r"<br /><b>Note:</b> Be extra careful!",)},
-                   '_targ':{'par':('F_PB', 'F_SB')}},
-            'HIL': {'man':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2')}}
+            'COM':{'man':{'fo': ('d', 'N'),
+                          'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
+                        },
+            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                           'amp':('u','A_PB','A_SB')})
+                         }},
+            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                           'amp':('u','A_SB','A_PB')}),
+                          'msg': ('a', r"<br /><b>Note:</b> Be careful!")
+                        }},
+            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
+                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                        }},
+            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'HIL': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+
                    }
 
         
@@ -132,40 +131,38 @@ class Manual_IIR(object):
     def __init__(self):
 
         # This part contains static information for building the filter tree
-
-        # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter filter design using the P/Z or the b/a widget.",)
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ('tspecs', 'fo') # manual filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = ('fo',) # manual filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ()     #  manual filter order
                     
         self.ft = 'IIR'
 
-        self.rt_dicts = ('com',) # additional parameter dicts for rt
+        self.rt_dicts = () # additional parameter dicts for rt
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man}}
-
 
         self.rt = {
-            'LP': {'man':{'par':()},
-                   '_targ':{'par':('F_PB', 'F_SB', 'A_PB', 'A_SB')}},
-            'HP': {'man':{'par':(),
-                          'msg':(r"<br /><b>Note:</b> Be careful!",)},
-                    '_targ':{'par':('F_SB', 'F_PB', 'A_SB', 'A_PB')}},
-            'BP': {'man':{'par':('F_C2',)},
-                   '_targ':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2')}},
-            'BS': {'man':{'par':('F_C2',),
-                      'msg':(r"<br /><b>Note:</b> Be extra careful!",)},
-                      '_targ':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2')}},
-            'HIL': {'man':{'par':()}}
+            'COM':{'man':{'fo': ('d', 'N'),
+                          'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
+                        },
+            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                           'amp':('u','A_PB','A_SB')})
+                         }},
+            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                           'amp':('u','A_SB','A_PB')}),
+                          'msg': ('a', r"<br /><b>Note:</b> Be careful!")
+                        }},
+            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
+                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                        }},
+            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'HIL': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+
                    }
         
         self.info = """
