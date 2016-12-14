@@ -54,15 +54,6 @@ class Firwin(QWidget):
 
     def __init__(self):
         QWidget.__init__(self)
-        
-        # common messages for all man. / min. filter order response types:
-        msg_man = (r"Enter desired filter order <b><i>N</i></b> and <b>-6 dB</b> pass band corner "
-                    "frequency(ies) <b><i>F<sub>C</sub></i></b> .",)
-        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
-                "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                "and the corresponding frequencies <b><i>F<sub>PB</sub></i></b>"
-                "&nbsp; and <b><i>F<sub>SB</sub></i></b> ."
-                "<br /><b>Note:</b> This is only a rough approximation!",)
 
         self.ft = 'FIR'
 
@@ -70,47 +61,22 @@ class Firwin(QWidget):
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-                    
-        
-#        self.rt =  {
-#        'LP': {'man':{'par':['F_C']},
-#               'min':{'par':['F_C']},
-#               '_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
-#        'HP': {'man':{'par':['F_C']},
-#               'min':{'par':['F_C']},
-#               '_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
-#        'BP': {'man':{'par':['F_C', 'F_C2']},
-#               'min':{'par':['F_C', 'F_C2']},
-#               '_targ':{'par':['F_SB', 'F_PB','F_PB2','F_SB2',
-#                               'A_SB', 'A_PB']}},
-#        'BS': {'man':{'par':['F_C', 'F_C2']},
-#               'min':{'par':['F_C', 'F_C2']},
-#               '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB']}}
-#               }
-
+                            
         c = Common()
 
         self.rt = c.rt_base_iir
         
         self.rtx = {
-            "HP": {"man":{"msg":('a', r"<br /><b>Note:</b> Order needs to be odd!")}},
-            "BS": {"man":{"msg":('a', r"<br /><b>Note:</b> Order needs to be odd!")}}
+            'COM':{'min':{'msg':('a',
+                                  r"<br /><b>Note:</b> This is only a rough approximation!")},
+                          'man':{'a',
+                                 r"Enter desired filter order <b><i>N</i></b> and <b>-6 dB</b> pass band corner "
+                                 "frequency(ies) <b><i>F<sub>C</sub></i></b> ."},                                  
+                                  },
+            'HP': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")}},
+            'BS': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")}}
             }
             
-#        self.rt = {
-#            "LP": {"man":{"par":[]},
-#                   "min":{"par":['F_PB','F_SB']}},
-#            "HP": {"man":{"par":[],
-#                          "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
-#                   "min":{"par":['F_SB','F_PB']}},
-#            "BP": {"man":{"par":['F_C2']},
-#                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
-#            "BS": {"man":{"par":['F_C2'],
-#                      "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
-#                   "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
-##            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
-#          #"DIFF":
-#                   }
         
         self.info = """Windowed FIR filters are designed by truncating the
         infinite impulse response of an ideal filter with a window function.
