@@ -58,40 +58,32 @@ a given frequency can be calculated via the si function (not implemented yet).
     def __init__(self):
         QWidget.__init__(self)       
 
-        # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter desired order (= delays) <b><i>N</i></b> per stage and "
-                    " and the number of stages. Target frequencies and amplitudes"
-                    " are only used for comparison, not for the design.",)
-                    
-        msg_min = ""
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ('fo', 'tspecs') # manual filter order
-        vis_min = () # minimum filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = () # manual filter order
-        dis_min = () # manual filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ('N',) # manual filter order
-        par_min = ()
         
         self.ft = 'FIR'
 
-        self.rt_dicts = ('com',)
+        self.rt_dicts = ()
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par": par_man},
-                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par": par_min}}
+
         self.rt = {
-            "LP": {"man":{"par":()},
-                   "_targ":{"par":('F_PB', 'F_SB', 'A_PB', 'A_SB')}
-                   },
-            "HP": {"man":{"par":()},
-                   "_targ":{"par":('F_SB', 'F_PB', 'A_SB', 'A_PB')}
-                   }} 
+            'COM':{'man':{'fo': ('a', 'N'),
+                          'msg':('a',
+                   "Enter desired order (= delays) <b><i>N</i></b> per stage and"
+                    " the number of <b>stages</b>. Target frequencies and amplitudes"
+                    " are only used for comparison, not for the design itself.")
+                        }
+                    },
+            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                           'amp':('u','A_PB','A_SB')})
+                          } 
+                },
+            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                           'amp':('u','A_SB','A_PB')})
+                         },
+                    }
+                }
+
 
         self.info_doc = []
 #        self.info_doc.append('remez()\n=======')
@@ -112,7 +104,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 
-        self.lbl_ma_1 = QLabel("Stages:")
+        self.lbl_ma_1 = QLabel("<b>Stages:</ b>")
         self.lbl_ma_1.setObjectName('wdg_lbl_ma_1')
         self.led_ma_1 = QLineEdit()
         self.led_ma_1.setText("1")
