@@ -64,26 +64,12 @@ class Firwin(QWidget):
                 "&nbsp; and <b><i>F<sub>SB</sub></i></b> ."
                 "<br /><b>Note:</b> This is only a rough approximation!",)
 
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ('fo','fspecs','tspecs') # manual filter order
-        vis_min = ('fo','fspecs','tspecs') # minimum filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = () # manual filter order
-        dis_min = ('fspecs',) # minimum filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ('N',)     #  manual filter order
-        par_min = ('A_PB', 'A_SB') #  minimum filter order
-
         self.ft = 'FIR'
 
-        self.rt_dicts = ('com', 'rtx')
+        self.rt_dicts = ('rtx',)
         # Common data for all filter response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
-                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
                     
         
 #        self.rt =  {
@@ -107,8 +93,8 @@ class Firwin(QWidget):
         self.rt = c.rt_base_iir
         
         self.rtx = {
-            "HP": {"man":{"msg":(r"<br /><b>Note:</b> Order needs to be odd!",)}},
-            "BS": {"man":{"msg":(r"<br /><b>Note:</b> Order needs to be odd!",)}}
+            "HP": {"man":{"msg":('a', r"<br /><b>Note:</b> Order needs to be odd!")}},
+            "BS": {"man":{"msg":('a', r"<br /><b>Note:</b> Order needs to be odd!")}}
             }
             
 #        self.rt = {
