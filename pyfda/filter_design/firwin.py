@@ -87,10 +87,7 @@ class Firwin(QWidget):
         
         #------------------- end of static info for filter tree ---------------
 
-        
-        # additional dynamic widgets that need to be set in the main widgets
-        # select_filter ('sf') and filter_order ('fo')
-        self.wdg = True
+        self.wdg = True  # has additional dynamic widget 'wdg_fil'
         
         self.hdl = None
         
