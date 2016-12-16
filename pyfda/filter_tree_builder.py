@@ -17,6 +17,63 @@ import pyfda.filter_factory as ff
 
 from .frozendict import FrozenDict, freeze_hierarchical
 
+#--------------------------------------------------------------------------
+def merge_dicts(d1, d2, path=None, mode='keep1'):
+    """
+    Merge the multi-level dictionaries d1 and d2. The ``mode`` flag determines the
+    behaviour when the same key is present in both dictionaries:
+    
+    * keep1  : keep the entry from dict1
+    * keep2  : keep the entry from dict2
+    * merge1 : merge the entries, putting the values from dict1 first (important for lists)
+    * merge2 : merge the entries, putting the values from dict2 first
+    
+    The parameter ``path`` is only used for keeping track of the hierarchical structure
+    for error messages, it should not be set when calling the function.
+    
+    dict1 is modified in place and returned, if this is not intended call the 
+    function using ``new_dict = merge_dicts(dict(d1), d2).
+    
+    If you need to merge more than two dicts use:
+    
+    from functools import reduce   # only for py3
+    reduce(merge, [d1, d2, d3...]) # add / merge all other dicts into d1
+    
+    Taken with some modifications from: 
+    http://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
+    """
+    if path is None: path = []
+    for key in d2:
+        if key in d1:
+            if isinstance(d1[key], dict) and isinstance(d2[key], dict):
+                merge_dicts(d1[key], d2[key], path + [str(key)], mode=mode)
+#TODO:            elif <either d1[key] OR d2[key] is not a dict> -> exception
+            elif d1[key] == d2[key] or mode == 'keep1':
+                pass  # keep item in dict1, discard item with same key in dict1
+            elif mode == 'keep2':
+                d1[key] = d2[key] # replace item in dict1 by item in dict2
+            else:
+                try:
+                    if mode == 'merge1':
+                        d1[key] += d2[key]
+                    elif mode == 'merge2':
+                        d1[key] = d2[key] + d1[key] 
+                    else:
+                        logger.warning("Unknown merge mode {0}.".format(mode))
+                except Exception as e:
+                    logger.warning("Merge conflict at {0}: {1}".format(path + str(key), e ))
+#                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        else:
+            d1[key] = d2[key] # add new entry to dict1
+    return d1
+
+# works
+# >>> print(merge({1:{"a":"A"},2:{"b":"B"}}, {2:{"c":"C"},3:{"d":"D"}}))
+# has conflict
+# >>> merge({1:{"a":"A"},2:{"b":"B"}}, {1:{"a":"A"},2:{"b":"C"}})
+
+
+
 
 class FilterTreeBuilder(object):
     """
@@ -335,6 +392,11 @@ class FilterTreeBuilder(object):
                 self.join_dicts(ff.fil_inst, ff.fil_inst.rt_dicts)
             
             ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
+            if 'COM' in ff.fil_inst.rt_dict:      # Now handle common info
+                for fo in ff.fil_inst.rt_dict[rt]: # iterate over 'min' / 'max' 
+                    if fo in ff.fil_inst.rt_dict['COM']:
+                        merge_dicts(fil_tree[rt][ft][fc][fo], 
+                                    ff.fil_inst.rt_dict['COM'][fo], mode='keep1')
 
             for rt in ff.fil_inst.rt:            # iterate over all response types
                 if rt == 'COM':                  # handle common info later
@@ -350,20 +412,6 @@ class FilterTreeBuilder(object):
                 # now append all the individual 'min' / 'man'  subwidget infos to fc:
                 fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
 
-            if 'COM' in ff.fil_inst.rt: # now join common parameters with all rt keys
-                for fo in ff.fil_inst.rt['COM']: # iterate over filter order ('min'/'max')
-                    for rt in fil_tree: # iterate over all response types in fil_tree
-                        if ft in fil_tree[rt] and fc in fil_tree[rt][ft]\
-                                                and fo in fil_tree[rt][ft][fc]:
-                            for s in ff.fil_inst.rt['COM'][fo]: # iterate over subwidgets
-                                # Test whether entry exists already in rt:
-                                if s in fil_tree[rt][ft][fc][fo]:
-                                    # yes, overwrite subwidget parameters
-                                    fil_tree[rt][ft][fc][fo][s] = ff.fil_inst.rt['COM'][fo][s]
-                                else:
-                                    # no, create new subwidget:parameters entry
-                                    fil_tree[rt][ft][fc][fo].update(\
-                                                    {s:ff.fil_inst.rt['COM'][fo][s]})
         return fil_tree
 
     #--------------------------------------------------------------------------
