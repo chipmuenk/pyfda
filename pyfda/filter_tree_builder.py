@@ -174,8 +174,8 @@ class FilterTreeBuilder(object):
             cur_line = fp.readline()
 
             while cur_line: # read until currentLine is empty (EOF reached)
+#                cur_line = cur_line.encode('UTF-8') # enforce utf-8
                 # remove white space and Newline characters at beginning and end:
-#                cur_line = cur_line.encode('UTF-8')
                 cur_line = cur_line.strip(' \n')
                 # Only process line if it is longer than 1 character
                 if len(cur_line) > 1:
