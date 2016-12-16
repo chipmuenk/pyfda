@@ -64,7 +64,7 @@ class Firwin(QWidget):
                             
         c = Common()
 
-        self.rt = c.rt_base_iir
+        self.rt_dict = c.rt_base_iir
         
         self.rtx = {
             'COM':{'min':{'msg':('a',

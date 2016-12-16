@@ -42,7 +42,7 @@ class Manual_FIR(object):
         # This data is merged with the entries for individual response types
         # (common data comes first):
 
-        self.rt = {
+        self.rt_dict = {
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
                         },
@@ -139,7 +139,7 @@ class Manual_IIR(object):
         # This data is merged with the entries for individual response types
         # (common data comes first):
 
-        self.rt = {
+        self.rt_dict = {
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
                         },

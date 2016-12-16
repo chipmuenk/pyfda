@@ -67,32 +67,26 @@ using Ichige's algorithm.
     def __init__(self):
         QWidget.__init__(self)
 
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ('fo','wspecs', 'tspecs') # manual filter order
-        vis_min = ('fo','wspecs', 'tspecs') # minimum filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = () # manual filter order
-        dis_min = ('wspecs',) # minimum filter order
-
         self.ft = 'FIR'
         
         self.rt_dicts = ('com',)
 
-        self.rt = {
-            'COM': {'man': {'msg':('a', 
-                        "Enter desired filter order <b><i>N</i></b>, corner "
-                        "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
-                        "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
-                        "value <b><i>W</i></b>&nbsp; for each band.")
-                },
-                    'min': {'msg': ('a',
-                        "Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
-                        "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                        "and the corresponding corner frequencies of pass and "
-                        "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                        "<b><i>F<sub>SB</sub></i></b> .",)
-                    }
+        self.rt_dict = {
+            'COM': {'man': {'fo':('a', 'N'),
+                            'msg':('a', 
+                                "Enter desired filter order <b><i>N</i></b>, corner "
+                                "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
+                                "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
+                                "value <b><i>W</i></b>&nbsp; for each band.")
+                            },
+                    'min': {'fo':('d', 'N'),
+                            'msg': ('a',
+                                "Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                                "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
+                                "and the corresponding corner frequencies of pass and "
+                                "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+                                "<b><i>F<sub>SB</sub></i></b> .")
+                            }
                 },
             'LP': {'man':{'wspecs': ('a','W_PB','W_SB'),
                           'tspecs': ('u', {'frq':('a','F_PB','F_SB'), 
@@ -131,13 +125,15 @@ using Ichige's algorithm.
                         }
                 },
             'HIL': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
-                          'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                           'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                          }
                     },
             'DIFF': {'man':{'wspecs': ('a','W_PB'),
-                          'tspecs': ('u', {'frq':('a','F_PB'), 
-                                           'amp':('i','A_PB','A_SB')})
+                            'tspecs': ('u', {'frq':('a','F_PB'), 
+                                           'amp':('i',)}),
+                            'msg':('a',"Enter the max. frequency up to where the differentiator "
+                                        "works.")
                           }
                     }
             }

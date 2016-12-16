@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Design equiripple-Filters (LP, HP, BP, BS) with fixed or minimum order, return
-the filter design in coefficients format ('ba')
+Design Moving-Average-Filters (LP, HP) with fixed order, return
+the filter design in coefficients format ('ba') or as poles/zeros ('zpk')
 
 Attention: 
 This class is re-instantiated dynamically everytime the filter design method
@@ -45,7 +45,7 @@ class MA(QWidget):
 
 can only be specified via their length and the number of cascaded sections. 
 
-The minimum order to fulfill the target specifications (minimum attenuation at
+The minimum order to obtain a minimum attenuation at
 a given frequency can be calculated via the si function (not implemented yet).
 
 **Design routines:**
@@ -66,7 +66,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         # This data is merged with the entries for individual response types
         # (common data comes first):
 
-        self.rt = {
+        self.rt_dict = {
             'COM':{'man':{'fo': ('a', 'N'),
                           'msg':('a',
                    "Enter desired order (= delays) <b><i>N</i></b> per stage and"
@@ -90,8 +90,8 @@ a given frequency can be calculated via the si function (not implemented yet).
 #        self.info_doc.append(sig.remez.__doc__)
 #        self.info_doc.append('remezord()\n==========')
 #        self.info_doc.append(remezord.__doc__)
-        # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = True
+        
+        self.wdg = True # has additional dynamic widget 'wdg_fil'
         
         self.hdl = ('ma', 'cic')
         #----------------------------------------------------------------------

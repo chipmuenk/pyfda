@@ -55,7 +55,7 @@ class Butter(object):
         self.com = {"man":{"msg":msg_man}}
 
         c = Common()
-        self.rt = c.rt_base_iir
+        self.rt_dict = c.rt_base_iir
         
         self.info = """
 **Butterworth filters**

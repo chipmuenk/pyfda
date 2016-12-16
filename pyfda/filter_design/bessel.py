@@ -52,10 +52,10 @@ class Bessel(object):
         # Common data for all man. / min. filter order response types:
         # This data is merged with the entries for individual response types
         # (common data comes first):
-        self.com = {'man':{'msg':msg_man,},
-                    'min':{'msg':msg_min,}}
+        self.com = {'man':{'msg':msg_man},
+                    'min':{'msg':msg_min}}
         c = Common()
-        self.rt = c.rt_base_iir
+        self.rt_dict = c.rt_base_iir
 
         self.info = """
 **Bessel filters**

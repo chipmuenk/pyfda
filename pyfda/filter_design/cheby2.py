@@ -53,30 +53,9 @@ class Cheby2(object):
         # (common data comes first):
         self.com = {'man':{'msg':msg_man}}        
         
-#        rt_base_iir = {
-#            'LP': {'man':{'par':['F_C']},
-#                   'min':{'par':['F_C']},
-#                   '_targ':{'par':['F_PB','F_SB','A_PB','A_SB']}},
-#            'HP': {'man':{'par':['F_C']},
-#                   'min':{'par':['F_C']},
-#                   '_targ':{'par':['F_SB','F_PB','A_SB','A_PB']}},
-#            'BP': {'man':{'par':['F_C', 'F_C2']},
-#                   'min':{'par':['F_C', 'F_C2']},
-#                   '_targ':{'par':['F_SB', 'F_PB','F_PB2','F_SB2',
-#                                   'A_SB', 'A_PB']}},
-#            'BS': {'man':{'par':['F_C', 'F_C2']},
-#                   'min':{'par':['F_C', 'F_C2']},
-#                   '_targ':{'par':['F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB']}}
-#                   }
 
         c = Common()
-        self.rt = c.rt_base_iir
-#        self.rtx = {
-#                  'LP': {'man':{'par':['F_C']}},
-#                  'HP': {'man':{'par':['F_C']}},
-#                  'BP': {'man':{'par':['F_C', 'F_C2']}},
-#                  'BS': {'man':{'par':['F_C', 'F_C2']}}
-#                  }
+        self.rt_dict = c.rt_base_iir
 
         self.info = """
 **Chebyshev Type 2 filters**
