@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 
-from .frozendict import FrozenDict, freeze_hierarchical
+from .frozendict import freeze_hierarchical
 
 #--------------------------------------------------------------------------
 def merge_dicts(d1, d2, path=None, mode='keep1'):
