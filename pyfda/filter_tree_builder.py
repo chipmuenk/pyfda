@@ -23,10 +23,10 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
     Merge the multi-level dictionaries d1 and d2. The ``mode`` flag determines the
     behaviour when the same key is present in both dictionaries:
     
-    * keep1  : keep the entry from dict1
-    * keep2  : keep the entry from dict2
-    * merge1 : merge the entries, putting the values from dict1 first (important for lists)
-    * merge2 : merge the entries, putting the values from dict2 first
+    * keep1 : keep the entry from dict1
+    * keep2 : keep the entry from dict2
+    * add1  : merge the entries, putting the values from dict2 first (important for lists)
+    * add2  : merge the entries, putting the values from dict1 first (  "  )
     
     The parameter ``path`` is only used for keeping track of the hierarchical structure
     for error messages, it should not be set when calling the function.
@@ -54,9 +54,9 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
                 d1[key] = d2[key] # replace item in dict1 by item in dict2
             else:
                 try:
-                    if mode == 'merge1':
+                    if mode == 'add2':
                         d1[key] += d2[key]
-                    elif mode == 'merge2':
+                    elif mode == 'add1':
                         d1[key] = d2[key] + d1[key] 
                     else:
                         logger.warning("Unknown merge mode {0}.".format(mode))
@@ -66,13 +66,6 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
         else:
             d1[key] = d2[key] # add new entry to dict1
     return d1
-
-# works
-# >>> print(merge({1:{"a":"A"},2:{"b":"B"}}, {2:{"c":"C"},3:{"d":"D"}}))
-# has conflict
-# >>> merge({1:{"a":"A"},2:{"b":"B"}}, {1:{"a":"A"},2:{"b":"C"}})
-
-
 
 
 class FilterTreeBuilder(object):
