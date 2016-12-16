@@ -137,8 +137,11 @@ class FilterTreeBuilder(object):
             # add attributes from dict to fil_tree for filter class fc
             fil_tree = self.build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
 
-            if hasattr(ff.fil_inst, 'rt_dicts'):
-                self.join_dicts(ff.fil_inst, ff.fil_inst.rt_dicts)
+            if hasattr(ff.fil_inst, 'rt_dict_add'):
+                fil_tree_add = {}
+                fil_tree_add = self.build_fil_tree(fc, ff.fil_inst.rt_dict_add)
+                print(pformat(fil_tree_add))                
+                merge_dicts(fil_tree, fil_tree_add, mode='add2')
 
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):       
