@@ -134,11 +134,12 @@ class FilterTreeBuilder(object):
                 logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
                 continue # continue with next entry in fb.fil_classes
             
+            # add attributes from dict to fil_tree for filter class fc
+            fil_tree = self.build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
+
             if hasattr(ff.fil_inst, 'rt_dicts'):
                 self.join_dicts(ff.fil_inst, ff.fil_inst.rt_dicts)
 
-            # add attributes from fc to fil_tree
-            fil_tree = self.build_fil_tree(fc, fil_tree)
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):       
         fb.fil_tree = freeze_hierarchical(fil_tree) 
@@ -312,10 +313,10 @@ class FilterTreeBuilder(object):
                     num_imports, imported_fil_classes)
 
 #==============================================================================
-    def build_fil_tree(self, fc, fil_tree = {}):
+    def build_fil_tree(self, fc, rt_dict, fil_tree = {}):
         """
-        Read attributes (ft, rt, rt:fo) from all filter classes (fc)
-        listed in the global dict ``fb.fil_classes``. Attributes are stored in
+        Read attributes (ft, rt, rt:fo) from filter class fc)
+        Attributes are stored in
         the design method classes in the format (example from common.py)
 
         self.ft = 'IIR'
@@ -350,7 +351,7 @@ class FilterTreeBuilder(object):
         response types -> filter types -> filter classes  -> filter order
         rt (e.g. 'LP')    ft (e.g. 'IIR') fc (e.g. 'cheby1') fo ('min' or 'man')
 
-        All attributes found for each filter branch are arranged in a dict, e.g.
+        All attributes found for fc are arranged in a dict, e.g.
         for ``cheby1.LPman`` and ``cheby1.LPmin``, listing the parameters to be
         displayed and whether they are active, unused, disabled or invisible for
         each subwidget:
@@ -392,7 +393,7 @@ class FilterTreeBuilder(object):
             
         ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
-        for rt in ff.fil_inst.rt_dict:            # iterate over all response types
+        for rt in rt_dict:                   # iterate over all response types
             if rt == 'COM':                  # handle common info later
                 continue
 
@@ -406,13 +407,13 @@ class FilterTreeBuilder(object):
                 fil_tree[rt][ft].update({fc:{}}) # no, create it
 
             # now append all the individual 'min' / 'man'  subwidget infos to fc:
-            fil_tree[rt][ft][fc].update(ff.fil_inst.rt_dict[rt])
+            fil_tree[rt][ft][fc].update(rt_dict[rt])
 
-            if 'COM' in ff.fil_inst.rt_dict:      # Now handle common info
-                for fo in ff.fil_inst.rt_dict[rt]: # iterate over 'min' / 'max' 
-                    if fo in ff.fil_inst.rt_dict['COM']:
+            if 'COM' in rt_dict:      # Now handle common info
+                for fo in rt_dict[rt]: # iterate over 'min' / 'max' 
+                    if fo in rt_dict['COM']:
                         merge_dicts(fil_tree[rt][ft][fc][fo], 
-                                    ff.fil_inst.rt_dict['COM'][fo], mode='keep1')
+                                    rt_dict['COM'][fo], mode='keep1')
 
         return fil_tree
 
