@@ -7,7 +7,7 @@ http://stackoverflow.com/questions/2703599/what-would-a-frozen-dict-be
 """
 if 3 / 2 == 1:
     version = 2
-elif 3 / 2 == 1.5:
+else:
     version = 3
 
 def col(i):
