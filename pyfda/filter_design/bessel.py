@@ -37,25 +37,59 @@ class Bessel(object):
 
     def __init__(self):
 
-        # common messages for all man. / min. filter order response types:
-        msg_man = ('a', "Enter the filter order <b><i>N</i></b> and the critical "
-            "frequency or frequencies <b><i>F<sub>C</sub></i></b> .")
-        msg_min = ('a',"Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+        self.ft = 'IIR'
+
+        self.rt_dict =  {
+            'COM':{'man':{'fo': ('a', 'N'),
+                   'msg':('a', "Enter the filter order <b><i>N</i></b> and the critical "
+                               "frequency or frequencies <b><i>F<sub>C</sub></i></b> .")},
+                   'min':{'fo': ('d', 'N'),
+                          'msg':('a',
+                   "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
                     "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
                     "&nbsp;and the corresponding corner frequencies of pass and "
                     "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
                     "<b><i>F<sub>SB</sub></i></b>&nbsp; (only a rough approximation).")
+                        }
+                    },
+            'LP': {'man':{'fspecs': ('a','F_C'),
+                          'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                           'amp':('u','A_PB','A_SB')})
+                          },
+                   'min':{'fspecs': ('d','F_C'),
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                                           'amp':('a','A_PB','A_SB')})
+                        }
+                },
+            'HP': {'man':{'fspecs': ('a','F_C'),
+                          'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                           'amp':('u','A_SB','A_PB')})
+                         },
+                   'min':{'fspecs': ('d','F_C'),
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                                           'amp':('a','A_SB','A_PB')})
+                         }
+                    },
+            'BP': {'man':{'fspecs': ('a','F_C', 'F_C2'),
+                          'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
+                                           'amp':('u','A_SB','A_PB')})
+                         },
+                   'min':{'fspecs': ('d','F_C','F_C2'),
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                                           'amp':('a','A_SB','A_PB')})
+                         },
+                    },
+            'BS': {'man':{'fspecs': ('a','F_C','F_C2'),
+                          'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
+                                           'amp':('u','A_PB','A_SB')})
+                          },
+                   'min':{'fspecs': ('d','F_C','F_C2'),
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                                           'amp':('a','A_PB','A_SB')})
+                        }
+                }
+            }
 
-        self.ft = 'IIR'
-
-        self.rt_dicts = ('com',)  # additional parameter dicts for rt
-        # Common data for all man. / min. filter order response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-        self.com = {'man':{'msg':msg_man},
-                    'min':{'msg':msg_min}}
-        c = Common()
-        self.rt_dict = c.rt_base_iir
 
         self.info = """
 **Bessel filters**

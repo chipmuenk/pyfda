@@ -43,7 +43,7 @@ class Common(object):
                          }
                     },
             'BP': {'man':{'fspecs': ('a','F_C', 'F_C2'),
-                          'tspecs': ('a', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
+                          'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
                                            'amp':('a','A_SB','A_PB')})
                          },
                    'min':{'fspecs': ('d','F_C','F_C2'),
@@ -52,7 +52,7 @@ class Common(object):
                          },
                     },
             'BS': {'man':{'fspecs': ('a','F_C','F_C2'),
-                          'tspecs': ('a', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
+                          'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
                                            'amp':('a','A_PB','A_SB')})
                           },
                    'min':{'fspecs': ('d','F_C','F_C2'),
