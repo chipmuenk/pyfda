@@ -27,7 +27,6 @@ import scipy.signal as sig
 from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
-from .common import Common
 
 __version__ = "1.5"
 
@@ -43,7 +42,7 @@ class Butter(object):
     def __init__(self):
 
         self.ft = 'IIR'
-
+        
         self.rt_dict =  {
             'COM':{'man':{'fo': ('a', 'N'),
                    'msg':('a', "Enter the filter order <b><i>N</i></b> and the -3 dB corner "
