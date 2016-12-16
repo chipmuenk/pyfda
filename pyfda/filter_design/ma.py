@@ -22,9 +22,11 @@ Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+import logging
+logger = logging.getLogger(__name__)
+
 from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
                       QVBoxLayout, QHBoxLayout)
-
 
 import numpy as np
 
