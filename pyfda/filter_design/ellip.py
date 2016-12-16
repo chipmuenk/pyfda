@@ -59,19 +59,22 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 
     def __init__(self):
 
-        # common messages for all man. / min. filter order response types:
-        msg_man = ('a', "Enter the filter order <b><i>N</i></b>, the minimum stop "
-            "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
-            "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first "
-            "drops below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")
-
         self.ft = 'IIR'
-
-        self.rt_dicts = ('com',) # additional parameter dicts for rt
 
         c = Common()                   
         self.rt_dict = c.rt_base_iir
-        self.com = {'man':{'msg':msg_man}}
+        
+        self.rt_dict_add = {
+            'COM':{'man':{'msg':('a',
+                 "Enter the filter order <b><i>N</i></b>, the minimum stop "
+                 "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
+                 "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first drops "
+                 "below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")}},
+            'LP': {'man':{}, 'min':{}},
+            'HP': {'man':{}, 'min':{}},
+            'BS': {'man':{}, 'min':{}},
+            'BP': {'man':{}, 'min':{}},
+            }
 
         self.info_doc = []
         self.info_doc.append('ellip()\n========')

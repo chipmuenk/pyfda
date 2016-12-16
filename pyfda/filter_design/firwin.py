@@ -56,17 +56,11 @@ class Firwin(QWidget):
         QWidget.__init__(self)
 
         self.ft = 'FIR'
-
-        self.rt_dicts = ('rtx',)
-        # Common data for all filter response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-                            
+                           
         c = Common()
-
         self.rt_dict = c.rt_base_iir
         
-        self.rtx = {
+        self.rt_dict_add = {
             'COM':{'min':{'msg':('a',
                                   r"<br /><b>Note:</b> This is only a rough approximation!")},
                    'man':{'msg':('a',
@@ -74,10 +68,12 @@ class Firwin(QWidget):
                                   "<b>-6 dB</b> pass band corner "
                                   "frequency(ies) <b><i>F<sub>C</sub></i></b> .")},                                  
                                   },
-            'LP': {'man':{},
+            'LP': {'man':{}, 'min':{}},
+            'HP': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")},
                    'min':{}},
-            'HP': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")}},
-            'BS': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")}}
+            'BS': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")},
+                   'min':{}},
+            'BP': {'man':{}, 'min':{}},
             }
             
         

@@ -38,23 +38,24 @@ class Cheby1(object):
     
     def __init__(self):
  
-        # common messages 
-        msg_man = ('a', "Enter the filter order <b><i>N</i></b> and the critical frequency "
-            "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
-            "the maximum ripple "
-            "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
-            "passband.")
-
         self.ft = 'IIR'
-
-        self.rt_dicts = ('com',) # additional parameter dicts for rt
-        # Common data for all man. / min. filter order response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-        self.com = {"man":{"msg":msg_man}}
 
         c = Common()
         self.rt_dict = c.rt_base_iir
+
+        self.rt_dict_add = {
+            'COM':{'man':{'msg':('a',
+                r"Enter the filter order <b><i>N</i></b> and the critical frequency "
+                 "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
+                 "the maximum ripple "
+                 "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
+                 "passband.")},                                  
+                                  },
+            'LP': {'man':{}, 'min':{}},
+            'HP': {'man':{}, 'min':{}},
+            'BS': {'man':{}, 'min':{}},
+            'BP': {'man':{}, 'min':{}},
+            }
 
 
         self.info = """
