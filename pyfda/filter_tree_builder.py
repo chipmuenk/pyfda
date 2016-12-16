@@ -124,9 +124,28 @@ class FilterTreeBuilder(object):
         # store names and modules in the dict fb.fil_classes as {filterName:filterModule}:
         self.dyn_filt_import(filt_list_names)
 
-        # Build a hierarchical filter tree dictionary with all valid filter 
-        # design methods and response types:
-        fil_tree = self.build_fil_tree()
+        """
+        Read attributes (ft, rt, fo) from all valid filter classes (fc)
+        listed in the global dict ``fb.fil_classes`` and store them in a filter
+        tree dict with the hierarchy 
+                                        rt-ft-fc-fo-subwidget:params.
+        """
+
+        fil_tree = {}
+
+        for fc in fb.fil_classes:  # iterate over all previously found filter classes fc
+
+            # instantiate a global instance ff.fil_inst() of filter class fc
+            err_code = ff.fil_factory.create_fil_inst(fc)
+            if err_code > 0:
+                logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
+                continue # continue with next entry in fb.fil_classes
+            
+            if hasattr(ff.fil_inst, 'rt_dicts'):
+                self.join_dicts(ff.fil_inst, ff.fil_inst.rt_dicts)
+
+            # add attributes from fc to fil_tree
+            fil_tree = self.build_fil_tree(fc, fil_tree)
 
         # Make the dictionary and all sub-dictionaries read-only ("FrozenDict"):       
         fb.fil_tree = freeze_hierarchical(fil_tree) 
@@ -300,14 +319,14 @@ class FilterTreeBuilder(object):
                     num_imports, imported_fil_classes)
 
 #==============================================================================
-    def build_fil_tree(self):
+    def build_fil_tree(self, fc, fil_tree = {}):
         """
         Read attributes (ft, rt, rt:fo) from all filter classes (fc)
         listed in the global dict ``fb.fil_classes``. Attributes are stored in
         the design method classes in the format (example from common.py)
 
         self.ft = 'IIR'
-        self.rt = {
+        self.rt_dict = {
                  'LP': {'man':{'fo':     ('a','N'),
                                'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
                                'fspecs': ('a','F_C'),
@@ -377,66 +396,66 @@ class FilterTreeBuilder(object):
         fil_tree : frozendict with filter tree
 
         """
-
-        fil_tree = {} # Dict with a hierarical tree fc-ft- ...
-
-        for fc in fb.fil_classes:  # iterate over keys (= all filter classes fc)
-
-            # instantiate a global instance ff.fil_inst() of filter class fc
-            err_code = ff.fil_factory.create_fil_inst(fc)
-            if err_code > 0:
-                logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
-                continue # continue with next entry in fb.fil_classes
             
-            if hasattr(ff.fil_inst, 'rt_dicts'):
-                self.join_dicts(ff.fil_inst, ff.fil_inst.rt_dicts)
-            
-            ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
+        ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
+
+        for rt in ff.fil_inst.rt_dict:            # iterate over all response types
+            if rt == 'COM':                  # handle common info later
+                continue
+
+            if rt not in fil_tree:           # is response type already in dict?
+                fil_tree.update({rt:{}})     # no, create it
+
+            if ft not in fil_tree[rt]:       # filter type already in dict[rt]?
+                fil_tree[rt].update({ft:{}}) # no, create it
+                
+            if fc not in fil_tree[rt][ft]:       # filter class already in dict[rt][ft]?
+                fil_tree[rt][ft].update({fc:{}}) # no, create it
+
+            # now append all the individual 'min' / 'man'  subwidget infos to fc:
+            fil_tree[rt][ft][fc].update(ff.fil_inst.rt_dict[rt])
+
             if 'COM' in ff.fil_inst.rt_dict:      # Now handle common info
                 for fo in ff.fil_inst.rt_dict[rt]: # iterate over 'min' / 'max' 
                     if fo in ff.fil_inst.rt_dict['COM']:
                         merge_dicts(fil_tree[rt][ft][fc][fo], 
                                     ff.fil_inst.rt_dict['COM'][fo], mode='keep1')
 
-            for rt in ff.fil_inst.rt:            # iterate over all response types
-                if rt == 'COM':                  # handle common info later
-                    continue
-                if rt not in fil_tree:           # is response type already in dict?
-                    fil_tree.update({rt:{}})     # no, create it
-
-                if ft not in fil_tree[rt]:       # filter type already in dict[rt]?
-                    fil_tree[rt].update({ft:{}}) # no, create it
-                    
-                if fc not in fil_tree[rt][ft]:       # filter class already in dict[rt][ft]?
-                    fil_tree[rt][ft].update({fc:{}}) # no, create it
-                # now append all the individual 'min' / 'man'  subwidget infos to fc:
-                fil_tree[rt][ft][fc].update(ff.fil_inst.rt[rt])
-
         return fil_tree
 
     #--------------------------------------------------------------------------
     def join_dicts(self, fc, dict_list):
+        """
+        Read all dictionaries with their names given in ``dict_list`` from
+        filter class ``fc`` and join them with the dictionary ``<fc>.rt_dict``. When
+        the key is already defined in ``<fc>.rt_dict``, join the values (e.g. append
+        a string).
+        """
         
         _dict = [getattr(fc,d) for d in dict_list if hasattr(fc,d)]
+#        print(type(fc).__name__, _dict)
         for d in _dict:
             for fo in d: # iterate over filter order ('min' or 'max')
-                for rt in fc.rt:
+                for rt in fc.rt_dict:
                     # add info only when the rt entry has a 'man' or 'min' key:
-                    if fo in fc.rt[rt]:
+#                    if type(fc).__name__ == 'Firwin': print(_dict, type(fc).__name__, rt)
+                    if fo in fc.rt_dict[rt]:
                         for s in d[fo]: # iterate over all subwidgets in fo
                             # Test whether subwidget exists already in rt:
-                            if s in fc.rt[rt][fo]:
-                                # yes, prepend common data
-                                fc.rt[rt][fo][s] =\
-                                    d[fo][s] + fc.rt[rt][fo][s]
+                            if type(fc).__name__ == 'Firwin': print(_dict, type(fc).__name__, s)
+                            if s in fc.rt_dict[rt][fo]:
+                                # yes, prepend data from additional dict
+                                if type(fc).__name__ == 'Firwin': print(_dict, type(fc).__name__, s)
+                                fc.rt_dict[rt][fo][s] =\
+                                    d[fo][s] + fc.rt_dict[rt][fo][s]
                             else:
                                 # no, create new subwidget
-                                fc.rt[rt][fo].update({s:d[fo][s]})
+                                fc.rt_dict[rt][fo].update({s:d[fo][s]})
 
                             logger.debug("{0}.{1}.{2}\n"
-                                "fc.rt[rt][fo]: {3}\n".format(
+                                "fc.rt_dict[rt][fo]: {3}\n".format(
                                  fc, rt, fo,
-                                 pformat(fc.rt[rt][fo])))
+                                 pformat(fc.rt_dict[rt][fo])))
 
 #==============================================================================
 if __name__ == "__main__":
