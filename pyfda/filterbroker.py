@@ -54,66 +54,6 @@ fil_classes = {# IIR:
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
-vis_man = ('fo','fspecs','tspecs') # manual filter order
-vis_min = ('fo','fspecs','tspecs') # minimum filter order
-dis_man = () # manual filter order
-dis_min = ('fspecs') # minimum filter order
-msg_min = ("minimum",)
-msg_man = ("maximum",)
-fil_tree_old = freeze_hierarchical({
-    'HP':
-        {'FIR':
-            {'Equiripple':
-                {'man': {"par":('N', 'A_PB', 'F_PB'),
-                         "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                 'min': {"par":('A_SB', 'A_PB', 'F_SB', 'F_PB'),
-                         "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
-         'IIR':
-             {'Cheby1':
-                 {'man': {"par":('N', 'A_PB', 'F_PB'),
-                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                  'min': {"par":('A_SB', 'A_PB', 'F_SB', 'F_PB'),
-                          "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-              'Cheby2':
-                  {'man': {"par":('N', 'A_SB', 'F_SB'),
-                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                   'min': {"par":('A_SB', 'A_PB', 'F_SB', 'F_PB'),
-                           "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
-    'BP':
-        {'FIR':
-            {'Equiripple':
-                {'man': {"par":('N', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2'),
-                         "vis":vis_man, "dis":dis_man, "msg":msg_man}}},
-         'IIR':
-             {'Cheby1': {'man': {"par":('N', 'A_PB', 'F_PB', 'F_PB2'), 
-                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":('A_PB', 'A_SB', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'),
-                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-              'Cheby2': {'man': {"par":('N', 'A_SB', 'F_SB', 'F_SB2'),
-                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":('A_PB', 'A_SB','F_SB',  'F_PB', 'F_PB2', 'F_SB2'),
-                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
-    'LP':
-        {'FIR':
-            {'Equiripple':
-                {'man': {"par":('N', 'A_PB', 'F_PB'), 
-                         "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                 'min': {"par":('A_PB', 'A_SB', 'F_PB', 'F_SB'),
-                         "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
-         'IIR':
-             {'Cheby1':
-                 {'man': {"par":('N', 'A_PB', 'F_PB'),
-                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                  'min': {"par":('A_PB', 'A_SB', 'F_PB', 'F_SB'), 
-                          "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-             'Cheby2': {'man': {"par":('N', 'A_SB', 'F_SB'),
-                                "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                        'min': {"par":('A_PB', 'A_SB', 'F_PB', 'F_SB'),
-                                "vis":vis_min, "dis":dis_min, "msg":msg_min}
-                        }
-            }
-        }
-    })
 
 fil_tree = freeze_hierarchical({
     'LP':{
