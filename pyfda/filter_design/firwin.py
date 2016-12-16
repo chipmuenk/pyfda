@@ -69,10 +69,13 @@ class Firwin(QWidget):
         self.rtx = {
             'COM':{'min':{'msg':('a',
                                   r"<br /><b>Note:</b> This is only a rough approximation!")},
-                          'man':{'a',
-                                 r"Enter desired filter order <b><i>N</i></b> and <b>-6 dB</b> pass band corner "
-                                 "frequency(ies) <b><i>F<sub>C</sub></i></b> ."},                                  
+                   'man':{'msg':('a',
+                                 r"Enter desired filter order <b><i>N</i></b> and " 
+                                  "<b>-6 dB</b> pass band corner "
+                                  "frequency(ies) <b><i>F<sub>C</sub></i></b> .")},                                  
                                   },
+            'LP': {'man':{},
+                   'min':{}},
             'HP': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")}},
             'BS': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")}}
             }
