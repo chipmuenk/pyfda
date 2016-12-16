@@ -416,39 +416,6 @@ class FilterTreeBuilder(object):
 
         return fil_tree
 
-    #--------------------------------------------------------------------------
-    def join_dicts(self, fc, dict_list):
-        """
-        Read all dictionaries with their names given in ``dict_list`` from
-        filter class ``fc`` and join them with the dictionary ``<fc>.rt_dict``. When
-        the key is already defined in ``<fc>.rt_dict``, join the values (e.g. append
-        a string).
-        """
-        
-        _dict = [getattr(fc,d) for d in dict_list if hasattr(fc,d)]
-#        print(type(fc).__name__, _dict)
-        for d in _dict:
-            for fo in d: # iterate over filter order ('min' or 'max')
-                for rt in fc.rt_dict:
-                    # add info only when the rt entry has a 'man' or 'min' key:
-#                    if type(fc).__name__ == 'Firwin': print(_dict, type(fc).__name__, rt)
-                    if fo in fc.rt_dict[rt]:
-                        for s in d[fo]: # iterate over all subwidgets in fo
-                            # Test whether subwidget exists already in rt:
-                            if type(fc).__name__ == 'Firwin': print(_dict, type(fc).__name__, s)
-                            if s in fc.rt_dict[rt][fo]:
-                                # yes, prepend data from additional dict
-                                if type(fc).__name__ == 'Firwin': print(_dict, type(fc).__name__, s)
-                                fc.rt_dict[rt][fo][s] =\
-                                    d[fo][s] + fc.rt_dict[rt][fo][s]
-                            else:
-                                # no, create new subwidget
-                                fc.rt_dict[rt][fo].update({s:d[fo][s]})
-
-                            logger.debug("{0}.{1}.{2}\n"
-                                "fc.rt_dict[rt][fo]: {3}\n".format(
-                                 fc, rt, fo,
-                                 pformat(fc.rt_dict[rt][fo])))
 
 #==============================================================================
 if __name__ == "__main__":
