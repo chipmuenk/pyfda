@@ -427,7 +427,7 @@ if __name__ == "__main__":
     # Need to start a QApplication to avoid the error
     #  "QWidget: Must construct a QApplication before a QPaintDevice"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
-    from PyQt4 import QtGui
+    from .compat import QtGui
     app = QtGui.QApplication(sys.argv)
 
     print("===== Initialize FilterReader ====")
