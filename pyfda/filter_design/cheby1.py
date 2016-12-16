@@ -38,12 +38,12 @@ class Cheby1(object):
     
     def __init__(self):
  
-        # common messages for all man. / min. filter order response types:
+        # common messages 
         msg_man = ('a', "Enter the filter order <b><i>N</i></b> and the critical frequency "
-            " or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
+            "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
             "the maximum ripple "
             "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
-            " passband.")
+            "passband.")
 
         self.ft = 'IIR'
 
