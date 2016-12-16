@@ -37,11 +37,6 @@ class Manual_FIR(object):
 
         self.ft = 'FIR'
 
-        self.rt_dicts = ('com',) # additional parameter dicts for rt
-        # Common data for all man. / min. filter order response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-
         self.rt_dict = {
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
@@ -50,8 +45,7 @@ class Manual_FIR(object):
                                            'amp':('u','A_PB','A_SB')})
                          }},
             'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
-                                           'amp':('u','A_SB','A_PB')}),
-                          'msg': ('a', r"<br /><b>Note:</b> Be careful!")
+                                           'amp':('u','A_SB','A_PB')})
                         }},
             'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
                                            'amp':('u','A_PB','A_SB','A_PB2')})
@@ -64,8 +58,7 @@ class Manual_FIR(object):
                         }},
             'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
                                            'amp':('u','A_SB','A_PB','A_SB2')})
-                        }},
-
+                        }}
                    }
 
         
@@ -134,11 +127,6 @@ class Manual_IIR(object):
                     
         self.ft = 'IIR'
 
-        self.rt_dicts = () # additional parameter dicts for rt
-        # Common data for all man. / min. filter order response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-
         self.rt_dict = {
             'COM':{'man':{'fo': ('d', 'N'),
                           'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
@@ -147,8 +135,7 @@ class Manual_IIR(object):
                                            'amp':('u','A_PB','A_SB')})
                          }},
             'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
-                                           'amp':('u','A_SB','A_PB')}),
-                          'msg': ('a', r"<br /><b>Note:</b> Be careful!")
+                                           'amp':('u','A_SB','A_PB')})
                         }},
             'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
                                            'amp':('u','A_PB','A_SB','A_PB2')})
@@ -161,8 +148,7 @@ class Manual_IIR(object):
                         }},
             'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
                                            'amp':('u','A_SB','A_PB','A_SB2')})
-                        }},
-
+                        }}
                    }
         
         self.info = """
