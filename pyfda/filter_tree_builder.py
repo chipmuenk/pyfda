@@ -47,11 +47,11 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
         return d1
 
     if path is None: path = ""
-    if path is None: path = []
     for key in d2:
         if key in d1:
             if isinstance(d1[key], dict) and isinstance(d2[key], dict):
-                merge_dicts(d1[key], d2[key], path + [str(key)], mode=mode)
+                # both entries are dicts, recurse one level deeper:
+                merge_dicts(d1[key], d2[key], path = path + str(key), mode=mode)
 #TODO:            elif <either d1[key] OR d2[key] is not a dict> -> exception
             elif d1[key] == d2[key] or mode == 'keep1':
                 pass  # keep item in dict1, discard item with same key in dict1
