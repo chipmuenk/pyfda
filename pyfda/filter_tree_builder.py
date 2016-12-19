@@ -316,7 +316,7 @@ class FilterTreeBuilder(object):
                     num_imports, imported_fil_classes)
 
 #==============================================================================
-    def build_fil_tree(self, fc, rt_dict, fil_tree = {}):
+    def build_fil_tree(self, fc, rt_dict, fil_tree = None):
         """
         Read attributes (ft, rt, rt:fo) from filter class fc)
         Attributes are stored in
@@ -390,9 +390,11 @@ class FilterTreeBuilder(object):
         Returns
         -------
 
-        fil_tree : frozendict with filter tree
+        fil_tree : filter tree
 
         """
+        if not fil_tree:
+            fil_tree = {}
             
         ft = ff.fil_inst.ft                  # get filter type (e.g. 'FIR')
 
@@ -414,9 +416,9 @@ class FilterTreeBuilder(object):
 
             if 'COM' in rt_dict:      # Now handle common info
                 for fo in rt_dict[rt]: # iterate over 'min' / 'max' 
-                    if fo in rt_dict['COM']:
+                    if fo in rt_dict['COM']: # and add common info first
                         merge_dicts(fil_tree[rt][ft][fc][fo], 
-                                    rt_dict['COM'][fo], mode='keep1')
+                                    rt_dict['COM'][fo], mode='add2')
 
         return fil_tree
 
