@@ -55,14 +55,23 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
             else:
                 try:
                     if mode == 'add2':
-                        d1[key] += d2[key]
+                        if (isinstance(d1[key], tuple) and 
+                            isinstance(d2[key], tuple)):  
+                            d1[key] = (d2[key][0], d2[key][1] + d1[key][1])
+                        else:
+                            d1[key] = d2[key] + d1[key]
+                        
                     elif mode == 'add1':
-                        d1[key] = d2[key] + d1[key] 
+                        if (isinstance(d1[key], tuple) and 
+                            isinstance(d2[key], tuple)):  
+                            d1[key] = (d1[key][0], d1[key][1] + d2[key][1])
+                        else:
+                            d1[key] = d1[key] + d2[key]
+                        
                     else:
                         logger.warning("Unknown merge mode {0}.".format(mode))
                 except Exception as e:
                     logger.warning("Merge conflict at {0}: {1}".format(path + str(key), e ))
-#                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
         else:
             d1[key] = d2[key] # add new entry to dict1
     return d1
