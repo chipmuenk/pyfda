@@ -42,6 +42,11 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
     Taken with some modifications from:
     http://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
     """
+    if not(isinstance(d1, dict) and isinstance(d2, dict)):
+        # at least one of the arguments is not a dict -> don't do anything
+        return d1
+
+    if path is None: path = ""
     if path is None: path = []
     for key in d2:
         if key in d1:
