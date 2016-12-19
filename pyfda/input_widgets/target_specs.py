@@ -10,12 +10,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QCheckBox,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
-
+from ..compat import QWidget, QLabel, QFont, QVBoxLayout, QGridLayout, pyqtSignal
 
 import pyfda.filterbroker as fb
 from pyfda.input_widgets import amplitude_specs, freq_specs
@@ -24,7 +19,7 @@ from pyfda.input_widgets import amplitude_specs, freq_specs
 class TargetSpecs(QWidget):
     """
     Build and update widget for entering the target specifications (frequencies
-    and amplitudes) like F_sb, F_pb, A_SB, etc.
+    and amplitudes) like F_SB, F_PB, A_SB, etc.
     """
 
     # class variables (shared between instances if more than one exists)
