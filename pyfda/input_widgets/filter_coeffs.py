@@ -320,10 +320,9 @@ class FilterCoeffs(QWidget):
             %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
 
-        self.sigFilterDesigned.emit()  
-        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+        self.sigFilterDesigned.emit()  # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
         # TODO: this also needs to trigger filter_specs.updateUI to switch to 
-        #       manual design when saving b, a
+        #       manual design when saving b,a
 
 #------------------------------------------------------------------------------
     def load_entries(self):
