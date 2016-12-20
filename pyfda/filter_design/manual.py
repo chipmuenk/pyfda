@@ -15,7 +15,10 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
-
+    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+         first element controls whether the widget is visible and / or enabled.
+         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
+         is read and merged with the first one.
 
 Author: Christian Muenker
 """
@@ -23,7 +26,7 @@ from __future__ import print_function, division, unicode_literals
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-__version__ = "1.4"
+__version__ = "2.0"
 
 filter_classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'}
 

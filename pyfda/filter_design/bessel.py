@@ -16,6 +16,11 @@ Version info:
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
          `FRMT` is now a class attribute
+    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+         first element controls whether the widget is visible and / or enabled.
+         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
+         is read and merged with the first one.
+
     
     Author: Christian Muenker
 """
@@ -25,9 +30,8 @@ import scipy.signal as sig
 from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, lin2unit
-from .common import Common
 
-__version__ = "1.4"
+__version__ = "2.0"
 
 filter_classes = {'Bessel':'Bessel'}
 

@@ -7,8 +7,6 @@ Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-#import pyfda.filterbroker as fb
-
 class Common(object):
     
     def __init__(self):
