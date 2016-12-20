@@ -12,9 +12,10 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QCheckBox, QPushButton,
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
+                      QCheckBox, QPushButton,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
                       pyqtSignal, QEvent)
 
 import numpy as np
