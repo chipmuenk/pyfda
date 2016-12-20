@@ -165,7 +165,7 @@ class InputTabWidgets(QWidget):
         logger.debug("updateAll called by %s", sender_name)
 
         self.filter_specs.color_design_button("ok")  
-        # TODO: The following should be handled within InputSpecs ?
+        # TODO: The following should be handled within FilterSpecs ?
         self.filter_specs.load_entries()
         self.filter_info.load_entries()
         self.filter_coeffs.load_entries()
