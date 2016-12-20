@@ -99,8 +99,12 @@ class SelectFilter(QWidget):
         # (correspondence is defined in pyfda_rc.py) and populate rt combo box
         #
         rt_list = sorted(list(fb.fil_tree.keys()))
+      
         for rt in rt_list:
-            self.cmbResponseType.addItem(rc.rt_names[rt], rt)
+            try:
+                self.cmbResponseType.addItem(rc.rt_names[rt], rt)
+            except KeyError as e:
+                logger.warn("KeyError: {0} has no corresponding full name in rc.rt_names.".format(e))
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
 
         if idx == -1: # Key 'LP' does not exist, use first entry instead
@@ -349,34 +353,34 @@ class SelectFilter(QWidget):
         self.load_filter_order(enb_signal)
         
 #------------------------------------------------------------------------------
-    def load_filter_order(self, enb_signal=False):
+    def load_filter_order(self, enb_signal=False, status = 'a'):
         """
         Called by set_design_method or from InputSpecs (with enb_signal = False),
           load filter order setting from fb.fil[0] and update widgets
 
         """                
-        # read dict_keys of available filter order [fo] methods for  
-        # current design method [fc] from fil_tree. Explicit list() needed for py3.
-        foList = list(fb.fil_tree[fb.fil[0]['rt']]\
-            [fb.fil[0]['ft']][fb.fil[0]['fc']].keys())
+        # collect dict_keys of available filter order [fo] methods for current 
+        # design method [fc] (explicit list() needed for Python 3)
+
+        fo_list = list(fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']].keys())
 
         # is currently selected fo setting available for (new) fc ?
-        if fb.fil[0]['fo'] in foList:
+        if fb.fil[0]['fo'] in fo_list:
             self.fo = fb.fil[0]['fo'] # keep current setting
         else:
-            self.fo = foList[0] # use first list entry from filterTree
+            self.fo = fo_list[0] # use first list entry from filterTree
             fb.fil[0]['fo'] = self.fo # and update fo method
 
         # Determine which subwidgets are __visible__
-        self.lblOrderN.setVisible('man' in foList)
-        self.ledOrderN.setVisible('man' in foList)
-        self.chkMinOrder.setVisible('min' in foList)
+        self.chkMinOrder.setVisible('min' in fo_list)
+        self.ledOrderN.setVisible(status in {'a', 'd'})
+        self.lblOrderN.setVisible(self.ledOrderN.isVisible())
 
         # Determine which subwidgets are __enabled__
         self.chkMinOrder.setChecked(fb.fil[0]['fo'] == 'min')
         self.ledOrderN.setText(str(fb.fil[0]['N']))
-        self.ledOrderN.setEnabled(not self.chkMinOrder.isChecked())
-        self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked())
+        self.ledOrderN.setEnabled(not (self.chkMinOrder.isChecked() or status == 'd'))
+        self.lblOrderN.setEnabled(self.ledOrderN.isEnabled())
         
         if enb_signal:
             self.sigFiltChanged.emit() # -> input_specs

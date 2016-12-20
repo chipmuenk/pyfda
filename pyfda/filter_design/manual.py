@@ -15,7 +15,10 @@ Version info:
     1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
-
+    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+         first element controls whether the widget is visible and / or enabled.
+         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
+         is read and merged with the first one.
 
 Author: Christian Muenker
 """
@@ -23,11 +26,20 @@ from __future__ import print_function, division, unicode_literals
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-__version__ = "1.4"
+__version__ = "2.0"
 
 filter_classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'}
 
 FRMT = 'ba' # default output format of filter design routines 'zpk' / 'ba' / 'sos'
+
+msg_man = ('a', "Design the filter using the P/Z or the b/a widget. "
+                "The target specs are only used for displaying spec limits.")
+                
+info_str =  ('In manual filter design mode you can only enter the target specifications of the filter. '
+        'Design the filter by entering / editing poles and zeros ("P/Z" tab) or coefficients '
+        '("b,a" tab). Use the info tab or the magnitude frequency response (check "Show Specs") '
+        'to check whether the designed filter fulfills the specs.')
+
 
 class Manual_FIR(object):
     
@@ -35,42 +47,38 @@ class Manual_FIR(object):
 
         # This part contains static information for building the filter tree
 
-        # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter filter design using the P/Z or the b/a widget.")
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fspecs','tspecs'] # manual filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = ['fo'] # manual filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['f_S']     #  manual filter order
-
-        # Common data for all filter response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man}}
-                    
         self.ft = 'FIR'
-        self.rt = {
-            "LP": {"man":{"par":[]}},
-            "HP": {"man":{"par":[],
-                          "msg":r"<br /><b>Note:</b> Be careful!"}},
-            "BP": {"man":{"par":['F_C2']}},
-            "BS": {"man":{"par":['F_C2'],
-                      "msg":r"<br /><b>Note:</b> Be extra careful!"}},
-            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
+
+        self.rt_dict = {
+            'COM':{'man':{'fo': ('d', 'N'),
+                          'msg': msg_man}
+                        },
+            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                           'amp':('u','A_PB','A_SB')})
+                         }},
+            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                           'amp':('u','A_SB','A_PB')})
+                        }},
+            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
+                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                        }},
+            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'HIL': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }}
                    }
 
         
-        self.info = """
-        Manual entry of filters is great.
-        """
+        self.info = info_str
+        self.info_doc = []
+        self.info_doc.append('manual FIR\n========')
         
         #------------------- end of static info for filter tree ---------------
-
-        self.hdl = None
         
         
     def construct_UI(self):
@@ -118,6 +126,12 @@ class Manual_FIR(object):
         pass
 
     def BSman(self, fil_dict):
+        pass
+    
+    def HILman(self, fil_dict):
+        pass
+
+    def DIFFman(self, fil_dict):
         pass
 
 #############################################################################    
@@ -126,44 +140,38 @@ class Manual_IIR(object):
     def __init__(self):
 
         # This part contains static information for building the filter tree
-
-        # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter filter design using the P/Z or the b/a widget.")
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['tspecs'] # manual filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['f_S']     #  manual filter order
-
-        # Common data for all filter response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man}}
                     
         self.ft = 'IIR'
-        self.rt = {
-            "LP": {"man":{"par":[]}},
-            "HP": {"man":{"par":[],
-                          "msg":r"<br /><b>Note:</b> Be careful!"}},
-            "BP": {"man":{"par":['F_C2']}},
-            "BS": {"man":{"par":['F_C2'],
-                      "msg":r"<br /><b>Note:</b> Be extra careful!"}},
-            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
+
+        self.rt_dict = {
+            'COM':{'man':{'fo': ('d', 'N'),
+                          'msg': msg_man}
+                        },
+            'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                           'amp':('u','A_PB','A_SB')})
+                         }},
+            'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                           'amp':('u','A_SB','A_PB')})
+                        }},
+            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
+                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                        }},
+            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'HIL': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
+            'DIFF': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }}
                    }
         
-        self.info = """
-        Manual entry of filters is great.
-        """
+        self.info = info_str
         self.info_doc = []
-        self.info_doc.append('manual()\n========')
+        self.info_doc.append('manual IIR\n========')
         
-        #------------------- end of static info for filter tree ---------------
-        
-        self.hdl = None       
+        #------------------- end of static info for filter tree ---------------       
         
     def construct_UI(self):
         """
@@ -209,6 +217,12 @@ class Manual_IIR(object):
         pass
 
     def BSman(self, fil_dict):
+        pass
+
+    def HILman(self, fil_dict):
+        pass
+
+    def DIFFman(self, fil_dict):
         pass
 
 

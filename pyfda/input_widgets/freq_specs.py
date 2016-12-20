@@ -9,17 +9,15 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QCheckBox,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
+from ..compat import (QtCore,
+                      QWidget, QLabel, QLineEdit, QFrame, QFont,
+                      QVBoxLayout, QHBoxLayout, QGridLayout,
+                      pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_lib import rt_label, style_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.simpleeval import simple_eval
-
 
 class FreqSpecs(QWidget):
     """
@@ -36,9 +34,7 @@ class FreqSpecs(QWidget):
         self.title = title
 
         self.qlabels = []    # list with references to QLabel widgets
-        self.qlineedit = []  # list with references to QLineEdit widgets
-        
-        self.new_labels = [] # list with actual labels
+        self.qlineedit = []  # list with references to QLineEdit widgetss
 
         self.spec_edited = False # flag whether QLineEdit field has been edited
 
@@ -142,7 +138,7 @@ class FreqSpecs(QWidget):
             self.spec_edited = False # reset flag
 
 #-------------------------------------------------------------
-    def update_UI(self, new_labels = []):
+    def update_UI(self, new_labels = ()):
         """
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
@@ -155,14 +151,13 @@ class FreqSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
+        state = new_labels[0]
+        new_labels = new_labels[1:]
+            
         self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
-        self.new_labels = new_labels
         num_new_labels = len(new_labels)
-        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
-            self._hide_entries(num_new_labels)
-
-        elif num_new_labels > self.n_cur_labels: # more new labels, create / show new ones
-            self._show_entries(num_new_labels)
+        # hide / show labels / create new subwidgets if neccessary:
+        self._show_entries(num_new_labels)
 
         #---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
@@ -171,13 +166,13 @@ class FreqSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
-
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
+
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+            style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
-
 
 #-------------------------------------------------------------        
     def load_entries(self):
@@ -198,7 +193,8 @@ class FreqSpecs(QWidget):
         # recalculate displayed freq spec values for (maybe) changed f_S
         logger.debug("exec load_entries")
         for i in range(len(self.qlineedit)):
-            f_label = str(self.qlineedit[i].objectName())
+            f_name = str(self.qlineedit[i].objectName()).split(":",1)
+            f_label = f_name[0]
             f_value = fb.fil[0][f_label] * fb.fil[0]['f_S']
 
             if not self.qlineedit[i].hasFocus():
@@ -208,19 +204,10 @@ class FreqSpecs(QWidget):
                 # widget has focus, show full precision
                 self.qlineedit[i].setText(str(f_value))
 
-
-#-------------------------------------------------------------
-    def _hide_entries(self, num_new_labels):
-        """
-        Hide subwidgets so that only `num_new_labels` subwidgets are visible
-        """
-        for i in range (num_new_labels, len(self.qlabels)):
-            self.qlabels[i].hide()
-            self.qlineedit[i].hide()
-
 #------------------------------------------------------------------------
     def _show_entries(self, num_new_labels):
         """
+        - check whether subwidgets need to be shown or hidden       
         - check whether enough subwidgets (QLabel und QLineEdit) exist for the 
           the required number of `num_new_labels`: 
               - create new ones if required 
@@ -231,9 +218,21 @@ class FreqSpecs(QWidget):
         - if enough subwidgets exist already, make enough of them visible to
           show all spec fields
         """
+
         num_tot_labels = len(self.qlabels) # number of existing labels (vis. + invis.)
 
-        if num_tot_labels < num_new_labels: # new widgets need to be generated
+        # less new subwidgets than currently displayed -> _hide some
+        if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
+            for i in range (num_new_labels, num_tot_labels):
+                self.qlabels[i].hide()
+                self.qlineedit[i].hide()
+        # enough hidden subwidgets but need to make more labels visible
+        elif num_tot_labels >= num_new_labels:
+            for i in range(self.n_cur_labels, num_new_labels):
+                self.qlabels[i].show()
+                self.qlineedit[i].show()
+
+        else: # new subwidgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
                 self.qlabels.append(QLabel(self))
                 self.qlabels[i].setText(rt_label("dummy"))
@@ -245,17 +244,12 @@ class FreqSpecs(QWidget):
                 self.layGSpecs.addWidget(self.qlabels[i],i,0)
                 self.layGSpecs.addWidget(self.qlineedit[i],i,1)
 
-        else: # make the right number of widgets visible
-            for i in range(self.n_cur_labels, num_new_labels):
-                self.qlabels[i].show()
-                self.qlineedit[i].show()
-
-
 #------------------------------------------------------------------------------
     def sort_dict_freqs(self):
         """
-        - Sort filter dict frequency spec entries with ascending frequency if 
-        - Update the QLineEdit frequency widgets
+        - Sort visible filter dict frequency spec entries with ascending frequency if 
+             the sort button is activated
+        - Update the visible QLineEdit frequency widgets
 
         The method is called when:
         - update_UI has been called after changing the filter design algorithm                                # that the response type has been changed 
@@ -265,12 +259,11 @@ class FreqSpecs(QWidget):
         """
         
         if fb.fil[0]['freq_specs_sort']:
-            fSpecs = [fb.fil[0][str(self.qlineedit[i].objectName())]
-                                            for i in range(len(self.qlineedit))]
-            fSpecs.sort()
-            
-            for i in range(len(self.qlineedit)):
-                fb.fil[0][str(self.qlineedit[i].objectName())] = fSpecs[i]
+            f_specs = [fb.fil[0][str(self.qlineedit[i].objectName())]
+                                            for i in range(self.n_cur_labels)]
+            f_specs.sort()
+            for i in range(self.n_cur_labels):
+                fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
                 
         self.load_entries()
 

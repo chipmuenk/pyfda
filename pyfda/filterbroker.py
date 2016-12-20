@@ -11,6 +11,8 @@ Author: Christian Muenker
 """
 
 from __future__ import division, unicode_literals, print_function, absolute_import
+from collections import defaultdict
+from .frozendict import freeze_hierarchical
 #import importlib
 #import logging
 #import six
@@ -52,67 +54,122 @@ fil_classes = {# IIR:
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo).
-vis_man = ['fo','fspecs','tspecs'] # manual filter order
-vis_min = ['fo','fspecs','tspecs'] # minimum filter order
-dis_man = [] # manual filter order
-dis_min = ['fspecs'] # minimum filter order
-msg_min = "minimum"
-msg_man = "maximum"
-fil_tree = {
-    'HP':
-        {'FIR':
-            {'equiripple':
-                {'man': {"par":['N', 'A_PB', 'F_PB'],
-                         "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                 'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
-                         "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
-         'IIR':
-             {'cheby1':
-                 {'man': {"par":['N', 'A_PB', 'F_PB'],
-                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                  'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
-                          "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-              'cheby2':
-                  {'man': {"par":['N', 'A_SB', 'F_SB'],
-                           "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                   'min': {"par":['A_SB', 'A_PB', 'F_SB', 'F_PB'],
-                           "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
-    'BP':
-        {'FIR':
-            {'equiripple':
-                {'man': {"par":['N', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'W_PB', 'W_SB', 'W_SB2'],
-                         "vis":vis_man, "dis":dis_man, "msg":msg_man}}},
-         'IIR':
-             {'cheby1': {'man': {"par":['N', 'A_PB', 'F_PB', 'F_PB2'], 
-                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":['A_PB', 'A_SB', 'F_SB', 'F_PB', 'F_PB2', 'F_SB2'],
-                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-              'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB', 'F_SB2'],
-                                 "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                         'min': {"par":['A_PB', 'A_SB','F_SB',  'F_PB', 'F_PB2', 'F_SB2'],
-                                 "vis":vis_min, "dis":dis_min, "msg":msg_min}}}},
-    'LP':
-        {'FIR':
-            {'equiripple':
-                {'man': {"par":['N', 'A_PB', 'F_PB'], 
-                         "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                 'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
-                         "vis":vis_min, "dis":dis_min, "msg":msg_min}}},
-         'IIR':
-             {'cheby1':
-                 {'man': {"par":['N', 'A_PB', 'F_PB'],
-                          "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                  'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'], 
-                          "vis":vis_min, "dis":dis_min, "msg":msg_min}},
-             'cheby2': {'man': {"par":['N', 'A_SB', 'F_SB'],
-                                "vis":vis_man, "dis":dis_man, "msg":msg_man},
-                        'min': {"par":['A_PB', 'A_SB', 'F_PB', 'F_SB'],
-                                "vis":vis_min, "dis":dis_min, "msg":msg_min}
-                        }
-            }
-        }
-    }
 
+fil_tree = freeze_hierarchical({
+    'LP':{
+        'FIR':{
+            'Equiripple':{
+                 'man':{'fo':     ('a','N'),
+                        'fspecs': ('a','F_C'),
+                        'wspecs': ('a','W_PB','W_SB'),
+                        'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                         'amp':('u','A_PB','A_SB')}),
+                        'msg':    ('a',
+                                     "Enter desired filter order <b><i>N</i></b>, corner "
+        "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
+        "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
+        "value <b><i>W</i></b>&nbsp; for each band."
+                                    )
+                        },
+                 'min':{'fo':     ('d','N'),
+                        'fspecs': ('d','F_C'),
+                        'wspecs': ('d','W_PB','W_SB'),
+                        'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                                         'amp':('a','A_PB','A_SB')}),
+                        'msg':    ('a',
+           "Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+            "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
+            "&nbsp;and the corresponding corner frequencies of pass and "
+            "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+            "<b><i>F<sub>SB</sub></i></b> ."
+                                    )
+                       },
+                }
+            },
+        'IIR':{
+             'Cheby1':{
+                 'man':{'fo':     ('a','N'),
+                        'fspecs': ('a','F_C'),
+                        'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                                         'amp':('u','A_PB','A_SB')})
+                        },
+                 'min':{'fo':     ('d','N'),
+                        'fspecs': ('d','F_C'),
+                        'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                                         'amp':('a','A_PB','A_SB')})
+                        }
+                }
+            }  
+        },
+    'HP':{
+        'FIR':{
+            'Equiripple':{
+                 'man':{'fo':     ('a','N'),
+                        'fspecs': ('a','F_C'),
+                        'wspecs': ('a','W_SB','W_PB'),
+                        'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                         'amp':('u','A_SB','A_PB')})
+                            },
+                 'min':{'fo':     ('d','N'),
+                        'wspecs': ('d','W_SB','W_PB'),
+                        'fspecs': ('d','F_C'),
+                        'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                                         'amp':('a','A_SB','A_PB')})
+                        }
+                    }
+              },
+        'IIR':{
+            'Cheby1':{
+                 'man':{'fo':     ('a','N'),
+                        'fspecs': ('a','F_C'),
+                        'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                                         'amp':('u','A_SB','A_PB')})
+                        },
+                 'min':{'fo':     ('d','N'),
+                        'fspecs': ('d','F_C'),
+                        'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                                         'amp':('a','A_SB','A_PB')})
+                        }
+                    }  
+                }
+        },
+    'BP':{
+        'FIR':{
+            'Equiripple':{
+                 'man':{'fo':     ('a','N'),
+                        'wspecs': ('a','W_SB','W_PB','W_SB2'),
+                        'fspecs': ('a','F_C','F_C2'),
+                        'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
+                                         'amp':('u','A_SB','A_PB','A_SB2')})
+                            },
+                 'min':{'fo':     ('d','N'),
+                        'fspecs': ('d','F_C','F_C2'),
+                        'wspecs': ('d','W_SB','W_PB','W_SB2'),
+                        'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                                         'amp':('a','A_SB','A_PB','A_SB2')})
+                        }
+                    }
+                }
+          },
+    'BS':{
+        'FIR':{
+            'Equiripple':{
+                'man':{ 'fo':     ('a','N'),
+                        'wspecs': ('a','W_PB','W_SB','W_PB2'),
+                        'fspecs': ('a','F_C','F_C2'),
+                        'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
+                                         'amp':('u','A_PB','A_SB','A_PB2')})
+                    },
+                'min':{ 'fo':     ('d','N'),
+                        'wspecs': ('d','W_PB','W_SB','W_PB2'),
+                        'fspecs': ('d','F_C','F_C2'),
+                        'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                                         'amp':('a','A_PB','A_SB','A_PB2')})
+                      }
+                }
+             }
+        }
+    })
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
@@ -120,10 +177,9 @@ fil_tree = {
 # and design routines
 #------------------------------------------------------------------------------
 
-fil = [None] * 10 # create empty list with length 10 for multiple filter designs
-# This functionality is not implemented yet, currently only fil[0] is used
 
-fil[0] = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
+# Initial filter dictionary
+fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'N':10, 'f_S':1,
             'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,
             'A_SB':0.001, 'A_SB2': 0.0001, 'F_SB':0.2, 'F_SB2':0.3, 'F_C2': 0.4, 'F_N2': 0.4,
@@ -148,3 +204,17 @@ fil[0] = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $',
             'wdg_dyn':{'win':'hann'}
             }
+
+
+fil = [None] * 10 # create empty list with length 10 for multiple filter designs
+# This functionality is not implemented yet, currently only fil[0] is used
+
+# define fil[0] as a dict with "built-in" default. The argument defines the default
+# factory that is called when a key is missing. Here, lambda simply returns a float.
+# When e.g. list is given as the default_factory, an empty list is returned.
+fil[0] = defaultdict(lambda: 0.123) 
+
+# Now, copy each key-value pair into the defaultdict
+for k in fil_init:
+    fil[0].update({k:fil_init[k]})
+

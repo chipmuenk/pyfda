@@ -15,6 +15,10 @@ Version info:
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
          `FRMT` is now a class attribute
+    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+         first element controls whether the widget is visible and / or enabled.
+         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
+         is read and merged with the first one.
 
 Author: Christian Muenker
 """
@@ -30,6 +34,7 @@ import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, remezord, round_odd
+from .common import Common
 
 
 # TODO: Hilbert, differentiator, multiband are missing
@@ -40,7 +45,7 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in fil_dict?
 
-__version__ = "1.4"
+__version__ = "2.0"
 
 filter_classes = {'Firwin':'Windowed FIR'}
 
@@ -53,49 +58,28 @@ class Firwin(QWidget):
 
     def __init__(self):
         QWidget.__init__(self)
-        
-        # common messages for all man. / min. filter order response types:
-        msg_man = (r"Enter desired filter order <b><i>N</i></b> and <b>-6 dB</b> pass band corner "
-                    "frequency(ies) <b><i>F<sub>C</sub></i></b> .")
-        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
-                "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                "and the corresponding frequencies <b><i>F<sub>PB</sub></i></b>"
-                "&nbsp; and <b><i>F<sub>SB</sub></i></b> ."
-                "<br /><b>Note:</b> This is only a rough approximation!")
 
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs'] # manual filter order
-        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
-        dis_min = ['fspecs'] # minimum filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C']     #  manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] #  minimum filter order
-
-        # Common data for all filter response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
-                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
-                    
         self.ft = 'FIR'
-        self.rt = {
-            "LP": {"man":{"par":[]},
-                   "min":{"par":['F_PB','F_SB']}},
-            "HP": {"man":{"par":[],
-                          "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
-                   "min":{"par":['F_SB','F_PB']}},
-            "BP": {"man":{"par":['F_C2']},
-                   "min":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2', 'A_SB2']}},
-            "BS": {"man":{"par":['F_C2'],
-                      "msg":r"<br /><b>Note:</b> Order needs to be odd!"},
-                   "min":{"par":['A_PB2','F_PB','F_SB','F_SB2','F_PB2']}}
-#            "HIL": {"man":{"par":['F_SB', 'F_PB', 'F_PB2', 'F_SB2','A_SB','A_PB','A_SB2']}}
-          #"DIFF":
-                   }
+                           
+        c = Common()
+        self.rt_dict = c.rt_base_iir
+        
+        self.rt_dict_add = {
+            'COM':{'min':{'msg':('a',
+                                  r"<br /><b>Note:</b> This is only a rough approximation!")},
+                   'man':{'msg':('a',
+                                 r"Enter desired filter order <b><i>N</i></b> and " 
+                                  "<b>-6 dB</b> pass band corner "
+                                  "frequency(ies) <b><i>F<sub>C</sub></i></b> .")},                                  
+                                  },
+            'LP': {'man':{}, 'min':{}},
+            'HP': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")},
+                   'min':{}},
+            'BS': {'man':{'msg':('a', r"<br /><b>Note:</b> Order needs to be odd!")},
+                   'min':{}},
+            'BP': {'man':{}, 'min':{}},
+            }
+            
         
         self.info = """Windowed FIR filters are designed by truncating the
         infinite impulse response of an ideal filter with a window function.
@@ -106,10 +90,7 @@ class Firwin(QWidget):
         
         #------------------- end of static info for filter tree ---------------
 
-        
-        # additional dynamic widgets that need to be set in the main widgets
-        # select_filter ('sf') and filter_order ('fo')
-        self.wdg = True
+        self.wdg = True  # has additional dynamic widget 'wdg_fil'
         
         self.hdl = None
         

@@ -132,6 +132,9 @@ class PlotHf(QWidget):
         Plot the specifications limits (F_SB, A_SB, ...) as lines and as
         hatched areas.
         """
+#        fc = (0.8,0.8,0.8) # color for shaded areas
+        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
+        line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
 
         def dB(lin):
             return 20 * np.log10(lin)
@@ -154,11 +157,6 @@ class PlotHf(QWidget):
             if A_lim_lor:
                 ax.fill_between(F_lim_lor, min(A_lim_lor), A_lim_lor, **fill_params)
 
-
-#        fc = (0.8,0.8,0.8) # color for shaded areas
-        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
-        line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
-
         if self.unitA == 'V':
             exp = 1.
         elif self.unitA == 'W':
@@ -169,7 +167,7 @@ class PlotHf(QWidget):
                 A_PB_max  = dB(1 + self.A_PB)
                 A_PB2_max = dB(1 + self.A_PB2)
             else: # IIR dB
-                A_PB_max = A_PB2_max = 0
+                A_PB_max = A_PB2_max = 0.5
 
             A_PB_min  = dB(1 - self.A_PB)
             A_PB2_min = dB(1 - self.A_PB2)
@@ -187,8 +185,8 @@ class PlotHf(QWidget):
                 A_PB_max = A_PB2_max = 1
 
             A_PB_min  = (1 - self.A_PB)**exp
-            A_PB2_min = (1 - self.A_PB)**exp
-            A_PB_minx = A_PB_min  / 1.05
+            A_PB2_min = (1 - self.A_PB2)**exp
+            A_PB_minx = min(A_PB_min, A_PB2_min) / 1.05
             A_PB_maxx = max(A_PB_max, A_PB2_max) * 1.05
 
             A_SB  = self.A_SB ** exp
@@ -433,6 +431,26 @@ class PlotHf(QWidget):
         """
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
+        # Get corners for spec display from the parameters of the target specs subwidget       
+        try:
+            param_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']]\
+                                    [fb.fil[0]['fc']][fb.fil[0]['fo']]['tspecs'][1]['amp']
+        except KeyError:
+            param_list = []
+
+        SB = [l for l in param_list if 'A_SB' in l]
+        PB = [l for l in param_list if 'A_PB' in l]
+        
+        if SB:
+            A_min = min([fb.fil[0][l] for l in SB])
+        else:
+            A_min = 5e-4
+
+        if PB:
+            A_max = max([fb.fil[0][l] for l in PB])
+        else:
+            A_max = 1
+
         if np.all(self.W) is None: # H(f) has not been calculated yet
             self.calc_hf()
 
@@ -493,18 +511,19 @@ class PlotHf(QWidget):
             self.ax.clear()
 
             #================ Main Plotting Routine =========================
-
+            
+                                                
             if self.unitA == 'dB':
-                A_lim = [20*np.log10(self.A_SB) -10, 20*np.log10(1+self.A_PB) +1]
+                A_lim = [20*np.log10(A_min) -10, 20*np.log10(1+A_max) +1]
                 self.H_plt = 20*np.log10(abs(H))
                 H_str += ' in dB ' + r'$\rightarrow$'
             elif self.unitA == 'V': #  'lin'
-                A_lim = [0, (self.A_PB+1)]
+                A_lim = [0, (1.05 + A_max)]
                 self.H_plt = H
                 H_str +=' in V ' + r'$\rightarrow $'
                 self.ax.axhline(linewidth=1, color='k') # horizontal line at 0
             else: # unit is W
-                A_lim = [0, (1 + self.A_PB)**2.]
+                A_lim = [0, (1.03 + A_max)**2.]
                 self.H_plt = H * H.conj()
                 H_str += ' in W ' + r'$\rightarrow $'
 
@@ -512,11 +531,12 @@ class PlotHf(QWidget):
             self.ax.plot(self.F, self.H_plt, label = 'H(f)')
             self.draw_phase(self.ax)
             #-----------------------------------------------------------
-       #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
-            self.ax.set_xlim(f_lim)
-            self.ax.set_ylim(A_lim)
 
             if self.specs: self.plot_spec_limits(self.ax)
+
+            #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
+            self.ax.set_xlim(f_lim)
+            self.ax.set_ylim(A_lim)
 
             self.ax.set_title(r'Magnitude Frequency Response')
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])

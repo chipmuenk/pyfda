@@ -15,6 +15,11 @@ Version info:
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
          `FRMT` is now a class attribute
+    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+         first element controls whether the widget is visible and / or enabled.
+         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
+         is read and merged with the first one.
+
     
 Author: Christian Muenker 2014 - 2016
 """
@@ -38,7 +43,7 @@ from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
 #           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
 
 
-__version__ = "1.4"
+__version__ = "2.0"
 
 filter_classes = {'Equiripple':'Equiripple'}
 
@@ -67,61 +72,102 @@ using Ichige's algorithm.
     def __init__(self):
         QWidget.__init__(self)
 
-        # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter desired filter order <b><i>N</i></b>, corner "
-        "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
-        "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
-        "value <b><i>W</i></b>&nbsp; for each band.")
-        msg_min = ("Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
-                    "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
-                    "and the corresponding corner frequencies of pass and "
-                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                    "<b><i>F<sub>SB</sub></i></b> .")
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','wspecs', 'tspecs'] # manual filter order
-        vis_min = ['fo','wspecs', 'tspecs'] # minimum filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = [] # manual filter order
-        dis_min = ['wspecs'] # minimum filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S'] # manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
-
-        # Common data for all man. / min. filter order response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-        self.com = {'man':{'vis':vis_man, 'dis':dis_man, 'msg':msg_man, 'par': par_man},
-                    'min':{'vis':vis_min, 'dis':dis_min, 'msg':msg_min, 'par': par_min}}
         self.ft = 'FIR'
-        self.rt = {
-            'LP': {'man':{'par':['W_PB','W_SB','F_PB','F_SB','A_PB','A_SB']},
-                   'min':{'par':['F_PB','F_SB','W_PB','W_SB']},
-                   'targ':{'par':['F_PB','F_SB','W_PB','W_SB']}},
-            'HP': {'man':{'par':['W_SB','W_PB','F_SB','F_PB','A_SB','A_PB']},
-                   'min':{'par':['F_SB','F_PB','W_SB','W_PB']},
-                   'targ':{'par':['F_SB','F_PB','W_SB','W_PB']}},
-            'BP': {'man':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB','W_PB','W_SB2','A_SB','A_PB','A_SB2']},
-                   'min':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB', 'W_PB','W_SB2','A_SB2']},
-                  'targ':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB', 'W_PB','W_SB2','A_SB2']}},
-            'BS': {'man':{'par':['F_PB', 'F_SB', 'F_SB2', 'F_PB2',
-                                 'W_PB', 'W_SB', 'W_PB2','A_PB','A_SB','A_PB2'],
-                      'msg':r"<br /><b>Note:</b> Order needs to be odd for a bandstop!"},
-                   'min':{'par':['A_PB2','W_PB','W_SB','W_PB2',
-                                 'F_PB','F_SB','F_SB2','F_PB2']},
-                  'targ':{'par':['A_PB2','W_PB','W_SB','W_PB2',
-                                 'F_PB','F_SB','F_SB2','F_PB2']}},
-            'HIL': {'man':{'par':['F_SB', 'F_PB', 'F_PB2', 'F_SB2',
-                                 'W_SB', 'W_PB', 'W_SB2'],
-                           'vis':["fspecs"], }},
-            'DIFF': {'man':{'par':['F_PB', 'W_PB'], 
-                            'vis':["fspecs"]}}
-                   }
+        
+        self.rt_dicts = ('com',)
+
+        self.rt_dict = {
+            'COM': {'man': {'fo':('a', 'N'),
+                            'msg':('a', 
+                                "Enter desired filter order <b><i>N</i></b>, corner "
+                                "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
+                                "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
+                                "value <b><i>W</i></b>&nbsp; for each band.")
+                            },
+                    'min': {'fo':('d', 'N'),
+                            'msg': ('a',
+                                "Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                                "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
+                                "and the corresponding corner frequencies of pass and "
+                                "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
+                                "<b><i>F<sub>SB</sub></i></b> .")
+                            }
+                },
+            'LP': {'man':{'wspecs': ('a','W_PB','W_SB'),
+                          'tspecs': ('u', {'frq':('a','F_PB','F_SB'), 
+                                           'amp':('u','A_PB','A_SB')})
+                          },
+                   'min':{'wspecs': ('d','W_PB','W_SB'),
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                                           'amp':('a','A_PB','A_SB')})
+                        }
+                },
+            'HP': {'man':{'wspecs': ('a','W_SB','W_PB'),
+                          'tspecs': ('u', {'frq':('a','F_SB','F_PB'), 
+                                           'amp':('u','A_SB','A_PB')})
+                         },
+                   'min':{'wspecs': ('d','W_SB','W_PB'),
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                                           'amp':('a','A_SB','A_PB')})
+                         }
+                    },
+            'BP': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
+                          'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                         },
+                   'min':{'wspecs': ('d','W_SB','W_PB','W_SB2'),
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                                           'amp':('a','A_SB','A_PB','A_SB2')})
+                         },
+                    },
+            'BS': {'man':{'wspecs': ('a','W_PB','W_SB','W_PB2'),
+                          'tspecs': ('u', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                          },
+                   'min':{'wspecs': ('d','W_PB','W_SB','W_PB2'),
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                                           'amp':('a','A_PB','A_SB','A_PB2')})
+                        }
+                },
+            'HIL': {'man':{'wspecs': ('a','W_SB','W_PB','W_SB2'),
+                           'tspecs': ('u', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                         }
+                    },
+            'DIFF': {'man':{'wspecs': ('a','W_PB'),
+                            'tspecs': ('u', {'frq':('a','F_PB'), 
+                                           'amp':('i',)}),
+                            'msg':('a',"Enter the max. frequency up to where the differentiator "
+                                        "works.")
+                          }
+                    }
+            }
+#                
+#
+#            'LP': {'man':{'wspecs':('W_PB','W_SB','F_PB','F_SB')},
+#                   'min':{'par':('F_PB','F_SB','W_PB','W_SB', 'A_PB', 'A_SB')},
+#                   '_targ':{'par':('F_PB','F_SB','A_PB','A_SB')}},
+#            'HP': {'man':{'par':('W_SB','W_PB','F_SB','F_PB')},
+#                   'min':{'par':('F_SB','F_PB','W_SB','W_PB','A_SB','A_PB')},
+#                   '_targ':{'par':('F_SB','F_PB','A_SB','A_PB')}},
+#            'BP': {'man':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+#                                 'W_SB','W_PB','W_SB2')},
+#                   'min':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+#                                 'W_SB', 'W_PB','W_SB2','A_SB','A_PB','A_SB2')},
+#                   '_targ':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+#                                 'A_SB', 'A_PB','A_SB2')}},
+#            'BS': {'man':{'par':('F_PB','F_SB','F_SB2','F_PB2', 'W_SB','W_PB','W_SB2'),
+#                          'msg':(r"<br /><b>Note:</b> Order needs to be odd for a bandstop!",)},
+#                   'min':{'par':('W_PB','W_SB','W_PB2',
+#                                 'F_PB','F_SB','F_SB2','F_PB2', 'A_PB','A_SB','A_PB2')},
+#                   '_targ':{'par':('F_PB','F_SB','F_SB2','F_PB2',
+#                                 'A_PB','A_SB','A_PB2',)}},
+#            'HIL': {'man':{'par':('F_SB', 'F_PB', 'F_PB2', 'F_SB2',
+#                                 'W_SB', 'W_PB', 'W_SB2'),
+#                           'vis':("fspecs",), }},
+#            'DIFF': {'man':{'par':('F_PB', 'W_PB'), 
+#                            'vis':("fspecs",)}}
+
         self.info_doc = []
         self.info_doc.append('remez()\n=======')
         self.info_doc.append(sig.remez.__doc__)

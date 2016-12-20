@@ -12,10 +12,9 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QCheckBox, QPushButton,
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QCheckBox, QPushButton,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      QVBoxLayout, QHBoxLayout, QSizePolicy,
                       pyqtSignal, QEvent)
 
 import numpy as np
@@ -320,7 +319,10 @@ class FilterCoeffs(QWidget):
             %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
 
-        self.sigFilterDesigned.emit()  # -> input_widgets -> pyFDA -> pltWidgets.updateAll()
+        self.sigFilterDesigned.emit()  
+        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+        # TODO: this also needs to trigger filter_specs.updateUI to switch to 
+        #       manual design when saving b, a
 
 #------------------------------------------------------------------------------
     def load_entries(self):

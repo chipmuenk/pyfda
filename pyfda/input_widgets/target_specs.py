@@ -10,12 +10,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QCheckBox,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
-
+from ..compat import QWidget, QLabel, QFont, QVBoxLayout, QGridLayout, pyqtSignal
 
 import pyfda.filterbroker as fb
 from pyfda.input_widgets import amplitude_specs, freq_specs
@@ -24,7 +19,7 @@ from pyfda.input_widgets import amplitude_specs, freq_specs
 class TargetSpecs(QWidget):
     """
     Build and update widget for entering the target specifications (frequencies
-    and amplitudes) like F_sb, F_pb, A_SB, etc.
+    and amplitudes) like F_SB, F_PB, A_SB, etc.
     """
 
     # class variables (shared between instances if more than one exists)
@@ -86,7 +81,7 @@ class TargetSpecs(QWidget):
         
 
 #------------------------------------------------------------------------------
-    def update_UI(self, freq_params = [], amp_params = []):
+    def update_UI(self, new_labels = ()):
         """
         Called when a new filter design algorithm has been selected
         Pass frequency and amplitude labels to the amplitude and frequency
@@ -94,13 +89,26 @@ class TargetSpecs(QWidget):
         The sigSpecsChanged signal is emitted already by select_filter.py
         """
 
-        # pass new labels to widgets
-        # set widgets invisible if param list is empty
-        self.f_specs.update_UI(new_labels = freq_params) # update frequency spec labels
-        self.a_specs.setVisible(amp_params != [])
-        self.a_specs.update_UI(new_labels = amp_params)
+        # pass new labels to widgets. The first element of the 'amp' and the
+        # 'freq' tuple is the state, 'u' is for 'unused', 'd' is for disabled
 
-#        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
+        if ('frq' in new_labels and len(new_labels['frq']) > 1 and
+                                              new_labels['frq'][0] != 'i'):
+            self.f_specs.show()
+            self.f_specs.setEnabled(new_labels['frq'][0] != 'd')
+            self.f_specs.update_UI(new_labels=new_labels['frq'])
+        else:
+            self.f_specs.hide()
+            
+        if ('amp' in new_labels and len(new_labels['amp']) > 1 and
+                                              new_labels['amp'][0] != 'i'):
+            self.a_specs.show()
+            self.a_specs.setEnabled(new_labels['amp'][0] != 'd')
+            self.a_specs.update_UI(new_labels=new_labels['amp'])
+        else:
+            self.a_specs.hide()
+#
+        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
     def load_entries(self):

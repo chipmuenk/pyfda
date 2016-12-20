@@ -16,16 +16,21 @@ Version info:
     1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
          `FRMT` is now a class attribute
+    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+         first element controls whether the widget is visible and / or enabled.
+         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
+         is read and merged with the first one.
 
 Author: Christian Münker
 """
-from __future__ import print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
 from scipy.signal import cheb1ord
     
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from .common import Common
 
-__version__ = "1.4"
+__version__ = "2.0"
 
 filter_classes = {'Cheby1':'Chebychev 1'}
 
@@ -37,47 +42,25 @@ class Cheby1(object):
     
     def __init__(self):
  
-        # common messages for all man. / min. filter order response types:
-        msg_man = ("Enter the filter order <b><i>N</i></b> and the critical frequency "
-            " or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
-            "the maximum ripple "
-            "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
-            " passband.")
-        msg_min = ("Enter maximum pass band ripple <b><i>A<sub>PB</sub></i></b> , "
-                    "minimum stop band attenuation <b><i>A<sub>SB</sub> </i></b>"
-                    "&nbsp;and the corresponding corner frequencies of pass and "
-                    "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                    "<b><i>F<sub>SB</sub></i></b> .")
-
-        # VISIBLE widgets for all man. / min. filter order response types:
-        vis_man = ['fo','fspecs','tspecs','aspecs'] # manual filter order
-        vis_min = ['fo','fspecs','tspecs'] # minimum filter order
-
-        # DISABLED widgets for all man. / min. filter order response types:
-        dis_man = ['tspecs'] # manual filter order
-        dis_min = ['fspecs'] # minimum filter order
-
-        # common PARAMETERS for all man. / min. filter order response types:
-        par_man = ['N', 'f_S', 'F_C', 'A_PB'] # manual filter order
-        par_min = ['f_S', 'A_PB', 'A_SB'] # minimum filter order
-
-        # Common data for all man. / min. filter order response types:
-        # This data is merged with the entries for individual response types
-        # (common data comes first):
-        self.com = {"man":{"vis":vis_man, "dis":dis_man, "msg":msg_man, "par":par_man},
-                    "min":{"vis":vis_min, "dis":dis_min, "msg":msg_min, "par":par_min}}
-
         self.ft = 'IIR'
-        self.rt = {
-          "LP": {"man":{"par":[]},
-                 "min":{"par":['F_PB','F_SB']}},
-          "HP": {"man":{"par":[]},
-                 "min":{"par":['F_SB','F_PB']}},
-          "BP": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_SB','F_PB','F_PB2','F_SB2']}},
-          "BS": {"man":{"par":['F_C2']},
-                 "min":{"par":['F_PB','F_SB','F_SB2','F_PB2']}}
-                 }
+
+        c = Common()
+        self.rt_dict = c.rt_base_iir
+
+        self.rt_dict_add = {
+            'COM':{'man':{'msg':('a',
+                r"Enter the filter order <b><i>N</i></b> and the critical frequency "
+                 "or frequencies <b><i>F<sub>C</sub></i></b>&nbsp; where the gain first drops below "
+                 "the maximum ripple "
+                 "<b><i>-A<sub>PB</sub></i></b>&nbsp; allowed below unity gain in the "
+                 "passband.")},                                  
+                                  },
+            'LP': {'man':{}, 'min':{}},
+            'HP': {'man':{}, 'min':{}},
+            'BS': {'man':{}, 'min':{}},
+            'BP': {'man':{}, 'min':{}},
+            }
+
 
         self.info = """
 **Chebychev Type 1 filters**

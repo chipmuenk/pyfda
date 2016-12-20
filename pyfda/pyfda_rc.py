@@ -52,6 +52,8 @@ save_dir = "D:/Daten"
 
 # Config file for logger
 log_config_file = "pyfda_log.conf"
+#log_config_file = "pyfda_log_debug.conf"
+
 
 # ======================== LAYOUT =============================================
 
@@ -112,7 +114,7 @@ css_dark = """
                 border-color: darkgrey;
     }
     QLineEdit:disabled{background-color:darkgrey;}
-    
+   
     QPushButton{background-color:grey;}
     
     QTableView{alternate-background-color:#222222;
@@ -129,7 +131,8 @@ css_light = """
 
     QLineEdit{background: white;
                 border-color: darkgrey;}
-    QLineEdit:disabled{background-color:lightgrey;}
+    QLineEdit:disabled{background-color:darkgrey;}
+  
     
     QPushButton{background-color:lightgrey; }
     
@@ -208,10 +211,12 @@ TabBarCss = """
 """
 
 css_common = """
+                *[state="normal"]{}
                 *[state="changed"]{background-color:yellow; color:black}
                 *[state="error"]{background-color:red; color:white}
                 *[state="failed"]{background-color:orange; color:white}
                 *[state="ok"]{background-color:green; color:white}
+                *[state="unused"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
                 
                 QWidget{font-size:10pt; font-family: Tahoma;}

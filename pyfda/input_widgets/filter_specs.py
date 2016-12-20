@@ -15,7 +15,7 @@ import numpy as np
 from ..compat import (QWidget, QLabel, QFrame, QPushButton,
                       QVBoxLayout, QGridLayout, QSizePolicy,
                       pyqtSignal)
-                      
+
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 #from pyfda.pyfda_lib import HLine
@@ -44,7 +44,7 @@ class FilterSpecs(QWidget):
         """
         Construct User Interface from all input subwidgets
         """
-        # Subwidget for selecting filter with response type rt (LP, ...), 
+        # Subwidget for selecting filter with response type rt (LP, ...),
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
@@ -71,10 +71,10 @@ class FilterSpecs(QWidget):
         layVMsg = QVBoxLayout()
         layVMsg.addWidget(self.lblMsg)
 
-        frmMsg = QFrame()
-        frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmMsg.setLayout(layVMsg)
-        frmMsg.setSizePolicy(QSizePolicy.Minimum,
+        self.frmMsg = QFrame()
+        self.frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmMsg.setLayout(layVMsg)
+        self.frmMsg.setSizePolicy(QSizePolicy.Minimum,
                              QSizePolicy.Minimum)
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
@@ -89,7 +89,7 @@ class FilterSpecs(QWidget):
         layGMain.addWidget(self.f_specs, 2, 0, 1, 2)  # Freq. specifications
         layGMain.addWidget(self.a_specs, 3, 0, 1, 2)  # Amplitude specs
         layGMain.addWidget(self.w_specs, 4, 0, 1, 2)  # Weight specs
-        layGMain.addWidget(frmMsg, 5, 0, 1, 2)        # Text message
+        layGMain.addWidget(self.frmMsg, 5, 0, 1, 2)        # Text message
         layGMain.addWidget(self.t_specs, 6, 0, 1, 2)  # Target specs
         layGMain.setRowStretch(7,1)
 #        layGMain.addWidget(HLine(QFrame, self), 7,0,1,2) # create HLine
@@ -103,8 +103,8 @@ class FilterSpecs(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
         #
-        # Changing the filter design requires updating UI because number or 
-        # kind of input fields changes -> Call update_all_UIs, emitting 
+        # Changing the filter design requires updating UI because number or
+        # kind of input fields changes -> Call update_all_UIs, emitting
         # sigFilterChanged when it's finished
         self.sel_fil.sigFiltChanged.connect(self.update_UI)
 
@@ -113,7 +113,7 @@ class FilterSpecs(QWidget):
         self.f_units.sigUnitChanged.connect(self.f_specs.load_entries)
         self.f_units.sigUnitChanged.connect(self.t_specs.load_entries)
         self.f_units.sigUnitChanged.connect(self.sigViewChanged)
-        # Activating the "Sort" button triggers sigSpecsChanged, requiring 
+        # Activating the "Sort" button triggers sigSpecsChanged, requiring
         # sorting and storing the frequency entries
         self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
         self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
@@ -140,12 +140,12 @@ class FilterSpecs(QWidget):
 #------------------------------------------------------------------------------
     def update_UI(self):
         """
-        update_all_UIs is called every time the filter design method or order
+        update_UI is called every time the filter design method or order
         (min / man) has been changed. This usually requires a different set of
         frequency and amplitude specs.
-        
-        At this time, the actual filter object instance has been created from 
-        the name of the design method (e.g. 'cheby1') in select_filter.py. 
+
+        At this time, the actual filter object instance has been created from
+        the name of the design method (e.g. 'cheby1') in select_filter.py.
         Its handle has been stored in fb.fil_inst.
 
         fb.fil[0] (currently selected filter) is read, then general information
@@ -153,7 +153,7 @@ class FilterSpecs(QWidget):
         the filter tree [fb.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
-        Then, the UIs of all subwidgets are updated using their "updateUI" method,
+        Then, the UIs of all subwidgets are updated using their "update_UI" method,
         finally the signal 'sigSpecsChanged' is emitted.
         """
 
@@ -161,67 +161,60 @@ class FilterSpecs(QWidget):
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
         fo = fb.fil[0]['fo'] # e.g. 'man'
-        # read all parameters for selected filter type, e.g. 'F_SB':
-        all_params = fb.fil_tree[rt][ft][fc][fo]['par']
 
-        vis_wdgs = fb.fil_tree[rt][ft][fc][fo]['vis'] # visible widgets
-        dis_wdgs = fb.fil_tree[rt][ft][fc][fo]['dis'] # disabled widgets
-        msg      = fb.fil_tree[rt][ft][fc][fo]['msg'] # message
+        # the keys of the all_widgets dict are the names of the subwidgets,
+        # the values are a tuple with the corresponding parameters
+        all_widgets = fb.fil_tree[rt][ft][fc][fo]
 
-        # Read freq / amp / weight labels for current filter design, building
-        # separate parameter lists according to the first letter
-        f_params = [l for l in all_params if l[0] == 'F'] # curr. not used
-        a_params = [l for l in all_params if l[0] == 'A']
-        w_params = [l for l in all_params if l[0] == 'W']
-        logger.debug("update_all_UIs\n"
-            "all_params = %s\n"
-            "a_params = %s\n"
-            "f_params = %s\n"
-            "w_params = %s\n",
-            all_params, a_params, f_params, w_params)
+        logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
+        logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
 
-        self.sel_fil.load_filter_order() # update filter order from dict
+        if 'fo' in all_widgets and len(all_widgets['fo']) > 1:
+            fo_status = all_widgets['fo'][0]
+        else:
+            fo_status = 'i'
+        self.sel_fil.load_filter_order(status = fo_status) # update filter order subwidget
 
-        # build separate parameter lists for min. and man. filter order 
-        # and target specs   
-        min_params = man_params = targ_params = []
-        
-        if "min" in fb.fil_tree[rt][ft][fc]:
-            min_params = fb.fil_tree[rt][ft][fc]['min']['par']
-            
-        if "man" in fb.fil_tree[rt][ft][fc]:
-            man_params = fb.fil_tree[rt][ft][fc]['man']['par']
+        if ('tspecs' in all_widgets and len(all_widgets['tspecs']) > 1 and
+                                              all_widgets['tspecs'][0] != 'i'):
+            self.t_specs.setVisible(True)
+            self.t_specs.setEnabled(all_widgets['tspecs'][0] != 'd')
+            self.t_specs.update_UI(new_labels=all_widgets['tspecs'][1])
+        else:
+            self.t_specs.hide()
 
-        if "targ" in fb.fil_tree[rt][ft][fc]:
-            targ_params = fb.fil_tree[rt][ft][fc]['targ']['par']
+        if ('fspecs' in all_widgets and len(all_widgets['fspecs']) > 1 and
+                                              all_widgets['fspecs'][0] != 'i'):
+            self.f_specs.setVisible(True)
+            self.f_specs.setEnabled(all_widgets['fspecs'][0] != 'd')
+            self.f_specs.update_UI(new_labels=all_widgets['fspecs'])
+        else:
+            self.f_specs.hide()
 
+        if ('aspecs' in all_widgets and len(all_widgets['aspecs']) > 1 and
+                                              all_widgets['aspecs'][0] != 'i'):
+            self.a_specs.setVisible(True)
+            self.a_specs.setEnabled(all_widgets['aspecs'][0] != 'd')
+            self.a_specs.update_UI(new_labels=all_widgets['aspecs'])
+        else:
+            self.a_specs.hide()
 
-        # always use parameters for MANUAL filter order for f_specs widget,
-        # frequency specs for minimum order are displayed in target specs
-        f_man_params = [l for l in man_params if l[0] == 'F']
-        self.f_specs.setVisible("fspecs" in vis_wdgs)
-        self.f_specs.setEnabled("fspecs" not in dis_wdgs)
-        self.f_specs.update_UI(new_labels=f_man_params)
+        if ('wspecs' in all_widgets and len(all_widgets['wspecs']) > 1 and
+                                              all_widgets['wspecs'][0] != 'i'):
+            self.w_specs.setVisible(True)
+            self.w_specs.setEnabled(all_widgets['wspecs'][0] != 'd')
+            self.w_specs.update_UI(new_labels=all_widgets['wspecs'])
+        else:
+            self.w_specs.hide()
 
-        # always use parameters for MINIMUM filter order for target frequency
-        # spec widget
-        f_min_params = [l for l in min_params if l[0] == 'F']
-        f_targ_params = [l for l in targ_params if l[0] == 'F']
+        if ('msg' in all_widgets and len(all_widgets['msg']) > 1  and
+                                              all_widgets['msg'][0] != 'i'):
+            self.frmMsg.setVisible(True)
+            self.frmMsg.setEnabled(all_widgets['msg'][0] != 'd')
+            self.lblMsg.setText(all_widgets['msg'][1:][0])
+        else:
+            self.frmMsg.hide()
 
-        self.t_specs.setVisible("tspecs" in vis_wdgs)
-        self.t_specs.setEnabled("tspecs" not in dis_wdgs)
-        self.t_specs.update_UI(f_min_params, a_params)
-        
-        # self.a_specs.setVisible(a_params != [])
-        self.a_specs.setVisible("aspecs" in vis_wdgs)
-        self.a_specs.setEnabled("aspecs" not in dis_wdgs)
-        self.a_specs.update_UI(new_labels=a_params)
-
-        self.w_specs.setVisible("wspecs" in vis_wdgs)
-        self.w_specs.setEnabled("wspecs" not in dis_wdgs)
-        self.w_specs.update_UI(new_labels=w_params)
-
-        self.lblMsg.setText(msg)
 
         self.sigSpecsChanged.emit()
 
@@ -251,8 +244,8 @@ class FilterSpecs(QWidget):
         """
         logger.debug("start_design_filt - Specs:\n"
             "fb.fil[0]: %s\n"
-            "fb.fil[0]['fc'] %s.%s%s", 
-            pformat(fb.fil[0]), str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), 
+            "fb.fil[0]['fc'] %s.%s%s",
+            pformat(fb.fil[0]), str(fb.fil[0]['fc']), str(fb.fil[0]['rt']),
                          str(fb.fil[0]['fo']))
 
         logger.info("startDesignFilt using: %s\nmethod: %s\n",
@@ -260,13 +253,13 @@ class FilterSpecs(QWidget):
 
         try:
             #----------------------------------------------------------------------
-            # A globally accessible instance fb.fil_inst of selected filter class fc 
+            # A globally accessible instance fb.fil_inst of selected filter class fc
             # has been instantiated in InputFilter.set_design_method, now
             # call the method specified in the filter dict fil[0].
-    
-            # The name of the instance method is constructed from the response 
+
+            # The name of the instance method is constructed from the response
             # type (e.g. 'LP') and the filter order (e.g. 'man'), giving e.g. 'LPman'.
-            # The filter is designed by passing the specs in fil[0] to the method, 
+            # The filter is designed by passing the specs in fil[0] to the method,
             # resulting in e.g. cheby1.LPman(fb.fil[0]) and writing back coefficients,
             # P/Z etc. back to fil[0].
 
@@ -276,18 +269,18 @@ class FilterSpecs(QWidget):
             # inst = ellip.ellip()
             # inst.LPmin(fb.fil[0])
             #-----------------------------------------------------------------------
-            
+
             if err > 0:
                 raise AttributeError("Unknown design method.")
                 self.color_design_button("error")
-    
+
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
             self.sel_fil.load_filter_order()
             self.w_specs.load_entries()
             self.f_specs.load_entries()
             self.color_design_button("ok")
-    
+
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
         except Exception as e:
@@ -295,7 +288,7 @@ class FilterSpecs(QWidget):
             self.color_design_button("error")
 
         logger.debug("start_design_filt - Results:\n"
-            "F_PB = %s, F_SB = %s\n" 
+            "F_PB = %s, F_SB = %s\n"
             "Filter order N = %s\n"
             "NDim fil[0]['ba'] = %s\n\n"
             "b,a = %s\n\n"
@@ -329,7 +322,7 @@ if __name__ == '__main__':
     from ..compat import QApplication
     app = QApplication(sys.argv)
     mainw = FilterSpecs(None)
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
 
     sys.exit(app.exec_())

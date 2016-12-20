@@ -329,6 +329,9 @@ class FilterPZ(QWidget):
             self.load_entries() # only needed for stand-alone test
          
         self.sigFilterDesigned.emit()
+        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+        # TODO: this also needs to trigger filter_specs.updateUI to switch to 
+        #       manual design when saving P/Z
 
         logger.debug("_save_entries - coeffients / zpk updated:\n"
             "b,a = %s\n\n"

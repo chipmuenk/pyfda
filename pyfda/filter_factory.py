@@ -65,7 +65,9 @@ class FilterFactory(object):
              
             :2: filter module found by FilterTreeBuilder but could not be imported 
              
-            :3: unknown error during instantiation
+            :3: filter class could not be instantiated
+
+            :4: unknown error during instantiation
         
         Example
         -------
@@ -122,10 +124,13 @@ class FilterFactory(object):
                 logger.warning(err_string)
                 self.err_code = 3
             else:
-                fil_inst = fil_class() # instantiate an object         
-                self.err_code = 0 # filter instance has been created / changed successfully
-            logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
-        
+                try:
+                    fil_inst = fil_class() # instantiate an object         
+                    self.err_code = 0 # filter instance has been created / changed successfully
+                    logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
+                except Exception as e:
+                    self.err_code = 4
+                    logger.warning("Error during instantiation of filter class {0}:\n{1}".format(fc,e))                    
         return self.err_code
 
 #------------------------------------------------------------------------------      
@@ -203,11 +208,12 @@ class FilterFactory(object):
                 getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
-                err_string = "\Error calling {0} of {1}':\n{2}.".format(method, fil_inst, e)
+                err_string = "\nError calling method '{0}' of class '{1}':\n{2}"\
+                                    .format(method, type(fil_inst).__name__, e)
                 self.err_code = 18
                 
         if self.err_code > 0:
-                logger.error(err_string)
+                logger.error("Err. Code {0}:\n{1}".format(self.err_code, err_string))
             
         return self.err_code
         
