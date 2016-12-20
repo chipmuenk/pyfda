@@ -216,14 +216,6 @@ class FilterInfo(QWidget):
     
             f_S  = fb.fil[0]['f_S']
     
-            # Build a list with all frequency related labels:
-            #--------------------------------------------------------------------
-            # First, extract the list with target specs of the selected
-            # filter class from filter tree. This is not needed for standard filter types
-            #try:
-            #    fil_list = fb.fil_tree[fb.fil[0]['rt']][fb.fil[0]['ft']][fb.fil[0]['fc']]['_targ']['par']
-            #except KeyError:
-            #    fil_list = []
     
             f_lbls = []
             f_vals = []
