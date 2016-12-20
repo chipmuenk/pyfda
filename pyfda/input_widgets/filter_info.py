@@ -11,11 +11,9 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QCheckBox,
+from ..compat import (QtGui, QWidget, QLabel, QFont, QCheckBox,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
+                      QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 try:
     from docutils.core import publish_string 
