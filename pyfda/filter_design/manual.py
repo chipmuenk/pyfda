@@ -32,6 +32,15 @@ filter_classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'}
 
 FRMT = 'ba' # default output format of filter design routines 'zpk' / 'ba' / 'sos'
 
+msg_man = ('a', "Design the filter using the P/Z or the b/a widget. "
+                "The target specs are only used for displaying spec limits.")
+                
+info_str =  ('In manual filter design mode you can only enter the target specifications of the filter. '
+        'Design the filter by entering / editing poles and zeros ("P/Z" tab) or coefficients '
+        '("b,a" tab). Use the info tab or the magnitude frequency response (check "Show Specs") '
+        'to check whether the designed filter fulfills the specs.')
+
+
 class Manual_FIR(object):
     
     def __init__(self):
@@ -42,7 +51,7 @@ class Manual_FIR(object):
 
         self.rt_dict = {
             'COM':{'man':{'fo': ('d', 'N'),
-                          'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
+                          'msg': msg_man}
                         },
             'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
                                            'amp':('u','A_PB','A_SB')})
@@ -65,13 +74,11 @@ class Manual_FIR(object):
                    }
 
         
-        self.info = """
-        Manual entry of filters is great.
-        """
+        self.info = info_str
+        self.info_doc = []
+        self.info_doc.append('manual FIR\n========')
         
         #------------------- end of static info for filter tree ---------------
-
-        self.hdl = None
         
         
     def construct_UI(self):
@@ -119,6 +126,12 @@ class Manual_FIR(object):
         pass
 
     def BSman(self, fil_dict):
+        pass
+    
+    def HILman(self, fil_dict):
+        pass
+
+    def DIFFman(self, fil_dict):
         pass
 
 #############################################################################    
@@ -132,7 +145,7 @@ class Manual_IIR(object):
 
         self.rt_dict = {
             'COM':{'man':{'fo': ('d', 'N'),
-                          'msg':('a', "Design the filter using the P/Z or the b/a widget.")}
+                          'msg': msg_man}
                         },
             'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
                                            'amp':('u','A_PB','A_SB')})
@@ -154,15 +167,11 @@ class Manual_IIR(object):
                         }}
                    }
         
-        self.info = """
-        Manual entry of filters is great.
-        """
+        self.info = info_str
         self.info_doc = []
-        self.info_doc.append('manual()\n========')
+        self.info_doc.append('manual IIR\n========')
         
-        #------------------- end of static info for filter tree ---------------
-        
-        self.hdl = None       
+        #------------------- end of static info for filter tree ---------------       
         
     def construct_UI(self):
         """
@@ -208,6 +217,12 @@ class Manual_IIR(object):
         pass
 
     def BSman(self, fil_dict):
+        pass
+
+    def HILman(self, fil_dict):
+        pass
+
+    def DIFFman(self, fil_dict):
         pass
 
 
