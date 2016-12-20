@@ -174,11 +174,6 @@ class FreqSpecs(QWidget):
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
 
-
-#-------------------------------------------------------------        
-    def val(self, ddict, label):
-        pass
-
 #-------------------------------------------------------------        
     def load_entries(self):
         """
@@ -200,10 +195,6 @@ class FreqSpecs(QWidget):
         for i in range(len(self.qlineedit)):
             f_name = str(self.qlineedit[i].objectName()).split(":",1)
             f_label = f_name[0]
-            if len(f_name) > 1:         
-                f_attr  = f_name[1]
-            else:
-                f_attr = 'a' # default attribute: "active"
             f_value = fb.fil[0][f_label] * fb.fil[0]['f_S']
 
             if not self.qlineedit[i].hasFocus():
