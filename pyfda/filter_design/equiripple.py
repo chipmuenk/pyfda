@@ -4,7 +4,7 @@ Design equiripple-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in coefficients format ('ba')
 
 Attention: 
-This class is re-instantiated dynamically everytime the filter design method
+This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
 Version info:   
@@ -63,8 +63,7 @@ using Ichige's algorithm.
 
 **Design routines:**
 
-``scipy.signal.remez()``\n
-``pyfda_lib.remezord()``
+``scipy.signal.remez()``, ``pyfda_lib.remezord()``
     """
 
     sigFiltChanged = pyqtSignal()

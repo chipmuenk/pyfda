@@ -81,8 +81,7 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
 
 **Design routines:**
 
-``scipy.signal.cheby2()``
-``scipy.signal.cheb2ord()``
+``scipy.signal.cheby2()``, ``scipy.signal.cheb2ord()``
 """
 
         self.info_doc = []

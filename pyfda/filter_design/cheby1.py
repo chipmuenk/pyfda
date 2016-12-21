@@ -79,8 +79,7 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
 
 **Design routines:**
 
-``scipy.signal.cheby1()``
-``scipy.signal.cheb1ord()``
+``scipy.signal.cheby1()``, ``scipy.signal.cheb1ord()``
 
         """
 

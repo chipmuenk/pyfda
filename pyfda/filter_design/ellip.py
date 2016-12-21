@@ -56,8 +56,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 
 **Design routines:**
 
-``scipy.signal.ellip()``
-``scipy.signal.ellipord()``
+``scipy.signal.ellip()``, ``scipy.signal.ellipord()``
 
         """
 
