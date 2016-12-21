@@ -167,7 +167,7 @@ class PlotHf(QWidget):
                 A_PB_max  = dB(1 + self.A_PB)
                 A_PB2_max = dB(1 + self.A_PB2)
             else: # IIR dB
-                A_PB_max = A_PB2_max = 0.5
+                A_PB_max = A_PB2_max = 0
 
             A_PB_min  = dB(1 - self.A_PB)
             A_PB2_min = dB(1 - self.A_PB2)
