@@ -286,9 +286,10 @@ class FilterInfo(QWidget):
             (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit = 'V')    
             # append frequencies and values for min. and max. filter reponse to 
             # test vector
+            
             f_lbls += ['Min.','Max.']
             # QTableView does not support direct formatting, use QLabel
-            # f_lbls = [rt_label(l) for l in f_lbls] 
+
             f_vals = np.append(f_vals, [F_min, F_max])
             a_targs = np.append(a_targs, [np.nan, np.nan])
             a_targs_dB = np.append(a_targs_dB, [np.nan, np.nan])
@@ -371,32 +372,6 @@ class FilterInfo(QWidget):
 #        dictstr = pprint.pformat(fb.fil[0])
         self.txtFiltTree.setText(dictstr)
         
-        
-#app = QApplication([])
-#view = QtWebKit.QWebView()
-#
-#class MyWebPage(QtWebKit.QWebPage):
-#    def acceptNavigationRequest(self, frame, req, nav_type):
-#        if nav_type == QtWebKit.QWebPage.NavigationTypeFormSubmitted:
-#            text = "<br/>\n".join(["%s: %s" % pair for pair in req.url().queryItems()])
-#            view.setHtml(text)
-#            return False
-#        else:
-#            return super(MyWebPage, self).acceptNavigationRequest(frame, req, nav_type)
-#
-#view.setPage(MyWebPage())
-#
-#html = """
-#<h1>Hello World!</h1>
-#"""
-#
-#view.setHtml(html)
-#
-##view.setWindowFlags(Qt.FramelessWindowHint) # no title
-##view.setWindowFlags(Qt.CustomizeWindowHint) # resizable frame
-#
-#view.show()
-#app.exec_()
 
 #------------------------------------------------------------------------------
 
