@@ -99,18 +99,30 @@ class Bessel(object):
 **Bessel filters**
 
 have the best phase linearity of all IIR filters in the pass band and hence
-maximally flat group delay. They have ripple in neither pass- nor stopband(s) 
-and minimum ringing of the step response.
+maximally flat group delay. They have a monotonous magnitude response in both
+pass and stop band(s) and minimum ringing of the step response. The roll-off is
+the most gentle of all IIR filters, often it is better to choose an FIR filter
+when phase linearity is important.
 
-For the filter design, only the order :math:`N` and critical frequency/
-frequencies :math:`F_C` can be specified. 
-There is no proper minimum order formula; instead, the minimum butterworth 
-order can be used for approximating the -3 dB frequency.
+Only the order :math:`N` and critical frequency(ies) :math:`F_C` can be specified.
+:math:`F_C` is the frequency where the phase response reaches its midpoint for
+both low-pass and high-pass filters (“phase-matched”).
+
+The magnitude response asymptotes are the same as a Butterworth filter of the
+same order and with the same :math:`F_C`, however, the actual magnitude response
+:math:`|H(F_C)|` depends on the filter order :math:`N`.
+
+Currently, no proper minimum order algorithm is implemented; instead, the minimum
+order for a Butterworth filter is used as a coarse approximation for finding
+:math:`N` and :math:`F_C`. This works reasonably well for the stop band but not
+for the pass band.
+
+For scipy 0.18 and higher, more design options have been implemented
+(not yet in the GUI).
 
 **Design routines:**
 
-``scipy.signal.bessel()``
-``scipy.signal.buttord()``
+``scipy.signal.bessel()``, ``scipy.signal.buttord()``
 """
 
     def construct_UI(self):
