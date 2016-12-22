@@ -6,7 +6,7 @@ return the filter design in zeros, poles, gain (zpk) or second-order sections
 
 Attention:
 This class is re-instantiated dynamically every time the filter design method
-is selected, calling the __init__ method.
+is selected, calling its __init__ method.
 
 Version info:
     1.0: initial working release

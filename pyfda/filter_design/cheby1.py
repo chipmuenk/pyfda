@@ -4,8 +4,8 @@ Design Chebychev 1 filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zpk (zeros, poles, gain) or second-order sections (sos) format.
 
 Attention:
-This class is re-instantiated dynamically everytime the filter design method
-is selected, calling the __init__ method.
+This class is re-instantiated dynamically every time the filter design method
+is selected, calling its __init__ method.
 
 Version info:   
     1.0: initial working release
@@ -65,14 +65,20 @@ class Cheby1(object):
         self.info = """
 **Chebychev Type 1 filters**
 
-have a constant ripple :math:`A_PB` in the passband(s) only, the stopband
-drops monotonously. This is achieved by placing an `N`-fold zero at :math:`z=-1`.
+maximize the rate of cutoff between the frequency response’s passband and stopband,
+at the expense of ripple :math:`A_PB` in the passband and increased ringing in
+the step response. The stopband drops monotonously. 
 
-For the filter design, the order :math:`N`, the passband ripple :math:`A_PB` and
+Type I filters roll off faster than Type II (cheby2), but Type II filters do not
+have any ripple in the passband.
+
+The passband has a constant ripple (equiripple) with a total of :math:`N` maxima
+and minima (for example, a 5th-order filter has 3 maxima and 2 minima). Consequently,
+the DC gain is unity for odd-order low-pass filters, and :math:`-A_PB` dB for even-order filters.
+
+For a manual filter design, the order :math:`N`, the passband ripple :math:`A_PB` and
 the critical frequency / frequencies :math:`F_C` where the gain drops below
 :math:`-A_PB` have to be specified.
-
-The attenuation in the stop band can only be controlled by the filter order.
 
 The ``cheb1ord()`` helper routine calculates the minimum order :math:`N` and the 
 critical passband frequency :math:`F_C` from passband / stopband specifications.

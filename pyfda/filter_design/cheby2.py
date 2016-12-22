@@ -65,16 +65,19 @@ class Cheby2(object):
         self.info = """
 **Chebyshev Type 2 filters**
 
-have a constant ripple :math:`A_SB` in the stop band(s) only, the pass band
-drops monotonously. This is achieved by placing :math:`N` zeros along the stop
-band.
+maximize the rate of cutoff between the frequency response’s passband and stopband,
+at the expense of ripple in the stopband and increased ringing in the step response.
 
-Order :math:`N`, stop band ripple :math:`A_SB` and
+Type II filters do not roll off as fast as Type I but their pass band rolls off
+monotonously. They have a constant ripple (equiripple) :math:`A_SB` in the stop
+band(s).
+
+For manual filter design, order :math:`N`, stop band ripple :math:`A_SB` and
 critical frequency / frequencies :math:`F_C` where the stop band attenuation
-:math:`A_SB` is first reached have to be specified for filter design.
+:math:`A_SB` is first reached have to be specified.
 
 The corner frequency/ies of the pass band can only be controlled indirectly
-by the filter order and by slightly adapting the value(s) of :math:`F_C`.
+by the filter order and by adapting the value(s) of :math:`F_C`.
 
 The ``cheb2ord()`` helper routine calculates the minimum order :math:`N` and the 
 critical stop band frequency :math:`F_C` from pass and stop band specifications.
