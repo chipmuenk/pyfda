@@ -5,7 +5,7 @@ return the filter design in zeros, poles, gain (zpk) or second-order sections
 (sos) format
 
 Attention:
-This class is re-instantiated dynamically everytime the filter design method
+This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
 Version info:
@@ -99,18 +99,22 @@ class Butter(object):
         self.info = """
 **Butterworth filters**
 
-have ripple in neither pass- nor stopband(s).
+have a maximally flat frequency response in the passband and are monotonous 
+in both pass and stop band(s), the step response has only ~4% overshoot 
+. The roll-off is moderately steep, the non-linearity of phase response and 
+group delay are better than with Chebychev and elliptic designs
+of the same order. Butterworth filters are a good compromise for many applications.
 
-For the filter design, only the order :math:`N` and
+For manual order filter design, only the order :math:`N` and
 the - 3dB corner frequency / frequencies :math:`F_C` can be specified.
 
-The ``buttord()`` helper routine calculates the minimum order :math:`N` and the
-critical frequency from pass and stop band specifications.
+The minimum order :math:`N` and suitable critical frequency (ies) :math:`F_C`
+are calculated using the ``buttord()``  helper routine to meet pass and stop band specifications 
+
 
 **Design routines:**
 
-``scipy.signal.butter()``
-``scipy.signal.buttord()``
+``scipy.signal.butter()``, ``scipy.signal.buttord()``
 
         """
 
