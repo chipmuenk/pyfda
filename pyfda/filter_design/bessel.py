@@ -7,7 +7,7 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
-Version info:   
+Version info:
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
@@ -21,7 +21,7 @@ Version info:
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
 
-    
+
     Author: Christian Muenker
 """
 # TODO: bandpass and bandstop designs are unstable???
@@ -57,38 +57,38 @@ class Bessel(object):
                         }
                     },
             'LP': {'man':{'fspecs': ('a','F_C'),
-                          'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                          'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
                                            'amp':('u','A_PB','A_SB')})
                           },
                    'min':{'fspecs': ('d','F_C'),
-                          'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
                                            'amp':('a','A_PB','A_SB')})
                         }
                 },
             'HP': {'man':{'fspecs': ('a','F_C'),
-                          'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                          'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
                                            'amp':('u','A_SB','A_PB')})
                          },
                    'min':{'fspecs': ('d','F_C'),
-                          'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
                                            'amp':('a','A_SB','A_PB')})
                          }
                     },
             'BP': {'man':{'fspecs': ('a','F_C', 'F_C2'),
-                          'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
+                          'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('u','A_SB','A_PB')})
                          },
                    'min':{'fspecs': ('d','F_C','F_C2'),
-                          'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                          'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
                                            'amp':('a','A_SB','A_PB')})
                          },
                     },
             'BS': {'man':{'fspecs': ('a','F_C','F_C2'),
-                          'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
+                          'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'),
                                            'amp':('u','A_PB','A_SB')})
                           },
                    'min':{'fspecs': ('d','F_C','F_C2'),
-                          'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                          'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'),
                                            'amp':('a','A_PB','A_SB')})
                         }
                 }
@@ -127,9 +127,9 @@ For scipy 0.18 and higher, more design options have been implemented
 
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the 
+        Create additional subwidget(s) needed for filter design with the
         names given in self.wdg :
-        These subwidgets are instantiated dynamically when needed in 
+        These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         (empty method, nothing to do in this filter)
         """
@@ -163,10 +163,10 @@ For scipy 0.18 and higher, more design options have been implemented
         self.F_PBC = None
         self.F_C   = fil_dict['F_C'] * 2
         self.F_C2  = fil_dict['F_C2'] * 2
-        
+
         self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
         self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
-        
+
         # bessel filter routines support only one amplitude spec for
         # pass- and stop band each
         if str(fil_dict['rt']) == 'BS':
@@ -178,16 +178,16 @@ For scipy 0.18 and higher, more design options have been implemented
     def _save(self, fil_dict, arg):
         """
         Convert results of filter design to all available formats (pz, ba, sos)
-        and store them in the global filter dictionary. 
-        
-        Corner frequencies and order calculated for minimum filter order are 
+        and store them in the global filter dictionary.
+
+        Corner frequencies and order calculated for minimum filter order are
         also stored to allow for an easy subsequent manual filter optimization.
         """
         fil_save(fil_dict, arg, self.FRMT, __name__)
-        
+
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC
-        if str(fil_dict['fo']) == 'min': 
+        if str(fil_dict['fo']) == 'min':
             fil_dict['N'] = self.N
 
             if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
