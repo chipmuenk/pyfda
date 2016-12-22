@@ -2,7 +2,9 @@ pyFDA
 ======
 ## Python Filter Design Analysis Tool
 
+[![PyPI version](https://badge.fury.io/py/pyfda.svg)](https://badge.fury.io/py/pyfda)
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.
 
@@ -10,24 +12,32 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
 ### Prerequisites
-Python versions: 2.7 ... 3.5
+* Python versions: **2.7** or **3.3 ... 3.5**
+* All operating systems - there should be no OS specific requirements.
+* Libraries:
+  * **(Py)Qt4** or **(Py)Qt5**. When both libraries are installed, PyQt5 is used.
+  * **numpy**
+  * **scipy**
+  * **matplotlib**
 
-Besides standard python libraries, the project builds on the following libraries:
-* numpy
-* scipy
-* matplotlib
-* docutils
-* pyQt4 (pyQt5 supported real soon)
+Optional libraries:
+* **docutils** for rich text in documentation
+* **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
 
-Optional:
-* xlwt and / or XlsxWriter for exporting filter coefficients as *.xls(x) files
+### Installing pyFDA
+There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
 
-### Installing and starting pyFDA
 #### pip
-This is the most convenient variant:
+This is the most convenient way:
 
     pip install pyfda
-    pyfdax
+
+#### conda
+If you use the Anaconda distribution, you can install pyfda from my Anaconda channel `Chipmuenk` using
+
+    conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
+
+Unfortunately, Anaconda insists on providing OS- and Python-specific versions for `pyfda`. I'm working on that, help is appreciated ...
 
 #### setup.py
     
@@ -35,19 +45,21 @@ Download the zip file and extract it to a directory of your choice. Install it e
 
     >> python setup.py install
 
-or run it where you have installed the python source files using (for testing / development)
+or just create a link to where you have copied the python source files (for testing / development) using
 
     >> python setup.py develop
 
-#### Executing
-In both cases, start scripts `pyfdax` and `pyfdax_noterm`are created in `<python>/Scripts`.
+### Starting pyFDA
+In any case, the start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
-For development, you can also run pyFDA using
+    >> pyfdax
+
+For development and debugging, you can also run pyFDA using
 
     In [1]: %run -m pyfda.pyfdax :# IPython or
     >> python -m pyfda.pyfdax    # plain python interpreter
     
-or files from pyFDA using e.g.
+All individual files from pyFDA can be run using e.g.
 
     In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
     >> python -m pyfda.input_widgets.input_pz  # plain python interpreter
@@ -66,7 +78,8 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### The following features are currently implemented:
 
 * **Filter design**
-    * **Design methods** from scipy.signal: Equiripple, Firwin, Butterworth, Elliptic, Chebychev 1 and Chebychev 2 
+    * **Design methods** from scipy.signal: Equiripple, Firwin, Movine Average, Bessel, Butterworth, Elliptic, Chebychev 1 and Chebychev 2
+    * **Second-Order Sections** are used in the filter design when available for more robust filter design and analysis
     * **Remember all specifications** when changing filter design methods
     * **Fine-tune** manually the filter order and corner frequencies calculated by minimum order algorithms
     * **Compare filter designs** for a given set of specifications and different design methods
@@ -88,12 +101,10 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
  * Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. 
  * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
- * Filter design files can be added and edited *without* changing or even restarting the program
 * **Saving and loading**
  * Save and load filter designs in pickled and in numpy's NPZ-format
  * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format
-* **Display help files** (own / Python docstrings) as rich text
-* **Runs under Python 2.7 and Python 3.4** 
+* **Display help files** (own / Python docstrings) as rich text 
 
 **More screenshots from the current version:**
 <table>
@@ -110,9 +121,8 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### Release 0.1
 
 The following features are still missing for the first release. 
-* Issue #8 (pyFDA doesn't shut down properly) is fixed in v0.1rc1
-* **scipy 0.16 SOS features**: implemented for filter design and frequency domain representation, time domain (sosfilt) is still missing
-* pyQt5 compatibility has become a must since it has become the default version in Anaconda and WinPython
+* Not all filter specifications are handled properly (issues #36 and #40), this is addressed currently and will be fixed in 0.1rc4
+* Scrolling and resizing of widgets has some flaws creating problems with small screens
 
 ### Release 0.2
 * **myHDL support**
