@@ -4,8 +4,8 @@ Design Bessel filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
 Attention:
-This class is re-instantiated dynamically everytime the filter design method
-is selected, calling the __init__ method.
+This class is re-instantiated dynamically every time the filter design method
+is selected, calling its __init__ method.
 
 Version info:
     1.0: initial working release
@@ -24,12 +24,11 @@ Version info:
 
     Author: Christian Muenker
 """
-# TODO: bandpass and bandstop designs are unstable???
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import buttord
 
-from pyfda.pyfda_lib import fil_save, lin2unit
+from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 
 __version__ = "2.0"
 
@@ -37,7 +36,10 @@ filter_classes = {'Bessel':'Bessel'}
 
 class Bessel(object):
 
-    FRMT = 'zpk' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+    if SOS_AVAIL:
+        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
+    else:
+        FRMT = 'zpk'
 
     def __init__(self):
 
