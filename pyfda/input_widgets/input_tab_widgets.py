@@ -67,6 +67,9 @@ class InputTabWidgets(QWidget):
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
+        tabWidget.setSizePolicy(QSizePolicy.Minimum,
+                                QSizePolicy.Expanding)
+
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
         
@@ -74,8 +77,7 @@ class InputTabWidgets(QWidget):
         layVMain.setContentsMargins(1,1,1,1) # R, T, L, B
 #
         self.setLayout(layVMain)
-        tabWidget.setSizePolicy(QSizePolicy.Minimum,
-                                 QSizePolicy.Expanding)
+                                 
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
