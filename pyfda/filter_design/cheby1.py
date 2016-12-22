@@ -66,10 +66,10 @@ class Cheby1(object):
 **Chebychev Type 1 filters**
 
 maximize the rate of cutoff between the frequency response’s passband and stopband,
-at the expense of ripple :math:`A_PB` in the passband and increased ringing in
+at the expense of passband ripple :math:`A_PB` and increased ringing in
 the step response. The stopband drops monotonously. 
 
-Type I filters roll off faster than Type II (cheby2), but Type II filters do not
+Type I filters roll off faster than Type II, but Type II filters do not
 have any ripple in the passband.
 
 The passband has a constant ripple (equiripple) with a total of :math:`N` maxima

@@ -4,8 +4,8 @@ Design ellip-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
 Attention:
-This class is re-instantiated dynamically everytime the filter design method
-is selected, calling the __init__ method.
+This class is re-instantiated dynamically every time the filter design method
+is selected, calling its __init__ method.
 
 Version info:   
     1.0: initial working release
@@ -43,13 +43,20 @@ class Ellip(object):
     info = """
 **Elliptic filters**
 
-(also known as Cauer filters) have a constant ripple :math:`A_PB` resp.
-:math:`A_SB` in both pass- and stopband(s).
+(also known as Cauer filters) have the steepest rate of transition between the 
+frequency response’s passband and stopband of all IIR filters. This comes
+at the expense of a constant ripple (equiripple) :math:`A_PB` and :math:`A_SB`
+in both pass and stop band. Ringing of the step response is increased in
+comparison to Chebychev filters.
+ 
+As the passband ripple :math:`A_PB` approaches 0, the elliptical filter becomes
+a Chebyshev type II filter. As the stopband ripple :math:`A_SB` approaches 0,
+it becomes a Chebyshev type I filter. As both approach 0, it becomes a Butterworth
+filter (butter).
 
 For the filter design, the order :math:`N`, minimum stopband attenuation
-:math:`A_SB` and
-the critical frequency / frequencies :math:`F_PB` where the gain first drops below
-the maximum passband ripple :math:`-A_PB` have to be specified.
+:math:`A_SB` and the critical frequency / frequencies :math:`F_PB` where the 
+gain first drops below the maximum passband ripple :math:`-A_PB` have to be specified.
 
 The ``ellipord()`` helper routine calculates the minimum order :math:`N` and the 
 critical passband frequency :math:`F_C` from pass and stop band specifications.

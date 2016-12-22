@@ -5,8 +5,6 @@ Widget for entering amplitude specifications
 Author: Christian Münker
 """
 
-# TODO: Check specs IIR / FIR A_PB <-> delta_PB
-
 from __future__ import print_function, division, unicode_literals
 import sys
 import logging
