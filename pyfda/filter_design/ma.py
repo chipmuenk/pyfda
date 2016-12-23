@@ -43,7 +43,7 @@ filter_classes = {'MA':'Moving Average'}
          
 class MA(QWidget):
         
-    FRMT = {'zpk', 'ba'} # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
+    FRMT = ('zpk', 'ba') # output format(s) of filter design routines 'zpk' / 'ba' / 'sos'
 
 
     info ="""
