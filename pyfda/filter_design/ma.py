@@ -216,16 +216,15 @@ a given frequency can be calculated via the si function (not implemented yet).
         has nothing to do here except deleting an 'sos' entry from an earlier
         filter design.
         """
-        if 'zpk' in self.FRMT:        
+        if 'zpk' in self.FRMT:
             fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
+
         if 'ba' in self.FRMT:
             fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
+
         fil_convert(fil_dict, self.FRMT)
 
-#        if str(fil_dict['fo']) == 'min': 
-        fil_dict['N'] = self.N  # yes, update filterbroker
-
-#        self._store_entries()
+        fil_dict['N'] = self.N  # always update filter dict with filter order
         
         
     def _create_ma(self, fil_dict, rt='LP'):
