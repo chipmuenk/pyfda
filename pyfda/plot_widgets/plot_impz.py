@@ -237,8 +237,6 @@ class PlotImpz(QWidget):
         self.ledFreq.setVisible(periodic_sig)
         self.lblFreqUnit.setVisible(periodic_sig)
 
-        
-#        self.lblFreqUnit.setVisible(fb.fil[0]['freq_specs_unit'] == 'f_S')
         self.lblFreqUnit.setText(rt_label(fb.fil[0]['freq_specs_unit']))
         self.load_entry()
         
