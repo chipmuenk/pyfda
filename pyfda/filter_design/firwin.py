@@ -294,8 +294,7 @@ class Firwin(QWidget):
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N'] # remez algorithms expects number of taps
-                                # which is larger by one than the order?!
+        self.N     = fil_dict['N']
         self.F_PB  = fil_dict['F_PB']
         self.F_SB  = fil_dict['F_SB']
         self.F_PB2 = fil_dict['F_PB2']
