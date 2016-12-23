@@ -89,10 +89,17 @@ a given frequency can be calculated via the si function (not implemented yet).
                          },
                 },
             'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
-                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                                           'amp':('u','A_PB','A_SB','A_PB2')}),
+                    'msg': ('a', "/nThis is not a proper band stop, it only lets pass"
+                            " frequency components around DC and <i>f<sub>S</sub></i>/2."
+                            " The order needs to be even."),
                         }},
             'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
-                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                                           'amp':('u','A_SB','A_PB','A_SB2')}),
+                    'msg': ('a', "/nThis is not a proper band pass, it only lets pass"
+                            " frequency components around <i>f<sub>S</sub></i>/4."
+                            " The order needs to be even."),
+
                         }},
                 }
 
