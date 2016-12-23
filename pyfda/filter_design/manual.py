@@ -33,13 +33,12 @@ filter_classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'}
 FRMT = 'ba' # default output format of filter design routines 'zpk' / 'ba' / 'sos'
 
 msg_man = ('a', "Design the filter using the P/Z or the b/a widget. "
-                "The target specs are only used for displaying spec limits.")
+                "The target specs are only used for entering and displaying spec limits.")
                 
-info_str =  ('In manual filter design mode you can only enter the target specifications of the filter. '
-        'Design the filter by entering / editing poles and zeros ("P/Z" tab) or coefficients '
-        '("b,a" tab). Use the info tab or the magnitude frequency response (check "Show Specs") '
-        'to check whether the designed filter fulfills the specs.')
-
+info_str =  ('In manual filter design mode the filter is designed by entering / editing '
+        'poles and zeros ("P/Z" tab) or coefficients ("b,a" tab). Use the info tab '
+        'or the magnitude frequency response (select "Show Specs") to check whether '
+        'the designed filter fulfills the specs in the "Target Specs" fields.')
 
 class Manual_FIR(object):
     
