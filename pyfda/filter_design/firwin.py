@@ -81,12 +81,19 @@ class Firwin(QWidget):
             }
             
         
-        self.info = """Windowed FIR filters are designed by truncating the
+        self.info = """**Windowed FIR filters**
+        
+        are designed by truncating the
         infinite impulse response of an ideal filter with a window function.
         The kind of used window has strong influence on ripple etc. of the
         resulting filter.
+        
+        **Design routines:**
+
+        ``scipy.signal.firwin()``
+
         """
-        #self.info_doc = [] is set in self.updateWindow()
+        #self.info_doc = [] is set in self._update_UI()
         
         #------------------- end of static info for filter tree ---------------
 
