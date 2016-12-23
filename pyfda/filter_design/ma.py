@@ -35,7 +35,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import fil_save, fil_convert #, round_odd, ceil_even, remezord, 
+from pyfda.pyfda_lib import fil_save, fil_convert, round_odd, ceil_even#, remezord, 
 
 __version__ = "2.0"
 
@@ -56,7 +56,7 @@ a given frequency can be calculated via the si function (not implemented yet).
 
 **Design routines:**
 
-``ma.calc()``\n
+``ma.calc()``
     """
 
     sigFiltChanged = pyqtSignal()
@@ -87,7 +87,13 @@ a given frequency can be calculated via the si function (not implemented yet).
             'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
                                            'amp':('u','A_SB','A_PB')})
                          },
-                    }
+                },
+            'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
+                                           'amp':('u','A_PB','A_SB','A_PB2')})
+                        }},
+            'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
+                                           'amp':('u','A_SB','A_PB','A_SB2')})
+                        }},
                 }
 
 
@@ -218,8 +224,8 @@ a given frequency can be calculated via the si function (not implemented yet).
             fil_save(fil_dict, self.b, 'ba', __name__, convert = False)
         fil_convert(fil_dict, self.FRMT)
 
-        if str(fil_dict['fo']) == 'min': 
-            fil_dict['N'] = self.N  # yes, update filterbroker
+#        if str(fil_dict['fo']) == 'min': 
+        fil_dict['N'] = self.N  # yes, update filterbroker
 
 #        self._store_entries()
         
@@ -233,29 +239,59 @@ a given frequency can be calculated via the si function (not implemented yet).
         b = 1.
         k = 1.
         L = self.N + 1
+        
         if rt == 'LP':
-            b0 = np.ones(L)
-            z0 = np.exp(-2j*np.pi*np.arange(1,L)/L)
+            b0 = np.ones(L) #  h[n] = {1; 1; 1; ...}
+            i = np.arange(1,L)
+
+            norm = L
+
         elif rt == 'HP':
             b0 = np.ones(L)
-            b0[::2] = -1.
+            b0[::2] = -1. # h[n] = {1; -1; 1; -1; ...}
+            
             i = np.arange(L)
             if (L % 2 == 0): # even order, remove middle element
                 i = np.delete(i ,round(L/2.))
             else: # odd order, shift by 0.5 and remove middle element
                 i = np.delete(i, int(L/2.)) + 0.5
-            z0 = np.exp(-2j*np.pi*i/L)
+
+            norm = L
             
+        elif rt == 'BP':
+            # N is even, L is odd
+            b0 = np.ones(L)
+            b0[1::2] = 0
+            b0[::4] = -1 # h[n] = {1; 0; -1; 0; 1; ... }
+            
+            L = L + 1
+            i = np.arange(L) # create N + 2 zeros around the unit circle, ...
+            # ... remove first and middle element and rotate by L / 4 
+            i = np.delete(i, [0, (L) // 2]) + L / 4         
+
+            norm = np.sum(abs(b0))
+
+        elif rt == 'BS':
+            # N is even, L is odd
+            b0 = np.ones(L)
+            b0[1::2] = 0
+
+            L = L + 1
+            i = np.arange(L) # create N + 2 zeros around the unit circle and ...
+            i = np.delete(i, [0, (L) // 2]) # ... remove first and middle element
+
+            norm = np.sum(b0)
+
+        z0 = np.exp(-2j*np.pi*i/L)            
         # calculate filter for multiple cascaded stages    
         for i in range(self.ma_stages):
             b = np.convolve(b0, b)
         z = np.repeat(z0, self.ma_stages)
-#       print("z0", z0, '\nz',  z)
         
-        # normalize filter to |H_max| = 1 is checked:
+        # normalize filter to |H_max| = 1 if checked:
         if self.chk_ma_2.isChecked():
-            b = b / (L ** self.ma_stages)
-            k = 1./L ** self.ma_stages
+            b = b / (norm ** self.ma_stages)
+            k = 1./norm ** self.ma_stages
         p = np.zeros(len(z))
         
         # store in class attributes for the _save method
@@ -279,6 +315,16 @@ a given frequency can be calculated via the si function (not implemented yet).
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self._create_ma(fil_dict, rt = 'HP')
+        
+    def BSman(self, fil_dict):
+        self._get_params(fil_dict)
+        self.N = ceil_even(self.N)  # enforce even order
+        self._create_ma(fil_dict, rt = 'BS')     
+        
+    def BPman(self, fil_dict):
+        self._get_params(fil_dict)
+        self.N = ceil_even(self.N)  # enforce even order
+        self._create_ma(fil_dict, rt = 'BP')     
 
 #    def HPmin(self, fil_dict):
 #        self._get_params(fil_dict)
