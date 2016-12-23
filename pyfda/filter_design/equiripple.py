@@ -64,7 +64,7 @@ The filter-coefficients are calculated in such a way that the transfer function
 minimizes the maximum error (**Minimax** design) between the desired gain and the
 realized gain in the specified frequency bands using the **Remez** exchange algorithm.
 The filter design algorithm is known as **Parks-McClellan** algorithm, in
-Matlab (R) it is called``firpm``.
+Matlab (R) it is called ``firpm``.
 
 Manual filter order design requires specifying the frequency bands (:math:`A_PB`,
 :math:`A_SB` etc.), the filter order :math:`N` and weight factors for the different
