@@ -963,7 +963,7 @@ def fil_convert(fil_dict, format_in):
             try:
                 fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
             except ValueError:
-                fil_dict['sos'] = 'None'
+                fil_dict['sos'] = []
                 print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
 
     elif 'sos' in format_in and SOS_AVAIL:
