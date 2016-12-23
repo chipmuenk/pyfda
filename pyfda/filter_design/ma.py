@@ -78,26 +78,37 @@ a given frequency can be calculated via the si function (not implemented yet).
                    "Enter desired order (= delays) <b><i>N</i></b> per stage and"
                     " the number of <b>stages</b>. Target frequencies and amplitudes"
                     " are only used for comparison, not for the design itself.")
+                        },
+                    'min':{'fo': ('d', 'N'),
+                          'msg':('a',
+                   "Enter desired attenuation <b><i>A<sub>SB</sub></i></b> at "
+                   "the corner of the stop band <b><i>F<sub>SB</sub></i></b>.")
                         }
                     },
             'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
                                            'amp':('u','A_PB','A_SB')})
-                          } 
+                          },
+                   'min':{'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                                           'amp':('a','A_PB','A_SB')})
+                   }
                 },
             'HP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
                                            'amp':('u','A_SB','A_PB')})
                          },
+                   'min':{'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                                           'amp':('a','A_SB','A_PB')})
+                         },
                 },
             'BS': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2', 'F_PB2'), 
                                            'amp':('u','A_PB','A_SB','A_PB2')}),
-                    'msg': ('a', "/nThis is not a proper band stop, it only lets pass"
+                    'msg': ('a', "\nThis is not a proper band stop, it only lets pass"
                             " frequency components around DC and <i>f<sub>S</sub></i>/2."
                             " The order needs to be even."),
                         }},
             'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
                                            'amp':('u','A_SB','A_PB','A_SB2')}),
-                    'msg': ('a', "/nThis is not a proper band pass, it only lets pass"
-                            " frequency components around <i>f<sub>S</sub></i>/4."
+                    'msg': ('a', "\nThis is not a proper band pass, it only lets pass"
+                            " frequency components around :math:`f_S / 4`."
                             " The order needs to be even."),
 
                         }},
@@ -227,7 +238,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         fil_dict['N'] = self.N  # always update filter dict with filter order
         
         
-    def _create_ma(self, fil_dict, rt='LP'):
+    def _calc_ma(self, fil_dict, rt='LP'):
         """
         Calculate coefficients and P/Z for moving average filter based on
         filter length L = N + 1 and number of cascaded stages and save the 
@@ -299,43 +310,33 @@ a given frequency can be calculated via the si function (not implemented yet).
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._create_ma(fil_dict)
+        self._calc_ma(fil_dict, rt = 'LP')
                    
-#    def LPmin(self, fil_dict):
-#        self._get_params(fil_dict)
-#        (self.N, F, A, W) = remezord([self.F_PB, self.F_SB], [1, 0],
-#            [self.A_PB, self.A_SB], Hz = 1, alg = self.alg)
-#
-#        self._save(fil_dict, sig.remez(self.N, F, [1, 0], weight = W, Hz = 1,
-#                        grid_density = self.grid_density))
+    def LPmin(self, fil_dict):
+        self._get_params(fil_dict)
+        self.N = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
+                                                     np.sin(self.F_SB * np.pi))))
+        self._calc_ma(fil_dict, rt = 'LP')
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._create_ma(fil_dict, rt = 'HP')
+        self._calc_ma(fil_dict, rt = 'HP')
+
+    def HPmin(self, fil_dict):
+        self._get_params(fil_dict)
+        self.N = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
+                                              np.sin((0.5 - self.F_SB) * np.pi))))
+        self._calc_ma(fil_dict, rt = 'HP')
         
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = ceil_even(self.N)  # enforce even order
-        self._create_ma(fil_dict, rt = 'BS')     
+        self._calc_ma(fil_dict, rt = 'BS')     
         
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = ceil_even(self.N)  # enforce even order
-        self._create_ma(fil_dict, rt = 'BP')     
-
-#    def HPmin(self, fil_dict):
-#        self._get_params(fil_dict)
-#        (self.N, F, A, W) = remezord([self.F_SB, self.F_PB], [0, 1],
-#            [self.A_SB, self.A_PB], Hz = 1, alg = self.alg)
-##        
-#
-#        if (self.N % 2 == 0): # even order
-#            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
-#                        type = 'hilbert', grid_density = self.grid_density))
-#        else:
-#            self._save(fil_dict, sig.remez(self.N, F,[0, 1], weight = W, Hz = 1, 
-#                        type = 'bandpass', grid_density = self.grid_density))
-
+        self._calc_ma(fil_dict, rt = 'BP')     
 
 #------------------------------------------------------------------------------
 
