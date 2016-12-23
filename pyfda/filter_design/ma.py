@@ -200,15 +200,6 @@ a given frequency can be calculated via the si function (not implemented yet).
             print("Key Error:",e)
 
 
-#    def _store_entries(self):
-#        """
-#        Store parameter settings in filter dictionary.
-#        """
-#        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
-#                                     'ma_normalize':self.chk_ma_2.isChecked()}})
-
-
-
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
@@ -221,9 +212,9 @@ a given frequency can be calculated via the si function (not implemented yet).
 
     def _save(self, fil_dict):
         """
-        Convert between poles / zeros / gain, filter coefficients (polynomes)
-        and second-order sections and store all available formats in the passed
-        dictionary 'fil_dict'.
+        Save MA-filters both in 'zpk' and 'ba' format. Subsequent conversion
+        has nothing to do here except deleting an 'sos' entry from an earlier
+        filter design.
         """
         if 'zpk' in self.FRMT:        
             fil_save(fil_dict, self.zpk, 'zpk', __name__, convert = False)
