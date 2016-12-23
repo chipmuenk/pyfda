@@ -35,7 +35,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import fil_save, fil_convert, round_odd, ceil_even#, remezord, 
+from pyfda.pyfda_lib import fil_save, fil_convert, ceil_even
 
 __version__ = "2.0"
 
