@@ -227,7 +227,7 @@ class FilterInfo(QWidget):
             unit = 'dB' # fix this for the moment
             # construct pairs of corner frequency and corresponding amplitude
             # labels in ascending frequency for each response type        
-            if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS'}:
+            if fb.fil[0]['rt'] in {'LP', 'HP', 'BP', 'BS', 'HIL'}:
                 if fb.fil[0]['rt'] == 'LP':
                     f_lbls = ['F_PB', 'F_SB'] 
                     a_lbls = ['A_PB', 'A_SB']
@@ -240,6 +240,10 @@ class FilterInfo(QWidget):
                 elif fb.fil[0]['rt'] == 'BS':
                     f_lbls = ['F_PB', 'F_SB', 'F_SB2', 'F_PB2']
                     a_lbls = ['A_PB', 'A_SB', 'A_SB', 'A_PB2']
+                elif fb.fil[0]['rt'] == 'HIL':
+                    f_lbls = ['F_PB', 'F_PB2']
+                    a_lbls = ['A_PB', 'A_PB']
+
 
             # Try to get lists of frequency / amplitude specs from the filter dict
             # that correspond to the f_lbls / a_lbls pairs defined above

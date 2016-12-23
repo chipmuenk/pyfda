@@ -240,7 +240,7 @@ class PlotHf(QWidget):
             F_lim_lor = F_lim_upr
             A_lim_lor = [A_PB_minx, A_PB2_min, A_PB2_min]
 
-        if fb.fil[0]['rt'] in {"BP", "HIL"}:
+        if fb.fil[0]['rt'] == 'BP':
             F_lim_upl = [0,    F_SB, F_SB]
             A_lim_upl = [A_SB, A_SB, A_SB_maxx]
 
@@ -251,6 +251,13 @@ class PlotHf(QWidget):
 
             F_lim_upr = [F_SB2,    F_SB2, F_max]
             A_lim_upr = [A_SB_maxx, A_SB2, A_SB2]
+
+        if fb.fil[0]['rt'] == 'HIL':
+            F_lim_upc = [F_PB,      F_PB,     F_PB2,    F_PB2]
+            A_lim_upc = [A_PB_maxx, A_PB_max, A_PB_max, A_PB_maxx]
+
+            F_lim_loc = F_lim_upc
+            A_lim_loc = [A_PB_minx, A_PB_min, A_PB_min, A_PB_minx]
 
         F_lim_upr = np.array(F_lim_upr)
         F_lim_lor = np.array(F_lim_lor)
