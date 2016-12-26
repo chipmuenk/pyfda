@@ -6,7 +6,6 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 SPLITTER = True
-SCROLL = False
 import sys, os
 #from sip import setdestroyonexit
 import logging
@@ -14,8 +13,7 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
-                     QSplitter, QScrollArea, QIcon, QMessageBox,
-                     QWidget, QFrame,
+                     QSplitter, QIcon, QMessageBox, QWidget, QFrame,
                      QVBoxLayout, QHBoxLayout, QSizePolicy)
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
@@ -135,22 +133,6 @@ class pyFDA(QMainWindow):
             layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
-
-        if SCROLL:
-            # Create scroll area and "monitor" _widget whether scrollbars are needed
-            scrollArea = QScrollArea()
-            scrollArea.setWidget(self.main_widget) # make main widget "scrollable"
-    
-            #============= Set behaviour of scroll area ======================
-            # scroll bars appear when the scroll area shrinks below this size:
-            scrollArea.setMinimumSize(QtCore.QSize(800, 500))
-    #        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
-    #        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
-            scrollArea.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                     QSizePolicy.MinimumExpanding)
-    
-            # Size of monitored widget is allowed to grow:
-            scrollArea.setWidgetResizable(True)
     
         self.main_widget.setFocus()
         # make main_widget occupy the main area of QMainWidget 
