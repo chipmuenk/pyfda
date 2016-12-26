@@ -9,7 +9,9 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QWidget, QVBoxLayout, QSizePolicy, pyqtSignal
+from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, QSizePolicy, pyqtSignal
+
+SCROLL = True
 
 import pyfda.filterbroker as fb
 
@@ -70,14 +72,33 @@ class InputTabWidgets(QWidget):
         tabWidget.setSizePolicy(QSizePolicy.Minimum,
                                 QSizePolicy.Expanding)
 
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(tabWidget)
-        
+        layVMain = QVBoxLayout(self)
+
         #setContentsMargins -> number of pixels between frame window border
         layVMain.setContentsMargins(1,1,1,1) # R, T, L, B
 #
-        self.setLayout(layVMain)
-                                 
+
+#--------------------------------------
+        if SCROLL:
+#            mygroupbox.setLayout(myform)
+            scroll = QScrollArea()
+            scroll.setWidget(tabWidget)
+            scroll.setWidgetResizable(True) # Size of monitored widget is allowed to grow:
+
+            # scroll bars appear when the scroll area shrinks below this size:
+#            scrollArea.setMinimumSize(QtCore.QSize(800, 500))
+    #        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
+    #        scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
+            scroll.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                     QSizePolicy.MinimumExpanding)
+
+#            scroll.setFixedHeight(400)
+            layVMain.addWidget(scroll)
+        else:
+            layVMain.addWidget(tabWidget) # add the tabWidget directly
+
+        self.setLayout(layVMain) # set the main layout of the window
+                                
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
