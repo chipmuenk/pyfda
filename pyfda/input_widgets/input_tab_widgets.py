@@ -56,8 +56,8 @@ class InputTabWidgets(QWidget):
 
     def _construct_UI(self):
         """ Initialize UI with tabbed input widgets """
-        tabWidget = QTabWidget()
-        tabWidget.setObjectName("TabWidg")
+        tabWidget = QTabWidget(self)
+        tabWidget.setObjectName("InpTabWdg")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.addTab(self.file_io, 'Files')
