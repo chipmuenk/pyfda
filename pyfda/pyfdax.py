@@ -166,9 +166,6 @@ class pyFDA(QMainWindow):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
         self.inputTabWidgets.sigFilterDesigned.connect(self.pltTabWidgets.update_data)
-        #
-        # sigReadFilters: button has been pressed to rebuild filter tree:
-        self.inputTabWidgets.file_io.sigReadFilters.connect(self.ftb.init_filters)
 
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 
