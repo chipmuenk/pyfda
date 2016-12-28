@@ -74,10 +74,14 @@ class FilterSpecs(QWidget):
         self.frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmMsg.setLayout(layVMsg)
         self.frmMsg.setSizePolicy(QSizePolicy.Minimum,
-                             QSizePolicy.Minimum)
+                                  QSizePolicy.Minimum)
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
         self.butQuit = QPushButton("Quit", self)
+        layHButtons = QHBoxLayout()
+#        layHButtons.setContentsMargins(2, 2, 2, 2)
+        layHButtons.addWidget(self.butDesignFilt)  # <Design Filter> button
+        layHButtons.addWidget(self.butQuit)        # <Quit> button
 
         #----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
