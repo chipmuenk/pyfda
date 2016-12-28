@@ -69,8 +69,8 @@ class InputTabWidgets(QWidget):
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
-        tabWidget.setSizePolicy(QSizePolicy.Minimum,
-                                QSizePolicy.Expanding)
+#        tabWidget.setSizePolicy(QSizePolicy.Minimum,
+#                                QSizePolicy.Expanding)
 
         layVMain = QVBoxLayout(self)
 
@@ -80,17 +80,16 @@ class InputTabWidgets(QWidget):
 
 #--------------------------------------
         if SCROLL:
-#            mygroupbox.setLayout(myform)
             scroll = QScrollArea()
             scroll.setWidget(tabWidget)
             scroll.setWidgetResizable(True) # Size of monitored widget is allowed to grow:
 
             # scroll bars appear when the scroll area shrinks below this size:
-#            scrollArea.setMinimumSize(QtCore.QSize(800, 500))
+#            scroll.setMinimumSize(QtCore.QSize(800, 500))
     #        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
     #        scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
             scroll.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                     QSizePolicy.MinimumExpanding)
+                                 QSizePolicy.MinimumExpanding)
 
 #            scroll.setFixedHeight(400)
             layVMain.addWidget(scroll)
