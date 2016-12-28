@@ -106,17 +106,17 @@ class pyFDA(QMainWindow):
             layVPlt = QVBoxLayout()
             layVPlt.addWidget(self.pltTabWidgets)
     
-            frmInput = QFrame()
+            frmInput = QFrame(self)
             frmInput.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
             frmInput.setLayout(layVInput)
-            frmInput.setSizePolicy(QSizePolicy.Minimum,
-                                     QSizePolicy.Minimum)
+            frmInput.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                   QSizePolicy.MinimumExpanding)
     
-            frmPlt = QFrame()
+            frmPlt = QFrame(self)
             frmPlt.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
             frmPlt.setLayout(layVPlt)
-            frmPlt.setSizePolicy(QSizePolicy.Minimum,
-                                     QSizePolicy.Minimum)
+            frmPlt.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                 QSizePolicy.MinimumExpanding)
     
             splitter = QSplitter(QtCore.Qt.Horizontal)
             splitter.addWidget(frmInput)
@@ -127,10 +127,10 @@ class pyFDA(QMainWindow):
             layHMain.addWidget(splitter)
 
         else: # no splitter design, only use layHMain layout
-            self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
+            self.inputTabWidgets.setMaximumWidth(420)
             layHMain.addWidget(self.inputTabWidgets)
             layHMain.addWidget(self.pltTabWidgets)
-            layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
+            layHMain.setContentsMargins(0, 0, 0, 0) # R, T, L, B
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
     
