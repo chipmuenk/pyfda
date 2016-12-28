@@ -10,7 +10,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QLabel, QFont, QVBoxLayout, QGridLayout, pyqtSignal
+from ..compat import QWidget, QLabel, QFont, QGridLayout, pyqtSignal, Qt
 
 import pyfda.filterbroker as fb
 from pyfda.input_widgets import amplitude_specs, freq_specs
@@ -55,20 +55,12 @@ class TargetSpecs(QWidget):
         lblTitle.setText(self.title)
         lblTitle.setFont(bfont)
         
-        layVFreq = QVBoxLayout()  # add stretch at bottom of ampSpecs
-        layVFreq.addWidget(self.f_specs) # to compensate for different number of 
-        layVFreq.addStretch()           # arguments
-        
-        layVAmp = QVBoxLayout()  # add stretch at bottom of freqSpecs
-        layVAmp.addWidget(self.a_specs) # to compensate for different number of 
-        layVAmp.addStretch()           # arguments
-        
         layGMain = QGridLayout()
-        layGMain.addWidget(lblTitle,0,0,1,2)# title
-        layGMain.addLayout(layVFreq,1,0)  # frequency specifications
-        layGMain.addLayout(layVAmp,1,1)  # amplitude specifications
-
-        layGMain.setContentsMargins(1,1,1,1)
+        layGMain.setAlignment(Qt.AlignTop)
+        layGMain.addWidget(lblTitle,0,0,1,2) # title
+        layGMain.addWidget(self.f_specs,1,0) # frequency specs
+        layGMain.addWidget(self.a_specs,1,1) # ampltitude specs
+        layGMain.setContentsMargins(1,0,1,0) # (left, top, right, bottom)
 
         self.setLayout(layGMain)
 
