@@ -278,12 +278,12 @@ class PlotImpz(QWidget):
             x = sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
             title_str = r'Response to Sawtooth Signal'
             H_str = r'$h_{saw}[n]$'
-         
-        if len(sos) == 0: # no second order sections for current filter          
-            h = sig.lfilter(self.bb, self.aa, x)
-            dc = sig.freqz(self.bb, self.aa, [0])
-        else:
+
+        if len(sos) > 0: # has second order sections        
             h = sig.sosfilt(sos, x)
+            dc = sig.freqz(self.bb, self.aa, [0])
+        else: # no second order sections for current filter 
+            h = sig.lfilter(self.bb, self.aa, x)
             dc = sig.freqz(self.bb, self.aa, [0])
         
         if stim == "StepErr":

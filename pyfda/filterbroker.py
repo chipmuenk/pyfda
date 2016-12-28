@@ -189,7 +189,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
             'q_coeff':{'QI':0, 'QF': 15, 'quant': 'round', 'ovfl': 'sat', 'frmt':'frac'},
-            'sos': None,
+            'sos': [],
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
             'amp_specs_unit':'dB',
             'freqSpecsRangeType':'Half',
