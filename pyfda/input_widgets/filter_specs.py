@@ -12,9 +12,8 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 
-from ..compat import (QWidget, QLabel, QFrame, QPushButton,
-                      QVBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal)
+from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal, QtGui,
+                      QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -83,22 +82,20 @@ class FilterSpecs(QWidget):
         #----------------------------------------------------------------------
         # LAYOUT for input specifications and buttons
         #----------------------------------------------------------------------
-        layGMain = QGridLayout()
-        layGMain.addWidget(self.sel_fil, 0, 0, 1, 2)  # Design method (IIR - ellip, ...)
-        layGMain.addWidget(self.f_units, 1, 0, 1, 2)  # Frequency units
-        layGMain.addWidget(self.f_specs, 2, 0, 1, 2)  # Freq. specifications
-        layGMain.addWidget(self.a_specs, 3, 0, 1, 2)  # Amplitude specs
-        layGMain.addWidget(self.w_specs, 4, 0, 1, 2)  # Weight specs
-        layGMain.addWidget(self.frmMsg, 5, 0, 1, 2)        # Text message
-        layGMain.addWidget(self.t_specs, 6, 0, 1, 2)  # Target specs
-        layGMain.setRowStretch(7,1)
-#        layGMain.addWidget(HLine(QFrame, self), 7,0,1,2) # create HLine
+        layVMain = QVBoxLayout(self)
+        layVMain.addWidget(self.sel_fil)  # Design method (IIR - ellip, ...)         
+        layVMain.addLayout(layHButtons)   # <Design> & <Quit> buttons
+        layVMain.addWidget(self.f_units)  # Frequency units
+        layVMain.addWidget(self.t_specs)  # Target specs
+        layVMain.addWidget(self.f_specs)  # Freq. specifications
+        layVMain.addWidget(self.a_specs)  # Amplitude specs
+        layVMain.addWidget(self.w_specs)  # Weight specs
+        layVMain.addWidget(self.frmMsg)   # Text message
 
-        layGMain.addWidget(self.butDesignFilt, 8, 0)  # <Design Filter> button
-        layGMain.addWidget(self.butQuit, 8, 1)        # <Quit> button
-        layGMain.setContentsMargins(0, 0, 0, 0)
+        layVMain.addStretch()
+        layVMain.setContentsMargins(1, 0, 1, 0) # R, T, L, B
 
-        self.setLayout(layGMain) # main layout of widget
+        self.setLayout(layVMain) # main layout of widget
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTS
