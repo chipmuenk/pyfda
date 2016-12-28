@@ -348,6 +348,13 @@ class PlotImpz(QWidget):
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
 
+        self.redraw()
+        
+#------------------------------------------------------------------------------
+    def redraw(self):
+        """
+        Redraw the canvas when e.g. the canvas size has changed
+        """
         self.mplwidget.redraw()
 
 #------------------------------------------------------------------------------        

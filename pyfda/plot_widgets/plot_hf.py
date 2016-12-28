@@ -116,7 +116,8 @@ class PlotHf(QWidget):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
-
+        
+        
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
@@ -549,9 +550,14 @@ class PlotHf(QWidget):
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
 
-        self.mplwidget.redraw()
+        self.redraw()
         
-       
+#------------------------------------------------------------------------------
+    def redraw(self):
+        """
+        Redraw the canvas when e.g. the canvas size has changed
+        """
+        self.mplwidget.redraw()
 
 
 #------------------------------------------------------------------------------

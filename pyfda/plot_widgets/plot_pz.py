@@ -90,10 +90,17 @@ class PlotPZ(QWidget):
         self.ax.set_xlabel('Real axis')
         self.ax.set_ylabel('Imaginary axis')
 
+        self.redraw()
+        
+#------------------------------------------------------------------------------
+    def redraw(self):
+        """
+        Redraw the canvas when e.g. the canvas size has changed
+        """
         self.mplwidget.redraw()
         
         
-
+#------------------------------------------------------------------------------
     def zplane(self, b=None, a=1, z=None, p=None, k =1,  pn_eps=1e-3, analog=False, plt_ax = None,
               verbose=False, style='square', anaCircleRad=0, lw=2,
               mps = 10, mzs = 10, mpc = 'r', mzc = 'b', plabel = '', zlabel = ''):

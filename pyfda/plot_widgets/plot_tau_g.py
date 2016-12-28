@@ -117,7 +117,15 @@ class PlotTauG(QWidget):
         self.ax.set_ylim([max(min(tau_g)-0.5,0), max(tau_g) + 0.5])
         self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
+        self.redraw()
+        
+#------------------------------------------------------------------------------
+    def redraw(self):
+        """
+        Redraw the canvas when e.g. the canvas size has changed
+        """
         self.mplwidget.redraw()
+        
 #------------------------------------------------------------------------------
 
 def main():

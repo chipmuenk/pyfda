@@ -142,6 +142,13 @@ class PlotPhi(QWidget):
         self.ax.set_ylabel(y_str)
         self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
+        self.redraw()
+        
+#------------------------------------------------------------------------------
+    def redraw(self):
+        """
+        Redraw the canvas when e.g. the canvas size has changed
+        """
         self.mplwidget.redraw()
 
 #------------------------------------------------------------------------------
