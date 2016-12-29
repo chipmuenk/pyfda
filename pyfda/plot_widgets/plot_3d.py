@@ -586,6 +586,13 @@ class Plot3D(QWidget):
 #        self.ax3d.set_zlabel(r'$|H(z)|\; \rightarrow $')
         self.ax3d.set_title(r'3D-Plot of $|H(\mathrm{e}^{\mathrm{j} \Omega})|$ and $|H(z)|$')
 
+        self.redraw()
+        
+#------------------------------------------------------------------------------
+    def redraw(self):
+        """
+        Redraw the canvas when e.g. the canvas size has changed
+        """
         self.mplwidget.redraw()
 
 #------------------------------------------------------------------------------

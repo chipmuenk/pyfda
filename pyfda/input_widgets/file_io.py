@@ -62,7 +62,6 @@ class File_IO(QWidget):
     """
     
     sigFilterLoaded = QtCore.pyqtSignal() # emitted when filter has been loaded successfully
-    sigReadFilters = QtCore.pyqtSignal()  # emitted when button "Read Filters" is pressed
 
     def __init__(self, parent):
         super(File_IO, self).__init__(parent)
@@ -84,10 +83,6 @@ class File_IO(QWidget):
         self.butSave = QPushButton("Save Filter", self)
         self.butLoad = QPushButton("Load Filter", self)
         
-        self.butReadFiltTree = QPushButton("Read Filters", self)
-        self.butReadFiltTree.setToolTip("Re-read filter design directory and build filter design tree.\n"
-                                        "(For developing and debugging).")
-
         lblSeparator = QLabel("CSV-Separator:")
         self.cmbSeparator = QComboBox(self)
         self.cmbSeparator.addItems(['","','";"','<TAB>','<CR>'])
@@ -106,7 +101,6 @@ class File_IO(QWidget):
         ifont.setItalic(True)
 
         layVIO = QVBoxLayout()
-
         layVIO.addWidget(self.butSave) # save filter dict -> various formats
         layVIO.addWidget(self.butLoad) # load filter dict -> various formats
         layVIO.addWidget(HLine(QFrame, self))
@@ -117,12 +111,9 @@ class File_IO(QWidget):
         layHIO = QHBoxLayout()        
         layHIO.addWidget(lblSeparator)
         layHIO.addWidget(self.cmbSeparator)        
-        layVIO.addLayout(layHIO)
-        layVIO.addWidget(HLine(QFrame, self))
-        layVIO.addStretch(1)
-        
-        layVIO.addWidget(self.butReadFiltTree) # re-read filter tree (for debugging)
 
+        layVIO.addLayout(layHIO)
+#        layVIO.addWidget(HLine(QFrame, self))
 
         layVMain = QVBoxLayout()
         layVMain.addLayout(layVIO)
@@ -136,8 +127,6 @@ class File_IO(QWidget):
         self.butImport.clicked.connect(self.import_coeffs)
         self.butSave.clicked.connect(self.save_filter)
         self.butLoad.clicked.connect(self.load_filter)
-        
-        self.butReadFiltTree.clicked.connect(self.sigReadFilters.emit)
 
 #------------------------------------------------------------------------------        
     def load_filter(self):

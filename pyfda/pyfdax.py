@@ -6,7 +6,6 @@ Authors: Julia Beike, Christian Muenker and Michael Winkler
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 SPLITTER = True
-SCROLL = False
 import sys, os
 #from sip import setdestroyonexit
 import logging
@@ -14,8 +13,7 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
-                     QSplitter, QScrollArea, QIcon, QMessageBox,
-                     QWidget, QFrame,
+                     QSplitter, QIcon, QMessageBox, QWidget, QFrame,
                      QVBoxLayout, QHBoxLayout, QSizePolicy)
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
@@ -108,49 +106,33 @@ class pyFDA(QMainWindow):
             layVPlt = QVBoxLayout()
             layVPlt.addWidget(self.pltTabWidgets)
     
-            frmInput = QFrame()
+            frmInput = QFrame(self)
             frmInput.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
             frmInput.setLayout(layVInput)
-            frmInput.setSizePolicy(QSizePolicy.Minimum,
-                                     QSizePolicy.Minimum)
+            frmInput.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                   QSizePolicy.MinimumExpanding)
     
-            frmPlt = QFrame()
+            frmPlt = QFrame(self)
             frmPlt.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
             frmPlt.setLayout(layVPlt)
-            frmPlt.setSizePolicy(QSizePolicy.Minimum,
-                                     QSizePolicy.Minimum)
+            frmPlt.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                 QSizePolicy.MinimumExpanding)
     
             splitter = QSplitter(QtCore.Qt.Horizontal)
             splitter.addWidget(frmInput)
             splitter.addWidget(frmPlt)
-            splitter.setStretchFactor(1,4) # factors for the initial sizes of subwidgets
-#            splitter.setSizes([200,600])
+            splitter.setStretchFactor(1,4) # relative initial sizes of subwidgets
+#            splitter.setSizes([200,600]) # absolute initial sizes of subwidgets
 
             layHMain.addWidget(splitter)
 
         else: # no splitter design, only use layHMain layout
-            self.inputTabWidgets.setMaximumWidth(420) # comment out for splitter
+            self.inputTabWidgets.setMaximumWidth(420)
             layHMain.addWidget(self.inputTabWidgets)
             layHMain.addWidget(self.pltTabWidgets)
-            layHMain.setContentsMargins(0, 0, 0, 0)#(left, top, right, bottom)
+            layHMain.setContentsMargins(0, 0, 0, 0) # R, T, L, B
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
-
-        if SCROLL:
-            # Create scroll area and "monitor" _widget whether scrollbars are needed
-            scrollArea = QScrollArea()
-            scrollArea.setWidget(self.main_widget) # make main widget "scrollable"
-    
-            #============= Set behaviour of scroll area ======================
-            # scroll bars appear when the scroll area shrinks below this size:
-            scrollArea.setMinimumSize(QtCore.QSize(800, 500))
-    #        scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
-    #        scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
-            scrollArea.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                     QSizePolicy.MinimumExpanding)
-    
-            # Size of monitored widget is allowed to grow:
-            scrollArea.setWidgetResizable(True)
     
         self.main_widget.setFocus()
         # make main_widget occupy the main area of QMainWidget 
@@ -184,9 +166,6 @@ class pyFDA(QMainWindow):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
         self.inputTabWidgets.sigFilterDesigned.connect(self.pltTabWidgets.update_data)
-        #
-        # sigReadFilters: button has been pressed to rebuild filter tree:
-        self.inputTabWidgets.file_io.sigReadFilters.connect(self.ftb.init_filters)
 
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 

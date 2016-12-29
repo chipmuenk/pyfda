@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
-                      QVBoxLayout, QHBoxLayout, pyqtSignal)
+                      QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
 
 import numpy as np
 
@@ -294,9 +294,9 @@ class HDLSpecs(QWidget):
 # -------------------------------------------------------------------
 
         layVMain.addWidget(self.lblMyhdl1)
-        layVMain.addWidget(HLine(self))
+        layVMain.addWidget(HLine(QFrame, self))
         layVMain.addWidget(self.lblMyhdl2)
-        layVMain.addWidget(HLine(self))
+        layVMain.addWidget(HLine(QFrame, self))
         layVMain.addLayout(self.layHButtonsHDL_i)
         
         layVMain.addLayout(self.layHButtonsHDL_c)

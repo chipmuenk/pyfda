@@ -9,7 +9,9 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QWidget, QVBoxLayout, QSizePolicy, pyqtSignal
+from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, QSizePolicy, pyqtSignal
+
+SCROLL = True
 
 import pyfda.filterbroker as fb
 
@@ -56,8 +58,8 @@ class InputTabWidgets(QWidget):
 
     def _construct_UI(self):
         """ Initialize UI with tabbed input widgets """
-        tabWidget = QTabWidget()
-        tabWidget.setObjectName("TabWidg")
+        tabWidget = QTabWidget(self)
+        tabWidget.setObjectName("InpTabWdg")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.addTab(self.file_io, 'Files')
@@ -67,17 +69,35 @@ class InputTabWidgets(QWidget):
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
-        tabWidget.setSizePolicy(QSizePolicy.Minimum,
-                                QSizePolicy.Expanding)
+#        tabWidget.setSizePolicy(QSizePolicy.Minimum,
+#                                QSizePolicy.Expanding)
 
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(tabWidget)
-        
+        layVMain = QVBoxLayout(self)
+
         #setContentsMargins -> number of pixels between frame window border
         layVMain.setContentsMargins(1,1,1,1) # R, T, L, B
 #
-        self.setLayout(layVMain)
-                                 
+
+#--------------------------------------
+        if SCROLL:
+            scroll = QScrollArea()
+            scroll.setWidget(tabWidget)
+            scroll.setWidgetResizable(True) # Size of monitored widget is allowed to grow:
+
+            # scroll bars appear when the scroll area shrinks below this size:
+#            scroll.setMinimumSize(QtCore.QSize(800, 500))
+    #        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
+    #        scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
+            scroll.setSizePolicy(QSizePolicy.MinimumExpanding,
+                                 QSizePolicy.MinimumExpanding)
+
+#            scroll.setFixedHeight(400)
+            layVMain.addWidget(scroll)
+        else:
+            layVMain.addWidget(tabWidget) # add the tabWidget directly
+
+        self.setLayout(layVMain) # set the main layout of the window
+                                
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
