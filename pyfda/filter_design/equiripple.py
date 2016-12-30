@@ -218,7 +218,7 @@ is estimated using Ichige's algorithm.
         """
         Disconnect all signal-slot connections to avoid crashes upon exit
         """
-        pass
+        self.led_remez_1.editingFinished.disconnect()
 
 
     def _load_entries(self):
