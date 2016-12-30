@@ -106,8 +106,9 @@ mpl_rc = {'lines.linewidth': 1.5,
 
 # dark theme
 css_dark = """
-    QWidget{color:white;background: #222222;}
-    
+    QWidget, QTextBrowser{color:white; background-color:#222222;}
+    /* QComboBox{color:#101010;} */
+    .QTabWidget::pane{background-color: #303030;} /* background of tab content */
     QLineEdit{background: #222222;
                 border-style: outset;
                 border-width: 2px;
@@ -123,18 +124,18 @@ css_dark = """
                 
             """
           
-
-# light theme 
+# light theme
 css_light = """
-    /* only match QWidget, not subclasses: */
-    QWidget{color:black; background: white;}
-
+    /* only match QWidget, not subclasses: 
+    .QWidget, .QFrame{color:black; background-color: white;}*/
+    .QTabWidget::pane{background-color: #F0F0F0;} /* background of tab content */
     QLineEdit{background: white;
                 border-color: darkgrey;}
     QLineEdit:disabled{background-color:darkgrey;}
   
     
     QPushButton{background-color:lightgrey; }
+    QPushButton:disabled{color:darkgrey; }
     
     QHeaderView::section{background-color:rgb(190,1,1); color:white;}
     """
