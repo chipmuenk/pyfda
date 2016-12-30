@@ -211,7 +211,7 @@ near ``f_S/2`` (highpass).
                 self.led_ma_1.setText(str(self.ma_stages))
                 self.chk_ma_2.setChecked(dyn_wdg_par['ma_normalize'])
         except KeyError as e:
-            print("Key Error:",e)
+            logging.warn("Key Error:",e)
 
 
     def _get_params(self, fil_dict):
