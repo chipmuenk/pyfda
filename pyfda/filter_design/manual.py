@@ -72,6 +72,10 @@ class Manual_FIR(object):
                         }}
                    }
 
+        self.wdg = False  # has no additional dynamic widgets
+        
+        self.hdl = ('df') # filter topologies
+
         
         self.info = info_str
         self.info_doc = []
@@ -165,6 +169,9 @@ class Manual_IIR(object):
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }}
                    }
+        self.wdg = False  # has no additional dynamic widgets
+        
+        self.hdl = ('df') # filter topologies
         
         self.info = info_str
         self.info_doc = []
