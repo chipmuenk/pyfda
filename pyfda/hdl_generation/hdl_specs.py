@@ -366,7 +366,7 @@ class HDLSpecs(QWidget):
         
         file_types = "Verilog (*.v);;VHDL (*.vhd)"
 
-        hdl_file, hdl_filter = dlg.getSaveFileName_(self,
+        hdl_file, hdl_filter = dlg.getSaveFileName_(
                 caption = "Save HDL as", directory="D:",
                 filter = file_types)
         hdl_file = str(hdl_file)
@@ -397,7 +397,7 @@ class HDLSpecs(QWidget):
         
         plt_types = "png (*.png);;svg (*.svg)"
 
-        plt_file, plt_type = dlg.getSaveFileName_(self,
+        plt_file, plt_type = dlg.getSaveFileName_(
                 caption = "Save plots as", directory="D:",
                 filter = plt_types)
         plt_file = str(plt_file)
