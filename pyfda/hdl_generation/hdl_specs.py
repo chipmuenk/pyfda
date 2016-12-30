@@ -325,7 +325,7 @@ class HDLSpecs(QWidget):
         #----------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-    def setupHDL(self, filename = ""):
+    def setupHDL(self, file_name = "", dir_name = ""):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
@@ -353,6 +353,12 @@ class HDLSpecs(QWidget):
         # =============== adapted from C. Feltons SIIR example =============
         self.flt = SIIR(W = self.W, b = np.array(coeffs[0][0:3]), 
                           a = np.array(coeffs[1][0:3]))
+        
+        
+        
+        self.flt.hdl_name = file_name
+        self.flt.hdl_directory = dir_name
+        #self.flt.hdl_target = 'verilog' # or 'vhdl'
 
         
 #------------------------------------------------------------------------------
@@ -372,14 +378,14 @@ class HDLSpecs(QWidget):
         hdl_file = str(hdl_file)
         hdl_filter = str(hdl_filter)
         logger.info('Creating hdl_file "%s"', hdl_file)
-        hdl_filename = os.path.splitext(os.path.basename(hdl_file))[0]
-        hdl_dirname = os.path.splitext(hdl_file)[0]
-        logger.info('Using hdl_filename "%s"', hdl_filename)
-        logger.info('Using hdl_dirname "%s"', hdl_dirname)
+        hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
+        hdl_dir_name = os.path.splitext(hdl_file)[0]
+        logger.info('Using hdl_filename "%s"', hdl_file_name)
+        logger.info('Using hdl_dirname "%s"', hdl_dir_name)
 
-        self.setupHDL(filename = os.path.join(hdl_dirname, hdl_filename))
-        self.flt.hdl_name = hdl_filename
-        self.flt.hdl_directory = hdl_dirname
+        self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
+        self.flt.hdl_name = hdl_file_name
+        self.flt.hdl_directory = hdl_dir_name
         self.flt.hdl_target = 'verilog' # or 'vhdl'
         self.flt.Convert()
         logger.info("HDL conversion finished!")
@@ -403,16 +409,15 @@ class HDLSpecs(QWidget):
         plt_file = str(plt_file)
         plt_type = str(plt_type)
         logger.info('Using plot filename "%s"', plt_file)
-        plot_filename = os.path.splitext(os.path.basename(plt_file))[0]
-        plot_dirname = os.path.splitext(plt_file)[0]
-        logger.info('Using plot filename "%s"', plot_filename)
-        logger.info('Using plot directory "%s"', plot_dirname)
+        plot_file_name = os.path.splitext(os.path.basename(plt_file))[0]
+        plot_dir_name = os.path.splitext(plt_file)[0]
+        logger.info('Using plot filename "%s"', plot_file_name)
+        logger.info('Using plot directory "%s"', plot_dir_name)
 
-        self.flt.plt_type = plt_type
-        self.flt.plt_file = plt_file
+#        self.flt.plt_type = plt_type
+#        self.flt.plt_file = plt_file
 
-
-        self.setupHDL(filename = os.path.join(plot_dirname, plot_filename))
+        self.setupHDL(file_name = plot_file_name, dir_name = plot_dir_name)
 
         
         self.setupHDL()
