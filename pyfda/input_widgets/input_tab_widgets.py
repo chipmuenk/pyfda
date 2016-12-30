@@ -16,7 +16,7 @@ SCROLL = True
 import pyfda.filterbroker as fb
 
 #from pyfda.input_widgets import input_specs_test as input_specs
-from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs, 
+from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
                                 filter_info, filter_pz)
 try:
     import myhdl
@@ -97,42 +97,42 @@ class InputTabWidgets(QWidget):
             layVMain.addWidget(tabWidget) # add the tabWidget directly
 
         self.setLayout(layVMain) # set the main layout of the window
-                                
+
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        # Collect "specs changed" / "filter designed" signals from all input 
+        # Collect "specs changed" / "filter designed" signals from all input
         # widgets and route them to plot / input widgets that need to be updated
         #
         # Check:
         #http://www.pythoncentral.io/pysidepyqt-tutorial-creating-your-own-signals-and-slots/#custom-tab-2-pyqt
         #
-        # sigSpecsChanged: signal indicating that filter SPECS have changed, 
-        #       requiring update of some plot widgets and input widgets:        
+        # sigSpecsChanged: signal indicating that filter SPECS have changed,
+        #       requiring update of some plot widgets and input widgets:
         self.filter_specs.sigSpecsChanged.connect(self.update_specs)
-        # sigViewChanged: signal indicating that PLOT VIEW has changed, 
-        #       requiring update of some plot widgets only:        
+        # sigViewChanged: signal indicating that PLOT VIEW has changed,
+        #       requiring update of some plot widgets only:
         self.filter_specs.sigViewChanged.connect(self.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
-        #       requiring update of all plot and some input widgets:        
+        #       requiring update of all plot and some input widgets:
         self.filter_specs.sigFilterDesigned.connect(self.update_all)
         self.filter_coeffs.sigFilterDesigned.connect(self.update_all)
 
         # The following three widgets require a reloading of the select_filter
         # widget to update the filter selection:
         self.filter_coeffs.sigFilterDesigned.connect(self.load_all)
-        self.filter_pz.sigFilterDesigned.connect(self.load_all)        
+        self.filter_pz.sigFilterDesigned.connect(self.load_all)
         self.file_io.sigFilterLoaded.connect(self.load_all)
         #----------------------------------------------------------------------
 
     def update_view(self):
         """
         Slot for InputSpecs.sigViewChanged
-        
+
         Propagate new PLOT VIEW (e.g. log scale) to plot widgets via pyfda.py
-            
+
         Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
@@ -143,11 +143,11 @@ class InputTabWidgets(QWidget):
 
     def update_specs(self):
         """
-        Slot for InputSpecs.sigSpecsChanged
-        
-        Propagate new filter SPECS from filter dict to other input widgets and 
+        Slot for FilterSpecs.sigSpecsChanged
+
+        Propagate new filter SPECS from filter dict to other input widgets and
         to plot widgets via pyfda.py
-            
+
         - Update input widgets that can / need to display specs (except inputSpecs
              - the origin of the signal !!)
         - Update plot widgets via sigSpecsChanged signal that need new
@@ -160,10 +160,10 @@ class InputTabWidgets(QWidget):
             self.hdlSpecs.update_UI()
 
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
-        
+
     def load_all(self):
         """
-        Called when a new filter has been LOADED: 
+        Called when a new filter has been LOADED:
         Pass new filter data from the global filter dict
         - Specifically call SelectFilter.load_entries
         - Update the input widgets that can / need to display filter data
@@ -175,20 +175,20 @@ class InputTabWidgets(QWidget):
 
     def update_all(self):
         """
-        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ      
-        
-        Called when a new filter has been DESIGNED: 
+        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
+
+        Called when a new filter has been DESIGNED:
         - Pass new filter data from the global filter dict
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
-        
+
         """
         sender_name = ""
         if self.sender(): # origin of signal that triggered the slot
             sender_name = self.sender().objectName()
         logger.debug("updateAll called by %s", sender_name)
 
-        self.filter_specs.color_design_button("ok")  
+        self.filter_specs.color_design_button("ok")
         # TODO: The following should be handled within FilterSpecs ?
         self.filter_specs.load_entries()
         self.filter_info.load_entries()
@@ -207,10 +207,9 @@ def main():
     app.setStyleSheet(rc.css_rc)
 
     mainw = InputTabWidgets(None)
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
-    
