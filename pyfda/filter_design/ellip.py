@@ -85,7 +85,11 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
             'BS': {'man':{}, 'min':{}},
             'BP': {'man':{}, 'min':{}},
             }
+        self.wdg = False  # has no additional dynamic widgets
+        
+        self.hdl = ('iir_sos', 'df') # filter topologies
 
+            
         self.info_doc = []
         self.info_doc.append('ellip()\n========')
         self.info_doc.append(sig.ellip.__doc__)
@@ -105,8 +109,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 
     def destruct_UI(self):
         """
-        - Disconnect all signal-slot connections to avoid crashes upon exit
-        - Delete dynamic widgets
+        Disconnect all signal-slot connections to avoid crashes upon exit
         (empty method, nothing to do in this filter)
         """
         pass

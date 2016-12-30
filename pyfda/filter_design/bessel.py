@@ -96,6 +96,9 @@ class Bessel(object):
                 }
             }
 
+        self.wdg = False  # has no additional dynamic widgets
+        
+        self.hdl = ('iir_sos', 'df') # filter topologies
 
         self.info = """
 **Bessel filters**
@@ -139,8 +142,7 @@ For scipy 0.18 and higher, more design options have been implemented
 
     def destruct_UI(self):
         """
-        - Disconnect all signal-slot connections to avoid crashes upon exit
-        - Delete dynamic widgets
+        Disconnect all signal-slot connections to avoid crashes upon exit
         (empty method, nothing to do in this filter)
         """
         pass

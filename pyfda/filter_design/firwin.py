@@ -99,9 +99,9 @@ class Firwin(QWidget):
 
         self.wdg = True  # has additional dynamic widget 'wdg_fil'
         
-        self.hdl = None
+        self.hdl = ('df') # filter topologies
         
-        
+        #----------------------------------------------------------------------        
     def construct_UI(self):
         """
         Create additional subwidget(s) needed for filter design with the 
@@ -229,12 +229,11 @@ class Firwin(QWidget):
         else:
             self.firWindow = self.fir_window_name
 
-        self.sigFiltChanged.emit() # -> input_filt -> input_specs
+        self.sigFiltChanged.emit() # -> select_filter -> filter_specs
             
     def destruct_UI(self):
         """
-        - Disconnect all signal-slot connections to avoid crashes upon exit
-        - Delete dynamic widgets
+        Disconnect all signal-slot connections to avoid crashes upon exit
         """
         self.cmb_firwin_win.activated.disconnect()
         self.led_firwin_1.editingFinished.disconnect()

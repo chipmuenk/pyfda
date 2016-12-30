@@ -57,8 +57,7 @@ class Equiripple(QWidget):
 
 have the steepest rate of transition between the frequency response’s passband
 and stopband of all FIR filters. This comes at the expense of a constant ripple
-(equiripple) :math:`A_PB` and :math:`A_SB` in both pass and stop band. Ringing
-of the step response is increased in comparison to Chebychev filters.
+(equiripple) :math:`A_PB` and :math:`A_SB` in both pass and stop band.
 
 The filter-coefficients are calculated in such a way that the transfer function
 minimizes the maximum error (**Minimax** design) between the desired gain and the
@@ -159,10 +158,11 @@ is estimated using Ichige's algorithm.
         self.info_doc.append(sig.remez.__doc__)
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
-        # additional dynamic widgets that need to be set in the main widgets
-        self.wdg = True
+
+        self.wdg = True  # has additional dynamic widget 'wdg_fil'
         
-        self.hdl = None
+        self.hdl = ('df') # filter topologies
+
         #----------------------------------------------------------------------
 
     def construct_UI(self):
@@ -212,25 +212,15 @@ is estimated using Ichige's algorithm.
 
         fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
         
-        self.sigFiltChanged.emit() # -> input_filt -> input_specs
+        self.sigFiltChanged.emit() # -> select_filter -> filter_specs
 
     def destruct_UI(self):
         """
-        - Disconnect all signal-slot connections to avoid crashes upon exit
-        - Delete dynamic widgets
+        Disconnect all signal-slot connections to avoid crashes upon exit
         """
         pass
-#        print("Destructing equiripple UI")
-#==============================================================================
-#         self.led_remez_1.editingFinished.disconnect()
-#         self.layHWin.removeWidget(self.led_remez_l)
-#         self.led_remez_1.deleteLater()
-#         self.layHWin.removeWidget(self.lbl_remez_l)
-#         self.lbl_remez_1.deleteLater()
-# #        self.wdg_remez.deleteLater()
-#==============================================================================
 
-        
+
     def _load_entries(self):
         """
         Reload parameter(s) from filter dictionary and set UI elements 

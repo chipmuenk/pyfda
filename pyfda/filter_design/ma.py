@@ -51,8 +51,14 @@ class MA(QWidget):
 
 can only be specified via their length and the number of cascaded sections. 
 
-The minimum order to obtain a minimum attenuation at
-a given frequency can be calculated via the si function (not implemented yet).
+The minimum order to obtain a certain attenuation at a given frequency is 
+calculated via the si function.
+
+Moving average filters can be implemented very efficiently in hard- and software
+as they require no multiplications but only addition and subtractions. Probably
+only the lowpass is really useful, as the other response types only filter out resp. 
+leave components at ``f_S/4`` (bandstop resp. bandpass) resp. leave components
+near ``f_S/2`` (highpass).
 
 **Design routines:**
 
@@ -123,7 +129,7 @@ a given frequency can be calculated via the si function (not implemented yet).
         
         self.wdg = True # has additional dynamic widget 'wdg_fil'
         
-        self.hdl = ('ma', 'cic')
+        self.hdl = ('ma', 'cic', 'df')  # filter topologies
         #----------------------------------------------------------------------
 
     def construct_UI(self):
@@ -183,14 +189,11 @@ a given frequency can be calculated via the si function (not implemented yet).
         """
         fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
                                      'ma_normalize':self.chk_ma_2.isChecked()}})
-        self.sigFiltChanged.emit() # -> input_filt -> input_specs                                     
-
+        self.sigFiltChanged.emit() # -> select_filter -> filter_specs
 
     def destruct_UI(self):
         """
-        - Disconnect all signal-slot connections to avoid crashes upon exit
-        - Delete dynamic widgets
-        (empty method, nothing to do in this filter)
+        Disconnect all signal-slot connections to avoid crashes upon exit
         """
         self.led_ma_1.editingFinished.disconnect()
         self.chk_ma_2.clicked.disconnect()

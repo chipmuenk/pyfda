@@ -96,6 +96,10 @@ class Butter(object):
                 }
             }
 
+        self.wdg = False  # has no additional dynamic widgets
+        
+        self.hdl = ('iir_sos', 'df') # filter topologies
+            
         self.info = """
 **Butterworth filters**
 
@@ -137,8 +141,7 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
 
     def destruct_UI(self):
         """
-        - Disconnect all signal-slot connections to avoid crashes upon exit
-        - Delete dynamic widgets
+        Disconnect all signal-slot connections to avoid crashes upon exit
         (empty method, nothing to do in this filter)
         """
         pass
