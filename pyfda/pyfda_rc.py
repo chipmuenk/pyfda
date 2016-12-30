@@ -57,7 +57,7 @@ log_config_file = "pyfda_log.conf"
 
 # ======================== LAYOUT =============================================
 
-THEME = 'light' # select dark or light theme
+THEME = 'light' # select 'dark', 'light' or 'original' theme
 
 # -----------------------------
 # Layout for matplotlib widgets
@@ -234,25 +234,18 @@ css_common = """
                 QSplitter::handle:vertical {
                     height: 10px;
                     } 
-
-            """\
-            + TabBarCss
-            
-"""
-            Or if you want to provide a guaranteed fallback for platforms 
-            that do not support theme icons, you can use the second argument:
-            
-            QIcon undoicon = QIcon.fromTheme("edit-undo", QIcon(":/undo.png"));
-"""
+            """
 
 
 if THEME == 'dark':
 
     mpl_rc.update(mpl_dark)
-    css_rc = css_common + css_dark
-else:
+    css_rc = css_common + TabBarCss + css_dark
+elif THEME == 'light':
     mpl_rc.update(mpl_light)
-    css_rc = css_common + css_light
+    css_rc = css_common + TabBarCss + css_light
+else:
+    css_rc = css_common
     
 
 
