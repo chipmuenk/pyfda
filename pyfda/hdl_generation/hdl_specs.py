@@ -330,9 +330,9 @@ class HDLSpecs(QWidget):
         """
         Update the UI after changing the filter class
         """
-        print("update hdl ui", ff.fil_inst.hdl)
-        self.butExportHDL.setEnabled('iir_sos' in ff.fil_inst.hdl)
-        self.butSimFixPoint.setEnabled('iir_sos' in ff.fil_inst.hdl)
+        if hasattr(ff.fil_inst, 'hdl'):
+            self.butExportHDL.setEnabled('iir_sos' in ff.fil_inst.hdl)
+            self.butSimFixPoint.setEnabled('iir_sos' in ff.fil_inst.hdl)
 
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
