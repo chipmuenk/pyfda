@@ -156,6 +156,8 @@ class InputTabWidgets(QWidget):
 
         self.filter_specs.color_design_button("changed")
         self.filter_info.load_entries()
+        if fb.MYHDL:
+            self.hdlSpecs.update_UI()
 
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
         
