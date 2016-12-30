@@ -57,14 +57,10 @@ class PlotTauG(QWidget):
     def _init_axes(self):
         """Initialize and clear the axes
         """
-#        self.ax = self.mplwidget.ax
+
         self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.clear()
-        self.ax.set_title(r'Group Delay $ \tau_g$')
         self.ax.hold(False)      
-        
-        #plt.gca().cla()
-        #p.clf()
         
 #------------------------------------------------------------------------------
     def draw(self):
@@ -110,7 +106,7 @@ class PlotTauG(QWidget):
         line_tau_g, = self.ax.plot(F, tau_g, label = "Group Delay")
         #---------------------------------------------------------
                    
-
+        self.ax.set_title(r'Group Delay $ \tau_g$')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(tau_str)
         # widen y-limits to suppress numerical inaccuracies when tau_g = constant
