@@ -313,8 +313,8 @@ class SelectFilter(QWidget):
         
         if fc != self.fc_last: # fc has changed:
 
-            # when old filter instance has a dyn. subwidget, try to destroy it
-            if hasattr(ff.fil_inst, 'wdg') and self.fc_last:      
+            # when filter has been changed, try to destroy dynamic widgets of last fc:
+            if self.fc_last:      
                 self._destruct_dyn_widgets() 
 
             #==================================================================
@@ -430,21 +430,22 @@ class SelectFilter(QWidget):
         been left (?)! Hence, it is necessary to skip this method when the new
         design method is the same as the old one.
         """
-  
-        try:
-            ff.fil_inst.sigFiltChanged.disconnect() # disconnect signal
-        except (TypeError, AttributeError) as e:
-            logger.warning("Could not disconnect signal!\n", e)
-            
-        try:
-            ff.fil_inst.destruct_UI() # local operations like disconnecting signals
-            self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
-            self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
 
-        except AttributeError as e:
-            print("Could not destruct_UI!\n", e)
-            
-        ff.fil_inst.deleteLater() # delete QWidget when scope has been left
+        if hasattr(ff.fil_inst, 'wdg') and ff.fil_inst.wdg:
+            try:
+                ff.fil_inst.sigFiltChanged.disconnect() # disconnect signal
+            except (TypeError, AttributeError) as e:
+                logger.warning("Could not disconnect signal!\n", e)
+                
+            try:
+                ff.fil_inst.destruct_UI() # local operations like disconnecting signals
+                self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
+                self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
+    
+            except AttributeError as e:
+                print("Could not destruct_UI!\n", e)
+                
+            ff.fil_inst.deleteLater() # delete QWidget when scope has been left
             
 
 #------------------------------------------------------------------------------
