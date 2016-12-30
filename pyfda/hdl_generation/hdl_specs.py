@@ -21,6 +21,7 @@ from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
     
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.filter_factory as ff
 import pyfda.pyfda_fix_lib as fix
 from pyfda.pyfda_lib import HLine
 #import pyfda.pyfda_rc as rc
@@ -323,6 +324,15 @@ class HDLSpecs(QWidget):
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    def update_UI(self):
+        """
+        Update the UI after changing the filter class
+        """
+        print("update hdl ui", ff.fil_inst.hdl)
+        self.butExportHDL.setEnabled('iir_sos' in ff.fil_inst.hdl)
+        self.butSimFixPoint.setEnabled('iir_sos' in ff.fil_inst.hdl)
 
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
