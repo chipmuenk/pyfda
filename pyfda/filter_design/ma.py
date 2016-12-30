@@ -62,7 +62,7 @@ near ``f_S/2`` (highpass).
 
 **Design routines:**
 
-``ma.calc()``
+``ma.calc_ma()``
     """
 
     sigFiltChanged = pyqtSignal()
@@ -241,7 +241,7 @@ near ``f_S/2`` (highpass).
         fil_dict['N'] = self.N  # always update filter dict with filter order
         
         
-    def _calc_ma(self, fil_dict, rt='LP'):
+    def calc_ma(self, fil_dict, rt='LP'):
         """
         Calculate coefficients and P/Z for moving average filter based on
         filter length L = N + 1 and number of cascaded stages and save the 
@@ -313,33 +313,33 @@ near ``f_S/2`` (highpass).
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._calc_ma(fil_dict, rt = 'LP')
+        self.calc_ma(fil_dict, rt = 'LP')
                    
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
                                                      np.sin(self.F_SB * np.pi))))
-        self._calc_ma(fil_dict, rt = 'LP')
+        self.calc_ma(fil_dict, rt = 'LP')
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
-        self._calc_ma(fil_dict, rt = 'HP')
+        self.calc_ma(fil_dict, rt = 'HP')
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
                                               np.sin((0.5 - self.F_SB) * np.pi))))
-        self._calc_ma(fil_dict, rt = 'HP')
+        self.calc_ma(fil_dict, rt = 'HP')
         
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = ceil_even(self.N)  # enforce even order
-        self._calc_ma(fil_dict, rt = 'BS')     
+        self.calc_ma(fil_dict, rt = 'BS')     
         
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = ceil_even(self.N)  # enforce even order
-        self._calc_ma(fil_dict, rt = 'BP')     
+        self.calc_ma(fil_dict, rt = 'BP')     
 
 #------------------------------------------------------------------------------
 
