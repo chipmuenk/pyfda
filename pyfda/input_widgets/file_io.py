@@ -9,7 +9,7 @@ import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QFD,
+from ..compat import (QtCore, QFD, Qt,
                       QWidget, QPushButton, QComboBox, QLabel, QFont, QFrame,
                       QVBoxLayout, QHBoxLayout)
 
@@ -116,6 +116,7 @@ class File_IO(QWidget):
 #        layVIO.addWidget(HLine(QFrame, self))
 
         layVMain = QVBoxLayout()
+        layVMain.setAlignment(Qt.AlignTop)
         layVMain.addLayout(layVIO)
             
         self.setLayout(layVMain)
