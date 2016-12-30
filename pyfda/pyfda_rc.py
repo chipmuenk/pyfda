@@ -104,7 +104,7 @@ mpl_rc = {'lines.linewidth': 1.5,
 # Layout for Qt widgets
 # ---------------------       
 
-# dark theme            
+# dark theme
 css_dark = """
     QWidget{color:white;background: #222222;}
     
@@ -137,9 +137,8 @@ css_light = """
     QPushButton{background-color:lightgrey; }
     
     QHeaderView::section{background-color:rgb(190,1,1); color:white;}
-    """    
-#    QGridLayout#plotSpecSelect{border: 3px solid red;} /* doesnt work */
-#    QGridLayout{border: 3px solid blue;} /* doesnt work */
+    """
+
 
 
 # common layout settings for QTabWidget
@@ -147,7 +146,7 @@ TabBarCss = """
  QTabWidget::pane { /* The tab _widget_ frame */
      border-top: 2px solid #C2C7CB;
  }
- 
+
  /* Only the right QTabWidget (named plot_tabs) gets a dashed left border */
  QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
 
