@@ -324,7 +324,7 @@ class HDLSpecs(QWidget):
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
-
+        self.update_UI() # initial setting
 #------------------------------------------------------------------------------
     def update_UI(self):
         """
