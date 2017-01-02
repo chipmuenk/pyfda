@@ -26,13 +26,12 @@ import pyfda.pyfda_fix_lib as fix
 from pyfda.pyfda_lib import HLine
 #import pyfda.pyfda_rc as rc
 
-from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
+from pyfda.hdl_generation.filter_iir import FilterIIR #  second order IIR filter object
+#from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
 
 
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
 #                 @ http://www.dsprelated.com/showcode/211.php
-
-#------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
@@ -74,7 +73,6 @@ class HDLSpecs(QWidget):
 #        self.lblMyhdl1.setFont(bfont)
         self.lblMyhdl2 = QLabel("Enter fixpoint signal formats as QI.QF:")
 
-        
         ledMaxWid = 30 # Max. Width of QLineEdit fields
         qQuant = ['none', 'round', 'fix', 'floor']
         qOvfl = ['none', 'wrap', 'sat']
@@ -354,21 +352,19 @@ class HDLSpecs(QWidget):
 
 
         self.W = (qI_i + qF_i + 1, 0) # Matlab format: (W,WF)
-        
-        #       get filter coefficients etc. from filter dict    
+        print("W = ", self.W)
+
+        # @todo: always use sos?  The filter object is setup to always
+        # @todo: generate a second order filter
+        # get filter coefficients etc. from filter dict
         coeffs = fb.fil[0]['ba']
         zpk =  fb.fil[0]['zpk']
         sos = fb.fil[0]['sos']
 
-        # =============== adapted from C. Feltons SIIR example =============
-        self.flt = SIIR(W = self.W, b = np.array(coeffs[0][0:3]), 
-                          a = np.array(coeffs[1][0:3]))
-        
-        
-        
-        self.flt.hdl_name = file_name
-        self.flt.hdl_directory = dir_name
-        #self.flt.hdl_target = 'verilog' # or 'vhdl'
+        # =============== adapted from C. Felton's SIIR example =============
+        self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
+                             a=np.array(coeffs[1][0:3]),
+                             word_format=(self.W[0], 0, self.W[1]))
 
         
 #------------------------------------------------------------------------------
@@ -397,7 +393,7 @@ class HDLSpecs(QWidget):
         self.flt.hdl_name = hdl_file_name
         self.flt.hdl_directory = hdl_dir_name
         self.flt.hdl_target = 'verilog' # or 'vhdl'
-        self.flt.Convert()
+        self.flt.convert() # was Convert()
         logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
@@ -429,9 +425,7 @@ class HDLSpecs(QWidget):
 
         self.setupHDL(file_name = plot_file_name, dir_name = plot_dir_name)
 
-        
-        self.setupHDL()
-        logger.info("Fixpoint simulation called")
+        logger.info("Fixpoint simulation setup")
         tb = self.flt.TestFreqResponse(Nloops=3, Nfft=1024)
         clk = Signal(False)
         ts  = Signal(False)
@@ -448,6 +442,11 @@ class HDLSpecs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+
+	# imports from one level above when run as __main__ :
+    __cwd__ = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.dirname(__cwd__))
+
 
     from ..compat import QApplication
     app = QApplication(sys.argv)

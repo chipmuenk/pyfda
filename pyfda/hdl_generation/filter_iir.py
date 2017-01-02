@@ -1,190 +1,380 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2011 Christopher Felton
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# Copyright (c) 2011, 2015 Christopher L. Felton
 #
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import division
+
 """
-==================
-Simple IIR Filter
-==================
+IIR Hadward Filter Generation
+=============================
+
 The following is a straight forward HDL description of a Direct Form I IIR
 filter and an object that encapsulates the design and configuration of the
 IIR filter.  This module can be used to generate synthesizable Verilog/VHDL
-for an FPGA.
+for ASIC of FPGA implementations.
+
 How to use this module
 -----------------------
-  1.  Instantiate an instance of the SIIR object.  Pass the desired low-pass
-      frequency cutoff (Fc) and the sample rate (Fs).
-   >>> flt = SIIR(Fc=1333, Fs=48000)
-  2.  Test the frequency response by running a simulation that inputs random
-      samples and then computes the FFT of the input and output, compute
-      Y(x)/X(w) = H(w) and plot.
-   >>> flt.TestFreqResponse()
-  3.  If all looks good create the Verilog and VHDL
-   >>> flt.Convert()
+
+   >>> flt = FilterIIR()
+
 This code is discussed in the following
 http://www.fpgarelated.com/showarticle/7.php
 http://dsp.stackexchange.com/questions/1605/designing-butterworth-filter-in-matlab-and-obtaining-filter-a-b-coefficients-a
+
+
 :Author: Christopher Felton <cfelton@ieee.org>
 """
 
-from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
-                   instance, instances, intbv, traceSignals, 
-                   Simulation, StopSimulation)
-#import myhdl
+import os
+
+from myhdl import (toVerilog, toVHDL, Signal, ResetSignal,
+                   always, delay, instance, intbv,
+                   traceSignals, Simulation, StopSimulation)
 
 import numpy as np
 from numpy import pi, log10
-from numpy.fft import fft, fftshift
-from numpy.random import uniform, normal
+from numpy.fft import fft
+from numpy.random import uniform
+from scipy import signal
 
-from scipy.signal import freqz
-import pylab
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# RTL description of the IIR type I filter
-def siir_hdl(
-    # ~~ Ports ~~
-    clk,           # Synchronous clock
-    x,             # Input word, fixed-point format described by "W"
-    y,             # Output word, fixed-point format described by "W"
-    ts,            # Sample rate strobe (sample rate < system clock rate)
-
-    # ~~ Parameters ~~
-    B=None,        # Numerator coefficients, in fixed-point specified
-    A=None,        # Denominator coefficients, in fixed-point specified
-    W=(24,0)       # Fixed-point description, tuple,
-                   #  W[0] = word length (wl)
-                   #  W[1] = integer word length (iwl)
-                   #  fraction word length (fwl) = wl-iwl-1
-    ):
-    """
-    This is a simple MyHDL IIR Direct Form I Filter example.  This is intended
-    to only be used with the SIIR object.
-    """
-
-    assert isinstance(A, tuple), "Tuple of denominator coefficents length 3"
-    assert len(A) == 3, "Tuple of denominator coefficients length 3"
-
-    assert isinstance(B, tuple), "Tuple of numerator coefficients length 3"
-    assert len(B) == 3, "Tuple of numerator coefficients length 3"
-
-    assert isinstance(W, tuple), "Fixed-Point format (W) should be a 2-element tuple"
-    assert len(W) == 2, "Fixed-Point format (W) should be a 2-element tuple"
-
-    # Make sure all coefficients are int, the class wrapper handles all float to
-    # fixed-point conversion.
-
-    rA = [isinstance(A[ii], int) for ii in range(len(A))]
-    rB = [isinstance(B[ii], int) for ii in range(len(B))]
-
-    assert False not in rA, "All A coefficients must be type int (fixed-point)"
-    assert False not in rB, "All B coefficients must be type int (fixed-point)"
-
-    Max  = 2**(W[0]-1)
-    # double width max and min
-    _max = 2**(2*W[0])
-    _min = -1*_max
-
-    # Quantize IIR Coefficients
-    b0 = B[0]
-    b1 = B[1]
-    b2 = B[2]
-
-    a1 = A[1]
-    a2 = A[2]
-
-    Q  = W[0]-1
-    Qd = 2*W[0]
-
-    # Delay elements, list of signals (double length for all)
-    ffd = [Signal(intbv(0, min=_min, max=_max)) for ii in range(2)]
-    fbd = [Signal(intbv(0, min=_min, max=_max)) for ii in range(2)]
-    #ib  = [Signal(intbv(0, min=_min, max=_max)) for ii in range(3)]
-    #ia  = [Signal(intbv(0, min=_min, max=_max)) for ii in range(2)]
-
-    yacc = Signal(intbv(0, min=_min, max=_max))
-    ys   = Signal(intbv(0, min=-1*Max, max=Max))
-
-    @always(clk.posedge)
-    def rtl_iir():
-        if ts:
-            ffd[1].next = ffd[0]
-            ffd[0].next = x
-
-            fbd[1].next = fbd[0]
-            fbd[0].next = yacc[Qd:Q].signed()
-
-        # Double precision accumulator
-        y.next = yacc[Qd:Q].signed()
-
-    @always_comb
-    def rtl_acc():
-        # Double precision accumulator
-        yacc.next = (b0*x) + (b1*ffd[0]) + (b2*ffd[1]) - (a1*fbd[0]) - (a2*fbd[1])
+from .filter_intf import FilterInterface
+from .filter_iir_hdl import filter_iir_hdl, filter_iir_sos_hdl
 
 
-    return instances()
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class FilterIIR(object):
+    def __init__(self, b=None, a=None, sos=None, word_format=(24,0), sample_rate=1):
+        """
+        In general this object generates the HDL based on a set of
+        coefficients or a second order sections matrix.  This object can
+        only be used for 2nd order type=I IIR filters or cascaded 2nd orders.
+        The coefficients are passed as floating-point values are and converted
+        to fixed-point using the format defined in the `W` argument.  The
+        `W` argument is a tuple that defines the overall word length (`wl`),
+        the interger word length (`iwl`) and the fractional word length (`fwl`):
+        `W= (wl, iwl, fwl,)`.
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def siir_sos_hdl(
-    # ~~ Ports ~~
-    clk,           # Synchronous clock
-    x,             # Input word, fixed-point format described by "W"
-    y,             # Output word, fixed-point format described by "W"
-    ts,            # Sample rate strobe (sample rate < system clock rate)
+        Arguments
+        ---------
+          b: the filters transfer function numerator coefficients
+          a: the filters transfer function denominator coefficients
+          sos: the second-order-sections array coefficients, if used `a` and `b`
+            are ignored
+          W: word format (fixed-point) used
 
-    # ~~ Parameters ~~
-    B=None,        # Numerator coefficients, in fixed-point specified
-    A=None,        # Denominator coefficients, in fixed-point specified
-    W=(24,0)       # Fixed-point description, tuple,
-                   #  W[0] = word length (wl)
-                   #  W[1] = integer word length (iwl)
-                   #  fraction word length (fwl) = wl-iwl-1
-    ):
+        @todo: utilize the myhdl.fixbv type for fixed point format (`W`)
+        """
+        # The W format, intended to be (total bits, integer bits,
+        # fraction bits) is not fully supported.
+        # Determine the max and min for the word-widths specified
+        w = word_format
+        self.word_format = w
+        self.max = int(2**(w[0]-1))
+        self.min = int(-1*self.max)
+        self._sample_rate = sample_rate
+        self._clock_frequncy = 20
 
-    assert len(B) == len(A)
-    NumberOfSections = len(B)
-    ListOfIir = [None for ii in range(NumberOfSections)]
-    _x = [Signal(intbv(0, max=y.max, min=y.min))
-          for ii in range(NumberOfSections+1)]
-    _x[0] = x
-    _x[NumberOfSections] = y
+        # properties that are set/configured
+        self._sample_rate = 1
+        self._clock_frequency = 20
+        self._shared_multiplier = False
 
-    for ii in range(len(B)):
-        ListOfIir[ii] = siir_hdl(clk, _x[ii], _x[ii+1], ts,
-                                 B=tuple(map(int, B[ii])),
-                                 A=tuple(map(int, A[ii])),
-                                 W=W)
+        self.Nfft = 1024
 
-    return ListOfIir
+        # conversion attributes
+        self.hdl_name = 'name'
+        self.hdl_directory = 'directory'
+        self.hdl_target = 'verilog' # or 'vhdl'
+
+        # create the fixed-point (integer) version of the coefficients
+        self._convert_coefficients(a, b, sos)
+
+        # used by the RTL simulation to generate freq response
+        self.yfavg, self.xfavg, self.pfavg = None, None, None
+
+        # golden model - direct-form I IIR filter using floating-point
+        # coefficients
+        self.iir_sections = [None for _ in range(self.n_section)]
+
+        # @todo: fix this, the default format of `b` and `a` should be
+        # @todo: an 2D array.
+        if self.n_section == 1:
+            b, a = [self.b], [self.a]
+        else:
+            b, a = self.b, self.a
+
+        # @todo: determine the section used type 1, 2, 3, 4 ...
+        # @todo: _iir_section = _iir_type_one_section if self.form_type == 1 else _iir_type_two_section
+        for ii in range(self.n_section):
+            # @todo: assign the structure type
+            self.iir_sections[ii] = IIRTypeOneSection(b[ii], a[ii])
+
+        self.first_pass = True
+
+    def _convert_coefficients(self, a, b, sos):
+        """ Extract the coefficients and convert to fixed-point (integer)
+
+        Arguments
+        ---------
+        :param a:
+        :param b:
+        :param sos:
+
+        """
+        # @todo: use myhdl.fixbv, currently the fixed-point coefficient
+        # @todo: the current implementation only uses an "all fractional"
+        # @todo: format.
+        if len(self.word_format) == 2 and self.word_format[1] != 0:
+            raise NotImplementedError
+        elif (len(self.word_format) == 3 and
+              self.word_format[1] != 0 and
+              self.word_format[2] != self.word_format[1]-1):
+            raise NotImplementedError
+
+        # @todo: if a sum-of-sections array is supplied only the first
+        # @todo: section is currently used to compute the frequency
+        # @todo: response, the full response is needed.
+        N, Wn = 2, 0
+        self.is_sos = False
+        if sos is not None:
+            self.is_sos = True
+            (self.n_section, o) = sos.shape
+            self.b = sos[:, 0:3]
+            self.a = sos[:, 3:6]
+        else:
+            self.b = b
+            self.a = a
+            self.n_section = 1
+
+        # fixed-point Coefficients for the IIR filter
+        # @todo: use myhdl.fixbv, see the comments and checks above
+        # @todo: the fixed-point conversion is currently very limited.
+        self.fxb = np.round(self.b * self.max)/self.max
+        self.fxa = np.floor(self.a * self.max)/self.max
+
+        # Save off the frequency response for the fixed-point
+        # coefficients.
+        if not self.is_sos:
+            self.w, self.h = signal.freqz(self.fxb, self.fxa)
+            self.hz = (self.w/(2*pi) * self._sample_rate)
+        else:
+            self.w = [None for _ in range(self.n_section)]
+            self.h = [None for _ in range(self.n_section)]
+            for ii in range(self.n_section):
+                self.w[ii], self.h[ii] = signal.freqz(self.fxb[ii], self.fxa[ii])
+            self.w, self.h = np.array(self.w), np.array(self.h)
+            self.hz = (self.w/(2*pi) * self._sample_rate)
+
+        # Create the integer version
+        if self.is_sos:
+            self.fxb = self.fxb * self.max
+            self.fxa = self.fxa * self.max
+        else:
+            self.fxb = tuple(map(int, self.fxb*self.max))
+            self.fxa = tuple(map(int, self.fxa*self.max))
+
+    @property
+    def shared_multiplier(self):
+        return self._shared_multiplier
+
+    @shared_multiplier.setter
+    def shared_multiplier(self, val):
+        # @todo: check the frequencies to make sure shared is valid
+        self._shared_multiplier = val
+
+    def filter_model(self, x):
+        """Floating-point IIR filter models
+        The "iir_sections" are assigned based on the settings, when
+        the filter is simulated an all floating-point simulation is
+        compared to the HDL.
+        """
+        for ii in range(self.n_section):
+            x = self.iir_sections[ii].process(x)
+        y = x
+
+        return y
+
+    def get_hdl(self, clock, reset, sigin, sigout):
+        if self.is_sos:
+            hdl = filter_iir_sos_hdl(clock, reset, sigin, sigout,
+                                     coefficients=(self.fxb, self.fxa),
+                                     shared_multiplier=self._shared_multiplier)
+        else:
+            hdl = filter_iir_hdl(clock, reset, sigin, sigout,
+                                 coefficients=(self.fxb, self.fxa),
+                                 shared_multiplier=self._shared_multiplier)
+        return hdl
+
+    def convert(self):
+        """Convert the HDL description to Verilog and VHDL.
+        """
+        w = self.word_format
+        imax = 2**(w[0]-1)
+
+        # small top-level wrapper
+        def filter_iir_top(clock, reset, x, xdv, y, ydv):
+            sigin = FilterInterface(word_format=(len(x), 0, len(y)-1))
+            sigin.data, sigin.data_valid = x, xdv
+            sigout = FilterInterface(word_format=(len(y), 0, len(y)-1))
+            sigout.data, sigout.data_valid = y, ydv
+
+            if self.is_sos:
+                iir_hdl = filter_iir_sos_hdl
+            else:
+                iir_hdl = filter_iir_hdl
+
+            iir = iir_hdl(clock, reset, sigin, sigout,
+                          coefficients=(self.fxb, self.fxa),
+                          shared_multiplier=self._shared_multiplier)
+            return iir
+
+        clock = Signal(False)
+        reset = ResetSignal(0, active=1, async=False)
+        x = Signal(intbv(0, min=-imax, max=imax))
+        y = Signal(intbv(0, min=-imax, max=imax))
+        xdv, ydv = Signal(bool(0)), Signal(bool(0))
+
+        if self.hdl_target.lower() == 'verilog':
+            tofunc = toVerilog
+        elif self.hdl_target.lower() == 'vhdl':
+            tofunc = toVHDL
+        else:
+            raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
+
+        if not os.path.isdir(self.hdl_directory):
+            os.mkdir(self.hdl_directory)
+        tofunc.name = self.hdl_name
+        tofunc.directory = self.hdl_directory
+        tofunc(filter_iir_top, clock, reset, x, xdv, y, ydv)
+
+    def simulate_freqz(self, num_loops=3, Nfft=1024):
+        """ simulate the discrete frequency response
+        This function will invoke an HDL simulation and capture the
+        inputs and outputs of the filter.  The response can be compared
+        to the frequency response (signal.freqz) of the coefficients.
+        """
+        self.Nfft = Nfft
+        w = self.word_format[0]
+        clock = Signal(bool(0))
+        reset = ResetSignal(0, active=1, async=False)
+        sigin = FilterInterface(word_format=self.word_format)
+        sigout = FilterInterface(word_format=self.word_format)
+        xf = Signal(0.0)    # floating point version
+
+        # determine the sample rate to clock frequency
+        fs = self._sample_rate
+        fc = self._clock_frequency
+        fscnt_max = fc//fs
+        cnt = Signal(fscnt_max)
+
+        def _test_stim():
+            # get the hardware description to simulation
+            tbdut = self.get_hdl(clock, reset, sigin, sigout)
+
+            @always(delay(10))
+            def tbclk():
+                clock.next = not clock
+
+            @always(clock.posedge)
+            def tbdv():
+                if cnt == 0:
+                    cnt.next = fscnt_max
+                    sigin.data_valid.next = True
+                else:
+                    cnt.next -= 1
+                    sigin.data_valid.next = False
+
+            @always(clock.posedge)
+            def tbrandom():
+                if sigin.data_valid:
+                    xi = uniform(-1, 1)
+                    sigin.data.next = int(self.max*xi)
+                    xf.next = xi
+
+            @instance
+            def tbstim():
+                ysave = np.zeros(Nfft)
+                xsave = np.zeros(Nfft)
+                psave = np.zeros(Nfft)
+
+                self.yfavg = np.zeros(Nfft)
+                self.xfavg = np.zeros(Nfft)
+                self.pfavg = np.zeros(Nfft)
+
+                for ii in range(num_loops):
+                    for jj in range(Nfft):
+                        yield sigin.data_valid.posedge
+                        xsave[jj] = float(sigin.data)/self.max
+                        yield sigout.data_valid.posedge
+                        ysave[jj] = float(sigout.data)/self.max
+                        # grab the response from the floating-point model
+                        psave[jj] = self.filter_model(float(xf))
+
+                    # remove any zeros
+                    xsave[xsave == 0] = 1e-19
+                    ysave[ysave == 0] = 1e-19
+                    psave[psave == 0] = 1e-19
+
+                    # average the FFT frames (converges the noise variance)
+                    self.yfavg += (np.abs(fft(ysave, Nfft)) / Nfft)
+                    self.xfavg += (np.abs(fft(xsave, Nfft)) / Nfft)
+                    self.pfavg += (np.abs(fft(psave, Nfft)) / Nfft)
+
+                raise StopSimulation
+
+            return (tbdut, tbclk, tbdv, tbrandom, tbstim,)
+
+        traceSignals.name = 'filter_iir_sim'
+        if os.path.isfile(traceSignals.name+'.vcd'):
+            os.remove(traceSignals.name+'.vcd')
+        gens = traceSignals(_test_stim)
+        Simulation(gens).run()
+
+        return None
+
+    def plot_response(self, ax):
+        # Plot the designed filter response
+        if self.n_section == 1:
+            fw, fh = signal.freqz(self.b, self.a, worN=self.Nfft)
+            ax.plot(fw, 20*log10(np.abs(fh)), linewidth=2, alpha=.75)
+            fxw, fxh = signal.freqz(self.fxb, self.fxa, worN=self.Nfft)
+            ax.plot(fxw, 20*log10(np.abs(fxh)), linestyle='--', linewidth=3,
+                    alpha=.75)
+
+        # plot the simulated response, if simulated data exists
+        if self.xfavg is None or self.yfavg is None or self.pfavg is None:
+            pass
+        else:
+            #  -- Fixed Point Sim --
+            xa = 2*pi * np.arange(self.Nfft)/self.Nfft
+            h = self.yfavg / self.xfavg
+            ax.plot(xa, 20*log10(h), linewidth=4, alpha=.5)
+            #  -- Floating Point Sim --
+            hp = self.pfavg / self.xfavg
+            ax.plot(xa, 20*log10(hp), color='k', linestyle=':',
+                    linewidth=2, alpha=.75)
+
+        ax.set_ylim(-80, 10)
+        ax.set_xlim(0, np.pi)
+
+        ax.set_ylabel('Magnitude dB');
+        ax.set_xlabel('Frequency Normalized Radians')
+        ax.legend(('Ideal', 'Quant. Coeff.',
+                      'Fixed-P. Sim', 'Floating-P. Sim'))
 
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class _iir_typeI_section(object):
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class IIRTypeOneSection(object):
     def __init__(self, b, a):
-        self.b = b
-        self.a = a
-
-        self._fbd = [0. for ii in range(2)]
-        self._ffd = [0. for ii in range(2)]
+        self.b, self.a = b, a
+        self._fbd = [0. for _ in range(2)]
+        self._ffd = [0. for _ in range(2)]
 
     def process(self, x):
-
         y = x*self.b[0] + \
             self._ffd[0]*self.b[1] + \
             self._ffd[1]*self.b[2] - \
@@ -200,303 +390,13 @@ class _iir_typeI_section(object):
         return y
 
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class _iir_typeII_section(object):
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class IIRTypeTwoSection(object):
     def __init__(self, b, a):
         self.b = b
         self.a = a
 
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class SIIR():
-    """
-    This is a simple example that illustrates how to create
-    an object for designing an simple (fixed structure) IIR
-    filter and the RTL implementation.
-    """
-    def __init__(self,
-                 Fc=9200,     # cutoff frequency
-                 Fs=96000,    # sample rate
-                 b = None,    # or pass b,a coefficients
-                 a = None,    # or pass b,a coefficients
-                 sos = None,  # WIP sos of section matrix
-                 W=(24,0)     # Fixed-point to use
-                 ):
-        """
-        In general this object generates
-        the HDL based on a set of coefficients or a sum of
-        sections matrix.  This object can only be used for 2nd
-        order type=I IIR filters or cascaded 2nd orders.
-        -------
-        """
-        print("init_SIIR")
-        print("b",b)
-        print(type(b), b)
-        print("a", a)
-        # The W format, intended to be (total bits, integer bits,
-        # fraction bits) is not fully supported.
-        # Determine the max and min for the word-widths specified
-        self.W = W
-        self.max = int(2**(W[0]-1))
-        self.min = int(-1*self.max)
-
-        # Filter Design
-        N  = 2
-        Wn = 0
-        self.isSos = False
-        if sos is not None:
-            self.isSos = True
-            (self.nSection, o) = sos.shape
-            print(sos)
-            self.b = sos[:, 0:3]
-            self.a = sos[:, 3:6]
-            #for ii in range(self.nSection):
-                #self.a[ii,1] = -1*self.a[ii,1]
-                #self.a[ii,2] = -1*self.a[ii,2]
-            print(self.b)
-            print(self.a)
-        else:
-            self.b = b
-            self.a = a
-            self.nSection = 1
-
-
-        # fixed-point Coefficients for the IIR filter
-        self.fxb = np.round(self.b * self.max)/self.max
-        self.fxa = np.floor(self.a * self.max)/self.max
-        
-        print("fxa", len(self.fxa), self.fxa)
-        print("fxb", len(self.fxb), self.fxb)
-
-        # Save off the frequency response for the fixed-point
-        # coefficients.
-        if not self.isSos:
-            self.w, self.h = freqz(self.fxb, self.fxa)
-            self.hz = (self.w/(2*pi) * Fs)
-        else:
-            self.w = [None for ii in range(self.nSection)]
-            self.h = [None for ii in range(self.nSection)]
-            for ii in range(self.nSection):
-                self.w[ii], self.h[ii] = freqz(self.fxb[ii], self.fxa[ii])
-            self.w = np.array(self.w); self.h = np.array(self.h)
-            self.hz = (self.w/(2*pi) * Fs)
-
-        # Create the integer version
-        if self.isSos:
-            self.fxb = self.fxb*self.max
-            self.fxa = self.fxa*self.max
-        else:
-            self.fxb = tuple(map(int, self.fxb*self.max))
-            self.fxa = tuple(map(int, self.fxa*self.max))
-
-        print ("IIR w,b,a", Wn, self.b, self.a)
-        print ("IIR fixed-point b,a", self.fxb, self.fxa)
-
-        # used by the RTL simulation to generate freq response
-        self.yfavg = None
-        self.xfavg = None
-        self.pfavg = None
-
-        # golden model
-        self.iirSections = [None for ii in range(self.nSection)]
-        if self.nSection > 1:
-            for ii in range(self.nSection):
-                self.iirSections[ii] = _iir_typeI_section(self.b[ii], self.a[ii])
-        else:
-            self.iirSections[0] = _iir_typeI_section(self.b, self.a)
-
-        #self._d = [0. for ii in range(2)]
-        #self._fbd = [0. for ii in range(2)]
-        #self._ffd = [0. for ii in range(2)]
-
-        self.firstPass = True
-
-    def filter_directI(self, x):
-
-        """Floating-point IIR filter direct-form I
-        """
-        #print(" Input x %d" % (x))
-        for ii in range(self.nSection):
-            x = self.iirSections[ii].process(x)
-        y = x
-        #print(" Output y %d" % (y))
-        #if self.isSos:
-        #    if self.firstPass:
-        #        print('WARNING: SOS WIP')
-        #        self.firstPass = False
-        #    return 0
-        #
-        #y = x*self.b[0] + \
-        #    self._ffd[0]*self.b[1] + \
-        #    self._ffd[1]*self.b[2] - \
-        #    self._fbd[0]*self.a[1] - \
-        #    self._fbd[1]*self.a[2]
-        #
-        #self._ffd[1] = self._ffd[0]
-        #self._ffd[0] = x
-        #
-        #self._fbd[1] = self._fbd[0]
-        #self._fbd[0] = y
-
+    def process(self, x):
+        # @todo: finish type two ...
+        y = 0
         return y
-
-
-    def filter_directII(self, x):
-        """Floating-point IIR filter direct-form II
-        """
-        if self.isSos:
-            raise (StandardError, "WIP SOS")
-
-        w = x - self._d[0]*self.a[1] - self._d[1]*self.a[2]
-        y = self.b[0]*w + self._d[0]*self.b[1] + self._d[1]*self.b[2]
-
-        self._d[1] = self._d[0]
-        self._d[0] = w
-
-        return y
-
-
-    def RTL(self, clk, x, y, ts):
-        if self.isSos:
-            hdl = siir_sos_hdl(clk, x, y, ts, A=self.fxa, B=self.fxb, W=self.W)
-        else:
-            hdl = siir_hdl(clk, x, y, ts, A=self.fxa, B=self.fxb, W=self.W)
-
-        return hdl
-
-
-    def Convert(self, W=None):
-        """Convert the HDL description to Verilog and VHDL.
-        """
-        clk = Signal(False)
-        ts  = Signal(False)
-        x   = Signal(intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
-        y   = Signal(intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
-
-        if self.isSos:
-            print("Convert IIR SOS to Verilog and VHDL")
-            toVerilog(siir_sos_hdl, clk, x, y, ts, A=self.fxa, B=self.fxb, W=self.W)
-            toVHDL(siir_sos_hdl, clk, x, y, ts, A=self.fxa, B=self.fxb, W=self.W)
-        else:
-            # Convert to Verilog and VHDL
-            print("Convert IIR to Verilog and VHDL")
-            toVerilog(siir_hdl, clk, x, y, ts,  A=self.fxa, B=self.fxb, W=self.W)
-            toVHDL(siir_hdl, clk, x, y, ts,  A=self.fxa, B=self.fxb, W=self.W) 
-
-    def TestFreqResponse(self, Nloops=3, Nfft=1024):
-        """
-        """
-        self.Nfft = Nfft
-        Q = self.W[0]-1
-        clk = Signal(False)
-        ts  = Signal(False)
-        x   = Signal(intbv(0,min=-2**Q,max=2**Q))
-        y   = Signal(intbv(0,min=-2**Q,max=2**Q))
-        xf  = Signal(0.0)
-
-        NC=32
-        cnt = Signal(NC)
-
-        dut = traceSignals(self.RTL, clk, x, y, ts)
-        #dut = self.RTL(clk, x, y, ts)
-
-        @always(delay(10))
-        def clkgen():
-            clk.next = not clk
-
-        @always(clk.posedge)
-        def tsgen():
-            if cnt == 0:
-                cnt.next = NC
-                ts.next = True
-            else:
-                cnt.next -= 1
-                ts.next = False
-
-        @always(clk.posedge)
-        def ist():
-            if ts:
-                xi      = uniform(-1,1)
-                x.next  = 0 #int(self.max*xi)
-                xf.next = xi
-
-        @instance
-        def stimulus():
-            ysave      = np.zeros(Nfft)
-            xsave      = np.zeros(Nfft)
-            psave      = np.zeros(Nfft)
-
-            self.yfavg = np.zeros(Nfft)
-            self.xfavg = np.zeros(Nfft)
-            self.pfavg = np.zeros(Nfft)
-
-            for ii in range(Nloops):
-                for jj in range(Nfft):
-                    yield ts.posedge
-                    xsave[jj] = float(xf)
-                    ysave[jj] = float(y)/self.max
-
-                    psave[jj] = self.filter_directI(float(xf))
-                    #psave[jj] = self.filter_directII(float(xf))
-
-                self.yfavg = self.yfavg + (abs(fft(ysave, Nfft)) / Nfft)
-                self.xfavg = self.xfavg + (abs(fft(xsave, Nfft)) / Nfft)
-                self.pfavg = self.pfavg + (abs(fft(psave, Nfft)) / Nfft)
-
-            raise StopSimulation
-
-        return instances()
-
-
-    def PlotResponse(self, fn="siir"):
-        # Plot the designed filter response
-        pylab.ioff()
-        if self.nSection == 1:
-            pylab.plot(self.w, 20*log10(np.abs(self.h)), 'm')
-            fxw,fxh = freqz(self.fxb, self.fxa)
-            pylab.plot(fxw, 20*log10(np.abs(fxh)), 'y:')
-
-        # plot the simulated response
-        #  -- Fixed Point Sim --
-        xa = 2*pi * np.arange(self.Nfft)/self.Nfft
-        H = self.yfavg / self.xfavg
-        pylab.plot(xa, 20*log10(H), 'b' )
-        #  -- Floating Point Sim --
-        Hp = self.pfavg / self.xfavg
-        pylab.plot(xa, 20*log10(Hp), 'g' )
-
-        #pylab.axis((0, pi, -40, 3))
-        pylab.ylabel('Magnitude dB');
-        pylab.xlabel('Frequency Normalized Radians')
-        pylab.legend(('Ideal', 'Quant. Coeff.',
-                      'Fixed-P. Sim', 'Floating-P. Sim'))
-        pylab.savefig(fn+".png")
-        pylab.savefig(fn+".eps")
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if __name__ == '__main__':
-    # Instantiate the filter and define the Signal
-    W = (8,0)
-    b = np.asarray([1,1,1])
-#    b = [1,1,1]
-    a = np.asarray([3, 0, 2])
-    # need to be ndarrays, with type list / tuple the filter "explodes" 
-    flt = SIIR(W = W, b = b, a = a)
-
-#    clk = Signal(False)
-#    ts  = Signal(False)
-#    x   = Signal(intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
-#    y   = Signal(intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
-#
-    # Setup the Testbench and run
-    print ("Simulation")
-    tb = flt.TestFreqResponse(Nloops=3, Nfft=1024)
-    sim = Simulation(tb)
-    print ("Run Simulation")
-    sim.run()
-    print ("Plot Response")
-    flt.PlotResponse()
-
-    flt.Convert()
-    print("Finished!")
