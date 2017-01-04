@@ -15,7 +15,6 @@ SCROLL = True
 
 import pyfda.filterbroker as fb
 
-#from pyfda.input_widgets import input_specs_test as input_specs
 from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
                                 filter_info, filter_pz)
 try:
@@ -24,7 +23,6 @@ except ImportError:
     fb.MYHDL = False
 else:
     fb.MYHDL = True
-    logger.info("Info: Module myHDL found -> filter synthesis enabled!")
     from pyfda.hdl_generation import hdl_specs
 
 
@@ -38,6 +36,10 @@ class InputTabWidgets(QWidget):
 
 
     def __init__(self, parent):
+        
+        if fb.MYHDL:
+            logger.info("Info: Module myHDL v{0} found -> filter synthesis enabled!".format(myhdl.__version__))
+
         super(InputTabWidgets, self).__init__(parent)
 
         self.filter_specs = filter_specs.FilterSpecs(self)
