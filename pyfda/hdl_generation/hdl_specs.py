@@ -377,8 +377,6 @@ class HDLSpecs(QWidget):
 
         self.flt.hdl_name = file_name
         self.flt.hdl_directory = dir_name
-        self.flt.hdl_target = self.hdl_type # 'verilog' or 'vhdl'
-
         
 #------------------------------------------------------------------------------
     def exportHDL(self):
@@ -395,18 +393,22 @@ class HDLSpecs(QWidget):
                 caption = "Save HDL as", directory="D:",
                 filter = file_types)
         hdl_file = str(hdl_file)
-        if str(hdl_filter) == '.vhd':
-            self.hdl_type = 'vhdl'
-        else:
-            self.hdl_type = 'verilog'
-            
-        logger.info('Creating hdl_file "{0}" of type "{1}"'.format(hdl_file, self.hdl_type))
+        
         hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
         hdl_dir_name = os.path.splitext(hdl_file)[0]
         logger.info('Using hdl_filename "%s"', hdl_file_name)
         logger.info('Using hdl_dirname "%s"', hdl_dir_name)
 
         self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
+        
+        print('target:', self.flt.hdl_target)
+        if str(hdl_filter) == '.vhd':
+            self.flt.hdl_target = 'vhdl'
+        else:
+            self.flt.hdl_target = 'verilog'
+            
+        logger.info('Creating hdl_file "{0}" of type "{1}"'.format(hdl_file, self.flt.hdl_target))
+
         self.flt.convert() # was Convert()
         logger.info("HDL conversion finished!")
 
