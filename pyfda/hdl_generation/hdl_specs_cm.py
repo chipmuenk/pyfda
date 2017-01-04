@@ -26,7 +26,7 @@ import pyfda.pyfda_fix_lib as fix
 from pyfda.pyfda_lib import HLine
 #import pyfda.pyfda_rc as rc
 
-from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
+from pyfda.hdl_generation.filter_iir_cm import SIIR #  second order IIR filter object
 
 
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
