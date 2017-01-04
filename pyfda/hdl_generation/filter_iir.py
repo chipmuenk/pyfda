@@ -76,7 +76,7 @@ class FilterIIR(object):
         self.max = int(2**(w[0]-1))
         self.min = int(-1*self.max)
         self._sample_rate = sample_rate
-        self._clock_frequncy = 20
+        self._clock_frequency = 20
 
         # properties that are set/configured
         self._sample_rate = 1
