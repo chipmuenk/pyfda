@@ -60,11 +60,18 @@ class FilterIIR(object):
 
         Arguments
         ---------
-          b: the filters transfer function numerator coefficients
-          a: the filters transfer function denominator coefficients
-          sos: the second-order-sections array coefficients, if used `a` and `b`
-            are ignored
-          W: word format (fixed-point) used
+          b: array_like
+              the filters transfer function numerator coefficients
+          
+          a: array_like
+              the filters transfer function denominator coefficients
+          
+          sos: array_like with shape (n_sections, 6)
+              the second-order-sections array coefficients. If used, `a` and `b`
+              are ignored
+            
+          W: tuple (WL, IWL, FWL)
+             fixed-point word format
 
         @todo: utilize the myhdl.fixbv type for fixed point format (`W`)
         """
