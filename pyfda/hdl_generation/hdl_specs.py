@@ -371,7 +371,7 @@ class HDLSpecs(QWidget):
         # =============== adapted from C. Felton's SIIR example =============
         self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
                              a=np.array(coeffs[1][0:3]),
-                             sos = sos,
+                             #sos = sos, doesn't work yet
                              word_format=(self.W[0], 0, self.W[1]))
 
         self.flt.hdl_name = file_name
