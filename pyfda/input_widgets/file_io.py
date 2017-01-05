@@ -15,9 +15,8 @@ from ..compat import (QtCore, QFD, Qt,
 
 import scipy.io
 import numpy as np
-import re
 import datetime
-#import json
+
 
 try:
     import cPickle as pickle
@@ -52,7 +51,7 @@ else:
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_rc as rc 
 import pyfda.pyfda_fix_lib as fix_lib
-from pyfda.pyfda_lib import HLine
+from pyfda.pyfda_lib import HLine, extract_file_ext
 
 # TODO: Save P/Z as well if possible
 
@@ -142,7 +141,7 @@ class File_IO(QWidget):
                 filter = file_filters)
         file_name = str(file_name) # QString -> str
 
-        for t in self.extract_file_ext(file_filters): # get a list of file extensions
+        for t in extract_file_ext(file_filters): # get a list of file extensions
             if t in str(file_type):
                 file_type = t
         
@@ -199,7 +198,7 @@ class File_IO(QWidget):
         # Qt5 has QFileDialog.mimeTypeFilters(), but under Qt4 the mime type cannot
         # be extracted reproducibly across file systems, so it is done manually:
 
-        for t in self.extract_file_ext(file_filters): # get a list of file extensions
+        for t in extract_file_ext(file_filters): # get a list of file extensions
             if t in str(file_type):
                 file_type = t           # return the last matching extension
 
@@ -253,7 +252,7 @@ class File_IO(QWidget):
                 directory = rc.save_dir, filter = file_filters) 
         file_name = str(file_name) # QString -> str needed for Python 2
 
-        for t in self.extract_file_ext(file_filters): # extract the list of file extensions
+        for t in extract_file_ext(file_filters): # extract the list of file extensions
             if t in str(file_type):
                 file_type = t
        
@@ -349,7 +348,7 @@ class File_IO(QWidget):
                 directory = rc.save_dir, filter = file_filters)
         file_name = str(file_name) # QString -> str
 
-        for t in self.extract_file_ext(file_filters): # extract the list of file extensions
+        for t in extract_file_ext(file_filters): # extract the list of file extensions
             if t in str(file_type):
                 file_type = t
         
@@ -380,35 +379,6 @@ class File_IO(QWidget):
                         rc.save_dir = os.path.dirname(file_name)
             except IOError as e:
                 logger.error("Failed loading %s!\n%s", file_name, e)
-
-
-#------------------------------------------------------------------------------
-    def prune_file_ext(self, file_type):
-        """
-        Prune file extension, e.g. '(*.txt)' from file type description
-        """
-        # regular expression: re.sub(pattern, repl, string) 
-        #  Return the string obtained by replacing the leftmost non-overlapping 
-        #  occurrences of the pattern in string by repl
-        #   '.' means any character
-        #   '+' means one or more
-        #   '[^a]' means except for 'a'
-        # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
-        # '(' must be escaped as '\('
-
-        return re.sub('\([^\)]+\)', '', file_type)
-
-#------------------------------------------------------------------------------        
-    def extract_file_ext(self, file_type):
-        """
-        Extract list with file extension(s), e.g. 'txt' from '(*.txt)' from file
-        type description
-        """
-
-        ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
-        ext_list = [t.strip('(*)') for t in ext_list] # remove '(*)'
-               
-        return ext_list
         
 
 #------------------------------------------------------------------------------
