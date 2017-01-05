@@ -14,7 +14,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont,
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QFrame,
                       QCheckBox, QVBoxLayout, QHBoxLayout, QSizePolicy,
                       pyqtSignal)
 
@@ -177,19 +177,19 @@ class SelectFilter(QWidget):
         layVAllWdg.addLayout(layHOrdWdg)
 
 #==============================================================================
-#         frmMain = QFrame()
-#         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-#         frmMain.setLayout(layVAllWdg)
-#
-#         layHMain = QHBoxLayout()
-#         layHMain.addWidget(frmMain)
-#         layHMain.setContentsMargins(0, 0, 0, 0)
-#
-#         self.setLayout(layHMain)
-# #        layHMain.setSizeConstraint(QLayout.SetFixedSize)
-#
+        frmMain = QFrame(self)
+        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmMain.setLayout(layVAllWdg)
+
+        layHMain = QHBoxLayout()
+        layHMain.addWidget(frmMain)
+        layHMain.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(layHMain)
+ #        layHMain.setSizeConstraint(QLayout.SetFixedSize)
+
 #==============================================================================
-        self.setLayout(layVAllWdg)
+#        self.setLayout(layVAllWdg)
 
         #------------------------------------------------------------
         # SIGNALS & SLOTS

@@ -97,7 +97,8 @@ class FilterSpecs(QWidget):
         layVMain.addWidget(self.frmMsg)   # Text message
 
         layVMain.addStretch()
-        layVMain.setContentsMargins(1, 0, 1, 0) # R, T, L, B
+        #layVMain.setContentsMargins(1, 0, 1, 0) # R, T, L, B
+        layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(layVMain) # main layout of widget
 

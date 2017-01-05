@@ -45,12 +45,9 @@ class FreqSpecs(QWidget):
         """
         Construct the User Interface
         """
-        self.layVMain = QVBoxLayout() # Widget main layout
-        layHTitle = QHBoxLayout()
-        
         bfont = QFont()
         bfont.setBold(True)
-#            bfont.setWeight(75)
+
         lblTitle = QLabel() # field for widget title
         lblTitle.setText(str(self.title))
         lblTitle.setFont(bfont)
@@ -58,20 +55,24 @@ class FreqSpecs(QWidget):
         self.lblUnit = QLabel()
         self.lblUnit.setText(" in " + rt_label(fb.fil[0]['freq_specs_unit']))
 
+        layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(self.lblUnit)
-        layHTitle.addStretch(100)
+        layHTitle.addStretch(2)
         
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
-        self.layGSpecs = QGridLayout() # sublayout for spec fields        
+        self.layGSpecs = QGridLayout() # sublayout for spec fields
+        # set the title as the first (fixed) entry in grid layout. The other
+        # fields are added and hidden dynamically in _show_entries and _hide_entries()
+        self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
 
-        sfFrame = QFrame()
-        sfFrame.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        sfFrame.setLayout(self.layGSpecs)
+        frmMain = QFrame(self)
+        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmMain.setLayout(self.layGSpecs)
 
-        self.layVMain.addLayout(layHTitle)
-        self.layVMain.addWidget(sfFrame)
+        self.layVMain = QVBoxLayout() # Widget main layout
+        self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(1,1,1,1)
         self.setLayout(self.layVMain)
         
@@ -240,9 +241,10 @@ class FreqSpecs(QWidget):
                 self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
-    
-                self.layGSpecs.addWidget(self.qlabels[i],i,0)
-                self.layGSpecs.addWidget(self.qlineedit[i],i,1)
+
+                # first entry is the title
+                self.layGSpecs.addWidget(self.qlabels[i],i+1,0)
+                self.layGSpecs.addWidget(self.qlineedit[i],i+1,1)
 
 #------------------------------------------------------------------------------
     def sort_dict_freqs(self):

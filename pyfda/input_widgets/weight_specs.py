@@ -10,11 +10,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, 
-                      QCheckBox, QToolButton,QPushButton,
-                      QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
-                      pyqtSignal, Qt, QEvent)
+                      QWidget, QLabel, QLineEdit, QFrame, QFont, QPushButton,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, style_widget
@@ -46,14 +43,13 @@ class WeightSpecs(QWidget):
         """
         Construct User Interface  
         """
-        self.layVMain = QVBoxLayout()   # Widget vertical layout
-        layHTitle = QHBoxLayout()       # Layout for title and reset button
-        self.layGSpecs   = QGridLayout()# Sublayout for spec fields
 
+        self.layGSpecs   = QGridLayout() # Sublayout for spec fields, populated
+                                         # dynamically in _show_entries()
         title = "Weight Specifications"
         bfont = QFont()
         bfont.setBold(True)
-#            bfont.setWeight(75)
+
         lblTitle = QLabel(self) # field for widget title
         lblTitle.setText(str(title))
         lblTitle.setFont(bfont)
@@ -61,16 +57,21 @@ class WeightSpecs(QWidget):
 
         self.butReset = QPushButton("Reset", self)
         self.butReset.setToolTip("Reset weights to 1")
-        
                 
+        layHTitle = QHBoxLayout()       # Layout for title and reset button
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(self.butReset)
-
-        frmMain = QFrame()
+        
+         # set the title as the first (fixed) entry in grid layout. The other
+         # fields are added and hidden dynamically in _show_entries and _hide_entries()
+        self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
+        
+        # This is the top level widget, encompassing the other widgets
+        frmMain = QFrame(self)
         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(self.layGSpecs)
 
-        self.layVMain.addLayout(layHTitle)
+        self.layVMain = QVBoxLayout()   # Widget main vertical layout
         self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(1,1,1,1)
 
@@ -232,9 +233,10 @@ class WeightSpecs(QWidget):
                 self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
-    
-                self.layGSpecs.addWidget(self.qlabels[i],i,0)
-                self.layGSpecs.addWidget(self.qlineedit[i],i,1)
+
+                # first entry is title and reset button
+                self.layGSpecs.addWidget(self.qlabels[i],i+1,0)
+                self.layGSpecs.addWidget(self.qlineedit[i],i+1,1)
 
         else: # make the right number of widgets visible
             for i in range(self.n_cur_labels, num_new_labels):

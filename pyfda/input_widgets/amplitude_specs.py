@@ -45,9 +45,6 @@ class AmplitudeSpecs(QWidget):
         """
         Construct User Interface
         """
-        self.layVMain = QVBoxLayout() # Widget vertical layout
-        layHTitle = QHBoxLayout() # layout for title and unit
-
         amp_units = ["dB", "V", "W"]
 
         bfont = QFont()
@@ -76,28 +73,34 @@ class AmplitudeSpecs(QWidget):
             amp_idx = 0
         self.cmbUnitsA.setCurrentIndex(amp_idx) # initialize for dBs
         
+        layHTitle = QHBoxLayout() # layout for title and unit
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(lblUnits, Qt.AlignLeft)
         layHTitle.addWidget(self.cmbUnitsA, Qt.AlignLeft)
         layHTitle.addStretch(2)
         
         self.layGSpecs = QGridLayout() # sublayout for spec fields
-        
-        frmMain = QFrame()
+        # set the title as the first (fixed) entry in grid layout. The other
+        # fields are added and hidden dynamically in _show_entries and _hide_entries()
+        self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
+
+        # This is the top level widget, encompassing the other widgets        
+        frmMain = QFrame(self)
         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(self.layGSpecs)
 
-        self.layVMain.addLayout(layHTitle)
+        self.layVMain = QVBoxLayout() # Widget main layout
         self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(1,1,1,1)
 
         self.setLayout(self.layVMain)
+        
+        self.n_cur_labels = 0 # number of currently visible labels / qlineedits
 
         # - Build a list from all entries in the fil_dict dictionary starting
         #   with "A" (= amplitude specifications of the current filter)
-        # - Pass the list to setEntries which recreates the widget
+        # - Pass the list to update_UI which recreates the widget
         # ATTENTION: Entries need to be converted from QString to str for Py 2
-        self.n_cur_labels = 0 # number of currently visible labels / qlineedits
         new_labels = [str(l) for l in fb.fil[0] if l[0] == 'A']
         self.update_UI(new_labels = new_labels)
 
@@ -272,9 +275,10 @@ class AmplitudeSpecs(QWidget):
                 self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")
                 self.qlineedit[i].installEventFilter(self)  # filter events
-    
-                self.layGSpecs.addWidget(self.qlabels[i],(i+0),0)
-                self.layGSpecs.addWidget(self.qlineedit[i],(i+0),1)
+
+                 # first entry is title
+                self.layGSpecs.addWidget(self.qlabels[i], i+1, 0)
+                self.layGSpecs.addWidget(self.qlineedit[i], i+1, 1)
 
         else: # make the right number of widgets visible
             for i in range(self.n_cur_labels, num_new_labels):
