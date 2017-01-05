@@ -26,8 +26,7 @@ import pyfda.pyfda_fix_lib as fix
 from pyfda.pyfda_lib import HLine, extract_file_ext
 #import pyfda.pyfda_rc as rc
 
-from pyfda.hdl_generation.filter_iir import FilterIIR #  second order IIR filter object
-#from pyfda.hdl_generation.filter_iir import SIIR #  second order IIR filter object
+from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
 
 
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
@@ -343,7 +342,6 @@ class HDLSpecs(QWidget):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
-
         qI_i = int(self.ledQIInput.text())
         qF_i = int(self.ledQFInput.text())
         
@@ -373,6 +371,7 @@ class HDLSpecs(QWidget):
         # =============== adapted from C. Felton's SIIR example =============
         self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
                              a=np.array(coeffs[1][0:3]),
+                             sos = sos,
                              word_format=(self.W[0], 0, self.W[1]))
 
         self.flt.hdl_name = file_name
@@ -383,36 +382,37 @@ class HDLSpecs(QWidget):
         """
         Synthesize HDL description of filter using myHDL module
         """
-        # Passing the file name doesn't work yet, itis currently fixed to 
-        # "siir_hdl" via the function with the same name
-        dlg = QFD(self)
+        dlg = QFD(self) # instantiate file dialog object
         
         file_types = "Verilog (*.v);;VHDL (*.vhd)"
 
         hdl_file, hdl_filter = dlg.getSaveFileName_(
-                caption = "Save HDL as", directory="D:",
-                filter = file_types)
-        hdl_file = str(hdl_file)
-        
+                caption="Save HDL as", directory=fb.base_dir,
+                filter=file_types)
+        hdl_file = os.path.normpath(str(hdl_file))
+        hdl_type = extract_file_ext(hdl_filter)[0] # return '.v' or '.vhd'
+
+        hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
         if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
             os.mkdir(hdl_dir_name)
+        fb.base_dir = hdl_dir_name # make this directory the new default / base dir
+
         # return the filename without suffix
         hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
-        hdl_dir_name = os.path.splitext(hdl_file)[0]
-        logger.info('Using hdl_filename "%s"', hdl_file_name)
-        logger.info('Using hdl_dirname "%s"', hdl_dir_name)
 
         self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
-        
-        print('target:', self.flt.hdl_target)
-        if str(hdl_filter) == '.vhd':
+    
+        if str(hdl_type) == '.vhd':
             self.flt.hdl_target = 'vhdl'
+            suffix = '.vhd'
         else:
             self.flt.hdl_target = 'verilog'
+            suffix = '.v'
             
-        logger.info('Creating hdl_file "{0}" of type "{1}"'.format(hdl_file, self.flt.hdl_target))
+        logger.info('Creating hdl_file "{0}"'.format(
+                    os.path.join(hdl_dir_name, hdl_file_name + suffix)))
 
-        self.flt.convert() # was Convert()
+        self.flt.convert()
         logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
@@ -422,30 +422,30 @@ class HDLSpecs(QWidget):
         """
         # Setup the Testbench and run
 
-        # Passing the file name doesn't work yet, itis currently fixed to 
-        # "siir_hdl" via the function with the same name
-        dlg = QFD(self)
+        dlg = QFD(self)  # instantiate file dialog object
         
         plt_types = "png (*.png);;svg (*.svg)"
 
         plt_file, plt_type = dlg.getSaveFileName_(
-                caption = "Save plots as", directory="D:",
+                caption = "Save plots as", directory=fb.base_dir,
                 filter = plt_types)
-        plt_file = str(plt_file)
+        plt_file = os.path.normpath(str(plt_file))
         plt_type = str(plt_type)
+        
         logger.info('Using plot filename "%s"', plt_file)
-        plot_file_name = os.path.splitext(os.path.basename(plt_file))[0]
-        plot_dir_name = os.path.splitext(plt_file)[0]
-        logger.info('Using plot filename "%s"', plot_file_name)
-        logger.info('Using plot directory "%s"', plot_dir_name)
-
-#        self.flt.plt_type = plt_type
-#        self.flt.plt_file = plt_file
-
-        self.setupHDL(file_name = plot_file_name, dir_name = plot_dir_name)
+        
+        plt_dir_name = os.path.dirname(plt_file)  # extract the directory path
         if not os.path.isdir(plt_dir_name): # create directory if it doesn't exist
-            os.mkdir(plt_dir_name)        
-        logger.info('Using plot filename "%s"', plt_file_name)
+            os.mkdir(plt_dir_name)
+        fb.base_dir = plt_dir_name # make this directory the new default / base dir
+        
+        # return the filename without suffix
+        plt_file_name = os.path.splitext(os.path.basename(plt_file))[0]
+
+        self.setupHDL(file_name = plt_file_name, dir_name = plt_dir_name)
+        
+        logger.info('Creating plot file "{0}"'.format(
+                    os.path.join(plt_dir_name, plt_file_name)))
 
         logger.info("Fixpoint simulation setup")
         tb = self.flt.simulate_freqz(num_loops=3, Nfft=1024)
