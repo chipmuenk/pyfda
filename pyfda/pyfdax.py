@@ -57,7 +57,7 @@ logging.info("Using logging config file {0}.".format(rc.log_config_file))
 
 if not os.path.exists(rc.save_dir):
     home_dir = pyfda_lib.get_home_dir()
-    logger.warning('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
+    logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
         rc.save_dir, home_dir)
     rc.save_dir = home_dir
 
