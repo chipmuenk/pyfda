@@ -394,6 +394,9 @@ class HDLSpecs(QWidget):
                 filter = file_types)
         hdl_file = str(hdl_file)
         
+        if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
+            os.mkdir(hdl_dir_name)
+        # return the filename without suffix
         hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
         hdl_dir_name = os.path.splitext(hdl_file)[0]
         logger.info('Using hdl_filename "%s"', hdl_file_name)
@@ -440,6 +443,9 @@ class HDLSpecs(QWidget):
 #        self.flt.plt_file = plt_file
 
         self.setupHDL(file_name = plot_file_name, dir_name = plot_dir_name)
+        if not os.path.isdir(plt_dir_name): # create directory if it doesn't exist
+            os.mkdir(plt_dir_name)        
+        logger.info('Using plot filename "%s"', plt_file_name)
 
         logger.info("Fixpoint simulation setup")
         tb = self.flt.simulate_freqz(num_loops=3, Nfft=1024)

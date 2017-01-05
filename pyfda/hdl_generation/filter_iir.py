@@ -252,8 +252,6 @@ class FilterIIR(object):
         else:
             raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
 
-        if not os.path.isdir(self.hdl_directory):
-            os.mkdir(self.hdl_directory)
         tofunc.name = self.hdl_name
         tofunc.directory = self.hdl_directory
         tofunc(filter_iir_top, clock, reset, x, xdv, y, ydv)
