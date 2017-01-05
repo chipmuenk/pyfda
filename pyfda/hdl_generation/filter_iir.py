@@ -31,6 +31,9 @@ http://dsp.stackexchange.com/questions/1605/designing-butterworth-filter-in-matl
 
 import os
 
+import logging
+logger = logging.getLogger(__name__)
+
 from myhdl import (toVerilog, toVHDL, Signal, ResetSignal,
                    always, delay, instance, intbv,
                    traceSignals, Simulation, StopSimulation)
