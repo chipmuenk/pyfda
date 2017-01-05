@@ -186,14 +186,14 @@ def filter_iir_sos_hdl(clock, reset, sigin, sigout, coefficients=None,
     b, a = coefficients
     assert len(b) == len(a)
     num_sections = len(b)
-    w = sigout.w
+    w = sigout.word_format
     list_of_iir = [None for _ in range(num_sections)]
     _x = [FilterInterface(word_format=sigout.word_format)
           for _ in range(num_sections+1)]
     _x[0] = sigin
     _x[num_sections] = sigout
 
-    for ii in range(len(B)):
+    for ii in range(len(b)):
         list_of_iir[ii] = filter_iir_hdl(clock, reset, _x[ii], _x[ii+1],
                                          coefficients=(b[ii], a[ii]),
                                          shared_multiplier=shared_multiplier)
