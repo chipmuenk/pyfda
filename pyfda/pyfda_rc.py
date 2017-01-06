@@ -149,9 +149,9 @@ css_dark = """
           
 # light theme
 css_light = """
-    /* only match QWidget, not subclasses:*/ 
+    /* .QWidget only matches QWidget, not subclasses: */
     .QWidget, .QFrame{color:black; background-color: white;}
-    .QTabWidget::pane{background-color: #F0F0F0;} /* background of tab content */
+    /*.QTabWidget::pane{background-color: #F0F0F0;}*/  /* background of tab content */
     QLineEdit{background: white;
                 border-color: darkgrey;}
     QLineEdit:disabled{background-color:darkgrey;}
