@@ -106,17 +106,18 @@ mpl_rc = {'lines.linewidth': 1.5,
 
 # dark theme
 css_dark = """
-    QWidget, QTextBrowser{color:white; background-color:#222222;}
+    .QWidget, .QTextBrowser, QFrame{color:white; background-color:#222222;}
     /* QComboBox{color:#101010;} */
-    .QTabWidget::pane{background-color: #303030;} /* background of tab content */
+    .QTabWidget::pane{background-color: #555555;} /* background of tab content */
     QLineEdit{background: #222222;
                 border-style: outset;
                 border-width: 2px;
                 border-color: darkgrey;
+                color: white;
     }
     QLineEdit:disabled{background-color:darkgrey;}
    
-    QPushButton{background-color:grey;}
+    QPushButton{background-color:grey; color:white}
     
     QTableView{alternate-background-color:#222222;
         background-color:black; gridline-color: white;}
@@ -233,7 +234,14 @@ css_common = """
     
                 QSplitter::handle:vertical {
                     height: 10px;
-                    } 
+                    }
+                    
+                /* QPushButton{
+                    border-style: solid;
+                    border-color: black;
+                    border-width: 1px;
+                    border-radius: 10px;
+                    } */
             """
 
 
