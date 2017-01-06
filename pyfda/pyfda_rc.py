@@ -26,7 +26,12 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals, absolute_import
 from pyfda import qrc_resources # contains all icons
-from cycler import cycler
+try:
+    from cycler import cycler
+    CYC = True
+except ImportError:
+    CYC = False
+    
 
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
@@ -68,7 +73,6 @@ THEME = 'light' # select 'dark', 'light' or 'original' theme
 mpl_dark = {'axes.facecolor':'black',
             'axes.labelcolor':'white',
             'axes.edgecolor':'white',
-            'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w']),
             'figure.facecolor':'#202020',
             'figure.edgecolor':'#808080', # also color for hatched specs in |H(f)|
             'savefig.facecolor':'black',
@@ -78,12 +82,14 @@ mpl_dark = {'axes.facecolor':'black',
             'text.color':'white',
             'grid.color':'#CCCCCC'
             }
-            
+if CYC:
+    mpl_dark.update({'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
+else:
+    mpl_dark.update({'axes.color_cycle': ['r', 'g', 'c', 'm', 'y', 'w']})    
 # light theme
 mpl_light = {'axes.facecolor':'white',
              'axes.labelcolor':'black',
             'axes.edgecolor':'black',
-            'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k']),
             'figure.facecolor':'white',
             'figure.edgecolor':'#808080', # also color for hatched specs in |H(f)|
             'savefig.facecolor':'white',
@@ -93,6 +99,10 @@ mpl_light = {'axes.facecolor':'white',
             'text.color':'black',
             'grid.color':'#222222'
             }
+if CYC:
+    mpl_light.update({'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k'])})
+else:
+    mpl_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
             
 # common layout settings
 mpl_rc = {'lines.linewidth': 1.5,
