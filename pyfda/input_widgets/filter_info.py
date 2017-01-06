@@ -139,6 +139,7 @@ class FilterInfo(QWidget):
         self._show_doc()
         self._show_filt_perf()
         self._show_filt_dict()
+        self._show_filt_tree()
 
 #------------------------------------------------------------------------------
     def _show_doc(self):
