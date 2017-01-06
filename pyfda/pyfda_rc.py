@@ -106,10 +106,21 @@ else:
             
 # common layout settings
 mpl_rc = {'lines.linewidth': 1.5,
-            'font.size':12, 'legend.fontsize':12, 
-            'axes.labelsize':12, 'axes.titlesize':14, 'axes.linewidth':1,
+
+            'font.family'               : 'serif',#'sans',
+            'font.style'                : 'normal',
+            'mathtext.fontset'          : 'stix',#'stixsans',
+            'mathtext.fallback_to_cm'   : True,
+            'mathtext.default'          : 'it',
+            'font.size'                 : 12, 
+            'legend.fontsize'           : 12, 
+            'axes.labelsize'            : 12, 
+            'axes.titlesize'            : 14, 
+            'axes.linewidth'            : 1,
             'axes.formatter.use_mathtext': True,
-            'figure.figsize':(5,4), 'figure.dpi' : 100}
+            'figure.figsize'            : (5,4),
+            'figure.dpi'                : 100
+            }
             
 # ---------------------
 # Layout for Qt widgets
