@@ -6,8 +6,12 @@ Author: Christian Münker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+import logging
+logger = logging.getLogger(__name__)
+
 from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, QSizePolicy
 
+from pyfda.pyfda_rc import params
 
 from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
                           plot_3d)
@@ -24,10 +28,10 @@ class PlotTabWidgets(QTabWidget):
         self.pltImpz = plot_impz.PlotImpz(self)
         self.plt3D = plot_3d.Plot3D(self)
 
-        self._init_UI()
+        self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def _init_UI(self):
+    def _construct_UI(self):
         """ Initialize UI with tabbed subplots """
         self.tabWidget = QTabWidget(self)
         self.tabWidget.setObjectName("plot_tabs")

@@ -44,9 +44,9 @@ class FilterCoeffs(QWidget):
 
 #        self.nrows = 0 # keep track of number of rows
 
-        self.initUI()
+        self._construct_UI()
 
-    def initUI(self):
+    def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
         - top chkbox row
