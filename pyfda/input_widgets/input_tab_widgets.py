@@ -14,6 +14,7 @@ from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, QSizePolicy,
 SCROLL = True
 
 import pyfda.filterbroker as fb
+from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
                                 filter_info, filter_pz)
@@ -61,7 +62,7 @@ class InputTabWidgets(QWidget):
     def _construct_UI(self):
         """ Initialize UI with tabbed input widgets """
         tabWidget = QTabWidget(self)
-        tabWidget.setObjectName("InpTabWdg")
+        tabWidget.setObjectName("input_tabs")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.addTab(self.file_io, 'Files')
