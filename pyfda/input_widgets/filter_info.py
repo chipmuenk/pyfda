@@ -27,7 +27,8 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import lin2unit# , rt_label
+from pyfda.pyfda_lib import lin2unit
+from pyfda.pyfda_rc import params
 # TODO: Passband and stopband info should show min / max values for each band
 
 class FilterInfo(QWidget):
@@ -51,12 +52,12 @@ class FilterInfo(QWidget):
         self.chkFiltPerf.setChecked(True)
         self.chkFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.txtFiltPerf = QTextBrowser()
-        self.txtFiltDict = QTextBrowser()
+        self.txtFiltPerf = QTextBrowser(self)
+        self.txtFiltDict = QTextBrowser(self)
 
         bfont = QFont()
         bfont.setBold(True)
-        self.tblFiltPerf = QTableWidget()
+        self.tblFiltPerf = QTableWidget(self)
         self.tblFiltPerf.setAlternatingRowColors(True)
 #        self.tblFiltPerf.verticalHeader().setVisible(False)
         self.tblFiltPerf.horizontalHeader().setHighlightSections(False)
@@ -84,21 +85,21 @@ class FilterInfo(QWidget):
         self.chkRichText.setEnabled(HAS_DOCUTILS)
         self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
 
-        self.txtFiltInfoBox = QTextBrowser()
+        self.txtFiltInfoBox = QTextBrowser(self)
         self.txtFiltInfoBox.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.Expanding)
                                           
         self.chkFiltDict = QCheckBox("FiltDict")
         self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")
 
-        self.txtFiltDict = QTextBrowser()
+        self.txtFiltDict = QTextBrowser(self)
         self.txtFiltDict.setSizePolicy(QSizePolicy.Minimum,
                                           QSizePolicy.Expanding)
 
         self.chkFiltTree = QCheckBox("FiltTree")
         self.chkFiltTree.setToolTip("Show filter tree for debugging.")
 
-        self.txtFiltTree = QTextBrowser()
+        self.txtFiltTree = QTextBrowser(self)
         self.txtFiltTree.setSizePolicy(QSizePolicy.Minimum,
                                           QSizePolicy.Expanding)
 
@@ -106,13 +107,13 @@ class FilterInfo(QWidget):
         # ============== UI Layout =====================================
         self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addWidget(self.chkFiltPerf)
-        self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.chkDocstring)
-        self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.chkRichText)
-        self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.chkFiltDict)
-        self.layHChkBoxes.addStretch(10)
+        self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.chkFiltTree)
 
         layVMain = QVBoxLayout()
@@ -121,6 +122,7 @@ class FilterInfo(QWidget):
         layVMain.addWidget(self.txtFiltInfoBox)
         layVMain.addWidget(self.txtFiltDict)
         layVMain.addWidget(self.txtFiltTree)
+        layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(10)
         self.setLayout(layVMain)
 
