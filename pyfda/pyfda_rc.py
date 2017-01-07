@@ -32,6 +32,18 @@ try:
 except ImportError:
     CYC = False
     
+import matplotlib.font_manager
+fonts = matplotlib.font_manager.findSystemFonts()
+afm_fonts = {f.name for f in matplotlib.font_manager.fontManager.afmlist}
+ttf_fonts = {f.name for f in matplotlib.font_manager.fontManager.ttflist}
+#print(afm_fonts)
+#print(ttf_fonts)
+#if 'STIX' in ttf_fonts:
+#    print("Stix!")
+    
+import matplotlib.pyplot as plt
+print(plt.rcParams['font.sans-serif'])
+print(plt.rcParams['font.serif'])
 
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
@@ -71,42 +83,43 @@ THEME = 'light' # select 'dark', 'light' or 'original' theme
 # Layout for matplotlib widgets
 # -----------------------------
 
-# dark theme
-mpl_dark = {'axes.facecolor':'black',
-            'axes.labelcolor':'white',
-            'axes.edgecolor':'white',
-            'figure.facecolor':'#202020',
-            'figure.edgecolor':'#808080', # also color for hatched specs in |H(f)|
-            'savefig.facecolor':'black',
-            'savefig.edgecolor':'black', 
-            'xtick.color':'white',
-            'ytick.color':'white',
-            'text.color':'white',
-            'grid.color':'#CCCCCC'
+# dark theme for matplotlib widgets
+mpl_dark = {'axes.facecolor'    : 'black',
+            'axes.labelcolor'   : 'white',
+            'axes.edgecolor'    : 'white',
+            'figure.facecolor'  : '#202020',
+            'figure.edgecolor'  : '#808080', # also color for hatched specs in |H(f)|
+            'savefig.facecolor' : 'black',
+            'savefig.edgecolor' : 'black', 
+            'xtick.color'       : 'white',
+            'ytick.color'       : 'white',
+            'text.color'        : 'white',
+            'grid.color'        : '#CCCCCC'
             }
 if CYC:
     mpl_dark.update({'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
 else:
     mpl_dark.update({'axes.color_cycle': ['r', 'g', 'c', 'm', 'y', 'w']})    
-# light theme
-mpl_light = {'axes.facecolor':'white',
-             'axes.labelcolor':'black',
-            'axes.edgecolor':'black',
-            'figure.facecolor':'white',
-            'figure.edgecolor':'#808080', # also color for hatched specs in |H(f)|
-            'savefig.facecolor':'white',
-            'savefig.edgecolor':'white', 
-            'xtick.color':'black',
-            'ytick.color':'black',
-            'text.color':'black',
-            'grid.color':'#222222'
+
+# light theme for matplotlib widgets
+mpl_light = {'axes.facecolor'   : 'white',
+             'axes.labelcolor'  : 'black',
+            'axes.edgecolor'    : 'black',
+            'figure.facecolor'  : 'white',
+            'figure.edgecolor'  : '#808080', # also color for hatched specs in |H(f)|
+            'savefig.facecolor' : 'white',
+            'savefig.edgecolor' : 'white', 
+            'xtick.color'       : 'black',
+            'ytick.color'       : 'black',
+            'text.color'        : 'black',
+            'grid.color'        : '#222222'
             }
 if CYC:
     mpl_light.update({'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k'])})
 else:
     mpl_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
             
-# common layout settings
+# common matplotlib widget settings
 mpl_rc = {'lines.linewidth': 1.5,
 
             'font.family'               : 'serif',#'sans',
@@ -119,7 +132,7 @@ mpl_rc = {'lines.linewidth': 1.5,
             'axes.labelsize'            : 12, 
             'axes.titlesize'            : 14, 
             'axes.linewidth'            : 1,
-            'axes.formatter.use_mathtext': True,
+            'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
             'figure.figsize'            : (5,4),
             'figure.dpi'                : 100
             }
@@ -130,8 +143,19 @@ mpl_rc = {'lines.linewidth': 1.5,
 
 # dark theme
 css_dark = """
-    .QWidget, .QTextBrowser, QFrame{color:white; background-color:#222222;}
-    /* QComboBox{color:#101010;} */
+    /* .Qxxx only matches Qxxx, not its subclasses: */
+    /* .QWidget{color:white; background-color:blue};  */
+
+    QWidget > .QFrame{color:white; background-color:yellow};
+
+
+    /* .QTextBrowser{color:white; background-color:red};
+        QMainWindow{color:white; background-color:black};
+    */
+    
+    QScrollArea{background-color:green;}
+    QScrollArea > QWidget > QWidget{background-color: green;}
+
     .QTabWidget::pane{background-color: #555555;} /* background of tab content */
     QLineEdit{background: #222222;
                 border-style: outset;
@@ -146,14 +170,20 @@ css_dark = """
     QTableView{alternate-background-color:#222222;
         background-color:black; gridline-color: white;}
     QHeaderView::section{background-color:rgb(190,1,1);}
-                
             """
           
 # light theme
 css_light = """
-    /* .QWidget only matches QWidget, not subclasses: */
+    /* .Qxxx only matches Qxxx, not its subclasses: */
     .QWidget, .QFrame{color:black; background-color: white;}
-    /*.QTabWidget::pane{background-color: #F0F0F0;}*/  /* background of tab content */
+    
+    QScrollArea{color:black; background-color:white;}
+    QScrollArea > QWidget > QWidget{color:black; background-color: white;}
+    
+    QTableWidget{color:black; background-color:white;}
+    
+    .QTabWidget::pane{background-color: #F0F0F0;} /* background of tab content */
+    
     QLineEdit{background: white;
                 border-color: darkgrey;}
     QLineEdit:disabled{background-color:darkgrey;}
