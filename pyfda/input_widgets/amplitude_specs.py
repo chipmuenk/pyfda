@@ -53,7 +53,6 @@ class AmplitudeSpecs(QWidget):
         lblTitle.setText(str(self.title))
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
-#        self.layVMain.addWidget(self.lblTitle)
 
         lblUnits = QLabel(self)
         lblUnits.setText(" in ")
@@ -91,7 +90,7 @@ class AmplitudeSpecs(QWidget):
 
         self.layVMain = QVBoxLayout() # Widget main layout
         self.layVMain.addWidget(frmMain)
-        self.layVMain.setContentsMargins(1,1,1,1)
+        self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
         
