@@ -107,11 +107,11 @@ class FreqUnits(QWidget):
         self.layGSpecWdg.addWidget(self.lblUnits,0,0)
         self.layGSpecWdg.addLayout(self.layHUnits,0,1)
 
-        sfFrame = QFrame()
-        sfFrame.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        sfFrame.setLayout(self.layGSpecWdg)
+        frmMain = QFrame(self)
+        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmMain.setLayout(self.layGSpecWdg)
 
-        self.layVMain.addWidget(sfFrame)
+        self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
