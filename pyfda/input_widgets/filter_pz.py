@@ -12,7 +12,7 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal,
+from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame,
                       QCheckBox, QPushButton, QSpinBox, QComboBox,
                       QTableWidget, QTableWidgetItem, QAbstractItemView,
                       QVBoxLayout, QHBoxLayout, QSizePolicy)
@@ -22,6 +22,7 @@ from scipy.signal import freqz
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import cround, fil_save
+from pyfda.pyfda_rc import params
 from pyfda.simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows
@@ -62,13 +63,13 @@ class FilterPZ(QWidget):
                 MaxTextlen = len(item)
                 longestText = item        
 
-        self.chkPZList = QCheckBox()
+        self.chkPZList = QCheckBox(self)
         self.chkPZList.setChecked(True)
         self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable list.")
         self.chkPZList.setText("Show Poles / Zeros")
 
-        self.lblRound = QLabel("Digits = ")
-        self.spnRound = QSpinBox()
+        lblRound = QLabel("Digits = ")
+        self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
         self.spnRound.setValue(0)
         self.spnRound.setToolTip("Round to d digits.")
@@ -81,16 +82,16 @@ class FilterPZ(QWidget):
 
         self.lblGain = QLabel("k = ")
         
-        self.chkNorm =  QCheckBox()
+        self.chkNorm =  QCheckBox(self)
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
         self.chkNorm.setText("Normalize")
 
-        self.ledGain = QLineEdit()
+        self.ledGain = QLineEdit(self)
         self.ledGain.setToolTip("Specify gain factor k.")
         self.ledGain.setText(str(1.))
 
-        self.tblPZ = QTableWidget()
+        self.tblPZ = QTableWidget(self)
         self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers)
         self.tblPZ.setAlternatingRowColors(True)
         self.tblPZ.setDragEnabled(True)
@@ -98,83 +99,92 @@ class FilterPZ(QWidget):
         self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.Expanding)
 
-        self.butAddRow = QPushButton()
-        self.butAddRow.setToolTip("Add row to PZ table.\n"
+        butAddRow = QPushButton(self)
+        butAddRow.setToolTip("Add row to PZ table.\n"
                                 "Select n existing rows to append n new rows.")
-        self.butAddRow.setText(butTexts[0])
+        butAddRow.setText(butTexts[0])
         
-        ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
-        self.butAddRow.setMaximumWidth(ButLength)
+        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
+        butAddRow.setMaximumWidth(ButLength)
 
-        self.butDelRow = QPushButton()
-        self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
+        butDelRow = QPushButton(self)
+        butDelRow.setToolTip("Delete selected row(s) from the table.\n"
                 "Multiple rows can be selected using <SHIFT> or <CTRL>."
                 "If nothing is selected, delete last row.")
-        self.butDelRow.setText(butTexts[1])
-        self.butDelRow.setMaximumWidth(ButLength)
+        butDelRow.setText(butTexts[1])
+        butDelRow.setMaximumWidth(ButLength)
 
-        self.butClear = QPushButton()
-        self.butClear.setToolTip("Clear all entries.")
-        self.butClear.setText(butTexts[4])
-        self.butClear.setMaximumWidth(ButLength)              
+        butClear = QPushButton(self)
+        butClear.setToolTip("Clear all entries.")
+        butClear.setText(butTexts[4])
+        butClear.setMaximumWidth(ButLength)              
 
-        self.butSave = QPushButton()
-        self.butSave.setToolTip("Save P/Z & update all plots.\n"
+        butSave = QPushButton(self)
+        butSave.setToolTip("Save P/Z & update all plots.\n"
                                 "No modifications are saved before!")
-        self.butSave.setText(butTexts[2])
-        self.butSave.setMaximumWidth(ButLength)
+        butSave.setText(butTexts[2])
+        butSave.setMaximumWidth(ButLength)
 
-        self.butLoad = QPushButton()
-        self.butLoad.setToolTip("Reload P / Z.")
-        self.butLoad.setText(butTexts[3])
-        self.butLoad.setMaximumWidth(ButLength)              
+        butLoad = QPushButton(self)
+        butLoad.setToolTip("Reload P / Z.")
+        butLoad.setText(butTexts[3])
+        butLoad.setMaximumWidth(ButLength)              
 
-        self.butSetZero = QPushButton()
-        self.butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
-        self.butSetZero.setText(butTexts[5])
-        self.butSetZero.setMaximumWidth(ButLength)              
+        butSetZero = QPushButton(self)
+        butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
+        butSetZero.setText(butTexts[5])
+        butSetZero.setMaximumWidth(ButLength)              
 
         self.lblEps = QLabel("for P, Z <")
 
-        self.ledSetEps = QLineEdit()
+        self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
 
         # ============== UI Layout =====================================
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addWidget(self.chkPZList)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.cmbFilterType)
-        self.layHChkBoxes.addStretch(1)        
-        self.layHChkBoxes.addWidget(self.lblRound)
-        self.layHChkBoxes.addWidget(self.spnRound)
+        layHChkBoxes = QHBoxLayout()
+        layHChkBoxes.addWidget(self.chkPZList)
+        layHChkBoxes.addStretch(1)
+        layHChkBoxes.addWidget(self.cmbFilterType)
+        layHChkBoxes.addStretch(1)        
+        layHChkBoxes.addWidget(lblRound)
+        layHChkBoxes.addWidget(self.spnRound)
 
-        self.layHGain = QHBoxLayout()
-        self.layHGain.addWidget(self.lblGain)
-        self.layHGain.addWidget(self.ledGain)
-        self.layHChkBoxes.addStretch(1)
-        self.layHGain.addWidget(self.chkNorm)
-        self.layHGain.addStretch()
+        layHGain = QHBoxLayout()
+        layHGain.addWidget(self.lblGain)
+        layHGain.addWidget(self.ledGain)
+#        layHChkBoxes.addStretch(1)
+        layHGain.addWidget(self.chkNorm)
+        layHGain.addStretch()
 
-        self.layHButtonsPZs1 = QHBoxLayout()
-        self.layHButtonsPZs1.addWidget(self.butAddRow)
-        self.layHButtonsPZs1.addWidget(self.butDelRow)
-        self.layHButtonsPZs1.addWidget(self.butSave)
-        self.layHButtonsPZs1.addWidget(self.butLoad)
-        self.layHButtonsPZs1.addStretch()
+        layHButtonsPZs1 = QHBoxLayout()
+        layHButtonsPZs1.addWidget(butAddRow)
+        layHButtonsPZs1.addWidget(butDelRow)
+        layHButtonsPZs1.addWidget(butSave)
+        layHButtonsPZs1.addWidget(butLoad)
+        layHButtonsPZs1.addStretch()
 
-        self.layHButtonsPZs2 = QHBoxLayout()
-        self.layHButtonsPZs2.addWidget(self.butClear)
-        self.layHButtonsPZs2.addWidget(self.butSetZero)
-        self.layHButtonsPZs2.addWidget(self.lblEps)
-        self.layHButtonsPZs2.addWidget(self.ledSetEps)
-        self.layHButtonsPZs2.addStretch()
+        layHButtonsPZs2 = QHBoxLayout()
+        layHButtonsPZs2.addWidget(butClear)
+        layHButtonsPZs2.addWidget(butSetZero)
+        layHButtonsPZs2.addWidget(self.lblEps)
+        layHButtonsPZs2.addWidget(self.ledSetEps)
+        layHButtonsPZs2.addStretch()
 
-        layVMain = QVBoxLayout()
-        layVMain.addLayout(self.layHChkBoxes)
-        layVMain.addLayout(self.layHGain)
-        layVMain.addLayout(self.layHButtonsPZs1)
-        layVMain.addLayout(self.layHButtonsPZs2)
+        layVBtns = QVBoxLayout()
+        layVBtns.addLayout(layHChkBoxes)
+        layVBtns.addLayout(layHGain)
+        layVBtns.addLayout(layHButtonsPZs1)
+        layVBtns.addLayout(layHButtonsPZs2)
+        
+        
+        # This frame encompasses all the buttons       
+        frmMain = QFrame(self)
+        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmMain.setLayout(layVBtns)
+
+        layVMain = QVBoxLayout()        
+        layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblPZ)
         layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(1)
@@ -194,16 +204,16 @@ class FilterPZ(QWidget):
 
         self.spnRound.editingFinished.connect(self.load_entries)
         self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
-        self.butLoad.clicked.connect(self.load_entries)
+        butLoad.clicked.connect(self.load_entries)
         self.chkPZList.clicked.connect(self.load_entries)
 
-        self.butSave.clicked.connect(self._save_entries)
+        butSave.clicked.connect(self._save_entries)
 
-        self.butDelRow.clicked.connect(self._delete_rows)
-        self.butAddRow.clicked.connect(self._add_rows)
-        self.butClear.clicked.connect(self._clear_table)
+        butDelRow.clicked.connect(self._delete_rows)
+        butAddRow.clicked.connect(self._add_rows)
+        butClear.clicked.connect(self._clear_table)
 
-        self.butSetZero.clicked.connect(self._zero_PZ)
+        butSetZero.clicked.connect(self._zero_PZ)
         #----------------------------------------------------------------------
 
 #------------------------------------------------------------------------------

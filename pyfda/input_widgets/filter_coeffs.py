@@ -22,6 +22,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import cround, fil_save
+from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 from pyfda.simpleeval import simple_eval
 
@@ -67,11 +68,10 @@ class FilterCoeffs(QWidget):
                 longestText = item
 
 
-        self.chkCoeffList =  QCheckBox()
+        self.chkCoeffList =  QCheckBox(self)
         self.chkCoeffList.setChecked(True)
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
-        self.lblCoeffList = QLabel()
-        self.lblCoeffList.setText("Show Coefficients")
+        self.lblCoeffList = QLabel("Show Coefficients", self)
         
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
@@ -80,7 +80,7 @@ class FilterCoeffs(QWidget):
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
 
-        self.tblCoeff = QTableWidget()
+        self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setEditTriggers(QTableWidget.AllEditTriggers)
         self.tblCoeff.setAlternatingRowColors(True)
 #        self.tblCoeff.QItemSelectionModel.Clear
@@ -89,86 +89,86 @@ class FilterCoeffs(QWidget):
         self.tblCoeff.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.MinimumExpanding)
 
-        self.butAddRow = QPushButton()
-        self.butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
-        self.butAddRow.setText(butTexts[0])
+        butAddRow = QPushButton(self)
+        butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
+        butAddRow.setText(butTexts[0])
         #Calculate the length for the buttons based on the longest ButtonText
-        ButLength = self.butAddRow.fontMetrics().boundingRect(longestText).width()+10
-        self.butAddRow.setMaximumWidth(ButLength)
+        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
+        butAddRow.setMaximumWidth(ButLength)
 
-        self.butDelRow = QPushButton()
-        self.butDelRow.setToolTip("Delete selected row(s) from the table.\n"
+        butDelRow = QPushButton(self)
+        butDelRow.setToolTip("Delete selected row(s) from the table.\n"
                 "Multiple rows can be selected using <SHIFT> or <CTRL>.\n"
                 "When noting is selected, delete last row.")
-        self.butDelRow.setText(butTexts[1])
-        self.butDelRow.setMaximumWidth(ButLength)
+        butDelRow.setText(butTexts[1])
+        butDelRow.setMaximumWidth(ButLength)
 
-        self.butSave = QPushButton()
-        self.butSave.setToolTip("Save coefficients & update filter plots.")
-        self.butSave.setText(butTexts[2])
-        self.butSave.setMaximumWidth(ButLength)
+        butSave = QPushButton(self)
+        butSave.setToolTip("Save coefficients & update filter plots.")
+        butSave.setText(butTexts[2])
+        butSave.setMaximumWidth(ButLength)
 
-        self.butLoad = QPushButton()
-        self.butLoad.setToolTip("Reload coefficients.")
-        self.butLoad.setText(butTexts[3])
-        self.butLoad.setMaximumWidth(ButLength)
+        butLoad = QPushButton(self)
+        butLoad.setToolTip("Reload coefficients.")
+        butLoad.setText(butTexts[3])
+        butLoad.setMaximumWidth(ButLength)
 
-        self.butClear = QPushButton()
-        self.butClear.setToolTip("Clear all entries.")
-        self.butClear.setText(butTexts[4])
-        self.butClear.setMaximumWidth(ButLength)
+        butClear = QPushButton(self)
+        butClear.setToolTip("Clear all entries.")
+        butClear.setText(butTexts[4])
+        butClear.setMaximumWidth(ButLength)
 
 
-        self.butSetZero = QPushButton()
-        self.butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
-        self.butSetZero.setText(butTexts[5])
-        self.butSetZero.setMaximumWidth(ButLength)
+        butSetZero = QPushButton(self)
+        butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
+        butSetZero.setText(butTexts[5])
+        butSetZero.setMaximumWidth(ButLength)
 
-        self.lblEps = QLabel()
+        self.lblEps = QLabel(self)
         self.lblEps.setText("for b, a <")
 
-        self.ledSetEps = QLineEdit()
+        self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
 
-        self.butQuant = QPushButton()
-        self.butQuant.setToolTip("Quantize coefficients = 0 with a magnitude < eps.")
-        self.butQuant.setText(butTexts[6])
-        self.butQuant.setMaximumWidth(ButLength)
+        butQuant = QPushButton(self)
+        butQuant.setToolTip("Quantize coefficients = 0 with a magnitude < eps.")
+        butQuant.setText(butTexts[6])
+        butQuant.setMaximumWidth(ButLength)
 
         self.lblQIQF  = QLabel("QI.QF = ")
         self.lblQOvfl = QLabel("Ovfl.:")
         self.lblQuant = QLabel("Quant.:")
 
-        self.ledQuantI = QLineEdit()
+        self.ledQuantI = QLineEdit(self)
         self.ledQuantI.setToolTip("Specify number of integer bits.")
         self.ledQuantI.setText("0")
         self.ledQuantI.setMaxLength(2) # maximum of 2 digits
         self.ledQuantI.setFixedWidth(30) # width of lineedit in points(?)
 
-        self.lblDot = QLabel()
+        self.lblDot = QLabel(self)
         self.lblDot.setText(".")
 
-        self.ledQuantF = QLineEdit()
+        self.ledQuantF = QLineEdit(self)
         self.ledQuantF.setToolTip("Specify number of fractional bits.")
         self.ledQuantF.setText("15")
         self.ledQuantF.setMaxLength(2) # maximum of 2 digits
 #        self.ledQuantF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledQuantF.setMaximumWidth(30)
 
-        self.cmbQQuant = QComboBox()
+        self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
         self.cmbQQuant.addItems(qQuant)
         self.cmbQQuant.setCurrentIndex(1) # 'round'
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
         
-        self.cmbQOvfl = QComboBox()
+        self.cmbQOvfl = QComboBox(self)
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
         self.cmbQOvfl.setCurrentIndex(2) # 'sat'
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
         
-        self.cmbQFormat = QComboBox()
+        self.cmbQFormat = QComboBox(self)
         qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
         self.cmbQFormat.addItems(qFormat)
         self.cmbQFormat.setCurrentIndex(0) # 'frac'
@@ -181,55 +181,63 @@ class FilterCoeffs(QWidget):
         self.cmbQFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # ============== UI Layout =====================================
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addWidget(self.chkCoeffList)
-        self.layHChkBoxes.addWidget(self.lblCoeffList)
-        self.layHChkBoxes.addStretch(1)
+        layHChkBoxes = QHBoxLayout()
+        layHChkBoxes.addWidget(self.chkCoeffList)
+        layHChkBoxes.addWidget(self.lblCoeffList)
+        layHChkBoxes.addStretch(1)
 
-        self.layHButtonsCoeffs1 = QHBoxLayout()
-        self.layHButtonsCoeffs1.addWidget(self.butAddRow)
-        self.layHButtonsCoeffs1.addWidget(self.butDelRow)
-        self.layHButtonsCoeffs1.addWidget(self.butSave)
-        self.layHButtonsCoeffs1.addWidget(self.butLoad)
-        self.layHButtonsCoeffs1.addWidget(self.cmbFilterType)
-        self.layHButtonsCoeffs1.addStretch()
+        layHButtonsCoeffs1 = QHBoxLayout()
+        layHButtonsCoeffs1.addWidget(butAddRow)
+        layHButtonsCoeffs1.addWidget(butDelRow)
+        layHButtonsCoeffs1.addWidget(butSave)
+        layHButtonsCoeffs1.addWidget(butLoad)
+        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
+        layHButtonsCoeffs1.addStretch()
 
-        self.layHButtonsCoeffs2 = QHBoxLayout()
-        self.layHButtonsCoeffs2.addWidget(self.butClear)
-        self.layHButtonsCoeffs2.addWidget(self.butSetZero)
-        self.layHButtonsCoeffs2.addWidget(self.lblEps)
-        self.layHButtonsCoeffs2.addWidget(self.ledSetEps)
-        self.layHButtonsCoeffs2.addStretch()
+        layHButtonsCoeffs2 = QHBoxLayout()
+        layHButtonsCoeffs2.addWidget(butClear)
+        layHButtonsCoeffs2.addWidget(butSetZero)
+        layHButtonsCoeffs2.addWidget(self.lblEps)
+        layHButtonsCoeffs2.addWidget(self.ledSetEps)
+        layHButtonsCoeffs2.addStretch()
 
-        self.layHButtonsCoeffs3 = QHBoxLayout()
-        self.layHButtonsCoeffs3.addWidget(self.butQuant)
-        self.layHButtonsCoeffs3.addWidget(self.lblQIQF)
-        self.layHButtonsCoeffs3.addWidget(self.ledQuantI)
-        self.layHButtonsCoeffs3.addWidget(self.lblDot)
-        self.layHButtonsCoeffs3.addWidget(self.ledQuantF)
+        layHButtonsCoeffs3 = QHBoxLayout()
+        layHButtonsCoeffs3.addWidget(butQuant)
+        layHButtonsCoeffs3.addWidget(self.lblQIQF)
+        layHButtonsCoeffs3.addWidget(self.ledQuantI)
+        layHButtonsCoeffs3.addWidget(self.lblDot)
+        layHButtonsCoeffs3.addWidget(self.ledQuantF)
 
-        self.layHButtonsCoeffs3.addStretch()
+        layHButtonsCoeffs3.addStretch()
 
-        self.layHButtonsCoeffs4 = QHBoxLayout()
+        layHButtonsCoeffs4 = QHBoxLayout()
 
-        self.layHButtonsCoeffs4.addWidget(self.lblQOvfl)
-        self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
-        self.layHButtonsCoeffs4.addWidget(self.lblQuant)
-        self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
-        self.layHButtonsCoeffs4.addWidget(self.cmbQFormat)
-        self.layHButtonsCoeffs4.addStretch()
+        layHButtonsCoeffs4.addWidget(self.lblQOvfl)
+        layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
+        layHButtonsCoeffs4.addWidget(self.lblQuant)
+        layHButtonsCoeffs4.addWidget(self.cmbQQuant)
+        layHButtonsCoeffs4.addWidget(self.cmbQFormat)
+        layHButtonsCoeffs4.addStretch()
 
+        layVBtns = QVBoxLayout()
+        layVBtns.addLayout(layHChkBoxes)
+        layVBtns.addLayout(layHButtonsCoeffs1)
+        layVBtns.addLayout(layHButtonsCoeffs2)
+        layVBtns.addLayout(layHButtonsCoeffs3)
+        layVBtns.addLayout(layHButtonsCoeffs4)
 
-        layVMain = QVBoxLayout()
-        layVMain.addLayout(self.layHChkBoxes)
-        layVMain.addLayout(self.layHButtonsCoeffs1)
-        layVMain.addLayout(self.layHButtonsCoeffs2)
-        layVMain.addLayout(self.layHButtonsCoeffs3)
-        layVMain.addLayout(self.layHButtonsCoeffs4)
+        # This frame encompasses all the buttons       
+        frmMain = QFrame(self)
+        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmMain.setLayout(layVBtns)
+
+        layVMain = QVBoxLayout()        
+        layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblCoeff)
         layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
+
         self.load_entries() # initialize table with default values from fb
 
         # ============== Signals & Slots ================================
@@ -243,16 +251,16 @@ class FilterCoeffs(QWidget):
 
         self.chkCoeffList.clicked.connect(self.load_entries)
         self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
-        self.butLoad.clicked.connect(self.load_entries)
+        butLoad.clicked.connect(self.load_entries)
 
-        self.butSave.clicked.connect(self.store_entries)
+        butSave.clicked.connect(self.store_entries)
 
-        self.butDelRow.clicked.connect(self.delete_rows)
-        self.butAddRow.clicked.connect(self.add_rows)
+        butDelRow.clicked.connect(self.delete_rows)
+        butAddRow.clicked.connect(self.add_rows)
 
-        self.butClear.clicked.connect(self._clear_table)
-        self.butSetZero.clicked.connect(self._set_coeffs_zero)
-        self.butQuant.clicked.connect(self.quant_coeffs)
+        butClear.clicked.connect(self._clear_table)
+        butSetZero.clicked.connect(self._set_coeffs_zero)
+        butQuant.clicked.connect(self.quant_coeffs)
 
 #------------------------------------------------------------------------------
     def _set_filter_type(self):

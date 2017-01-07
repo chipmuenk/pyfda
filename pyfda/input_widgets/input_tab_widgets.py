@@ -74,7 +74,7 @@ class InputTabWidgets(QWidget):
 #        tabWidget.setSizePolicy(QSizePolicy.Minimum,
 #                                QSizePolicy.Expanding)
 
-        layVMain = QVBoxLayout(self)
+        layVMain = QVBoxLayout()
 
         #setContentsMargins -> number of pixels between frame window border
         layVMain.setContentsMargins(*params['wdg_margins']) 
@@ -82,7 +82,7 @@ class InputTabWidgets(QWidget):
 
 #--------------------------------------
         if SCROLL:
-            scroll = QScrollArea()
+            scroll = QScrollArea(self)
             scroll.setWidget(tabWidget)
             scroll.setWidgetResizable(True) # Size of monitored widget is allowed to grow:
 
