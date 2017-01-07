@@ -183,10 +183,9 @@ class SelectFilter(QWidget):
 
         layHMain = QHBoxLayout()
         layHMain.addWidget(frmMain)
-        layHMain.setContentsMargins(0, 0, 0, 0)
+        layHMain.setContentsMargins(*rc.params['wdg_margins']) # (0, 0, 0, 0)
 
         self.setLayout(layHMain)
- #        layHMain.setSizeConstraint(QLayout.SetFixedSize)
 
 #==============================================================================
 #        self.setLayout(layVAllWdg)

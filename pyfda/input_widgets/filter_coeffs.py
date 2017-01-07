@@ -227,6 +227,7 @@ class FilterCoeffs(QWidget):
         layVMain.addLayout(self.layHButtonsCoeffs3)
         layVMain.addLayout(self.layHButtonsCoeffs4)
         layVMain.addWidget(self.tblCoeff)
+        layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
         self.load_entries() # initialize table with default values from fb

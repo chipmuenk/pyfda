@@ -40,7 +40,7 @@ class PlotTabWidgets(QTabWidget):
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tabWidget)
-        layVMain.setContentsMargins(1,1,1,1)#(left, top, right, bottom)
+        layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 #
         self.setLayout(layVMain)
         self.timer_id = QtCore.QTimer()

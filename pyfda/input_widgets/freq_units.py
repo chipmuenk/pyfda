@@ -112,7 +112,7 @@ class FreqUnits(QWidget):
         sfFrame.setLayout(self.layGSpecWdg)
 
         self.layVMain.addWidget(sfFrame)
-        self.layVMain.setContentsMargins(1,1,1,1)
+        self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
 

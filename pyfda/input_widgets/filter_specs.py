@@ -18,6 +18,7 @@ from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal, QtGui,
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 #from pyfda.pyfda_lib import HLine
+from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
@@ -98,7 +99,7 @@ class FilterSpecs(QWidget):
 
         layVMain.addStretch()
         #layVMain.setContentsMargins(1, 0, 1, 0) # R, T, L, B
-        layVMain.setContentsMargins(1,1,1,1)
+        layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain) # main layout of widget
 

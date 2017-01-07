@@ -77,7 +77,7 @@ class InputTabWidgets(QWidget):
         layVMain = QVBoxLayout(self)
 
         #setContentsMargins -> number of pixels between frame window border
-        layVMain.setContentsMargins(1,1,1,1) # R, T, L, B
+        layVMain.setContentsMargins(*params['wdg_margins']) 
 #
 
 #--------------------------------------

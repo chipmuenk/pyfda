@@ -37,7 +37,9 @@ except ImportError:
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}', # format string for QLineEdit fields
           'P_Marker': [12, 'r'], # size and color for poles' marker
-          'Z_Marker': [12, 'b']} # size and color for zeros' marker
+          'Z_Marker': [12, 'b'], # size and color for zeros' marker
+          'wdg_margins' : (1,1,1,1)  # R, T, L, B widget margins
+          }
 
 # Dictionary with translations between short method names and long names for
 # response types

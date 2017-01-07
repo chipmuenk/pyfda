@@ -176,6 +176,7 @@ class FilterPZ(QWidget):
         layVMain.addLayout(self.layHButtonsPZs1)
         layVMain.addLayout(self.layHButtonsPZs2)
         layVMain.addWidget(self.tblPZ)
+        layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
         

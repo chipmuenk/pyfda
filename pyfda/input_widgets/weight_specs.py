@@ -73,7 +73,7 @@ class WeightSpecs(QWidget):
 
         self.layVMain = QVBoxLayout()   # Widget main vertical layout
         self.layVMain.addWidget(frmMain)
-        self.layVMain.setContentsMargins(1,1,1,1)
+        self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
 

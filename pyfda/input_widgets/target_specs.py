@@ -15,6 +15,7 @@ from ..compat import (QWidget, QLabel, QFont, QGridLayout, QFrame, pyqtSignal, Q
 
 import pyfda.filterbroker as fb
 from pyfda.input_widgets import amplitude_specs, freq_specs
+from pyfda.pyfda_rc import params
 
 
 class TargetSpecs(QWidget):
@@ -69,7 +70,7 @@ class TargetSpecs(QWidget):
 
         self.layVMain = QVBoxLayout() # Widget main layout
         self.layVMain.addWidget(frmMain)
-        self.layVMain.setContentsMargins(1,1,1,1)
+        self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(self.layVMain)
         

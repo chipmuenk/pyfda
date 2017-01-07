@@ -117,6 +117,8 @@ class File_IO(QWidget):
         layVMain = QVBoxLayout()
         layVMain.setAlignment(Qt.AlignTop)
         layVMain.addLayout(layVIO)
+        layVMain.setContentsMargins(*rc.params['wdg_margins'])
+
             
         self.setLayout(layVMain)
 

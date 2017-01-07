@@ -73,7 +73,7 @@ class FreqSpecs(QWidget):
 
         self.layVMain = QVBoxLayout() # Widget main layout
         self.layVMain.addWidget(frmMain)
-        self.layVMain.setContentsMargins(1,1,1,1)
+        self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
         
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits        
