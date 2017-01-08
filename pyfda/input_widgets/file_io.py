@@ -110,8 +110,7 @@ class File_IO(QWidget):
         layHIO = QHBoxLayout()        
         layHIO.addWidget(lblSeparator)
         layHIO.addWidget(self.cmbSeparator)        
-
-#        layVIO.addLayout(layHIO)
+        layVIO.addLayout(layHIO)
 ##        layVIO.addWidget(HLine(QFrame, self))
 
         # This is the top level widget, encompassing the other widgets        
