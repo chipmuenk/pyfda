@@ -173,9 +173,9 @@ is estimated using Ichige's algorithm.
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 #        print("Constructing Equiripple UI")
-        self.lbl_remez_1 = QLabel("Grid Density")
+        self.lbl_remez_1 = QLabel("Grid Density", self)
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
-        self.led_remez_1 = QLineEdit()
+        self.led_remez_1 = QLineEdit(self)
         self.led_remez_1.setText("16")
         self.led_remez_1.setObjectName('wdg_led_remez_1')
         self.led_remez_1.setToolTip("Number of frequency points for Remez algorithm. Increase the\n"
@@ -187,7 +187,7 @@ is estimated using Ichige's algorithm.
         self.layHWin.addWidget(self.led_remez_1)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QWidget()
+        self.wdg_fil = QFrame(self)
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layHWin)
 

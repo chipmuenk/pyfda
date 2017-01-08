@@ -111,7 +111,7 @@ class Firwin(QWidget):
         """
 
         # Combobox for selecting the algorithm to estimate minimum filter order
-        self.cmb_firwin_alg = QComboBox()
+        self.cmb_firwin_alg = QComboBox(self)
         self.cmb_firwin_alg.setObjectName('wdg_cmb_firwin_alg')
         self.cmb_firwin_alg.addItems(['ichige','kaiser','herrmann'])
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
@@ -119,7 +119,7 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.hide()
 
         # Combobox for selecting the window used for filter design
-        self.cmb_firwin_win = QComboBox()
+        self.cmb_firwin_win = QComboBox(self)
         self.cmb_firwin_win.setObjectName('wdg_cmb_firwin_win')
 
         windows = ['Barthann','Bartlett','Blackman','Blackmanharris','Bohman',
@@ -137,17 +137,17 @@ class Firwin(QWidget):
         # Minimum size, can be changed in the upper hierarchy levels using layouts:
         self.cmb_firwin_win.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lbl_firwin_1 = QLabel("a")
+        self.lbl_firwin_1 = QLabel("a", self)
         self.lbl_firwin_1.setObjectName('wdg_lbl_firwin_1')
-        self.led_firwin_1 = QLineEdit()
+        self.led_firwin_1 = QLineEdit(self)
         self.led_firwin_1.setText("0.5")
         self.led_firwin_1.setObjectName('wdg_led_firwin_1')
         self.lbl_firwin_1.setVisible(False)
         self.led_firwin_1.setVisible(False)
                
-        self.lbl_firwin_2 = QLabel("b")
+        self.lbl_firwin_2 = QLabel("b", self)
         self.lbl_firwin_2.setObjectName('wdg_lbl_firwin_2')
-        self.led_firwin_2 = QLineEdit()
+        self.led_firwin_2 = QLineEdit(self)
         self.led_firwin_2.setText("0.5")
         self.led_firwin_2.setObjectName('wdg_led_firwin_2')
         self.led_firwin_2.setVisible(False)
@@ -163,7 +163,7 @@ class Firwin(QWidget):
         self.layGWin.addWidget(self.led_firwin_2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QWidget()
+        self.wdg_fil = QFrame(self)
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layGWin)
 

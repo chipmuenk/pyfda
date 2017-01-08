@@ -140,16 +140,16 @@ near ``f_S/2`` (highpass).
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 
-        self.lbl_ma_1 = QLabel("<b>Stages:</ b>")
+        self.lbl_ma_1 = QLabel("<b>Stages:</ b>", self)
         self.lbl_ma_1.setObjectName('wdg_lbl_ma_1')
-        self.led_ma_1 = QLineEdit()
+        self.led_ma_1 = QLineEdit(self)
         self.led_ma_1.setText("1")
         self.led_ma_1.setObjectName('wdg_led_ma_1')
         self.led_ma_1.setToolTip("Set number of stages ")
         
-        self.lbl_ma_2 = QLabel("Normalize:")
+        self.lbl_ma_2 = QLabel("Normalize:", self)
         self.lbl_ma_2.setObjectName('wdg_lbl_ma_2')
-        self.chk_ma_2 = QCheckBox()
+        self.chk_ma_2 = QCheckBox(self)
         self.chk_ma_2.setChecked(True)
         self.chk_ma_2.setObjectName('wdg_chk_ma_2')
         self.chk_ma_2.setToolTip("Normalize to| H_max = 1|")
@@ -162,7 +162,7 @@ near ``f_S/2`` (highpass).
         self.layHWin.addWidget(self.chk_ma_2)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QWidget()
+        self.wdg_fil = QFrame(self)
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layHWin)
 
