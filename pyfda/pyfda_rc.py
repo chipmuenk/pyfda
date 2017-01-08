@@ -33,17 +33,9 @@ except ImportError:
     CYC = False
     
 import matplotlib.font_manager
-fonts = matplotlib.font_manager.findSystemFonts()
-afm_fonts = {f.name for f in matplotlib.font_manager.fontManager.afmlist}
-ttf_fonts = {f.name for f in matplotlib.font_manager.fontManager.ttflist}
-#print(afm_fonts)
-#print(ttf_fonts)
-#if 'STIX' in ttf_fonts:
-#    print("Stix!")
-    
-import matplotlib.pyplot as plt
-print(plt.rcParams['font.sans-serif'])
-print(plt.rcParams['font.serif'])
+#fonts = matplotlib.font_manager.findSystemFonts()
+afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
+ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
 
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
@@ -77,7 +69,7 @@ log_config_file = "pyfda_log.conf"
 
 # ======================== LAYOUT =============================================
 
-THEME = 'light' # select 'dark', 'light' or 'original' theme
+THEME = 'dark' # select 'dark', 'light' or 'original' theme
 
 # -----------------------------
 # Layout for matplotlib widgets
@@ -120,43 +112,62 @@ else:
     mpl_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
             
 # common matplotlib widget settings
-mpl_rc = {'lines.linewidth': 1.5,
-
-            'font.family'               : 'serif',#'sans',
-            'font.style'                : 'normal',
-            'mathtext.fontset'          : 'stix',#'stixsans',
-            'mathtext.fallback_to_cm'   : True,
-            'mathtext.default'          : 'it',
-            'font.size'                 : 12, 
-            'legend.fontsize'           : 12, 
-            'axes.labelsize'            : 12, 
-            'axes.titlesize'            : 14, 
-            'axes.linewidth'            : 1,
-            'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
-            'figure.figsize'            : (5,4),
-            'figure.dpi'                : 100
+mpl_rc = {'lines.linewidth'           : 1.5,
+          'font.family'               : 'sans-serif',#'serif',
+          'font.style'                : 'normal',
+          'mathtext.fontset'          : 'stixsans',#'stix',
+          'mathtext.fallback_to_cm'   : True,
+          'mathtext.default'          : 'it',
+          'font.size'                 : 12, 
+          'legend.fontsize'           : 12, 
+          'axes.labelsize'            : 12, 
+          'axes.titlesize'            : 14, 
+          'axes.linewidth'            : 1,
+          'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
+          'figure.figsize'            : (5,4),
+          'figure.dpi'                : 100
             }
-            
+
+if 'DejaVu Sans' in ttf_fonts:
+    print('\n DejaVu')
+    mpl_rc.update({
+                   'mathtext.fontset' : 'custom',
+                   'mathtext.rm' : 'DejaVu Sans',
+                   'mathtext.it' : 'DejaVu Sans:italic',
+                   'mathtext.bf' : 'DejaVu Sans:bold'
+                  })
+elif 'Bitstream Vera Sans' in ttf_fonts:
+    print('\nHi Vera')
+    mpl_rc.update({
+                   'mathtext.fontset' : 'custom',
+                   'mathtext.rm' : 'Bitstream Vera Sans',
+                   'mathtext.it' : 'Bitstream Vera Sans:italic',
+                   'mathtext.bf' : 'Bitstream Vera Sans:bold'
+                  })
+
+# set all text to Stix font
+#matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
+#matplotlib.rcParams['font.family'] = 'STIXGeneral'
 # ---------------------
 # Layout for Qt widgets
 # ---------------------       
-
+# .Qxxx{} only matches Qxxx, not its children
+#  #mylabel Qxxx{} only matches Qxxx with object name #mylabel
+#  Qxxx Qyyy{} only matches Qyyy that is a child of Qxxx
+ 
 # dark theme
 css_dark = """
-    /* .Qxxx only matches Qxxx, not its subclasses: */
-    /* .QWidget{color:white; background-color:blue};  */
-
-    QWidget > .QFrame{color:white; background-color:yellow};
-
-
-    /* .QTextBrowser{color:white; background-color:red};
-        QMainWindow{color:white; background-color:black};
-    */
+    .QWidget{color:white; background-color: black } /* background of application */
+    QWidget > .QFrame{background-color: #222222}
+    QFrame{color:white;}
+    QTextEdit{color: white; background-color: #444444;}
+    QCheckBox{color: white;}
     
-    QScrollArea{background-color:green;}
-    QScrollArea > QWidget > QWidget{background-color: green;}
+    QScrollArea{background-color: #222222}
+    QScrollArea > QWidget > QWidget{background-color: #222222}
 
-    .QTabWidget::pane{background-color: #555555;} /* background of tab content */
+    .QTabWidget::pane{color: white; background-color: #555555;} /* background of tab content */
+
     QLineEdit{background: #222222;
                 border-style: outset;
                 border-width: 2px;
@@ -168,13 +179,16 @@ css_dark = """
     QPushButton{background-color:grey; color:white}
     
     QTableView{alternate-background-color:#222222;
-        background-color:black; gridline-color: white;}
-    QHeaderView::section{background-color:rgb(190,1,1);}
+        background-color:#444444; gridline-color: white;}
+    QHeaderView{background-color:#222222;}
+    QHeaderView::section{background-color:#111111;}
+    QTableWidget QTableCornerButton::section{background-color:#444444;}
+    QHeaderView::section:checked{background-color:rgb(190,1,1);}
+    QMessageBox{background-color:#444444}
             """
           
 # light theme
 css_light = """
-    /* .Qxxx only matches Qxxx, not its subclasses: */
     .QWidget, .QFrame{color:black; background-color: white;}
     
     QScrollArea{color:black; background-color:white;}
@@ -194,7 +208,6 @@ css_light = """
     
     QHeaderView::section{background-color:rgb(190,1,1); color:white;}
     """
-
 
 
 # common layout settings for QTabWidget
