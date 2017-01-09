@@ -69,7 +69,7 @@ log_config_file = "pyfda_log.conf"
 
 # ======================== LAYOUT =============================================
 
-THEME = 'dark' # select 'dark', 'light' or 'original' theme
+THEME = 'light' # select 'dark', 'light' or 'original' theme
 
 # -----------------------------
 # Layout for matplotlib widgets
@@ -212,8 +212,10 @@ css_light = """
 
 # common layout settings for QTabWidget
 TabBarCss = """
- QTabWidget::pane { /* The tab _widget_ frame */
-     border-top: 2px solid #C2C7CB;
+ QTabWidget::pane { /* The tab _widget_ frame
+    
+     border-top: 2px solid #123456;  */
+     border : 0;
  }
 
  /* Only the right QTabWidget (named plot_tabs) gets a dashed left border */
@@ -231,7 +233,7 @@ TabBarCss = """
      font-weight:bold;
      background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
-     border: 1px solid #C4C4C3;
+     border: 1px solid #C4C4C3; 
      border-bottom-color: #C2C7CB; /* same as the pane color */
      border-top-left-radius: 4px;
      border-top-right-radius: 4px;
@@ -243,7 +245,7 @@ TabBarCss = """
  
  QTabBar::tab:selected {
      border-color: #9B9B9B;
-     border-bottom-color: #C2C7CB; /* same as pane color */
+     border-bottom-color: #444444; /* same as pane color */
  }
 
  QTabBar::tab:!selected {
