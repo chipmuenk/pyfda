@@ -177,7 +177,6 @@ class FilterPZ(QWidget):
         layVBtns.addLayout(layHButtonsPZs1)
         layVBtns.addLayout(layHButtonsPZs2)
         
-        
         # This frame encompasses all the buttons       
         frmMain = QFrame(self)
         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
@@ -187,7 +186,7 @@ class FilterPZ(QWidget):
         layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblPZ)
         layVMain.setContentsMargins(*params['wdg_margins'])
-#        layVMain.addStretch(1)
+
         self.setLayout(layVMain)
         
         self.load_entries() # initialize table with default values from filterbroker

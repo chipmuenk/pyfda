@@ -195,7 +195,7 @@ class WeightSpecs(QWidget):
             w_label = str(widget.objectName())
             w_value = simple_eval(widget.text())
             fb.fil[0].update({w_label:w_value})
-            self.sigSpecsChanged.emit() # -> input_specs
+            self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag
         self.load_entries()
         
@@ -254,8 +254,8 @@ class WeightSpecs(QWidget):
             w_label = str(self.qlineedit[i].objectName())
             fb.fil[0].update({w_label:1})
 
-        self.load_entries() # -> input_specs
-        self.sigSpecsChanged.emit() # -> input_specs
+        self.load_entries()
+        self.sigSpecsChanged.emit() # -> filter_specs
 
 
 #------------------------------------------------------------------------------

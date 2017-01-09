@@ -135,7 +135,7 @@ class FreqSpecs(QWidget):
             f_value = simple_eval(event_source.text()) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
-            self.sigSpecsChanged.emit() # -> input_specs
+            self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag
 
 #-------------------------------------------------------------
@@ -257,7 +257,7 @@ class FreqSpecs(QWidget):
         - update_UI has been called after changing the filter design algorithm                                # that the response type has been changed 
           eg. from LP -> HP, requiring a different order of frequency entries
         - a frequency spec field has been edited
-        - the sort button has been clicked (from input_specs.py)
+        - the sort button has been clicked (from filter_specs.py)
         """
         
         if fb.fil[0]['freq_specs_sort']:

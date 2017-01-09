@@ -238,7 +238,7 @@ class AmplitudeSpecs(QWidget):
             amp_label = str(source.objectName())
             amp_value = simple_eval(source.text())
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
-            self.sigSpecsChanged.emit() # -> input_specs
+            self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag
         self.load_entries()
 
