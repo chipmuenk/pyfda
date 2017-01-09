@@ -89,7 +89,7 @@ class PlotTabWidgets(QTabWidget):
     def update_data(self):
         """
         Calculate subplots with new filter DATA and redraw them,
-        triggered by self.inputTabWidgets.sigFilterDesigned
+        triggered by self.inputTabWidgets.sigFilterDesigned.
         """
         logger.debug("update_data (filter designed)")
         self.pltHf.draw()
@@ -103,7 +103,7 @@ class PlotTabWidgets(QTabWidget):
     def update_view(self):
         """
         Update plot limits with new filter SPECS and redraw all subplots,
-        triggered by self.inputTabWidgets.sigSpecsChanged
+        triggered by self.inputTabWidgets.sigSpecsChanged.
         """
         logger.debug("update_view (specs changed)")
         self.pltHf.update_view()
