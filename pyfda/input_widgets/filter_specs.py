@@ -144,7 +144,7 @@ class FilterSpecs(QWidget):
     def update_UI(self):
         """
         update_UI is called every time the filter design method or order
-        (min / man) has been changed. This usually requires a different set of
+        (min / man) has been changed as this usually requires a different set of
         frequency and amplitude specs.
 
         At this time, the actual filter object instance has been created from
@@ -218,7 +218,7 @@ class FilterSpecs(QWidget):
         else:
             self.frmMsg.hide()
 
-
+        logger.debug("emit sigSpecsChanged")
         self.sigSpecsChanged.emit()
 
 #------------------------------------------------------------------------------
