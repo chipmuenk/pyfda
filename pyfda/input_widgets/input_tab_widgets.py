@@ -142,6 +142,7 @@ class InputTabWidgets(QWidget):
 
         self.filter_info.load_entries() # also update frequency unit
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
+        logger.debug("Emit sigViewChanged!")
 
 
     def update_specs(self):
@@ -161,7 +162,7 @@ class InputTabWidgets(QWidget):
         self.filter_info.load_entries()
         if fb.MYHDL:
             self.hdlSpecs.update_UI()
-
+        logger.debug("Emit sigSpecsChanged!")
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
 
     def load_all(self):
@@ -198,6 +199,7 @@ class InputTabWidgets(QWidget):
         self.filter_coeffs.load_entries()
         self.filter_pz.load_entries()
 
+        logger.debug("Emit sigFilterDesigned!")
         self.sigFilterDesigned.emit() # pyFDA -> PlotTabWidgets.update_data
 
 
