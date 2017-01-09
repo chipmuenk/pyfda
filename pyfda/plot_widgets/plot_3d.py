@@ -219,6 +219,7 @@ class Plot3D(QWidget):
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
+        self.mplwidget.mplToolbar.enable_update(state = False) # disable initially
         logger.debug("UI initialized")
 
 
@@ -359,7 +360,7 @@ class Plot3D(QWidget):
         Main drawing entry point: Check whether updating is enabled in the
         toolbar and then perform the actual plot
         """
-        if self.mplwidget.mplToolbar.enable_update:
+        if self.mplwidget.mplToolbar.enabled:
             self.draw_3d()
 
 
