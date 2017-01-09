@@ -158,7 +158,6 @@ elif 'Bitstream Vera Sans' in ttf_fonts:
 # dark theme
 css_dark = """
     .QWidget{color:white; background-color: black } /* background of application */
-    QWidget > .QFrame{background-color: #222222}
     QFrame{color:white;}
     QTextEdit{color: white; background-color: #444444;}
     QCheckBox{color: white;}
@@ -184,6 +183,7 @@ css_dark = """
     QHeaderView::section{background-color:#111111;}
     QTableWidget QTableCornerButton::section{background-color:#444444;}
     QHeaderView::section:checked{background-color:rgb(190,1,1);}
+    QComboBox QListView {color:black}
     QMessageBox{background-color:#444444}
             """
           
