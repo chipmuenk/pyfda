@@ -309,9 +309,9 @@ class PlotImpz(QWidget):
 
 
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='bo', linefmt='r')
+        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='o', label = '$h[n]$')
         if self.chkPltStim.isChecked():
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='k*', linefmt='0.5')
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='*', linefmt='1', label = 'Stim.')
             for stem in ss:
                 stem.set_linewidth(0.5)
             bs.set_visible(False) # invisible bottomline
@@ -320,7 +320,7 @@ class PlotImpz(QWidget):
 
         if self.cmplx:
             [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=bottom,
-                                                markerfmt='rd', linefmt='b')
+                                                markerfmt='d', label = '$h_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
@@ -338,11 +338,11 @@ class PlotImpz(QWidget):
             # plotting the stems
             for i in range(len(t)):
               self.ax3d.plot([t[i], t[i]], [h[i], h[i]], [0, h_i[i]],
-                             '-', linewidth=2, color='b', alpha=.5)
+                             '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
             self.ax3d.plot(t, h, h_i, 'o', markersize=8,
-                           markerfacecolor='none', color='b', label='ib')
+                           markerfacecolor='none', label='$h[n]$')
 
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')
