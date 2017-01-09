@@ -36,7 +36,7 @@ class SelectFilter(QWidget):
       response resp. filter type is read and the combo box(es) further down in
       the hierarchy are populated according to the available combinations.
 
-      The signal sigFiltChanged is triggered and propagated to input_specs.py
+      The signal sigFiltChanged is triggered and propagated to filter_specs.py
       where it triggers the recreation of all subwidgets.
     """
 
@@ -382,7 +382,8 @@ class SelectFilter(QWidget):
         self.lblOrderN.setEnabled(self.ledOrderN.isEnabled())
 
         if enb_signal:
-            self.sigFiltChanged.emit() # -> input_specs
+            logger.debug("Emit sigFiltChanged")
+            self.sigFiltChanged.emit() # -> filter_specs
 
 #------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
@@ -415,7 +416,8 @@ class SelectFilter(QWidget):
         fb.fil[0].update({'N' : ordn})
 
         if enb_signal:
-            self.sigFiltChanged.emit() # -> input_specs
+            logger.debug("Emit sigFiltChanged") 
+            self.sigFiltChanged.emit() # -> filter_specs
 
 #------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
@@ -467,7 +469,7 @@ class SelectFilter(QWidget):
                 ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
         except AttributeError as e:
-            print("select_filter._construct_dyn_widgets:", e)
+            logger.warn(e)
 
 #------------------------------------------------------------------------------
 
