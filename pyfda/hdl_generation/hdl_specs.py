@@ -24,7 +24,7 @@ import pyfda.filterbroker as fb # importing filterbroker initializes all its glo
 import pyfda.filter_factory as ff
 import pyfda.pyfda_fix_lib as fix
 from pyfda.pyfda_lib import HLine, extract_file_ext
-#import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import params
 
 from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
 
@@ -289,31 +289,38 @@ class HDLSpecs(QWidget):
         self.layHButtonsHDL_h = QHBoxLayout()
         self.layHButtonsHDL_h.addWidget(self.butSimFixPoint)            
         self.layHButtonsHDL_h.addWidget(self.butExportHDL)
+
+# -------------------------------------------------------------------        
+        layVBtns = QVBoxLayout()
+        layVBtns.addWidget(self.lblMyhdl1)
+        layVBtns.addWidget(HLine(QFrame, self))
+        layVBtns.addWidget(self.lblMyhdl2)
+        layVBtns.addWidget(HLine(QFrame, self))
+        layVBtns.addLayout(self.layHButtonsHDL_i)
+        
+        layVBtns.addLayout(self.layHButtonsHDL_c)
+        layVBtns.addLayout(self.layHButtonsHDL_cc)
+        
+        layVBtns.addLayout(self.layHButtonsHDL_a)
+        layVBtns.addLayout(self.layHButtonsHDL_ac)
+
+        layVBtns.addLayout(self.layHButtonsHDL_o)
+        layVBtns.addLayout(self.layHButtonsHDL_oc)
+        
+        layVBtns.addLayout(self.layHButtonsHDL_h)
+
+        # -------------------------------------------------------------------
+        # This frame encompasses all the buttons            
+        frmMain = QFrame(self)
+        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmMain.setLayout(layVBtns)
+
 # -------------------------------------------------------------------
-
         layVMain = QVBoxLayout()
-        
-        layVMain.addWidget(self.lblMyhdl1)
-        layVMain.addWidget(HLine(QFrame, self))
-        layVMain.addWidget(self.lblMyhdl2)
-        layVMain.addWidget(HLine(QFrame, self))
-        layVMain.addLayout(self.layHButtonsHDL_i)
-        
-        layVMain.addLayout(self.layHButtonsHDL_c)
-        layVMain.addLayout(self.layHButtonsHDL_cc)
-        
-        layVMain.addLayout(self.layHButtonsHDL_a)
-        layVMain.addLayout(self.layHButtonsHDL_ac)
-
-        layVMain.addLayout(self.layHButtonsHDL_o)
-        layVMain.addLayout(self.layHButtonsHDL_oc)
-        
-        layVMain.addLayout(self.layHButtonsHDL_h)
+        layVMain.addWidget(frmMain)
+        layVMain.setContentsMargins(*params['wdg_margins'])
         
         layVMain.addStretch()
-        
-
-# -------------------------------------------------------------------
             
         self.setLayout(layVMain)
 
