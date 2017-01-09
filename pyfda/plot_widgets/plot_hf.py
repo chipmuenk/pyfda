@@ -376,7 +376,7 @@ class PlotHf(QWidget):
             self.ax_p.plot(self.F,np.unwrap(phi)*scale,
                                'b--', label = "Phase")
         #-----------------------------------------------------------
-            self.ax_p.set_ylabel(phi_str, color='blue')
+            self.ax_p.set_ylabel(phi_str)
             nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
             # http://stackoverflow.com/questions/28692608/align-grid-lines-on-two-plots
             # http://stackoverflow.com/questions/3654619/matplotlib-multiple-y-axes-grid-lines-applied-to-both
