@@ -101,30 +101,13 @@ class pyFDA(QMainWindow):
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
 
         if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
-            layVInput = QVBoxLayout()
-            layVInput.addWidget(self.inputTabWidgets)
-            layVPlt = QVBoxLayout()
-            layVPlt.addWidget(self.pltTabWidgets)
-    
-            frmInput = QFrame(self)
-            frmInput.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-            frmInput.setLayout(layVInput)
-            frmInput.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                   QSizePolicy.MinimumExpanding)
-    
-            frmPlt = QFrame(self)
-            frmPlt.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-            frmPlt.setLayout(layVPlt)
-            frmPlt.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                 QSizePolicy.MinimumExpanding)
-    
             splitter = QSplitter(QtCore.Qt.Horizontal)
-            splitter.addWidget(frmInput)
-            splitter.addWidget(frmPlt)
+            splitter.addWidget(self.inputTabWidgets)
+            splitter.addWidget(self.pltTabWidgets)            
             splitter.setStretchFactor(1,4) # relative initial sizes of subwidgets
 #            splitter.setSizes([200,600]) # absolute initial sizes of subwidgets
-
             layHMain.addWidget(splitter)
+            layHMain.setContentsMargins(*rc.params['wdg_margins'])
 
         else: # no splitter design, only use layHMain layout
             self.inputTabWidgets.setMaximumWidth(420)
