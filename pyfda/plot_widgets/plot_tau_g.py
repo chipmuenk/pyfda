@@ -64,7 +64,7 @@ class PlotTauG(QWidget):
         
 #------------------------------------------------------------------------------
     def draw(self):
-        if self.mplwidget.mplToolbar.enable_update:
+        if self.mplwidget.mplToolbar.enabled:
             self.draw_taug()
             
 #------------------------------------------------------------------------------

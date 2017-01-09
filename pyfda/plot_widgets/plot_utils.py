@@ -66,13 +66,14 @@ class MplWidget(QWidget):
 
         self.pltCanv.updateGeometry()
 
-        # Create a custom navigation toolbar, tied to the canvas
+        # Create a custom navigation toolbar, tied to the canvas and
+        # initialize toolbar settings
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MyMplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
-        self.mplToolbar.enable_update = True
+        self.mplToolbar.enable_update(state = True) 
 
         #=============================================
         # Widget layout with QHBox / QVBox
@@ -389,23 +390,29 @@ class MyMplToolbar(NavigationToolbar):
         self.lock_zoom = not self.lock_zoom
 
 #------------------------------------------------------------------------------
-    def enable_update(self):
+    def enable_update(self, state = None):
         """
         Toggle the enable button and setting and enable / disable all 
         buttons accordingly. 
         """
-        self.enable_update = not self.enable_update
-        self.a_gr.setEnabled(self.enable_update)
-        self.a_ho.setEnabled(self.enable_update)
-        self.a_ba.setEnabled(self.enable_update)
-        self.a_fw.setEnabled(self.enable_update)
-        self.a_pa.setEnabled(self.enable_update)
-        self.a_zo.setEnabled(self.enable_update)
-        self.a_fv.setEnabled(self.enable_update)
-        self.a_rd.setEnabled(self.enable_update)
-        self.a_sv.setEnabled(self.enable_update)
-        self.a_cb.setEnabled(self.enable_update)
-        self.a_op.setEnabled(self.enable_update)
+        if state is not None:
+            self.enabled = state
+        else:
+            self.enabled = not self.enabled
+            
+
+        self.a_ho.setEnabled(self.enabled)
+        self.a_ba.setEnabled(self.enabled)
+        self.a_fw.setEnabled(self.enabled)
+        self.a_pa.setEnabled(self.enabled)
+        self.a_zo.setEnabled(self.enabled)
+        self.a_fv.setEnabled(self.enabled)
+        self.a_lk.setEnabled(self.enabled)
+        self.a_gr.setEnabled(self.enabled)        
+        self.a_rd.setEnabled(self.enabled)
+        self.a_sv.setEnabled(self.enabled)
+        self.a_cb.setEnabled(self.enabled)
+        self.a_op.setEnabled(self.enabled)
         
             
 #------------------------------------------------------------------------------

@@ -86,7 +86,7 @@ class PlotPhi(QWidget):
         """
         main entry point for drawing the phase
         """
-        if self.mplwidget.mplToolbar.enable_update:
+        if self.mplwidget.mplToolbar.enabled:
             self.draw_phi()
 
     def draw_phi(self):

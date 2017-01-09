@@ -430,7 +430,7 @@ class PlotHf(QWidget):
         """
         Re-calculate |H(f)| and draw the figure
         """
-        if self.mplwidget.mplToolbar.enable_update:
+        if self.mplwidget.mplToolbar.enabled:
             self.calc_hf()
             self.update_view()
 
