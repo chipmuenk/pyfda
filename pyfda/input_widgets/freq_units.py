@@ -152,10 +152,10 @@ class FreqUnits(QWidget):
             self.fs_old = fb.fil[0]['f_S'] # store current sampling frequency
             if f_unit == "f_S": # normalized to f_S
                 fb.fil[0]['f_S'] = 1.
-                f_label = r"$F = f/f_S = \Omega / 2 \pi \; \rightarrow$"
+                f_label = r"$F = f\, /\, f_S = \Omega \, /\,  2 \mathrm{\pi} \; \rightarrow$"
             else:   # idx == 1: normalized to f_nyq = f_S / 2
                 fb.fil[0]['f_S'] = 2.
-                f_label = r"$F = 2f/f_S = \Omega / \pi \; \rightarrow$"
+                f_label = r"$F = 2f \, / \, f_S = \Omega \, / \, \mathrm{\pi} \; \rightarrow$"
             t_label = r"$n \; \rightarrow$"
 
             self.ledF_S.setText(params['FMT'].format(fb.fil[0]['f_S']))
