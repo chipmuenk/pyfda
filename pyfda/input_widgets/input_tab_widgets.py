@@ -32,8 +32,9 @@ class InputTabWidgets(QWidget):
     Create a tabbed widget for various input subwidgets
     """
     # class variables (shared between instances if more than one exists)
-    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
+    sigViewChanged = pyqtSignal() # emitted when view (e.g. single / double sided f) has changed
     sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
+    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
 
 
     def __init__(self, parent):
@@ -139,10 +140,9 @@ class InputTabWidgets(QWidget):
         Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
-
-        self.filter_info.load_entries() # also update frequency unit
-        self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
+        self.filter_info.load_entries() # update frequency unit of info widget
         logger.debug("Emit sigViewChanged!")
+        self.sigViewChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
 
 
     def update_specs(self):
