@@ -26,16 +26,12 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals, absolute_import
 from pyfda import qrc_resources # contains all icons
-try:
-    from cycler import cycler
-    CYC = True
-except ImportError:
-    CYC = False
     
-import matplotlib.font_manager
-#fonts = matplotlib.font_manager.findSystemFonts()
-afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
-ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
+# #############################################################################
+# General layout settings
+# #############################################################################
+
+THEME = 'light' # select 'dark', 'light' or 'original' theme
 
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
@@ -61,7 +57,8 @@ params_light = {'mpl_hatch': {'facecolor': 'none',
                               'alpha': 0.5}}
 
 # Dictionary with translations between short method names and long names for
-# response types
+# response types - the long name can be changed as you like, but don't change 
+# change the short name - it is used to construct the filter design method names
 rt_names = {"LP":"Lowpass", "HP":"Highpass", "BP":"Bandpass",
             "BS":"Bandstop", "AP":"Allpass", "MB":"Multiband",
             "HIL":"Hilbert", "DIFF":"Differentiator"}
@@ -73,22 +70,15 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 # Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
 # in filterbroker.py
 
-
 # Default savedir for filter coefficients, filter dicts etc.
 save_dir = "D:/Daten"
 
 # Config file for logger
 log_config_file = "pyfda_log.conf"
-#log_config_file = "pyfda_log_debug.conf"
 
-
-# ======================== LAYOUT =============================================
-
-THEME = 'light' # select 'dark', 'light' or 'original' theme
-
-# -----------------------------
-# Layout for matplotlib widgets
-# -----------------------------
+# #############################################################################
+# Matplotlib layout settings
+# #############################################################################
 
 # dark theme for matplotlib widgets
 mpl_dark = {'axes.facecolor'    : 'black',
@@ -103,10 +93,15 @@ mpl_dark = {'axes.facecolor'    : 'black',
             'text.color'        : 'white',
             'grid.color'        : '#CCCCCC'
             }
-if CYC:
+
+try:
+    # cycler is used by default with matplotlib 1.5 upwards
+    from cycler import cycler
+    CYC = True
     mpl_dark.update({'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
-else:
-    mpl_dark.update({'axes.color_cycle': ['r', 'g', 'c', 'm', 'y', 'w']})    
+except ImportError:
+    CYC = False
+    mpl_dark.update({'axes.color_cycle': ['r', 'g', 'c', 'm', 'y', 'w']})
 
 # light theme for matplotlib widgets
 mpl_light = {'axes.facecolor'   : 'white',
@@ -143,6 +138,11 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'figure.dpi'                : 100
             }
 
+# --------------------- Matplotlib Fonts --------------------------------------
+import matplotlib.font_manager
+afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist})
+ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
+
 if 'DejaVu Sans' in ttf_fonts:
     print('\n DejaVu')
     mpl_rc.update({
@@ -159,19 +159,25 @@ elif 'Bitstream Vera Sans' in ttf_fonts:
                    'mathtext.it' : 'Bitstream Vera Sans:italic',
                    'mathtext.bf' : 'Bitstream Vera Sans:bold'
                   })
+# else: use sans-serif and stix-sans
 
 # set all text to Stix font
 #matplotlib.rcParams['mathtext.fontset'] = 'stixsans'
 #matplotlib.rcParams['font.family'] = 'STIXGeneral'
-# ---------------------
-# Layout for Qt widgets
-# ---------------------       
+
+# #############################################################################
+# QWidget style sheets (QSS)
+# #############################################################################
+      
 # .Qxxx{} only matches Qxxx, not its children
 #  #mylabel Qxxx{} only matches Qxxx with object name #mylabel
 #  Qxxx Qyyy{} only matches Qyyy that is a child of Qxxx
- 
-# dark theme
-css_dark = """
+#  Qxxx:mystate only matches Qyyy in state 'mystate' (e.g. disabled)
+
+#--------------- 
+# dark QSS theme
+#---------------
+qss_dark = """
     .QWidget{color:white; background-color: black } /* background of application */
     QFrame{color:white;}
     QTextEdit{color: white; background-color: #444444;}
@@ -201,9 +207,10 @@ css_dark = """
     QComboBox QListView {color:black}
     QMessageBox{background-color:#444444}
             """
-          
-# light theme
-css_light = """
+# ---------------         
+# light QSS theme
+# ---------------
+qss_light = """
     .QWidget, .QFrame{color:black; background-color: white;}
     
     QScrollArea{color:black; background-color:white;}
@@ -226,7 +233,7 @@ css_light = """
 
 
 # common layout settings for QTabWidget
-TabBarCss = """
+qss_tab_bar = """
  QTabWidget::pane { /* The tab _widget_ frame
     
      border-top: 2px solid #123456;  */
@@ -294,8 +301,8 @@ TabBarCss = """
      margin: 0; /* if there is only one tab, we don't want overlapping margins */
  }
 """
-
-css_common = """
+# Common qss settings for all themes
+qss_common = """
                 *[state="normal"]{}
                 *[state="changed"]{background-color:yellow; color:black}
                 *[state="error"]{background-color:red; color:white}
@@ -330,18 +337,14 @@ css_common = """
 
 
 if THEME == 'dark':
-
     mpl_rc.update(mpl_dark)
     params.update(params_dark)
-    css_rc = css_common + TabBarCss + css_dark
+    css_rc = qss_common + qss_tab_bar + qss_dark
+    
 elif THEME == 'light':
     mpl_rc.update(mpl_light)
     params.update(params_light)
-    css_rc = css_common + TabBarCss + css_light
-else:
-    css_rc = css_common
+    css_rc = qss_common + qss_tab_bar + qss_light
     
-
-
-
-
+else:
+    css_rc = qss_common
