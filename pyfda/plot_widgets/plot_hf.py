@@ -15,7 +15,7 @@ from matplotlib import rcParams
 #import matplotlib.ticker
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 class PlotHf(QWidget):
@@ -130,33 +130,31 @@ class PlotHf(QWidget):
 #------------------------------------------------------------------------------
     def plot_spec_limits(self, ax):
         """
-        Plot the specifications limits (F_SB, A_SB, ...) as lines and as
-        hatched areas.
+        Plot the specifications limits (F_SB, A_SB, ...) as hatched areas with borders.
         """
-#        fc = (0.8,0.8,0.8) # color for shaded areas
-        fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
-        line_params = {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}
+        hatch = params['mpl_hatch']
+        hatch_borders = params['mpl_hatch_border']
 
         def dB(lin):
             return 20 * np.log10(lin)
 
         def _plot_specs():
             # upper limits:
-            ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **line_params)
+            ax.plot(F_lim_upl, A_lim_upl, F_lim_upc, A_lim_upc, F_lim_upr, A_lim_upr, **hatch_borders)
             if A_lim_upl:
-                ax.fill_between(F_lim_upl, max(A_lim_upl), A_lim_upl, **fill_params)
+                ax.fill_between(F_lim_upl, max(A_lim_upl), A_lim_upl, **hatch)
             if A_lim_upc:
-                ax.fill_between(F_lim_upc, max(A_lim_upc), A_lim_upc, **fill_params)
+                ax.fill_between(F_lim_upc, max(A_lim_upc), A_lim_upc, **hatch)
             if A_lim_upr:
-                ax.fill_between(F_lim_upr, max(A_lim_upr), A_lim_upr, **fill_params)
+                ax.fill_between(F_lim_upr, max(A_lim_upr), A_lim_upr, **hatch)
             # lower limits:
-            ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **line_params)
+            ax.plot(F_lim_lol, A_lim_lol, F_lim_loc, A_lim_loc, F_lim_lor, A_lim_lor, **hatch_borders)
             if A_lim_lol:
-                ax.fill_between(F_lim_lol, min(A_lim_lol), A_lim_lol, **fill_params)
+                ax.fill_between(F_lim_lol, min(A_lim_lol), A_lim_lol, **hatch)
             if A_lim_loc:
-                ax.fill_between(F_lim_loc, min(A_lim_loc), A_lim_loc, **fill_params)
+                ax.fill_between(F_lim_loc, min(A_lim_loc), A_lim_loc, **hatch)
             if A_lim_lor:
-                ax.fill_between(F_lim_lor, min(A_lim_lor), A_lim_lor, **fill_params)
+                ax.fill_between(F_lim_lor, min(A_lim_lor), A_lim_lor, **hatch)
 
         if self.unitA == 'V':
             exp = 1.
@@ -423,7 +421,7 @@ class PlotHf(QWidget):
 
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
         [self.W, self.H_cplx] = sig.freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1],
-            worN = rc.params['N_FFT'], whole = True) # bb, aa, N_FFT, 0 ... 2 pi
+            worN = params['N_FFT'], whole = True) # bb, aa, N_FFT, 0 ... 2 pi
 
 #------------------------------------------------------------------------------
     def draw(self):
@@ -495,8 +493,8 @@ class PlotHf(QWidget):
             self.H_c = np.fft.fftshift(self.H_cplx)
             self.F -= self.f_S/2.
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-            self.H_c = self.H_cplx[0:rc.params['N_FFT']//2]
-            self.F = self.F[0:rc.params['N_FFT']//2]
+            self.H_c = self.H_cplx[0:params['N_FFT']//2]
+            self.F = self.F[0:params['N_FFT']//2]
 
         # now calculate mag / real / imaginary part of H_c:
         if self.linphase: # remove the linear phase

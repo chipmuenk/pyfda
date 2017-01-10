@@ -42,8 +42,23 @@ params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}', # format string for QLineEdit fields
           'P_Marker': [12, 'r'], # size and color for poles' marker
           'Z_Marker': [12, 'b'], # size and color for zeros' marker
-          'wdg_margins' : (1,1,1,1)  # R, T, L, B widget margins
+          'wdg_margins' : (1,1,1,1),  # R, T, L, B widget margins
+          'mpl_hatch_border': {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}     
           }
+params_dark = {'mpl_hatch': {'facecolor': 'none',
+                             'hatch'    : '/', 
+                             'edgecolor': '#808080', # same as figure.edgecolor
+                             'lw'       : 0.0},
+               'mpl_stimuli':{'color': 'w', 
+                              'alpha': 0.5}}
+
+#fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
+params_light = {'mpl_hatch': {'facecolor': 'none',
+                             'hatch'    : '/', 
+                             'edgecolor': '#808080', # same as figure.edgecolor
+                             'lw'       : 0.0},
+               'mpl_stimuli':{'color': 'k', 
+                              'alpha': 0.5}}
 
 # Dictionary with translations between short method names and long names for
 # response types
@@ -317,9 +332,11 @@ css_common = """
 if THEME == 'dark':
 
     mpl_rc.update(mpl_dark)
+    params.update(params_dark)
     css_rc = css_common + TabBarCss + css_dark
 elif THEME == 'light':
     mpl_rc.update(mpl_light)
+    params.update(params_light)
     css_rc = css_common + TabBarCss + css_light
 else:
     css_rc = css_common
