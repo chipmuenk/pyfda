@@ -187,10 +187,10 @@ class pyFDA(QMainWindow):
     
     def closeEvent(self, event): 
         """
-        reimplement QMainWindow.closeEvent() to prompt the user "Are you sure ..."
+        reimplement QMainWindow.closeEvent() to prompt the user
         """
         reply = QMessageBox.question(self, 'Message',
-            "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+            "Quit pyFDA?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             event.accept()
@@ -213,7 +213,7 @@ def main():
      # instantiate QApplication object, passing command line arguments
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
-    app.setStyleSheet(rc.css_rc) 
+    app.setStyleSheet(rc.qss_rc) 
 
     mainw = pyFDA()
 
