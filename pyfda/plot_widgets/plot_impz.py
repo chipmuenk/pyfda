@@ -263,7 +263,7 @@ class PlotImpz(QWidget):
         elif stim == "StepErr":
             x = np.ones(N) # create step function
             title_str = r'Settling Error'
-            H_str = r'$H(0) - h_{\epsilon}[n]$'
+            H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif stim in {"Sine", "Rect"}:
             x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
@@ -310,10 +310,17 @@ class PlotImpz(QWidget):
 
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='o', label = '$h[n]$')
+        stem_fmt = params['mpl_stimuli']
         if self.chkPltStim.isChecked():
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, markerfmt='*', linefmt='1', label = 'Stim.')
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, label = 'Stim.', **stem_fmt)
+            ms.set_mfc(stem_fmt['mfc'])
+            ms.set_mec(stem_fmt['mec'])
+            ms.set_ms(stem_fmt['ms'])
+            ms.set_alpha(stem_fmt['alpha'])
             for stem in ss:
-                stem.set_linewidth(0.5)
+                stem.set_linewidth(stem_fmt['lw'])
+                stem.set_color(stem_fmt['mec'])
+                stem.set_alpha(stem_fmt['alpha'])
             bs.set_visible(False) # invisible bottomline
         expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
