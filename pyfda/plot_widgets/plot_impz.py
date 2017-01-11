@@ -32,43 +32,43 @@ class PlotImpz(QWidget):
         self._init_UI()
 
     def _init_UI(self):
-        self.lblLog = QLabel(self)
-        self.lblLog.setText("Log:")
         self.chkLog = QCheckBox(self)
         self.chkLog.setObjectName("chkLog")
-        self.chkLog.setToolTip("Show logarithmic impulse / step response.")
+        self.chkLog.setToolTip("Show logarithmic stimulus response.")
         self.chkLog.setChecked(False)
+        self.lblLog = QLabel("Log. <i>h</i>", self)
 
-        self.lblLogBottom = QLabel("Bottom = ")
+        self.lblLogBottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
         self.ledLogBottom.setText("-80")
         self.ledLogBottom.setToolTip("Minimum display value for log. scale.")
         self.lbldB = QLabel("dB")
         
         self.lblPltStim = QLabel(self)
-        self.lblPltStim.setText("Stimulus:  Show")
-        self.chkPltStim = QCheckBox(self)
+        self.lblPltStim.setText("Stimulus:")
+        self.chkPltStim = QCheckBox("Show", self)
         self.chkPltStim.setChecked(False)
+        self.chkPltStim.setToolTip("Show stimulus signal.")
         
-        self.lblStimulus = QLabel("Type = ")
+        self.lblStimulus = QLabel("Type = ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         
-        self.lblFreq = QLabel("<i>f</i>&nbsp; =")
+        self.lblFreq = QLabel("<i>f</i>&nbsp; =", self)
 
         self.ledFreq = QLineEdit(self)
         self.ledFreq.setText(str(self.stim_freq))
         self.ledFreq.setToolTip("Stimulus frequency.")
         
-        self.lblFreqUnit = QLabel("f_S")
+        self.lblFreqUnit = QLabel("f_S", self)
 
-        self.lblNPoints = QLabel("<i>N</i>&nbsp; =")
+        self.lblNPoints = QLabel("<i>N</i>&nbsp; =", self)
 
         self.ledNPoints = QLineEdit(self)
         self.ledNPoints.setText("0")
         self.ledNPoints.setToolTip("Number of points to calculate and display.\n"
-                                   "N = 0 chooses automatically.")
+                                   "N = 0 selects automatically.")
 
         self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
@@ -76,8 +76,8 @@ class PlotImpz(QWidget):
         self.layHChkBoxes.addWidget(self.lblNPoints)
         self.layHChkBoxes.addWidget(self.ledNPoints)
         self.layHChkBoxes.addStretch(2)
-        self.layHChkBoxes.addWidget(self.lblLog)
         self.layHChkBoxes.addWidget(self.chkLog)
+        self.layHChkBoxes.addWidget(self.lblLog)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblLogBottom)
         self.layHChkBoxes.addWidget(self.ledLogBottom)

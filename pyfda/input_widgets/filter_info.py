@@ -48,15 +48,41 @@ class FilterInfo(QWidget):
         - A large text window for displaying infos about the filter design
           algorithm
         """
-        self.chkFiltPerf = QCheckBox("H(f)")
+        bfont = QFont()
+        bfont.setBold(True)
+        
+        # ============== UI Layout =====================================
+        # widget / subwindow for filter infos
+        self.chkFiltPerf = QCheckBox("H(f)", self)
         self.chkFiltPerf.setChecked(True)
         self.chkFiltPerf.setToolTip("Display frequency response at test frequencies.")
 
-        self.txtFiltPerf = QTextBrowser(self)
-        self.txtFiltDict = QTextBrowser(self)
+        self.chkDocstring = QCheckBox("Doc$", self)
+        self.chkDocstring.setChecked(False)
+        self.chkDocstring.setToolTip("Display docstring from python filter method.")
 
-        bfont = QFont()
-        bfont.setBold(True)
+        self.chkRichText = QCheckBox("RTF", self)
+        self.chkRichText.setChecked(HAS_DOCUTILS)
+        self.chkRichText.setEnabled(HAS_DOCUTILS)
+        self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
+                                                  
+        self.chkFiltDict = QCheckBox("FiltDict", self)
+        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")   
+
+        self.chkFiltTree = QCheckBox("FiltTree", self)
+        self.chkFiltTree.setToolTip("Show filter tree for debugging.")
+
+        self.layHChkBoxes = QHBoxLayout()
+        self.layHChkBoxes.addWidget(self.chkFiltPerf)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.chkDocstring)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.chkRichText)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.chkFiltDict)
+        self.layHChkBoxes.addStretch(1)
+        self.layHChkBoxes.addWidget(self.chkFiltTree)
+        
         self.tblFiltPerf = QTableWidget(self)
         self.tblFiltPerf.setAlternatingRowColors(True)
 #        self.tblFiltPerf.verticalHeader().setVisible(False)
@@ -71,50 +97,19 @@ class FilterInfo(QWidget):
         self.tblFiltPerf.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.MinimumExpanding)
 
-#        self.tblFiltPerf = QTextTable(self.txtFiltPerf)
-#        QTextBrowser()
-#        self.txtFiltPerf.setSizePolicy(QSizePolicy.Minimum,
-#                                          QSizePolicy.Expanding)
-        # widget / subwindow for filter infos
-        self.chkDocstring = QCheckBox("Doc$")
-        self.chkDocstring.setChecked(False)
-        self.chkDocstring.setToolTip("Display docstring from python filter method.")
-
-        self.chkRichText = QCheckBox("RTF")
-        self.chkRichText.setChecked(HAS_DOCUTILS)
-        self.chkRichText.setEnabled(HAS_DOCUTILS)
-        self.chkRichText.setToolTip("Render documentation in Rich Text Format.")
-
         self.txtFiltInfoBox = QTextBrowser(self)
         self.txtFiltInfoBox.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.Expanding)
-                                          
-        self.chkFiltDict = QCheckBox("FiltDict")
-        self.chkFiltDict.setToolTip("Show filter dictionary for debugging.")
 
         self.txtFiltDict = QTextBrowser(self)
         self.txtFiltDict.setSizePolicy(QSizePolicy.Minimum,
                                           QSizePolicy.Expanding)
-
-        self.chkFiltTree = QCheckBox("FiltTree")
-        self.chkFiltTree.setToolTip("Show filter tree for debugging.")
 
         self.txtFiltTree = QTextBrowser(self)
         self.txtFiltTree.setSizePolicy(QSizePolicy.Minimum,
                                           QSizePolicy.Expanding)
 
 
-        # ============== UI Layout =====================================
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addWidget(self.chkFiltPerf)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkDocstring)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkRichText)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkFiltDict)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkFiltTree)
 
         layVMain = QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)

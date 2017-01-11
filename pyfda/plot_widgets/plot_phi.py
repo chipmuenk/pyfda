@@ -32,15 +32,13 @@ class PlotPhi(QWidget):
         self.cmbUnitsPhi.setCurrentIndex(0)
         self.cmbUnitsPhi.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lblWrap = QLabel("Wrapped Phase")
-        self.btnWrap = QCheckBox()
-        self.btnWrap.setChecked(False)
-        self.btnWrap.setToolTip("Plot phase wrapped to +/- pi")
+        self.chkWrap = QCheckBox("Wrapped Phase", self)
+        self.chkWrap.setChecked(False)
+        self.chkWrap.setToolTip("Plot phase wrapped to +/- pi")
         self.layHChkBoxes = QHBoxLayout()
         self.layHChkBoxes.addStretch(10)
         self.layHChkBoxes.addWidget(self.cmbUnitsPhi)
-        self.layHChkBoxes.addWidget(self.lblWrap)
-        self.layHChkBoxes.addWidget(self.btnWrap)
+        self.layHChkBoxes.addWidget(self.chkWrap)
         self.layHChkBoxes.addStretch(10)
 
         #----------------------------------------------------------------------
@@ -64,7 +62,7 @@ class PlotPhi(QWidget):
 #        #=============================================
 #        # Signals & Slots
 #        #=============================================
-        self.btnWrap.clicked.connect(self.draw)
+        self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         
     def _init_axes(self):
@@ -127,7 +125,7 @@ class PlotPhi(QWidget):
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
         H = np.nan_to_num(H) 
-        if self.btnWrap.isChecked():
+        if self.chkWrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale

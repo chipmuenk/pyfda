@@ -36,7 +36,7 @@ class PlotHf(QWidget):
         "without linear phase (acausal system).")
         self.cmbShowH.setCurrentIndex(0)
 
-        self.lblIn = QLabel("in")
+        self.lblIn = QLabel("in", self)
 
         units = ['dB', 'V', 'W', 'Auto']
         self.cmbUnitsA = QComboBox(self)
@@ -49,13 +49,11 @@ class PlotHf(QWidget):
         self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lblLinphase = QLabel("Acausal system")
-        self.chkLinphase = QCheckBox()
+        self.chkLinphase = QCheckBox("Acausal system", self)
         self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
            "Attention: this makes no sense for a non-linear phase system!")
 
-        self.lblInset = QLabel("Inset")
-
+        self.lblInset = QLabel("Inset", self)
         self.cmbInset = QComboBox(self)
         self.cmbInset.addItems(['off', 'edit', 'fixed'])
         self.cmbInset.setObjectName("cmbInset")
@@ -63,13 +61,11 @@ class PlotHf(QWidget):
         self.cmbInset.setCurrentIndex(0)
         self.inset_idx = 0 # store previous index for comparison
 
-        self.lblSpecs = QLabel("Show Specs")
-        self.chkSpecs = QCheckBox()
+        self.chkSpecs = QCheckBox("Show Specs", self)
         self.chkSpecs.setChecked(False)
         self.chkSpecs.setToolTip("Display filter specs as hatched regions")
 
-        self.lblPhase = QLabel("Phase")
-        self.chkPhase = QCheckBox()
+        self.chkPhase = QCheckBox("Phase", self)
         self.chkPhase.setToolTip("Overlay phase")
 
 
@@ -79,16 +75,13 @@ class PlotHf(QWidget):
         self.layHChkBoxes.addWidget(self.lblIn)
         self.layHChkBoxes.addWidget(self.cmbUnitsA)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblLinphase)
         self.layHChkBoxes.addWidget(self.chkLinphase)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.lblInset)
         self.layHChkBoxes.addWidget(self.cmbInset)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblSpecs)
         self.layHChkBoxes.addWidget(self.chkSpecs)
         self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblPhase)
         self.layHChkBoxes.addWidget(self.chkPhase)
         self.layHChkBoxes.addStretch(10)
 
@@ -468,7 +461,6 @@ class PlotHf(QWidget):
         # Linphase settings only makes sense for amplitude plot
         self.chkLinphase.setCheckable(self.unitA == 'V')
         self.chkLinphase.setEnabled(self.unitA == 'V')
-        self.lblLinphase.setEnabled(self.unitA == 'V')
 
         self.specs = self.chkSpecs.isChecked()
         self.linphase = self.chkLinphase.isChecked()

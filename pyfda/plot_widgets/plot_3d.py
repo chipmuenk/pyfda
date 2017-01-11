@@ -51,49 +51,44 @@ class Plot3D(QWidget):
         self.zmax = 4
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu_r'
-        self._init_UI()
+        self._construct_UI()
 
-    def _init_UI(self):
-        self.chkLog = QCheckBox(self)
-        self.chkLog.setText("Log.")
+    def _construct_UI(self):
+        self.chkLog = QCheckBox("Log.", self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("Logarithmic scale")
         self.chkLog.setChecked(False)
 
-        self.chkPolar = QCheckBox(self)
-        self.chkPolar.setText("Polar")
+        self.chkPolar = QCheckBox("Polar", self)
         self.chkPolar.setObjectName("chkPolar")
-        self.chkPolar.setToolTip("Polar coordinates")
+        self.chkPolar.setToolTip("Polar coordinate range")
         self.chkPolar.setChecked(False)
 
 
-        self.lblBottom = QLabel("Bottom =")
+        self.lblBottom = QLabel("Bottom =", self)
         self.ledBottom = QLineEdit(self)
         self.ledBottom.setObjectName("ledBottom")
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setToolTip("Minimum display value.")
 
-        self.lblTop = QLabel("Top:")
+        self.lblTop = QLabel("Top:", self)
         self.ledTop = QLineEdit(self)
         self.ledTop.setObjectName("ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
 #        self.ledTop.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
 
-        self.chkUC = QCheckBox(self)
-        self.chkUC.setText("UC")
+        self.chkUC = QCheckBox("UC", self)
         self.chkUC.setObjectName("chkUC")
         self.chkUC.setToolTip("Plot unit circle")
         self.chkUC.setChecked(True)
 
-        self.chkPZ = QCheckBox(self)
-        self.chkPZ.setText("P/Z")
+        self.chkPZ = QCheckBox("P/Z", self)
         self.chkPZ.setObjectName("chkPZ")
         self.chkPZ.setToolTip("Plot poles and zeros")
         self.chkPZ.setChecked(True)
 
-        self.chkHf = QCheckBox(self)
-        self.chkHf.setText("H(f)")
+        self.chkHf = QCheckBox("H(f)", self)
         self.chkHf.setObjectName("chkHf")
         self.chkHf.setToolTip("Plot H(f) along the unit circle")
         self.chkHf.setChecked(True)
@@ -106,8 +101,7 @@ class Plot3D(QWidget):
         self.cmbMode3D.setCurrentIndex(0)
         self.cmbMode3D.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkColormap_r = QCheckBox(self)
-        self.chkColormap_r.setText("reverse")
+        self.chkColormap_r = QCheckBox("reverse", self)
         self.chkColormap_r.setToolTip("reverse colormap")
         self.chkColormap_r.setChecked(True)
 
@@ -115,19 +109,17 @@ class Plot3D(QWidget):
         self._init_cmb_colormap()
         self.cmbColormap.setToolTip("Select colormap")
 
-        self.chkColBar = QCheckBox(self)
-        self.chkColBar.setText("Colorbar")
+        self.chkColBar = QCheckBox("Colorbar", self)
         self.chkColBar.setObjectName("chkColBar")
         self.chkColBar.setToolTip("Show colorbar")
         self.chkColBar.setChecked(False)
 
-        self.chkLighting = QCheckBox(self)
-        self.chkLighting.setText("Lighting")
+        self.chkLighting = QCheckBox("Lighting", self)
         self.chkLighting.setObjectName("chkLighting")
         self.chkLighting.setToolTip("Enable light source")
         self.chkLighting.setChecked(False)
 
-        self.lblAlpha = QLabel("Alpha")
+        self.lblAlpha = QLabel("Alpha", self)
         self.diaAlpha = QDial(self)
         self.diaAlpha.setRange(0., 10.)
         self.diaAlpha.setValue(10)
@@ -137,7 +129,7 @@ class Plot3D(QWidget):
         self.diaAlpha.setWrapping(False)
         self.diaAlpha.setToolTip("Set transparency for surf and 3D-contour plot.")
 
-        self.lblHatch = QLabel("Stride")
+        self.lblHatch = QLabel("Stride", self)
         self.diaHatch = QDial(self)
         self.diaHatch.setRange(0., 9.)
         self.diaHatch.setValue(5)
@@ -147,8 +139,7 @@ class Plot3D(QWidget):
         self.diaHatch.setWrapping(False)
         self.diaHatch.setToolTip("Set hatching for H(jw).")
 
-        self.chkContour2D = QCheckBox(self)
-        self.chkContour2D.setText("Contour2D")
+        self.chkContour2D = QCheckBox("Contour2D", self)
         self.chkContour2D.setObjectName("chkContour2D")
         self.chkContour2D.setToolTip("Plot 2D-contours at z =0")
         self.chkContour2D.setChecked(False)
@@ -170,17 +161,20 @@ class Plot3D(QWidget):
         self.layGSelect.addWidget(self.chkUC, 0, 6)
         self.layGSelect.addWidget(self.chkHf, 1, 6)
         self.layGSelect.addWidget(self.chkPZ, 0, 8)
-        self.layGSelect.addWidget(self.cmbColormap, 0,10,1,1)
-        self.layGSelect.addWidget(self.chkColormap_r, 1,10)
-        self.layGSelect.addWidget(self.cmbMode3D, 0, 12)
-        self.layGSelect.addWidget(self.chkContour2D, 1, 12)
+        
+        self.layGSelect.addWidget(self.cmbMode3D, 0, 10)
+        self.layGSelect.addWidget(self.chkContour2D, 1, 10)        
+        self.layGSelect.addWidget(self.cmbColormap, 0,12,1,1)
+        self.layGSelect.addWidget(self.chkColormap_r, 1,12)
+
         self.layGSelect.addWidget(self.chkLighting, 0, 14)
         self.layGSelect.addWidget(self.chkColBar, 1, 14)
 
-        self.layGSelect.addWidget(self.diaAlpha, 0, 16)
         self.layGSelect.addWidget(self.lblAlpha, 0, 15)
-        self.layGSelect.addWidget(self.diaHatch, 1, 16)
+        self.layGSelect.addWidget(self.diaAlpha, 0, 16)
+
         self.layGSelect.addWidget(self.lblHatch, 1, 15)
+        self.layGSelect.addWidget(self.diaHatch, 1, 16)
 
         #----------------------------------------------------------------------
         # mplwidget

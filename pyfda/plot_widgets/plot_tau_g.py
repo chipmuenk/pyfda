@@ -24,8 +24,7 @@ class PlotTauG(QWidget):
         super(PlotTauG, self).__init__(parent)
 
 
-        self.chkWarnings = QCheckBox()
-        self.chkWarnings.setText("Enable Warnings")
+        self.chkWarnings = QCheckBox("Enable Warnings", self)
         self.chkWarnings.setChecked(False)
         self.chkWarnings.setToolTip("Print warnings about singular group delay")
 

@@ -33,28 +33,41 @@ from pyfda import qrc_resources # contains all icons
 
 THEME = 'light' # select 'dark', 'light' or 'original' theme
 
+mpl_ms = 8 # base size for matplotlib markers
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}', # format string for QLineEdit fields
-          'P_Marker': [12, 'r'], # size and color for poles' marker
-          'Z_Marker': [12, 'b'], # size and color for zeros' marker
+          'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
+          'Z_Marker': [mpl_ms, 'b'], # size and color for zeros' marker
           'wdg_margins' : (1,1,1,1),  # R, T, L, B widget margins
           'mpl_hatch_border': {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}     
           }
-params_dark = {'mpl_hatch': {'facecolor': 'none',
+params_dark = {'mpl_hatch': {                          # hatched area for specs
+                             'facecolor': 'none', 
                              'hatch'    : '/', 
-                             'edgecolor': '#808080', # same as figure.edgecolor
-                             'lw'       : 0.0},
-               'mpl_stimuli':{'color': 'w', 
-                              'alpha': 0.5}}
+                             'edgecolor': '#808080',   # same as figure.edgecolor
+                             'lw'       : 0.0},        # no border around hatched area
+                             
+               'mpl_stimuli':{                         # style for stimulus signals
+                              'mfc': 'w', 'mec' : 'w', # marker face + edge color
+                              'ms': mpl_ms,            # marker size
+                              'alpha': 0.25,           # transparency (marker + stem)
+                              'markerfmt':'*',         # marker symbol
+                              'lw':'2' }}              # stem linewidth
 
 #fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
-params_light = {'mpl_hatch': {'facecolor': 'none',
+params_light = {'mpl_hatch': {                         # hatched area for specs
+                             'facecolor': 'none',
                              'hatch'    : '/', 
-                             'edgecolor': '#808080', # same as figure.edgecolor
-                             'lw'       : 0.0},
-               'mpl_stimuli':{'color': 'k', 
-                              'alpha': 0.5}}
+                             'edgecolor': '#808080',   # same as figure.edgecolor
+                             'lw'       : 0.0},        # no border around hatched area
+                             
+               'mpl_stimuli':{                         # style for stimulus signals
+                              'mfc': 'k', 'mec' : 'k', # marker face + edge color
+                              'ms': mpl_ms,            # marker size
+                              'alpha': 0.25,           # transparency (marker + stem)
+                              'markerfmt':'*',         # marker symbol 
+                              'lw':'2' }}              # stem linewidth
 
 # Dictionary with translations between short method names and long names for
 # response types - the long name can be changed as you like, but don't change 
@@ -123,6 +136,7 @@ else:
             
 # common matplotlib widget settings
 mpl_rc = {'lines.linewidth'           : 1.5,
+          'lines.markersize'          : mpl_ms,         # markersize, in points
           'font.family'               : 'sans-serif',#'serif',
           'font.style'                : 'normal',
           'mathtext.fontset'          : 'stixsans',#'stix',
@@ -132,7 +146,7 @@ mpl_rc = {'lines.linewidth'           : 1.5,
           'legend.fontsize'           : 12, 
           'axes.labelsize'            : 12, 
           'axes.titlesize'            : 14, 
-          'axes.linewidth'            : 1,
+          'axes.linewidth'            : 1, # linewidth for coordinate system
           'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
           'figure.figsize'            : (5,4),
           'figure.dpi'                : 100
@@ -215,6 +229,8 @@ qss_light = """
     
     QScrollArea{color:black; background-color:white;}
     QScrollArea > QWidget > QWidget{color:black; background-color: white;}
+    
+    QTextEdit{background-color: white;}
     
     QTableWidget{color:black; background-color:white;}
     
@@ -339,12 +355,12 @@ qss_common = """
 if THEME == 'dark':
     mpl_rc.update(mpl_dark)
     params.update(params_dark)
-    css_rc = qss_common + qss_tab_bar + qss_dark
+    qss_rc = qss_common + qss_tab_bar + qss_dark
     
 elif THEME == 'light':
     mpl_rc.update(mpl_light)
     params.update(params_light)
-    css_rc = qss_common + qss_tab_bar + qss_light
+    qss_rc = qss_common + qss_tab_bar + qss_light
     
 else:
-    css_rc = qss_common
+    qss_rc = qss_common
