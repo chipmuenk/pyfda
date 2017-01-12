@@ -63,12 +63,11 @@ class FilterPZ(QWidget):
                 MaxTextlen = len(item)
                 longestText = item        
 
-        self.chkPZList = QCheckBox(self)
+        self.chkPZList = QCheckBox("Show Poles / Zeros", self)
         self.chkPZList.setChecked(True)
         self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable list.")
-        self.chkPZList.setText("Show Poles / Zeros")
 
-        lblRound = QLabel("Digits = ")
+        lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
         self.spnRound.setValue(0)
@@ -79,17 +78,16 @@ class FilterPZ(QWidget):
         self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
         self.cmbFilterType.addItems(["FIR","IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.lblGain = QLabel("k = ")
         
-        self.chkNorm =  QCheckBox(self)
+        self.chkNorm =  QCheckBox("Normalize", self)
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
-        self.chkNorm.setText("Normalize")
 
+        self.lblGain = QLabel("k = ", self)     
         self.ledGain = QLineEdit(self)
         self.ledGain.setToolTip("Specify gain factor k.")
         self.ledGain.setText(str(1.))
+        self.ledGain.setObjectName("ledGain")
 
         self.tblPZ = QTableWidget(self)
         self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers)
@@ -99,44 +97,37 @@ class FilterPZ(QWidget):
         self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.Expanding)
 
-        butAddRow = QPushButton(self)
+        butAddRow = QPushButton(butTexts[0], self)
         butAddRow.setToolTip("Add row to PZ table.\n"
                                 "Select n existing rows to append n new rows.")
-        butAddRow.setText(butTexts[0])
         
         ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
         butAddRow.setMaximumWidth(ButLength)
 
-        butDelRow = QPushButton(self)
+        butDelRow = QPushButton(butTexts[1], self)
         butDelRow.setToolTip("Delete selected row(s) from the table.\n"
                 "Multiple rows can be selected using <SHIFT> or <CTRL>."
                 "If nothing is selected, delete last row.")
-        butDelRow.setText(butTexts[1])
         butDelRow.setMaximumWidth(ButLength)
 
-        butClear = QPushButton(self)
+        butClear = QPushButton(butTexts[4], self)
         butClear.setToolTip("Clear all entries.")
-        butClear.setText(butTexts[4])
         butClear.setMaximumWidth(ButLength)              
 
-        butSave = QPushButton(self)
+        butSave = QPushButton(butTexts[2], self)
         butSave.setToolTip("Save P/Z & update all plots.\n"
                                 "No modifications are saved before!")
-        butSave.setText(butTexts[2])
         butSave.setMaximumWidth(ButLength)
 
-        butLoad = QPushButton(self)
+        butLoad = QPushButton(butTexts[3], self)
         butLoad.setToolTip("Reload P / Z.")
-        butLoad.setText(butTexts[3])
         butLoad.setMaximumWidth(ButLength)              
 
-        butSetZero = QPushButton(self)
+        butSetZero = QPushButton(butTexts[5], self)
         butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
-        butSetZero.setText(butTexts[5])
         butSetZero.setMaximumWidth(ButLength)              
 
-        self.lblEps = QLabel("for P, Z <")
-
+        self.lblEps = QLabel("for P, Z <", self)
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
