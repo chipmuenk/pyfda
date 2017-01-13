@@ -256,7 +256,7 @@ near ``f_S/2`` (highpass).
         
         if rt == 'LP':
             b0 = np.ones(L) #  h[n] = {1; 1; 1; ...}
-            i = np.arange(1,L)
+            i = np.arange(1, L)
 
             norm = L
 
@@ -281,7 +281,7 @@ near ``f_S/2`` (highpass).
             L = L + 1
             i = np.arange(L) # create N + 2 zeros around the unit circle, ...
             # ... remove first and middle element and rotate by L / 4 
-            i = np.delete(i, [0, (L) // 2]) + L / 4         
+            i = np.delete(i, [0, L // 2]) + L / 4         
 
             norm = np.sum(abs(b0))
 
@@ -292,7 +292,7 @@ near ``f_S/2`` (highpass).
 
             L = L + 1
             i = np.arange(L) # create N + 2 zeros around the unit circle and ...
-            i = np.delete(i, [0, (L) // 2]) # ... remove first and middle element
+            i = np.delete(i, [0, L // 2]) # ... remove first and middle element
 
             norm = np.sum(b0)
 
