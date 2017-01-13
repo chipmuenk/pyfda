@@ -177,6 +177,22 @@ near ``f_S/2`` (highpass).
         self._load_entries() # get initial / last setting from dictionary
         self._update_UI()
         
+
+    def _load_entries(self):
+        """
+        Reload parameter(s) from filter dictionary and set UI elements 
+        when filter is loaded from disk.
+        """
+        try:
+            dyn_wdg_par = fb.fil[0]['wdg_dyn']
+            if 'ma_stages' in dyn_wdg_par:
+                self.ma_stages = dyn_wdg_par['ma_stages']
+                self.led_ma_1.setText(str(self.ma_stages))
+                self.chk_ma_2.setChecked(dyn_wdg_par['ma_normalize'])
+        except KeyError as e:
+            logger.info("Key Error:",e)
+
+        
     def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
@@ -191,6 +207,7 @@ near ``f_S/2`` (highpass).
                                      'ma_normalize':self.chk_ma_2.isChecked()}})
         self.sigFiltChanged.emit() # -> select_filter -> filter_specs
 
+
     def destruct_UI(self):
         """
         Disconnect all signal-slot connections to avoid crashes upon exit
@@ -199,20 +216,6 @@ near ``f_S/2`` (highpass).
         self.chk_ma_2.clicked.disconnect()
 
         
-    def _load_entries(self):
-        """
-        Reload parameter(s) from filter dictionary and set UI elements 
-        when filter is loaded from disk.
-        """
-        try:
-            dyn_wdg_par = fb.fil[0]['wdg_dyn']
-            if 'ma_stages' in dyn_wdg_par:
-                self.ma_stages = dyn_wdg_par['ma_stages']
-                self.led_ma_1.setText(str(self.ma_stages))
-                self.chk_ma_2.setChecked(dyn_wdg_par['ma_normalize'])
-        except KeyError as e:
-            logging.warn("Key Error:",e)
-
 
     def _get_params(self, fil_dict):
         """
