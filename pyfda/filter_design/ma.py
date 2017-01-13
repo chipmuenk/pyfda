@@ -35,7 +35,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import fil_save, fil_convert, ceil_even
+from pyfda.pyfda_lib import fil_save, fil_convert, ceil_even, ceil_odd, floor_odd
 
 __version__ = "2.0"
 
@@ -222,7 +222,8 @@ near ``f_S/2`` (highpass).
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N']
+        # N is total order, L is number of taps per stage
+        self.L     = fil_dict['N'] + 1 #// self.ma_stages + 1 
         self.F_SB  = fil_dict['F_SB']
         self.A_SB  = fil_dict['A_SB']
         
@@ -241,7 +242,7 @@ near ``f_S/2`` (highpass).
 
         fil_convert(fil_dict, self.FRMT)
 
-        fil_dict['N'] = self.N  # always update filter dict with filter order
+        fil_dict['N'] = (self.L -1) # * self.ma_stages # always update filter dict with filter order
         
         
     def calc_ma(self, fil_dict, rt='LP'):
@@ -252,7 +253,7 @@ near ``f_S/2`` (highpass).
         """
         b = 1.
         k = 1.
-        L = self.N + 1
+        L = self.L
         
         if rt == 'LP':
             b0 = np.ones(L) #  h[n] = {1; 1; 1; ...}
@@ -320,7 +321,7 @@ near ``f_S/2`` (highpass).
                    
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
-        self.N = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
+        self.L = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
                                                      np.sin(self.F_SB * np.pi))))
         self.calc_ma(fil_dict, rt = 'LP')
 
@@ -330,18 +331,18 @@ near ``f_S/2`` (highpass).
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
-        self.N = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
+        self.L = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
                                               np.sin((0.5 - self.F_SB) * np.pi))))
         self.calc_ma(fil_dict, rt = 'HP')
         
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
-        self.N = ceil_even(self.N)  # enforce even order
+        self.L = floor_odd(self.L)  # enforce even order
         self.calc_ma(fil_dict, rt = 'BS')     
         
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
-        self.N = ceil_even(self.N)  # enforce even order
+        self.L = floor_odd(self.L)  # enforce even order
         self.calc_ma(fil_dict, rt = 'BP')     
 
 #------------------------------------------------------------------------------
