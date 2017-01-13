@@ -1223,13 +1223,25 @@ def ceil_odd(x):
     Return the smallest odd integer not less than x. x can be integer or float.
     """
     return round_odd(x+1)
+    
+def floor_odd(x):
+    """
+    Return the largest odd integer not larger than x. x can be integer or float.
+    """
+    return round_odd(x-1)
 
 
 def ceil_even(x):
     """
-    Return the smallest odd integer not less than x. x can be integer or float.
+    Return the smallest even integer not less than x. x can be integer or float.
     """
     return round_even(x+1)
+    
+def floor_even(x):
+    """
+    Return the largest even integer not larger than x. x can be integer or float.
+    """
+    return round_even(x-1)
 
 
 def remlplen_herrmann(fp,fs,dp,ds):
