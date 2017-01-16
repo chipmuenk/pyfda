@@ -21,9 +21,8 @@ import numpy as np
 from scipy.signal import freqz
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import cround, fil_save
+from pyfda.pyfda_lib import fil_save, safe_eval
 from pyfda.pyfda_rc import params
-from pyfda.simpleeval import simple_eval
 
 # TODO: delete / insert individual cells instead of rows
 # TODO: correct scaling after insertion / deletion of cells
@@ -260,7 +259,7 @@ class FilterPZ(QWidget):
         if self.spec_edited:
             print(str(source.objectName()))
             if str(source.objectName()) == "ledGain":
-                value = simple_eval(source.text())
+                value = safe_eval(source.text())
                 self.zpk[2] = value
                 self.sigFilterDesigned.emit() # -> filter_specs
                 self.spec_edited = False # reset flag
@@ -310,8 +309,8 @@ class FilterPZ(QWidget):
                 self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
             else:
                 self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
-    
-            self.zpk = fb.fil[0]['zpk']
+
+            #self.zpk = fb.fil[0]['zpk']
             n_digits = int(self.spnRound.text())
     
             self.tblPZ.setVisible(self.chkPZList.isChecked())
@@ -362,7 +361,7 @@ class FilterPZ(QWidget):
     def load_entries(self):
         """
         Load all entries from filter dict fb.fil[0]['zpk'] into the shadow 
-        register self.zpk and create a table from it, overwriting all previous entries.
+        register self.zpk.
         """        
         if fb.fil[0]['ft'] == 'FIR':
             self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
@@ -370,47 +369,6 @@ class FilterPZ(QWidget):
             self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
 
         self.zpk = fb.fil[0]['zpk']
-        n_digits = int(self.spnRound.text())
-
-        self.tblPZ.setVisible(self.chkPZList.isChecked())
-        
-        if self.chkNorm.isChecked():
-            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
-            self.Hmax_last = max(abs(H)) # store current max. filter gain
-            if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
-                self.Hmax_last = 1.
-
-        if not np.isfinite(self.zpk[2]):
-            self.zpk[2] = 1.
-        self.ledGain.setText(str(self.zpk[2]))
-
-        self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
-
-        logger.debug("load_entries - pz:\n"
-            "Shape = %s\n"
-            "Len   = %d\n"
-            "NDim  = %d\n\n"
-            "ZPK = %s"
-            %(np.shape(self.zpk),len(self.zpk), np.ndim(self.zpk), pformat(self.zpk))
-              )
-
-        self.tblPZ.setColumnCount(2)
-        self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
-        for col in range(2):
-            for row in range(len(self.zpk[col])):
-                logger.debug("Len Row = %d" %len(self.zpk[col]))
-                item = self.tblPZ.item(row, col)
-                # copy content of self.zpk to corresponding table field, rounding 
-                # as specified and removing the brackets of complex arguments
-                if item: # does item exist?
-                    item.setText(str(cround(self.zpk[col][row], n_digits)).strip('()'))
-                else: # no construct it
-                    self.tblPZ.setItem(row,col,QTableWidgetItem(
-                          str(cround(self.zpk[col][row], n_digits)).strip('()')))
-
-        self.tblPZ.resizeColumnsToContents()
-        self.tblPZ.resizeRowsToContents()
-        
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
@@ -432,13 +390,13 @@ class FilterPZ(QWidget):
                 item = self.tblPZ.item(row, col)
                 if item:
                     if item.text() != "":
-                        rows.append(simple_eval(item.text()))
+                        rows.append(safe_eval(item.text()))
                 else:
                     rows.append(0.)
 
             self.zpk.append(rows)
 
-        self.zpk.append(simple_eval(self.ledGain.text())) # append k factor to self.zpk
+        self.zpk.append(safe_eval(self.ledGain.text())) # append k factor to self.zpk
 
         fb.fil[0]['N'] = num_rows
      
@@ -558,7 +516,7 @@ class FilterPZ(QWidget):
             for row in range(num_rows):
                 item = self.tblPZ.item(row, col)
                 if item:
-                    if abs(simple_eval(item.text())) < eps:
+                    if abs(safe_eval(item.text())) < eps:
                         item.setText(str(0.))
                 else:
                     self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))

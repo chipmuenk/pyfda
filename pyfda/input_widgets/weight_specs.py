@@ -14,9 +14,8 @@ from ..compat import (QtCore, QtGui,
                       QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, style_widget
+from pyfda.pyfda_lib import rt_label, style_widget, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.simpleeval import simple_eval
 
 
 class WeightSpecs(QWidget):
@@ -193,7 +192,7 @@ class WeightSpecs(QWidget):
         """
         if self.spec_edited:
             w_label = str(widget.objectName())
-            w_value = simple_eval(widget.text())
+            w_value = safe_eval(widget.text())
             fb.fil[0].update({w_label:w_value})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag

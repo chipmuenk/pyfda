@@ -15,9 +15,9 @@ from ..compat import (QtCore, Qt, QEvent, pyqtSignal,
                       QVBoxLayout, QHBoxLayout, QGridLayout)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, style_widget
+from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, style_widget, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.simpleeval import simple_eval
+
 
 class AmplitudeSpecs(QWidget):
     """
@@ -236,7 +236,7 @@ class AmplitudeSpecs(QWidget):
             unit = str(self.cmbUnitsA.currentText())
             filt_type = fb.fil[0]['ft']
             amp_label = str(source.objectName())
-            amp_value = simple_eval(source.text())
+            amp_value = safe_eval(source.text())
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag

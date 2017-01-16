@@ -15,9 +15,8 @@ from ..compat import (QtCore,
                       pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, style_widget
+from pyfda.pyfda_lib import rt_label, style_widget, safe_eval
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.simpleeval import simple_eval
 
 class FreqSpecs(QWidget):
     """
@@ -132,7 +131,7 @@ class FreqSpecs(QWidget):
         """
         if self.spec_edited:
             f_label = str(event_source.objectName())
-            f_value = simple_eval(event_source.text()) / fb.fil[0]['f_S']
+            f_value = safe_eval(event_source.text()) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
             self.sigSpecsChanged.emit() # -> filter_specs

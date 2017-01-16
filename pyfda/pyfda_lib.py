@@ -40,13 +40,19 @@ from scipy import __version__ as _scipy_version
 
 #import logging
 from distutils.version import LooseVersion
-
 SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
 
-#from PyQt4 import QtGui
-#print("scipy:", _scipy_version)
+from pyfda.simpleeval import simple_eval
 
 #### General functions ########################################################
+
+def safe_eval(expr):
+    try:
+        return simple_eval(expr)
+    except SyntaxError:
+        return 0.
+            
+
 # taken from
 # http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
 def valid(path):

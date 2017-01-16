@@ -15,16 +15,16 @@ logger = logging.getLogger(__name__)
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
                       QCheckBox, QPushButton,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      QVBoxLayout, QHBoxLayout, QSizePolicy,
                       pyqtSignal, QEvent)
 
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import cround, fil_save
+from pyfda.pyfda_lib import cround, fil_save, safe_eval
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
-from pyfda.simpleeval import simple_eval
+
 
 # TODO: delete / insert individual cells instead of rows
 # TODO: drag & drop doesn't work
@@ -303,7 +303,7 @@ class FilterCoeffs(QWidget):
                 item = self.tblCoeff.item(row, col)
                 if item:
                     if item.text() != "":
-                        rows.append(simple_eval(item.text()))
+                        rows.append(safe_eval(item.text()))
                 else:
                     rows.append(0.)
 #                    rows.append(float(item.text()) if item else 0.)
@@ -471,7 +471,7 @@ class FilterCoeffs(QWidget):
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
                 if item:
-                    if abs(simple_eval(item.text())) < eps:
+                    if abs(safe_eval(item.text())) < eps:
                         item.setText(str(0.))
                 else:
                     self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
@@ -494,7 +494,7 @@ class FilterCoeffs(QWidget):
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
                 if item:
-                    item.setText(str(myQ.fix(simple_eval(item.text()))))
+                    item.setText(str(myQ.fix(safe_eval(item.text()))))
                 else:
                     self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 
