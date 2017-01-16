@@ -13,8 +13,7 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
-                     QSplitter, QIcon, QMessageBox, QWidget, QFrame,
-                     QVBoxLayout, QHBoxLayout, QSizePolicy)
+                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout)
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid 
