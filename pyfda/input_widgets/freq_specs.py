@@ -159,6 +159,10 @@ class FreqSpecs(QWidget):
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
 
+        wdg_pix_width  = fb.QFMetric.width("8"*8)# calculate width in pixels
+        wdg_pix_height = fb.QFMetric.height()
+
+
         #---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
                             fb.fil[0]['rt'],fb.fil[0]['fc'],fb.fil[0]['fo']))
@@ -169,6 +173,7 @@ class FreqSpecs(QWidget):
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
 
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+            self.qlineedit[i].setFixedSize(wdg_pix_width, wdg_pix_height) # set widget dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
