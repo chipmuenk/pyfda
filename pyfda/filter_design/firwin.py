@@ -244,20 +244,22 @@ class Firwin(QWidget):
     def _load_entries(self):
         """
         Reload window selection and parameters from filter dictionary
-        and set UI elements accordingly (when filter is loaded from disk).
+        and set UI elements accordingly. load_entries() is called upon 
+        initialization and when the filter is loaded from disk.
         """
         win_idx = 0
         alg_idx = 0
-        try:
-            dyn_wdg_par = fb.fil[0]['wdg_dyn']
-            if 'win' in dyn_wdg_par:
-                if np.isscalar(dyn_wdg_par['win']): # true for strings (non-vectors) 
-                    window = dyn_wdg_par['win']
+        if 'wdg_fil' in fb.fil[0] and 'firwin' in fb.fil[0]['wdg_fil']:
+            wdg_fil_par = fb.fil[0]['wdg_fil']['firwin']
+
+            if 'win' in wdg_fil_par:
+                if np.isscalar(wdg_fil_par['win']): # true for strings (non-vectors) 
+                    window = wdg_fil_par['win']
                 else:
-                    window = dyn_wdg_par['win'][0]
-                    self.led_firwin_1.setText(str(dyn_wdg_par['win'][1]))
-                    if len(dyn_wdg_par['win']) > 2:
-                        self.led_firwin_2.setText(str(dyn_wdg_par['win'][2]))                       
+                    window = wdg_fil_par['win'][0]
+                    self.led_firwin_1.setText(str(wdg_fil_par['win'][1]))
+                    if len(wdg_fil_par['win']) > 2:
+                        self.led_firwin_2.setText(str(wdg_fil_par['win'][2]))                       
 
                 # find index for window string
                 win_idx = self.cmb_firwin_win.findText(window, 
@@ -265,14 +267,11 @@ class Firwin(QWidget):
                 if win_idx == -1: # Key does not exist, use first entry instead
                     win_idx = 0
                     
-            if 'alg' in dyn_wdg_par:
-                alg_idx = self.cmb_firwin_alg.findText(dyn_wdg_par['alg'], 
+            if 'alg' in wdg_fil_par:
+                alg_idx = self.cmb_firwin_alg.findText(wdg_fil_par['alg'], 
                                 Qt.MatchFixedString)
                 if alg_idx == -1: # Key does not exist, use first entry instead
                     alg_idx = 0
-                
-        except KeyError as e:
-            print("Key Error:",e)
         
         self.cmb_firwin_win.setCurrentIndex(win_idx) # set index for window and
         self.cmb_firwin_alg.setCurrentIndex(alg_idx) # and algorithm cmbBox
@@ -282,11 +281,13 @@ class Firwin(QWidget):
         Store window and alg. selection and parameter settings (part of 
         self.firWindow, if any) in filter dictionary.
         """
+        if not 'wdg_fil' in fb.fil[0]:
+            fb.fil[0].update({'wdg_fil':{}})
+        fb.fil[0]['wdg_fil'].update({'firwin':
+                                        {'win':self.firWindow,
+                                         'alg':self.alg}
+                                 })
             
-            
-        fb.fil[0].update({'wdg_dyn':{'win':self.firWindow,
-                                 'alg':self.alg}})
-
 
     def _get_params(self, fil_dict):
         """
@@ -334,7 +335,7 @@ class Firwin(QWidget):
         if self.fir_window_name == 'kaiser':
             N, beta = sig.kaiserord(fb.fil[0]['A_SB'], delta_f)
             self.led_firwin_1.setText(str(beta))
-            fb.fil[0]['wdg_dyn'][1] = beta
+            fb.fil[0]['wdg_fil'][1] = beta
             self.firWindow[1] = beta
             self._load_entries()
             return N

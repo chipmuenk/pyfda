@@ -193,24 +193,26 @@ near ``f_S/2`` (highpass).
 
     def _load_entries(self):
         """
-        Reload parameter(s) from filter dictionary and set UI elements 
-        when filter initialied or loaded from disk.
+        Reload parameter(s) from filter dictionary (if they exist) and set 
+        corresponding UI elements. load_entries() is called upon initialization
+        and when the filter is loaded from disk.
         """
-        try:
-            dyn_wdg_par = fb.fil[0]['wdg_dyn']['ma']
-            self.delays = dyn_wdg_par['delays']    
-            self.led_delays.setText(str(self.delays))
-            self.stages = dyn_wdg_par['stages']
-            self.led_stages.setText(str(self.stages))
-            self.chk_norm.setChecked(dyn_wdg_par['normalize'])
-        except KeyError as e:
-            logger.info("Key Error:", e)
+        if 'wdg_fil' in fb.fil[0] and 'ma' in fb.fil[0]['wdg_fil']:
+            wdg_fil_par = fb.fil[0]['wdg_fil']['ma']
+            if 'delays' in wdg_fil_par:
+                self.delays = wdg_fil_par['delays']    
+                self.led_delays.setText(str(self.delays))
+            if 'stages' in wdg_fil_par:
+                self.stages = wdg_fil_par['stages']
+                self.led_stages.setText(str(self.stages))
+            if 'normalize' in wdg_fil_par:
+                self.chk_norm.setChecked(wdg_fil_par['normalize'])
 
         
     def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
-        and converted to integer.) and resize the textfields according to content.
+        and converted to integer) and resize the textfields according to content.
         """
         self.delays = int(abs(round(float(self.led_delays.text()))))
         self.led_delays.setText(str(self.delays))        
@@ -230,12 +232,14 @@ near ``f_S/2`` (highpass).
         """
         Store parameter settings in filter dictionary.
         """
-        fb.fil[0].update({'wdg_dyn':{'ma':
+        if not 'wdg_fil' in fb.fil[0]:
+            fb.fil[0].update({'wdg_fil':{}})
+        fb.fil[0]['wdg_fil'].update({'ma':
                                         {'delays':self.delays,
                                          'stages':self.stages,
                                          'normalize':self.chk_norm.isChecked()}
-                                    }
-                        })
+                                    })
+                                    
         self.sigFiltChanged.emit() # -> select_filter -> filter_specs
 
 

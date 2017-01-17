@@ -25,6 +25,9 @@ Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
+import logging
+logger = logging.getLogger(__name__)
+
 from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame,
                       QVBoxLayout, QHBoxLayout)
 
@@ -210,7 +213,11 @@ is estimated using Ichige's algorithm.
         self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
         self.led_remez_1.setText(str(self.grid_density))
 
-        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
+        if not 'wdg_fil' in fb.fil[0]:
+            fb.fil[0].update({'wdg_fil':{}})
+        fb.fil[0]['wdg_fil'].update({'equiripple':
+                                        {'grid_density':self.grid_density}
+                                    })
         
         self.sigFiltChanged.emit() # -> select_filter -> filter_specs
 
@@ -223,24 +230,15 @@ is estimated using Ichige's algorithm.
 
     def _load_entries(self):
         """
-        Reload parameter(s) from filter dictionary and set UI elements 
-        when filter is loaded from disk.
+        Reload parameter(s) from filter dictionary (if they exist) and set 
+        corresponding UI elements. load_entries() is called upon initialization
+        and when the filter is loaded from disk.
         """
-        try:
-            dyn_wdg_par = fb.fil[0]['wdg_dyn']
-            if 'grid_density' in dyn_wdg_par:
-                self.grid_density = dyn_wdg_par['grid_density']
+        if 'wdg_fil' in fb.fil[0] and 'equiripple' in fb.fil[0]['wdg_fil']:
+            wdg_fil_par = fb.fil[0]['wdg_fil']['equiripple']
+            if 'grid_density' in wdg_fil_par:
+                self.grid_density = wdg_fil_par['grid_density']
                 self.led_remez_1.setText(str(self.grid_density))
-        except KeyError as e:
-            print("Key Error:",e)
-
-
-#    def _store_entries(self):
-#        """
-#        Store parameter settings in filter dictionary.
-#        """
-#        fb.fil[0].update({'wdg_dyn':{'grid_density':self.grid_density}})
-
 
 
     def _get_params(self, fil_dict):
