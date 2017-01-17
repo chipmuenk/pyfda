@@ -15,8 +15,7 @@ import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import expand_lim, rt_label
-from pyfda.simpleeval import simple_eval
+from pyfda.pyfda_lib import expand_lim, rt_label, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -135,7 +134,7 @@ class PlotImpz(QWidget):
 
         def _store_entry(source):
             if self.spec_edited:
-                self.stim_freq = simple_eval(source.text()) / fb.fil[0]['f_S']
+                self.stim_freq = safe_eval(source.text()) / fb.fil[0]['f_S']
                 self.spec_edited = False # reset flag
                 self.draw()
                 
