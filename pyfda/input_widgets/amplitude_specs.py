@@ -49,13 +49,11 @@ class AmplitudeSpecs(QWidget):
 
         bfont = QFont()
         bfont.setBold(True)
-        lblTitle = QLabel(self) # field for widget title
-        lblTitle.setText(str(self.title))
+        lblTitle = QLabel(str(self.title), self) # field for widget title
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
 
-        lblUnits = QLabel(self)
-        lblUnits.setText(" in ")
+        lblUnits = QLabel("in", self)
 
         self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(amp_units)
@@ -76,7 +74,7 @@ class AmplitudeSpecs(QWidget):
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(lblUnits, Qt.AlignLeft)
         layHTitle.addWidget(self.cmbUnitsA, Qt.AlignLeft)
-        layHTitle.addStretch(2)
+        layHTitle.addStretch(1)
         
         self.layGSpecs = QGridLayout() # sublayout for spec fields
         # set the title as the first (fixed) entry in grid layout. The other

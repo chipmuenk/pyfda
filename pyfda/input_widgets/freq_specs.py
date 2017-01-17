@@ -47,17 +47,16 @@ class FreqSpecs(QWidget):
         bfont = QFont()
         bfont.setBold(True)
 
-        lblTitle = QLabel() # field for widget title
-        lblTitle.setText(str(self.title))
+        lblTitle = QLabel(str(self.title), self) # field for widget title
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
-        self.lblUnit = QLabel()
-        self.lblUnit.setText(" in " + rt_label(fb.fil[0]['freq_specs_unit']))
+        self.lblUnit = QLabel(self)
+        self.lblUnit.setText("in " + rt_label(fb.fil[0]['freq_specs_unit']))
 
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(self.lblUnit)
-        layHTitle.addStretch(2)
+        layHTitle.addStretch(1)
         
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
