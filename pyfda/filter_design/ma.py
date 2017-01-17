@@ -158,7 +158,7 @@ near ``f_S/2`` (highpass).
         self.led_stages.setObjectName('wdg_led_ma_1')
         self.led_stages.setToolTip("Set number of stages ")
         
-        self.chk_norm = QCheckBox("Normalize:", self)
+        self.chk_norm = QCheckBox("Normalize", self)
         self.chk_norm.setChecked(True)
         self.chk_norm.setObjectName('wdg_chk_ma_2')
         self.chk_norm.setToolTip("Normalize to| H_max = 1|")
@@ -228,9 +228,14 @@ near ``f_S/2`` (highpass).
 
         self.led_delays.setFixedSize(delays_pix_width, pix_height)
         self.led_stages.setFixedSize(stages_pix_width, pix_height)
+        
+        self._store_entries()
+
+    def _store_entries(self):
 
         """
-        Store parameter settings in filter dictionary.
+        Store parameter settings in filter dictionary. Called from _update_UI()
+        and _save()
         """
         if not 'wdg_fil' in fb.fil[0]:
             fb.fil[0].update({'wdg_fil':{}})
@@ -264,8 +269,8 @@ near ``f_S/2`` (highpass).
 
     def _save(self, fil_dict):
         """
-        Save MA-filters both in 'zpk' and 'ba' format. Subsequent conversion
-        has nothing to do here except deleting an 'sos' entry from an earlier
+        Save MA-filters both in 'zpk' and 'ba' format; no conversion has to be
+        performed except maybe deleting an 'sos' entry from an earlier
         filter design.
         """
         if 'zpk' in self.FRMT:
@@ -276,7 +281,12 @@ near ``f_S/2`` (highpass).
 
         fil_convert(fil_dict, self.FRMT)
 
-        fil_dict['N'] = self.delays * self.stages # always update filter dict with filter order
+        # always update filter dict and LineEdit, in case the design algorithm 
+        # has changed the number of delays:
+        fil_dict['N'] = self.delays * self.stages # updated filter order
+        self.led_delays.setText(str(self.delays)) # updated number of delays
+        
+        self._store_entries()
         
         
     def calc_ma(self, fil_dict, rt='LP'):
@@ -355,7 +365,7 @@ near ``f_S/2`` (highpass).
                    
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = int(np.ceil(1 / (self.A_SB **(1/self.stages) * 
+        self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) * 
                                                      np.sin(self.F_SB * np.pi))))
         self.calc_ma(fil_dict, rt = 'LP')
 
@@ -365,18 +375,18 @@ near ``f_S/2`` (highpass).
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = int(np.ceil(1 / (self.A_SB **(1/self.stages) * 
+        self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) * 
                                               np.sin((0.5 - self.F_SB) * np.pi))))
         self.calc_ma(fil_dict, rt = 'HP')
         
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = floor_odd(self.L)  # enforce even order
+        self.delays = floor_odd(self.delays)  # enforce even order
         self.calc_ma(fil_dict, rt = 'BS')     
         
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = floor_odd(self.L)  # enforce even order
+        self.delays = floor_odd(self.delays)  # enforce even order
         self.calc_ma(fil_dict, rt = 'BP')     
 
 #------------------------------------------------------------------------------
