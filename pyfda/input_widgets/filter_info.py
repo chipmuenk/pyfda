@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QtGui, QWidget, QLabel, QFont, QCheckBox,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy)
+                      QVBoxLayout, QHBoxLayout, QSizePolicy, QSplitter, Qt)
 
 try:
     from docutils.core import publish_string 
@@ -90,35 +90,30 @@ class FilterInfo(QWidget):
         self.tblFiltPerf.horizontalHeader().setFont(bfont)
         self.tblFiltPerf.verticalHeader().setHighlightSections(False)
         self.tblFiltPerf.verticalHeader().setFont(bfont)
-        
-#        self.tblCoeff.QItemSelectionModel.Clear
-#        self.tblCoeff.setDragEnabled(True)
-#        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
-        self.tblFiltPerf.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                          QSizePolicy.MinimumExpanding)
 
         self.txtFiltInfoBox = QTextBrowser(self)
-        self.txtFiltInfoBox.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                          QSizePolicy.Expanding)
 
         self.txtFiltDict = QTextBrowser(self)
-        self.txtFiltDict.setSizePolicy(QSizePolicy.Minimum,
-                                          QSizePolicy.Expanding)
 
         self.txtFiltTree = QTextBrowser(self)
-        self.txtFiltTree.setSizePolicy(QSizePolicy.Minimum,
-                                          QSizePolicy.Expanding)
-
 
 
         layVMain = QVBoxLayout()
         layVMain.addLayout(self.layHChkBoxes)
-        layVMain.addWidget(self.tblFiltPerf)
-        layVMain.addWidget(self.txtFiltInfoBox)
-        layVMain.addWidget(self.txtFiltDict)
-        layVMain.addWidget(self.txtFiltTree)
+        splitter = QSplitter(self)
+        splitter.setOrientation(Qt.Vertical)
+        splitter.addWidget(self.tblFiltPerf)
+        splitter.addWidget(self.txtFiltInfoBox)
+        splitter.addWidget(self.txtFiltDict)
+        splitter.addWidget(self.txtFiltTree)
+        # setSizes uses absolute pixel values, but can be "misused" by specifying values
+        # that are way too large: in this case, the space is distributed according
+        # to the _ratio_ of the values:
+        splitter.setSizes([3000,10000,1000,1000])
+        layVMain.addWidget(splitter)
+
         layVMain.setContentsMargins(*params['wdg_margins'])
-#        layVMain.addStretch(10)
+
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
