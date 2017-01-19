@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 from ..compat import (QtCore,
                       QWidget, QLabel, QLineEdit, QFrame, QFont,
                       QVBoxLayout, QHBoxLayout, QGridLayout,
-                      pyqtSignal, QEvent)
+                      pyqtSignal, QEvent, QFMetric)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, style_widget, safe_eval
@@ -158,8 +158,9 @@ class FreqSpecs(QWidget):
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
 
-        wdg_pix_width  = fb.QFMetric.width("8"*8)# calculate width in pixels
-        wdg_pix_height = fb.QFMetric.height()
+        wdg_pix_width  = QFMetric.width("8"*8)# calculate width in pixels
+        wdg_pix_height = QFMetric.height()*1.5
+        print(wdg_pix_height)
 
 
         #---------------------------- logging -----------------------------

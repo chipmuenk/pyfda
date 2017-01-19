@@ -27,13 +27,6 @@ design_filt_state = "changed"
 # module myhdl found?
 MYHDL = False
 
-# placeholder für QFontMetric font properties. This is set in pyfdax.main()
-QFMetric = None
-# wdg_pix_width  = QFMetric.width("Hallo")# calculate width in pixels
-# wdg_pix_height = QFMetric.height()
-# my_widget.setFixedSize(wdg_pix_width, wdg_pix_height) # set widget dimensions
-
-
 # see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 # see http://stackoverflow.com/questions/2447353/getattr-on-a-module
 

@@ -35,6 +35,16 @@ except ImportError:
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
     HAS_QT5 = False
 
+# use QFontMetrics to measure / set the width of widgets depending on the
+# font properties and store it in filter broker
+myfont = QFont("", 0)
+QFMetric = QFontMetrics(myfont)
+QFMetric.xxx = 13
+
+# wdg_pix_width  = QFMetrics.width("Hallo")# calculate width in pixels
+# wdg_pix_height = QFMetric.height()
+# my_widget.setFixedSize(wdg_pix_width, wdg_pix_height) # set widget dimensions
+
 
 class QFD(QFileDialog):
     """

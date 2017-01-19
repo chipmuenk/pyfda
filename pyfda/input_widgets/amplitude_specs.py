@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, Qt, QEvent, pyqtSignal, 
                       QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont,
-                      QVBoxLayout, QHBoxLayout, QGridLayout)
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QFMetric)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, style_widget, safe_eval
@@ -164,8 +164,8 @@ class AmplitudeSpecs(QWidget):
         state = new_labels[0]        
         new_labels = new_labels[1:]
 
-        wdg_pix_width  = fb.QFMetric.width("8"*8)# calculate width in pixels
-        wdg_pix_height = fb.QFMetric.height()
+        wdg_pix_width  = QFMetric.width("8"*8)# calculate width in pixels
+        wdg_pix_height = QFMetric.height()
 
         num_new_labels = len(new_labels)
         if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before

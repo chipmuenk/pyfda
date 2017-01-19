@@ -13,8 +13,7 @@ import logging.config
 logger = logging.getLogger(__name__)
 
 from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
-                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout,
-                     QFont, QFontMetrics)
+                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout)
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid 
@@ -214,12 +213,6 @@ def main():
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
     app.setStyleSheet(rc.qss_rc)
-
-    # use QFontMetrics to measure / set the width of widgets depending on the
-    # font properties and store it in filter broker
-    myfont = QFont("", 0)
-    fb.QFMetric = QFontMetrics(myfont)
-
 
     mainw = pyFDA()
 
