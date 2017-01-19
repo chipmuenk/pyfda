@@ -48,8 +48,8 @@ QFMetric.xxx = 13
 
 class QFD(QFileDialog):
     """
-    Subclass methods whose names changed between PyQt4 and PyQt5 and provide
-    a common API.
+    Subclass QFileDialog methods whose names changed between PyQt4 and PyQt5 
+    to provide a common API.
     """
     def __init__(self, parent):
         super(QFD, self).__init__(parent)
@@ -74,4 +74,51 @@ class QFD(QFileDialog):
 
 
 
+import sys
+
+class QCustomTableWidget (QTableWidget):
+    def __init__ (self, parent = None):
+        super(QCustomTableWidget, self).__init__(parent)
+        # Setup row & column data
+        listsVerticalHeaderItem = ['Device 1', 'Device 2', 'Device 3', 'Device 4', 'Device 5']
+        self.setRowCount(len(listsVerticalHeaderItem))
+        for index in range(self.rowCount()):
+            self.setVerticalHeaderItem(index, QtGui.QTableWidgetItem(listsVerticalHeaderItem[index]))
+#        listsVerticalHeaderItem = ['Device 1', 'Device 2', 'Device 3', 'Device 4']
+        self.setColumnCount(5)
+        listsHorizontalHeaderItem = ['Option 1', 'Option 2']
+        self.setColumnCount(len(listsHorizontalHeaderItem))
+        for index in range(self.columnCount()):
+            self.setHorizontalHeaderItem(index, QtGui.QTableWidgetItem(listsHorizontalHeaderItem[index]))
+
+    def dataChanged (self, topLeftQModelIndex, bottomRightQModelIndex):
+        row                  = topLeftQModelIndex.row()
+        column               = topLeftQModelIndex.column()
+        dataQTableWidgetItem = self.item(row, column)
+        print('###### Data Changed  ######')
+        print('row    :', row + 1)
+        print('column :', column + 1)
+        print('data   :', dataQTableWidgetItem.text())
+        self.emit(QtCore.SIGNAL('dataChanged'), row, column, dataQTableWidgetItem)
+        QtGui.QTableWidget.dataChanged(self, topLeftQModelIndex, bottomRightQModelIndex)
+
+class QCustomWidget (QtGui.QWidget):
+    def __init__(self, parent = None):
+        super(QCustomWidget, self).__init__(parent)
+        self.myQCustomTableWidget = QCustomTableWidget(self)
+        self.myQLabel = QtGui.QLabel('Track edited data', self)
+        myQVBoxLayout = QtGui.QVBoxLayout()
+        myQVBoxLayout.addWidget(self.myQLabel)
+        myQVBoxLayout.addWidget(self.myQCustomTableWidget)
+        self.setLayout(myQVBoxLayout)
+        self.connect(self.myQCustomTableWidget, QtCore.SIGNAL('dataChanged'), self.setTrackData)
+
+    def setTrackData (self, row, column, dataQTableWidgetItem):
+        self.myQLabel.setText('Last updated\nRow : %d, Column : %d, Data : %s' % (row + 1, column + 1, str(dataQTableWidgetItem.text())))
+
+if __name__ == '__main__':
+    myQApplication = QApplication(sys.argv)
+    myQCustomWidget = QCustomWidget()
+    myQCustomWidget.show()
+    sys.exit(myQApplication.exec_())
 
