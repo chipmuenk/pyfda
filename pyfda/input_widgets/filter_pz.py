@@ -321,10 +321,10 @@ class FilterPZ(QWidget):
                 if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
                     self.Hmax_last = 1.
     
-            if not np.isfinite(self.zpk[2]):
-                self.zpk[2] = 1.
-            self.ledGain.setText(str(self.zpk[2]))
-    
+                if not np.isfinite(self.zpk[2]):
+                    self.zpk[2] = 1.
+                self.ledGain.setText(str(self.zpk[2]))
+        
             self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
     
             logger.debug("load_entries - pz:\n"
