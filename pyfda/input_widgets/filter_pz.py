@@ -304,7 +304,7 @@ class FilterPZ(QWidget):
         (Re-)Create the diplayed table from the shadow table self.zpk with the 
         desired number of digits and in the desired format.
         
-        Called by _store_entriy()
+        Called by _store_entry()
         """
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
@@ -314,10 +314,12 @@ class FilterPZ(QWidget):
         
             if not self.ledGain.hasFocus():
                     # widget has no focus, round the display
-                    self.ledGain.setText(str(params['FMT'].format(fb.fil[0]['zpk'][2])))
+                    print("no focus")
+                    self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
             else:
                     # widget has focus, show full precision
-                    self.ledGain.setText(str(fb.fil[0]['zpk'][2]))
+                    self.ledGain.setText(str(self.zpk[2]))
+                    print("focus")
                     
             if fb.fil[0]['ft'] == 'FIR':
                 self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
