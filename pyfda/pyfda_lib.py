@@ -27,6 +27,8 @@ Created on Mon Apr 30 10:29:42 2012
 
 from __future__ import division, print_function
 import os, sys, six, re
+import logging
+logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, arctan
 
@@ -49,7 +51,8 @@ from pyfda.simpleeval import simple_eval
 def safe_eval(expr):
     try:
         return simple_eval(expr)
-    except SyntaxError:
+    except (SyntaxError, ZeroDivisionError) as e:
+        logger.warn(e)
         return 0.
             
 
