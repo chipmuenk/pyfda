@@ -183,6 +183,7 @@ class FilterPZ(QWidget):
         self.setLayout(layVMain)
         
         self.load_entries() # initialize table with default values from filterbroker
+        self._update_entries()
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
