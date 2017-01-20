@@ -236,21 +236,34 @@ class FilterPZ(QWidget):
                 print(source.objectName(), "focus in")
                 self.spec_edited = False
                 self._update_entries()
+                return True
             elif event.type() == QEvent.KeyPress:
                 print(source.objectName(), "key")
                 self.spec_edited = True # entry has been changed
                 key = event.key() # key press: 6, key release: 7
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}: # store entry
                     self._store_entry(source)
+                    return True
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False                    
                     self._update_entries()
+                    return True
+
             elif event.type() == QEvent.FocusOut: # 9
                 print(source.objectName(), "focus out")
                 self._store_entry(source)
+                return True
+                # 1: Timer event, 10/11: mouse enters/leaves widget, 12: paint,
+                # 24/25: window is activated / deactivated
+                # 110: Tooltip was requested
+#            elif str(source.objectName()) == "tblPZ" and event.type() not in (1, 10, 11, 12, 110):
+#                print(event.type())
+#            else:
         # Call base class method to continue normal event processing:
+ #               return super(FilterPZ, self).eventFilter(source, event)
+#        else:
+#            return super(FilterPZ, self).eventFilter(source, event)
         return super(FilterPZ, self).eventFilter(source, event)
-        
 #------------------------------------------------------------------------------
     def _store_entry(self, source):
         """
