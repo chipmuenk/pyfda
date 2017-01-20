@@ -9,8 +9,8 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QFrame, QFont, QPushButton,
+from ..compat import (QtCore,
+                      QWidget, QLabel, QLineEdit, QFrame, QFont, QToolButton,
                       QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
@@ -54,7 +54,8 @@ class WeightSpecs(QWidget):
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
 
-        self.butReset = QPushButton("Reset", self)
+        self.butReset = QToolButton(self)
+        self.butReset.setText("Reset")
         self.butReset.setToolTip("Reset weights to 1")
                 
         layHTitle = QHBoxLayout()       # Layout for title and reset button
