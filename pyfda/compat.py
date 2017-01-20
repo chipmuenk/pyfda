@@ -9,7 +9,7 @@ try:
                                  QWidget, QComboBox, QLabel, QLineEdit, QFrame,
                                  QPushButton, QCheckBox, QToolButton, QSpinBox, QDial,
                                  QFileDialog, QInputDialog,
-                                 QTableWidget, QTableWidgetItem, QTextBrowser, 
+                                 QTableWidget, QTableWidgetItem, QTextBrowser,
                                  QSizePolicy, QAbstractItemView,
                                  QHBoxLayout, QVBoxLayout, QGridLayout)
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -65,18 +65,18 @@ class QFMetric(object):
 
 class QFD(QFileDialog):
     """
-    Subclass QFileDialog methods whose names changed between PyQt4 and PyQt5 
+    Subclass QFileDialog methods whose names changed between PyQt4 and PyQt5
     to provide a common API.
     """
     def __init__(self, parent):
         super(QFD, self).__init__(parent)
-    
+
     def getOpenFileName_(self, **kwarg):
         if HAS_QT5:
             return self.getOpenFileName(**kwarg)
         else:
             return self.getOpenFileNameAndFilter(**kwarg)
-            
+
     def getOpenFileNames_(self, **kwarg):
         if HAS_QT5:
             return self.getOpenFileNames(**kwarg)
@@ -94,19 +94,19 @@ class QFD(QFileDialog):
 import sys
 
 class QCustomTableWidget (QTableWidget):
+    sigDataChanged = pyqtSignal()
     def __init__ (self, parent = None):
         super(QCustomTableWidget, self).__init__(parent)
         # Setup row & column data
         listsVerticalHeaderItem = ['Device 1', 'Device 2', 'Device 3', 'Device 4', 'Device 5']
         self.setRowCount(len(listsVerticalHeaderItem))
         for index in range(self.rowCount()):
-            self.setVerticalHeaderItem(index, QtGui.QTableWidgetItem(listsVerticalHeaderItem[index]))
+            self.setVerticalHeaderItem(index, QTableWidgetItem(listsVerticalHeaderItem[index]))
 #        listsVerticalHeaderItem = ['Device 1', 'Device 2', 'Device 3', 'Device 4']
-        self.setColumnCount(5)
         listsHorizontalHeaderItem = ['Option 1', 'Option 2']
         self.setColumnCount(len(listsHorizontalHeaderItem))
         for index in range(self.columnCount()):
-            self.setHorizontalHeaderItem(index, QtGui.QTableWidgetItem(listsHorizontalHeaderItem[index]))
+            self.setHorizontalHeaderItem(index, QTableWidgetItem(listsHorizontalHeaderItem[index]))
 
     def dataChanged (self, topLeftQModelIndex, bottomRightQModelIndex):
         row                  = topLeftQModelIndex.row()
@@ -116,19 +116,21 @@ class QCustomTableWidget (QTableWidget):
         print('row    :', row + 1)
         print('column :', column + 1)
         print('data   :', dataQTableWidgetItem.text())
-        self.emit(QtCore.SIGNAL('dataChanged'), row, column, dataQTableWidgetItem)
-        QtGui.QTableWidget.dataChanged(self, topLeftQModelIndex, bottomRightQModelIndex)
+        self.emit(self.sigDataChanged, row, column, dataQTableWidgetItem)
+        QTableWidget.dataChanged(self, topLeftQModelIndex, bottomRightQModelIndex)
 
-class QCustomWidget (QtGui.QWidget):
+class QCustomWidget (QWidget):
     def __init__(self, parent = None):
         super(QCustomWidget, self).__init__(parent)
         self.myQCustomTableWidget = QCustomTableWidget(self)
-        self.myQLabel = QtGui.QLabel('Track edited data', self)
-        myQVBoxLayout = QtGui.QVBoxLayout()
+        self.myQCustomTableWidget.setColumnCount(5)
+        self.myQLabel = QLabel('Track edited data', self)
+        myQVBoxLayout = QVBoxLayout()
         myQVBoxLayout.addWidget(self.myQLabel)
         myQVBoxLayout.addWidget(self.myQCustomTableWidget)
         self.setLayout(myQVBoxLayout)
-        self.connect(self.myQCustomTableWidget, QtCore.SIGNAL('dataChanged'), self.setTrackData)
+#        self.connect(self.myQCustomTableWidget, QtCore.SIGNAL('sigDataChanged'), self.setTrackData)
+        self.myQCustomTableWidget.sigDataChanged.connect(self.setTrackData)
 
     def setTrackData (self, row, column, dataQTableWidgetItem):
         self.myQLabel.setText('Last updated\nRow : %d, Column : %d, Data : %s' % (row + 1, column + 1, str(dataQTableWidgetItem.text())))
@@ -138,4 +140,3 @@ if __name__ == '__main__':
     myQCustomWidget = QCustomWidget()
     myQCustomWidget.show()
     sys.exit(myQApplication.exec_())
-
