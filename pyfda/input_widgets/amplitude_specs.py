@@ -90,6 +90,8 @@ class AmplitudeSpecs(QWidget):
         self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
+        self.qfm = QFMetric(self) # instance for calculating font metrics
+
         self.setLayout(self.layVMain)
         
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits
@@ -164,8 +166,9 @@ class AmplitudeSpecs(QWidget):
         state = new_labels[0]        
         new_labels = new_labels[1:]
 
-        wdg_pix_width  = QFMetric.width("8"*8)# calculate width in pixels
-        wdg_pix_height = QFMetric.height()
+        lbl_pix_width = max([self.qfm.width(l) for l in new_labels])
+        led_pix_width  = self.qfm.W0 * 8 # width of "0" in pixels
+        led_pix_height = self.qfm.H
 
         num_new_labels = len(new_labels)
         if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
@@ -177,10 +180,11 @@ class AmplitudeSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
-
+            self.qlabels[i].setFixedSize(lbl_pix_width, led_pix_height) # set label dimensions
+            
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-            self.qlineedit[i].setFixedSize(wdg_pix_width, wdg_pix_height) # set widget dimensions
+            self.qlineedit[i].setFixedSize(led_pix_width, led_pix_height) # set lineedit dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels

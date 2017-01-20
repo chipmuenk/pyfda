@@ -74,6 +74,8 @@ class FreqSpecs(QWidget):
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
         
+        self.qfm = QFMetric(self) # instance for calculating font metrics
+
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits        
 
         #----------------------------------------------------------------------
@@ -153,15 +155,14 @@ class FreqSpecs(QWidget):
         state = new_labels[0]
         new_labels = new_labels[1:]
             
-        self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
+        self.lblUnit.setText(" in " + rt_label(fb.fil[0]['freq_specs_unit']))
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
 
-        wdg_pix_width  = QFMetric.width("8"*8)# calculate width in pixels
-        wdg_pix_height = QFMetric.height()*1.5
-        print(wdg_pix_height)
-
+        lbl_pix_width = max([self.qfm.width(l) for l in new_labels])
+        led_pix_width  = self.qfm.W0 * 8 # width of "0" in pixels
+        led_pix_height = self.qfm.H
 
         #---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
@@ -170,10 +171,11 @@ class FreqSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
+            self.qlabels[i].setFixedSize(lbl_pix_width, led_pix_height)
+            
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
-
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-            self.qlineedit[i].setFixedSize(wdg_pix_width, wdg_pix_height) # set widget dimensions
+            self.qlineedit[i].setFixedSize(led_pix_width, led_pix_height) # set widget dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
