@@ -483,19 +483,35 @@ class FilterPZ(QWidget):
         - delete the rows starting at the bottom
         If nothing is selected, delete last row.
         """
-        old_rows = self.tblPZ.rowCount()
-        indices = self.tblPZ.selectionModel().selectedIndexes()
-        rows = set()
-        for index in indices:
-            rows.add(index.row()) # collect all selected rows in a set
-        if len(rows) == 0:
-            rows = {old_rows-1}
-        rows = sorted(list(rows), reverse = True)# sort rows in decending order
-        for r in rows:
-            self.tblPZ.removeRow(r)
-
-        self.tblPZ.setRowCount(old_rows - len(rows))
-
+        l = []
+        for _ in self.tblPZ.selectedItems():
+            l.append([_.column(), _.row(), ])
+        l.sort(reverse = True)
+        print(self.zpk)
+        for _ in l:
+            self.zpk = np.delete(self.zpk, _)
+        print(self.zpk)
+#        print(self.tblPZ.selectedItems())
+        # remove last elements of P/Z
+        if not self.tblPZ.selectedItems():
+            # delete last row if nothing is selected
+            if len(self.zpk[0]) > 0:
+                self.zpk[0] = self.zpk[0][:-1]
+            if len(self.zpk[1]) > 0:
+                self.zpk[1] = self.zpk[1][:-1]
+#==============================================================================
+#         rows = set()
+#         for index in indices:
+#             rows.add(index.row()) # collect all selected rows in a set
+#         if len(rows) == 0:
+#             rows = {old_rows-1}
+#         rows = sorted(list(rows), reverse = True)# sort rows in decending order
+#         for r in rows:
+#             self.tblPZ.removeRow(r)
+# 
+#         self.tblPZ.setRowCount(old_rows - len(rows))
+#==============================================================================
+        self._update_entries()
 
 #------------------------------------------------------------------------------
     def _add_rows(self):
