@@ -18,6 +18,7 @@ from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QE
                       QVBoxLayout, QHBoxLayout, QSizePolicy)
 
 import numpy as np
+import numpy.ma as ma
 from scipy.signal import freqz
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -94,10 +95,12 @@ class FilterPZ(QWidget):
         self.tblPZ.setAlternatingRowColors(True) # alternating row colors
 #        self.tblPZ.setDragEnabled(True)
 #        self.tblPZ.setDragDropMode(QAbstractItemView.InternalMove)
+#        self.tblPZ.SelectionMode.
         self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.Expanding)
         self.tblPZ.setObjectName("tblPZ")
         self.tblPZ.installEventFilter(self)
+        
 
         butAddRow = QPushButton(butTexts[0], self)
         butAddRow.setToolTip("Add row to PZ table.\n"
@@ -231,12 +234,12 @@ class FilterPZ(QWidget):
           `spec_edited`== True) and display the stored value in selected format
         """
 
-        if isinstance(source, (QLineEdit, QTableWidget, QTableWidgetItem)): # could be extended for other widgets
-            if event.type() == QEvent.FocusIn: # 8
+        if isinstance(source, (QLineEdit)):#, QTableWidget, QTableWidgetItem)): # could be extended for other widgets
+            if event.type() == QEvent.FocusIn and isinstance(source, QLineEdit): # 8
                 print(source.objectName(), "focus in")
                 self.spec_edited = False
                 self._update_entries()
-                return True
+                return True # event processing stops here
             elif event.type() == QEvent.KeyPress:
                 print(source.objectName(), "key")
                 self.spec_edited = True # entry has been changed
@@ -297,6 +300,45 @@ class FilterPZ(QWidget):
             fb.fil[0]['ft'] = 'FIR'            
         else:
             fb.fil[0]['ft'] = 'IIR'
+
+#------------------------------------------------------------------------------
+    def _update_gain(self):
+        """
+        Recalculate gain and update QLineEdit
+        
+        Called by _store_entry()
+        """
+        self.ledGain.setVisible(self.chkPZList.isChecked())
+        self.lblGain.setVisible(self.chkPZList.isChecked())
+        
+        if self.chkPZList.isChecked():
+        
+            if fb.fil[0]['ft'] == 'FIR':
+                self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
+            else:
+                self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
+
+            #self.zpk = fb.fil[0]['zpk']
+            n_digits = int(self.spnRound.text())
+            
+            if self.chkNorm.isChecked():
+                [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
+                self.Hmax_last = max(abs(H)) # store current max. filter gain
+                if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
+                    self.Hmax_last = 1.
+    
+                if not np.isfinite(self.zpk[2]):
+                    self.zpk[2] = 1.
+                
+            if not self.ledGain.hasFocus():
+                    # widget has no focus, round the display
+                    print("no focus")
+                    self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+            else:
+                    # widget has focus, show full precision
+                    self.ledGain.setText(str(self.zpk[2]))
+                    print("focus")
+
 
 #------------------------------------------------------------------------------
     def _update_entries(self):
@@ -363,6 +405,7 @@ class FilterPZ(QWidget):
                         if not item.isSelected():
                             # widget has no focus, round the display
                             item.setText(str(params['FMT'].format(self.zpk[col][row])))
+                            print("unselected")
                         else:
                             # widget has focus, show full precision
                             item.setText(str(self.zpk[col][row]).strip('()'))
@@ -384,7 +427,7 @@ class FilterPZ(QWidget):
         else:
             self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
 
-        self.zpk = fb.fil[0]['zpk']
+        self.zpk = ma.masked_array(fb.fil[0]['zpk'])
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
@@ -514,7 +557,7 @@ class FilterPZ(QWidget):
         new_rows = len(self.tblPZ.selectionModel().selectedRows()) + old_rows
         self.tblPZ.setRowCount(new_rows)
 
-        if old_rows == new_rows: # nothing selected
+        if len(self.tblPZ.selectionModel().selectedRows()) == 0: # nothing selected
             new_rows = old_rows + 1 # add at least one row
 
         self.tblPZ.setRowCount(new_rows)
@@ -522,9 +565,6 @@ class FilterPZ(QWidget):
         for col in range(2):
             for row in range(old_rows, new_rows):
                 self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
-
-        self.tblPZ.resizeColumnsToContents()
-        self.tblPZ.resizeRowsToContents()
 
 
 #------------------------------------------------------------------------------
