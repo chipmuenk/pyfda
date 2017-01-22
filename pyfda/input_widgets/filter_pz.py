@@ -456,22 +456,13 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _clear_table(self):
         """
-        Clear & initialize table for two poles and zeros @ origin,
+        Clear & initialize table and zpk for two poles and zeros @ origin,
         P = Z = [0; 0], k = 1
         """
-        self.tblPZ.clear()
-        self.tblPZ.setRowCount(2)
-        self.tblPZ.setColumnCount(2)
-        self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
-
+        self.zpk = ma.masked_array([[0, 0], [0, 0], 1])
         self.Hmax_last = 1.0
-        self.ledGain.setText("1.0")
-
-        num_cols = self.tblPZ.columnCount()
-        for row in range(2):
-            for col in range(num_cols):
-                self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
-
+        
+        self._update_entries()
 
 #------------------------------------------------------------------------------
     def _delete_rows(self):
