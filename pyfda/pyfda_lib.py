@@ -1370,22 +1370,3 @@ def HLine(QFrame, widget):
 
 if __name__=='__main__':
     pass
-#    import matplotlib.pyplot as plt
-##    from matplotlib import patches
-#    ax1 = plt.figure(1).add_subplot(111)
-#    print(zplane(b=[1,0,0,1], a = 1, plt_ax = ax1))
-#    ax2 = plt.figure(2).add_subplot(111)
-#    print(zplane(z=1, plt_ax = ax2))
-#    ax3 = plt.figure(3).add_subplot(111)
-#    print(zplane(b=[1,1], plt_ax = ax3))
-#    format_ticks(ax3, 'xy', format="%2.2f", scale = 5)
-#    
-#    ax4 = plt.figure(4).add_subplot(111)
-#    print(zplane(b=[1,0], plt_ax = ax4))
-#    ax5 = plt.figure(5).add_subplot(111)
-#    print(zplane(b=[1,1,1,1,1], plt_ax = ax5))
-#    ax6 = plt.figure(6).add_subplot(111)
-#    print(zplane(b=np.convolve([1,1,1,1,1], [1,1,1,1,1]), a = [1,1], plt_ax = ax6))
-##    ax7 = plt.figure(7).add_subplot(111)
-##    print(zplane(b=1, plt_ax = ax7))
-#    plt.show()
