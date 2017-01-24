@@ -37,10 +37,10 @@ class FilterPZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-    
+
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal()
-    
+
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
 
@@ -57,11 +57,11 @@ class FilterPZ(QWidget):
         longestText = ""
         ButLength = 0
         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero"]
-        
+
         for item in butTexts:
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
-                longestText = item        
+                longestText = item
 
         self.chkPZList = QCheckBox("Show Poles / Zeros", self)
         self.chkPZList.setChecked(True)
@@ -78,12 +78,12 @@ class FilterPZ(QWidget):
         self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
         self.cmbFilterType.addItems(["FIR","IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        
+
         self.chkNorm =  QCheckBox("Normalize", self)
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
 
-        self.lblGain = QLabel("k = ", self)     
+        self.lblGain = QLabel("k = ", self)
         self.ledGain = QLineEdit(self)
         self.ledGain.setToolTip("Specify gain factor k.")
         self.ledGain.setText(str(1.))
@@ -100,24 +100,24 @@ class FilterPZ(QWidget):
                                           QSizePolicy.Expanding)
         self.tblPZ.setObjectName("tblPZ")
         self.tblPZ.installEventFilter(self)
-        
+
 
         butAddRow = QPushButton(butTexts[0], self)
         butAddRow.setToolTip("Add row to PZ table.\n"
                                 "Select n existing rows to append n new rows.")
-        
+
         ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
         butAddRow.setMaximumWidth(ButLength)
 
-        butDelRow = QPushButton(butTexts[1], self)
-        butDelRow.setToolTip("Delete selected row(s) from the table.\n"
-                "Multiple rows can be selected using <SHIFT> or <CTRL>."
+        butDelCell = QPushButton(butTexts[1], self)
+        butDelCell.setToolTip("Delete selected cell(s) from the table.\n"
+                "Multiple cells can be selected using <SHIFT> or <CTRL>."
                 "If nothing is selected, delete last row.")
-        butDelRow.setMaximumWidth(ButLength)
+        butDelCell.setMaximumWidth(ButLength)
 
         butClear = QPushButton(butTexts[4], self)
         butClear.setToolTip("Clear all entries.")
-        butClear.setMaximumWidth(ButLength)              
+        butClear.setMaximumWidth(ButLength)
 
         butSave = QPushButton(butTexts[2], self)
         butSave.setToolTip("Save P/Z & update all plots.\n"
@@ -126,11 +126,11 @@ class FilterPZ(QWidget):
 
         butLoad = QPushButton(butTexts[3], self)
         butLoad.setToolTip("Reload P / Z.")
-        butLoad.setMaximumWidth(ButLength)              
+        butLoad.setMaximumWidth(ButLength)
 
         butSetZero = QPushButton(butTexts[5], self)
         butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
-        butSetZero.setMaximumWidth(ButLength)              
+        butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel("for P, Z <", self)
         self.ledSetEps = QLineEdit(self)
@@ -142,7 +142,7 @@ class FilterPZ(QWidget):
         layHChkBoxes.addWidget(self.chkPZList)
         layHChkBoxes.addStretch(1)
         layHChkBoxes.addWidget(self.cmbFilterType)
-        layHChkBoxes.addStretch(1)        
+        layHChkBoxes.addStretch(1)
         layHChkBoxes.addWidget(lblRound)
         layHChkBoxes.addWidget(self.spnRound)
 
@@ -155,7 +155,7 @@ class FilterPZ(QWidget):
 
         layHButtonsPZs1 = QHBoxLayout()
         layHButtonsPZs1.addWidget(butAddRow)
-        layHButtonsPZs1.addWidget(butDelRow)
+        layHButtonsPZs1.addWidget(butDelCell)
         layHButtonsPZs1.addWidget(butSave)
         layHButtonsPZs1.addWidget(butLoad)
         layHButtonsPZs1.addStretch()
@@ -172,19 +172,19 @@ class FilterPZ(QWidget):
         layVBtns.addLayout(layHGain)
         layVBtns.addLayout(layHButtonsPZs1)
         layVBtns.addLayout(layHButtonsPZs2)
-        
-        # This frame encompasses all the buttons       
+
+        # This frame encompasses all the buttons
         frmMain = QFrame(self)
         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(layVBtns)
 
-        layVMain = QVBoxLayout()        
+        layVMain = QVBoxLayout()
         layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblPZ)
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)
-        
+
         self.load_entries() # initialize table with default values from filterbroker
         self._update_entries()
 
@@ -205,7 +205,7 @@ class FilterPZ(QWidget):
 
         butSave.clicked.connect(self._save_entries)
 
-        butDelRow.clicked.connect(self._delete_rows)
+        butDelCell.clicked.connect(self._delete_cells)
         butAddRow.clicked.connect(self._add_rows)
         butClear.clicked.connect(self._clear_table)
 
@@ -234,12 +234,17 @@ class FilterPZ(QWidget):
           `spec_edited`== True) and display the stored value in selected format
         """
 
-        if isinstance(source, (QLineEdit)):#, QTableWidget, QTableWidgetItem)): # could be extended for other widgets
-            if event.type() == QEvent.FocusIn and isinstance(source, QLineEdit): # 8
+        if isinstance(source, (QLineEdit, QTableWidget)):#, QTableWidgetItem)): # could be extended for other widgets
+            if event.type() == QEvent.FocusIn:  # 8
                 print(source.objectName(), "focus in")
                 self.spec_edited = False
-                self._update_entries()
+                self._update_entry(source)
+#                if isinstance(source, QLineEdit):
+#                    self._update_entry(source)
+#                else:
+#                    self._update_entries()
                 return True # event processing stops here
+
             elif event.type() == QEvent.KeyPress:
                 print(source.objectName(), "key")
                 self.spec_edited = True # entry has been changed
@@ -248,12 +253,13 @@ class FilterPZ(QWidget):
                     self._store_entry(source)
                     return True
                 elif key == QtCore.Qt.Key_Escape: # revert changes
-                    self.spec_edited = False                    
+                    self.spec_edited = False
                     self._update_entries()
                     return True
 
             elif event.type() == QEvent.FocusOut: # 9
                 print(source.objectName(), "focus out")
+                self._update_entry(source)
                 self._store_entry(source)
                 return True
                 # 1: Timer event, 10/11: mouse enters/leaves widget, 12: paint,
@@ -274,220 +280,238 @@ class FilterPZ(QWidget):
         store it in the shadow dict. This is triggered by `QEvent.focusOut`.
         """
         if self.spec_edited:
-            print(str(source.objectName()))
-            if str(source.objectName()) == "ledGain":
+            print("\n_store_entry:", str(source.objectName()))
+            if isinstance(source, QLineEdit):
                 value = safe_eval(source.text())
                 self.zpk[2] = value
-                self.sigFilterDesigned.emit() # -> filter_specs
                 self.spec_edited = False # reset flag
-            elif str(source.objectName()) == "tblPZ":
-                #index = self.tblPZ.currentIndex()
-                #item = self.tblPZ.currentItem()
+            else:
                 row = self.tblPZ.currentRow()
-                column = self.tblPZ.currentColumn()
-                print(column, row)
+                col = self.tblPZ.currentColumn()
+                item = self.tblPZ.item(col, row).text()
+                if item:
+                    if item != "":
+                        self.zpk[col][row] = safe_eval(str(item))# safe_eval(item)
+                else:
+                    self.zpk[col][row] = 0.
 
-        self._update_entries()                
-#        self.load_entries()
+                print("current item:", item)
+
+            self._update_entries()
 
 #------------------------------------------------------------------------------
     def _set_filter_type(self):
         """
         Change between FIR and IIR filter setting
         """
-        
+
         if self.cmbFilterType.currentText() == 'FIR':
-            fb.fil[0]['ft'] = 'FIR'            
+            fb.fil[0]['ft'] = 'FIR'
         else:
             fb.fil[0]['ft'] = 'IIR'
 
+
 #------------------------------------------------------------------------------
-    def _update_gain(self):
+    def _update_entry(self, source = None):
         """
+        (Re-)Create the diplayed table from the shadow table self.zpk with the
+        desired number of digits and in the desired format.
+
         Recalculate gain and update QLineEdit
-        
+
         Called by _store_entry()
         """
-        self.ledGain.setVisible(self.chkPZList.isChecked())
-        self.lblGain.setVisible(self.chkPZList.isChecked())
-        
+        print("\n_update_entry:")
         if self.chkPZList.isChecked():
-        
-            if fb.fil[0]['ft'] == 'FIR':
-                self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
-            else:
-                self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
+            if isinstance(source, QLineEdit) or not source:
 
-            #self.zpk = fb.fil[0]['zpk']
-            n_digits = int(self.spnRound.text())
-            
-            if self.chkNorm.isChecked():
-                [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
-                self.Hmax_last = max(abs(H)) # store current max. filter gain
-                if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
-                    self.Hmax_last = 1.
-    
-                if not np.isfinite(self.zpk[2]):
-                    self.zpk[2] = 1.
-                
-            if not self.ledGain.hasFocus():
-                    # widget has no focus, round the display
-                    print("no focus")
-                    self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
-            else:
-                    # widget has focus, show full precision
-                    self.ledGain.setText(str(self.zpk[2]))
-                    print("focus")
+                self.ledGain.setVisible(self.chkPZList.isChecked())
+                self.lblGain.setVisible(self.chkPZList.isChecked())
+
+                n_digits = int(self.spnRound.text())
+
+                if self.chkNorm.isChecked():
+                    [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
+                    self.Hmax_last = max(abs(H)) # store current max. filter gain
+                    if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
+                        self.Hmax_last = 1.
+
+                    if not np.isfinite(self.zpk[2]):
+                        self.zpk[2] = 1.
+
+                if not self.ledGain.hasFocus():
+                        # widget has no focus, round the display
+                        print("led no focus")
+                        self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+                else:
+                        # widget has focus, show full precision
+                        self.ledGain.setText(str(self.zpk[2]))
+                        print("led focus")
+
+            if isinstance(source, QTableWidget) or not source:
+
+#                sel = self.tblPZ.selectedItems() # list with selected instances
+#                print(sel)
+#                if sel:
+#                    col = sel[0].column()
+#                    row = sel[0].row()
+
+                row = self.tblPZ.currentRow()
+                col = self.tblPZ.currentColumn()
+                cur_idx = self.tblPZ.currentIndex()
+                print("current table item:", col, row)
+                print("current index:", cur_idx.column(),cur_idx.row())
+                print("gc:", self._get_selected(self.tblPZ)['cur'])
+
+
+                item = self.tblPZ.item(row, col)
+                item_w = self.tblPZ.currentItem()
+                # copy content of self.zpk to corresponding table field, rounding
+                # as specified and removing the brackets of complex arguments
+                if item: # does item exist?
+                    if not item.isSelected():
+#                        # widget has no focus, round the display
+#                        print("item not selected:", col, row)
+#                        print(item_w.isSelected())
+#                        item.setText(str(params['FMT'].format(self.zpk[col][row])))
+#                    else:
+#                        # widget has focus, show full precision
+                        item.setText(str(self.zpk[col][row]).strip('()'))
+                        print("item selected:", col, row)
+                else: # no, construct it:
+                    self.tblPZ.setItem(row,col,QTableWidgetItem(
+                          str(self.zpk[col][row]).strip('()')))
+
+
 
 
 #------------------------------------------------------------------------------
     def _update_entries(self):
         """
-        (Re-)Create the diplayed table from the shadow table self.zpk with the 
-        desired number of digits and in the desired format.
-        
-        Called by _store_entry()
+        (Re-)Create the diplayed table from the shadow table self.zpk with the
+        desired number of digits and in the desired format - all entries are
+        assumed to be unselected.
+
+        Called by _store_entry() and eventFilter
         """
+        print("\n_update_entries:")
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
         self.tblPZ.setVisible(self.chkPZList.isChecked())
-        
+
         if self.chkPZList.isChecked():
-        
-            if not self.ledGain.hasFocus():
-                    # widget has no focus, round the display
-                    print("no focus")
-                    self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
-            else:
-                    # widget has focus, show full precision
-                    self.ledGain.setText(str(self.zpk[2]))
-                    print("focus")
-                    
+
             if fb.fil[0]['ft'] == 'FIR':
                 self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
             else:
                 self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
 
-            #self.zpk = fb.fil[0]['zpk']
             n_digits = int(self.spnRound.text())
-    
-            self.tblPZ.setVisible(self.chkPZList.isChecked())
-            
-            if self.chkNorm.isChecked():
-                [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
-                self.Hmax_last = max(abs(H)) # store current max. filter gain
-                if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
-                    self.Hmax_last = 1.
-    
-                if not np.isfinite(self.zpk[2]):
-                    self.zpk[2] = 1.
-                self.ledGain.setText(str(self.zpk[2]))
-        
+
+            self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+
             self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
-    
-            logger.debug("load_entries - pz:\n"
+
+            logger.debug("_update_entries - pz:\n"
                 "Shape = %s\n"
                 "Len   = %d\n"
                 "NDim  = %d\n\n"
                 "ZPK = %s"
                 %(np.shape(self.zpk),len(self.zpk), np.ndim(self.zpk), pformat(self.zpk))
                   )
-    
+
             self.tblPZ.setColumnCount(2)
             self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
             for col in range(2):
                 for row in range(len(self.zpk[col])):
                     logger.debug("Len Row = %d" %len(self.zpk[col]))
                     item = self.tblPZ.item(row, col)
-                    # copy content of self.zpk to corresponding table field, rounding 
+                    # copy content of self.zpk to corresponding table field, formatting
                     # as specified and removing the brackets of complex arguments
                     if item: # does item exist?
-                        if not item.isSelected():
-                            # widget has no focus, round the display
-                            item.setText(str(params['FMT'].format(self.zpk[col][row])))
-                            print("unselected")
-                        else:
-                            # widget has focus, show full precision
-                            item.setText(str(self.zpk[col][row]).strip('()'))
+                        item.setText(str(params['FMT'].format(self.zpk[col][row]))) # .strip('()'))
                     else: # no, construct it:
                         self.tblPZ.setItem(row,col,QTableWidgetItem(
                               str(self.zpk[col][row]).strip('()')))
-    
+
             self.tblPZ.resizeColumnsToContents()
             self.tblPZ.resizeRowsToContents()
 
 #------------------------------------------------------------------------------
     def load_entries(self):
         """
-        Load all entries from filter dict fb.fil[0]['zpk'] into the shadow 
-        register self.zpk.
-        """        
+        Load all entries from filter dict fb.fil[0]['zpk'] into the shadow
+        register self.zpk and update the display.
+        """
+        print("\nload_entries:")
         if fb.fil[0]['ft'] == 'FIR':
             self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
         else:
             self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
 
-        self.zpk = ma.masked_array(fb.fil[0]['zpk'])
+        self.zpk = fb.fil[0]['zpk']
+        self._update_entries()
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
         """
         Save the values from the shadow dict to the filter PZ dict
         """
-            
+
         logger.debug("=====================\nInputPZ._save_entries called")
-            
-        self.zpk = [] 
-        
-        num_rows = self.tblPZ.rowCount()
-        logger.debug("nrows = %d" %num_rows)
 
-        #iterate over both columns
-        for col in range(2):
-            rows = []
-            for row in range(num_rows):
-                item = self.tblPZ.item(row, col)
-                if item:
-                    if item.text() != "":
-                        rows.append(safe_eval(item.text()))
-                else:
-                    rows.append(0.)
-
-            self.zpk.append(rows)
-
-        self.zpk.append(safe_eval(self.ledGain.text())) # append k factor to self.zpk
-
-        fb.fil[0]['N'] = num_rows
-     
-        if np.any(self.zpk[1]):
-            fb.fil[0]['ft'] = 'IIR'
-            fb.fil[0]['fc'] = 'Manual_IIR'
-            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
-        else:
-            fb.fil[0]['ft'] = 'FIR'
-            fb.fil[0]['fc'] = 'Manual_FIR'
-            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
-
-        fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save & convert to 'ba'
-
-        if self.chkNorm.isChecked():
-            # set gain factor k (self.zpk[2]) in such a way that the max. filter 
-            # gain remains unchanged
-            # TODO: Comparison against Hmax is not robust, need to find another anchor
-            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
-            Hmax = max(abs(H))
-            if not np.isfinite(Hmax) or Hmax > 1e4:
-                Hmax = 1.
-            self.zpk[2] = self.zpk[2] * self.Hmax_last / max(abs(H))
-            fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save with new gain
+        fb.fil[0]['N'] = max(len(self.zpk[0]), len(self.zpk[1]))
+#        self.zpk = []
+#
+#        num_rows = self.tblPZ.rowCount()
+#        logger.debug("nrows = %d" %num_rows)
+#
+#        #iterate over both columns
+#        for col in range(2):
+#            rows = []
+#            for row in range(num_rows):
+#                item = self.tblPZ.item(row, col)
+#                if item:
+#                    if item.text() != "":
+#                        rows.append(safe_eval(item.text()))
+#                else:
+#                    rows.append(0.)
+#
+#            self.zpk.append(rows)
+#
+#        self.zpk.append(safe_eval(self.ledGain.text())) # append k factor to self.zpk
+#
+#        fb.fil[0]['N'] = num_rows
+#
+#        if np.any(self.zpk[1]):
+#            fb.fil[0]['ft'] = 'IIR'
+#            fb.fil[0]['fc'] = 'Manual_IIR'
+#            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+#        else:
+#            fb.fil[0]['ft'] = 'FIR'
+#            fb.fil[0]['fc'] = 'Manual_FIR'
+#            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+#
+#        fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save & convert to 'ba'
+#
+#        if self.chkNorm.isChecked():
+#            # set gain factor k (self.zpk[2]) in such a way that the max. filter
+#            # gain remains unchanged
+#            # TODO: Comparison against Hmax is not robust, need to find another anchor
+#            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
+#            Hmax = max(abs(H))
+#            if not np.isfinite(Hmax) or Hmax > 1e4:
+#                Hmax = 1.
+#            self.zpk[2] = self.zpk[2] * self.Hmax_last / max(abs(H))
+        fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save with new gain
 
         if __name__ == '__main__':
             self.load_entries() # only needed for stand-alone test
-         
-        self.sigFilterDesigned.emit()
+
+        self.sigFilterDesigned.emit() # -> filter_specs
         self.sigSpecsChanged.emit()
         # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
-        # TODO: this also needs to trigger filter_specs.updateUI to switch to 
+        # TODO: this also needs to trigger filter_specs.updateUI to switch to
         #       manual design when saving P/Z
 
         logger.debug("_save_entries - coeffients / zpk updated:\n"
@@ -502,49 +526,64 @@ class FilterPZ(QWidget):
         Clear & initialize table and zpk for two poles and zeros @ origin,
         P = Z = [0; 0], k = 1
         """
-        self.zpk = ma.masked_array([[0, 0], [0, 0], 1])
+        self.zpk = np.array([[0, 0], [0, 0], 1])
         self.Hmax_last = 1.0
-        
+
         self._update_entries()
 
 #------------------------------------------------------------------------------
-    def _delete_rows(self):
+    def _get_selected(self, table):
         """
-        Delete all selected rows by:
-        - reading the indices of all selected cells
-        - collecting the row numbers in a set (only unique elements)
-        - sort the elements in a list in descending order
-        - delete the rows starting at the bottom
-        If nothing is selected, delete last row.
+        get selected cells and return:
+        - indices of selected cells
+        - selected colums
+        - selected rows
+        - current cell
         """
-        l = []
-        for _ in self.tblPZ.selectedItems():
-            l.append([_.column(), _.row(), ])
-        l.sort(reverse = True)
-        print(self.zpk)
-        for _ in l:
-            self.zpk = np.delete(self.zpk, _)
-        print(self.zpk)
-#        print(self.tblPZ.selectedItems())
-        # remove last elements of P/Z
-        if not self.tblPZ.selectedItems():
-            # delete last row if nothing is selected
-            if len(self.zpk[0]) > 0:
-                self.zpk[0] = self.zpk[0][:-1]
-            if len(self.zpk[1]) > 0:
-                self.zpk[1] = self.zpk[1][:-1]
-#==============================================================================
-#         rows = set()
-#         for index in indices:
-#             rows.add(index.row()) # collect all selected rows in a set
-#         if len(rows) == 0:
-#             rows = {old_rows-1}
-#         rows = sorted(list(rows), reverse = True)# sort rows in decending order
-#         for r in rows:
-#             self.tblPZ.removeRow(r)
-# 
-#         self.tblPZ.setRowCount(old_rows - len(rows))
-#==============================================================================
+        print("get_selected")
+        idx = []
+        for _ in table.selectedItems():
+            idx.append([_.column(), _.row(), ])
+        cols = sorted(list({i[0] for i in idx}))
+        rows = sorted(list({i[1] for i in idx}))
+        cur = (table.currentColumn(), table.currentRow())
+
+
+        cur_idx = table.currentIndex()
+        cur_itm = table.currentItem()
+        print("cur_index: ", cur_idx.column(), cur_idx.row())
+        print("cur_item:", cur_itm.isSelected())
+        print("cur_r_c:", cur)
+
+
+        return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
+
+
+#------------------------------------------------------------------------------
+    def _delete_cells(self):
+        """
+        Delete all selected elements by:
+        - determining the indices of all selected cells in the P and Z arrays
+        - deleting elements with those indices
+        - equalizing the lengths of P and Z array by appending the required
+          number of zeros.
+        """
+        sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
+        Z = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
+        P = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
+
+        # Delete array entries with selected indices. If Z or P are empty,
+        # arrays remain unchanged.
+        self.zpk[0] = np.delete(self.zpk[0], Z)
+        self.zpk[1] = np.delete(self.zpk[1], P)
+
+        # test and correct if P and Z array have different lengths:
+        D = len(self.zpk[0]) - len(self.zpk[1])
+        if D > 0:
+            self.zpk[1] = np.append(self.zpk[1], np.zeros(D))
+        elif D < 0:
+            self.zpk[0] = np.append(self.zpk[0], np.zeros(-D))
+
         self._update_entries()
 
 #------------------------------------------------------------------------------
@@ -553,19 +592,26 @@ class FilterPZ(QWidget):
         Add the number of selected rows to the table and fill new cells with
         zeros. If nothing is selected, add one row.
         """
-        old_rows = self.tblPZ.rowCount()
-        new_rows = len(self.tblPZ.selectionModel().selectedRows()) + old_rows
-        self.tblPZ.setRowCount(new_rows)
+        print("\n_add_rows:")
+        print(self.tblPZ.selectionModel().selectedRows(), "\n", self.tblPZ.currentRow())
+        sel = len(self.tblPZ.selectionModel().selectedRows())
+        row = self.tblPZ.currentRow()
+        print(self._get_selected(self.tblPZ))
+        print(sel, row)
 
-        if len(self.tblPZ.selectionModel().selectedRows()) == 0: # nothing selected
-            new_rows = old_rows + 1 # add at least one row
+        if sel == 0: # nothing selected
+            sel = 1 # add at least one row
+            row = min(len(self.zpk[0]), len(self.zpk[1]))
 
-        self.tblPZ.setRowCount(new_rows)
+        self.zpk[0] = np.insert(self.zpk[0], row, 0)
+        self.zpk[1] = np.insert(self.zpk[1], row, 0)
 
-        for col in range(2):
-            for row in range(old_rows, new_rows):
-                self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
-
+#        self.tblPZ.setRowCount(new_rows)
+#
+#        for col in range(2):
+#            for row in range(old_rows, new_rows):
+#                self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
+        self._update_entries()
 
 #------------------------------------------------------------------------------
     def _zero_PZ(self):
@@ -592,7 +638,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainw = FilterPZ(None)
 
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
 
     sys.exit(app.exec_())
