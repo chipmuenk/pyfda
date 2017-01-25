@@ -25,7 +25,6 @@ import pyfda.filterbroker as fb # importing filterbroker initializes all its glo
 from pyfda.pyfda_lib import fil_save, safe_eval
 from pyfda.pyfda_rc import params
 
-# TODO: delete / insert individual cells instead of rows
 # TODO: correct scaling after insertion / deletion of cells
 # TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end
@@ -111,8 +110,7 @@ class FilterPZ(QWidget):
 
         butDelCell = QPushButton(butTexts[1], self)
         butDelCell.setToolTip("Delete selected cell(s) from the table.\n"
-                "Multiple cells can be selected using <SHIFT> or <CTRL>."
-                "If nothing is selected, delete last row.")
+                "Multiple cells can be selected using <SHIFT> or <CTRL>.")
         butDelCell.setMaximumWidth(ButLength)
 
         butClear = QPushButton(butTexts[4], self)
@@ -132,7 +130,7 @@ class FilterPZ(QWidget):
         butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
         butSetZero.setMaximumWidth(ButLength)
 
-        self.lblEps = QLabel("for P, Z <", self)
+        self.lblEps = QLabel("for eps <", self)
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
@@ -461,48 +459,7 @@ class FilterPZ(QWidget):
         logger.debug("=====================\nInputPZ._save_entries called")
 
         fb.fil[0]['N'] = max(len(self.zpk[0]), len(self.zpk[1]))
-#        self.zpk = []
-#
-#        num_rows = self.tblPZ.rowCount()
-#        logger.debug("nrows = %d" %num_rows)
-#
-#        #iterate over both columns
-#        for col in range(2):
-#            rows = []
-#            for row in range(num_rows):
-#                item = self.tblPZ.item(row, col)
-#                if item:
-#                    if item.text() != "":
-#                        rows.append(safe_eval(item.text()))
-#                else:
-#                    rows.append(0.)
-#
-#            self.zpk.append(rows)
-#
-#        self.zpk.append(safe_eval(self.ledGain.text())) # append k factor to self.zpk
-#
-#        fb.fil[0]['N'] = num_rows
-#
-#        if np.any(self.zpk[1]):
-#            fb.fil[0]['ft'] = 'IIR'
-#            fb.fil[0]['fc'] = 'Manual_IIR'
-#            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
-#        else:
-#            fb.fil[0]['ft'] = 'FIR'
-#            fb.fil[0]['fc'] = 'Manual_FIR'
-#            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
-#
-#        fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save & convert to 'ba'
-#
-#        if self.chkNorm.isChecked():
-#            # set gain factor k (self.zpk[2]) in such a way that the max. filter
-#            # gain remains unchanged
-#            # TODO: Comparison against Hmax is not robust, need to find another anchor
-#            [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
-#            Hmax = max(abs(H))
-#            if not np.isfinite(Hmax) or Hmax > 1e4:
-#                Hmax = 1.
-#            self.zpk[2] = self.zpk[2] * self.Hmax_last / max(abs(H))
+
         fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save with new gain
 
         if __name__ == '__main__':
