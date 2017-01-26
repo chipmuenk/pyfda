@@ -34,7 +34,7 @@ from pyfda.pyfda_rc import params
 
 class ItemDelegate(QStyledItemDelegate):
     def displayText(self, text, locale):
-        return "{:.3g}".format(float(text))
+        return "{:.3g}".format(safe_eval(text))
 
 class FilterPZ(QWidget):
     """
@@ -102,7 +102,7 @@ class FilterPZ(QWidget):
         self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.Expanding)
         self.tblPZ.setObjectName("tblPZ")
-        self.myTable.setItemDelegate(ItemDelegate(self))
+        self.tblPZ.setItemDelegate(ItemDelegate(self))
 #        self.tblPZ.installEventFilter(self)
 
 
@@ -237,7 +237,7 @@ class FilterPZ(QWidget):
           `spec_edited`== True) and display the stored value in selected format
         """
 
-        if isinstance(source, (QLineEdit, QTableWidget)):#, QTableWidgetItem)): # could be extended for other widgets
+        if isinstance(source, QLineEdit):#, QTableWidgetItem)): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:  # 8
                 print(source.objectName(), "focus in")
                 self.spec_edited = False
