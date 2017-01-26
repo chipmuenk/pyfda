@@ -94,13 +94,13 @@ class FilterPZ(QWidget):
         self.ledGain.installEventFilter(self)
 
         self.tblPZ = QTableWidget(self)
-        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
+#        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
         self.tblPZ.setAlternatingRowColors(True) # alternating row colors
 #        self.tblPZ.setDragEnabled(True)
 #        self.tblPZ.setDragDropMode(QAbstractItemView.InternalMove)
 #        self.tblPZ.SelectionMode.
-        self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                          QSizePolicy.Expanding)
+#        self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
+#                                          QSizePolicy.Expanding)
         self.tblPZ.setObjectName("tblPZ")
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 #        self.tblPZ.installEventFilter(self)
