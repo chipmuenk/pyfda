@@ -31,10 +31,13 @@ from pyfda.pyfda_rc import params
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: order P/Z depending on frequency or magnitude
 # TODO: display SOS graphically
+n_digits = 4
 
 class ItemDelegate(QStyledItemDelegate):
     def displayText(self, text, locale):
-        return "{:.3g}".format(safe_eval(text))
+        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = FilterPZ.n_digits)
+    
+    
 
 class FilterPZ(QWidget):
     """
@@ -43,6 +46,7 @@ class FilterPZ(QWidget):
 
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal()
+    n_digits = 5
 
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
@@ -73,8 +77,8 @@ class FilterPZ(QWidget):
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
-        self.spnRound.setValue(0)
-        self.spnRound.setToolTip("Round to d digits.")
+        self.spnRound.setValue(n_digits)
+        self.spnRound.setToolTip("Display d digits.")
 
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
@@ -86,7 +90,7 @@ class FilterPZ(QWidget):
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
 
-        self.lblGain = QLabel("k = ", self)
+        self.lblGain = QLabel("<i>k</i> = ", self)
         self.ledGain = QLineEdit(self)
         self.ledGain.setToolTip("Specify gain factor k.")
         self.ledGain.setText(str(1.))
@@ -96,15 +100,10 @@ class FilterPZ(QWidget):
         self.tblPZ = QTableWidget(self)
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
         self.tblPZ.setAlternatingRowColors(True) # alternating row colors
-#        self.tblPZ.setDragEnabled(True)
-#        self.tblPZ.setDragDropMode(QAbstractItemView.InternalMove)
-#        self.tblPZ.SelectionMode.
 #        self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
 #                                          QSizePolicy.Expanding)
         self.tblPZ.setObjectName("tblPZ")
         self.tblPZ.setItemDelegate(ItemDelegate(self))
-#        self.tblPZ.installEventFilter(self)
-
 
         butAddRow = QPushButton(butTexts[0], self)
         butAddRow.setToolTip("Add row to PZ table.\n"
@@ -135,7 +134,7 @@ class FilterPZ(QWidget):
         butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
         butSetZero.setMaximumWidth(ButLength)
 
-        self.lblEps = QLabel("for eps <", self)
+        self.lblEps = QLabel("for &Epsilon; <", self)
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
@@ -194,13 +193,6 @@ class FilterPZ(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-#        self.tblPZ.itemEntered.connect(self.saveZPK) # nothing happens
-#        self.tblPZ.itemActivated.connect(self.saveZPK) # nothing happens
-#        self.tblPZ.itemChanged.connect(self.saveZPK) # works but fires multiple times
-#        self.tblPZ.selectionModel().currentChanged.connect(self.saveZPK)
-#        self.tblPZ.clicked.connect(self.saveZPK)
-#        self.ledGain.editingFinished.connect(self.saveZPK)
-
         self.spnRound.editingFinished.connect(self.load_entries)
         self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
         butLoad.clicked.connect(self.load_entries)
@@ -237,15 +229,11 @@ class FilterPZ(QWidget):
           `spec_edited`== True) and display the stored value in selected format
         """
 
-        if isinstance(source, QLineEdit):#, QTableWidgetItem)): # could be extended for other widgets
+        if isinstance(source, QLineEdit):
             if event.type() == QEvent.FocusIn:  # 8
                 print(source.objectName(), "focus in")
                 self.spec_edited = False
                 self._update_entry(source)
-#                if isinstance(source, QLineEdit):
-#                    self._update_entry(source)
-#                else:
-#                    self._update_entries()
                 return True # event processing stops here
 
             elif event.type() == QEvent.KeyPress:
@@ -265,16 +253,6 @@ class FilterPZ(QWidget):
                 self._update_entry(source)
                 self._store_entry(source)
                 return True
-                # 1: Timer event, 10/11: mouse enters/leaves widget, 12: paint,
-                # 24/25: window is activated / deactivated
-                # 110: Tooltip was requested
-#            elif str(source.objectName()) == "tblPZ" and event.type() not in (1, 10, 11, 12, 110):
-#                print(event.type())
-#            else:
-        # Call base class method to continue normal event processing:
- #               return super(FilterPZ, self).eventFilter(source, event)
-#        else:
-#            return super(FilterPZ, self).eventFilter(source, event)
         return super(FilterPZ, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
     def _store_entry(self, source):
@@ -288,17 +266,6 @@ class FilterPZ(QWidget):
                 value = safe_eval(source.text())
                 self.zpk[2] = value
                 self.spec_edited = False # reset flag
-            else:
-                row = self.tblPZ.currentRow()
-                col = self.tblPZ.currentColumn()
-                item = self.tblPZ.item(col, row).text()
-                if item:
-                    if item != "":
-                        self.zpk[col][row] = safe_eval(str(item))# safe_eval(item)
-                else:
-                    self.zpk[col][row] = 0.
-
-                print("current item:", item)
 
             self._update_entries()
 
@@ -325,13 +292,15 @@ class FilterPZ(QWidget):
         Called by _store_entry()
         """
         print("\n_update_entry:")
+        
+        FilterPZ.n_digits = int(self.spnRound.text())
+        
         if self.chkPZList.isChecked():
             if isinstance(source, QLineEdit) or not source:
 
                 self.ledGain.setVisible(self.chkPZList.isChecked())
                 self.lblGain.setVisible(self.chkPZList.isChecked())
 
-                n_digits = int(self.spnRound.text())
 
                 if self.chkNorm.isChecked():
                     [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
@@ -351,53 +320,19 @@ class FilterPZ(QWidget):
                         self.ledGain.setText(str(self.zpk[2]))
                         print("led focus")
 
-            if isinstance(source, QTableWidget) or not source:
-
-#                sel = self.tblPZ.selectedItems() # list with selected instances
-#                print(sel)
-#                if sel:
-#                    col = sel[0].column()
-#                    row = sel[0].row()
-
-                row = self.tblPZ.currentRow()
-                col = self.tblPZ.currentColumn()
-                cur_idx = self.tblPZ.currentIndex()
-                print("current table item:", col, row)
-                print("current index:", cur_idx.column(),cur_idx.row())
-                print("gc:", self._get_selected(self.tblPZ)['cur'])
-
-
-                item = self.tblPZ.item(row, col)
-                item_w = self.tblPZ.currentItem()
-                # copy content of self.zpk to corresponding table field, rounding
-                # as specified and removing the brackets of complex arguments
-                if item: # does item exist?
-                    if not item.isSelected():
-#                        # widget has no focus, round the display
-#                        print("item not selected:", col, row)
-#                        print(item_w.isSelected())
-#                        item.setText(str(params['FMT'].format(self.zpk[col][row])))
-#                    else:
-#                        # widget has focus, show full precision
-                        item.setText(str(self.zpk[col][row]).strip('()'))
-                        print("item selected:", col, row)
-                else: # no, construct it:
-                    self.tblPZ.setItem(row,col,QTableWidgetItem(
-                          str(self.zpk[col][row]).strip('()')))
-
-
-
 
 #------------------------------------------------------------------------------
     def _update_entries(self):
         """
         (Re-)Create the diplayed table from the shadow table self.zpk with the
-        desired number of digits and in the desired format - all entries are
-        assumed to be unselected.
+        desired number of digits and in the desired format.
 
         Called by _store_entry() and eventFilter
         """
         print("\n_update_entries:")
+
+        self.n_digits = int(self.spnRound.text())
+        
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
         self.tblPZ.setVisible(self.chkPZList.isChecked())
@@ -408,8 +343,6 @@ class FilterPZ(QWidget):
                 self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
             else:
                 self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
-
-            n_digits = int(self.spnRound.text())
 
             self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
 
@@ -428,11 +361,11 @@ class FilterPZ(QWidget):
             for col in range(2):
                 for row in range(len(self.zpk[col])):
                     logger.debug("Len Row = %d" %len(self.zpk[col]))
+
+                    # set table item from self.zpk and strip '()' of complex numbers
                     item = self.tblPZ.item(row, col)
-                    # copy content of self.zpk to corresponding table field, formatting
-                    # as specified and removing the brackets of complex arguments
                     if item: # does item exist?
-                        item.setText(str(params['FMT'].format(self.zpk[col][row]))) # .strip('()'))
+                        item.setText(str(self.zpk[col][row]).strip('()'))             
                     else: # no, construct it:
                         self.tblPZ.setItem(row,col,QTableWidgetItem(
                               str(self.zpk[col][row]).strip('()')))
@@ -462,8 +395,25 @@ class FilterPZ(QWidget):
         """
 
         logger.debug("=====================\nInputPZ._save_entries called")
+        
+        self.zpk = []
+        num_rows, num_cols = self.tblPZ.rowCount(), self.tblPZ.columnCount()
+                       
+        for col in range(num_cols):
+            rows = []
+            for row in range(num_rows):
+                item = self.tblPZ.item(row, col)
+                if item:
+                    if item.text() != "":
+                        rows.append(safe_eval(item.text()))
+                else:
+                    rows.append(0.)
 
-        fb.fil[0]['N'] = max(len(self.zpk[0]), len(self.zpk[1]))
+            self.zpk.append(rows) # type: list num_cols x num_rows
+            
+        self.zpk.append(safe_eval(self.ledGain.text())) # zpk[2] = gain
+        
+        fb.fil[0]['N'] = num_rows
 
         fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save with new gain
 
@@ -512,11 +462,8 @@ class FilterPZ(QWidget):
 
 
         cur_idx = table.currentIndex()
-        cur_itm = table.currentItem()
         print("cur_index: ", cur_idx.column(), cur_idx.row())
-        print("cur_item:", cur_itm.isSelected())
         print("cur_r_c:", cur)
-
 
         return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
 
