@@ -31,7 +31,6 @@ from pyfda.pyfda_rc import params
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: order P/Z depending on frequency or magnitude
 # TODO: display SOS graphically
-n_digits = 4
 
 class ItemDelegate(QStyledItemDelegate):
     def displayText(self, text, locale):
@@ -46,7 +45,7 @@ class FilterPZ(QWidget):
 
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal()
-    n_digits = 5
+    n_digits = 3 # initial setting for number of displayed digits
 
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
@@ -77,7 +76,7 @@ class FilterPZ(QWidget):
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
-        self.spnRound.setValue(n_digits)
+        self.spnRound.setValue(FilterPZ.n_digits)
         self.spnRound.setToolTip("Display d digits.")
 
         self.cmbFilterType = QComboBox(self)
@@ -293,7 +292,6 @@ class FilterPZ(QWidget):
         """
         print("\n_update_entry:")
         
-        FilterPZ.n_digits = int(self.spnRound.text())
         
         if self.chkPZList.isChecked():
             if isinstance(source, QLineEdit) or not source:
@@ -331,7 +329,7 @@ class FilterPZ(QWidget):
         """
         print("\n_update_entries:")
 
-        self.n_digits = int(self.spnRound.text())
+        FilterPZ.n_digits = int(self.spnRound.text())
         
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
