@@ -49,9 +49,10 @@ from pyfda.simpleeval import simple_eval
 #### General functions ########################################################
 
 def safe_eval(expr):
+    _ = expr
     try:
         return simple_eval(expr)
-    except (SyntaxError, ZeroDivisionError) as e:
+    except (SyntaxError, ZeroDivisionError, IndexError) as e:
         logger.warn(e)
         return 0.
             
