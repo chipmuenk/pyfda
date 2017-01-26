@@ -368,6 +368,7 @@ class FilterPZ(QWidget):
 
             self.tblPZ.resizeColumnsToContents()
             self.tblPZ.resizeRowsToContents()
+            self.tblPZ.clearSelection()
 
 #------------------------------------------------------------------------------
     def load_entries(self):
