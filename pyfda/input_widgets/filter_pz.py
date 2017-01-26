@@ -25,8 +25,7 @@ from pyfda.pyfda_lib import fil_save, safe_eval, rt_label
 from pyfda.pyfda_rc import params
 
 # TODO: correct scaling after insertion / deletion of cells
-# TODO: insert row above currently selected row instead of appending at the end
-# TODO: eliminate trailing zeros for filter order calculation
+# TODO: eliminate trailing zeros and pole / zero pairs for filter order calculation
 # TODO: order P/Z depending on frequency or magnitude
 # TODO: display SOS graphically
 
