@@ -13,16 +13,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
-                      QCheckBox, QPushButton, QSpinBox, QComboBox,
-                      QTableWidget, QTableWidgetItem, QAbstractItemView,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy, QStyledItemDelegate)
+                      QCheckBox, QPushButton, QSpinBox, QComboBox, Qt,
+                      QTableWidget, QTableWidgetItem,
+                      QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
 
 import numpy as np
 import numpy.ma as ma
 from scipy.signal import freqz
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval
+from pyfda.pyfda_lib import fil_save, safe_eval, rt_label
 from pyfda.pyfda_rc import params
 
 # TODO: correct scaling after insertion / deletion of cells
@@ -89,7 +89,7 @@ class FilterPZ(QWidget):
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
 
-        self.lblGain = QLabel("<i>k</i> = ", self)
+        self.lblGain = QLabel(rt_label("k = "), self)
         self.ledGain = QLineEdit(self)
         self.ledGain.setToolTip("Specify gain factor k.")
         self.ledGain.setText(str(1.))
@@ -133,7 +133,8 @@ class FilterPZ(QWidget):
         butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
         butSetZero.setMaximumWidth(ButLength)
 
-        self.lblEps = QLabel("for &Epsilon; <", self)
+        self.lblEps = QLabel("for " + rt_label("&epsilon; &lt;"), self)
+#        self.lblEps.setTextFormat(Qt.RichText)
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
