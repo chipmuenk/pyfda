@@ -92,53 +92,5 @@ class QFD(QFileDialog):
             return self.getSaveFileNameAndFilter(**kwarg)
 
 
-
-import sys
-
-class QCustomTableWidget (QTableWidget):
-    sigDataChanged = pyqtSignal()
-    def __init__ (self, parent = None):
-        super(QCustomTableWidget, self).__init__(parent)
-        # Setup row & column data
-        listsVerticalHeaderItem = ['Device 1', 'Device 2', 'Device 3', 'Device 4', 'Device 5']
-        self.setRowCount(len(listsVerticalHeaderItem))
-        for index in range(self.rowCount()):
-            self.setVerticalHeaderItem(index, QTableWidgetItem(listsVerticalHeaderItem[index]))
-#        listsVerticalHeaderItem = ['Device 1', 'Device 2', 'Device 3', 'Device 4']
-        listsHorizontalHeaderItem = ['Option 1', 'Option 2']
-        self.setColumnCount(len(listsHorizontalHeaderItem))
-        for index in range(self.columnCount()):
-            self.setHorizontalHeaderItem(index, QTableWidgetItem(listsHorizontalHeaderItem[index]))
-
-    def dataChanged (self, topLeftQModelIndex, bottomRightQModelIndex):
-        row                  = topLeftQModelIndex.row()
-        column               = topLeftQModelIndex.column()
-        dataQTableWidgetItem = self.item(row, column)
-        print('###### Data Changed  ######')
-        print('row    :', row + 1)
-        print('column :', column + 1)
-        print('data   :', dataQTableWidgetItem.text())
-        self.emit(self.sigDataChanged, row, column, dataQTableWidgetItem)
-        QTableWidget.dataChanged(self, topLeftQModelIndex, bottomRightQModelIndex)
-
-class QCustomWidget (QWidget):
-    def __init__(self, parent = None):
-        super(QCustomWidget, self).__init__(parent)
-        self.myQCustomTableWidget = QCustomTableWidget(self)
-        self.myQCustomTableWidget.setColumnCount(5)
-        self.myQLabel = QLabel('Track edited data', self)
-        myQVBoxLayout = QVBoxLayout()
-        myQVBoxLayout.addWidget(self.myQLabel)
-        myQVBoxLayout.addWidget(self.myQCustomTableWidget)
-        self.setLayout(myQVBoxLayout)
-#        self.connect(self.myQCustomTableWidget, QtCore.SIGNAL('sigDataChanged'), self.setTrackData)
-        self.myQCustomTableWidget.sigDataChanged.connect(self.setTrackData)
-
-    def setTrackData (self, row, column, dataQTableWidgetItem):
-        self.myQLabel.setText('Last updated\nRow : %d, Column : %d, Data : %s' % (row + 1, column + 1, str(dataQTableWidgetItem.text())))
-
 if __name__ == '__main__':
-    myQApplication = QApplication(sys.argv)
-    myQCustomWidget = QCustomWidget()
-    myQCustomWidget.show()
-    sys.exit(myQApplication.exec_())
+    pass
