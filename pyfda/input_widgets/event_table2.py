@@ -39,6 +39,13 @@ class EventTable (QWidget):
                 self.myTable.setItem(row, col, item)
         self.myTable.resizeColumnsToContents()
         self.myTable.resizeRowsToContents()
+        
+        for col in range(self.columns):
+            for row in range(self.rows):
+                print(self.myTable.item(row, col).text())
+
+        
+        
 
 if __name__ == "__main__":
     import sys
