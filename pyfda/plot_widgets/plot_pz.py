@@ -192,7 +192,6 @@ class PlotPZ(QWidget):
         p = np.atleast_1d(p)
     
         if b.any(): # coefficients were specified
-            zpk = False
             if len(b) < 2 and len(a) < 2:
                 raise TypeError(
                 'No proper filter coefficients: both b and a are scalars!')
@@ -213,9 +212,7 @@ class PlotPZ(QWidget):
             p = np.roots(a)
             z = np.roots(b)
             k = kn/kd
-        elif p.any() or z.any(): # P/Z were specified
-            zpk = True
-        else:
+        elif not (len(p) or len(z)): # P/Z were specified
             raise TypeError(
             'No proper filter coefficients: Either b,a or z,p must be specified!')          
     
