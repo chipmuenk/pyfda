@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
                       QCheckBox, QPushButton, QSpinBox, QComboBox,
                       QTableWidget, QTableWidgetItem, QAbstractItemView,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy)
+                      QVBoxLayout, QHBoxLayout, QSizePolicy, QStyledItemDelegate)
 
 import numpy as np
 import numpy.ma as ma
@@ -32,6 +32,10 @@ from pyfda.pyfda_rc import params
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: order P/Z depending on frequency or magnitude
 # TODO: display SOS graphically
+
+class ItemDelegate(QStyledItemDelegate):
+    def displayText(self, text, locale):
+        return "{:.3g}".format(float(text))
 
 class FilterPZ(QWidget):
     """
@@ -99,7 +103,8 @@ class FilterPZ(QWidget):
         self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
                                           QSizePolicy.Expanding)
         self.tblPZ.setObjectName("tblPZ")
-        self.tblPZ.installEventFilter(self)
+        self.myTable.setItemDelegate(ItemDelegate(self))
+#        self.tblPZ.installEventFilter(self)
         
 
         butAddRow = QPushButton(butTexts[0], self)

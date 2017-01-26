@@ -11,7 +11,8 @@ try:
                                  QFileDialog, QInputDialog,
                                  QTableWidget, QTableWidgetItem, QTextBrowser,
                                  QSizePolicy, QAbstractItemView,
-                                 QHBoxLayout, QVBoxLayout, QGridLayout)
+                                 QHBoxLayout, QVBoxLayout, QGridLayout,
+                                 QStyledItemDelegate)
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
     HAS_QT5 = True
@@ -29,7 +30,8 @@ except ImportError:
                              QFileDialog, QInputDialog,
                              QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
                              QSizePolicy, QAbstractItemView,
-                             QHBoxLayout, QVBoxLayout, QGridLayout)
+                             QHBoxLayout, QVBoxLayout, QGridLayout,
+                             QStyledItemDelegate)
 
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
