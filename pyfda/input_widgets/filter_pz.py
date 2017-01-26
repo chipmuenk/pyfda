@@ -18,7 +18,6 @@ from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QE
                       QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
 
 import numpy as np
-import numpy.ma as ma
 from scipy.signal import freqz
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -26,7 +25,6 @@ from pyfda.pyfda_lib import fil_save, safe_eval, rt_label
 from pyfda.pyfda_rc import params
 
 # TODO: correct scaling after insertion / deletion of cells
-# TODO: drag & drop doesn't work
 # TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: order P/Z depending on frequency or magnitude
@@ -98,9 +96,7 @@ class FilterPZ(QWidget):
 
         self.tblPZ = QTableWidget(self)
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
-        self.tblPZ.setAlternatingRowColors(True) # alternating row colors
-#        self.tblPZ.setSizePolicy(QSizePolicy.MinimumExpanding,
-#                                          QSizePolicy.Expanding)
+        self.tblPZ.setAlternatingRowColors(True) # alternating row colors)
         self.tblPZ.setObjectName("tblPZ")
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
@@ -501,10 +497,7 @@ class FilterPZ(QWidget):
         zeros. If nothing is selected, add one row.
         """
         print("\n_add_rows:")
-        print(self.tblPZ.selectionModel().selectedRows(), "\n", self.tblPZ.currentRow())
-        sel = len(self.tblPZ.selectionModel().selectedRows())
         row = self.tblPZ.currentRow()
-        print(self._get_selected(self.tblPZ))
         print(sel, row)
 
         if sel == 0: # nothing selected
@@ -514,11 +507,6 @@ class FilterPZ(QWidget):
         self.zpk[0] = np.insert(self.zpk[0], row, 0)
         self.zpk[1] = np.insert(self.zpk[1], row, 0)
 
-#        self.tblPZ.setRowCount(new_rows)
-#
-#        for col in range(2):
-#            for row in range(old_rows, new_rows):
-#                self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
         self._update_entries()
 
 #------------------------------------------------------------------------------
