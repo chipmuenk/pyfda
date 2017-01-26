@@ -101,8 +101,9 @@ class FilterPZ(QWidget):
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
         butAddRow = QPushButton(butTexts[0], self)
-        butAddRow.setToolTip("Add row to PZ table.\n"
-                                "Select n existing rows to append n new rows.")
+        butAddRow.setToolTip("Select N existing rows to insert N new rows\n"
+                            "above last selected cell. When nothing is\n "
+                             "selected, add a row after the last row.")
 
         ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
         butAddRow.setMaximumWidth(ButLength)
@@ -498,14 +499,15 @@ class FilterPZ(QWidget):
         """
         print("\n_add_rows:")
         row = self.tblPZ.currentRow()
+        sel = len(self._get_selected(self.tblPZ)['rows'])
         print(sel, row)
 
         if sel == 0: # nothing selected
             sel = 1 # add at least one row
             row = min(len(self.zpk[0]), len(self.zpk[1]))
 
-        self.zpk[0] = np.insert(self.zpk[0], row, 0)
-        self.zpk[1] = np.insert(self.zpk[1], row, 0)
+        self.zpk[0] = np.insert(self.zpk[0], row, np.zeros(sel))
+        self.zpk[1] = np.insert(self.zpk[1], row, np.zeros(sel))
 
         self._update_entries()
 
