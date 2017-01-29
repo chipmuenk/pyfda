@@ -30,9 +30,15 @@ from pyfda.pyfda_rc import params
 # TODO: display SOS graphically
 
 class ItemDelegate(QStyledItemDelegate):
+    """
+    The following methods are subclassed to replace display and editor of the 
+    QTableWidget.
+    displayText() displays number with n_digits without sacrificing precision of
+    the data stored in the table.
+    """
     def displayText(self, text, locale):
-        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = FilterPZ.n_digits)
-    
+        return "{:.{n_digits}g}".format(np.asscalar(np.real_if_close(
+                        safe_eval(text), tol = 100)), n_digits = FilterPZ.n_digits)
     
 
 class FilterPZ(QWidget):
