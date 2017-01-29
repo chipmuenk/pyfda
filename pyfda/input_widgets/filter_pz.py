@@ -485,6 +485,7 @@ class FilterPZ(QWidget):
         elif D < 0:
             self.zpk[0] = np.append(self.zpk[0], np.zeros(-D))
 
+        self._delete_PZ_pairs()
         self._update_entries()
 
 #------------------------------------------------------------------------------
@@ -523,6 +524,18 @@ class FilterPZ(QWidget):
                         item.setText(str(0.))
                 else:
                     self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
+#------------------------------------------------------------------------------
+    def _delete_PZ_pairs(self, eps = 0):
+        """
+        Find and delete pairs of poles and zeros in self.zpk
+        The filter dict and the table have to be updated afterwards.
+        """
+        for z in range(len(self.zpk[0])-1, -1, -1): # start at the bottom
+            for p in range(len(self.zpk[1])-1, -1, -1):
+                if np.isclose(self.zpk[0][z], self.zpk[1][p], rtol = eps, atol = 1e-08):
+                    self.zpk[0] = np.delete(self.zpk[0], z)
+                    self.zpk[1] = np.delete(self.zpk[1], p)
+                    break
 
 #------------------------------------------------------------------------------
 
