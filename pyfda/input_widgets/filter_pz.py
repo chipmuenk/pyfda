@@ -248,7 +248,7 @@ class FilterPZ(QWidget):
                     return True
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False
-                    self._update_entries()
+                    self._update_entry(source)
                     return True
 
             elif event.type() == QEvent.FocusOut: # 9
@@ -270,7 +270,7 @@ class FilterPZ(QWidget):
                 self.zpk[2] = value
                 self.spec_edited = False # reset flag
 
-            self._update_entries()
+            self._update_entry()
 
 #------------------------------------------------------------------------------
     def _set_filter_type(self):
