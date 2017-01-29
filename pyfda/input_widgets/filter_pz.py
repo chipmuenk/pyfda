@@ -72,9 +72,9 @@ class FilterPZ(QWidget):
                 MaxTextlen = len(item)
                 longestText = item
 
-        self.chkPZList = QCheckBox("Show Poles / Zeros", self)
+        self.chkPZList = QCheckBox("Show table", self)
         self.chkPZList.setChecked(True)
-        self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable list.")
+        self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable table.")
 
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
@@ -185,6 +185,7 @@ class FilterPZ(QWidget):
         layVMain = QVBoxLayout()
         layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblPZ)
+#        layVMain.addStretch(1)
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)
