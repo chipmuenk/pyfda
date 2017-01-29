@@ -123,6 +123,7 @@ class InputTabWidgets(QWidget):
         #       requiring update of all plot and some input widgets:
         self.filter_specs.sigFilterDesigned.connect(self.update_all)
         self.filter_coeffs.sigFilterDesigned.connect(self.update_all)
+        self.filter_pz.sigFilterDesigned.connect(self.update_all)
 
         # The following three widgets require a reloading of the select_filter
         # widget to update the filter selection:
