@@ -100,16 +100,16 @@ class FilterPZ(QWidget):
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
         butAddRow = QPushButton(butTexts[0], self)
-        butAddRow.setToolTip("Select N existing rows to insert N new rows\n"
-                            "above last selected cell. When nothing is\n "
-                             "selected, add a row after the last row.")
+        butAddRow.setToolTip("<SPAN>Select <i>N</i> existing rows "
+                             "to insert <i>N</i> new rows above last selected cell. "
+                             "When nothing is selected, add a row at the end.</SPAN>")
 
         ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
         butAddRow.setMaximumWidth(ButLength)
 
         butDelCell = QPushButton(butTexts[1], self)
         butDelCell.setToolTip("Delete selected cell(s) from the table.\n"
-                "Multiple cells can be selected using <SHIFT> or <CTRL>.")
+                "Use <SHIFT> or <CTRL> to select multiple cells.")
         butDelCell.setMaximumWidth(ButLength)
 
         butClear = QPushButton(butTexts[4], self)
@@ -126,13 +126,13 @@ class FilterPZ(QWidget):
         butLoad.setMaximumWidth(ButLength)
 
         butSetZero = QPushButton(butTexts[5], self)
-        butSetZero.setToolTip("Set P / Z = 0 with a magnitude < eps.")
+        butSetZero.setToolTip("<SPAN>Set P / Z = 0 when magnitude &lt; &epsilon;.</SPAN>")
         butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel("for " + rt_label("&epsilon; &lt;"), self)
 #        self.lblEps.setTextFormat(Qt.RichText)
         self.ledSetEps = QLineEdit(self)
-        self.ledSetEps.setToolTip("Specify eps value.")
+        self.ledSetEps.setToolTip("<SPAN>Specify tolerance.</SPAN>")
         self.ledSetEps.setText(str(1e-6))
 
         # ============== UI Layout =====================================
@@ -319,10 +319,10 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _update_entries(self):
         """
-        (Re-)Create the diplayed table from the shadow table self.zpk with the
-        desired number of digits and in the desired format.
+        (Re-)Create the displayed table from self.zpk with the
+        desired number format.
 
-        Called by _store_entry() and eventFilter
+        Called by _store_entry()
         """
         print("\n_update_entries:")
 
@@ -333,7 +333,7 @@ class FilterPZ(QWidget):
         self.tblPZ.setVisible(self.chkPZList.isChecked())
 
         if self.chkPZList.isChecked():
-
+            # set filter type combo box to content of filter dict
             if fb.fil[0]['ft'] == 'FIR':
                 self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
             else:
@@ -342,21 +342,10 @@ class FilterPZ(QWidget):
             self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
 
             self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
-
-            logger.debug("_update_entries - pz:\n"
-                "Shape = %s\n"
-                "Len   = %d\n"
-                "NDim  = %d\n\n"
-                "ZPK = %s"
-                %(np.shape(self.zpk),len(self.zpk), np.ndim(self.zpk), pformat(self.zpk))
-                  )
-
             self.tblPZ.setColumnCount(2)
-            self.tblPZ.setHorizontalHeaderLabels(["Z", "P"])
+            self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
             for col in range(2):
                 for row in range(len(self.zpk[col])):
-                    logger.debug("Len Row = %d" %len(self.zpk[col]))
-
                     # set table item from self.zpk and strip '()' of complex numbers
                     item = self.tblPZ.item(row, col)
                     if item: # does item exist?
