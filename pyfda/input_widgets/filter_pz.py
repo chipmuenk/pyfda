@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
-                      QCheckBox, QPushButton, QSpinBox, QComboBox, Qt,
+                      QCheckBox, QPushButton, QSpinBox, QComboBox,
                       QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
 
