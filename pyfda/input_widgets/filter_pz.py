@@ -437,6 +437,7 @@ class FilterPZ(QWidget):
         - deleting elements with those indices
         - equalizing the lengths of P and Z array by appending the required
           number of zeros.
+        - providing at least P = Z = 0 (order 1)
         """
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
         Z = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
@@ -447,7 +448,7 @@ class FilterPZ(QWidget):
         self.zpk[0] = np.delete(self.zpk[0], Z)
         self.zpk[1] = np.delete(self.zpk[1], P)
 
-        # test and correct if P and Z array have different lengths:
+        # test and equalize if P and Z array have different lengths:
         D = len(self.zpk[0]) - len(self.zpk[1])
         if D > 0:
             self.zpk[1] = np.append(self.zpk[1], np.zeros(D))
@@ -466,11 +467,12 @@ class FilterPZ(QWidget):
         print("\n_add_rows:")
         row = self.tblPZ.currentRow()
         sel = len(self._get_selected(self.tblPZ)['rows'])
+        # TODO: evaluate non-contiguous selection as well?
         print(sel, row)
 
         if sel == 0: # nothing selected
-            sel = 1 # add at least one row
-            row = min(len(self.zpk[0]), len(self.zpk[1]))
+            sel = 1 # add at least one row ...
+            row = min(len(self.zpk[0]), len(self.zpk[1])) # ... at the bottom
 
         self.zpk[0] = np.insert(self.zpk[0], row, np.zeros(sel))
         self.zpk[1] = np.insert(self.zpk[1], row, np.zeros(sel))
@@ -480,9 +482,9 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _zero_PZ(self):
         """
-        Set all PZs = 0 with a magnitude less than eps
+        Set all PZs = 0 with a magnitude less than eps and delete P/Z pairs
+        afterwards.
         """
-        eps = float(self.ledSetEps.text())
         num_rows= self.tblPZ.rowCount()
 
         for col in range(2):
