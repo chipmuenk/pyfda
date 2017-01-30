@@ -278,11 +278,10 @@ class FilterPZ(QWidget):
         
         
         if self.chkPZList.isChecked():
-            if isinstance(source, QLineEdit) or not source:
+            if isinstance(source, QLineEdit):
 
                 self.ledGain.setVisible(self.chkPZList.isChecked())
                 self.lblGain.setVisible(self.chkPZList.isChecked())
-
 
                 if self.chkNorm.isChecked():
                     [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
