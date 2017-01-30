@@ -199,7 +199,7 @@ class FilterPZ(QWidget):
         butClear.clicked.connect(self._clear_table)
 
         butSetZero.clicked.connect(self._zero_PZ)
-        self.tblPZ.itemChanged.connect(self._copy_entries)
+        self.tblPZ.itemChanged.connect(self._copy_entry)
         #----------------------------------------------------------------------
 
         # Every time a field is edited, call self._store_entry and
@@ -350,6 +350,21 @@ class FilterPZ(QWidget):
 
         self.zpk = fb.fil[0]['zpk']
         self._update_entries()
+
+#------------------------------------------------------------------------------
+    def _copy_entry(self):
+        """
+        Copy the values from the current table item to self.zpk 
+        """  
+        col = self.tblPZ.currentIndex().column()
+        row = self.tblPZ.currentIndex().row()
+        item = self.tblPZ.item(row,col)
+
+        if item:
+            if item.text() != "":
+                self.zpk[col][row] = safe_eval(item.text())
+            else:
+                self.zpk[col][row] = 0.
 
 #------------------------------------------------------------------------------
     def _copy_entries(self):
