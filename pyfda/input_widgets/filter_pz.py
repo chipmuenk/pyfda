@@ -351,14 +351,13 @@ class FilterPZ(QWidget):
         self._update_entries()
 
 #------------------------------------------------------------------------------
-    def _save_entries(self):
+    def _copy_entries(self):
         """
-        Save the values from the shadow dict to the filter PZ dict
-        """
-
-        logger.debug("=====================\nInputPZ._save_entries called")
-        
-        self.zpk = []
+        Copy the values from the table to self.zpk 
+        """  
+        print(self.tblPZ.currentIndex().column(), self.tblPZ.currentIndex().row())
+        self.zpk[0] = self.zpk[1] = []
+        # self.zpk[2] is not modified here! 
         num_rows, num_cols = self.tblPZ.rowCount(), self.tblPZ.columnCount()
                        
         for col in range(num_cols):
@@ -371,11 +370,23 @@ class FilterPZ(QWidget):
                 else:
                     rows.append(0.)
 
-            self.zpk.append(rows) # type: list num_cols x num_rows
-            
-        self.zpk.append(safe_eval(self.ledGain.text())) # zpk[2] = gain
+            self.zpk[col] = rows # type: list num_cols x num_rows
+
+#------------------------------------------------------------------------------
+    def _save_entries(self):
+        """
+        Save the values from self.zpk to the filter PZ dict,
+        the QLineEdit for setting the gain has to be treated separately.
+        """
+
+        logger.debug("=====================\nFilterPZ._save_entries called")
         
-        fb.fil[0]['N'] = num_rows
+        self._copy_entries()
+        fb.fil[0]['N'] = len(self.zpk[0])
+        if np.any(self.zpk[1]): # any non-zero poles?
+            fb.fil[0]['fc'] = 'Manual_IIR'
+        else:
+            fb.fil[0]['fc'] = 'Manual_FIR'
 
         fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save with new gain
 
