@@ -464,7 +464,8 @@ class FilterPZ(QWidget):
         - deleting elements with those indices
         - equalizing the lengths of P and Z array by appending the required
           number of zeros.
-        - providing at least P = Z = 0 (order 1)
+        - deleting all P/Z pairs
+        Finally, the table is updated from self.zpk.
         """
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
         Z = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
