@@ -536,6 +536,10 @@ class FilterPZ(QWidget):
                     self.zpk[1] = np.delete(self.zpk[1], p)
                     break
 
+        if len(self.zpk[0]) < 1 : # no P / Z, add 1 row
+            self.zpk[0] = np.append(self.zpk[0], 0.)
+            self.zpk[1] = np.append(self.zpk[1], 0.)
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
