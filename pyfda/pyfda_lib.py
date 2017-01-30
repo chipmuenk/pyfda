@@ -952,18 +952,24 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
     
     if format_in == 'sos':
             fil_dict['sos'] = arg
+            fil_dict['ft'] = 'IIR'
 
     elif format_in == 'zpk':
         format_error = False
         if np.ndim(arg) == 1:
-            if np.ndim(arg[0]) == 0: # list / array with z only
+            if np.ndim(arg[0]) == 0: # list / array with z only -> FIR
                 z = arg
                 p = np.zeros(len(z))
                 k = 1
                 fil_dict['zpk'] = [z, p, k]
+                fil_dict['ft'] = 'FIR'
             elif np.ndim(arg[0]) == 1: # list of lists
                 if np.shape(arg)[0] == 3:
                     fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+                    if np.any(arg[1]): # non-zero poles -> IIR
+                        fil_dict['ft'] = 'IIR'
+                    else:
+                        fil_dict['ft'] = 'FIR'
                 else:
                     format_error = True
             else:
@@ -976,14 +982,18 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
 
             
     elif format_in == 'ba': 
-        if np.ndim(arg) == 1: # arg = [b]
+        if np.ndim(arg) == 1: # arg = [b] -> FIR
             b = np.asarray(arg)
             a = np.zeros(len(b))
             a[0] = 1
-
+            fil_dict['ft'] = 'FIR'
         else: # arg = [b,a]
             b = arg[0]
             a = arg[1]
+            if np.any(a):
+                fil_dict['ft'] = 'IIR'
+            else:
+                fil_dict['ft'] = 'FIR'
 
         fil_dict['ba'] = [b, a]
 
