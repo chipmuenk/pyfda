@@ -199,6 +199,7 @@ class FilterPZ(QWidget):
         butClear.clicked.connect(self._clear_table)
 
         butSetZero.clicked.connect(self._zero_PZ)
+        self.tblPZ.itemChanged.connect(self._copy_entries)
         #----------------------------------------------------------------------
 
         # Every time a field is edited, call self._store_entry and
