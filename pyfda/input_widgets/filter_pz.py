@@ -485,16 +485,20 @@ class FilterPZ(QWidget):
         Set all PZs = 0 with a magnitude less than eps and delete P/Z pairs
         afterwards.
         """
-        num_rows= self.tblPZ.rowCount()
+        eps = abs(safe_eval(self.ledSetEps.text()))
+        
+        remove_me = np.isclose(self.zpk[0:2], 0, rtol=0, atol = eps)
+        self.zpk[0:2] = self.zpk[0:2] * np.logical_not(remove_me)
+        
 
-        for col in range(2):
-            for row in range(num_rows):
-                item = self.tblPZ.item(row, col)
-                if item:
-                    if abs(safe_eval(item.text())) < eps:
-                        item.setText(str(0.))
-                else:
-                    self.tblPZ.setItem(row,col,QTableWidgetItem("0.0"))
+#        for col in range(2):
+#            for row in range(len(self.zpk[col])):
+#                # set table item from self.zpk and strip '()' of complex numbers
+#                item = self.tblPZ.item(row, col)
+#                if np.isclose(safe_eval(item.text()), 0, rtol=0, atol=eps):
+#                        item.setText(str(0.))
+        self._delete_PZ_pairs()
+        self._update_entries()
 #------------------------------------------------------------------------------
     def _delete_PZ_pairs(self, eps = 0):
         """
