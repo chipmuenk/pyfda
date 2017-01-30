@@ -82,12 +82,6 @@ class FilterPZ(QWidget):
         self.spnRound.setValue(FilterPZ.n_digits)
         self.spnRound.setToolTip("Display d digits.")
 
-        self.cmbFilterType = QComboBox(self)
-        self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
-        self.cmbFilterType.addItems(["FIR","IIR"])
-        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
         self.chkNorm =  QCheckBox("Normalize", self)
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
@@ -145,8 +139,6 @@ class FilterPZ(QWidget):
         layHChkBoxes = QHBoxLayout()
         layHChkBoxes.addWidget(self.chkPZList)
         layHChkBoxes.addStretch(1)
-        layHChkBoxes.addWidget(self.cmbFilterType)
-        layHChkBoxes.addStretch(1)
         layHChkBoxes.addWidget(lblRound)
         layHChkBoxes.addWidget(self.spnRound)
 
@@ -197,7 +189,6 @@ class FilterPZ(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.spnRound.editingFinished.connect(self.load_entries)
-        self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
         butLoad.clicked.connect(self.load_entries)
         self.chkPZList.clicked.connect(self.load_entries)
 
@@ -273,18 +264,6 @@ class FilterPZ(QWidget):
             self._update_entry()
 
 #------------------------------------------------------------------------------
-    def _set_filter_type(self):
-        """
-        Change between FIR and IIR filter setting
-        """
-
-        if self.cmbFilterType.currentText() == 'FIR':
-            fb.fil[0]['ft'] = 'FIR'
-        else:
-            fb.fil[0]['ft'] = 'IIR'
-
-
-#------------------------------------------------------------------------------
     def _update_entry(self, source = None):
         """
         (Re-)Create the diplayed table from the shadow table self.zpk with the
@@ -340,11 +319,6 @@ class FilterPZ(QWidget):
         self.tblPZ.setVisible(self.chkPZList.isChecked())
 
         if self.chkPZList.isChecked():
-            # set filter type combo box to content of filter dict
-            if fb.fil[0]['ft'] == 'FIR':
-                self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
-            else:
-                self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
 
             self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
 
@@ -372,10 +346,6 @@ class FilterPZ(QWidget):
         register self.zpk and update the display.
         """
         print("\nload_entries:")
-        if fb.fil[0]['ft'] == 'FIR':
-            self.cmbFilterType.setCurrentIndex(0) # set comboBox to "FIR"
-        else:
-            self.cmbFilterType.setCurrentIndex(1) # set comboBox to "IIR"
 
         self.zpk = fb.fil[0]['zpk']
         self._update_entries()
