@@ -187,7 +187,7 @@ class FilterInfo(QWidget):
             for the filter defined in the filter dict in a given frequency band
             [f_start, f_stop].
             """
-            w = np.linspace(f_start, f_stop, 2048)*2*np.pi            
+            w = np.linspace(f_start, f_stop, params['N_FFT'])*2*np.pi
             [w, H] = sig.freqz(bb, aa)
             f = w / (2.0 * pi) # frequency normalized to f_S
             H_abs = abs(H)
