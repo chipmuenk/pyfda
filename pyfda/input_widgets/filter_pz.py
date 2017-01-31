@@ -8,6 +8,7 @@ Tab-Widget for displaying and modifying filter Poles and Zeros
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
+import six
 from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
@@ -469,7 +470,6 @@ class FilterPZ(QWidget):
         print("cur_r_c:", cur)
 
         return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
-
 
 #------------------------------------------------------------------------------
     def _delete_cells(self):
