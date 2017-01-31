@@ -394,26 +394,26 @@ class FilterPZ(QWidget):
                 self.zpk[col][row] = 0.
 
 #------------------------------------------------------------------------------
-    def _copy_entries(self):
-        """
-        Copy the values from the table to self.zpk 
-        """  
-        print(self.tblPZ.currentIndex().column(), self.tblPZ.currentIndex().row())
-        self.zpk[0] = self.zpk[1] = []
-        # self.zpk[2] is not modified here! 
-        num_rows, num_cols = self.tblPZ.rowCount(), self.tblPZ.columnCount()
-                       
-        for col in range(num_cols):
-            rows = []
-            for row in range(num_rows):
-                item = self.tblPZ.item(row, col)
-                if item:
-                    if item.text() != "":
-                        rows.append(safe_eval(item.text()))
-                else:
-                    rows.append(0.)
-
-            self.zpk[col] = rows # type: list num_cols x num_rows
+#    def _copy_entries(self):
+#        """
+#        Copy the values from the table to self.zpk 
+#        """  
+#        print(self.tblPZ.currentIndex().column(), self.tblPZ.currentIndex().row())
+#        self.zpk[0] = self.zpk[1] = []
+#        # self.zpk[2] is not modified here! 
+#        num_rows, num_cols = self.tblPZ.rowCount(), self.tblPZ.columnCount()
+#                       
+#        for col in range(num_cols):
+#            rows = []
+#            for row in range(num_rows):
+#                item = self.tblPZ.item(row, col)
+#                if item:
+#                    if item.text() != "":
+#                        rows.append(safe_eval(item.text()))
+#                else:
+#                    rows.append(0.)
+#
+#            self.zpk[col] = rows # type: list num_cols x num_rows
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
