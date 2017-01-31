@@ -18,7 +18,7 @@ from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QE
                       QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
 
 import numpy as np
-from scipy.signal import freqz
+from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval, rt_label
@@ -92,6 +92,8 @@ class FilterPZ(QWidget):
         self.chkNorm =  QCheckBox("Normalize", self)
         self.chkNorm.setChecked(False)
         self.chkNorm.setToolTip("Normalize max. (H(f)).")
+        self.cmbNorm = QComboBox(self)
+        self.cmbNorm.addItems(["None", "1", "Max"])
 
         self.lblGain = QLabel(rt_label("k = "), self)
         self.ledGain = QLineEdit(self)
@@ -154,6 +156,7 @@ class FilterPZ(QWidget):
         layHGain.addWidget(self.ledGain)
 #        layHChkBoxes.addStretch(1)
         layHGain.addWidget(self.chkNorm)
+        layHGain.addWidget(self.cmbNorm)
         layHGain.addStretch()
 
         layHButtonsPZs1 = QHBoxLayout()
@@ -207,6 +210,7 @@ class FilterPZ(QWidget):
 
         butSetZero.clicked.connect(self._zero_PZ)
         self.tblPZ.itemChanged.connect(self._copy_entry)
+        self.cmbNorm.activated.connect(self._copy_item)
         #----------------------------------------------------------------------
 
         # Every time a table item is edited, call self._copy_item to copy the
@@ -270,11 +274,25 @@ class FilterPZ(QWidget):
 
             self._update_entry()
 
-#------------------------------------------------------------------------------
-    def _update_entry(self, source = None):
+    def _normalize_gain(self):
         """
-        (Re-)Create the diplayed table from the shadow table self.zpk with the
-        desired number of digits and in the desired format.
+        Normalize the gain factor so that the maximum of |H(f)| stays 1 or a 
+        previously stored maximum value of |H(f)|
+        """
+        if not np.isfinite(self.zpk[2]):
+            self.zpk[2] = 1.
+
+        if self.cmbNorm.currentText() != "None":        
+            b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2]) 
+            [w, H] = freqz(b, a) 
+            Hmax = max(abs(H)) 
+            if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
+                Hmax = 1.
+            if self.cmbNorm.currentText() == "1":
+                self.zpk[2] = self.zpk[2] / Hmax
+            elif self.cmbNorm.currentText() == "Max":
+                self.zpk[2] = self.zpk[2] / Hmax * self.Hmax_last
+            self.Hmax_last = Hmax # store current max. filter gain
 
         Recalculate gain and update QLineEdit
 
