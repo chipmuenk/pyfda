@@ -192,15 +192,15 @@ class FilterPZ(QWidget):
 
         self.setLayout(layVMain)
 
-        self.load_entries() # initialize table with default values from filterbroker
-        self._update_entries()
+        self.load_dict() # initialize table from filterbroker
+        self._refresh_table()
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.spnRound.editingFinished.connect(self.load_entries)
-        butLoad.clicked.connect(self.load_entries)
-        self.chkPZList.clicked.connect(self.load_entries)
+        self.spnRound.editingFinished.connect(self._refresh_table)
+        butLoad.clicked.connect(self.load_dict)
+        self.chkPZList.clicked.connect(self.load_dict)
 
         butSave.clicked.connect(self._save_entries)
 
@@ -318,7 +318,7 @@ class FilterPZ(QWidget):
 
 
 #------------------------------------------------------------------------------
-    def _update_entries(self):
+    def _refresh_table(self):
         """
         (Re-)Create the displayed table from self.zpk with the
         desired number format.
@@ -348,7 +348,7 @@ class FilterPZ(QWidget):
                     # set table item from self.zpk and strip '()' of complex numbers
                     item = self.tblPZ.item(row, col)
                     if item: # does item exist?
-                        item.setText(str(self.zpk[col][row]).strip('()'))             
+                        item.setText(str(self.zpk[col][row]).strip('()'))
                     else: # no, construct it:
                         self.tblPZ.setItem(row,col,QTableWidgetItem(
                               str(self.zpk[col][row]).strip('()')))
@@ -358,15 +358,15 @@ class FilterPZ(QWidget):
             self.tblPZ.clearSelection()
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Load all entries from filter dict fb.fil[0]['zpk'] into the shadow
         register self.zpk and update the display.
         """
-        print("\nload_entries:")
+        print("\nload_dict:")
 
         self.zpk = fb.fil[0]['zpk']
-        self._update_entries()
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _copy_entry(self):
@@ -424,12 +424,10 @@ class FilterPZ(QWidget):
         fil_save(fb.fil[0], self.zpk, 'zpk', __name__) # save with new gain
 
         if __name__ == '__main__':
-            self.load_entries() # only needed for stand-alone test
+            self.load_dict() # only needed for stand-alone test
 
         self.sigFilterDesigned.emit() # -> filter_specs
         # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
-        # TODO: this also needs to trigger filter_specs.updateUI to switch to
-        #       manual design when saving P/Z
 
         logger.debug("_save_entries - coeffients / zpk updated:\n"
             "b,a = %s\n\n"
@@ -446,7 +444,7 @@ class FilterPZ(QWidget):
         self.zpk = np.array([[0, 0], [0, 0], 1])
         self.Hmax_last = 1.0
 
-        self._update_entries()
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _get_selected(self, table):
@@ -501,7 +499,7 @@ class FilterPZ(QWidget):
             self.zpk[0] = np.append(self.zpk[0], np.zeros(-D))
 
         self._delete_PZ_pairs()
-        self._update_entries()
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _add_rows(self):
@@ -522,12 +520,12 @@ class FilterPZ(QWidget):
         self.zpk[0] = np.insert(self.zpk[0], row, np.zeros(sel))
         self.zpk[1] = np.insert(self.zpk[1], row, np.zeros(sel))
 
-        self._update_entries()
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _zero_PZ(self):
         """
-        Set all PZs = 0 with a magnitude less than eps and delete P/Z pairs
+        Set all P/Zs = 0 with a magnitude less than eps and delete P/Z pairs
         afterwards.
         """
         eps = abs(safe_eval(self.ledSetEps.text()))
@@ -535,15 +533,8 @@ class FilterPZ(QWidget):
         remove_me = np.isclose(self.zpk[0:2], 0, rtol=0, atol = eps)
         self.zpk[0:2] = self.zpk[0:2] * np.logical_not(remove_me)
         
-
-#        for col in range(2):
-#            for row in range(len(self.zpk[col])):
-#                # set table item from self.zpk and strip '()' of complex numbers
-#                item = self.tblPZ.item(row, col)
-#                if np.isclose(safe_eval(item.text()), 0, rtol=0, atol=eps):
-#                        item.setText(str(0.))
         self._delete_PZ_pairs()
-        self._update_entries()
+        self._refresh_table()
 #------------------------------------------------------------------------------
     def _delete_PZ_pairs(self, eps = 0):
         """
