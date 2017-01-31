@@ -49,9 +49,12 @@ from pyfda.simpleeval import simple_eval
 #### General functions ########################################################
 
 def safe_eval(expr):
-    _ = expr
+    """
+    try ... except wrapper around simple_eval to catch various errors
+    """
     try:
-        return simple_eval(expr)
+        # eliminate very small imaginary components due to rounding errors
+        return np.asscalar(np.real_if_close(simple_eval(expr), tol = 100))
     except (SyntaxError, ZeroDivisionError, IndexError) as e:
         logger.warn(e)
         return 0.
@@ -125,7 +128,6 @@ def read_cmb_box(cmb_box):
     This is first converted from the QVariant container format to a
     QString, next to a "normal" non-unicode string.
 
-    
     Returns:
     
     The current setting of combobox as string
