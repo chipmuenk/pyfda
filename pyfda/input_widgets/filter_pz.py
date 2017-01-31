@@ -238,7 +238,7 @@ class FilterPZ(QWidget):
             if event.type() == QEvent.FocusIn:  # 8
                 print(source.objectName(), "focus in")
                 self.spec_edited = False
-                self._update_entry(source)
+                self._update_gain(source)
                 return True # event processing stops here
 
             elif event.type() == QEvent.KeyPress:
@@ -246,33 +246,33 @@ class FilterPZ(QWidget):
                 self.spec_edited = True # entry has been changed
                 key = event.key() # key press: 6, key release: 7
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}: # store entry
-                    self._store_entry(source)
+                    self._store_gain(source)
                     return True
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False
-                    self._update_entry(source)
+                    self._update_gain(source)
                     return True
 
             elif event.type() == QEvent.FocusOut: # 9
                 print(source.objectName(), "focus out")
-                self._update_entry(source)
-                self._store_entry(source)
+                self._update_gain(source)
+                self._store_gain(source)
                 return True
         return super(FilterPZ, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
-    def _store_entry(self, source):
+    def _store_gain(self, source):
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
-        store it in the shadow dict. This is triggered by `QEvent.focusOut`.
+        store it in the shadow dict. This is triggered by `QEvent.focusOut` or 
+        RETURN key.
         """
         if self.spec_edited:
             print("\n_store_entry:", str(source.objectName()))
-            if isinstance(source, QLineEdit):
-                value = safe_eval(source.text())
-                self.zpk[2] = value
-                self.spec_edited = False # reset flag
+            value = safe_eval(source.text())
+            self.zpk[2] = value
+            self.spec_edited = False # reset flag
 
-            self._update_entry()
+            self._update_gain()
 
     def _normalize_gain(self):
         """
@@ -294,6 +294,9 @@ class FilterPZ(QWidget):
                 self.zpk[2] = self.zpk[2] / Hmax * self.Hmax_last
             self.Hmax_last = Hmax # store current max. filter gain
 
+#------------------------------------------------------------------------------
+    def _update_gain(self, source = None):
+        """
         Recalculate gain and update QLineEdit
 
         Called by _store_entry()
@@ -301,30 +304,17 @@ class FilterPZ(QWidget):
         print("\n_update_gain:")
         
         self.ledGain.setVisible(self.chkPZList.isChecked())
+        self.lblGain.setVisible(self.chkPZList.isChecked())
         
         if self.chkPZList.isChecked():
             if isinstance(source, QLineEdit):
 
-                self.ledGain.setVisible(self.chkPZList.isChecked())
-                self.lblGain.setVisible(self.chkPZList.isChecked())
-
-                if self.chkNorm.isChecked():
-                    [w, H] = freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1]) # (bb, aa)
-                    self.Hmax_last = max(abs(H)) # store current max. filter gain
-                    if not np.isfinite(self.Hmax_last) or self.Hmax_last > 1e4:
-                        self.Hmax_last = 1.
-
-                    if not np.isfinite(self.zpk[2]):
-                        self.zpk[2] = 1.
-
-                if not self.ledGain.hasFocus():
-                        # widget has no focus, round the display
-                        print("led no focus")
-                        self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
-                else:
-                        # widget has focus, show full precision
-                        self.ledGain.setText(str(self.zpk[2]))
-                        print("led focus")
+                self._normalize_gain()
+                
+                if not self.ledGain.hasFocus():  # no focus, round the gain
+                    self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+                else: # widget has focus, show gain with full precision
+                    self.ledGain.setText(str(self.zpk[2]))
 
 
 #------------------------------------------------------------------------------
