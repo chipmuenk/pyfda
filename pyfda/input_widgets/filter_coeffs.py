@@ -238,7 +238,7 @@ class FilterCoeffs(QWidget):
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
 
-        self.load_entries() # initialize table with default values from fb
+        self.load_dict() # initialize table with default values from filter dict
 
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemEntered.connect(self.save_coeffs) # nothing happens
@@ -249,9 +249,9 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.clicked.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
 
-        self.chkCoeffList.clicked.connect(self.load_entries)
+        self.chkCoeffList.clicked.connect(self.load_dict)
         self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
-        butLoad.clicked.connect(self.load_entries)
+        butLoad.clicked.connect(self.load_dict)
 
         butSave.clicked.connect(self.store_entries)
 
@@ -273,7 +273,7 @@ class FilterCoeffs(QWidget):
         else:
             fb.fil[0]['ft'] = 'IIR'
             
-        self.load_entries()
+        self.load_dict()
 
 #------------------------------------------------------------------------------
     def store_entries(self):
@@ -334,7 +334,7 @@ class FilterCoeffs(QWidget):
         #       manual design when saving b,a
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Create table from filter coeff dict
         """
@@ -368,7 +368,7 @@ class FilterCoeffs(QWidget):
         idx_str = [str(n) for n in range(num_rows)]
         self.tblCoeff.setVerticalHeaderLabels(idx_str)
 
-        logger.debug("load_entries - coeffs:\n"
+        logger.debug("load_dict - coeffs:\n"
             "Shape = %s\n"
             "Len   = %d\n"
             "NDim  = %d\n\n"

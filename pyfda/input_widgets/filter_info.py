@@ -39,7 +39,7 @@ class FilterInfo(QWidget):
         super(FilterInfo, self).__init__(parent)
         
         self._construct_UI()
-        self.load_entries()
+        self.load_dict()
 
     def _construct_UI(self):
         """
@@ -124,7 +124,7 @@ class FilterInfo(QWidget):
         self.chkRichText.clicked.connect(self._show_doc)
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         update docs and filter performance
         """

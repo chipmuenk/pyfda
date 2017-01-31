@@ -222,7 +222,7 @@ class FilterSpecs(QWidget):
         self.sigSpecsChanged.emit()
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload all specs/parameters entries from global dict fb.fil[0],
         using the "load_entries" methods of the individual classes

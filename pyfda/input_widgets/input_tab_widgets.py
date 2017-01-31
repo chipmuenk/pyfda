@@ -195,10 +195,10 @@ class InputTabWidgets(QWidget):
 
         self.filter_specs.color_design_button("ok")
         # TODO: The following should be handled within FilterSpecs ?
-        self.filter_specs.load_entries()
-        self.filter_info.load_entries()
-        self.filter_coeffs.load_entries()
-        self.filter_pz.load_entries()
+        self.filter_specs.load_dict()
+        self.filter_info.load_dict()
+        self.filter_coeffs.load_dict()
+        self.filter_pz.load_dict()
 
         logger.debug("Emit sigFilterDesigned!")
         self.sigFilterDesigned.emit() # pyFDA -> PlotTabWidgets.update_data
