@@ -508,13 +508,11 @@ class FilterPZ(QWidget):
         Add the number of selected rows to the table and fill new cells with
         zeros. If nothing is selected, add one row.
         """
-        print("\n_add_rows:")
         row = self.tblPZ.currentRow()
         sel = len(self._get_selected(self.tblPZ)['rows'])
-        # TODO: evaluate non-contiguous selection as well?
-        print(sel, row)
+        # TODO: evaluate and create non-contiguous selections as well?
 
-        if sel == 0: # nothing selected
+        if sel == 0: # nothing selected -> 
             sel = 1 # add at least one row ...
             row = min(len(self.zpk[0]), len(self.zpk[1])) # ... at the bottom
 
