@@ -209,7 +209,7 @@ class FilterPZ(QWidget):
         butClear.clicked.connect(self._clear_table)
 
         butSetZero.clicked.connect(self._zero_PZ)
-        self.tblPZ.itemChanged.connect(self._copy_entry)
+        self.tblPZ.itemChanged.connect(self._copy_item)
         self.cmbNorm.activated.connect(self._copy_item)
         #----------------------------------------------------------------------
 
@@ -369,9 +369,10 @@ class FilterPZ(QWidget):
         self._refresh_table()
 
 #------------------------------------------------------------------------------
-    def _copy_entry(self):
+    def _copy_item(self):
         """
-        Copy the values from the current table item to self.zpk 
+        Copy the value from the current table item to self.zpk. This is triggered
+        every time a table item is edited.
         """  
         col = self.tblPZ.currentIndex().column()
         row = self.tblPZ.currentIndex().row()
