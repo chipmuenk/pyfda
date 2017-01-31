@@ -415,7 +415,6 @@ class FilterPZ(QWidget):
 
         logger.debug("=====================\nFilterPZ._save_entries called")
         
-        self._copy_entries()
         fb.fil[0]['N'] = len(self.zpk[0])
         if np.any(self.zpk[1]): # any non-zero poles?
             fb.fil[0]['fc'] = 'Manual_IIR'
