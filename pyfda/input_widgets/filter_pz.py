@@ -33,13 +33,21 @@ class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the 
     QTableWidget.
-    displayText() displays number with n_digits without sacrificing precision of
+
+    `displayText()` displays number with n_digits without sacrificing precision of
     the data stored in the table.
+
+    In Python 3, python Qt objects are automatically converted to QVariant
+    when stored as "data" e.g. in a QTableWidgetItem and converted back when
+    retrieved. In Python 2, QVariant is returned when itemData is retrieved.
+    This is first converted from the QVariant container format to a
+    QString, next to a "normal" non-unicode string.
+
     """
     def displayText(self, text, locale):
-        return "{:.{n_digits}g}".format(np.asscalar(np.real_if_close(
-                        safe_eval(text), tol = 100)), n_digits = FilterPZ.n_digits)
-    
+        if not isinstance(text, six.text_type): #  
+            text = text.toString() # needed for Python 2, doesn't work with Py3
+        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = FilterPZ.n_digits)
 
 class FilterPZ(QWidget):
     """
