@@ -61,7 +61,8 @@ class FilterPZ(QWidget):
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
 
-        self.Hmax_last = 1
+        self.Hmax_last = 1  # initial setting for maximum gain
+        self.norm_last = "" # initial setting for previous combobox 
 
         self._construct_UI()
 
@@ -286,8 +287,6 @@ class FilterPZ(QWidget):
         print(type(self.cmbNorm.currentText()), self.cmbNorm.currentText())
         norm = self.cmbNorm.currentText()
         if norm != "None":
-        print(self.cmbNorm.currentText())
-        if self.cmbNorm.currentText() != "None":
             print("not None")
             b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2]) 
             [w, H] = freqz(b, a) 
@@ -295,10 +294,12 @@ class FilterPZ(QWidget):
             if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
                 Hmax = 1.
             if norm == "1":
-                self.zpk[2] = self.zpk[2] / Hmax
+                self.zpk[2] = self.zpk[2] / Hmax # normalize to 1
             elif norm == "Max":
+                if norm != self.norm_last: # setting has been changed -> 'Max'
+                    self.Hmax_last = Hmax # use current design to set Hmax_last
                 self.zpk[2] = self.zpk[2] / Hmax * self.Hmax_last
-            self.Hmax_last = Hmax # store current max. filter gain
+            self.norm_last = norm # store current setting of combobox
 
 #------------------------------------------------------------------------------
     def _restore_gain(self, source = None):
