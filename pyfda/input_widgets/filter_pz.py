@@ -372,7 +372,8 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _copy_item(self):
         """
-        Copy the value from the current table item to self.zpk. This is triggered
+        Copy the value from the current table item to self.zpk and update the
+        gain. This is triggered
         every time a table item is edited.
         """  
         col = self.tblPZ.currentIndex().column()
@@ -384,6 +385,8 @@ class FilterPZ(QWidget):
                 self.zpk[col][row] = safe_eval(item.text())
             else:
                 self.zpk[col][row] = 0.
+        
+        self._update_gain()
 
 #------------------------------------------------------------------------------
 #    def _copy_entries(self):
