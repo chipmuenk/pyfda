@@ -268,8 +268,7 @@ class FilterPZ(QWidget):
         """
         if self.spec_edited:
             print("\n_store_entry:", str(source.objectName()))
-            value = safe_eval(source.text())
-            self.zpk[2] = value
+            self.zpk[2] = safe_eval(source.text())
             self.spec_edited = False # reset flag
 
             self._update_gain()
