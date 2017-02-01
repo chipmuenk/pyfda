@@ -283,7 +283,9 @@ class FilterPZ(QWidget):
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
 
-        if self.cmbNorm.currentText() != "None":        
+        print(self.cmbNorm.currentText())
+        if self.cmbNorm.currentText() != "None":
+            print("not None")
             b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2]) 
             [w, H] = freqz(b, a) 
             Hmax = max(abs(H)) 
