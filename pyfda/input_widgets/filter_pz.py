@@ -341,7 +341,8 @@ class FilterPZ(QWidget):
 
         if self.chkPZList.isChecked():
 
-            self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+
+            self._restore_gain()
 
             self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
             self.tblPZ.setColumnCount(2)
