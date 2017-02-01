@@ -247,7 +247,9 @@ class FilterPZ(QWidget):
                 key = event.key() # key press: 6, key release: 7
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}: # store entry
                     self._store_gain(source)
+                    self._restore_gain(source) # display in desired format
                     return True
+
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False
                     self._restore_gain(source)
