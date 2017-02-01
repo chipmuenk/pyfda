@@ -90,11 +90,10 @@ class FilterPZ(QWidget):
         self.spnRound.setValue(FilterPZ.n_digits)
         self.spnRound.setToolTip("Display d digits.")
 
-        self.chkNorm =  QCheckBox("Normalize", self)
-        self.chkNorm.setChecked(False)
-        self.chkNorm.setToolTip("Normalize max. (H(f)).")
+        self.lblNorm = QLabel("Normalize", self)
         self.cmbNorm = QComboBox(self)
         self.cmbNorm.addItems(["None", "1", "Max"])
+        self.cmbNorm.setToolTip("Normalize max. (H(f)).")
 
         self.lblGain = QLabel(rt_label("k = "), self)
         self.ledGain = QLineEdit(self)
@@ -156,7 +155,7 @@ class FilterPZ(QWidget):
         layHGain.addWidget(self.lblGain)
         layHGain.addWidget(self.ledGain)
 #        layHChkBoxes.addStretch(1)
-        layHGain.addWidget(self.chkNorm)
+        layHGain.addWidget(self.lblNorm)
         layHGain.addWidget(self.cmbNorm)
         layHGain.addStretch()
 
