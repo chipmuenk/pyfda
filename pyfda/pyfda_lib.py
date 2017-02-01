@@ -120,7 +120,7 @@ def extract_file_ext(file_type):
 #------------------------------------------------------------------------------
 def read_cmb_box(cmb_box):
     """
-    Read out current setting of comboBox and convert it to string.
+    Read out current itemData of comboBox and convert it to string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
