@@ -201,7 +201,7 @@ is estimated using Ichige's algorithm.
         # fires when edited line looses focus or when RETURN is pressed
         #----------------------------------------------------------------------
 
-        self._load_entries() # get initial / last setting from dictionary
+        self._load_dict() # get initial / last setting from dictionary
         self._update_UI()
         
     def _update_UI(self):
@@ -228,10 +228,10 @@ is estimated using Ichige's algorithm.
         self.led_remez_1.editingFinished.disconnect()
 
 
-    def _load_entries(self):
+    def _load_dict(self):
         """
         Reload parameter(s) from filter dictionary (if they exist) and set 
-        corresponding UI elements. load_entries() is called upon initialization
+        corresponding UI elements. _load_dict() is called upon initialization
         and when the filter is loaded from disk.
         """
         if 'wdg_fil' in fb.fil[0] and 'equiripple' in fb.fil[0]['wdg_fil']:

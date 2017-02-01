@@ -176,7 +176,7 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.activated.connect(self._update_UI)
         #----------------------------------------------------------------------
 
-        self._load_entries() # get initial / last setting from dictionary
+        self._load_dict() # get initial / last setting from dictionary
         self._update_UI()
 
 
@@ -241,10 +241,10 @@ class Firwin(QWidget):
         self.cmb_firwin_alg.activated.disconnect()
 
 
-    def _load_entries(self):
+    def _load_dict(self):
         """
         Reload window selection and parameters from filter dictionary
-        and set UI elements accordingly. load_entries() is called upon 
+        and set UI elements accordingly. load_dict() is called upon 
         initialization and when the filter is loaded from disk.
         """
         win_idx = 0
@@ -337,7 +337,7 @@ class Firwin(QWidget):
             self.led_firwin_1.setText(str(beta))
             fb.fil[0]['wdg_fil'][1] = beta
             self.firWindow[1] = beta
-            self._load_entries()
+            self._load_dict()
             return N
         
         if self.firWindow == 'hann':

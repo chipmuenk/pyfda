@@ -113,13 +113,13 @@ class TargetSpecs(QWidget):
         self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Update entries from global dict fb.fil[0]
-        parameters, using the "load_entries" methods of the classes
+        parameters, using the "load_dict" methods of the classes
         """
-        self.a_specs.load_entries() # magnitude specs with unit
-        self.f_specs.load_entries() # weight specification
+        self.a_specs.load_dict() # magnitude specs with unit
+        self.f_specs.load_dict() # weight specification
 
 #------------------------------------------------------------------------------
 

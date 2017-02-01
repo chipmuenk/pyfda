@@ -141,7 +141,7 @@ class InputTabWidgets(QWidget):
         Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
-        self.filter_info.load_entries() # update frequency unit of info widget
+        self.filter_info.load_dict() # update frequency unit of info widget
         logger.debug("Emit sigViewChanged!")
         self.sigViewChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
 
@@ -160,7 +160,7 @@ class InputTabWidgets(QWidget):
         """
 
         self.filter_specs.color_design_button("changed")
-        self.filter_info.load_entries()
+        self.filter_info.load_dict()
         if fb.MYHDL:
             self.hdlSpecs.update_UI()
         logger.debug("Emit sigSpecsChanged!")
@@ -170,11 +170,11 @@ class InputTabWidgets(QWidget):
         """
         Called when a new filter has been LOADED:
         Pass new filter data from the global filter dict
-        - Specifically call SelectFilter.load_entries
+        - Specifically call SelectFilter.load_dict
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         """
-        self.filter_specs.sel_fil.load_entries() # update select_filter widget
+        self.filter_specs.sel_fil.load_dict() # update select_filter widget
         self.update_all()
 
 

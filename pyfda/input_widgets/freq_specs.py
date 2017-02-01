@@ -106,7 +106,7 @@ class FreqSpecs(QWidget):
         if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_entries()
+                self.load_dict()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -114,7 +114,7 @@ class FreqSpecs(QWidget):
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False                    
-                    self.load_entries()
+                    self.load_dict()
                 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
@@ -182,7 +182,7 @@ class FreqSpecs(QWidget):
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
 
 #-------------------------------------------------------------        
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload textfields from filter dictionary 
         Transform the displayed frequency spec input fields according to the units
@@ -190,7 +190,7 @@ class FreqSpecs(QWidget):
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
-        load_entries is called during init and when the frequency unit or the
+        load_dict is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
@@ -198,7 +198,7 @@ class FreqSpecs(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.debug("exec load_entries")
+        logger.debug("exec load_dict")
         for i in range(len(self.qlineedit)):
             f_name = str(self.qlineedit[i].objectName()).split(":",1)
             f_label = f_name[0]
@@ -273,7 +273,7 @@ class FreqSpecs(QWidget):
             for i in range(self.n_cur_labels):
                 fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
                 
-        self.load_entries()
+        self.load_dict()
 
 
 #------------------------------------------------------------------------------

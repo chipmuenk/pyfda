@@ -107,10 +107,10 @@ class AmplitudeSpecs(QWidget):
         # SIGNALS & SLOTs / EVENT MONITORING
         #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self._set_amp_unit)
-        #       ^ this also triggers the initial load_entries
+        #       ^ this also triggers the initial load_dict
         # DYNAMIC EVENT MONITORING
         # Every time a field is edited, call self._store_entry and
-        # self.load_entries. This is achieved by dynamically installing and
+        # self.load_dict. This is achieved by dynamically installing and
         # removing event filters when creating / deleting subwidgets.
         # The event filter monitors the focus of the input fields.
 
@@ -133,7 +133,7 @@ class AmplitudeSpecs(QWidget):
         if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_entries()
+                self.load_dict()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -141,7 +141,7 @@ class AmplitudeSpecs(QWidget):
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False                    
-                    self.load_entries()
+                    self.load_dict()
 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
@@ -188,11 +188,11 @@ class AmplitudeSpecs(QWidget):
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
-        self.load_entries() # display rounded filter dict entries in selected unit
+        self.load_dict() # display rounded filter dict entries in selected unit
 
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload and reformat the amplitude textfields from filter dict when a new filter
         design algorithm is selected or when the user has changed the unit  (V / W / dB):
@@ -220,10 +220,10 @@ class AmplitudeSpecs(QWidget):
     def _set_amp_unit(self, source):
         """
         Store unit for amplitude in filter dictionary, reload amplitude spec 
-        entries via load_entries and fire a sigUnitChanged signal
+        entries via load_dict and fire a sigUnitChanged signal
         """
         fb.fil[0]['amp_specs_unit'] = str(self.cmbUnitsA.currentText())
-        self.load_entries()
+        self.load_dict()
 
         self.sigUnitChanged.emit() # -> input_widgets
 
@@ -246,7 +246,7 @@ class AmplitudeSpecs(QWidget):
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag
-        self.load_entries()
+        self.load_dict()
 
 #-------------------------------------------------------------
     def _hide_entries(self, num_new_labels):

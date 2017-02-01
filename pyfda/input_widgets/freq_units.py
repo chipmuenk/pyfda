@@ -248,7 +248,7 @@ class FreqUnits(QWidget):
 
 
     #-------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload comboBox settings and textfields from filter dictionary
         Block signals during update of combobox / lineedit widgets

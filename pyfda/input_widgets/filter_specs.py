@@ -113,8 +113,8 @@ class FilterSpecs(QWidget):
 
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
-        self.f_units.sigUnitChanged.connect(self.f_specs.load_entries)
-        self.f_units.sigUnitChanged.connect(self.t_specs.load_entries)
+        self.f_units.sigUnitChanged.connect(self.f_specs.load_dict)
+        self.f_units.sigUnitChanged.connect(self.t_specs.load_dict)
         self.f_units.sigUnitChanged.connect(self.sigViewChanged)
         # Activating the "Sort" button triggers sigSpecsChanged, requiring
         # sorting and storing the frequency entries
@@ -225,14 +225,14 @@ class FilterSpecs(QWidget):
     def load_dict(self):
         """
         Reload all specs/parameters entries from global dict fb.fil[0],
-        using the "load_entries" methods of the individual classes
+        using the "load_dict" methods of the individual classes
         """
-        self.sel_fil.load_entries() # select filter widget
-        self.f_units.load_entries() # frequency units widget
-        self.f_specs.load_entries() # frequency specification widget
-        self.a_specs.load_entries() # magnitude specs with unit
-        self.w_specs.load_entries() # weight specification
-        self.t_specs.load_entries() # target specs
+        self.sel_fil.load_dict() # select filter widget
+        self.f_units.load_dict() # frequency units widget
+        self.f_specs.load_dict() # frequency specification widget
+        self.a_specs.load_dict() # magnitude specs with unit
+        self.w_specs.load_dict() # weight specification
+        self.t_specs.load_dict() # target specs
 
 #------------------------------------------------------------------------------
     def start_design_filt(self):
@@ -280,8 +280,8 @@ class FilterSpecs(QWidget):
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
             self.sel_fil.load_filter_order()
-            self.w_specs.load_entries()
-            self.f_specs.load_entries()
+            self.w_specs.load_dict()
+            self.f_specs.load_dict()
             self.color_design_button("ok")
 
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
