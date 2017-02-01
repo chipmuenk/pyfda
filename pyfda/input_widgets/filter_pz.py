@@ -281,6 +281,9 @@ class FilterPZ(QWidget):
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
 
+        print(type(self.cmbNorm.currentText()), self.cmbNorm.currentText())
+        norm = self.cmbNorm.currentText()
+        if norm != "None":
         print(self.cmbNorm.currentText())
         if self.cmbNorm.currentText() != "None":
             print("not None")
@@ -289,9 +292,9 @@ class FilterPZ(QWidget):
             Hmax = max(abs(H)) 
             if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
                 Hmax = 1.
-            if self.cmbNorm.currentText() == "1":
+            if norm == "1":
                 self.zpk[2] = self.zpk[2] / Hmax
-            elif self.cmbNorm.currentText() == "Max":
+            elif norm == "Max":
                 self.zpk[2] = self.zpk[2] / Hmax * self.Hmax_last
             self.Hmax_last = Hmax # store current max. filter gain
 
