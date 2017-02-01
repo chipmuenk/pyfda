@@ -374,9 +374,12 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _copy_item(self):
         """
-        Copy the value from the current table item to self.zpk and update the
-        gain. This is triggered
-        every time a table item is edited.
+        Copy the value from the current table item to self.zpk and normalize / 
+        update the gain. This is triggered every time a table item is edited.
+        When no item was selected, only the gain is updated.
+        
+        Triggered by  `tblPZ.itemChanged` and `cmbNorm.activated`
+
         """  
         col = self.tblPZ.currentIndex().column()
         row = self.tblPZ.currentIndex().row()
