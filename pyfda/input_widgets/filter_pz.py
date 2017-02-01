@@ -238,7 +238,7 @@ class FilterPZ(QWidget):
             if event.type() == QEvent.FocusIn:  # 8
                 print(source.objectName(), "focus in")
                 self.spec_edited = False
-                self._update_gain(source)
+                self._restore_gain(source)
                 return True # event processing stops here
 
             elif event.type() == QEvent.KeyPress:
@@ -250,13 +250,13 @@ class FilterPZ(QWidget):
                     return True
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False
-                    self._update_gain(source)
+                    self._restore_gain(source)
                     return True
 
             elif event.type() == QEvent.FocusOut: # 9
                 print(source.objectName(), "focus out")
-                self._update_gain(source)
                 self._store_gain(source)
+                self._restore_gain(source) # display in desired format
                 return True
         return super(FilterPZ, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
@@ -299,7 +299,7 @@ class FilterPZ(QWidget):
             self.Hmax_last = Hmax # store current max. filter gain
 
 #------------------------------------------------------------------------------
-    def _update_gain(self, source = None):
+    def _restore_gain(self, source = None):
         """
         Recalculate gain and update QLineEdit
 
@@ -389,7 +389,7 @@ class FilterPZ(QWidget):
             else:
                 self.zpk[col][row] = 0.
         
-        self._update_gain()
+        self._restore_gain()
 
 #------------------------------------------------------------------------------
 #    def _copy_entries(self):
