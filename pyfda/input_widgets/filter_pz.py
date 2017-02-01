@@ -274,8 +274,7 @@ class FilterPZ(QWidget):
             self.zpk[2] = safe_eval(source.text())
             self.spec_edited = False # reset flag
 
-            self._update_gain()
-
+#------------------------------------------------------------------------------
     def _normalize_gain(self):
         """
         Normalize the gain factor so that the maximum of |H(f)| stays 1 or a 
@@ -392,6 +391,7 @@ class FilterPZ(QWidget):
             else:
                 self.zpk[col][row] = 0.
         
+        self._normalize_gain()
         self._restore_gain()
 
 #------------------------------------------------------------------------------
