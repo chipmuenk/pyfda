@@ -314,14 +314,10 @@ class FilterPZ(QWidget):
         self.lblGain.setVisible(self.chkPZList.isChecked())
         
         if self.chkPZList.isChecked():
-            if isinstance(source, QLineEdit):
-
-                self._normalize_gain()
-                
-                if not self.ledGain.hasFocus():  # no focus, round the gain
-                    self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
-                else: # widget has focus, show gain with full precision
-                    self.ledGain.setText(str(self.zpk[2]))
+            if not self.ledGain.hasFocus():  # no focus, round the gain
+                self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+            else: # widget has focus, show gain with full precision
+                self.ledGain.setText(str(self.zpk[2]))
 
 
 #------------------------------------------------------------------------------
