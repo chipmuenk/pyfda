@@ -377,7 +377,7 @@ class FilterPZ(QWidget):
         register self.zpk and update the display.
         """
 
-        self.zpk = fb.fil[0]['zpk'].copy()
+        self.zpk = np.array(fb.fil[0]['zpk']) # this enforces a deep copy
         self._refresh_table()
 
 #------------------------------------------------------------------------------
