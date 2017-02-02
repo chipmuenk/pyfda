@@ -71,8 +71,8 @@ class FilterPZ(QWidget):
         Intitialize the widget, consisting of:
         """
         #  size for QLineEdit fields
-        self.H  = QFMetric.H
-        self.W8 = QFMetric.W * 8
+        H  = QFMetric.H
+        W8 = QFMetric.W0 * 8
 
         # Find which button holds the longest text:
         MaxTextlen = 0
@@ -107,7 +107,7 @@ class FilterPZ(QWidget):
         self.ledGain.setToolTip("Specify gain factor <i>k</i>.")
         self.ledGain.setText(str(1.))
         self.ledGain.setObjectName("ledGain")
-        self.ledGain.setFixedSize(self.W8, self.H)
+        self.ledGain.setFixedSize(W8, H)
         self.ledGain.installEventFilter(self)
 
         self.tblPZ = QTableWidget(self)
@@ -151,7 +151,7 @@ class FilterPZ(QWidget):
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("<SPAN>Specify tolerance.</SPAN>")
         self.ledSetEps.setText(str(1e-6))
-        self.ledSetEps.setFixedSize(self.W8, self.H)
+        self.ledSetEps.setFixedSize(W8, H)
 
         # ============== UI Layout =====================================
         layHChkBoxes = QHBoxLayout()

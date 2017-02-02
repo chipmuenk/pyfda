@@ -160,9 +160,7 @@ class FreqSpecs(QWidget):
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
 
-        lbl_pix_width = max([self.qfm.width(l) for l in new_labels])
-        led_pix_width  = self.qfm.W0 * 8 # width of "0" in pixels
-        led_pix_height = self.qfm.H
+        W_lbl = max([self.qfm.width(l) for l in new_labels]) # max. label width in pixel
 
         #---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
@@ -171,11 +169,11 @@ class FreqSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
-            self.qlabels[i].setFixedSize(lbl_pix_width, led_pix_height)
+            self.qlabels[i].setFixedSize(W_lbl, QFMetric.H)
             
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-            self.qlineedit[i].setFixedSize(led_pix_width, led_pix_height) # set widget dimensions
+            self.qlineedit[i].setFixedSize(QFMetric.W0 * 8, QFMetric.H) # set widget dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels

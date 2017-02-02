@@ -55,15 +55,15 @@ class QFMetric(object):
 #        super(QFMetric, self).__init__(parent)
         myfont = QFont("", 0)
         self.qfm = QFontMetrics(myfont)
-        self.W0 = self.qfm.width("0")
-        self.H = self.qfm.height()
+        # self.W0 = self.qfm.width("0") # width of "0" in pixels
+        # self.H = self.qfm.height() # height of "0" in pixels (too tight on some systems)
 
+        # define class attributes
         test_label = QLabel("0")
-        QFMetric.H = round(test_label.sizeHint().height() * 1.25) # class attribute
-        QFMetric.W = round(test_label.sizeHint().width() * 1.25) # class attribute
-
-        print(self.W0, self.H)
-        print(self.qfm.size(0, "0"))
+        test_edit = QLineEdit()
+        QFMetric.H = round(test_edit.sizeHint().height())
+        QFMetric.W0 = round(test_label.sizeHint().width())
+        # print("LabelW, LabelH, EditH:", QFMetric.W0, round(test_label.sizeHint().height()), QFMetric.H)
 
     def width(self, mystring):
         return self.qfm.width(mystring)
