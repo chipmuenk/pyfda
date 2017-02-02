@@ -240,13 +240,11 @@ class FilterPZ(QWidget):
 
         if isinstance(source, QLineEdit):
             if event.type() == QEvent.FocusIn:  # 8
-                print(source.objectName(), "focus in")
                 self.spec_edited = False
                 self._restore_gain(source)
                 return True # event processing stops here
 
             elif event.type() == QEvent.KeyPress:
-                print(source.objectName(), "key")
                 self.spec_edited = True # entry has been changed
                 key = event.key() # key press: 6, key release: 7
                 if key in {QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter}: # store entry
@@ -273,7 +271,6 @@ class FilterPZ(QWidget):
         RETURN key.
         """
         if self.spec_edited:
-            print("\n_store_entry:", str(source.objectName()))
             self.zpk[2] = safe_eval(source.text())
             self.spec_edited = False # reset flag
 
@@ -286,10 +283,8 @@ class FilterPZ(QWidget):
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
 
-        print(type(self.cmbNorm.currentText()), self.cmbNorm.currentText())
         norm = self.cmbNorm.currentText()
         if norm != "None":
-            print("not None")
             b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2]) 
             [w, H] = freqz(b, a) 
             Hmax = max(abs(H)) 
@@ -310,8 +305,7 @@ class FilterPZ(QWidget):
 
         Called by _store_entry()
         """
-        print("\n_update_gain:")
-        
+
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
         
@@ -333,7 +327,6 @@ class FilterPZ(QWidget):
 
         Called by _store_entry()
         """
-        print("\n_refresh_table:")
 
         FilterPZ.n_digits = int(self.spnRound.text())
         
@@ -369,9 +362,7 @@ class FilterPZ(QWidget):
         Load all entries from filter dict fb.fil[0]['zpk'] into the shadow
         register self.zpk and update the display.
         """
-        print("\nload_dict:")
 
-        self.zpk = fb.fil[0]['zpk']
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -468,18 +459,12 @@ class FilterPZ(QWidget):
         - selected rows
         - current cell
         """
-        print("get_selected")
         idx = []
         for _ in table.selectedItems():
             idx.append([_.column(), _.row(), ])
         cols = sorted(list({i[0] for i in idx}))
         rows = sorted(list({i[1] for i in idx}))
         cur = (table.currentColumn(), table.currentRow())
-
-
-        cur_idx = table.currentIndex()
-        print("cur_index: ", cur_idx.column(), cur_idx.row())
-        print("cur_r_c:", cur)
 
         return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
 
