@@ -83,7 +83,8 @@ class FilterPZ(QWidget):
 
         self.chkPZList = QCheckBox("Show table", self)
         self.chkPZList.setChecked(True)
-        self.chkPZList.setToolTip("Show filter Poles / Zeros as an editable table.")
+        self.chkPZList.setToolTip("<span>Show filter Poles / Zeros as an editable table. "
+                                  "For high order systems, this might be slow. </span>")
 
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
@@ -94,11 +95,12 @@ class FilterPZ(QWidget):
         self.lblNorm = QLabel("Normalize", self)
         self.cmbNorm = QComboBox(self)
         self.cmbNorm.addItems(["None", "1", "Max"])
-        self.cmbNorm.setToolTip("Normalize max. (H(f)).")
+        self.cmbNorm.setToolTip("<span>Set the gain <i>k</i> so that H(f)<sub>max</sub> is "
+                                "either 1 or the max. of the previous system.</span>")
 
         self.lblGain = QLabel(rt_label("k = "), self)
         self.ledGain = QLineEdit(self)
-        self.ledGain.setToolTip("Specify gain factor k.")
+        self.ledGain.setToolTip("Specify gain factor <i>k</i>.")
         self.ledGain.setText(str(1.))
         self.ledGain.setObjectName("ledGain")
         self.ledGain.installEventFilter(self)
