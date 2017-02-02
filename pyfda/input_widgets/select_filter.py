@@ -210,11 +210,11 @@ class SelectFilter(QWidget):
 
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload comboboxes from filter dictionary to update changed settings
         after loading a filter design from disk.
-        `load_entries` uses the automatism of _set_response_type etc.
+        `load_dict` uses the automatism of _set_response_type etc.
         of checking whether the previously selected filter design method is
         also available for the new combination.
         """

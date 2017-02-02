@@ -27,6 +27,8 @@ Created on Mon Apr 30 10:29:42 2012
 
 from __future__ import division, print_function
 import os, sys, six, re
+import logging
+logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, arctan
 
@@ -40,13 +42,26 @@ from scipy import __version__ as _scipy_version
 
 #import logging
 from distutils.version import LooseVersion
-
 SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
 
-#from PyQt4 import QtGui
-#print("scipy:", _scipy_version)
+import pyfda.simpleeval as se
 
 #### General functions ########################################################
+
+def safe_eval(expr):
+    """
+    try ... except wrapper around simple_eval to catch various errors
+    Error type could be used to start more specific actions (like, restore 
+    the previous value)
+    """
+    try:
+        # eliminate very small imaginary components due to rounding errors
+        return np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
+    except (SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+        logger.warn(e)
+        return 0.
+            
+
 # taken from
 # http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
 def valid(path):
@@ -107,7 +122,7 @@ def extract_file_ext(file_type):
 #------------------------------------------------------------------------------
 def read_cmb_box(cmb_box):
     """
-    Read out current setting of comboBox and convert it to string.
+    Read out current itemData of comboBox and convert it to string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
@@ -115,7 +130,6 @@ def read_cmb_box(cmb_box):
     This is first converted from the QVariant container format to a
     QString, next to a "normal" non-unicode string.
 
-    
     Returns:
     
     The current setting of combobox as string
@@ -942,18 +956,24 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
     
     if format_in == 'sos':
             fil_dict['sos'] = arg
+            fil_dict['ft'] = 'IIR'
 
     elif format_in == 'zpk':
         format_error = False
         if np.ndim(arg) == 1:
-            if np.ndim(arg[0]) == 0: # list / array with z only
+            if np.ndim(arg[0]) == 0: # list / array with z only -> FIR
                 z = arg
                 p = np.zeros(len(z))
                 k = 1
                 fil_dict['zpk'] = [z, p, k]
+                fil_dict['ft'] = 'FIR'
             elif np.ndim(arg[0]) == 1: # list of lists
                 if np.shape(arg)[0] == 3:
                     fil_dict['zpk'] = [arg[0], arg[1], arg[2]]
+                    if np.any(arg[1]): # non-zero poles -> IIR
+                        fil_dict['ft'] = 'IIR'
+                    else:
+                        fil_dict['ft'] = 'FIR'
                 else:
                     format_error = True
             else:
@@ -966,14 +986,18 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
 
             
     elif format_in == 'ba': 
-        if np.ndim(arg) == 1: # arg = [b]
+        if np.ndim(arg) == 1: # arg = [b] -> FIR
             b = np.asarray(arg)
             a = np.zeros(len(b))
             a[0] = 1
-
+            fil_dict['ft'] = 'FIR'
         else: # arg = [b,a]
             b = arg[0]
             a = arg[1]
+            if np.any(a):
+                fil_dict['ft'] = 'IIR'
+            else:
+                fil_dict['ft'] = 'FIR'
 
         fil_dict['ba'] = [b, a]
 
@@ -1361,22 +1385,3 @@ def HLine(QFrame, widget):
 
 if __name__=='__main__':
     pass
-#    import matplotlib.pyplot as plt
-##    from matplotlib import patches
-#    ax1 = plt.figure(1).add_subplot(111)
-#    print(zplane(b=[1,0,0,1], a = 1, plt_ax = ax1))
-#    ax2 = plt.figure(2).add_subplot(111)
-#    print(zplane(z=1, plt_ax = ax2))
-#    ax3 = plt.figure(3).add_subplot(111)
-#    print(zplane(b=[1,1], plt_ax = ax3))
-#    format_ticks(ax3, 'xy', format="%2.2f", scale = 5)
-#    
-#    ax4 = plt.figure(4).add_subplot(111)
-#    print(zplane(b=[1,0], plt_ax = ax4))
-#    ax5 = plt.figure(5).add_subplot(111)
-#    print(zplane(b=[1,1,1,1,1], plt_ax = ax5))
-#    ax6 = plt.figure(6).add_subplot(111)
-#    print(zplane(b=np.convolve([1,1,1,1,1], [1,1,1,1,1]), a = [1,1], plt_ax = ax6))
-##    ax7 = plt.figure(7).add_subplot(111)
-##    print(zplane(b=1, plt_ax = ax7))
-#    plt.show()

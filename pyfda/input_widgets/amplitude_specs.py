@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, Qt, QEvent, pyqtSignal, 
                       QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont,
-                      QVBoxLayout, QHBoxLayout, QGridLayout)
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QFMetric)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, style_widget
+from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, style_widget, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.simpleeval import simple_eval
+
 
 class AmplitudeSpecs(QWidget):
     """
@@ -49,13 +49,11 @@ class AmplitudeSpecs(QWidget):
 
         bfont = QFont()
         bfont.setBold(True)
-        lblTitle = QLabel(self) # field for widget title
-        lblTitle.setText(str(self.title))
+        lblTitle = QLabel(str(self.title), self) # field for widget title
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
 
-        lblUnits = QLabel(self)
-        lblUnits.setText(" in ")
+        lblUnits = QLabel("in", self)
 
         self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(amp_units)
@@ -76,7 +74,7 @@ class AmplitudeSpecs(QWidget):
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(lblUnits, Qt.AlignLeft)
         layHTitle.addWidget(self.cmbUnitsA, Qt.AlignLeft)
-        layHTitle.addStretch(2)
+        layHTitle.addStretch(1)
         
         self.layGSpecs = QGridLayout() # sublayout for spec fields
         # set the title as the first (fixed) entry in grid layout. The other
@@ -91,6 +89,8 @@ class AmplitudeSpecs(QWidget):
         self.layVMain = QVBoxLayout() # Widget main layout
         self.layVMain.addWidget(frmMain)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
+
+        self.qfm = QFMetric(self) # instance for calculating font metrics
 
         self.setLayout(self.layVMain)
         
@@ -107,10 +107,10 @@ class AmplitudeSpecs(QWidget):
         # SIGNALS & SLOTs / EVENT MONITORING
         #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self._set_amp_unit)
-        #       ^ this also triggers the initial load_entries
+        #       ^ this also triggers the initial load_dict
         # DYNAMIC EVENT MONITORING
         # Every time a field is edited, call self._store_entry and
-        # self.load_entries. This is achieved by dynamically installing and
+        # self.load_dict. This is achieved by dynamically installing and
         # removing event filters when creating / deleting subwidgets.
         # The event filter monitors the focus of the input fields.
 
@@ -133,7 +133,7 @@ class AmplitudeSpecs(QWidget):
         if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_entries()
+                self.load_dict()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -141,7 +141,7 @@ class AmplitudeSpecs(QWidget):
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False                    
-                    self.load_entries()
+                    self.load_dict()
 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
@@ -166,6 +166,10 @@ class AmplitudeSpecs(QWidget):
         state = new_labels[0]        
         new_labels = new_labels[1:]
 
+        lbl_pix_width = max([self.qfm.width(l) for l in new_labels])
+        led_pix_width  = self.qfm.W0 * 8 # width of "0" in pixels
+        led_pix_height = self.qfm.H
+
         num_new_labels = len(new_labels)
         if num_new_labels < self.n_cur_labels: # less new labels/qlineedit fields than before
             self._hide_entries(num_new_labels)
@@ -176,17 +180,19 @@ class AmplitudeSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
-
+            self.qlabels[i].setFixedSize(lbl_pix_width, led_pix_height) # set label dimensions
+            
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+            self.qlineedit[i].setFixedSize(led_pix_width, led_pix_height) # set lineedit dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
-        self.load_entries() # display rounded filter dict entries in selected unit
+        self.load_dict() # display rounded filter dict entries in selected unit
 
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload and reformat the amplitude textfields from filter dict when a new filter
         design algorithm is selected or when the user has changed the unit  (V / W / dB):
@@ -214,10 +220,10 @@ class AmplitudeSpecs(QWidget):
     def _set_amp_unit(self, source):
         """
         Store unit for amplitude in filter dictionary, reload amplitude spec 
-        entries via load_entries and fire a sigUnitChanged signal
+        entries via load_dict and fire a sigUnitChanged signal
         """
         fb.fil[0]['amp_specs_unit'] = str(self.cmbUnitsA.currentText())
-        self.load_entries()
+        self.load_dict()
 
         self.sigUnitChanged.emit() # -> input_widgets
 
@@ -236,11 +242,11 @@ class AmplitudeSpecs(QWidget):
             unit = str(self.cmbUnitsA.currentText())
             filt_type = fb.fil[0]['ft']
             amp_label = str(source.objectName())
-            amp_value = simple_eval(source.text())
+            amp_value = safe_eval(source.text())
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag
-        self.load_entries()
+        self.load_dict()
 
 #-------------------------------------------------------------
     def _hide_entries(self, num_new_labels):

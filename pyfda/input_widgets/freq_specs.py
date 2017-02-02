@@ -12,12 +12,11 @@ logger = logging.getLogger(__name__)
 from ..compat import (QtCore,
                       QWidget, QLabel, QLineEdit, QFrame, QFont,
                       QVBoxLayout, QHBoxLayout, QGridLayout,
-                      pyqtSignal, QEvent)
+                      pyqtSignal, QEvent, QFMetric)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, style_widget
+from pyfda.pyfda_lib import rt_label, style_widget, safe_eval
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.simpleeval import simple_eval
 
 class FreqSpecs(QWidget):
     """
@@ -48,17 +47,16 @@ class FreqSpecs(QWidget):
         bfont = QFont()
         bfont.setBold(True)
 
-        lblTitle = QLabel() # field for widget title
-        lblTitle.setText(str(self.title))
+        lblTitle = QLabel(str(self.title), self) # field for widget title
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
-        self.lblUnit = QLabel()
-        self.lblUnit.setText(" in " + rt_label(fb.fil[0]['freq_specs_unit']))
+        self.lblUnit = QLabel(self)
+        self.lblUnit.setText("in " + rt_label(fb.fil[0]['freq_specs_unit']))
 
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
         layHTitle.addWidget(self.lblUnit)
-        layHTitle.addStretch(2)
+        layHTitle.addStretch(1)
         
         # Create a gridLayout consisting of QLabel and QLineEdit fields
         # for the frequency specs:
@@ -76,6 +74,8 @@ class FreqSpecs(QWidget):
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
         
+        self.qfm = QFMetric(self) # instance for calculating font metrics
+
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits        
 
         #----------------------------------------------------------------------
@@ -106,7 +106,7 @@ class FreqSpecs(QWidget):
         if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_entries()
+                self.load_dict()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -114,7 +114,7 @@ class FreqSpecs(QWidget):
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False                    
-                    self.load_entries()
+                    self.load_dict()
                 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
@@ -132,7 +132,7 @@ class FreqSpecs(QWidget):
         """
         if self.spec_edited:
             f_label = str(event_source.objectName())
-            f_value = simple_eval(event_source.text()) / fb.fil[0]['f_S']
+            f_value = safe_eval(event_source.text()) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
             self.sigSpecsChanged.emit() # -> filter_specs
@@ -155,10 +155,14 @@ class FreqSpecs(QWidget):
         state = new_labels[0]
         new_labels = new_labels[1:]
             
-        self.lblUnit.setText(" in " + str(fb.fil[0]['freq_specs_unit']))
+        self.lblUnit.setText(" in " + rt_label(fb.fil[0]['freq_specs_unit']))
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
+
+        lbl_pix_width = max([self.qfm.width(l) for l in new_labels])
+        led_pix_width  = self.qfm.W0 * 8 # width of "0" in pixels
+        led_pix_height = self.qfm.H
 
         #---------------------------- logging -----------------------------
         logger.debug("update_UI: {0}-{1}-{2}".format(
@@ -167,16 +171,18 @@ class FreqSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
+            self.qlabels[i].setFixedSize(lbl_pix_width, led_pix_height)
+            
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
-
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+            self.qlineedit[i].setFixedSize(led_pix_width, led_pix_height) # set widget dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
 
 #-------------------------------------------------------------        
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload textfields from filter dictionary 
         Transform the displayed frequency spec input fields according to the units
@@ -184,7 +190,7 @@ class FreqSpecs(QWidget):
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
-        load_entries is called during init and when the frequency unit or the
+        load_dict is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
@@ -192,7 +198,7 @@ class FreqSpecs(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.debug("exec load_entries")
+        logger.debug("exec load_dict")
         for i in range(len(self.qlineedit)):
             f_name = str(self.qlineedit[i].objectName()).split(":",1)
             f_label = f_name[0]
@@ -267,7 +273,7 @@ class FreqSpecs(QWidget):
             for i in range(self.n_cur_labels):
                 fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
                 
-        self.load_entries()
+        self.load_dict()
 
 
 #------------------------------------------------------------------------------

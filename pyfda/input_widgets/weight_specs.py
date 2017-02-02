@@ -9,14 +9,13 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QtGui,
-                      QWidget, QLabel, QLineEdit, QFrame, QFont, QPushButton,
+from ..compat import (QtCore,
+                      QWidget, QLabel, QLineEdit, QFrame, QFont, QToolButton,
                       QVBoxLayout, QHBoxLayout, QGridLayout, pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, style_widget
+from pyfda.pyfda_lib import rt_label, style_widget, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.simpleeval import simple_eval
 
 
 class WeightSpecs(QWidget):
@@ -55,7 +54,8 @@ class WeightSpecs(QWidget):
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
 
-        self.butReset = QPushButton("Reset", self)
+        self.butReset = QToolButton(self)
+        self.butReset.setText("Reset")
         self.butReset.setToolTip("Reset weights to 1")
                 
         layHTitle = QHBoxLayout()       # Layout for title and reset button
@@ -93,7 +93,7 @@ class WeightSpecs(QWidget):
         #       ^ this also initializes the weight text fields
         # DYNAMIC EVENT MONITORING
         # Every time a field is edited, call self._store_entry and
-        # self.load_entries. This is achieved by dynamically installing and
+        # self.load_dict. This is achieved by dynamically installing and
         # removing event filters when creating / deleting subwidgets.
         # The event filter monitors the focus of the input fields.
 
@@ -116,7 +116,7 @@ class WeightSpecs(QWidget):
         if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_entries()
+                self.load_dict()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -124,7 +124,7 @@ class WeightSpecs(QWidget):
                     self._store_entry(source)
                 elif key == QtCore.Qt.Key_Escape: # revert changes
                     self.spec_edited = False                    
-                    self.load_entries()
+                    self.load_dict()
 
             elif event.type() == QEvent.FocusOut:
                 self._store_entry(source)
@@ -166,11 +166,11 @@ class WeightSpecs(QWidget):
 
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
-        self.load_entries() # display rounded filter dict entries
+        self.load_dict() # display rounded filter dict entries
 
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Reload textfields from filter dictionary to update changed settings
         """
@@ -193,11 +193,11 @@ class WeightSpecs(QWidget):
         """
         if self.spec_edited:
             w_label = str(widget.objectName())
-            w_value = simple_eval(widget.text())
+            w_value = safe_eval(widget.text())
             fb.fil[0].update({w_label:w_value})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag
-        self.load_entries()
+        self.load_dict()
         
 
 #-------------------------------------------------------------
@@ -254,7 +254,7 @@ class WeightSpecs(QWidget):
             w_label = str(self.qlineedit[i].objectName())
             fb.fil[0].update({w_label:1})
 
-        self.load_entries()
+        self.load_dict()
         self.sigSpecsChanged.emit() # -> filter_specs
 
 

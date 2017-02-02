@@ -15,8 +15,7 @@ import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import expand_lim, rt_label
-from pyfda.simpleeval import simple_eval
+from pyfda.pyfda_lib import expand_lim, rt_label, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -135,14 +134,14 @@ class PlotImpz(QWidget):
 
         def _store_entry(source):
             if self.spec_edited:
-                self.stim_freq = simple_eval(source.text()) / fb.fil[0]['f_S']
+                self.stim_freq = safe_eval(source.text()) / fb.fil[0]['f_S']
                 self.spec_edited = False # reset flag
                 self.draw()
                 
         if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_entry()
+                self.load_dict()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -159,7 +158,7 @@ class PlotImpz(QWidget):
         return super(PlotImpz, self).eventFilter(source, event)
 
 #-------------------------------------------------------------        
-    def load_entry(self):
+    def load_dict(self):
         """
         Reload textfields from filter dictionary 
         Transform the displayed frequency spec input fields according to the units
@@ -167,7 +166,7 @@ class PlotImpz(QWidget):
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
-        load_entries is called during init and when the frequency unit or the
+        load_dict() is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
@@ -175,7 +174,7 @@ class PlotImpz(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.debug("exec load_entry")
+        logger.debug("exec load_dict")
         if not self.ledFreq.hasFocus():
             # widget has no focus, round the display
             self.ledFreq.setText(
@@ -238,7 +237,7 @@ class PlotImpz(QWidget):
         self.lblFreqUnit.setVisible(periodic_sig)
 
         self.lblFreqUnit.setText(rt_label(fb.fil[0]['freq_specs_unit']))
-        self.load_entry()
+        self.load_dict()
         
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])

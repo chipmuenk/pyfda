@@ -79,7 +79,7 @@ class Manual_FIR(object):
         
         self.info = info_str
         self.info_doc = []
-        self.info_doc.append('manual FIR\n========')
+        self.info_doc.append('manual FIR\n==========')
         
         #------------------- end of static info for filter tree ---------------
         
@@ -175,7 +175,7 @@ class Manual_IIR(object):
         
         self.info = info_str
         self.info_doc = []
-        self.info_doc.append('manual IIR\n========')
+        self.info_doc.append('manual IIR\n==========')
         
         #------------------- end of static info for filter tree ---------------       
         

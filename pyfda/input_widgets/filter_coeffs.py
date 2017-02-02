@@ -15,16 +15,16 @@ logger = logging.getLogger(__name__)
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
                       QCheckBox, QPushButton,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy,
+                      QVBoxLayout, QHBoxLayout, QSizePolicy,
                       pyqtSignal, QEvent)
 
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import cround, fil_save
+from pyfda.pyfda_lib import cround, fil_save, safe_eval
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
-from pyfda.simpleeval import simple_eval
+
 
 # TODO: delete / insert individual cells instead of rows
 # TODO: drag & drop doesn't work
@@ -238,7 +238,7 @@ class FilterCoeffs(QWidget):
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
 
-        self.load_entries() # initialize table with default values from fb
+        self.load_dict() # initialize table with default values from filter dict
 
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemEntered.connect(self.save_coeffs) # nothing happens
@@ -249,9 +249,9 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.clicked.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
 
-        self.chkCoeffList.clicked.connect(self.load_entries)
+        self.chkCoeffList.clicked.connect(self.load_dict)
         self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
-        butLoad.clicked.connect(self.load_entries)
+        butLoad.clicked.connect(self.load_dict)
 
         butSave.clicked.connect(self.store_entries)
 
@@ -273,7 +273,7 @@ class FilterCoeffs(QWidget):
         else:
             fb.fil[0]['ft'] = 'IIR'
             
-        self.load_entries()
+        self.load_dict()
 
 #------------------------------------------------------------------------------
     def store_entries(self):
@@ -303,7 +303,7 @@ class FilterCoeffs(QWidget):
                 item = self.tblCoeff.item(row, col)
                 if item:
                     if item.text() != "":
-                        rows.append(simple_eval(item.text()))
+                        rows.append(safe_eval(item.text()))
                 else:
                     rows.append(0.)
 #                    rows.append(float(item.text()) if item else 0.)
@@ -334,7 +334,7 @@ class FilterCoeffs(QWidget):
         #       manual design when saving b,a
 
 #------------------------------------------------------------------------------
-    def load_entries(self):
+    def load_dict(self):
         """
         Create table from filter coeff dict
         """
@@ -368,7 +368,7 @@ class FilterCoeffs(QWidget):
         idx_str = [str(n) for n in range(num_rows)]
         self.tblCoeff.setVerticalHeaderLabels(idx_str)
 
-        logger.debug("load_entries - coeffs:\n"
+        logger.debug("load_dict - coeffs:\n"
             "Shape = %s\n"
             "Len   = %d\n"
             "NDim  = %d\n\n"
@@ -471,7 +471,7 @@ class FilterCoeffs(QWidget):
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
                 if item:
-                    if abs(simple_eval(item.text())) < eps:
+                    if abs(safe_eval(item.text())) < eps:
                         item.setText(str(0.))
                 else:
                     self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
@@ -494,7 +494,7 @@ class FilterCoeffs(QWidget):
             for row in range(num_rows):
                 item = self.tblCoeff.item(row, col)
                 if item:
-                    item.setText(str(myQ.fix(simple_eval(item.text()))))
+                    item.setText(str(myQ.fix(safe_eval(item.text()))))
                 else:
                     self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 

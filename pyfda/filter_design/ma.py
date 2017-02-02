@@ -29,8 +29,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
-                      QVBoxLayout, QHBoxLayout)
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
+                      QVBoxLayout, QHBoxLayout, QSizePolicy, QFont, QFontMetrics)
 
 import numpy as np
 
@@ -81,7 +81,7 @@ near ``f_S/2`` (highpass).
         self.rt_dict = {
             'COM':{'man':{'fo': ('a', 'N'),
                           'msg':('a',
-                   "Enter desired order (= delays) <b><i>N</i></b> per stage and"
+                   "Enter desired order (= delays) <b><i>M</i></b> per stage and"
                     " the number of <b>stages</b>. Target frequencies and amplitudes"
                     " are only used for comparison, not for the design itself.")
                         },
@@ -140,26 +140,38 @@ near ``f_S/2`` (highpass).
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
 
-        self.lbl_ma_1 = QLabel("<b>Stages:</ b>", self)
-        self.lbl_ma_1.setObjectName('wdg_lbl_ma_1')
-        self.led_ma_1 = QLineEdit(self)
-        self.led_ma_1.setText("1")
-        self.led_ma_1.setObjectName('wdg_led_ma_1')
-        self.led_ma_1.setToolTip("Set number of stages ")
+        self.lbl_delays = QLabel("<b><i>M =</ i></ b>", self)
+        self.lbl_delays.setObjectName('wdg_lbl_ma_0')
+        self.led_delays = QLineEdit(self)
+        try:
+            self.led_delays.setText(str(fb.fil[0]['N']))
+        except KeyError:
+            self.led_delays.setText("12")
+        self.led_delays.setObjectName('wdg_led_ma_0')
+        self.led_delays.setToolTip("Set number of delays per stage")
+
+        self.lbl_stages = QLabel("<b>Stages =</ b>", self)
+        self.lbl_stages.setObjectName('wdg_lbl_ma_1')
+        self.led_stages = QLineEdit(self)
+        self.led_stages.setText("1")
         
-        self.lbl_ma_2 = QLabel("Normalize:", self)
-        self.lbl_ma_2.setObjectName('wdg_lbl_ma_2')
-        self.chk_ma_2 = QCheckBox(self)
-        self.chk_ma_2.setChecked(True)
-        self.chk_ma_2.setObjectName('wdg_chk_ma_2')
-        self.chk_ma_2.setToolTip("Normalize to| H_max = 1|")
+        self.led_stages.setObjectName('wdg_led_ma_1')
+        self.led_stages.setToolTip("Set number of stages ")
+        
+        self.chk_norm = QCheckBox("Normalize", self)
+        self.chk_norm.setChecked(True)
+        self.chk_norm.setObjectName('wdg_chk_ma_2')
+        self.chk_norm.setToolTip("Normalize to| H_max = 1|")
         
         self.layHWin = QHBoxLayout()
         self.layHWin.setObjectName('wdg_layGWin')
-        self.layHWin.addWidget(self.lbl_ma_1)
-        self.layHWin.addWidget(self.led_ma_1)
-        self.layHWin.addWidget(self.lbl_ma_2)
-        self.layHWin.addWidget(self.chk_ma_2)
+        self.layHWin.addWidget(self.lbl_delays)
+        self.layHWin.addWidget(self.led_delays)
+        self.layHWin.addStretch(1)
+        self.layHWin.addWidget(self.lbl_stages)
+        self.layHWin.addWidget(self.led_stages)
+        self.layHWin.addStretch(1)        
+        self.layHWin.addWidget(self.chk_norm)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
         self.wdg_fil = QFrame(self)
@@ -169,42 +181,70 @@ near ``f_S/2`` (highpass).
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.led_ma_1.editingFinished.connect(self._update_UI)
+        self.led_delays.editingFinished.connect(self._update_UI)
+        self.led_stages.editingFinished.connect(self._update_UI)
         # fires when edited line looses focus or when RETURN is pressed
-        self.chk_ma_2.clicked.connect(self._update_UI)
+        self.chk_norm.clicked.connect(self._update_UI)
         #----------------------------------------------------------------------
 
-        self._load_entries() # get initial / last setting from dictionary
+        self._load_dict() # get initial / last setting from dictionary
         self._update_UI()
         
 
-    def _load_entries(self):
+    def _load_dict(self):
         """
-        Reload parameter(s) from filter dictionary and set UI elements 
-        when filter is loaded from disk.
+        Reload parameter(s) from filter dictionary (if they exist) and set 
+        corresponding UI elements. load_dict() is called upon initialization
+        and when the filter is loaded from disk.
         """
-        try:
-            dyn_wdg_par = fb.fil[0]['wdg_dyn']
-            if 'ma_stages' in dyn_wdg_par:
-                self.ma_stages = dyn_wdg_par['ma_stages']
-                self.led_ma_1.setText(str(self.ma_stages))
-                self.chk_ma_2.setChecked(dyn_wdg_par['ma_normalize'])
-        except KeyError as e:
-            logger.info("Key Error:",e)
+        if 'wdg_fil' in fb.fil[0] and 'ma' in fb.fil[0]['wdg_fil']:
+            wdg_fil_par = fb.fil[0]['wdg_fil']['ma']
+            if 'delays' in wdg_fil_par:
+                self.delays = wdg_fil_par['delays']    
+                self.led_delays.setText(str(self.delays))
+            if 'stages' in wdg_fil_par:
+                self.stages = wdg_fil_par['stages']
+                self.led_stages.setText(str(self.stages))
+            if 'normalize' in wdg_fil_par:
+                self.chk_norm.setChecked(wdg_fil_par['normalize'])
 
         
     def _update_UI(self):
         """
         Update UI when line edit field is changed (here, only the text is read
-        and converted to integer.)
+        and converted to integer) and resize the textfields according to content.
         """
-        self.ma_stages = int(abs(round(float(self.led_ma_1.text()))))
-        self.led_ma_1.setText(str(self.ma_stages))
+        self.delays = int(abs(round(float(self.led_delays.text()))))
+        self.led_delays.setText(str(self.delays))        
+        self.stages = int(abs(round(float(self.led_stages.text()))))
+        self.led_stages.setText(str(self.stages))
+         # use QFontMetrics to measure / set the width independently of font
+        myfont = QFont("", 0)
+        fm = QFontMetrics(myfont)
+        delays_pix_width = fm.width(str(self.delays)+ "m") # add 1 'em' to width
+        stages_pix_width = fm.width(str(self.stages)+ "m") # add 1 'em' to width
+
+        pix_height = fm.height()
+
+        self.led_delays.setFixedSize(delays_pix_width, pix_height)
+        self.led_stages.setFixedSize(stages_pix_width, pix_height)
+        
+        self._store_entries()
+
+    def _store_entries(self):
+
         """
-        Store parameter settings in filter dictionary.
+        Store parameter settings in filter dictionary. Called from _update_UI()
+        and _save()
         """
-        fb.fil[0].update({'wdg_dyn':{'ma_stages':self.ma_stages,
-                                     'ma_normalize':self.chk_ma_2.isChecked()}})
+        if not 'wdg_fil' in fb.fil[0]:
+            fb.fil[0].update({'wdg_fil':{}})
+        fb.fil[0]['wdg_fil'].update({'ma':
+                                        {'delays':self.delays,
+                                         'stages':self.stages,
+                                         'normalize':self.chk_norm.isChecked()}
+                                    })
+                                    
         self.sigFiltChanged.emit() # -> select_filter -> filter_specs
 
 
@@ -212,10 +252,10 @@ near ``f_S/2`` (highpass).
         """
         Disconnect all signal-slot connections to avoid crashes upon exit
         """
-        self.led_ma_1.editingFinished.disconnect()
-        self.chk_ma_2.clicked.disconnect()
+        self.led_delays.editingFinished.disconnect()
+        self.led_stages.editingFinished.disconnect()
+        self.chk_norm.clicked.disconnect()
 
-        
 
     def _get_params(self, fil_dict):
         """
@@ -223,15 +263,14 @@ near ``f_S/2`` (highpass).
         parameters, scaling / transforming them if needed.
         """
         # N is total order, L is number of taps per stage
-        self.L     = fil_dict['N'] + 1 #// self.ma_stages + 1 
         self.F_SB  = fil_dict['F_SB']
         self.A_SB  = fil_dict['A_SB']
         
 
     def _save(self, fil_dict):
         """
-        Save MA-filters both in 'zpk' and 'ba' format. Subsequent conversion
-        has nothing to do here except deleting an 'sos' entry from an earlier
+        Save MA-filters both in 'zpk' and 'ba' format; no conversion has to be
+        performed except maybe deleting an 'sos' entry from an earlier
         filter design.
         """
         if 'zpk' in self.FRMT:
@@ -242,7 +281,12 @@ near ``f_S/2`` (highpass).
 
         fil_convert(fil_dict, self.FRMT)
 
-        fil_dict['N'] = (self.L -1) # * self.ma_stages # always update filter dict with filter order
+        # always update filter dict and LineEdit, in case the design algorithm 
+        # has changed the number of delays:
+        fil_dict['N'] = self.delays * self.stages # updated filter order
+        self.led_delays.setText(str(self.delays)) # updated number of delays
+        
+        self._store_entries()
         
         
     def calc_ma(self, fil_dict, rt='LP'):
@@ -253,7 +297,7 @@ near ``f_S/2`` (highpass).
         """
         b = 1.
         k = 1.
-        L = self.L
+        L = self.delays + 1
         
         if rt == 'LP':
             b0 = np.ones(L) #  h[n] = {1; 1; 1; ...}
@@ -299,14 +343,14 @@ near ``f_S/2`` (highpass).
 
         z0 = np.exp(-2j*np.pi*i/L)            
         # calculate filter for multiple cascaded stages    
-        for i in range(self.ma_stages):
+        for i in range(self.stages):
             b = np.convolve(b0, b)
-        z = np.repeat(z0, self.ma_stages)
+        z = np.repeat(z0, self.stages)
         
         # normalize filter to |H_max| = 1 if checked:
-        if self.chk_ma_2.isChecked():
-            b = b / (norm ** self.ma_stages)
-            k = 1./norm ** self.ma_stages
+        if self.chk_norm.isChecked():
+            b = b / (norm ** self.stages)
+            k = 1./norm ** self.stages
         p = np.zeros(len(z))
         
         # store in class attributes for the _save method
@@ -321,7 +365,7 @@ near ``f_S/2`` (highpass).
                    
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
+        self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) * 
                                                      np.sin(self.F_SB * np.pi))))
         self.calc_ma(fil_dict, rt = 'LP')
 
@@ -331,18 +375,18 @@ near ``f_S/2`` (highpass).
 
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = int(np.ceil(1 / (self.A_SB **(1/self.ma_stages) * 
+        self.delays = int(np.ceil(1 / (self.A_SB **(1/self.stages) * 
                                               np.sin((0.5 - self.F_SB) * np.pi))))
         self.calc_ma(fil_dict, rt = 'HP')
         
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = floor_odd(self.L)  # enforce even order
+        self.delays = floor_odd(self.delays)  # enforce even order
         self.calc_ma(fil_dict, rt = 'BS')     
         
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
-        self.L = floor_odd(self.L)  # enforce even order
+        self.delays = floor_odd(self.delays)  # enforce even order
         self.calc_ma(fil_dict, rt = 'BP')     
 
 #------------------------------------------------------------------------------

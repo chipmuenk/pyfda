@@ -26,6 +26,8 @@ Author: Christian Muenker
 
 from __future__ import division, unicode_literals, absolute_import
 from pyfda import qrc_resources # contains all icons
+import logging
+logger = logging.getLogger(__name__)
     
 # #############################################################################
 # General layout settings
@@ -158,7 +160,7 @@ afm_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.afmlist}
 ttf_fonts = sorted({f.name for f in matplotlib.font_manager.fontManager.ttflist})
 
 if 'DejaVu Sans' in ttf_fonts:
-    print('\n DejaVu')
+    logger.info("Using 'DejaVu Sans' font.")
     mpl_rc.update({
                    'mathtext.fontset' : 'custom',
                    'mathtext.rm' : 'DejaVu Sans',
@@ -166,7 +168,7 @@ if 'DejaVu Sans' in ttf_fonts:
                    'mathtext.bf' : 'DejaVu Sans:bold'
                   })
 elif 'Bitstream Vera Sans' in ttf_fonts:
-    print('\nHi Vera')
+    logger.info("Using 'Bitstream Vera Sans' font.")
     mpl_rc.update({
                    'mathtext.fontset' : 'custom',
                    'mathtext.rm' : 'Bitstream Vera Sans',
