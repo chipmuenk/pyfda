@@ -336,7 +336,6 @@ class FilterPZ(QWidget):
 
         if self.chkPZList.isChecked():
 
-
             self._restore_gain()
 
             self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
@@ -363,6 +362,7 @@ class FilterPZ(QWidget):
         register self.zpk and update the display.
         """
 
+        self.zpk = fb.fil[0]['zpk'].copy()
         self._refresh_table()
 
 #------------------------------------------------------------------------------
