@@ -31,7 +31,7 @@ from pyfda.pyfda_rc import params
 
 class ItemDelegate(QStyledItemDelegate):
     """
-    The following methods are subclassed to replace display and editor of the 
+    The following methods are subclassed to replace display and editor of the
     QTableWidget.
 
     `displayText()` displays number with n_digits without sacrificing precision of
@@ -45,7 +45,7 @@ class ItemDelegate(QStyledItemDelegate):
 
     """
     def displayText(self, text, locale):
-        if not isinstance(text, six.text_type): #  
+        if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
         return "{:.{n_digits}g}".format(safe_eval(text), n_digits = FilterPZ.n_digits)
 
@@ -62,7 +62,7 @@ class FilterPZ(QWidget):
         super(FilterPZ, self).__init__(parent)
 
         self.Hmax_last = 1  # initial setting for maximum gain
-        self.norm_last = "" # initial setting for previous combobox 
+        self.norm_last = "" # initial setting for previous combobox
 
         self._construct_UI()
 
@@ -271,7 +271,7 @@ class FilterPZ(QWidget):
     def _store_gain(self, source):
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
-        store it in the shadow dict. This is triggered by `QEvent.focusOut` or 
+        store it in the shadow dict. This is triggered by `QEvent.focusOut` or
         RETURN key.
         """
         if self.spec_edited:
@@ -281,7 +281,7 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _normalize_gain(self):
         """
-        Normalize the gain factor so that the maximum of |H(f)| stays 1 or a 
+        Normalize the gain factor so that the maximum of |H(f)| stays 1 or a
         previously stored maximum value of |H(f)|. Do this every time a P or Z
         has been change.
 
@@ -292,9 +292,9 @@ class FilterPZ(QWidget):
 
         norm = self.cmbNorm.currentText()
         if norm != "None":
-            b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2]) 
-            [w, H] = freqz(b, a) 
-            Hmax = max(abs(H)) 
+            b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2])
+            [w, H] = freqz(b, a)
+            Hmax = max(abs(H))
             if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
                 Hmax = 1.
             if norm == "1":
@@ -317,7 +317,7 @@ class FilterPZ(QWidget):
 
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
-        
+
         if self.chkPZList.isChecked():
             if not self.ledGain.hasFocus():  # no focus, round the gain
                 self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
@@ -331,14 +331,14 @@ class FilterPZ(QWidget):
         (Re-)Create the displayed table from self.zpk with the
         desired number format.
 
-        TODO:        
+        TODO:
         Update zpk[2]?
 
         Called by _store_entry()
         """
 
         FilterPZ.n_digits = int(self.spnRound.text())
-        
+
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
         self.tblPZ.setVisible(self.chkPZList.isChecked())
@@ -377,13 +377,13 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _copy_item(self):
         """
-        Copy the value from the current table item to self.zpk and normalize / 
+        Copy the value from the current table item to self.zpk and normalize /
         update the gain. This is triggered every time a table item is edited.
         When no item was selected, only the gain is updated.
-        
+
         Triggered by  `tblPZ.itemChanged` and `cmbNorm.activated`
 
-        """  
+        """
         col = self.tblPZ.currentIndex().column()
         row = self.tblPZ.currentIndex().row()
         item = self.tblPZ.item(row,col)
@@ -494,7 +494,7 @@ class FilterPZ(QWidget):
         sel = len(self._get_selected(self.tblPZ)['rows'])
         # TODO: evaluate and create non-contiguous selections as well?
 
-        if sel == 0: # nothing selected -> 
+        if sel == 0: # nothing selected ->
             sel = 1 # add at least one row ...
             row = min(len(self.zpk[0]), len(self.zpk[1])) # ... at the bottom
 
@@ -510,10 +510,10 @@ class FilterPZ(QWidget):
         afterwards.
         """
         eps = abs(safe_eval(self.ledSetEps.text()))
-        
+
         remove_me = np.isclose(self.zpk[0:2], 0, rtol=0, atol = eps)
         self.zpk[0:2] = self.zpk[0:2] * np.logical_not(remove_me)
-        
+
         self._delete_PZ_pairs()
         self._refresh_table()
 
