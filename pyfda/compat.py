@@ -36,7 +36,7 @@ except ImportError:
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
     HAS_QT5 = False
-
+    
 
 class QFMetric(object):
     """
@@ -57,6 +57,10 @@ class QFMetric(object):
         self.qfm = QFontMetrics(myfont)
         self.W0 = self.qfm.width("0")
         self.H = self.qfm.height()
+
+        test_label = QLabel("0")
+        QFMetric.H = round(test_label.sizeHint().height() * 1.25) # class attribute
+        QFMetric.W = round(test_label.sizeHint().width() * 1.25) # class attribute
 
         print(self.W0, self.H)
         print(self.qfm.size(0, "0"))

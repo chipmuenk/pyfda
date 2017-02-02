@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
                       QCheckBox, QPushButton, QSpinBox, QComboBox,
-                      QTableWidget, QTableWidgetItem, Qt,
+                      QTableWidget, QTableWidgetItem, Qt, QFMetric,
                       QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
 
 import numpy as np
@@ -70,6 +70,10 @@ class FilterPZ(QWidget):
         """
         Intitialize the widget, consisting of:
         """
+        #  size for QLineEdit fields
+        self.H  = QFMetric.H
+        self.W8 = QFMetric.W * 8
+
         # Find which button holds the longest text:
         MaxTextlen = 0
         longestText = ""
@@ -103,6 +107,7 @@ class FilterPZ(QWidget):
         self.ledGain.setToolTip("Specify gain factor <i>k</i>.")
         self.ledGain.setText(str(1.))
         self.ledGain.setObjectName("ledGain")
+        self.ledGain.setFixedSize(self.W8, self.H)
         self.ledGain.installEventFilter(self)
 
         self.tblPZ = QTableWidget(self)
@@ -146,6 +151,7 @@ class FilterPZ(QWidget):
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("<SPAN>Specify tolerance.</SPAN>")
         self.ledSetEps.setText(str(1e-6))
+        self.ledSetEps.setFixedSize(self.W8, self.H)
 
         # ============== UI Layout =====================================
         layHChkBoxes = QHBoxLayout()
