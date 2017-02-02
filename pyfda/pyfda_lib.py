@@ -44,18 +44,20 @@ from scipy import __version__ as _scipy_version
 from distutils.version import LooseVersion
 SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
 
-from pyfda.simpleeval import simple_eval
+import pyfda.simpleeval as se
 
 #### General functions ########################################################
 
 def safe_eval(expr):
     """
     try ... except wrapper around simple_eval to catch various errors
+    Error type could be used to start more specific actions (like, restore 
+    the previous value)
     """
     try:
         # eliminate very small imaginary components due to rounding errors
-        return np.asscalar(np.real_if_close(simple_eval(expr), tol = 100))
-    except (SyntaxError, ZeroDivisionError, IndexError) as e:
+        return np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
+    except (SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
         logger.warn(e)
         return 0.
             
