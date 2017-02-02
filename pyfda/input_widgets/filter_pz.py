@@ -516,10 +516,10 @@ class FilterPZ(QWidget):
         afterwards.
         """
         eps = abs(safe_eval(self.ledSetEps.text()))
-
-        remove_me = np.isclose(self.zpk[0:2], 0, rtol=0, atol = eps)
-        self.zpk[0:2] = self.zpk[0:2] * np.logical_not(remove_me)
-
+        self.zpk[0] = self.zpk[0] * np.logical_not(
+                                        np.isclose(self.zpk[0], 0., rtol=0, atol = eps))
+        self.zpk[1] = self.zpk[1] * np.logical_not(
+                                        np.isclose(self.zpk[1], 0., rtol=0, atol = eps))
         self._delete_PZ_pairs()
         self._refresh_table()
 
