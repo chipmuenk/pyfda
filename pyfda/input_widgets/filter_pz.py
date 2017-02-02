@@ -262,7 +262,6 @@ class FilterPZ(QWidget):
                     return True
 
             elif event.type() == QEvent.FocusOut: # 9
-                print(source.objectName(), "focus out")
                 self._store_gain(source)
                 self._restore_gain(source) # display in desired format
                 return True
@@ -282,7 +281,10 @@ class FilterPZ(QWidget):
     def _normalize_gain(self):
         """
         Normalize the gain factor so that the maximum of |H(f)| stays 1 or a 
-        previously stored maximum value of |H(f)|
+        previously stored maximum value of |H(f)|. Do this every time a P or Z
+        has been change.
+
+        Called by _copy_item()
         """
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
@@ -305,9 +307,9 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def _restore_gain(self, source = None):
         """
-        Recalculate gain and update QLineEdit
+        Update QLineEdit with either full (has focus) or reduced precision (no focus)
 
-        Called by _store_entry()
+        Called by eventFilter, _normalize_gain() and _refresh_table()
         """
 
         self.ledGain.setVisible(self.chkPZList.isChecked())
@@ -393,28 +395,6 @@ class FilterPZ(QWidget):
         self._restore_gain()
 
 #------------------------------------------------------------------------------
-#    def _copy_entries(self):
-#        """
-#        Copy the values from the table to self.zpk 
-#        """  
-#        print(self.tblPZ.currentIndex().column(), self.tblPZ.currentIndex().row())
-#        self.zpk[0] = self.zpk[1] = []
-#        # self.zpk[2] is not modified here! 
-#        num_rows, num_cols = self.tblPZ.rowCount(), self.tblPZ.columnCount()
-#                       
-#        for col in range(num_cols):
-#            rows = []
-#            for row in range(num_rows):
-#                item = self.tblPZ.item(row, col)
-#                if item:
-#                    if item.text() != "":
-#                        rows.append(safe_eval(item.text()))
-#                else:
-#                    rows.append(0.)
-#
-#            self.zpk[col] = rows # type: list num_cols x num_rows
-
-#------------------------------------------------------------------------------
     def _save_entries(self):
         """
         Save the values from self.zpk to the filter PZ dict,
@@ -469,6 +449,7 @@ class FilterPZ(QWidget):
         cols = sorted(list({i[0] for i in idx}))
         rows = sorted(list({i[1] for i in idx}))
         cur = (table.currentColumn(), table.currentRow())
+        #cur_idx_row = table.currentIndex().row()
 
         return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
 
