@@ -265,6 +265,7 @@ class FilterPZ(QWidget):
                 self._store_gain(source)
                 self._restore_gain(source) # display in desired format
                 return True
+
         return super(FilterPZ, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
     def _store_gain(self, source):
@@ -303,6 +304,8 @@ class FilterPZ(QWidget):
                     self.Hmax_last = Hmax # use current design to set Hmax_last
                 self.zpk[2] = self.zpk[2] / Hmax * self.Hmax_last
             self.norm_last = norm # store current setting of combobox
+
+        self._restore_gain()
 
 #------------------------------------------------------------------------------
     def _restore_gain(self, source = None):
@@ -390,9 +393,7 @@ class FilterPZ(QWidget):
                 self.zpk[col][row] = safe_eval(item.text())
             else:
                 self.zpk[col][row] = 0.
-        
         self._normalize_gain()
-        self._restore_gain()
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
@@ -402,7 +403,7 @@ class FilterPZ(QWidget):
         """
 
         logger.debug("=====================\nFilterPZ._save_entries called")
-        
+
         fb.fil[0]['N'] = len(self.zpk[0])
         if np.any(self.zpk[1]): # any non-zero poles?
             fb.fil[0]['fc'] = 'Manual_IIR'
@@ -515,6 +516,7 @@ class FilterPZ(QWidget):
         
         self._delete_PZ_pairs()
         self._refresh_table()
+
 #------------------------------------------------------------------------------
     def _delete_PZ_pairs(self, eps = 0):
         """
