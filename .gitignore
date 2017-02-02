@@ -55,6 +55,7 @@ target/
 
 # Spyder
 .spyderproject
+.spyproject
 .spyderworkspace
 
 # Tex
