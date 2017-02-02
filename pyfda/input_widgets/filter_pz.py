@@ -213,7 +213,11 @@ class FilterPZ(QWidget):
         butClear.clicked.connect(self._clear_table)
 
         butSetZero.clicked.connect(self._zero_PZ)
-        self.tblPZ.itemChanged.connect(self._copy_item)
+        # signal itemChanged is also triggered programmatically,
+        # itemSelectionChanged is only triggered when entering cell
+        # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
+
+        self.tblPZ.cellChanged.connect(self._copy_item)
         self.cmbNorm.activated.connect(self._copy_item)
         #----------------------------------------------------------------------
 
