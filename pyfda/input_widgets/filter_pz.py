@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
                       QCheckBox, QPushButton, QSpinBox, QComboBox,
-                      QTableWidget, QTableWidgetItem,
+                      QTableWidget, QTableWidgetItem, Qt,
                       QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
 
 import numpy as np
@@ -186,9 +186,10 @@ class FilterPZ(QWidget):
         frmMain.setLayout(layVBtns)
 
         layVMain = QVBoxLayout()
+        layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblPZ)
-#        layVMain.addStretch(1)
+
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)
