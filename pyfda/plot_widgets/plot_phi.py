@@ -35,19 +35,18 @@ class PlotPhi(QWidget):
         self.chkWrap = QCheckBox("Wrapped Phase", self)
         self.chkWrap.setChecked(False)
         self.chkWrap.setToolTip("Plot phase wrapped to +/- pi")
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
-        self.layHChkBoxes.addWidget(self.cmbUnitsPhi)
-        self.layHChkBoxes.addWidget(self.chkWrap)
-        self.layHChkBoxes.addStretch(10)
+        
+        layHControls = QHBoxLayout()
+        layHControls.addStretch(10)
+        layHControls.addWidget(self.cmbUnitsPhi)
+        layHControls.addWidget(self.chkWrap)
+        layHControls.addStretch(10)
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-        
+        self.mplwidget.layVMainMpl.addLayout(layHControls) 
         self.setLayout(self.mplwidget.layVMainMpl)
 
 

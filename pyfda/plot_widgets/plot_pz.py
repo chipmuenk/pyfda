@@ -26,16 +26,14 @@ class PlotPZ(QWidget):
     def __init__(self, parent): 
         super(PlotPZ, self).__init__(parent)
 
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
+        layHControls = QHBoxLayout()
+        layHControls.addStretch(10)
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-        
+        self.mplwidget.layVMainMpl.addLayout(layHControls)
         self.setLayout(self.mplwidget.layVMainMpl)
 
         # make this the central widget, taking all available space:

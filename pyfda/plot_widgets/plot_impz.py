@@ -69,38 +69,36 @@ class PlotImpz(QWidget):
         self.ledNPoints.setToolTip("Number of points to calculate and display.\n"
                                    "N = 0 selects automatically.")
 
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
+        layHControls = QHBoxLayout()
+        layHControls.addStretch(10)
         
-        self.layHChkBoxes.addWidget(self.lblNPoints)
-        self.layHChkBoxes.addWidget(self.ledNPoints)
-        self.layHChkBoxes.addStretch(2)
-        self.layHChkBoxes.addWidget(self.chkLog)
-        self.layHChkBoxes.addWidget(self.lblLog)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblLogBottom)
-        self.layHChkBoxes.addWidget(self.ledLogBottom)
-        self.layHChkBoxes.addWidget(self.lbldB)
-        self.layHChkBoxes.addStretch(2)
-        self.layHChkBoxes.addWidget(self.lblPltStim)
-        self.layHChkBoxes.addWidget(self.chkPltStim)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblStimulus)
-        self.layHChkBoxes.addWidget(self.cmbStimulus)
-        self.layHChkBoxes.addStretch(2)
-        self.layHChkBoxes.addWidget(self.lblFreq)
-        self.layHChkBoxes.addWidget(self.ledFreq)
-        self.layHChkBoxes.addWidget(self.lblFreqUnit)
+        layHControls.addWidget(self.lblNPoints)
+        layHControls.addWidget(self.ledNPoints)
+        layHControls.addStretch(2)
+        layHControls.addWidget(self.chkLog)
+        layHControls.addWidget(self.lblLog)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.lblLogBottom)
+        layHControls.addWidget(self.ledLogBottom)
+        layHControls.addWidget(self.lbldB)
+        layHControls.addStretch(2)
+        layHControls.addWidget(self.lblPltStim)
+        layHControls.addWidget(self.chkPltStim)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.lblStimulus)
+        layHControls.addWidget(self.cmbStimulus)
+        layHControls.addStretch(2)
+        layHControls.addWidget(self.lblFreq)
+        layHControls.addWidget(self.ledFreq)
+        layHControls.addWidget(self.lblFreqUnit)
 
-        self.layHChkBoxes.addStretch(10)
+        layHControls.addStretch(10)
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-
+        self.mplwidget.layVMainMpl.addLayout(layHControls)
         self.setLayout(self.mplwidget.layVMainMpl)
 
         #----------------------------------------------------------------------

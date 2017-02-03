@@ -6,7 +6,7 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout
+from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame
 
 import numpy as np
 import scipy.signal as sig
@@ -42,16 +42,16 @@ class PlotHf(QWidget):
         self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(units)
         self.cmbUnitsA.setObjectName("cmbUnitsA")
-        self.cmbUnitsA.setToolTip("Set unit for y-axis:\n"
-        "dB is attenuation (positive values)\nV and W are less than 1.")
+        self.cmbUnitsA.setToolTip("<span>Set unit for y-axis:\n"
+        "dB is attenuation (positive values), V and W are gain (less than 1).</span>")
         self.cmbUnitsA.setCurrentIndex(0)
 
         self.cmbShowH.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.chkLinphase = QCheckBox("Acausal system", self)
-        self.chkLinphase.setToolTip("Remove linear phase according to filter order.\n"
-           "Attention: this makes no sense for a non-linear phase system!")
+        self.chkLinphase = QCheckBox("Zero phase", self)
+        self.chkLinphase.setToolTip("<span>Subtract linear phase according to filter order.\n"
+           "Attention: this makes no sense for a non-linear phase system!</span>")
 
         self.lblInset = QLabel("Inset", self)
         self.cmbInset = QComboBox(self)
@@ -69,29 +69,35 @@ class PlotHf(QWidget):
         self.chkPhase.setToolTip("Overlay phase")
 
 
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
-        self.layHChkBoxes.addWidget(self.cmbShowH)
-        self.layHChkBoxes.addWidget(self.lblIn)
-        self.layHChkBoxes.addWidget(self.cmbUnitsA)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkLinphase)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.lblInset)
-        self.layHChkBoxes.addWidget(self.cmbInset)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkSpecs)
-        self.layHChkBoxes.addStretch(1)
-        self.layHChkBoxes.addWidget(self.chkPhase)
-        self.layHChkBoxes.addStretch(10)
+        layHControls = QHBoxLayout()
+        layHControls.addStretch(10)
+        layHControls.addWidget(self.cmbShowH)
+        layHControls.addWidget(self.lblIn)
+        layHControls.addWidget(self.cmbUnitsA)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.chkLinphase)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.lblInset)
+        layHControls.addWidget(self.cmbInset)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.chkSpecs)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.chkPhase)
+        layHControls.addStretch(10)
+        
+        # This widget encompasses all control subwidgets:
+        self.frmControls = QFrame(self)
+        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmControls.setLayout(layHControls)
+        layHControls.setContentsMargins(*params['wdg_margins'])
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
+        # This is the plot pane widget, encompassing the other widgets        
         self.mplwidget = MplWidget(self)
-
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-
+        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
         self.init_axes()

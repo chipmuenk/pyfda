@@ -28,14 +28,12 @@ class PlotTauG(QWidget):
         self.chkWarnings.setChecked(False)
         self.chkWarnings.setToolTip("Print warnings about singular group delay")
 
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
-        self.layHChkBoxes.addWidget(self.chkWarnings)
+        layHControls = QHBoxLayout()
+        layHControls.addStretch(10)
+        layHControls.addWidget(self.chkWarnings)
 
         self.mplwidget = MplWidget(self)
-        
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-        
+        self.mplwidget.layVMainMpl.addLayout(layHControls)
         self.setLayout(self.mplwidget.layVMainMpl)
 
         # make this the central widget, taking all available space:
