@@ -146,38 +146,38 @@ class Plot3D(QWidget):
         # LAYOUT for UI widgets
         #----------------------------------------------------------------------
 
-        layHControls = QGridLayout()
-        layHControls.addWidget(self.chkLog, 0, 0)
-        layHControls.addWidget(self.chkPolar, 1, 0)
-        layHControls.addWidget(self.lblTop, 0, 2)
-        layHControls.addWidget(self.lblBottom, 1, 2)
-        layHControls.addWidget(self.ledTop, 0, 4)
-        layHControls.addWidget(self.ledBottom, 1, 4)
-        layHControls.setColumnStretch(5,1)
+        layGControls = QGridLayout()
+        layGControls.addWidget(self.chkLog, 0, 0)
+        layGControls.addWidget(self.chkPolar, 1, 0)
+        layGControls.addWidget(self.lblTop, 0, 2)
+        layGControls.addWidget(self.lblBottom, 1, 2)
+        layGControls.addWidget(self.ledTop, 0, 4)
+        layGControls.addWidget(self.ledBottom, 1, 4)
+        layGControls.setColumnStretch(5,1)
 
-        layHControls.addWidget(self.chkUC, 0, 6)
-        layHControls.addWidget(self.chkHf, 1, 6)
-        layHControls.addWidget(self.chkPZ, 0, 8)
+        layGControls.addWidget(self.chkUC, 0, 6)
+        layGControls.addWidget(self.chkHf, 1, 6)
+        layGControls.addWidget(self.chkPZ, 0, 8)
         
-        layHControls.addWidget(self.cmbMode3D, 0, 10)
-        layHControls.addWidget(self.chkContour2D, 1, 10)        
-        layHControls.addWidget(self.cmbColormap, 0,12,1,1)
-        layHControls.addWidget(self.chkColormap_r, 1,12)
+        layGControls.addWidget(self.cmbMode3D, 0, 10)
+        layGControls.addWidget(self.chkContour2D, 1, 10)        
+        layGControls.addWidget(self.cmbColormap, 0,12,1,1)
+        layGControls.addWidget(self.chkColormap_r, 1,12)
 
-        layHControls.addWidget(self.chkLighting, 0, 14)
-        layHControls.addWidget(self.chkColBar, 1, 14)
+        layGControls.addWidget(self.chkLighting, 0, 14)
+        layGControls.addWidget(self.chkColBar, 1, 14)
 
-        layHControls.addWidget(self.lblAlpha, 0, 15)
-        layHControls.addWidget(self.diaAlpha, 0, 16)
+        layGControls.addWidget(self.lblAlpha, 0, 15)
+        layGControls.addWidget(self.diaAlpha, 0, 16)
 
-        layHControls.addWidget(self.lblHatch, 1, 15)
-        layHControls.addWidget(self.diaHatch, 1, 16)
+        layGControls.addWidget(self.lblHatch, 1, 15)
+        layGControls.addWidget(self.diaHatch, 1, 16)
 
         # This widget encompasses all control subwidgets   
         self.frmControls = QFrame(self)
         self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        self.frmControls.setLayout(layHControls)
-        layHControls.setContentsMargins(*params['wdg_margins'])
+        self.frmControls.setLayout(layGControls)
+#        layGControls.setContentsMargins(*params['wdg_margins'])
 
 
         #----------------------------------------------------------------------
@@ -354,6 +354,7 @@ class Plot3D(QWidget):
         Main drawing entry point: Check whether updating is enabled in the
         toolbar and then perform the actual plot
         """
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.draw_3d()
 

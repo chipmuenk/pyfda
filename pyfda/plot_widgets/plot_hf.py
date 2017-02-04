@@ -89,7 +89,7 @@ class PlotHf(QWidget):
         self.frmControls = QFrame(self)
         self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmControls.setLayout(layHControls)
-        layHControls.setContentsMargins(*params['wdg_margins'])
+#        layHControls.setContentsMargins(*params['wdg_margins'])
 
         #----------------------------------------------------------------------
         # mplwidget
@@ -425,8 +425,9 @@ class PlotHf(QWidget):
 #------------------------------------------------------------------------------
     def draw(self):
         """
-        Re-calculate |H(f)| and draw the figure
+        Re-calculate |H(f)| and draw the figure if enabled
         """
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.calc_hf()
             self.update_view()

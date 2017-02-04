@@ -6,14 +6,12 @@ Edited by Christian Münker, 2013
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-from ..compat import (QtCore, QCheckBox, QWidget,
-                      QVBoxLayout, QHBoxLayout, 
-                      pyqtSignal, Qt, QEvent)
+from ..compat import QCheckBox, QWidget, QFrame, QHBoxLayout
 
 import numpy as np
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import grpdelay
 from pyfda.plot_widgets.plot_utils import MplWidget
 
@@ -31,14 +29,17 @@ class PlotTauG(QWidget):
         layHControls = QHBoxLayout()
         layHControls.addStretch(10)
         layHControls.addWidget(self.chkWarnings)
+        
+        # This widget encompasses all control subwidgets:
+        self.frmControls = QFrame(self)
+        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmControls.setLayout(layHControls)
+#        layHControls.setContentsMargins(*params['wdg_margins'])
 
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addLayout(layHControls)
+        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
-
-        # make this the central widget, taking all available space:
-#        self.setCentralWidget(self.mplwidget)
-
         
         self._init_axes()
 
@@ -82,7 +83,7 @@ class PlotTauG(QWidget):
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
-        [w, tau_g] = grpdelay(bb,aa, rc.params['N_FFT'], whole = wholeF, 
+        [w, tau_g] = grpdelay(bb,aa, params['N_FFT'], whole = wholeF, 
             verbose = self.chkWarnings.isChecked())
 
         F = w / (2 * np.pi) * fb.fil[0]['f_S']

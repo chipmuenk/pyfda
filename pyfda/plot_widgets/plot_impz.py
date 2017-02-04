@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QEvent,
-                      Qt, QHBoxLayout)
+                      Qt, QHBoxLayout, QFrame)
 
 import numpy as np
 import scipy.signal as sig
@@ -93,12 +93,19 @@ class PlotImpz(QWidget):
         layHControls.addWidget(self.lblFreqUnit)
 
         layHControls.addStretch(10)
+        
+        # This widget encompasses all control subwidgets:
+        self.frmControls = QFrame(self)
+        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmControls.setLayout(layHControls)
+        layHControls.setContentsMargins(*params['wdg_margins'])
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addLayout(layHControls)
+        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
         #----------------------------------------------------------------------
