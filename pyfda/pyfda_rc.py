@@ -319,14 +319,35 @@ qss_tab_bar = """
      margin: 0; /* if there is only one tab, we don't want overlapping margins */
  }
 """
+qss_push_button = """
+ QPushButton{
+         border-style: solid; /* solid, outset */
+         border-color: #999999;
+         border-width: 1px;
+         border-radius: 3px;
+         padding : 2px;
+         /*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);*/
+         color: black;
+                    }
+
+"""
 # Common qss settings for all themes
 qss_common = """
                 *[state="normal"]{}
-                *[state="changed"]{background-color:yellow; color:black}
-                *[state="error"]{background-color:red; color:white}
-                *[state="failed"]{background-color:orange; color:white}
-                *[state="ok"]{background-color:green; color:white}
-                *[state="unused"]{background-color:white; color:darkgrey}
+                                 
+                QPushButton[state="changed"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
+                                color: black;}
+
+                QPushButton[state="error"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
+                                color: white;}
+                QPushButton[state="failed"]{background-color:orange; color:white}
+                QPushButton[state="ok"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
+                                color: white;}
+                QPushButton[state="unused"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
                 
                 QWidget{font-size:10pt; font-family: Tahoma;}
@@ -358,24 +379,18 @@ qss_common = """
                     image: url(':/ellipses_h.svg');                     
                     }
                     
-                /* QPushButton{
-                    border-style: solid;
-                    border-color: black;
-                    border-width: 1px;
-                    border-radius: 10px;
-                    } */
             """
-
+# QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
 
 if THEME == 'dark':
     mpl_rc.update(mpl_dark)
     params.update(params_dark)
-    qss_rc = qss_common + qss_tab_bar + qss_dark
+    qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_dark
     
 elif THEME == 'light':
     mpl_rc.update(mpl_light)
     params.update(params_light)
-    qss_rc = qss_common + qss_tab_bar + qss_light
+    qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_light
     
 else:
     qss_rc = qss_common
