@@ -27,7 +27,11 @@ import pyfda.filterbroker as fb
 from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
 from pyfda import qrc_resources # contains all icons
-# create with pyrcc4 pyfda.qrc -o qrc_resources.py -py3
+# edit pyfda.qrc, then
+# create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
+#   or          pyrcc5 pyfda.qrc -o qrc_resources.py
+# and manually replace "from from PyQt5 import QtCore"
+#   by "from .compat import QtCore" in qrc_resources.py
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
 from pyfda.input_widgets import input_tab_widgets
