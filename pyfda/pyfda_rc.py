@@ -333,16 +333,29 @@ qss_common = """
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
                                 border-width: 2px;}
-                QSplitter::handle {
-                    image: url(':/grid-four-up.svg');
-                    }
-    
-                QSplitter::handle:horizontal {
-                    width: 10px;
-                    }
-    
+                
+                /* QSplitter styling adopted from
+                http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
+                */
+                  
                 QSplitter::handle:vertical {
-                    height: 10px;
+                    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
+                                        stop:0 rgba(255, 255, 255, 0), 
+                                        stop:0.407273 rgba(200, 200, 200, 255), 
+                                        stop:0.4825 rgba(101, 104, 113, 235), 
+                                        stop:0.6 rgba(255, 255, 255, 0));                 
+                    height: 8px;
+                    image: url(':/ellipses_v.svg');
+                    }
+                
+                QSplitter::handle:horizontal {
+                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                        stop:0 rgba(255, 255, 255, 0), 
+                                        stop:0.407273 rgba(200, 200, 200, 255), 
+                                        stop:0.4825 rgba(101, 104, 113, 235), 
+                                        stop:0.6 rgba(255, 255, 255, 0)); 
+                    width: 8px;
+                    image: url(':/ellipses_h.svg');                     
                     }
                     
                 /* QPushButton{
