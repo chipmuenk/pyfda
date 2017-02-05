@@ -6,13 +6,13 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout
+from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout
 
 
 import numpy as np
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import params
 
 from pyfda.pyfda_lib import unique_roots
 
@@ -26,16 +26,21 @@ class PlotPZ(QWidget):
     def __init__(self, parent): 
         super(PlotPZ, self).__init__(parent)
 
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
+        layHControls = QHBoxLayout()
+        layHControls.addStretch(10)
+        
+        # This widget encompasses all control subwidgets:
+#        self.frmControls = QFrame(self)
+#        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+#        self.frmControls.setLayout(layHControls)
+
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-        
+        self.mplwidget.layVMainMpl.addLayout(layHControls)
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
         # make this the central widget, taking all available space:
@@ -76,8 +81,8 @@ class PlotPZ(QWidget):
         """
         (re)draw P/Z plot
         """
-        p_marker = rc.params['P_Marker']
-        z_marker = rc.params['Z_Marker']
+        p_marker = params['P_Marker']
+        z_marker = params['Z_Marker']
         
         zpk = fb.fil[0]['zpk']
 

@@ -41,7 +41,7 @@ params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}', # format string for QLineEdit fields
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
           'Z_Marker': [mpl_ms, 'b'], # size and color for zeros' marker
-          'wdg_margins' : (1,1,1,1),  # R, T, L, B widget margins
+          'wdg_margins' : (2,2,2,0),  # R, T, L, B widget margins
           'mpl_hatch_border': {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}     
           }
 params_dark = {'mpl_hatch': {                          # hatched area for specs

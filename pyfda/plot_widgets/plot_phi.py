@@ -6,14 +6,14 @@ Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout
+from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame
 
 
 import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 
@@ -35,25 +35,27 @@ class PlotPhi(QWidget):
         self.chkWrap = QCheckBox("Wrapped Phase", self)
         self.chkWrap.setChecked(False)
         self.chkWrap.setToolTip("Plot phase wrapped to +/- pi")
-        self.layHChkBoxes = QHBoxLayout()
-        self.layHChkBoxes.addStretch(10)
-        self.layHChkBoxes.addWidget(self.cmbUnitsPhi)
-        self.layHChkBoxes.addWidget(self.chkWrap)
-        self.layHChkBoxes.addStretch(10)
+        
+        layHControls = QHBoxLayout()
+#        layHControls.addStretch(10)
+        layHControls.addWidget(self.cmbUnitsPhi)
+        layHControls.addWidget(self.chkWrap)
+        layHControls.addStretch(10)
+        
+        # This widget encompasses all control subwidgets:
+        self.frmControls = QFrame(self)
+        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmControls.setLayout(layHControls)
+        #layHControls.setContentsMargins(*params['wdg_margins'])
+
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-
-        self.mplwidget.layVMainMpl.addLayout(self.layHChkBoxes)
-        
+        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
-
-
-#        self.mplwidget.setFocus()
-        # make this the central widget, taking all available space:
-#        self.setCentralWidget(self.mplwidget)
         
         self._init_axes()
 
@@ -100,7 +102,7 @@ class PlotPhi(QWidget):
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
-        [W,H] = sig.freqz(self.bb, self.aa, worN = rc.params['N_FFT'],
+        [W,H] = sig.freqz(self.bb, self.aa, worN = params['N_FFT'],
                         whole = wholeF)
 
         F = W / (2 * np.pi) * f_S

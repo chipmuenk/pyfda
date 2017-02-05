@@ -8,15 +8,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QDial,
-                      QGridLayout, QSizePolicy)
+                      QGridLayout, QFrame)
 
 import numpy as np
-from numpy import pi, ones, zeros, sin, cos, log10
+from numpy import pi, ones, sin, cos, log10
 import scipy.signal as sig
 
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_rc as rc
+from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import H_mag
 from pyfda.plot_widgets.plot_utils import MplWidget
 
@@ -64,7 +64,6 @@ class Plot3D(QWidget):
         self.chkPolar.setToolTip("Polar coordinate range")
         self.chkPolar.setChecked(False)
 
-
         self.lblBottom = QLabel("Bottom =", self)
         self.ledBottom = QLineEdit(self)
         self.ledBottom.setObjectName("ledBottom")
@@ -76,7 +75,6 @@ class Plot3D(QWidget):
         self.ledTop.setObjectName("ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
-#        self.ledTop.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
 
         self.chkUC = QCheckBox("UC", self)
         self.chkUC.setObjectName("chkUC")
@@ -148,46 +146,48 @@ class Plot3D(QWidget):
         # LAYOUT for UI widgets
         #----------------------------------------------------------------------
 
-        self.layGSelect = QGridLayout()
-        self.layGSelect.setObjectName('plotSpecSelect')
-        self.layGSelect.addWidget(self.chkLog, 0, 0)
-        self.layGSelect.addWidget(self.chkPolar, 1, 0)
-        self.layGSelect.addWidget(self.lblTop, 0, 2)
-        self.layGSelect.addWidget(self.lblBottom, 1, 2)
-        self.layGSelect.addWidget(self.ledTop, 0, 4)
-        self.layGSelect.addWidget(self.ledBottom, 1, 4)
-        self.layGSelect.setColumnStretch(5,1)
+        layGControls = QGridLayout()
+        layGControls.addWidget(self.chkLog, 0, 0)
+        layGControls.addWidget(self.chkPolar, 1, 0)
+        layGControls.addWidget(self.lblTop, 0, 2)
+        layGControls.addWidget(self.lblBottom, 1, 2)
+        layGControls.addWidget(self.ledTop, 0, 4)
+        layGControls.addWidget(self.ledBottom, 1, 4)
+        layGControls.setColumnStretch(5,1)
 
-        self.layGSelect.addWidget(self.chkUC, 0, 6)
-        self.layGSelect.addWidget(self.chkHf, 1, 6)
-        self.layGSelect.addWidget(self.chkPZ, 0, 8)
+        layGControls.addWidget(self.chkUC, 0, 6)
+        layGControls.addWidget(self.chkHf, 1, 6)
+        layGControls.addWidget(self.chkPZ, 0, 8)
         
-        self.layGSelect.addWidget(self.cmbMode3D, 0, 10)
-        self.layGSelect.addWidget(self.chkContour2D, 1, 10)        
-        self.layGSelect.addWidget(self.cmbColormap, 0,12,1,1)
-        self.layGSelect.addWidget(self.chkColormap_r, 1,12)
+        layGControls.addWidget(self.cmbMode3D, 0, 10)
+        layGControls.addWidget(self.chkContour2D, 1, 10)        
+        layGControls.addWidget(self.cmbColormap, 0,12,1,1)
+        layGControls.addWidget(self.chkColormap_r, 1,12)
 
-        self.layGSelect.addWidget(self.chkLighting, 0, 14)
-        self.layGSelect.addWidget(self.chkColBar, 1, 14)
+        layGControls.addWidget(self.chkLighting, 0, 14)
+        layGControls.addWidget(self.chkColBar, 1, 14)
 
-        self.layGSelect.addWidget(self.lblAlpha, 0, 15)
-        self.layGSelect.addWidget(self.diaAlpha, 0, 16)
+        layGControls.addWidget(self.lblAlpha, 0, 15)
+        layGControls.addWidget(self.diaAlpha, 0, 16)
 
-        self.layGSelect.addWidget(self.lblHatch, 1, 15)
-        self.layGSelect.addWidget(self.diaHatch, 1, 16)
+        layGControls.addWidget(self.lblHatch, 1, 15)
+        layGControls.addWidget(self.diaHatch, 1, 16)
+
+        # This widget encompasses all control subwidgets   
+        self.frmControls = QFrame(self)
+        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmControls.setLayout(layGControls)
+#        layGControls.setContentsMargins(*params['wdg_margins'])
+
 
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
+        # This is the plot pane widget, encompassing the other widgets        
         self.mplwidget = MplWidget(self)
-
-        self.mplwidget.layVMainMpl.addLayout(self.layGSelect)
-        
+        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
-
-#        self.mplwidget.setFocus()
-        # make this the central widget, taking all available space:
-#        self.setCentralWidget(self.mplwidget)
         
         self._init_grid() # initialize grid and do initial plot
 
@@ -354,6 +354,7 @@ class Plot3D(QWidget):
         Main drawing entry point: Check whether updating is enabled in the
         toolbar and then perform the actual plot
         """
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.draw_3d()
 
@@ -373,7 +374,7 @@ class Plot3D(QWidget):
 
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half' # not used
         f_S = fb.fil[0]['f_S']
-        N_FFT = rc.params['N_FFT']
+        N_FFT = params['N_FFT']
         
         alpha = self.diaAlpha.value()/10.
         cmap = cm.get_cmap(str(self.cmbColormap.currentText()))
