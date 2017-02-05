@@ -258,8 +258,8 @@ qss_tab_bar = """
      border : 0;
  }
 
- /* Only the right QTabWidget (named plot_tabs) gets a dashed left border */
- QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
+ /* Only the right QTabWidget (named plot_tabs) gets a dashed left border
+ QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;} */
 
  QTabWidget::tab-bar {
      left: 0.3em; /* move bar to the right: hack to prevent truncation of labels (QTBUG-6905) */
