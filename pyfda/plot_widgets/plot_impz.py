@@ -70,7 +70,6 @@ class PlotImpz(QWidget):
                                    "N = 0 selects automatically.")
 
         layHControls = QHBoxLayout()
-        layHControls.addStretch(10)
         
         layHControls.addWidget(self.lblNPoints)
         layHControls.addWidget(self.ledNPoints)
@@ -98,7 +97,6 @@ class PlotImpz(QWidget):
         self.frmControls = QFrame(self)
         self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmControls.setLayout(layHControls)
-        layHControls.setContentsMargins(*params['wdg_margins'])
 
         #----------------------------------------------------------------------
         # mplwidget
@@ -117,7 +115,6 @@ class PlotImpz(QWidget):
         self.chkPltStim.clicked.connect(self.draw)
         self.cmbStimulus.currentIndexChanged.connect(self.draw)
         self.ledFreq.installEventFilter(self) 
-#        self.ledFreq.editingFinished.connect(self.draw)
 
         self.draw() # initial calculation and drawing
 
