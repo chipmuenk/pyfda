@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
-                      QCheckBox, QPushButton, QSpinBox, QComboBox,
+                      QCheckBox, QPushButton, QSpinBox, QComboBox, QFont,
                       QTableWidget, QTableWidgetItem, Qt, QFMetric,
                       QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
 
@@ -73,6 +73,9 @@ class FilterPZ(QWidget):
         #  size for QLineEdit fields
         H  = QFMetric.H
         W8 = QFMetric.W0 * 8
+        
+        bfont = QFont()
+        bfont.setBold(True)
 
         # Find which button holds the longest text:
         MaxTextlen = 0
@@ -114,6 +117,13 @@ class FilterPZ(QWidget):
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
         self.tblPZ.setAlternatingRowColors(True) # alternating row colors)
         self.tblPZ.setObjectName("tblPZ")
+
+        self.tblPZ.horizontalHeader().setHighlightSections(False)
+        self.tblPZ.horizontalHeader().setFont(bfont)
+
+        self.tblPZ.verticalHeader().setHighlightSections(True)
+        self.tblPZ.verticalHeader().setFont(bfont)
+        self.tblPZ.setColumnCount(2)
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
         butAddRow = QPushButton(butTexts[0], self)
@@ -125,8 +135,9 @@ class FilterPZ(QWidget):
         butAddRow.setMaximumWidth(ButLength)
 
         butDelCell = QPushButton(butTexts[1], self)
-        butDelCell.setToolTip("Delete selected cell(s) from the table.\n"
-                "Use <SHIFT> or <CTRL> to select multiple cells.")
+        butDelCell.setToolTip("<span>Delete selected cell(s) from the table. "
+                "Use <SHIFT> or <CTRL> to select multiple cells. "
+                "If nothing is selected, delete the last row.</span>")
         butDelCell.setMaximumWidth(ButLength)
 
         butClear = QPushButton(butTexts[4], self)
@@ -353,9 +364,9 @@ class FilterPZ(QWidget):
 
             self._restore_gain()
 
-            self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
-            self.tblPZ.setColumnCount(2)
             self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
+            self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
+
             for col in range(2):
                 for row in range(len(self.zpk[col])):
                     # set table item from self.zpk and strip '()' of complex numbers
@@ -476,7 +487,11 @@ class FilterPZ(QWidget):
         P = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
 
         # Delete array entries with selected indices. If Z or P are empty,
-        # arrays remain unchanged.
+        # delete the last row.
+        if not any(Z):
+            Z = [len(self.zpk[0])-1]
+        if not any(P):
+            P = [len(self.zpk[1])-1]
         self.zpk[0] = np.delete(self.zpk[0], Z)
         self.zpk[1] = np.delete(self.zpk[1], P)
 
@@ -516,10 +531,15 @@ class FilterPZ(QWidget):
         afterwards.
         """
         eps = abs(safe_eval(self.ledSetEps.text()))
-        self.zpk[0] = self.zpk[0] * np.logical_not(
+        sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
+        if not sel:
+            self.zpk[0] = self.zpk[0] * np.logical_not(
                                         np.isclose(self.zpk[0], 0., rtol=0, atol = eps))
-        self.zpk[1] = self.zpk[1] * np.logical_not(
+            self.zpk[1] = self.zpk[1] * np.logical_not(
                                         np.isclose(self.zpk[1], 0., rtol=0, atol = eps))
+        else:
+            pass
+        
         self._delete_PZ_pairs()
         self._refresh_table()
 
