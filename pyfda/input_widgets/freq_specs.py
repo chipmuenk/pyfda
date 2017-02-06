@@ -9,7 +9,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore,
+from ..compat import (QtCore, Qt,
                       QWidget, QLabel, QLineEdit, QFrame, QFont,
                       QVBoxLayout, QHBoxLayout, QGridLayout,
                       pyqtSignal, QEvent, QFMetric)
@@ -70,7 +70,7 @@ class FreqSpecs(QWidget):
         frmMain.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout() # Widget main layout
-        self.layVMain.addWidget(frmMain)
+        self.layVMain.addWidget(frmMain)#, Qt.AlignLeft)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
         
