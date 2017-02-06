@@ -67,13 +67,15 @@ class FilterSpecs(QWidget):
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
 #        self.lblMsg.setFrameShape(QFrame.StyledPanel|QFrame.Sunken)
-
         layVMsg = QVBoxLayout()
         layVMsg.addWidget(self.lblMsg)
 
-        self.frmMsg = QFrame()
+        self.frmMsg = QFrame(self)
         self.frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmMsg.setLayout(layVMsg)
+        layVFrm = QVBoxLayout()
+        layVFrm.addWidget(self.frmMsg)
+        layVFrm.setContentsMargins(*params['wdg_margins'])
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
         self.butQuit = QPushButton("Quit", self)
@@ -93,10 +95,10 @@ class FilterSpecs(QWidget):
         layVMain.addWidget(self.f_specs)  # Freq. specifications
         layVMain.addWidget(self.a_specs)  # Amplitude specs
         layVMain.addWidget(self.w_specs)  # Weight specs
-        layVMain.addWidget(self.frmMsg)   # Text message
+        layVMain.addLayout(layVFrm)       # Text message
 
         layVMain.addStretch()
-        #layVMain.setContentsMargins(1, 0, 1, 0) # R, T, L, B
+
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain) # main layout of widget
