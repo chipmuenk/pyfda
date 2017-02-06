@@ -33,9 +33,9 @@ class PlotImpz(QWidget):
     def _init_UI(self):
         self.chkLog = QCheckBox(self)
         self.chkLog.setObjectName("chkLog")
-        self.chkLog.setToolTip("Show logarithmic stimulus response.")
+        self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLog.setChecked(False)
-        self.lblLog = QLabel("Log. <i>h</i>", self)
+        self.lblLog = QLabel("Log. y-axis", self)
 
         self.lblLogBottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
