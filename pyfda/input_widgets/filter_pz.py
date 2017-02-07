@@ -81,12 +81,15 @@ class FilterPZ(QWidget):
         MaxTextlen = 0
         longestText = ""
         ButLength = 0
-        butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero"]
-
+        butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set 0"]
+        
         for item in butTexts:
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
-                longestText = item
+                longestText = item + "mm"
+        
+        butAddRow = QPushButton(butTexts[0], self)
+        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 
         self.chkPZList = QCheckBox("Show table", self)
         self.chkPZList.setChecked(True)
@@ -126,17 +129,15 @@ class FilterPZ(QWidget):
         self.tblPZ.setColumnCount(2)
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
-        butAddRow = QPushButton(butTexts[0], self)
+
         butAddRow.setToolTip("<SPAN>Select <i>N</i> existing rows "
                              "to insert <i>N</i> new rows above last selected cell. "
                              "When nothing is selected, add a row at the end.</SPAN>")
-
-        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
         butAddRow.setMaximumWidth(ButLength)
 
         butDelCell = QPushButton(butTexts[1], self)
         butDelCell.setToolTip("<span>Delete selected cell(s) from the table. "
-                "Use <SHIFT> or <CTRL> to select multiple cells. "
+                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                 "If nothing is selected, delete the last row.</span>")
         butDelCell.setMaximumWidth(ButLength)
 
@@ -145,7 +146,7 @@ class FilterPZ(QWidget):
         butClear.setMaximumWidth(ButLength)
 
         butSave = QPushButton(butTexts[2], self)
-        butSave.setToolTip("Save P/Z & update all plots.\n"
+        butSave.setToolTip("Save P/Z and update all plots.\n"
                                 "No modifications are saved before!")
         butSave.setMaximumWidth(ButLength)
 
@@ -154,7 +155,9 @@ class FilterPZ(QWidget):
         butLoad.setMaximumWidth(ButLength)
 
         butSetZero = QPushButton(butTexts[5], self)
-        butSetZero.setToolTip("<SPAN>Set P / Z = 0 when magnitude &lt; &epsilon;.</SPAN>")
+        butSetZero.setToolTip("<SPAN>Set selected cells = 0 when magnitude "
+                            "&lt; &epsilon;. When nothing is selected, apply to "
+                            "all cells.</SPAN>")
         butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel("for " + rt_label("&epsilon; &lt;"), self)
