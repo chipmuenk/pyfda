@@ -33,9 +33,9 @@ class PlotImpz(QWidget):
     def _init_UI(self):
         self.chkLog = QCheckBox(self)
         self.chkLog.setObjectName("chkLog")
-        self.chkLog.setToolTip("Show logarithmic stimulus response.")
+        self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLog.setChecked(False)
-        self.lblLog = QLabel("Log. <i>h</i>", self)
+        self.lblLog = QLabel("Log. y-axis", self)
 
         self.lblLogBottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
@@ -51,7 +51,7 @@ class PlotImpz(QWidget):
         
         self.lblStimulus = QLabel("Type = ", self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw"])
+        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw", "RandN", "RandU"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         
         self.lblFreq = QLabel("<i>f</i>&nbsp; =", self)
@@ -70,7 +70,6 @@ class PlotImpz(QWidget):
                                    "N = 0 selects automatically.")
 
         layHControls = QHBoxLayout()
-        layHControls.addStretch(10)
         
         layHControls.addWidget(self.lblNPoints)
         layHControls.addWidget(self.ledNPoints)
@@ -98,7 +97,6 @@ class PlotImpz(QWidget):
         self.frmControls = QFrame(self)
         self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmControls.setLayout(layHControls)
-        layHControls.setContentsMargins(*params['wdg_margins'])
 
         #----------------------------------------------------------------------
         # mplwidget
@@ -117,7 +115,6 @@ class PlotImpz(QWidget):
         self.chkPltStim.clicked.connect(self.draw)
         self.cmbStimulus.currentIndexChanged.connect(self.draw)
         self.ledFreq.installEventFilter(self) 
-#        self.ledFreq.editingFinished.connect(self.draw)
 
         self.draw() # initial calculation and drawing
 
@@ -273,16 +270,31 @@ class PlotImpz(QWidget):
         elif stim in {"Sine", "Rect"}:
             x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
             if stim == "Sine":
-                title_str = r'Response to Sine Signal'
-                H_str = r'$h_{\sin}[n]$'
+                title_str = r'Transient Response to Sine Signal'
+                H_str = r'$y_{\sin}[n]$'
             else:
                 x = np.sign(x)
-                title_str = r'Response to Rect. Signal'
-                H_str = r'$h_{rect}[n]$'
-        else:
+                title_str = r'Transient Response to Rect. Signal'
+                H_str = r'$y_{rect}[n]$'
+
+        elif stim == "Saw":
             x = sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
-            title_str = r'Response to Sawtooth Signal'
-            H_str = r'$h_{saw}[n]$'
+            title_str = r'Transient Response to Sawtooth Signal'
+            H_str = r'$y_{saw}[n]$'
+
+        elif stim == "RandN":
+            x = np.random.randn(N)
+            title_str = r'Transient Response to Gaussian Noise'
+            H_str = r'$y_{gauss}[n]$'
+
+        elif stim == "RandU":
+            x = np.random.rand(N)-0.5
+            title_str = r'Transient Response to Uniform Noise'
+            H_str = r'$y_{uni}[n]$'
+
+        else:
+            logger.error('Unknown stimulus "{0}"'.format(stim))
+            return
 
         if len(sos) > 0: # has second order sections        
             h = sig.sosfilt(sos, x)

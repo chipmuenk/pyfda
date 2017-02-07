@@ -41,7 +41,7 @@ params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
           'FMT': '{:.3g}', # format string for QLineEdit fields
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
           'Z_Marker': [mpl_ms, 'b'], # size and color for zeros' marker
-          'wdg_margins' : (2,2,2,0),  # R, T, L, B widget margins
+          'wdg_margins' : (2,1,2,0),  # R, T, L, B widget margins
           'mpl_hatch_border': {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}     
           }
 params_dark = {'mpl_hatch': {                          # hatched area for specs
@@ -258,8 +258,8 @@ qss_tab_bar = """
      border : 0;
  }
 
- /* Only the right QTabWidget (named plot_tabs) gets a dashed left border */
- QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;}
+ /* Only the right QTabWidget (named plot_tabs) gets a dashed left border
+ QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;} */
 
  QTabWidget::tab-bar {
      left: 0.3em; /* move bar to the right: hack to prevent truncation of labels (QTBUG-6905) */
@@ -319,50 +319,78 @@ qss_tab_bar = """
      margin: 0; /* if there is only one tab, we don't want overlapping margins */
  }
 """
+qss_push_button = """
+ QPushButton{
+         border-style: solid; /* solid, outset */
+         border-color: #999999;
+         border-width: 1px;
+         border-radius: 3px;
+         padding : 2px;
+         /*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);*/
+         color: black;
+                    }
+
+"""
 # Common qss settings for all themes
 qss_common = """
                 *[state="normal"]{}
-                *[state="changed"]{background-color:yellow; color:black}
-                *[state="error"]{background-color:red; color:white}
-                *[state="failed"]{background-color:orange; color:white}
-                *[state="ok"]{background-color:green; color:white}
-                *[state="unused"]{background-color:white; color:darkgrey}
+                                 
+                QPushButton[state="changed"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
+                                color: black;}
+
+                QPushButton[state="error"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 #cccccc, stop: 0.1 red, stop: 1.0 #444444);
+                                color: white;}
+                QPushButton[state="failed"]{background-color:orange; color:white}
+                QPushButton[state="ok"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
+                                color: white;}
+                QPushButton[state="unused"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
                 
                 QWidget{font-size:10pt; font-family: Tahoma;}
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
                                 border-width: 2px;}
-                QSplitter::handle {
-                    image: url(':/grid-four-up.svg');
-                    }
-    
-                QSplitter::handle:horizontal {
-                    width: 10px;
-                    }
-    
+                
+                /* QSplitter styling adopted from
+                http://stackoverflow.com/questions/6832499/qsplitter-show-a-divider-or-a-margin-between-the-two-widgets
+                */
+                  
                 QSplitter::handle:vertical {
-                    height: 10px;
+                    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
+                                        stop:0 rgba(255, 255, 255, 0), 
+                                        stop:0.407273 rgba(200, 200, 200, 255), 
+                                        stop:0.4825 rgba(101, 104, 113, 235), 
+                                        stop:0.6 rgba(255, 255, 255, 0));                 
+                    height: 8px;
+                    image: url(':/ellipses_v.svg');
+                    }
+                
+                QSplitter::handle:horizontal {
+                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                        stop:0 rgba(255, 255, 255, 0), 
+                                        stop:0.407273 rgba(200, 200, 200, 255), 
+                                        stop:0.4825 rgba(101, 104, 113, 235), 
+                                        stop:0.6 rgba(255, 255, 255, 0)); 
+                    width: 8px;
+                    image: url(':/ellipses_h.svg');                     
                     }
                     
-                /* QPushButton{
-                    border-style: solid;
-                    border-color: black;
-                    border-width: 1px;
-                    border-radius: 10px;
-                    } */
             """
-
+# QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
 
 if THEME == 'dark':
     mpl_rc.update(mpl_dark)
     params.update(params_dark)
-    qss_rc = qss_common + qss_tab_bar + qss_dark
+    qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_dark
     
 elif THEME == 'light':
     mpl_rc.update(mpl_light)
     params.update(params_light)
-    qss_rc = qss_common + qss_tab_bar + qss_light
+    qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_light
     
 else:
     qss_rc = qss_common

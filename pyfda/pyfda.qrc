@@ -6,6 +6,8 @@
     <file alias="camera-slr.svg">images/icons/camera-slr.svg</file>
     <file alias="circle-check.svg">images/icons/circle-check.svg</file>
     <file alias="cog.svg">images/icons/cog.svg</file>
+    <file alias="ellipses_h.svg">images/icons/ellipses_h.svg</file>
+    <file alias="ellipses_v.svg">images/icons/ellipses_v.svg</file>
     <file alias="file.svg">images/icons/file.svg</file>
     <file alias="fullscreen-enter.svg">images/icons/fullscreen-enter.svg</file>
     <file alias="grid-four-up.svg">images/icons/grid-four-up.svg</file>
@@ -13,7 +15,7 @@
     <file alias="lock-locked.svg">images/icons/lock-locked.svg</file>
     <file alias="magnifying-glass.svg">images/icons/magnifying-glass.svg</file>
     <file alias="move.svg">images/icons/move.svg</file>
-    
+
     <file alias="pyfda_icon.svg">images/icons/pyfda_icon.svg</file>
 </qresource>
 </RCC>

@@ -9,7 +9,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, QSizePolicy, pyqtSignal
+from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
 
 SCROLL = True
 
@@ -73,14 +73,10 @@ class InputTabWidgets(QWidget):
         if fb.MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
-#        tabWidget.setSizePolicy(QSizePolicy.Minimum,
-#                                QSizePolicy.Expanding)
-
         layVMain = QVBoxLayout()
 
         #setContentsMargins -> number of pixels between frame window border
         layVMain.setContentsMargins(*params['wdg_margins']) 
-#
 
 #--------------------------------------
         if SCROLL:
@@ -88,14 +84,6 @@ class InputTabWidgets(QWidget):
             scroll.setWidget(tabWidget)
             scroll.setWidgetResizable(True) # Size of monitored widget is allowed to grow:
 
-            # scroll bars appear when the scroll area shrinks below this size:
-#            scroll.setMinimumSize(QtCore.QSize(800, 500))
-    #        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) #default
-    #        scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded) # default
-            scroll.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                 QSizePolicy.MinimumExpanding)
-
-#            scroll.setFixedHeight(400)
             layVMain.addWidget(scroll)
         else:
             layVMain.addWidget(tabWidget) # add the tabWidget directly
