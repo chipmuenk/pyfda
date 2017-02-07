@@ -222,6 +222,7 @@ class PlotImpz(QWidget):
 
 #------------------------------------------------------------------------------
     def draw(self):
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.draw_impz()
 
