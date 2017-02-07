@@ -538,8 +538,9 @@ class FilterPZ(QWidget):
             self.zpk[1] = self.zpk[1] * np.logical_not(
                                         np.isclose(self.zpk[1], 0., rtol=0, atol = eps))
         else:
-            pass
-        
+            for i in sel:
+                self.zpk[i[0]][i[1]] = self.zpk[i[0]][i[1]] * np.logical_not(
+                                         np.isclose(self.zpk[i[0]][i[1]], 0., rtol=0, atol = eps))
         self._delete_PZ_pairs()
         self._refresh_table()
 
