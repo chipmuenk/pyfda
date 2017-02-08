@@ -32,12 +32,18 @@ logger = logging.getLogger(__name__)
 # #############################################################################
 # General layout settings
 # #############################################################################
+# Get all available system styles:
+#from PyQt5.QtWidgets import QStyleFactory
+#fróm PyQt4.QtGui import QStyleFactory
+#print(QStyleFactory.keys())
 
-THEME = 'light' # select 'dark', 'light' or 'none' theme
-# QT4: motif, cleanlooks, CDE, windows, plastique
-#   MS Windows only:    windowsxp, windowsvista
-#   Mac only:           macintosh
-# QT5:                  fusion
+THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the
+                    # system styles like 'windows':
+# QT4 only:         motif, cleanlooks, CDE, plastique
+# QT5 only:         fusion
+# MS Windows only:  windowsxp, windowsvista
+# Mac only:         macintosh
+
 mpl_ms = 8 # base size for matplotlib markers
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
