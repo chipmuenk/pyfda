@@ -214,9 +214,20 @@ def main():
     *before* any other objects related to the user interface are created."     
     """
      # instantiate QApplication object, passing command line arguments
-    app = QApplication(sys.argv)
+
+    if len(rc.qss_rc) > 20:
+        app = QApplication(sys.argv)
+        app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
+    else:
+        qstyle = QApplication.setStyle(rc.qss_rc) # no, this is just a name for a system stylesheet
+        if qstyle:
+            logger.info('Using system style "{0}".'.format(rc.qss_rc))
+            print(qstyle, "found")
+        else:
+            logger.warn('Style "{0}" not found, falling back to default style.'.format(rc.qss_rc))
+            print("not found")
+        app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
-    app.setStyleSheet(rc.qss_rc)
 
     mainw = pyFDA()
 

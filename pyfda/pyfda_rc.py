@@ -33,8 +33,11 @@ logger = logging.getLogger(__name__)
 # General layout settings
 # #############################################################################
 
-THEME = 'light' # select 'dark', 'light' or 'original' theme
-
+THEME = 'light' # select 'dark', 'light' or 'none' theme
+# QT4: motif, cleanlooks, CDE, windows, plastique
+#   MS Windows only:    windowsxp, windowsvista
+#   Mac only:           macintosh
+# QT5:                  fusion
 mpl_ms = 8 # base size for matplotlib markers
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
@@ -414,6 +417,13 @@ elif THEME == 'light':
     mpl_rc.update(mpl_rc_light)
     params.update(mpl_params_light)
     qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_light
-    
-else:
+
+elif THEME == 'none':
+    mpl_rc.update(mpl_rc_light)
+    params.update(mpl_params_light)  
     qss_rc = qss_common
+    
+else: # use the THEME name as the QStyle name 
+    mpl_rc.update(mpl_rc_light)
+    params.update(mpl_params_light)  
+    qss_rc = THEME
