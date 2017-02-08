@@ -44,32 +44,36 @@ params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
           'wdg_margins' : (2,1,2,0),  # R, T, L, B widget margins
           'mpl_hatch_border': {'linewidth':1.0, 'color':'blue', 'linestyle':'--'}     
           }
-params_dark = {'mpl_hatch': {                          # hatched area for specs
-                             'facecolor': 'none', 
-                             'hatch'    : '/', 
-                             'edgecolor': '#808080',   # same as figure.edgecolor
-                             'lw'       : 0.0},        # no border around hatched area
-                             
-               'mpl_stimuli':{                         # style for stimulus signals
-                              'mfc': 'w', 'mec' : 'w', # marker face + edge color
-                              'ms': mpl_ms,            # marker size
-                              'alpha': 0.25,           # transparency (marker + stem)
-                              'markerfmt':'*',         # marker symbol
-                              'lw':'2' }}              # stem linewidth
+mpl_params_dark = {
+            'mpl_hatch': {                          # hatched area for specs
+                         'facecolor': 'none', 
+                         'hatch'    : '/', 
+                         'edgecolor': '#808080',   # same as figure.edgecolor
+                         'lw'       : 0.0},        # no border around hatched area
+                         
+            'mpl_stimuli':{                         # style for stimulus signals
+                          'mfc': 'w', 'mec' : 'w', # marker face + edge color
+                          'ms': mpl_ms,            # marker size
+                          'alpha': 0.25,           # transparency (marker + stem)
+                          'markerfmt':'*',         # marker symbol
+                          'lw':'2' }               # stem linewidth
+                    }
 
 #fill_params = {'facecolor':'none','hatch':'/', 'edgecolor':rcParams['figure.edgecolor'], 'lw':0.0}
-params_light = {'mpl_hatch': {                         # hatched area for specs
-                             'facecolor': 'none',
-                             'hatch'    : '/', 
-                             'edgecolor': '#808080',   # same as figure.edgecolor
-                             'lw'       : 0.0},        # no border around hatched area
-                             
-               'mpl_stimuli':{                         # style for stimulus signals
-                              'mfc': 'k', 'mec' : 'k', # marker face + edge color
-                              'ms': mpl_ms,            # marker size
-                              'alpha': 0.25,           # transparency (marker + stem)
-                              'markerfmt':'*',         # marker symbol 
-                              'lw':'2' }}              # stem linewidth
+mpl_params_light = {
+            'mpl_hatch': {                         # hatched area for specs
+                         'facecolor': 'none',
+                         'hatch'    : '/', 
+                         'edgecolor': '#808080',   # same as figure.edgecolor
+                         'lw'       : 0.0},        # no border around hatched area
+
+            'mpl_stimuli':{                         # style for stimulus signals
+                          'mfc': 'k', 'mec' : 'k', # marker face + edge color
+                          'ms': mpl_ms,            # marker size
+                          'alpha': 0.25,           # transparency (marker + stem)
+                          'markerfmt':'*',         # marker symbol 
+                          'lw':'2' }              # stem linewidth
+                    }
 
 # Dictionary with translations between short method names and long names for
 # response types - the long name can be changed as you like, but don't change 
@@ -96,7 +100,8 @@ log_config_file = "pyfda_log.conf"
 # #############################################################################
 
 # dark theme for matplotlib widgets
-mpl_dark = {'axes.facecolor'    : 'black',
+mpl_rc_dark = {
+            'axes.facecolor'    : 'black',
             'axes.labelcolor'   : 'white',
             'axes.edgecolor'    : 'white',
             'figure.facecolor'  : '#202020',
@@ -113,14 +118,17 @@ try:
     # cycler is used by default with matplotlib 1.5 upwards
     from cycler import cycler
     CYC = True
-    mpl_dark.update({'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
+    mpl_rc_dark.update(
+            {'axes.prop_cycle': cycler('color', ['r', 'g', 'c', 'm', 'y', 'w'])})
 except ImportError:
     CYC = False
-    mpl_dark.update({'axes.color_cycle': ['r', 'g', 'c', 'm', 'y', 'w']})
+    mpl_rc_dark.update(
+            {'axes.color_cycle': ['r', 'g', 'c', 'm', 'y', 'w']})
 
 # light theme for matplotlib widgets
-mpl_light = {'axes.facecolor'   : 'white',
-             'axes.labelcolor'  : 'black',
+mpl_rc_light = {
+            'axes.facecolor'    : 'white',
+            'axes.labelcolor'   : 'black',
             'axes.edgecolor'    : 'black',
             'figure.facecolor'  : 'white',
             'figure.edgecolor'  : '#808080', # also color for hatched specs in |H(f)|
@@ -132,9 +140,9 @@ mpl_light = {'axes.facecolor'   : 'white',
             'grid.color'        : '#222222'
             }
 if CYC:
-    mpl_light.update({'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k'])})
+    mpl_rc_light.update({'axes.prop_cycle': cycler('color', ['r', 'b', 'c', 'm', 'k'])})
 else:
-    mpl_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
+    mpl_rc_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
             
 # common matplotlib widget settings
 mpl_rc = {'lines.linewidth'           : 1.5,
@@ -219,7 +227,11 @@ qss_dark = """
     }
     QLineEdit:disabled{background-color:darkgrey;}
    
-    QPushButton{background-color:grey; color:white}
+ QPushButton{
+         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+         color: black;
+                    }
     
     QTableView{alternate-background-color:#222222;
         background-color:#444444; gridline-color: white;}
@@ -249,8 +261,10 @@ qss_light = """
                 border-color: darkgrey;}
     QLineEdit:disabled{background-color:darkgrey;}
   
-    
-    QPushButton{background-color:lightgrey; }
+    QPushButton{
+         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+                    }    
     QPushButton:disabled{color:darkgrey; }
     
     QHeaderView::section{background-color:rgb(190,1,1); color:white;}
@@ -341,7 +355,9 @@ qss_push_button = """
 """
 # Common qss settings for all themes
 qss_common = """
-                *[state="normal"]{}
+                QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
+                                color: black;}
                                  
                 QPushButton[state="changed"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 #cccccc, stop: 0.1 yellow, stop: 1.0 #999999);
@@ -390,13 +406,13 @@ qss_common = """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
 
 if THEME == 'dark':
-    mpl_rc.update(mpl_dark)
-    params.update(params_dark)
+    mpl_rc.update(mpl_rc_dark)
+    params.update(mpl_params_dark)
     qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_dark
     
 elif THEME == 'light':
-    mpl_rc.update(mpl_light)
-    params.update(params_light)
+    mpl_rc.update(mpl_rc_light)
+    params.update(mpl_params_light)
     qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_light
     
 else:
