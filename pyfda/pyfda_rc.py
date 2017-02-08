@@ -230,7 +230,7 @@ qss_dark = """
     }
     QLineEdit:disabled{background-color:darkgrey;}
    
- QPushButton{
+    QPushButton{
          background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
          color: black;
@@ -242,6 +242,7 @@ qss_dark = """
     QHeaderView::section{background-color:#111111;}
     QTableWidget QTableCornerButton::section{background-color:#444444;}
     QHeaderView::section:checked{background-color:rgb(190,1,1);}
+
     QComboBox QListView {color:black}
     QMessageBox{background-color:#444444}
             """
@@ -269,8 +270,11 @@ qss_light = """
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
                     }    
     QPushButton:disabled{color:darkgrey; }
+
+    QHeaderView::section{background-color:darkgray; color:white;}    
+    QHeaderView::section:checked{background-color:rgb(190,1,1); color:white;}
     
-    QHeaderView::section{background-color:rgb(190,1,1); color:white;}
+    QMessageBox{background-color: #EEEEEE}
     """
 
 
@@ -391,8 +395,7 @@ qss_common = """
                                         stop:0.6 rgba(255, 255, 255, 0)); 
                     width: 8px;
                     image: url(':/ellipses_h.svg');                     
-                    }
-                    
+                    }     
             """
 # QApplication.setStyle(QStyleFactory.create('Cleanlooks')) re-create default styles
 
