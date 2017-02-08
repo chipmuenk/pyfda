@@ -197,7 +197,14 @@ qss_dark = """
     .QWidget{color:white; background-color: black } /* background of application */
     QFrame{color:white;}
     QTextEdit{color: white; background-color: #444444;}
-    QCheckBox{color: white;}
+    QCheckBox{
+        border: none;  /* dummy, needed to force using non-system widget rendering */    
+        color: white;
+        }
+    QCheckBox::indicator{
+     /* setting any properties here removes all default styles ... */
+       }
+
     
     QScrollArea{background-color: #222222}
     QScrollArea > QWidget > QWidget{background-color: #222222}
