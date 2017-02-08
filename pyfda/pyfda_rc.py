@@ -343,19 +343,7 @@ qss_tab_bar = """
      margin: 0; /* if there is only one tab, we don't want overlapping margins */
  }
 """
-qss_push_button = """
- QPushButton{
-         border-style: solid; /* solid, outset */
-         border-color: #999999;
-         border-width: 1px;
-         border-radius: 3px;
-         padding : 2px;
-         /*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);*/
-         color: black;
-                    }
 
-"""
 # Common qss settings for all themes
 qss_common = """
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -411,12 +399,12 @@ qss_common = """
 if THEME == 'dark':
     mpl_rc.update(mpl_rc_dark)
     params.update(mpl_params_dark)
-    qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_dark
+    qss_rc = qss_common + qss_tab_bar + qss_dark
     
 elif THEME == 'light':
     mpl_rc.update(mpl_rc_light)
     params.update(mpl_params_light)
-    qss_rc = qss_common + qss_tab_bar + qss_push_button + qss_light
+    qss_rc = qss_common + qss_tab_bar + qss_light
 
 elif THEME == 'none':
     mpl_rc.update(mpl_rc_light)
