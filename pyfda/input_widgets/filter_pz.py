@@ -121,7 +121,7 @@ class FilterPZ(QWidget):
         self.tblPZ.setAlternatingRowColors(True) # alternating row colors)
         self.tblPZ.setObjectName("tblPZ")
 
-        self.tblPZ.horizontalHeader().setHighlightSections(False)
+        self.tblPZ.horizontalHeader().setHighlightSections(True) # highlight when selected
         self.tblPZ.horizontalHeader().setFont(bfont)
 
         self.tblPZ.verticalHeader().setHighlightSections(True)
