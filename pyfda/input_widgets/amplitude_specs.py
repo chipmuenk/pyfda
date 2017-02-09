@@ -80,6 +80,7 @@ class AmplitudeSpecs(QWidget):
         # set the title as the first (fixed) entry in grid layout. The other
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
         self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
+        self.layGSpecs.setAlignment(Qt.AlignLeft)
 
         # This is the top level widget, encompassing the other widgets        
         frmMain = QFrame(self)

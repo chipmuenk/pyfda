@@ -64,6 +64,7 @@ class FreqSpecs(QWidget):
         # set the title as the first (fixed) entry in grid layout. The other
         # fields are added and hidden dynamically in _show_entries and _hide_entries()
         self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
+        self.layGSpecs.setAlignment(Qt.AlignLeft)
 
         frmMain = QFrame(self)
         frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
