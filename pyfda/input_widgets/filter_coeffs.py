@@ -62,10 +62,11 @@ class FilterCoeffs(QWidget):
         ButLength = 0
         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
 
+        # Find the longest text + padding for subsequent bounding box calculation 
         for item in butTexts:
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
-                longestText = item
+                longestText = item + "mm" # this is the longest text + padding for  
 
 
         self.chkCoeffList =  QCheckBox(self)
@@ -93,7 +94,7 @@ class FilterCoeffs(QWidget):
         butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
         butAddRow.setText(butTexts[0])
         #Calculate the length for the buttons based on the longest ButtonText
-        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()+10
+        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
         butAddRow.setMaximumWidth(ButLength)
 
         butDelRow = QPushButton(self)
