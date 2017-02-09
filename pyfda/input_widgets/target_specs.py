@@ -62,6 +62,9 @@ class TargetSpecs(QWidget):
         layGSpecs.addWidget(self.f_specs,1,0) # frequency specs
         layGSpecs.addWidget(self.a_specs,1,1) # ampltitude specs
 #        layGSpecs.setContentsMargins(1,0,1,0) # (left, top, right, bottom)
+        self.a_specs.frmMain.setFrameStyle(QFrame.NoFrame)
+        self.f_specs.frmMain.setFrameStyle(QFrame.NoFrame)        
+        layHSpecs.addWidget(self.f_specs) # frequency specs
            
         # This is the top level widget, encompassing the other widgets        
         frmMain = QFrame(self)

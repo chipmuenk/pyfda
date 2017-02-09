@@ -66,12 +66,12 @@ class FreqSpecs(QWidget):
         self.layGSpecs.addLayout(layHTitle, 0, 0, 1, 2)
         self.layGSpecs.setAlignment(Qt.AlignLeft)
 
-        frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmMain.setLayout(self.layGSpecs)
+        self.frmMain = QFrame(self)
+        self.frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmMain.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout() # Widget main layout
-        self.layVMain.addWidget(frmMain)#, Qt.AlignLeft)
+        self.layVMain.addWidget(self.frmMain)#, Qt.AlignLeft)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
         

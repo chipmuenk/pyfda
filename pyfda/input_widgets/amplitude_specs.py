@@ -83,18 +83,18 @@ class AmplitudeSpecs(QWidget):
         self.layGSpecs.setAlignment(Qt.AlignLeft)
 
         # This is the top level widget, encompassing the other widgets        
-        frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmMain.setLayout(self.layGSpecs)
+        self.frmMain = QFrame(self)
+        self.frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmMain.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout() # Widget main layout
-        self.layVMain.addWidget(frmMain)
+        self.layVMain.addWidget(self.frmMain)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
         # self.qfm = QFMetric(self) # instance for calculating font metrics
 
         self.setLayout(self.layVMain)
-        
+
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits
 
         # - Build a list from all entries in the fil_dict dictionary starting
