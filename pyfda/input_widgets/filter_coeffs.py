@@ -229,7 +229,6 @@ class FilterCoeffs(QWidget):
 
         # This frame encompasses all the buttons       
         frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(layVBtns)
 
         layVMain = QVBoxLayout()        

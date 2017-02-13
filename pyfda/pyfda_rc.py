@@ -205,6 +205,7 @@ elif 'Bitstream Vera Sans' in ttf_fonts:
 # .Qxxx{} only matches Qxxx, not its children
 #  #mylabel Qxxx{} only matches Qxxx with object name #mylabel
 #  Qxxx Qyyy{} only matches Qyyy that is a child of Qxxx
+#  Qxxx > Qyyy only matches Qyyy that is a direct child of Qxxxx
 #  Qxxx:mystate only matches Qyyy in state 'mystate' (e.g. disabled)
 
 #--------------- 
@@ -286,14 +287,13 @@ qss_light = """
 
 # common layout settings for QTabWidget
 qss_tab_bar = """
- QTabWidget::pane { /* The tab _widget_ frame
+ .QTabWidget::pane { /* The tab _widget_ frame */ 
     
-     border-top: 2px solid #123456;  */
-     border : 0;
+     border-top: 2px solid #123456; 
+     /*border : 5px solid;
+     padding: 0;
+     margin:  0; */
  }
-
- /* Only the right QTabWidget (named plot_tabs) gets a dashed left border
- QTabWidget#plot_tabs::pane{border-left: 2px dashed grey;} */
 
  QTabWidget::tab-bar {
      left: 0.3em; /* move bar to the right: hack to prevent truncation of labels (QTBUG-6905) */
@@ -356,6 +356,39 @@ qss_tab_bar = """
 
 # Common qss settings for all themes
 qss_common = """
+                QWidget{font-size:10pt; font-family: Tahoma;}
+                /* Frame with control elements of all plot widgets */
+                #frmControls{
+                    border-top: solid #22cccc;
+                    border-width: 2px;
+                    margin: 0px;
+                    padding: 5px;}
+                QTabWidget#input_tabs > QFrame QFrame,                
+                QTabWidget#input_tabs QTextBrowser
+                {
+                    /* background-color: pink; */
+                    border-top: solid black;
+                    border: solid darkgrey;
+                    border-width: 1px 0 1px 0;
+                    padding: 0px;
+                    margin: 2px;
+                    }
+                /* Frame in frame, e.g. for target specs */
+                QTabWidget#input_tabs > QFrame QFrame .QFrame
+                {
+                    border: solid darkgrey;
+                    border-width: 1px 0 0px 0;
+                    padding: 0px;
+                    margin: 0px;
+                    }
+                #layMain{
+                    margin: 0px; 
+                    padding: 0px;
+                    background-color: lightblue;
+                    }
+                    
+                /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
+                
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
                                 color: black;}
@@ -374,7 +407,6 @@ qss_common = """
                 QPushButton[state="unused"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
                 
-                QWidget{font-size:10pt; font-family: Tahoma;}
                 QLineEdit{background-color:lightblue;
                                 /* border-style: outset; */
                                 border-width: 2px;}

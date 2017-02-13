@@ -178,7 +178,6 @@ class SelectFilter(QWidget):
 
 #==============================================================================
         frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(layVAllWdg)
 
         layHMain = QHBoxLayout()

@@ -68,7 +68,6 @@ class WeightSpecs(QWidget):
         
         # This is the top level widget, encompassing the other widgets
         frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout()   # Widget main vertical layout

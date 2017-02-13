@@ -11,9 +11,9 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtGui, QWidget, QLabel, QFont, QCheckBox,
+from ..compat import (QtGui, QWidget, QLabel, QFont, QCheckBox, QFrame,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy, QSplitter, Qt)
+                      QVBoxLayout, QHBoxLayout, QSplitter, Qt)
 
 try:
     from docutils.core import publish_string 
@@ -82,6 +82,9 @@ class FilterInfo(QWidget):
         self.layHChkBoxes.addWidget(self.chkFiltDict)
         self.layHChkBoxes.addStretch(1)
         self.layHChkBoxes.addWidget(self.chkFiltTree)
+        self.frmMain = QFrame(self)
+        self.frmMain.setLayout(self.layHChkBoxes)
+
         
         self.tblFiltPerf = QTableWidget(self)
         self.tblFiltPerf.setAlternatingRowColors(True)
@@ -99,7 +102,9 @@ class FilterInfo(QWidget):
 
 
         layVMain = QVBoxLayout()
-        layVMain.addLayout(self.layHChkBoxes)
+        layVMain.addWidget(self.frmMain)
+
+#        layVMain.addLayout(self.layHChkBoxes)
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.tblFiltPerf)

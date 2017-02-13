@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, Qt, QEvent, pyqtSignal, 
                       QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont,
-                      QVBoxLayout, QHBoxLayout, QGridLayout, QFMetric)
+                      QVBoxLayout, QHBoxLayout, QGridLayout)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, style_widget, safe_eval
@@ -84,7 +84,6 @@ class AmplitudeSpecs(QWidget):
 
         # This is the top level widget, encompassing the other widgets        
         self.frmMain = QFrame(self)
-        self.frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmMain.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout() # Widget main layout

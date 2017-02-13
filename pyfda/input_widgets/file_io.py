@@ -111,11 +111,9 @@ class File_IO(QWidget):
         layHIO.addWidget(lblSeparator)
         layHIO.addWidget(self.cmbSeparator)        
         layVIO.addLayout(layHIO)
-##        layVIO.addWidget(HLine(QFrame, self))
 
         # This is the top level widget, encompassing the other widgets        
         frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(layVIO)
 
         layVMain = QVBoxLayout()

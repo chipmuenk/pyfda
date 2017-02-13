@@ -175,10 +175,8 @@ class Plot3D(QWidget):
 
         # This widget encompasses all control subwidgets   
         self.frmControls = QFrame(self)
-        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layGControls)
-#        layGControls.setContentsMargins(*params['wdg_margins'])
-
 
         #----------------------------------------------------------------------
         # mplwidget

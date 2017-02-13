@@ -74,7 +74,6 @@ class TargetSpecs(QWidget):
            
         # This is the top level widget, encompassing the other widgets        
         frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(layVSpecs)
 
         self.layVMain = QVBoxLayout() # Widget main layout

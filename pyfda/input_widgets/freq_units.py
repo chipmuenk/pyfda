@@ -107,7 +107,6 @@ class FreqUnits(QWidget):
         self.layGSpecWdg.addLayout(self.layHUnits,0,1)
 
         frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmMain.setLayout(self.layGSpecWdg)
 
         self.layVMain.addWidget(frmMain)

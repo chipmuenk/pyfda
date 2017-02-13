@@ -32,9 +32,8 @@ class PlotTauG(QWidget):
         
         # This widget encompasses all control subwidgets:
         self.frmControls = QFrame(self)
-        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
-#        layHControls.setContentsMargins(*params['wdg_margins'])
 
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)

@@ -66,12 +66,10 @@ class FilterSpecs(QWidget):
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
-#        self.lblMsg.setFrameShape(QFrame.StyledPanel|QFrame.Sunken)
         layVMsg = QVBoxLayout()
         layVMsg.addWidget(self.lblMsg)
 
         self.frmMsg = QFrame(self)
-        self.frmMsg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmMsg.setLayout(layVMsg)
         layVFrm = QVBoxLayout()
         layVFrm.addWidget(self.frmMsg)

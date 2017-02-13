@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 from ..compat import (QtCore, Qt,
                       QWidget, QLabel, QLineEdit, QFrame, QFont,
                       QVBoxLayout, QHBoxLayout, QGridLayout,
-                      pyqtSignal, QEvent, QFMetric)
+                      pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, style_widget, safe_eval
@@ -67,15 +67,12 @@ class FreqSpecs(QWidget):
         self.layGSpecs.setAlignment(Qt.AlignLeft)
 
         self.frmMain = QFrame(self)
-        self.frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         self.frmMain.setLayout(self.layGSpecs)
 
         self.layVMain = QVBoxLayout() # Widget main layout
         self.layVMain.addWidget(self.frmMain)#, Qt.AlignLeft)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
-        
-#        self.qfm = QFMetric(self) # instance for calculating font metrics
 
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits        
 

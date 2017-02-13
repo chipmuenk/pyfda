@@ -31,7 +31,6 @@ class PlotPZ(QWidget):
         
         # This widget encompasses all control subwidgets:
 #        self.frmControls = QFrame(self)
-#        self.frmControls.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
 #        self.frmControls.setLayout(layHControls)
 
 
