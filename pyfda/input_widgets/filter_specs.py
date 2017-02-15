@@ -157,7 +157,6 @@ class FilterSpecs(QWidget):
         Then, the UIs of all subwidgets are updated using their "update_UI" method,
         finally the signal 'sigSpecsChanged' is emitted.
         """
-
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
@@ -170,11 +169,7 @@ class FilterSpecs(QWidget):
         logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
         logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
 
-        if 'fo' in all_widgets and len(all_widgets['fo']) > 1:
-            fo_status = all_widgets['fo'][0]
-        else:
-            fo_status = 'i'
-        self.sel_fil.load_filter_order(status = fo_status) # update filter order subwidget
+        # self.sel_fil.load_filter_order() # update filter order subwidget, called by select_filter
 
         if ('tspecs' in all_widgets and len(all_widgets['tspecs']) > 1 and
                                               all_widgets['tspecs'][0] != 'i'):
