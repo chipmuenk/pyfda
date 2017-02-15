@@ -29,8 +29,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy, QFont, QFontMetrics)
+from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
+                      QVBoxLayout, QHBoxLayout, QFMetric)
 
 import numpy as np
 
@@ -177,6 +177,8 @@ near ``f_S/2`` (highpass).
         self.wdg_fil = QFrame(self)
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layHWin)
+        
+        self.qfm = QFMetric(self) # instance for calculating font metrics
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -218,16 +220,9 @@ near ``f_S/2`` (highpass).
         self.led_delays.setText(str(self.delays))        
         self.stages = int(abs(round(float(self.led_stages.text()))))
         self.led_stages.setText(str(self.stages))
-         # use QFontMetrics to measure / set the width independently of font
-        myfont = QFont("", 0)
-        fm = QFontMetrics(myfont)
-        delays_pix_width = fm.width(str(self.delays)+ "m") # add 1 'em' to width
-        stages_pix_width = fm.width(str(self.stages)+ "m") # add 1 'em' to width
-
-        pix_height = fm.height()
-
-        self.led_delays.setFixedSize(delays_pix_width, pix_height)
-        self.led_stages.setFixedSize(stages_pix_width, pix_height)
+       
+        self.led_delays.setFixedSize(QFMetric.W0 * 6, QFMetric.H) # set lineedit dimensions
+        self.led_stages.setFixedSize(QFMetric.W0 * 6, QFMetric.H) # set lineedit dimensions
         
         self._store_entries()
 
