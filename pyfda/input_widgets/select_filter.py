@@ -67,13 +67,6 @@ class SelectFilter(QWidget):
         See filterbroker.py for structure and content of "filterTree" dict
 
         """
-
-        bfont = QFont()
-        ifont = QFont()
-        bfont.setBold(True)
-        bfont.setWeight(75)
-        ifont.setItalic(True)
-
         #----------------------------------------------------------------------
         # Combo boxes for filter selection
         #----------------------------------------------------------------------
@@ -82,7 +75,7 @@ class SelectFilter(QWidget):
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("Select the kind of filter (recursive, transversal, ...).")
+        self.cmbFilterType.setToolTip("<span>Select the kind of filter (recursive, transversal, ...).</span>")
         self.cmbFilterClass = QComboBox(self)
         self.cmbFilterClass.setObjectName("comboFilterClass")
         self.cmbFilterClass.setToolTip("Select the filter design class.")
@@ -138,23 +131,19 @@ class SelectFilter(QWidget):
         #----------------------------------------------------------------------
         # see Summerfield p. 278
         self.layHDynWdg = QHBoxLayout() # for additional dynamic subwidgets
-        self.frmDynWdg = QFrame() # collect subwidgets in frame (no border)
-        self.frmDynWdg.setObjectName("wdg_frmDynWdg")
-        self.frmDynWdg.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                     QSizePolicy.Minimum)
+##        self.frmDynWdg = QFrame(self) # collect subwidgets in frame (no border)
+##        self.frmDynWdg.setObjectName("wdg_frmDynWdg")
 
         #Debugging: enable next line to show border of frmDnyWdg
         #self.frmDynWdg.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
-        self.frmDynWdg.setLayout(self.layHDynWdg)
+##        self.frmDynWdg.setLayout(self.layHDynWdg)
 
         #----------------------------------------------------------------------
         # Filter Order Subwidgets
         #----------------------------------------------------------------------
-        self.lblOrder =  QLabel("Order:")
-        self.lblOrder.setFont(bfont)
+        self.lblOrder =  QLabel("<b>Order:</b>")
         self.chkMinOrder = QCheckBox("Minimum", self)
-        self.lblOrderN = QLabel("N = ")
-        self.lblOrderN.setFont(ifont)
+        self.lblOrderN = QLabel("<b><i>N =</i></b>")
         self.ledOrderN = QLineEdit(str(fb.fil[0]['N']),self)
 
         #--------------------------------------------------
@@ -169,20 +158,19 @@ class SelectFilter(QWidget):
         #----------------------------------------------------------------------
         # OVERALL LAYOUT (stack standard + dynamic subwidgets vertically)
         #----------------------------------------------------------------------
-
-        layVAllWdg = QVBoxLayout()
-        layVAllWdg.addLayout(layHFilWdg)
-        layVAllWdg.addWidget(self.frmDynWdg)
-        layVAllWdg.addWidget(HLine(QFrame, self))
-        layVAllWdg.addLayout(layHOrdWdg)
+        self.layVAllWdg = QVBoxLayout()
+        self.layVAllWdg.addLayout(layHFilWdg)
+        self.layVAllWdg.addLayout(self.layHDynWdg)
+##        self.layVAllWdg.addWidget(self.frmDynWdg)
+        self.layVAllWdg.addLayout(layHOrdWdg)
 
 #==============================================================================
         frmMain = QFrame(self)
-        frmMain.setLayout(layVAllWdg)
+        frmMain.setLayout(self.layVAllWdg)
 
         layHMain = QHBoxLayout()
         layHMain.addWidget(frmMain)
-        layHMain.setContentsMargins(*rc.params['wdg_margins']) # (0, 0, 0, 0)
+        layHMain.setContentsMargins(*rc.params['wdg_margins'])
 
         self.setLayout(layHMain)
 
@@ -462,8 +450,10 @@ class SelectFilter(QWidget):
             if ff.fil_inst.wdg:
                 self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
-                self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
-                self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
+                
+##                self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
+##                self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
+# #               self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
 
                 ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
