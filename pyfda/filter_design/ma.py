@@ -109,13 +109,13 @@ near ``f_S/2`` (highpass).
                                            'amp':('u','A_PB','A_SB','A_PB2')}),
                     'msg': ('a', "\nThis is not a proper band stop, it only lets pass"
                             " frequency components around DC and <i>f<sub>S</sub></i>/2."
-                            " The order needs to be even."),
+                            " The order needs to be odd."),
                         }},
             'BP': {'man':{'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2',), 
                                            'amp':('u','A_SB','A_PB','A_SB2')}),
                     'msg': ('a', "\nThis is not a proper band pass, it only lets pass"
-                            " frequency components around :math:`f_S / 4`."
-                            " The order needs to be even."),
+                            " frequency components around <i>f<sub>S</sub></i>/4."
+                            " The order needs to be odd."),
 
                         }},
                 }
@@ -381,12 +381,12 @@ near ``f_S/2`` (highpass).
         
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
-        self.delays = floor_odd(self.delays)  # enforce even order
+        self.delays = ceil_odd(self.delays)  # enforce odd order
         self.calc_ma(fil_dict, rt = 'BS')     
         
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
-        self.delays = floor_odd(self.delays)  # enforce even order
+        self.delays = ceil_odd(self.delays)  # enforce odd order
         self.calc_ma(fil_dict, rt = 'BP')     
 
 #------------------------------------------------------------------------------
