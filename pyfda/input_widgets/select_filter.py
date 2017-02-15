@@ -14,14 +14,13 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame, QFont, QFrame,
-                      QCheckBox, QVBoxLayout, QHBoxLayout, QSizePolicy,
-                      pyqtSignal)
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
+                      QCheckBox, QVBoxLayout, QHBoxLayout, pyqtSignal)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 import pyfda.pyfda_rc as rc
-from pyfda.pyfda_lib import HLine, read_cmb_box
+from pyfda.pyfda_lib import read_cmb_box
 
 
 class SelectFilter(QWidget):
