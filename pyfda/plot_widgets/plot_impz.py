@@ -113,7 +113,8 @@ class PlotImpz(QWidget):
         self.ledNPoints.editingFinished.connect(self.draw)
         self.ledLogBottom.editingFinished.connect(self.draw)
         self.chkPltStim.clicked.connect(self.draw)
-        self.cmbStimulus.currentIndexChanged.connect(self.draw)
+#        self.cmbStimulus.currentIndexChanged.connect(self.draw)
+        self.cmbStimulus.activated.connect(self.draw)
         self.ledFreq.installEventFilter(self) 
 
         self.draw() # initial calculation and drawing
