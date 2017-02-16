@@ -289,7 +289,7 @@ qss_light = """
 qss_tab_bar = """
  .QTabWidget::pane { /* The tab _widget_ frame */ 
     
-     border-top: 2px solid #123456; 
+     border-top: 2px solid #C2C7CB; 
      /*border : 5px solid;
      padding: 0;
      margin:  0; */
