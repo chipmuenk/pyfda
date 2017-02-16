@@ -410,7 +410,7 @@ qss_common = """
                 QPushButton[state="ok"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 #cccccc, stop: 0.1 green, stop: 1.0 #444444);
                                 color: white;}
-                QPushButton[state="unused"]{background-color:white; color:darkgrey}
+                *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
                 QPushButton:pressed {background-color:black; color:white}
                 
                 QLineEdit{background-color:lightblue;
