@@ -9,7 +9,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, QSizePolicy
+from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore
 
 from pyfda.pyfda_rc import params
 
