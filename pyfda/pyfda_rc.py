@@ -359,27 +359,31 @@ qss_common = """
                 QWidget{font-size:10pt; font-family: Tahoma;}
                 /* Frame with control elements of all plot widgets */
                 #frmControls{
-                    border-top: solid #22cccc;
+                    border-top: solid darkgrey;
                     border-width: 2px;
-                    margin: 0px;
-                    padding: 5px;}
+                    margin: 0;
+                    padding: 0;
+                    }
+
+                /* Frame for input subwidgets */
                 QTabWidget#input_tabs > QFrame QFrame,                
                 QTabWidget#input_tabs QTextBrowser
                 {
                     /* background-color: pink; */
-                    border-top: solid black;
                     border: solid darkgrey;
                     border-width: 1px 0 1px 0;
-                    padding: 0px;
-                    margin: 2px;
+                    padding: 0;
+                    margin: 1px 0 0 0;
                     }
-                /* Frame in frame, e.g. for target specs */
+
+                /* Frame in frame, e.g. for target specs, only border-top */
                 QTabWidget#input_tabs > QFrame QFrame .QFrame
                 {
+                    /* background-color:lime; */
                     border: solid darkgrey;
-                    border-width: 1px 0 0px 0;
-                    padding: 0px;
-                    margin: 0px;
+                    border-width: 1px 0 0 0;
+                    padding: 0;
+                    margin: 0;
                     }
 
                 /* Dynamic filter subwidget */
@@ -387,13 +391,10 @@ qss_common = """
                     /*background-color:lightblue;*/
                     border: none;
                     padding: 5px 0 0 0;
-                #layMain{
-                    margin: 0px; 
-                    padding: 0px;
-                    background-color: lightblue;
                     }
+
                 /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
-                
+
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);
                                 color: black;}
