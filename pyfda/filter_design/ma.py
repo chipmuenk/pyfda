@@ -89,8 +89,8 @@ near ``f_S/2`` (highpass).
                           'msg':('a',
                    "Enter desired attenuation <b><i>A<sub>SB</sub></i></b> at "
                    "the corner of the stop band <b><i>F<sub>SB</sub></i></b>. "
-                   "Choose the number of stages, the minimum order M per stage "
-                   "will be determined. Passband specs are not regarded.")
+                   "Choose the number of <b>stages</b>, the minimum order <b><i>M</i></b> "
+                   "per stage will be determined. Passband specs are not regarded.")
                         }
                     },
             'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
