@@ -487,12 +487,12 @@ class FilterPZ(QWidget):
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
         Z = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
         P = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
+        print(Z,P)
 
-        # Delete array entries with selected indices. If Z or P are empty,
-        # delete the last row.
-        if not any(Z):
+        # Delete array entries with selected indices. If nothing is selected 
+        # (Z and P are empty), delete the last row.
+        if len(Z) < 1 and len(P) < 1:
             Z = [len(self.zpk[0])-1]
-        if not any(P):
             P = [len(self.zpk[1])-1]
         self.zpk[0] = np.delete(self.zpk[0], Z)
         self.zpk[1] = np.delete(self.zpk[1], P)
