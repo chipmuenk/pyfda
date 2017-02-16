@@ -24,7 +24,7 @@ Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QComboBox,
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox,
                       QVBoxLayout, QGridLayout)
 
 import numpy as np
@@ -163,7 +163,7 @@ class Firwin(QWidget):
         self.layGWin.addWidget(self.led_firwin_2,1,3)
         self.layGWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QFrame(self)
+        self.wdg_fil = QWidget(self)
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layGWin)
 
@@ -419,7 +419,7 @@ class Firwin(QWidget):
 
 if __name__ == '__main__':
     import sys 
-    from ..compat import QApplication
+    from ..compat import QApplication, QFrame
 
     app = QApplication(sys.argv)
     

@@ -381,12 +381,17 @@ qss_common = """
                     padding: 0px;
                     margin: 0px;
                     }
+
+                /* Dynamic filter subwidget */
+                #wdg_fil{
+                    /*background-color:lightblue;*/
+                    border: none;
+                    padding: 5px 0 0 0;
                 #layMain{
                     margin: 0px; 
                     padding: 0px;
                     background-color: lightblue;
                     }
-                    
                 /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
                 
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,

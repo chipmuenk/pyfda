@@ -28,8 +28,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame,
-                      QVBoxLayout, QHBoxLayout)
+from ..compat import QWidget, QLabel, QLineEdit, pyqtSignal, QVBoxLayout, QHBoxLayout
 
 import scipy.signal as sig
 import numpy as np
@@ -95,7 +94,8 @@ is estimated using Ichige's algorithm.
                                 "Enter desired filter order <b><i>N</i></b>, corner "
                                 "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
                                 "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
-                                "value <b><i>W</i></b>&nbsp; for each band.")
+                                "value <b><i>W</i></b>&nbsp; for each band. Amplitude specs "
+                                "are not used for the design.")
                             },
                     'min': {'fo':('d', 'N'),
                             'msg': ('a',
@@ -190,7 +190,7 @@ is estimated using Ichige's algorithm.
         self.layHWin.addWidget(self.led_remez_1)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QFrame(self)
+        self.wdg_fil = QWidget(self)
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layHWin)
 
@@ -376,7 +376,7 @@ is estimated using Ichige's algorithm.
 
 if __name__ == '__main__':
     import sys
-    from ..compat import QApplication
+    from ..compat import QApplication, QFrame
 
     app = QApplication(sys.argv)
     

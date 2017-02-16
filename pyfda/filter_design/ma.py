@@ -29,7 +29,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QCheckBox,
+from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
                       QVBoxLayout, QHBoxLayout, QFMetric)
 
 import numpy as np
@@ -88,7 +88,9 @@ near ``f_S/2`` (highpass).
                     'min':{'fo': ('d', 'N'),
                           'msg':('a',
                    "Enter desired attenuation <b><i>A<sub>SB</sub></i></b> at "
-                   "the corner of the stop band <b><i>F<sub>SB</sub></i></b>.")
+                   "the corner of the stop band <b><i>F<sub>SB</sub></i></b>. "
+                   "Choose the number of stages, the minimum order M per stage "
+                   "will be determined. Passband specs are not regarded.")
                         }
                     },
             'LP': {'man':{'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
@@ -174,7 +176,7 @@ near ``f_S/2`` (highpass).
         self.layHWin.addWidget(self.chk_norm)
         self.layHWin.setContentsMargins(0,0,0,0)
         # Widget containing all subwidgets (cmbBoxes, Labels, lineEdits)
-        self.wdg_fil = QFrame(self)
+        self.wdg_fil = QWidget(self)
         self.wdg_fil.setObjectName('wdg_fil')
         self.wdg_fil.setLayout(self.layHWin)
         
@@ -388,7 +390,7 @@ near ``f_S/2`` (highpass).
 
 if __name__ == '__main__':
     import sys
-    from ..compat import QApplication
+    from ..compat import QApplication, QFrame
    
     app = QApplication(sys.argv)
     
