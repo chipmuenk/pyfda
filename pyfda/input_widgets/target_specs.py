@@ -10,7 +10,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QFont, QGridLayout, QFrame, pyqtSignal, Qt,
+from ..compat import (QWidget, QLabel, QFont, QFrame, pyqtSignal, Qt,
                       QHBoxLayout, QVBoxLayout)
 
 import pyfda.filterbroker as fb
@@ -59,19 +59,17 @@ class TargetSpecs(QWidget):
         
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
-        layHTitle.setContentsMargins(*params['wdg_margins'])
+        layHTitle.setAlignment(Qt.AlignHCenter)
         layHSpecs = QHBoxLayout()
         layHSpecs.setAlignment(Qt.AlignTop)
-        self.a_specs.frmMain.setFrameStyle(QFrame.NoFrame)
-        self.f_specs.frmMain.setFrameStyle(QFrame.NoFrame)
         layHSpecs.addWidget(self.f_specs) # frequency specs
         layHSpecs.addWidget(self.a_specs) # ampltitude specs
+
         layVSpecs = QVBoxLayout()
         layVSpecs.addLayout(layHTitle)
         layVSpecs.addLayout(layHSpecs)
-        layVSpecs.setContentsMargins(0,0,0,0) # (left, top, right, bottom)
+        layVSpecs.setContentsMargins(0,6,0,0) # (left, top, right, bottom)
 
-           
         # This is the top level widget, encompassing the other widgets        
         frmMain = QFrame(self)
         frmMain.setLayout(layVSpecs)
