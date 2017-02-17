@@ -72,7 +72,7 @@ class FilterPZ(QWidget):
         #  size for QLineEdit fields
 #        H  = QFMetric.H
 #        W8 = QFMetric.W0 * 8
-        
+
         bfont = QFont()
         bfont.setBold(True)
 
@@ -81,12 +81,12 @@ class FilterPZ(QWidget):
         longestText = ""
         ButLength = 0
         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set 0"]
-        
+
         for item in butTexts:
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
                 longestText = item + "mm"
-        
+
         butAddRow = QPushButton(butTexts[0], self)
         ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 
@@ -487,7 +487,7 @@ class FilterPZ(QWidget):
         P = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
         print(Z,P)
 
-        # Delete array entries with selected indices. If nothing is selected 
+        # Delete array entries with selected indices. If nothing is selected
         # (Z and P are empty), delete the last row.
         if len(Z) < 1 and len(P) < 1:
             Z = [len(self.zpk[0])-1]

@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QCheckBox, QPushButton, QSpinBox, 
+                      QCheckBox, QPushButton, QSpinBox,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout, QSizePolicy,
                       pyqtSignal, QEvent, QStyledItemDelegate)
@@ -83,24 +83,24 @@ class FilterCoeffs(QWidget):
         ButLength = 0
         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
 
-        # Find the longest text + padding for subsequent bounding box calculation 
+        # Find the longest text + padding for subsequent bounding box calculation
         for item in butTexts:
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
-                longestText = item + "mm" # this is the longest text + padding for  
+                longestText = item + "mm" # this is the longest text + padding for
 
 
         self.chkCoeffList =  QCheckBox("Show Coefficients", self)
         self.chkCoeffList.setChecked(True)
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
         self.lblCoeffList = QLabel("Show Coefficients", self)
-        
+
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
         self.spnRound.setValue(params['FMT_ba'])
         self.spnRound.setToolTip("Display <i>d</i> digits.")
-        
+
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
@@ -191,13 +191,13 @@ class FilterCoeffs(QWidget):
         self.cmbQQuant.addItems(qQuant)
         self.cmbQQuant.setCurrentIndex(1) # 'round'
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
-        
+
         self.cmbQOvfl = QComboBox(self)
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
         self.cmbQOvfl.setCurrentIndex(2) # 'sat'
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
-        
+
         self.cmbQFormat = QComboBox(self)
         qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
         self.cmbQFormat.addItems(qFormat)
@@ -258,7 +258,7 @@ class FilterCoeffs(QWidget):
         layVBtns.addLayout(layHButtonsCoeffs3)
         layVBtns.addLayout(layHButtonsCoeffs4)
 
-        # This frame encompasses all the buttons       
+        # This frame encompasses all the buttons
         frmMain = QFrame(self)
         frmMain.setLayout(layVBtns)
 
@@ -305,12 +305,12 @@ class FilterCoeffs(QWidget):
         """
         Change between FIR and IIR filter setting
         """
-        
+
         if self.cmbFilterType.currentText() == 'FIR':
-            fb.fil[0]['ft'] = 'FIR'            
+            fb.fil[0]['ft'] = 'FIR'
         else:
             fb.fil[0]['ft'] = 'IIR'
-            
+
         self.load_dict()
 
 #------------------------------------------------------------------------------
@@ -331,32 +331,32 @@ class FilterCoeffs(QWidget):
             coeffs = self.ba
             num_rows = max(len(self.ba[0]), len(self.ba[1]))
             # num_rows = max(np.shape(coeffs))
-            
+
             q_coeff = fb.fil[0]['q_coeff']
             self.ledQuantI.setText(str(q_coeff['QI']))
-            self.ledQuantF.setText(str(q_coeff['QF']))       
+            self.ledQuantF.setText(str(q_coeff['QF']))
             self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
             self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
-            
-            # check whether filter is FIR and only needs one column 
+
+            # check whether filter is FIR and only needs one column
             if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
                 num_cols = 1
                 self.tblCoeff.setColumnCount(1)
                 self.tblCoeff.setHorizontalHeaderLabels(["b"])
-                self.cmbFilterType.setCurrentIndex(0) # set to "FIR"     
-                
+                self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+
             else:
                 num_cols = 2
                 self.tblCoeff.setColumnCount(2)
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
                 self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
-            
+
             self.tblCoeff.setRowCount(num_rows)
             self.tblCoeff.setColumnCount(num_cols)
             # create index strings for column 0, starting with 0
             idx_str = [str(n) for n in range(num_rows)]
             self.tblCoeff.setVerticalHeaderLabels(idx_str)
-    
+
             logger.debug("load_dict - coeffs:\n"
                 "Shape = %s\n"
                 "Len   = %d\n"
@@ -387,34 +387,34 @@ class FilterCoeffs(QWidget):
 #         """
 #         coeffs = fb.fil[0]['ba']
 #         num_rows = max(np.shape(coeffs))
-#         
+#
 #         q_coeff = fb.fil[0]['q_coeff']
 #         self.ledQuantI.setText(str(q_coeff['QI']))
-#         self.ledQuantF.setText(str(q_coeff['QF']))       
+#         self.ledQuantF.setText(str(q_coeff['QF']))
 #         self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
 #         self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
-#         
-#         # check whether filter is FIR and only needs one column 
+#
+#         # check whether filter is FIR and only needs one column
 #         if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
 #             num_cols = 1
 #             self.tblCoeff.setColumnCount(1)
 #             self.tblCoeff.setHorizontalHeaderLabels(["b"])
-#             self.cmbFilterType.setCurrentIndex(0) # set to "FIR"     
-#             
+#             self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+#
 #         else:
 #             num_cols = 2
 #             self.tblCoeff.setColumnCount(2)
 #             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-#             self.cmbFilterType.setCurrentIndex(1) # set to "IIR"       
-# 
-#             
+#             self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+#
+#
 #         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 #         self.tblCoeff.setRowCount(num_rows)
 #         self.tblCoeff.setColumnCount(num_cols)
 #         # create index strings for column 0, starting with 0
 #         idx_str = [str(n) for n in range(num_rows)]
 #         self.tblCoeff.setVerticalHeaderLabels(idx_str)
-# 
+#
 #         logger.debug("load_dict - coeffs:\n"
 #             "Shape = %s\n"
 #             "Len   = %d\n"
@@ -422,11 +422,11 @@ class FilterCoeffs(QWidget):
 #             "Coeffs = %s"
 #             %(np.shape(coeffs),len(coeffs), np.ndim(coeffs), pformat(coeffs))
 #               )
-# 
+#
 #         for col in range(num_cols):
 #             for row in range(np.shape(coeffs)[1]):
 #                 item = self.tblCoeff.item(row, col)
-#                 # copy content of zpk to corresponding table field, rounding 
+#                 # copy content of zpk to corresponding table field, rounding
 #                 # as specified and removing the brackets of complex arguments
 #                 if item:
 #                     item.setText(str(cround(coeffs[col][row])).strip('()'))
@@ -435,7 +435,7 @@ class FilterCoeffs(QWidget):
 #                                 str(cround(coeffs[col][row])).strip('()')))
 #         self.tblCoeff.resizeColumnsToContents()
 #         self.tblCoeff.resizeRowsToContents()
-# 
+#
 #==============================================================================
 
 
@@ -456,7 +456,7 @@ class FilterCoeffs(QWidget):
         This is triggered every time a table item is edited.
         When no item was selected, do nothing.
 
-        Triggered by  `tblCoeff.cellChanged` 
+        Triggered by  `tblCoeff.cellChanged`
 
         """
         col = self.tblCoeff.currentIndex().column()
@@ -518,7 +518,7 @@ class FilterCoeffs(QWidget):
 #         coeffs = []
 #         num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
 #         logger.debug("store_entries: \n%s rows x  %s cols" %(num_rows, num_cols))
-# 
+#
 #         if self.cmbFilterType.currentText() ==  'IIR':
 #             fb.fil[0]['ft'] = 'IIR'
 #             fb.fil[0]['fc'] = 'Manual_IIR'
@@ -527,8 +527,8 @@ class FilterCoeffs(QWidget):
 #             fb.fil[0]['ft'] = 'FIR'
 #             fb.fil[0]['fc'] = 'Manual_FIR'
 #             self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
-# 
-# 
+#
+#
 # #        if num_cols > 1: # IIR
 #         for col in range(num_cols):
 #             rows = []
@@ -544,7 +544,7 @@ class FilterCoeffs(QWidget):
 #                 coeffs = rows
 #             else:
 #                 coeffs.append(rows) # type: list num_cols x num_rows
-# 
+#
 #         fb.fil[0]["N"] = num_rows - 1
 #         fb.fil[0]["q_coeff"] = {
 #                 'QI':int(self.ledQuantI.text()),
@@ -553,14 +553,14 @@ class FilterCoeffs(QWidget):
 #                 'ovfl':self.cmbQOvfl.currentText(),
 #                 'frmt':self.cmbQFormat.currentText()
 #                 }
-# 
+#
 #         fil_save(fb.fil[0], coeffs, 'ba', __name__)
-# 
+#
 #         self.sigFilterDesigned.emit()  # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
-#         # TODO: this also needs to trigger filter_specs.updateUI to switch to 
+#         # TODO: this also needs to trigger filter_specs.updateUI to switch to
 #         #       manual design when saving b,a
-# 
-# 
+#
+#
 #==============================================================================
 #------------------------------------------------------------------------------
     def delete_rows(self):
@@ -619,12 +619,12 @@ class FilterCoeffs(QWidget):
         self.tblCoeff.setRowCount(3)
 
         num_cols = self.tblCoeff.columnCount()
-        
+
         if num_cols < 2:
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
         else:
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-        
+
         for row in range(3):
             for col in range(num_cols):
                 if row == 0:
@@ -660,7 +660,7 @@ class FilterCoeffs(QWidget):
                          'quant': self.cmbQQuant.currentText(),
                          'ovfl':self.cmbQOvfl.currentText(),
                          'frmt':self.cmbQFormat.currentText()})
-                         
+
         num_rows, num_cols = self.tblCoeff.rowCount(),\
                                         self.tblCoeff.columnCount()
         for col in range(num_cols):
@@ -682,7 +682,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainw = FilterCoeffs(None)
 
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
 
     sys.exit(app.exec_())
