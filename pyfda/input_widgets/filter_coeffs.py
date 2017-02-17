@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QCheckBox, QPushButton, QSpinBox,
+                      QCheckBox, QPushButton, QSpinBox, QFont,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
@@ -75,6 +75,8 @@ class FilterCoeffs(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
+        bfont = QFont()
+        bfont.setBold(True)
 
          #Which Button holds the longest Text?
 
@@ -111,6 +113,9 @@ class FilterCoeffs(QWidget):
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setEditTriggers(QTableWidget.AllEditTriggers)
         self.tblCoeff.setAlternatingRowColors(True)
+        self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
+        self.tblCoeff.horizontalHeader().setFont(bfont)
+
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
         self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
