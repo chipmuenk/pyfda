@@ -351,7 +351,7 @@ class FilterPZ(QWidget):
         TODO:
         Update zpk[2]?
 
-        Called by _store_entry()
+        Called by _copy_item()
         """
 
         params['FMT_pz'] = int(self.spnRound.text())
@@ -480,12 +480,11 @@ class FilterPZ(QWidget):
         - equalizing the lengths of P and Z array by appending the required
           number of zeros.
         - deleting all P/Z pairs
-        Finally, the table is updated from self.zpk.
+        Finally, the table is refreshed from self.zpk.
         """
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
         Z = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
         P = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
-        print(Z,P)
 
         # Delete array entries with selected indices. If nothing is selected
         # (Z and P are empty), delete the last row.
