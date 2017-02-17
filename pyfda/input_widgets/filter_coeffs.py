@@ -111,7 +111,7 @@ class FilterCoeffs(QWidget):
 
 
         self.tblCoeff = QTableWidget(self)
-        self.tblCoeff.setEditTriggers(QTableWidget.AllEditTriggers)
+#        self.tblCoeff.setEditTriggers(QTableWidget.AllEditTriggers)
         self.tblCoeff.setAlternatingRowColors(True)
         self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
         self.tblCoeff.horizontalHeader().setFont(bfont)
@@ -641,7 +641,7 @@ class FilterCoeffs(QWidget):
 #                else:
 #                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 #
-##------------------------------------------------------------------------------
+
     def _set_coeffs_zero(self):
         """
         Set all coefficients = 0 in table with a magnitude less than eps
