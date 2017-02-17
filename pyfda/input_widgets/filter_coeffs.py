@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
                       QCheckBox, QPushButton, QSpinBox,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy,
+                      QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
 
 import numpy as np
@@ -612,27 +612,31 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _clear_table(self):
         """
-        Clear table & initialize coeff, zpk for two poles and zeros @ origin,
+        Clear table & initialize coeff for two poles and zeros @ origin,
         a = b = [1; 0; 0]
         """
-        self.tblCoeff.clear()
-        self.tblCoeff.setRowCount(3)
+        self.ba = np.array([[1, 0, 0], [1, 0, 0]])
 
-        num_cols = self.tblCoeff.columnCount()
-
-        if num_cols < 2:
-            self.tblCoeff.setHorizontalHeaderLabels(["b"])
-        else:
-            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-
-        for row in range(3):
-            for col in range(num_cols):
-                if row == 0:
-                    self.tblCoeff.setItem(row,col,QTableWidgetItem("1.0"))
-                else:
-                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
-
-#------------------------------------------------------------------------------
+        self._refresh_table()
+        
+#        self.tblCoeff.clear()
+#        self.tblCoeff.setRowCount(3)
+#
+#        num_cols = self.tblCoeff.columnCount()
+#
+#        if num_cols < 2:
+#            self.tblCoeff.setHorizontalHeaderLabels(["b"])
+#        else:
+#            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+#
+#        for row in range(3):
+#            for col in range(num_cols):
+#                if row == 0:
+#                    self.tblCoeff.setItem(row,col,QTableWidgetItem("1.0"))
+#                else:
+#                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
+#
+##------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
         """
         Set all coefficients = 0 in table with a magnitude less than eps
