@@ -12,7 +12,7 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
                       QCheckBox, QPushButton, QSpinBox, 
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout, QSizePolicy,
@@ -21,7 +21,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import cround, fil_save, safe_eval
+from pyfda.pyfda_lib import fil_save, safe_eval
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
@@ -262,7 +262,8 @@ class FilterCoeffs(QWidget):
         frmMain = QFrame(self)
         frmMain.setLayout(layVBtns)
 
-        layVMain = QVBoxLayout()        
+        layVMain = QVBoxLayout()
+        layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblCoeff)
         layVMain.setContentsMargins(*params['wdg_margins'])
@@ -270,6 +271,8 @@ class FilterCoeffs(QWidget):
         self.setLayout(layVMain)
 
         self.load_dict() # initialize table with default values from filter dict
+        # TODO: needed?
+        self._refresh_table()
 
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemEntered.connect(self.save_coeffs) # nothing happens
@@ -279,12 +282,14 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.itemChanged.connect(self.save_coeffs)
 #        self.tblCoeff.clicked.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
+        self.spnRound.editingFinished.connect(self._refresh_table)
 
-        self.chkCoeffList.clicked.connect(self.load_dict)
-        self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
         butLoad.clicked.connect(self.load_dict)
+        self.chkCoeffList.clicked.connect(self.load_dict)
 
-        butSave.clicked.connect(self.store_entries)
+        butSave.clicked.connect(self._save_entries)
+
+        self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
 
         butDelRow.clicked.connect(self.delete_rows)
         butAddRow.clicked.connect(self.add_rows)
@@ -292,6 +297,8 @@ class FilterCoeffs(QWidget):
         butClear.clicked.connect(self._clear_table)
         butSetZero.clicked.connect(self._set_coeffs_zero)
         butQuant.clicked.connect(self.quant_coeffs)
+
+        self.tblCoeff.cellChanged.connect(self._copy_item)
 
 #------------------------------------------------------------------------------
     def _set_filter_type(self):
@@ -307,44 +314,177 @@ class FilterCoeffs(QWidget):
         self.load_dict()
 
 #------------------------------------------------------------------------------
-    def store_entries(self):
+    def _refresh_table(self):
         """
-        Read out coefficients table and save the values to filter 'coeffs'
-        and 'zpk' dicts. Is called when clicking the <Save> button, triggers
-        a recalculation and replot of all plot widgets.
+        (Re-)Create the displayed table from self.ba with the
+        desired number format.
+
+        Called by _store_entry()
         """
-        coeffs = []
-        num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
-        logger.debug("store_entries: \n%s rows x  %s cols" %(num_rows, num_cols))
 
         params['FMT_ba'] = int(self.spnRound.text())
-        if self.cmbFilterType.currentText() ==  'IIR':
-            fb.fil[0]['ft'] = 'IIR'
-            fb.fil[0]['fc'] = 'Manual_IIR'
-            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
-        else:
-            fb.fil[0]['ft'] = 'FIR'
-            fb.fil[0]['fc'] = 'Manual_FIR'
-            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
 
+        self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
 
-#        if num_cols > 1: # IIR
-        for col in range(num_cols):
-            rows = []
-            for row in range(num_rows):
-                item = self.tblCoeff.item(row, col)
-                if item:
-                    if item.text() != "":
-                        rows.append(safe_eval(item.text()))
-                else:
-                    rows.append(0.)
-#                    rows.append(float(item.text()) if item else 0.)
-            if num_cols == 1:
-                coeffs = rows
+        if self.chkCoeffList.isChecked():
+
+            coeffs = self.ba
+            num_rows = max(len(self.ba[0]), len(self.ba[1]))
+            # num_rows = max(np.shape(coeffs))
+            
+            q_coeff = fb.fil[0]['q_coeff']
+            self.ledQuantI.setText(str(q_coeff['QI']))
+            self.ledQuantF.setText(str(q_coeff['QF']))       
+            self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
+            self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
+            
+            # check whether filter is FIR and only needs one column 
+            if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
+                num_cols = 1
+                self.tblCoeff.setColumnCount(1)
+                self.tblCoeff.setHorizontalHeaderLabels(["b"])
+                self.cmbFilterType.setCurrentIndex(0) # set to "FIR"     
+                
             else:
-                coeffs.append(rows) # type: list num_cols x num_rows
+                num_cols = 2
+                self.tblCoeff.setColumnCount(2)
+                self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+                self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+            
+            self.tblCoeff.setRowCount(num_rows)
+            self.tblCoeff.setColumnCount(num_cols)
+            # create index strings for column 0, starting with 0
+            idx_str = [str(n) for n in range(num_rows)]
+            self.tblCoeff.setVerticalHeaderLabels(idx_str)
+    
+            logger.debug("load_dict - coeffs:\n"
+                "Shape = %s\n"
+                "Len   = %d\n"
+                "NDim  = %d\n\n"
+                "Coeffs = %s"
+                %(np.shape(coeffs),len(coeffs), np.ndim(coeffs), pformat(coeffs))
+                  )
 
-        fb.fil[0]["N"] = num_rows - 1
+            for col in range(num_cols):
+                    for row in range(len(self.ba[col])):
+                        # set table item from self.ba and strip '()' of complex numbers
+                        item = self.tblCoeff.item(row, col)
+                        if item: # does item exist?
+                            item.setText(str(self.ba[col][row]).strip('()'))
+                        else: # no, construct it:
+                            self.tblCoeff.setItem(row,col,QTableWidgetItem(
+                                  str(self.ba[col][row]).strip('()')))
+
+            self.tblCoeff.resizeColumnsToContents()
+            self.tblCoeff.resizeRowsToContents()
+            self.tblCoeff.clearSelection()
+
+#==============================================================================
+# #------------------------------------------------------------------------------
+#     def load_dict(self):
+#         """
+#         Create table from filter coeff dict
+#         """
+#         coeffs = fb.fil[0]['ba']
+#         num_rows = max(np.shape(coeffs))
+#         
+#         q_coeff = fb.fil[0]['q_coeff']
+#         self.ledQuantI.setText(str(q_coeff['QI']))
+#         self.ledQuantF.setText(str(q_coeff['QF']))       
+#         self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
+#         self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
+#         
+#         # check whether filter is FIR and only needs one column 
+#         if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
+#             num_cols = 1
+#             self.tblCoeff.setColumnCount(1)
+#             self.tblCoeff.setHorizontalHeaderLabels(["b"])
+#             self.cmbFilterType.setCurrentIndex(0) # set to "FIR"     
+#             
+#         else:
+#             num_cols = 2
+#             self.tblCoeff.setColumnCount(2)
+#             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+#             self.cmbFilterType.setCurrentIndex(1) # set to "IIR"       
+# 
+#             
+#         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
+#         self.tblCoeff.setRowCount(num_rows)
+#         self.tblCoeff.setColumnCount(num_cols)
+#         # create index strings for column 0, starting with 0
+#         idx_str = [str(n) for n in range(num_rows)]
+#         self.tblCoeff.setVerticalHeaderLabels(idx_str)
+# 
+#         logger.debug("load_dict - coeffs:\n"
+#             "Shape = %s\n"
+#             "Len   = %d\n"
+#             "NDim  = %d\n\n"
+#             "Coeffs = %s"
+#             %(np.shape(coeffs),len(coeffs), np.ndim(coeffs), pformat(coeffs))
+#               )
+# 
+#         for col in range(num_cols):
+#             for row in range(np.shape(coeffs)[1]):
+#                 item = self.tblCoeff.item(row, col)
+#                 # copy content of zpk to corresponding table field, rounding 
+#                 # as specified and removing the brackets of complex arguments
+#                 if item:
+#                     item.setText(str(cround(coeffs[col][row])).strip('()'))
+#                 else:
+#                     self.tblCoeff.setItem(row,col,QTableWidgetItem(
+#                                 str(cround(coeffs[col][row])).strip('()')))
+#         self.tblCoeff.resizeColumnsToContents()
+#         self.tblCoeff.resizeRowsToContents()
+# 
+#==============================================================================
+
+
+#------------------------------------------------------------------------------
+    def load_dict(self):
+        """
+        Load all entries from filter dict fb.fil[0]['ba'] into the shadow
+        register self.ba and update the display.
+        """
+
+        self.ba = np.array(fb.fil[0]['ba']) # this enforces a deep copy
+        self._refresh_table()
+
+#------------------------------------------------------------------------------
+    def _copy_item(self):
+        """
+        Copy the value from the current table item to self.ba
+        This is triggered every time a table item is edited.
+        When no item was selected, do nothing.
+
+        Triggered by  `tblCoeff.cellChanged` 
+
+        """
+        col = self.tblCoeff.currentIndex().column()
+        row = self.tblCoeff.currentIndex().row()
+        item = self.tblCoeff.item(row,col)
+
+        if item:
+            if item.text() != "":
+                self.ba[col][row] = safe_eval(item.text())
+            else:
+                self.ba[col][row] = 0.
+#        self._normalize_gain()
+
+#------------------------------------------------------------------------------
+    def _save_entries(self):
+        """
+        Save the values from self.ba to the filter BA dict.
+        """
+
+        logger.debug("=====================\nFilterCoeff._save_entries called")
+
+        fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
+        # TODO: The following doesn't work, needs to check whether this is IIR / FIR
+        if np.any(self.ba[1]): # any denominator coefficients?
+            fb.fil[0]['fc'] = 'Manual_IIR'
+        else:
+            fb.fil[0]['fc'] = 'Manual_FIR'
+
         fb.fil[0]["q_coeff"] = {
                 'QI':int(self.ledQuantI.text()),
                 'QF':int(self.ledQuantF.text()),
@@ -353,74 +493,75 @@ class FilterCoeffs(QWidget):
                 'frmt':self.cmbQFormat.currentText()
                 }
 
-        fil_save(fb.fil[0], coeffs, 'ba', __name__)
+        fil_save(fb.fil[0], self.ba, 'ba', __name__) # save as coeffs
 
-        logger.debug("store_entries - coeffients / zpk updated:\n"
+        if __name__ == '__main__':
+            self.load_dict() # only needed for stand-alone test
+
+        self.sigFilterDesigned.emit() # -> filter_specs
+        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+
+        logger.debug("_save_entries - coeffients / zpk updated:\n"
             "b,a = %s\n\n"
             "zpk = %s\n"
             %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
 
-        self.sigFilterDesigned.emit()  # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
-        # TODO: this also needs to trigger filter_specs.updateUI to switch to 
-        #       manual design when saving b,a
-
-#------------------------------------------------------------------------------
-    def load_dict(self):
-        """
-        Create table from filter coeff dict
-        """
-        coeffs = fb.fil[0]['ba']
-        num_rows = max(np.shape(coeffs))
-        
-        q_coeff = fb.fil[0]['q_coeff']
-        self.ledQuantI.setText(str(q_coeff['QI']))
-        self.ledQuantF.setText(str(q_coeff['QF']))       
-        self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
-        self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
-        
-        # check whether filter is FIR and only needs one column 
-        if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
-            num_cols = 1
-            self.tblCoeff.setColumnCount(1)
-            self.tblCoeff.setHorizontalHeaderLabels(["b"])
-            self.cmbFilterType.setCurrentIndex(0) # set to "FIR"     
-            
-        else:
-            num_cols = 2
-            self.tblCoeff.setColumnCount(2)
-            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-            self.cmbFilterType.setCurrentIndex(1) # set to "IIR"       
-
-            
-        self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
-        self.tblCoeff.setRowCount(num_rows)
-        self.tblCoeff.setColumnCount(num_cols)
-        # create index strings for column 0, starting with 0
-        idx_str = [str(n) for n in range(num_rows)]
-        self.tblCoeff.setVerticalHeaderLabels(idx_str)
-
-        logger.debug("load_dict - coeffs:\n"
-            "Shape = %s\n"
-            "Len   = %d\n"
-            "NDim  = %d\n\n"
-            "Coeffs = %s"
-            %(np.shape(coeffs),len(coeffs), np.ndim(coeffs), pformat(coeffs))
-              )
-
-        for col in range(num_cols):
-            for row in range(np.shape(coeffs)[1]):
-                item = self.tblCoeff.item(row, col)
-                # copy content of zpk to corresponding table field, rounding 
-                # as specified and removing the brackets of complex arguments
-                if item:
-                    item.setText(str(cround(coeffs[col][row])).strip('()'))
-                else:
-                    self.tblCoeff.setItem(row,col,QTableWidgetItem(
-                                str(cround(coeffs[col][row])).strip('()')))
-        self.tblCoeff.resizeColumnsToContents()
-        self.tblCoeff.resizeRowsToContents()
-
+#==============================================================================
+# #------------------------------------------------------------------------------
+#     def store_entries(self):
+#         """
+#         Read out coefficients table and save the values to filter 'coeffs'
+#         and 'zpk' dicts. Is called when clicking the <Save> button, triggers
+#         a recalculation and replot of all plot widgets.
+#         """
+#         coeffs = []
+#         num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
+#         logger.debug("store_entries: \n%s rows x  %s cols" %(num_rows, num_cols))
+# 
+#         if self.cmbFilterType.currentText() ==  'IIR':
+#             fb.fil[0]['ft'] = 'IIR'
+#             fb.fil[0]['fc'] = 'Manual_IIR'
+#             self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+#         else:
+#             fb.fil[0]['ft'] = 'FIR'
+#             fb.fil[0]['fc'] = 'Manual_FIR'
+#             self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+# 
+# 
+# #        if num_cols > 1: # IIR
+#         for col in range(num_cols):
+#             rows = []
+#             for row in range(num_rows):
+#                 item = self.tblCoeff.item(row, col)
+#                 if item:
+#                     if item.text() != "":
+#                         rows.append(safe_eval(item.text()))
+#                 else:
+#                     rows.append(0.)
+# #                    rows.append(float(item.text()) if item else 0.)
+#             if num_cols == 1:
+#                 coeffs = rows
+#             else:
+#                 coeffs.append(rows) # type: list num_cols x num_rows
+# 
+#         fb.fil[0]["N"] = num_rows - 1
+#         fb.fil[0]["q_coeff"] = {
+#                 'QI':int(self.ledQuantI.text()),
+#                 'QF':int(self.ledQuantF.text()),
+#                 'quant':self.cmbQQuant.currentText(),
+#                 'ovfl':self.cmbQOvfl.currentText(),
+#                 'frmt':self.cmbQFormat.currentText()
+#                 }
+# 
+#         fil_save(fb.fil[0], coeffs, 'ba', __name__)
+# 
+#         self.sigFilterDesigned.emit()  # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+#         # TODO: this also needs to trigger filter_specs.updateUI to switch to 
+#         #       manual design when saving b,a
+# 
+# 
+#==============================================================================
 #------------------------------------------------------------------------------
     def delete_rows(self):
         """
