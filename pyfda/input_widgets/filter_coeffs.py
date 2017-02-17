@@ -317,6 +317,7 @@ class FilterCoeffs(QWidget):
         num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
         logger.debug("store_entries: \n%s rows x  %s cols" %(num_rows, num_cols))
 
+        params['FMT_ba'] = int(self.spnRound.text())
         if self.cmbFilterType.currentText() ==  'IIR':
             fb.fil[0]['ft'] = 'IIR'
             fb.fil[0]['fc'] = 'Manual_IIR'

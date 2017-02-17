@@ -160,7 +160,6 @@ class FilterPZ(QWidget):
         butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel("for " + rt_label("&epsilon; &lt;"), self)
-#        self.lblEps.setTextFormat(Qt.RichText)
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("<SPAN>Specify tolerance.</SPAN>")
         self.ledSetEps.setText(str(1e-6))
@@ -355,7 +354,7 @@ class FilterPZ(QWidget):
         Called by _store_entry()
         """
 
-        FilterPZ.n_digits = int(self.spnRound.text())
+        params['FMT_pz'] = int(self.spnRound.text())
 
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
@@ -399,7 +398,7 @@ class FilterPZ(QWidget):
         update the gain. This is triggered every time a table item is edited.
         When no item was selected, only the gain is updated.
 
-        Triggered by  `tblPZ.itemChanged` and `cmbNorm.activated`
+        Triggered by  `tblPZ.cellChanged` and `cmbNorm.activated`
 
         """
         col = self.tblPZ.currentIndex().column()
