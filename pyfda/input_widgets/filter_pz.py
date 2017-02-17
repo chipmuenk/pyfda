@@ -47,7 +47,7 @@ class ItemDelegate(QStyledItemDelegate):
     def displayText(self, text, locale):
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
-        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = FilterPZ.n_digits)
+        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_pz'])
 
 class FilterPZ(QWidget):
     """
@@ -56,7 +56,6 @@ class FilterPZ(QWidget):
 
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal()
-    n_digits = 3 # class attribute, initial setting for number of displayed digits
 
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
@@ -99,7 +98,7 @@ class FilterPZ(QWidget):
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
-        self.spnRound.setValue(FilterPZ.n_digits)
+        self.spnRound.setValue(params['FMT_pz'])
         self.spnRound.setToolTip("Display d digits.")
 
         self.lblNorm = QLabel("Normalize", self)

@@ -7,16 +7,16 @@ Created on Tue Nov 26 10:57:30 2013
 Tab-Widget for displaying and modifying filter coefficients
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
+import sys, six
 from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QCheckBox, QPushButton,
+                      QCheckBox, QPushButton, QSpinBox, 
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout, QSizePolicy,
-                      pyqtSignal, QEvent)
+                      pyqtSignal, QEvent, QStyledItemDelegate)
 
 import numpy as np
 
@@ -33,13 +33,34 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: Fill combobox for Wrap / Quant settings
 # TODO: Separate View and Storage of data for selecting number of displayed digits
 
+class ItemDelegate(QStyledItemDelegate):
+    """
+    The following methods are subclassed to replace display and editor of the
+    QTableWidget.
+
+    `displayText()` displays number with n_digits without sacrificing precision of
+    the data stored in the table.
+
+    In Python 3, python Qt objects are automatically converted to QVariant
+    when stored as "data" e.g. in a QTableWidgetItem and converted back when
+    retrieved. In Python 2, QVariant is returned when itemData is retrieved.
+    This is first converted from the QVariant container format to a
+    QString, next to a "normal" non-unicode string.
+
+    """
+    def displayText(self, text, locale):
+        if not isinstance(text, six.text_type): #
+            text = text.toString() # needed for Python 2, doesn't work with Py3
+        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
+
+
 class FilterCoeffs(QWidget):
     """
     Create widget for viewing / editing / entering data
     """
-        # class variables (shared between instances if more than one exists)
+    # class variables (shared between instances if more than one exists)
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
-                                    # manually
+
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
 
@@ -69,10 +90,16 @@ class FilterCoeffs(QWidget):
                 longestText = item + "mm" # this is the longest text + padding for  
 
 
-        self.chkCoeffList =  QCheckBox(self)
+        self.chkCoeffList =  QCheckBox("Show Coefficients", self)
         self.chkCoeffList.setChecked(True)
         self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
         self.lblCoeffList = QLabel("Show Coefficients", self)
+        
+        lblRound = QLabel("Digits = ", self)
+        self.spnRound = QSpinBox(self)
+        self.spnRound.setRange(0,9)
+        self.spnRound.setValue(params['FMT_ba'])
+        self.spnRound.setToolTip("Display <i>d</i> digits.")
         
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
@@ -87,8 +114,10 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
         self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
-        self.tblCoeff.setSizePolicy(QSizePolicy.MinimumExpanding,
-                                          QSizePolicy.MinimumExpanding)
+#        self.tblCoeff.setSizePolicy(QSizePolicy.MinimumExpanding,
+#                                          QSizePolicy.MinimumExpanding)
+        self.tblCoeff.setItemDelegate(ItemDelegate(self))
+
 
         butAddRow = QPushButton(self)
         butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
@@ -184,8 +213,10 @@ class FilterCoeffs(QWidget):
         # ============== UI Layout =====================================
         layHChkBoxes = QHBoxLayout()
         layHChkBoxes.addWidget(self.chkCoeffList)
-        layHChkBoxes.addWidget(self.lblCoeffList)
+#        layHChkBoxes.addWidget(self.lblCoeffList)
         layHChkBoxes.addStretch(1)
+        layHChkBoxes.addWidget(lblRound)
+        layHChkBoxes.addWidget(self.spnRound)
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(butAddRow)

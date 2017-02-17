@@ -46,8 +46,10 @@ THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the
 
 mpl_ms = 8 # base size for matplotlib markers
 # Various parameters for calculation and plotting
-params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
-          'FMT': '{:.3g}', # format string for QLineEdit fields
+params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
+          'FMT': '{:.3g}',  # format string for QLineEdit fields
+          'FMT_ba': 4,      # number of digits for coefficient table
+          'FMT_pz': 5,      # number of digits for Pole/Zero table
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
           'Z_Marker': [mpl_ms, 'b'], # size and color for zeros' marker
           'wdg_margins' : (2,1,2,0),  # R, T, L, B widget margins
