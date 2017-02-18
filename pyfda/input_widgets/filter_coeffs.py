@@ -79,7 +79,6 @@ class FilterCoeffs(QWidget):
         bfont.setBold(True)
 
          #Which Button holds the longest Text?
-
         MaxTextlen = 0
         longestText = ""
         ButLength = 0
@@ -642,6 +641,60 @@ class FilterCoeffs(QWidget):
 #                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
 #
 
+#------------------------------------------------------------------------------
+    def _get_selected(self, table):
+        """
+        get selected cells and return:
+        - indices of selected cells
+        - selected colums
+        - selected rows
+        - current cell
+        """
+        idx = []
+        for _ in table.selectedItems():
+            idx.append([_.column(), _.row(), ])
+        cols = sorted(list({i[0] for i in idx}))
+        rows = sorted(list({i[1] for i in idx}))
+        cur = (table.currentColumn(), table.currentRow())
+        #cur_idx_row = table.currentIndex().row()
+
+        return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
+
+#------------------------------------------------------------------------------
+    def _delete_cells(self):
+        """
+        Delete all selected elements by:
+        - determining the indices of all selected cells in the P and Z arrays
+        - deleting elements with those indices
+        - equalizing the lengths of B and A array by appending the required
+          number of zeros.
+        Finally, the table is refreshed from self.ba.
+        """
+        # TODO: FIR and IIR need to be treated separately
+        sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
+        B = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
+        A = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
+        print(B,A)
+
+        # Delete array entries with selected indices. If nothing is selected
+        # (Z and P are empty), delete the last row.
+        if len(B) < 1 and len(A) < 1:
+            B = [len(self.ba[0])-1]
+            A = [len(self.ba[1])-1]
+        self.ba[0] = np.delete(self.ba[0], B)
+        self.ba[1] = np.delete(self.ba[1], A)
+
+        # test and equalize if P and Z array have different lengths:
+        D = len(self.ba[0]) - len(self.ba[1])
+        if D > 0:
+            self.ba[1] = np.append(self.ba[1], np.zeros(D))
+        elif D < 0:
+            self.ba[0] = np.append(self.ba[0], np.zeros(-D))
+
+#        self._delete_PZ_pairs()
+        self._refresh_table()
+
+#------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
         """
         Set all coefficients = 0 in table with a magnitude less than eps
