@@ -303,8 +303,8 @@ class FilterCoeffs(QWidget):
 
         self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
 
-        butDelRow.clicked.connect(self.delete_rows)
-        butAddRow.clicked.connect(self.add_rows)
+        butDelCell.clicked.connect(self._delete_cells)
+        butAddRow.clicked.connect(self._add_rows)
 
         butClear.clicked.connect(self._clear_table)
         butSetZero.clicked.connect(self._set_coeffs_zero)
@@ -584,6 +584,27 @@ class FilterCoeffs(QWidget):
 
 #        self._delete_PZ_pairs()
         self._refresh_table()
+        
+#------------------------------------------------------------------------------
+    def _add_rows(self):
+        """
+        Add the number of selected rows to the table and fill new cells with
+        zeros. If nothing is selected, add 1 row.
+        """
+        row = self.tblCoeff.currentRow()
+        sel = len(self._get_selected(self.tblCoeff)['rows'])
+        # TODO: evaluate and create non-contiguous selections as well?
+
+        if sel == 0: # nothing selected ->
+            sel = 1 # add at least one row ...
+            row = min(len(self.ba[0]), len(self.ba[1])) # ... at the bottom
+
+        self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))
+        self.ba[1] = np.insert(self.ba[1], row, np.zeros(sel))
+
+        self._equalize_ba_length()
+        self._refresh_table()
+
 
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
