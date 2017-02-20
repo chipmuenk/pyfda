@@ -571,13 +571,13 @@ class FilterCoeffs(QWidget):
         Finally, the table is refreshed from self.ba.
         """
         # TODO: FIR and IIR need to be treated separately
-        sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
+        sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
         B = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
         A = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
         print(B,A)
 
         # Delete array entries with selected indices. If nothing is selected
-        # (Z and P are empty), delete the last row.
+        # (B and A are empty), delete the last row.
         if len(B) < 1 and len(A) < 1:
             B = [len(self.ba[0])-1]
             A = [len(self.ba[1])-1]
