@@ -235,14 +235,15 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(self.butEnable)
         layHButtonsCoeffs1.addWidget(butAddRow)
-        layHButtonsCoeffs1.addWidget(butDelRow)
+        layHButtonsCoeffs1.addWidget(butDelCell)
+        layHButtonsCoeffs1.addWidget(butClear)
+
         layHButtonsCoeffs1.addWidget(butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addStretch()
 
         layHButtonsCoeffs2 = QHBoxLayout()
-        layHButtonsCoeffs2.addWidget(butClear)
         layHButtonsCoeffs2.addWidget(butSetZero)
         layHButtonsCoeffs2.addWidget(self.lblEps)
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
@@ -267,8 +268,8 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs4.addStretch()
 
         layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHChkBoxes)
         layVBtns.addLayout(layHButtonsCoeffs1)
+        layVBtns.addLayout(layHChkBoxes)        
         layVBtns.addLayout(layHButtonsCoeffs2)
         layVBtns.addLayout(layHButtonsCoeffs3)
         layVBtns.addLayout(layHButtonsCoeffs4)
