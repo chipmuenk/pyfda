@@ -88,6 +88,8 @@ class FilterCoeffs(QWidget):
                 longestText = item + "mm" # this is the longest text + padding for
 
         butAddRow = QPushButton(self)
+        #Calculate the length for the buttons based on the longest ButtonText
+        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
