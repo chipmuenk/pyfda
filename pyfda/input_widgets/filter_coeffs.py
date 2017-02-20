@@ -458,9 +458,18 @@ class FilterCoeffs(QWidget):
         """
         Load all entries from filter dict fb.fil[0]['ba'] into the shadow
         register self.ba and update the display.
+        
+        The shadow register is a list of two ndarrays to allow different
+        lengths for b and a subarrays while adding / deleting items. 
+        The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
+        otherwise the filter dict would be modified inadvertedly. Enforcing the 
+        type np.complex is necessary, otherwise operations creating complex 
+        coefficient values (or complex user entries) create errors.
         """
-
-        self.ba = np.array(fb.fil[0]['ba']) # this enforces a deep copy
+        
+        self.ba = [0, 0]
+        self.ba[0] = np.array(fb.fil[0]['ba'], dtype = complex)[0] # this enforces a deep copy
+        self.ba[1] = np.array(fb.fil[0]['ba'], dtype = complex)[1]
         self._refresh_table()
 
 #------------------------------------------------------------------------------
