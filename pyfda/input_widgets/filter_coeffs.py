@@ -91,11 +91,7 @@ class FilterCoeffs(QWidget):
                 MaxTextlen = len(item)
                 longestText = item + "mm" # this is the longest text + padding for
 
-
-        self.chkCoeffList =  QCheckBox("Show Coefficients", self)
-        self.chkCoeffList.setChecked(True)
-        self.chkCoeffList.setToolTip("Show filter coefficients as an editable list.")
-        self.lblCoeffList = QLabel("Show Coefficients", self)
+        butAddRow = QPushButton(self)
 
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
@@ -122,6 +118,14 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.setSizePolicy(QSizePolicy.MinimumExpanding,
 #                                          QSizePolicy.MinimumExpanding)
         self.tblCoeff.setItemDelegate(ItemDelegate(self))
+
+        self.butEnable = QPushButton(self)
+        self.butEnable.setIcon(QIcon(':/circle-check.svg'))
+        self.butEnable.setIconSize(q_icon_size)
+        self.butEnable.setCheckable(True)
+        self.butEnable.setChecked(True)
+        self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
+                "For high order systems, this might be slow. </span>")
 
         # butAddRow = QPushButton(self) # moved to top
         butAddRow.setIcon(QIcon(':/plus.svg'))
@@ -226,13 +230,12 @@ class FilterCoeffs(QWidget):
 
         # ============== UI Layout =====================================
         layHChkBoxes = QHBoxLayout()
-        layHChkBoxes.addWidget(self.chkCoeffList)
-#        layHChkBoxes.addWidget(self.lblCoeffList)
-        layHChkBoxes.addStretch(1)
         layHChkBoxes.addWidget(lblRound)
         layHChkBoxes.addWidget(self.spnRound)
+        #layHChkBoxes.addStretch()        
 
         layHButtonsCoeffs1 = QHBoxLayout()
+        layHButtonsCoeffs1.addWidget(self.butEnable)
         layHButtonsCoeffs1.addWidget(butAddRow)
         layHButtonsCoeffs1.addWidget(butDelRow)
         layHButtonsCoeffs1.addWidget(butSave)
@@ -299,7 +302,7 @@ class FilterCoeffs(QWidget):
         self.spnRound.editingFinished.connect(self._refresh_table)
 
         butLoad.clicked.connect(self.load_dict)
-        self.chkCoeffList.clicked.connect(self.load_dict)
+        self.butEnable.clicked.connect(self.load_dict)
 
         butSave.clicked.connect(self._save_entries)
 
@@ -338,10 +341,9 @@ class FilterCoeffs(QWidget):
 
         params['FMT_ba'] = int(self.spnRound.text())
 
-        self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
+        if self.butEnable.isChecked():
 
-        if self.chkCoeffList.isChecked():
-
+            self.tblCoeff.setVisible(True)
             coeffs = self.ba
             num_rows = max(len(self.ba[0]), len(self.ba[1]))
             # num_rows = max(np.shape(coeffs))
@@ -392,6 +394,9 @@ class FilterCoeffs(QWidget):
             self.tblCoeff.resizeColumnsToContents()
             self.tblCoeff.resizeRowsToContents()
             self.tblCoeff.clearSelection()
+            
+        else:
+            self.tblCoeff.setVisible(False)
 
 #==============================================================================
 # #------------------------------------------------------------------------------
