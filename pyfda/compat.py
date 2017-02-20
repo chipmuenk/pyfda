@@ -3,7 +3,7 @@ try:
     import PyQt5
     from PyQt5 import QtGui, QtCore
     from PyQt5.QtCore import pyqtSignal, Qt, QEvent, QT_VERSION_STR
-    from PyQt5.QtGui import QFont, QFontMetrics, QTextCursor, QIcon, QImage
+    from PyQt5.QtGui import QFont, QFontMetrics, QTextCursor, QIcon, QImage, QSize
     from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QApplication,
                                  QScrollArea, QSplitter, QMessageBox,
                                  QWidget, QComboBox, QLabel, QLineEdit, QFrame,
@@ -21,7 +21,7 @@ except ImportError:
     import PyQt4
 
     from PyQt4 import QtGui, QtCore
-    from PyQt4.QtCore import pyqtSignal, Qt, QEvent, QT_VERSION_STR
+    from PyQt4.QtCore import pyqtSignal, Qt, QEvent, QT_VERSION_STR,  QSize
     from PyQt4.QtGui import (QFont, QFontMetrics, QIcon, QImage,
                              QMainWindow, QTabWidget, QApplication,
                              QScrollArea, QSplitter, QMessageBox,

@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QCheckBox, QPushButton, QSpinBox, QFont,
+                      QCheckBox, QPushButton, QSpinBox, QFont, QIcon, QSize,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
@@ -77,6 +77,7 @@ class FilterCoeffs(QWidget):
         """
         bfont = QFont()
         bfont.setBold(True)
+        q_icon_size = QSize(20, 20)
 
          #Which Button holds the longest Text?
         MaxTextlen = 0
@@ -122,40 +123,49 @@ class FilterCoeffs(QWidget):
 #                                          QSizePolicy.MinimumExpanding)
         self.tblCoeff.setItemDelegate(ItemDelegate(self))
 
+        # butAddRow = QPushButton(self) # moved to top
+        butAddRow.setIcon(QIcon(':/plus.svg'))
+        butAddRow.setIconSize(q_icon_size)
+        # butAddRow.setText(butTexts[0])
+        butAddRow.setToolTip("<SPAN>Select <i>N</i> existing rows "
+                             "to insert <i>N</i> new rows above last selected cell. "
+                             "When nothing is selected, add a row at the end.</SPAN>")
+#        butAddRow.setMaximumWidth(ButLength)
 
-        butAddRow = QPushButton(self)
-        butAddRow.setToolTip("Add row to coefficient table.\nSelect n existing rows to append n new rows.")
-        butAddRow.setText(butTexts[0])
-        #Calculate the length for the buttons based on the longest ButtonText
-        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
-        butAddRow.setMaximumWidth(ButLength)
-
-        butDelRow = QPushButton(self)
-        butDelRow.setToolTip("Delete selected row(s) from the table.\n"
-                "Multiple rows can be selected using <SHIFT> or <CTRL>.\n"
-                "When noting is selected, delete last row.")
-        butDelRow.setText(butTexts[1])
-        butDelRow.setMaximumWidth(ButLength)
+        butDelCell = QPushButton(self)
+        butDelCell.setIcon(QIcon(':/minus.svg'))
+        butDelCell.setIconSize(q_icon_size)        
+        butDelCell.setToolTip("<span>Delete selected cell(s) from the table. "
+                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
+                "If nothing is selected, delete the last row.</span>")
+#        butDelCell.setText(butTexts[1])
+        #butDelCell.setMaximumWidth(ButLength)
 
         butSave = QPushButton(self)
-        butSave.setToolTip("Save coefficients & update filter plots.")
-        butSave.setText(butTexts[2])
-        butSave.setMaximumWidth(ButLength)
+        # butSave.setText(butTexts[2])
+        butSave.setIcon(QIcon(':/upload.svg'))
+        butSave.setIconSize(q_icon_size)
+        butSave.setToolTip("<span>Save coefficients and update all plots. "
+                                "No modifications are saved before!</span>")
+        #butSave.setMaximumWidth(ButLength)
 
         butLoad = QPushButton(self)
+        butLoad.setIcon(QIcon(':/download.svg'))
+        butLoad.setIconSize(q_icon_size)
+        # butLoad.setText(butTexts[3])
         butLoad.setToolTip("Reload coefficients.")
-        butLoad.setText(butTexts[3])
-        butLoad.setMaximumWidth(ButLength)
+        #butLoad.setMaximumWidth(ButLength)
 
         butClear = QPushButton(self)
+        butClear.setIcon(QIcon(':/trash.svg'))
+        butClear.setIconSize(q_icon_size)
+        # butClear.setText(butTexts[4])
         butClear.setToolTip("Clear all entries.")
-        butClear.setText(butTexts[4])
-        butClear.setMaximumWidth(ButLength)
+        #butClear.setMaximumWidth(ButLength)
 
 
-        butSetZero = QPushButton(self)
-        butSetZero.setToolTip("Set coefficients = 0 with a magnitude < eps.")
-        butSetZero.setText(butTexts[5])
+        butSetZero = QPushButton(butTexts[5], self)
+        butSetZero.setToolTip("<span>Set coefficients = 0 with a magnitude &lt; &epsilon;.</span>")
         butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel(self)
