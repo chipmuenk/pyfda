@@ -145,8 +145,8 @@ class FilterPZ(QWidget):
         butClear.setMaximumWidth(ButLength)
 
         butSave = QPushButton(butTexts[2], self)
-        butSave.setToolTip("Save P/Z and update all plots.\n"
-                                "No modifications are saved before!")
+        butSave.setToolTip("<span>Save P/Z and update all plots. "
+                                "No modifications are saved before!</span>")
         butSave.setMaximumWidth(ButLength)
 
         butLoad = QPushButton(butTexts[3], self)
