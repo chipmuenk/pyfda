@@ -386,9 +386,14 @@ class FilterPZ(QWidget):
         """
         Load all entries from filter dict fb.fil[0]['zpk'] into the shadow
         register self.zpk and update the display.
-        """
+        The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
+        otherwise the filter dict would be modified inadvertedly. Enforcing the 
+        type np.complex is necessary, otherwise operations creating complex 
+        coefficient values (or complex user entries) create errors.
 
-        self.zpk = np.array(fb.fil[0]['zpk']) # this enforces a deep copy
+        """
+        # TODO: dtype=complex needs to be set for all subarrays
+        self.zpk = np.array(fb.fil[0]['zpk'])# this enforces a deep copy
         self._refresh_table()
 
 #------------------------------------------------------------------------------
