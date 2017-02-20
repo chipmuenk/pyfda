@@ -552,6 +552,15 @@ class FilterCoeffs(QWidget):
         return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
 
 #------------------------------------------------------------------------------
+    def _equalize_ba_length(self):
+        # test and equalize if P and Z array have different lengths:
+        D = len(self.ba[0]) - len(self.ba[1])
+        if D > 0:
+            self.ba[1] = np.append(self.ba[1], np.zeros(D))
+        elif D < 0:
+            self.ba[0] = np.append(self.ba[0], np.zeros(-D))
+
+#------------------------------------------------------------------------------
     def _delete_cells(self):
         """
         Delete all selected elements by:
@@ -575,13 +584,8 @@ class FilterCoeffs(QWidget):
         self.ba[0] = np.delete(self.ba[0], B)
         self.ba[1] = np.delete(self.ba[1], A)
 
-        # test and equalize if P and Z array have different lengths:
-        D = len(self.ba[0]) - len(self.ba[1])
-        if D > 0:
-            self.ba[1] = np.append(self.ba[1], np.zeros(D))
-        elif D < 0:
-            self.ba[0] = np.append(self.ba[0], np.zeros(-D))
-
+        # test and equalize if B and a array have different lengths:
+        self._equalize_ba_length()
 #        self._delete_PZ_pairs()
         self._refresh_table()
         
