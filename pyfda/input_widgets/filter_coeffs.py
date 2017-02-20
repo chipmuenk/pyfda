@@ -115,8 +115,6 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
         self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
-#        self.tblCoeff.setSizePolicy(QSizePolicy.MinimumExpanding,
-#                                          QSizePolicy.MinimumExpanding)
         self.tblCoeff.setItemDelegate(ItemDelegate(self))
 
         self.butEnable = QPushButton(self)
