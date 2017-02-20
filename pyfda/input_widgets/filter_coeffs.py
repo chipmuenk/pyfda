@@ -527,7 +527,7 @@ class FilterCoeffs(QWidget):
         Clear table & initialize coeff for two poles and zeros @ origin,
         a = b = [1; 0; 0]
         """
-        self.ba = np.array([[1, 0, 0], [1, 0, 0]])
+        self.ba = np.array([[1, 0, 0], [1, 0, 0]], dtype = np.complex)
 
         self._refresh_table()
         
