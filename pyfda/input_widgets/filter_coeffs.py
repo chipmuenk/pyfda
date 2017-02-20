@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QCheckBox, QPushButton, QSpinBox, QFont, QIcon, QSize,
+                      QPushButton, QSpinBox, QFont, QIcon, QSize,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
@@ -26,12 +26,8 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 
-# TODO: delete / insert individual cells instead of rows
-# TODO: drag & drop doesn't work
-# TODO: insert row above currently selected row instead of appending at the end
 # TODO: eliminate trailing zeros for filter order calculation
 # TODO: Fill combobox for Wrap / Quant settings
-# TODO: Separate View and Storage of data for selecting number of displayed digits
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -525,108 +521,6 @@ class FilterCoeffs(QWidget):
             %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
 
-#==============================================================================
-# #------------------------------------------------------------------------------
-#     def store_entries(self):
-#         """
-#         Read out coefficients table and save the values to filter 'coeffs'
-#         and 'zpk' dicts. Is called when clicking the <Save> button, triggers
-#         a recalculation and replot of all plot widgets.
-#         """
-#         coeffs = []
-#         num_rows, num_cols = self.tblCoeff.rowCount(), self.tblCoeff.columnCount()
-#         logger.debug("store_entries: \n%s rows x  %s cols" %(num_rows, num_cols))
-#
-#         if self.cmbFilterType.currentText() ==  'IIR':
-#             fb.fil[0]['ft'] = 'IIR'
-#             fb.fil[0]['fc'] = 'Manual_IIR'
-#             self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
-#         else:
-#             fb.fil[0]['ft'] = 'FIR'
-#             fb.fil[0]['fc'] = 'Manual_FIR'
-#             self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
-#
-#
-# #        if num_cols > 1: # IIR
-#         for col in range(num_cols):
-#             rows = []
-#             for row in range(num_rows):
-#                 item = self.tblCoeff.item(row, col)
-#                 if item:
-#                     if item.text() != "":
-#                         rows.append(safe_eval(item.text()))
-#                 else:
-#                     rows.append(0.)
-# #                    rows.append(float(item.text()) if item else 0.)
-#             if num_cols == 1:
-#                 coeffs = rows
-#             else:
-#                 coeffs.append(rows) # type: list num_cols x num_rows
-#
-#         fb.fil[0]["N"] = num_rows - 1
-#         fb.fil[0]["q_coeff"] = {
-#                 'QI':int(self.ledQuantI.text()),
-#                 'QF':int(self.ledQuantF.text()),
-#                 'quant':self.cmbQQuant.currentText(),
-#                 'ovfl':self.cmbQOvfl.currentText(),
-#                 'frmt':self.cmbQFormat.currentText()
-#                 }
-#
-#         fil_save(fb.fil[0], coeffs, 'ba', __name__)
-#
-#         self.sigFilterDesigned.emit()  # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
-#         # TODO: this also needs to trigger filter_specs.updateUI to switch to
-#         #       manual design when saving b,a
-#
-#
-#==============================================================================
-#------------------------------------------------------------------------------
-    def delete_rows(self):
-        """
-        Delete all selected rows by:
-        - reading the indices of all selected cells
-        - collecting the row numbers in a set (only unique elements)
-        - sort the elements in a list in descending order
-        - delete the rows starting at the bottom
-        If nothing is selected, delete last row.
-        """
-        # returns index to rows:
-#        rows = self.tblCoeff.selectionModel().selectedRows()
-        nrows = self.tblCoeff.rowCount()
-        indices = self.tblCoeff.selectionModel().selectedIndexes()
-        rows = set()
-        for index in indices:
-            rows.add(index.row()) # collect all selected rows in a set
-        if len(rows) == 0: # nothing selected
-            rows = {nrows-1} # -> select last row
-        rows = sorted(list(rows), reverse = True)# sort rows in decending order
-        for r in rows:
-#            self.tblCoeff.removeRow(r.row())
-            self.tblCoeff.removeRow(r)
-        self.tblCoeff.setRowCount(nrows - len(rows))
-
-#------------------------------------------------------------------------------
-    def add_rows(self):
-        """
-        Add the number of selected rows to the table and fill new cells with
-        zeros. If nothing is selected, add 1 row.
-        """
-        old_rows = self.tblCoeff.rowCount()
-        new_rows = len(self.tblCoeff.selectionModel().selectedRows()) + old_rows
-        self.tblCoeff.setRowCount(new_rows)
-
-        if old_rows == new_rows: # nothing selected
-            new_rows = old_rows + 1 # add at least one row
-
-        self.tblCoeff.setRowCount(new_rows)
-
-        for col in range(2):
-            for row in range(old_rows, new_rows):
-                self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
-
-        self.tblCoeff.resizeColumnsToContents()
-        self.tblCoeff.resizeRowsToContents()
-
 #------------------------------------------------------------------------------
     def _clear_table(self):
         """
@@ -637,23 +531,6 @@ class FilterCoeffs(QWidget):
 
         self._refresh_table()
         
-#        self.tblCoeff.clear()
-#        self.tblCoeff.setRowCount(3)
-#
-#        num_cols = self.tblCoeff.columnCount()
-#
-#        if num_cols < 2:
-#            self.tblCoeff.setHorizontalHeaderLabels(["b"])
-#        else:
-#            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-#
-#        for row in range(3):
-#            for col in range(num_cols):
-#                if row == 0:
-#                    self.tblCoeff.setItem(row,col,QTableWidgetItem("1.0"))
-#                else:
-#                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
-#
 
 #------------------------------------------------------------------------------
     def _get_selected(self, table):
