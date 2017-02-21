@@ -146,6 +146,20 @@ def read_cmb_box(cmb_box):
     return cmb_data
     
 #------------------------------------------------------------------------------
+def set_cmb_box(cmb_box, data):
+    """
+    set combobox to 'data'. When 'data' is not in the combobox entries, use
+    the first entry.
+    """
+    idx = cmb_box.findData(data) # find index for 'LP'
+
+    if idx == -1: # data does not exist, use first entry instead
+        idx = 0
+
+    cmb_box.setCurrentIndex(idx) # set index
+
+    
+#------------------------------------------------------------------------------
 def style_widget(widget, state):
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:  

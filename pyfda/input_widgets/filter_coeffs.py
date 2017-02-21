@@ -453,7 +453,7 @@ class FilterCoeffs(QWidget):
 #         self.tblCoeff.resizeRowsToContents()
 #
 #==============================================================================
-
+            
 
 #------------------------------------------------------------------------------
     def load_dict(self):
@@ -472,6 +472,14 @@ class FilterCoeffs(QWidget):
         self.ba = [0, 0]
         self.ba[0] = np.array(fb.fil[0]['ba'], dtype = complex)[0] # this enforces a deep copy
         self.ba[1] = np.array(fb.fil[0]['ba'], dtype = complex)[1]
+
+        # set comboBoxes from dictionary
+        self.ledQuantI.setText(str(fb.fil[0]['q_coeff']['QI']))
+        self.ledQuantF.setText(str(fb.fil[0]['q_coeff']['QF']))
+        set_cmb_box(self.cmbQQuant, fb.fil[0]['q_coeff']['quant']) 
+        set_cmb_box(self.cmbQOvfl, fb.fil[0]['q_coeff']['ovfl'])
+        set_cmb_box(self.cmbFormat, fb.fil[0]['q_coeff']['frmt']) 
+                
         self._refresh_table()
 
 #------------------------------------------------------------------------------
