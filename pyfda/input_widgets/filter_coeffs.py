@@ -52,9 +52,28 @@ class ItemDelegate(QStyledItemDelegate):
 
 
     def displayText(self, text, locale):
+
+        def tohex(val, nbits):
+            return hex((val + (1 << nbits)) % (1 << nbits))
+            # np.set_printoptions(formatter={'int':hex})
+
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
-        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
+        idx = self.coeff_inst.cmbFormat.currentIndex()
+
+        W = fb.fil[0]['q_coeff']['QI'] + fb.fil[0]['q_coeff']['QF'] + 1
+
+        dec = int(safe_eval(text) * 2**W)
+        dec_digits = int(np.ceil(np.log10(2 ** W))+2) # required number of digits for dec. repr.
+
+        if idx == 0: # fractional format
+            return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
+        elif idx == 1: # decimal format
+            return "{0:>{1}}".format(dec, dec_digits)# , n_digits = int(np.ceil(np.log10(2 ** W))))
+        elif idx == 2: # hex format
+            return "{0}".format(tohex(dec, W))
+        else:
+            return "{0}".format(np.binary_repr(dec, width = W))
 
 
 class FilterCoeffs(QWidget):
