@@ -150,11 +150,13 @@ def style_widget(widget, state):
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:  
     Color the >> DESIGN FILTER << button according to the filter design state:
-    "ok":  green, filter has been designed, everything ok
-    "changed": yellow, filter specs have been changed
-    "error" : red, an error has occurred during filter design
-    "failed" : orange, filter fails to meet target specs
-    "unused": grey
+    
+    - "normal": default, no color styling
+    - "ok":  green, filter has been designed, everything ok
+    - "changed": yellow, filter specs have been changed
+    - "error" : red, an error has occurred during filter design
+    - "failed" : orange, filter fails to meet target specs
+    - "unused": grey
     """
     state = str(state)
     if state == 'u':
@@ -168,6 +170,8 @@ def style_widget(widget, state):
     widget.style().unpolish(widget)
     widget.style().polish(widget)
     widget.update()
+    
+    #------------------------------------------------------------------------------
 
 
 def dB(lin, power = False):

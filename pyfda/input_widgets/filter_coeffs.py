@@ -21,7 +21,7 @@ from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval
+from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
