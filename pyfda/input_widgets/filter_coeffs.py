@@ -27,7 +27,6 @@ import pyfda.pyfda_fix_lib as fix
 
 
 # TODO: eliminate trailing zeros for filter order calculation
-# TODO: Fill combobox for Wrap / Quant settings
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -289,7 +288,6 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
 
         # ============== Signals & Slots ================================
-#        self.tblCoeff.itemEntered.connect(self.save_coeffs) # nothing happens
 #        self.tblCoeff.itemActivated.connect(self.save_coeffs) # nothing happens
         # this works but fires multiple times _and_ fires every time cell is
         # changed by program as well!
@@ -333,7 +331,7 @@ class FilterCoeffs(QWidget):
         (Re-)Create the displayed table from self.ba with the
         desired number format.
 
-        Called by _store_entry()
+        Called at the end of nearly every method.
         """
 
         params['FMT_ba'] = int(self.spnRound.text())
@@ -341,9 +339,8 @@ class FilterCoeffs(QWidget):
         if self.butEnable.isChecked():
 
             self.tblCoeff.setVisible(True)
-            coeffs = self.ba
+
             num_rows = max(len(self.ba[0]), len(self.ba[1]))
-            # num_rows = max(np.shape(coeffs))
 
             q_coeff = fb.fil[0]['q_coeff']
             self.ledQuantI.setText(str(q_coeff['QI']))
@@ -375,7 +372,7 @@ class FilterCoeffs(QWidget):
                 "Len   = %d\n"
                 "NDim  = %d\n\n"
                 "Coeffs = %s"
-                %(np.shape(coeffs),len(coeffs), np.ndim(coeffs), pformat(coeffs))
+                %(np.shape(self.ba),len(self.ba), np.ndim(self.ba), pformat(self.ba))
                   )
 
             for col in range(num_cols):
@@ -394,65 +391,6 @@ class FilterCoeffs(QWidget):
             
         else:
             self.tblCoeff.setVisible(False)
-
-#==============================================================================
-# #------------------------------------------------------------------------------
-#     def load_dict(self):
-#         """
-#         Create table from filter coeff dict
-#         """
-#         coeffs = fb.fil[0]['ba']
-#         num_rows = max(np.shape(coeffs))
-#
-#         q_coeff = fb.fil[0]['q_coeff']
-#         self.ledQuantI.setText(str(q_coeff['QI']))
-#         self.ledQuantF.setText(str(q_coeff['QF']))
-#         self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
-#         self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
-#
-#         # check whether filter is FIR and only needs one column
-#         if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
-#             num_cols = 1
-#             self.tblCoeff.setColumnCount(1)
-#             self.tblCoeff.setHorizontalHeaderLabels(["b"])
-#             self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
-#
-#         else:
-#             num_cols = 2
-#             self.tblCoeff.setColumnCount(2)
-#             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-#             self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
-#
-#
-#         self.tblCoeff.setVisible(self.chkCoeffList.isChecked())
-#         self.tblCoeff.setRowCount(num_rows)
-#         self.tblCoeff.setColumnCount(num_cols)
-#         # create index strings for column 0, starting with 0
-#         idx_str = [str(n) for n in range(num_rows)]
-#         self.tblCoeff.setVerticalHeaderLabels(idx_str)
-#
-#         logger.debug("load_dict - coeffs:\n"
-#             "Shape = %s\n"
-#             "Len   = %d\n"
-#             "NDim  = %d\n\n"
-#             "Coeffs = %s"
-#             %(np.shape(coeffs),len(coeffs), np.ndim(coeffs), pformat(coeffs))
-#               )
-#
-#         for col in range(num_cols):
-#             for row in range(np.shape(coeffs)[1]):
-#                 item = self.tblCoeff.item(row, col)
-#                 # copy content of zpk to corresponding table field, rounding
-#                 # as specified and removing the brackets of complex arguments
-#                 if item:
-#                     item.setText(str(cround(coeffs[col][row])).strip('()'))
-#                 else:
-#                     self.tblCoeff.setItem(row,col,QTableWidgetItem(
-#                                 str(cround(coeffs[col][row])).strip('()')))
-#         self.tblCoeff.resizeColumnsToContents()
-#         self.tblCoeff.resizeRowsToContents()
-#
-#==============================================================================
             
 
 #------------------------------------------------------------------------------
@@ -501,7 +439,6 @@ class FilterCoeffs(QWidget):
                 self.ba[col][row] = safe_eval(item.text())
             else:
                 self.ba[col][row] = 0.
-#        self._normalize_gain()
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
@@ -572,7 +509,7 @@ class FilterCoeffs(QWidget):
 
 #------------------------------------------------------------------------------
     def _equalize_ba_length(self):
-        # test and equalize if P and Z array have different lengths:
+        # test and equalize if b and a subarray have different lengths:
         D = len(self.ba[0]) - len(self.ba[1])
         if D > 0:
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
@@ -649,7 +586,7 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
-        Quantize all coefficients
+        Quantize all coefficients and refresh table
         """
         # define + instantiate fixed-point object
         myQ = fix.Fixed({'QI':int(self.ledQuantI.text()),
