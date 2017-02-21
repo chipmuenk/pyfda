@@ -80,13 +80,10 @@ class FilterCoeffs(QWidget):
     """
     Create widget for viewing / editing / entering data
     """
-    # class variables (shared between instances if more than one exists)
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
 
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
-
-#        self.nrows = 0 # keep track of number of rows
 
         self._construct_UI()
 
