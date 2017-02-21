@@ -43,6 +43,14 @@ class ItemDelegate(QStyledItemDelegate):
     QString, next to a "normal" non-unicode string.
 
     """
+    def __init__(self, parent, inst):
+        """
+        pass instance using this class as a parameter to access attributes here
+        """
+        super(ItemDelegate, self).__init__(parent)
+        self.coeff_inst = inst
+
+
     def displayText(self, text, locale):
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
@@ -112,7 +120,7 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
         self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
-        self.tblCoeff.setItemDelegate(ItemDelegate(self))
+        self.tblCoeff.setItemDelegate(ItemDelegate(self, self))
 
         self.butEnable = QPushButton(self)
         self.butEnable.setIcon(QIcon(':/circle-check.svg'))
