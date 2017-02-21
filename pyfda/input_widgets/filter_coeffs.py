@@ -281,16 +281,21 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs3.addWidget(self.lblDot)
         layHButtonsCoeffs3.addWidget(self.ledQuantF)
         layHButtonsCoeffs3.addStretch()
-        self.frmQSettings = QFrame(self)
-        self.frmQSettings.setLayout(layHButtonsCoeffs3)
         
+        layHButtonsCoeffs4 = QHBoxLayout()
+        layHButtonsCoeffs4.addWidget(self.lblQOvfl)
+        layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
+        layHButtonsCoeffs4.addWidget(self.lblQuant)
+        layHButtonsCoeffs4.addWidget(self.cmbQQuant)
+        layHButtonsCoeffs4.addStretch()
+        
+        layVButtonsQ = QVBoxLayout()
+        layVButtonsQ.addLayout(layHButtonsCoeffs3)
+        layVButtonsQ.addLayout(layHButtonsCoeffs4)
 
-        self.layHButtonsCoeffs4 = QHBoxLayout()
-        self.layHButtonsCoeffs4.addWidget(self.lblQOvfl)
-        self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
-        self.layHButtonsCoeffs4.addWidget(self.lblQuant)
-        self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
-        self.layHButtonsCoeffs4.addStretch()
+        self.frmQSettings = QFrame(self)
+        self.frmQSettings.setLayout(layVButtonsQ)
+        
 
         layVBtns = QVBoxLayout()
         layVBtns.addLayout(layHChkBoxes)  
@@ -298,8 +303,7 @@ class FilterCoeffs(QWidget):
         layVBtns.addLayout(layHButtonsCoeffs2)
         layVBtns.addWidget(self.frmQSettings)
 #        layVBtns.addLayout(layHButtonsCoeffs3)
-        
-        layVBtns.addLayout(self.layHButtonsCoeffs4)
+#        layVBtns.addLayout(self.layHButtonsCoeffs4)
 
         # This frame encompasses all the buttons
         frmMain = QFrame(self)
