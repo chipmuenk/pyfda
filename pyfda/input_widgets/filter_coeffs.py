@@ -134,14 +134,13 @@ class FilterCoeffs(QWidget):
 
 
         self.tblCoeff = QTableWidget(self)
-#        self.tblCoeff.setEditTriggers(QTableWidget.AllEditTriggers)
         self.tblCoeff.setAlternatingRowColors(True)
         self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
         self.tblCoeff.horizontalHeader().setFont(bfont)
 
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
-        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove)
+#        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work like intended
         self.tblCoeff.setItemDelegate(ItemDelegate(self, self))
 
         self.butEnable = QPushButton(self)
