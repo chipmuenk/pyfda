@@ -110,11 +110,17 @@ class FilterCoeffs(QWidget):
                 MaxTextlen = len(item)
                 longestText = item + "mm" # this is the longest text + padding for
 
-        butAddRow = QPushButton(self)
         #Calculate the length for the buttons based on the longest ButtonText
-        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
+        #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 
-        lblRound = QLabel("Digits = ", self)
+        self.cmbFormat = QComboBox(self)
+        qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
+        self.cmbFormat.addItems(qFormat)
+        self.cmbFormat.setCurrentIndex(0) # 'frac'
+        self.cmbFormat.setToolTip('Set the display and output format.')
+        self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
+        self.lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
         self.spnRound.setValue(params['FMT_ba'])
@@ -146,30 +152,30 @@ class FilterCoeffs(QWidget):
         self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
                 "For high order systems, this might be slow. </span>")
 
-        # butAddRow = QPushButton(self) # moved to top
-        butAddRow.setIcon(QIcon(':/plus.svg'))
-        butAddRow.setIconSize(q_icon_size)
+        butAddCells = QPushButton(self)
+        butAddCells.setIcon(QIcon(':/plus.svg'))
+        butAddCells.setIconSize(q_icon_size)
         # butAddRow.setText(butTexts[0])
-        butAddRow.setToolTip("<SPAN>Select <i>N</i> existing rows "
-                             "to insert <i>N</i> new rows above last selected cell. "
-                             "When nothing is selected, add a row at the end.</SPAN>")
+        butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
+                                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
+                                "When nothing is selected, add a row at the end.</SPAN>")
 #        butAddRow.setMaximumWidth(ButLength)
 
-        butDelCell = QPushButton(self)
-        butDelCell.setIcon(QIcon(':/minus.svg'))
-        butDelCell.setIconSize(q_icon_size)        
-        butDelCell.setToolTip("<span>Delete selected cell(s) from the table. "
-                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-                "If nothing is selected, delete the last row.</span>")
+        butDelCells = QPushButton(self)
+        butDelCells.setIcon(QIcon(':/minus.svg'))
+        butDelCells.setIconSize(q_icon_size)        
+        butDelCells.setToolTip("<span>Delete selected cell(s) from the table. "
+                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells.</span>")
 #        butDelCell.setText(butTexts[1])
         #butDelCell.setMaximumWidth(ButLength)
 
-        butSave = QPushButton(self)
+        self.butSave = QPushButton(self)
         # butSave.setText(butTexts[2])
-        butSave.setIcon(QIcon(':/upload.svg'))
-        butSave.setIconSize(q_icon_size)
-        butSave.setToolTip("<span>Save coefficients and update all plots. "
+        self.butSave.setIcon(QIcon(':/upload.svg'))
+        self.butSave.setIconSize(q_icon_size)
+        self.butSave.setToolTip("<span>Save coefficients and update all plots. "
                                 "No modifications are saved before!</span>")
+
         #butSave.setMaximumWidth(ButLength)
 
         butLoad = QPushButton(self)
@@ -199,7 +205,7 @@ class FilterCoeffs(QWidget):
         self.ledSetEps.setText(str(1e-6))
 
         butQuant = QPushButton(self)
-        butQuant.setToolTip("Quantize coefficients = 0 with a magnitude < eps.")
+        butQuant.setToolTip("Quantize coefficients with selected settings.")
         butQuant.setText(butTexts[6])
         butQuant.setMaximumWidth(ButLength)
 
@@ -235,31 +241,26 @@ class FilterCoeffs(QWidget):
         self.cmbQOvfl.setCurrentIndex(2) # 'sat'
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
 
-        self.cmbQFormat = QComboBox(self)
-        qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
-        self.cmbQFormat.addItems(qFormat)
-        self.cmbQFormat.setCurrentIndex(0) # 'frac'
-        self.cmbQFormat.setToolTip('Set the output format.')
-
-
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbQFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         # ============== UI Layout =====================================
         layHChkBoxes = QHBoxLayout()
-        layHChkBoxes.addWidget(lblRound)
+        layHChkBoxes.setAlignment(Qt.AlignLeft)
+        layHChkBoxes.addWidget(self.butEnable)
+        layHChkBoxes.addWidget(self.cmbFormat)
+        layHChkBoxes.addWidget(self.lblRound)
         layHChkBoxes.addWidget(self.spnRound)
-        #layHChkBoxes.addStretch()        
+        layHChkBoxes.addStretch()        
+
 
         layHButtonsCoeffs1 = QHBoxLayout()
-        layHButtonsCoeffs1.addWidget(self.butEnable)
-        layHButtonsCoeffs1.addWidget(butAddRow)
-        layHButtonsCoeffs1.addWidget(butDelCell)
+        layHButtonsCoeffs1.addWidget(butAddCells)
+        layHButtonsCoeffs1.addWidget(butDelCells)
         layHButtonsCoeffs1.addWidget(butClear)
 
-        layHButtonsCoeffs1.addWidget(butSave)
+        layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addStretch()
@@ -270,30 +271,33 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
         layHButtonsCoeffs2.addStretch()
 
+
         layHButtonsCoeffs3 = QHBoxLayout()
         layHButtonsCoeffs3.addWidget(butQuant)
         layHButtonsCoeffs3.addWidget(self.lblQIQF)
         layHButtonsCoeffs3.addWidget(self.ledQuantI)
         layHButtonsCoeffs3.addWidget(self.lblDot)
         layHButtonsCoeffs3.addWidget(self.ledQuantF)
-
         layHButtonsCoeffs3.addStretch()
+        self.frmQSettings = QFrame(self)
+        self.frmQSettings.setLayout(layHButtonsCoeffs3)
+        
 
-        layHButtonsCoeffs4 = QHBoxLayout()
-
-        layHButtonsCoeffs4.addWidget(self.lblQOvfl)
-        layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
-        layHButtonsCoeffs4.addWidget(self.lblQuant)
-        layHButtonsCoeffs4.addWidget(self.cmbQQuant)
-        layHButtonsCoeffs4.addWidget(self.cmbQFormat)
-        layHButtonsCoeffs4.addStretch()
+        self.layHButtonsCoeffs4 = QHBoxLayout()
+        self.layHButtonsCoeffs4.addWidget(self.lblQOvfl)
+        self.layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
+        self.layHButtonsCoeffs4.addWidget(self.lblQuant)
+        self.layHButtonsCoeffs4.addWidget(self.cmbQQuant)
+        self.layHButtonsCoeffs4.addStretch()
 
         layVBtns = QVBoxLayout()
+        layVBtns.addLayout(layHChkBoxes)  
         layVBtns.addLayout(layHButtonsCoeffs1)
-        layVBtns.addLayout(layHChkBoxes)        
         layVBtns.addLayout(layHButtonsCoeffs2)
-        layVBtns.addLayout(layHButtonsCoeffs3)
-        layVBtns.addLayout(layHButtonsCoeffs4)
+        layVBtns.addWidget(self.frmQSettings)
+#        layVBtns.addLayout(layHButtonsCoeffs3)
+        
+        layVBtns.addLayout(self.layHButtonsCoeffs4)
 
         # This frame encompasses all the buttons
         frmMain = QFrame(self)
