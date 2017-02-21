@@ -370,6 +370,10 @@ class FilterCoeffs(QWidget):
 
         params['FMT_ba'] = int(self.spnRound.text())
 
+
+        self.spnRound.setEnabled(self.cmbFormat.currentIndex() == 0)
+        self.lblRound.setEnabled(self.cmbFormat.currentIndex() == 0)
+        
         if self.butEnable.isChecked():
 
             self.tblCoeff.setVisible(True)
