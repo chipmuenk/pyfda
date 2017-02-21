@@ -191,10 +191,10 @@ class FilterCoeffs(QWidget):
         butClear.setToolTip("Clear all entries.")
         #butClear.setMaximumWidth(ButLength)
 
-
         butSetZero = QPushButton(butTexts[5], self)
         butSetZero.setToolTip("<span>Set coefficients = 0 with a magnitude &lt; &epsilon;.</span>")
-        butSetZero.setMaximumWidth(ButLength)
+        butSetZero.setIconSize(q_icon_size)
+#        butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel(self)
         self.lblEps.setText("for b, a <")
@@ -205,8 +205,11 @@ class FilterCoeffs(QWidget):
 
         butQuant = QPushButton(self)
         butQuant.setToolTip("Quantize coefficients with selected settings.")
-        butQuant.setText(butTexts[6])
-        butQuant.setMaximumWidth(ButLength)
+        butQuant.setText("Q!")
+        butQuant.setIconSize(q_icon_size)
+
+#        butQuant.setText(butTexts[6])
+#        butQuant.setMaximumWidth(ButLength)
 
         self.lblQIQF  = QLabel("QI.QF = ")
         self.lblQOvfl = QLabel("Ovfl.:")
