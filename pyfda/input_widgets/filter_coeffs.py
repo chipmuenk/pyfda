@@ -326,25 +326,25 @@ class FilterCoeffs(QWidget):
         # this works but fires multiple times _and_ fires every time cell is
         # changed by program as well!
 #        self.tblCoeff.itemChanged.connect(self.save_coeffs)
-#        self.tblCoeff.clicked.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
         self.spnRound.editingFinished.connect(self._refresh_table)
 
-        butLoad.clicked.connect(self.load_dict)
         self.butEnable.clicked.connect(self.load_dict)
-
-        butSave.clicked.connect(self._save_entries)
+        self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
 
         self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
 
-        butDelCell.clicked.connect(self._delete_cells)
-        butAddRow.clicked.connect(self._add_rows)
-
+        butDelCells.clicked.connect(self._delete_cells)
+        butAddCells.clicked.connect(self._add_cells)
+        butLoad.clicked.connect(self.load_dict)
+        self.butSave.clicked.connect(self._save_entries)
         butClear.clicked.connect(self._clear_table)
         butSetZero.clicked.connect(self._set_coeffs_zero)
+
         butQuant.clicked.connect(self.quant_coeffs)
 
         self.tblCoeff.cellChanged.connect(self._copy_item)
+#        self.tblCoeff.dropEvent.connect(self._copy_item)
 
 #------------------------------------------------------------------------------
     def _set_filter_type(self):
