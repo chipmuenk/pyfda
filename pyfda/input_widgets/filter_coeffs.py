@@ -459,6 +459,7 @@ class FilterCoeffs(QWidget):
         set_cmb_box(self.cmbFormat, fb.fil[0]['q_coeff']['frmt']) 
                 
         self._refresh_table()
+        style_widget(self.butSave, 'normal')
 
 #------------------------------------------------------------------------------
     def _copy_item(self):
@@ -550,6 +551,7 @@ class FilterCoeffs(QWidget):
         self.ba = np.array([[1, 0, 0], [1, 0, 0]], dtype = np.complex)
 
         self._refresh_table()
+        style_widget(self.butSave, 'changed')
         
 
 #------------------------------------------------------------------------------
@@ -604,6 +606,7 @@ class FilterCoeffs(QWidget):
         # test and equalize if b and a array have different lengths:
         self._equalize_ba_length()
         self._refresh_table()
+        style_widget(self.butSave, 'changed')
         
 
 #------------------------------------------------------------------------------
@@ -627,6 +630,7 @@ class FilterCoeffs(QWidget):
 
         self._equalize_ba_length()
         self._refresh_table()
+        style_widget(self.butSave, 'changed')
 
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
