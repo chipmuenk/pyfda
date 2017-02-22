@@ -498,7 +498,7 @@ class FilterCoeffs(QWidget):
                 'QF':int(self.ledQuantF.text()),
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
-                'frmt':self.cmbQFormat.currentText()
+                'frmt':self.cmbFormat.currentText()
                 }
 
         fil_save(fb.fil[0], self.ba, 'ba', __name__) # save as coeffs
