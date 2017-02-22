@@ -479,6 +479,26 @@ class FilterCoeffs(QWidget):
                 self.ba[col][row] = 0.
         style_widget(self.butSave, 'changed')
 
+#------------------------------------------------------------------------------
+    def _read_q_settings(self):
+        """
+        read out the settings of the quantization comboboxes
+        """
+        self.myQ = fix.Fixed({'QI':int(self.ledQuantI.text()),
+                         'QF':int(self.ledQuantF.text()),
+                         'quant': self.cmbQQuant.currentText(),
+                         'ovfl':self.cmbQOvfl.currentText(),
+                         'frmt':self.cmbQFormat.currentText()})
+                         
+        fb.fil[0]["q_coeff"] = {
+                'QI':int(self.ledQuantI.text()),
+                'QF':int(self.ledQuantF.text()),
+                'quant':self.cmbQQuant.currentText(),
+                'ovfl':self.cmbQOvfl.currentText(),
+                'frmt':self.cmbFormat.currentText()
+                }
+
+
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
@@ -606,7 +626,6 @@ class FilterCoeffs(QWidget):
         self._equalize_ba_length()
         self._refresh_table()
 
-
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
         """
@@ -630,24 +649,24 @@ class FilterCoeffs(QWidget):
         Quantize all coefficients and refresh table
         """
         # define + instantiate fixed-point object
-        myQ = fix.Fixed({'QI':int(self.ledQuantI.text()),
-                         'QF':int(self.ledQuantF.text()),
-                         'quant': self.cmbQQuant.currentText(),
-                         'ovfl':self.cmbQOvfl.currentText(),
-                         'frmt':self.cmbQFormat.currentText()})
-
-        num_rows, num_cols = self.tblCoeff.rowCount(),\
-                                        self.tblCoeff.columnCount()
-        for col in range(num_cols):
-            for row in range(num_rows):
-                item = self.tblCoeff.item(row, col)
-                if item:
-                    item.setText(str(myQ.fix(safe_eval(item.text()))))
-                else:
-                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
-
-        self.tblCoeff.resizeColumnsToContents()
-        self.tblCoeff.resizeRowsToContents()
+        self._read_q_settings()
+        
+        self.myQ.fix(self.ba)
+        
+        self._refresh_table()
+        
+#        num_rows, num_cols = self.tblCoeff.rowCount(),\
+#                                        self.tblCoeff.columnCount()
+#        for col in range(num_cols):
+#            for row in range(num_rows):
+#                item = self.tblCoeff.item(row, col)
+#                if item:
+#                    item.setText(str(self.myQ.fix(safe_eval(item.text()))))
+#                else:
+#                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
+#
+#        self.tblCoeff.resizeColumnsToContents()
+#        self.tblCoeff.resizeRowsToContents()
 
 #------------------------------------------------------------------------------
 
