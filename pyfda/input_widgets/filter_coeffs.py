@@ -569,24 +569,16 @@ class FilterCoeffs(QWidget):
         Finally, the table is refreshed from self.ba.
         """
         # TODO: FIR and IIR need to be treated separately
-        sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
-        B = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
-        A = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
-        print(B,A)
+        sel = self._get_selected(self.tblCoeff)['sel'] # get indices of all selected cells
 
-        # Delete array entries with selected indices. If nothing is selected
-        # (B and A are empty), delete the last row.
-        if len(B) < 1 and len(A) < 1:
-            B = [len(self.ba[0])-1]
-            A = [len(self.ba[1])-1]
-        self.ba[0] = np.delete(self.ba[0], B)
-        self.ba[1] = np.delete(self.ba[1], A)
+        self.ba[0] = np.delete(self.ba[0], sel[0])
+        self.ba[1] = np.delete(self.ba[1], sel[1])
 
-        # test and equalize if B and a array have different lengths:
+        # test and equalize if b and a array have different lengths:
         self._equalize_ba_length()
-#        self._delete_PZ_pairs()
         self._refresh_table()
         
+
 #------------------------------------------------------------------------------
     def _add_rows(self):
         """
