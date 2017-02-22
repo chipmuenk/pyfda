@@ -477,6 +477,8 @@ class FilterCoeffs(QWidget):
                 self.ba[col][row] = safe_eval(item.text())
             else:
                 self.ba[col][row] = 0.
+        style_widget(self.butSave, 'changed')
+
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
@@ -514,6 +516,7 @@ class FilterCoeffs(QWidget):
             "zpk = %s\n"
             %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
+        style_widget(self.butSave, 'normal')
 
 #------------------------------------------------------------------------------
     def _clear_table(self):
