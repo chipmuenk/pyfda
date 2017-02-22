@@ -495,14 +495,14 @@ class FilterCoeffs(QWidget):
         """
         self.myQ = fix.Fixed({'QI':int(self.ledQuantI.text()),
                          'QF':int(self.ledQuantF.text()),
-                         'quant': self.cmbQQuant.currentText(),
+                         'quant': self.cmbQuant.currentText(),
                          'ovfl':self.cmbQOvfl.currentText(),
                          'frmt':self.cmbQFormat.currentText()})
                          
         fb.fil[0]["q_coeff"] = {
                 'QI':int(self.ledQuantI.text()),
                 'QF':int(self.ledQuantF.text()),
-                'quant':self.cmbQQuant.currentText(),
+                'quant':self.cmbQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText()
                 }
