@@ -367,6 +367,7 @@ class FilterPZ(QWidget):
             self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
             self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
 
+            self.tblPZ.blockSignals(True)
             for col in range(2):
                 for row in range(len(self.zpk[col])):
                     # set table item from self.zpk and strip '()' of complex numbers
@@ -376,6 +377,7 @@ class FilterPZ(QWidget):
                     else: # no, construct it:
                         self.tblPZ.setItem(row,col,QTableWidgetItem(
                               str(self.zpk[col][row]).strip('()')))
+            self.tblPZ.blockSignals(False)
 
             self.tblPZ.resizeColumnsToContents()
             self.tblPZ.resizeRowsToContents()

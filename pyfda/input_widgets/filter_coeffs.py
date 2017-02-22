@@ -413,8 +413,9 @@ class FilterCoeffs(QWidget):
                 %(np.shape(self.ba),len(self.ba), np.ndim(self.ba), pformat(self.ba))
                   )
 
+            self.tblCoeff.blockSignals(True)
             for col in range(num_cols):
-                    for row in range(len(self.ba[col])):
+                    for row in range(num_rows):
                         # set table item from self.ba and strip '()' of complex numbers
                         item = self.tblCoeff.item(row, col)
                         if item: # does item exist?
@@ -422,6 +423,7 @@ class FilterCoeffs(QWidget):
                         else: # no, construct it:
                             self.tblCoeff.setItem(row,col,QTableWidgetItem(
                                   str(self.ba[col][row]).strip('()')))
+            self.tblCoeff.blockSignals(False)
 
             self.tblCoeff.resizeColumnsToContents()
             self.tblCoeff.resizeRowsToContents()
