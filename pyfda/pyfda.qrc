@@ -1,6 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <! QtPy4: pyrcc4 pyfda.qrc -o qrc_resources.py -py3>
 <! QtPy5: pyrcc5 pyfda.qrc -o qrc_resources.py>
+
+<! manual edit in qrc_resources.py : from PyQtX import QtCore -> from .compat import QtCore>
 <qresource>
     <file alias="action-redo.svg">images/icons/action-redo.svg</file>
     <file alias="action-undo.svg">images/icons/action-undo.svg</file>
