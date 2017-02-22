@@ -273,7 +273,6 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
         layHButtonsCoeffs2.addStretch()
 
-
         layHButtonsCoeffs3 = QHBoxLayout()
         layHButtonsCoeffs3.addWidget(butQuant)
         layHButtonsCoeffs3.addWidget(self.lblQIQF)
@@ -471,15 +470,22 @@ class FilterCoeffs(QWidget):
         Triggered by  `tblCoeff.cellChanged`
 
         """
+        # multiple selection:
+        #idx = self._get_selected(self.tblCoeff)['idx']
+        #for x in idx:
+        #    print(self.tblCoeff.item(x[0],x[1]).text())
+
         col = self.tblCoeff.currentIndex().column()
         row = self.tblCoeff.currentIndex().row()
         item = self.tblCoeff.item(row,col)
+        
 
         if item:
             if item.text() != "":
                 self.ba[col][row] = safe_eval(item.text())
             else:
                 self.ba[col][row] = 0.
+
         style_widget(self.butSave, 'changed')
 
 #------------------------------------------------------------------------------
@@ -575,7 +581,6 @@ class FilterCoeffs(QWidget):
         # rows = sorted(list({i[1] for i in idx}))
         cur = (table.currentColumn(), table.currentRow())
         # cur_idx_row = table.currentIndex().row()
-
         return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
 
 #------------------------------------------------------------------------------
