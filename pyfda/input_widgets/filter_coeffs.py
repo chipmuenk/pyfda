@@ -446,10 +446,10 @@ class FilterCoeffs(QWidget):
         type np.complex is necessary, otherwise operations creating complex 
         coefficient values (or complex user entries) create errors.
         """
-        
+
         self.ba = [0, 0]
-        self.ba[0] = np.array(fb.fil[0]['ba'], dtype = complex)[0] # this enforces a deep copy
-        self.ba[1] = np.array(fb.fil[0]['ba'], dtype = complex)[1]
+        self.ba[0] = np.array(fb.fil[0]['ba'][0], dtype = complex)
+        self.ba[1] = np.array(fb.fil[0]['ba'][1], dtype = complex)
 
         # set comboBoxes from dictionary
         self.ledQuantI.setText(str(fb.fil[0]['q_coeff']['QI']))
