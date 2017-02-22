@@ -580,7 +580,9 @@ class FilterCoeffs(QWidget):
 
 #------------------------------------------------------------------------------
     def _equalize_ba_length(self):
-        # test and equalize if b and a subarray have different lengths:
+        """
+        test and equalize if b and a subarray have different lengths:
+        """
         D = len(self.ba[0]) - len(self.ba[1])
         if D > 0:
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
