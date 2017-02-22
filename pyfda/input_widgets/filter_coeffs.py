@@ -519,7 +519,8 @@ class FilterCoeffs(QWidget):
     def _clear_table(self):
         """
         Clear table & initialize coeff for two poles and zeros @ origin,
-        a = b = [1; 0; 0]
+        a = b = [1; 0; 0]. Initialize with dtype complex to avoid errors 
+        if the data type becomes complex later on.
         """
         self.ba = np.array([[1, 0, 0], [1, 0, 0]], dtype = np.complex)
 
