@@ -246,6 +246,8 @@ class FilterCoeffs(QWidget):
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        
+        self.clipboard = QApplication.clipboard()
 
         # ============== UI Layout =====================================
         layHChkBoxes = QHBoxLayout()
@@ -559,6 +561,57 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
         style_widget(self.butSave, 'changed')
         
+#------------------------------------------------------------------------------
+    def _copy_to_clipboard(self):
+        """
+        Copy table from self.ba to clipboard as tab-separated list
+        """
+        
+        text = ""
+        for r in range(self.num_rows - 1):
+            for c in range(self.num_cols - 1):
+                print(r,c)
+                text += str(self.ba[c][r])
+                print(str(self.ba[c][r]))
+                if c != self.num_cols:
+                    text += "\t"
+            if r != self.num_rows:        
+                text += "\n"
+
+        self.clipboard.setText(text)
+        
+        #self.textLabel.setText(self.clipboard.text())
+                
+        
+#==============================================================================
+#         void MyTableWidget::keyPressEvent(QKeyEvent* event) {
+#     // If Ctrl-C typed
+#     // Or use event->matches(QKeySequence::Copy)
+#     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
+#     {
+#         QModelIndexList cells = selectedIndexes();
+#         qSort(cells); // Necessary, otherwise they are in column order
+# 
+#         QString text;
+#         int currentRow = 0; // To determine when to insert newlines
+#         foreach (const QModelIndex& cell, cells) {
+#             if (text.length() == 0) {
+#                 // First item
+#             } else if (cell.row() != currentRow) {
+#                 // New row
+#                 text += '\n';
+#             } else {
+#                 // Next cell
+#                 text += '\t';
+#             }
+#             currentRow = cell.row();
+#             text += cell.data().toString();
+#         }
+# 
+#         QApplication::clipboard()->setText(text);
+#     }
+# }
+#==============================================================================
 
 #------------------------------------------------------------------------------
     def _get_selected(self, table):
