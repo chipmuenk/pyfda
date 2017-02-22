@@ -162,6 +162,7 @@ class InputTabWidgets(QWidget):
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         """
+        self.filter_specs.color_design_button("ok")
         self.filter_specs.sel_fil.load_dict() # update select_filter widget
         self.update_all()
 

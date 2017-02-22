@@ -271,25 +271,21 @@ class FilterSpecs(QWidget):
 
             if err > 0:
                 raise AttributeError("Unknown design method.")
-                fb.design_filt_state = "error"            
-                style_widget(self.butDesignFilt, "error")
-
+                self.color_design_button("error")
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
             self.sel_fil.load_filter_order()
             self.w_specs.load_dict()
             self.f_specs.load_dict()
 
-            fb.design_filt_state = "ok"            
-            style_widget(self.butDesignFilt, "ok")
+            self.color_design_button("ok")
 
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
         except Exception as e:
             logger.warning("start_design_filt:\n%s\n%s\n", e.__doc__, e)
             
-            fb.design_filt_state = "error"            
-            style_widget(self.butDesignFilt, "error")
+            self.color_design_button("error")
 
         logger.debug("start_design_filt - Results:\n"
             "F_PB = %s, F_SB = %s\n"
@@ -300,7 +296,12 @@ class FilterSpecs(QWidget):
             str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
             str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
                 pformat(fb.fil[0]['zpk'])
-              )        
+              )
+
+    def color_design_button(self, state):
+        fb.design_filt_state = state
+        style_widget(self.butDesignFilt, state)
+
 
 #------------------------------------------------------------------------------
 
