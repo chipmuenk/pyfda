@@ -535,19 +535,24 @@ class FilterCoeffs(QWidget):
         """
         get selected cells and return:
         - indices of selected cells
-        - selected colums
-        - selected rows
-        - current cell
+        - list of selected cells per column, sorted in reverse
+        - current cell selection
         """
         idx = []
         for _ in table.selectedItems():
             idx.append([_.column(), _.row(), ])
-        cols = sorted(list({i[0] for i in idx}))
-        rows = sorted(list({i[1] for i in idx}))
-        cur = (table.currentColumn(), table.currentRow())
-        #cur_idx_row = table.currentIndex().row()
 
-        return {'idx':idx, 'cols':cols, 'rows':rows, 'cur':cur}
+        sel = [0, 0]
+        sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse = True)
+        sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse = True)
+
+        # use set comprehension to eliminate multiple identical entries
+        # cols = sorted(list({i[0] for i in idx}))
+        # rows = sorted(list({i[1] for i in idx}))
+        cur = (table.currentColumn(), table.currentRow())
+        # cur_idx_row = table.currentIndex().row()
+
+        return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
 
 #------------------------------------------------------------------------------
     def _equalize_ba_length(self):
@@ -580,21 +585,23 @@ class FilterCoeffs(QWidget):
         
 
 #------------------------------------------------------------------------------
-    def _add_rows(self):
+    def _add_cells(self):
         """
         Add the number of selected rows to the table and fill new cells with
-        zeros. If nothing is selected, add 1 row.
+        zeros. If nothing is selected, add one row at the bottom.
         """
-        row = self.tblCoeff.currentRow()
-        sel = len(self._get_selected(self.tblCoeff)['rows'])
-        # TODO: evaluate and create non-contiguous selections as well?
+        # get indices of all selected cells
+        sel = self._get_selected(self.tblCoeff)['sel'] 
 
-        if sel == 0: # nothing selected ->
-            sel = 1 # add at least one row ...
-            row = min(len(self.ba[0]), len(self.ba[1])) # ... at the bottom
+        if not np.any(sel):
+            sel[0] = [len(self.ba[0])]
+            sel[1] = [len(self.ba[1])]
 
-        self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))
-        self.ba[1] = np.insert(self.ba[1], row, np.zeros(sel))
+        self.ba[0] = np.insert(self.ba[0], sel[0], 0)
+        self.ba[1] = np.insert(self.ba[1], sel[1], 0)                
+            
+        # insert 'sel' contiguous rows  before 'row':
+        # self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))        
 
         self._equalize_ba_length()
         self._refresh_table()
