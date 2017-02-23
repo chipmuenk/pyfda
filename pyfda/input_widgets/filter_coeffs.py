@@ -335,7 +335,7 @@ class FilterCoeffs(QWidget):
         self.butEnable.clicked.connect(self.load_dict)
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
 
-        self.cmbFilterType.currentIndexChanged.connect(self._set_filter_type)
+        self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 
         butDelCells.clicked.connect(self._delete_cells)
         butAddCells.clicked.connect(self._add_cells)
@@ -350,16 +350,49 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.dropEvent.connect(self._copy_item)
 
 #------------------------------------------------------------------------------
-    def _set_filter_type(self):
+    def _filter_type(self, fil_type=None):
         """
-        Change between FIR and IIR filter setting
+        Get / set 'FIR' and 'IIR' filter type: 
+            When type is not declared, read cmbFilterType combobox and set filter
+            dict accordingly.
+            
+            When type is declared as 'auto', check whether all items of a = self.ba[1] 
+            are zero except for the first one. If true, it's an 'IIR', otherwise
+            it's a 'FIR' filter.
+            Set cmbFilterType combobox and filter dict accordingly.
         """
-
-        if self.cmbFilterType.currentText() == 'FIR':
-            fb.fil[0]['ft'] = 'FIR'
+        if not fil_type: # no argument, read out combobox
+            if self.cmbFilterType.currentText() == 'IIR':
+                ft = 'IIR'
+            else:
+                ft = 'FIR'
         else:
-            fb.fil[0]['ft'] = 'IIR'
+            if fil_type == 'auto': # determine type of filter from coefficients
+                if np.any(self.ba[1][0:]):
+                    ft = 'IIR'
+                else:
+                    ft = 'FIR'
+                
+            if fil_type == 'IIR': # filter type has been specified
+                ft = 'IIR'
+            else:
+                ft = 'IIR'
 
+        if ft == 'IIR':
+            self.col = 2
+            set_cmb_box(self.cmbFilterType, 'IIR')
+            self.tblCoeff.setColumnCount(2)
+            self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+        else:
+            self.col = 1
+            set_cmb_box(self.cmbFilterType, 'FIR')
+            self.tblCoeff.setColumnCount(1)
+            self.tblCoeff.setHorizontalHeaderLabels(["b"])
+            
+        fb.fil[0]['ft'] = ft
+        self.tblCoeff.setColumnCount(self.col)
+
+                
         self.load_dict()
 
 #------------------------------------------------------------------------------
@@ -381,8 +414,6 @@ class FilterCoeffs(QWidget):
 
             self.tblCoeff.setVisible(True)
 
-            num_rows = max(len(self.ba[0]), len(self.ba[1]))
-
             q_coeff = fb.fil[0]['q_coeff']
             self.ledQuantI.setText(str(q_coeff['QI']))
             self.ledQuantF.setText(str(q_coeff['QF']))
@@ -390,22 +421,22 @@ class FilterCoeffs(QWidget):
             self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
 
             # check whether filter is FIR and only needs one column
-            if fb.fil[0]['ft'] == 'FIR':# and np.all(fb.fil[0]['zpk'][1]) == 0:
-                num_cols = 1
+            if fb.fil[0]['ft'] == 'FIR':
+                self.num_cols = 1
                 self.tblCoeff.setColumnCount(1)
                 self.tblCoeff.setHorizontalHeaderLabels(["b"])
-                self.cmbFilterType.setCurrentIndex(0) # set to "FIR"
+                set_cmb_box(self.cmbFilterType, 'FIR')
 
             else:
-                num_cols = 2
+                self.num_cols = 2
                 self.tblCoeff.setColumnCount(2)
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-                self.cmbFilterType.setCurrentIndex(1) # set to "IIR"
+                set_cmb_box(self.cmbFilterType, 'IIR')
 
-            self.tblCoeff.setRowCount(num_rows)
-            self.tblCoeff.setColumnCount(num_cols)
+            self.tblCoeff.setRowCount(self.num_rows)
+            self.tblCoeff.setColumnCount(self.num_cols)
             # create index strings for column 0, starting with 0
-            idx_str = [str(n) for n in range(num_rows)]
+            idx_str = [str(n) for n in range(self.num_rows)]
             self.tblCoeff.setVerticalHeaderLabels(idx_str)
 
             logger.debug("load_dict - coeffs:\n"
@@ -417,8 +448,8 @@ class FilterCoeffs(QWidget):
                   )
 
             self.tblCoeff.blockSignals(True)
-            for col in range(num_cols):
-                    for row in range(num_rows):
+            for col in range(self.num_cols):
+                    for row in range(self.num_rows):
                         # set table item from self.ba and strip '()' of complex numbers
                         item = self.tblCoeff.item(row, col)
                         if item: # does item exist?
