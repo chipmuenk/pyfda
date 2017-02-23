@@ -67,7 +67,7 @@ class ItemDelegate(QStyledItemDelegate):
         dec_digits = int(np.ceil(np.log10(2 ** W))+2) # required number of digits for dec. repr.
 
         if idx == 0: # fractional format
-            return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
+            return "{:#.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
         elif idx == 1: # decimal format
             return "{0:{1}}".format(dec, dec_digits)# , n_digits = int(np.ceil(np.log10(2 ** W))))
         elif idx == 2: # hex format
