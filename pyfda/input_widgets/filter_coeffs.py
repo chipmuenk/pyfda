@@ -132,7 +132,14 @@ class FilterCoeffs(QWidget):
         self.spnRound.setRange(0,9)
         self.spnRound.setValue(params['FMT_ba'])
         self.spnRound.setToolTip("Display <i>d</i> digits.")
-
+        
+        self.butClipboard = QPushButton(self)
+        self.butClipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.butClipboard.setIconSize(q_icon_size)
+        self.butClipboard.setToolTip("<span>Copy table to clipboard. Selected items are copied as "
+                            "displayed to clipboard. When nothing is selected, the whole table "
+                            "is copied to the clipboard with full precision in decimal format. </span>")
+        
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
@@ -339,6 +346,7 @@ class FilterCoeffs(QWidget):
 
         self.butEnable.clicked.connect(self.load_dict)
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
+        self.butClipboard.clicked.connect(self._copy_to_clipboard)
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 
