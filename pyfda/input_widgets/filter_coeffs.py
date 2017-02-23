@@ -353,8 +353,7 @@ class FilterCoeffs(QWidget):
         # changed by program as well!
 #        self.tblCoeff.itemChanged.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
-
-        self.butEnable.clicked.connect(self.load_dict)
+        self.butEnable.clicked.connect(self._refresh_table)
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.butClipboard.clicked.connect(self._copy_to_clipboard)
