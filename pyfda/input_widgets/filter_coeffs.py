@@ -69,7 +69,7 @@ class ItemDelegate(QStyledItemDelegate):
         if idx == 0: # fractional format
             return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
         elif idx == 1: # decimal format
-            return "{0:>{1}}".format(dec, dec_digits)# , n_digits = int(np.ceil(np.log10(2 ** W))))
+            return "{0:{1}}".format(dec, dec_digits)# , n_digits = int(np.ceil(np.log10(2 ** W))))
         elif idx == 2: # hex format
             return "{0}".format(tohex(dec, W))
         else:
@@ -450,14 +450,16 @@ class FilterCoeffs(QWidget):
 
             self.tblCoeff.blockSignals(True)
             for col in range(self.num_cols):
-                    for row in range(self.num_rows):
-                        # set table item from self.ba and strip '()' of complex numbers
-                        item = self.tblCoeff.item(row, col)
-                        if item: # does item exist?
-                            item.setText(str(self.ba[col][row]).strip('()'))
-                        else: # no, construct it:
-                            self.tblCoeff.setItem(row,col,QTableWidgetItem(
-                                  str(self.ba[col][row]).strip('()')))
+                for row in range(self.num_rows):
+                    # set table item from self.ba and strip '()' of complex numbers
+                    item = self.tblCoeff.item(row, col)
+                    if item: # does item exist?
+                        item.setText(str(self.ba[col][row]).strip('()'))
+                    else: # no, construct it:
+                        self.tblCoeff.setItem(row,col,QTableWidgetItem(
+                              str(self.ba[col][row]).strip('()')))
+                    self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight)
+                    
             self.tblCoeff.blockSignals(False)
 
             self.tblCoeff.resizeColumnsToContents()
