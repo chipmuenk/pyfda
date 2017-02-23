@@ -6,6 +6,11 @@ Created on Tue Nov 26 10:57:30 2013
 
 Tab-Widget for displaying and modifying filter coefficients
 """
+
+
+# TODO: FIR / IIR - Filter detection: Save always switches to IIR
+# TODO: Copy selection from table via QClipboard
+# TODO: Quantization
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, six
 from pprint import pformat
