@@ -146,7 +146,7 @@ class FilterCoeffs(QWidget):
 
         self.lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
-        self.spnRound.setRange(0,9)
+        self.spnRound.setRange(0,16)
         self.spnRound.setValue(params['FMT_ba'])
         self.spnRound.setToolTip("Display <i>d</i> digits.")
         
@@ -436,6 +436,7 @@ class FilterCoeffs(QWidget):
         
         if self.butEnable.isChecked():
 
+            self.frmQSettings.setVisible(True)
             self.tblCoeff.setVisible(True)
 
             q_coeff = fb.fil[0]['q_coeff']
@@ -492,6 +493,7 @@ class FilterCoeffs(QWidget):
             self._copy_to_clipboard()
             
         else:
+            self.frmQSettings.setVisible(False)
             self.tblCoeff.setVisible(False)
             
 
