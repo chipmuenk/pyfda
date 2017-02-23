@@ -11,6 +11,13 @@ Tab-Widget for displaying and modifying filter coefficients
 # TODO: FIR / IIR - Filter detection: Save always switches to IIR
 # TODO: Copy selection from table via QClipboard
 # TODO: Quantization
+# TODO: number of digits is limited to 12?!
+# TODO: File filter_pz.py", line 412, in _copy_item
+#    self.zpk[col][row] = safe_eval(item.text())
+# TypeError: can't convert complex to float
+#Fehler tritt nur auf wenn Tabellenwerte vorher reell waren?!
+	
+
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, six
 from pprint import pformat
@@ -30,8 +37,6 @@ from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-
-# TODO: eliminate trailing zeros for filter order calculation
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -59,6 +64,9 @@ class ItemDelegate(QStyledItemDelegate):
     def displayText(self, text, locale):
 
         def tohex(val, nbits):
+            """
+            Display negative hex values in Two's complement format
+            """
 #            return hex((val + (1 << nbits)) % (1 << nbits))
             return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
@@ -120,6 +128,15 @@ class FilterCoeffs(QWidget):
 #         #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 # 
 #==============================================================================
+        self.butEnable = QPushButton(self)
+        self.butEnable.setIcon(QIcon(':/circle-check.svg'))
+        self.butEnable.setIconSize(q_icon_size)
+        self.butEnable.setCheckable(True)
+        self.butEnable.setChecked(True)
+        self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
+                "For high order systems, this might be slow. </span>")
+
+
         self.cmbFormat = QComboBox(self)
         qFormat = ['Dec', 'Int', 'Hex', 'Bin']
         self.cmbFormat.addItems(qFormat)
@@ -157,13 +174,6 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work like intended
         self.tblCoeff.setItemDelegate(ItemDelegate(self, self))
 
-        self.butEnable = QPushButton(self)
-        self.butEnable.setIcon(QIcon(':/circle-check.svg'))
-        self.butEnable.setIconSize(q_icon_size)
-        self.butEnable.setCheckable(True)
-        self.butEnable.setChecked(True)
-        self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
-                "For high order systems, this might be slow. </span>")
 
         butAddCells = QPushButton(self)
         butAddCells.setIcon(QIcon(':/plus.svg'))
@@ -270,6 +280,7 @@ class FilterCoeffs(QWidget):
         layHChkBoxes.addWidget(self.cmbFormat)
         layHChkBoxes.addWidget(self.lblRound)
         layHChkBoxes.addWidget(self.spnRound)
+        layHChkBoxes.addWidget(self.butClipboard)
         layHChkBoxes.addStretch()        
 
 
@@ -342,10 +353,10 @@ class FilterCoeffs(QWidget):
         # changed by program as well!
 #        self.tblCoeff.itemChanged.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
-        self.spnRound.editingFinished.connect(self._refresh_table)
 
         self.butEnable.clicked.connect(self.load_dict)
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
+        self.spnRound.editingFinished.connect(self._refresh_table)
         self.butClipboard.clicked.connect(self._copy_to_clipboard)
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
