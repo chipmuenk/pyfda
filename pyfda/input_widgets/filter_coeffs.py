@@ -54,8 +54,8 @@ class ItemDelegate(QStyledItemDelegate):
     def displayText(self, text, locale):
 
         def tohex(val, nbits):
-            return hex((val + (1 << nbits)) % (1 << nbits))
-            # np.set_printoptions(formatter={'int':hex})
+#            return hex((val + (1 << nbits)) % (1 << nbits))
+            return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
