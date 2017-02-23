@@ -193,7 +193,7 @@ class FilterCoeffs(QWidget):
         butClear.setToolTip("Clear all entries.")
         #butClear.setMaximumWidth(ButLength)
 
-        butSetZero = QPushButton(butTexts[5], self)
+        butSetZero = QPushButton("= 0", self)
         butSetZero.setToolTip("<span>Set coefficients = 0 with a magnitude &lt; &epsilon;.</span>")
         butSetZero.setIconSize(q_icon_size)
 #        butSetZero.setMaximumWidth(ButLength)
@@ -404,11 +404,12 @@ class FilterCoeffs(QWidget):
         Called at the end of nearly every method.
         """
 
+        self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
+
         params['FMT_ba'] = int(self.spnRound.text())
 
-
-        self.spnRound.setEnabled(self.cmbFormat.currentIndex() == 0)
-        self.lblRound.setEnabled(self.cmbFormat.currentIndex() == 0)
+        self.spnRound.setEnabled(self.cmbFormat.currentIndex() == 0) # only enabled for 
+        self.lblRound.setEnabled(self.cmbFormat.currentIndex() == 0) # format = decimal
         
         if self.butEnable.isChecked():
 
@@ -463,6 +464,8 @@ class FilterCoeffs(QWidget):
             self.tblCoeff.resizeRowsToContents()
             self.tblCoeff.clearSelection()
             
+            self._copy_to_clipboard()
+            
         else:
             self.tblCoeff.setVisible(False)
             
@@ -484,7 +487,7 @@ class FilterCoeffs(QWidget):
         self.ba = [0, 0]
         self.ba[0] = np.array(fb.fil[0]['ba'][0], dtype = complex)
         self.ba[1] = np.array(fb.fil[0]['ba'][1], dtype = complex)
-
+        
         # set comboBoxes from dictionary
         self.ledQuantI.setText(str(fb.fil[0]['q_coeff']['QI']))
         self.ledQuantF.setText(str(fb.fil[0]['q_coeff']['QF']))
