@@ -12,8 +12,8 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFrame,
-                      QPushButton, QSpinBox, QFont, QIcon, QSize,
+from ..compat import (Qt, QApplication, QWidget, QLabel, QLineEdit, QComboBox,
+                      QFrame, QPushButton, QSpinBox, QFont, QIcon, QSize,
                       QAbstractItemView, QTableWidget, QTableWidgetItem,
                       QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
@@ -98,21 +98,23 @@ class FilterCoeffs(QWidget):
         bfont.setBold(True)
         q_icon_size = QSize(20, 20)
 
-         #Which Button holds the longest Text?
-        MaxTextlen = 0
-        longestText = ""
-        ButLength = 0
-        butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
-
-        # Find the longest text + padding for subsequent bounding box calculation
-        for item in butTexts:
-            if len(item) > MaxTextlen:
-                MaxTextlen = len(item)
-                longestText = item + "mm" # this is the longest text + padding for
-
-        #Calculate the length for the buttons based on the longest ButtonText
-        #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
-
+#==============================================================================
+#          #Which Button holds the longest Text?
+#         MaxTextlen = 0
+#         longestText = ""
+#         ButLength = 0
+#         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
+# 
+#         # Find the longest text + padding for subsequent bounding box calculation
+#         for item in butTexts:
+#             if len(item) > MaxTextlen:
+#                 MaxTextlen = len(item)
+#                 longestText = item + "mm" # this is the longest text + padding for
+# 
+#         #Calculate the length for the buttons based on the longest ButtonText
+#         #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
+# 
+#==============================================================================
         self.cmbFormat = QComboBox(self)
         qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
         self.cmbFormat.addItems(qFormat)
