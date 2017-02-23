@@ -116,7 +116,7 @@ class FilterCoeffs(QWidget):
 # 
 #==============================================================================
         self.cmbFormat = QComboBox(self)
-        qFormat = ['Frac', 'Dec', 'Hex', 'Bin']
+        qFormat = ['Dec', 'Int', 'Hex', 'Bin']
         self.cmbFormat.addItems(qFormat)
         self.cmbFormat.setCurrentIndex(0) # 'frac'
         self.cmbFormat.setToolTip('Set the display and output format.')
