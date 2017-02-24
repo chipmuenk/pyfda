@@ -275,8 +275,8 @@ class MyMplToolbar(NavigationToolbar):
         self.cb = None #will be used for the clipboard
         self.temp_file = os.path.join(pyfda_lib.get_home_dir(), 'tempMPL.png')
  
-        self.a_cb = self.addAction(QIcon(':/camera-slr.svg'), 'Save', self.mpl2Clip)
-        self.a_cb.setToolTip('Copy to clipboard')
+        self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'Save', self.mpl2Clip)
+        self.a_cb.setToolTip('Copy to clipboard in png format.')
         self.a_cb.setShortcut("Ctrl+C")
 
         # --------------------------------------
