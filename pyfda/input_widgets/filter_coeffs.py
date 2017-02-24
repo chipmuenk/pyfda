@@ -570,7 +570,7 @@ class FilterCoeffs(QWidget):
         fb.fil[0]["q_coeff"] = {
                 'QI':int(self.ledQuantI.text()),
                 'QF':int(self.ledQuantF.text()),
-                'quant':self.cmbQuant.currentText(),
+                'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText()
                 }
