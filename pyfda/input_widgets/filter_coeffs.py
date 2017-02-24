@@ -153,9 +153,9 @@ class FilterCoeffs(QWidget):
         self.butClipboard = QPushButton(self)
         self.butClipboard.setIcon(QIcon(':/clipboard.svg'))
         self.butClipboard.setIconSize(q_icon_size)
-        self.butClipboard.setToolTip("<span>Copy table to clipboard. Selected items are copied as "
-                            "displayed to clipboard. When nothing is selected, the whole table "
-                            "is copied to the clipboard with full precision in decimal format. </span>")
+        self.butClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
+                            "displayed. When nothing is selected, the whole table "
+                            "is copied with full precision in decimal format. </span>")
         
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
