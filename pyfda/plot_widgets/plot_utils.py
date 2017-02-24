@@ -209,7 +209,7 @@ class MyMplToolbar(NavigationToolbar):
 
         # ENABLE:
         self.a_en = self.addAction(QIcon(':/circle-check.svg'), 'Enable Plot', self.enable_update)
-        self.a_en.setToolTip('Enable plot update')
+        self.a_en.setToolTip('Enable / disable plot update')
         self.a_en.setCheckable(True)
         self.a_en.setChecked(True)
 #        a.setEnabled(False)
@@ -218,13 +218,13 @@ class MyMplToolbar(NavigationToolbar):
 
         # HOME:
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
-        self.a_ho.setToolTip('Reset original view')
+        self.a_ho.setToolTip('Reset original zoom')
         # BACK:
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
-        self.a_ba.setToolTip('Back to previous view')
+        self.a_ba.setToolTip('Back to previous zoom')
         # FORWARD:
         self.a_fw = self.addAction(QIcon(':/action-redo.svg'), 'Forward', self.forward)
-        self.a_fw.setToolTip('Forward to next view')
+        self.a_fw.setToolTip('Forward to next zoom')
 
         self.addSeparator() #---------------------------------------------
 
