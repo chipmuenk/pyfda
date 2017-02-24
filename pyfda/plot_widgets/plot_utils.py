@@ -208,7 +208,7 @@ class MyMplToolbar(NavigationToolbar):
 #---------------- Construct Toolbar using QRC icons ---------------------------
 
         # ENABLE:
-        self.a_en = self.addAction(QIcon(':/circle-check.svg'), 'Enable Plot', self.enable_update)
+        self.a_en = self.addAction(QIcon(':/circle-check.svg'), 'Enable Update', self.enable_update)
         self.a_en.setToolTip('Enable / disable plot update')
         self.a_en.setCheckable(True)
         self.a_en.setChecked(True)
@@ -247,12 +247,12 @@ class MyMplToolbar(NavigationToolbar):
             'Zoom full extent', self.parent.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
-        # LOCK VIEW:
+        # LOCK ZOOM:
         self.a_lk = self.addAction(QIcon(':/lock-unlocked.svg'), \
-                                   'Lock / unlock zoom', self.toggle_lock_zoom)
+                                   'Lock zoom', self.toggle_lock_zoom)
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
-        self.a_lk.setToolTip('Lock current zoom setting')
+        self.a_lk.setToolTip('Lock / unlock current zoom setting')
 
         # --------------------------------------
         self.addSeparator()
