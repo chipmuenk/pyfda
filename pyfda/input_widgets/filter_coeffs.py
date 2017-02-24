@@ -623,19 +623,22 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
-        Copy table from self.ba to clipboard as tab-separated list
+        Copy table from self.ba to clipboard as CSV list
         """
-        
         text = ""
-        for r in range(self.num_rows - 1):
-            for c in range(self.num_cols - 1):
-                print(r,c)
-                text += str(self.ba[c][r])
-                print(str(self.ba[c][r]))
-                if c != self.num_cols:
-                    text += "\t"
-            if r != self.num_rows:        
-                text += "\n"
+        tab = "\t"
+        cr = "\n"
+        sel = self._get_selected(self.tblCoeff)
+        if not np.any(sel): # nothing selected
+            for r in range(self.num_rows - 1):
+                for c in range(self.num_cols - 1):
+                    text += str(self.ba[c][r])
+                    if c != self.num_cols:
+                        text += tab
+                if r != self.num_rows:        
+                    text += cr
+        else:
+            pass
 
         self.clipboard.setText(text)
         
