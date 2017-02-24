@@ -466,14 +466,6 @@ class FilterCoeffs(QWidget):
             idx_str = [str(n) for n in range(self.num_rows)]
             self.tblCoeff.setVerticalHeaderLabels(idx_str)
 
-            logger.debug("load_dict - coeffs:\n"
-                "Shape = %s\n"
-                "Len   = %d\n"
-                "NDim  = %d\n\n"
-                "Coeffs = %s"
-                %(np.shape(self.ba),len(self.ba), np.ndim(self.ba), pformat(self.ba))
-                  )
-
             self.tblCoeff.blockSignals(True)
             for col in range(self.num_cols):
                 for row in range(self.num_rows):
