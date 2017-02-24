@@ -287,7 +287,7 @@ class MyMplToolbar(NavigationToolbar):
             self.a_op = self.addAction(QIcon(':/cog.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip('Edit curves line and axes parameters')
 
-        self.buttons = {}
+#        self.buttons = {}
 
         # Add the x,y location widget at the right side of the toolbar
         # The stretch factor is 1 which means any resizing of the toolbar
