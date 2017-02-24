@@ -28,6 +28,8 @@ from __future__ import division, unicode_literals, absolute_import
 from pyfda import qrc_resources # contains all icons
 import logging
 logger = logging.getLogger(__name__)
+
+from .pyfda_versions import cmp_version
     
 # #############################################################################
 # General layout settings
@@ -110,13 +112,43 @@ log_config_file = "pyfda_log.conf"
 # Matplotlib layout settings
 # #############################################################################
 
+# common matplotlib widget settings
+mpl_rc = {'lines.linewidth'           : 1.5,
+          'lines.markersize'          : mpl_ms,         # markersize, in points
+          'font.family'               : 'sans-serif',#'serif',
+          'font.style'                : 'normal',
+          'mathtext.fontset'          : 'stixsans',#'stix',
+          'mathtext.fallback_to_cm'   : True,
+          'mathtext.default'          : 'it',
+          'font.size'                 : 12, 
+          'legend.fontsize'           : 12, 
+          'axes.labelsize'            : 12, 
+          'axes.titlesize'            : 14, 
+          'axes.linewidth'            : 1, # linewidth for coordinate system
+          'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
+          'grid.linestyle'            : ':',
+          'grid.linewidth'            : 0.5,
+          'xtick.direction'           : 'out',
+          'ytick.direction'           : 'out',
+          #'xtick.top'                 : False, 2.0 only
+          'figure.figsize'            : (5,4),
+          'figure.dpi'                : 100
+            }
+
+mpl_2 =  {'hatch.color'               : '#808080',
+          'hatch.linewidth'           : 0.5
+          }
+
+if cmp_version('matplotlib', '2.0') >= 0:
+    mpl_rc.update(mpl_2)
+
 # dark theme for matplotlib widgets
 mpl_rc_dark = {
             'axes.facecolor'    : 'black',
             'axes.labelcolor'   : 'white',
             'axes.edgecolor'    : 'white',
             'figure.facecolor'  : '#202020',
-            'figure.edgecolor'  : '#808080', # also color for hatched specs in |H(f)|
+            'figure.edgecolor'  : '#808080', # also color for hatched specs for mpl < 2.0
             'savefig.facecolor' : 'black',
             'savefig.edgecolor' : 'black', 
             'xtick.color'       : 'white',
@@ -142,7 +174,7 @@ mpl_rc_light = {
             'axes.labelcolor'   : 'black',
             'axes.edgecolor'    : 'black',
             'figure.facecolor'  : 'white',
-            'figure.edgecolor'  : '#808080', # also color for hatched specs in |H(f)|
+            'figure.edgecolor'  : '#808080', # also color for hatched specs for mpl < 2.0
             'savefig.facecolor' : 'white',
             'savefig.edgecolor' : 'white', 
             'xtick.color'       : 'black',
@@ -155,23 +187,6 @@ if CYC:
 else:
     mpl_rc_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
             
-# common matplotlib widget settings
-mpl_rc = {'lines.linewidth'           : 1.5,
-          'lines.markersize'          : mpl_ms,         # markersize, in points
-          'font.family'               : 'sans-serif',#'serif',
-          'font.style'                : 'normal',
-          'mathtext.fontset'          : 'stixsans',#'stix',
-          'mathtext.fallback_to_cm'   : True,
-          'mathtext.default'          : 'it',
-          'font.size'                 : 12, 
-          'legend.fontsize'           : 12, 
-          'axes.labelsize'            : 12, 
-          'axes.titlesize'            : 14, 
-          'axes.linewidth'            : 1, # linewidth for coordinate system
-          'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
-          'figure.figsize'            : (5,4),
-          'figure.dpi'                : 100
-            }
 
 # --------------------- Matplotlib Fonts --------------------------------------
 import matplotlib.font_manager
