@@ -437,7 +437,9 @@ class FilterCoeffs(QWidget):
         if self.butEnable.isChecked():
 
             self.frmQSettings.setVisible(True)
+            self.butEnable.setIcon(QIcon(':/circle-check.svg'))            
             self.tblCoeff.setVisible(True)
+            
 
             q_coeff = fb.fil[0]['q_coeff']
             self.ledQuantI.setText(str(q_coeff['QI']))
@@ -494,6 +496,7 @@ class FilterCoeffs(QWidget):
             
         else:
             self.frmQSettings.setVisible(False)
+            self.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(False)
             
 
