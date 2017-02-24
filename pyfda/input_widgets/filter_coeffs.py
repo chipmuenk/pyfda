@@ -560,13 +560,7 @@ class FilterCoeffs(QWidget):
     def _read_q_settings(self):
         """
         read out the settings of the quantization comboboxes
-        """
-        self.myQ = fix.Fixed({'QI':int(self.ledQuantI.text()),
-                         'QF':int(self.ledQuantF.text()),
-                         'quant': self.cmbQuant.currentText(),
-                         'ovfl':self.cmbQOvfl.currentText(),
-                         'frmt':self.cmbQFormat.currentText()})
-                         
+        """                         
         fb.fil[0]["q_coeff"] = {
                 'QI':int(self.ledQuantI.text()),
                 'QF':int(self.ledQuantF.text()),
@@ -574,8 +568,7 @@ class FilterCoeffs(QWidget):
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText()
                 }
-
-
+        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
