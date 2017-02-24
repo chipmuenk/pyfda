@@ -12,6 +12,39 @@ import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
+from pyfda import pyfda_lib
+from pyfda import pyfda_rc as rc
+# get dir for this file and store as base_dir in filterbroker
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+class DynFileHandler(logging.FileHandler):
+    """
+    subclass FileHandler with a customized handler for dynamic definition of
+    the logging filepath and -name
+    """
+    def __init__(self, *args):
+        filename, mode = args
+        if not os.path.isabs(filename): # path to logging file given in config_file?
+            filename = os.path.join(base_dir, filename) # no, use basedir
+        logging.FileHandler.__init__(self, filename, mode)
+
+# "register" custom class DynFileHandler as an attribute for the logging module
+# to use it inside the logging config file and pass file name / path and mode
+# as parameters:
+logging.DynFileHandler = DynFileHandler
+logging.config.fileConfig(os.path.join(base_dir, rc.log_config_file))#, disable_existing_loggers=True)
+logging.info("Using logging config file {0}.".format(rc.log_config_file))
+
+if not os.path.exists(rc.save_dir):
+    home_dir = pyfda_lib.get_home_dir()
+    logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
+        rc.save_dir, home_dir)
+    rc.save_dir = home_dir
+
+#==============================================================================
+import pyfda.filterbroker as fb
+fb.base_dir = base_dir
+
 from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
                      QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout)
 import matplotlib
@@ -23,9 +56,7 @@ if HAS_QT5:
 else:
     matplotlib.use("Qt4Agg")
     
-import pyfda.filterbroker as fb
-from pyfda import pyfda_lib
-from pyfda import pyfda_rc as rc
+
 from pyfda import qrc_resources # contains all icons
 # edit pyfda.qrc, then
 # create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
@@ -37,32 +68,6 @@ from pyfda.filter_tree_builder import FilterTreeBuilder
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
-# get dir for this file and store as base_dir in filterbroker
-fb.base_dir = os.path.dirname(os.path.abspath(__file__))
-
-class DynFileHandler(logging.FileHandler):
-    """
-    subclass FileHandler with a customized handler for dynamic definition of
-    the logging filepath and -name
-    """
-    def __init__(self, *args):
-        filename, mode = args
-        if not os.path.isabs(filename): # path to logging file given in config_file?
-            filename = os.path.join(fb.base_dir, filename) # no, use basedir
-        logging.FileHandler.__init__(self, filename, mode)
-
-# "register" custom class DynFileHandler as an attribute for the logging module
-# to use it inside the logging config file and pass file name / path and mode
-# as parameters:
-logging.DynFileHandler = DynFileHandler
-logging.config.fileConfig(os.path.join(fb.base_dir, rc.log_config_file))#, disable_existing_loggers=True)
-logging.info("Using logging config file {0}.".format(rc.log_config_file))
-
-if not os.path.exists(rc.save_dir):
-    home_dir = pyfda_lib.get_home_dir()
-    logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
-        rc.save_dir, home_dir)
-    rc.save_dir = home_dir
 
 
 class pyFDA(QMainWindow):
