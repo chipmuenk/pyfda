@@ -44,12 +44,12 @@ class MplWidget(QWidget):
     """
 
     def __init__(self, parent):
-        super(MplWidget, self).__init__(parent) 
+        super(MplWidget, self).__init__(parent)
         # Create the mpl figure and subplot (white bg, 100 dots-per-inch).
         # Construct the canvas with the figure
         #
         self.plt_lim = [] # x,y plot limits
-        self.fig = Figure() 
+        self.fig = Figure()
 #        self.mpl = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])#
 #        self.mpl21 = self.fig.add_subplot(211)
 
@@ -73,7 +73,7 @@ class MplWidget(QWidget):
         self.mplToolbar = MyMplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
-        self.mplToolbar.enable_update(state = True) 
+        self.mplToolbar.enable_update(state = True)
 
         #=============================================
         # Widget layout with QHBox / QVBox
@@ -100,7 +100,7 @@ class MplWidget(QWidget):
         """
         if not self.mplToolbar.lock_zoom:
             for ax in self.fig.axes:
-                self.limits = ax.axis() # save old limits        
+                self.limits = ax.axis() # save old limits
 
 #------------------------------------------------------------------------------
     def redraw(self):
@@ -249,7 +249,7 @@ class MyMplToolbar(NavigationToolbar):
 
         # LOCK VIEW:
         self.a_lk = self.addAction(QIcon(':/lock-unlocked.svg'), \
-                                   'Lock / unlock zoom', self.toggle_lock_zoom)                
+                                   'Lock / unlock zoom', self.toggle_lock_zoom)
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
         self.a_lk.setToolTip('Lock current zoom setting')
@@ -271,10 +271,10 @@ class MyMplToolbar(NavigationToolbar):
         # SAVE:
         self.a_sv = self.addAction(QIcon(':/file.svg'), 'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
-        
+
         self.cb = None #will be used for the clipboard
         self.temp_file = os.path.join(pyfda_lib.get_home_dir(), 'tempMPL.png')
- 
+
         self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'Save', self.mpl2Clip)
         self.a_cb.setToolTip('Copy to clipboard in png format.')
         self.a_cb.setShortcut("Ctrl+C")
@@ -377,8 +377,8 @@ class MyMplToolbar(NavigationToolbar):
         self.grid = not self.grid
         for ax in self.parent.fig.axes:
             ax.grid(self.grid)
-        self.parent.pltCanv.draw() # don't use self.parent.redraw()      
-        
+        self.parent.pltCanv.draw() # don't use self.parent.redraw()
+
 #------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
         """
@@ -397,12 +397,13 @@ class MyMplToolbar(NavigationToolbar):
             self.a_lk.setIcon(QIcon(':/lock-unlocked.svg'))
             self.a_zo.setEnabled(True)
             self.a_pa.setEnabled(True)
-            self.a_fv.setEnabled(True)            
+            self.a_fv.setEnabled(True)
+
 #------------------------------------------------------------------------------
     def enable_update(self, state = None):
         """
-        Toggle the enable button and setting and enable / disable all 
-        buttons accordingly. 
+        Toggle the enable button and setting and enable / disable all
+        buttons accordingly.
         """
         if state is not None:
             self.enabled = state
@@ -412,7 +413,7 @@ class MyMplToolbar(NavigationToolbar):
             self.a_en.setIcon(QIcon(':/circle-check.svg'))
         else:
             self.a_en.setIcon(QIcon(':/circle-x.svg'))
-            
+
         self.a_ho.setEnabled(self.enabled)
         self.a_ba.setEnabled(self.enabled)
         self.a_fw.setEnabled(self.enabled)
@@ -420,13 +421,12 @@ class MyMplToolbar(NavigationToolbar):
         self.a_zo.setEnabled(self.enabled)
         self.a_fv.setEnabled(self.enabled)
         self.a_lk.setEnabled(self.enabled)
-        self.a_gr.setEnabled(self.enabled)        
+        self.a_gr.setEnabled(self.enabled)
         self.a_rd.setEnabled(self.enabled)
         self.a_sv.setEnabled(self.enabled)
         self.a_cb.setEnabled(self.enabled)
         self.a_op.setEnabled(self.enabled)
-        
-            
+
 #------------------------------------------------------------------------------
     def mpl2Clip(self):
         """
