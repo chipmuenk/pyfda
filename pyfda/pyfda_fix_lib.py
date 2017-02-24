@@ -188,6 +188,12 @@ class Fixed(object):
         >>> 
     
         """
+        y = np.real_if_close(y)
+        if np.iscomplexobj(y):
+            logger.warn("Casting complex values to real before quantization!")
+            print("complex!")
+            y = y.real()
+            
         try:
             _ = len(y)
         except TypeError: # exception -> y is scalar:   
