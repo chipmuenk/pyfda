@@ -248,8 +248,8 @@ class MyMplToolbar(NavigationToolbar):
         self.a_fv.setToolTip('Zoom to full extent')
 
         # LOCK VIEW:
-        self.a_lk = self.addAction(QIcon(':/lock-locked.svg'), \
-                                   'Lock zoom', self.toggle_lock_zoom)                
+        self.a_lk = self.addAction(QIcon(':/lock-unlocked.svg'), \
+                                   'Lock / unlock zoom', self.toggle_lock_zoom)                
         self.a_lk.setCheckable(True)
         self.a_lk.setChecked(False)
         self.a_lk.setToolTip('Lock current zoom setting')
