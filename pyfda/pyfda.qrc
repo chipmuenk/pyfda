@@ -6,6 +6,7 @@
     <file alias="brush.svg">images/icons/brush.svg</file>
     <file alias="camera-slr.svg">images/icons/camera-slr.svg</file>
     <file alias="circle-check.svg">images/icons/circle-check.svg</file>
+    <file alias="circle-x.svg">images/icons/circle-x.svg</file>    
     <file alias="clipboard.svg">images/icons/clipboard.svg</file>
     <file alias="cog.svg">images/icons/cog.svg</file>
     <file alias="download.svg">images/icons/data-transfer-download.svg</file>
@@ -16,6 +17,7 @@
     <file alias="grid-four-up.svg">images/icons/grid-four-up.svg</file>
     <file alias="home.svg">images/icons/home.svg</file>
     <file alias="lock-locked.svg">images/icons/lock-locked.svg</file>
+    <file alias="lock-unlocked.svg">images/icons/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/magnifying-glass.svg</file>
     <file alias="move.svg">images/icons/move.svg</file>
     <file alias="minus.svg">images/icons/minus.svg</file>
@@ -42,7 +44,6 @@ fullscreen-exit.svg
 graph.svg
 grid-four-up.svg
 headphones.svg
-lock-unlocked.svg
 microphone.svg
 
 reload.svg
