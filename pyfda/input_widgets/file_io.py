@@ -394,11 +394,11 @@ class File_IO(QWidget):
         """
 
         frmt = fb.fil[0]['q_coeff']['frmt'] # store old format
-        fb.fil[0]['q_coeff']['frmt'] = 'dec' # 'hex'
+        fb.fil[0]['q_coeff']['frmt'] = 'int' # 'hex'
         qc = fix_lib.Fixed(fb.fil[0]['q_coeff'])
         bq = qc.fix(fb.fil[0]['ba'][0]) # Quantize coefficients to integer format
         coe_width = qc.QF + qc.QI + 1 # quantized word length; Int. + Frac. + Sign bit
-        if fb.fil[0]['q_coeff']['frmt'] == 'dec':
+        if fb.fil[0]['q_coeff']['frmt'] == 'int':
             coe_radix = 10
         else:
             coe_radix = 16

@@ -78,7 +78,7 @@ class Fixed(object):
         Overflow behaviour ('wrap', 'sat', ...)
         
     frmt : string
-        target output format ('frac', 'dec', 'bin')
+        target output format ('frac', 'int', 'bin', 'hex')
 
     N_over : integer
         total number of overflows
@@ -241,8 +241,9 @@ class Fixed(object):
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.overfl))
                 return None
-
-        if self.frmt in {'dec', 'hex', 'bin'}:
+        if self.frmt == 'frac':
+                return yq
+        if self.frmt in {'hex', 'bin', 'int'}:
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
         if self.frmt == 'hex':
             vhex = np.vectorize(hex) # vectorize python hex function for use with numpy array
@@ -252,6 +253,7 @@ class Fixed(object):
         if self.frmt == 'bin':
             return np.binary_repr(yq, width=(self.QF + self.QI + 1))
         elif self.frmt in {'frac', 'dec'}:
+        elif self.frmt == 'int':
             return yq
         else:
             # float.hex() ?
