@@ -246,19 +246,25 @@ class Fixed(object):
         if self.frmt in {'hex', 'bin', 'int'}:
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
         if self.frmt == 'hex':
-            vhex = np.vectorize(hex) # vectorize python hex function for use with numpy array
- # TODO           not quite: neg. hex numbers should be written as twos complemente
-            # http://stackoverflow.com/questions/16427073/signed-integer-to-twos-complement-hexadecimal
-            return vhex(yq)
-        if self.frmt == 'bin':
-            return np.binary_repr(yq, width=(self.QF + self.QI + 1))
-        elif self.frmt in {'frac', 'dec'}:
+            vhex = np.vectorize(self.hex2)
+            return vhex(yq, width = self.W)
+        elif self.frmt == 'bin':
+            return np.binary_repr(yq, width=self.W)
         elif self.frmt == 'int':
             return yq
         else:
             # float.hex() ?
             raise Exception('Unknown output format "%s"!'%(self.format))
             return None
+
+   
+    def hex2(self, val, width):
+            """
+            Display negative hex values in Two's complement format
+            """
+            return "{0:x}".format((val + (1 << width)) % (1 << width))
+         
+#==============================================================================
             
             
     def resetN(self):
