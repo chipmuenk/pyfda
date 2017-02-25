@@ -272,6 +272,9 @@ class FilterCoeffs(QWidget):
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         
         self.clipboard = QApplication.clipboard()
+        
+        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
+
 
         # ============== UI Layout =====================================
         layHChkBoxes = QHBoxLayout()
@@ -366,7 +369,13 @@ class FilterCoeffs(QWidget):
         self.butSave.clicked.connect(self._save_entries)
         butClear.clicked.connect(self._clear_table)
         butSetZero.clicked.connect(self._set_coeffs_zero)
-
+        
+        self.cmbFormat.currentIndexChanged.connect(self._store_q_settings)
+        self.cmbQOvfl.currentIndexChanged.connect(self._store_q_settings)
+        self.cmbQQuant.currentIndexChanged.connect(self._store_q_settings)
+        self.ledQuantF.editingFinished.connect(self._store_q_settings)
+        self.ledQuantI.editingFinished.connect(self._store_q_settings)
+        
         butQuant.clicked.connect(self.quant_coeffs)
 
         self.tblCoeff.cellChanged.connect(self._copy_item)
@@ -414,8 +423,7 @@ class FilterCoeffs(QWidget):
             
         fb.fil[0]['ft'] = ft
         self.tblCoeff.setColumnCount(self.col)
-
-                
+        
         self.load_dict()
 
 #------------------------------------------------------------------------------
@@ -440,13 +448,6 @@ class FilterCoeffs(QWidget):
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))            
             self.tblCoeff.setVisible(True)
             
-
-            q_coeff = fb.fil[0]['q_coeff']
-            self.ledQuantI.setText(str(q_coeff['QI']))
-            self.ledQuantF.setText(str(q_coeff['QF']))
-            self.cmbQQuant.setCurrentIndex(self.cmbQQuant.findText(q_coeff['quant']))
-            self.cmbQOvfl.setCurrentIndex(self.cmbQOvfl.findText(q_coeff['ovfl']))
-
             # check whether filter is FIR and only needs one column
             if fb.fil[0]['ft'] == 'FIR':
                 self.num_cols = 1
@@ -511,11 +512,7 @@ class FilterCoeffs(QWidget):
         self.ba[1] = np.array(fb.fil[0]['ba'][1], dtype = complex)
         
         # set comboBoxes from dictionary
-        self.ledQuantI.setText(str(fb.fil[0]['q_coeff']['QI']))
-        self.ledQuantF.setText(str(fb.fil[0]['q_coeff']['QF']))
-        set_cmb_box(self.cmbQQuant, fb.fil[0]['q_coeff']['quant']) 
-        set_cmb_box(self.cmbQOvfl, fb.fil[0]['q_coeff']['ovfl'])
-        set_cmb_box(self.cmbFormat, fb.fil[0]['q_coeff']['frmt']) 
+        self._load_q_settings()
                 
         self._refresh_table()
         style_widget(self.butSave, 'normal')
@@ -549,9 +546,10 @@ class FilterCoeffs(QWidget):
         style_widget(self.butSave, 'changed')
 
 #------------------------------------------------------------------------------
-    def _read_q_settings(self):
+    def _store_q_settings(self):
         """
-        read out the settings of the quantization comboboxes
+        read out the settings of the quantization comboboxes and store them in 
+        filter dict. Update the fixpoint object.
         """                         
         fb.fil[0]["q_coeff"] = {
                 'QI':int(self.ledQuantI.text()),
@@ -560,6 +558,21 @@ class FilterCoeffs(QWidget):
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText()
                 }
+        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
+        
+#------------------------------------------------------------------------------
+    def _load_q_settings(self):
+        """
+        load the quantization settings from the filter dict and set the widgets
+        accordingly. Update the fixpoint object.
+        """                         
+        q_coeff = fb.fil[0]['q_coeff']
+        self.ledQuantI.setText(str(q_coeff['QI']))
+        self.ledQuantF.setText(str(q_coeff['QF']))                
+        set_cmb_box(self.cmbQQuant, q_coeff['quant']) 
+        set_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
+        set_cmb_box(self.cmbFormat, q_coeff['frmt']) 
+
         self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
 
 #------------------------------------------------------------------------------
