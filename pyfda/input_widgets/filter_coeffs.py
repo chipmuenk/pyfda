@@ -67,7 +67,6 @@ class ItemDelegate(QStyledItemDelegate):
             """
             Display negative hex values in Two's complement format
             """
-#            return hex((val + (1 << nbits)) % (1 << nbits))
             return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
         if not isinstance(text, six.text_type): #
@@ -76,17 +75,21 @@ class ItemDelegate(QStyledItemDelegate):
 
         W = fb.fil[0]['q_coeff']['QI'] + fb.fil[0]['q_coeff']['QF'] + 1
 
-        dec = int(safe_eval(text) * 2**W)
+        y = safe_eval(text)
+        dec = int( y * 2**W)
         dec_digits = int(np.ceil(np.log10(2 ** W))+2) # required number of digits for dec. repr.
+
 
         if idx == 0: # fractional format
             return "{:#.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
         elif idx == 1: # decimal format
             return "{0:{1}}".format(dec, dec_digits)# , n_digits = int(np.ceil(np.log10(2 ** W))))
-        elif idx == 2: # hex format
-            return "{0}".format(tohex(dec, W))
+#        elif idx == 2: # hex format
+#            return "{0}".format(tohex(dec, W))
         else:
-            return "{0}".format(np.binary_repr(dec, width = W))
+            return "{0}".format(self.coeff_inst.myQ.fix(y))
+#            return "{0}".format(np.binary_repr(dec, width = W))
+ # TODO: change completely to fix(y)       
 
 
 class FilterCoeffs(QWidget):
