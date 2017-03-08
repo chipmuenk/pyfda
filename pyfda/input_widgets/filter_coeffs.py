@@ -78,6 +78,20 @@ class ItemDelegate(QStyledItemDelegate):
             return "{0:>{1}}".format(self.parent.myQ.fix(y), self.parent.myQ.digits)       
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
+#    def createEditor(self, parent, options, index):
+#       # default editor is QLineEdit
+#        return QTextEdit(parent)
+#
+#    def setEditorData(self, editor, index):
+#        editor.setText(index.data())
+
+    def setModelData(self, editor, model, index):
+#        if isinstance(editor, QtGui.QTextEdit):
+#            model.setData(index, editor.toPlainText())
+        if isinstance(editor, QComboBox):
+            model.setData(index, editor.currentText())
+        else:
+            super(ItemDelegate, self).setModelData(editor, model, index)
 
 class FilterCoeffs(QWidget):
     """
