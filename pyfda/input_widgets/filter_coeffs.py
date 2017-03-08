@@ -797,25 +797,16 @@ class FilterCoeffs(QWidget):
         """
         Quantize all coefficients and refresh table
         """
-        # define + instantiate fixed-point object
-        self._read_q_settings()
+
+        self._store_q_settings() # read comboboxes and store  setting in filter dict
+        # (re)define + instantiate fixed-point object        
+        for i in range(len(self.ba[0])):
+            self.ba[0][i] = self.myQ.fix(self.ba[0][i])
+            print(self.ba[0][i])
+#        self.ba = self.myQ.fix(self.ba)
         
-        self.myQ.fix(self.ba)
-        
+        style_widget(self.butSave, 'changed')        
         self._refresh_table()
-        
-#        num_rows, num_cols = self.tblCoeff.rowCount(),\
-#                                        self.tblCoeff.columnCount()
-#        for col in range(num_cols):
-#            for row in range(num_rows):
-#                item = self.tblCoeff.item(row, col)
-#                if item:
-#                    item.setText(str(self.myQ.fix(safe_eval(item.text()))))
-#                else:
-#                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
-#
-#        self.tblCoeff.resizeColumnsToContents()
-#        self.tblCoeff.resizeRowsToContents()
 
 #------------------------------------------------------------------------------
 
