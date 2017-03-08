@@ -215,13 +215,15 @@ class Fixed(object):
             logger.warn("Casting complex values to real before quantization!")
             print("complex!")
             y = y.real()
-            
+
         try:
             _ = len(y)
         except TypeError: # exception -> y is scalar:   
+            SCALAR = True
             over_pos = over_neg = yq = 0
         else: # no exception -> y is array:
             # create empty arrays for result and overflows with same shape as y
+            SCALAR = False
             y = np.asarray(y)
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
@@ -268,9 +270,15 @@ class Fixed(object):
         if self.frmt in {'hex', 'bin', 'int'}:
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
         if self.frmt == 'hex':
-            return vhex2(yq, nbits=self.W)
+            if SCALAR:
+                return hex2(yq, nbits=self.W)
+            else:
+                return vhex2(yq, nbits=self.W)
         elif self.frmt == 'bin':
-            return vbin(yq, width=self.W)
+            if SCALAR:
+                 return np.binary_repr(yq, width=self.W)
+            else:
+                return vbin(yq, width=self.W)
         elif self.frmt == 'int':
             return yq
         else:
