@@ -373,7 +373,6 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.itemChanged.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
         self.butEnable.clicked.connect(self._refresh_table)
-        self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.butClipboard.clicked.connect(self._copy_to_clipboard)
 
@@ -575,6 +574,7 @@ class FilterCoeffs(QWidget):
                 'frmt':self.cmbFormat.currentText()
                 }
         self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
+        self._refresh_table()
         
 #------------------------------------------------------------------------------
     def _load_q_settings(self):
