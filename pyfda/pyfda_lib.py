@@ -136,10 +136,7 @@ def read_cmb_box(cmb_box):
     """
     idx = cmb_box.currentIndex()
     cmb_data = cmb_box.itemData(idx)
-#        if hasattr(cmb_data, Qt.QVariant):
     if not isinstance(cmb_data, six.text_type):
-#        if not isinstance(cmb_data, six.string_types):
-#        if not isinstance(cmb_data, str):
         cmb_data = cmb_data.toString() # needed for Python 2
     cmb_data = str(cmb_data)
 
