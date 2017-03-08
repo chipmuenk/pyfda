@@ -188,9 +188,6 @@ class Fixed(object):
         >>> 
     
         """
-        self.W = self.QF + self.QI + 1 # total number of bits
-        W_dec = np.ceil(self.W * np.log10(2.)) # max. digits required for decimal repr.
-        W_hex = np.ceil(self.W / 4.) # max. digits required for hex repr.
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
             logger.warn("Casting complex values to real before quantization!")
@@ -256,7 +253,6 @@ class Fixed(object):
         elif self.frmt == 'int':
             return yq
         else:
-            # float.hex() ?
             raise Exception('Unknown output format "%s"!'%(self.format))
             return None
 
