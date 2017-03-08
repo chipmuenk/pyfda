@@ -725,10 +725,14 @@ class FilterCoeffs(QWidget):
         test and equalize if b and a subarray have different lengths:
         """
         D = len(self.ba[0]) - len(self.ba[1])
-        if D > 0:
+            
+        if D > 0: # b is longer than a
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
-        elif D < 0:
-            self.ba[0] = np.append(self.ba[0], np.zeros(-D))
+        elif D < 0: # a is longer than b
+            if fb.fil[0] == 'IIR':
+                self.ba[0] = np.append(self.ba[0], np.zeros(-D))
+            else:
+                self.ba[1] = self.ba[1][:D] # discard last D elements of a
 
 #------------------------------------------------------------------------------
     def _delete_cells(self):
@@ -744,6 +748,7 @@ class FilterCoeffs(QWidget):
         sel = self._get_selected(self.tblCoeff)['sel'] # get indices of all selected cells
 
         self.ba[0] = np.delete(self.ba[0], sel[0])
+#        if fb.fil[0]['ft'] == 'IIR': # not necessary?
         self.ba[1] = np.delete(self.ba[1], sel[1])
 
         # test and equalize if b and a array have different lengths:
