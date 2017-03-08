@@ -72,7 +72,7 @@ class ItemDelegate(QStyledItemDelegate):
         y = safe_eval(text)
 
         if frmt == 'frac': # fractional format
-            return "{:0.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
+            return "{0:.{1}g}".format(safe_eval(text), params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.fix(y), self.parent.myQ.digits)       
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
