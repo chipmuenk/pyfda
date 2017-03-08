@@ -270,7 +270,7 @@ class Fixed(object):
         if self.frmt == 'hex':
             return vhex2(yq, nbits=self.W)
         elif self.frmt == 'bin':
-            return np.binary_repr(yq, width=self.W)
+            return vbin(yq, width=self.W)
         elif self.frmt == 'int':
             return yq
         else:
