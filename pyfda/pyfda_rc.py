@@ -411,6 +411,12 @@ qss_common = """
                     }
 
                 /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
+                
+                QPushButton
+                {
+                width: 20px;
+                height: 20px;
+                }
 
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);

@@ -112,7 +112,7 @@ class FilterCoeffs(QWidget):
         """
         bfont = QFont()
         bfont.setBold(True)
-        q_icon_size = QSize(20, 20)
+#        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
 #==============================================================================
 #          #Which Button holds the longest Text?
@@ -136,6 +136,7 @@ class FilterCoeffs(QWidget):
         # ---------------------------------------------
         self.butEnable = QPushButton(self)
         self.butEnable.setIcon(QIcon(':/circle-check.svg'))
+        q_icon_size = self.butEnable.iconSize() # <- uncomment this for manual sizing
         self.butEnable.setIconSize(q_icon_size)
         self.butEnable.setCheckable(True)
         self.butEnable.setChecked(True)
