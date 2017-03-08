@@ -276,16 +276,8 @@ class Fixed(object):
         else:
             raise Exception('Unknown output format "%s"!'%(self.format))
             return None
-
-   
-    def hex2(self, val, width):
-            """
-            Display negative hex values in Two's complement format
-            """
-            return "{0:x}".format((val + (1 << width)) % (1 << width))
          
-#==============================================================================
-            
+#==============================================================================            
             
     def resetN(self):
         """ Reset overflow-counters of Fixed object"""
