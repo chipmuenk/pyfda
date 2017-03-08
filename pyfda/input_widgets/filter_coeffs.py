@@ -37,7 +37,6 @@ from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
@@ -132,14 +131,23 @@ class FilterCoeffs(QWidget):
 #         #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 # 
 #==============================================================================
+        # ---------------------------------------------
+        # UI Elements for controlling the display
+        # ---------------------------------------------
         self.butEnable = QPushButton(self)
         self.butEnable.setIcon(QIcon(':/circle-check.svg'))
         self.butEnable.setIconSize(q_icon_size)
         self.butEnable.setCheckable(True)
         self.butEnable.setChecked(True)
         self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
-                "For high order systems, this might be slow. </span>")
+                "For high order systems, this might be slow.</span>")
 
+        self.butQEnable = QPushButton(self)
+        self.butQEnable.setIcon(QIcon(':/menu.svg'))
+        self.butQEnable.setIconSize(q_icon_size)
+        self.butQEnable.setCheckable(True)
+        self.butQEnable.setChecked(True)
+        self.butQEnable.setToolTip("<span>Show quantization options.</span>")
 
         self.cmbFormat = QComboBox(self)
         qFormat = ['Frac', 'Int', 'Hex', 'Bin']
@@ -154,19 +162,23 @@ class FilterCoeffs(QWidget):
         self.spnRound.setValue(params['FMT_ba'])
         self.spnRound.setToolTip("Display <i>d</i> digits.")
         
-        self.butClipboard = QPushButton(self)
-        self.butClipboard.setIcon(QIcon(':/clipboard.svg'))
-        self.butClipboard.setIconSize(q_icon_size)
-        self.butClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
-                            "displayed. When nothing is selected, the whole table "
-                            "is copied with full precision in decimal format. </span>")
-        
+        layHDisplay = QHBoxLayout()
+        layHDisplay.setAlignment(Qt.AlignLeft)
+        layHDisplay.addWidget(self.butEnable)
+        layHDisplay.addWidget(self.butQEnable)
+        layHDisplay.addWidget(self.cmbFormat)
+        layHDisplay.addWidget(self.lblRound)
+        layHDisplay.addWidget(self.spnRound)
+        layHDisplay.addStretch()        
+
+        # ---------------------------------------------
+        # UI Elements for loading / storing
+        # ---------------------------------------------        
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
         self.cmbFilterType.addItems(["FIR","IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
 
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setAlternatingRowColors(True)
@@ -219,6 +231,24 @@ class FilterCoeffs(QWidget):
         butClear.setToolTip("Clear all entries.")
         #butClear.setMaximumWidth(ButLength)
 
+        self.butClipboard = QPushButton(self)
+        self.butClipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.butClipboard.setIconSize(q_icon_size)
+        self.butClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
+                            "displayed. When nothing is selected, the whole table "
+                            "is copied with full precision in decimal format. </span>")
+
+        layHButtonsCoeffs1 = QHBoxLayout()
+        layHButtonsCoeffs1.addWidget(butAddCells)
+        layHButtonsCoeffs1.addWidget(butDelCells)
+        layHButtonsCoeffs1.addWidget(butClear)
+        layHButtonsCoeffs1.addWidget(self.butSave)
+        layHButtonsCoeffs1.addWidget(butLoad)
+        layHButtonsCoeffs1.addWidget(self.butClipboard)
+        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
+        layHButtonsCoeffs1.addStretch()
+#---------------------------------------------------------
+        
         butSetZero = QPushButton("= 0", self)
         butSetZero.setToolTip("<span>Set coefficients = 0 with a magnitude &lt; &epsilon;.</span>")
         butSetZero.setIconSize(q_icon_size)
@@ -281,25 +311,7 @@ class FilterCoeffs(QWidget):
 
 
         # ============== UI Layout =====================================
-        layHChkBoxes = QHBoxLayout()
-        layHChkBoxes.setAlignment(Qt.AlignLeft)
-        layHChkBoxes.addWidget(self.butEnable)
-        layHChkBoxes.addWidget(self.cmbFormat)
-        layHChkBoxes.addWidget(self.lblRound)
-        layHChkBoxes.addWidget(self.spnRound)
-        layHChkBoxes.addWidget(self.butClipboard)
-        layHChkBoxes.addStretch()        
 
-
-        layHButtonsCoeffs1 = QHBoxLayout()
-        layHButtonsCoeffs1.addWidget(butAddCells)
-        layHButtonsCoeffs1.addWidget(butDelCells)
-        layHButtonsCoeffs1.addWidget(butClear)
-
-        layHButtonsCoeffs1.addWidget(self.butSave)
-        layHButtonsCoeffs1.addWidget(butLoad)
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
-        layHButtonsCoeffs1.addStretch()
 
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(butSetZero)
@@ -331,7 +343,7 @@ class FilterCoeffs(QWidget):
         
 
         layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHChkBoxes)  
+        layVBtns.addLayout(layHDisplay)  
         layVBtns.addLayout(layHButtonsCoeffs1)
         layVBtns.addLayout(layHButtonsCoeffs2)
         layVBtns.addWidget(self.frmQSettings)
