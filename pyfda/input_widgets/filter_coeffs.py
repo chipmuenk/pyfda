@@ -62,12 +62,7 @@ class ItemDelegate(QStyledItemDelegate):
 
 
     def displayText(self, text, locale):
-
-        def tohex(val, nbits):
-            """
-            Display negative hex values in Two's complement format
-            """
-            return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
+        """
 
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3

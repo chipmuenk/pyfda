@@ -20,6 +20,13 @@ import numpy as np
 from numpy import binary_repr
 __version__ = 0.4
 
+def hex2(val, nbits):
+    """
+    Return `val` in hex format with a wordlength of `nbits`. In contrast to hex(),   
+    negative values are returned in two's complement format 
+    """
+    return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
+
 #------------------------------------------------------------------------
 class Fixed(object):    
     """
