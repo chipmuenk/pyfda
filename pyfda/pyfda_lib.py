@@ -120,9 +120,9 @@ def extract_file_ext(file_type):
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
 #------------------------------------------------------------------------------
-def read_cmb_box(cmb_box):
+def get_cmb_box(cmb_box, data=True):
     """
-    Read out current itemData of comboBox and convert it to string.
+    Get current itemData or Text of comboBox and convert it to string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
@@ -132,12 +132,16 @@ def read_cmb_box(cmb_box):
 
     Returns:
     
-    The current setting of combobox as string
+    The current text or data of combobox as a string
     """
-    idx = cmb_box.currentIndex()
-    cmb_data = cmb_box.itemData(idx)
-    if not isinstance(cmb_data, six.text_type):
-        cmb_data = cmb_data.toString() # needed for Python 2
+    if data:
+        idx = cmb_box.currentIndex()
+        cmb_data = cmb_box.itemData(idx)
+        if not isinstance(cmb_data, six.text_type):
+            cmb_data = cmb_data.toString() # needed for Python 2
+    else:
+        cmb_data = cmb_box.currentText()
+        
     cmb_data = str(cmb_data)
 
     return cmb_data

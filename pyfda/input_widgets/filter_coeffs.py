@@ -33,7 +33,7 @@ from ..compat import (Qt, QApplication, QWidget, QLabel, QLineEdit, QComboBox,
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box
+from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, get_cmb_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
@@ -67,7 +67,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
-        frmt = str(self.parent.cmbFormat.currentText()).lower()
+        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
   
         y = safe_eval(text)
 
