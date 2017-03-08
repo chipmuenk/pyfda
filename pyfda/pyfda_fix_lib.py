@@ -268,7 +268,7 @@ class Fixed(object):
         if self.frmt in {'hex', 'bin', 'int'}:
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
         if self.frmt == 'hex':
-            return vhex(yq, width = self.W)
+            return vhex2(yq, nbits=self.W)
         elif self.frmt == 'bin':
             return np.binary_repr(yq, width=self.W)
         elif self.frmt == 'int':
