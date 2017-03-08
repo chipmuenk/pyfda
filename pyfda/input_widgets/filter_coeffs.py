@@ -808,7 +808,8 @@ class FilterCoeffs(QWidget):
         # (re)define + instantiate fixed-point object        
         for i in range(len(self.ba[0])):
             self.ba[0][i] = self.myQ.fix(self.ba[0][i])
-            print(self.ba[0][i])
+            if i > 0: # don't quantize first "1" in denonimator polynome
+                self.ba[1][i] = self.myQ.fix(self.ba[1][i])
 #        self.ba = self.myQ.fix(self.ba)
         
         style_widget(self.butSave, 'changed')        
