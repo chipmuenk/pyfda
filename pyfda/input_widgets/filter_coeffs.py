@@ -53,38 +53,30 @@ class ItemDelegate(QStyledItemDelegate):
     QString, next to a "normal" non-unicode string.
 
     """
-    def __init__(self, parent, inst):
+    def __init__(self, parent):
         """
-        pass instance using this class as a parameter to access attributes here
+        Pass instance `parent` of parent class
         """
         super(ItemDelegate, self).__init__(parent)
-        self.coeff_inst = inst
+        self.parent = parent # instance of the parent (not the base) class
 
 
     def displayText(self, text, locale):
         """
+        Return `text` in the number format selected in `parent.cmbFormat`.
+        """
 
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
-        idx = self.coeff_inst.cmbFormat.currentIndex()
-
-        W = fb.fil[0]['q_coeff']['QI'] + fb.fil[0]['q_coeff']['QF'] + 1
-
+        frmt = str(self.parent.cmbFormat.currentText()).lower()
+  
         y = safe_eval(text)
-        dec = int( y * 2**W)
-        dec_digits = int(np.ceil(np.log10(2 ** W))+2) # required number of digits for dec. repr.
 
-
-        if idx == 0: # fractional format
-            return "{:#.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
-        elif idx == 1: # decimal format
-            return "{0:{1}}".format(dec, dec_digits)# , n_digits = int(np.ceil(np.log10(2 ** W))))
-#        elif idx == 2: # hex format
-#            return "{0}".format(tohex(dec, W))
+        if frmt == 'frac': # fractional format
+            return "{:0.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_ba'])
         else:
-            return "{0}".format(self.coeff_inst.myQ.fix(y))
-#            return "{0}".format(np.binary_repr(dec, width = W))
- # TODO: change completely to fix(y)       
+            return "{0:>{1}}".format(self.parent.myQ.fix(y), self.parent.myQ.digits)       
+# see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
 
 class FilterCoeffs(QWidget):
@@ -170,7 +162,7 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
 #        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work like intended
-        self.tblCoeff.setItemDelegate(ItemDelegate(self, self))
+        self.tblCoeff.setItemDelegate(ItemDelegate(self))
 
 
         butAddCells = QPushButton(self)

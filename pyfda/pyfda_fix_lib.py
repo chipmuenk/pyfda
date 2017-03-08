@@ -68,7 +68,7 @@ class Fixed(object):
     * **'frmt'** : Output format, optional; default = 'frac'
 
       - 'frac' : (default) return result as a fraction
-      - 'dec'  : return result in decimal form, scaled by :math:`2^{WF}`
+      - 'int'  : return result in integer form, scaled by :math:`2^{WF}`
       - 'bin'  : return result as binary string, scaled by :math:`2^{WF}`
       - 'hex'  : return result as hex string, scaled by :math:`2^{WF}`
         
@@ -150,10 +150,22 @@ class Fixed(object):
         self.frmt = str(q_obj['frmt']).lower()
         self.QF = q_obj['QF']
         self.QI = q_obj['QI']
+        self.W = self.QF + self.QI + 1
         
         self.LSB  = 2. ** (-q_obj['QF']) # value of LSB = 2 ^ (-WF)
         self.MSB  = 2. ** q_obj['QI']    # value of MSB = 2 ^ WI
-        
+
+        if self.frmt == 'int':
+            self.digits = int(np.ceil(np.log10(self.W) * np.log10(2.))) # required number of digits for dec. repr.
+        elif self.frmt == 'bin':
+            self.digits = self.W # required number of digits for bin. repr.
+        elif self.frmt == 'hex':
+            self.digits = int(np.ceil(self.W / 4.)) # required number of digits for hex. repr.
+        elif self.frmt == 'frac':
+            self.digits = 4
+        else:
+            raise Exception(u'Unknown format "%s"!'%(self.frmt))
+
 
     def fix(self, y):
         """
