@@ -19,11 +19,13 @@
     <file alias="lock-locked.svg">images/icons/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/magnifying-glass.svg</file>
+    <file alias="menu.svg">images/icons/menu.svg</file>
     <file alias="move.svg">images/icons/move.svg</file>
     <file alias="minus.svg">images/icons/minus.svg</file>
     <file alias="plus.svg">images/icons/plus.svg</file>
     <file alias="trash.svg">images/icons/trash.svg</file>
     <file alias="upload.svg">images/icons/data-transfer-upload.svg</file>
+    <file alias="wrench.svg">images/icons/wrench.svg</file>
 
     <file alias="pyfda_icon.svg">images/icons/pyfda_icon.svg</file>
 </qresource>
@@ -51,7 +53,6 @@ resize-both.svg
 resize-height.svg
 resize-width.svg
 star.svg
-wrench.svg
 -->
 
 
