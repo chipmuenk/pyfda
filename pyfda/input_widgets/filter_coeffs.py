@@ -129,6 +129,8 @@ class FilterCoeffs(QWidget):
 # 
 #         #Calculate the length for the buttons based on the longest ButtonText
 #         #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
+#        butDelCell.setText(butTexts[1])
+#        butDelCell.setMaximumWidth(ButLength)
 # 
 #==============================================================================
         # ---------------------------------------------
@@ -195,42 +197,31 @@ class FilterCoeffs(QWidget):
         butAddCells = QPushButton(self)
         butAddCells.setIcon(QIcon(':/plus.svg'))
         butAddCells.setIconSize(q_icon_size)
-        # butAddRow.setText(butTexts[0])
         butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
                                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                                 "When nothing is selected, add a row at the end.</SPAN>")
-#        butAddRow.setMaximumWidth(ButLength)
 
         butDelCells = QPushButton(self)
         butDelCells.setIcon(QIcon(':/minus.svg'))
         butDelCells.setIconSize(q_icon_size)        
         butDelCells.setToolTip("<span>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells.</span>")
-#        butDelCell.setText(butTexts[1])
-        #butDelCell.setMaximumWidth(ButLength)
 
         self.butSave = QPushButton(self)
-        # butSave.setText(butTexts[2])
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
         self.butSave.setToolTip("<span>Save coefficients and update all plots. "
                                 "No modifications are saved before!</span>")
 
-        #butSave.setMaximumWidth(ButLength)
-
         butLoad = QPushButton(self)
         butLoad.setIcon(QIcon(':/download.svg'))
         butLoad.setIconSize(q_icon_size)
-        # butLoad.setText(butTexts[3])
         butLoad.setToolTip("Reload coefficients.")
-        #butLoad.setMaximumWidth(ButLength)
 
         butClear = QPushButton(self)
         butClear.setIcon(QIcon(':/trash.svg'))
         butClear.setIconSize(q_icon_size)
-        # butClear.setText(butTexts[4])
         butClear.setToolTip("Clear all entries.")
-        #butClear.setMaximumWidth(ButLength)
 
         self.butClipboard = QPushButton(self)
         self.butClipboard.setIcon(QIcon(':/clipboard.svg'))
@@ -253,7 +244,6 @@ class FilterCoeffs(QWidget):
         butSetZero = QPushButton("= 0", self)
         butSetZero.setToolTip("<span>Set coefficients = 0 with a magnitude &lt; &epsilon;.</span>")
         butSetZero.setIconSize(q_icon_size)
-#        butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel(self)
         self.lblEps.setText("for b, a <")
@@ -266,9 +256,6 @@ class FilterCoeffs(QWidget):
         butQuant.setToolTip("Quantize coefficients with selected settings.")
         butQuant.setText("Q!")
         butQuant.setIconSize(q_icon_size)
-
-#        butQuant.setText(butTexts[6])
-#        butQuant.setMaximumWidth(ButLength)
 
         self.lblQIQF  = QLabel("QI.QF = ")
         self.lblQOvfl = QLabel("Ovfl.:")
@@ -308,7 +295,7 @@ class FilterCoeffs(QWidget):
         
         self.clipboard = QApplication.clipboard()
         
-        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
+        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object
 
 
         # ============== UI Layout =====================================
