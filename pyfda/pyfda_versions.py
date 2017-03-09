@@ -11,14 +11,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 # ================ Required Modules ============================
-try:
-    from numpy import __version__ as VERSION_NP
-    from scipy import __version__ as VERSION_SCI
-    from matplotlib import __version__ as VERSION_MPL
-    from .compat import QT_VERSION_STR
-    from xyz import monkey
-except ImportError as e:
-    print("Fatal - required module not found:\n", e )
+from numpy import __version__ as VERSION_NP
+from scipy import __version__ as VERSION_SCI
+from matplotlib import __version__ as VERSION_MPL
+from .compat import QT_VERSION_STR # imports pyQt
 
 VERSION = {}
 VERSION.update({'python_long': sys.version})
