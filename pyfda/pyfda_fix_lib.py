@@ -31,6 +31,7 @@ def hex2(val, nbits):
 
 vbin  = np.vectorize(np.binary_repr)
 vhex2 = np.vectorize(hex2)
+mybin = np.frompyfunc(np.binary_repr, 2, 1)
 
 #------------------------------------------------------------------------
 class Fixed(object):    
@@ -106,6 +107,9 @@ class Fixed(object):
         
     MSB : float
         value of most significant bit (MSB)
+        
+    digits : integer (read only)
+        number of digits required for selected number format and wordlength
         
     Notes
     -----
@@ -216,19 +220,27 @@ class Fixed(object):
         if np.iscomplexobj(y):
             logger.warn("Casting complex values to real before quantization!")
             print("complex!")
+            # quantizing complex objects is not supported yet
             y = y.real()
 
-        try:
-            _ = len(y)
-        except TypeError: # exception -> y is scalar:   
-            SCALAR = True
-            over_pos = over_neg = yq = 0
-        else: # no exception -> y is array:
-            # create empty arrays for result and overflows with same shape as y
+        if np.shape(y):
+            # create empty arrays for result and overflows with same shape as y for speedup
             SCALAR = False
-            y = np.asarray(y)
+            y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
+        else:
+            SCALAR = True
+            over_pos = over_neg = yq = 0
+#        except TypeError: # exception -> y is scalar or singleton array  
+#            SCALAR = True
+#            over_pos = over_neg = yq = 0
+#        else: # no exception -> y is array:
+#            # create empty arrays for result and overflows with same shape as y for speedup
+#            SCALAR = False
+#            y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
+#            yq = np.zeros(y.shape)
+#            over_pos = over_neg = np.zeros(y.shape, dtype = bool)
         # Quantize inputs
         if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
              # largest integer i, such that i <= x (= binary truncation)
@@ -268,20 +280,25 @@ class Fixed(object):
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.overfl))
                 return None
+
+        if SCALAR and isinstance(yq, np.ndarray):
+            yq = yq.item() # convert singleton array to scalar
+        
         if self.frmt == 'frac':
-                return yq
+            return yq
         if self.frmt in {'hex', 'bin', 'int'}:
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
         if self.frmt == 'hex':
-            if SCALAR:
-                return hex2(yq, nbits=self.W)
-            else:
+            if not SCALAR:
                 return vhex2(yq, nbits=self.W)
-        elif self.frmt == 'bin':
-            if SCALAR:
-                 return np.binary_repr(yq, width=self.W)
             else:
-                return vbin(yq, width=self.W)
+                return hex2(yq, nbits=self.W)
+        elif self.frmt == 'bin':
+            return mybin(yq, self.W)
+#            if SCALAR:
+#                return np.binary_repr(yq, width=self.W)
+#            else:
+#                return vbin(yq, width=self.W)
         elif self.frmt == 'int':
             return yq
         else:
