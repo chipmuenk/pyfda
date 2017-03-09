@@ -183,9 +183,9 @@ class Fixed(object):
         
         Returns
         -------
-        yq : ndarray
-            The quantized input value(s) as an ndarray with np.float64. If this is
-            not what you want, see examples.
+        yq : float or ndarray with the same shape as y
+            The quantized input value(s) as a np.float64 or an ndarray with np.float64
+            If this is not what you want, see examples.
 
         Example:
         --------
@@ -243,7 +243,8 @@ class Fixed(object):
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
         
         # Handle Overflow / saturation        
-        if   self.ovfl == 'none': pass
+        if   self.ovfl == 'none': 
+            pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -self.MSB)
@@ -260,7 +261,7 @@ class Fixed(object):
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                    yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB)),
+                    yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+yq)/(2*self.MSB)),
                     yq)
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.overfl))
