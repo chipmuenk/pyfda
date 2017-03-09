@@ -466,7 +466,7 @@ class FilterCoeffs(QWidget):
 
             self.tblCoeff.setRowCount(self.num_rows)
             self.tblCoeff.setColumnCount(self.num_cols)
-            # create index strings for column 0, starting with 0
+            # Create strings for index column (vertical header), starting with "0"
             idx_str = [str(n) for n in range(self.num_rows)]
             self.tblCoeff.setVerticalHeaderLabels(idx_str)
 
@@ -554,7 +554,7 @@ class FilterCoeffs(QWidget):
         read out the settings of the quantization comboboxes and store them in 
         filter dict. Update the fixpoint object.
         """                         
-        fb.fil[0]["q_coeff"] = {
+        fb.fil[0]['q_coeff'] = {
                 'QI':int(self.ledQuantI.text()),
                 'QF':int(self.ledQuantF.text()),
                 'quant':self.cmbQQuant.currentText(),
@@ -791,8 +791,8 @@ class FilterCoeffs(QWidget):
         Quantize all coefficients and refresh table
         """
 
-        self._store_q_settings() # read comboboxes and store  setting in filter dict
-        # (re)define + instantiate fixed-point object        
+        self._store_q_settings() # read comboboxes and store setting in filter dict
+        # change output format to 'frac' for self.ba
         for i in range(len(self.ba[0])):
             self.ba[0][i] = self.myQ.fix(self.ba[0][i])
             if i > 0: # don't quantize first "1" in denonimator polynome
