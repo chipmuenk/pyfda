@@ -37,6 +37,14 @@ from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, get_
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
+# TODO: FIR / IIR chaos
+# TODO: Edit coefficients in the selected output format
+# TODO: Clipboard functionality
+# TODO: enable / disable buttons, clean up UI
+# TODO: what happens with complex / nearly real coefficients?
+# TODO: Set = 0 functionality not implemented
+# TODO: Buttons with <Q> etc -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
+
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the

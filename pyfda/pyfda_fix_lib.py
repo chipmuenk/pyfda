@@ -20,6 +20,8 @@ import numpy as np
 from numpy import binary_repr
 __version__ = 0.4
 
+# TODO: unify and test handling of scalar / array inputs and of vectorized functions
+
 def hex2(val, nbits):
     """
     Return `val` in hex format with a wordlength of `nbits`. In contrast to hex(),   
