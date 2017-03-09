@@ -450,14 +450,15 @@ class FilterCoeffs(QWidget):
             self.frmQSettings.setVisible(True)
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))            
             self.tblCoeff.setVisible(True)
-            
+
+            self._load_q_settings()
+
             # check whether filter is FIR and only needs one column
             if fb.fil[0]['ft'] == 'FIR':
                 self.num_cols = 1
                 self.tblCoeff.setColumnCount(1)
                 self.tblCoeff.setHorizontalHeaderLabels(["b"])
                 set_cmb_box(self.cmbFilterType, 'FIR')
-
             else:
                 self.num_cols = 2
                 self.tblCoeff.setColumnCount(2)
@@ -481,20 +482,19 @@ class FilterCoeffs(QWidget):
                         self.tblCoeff.setItem(row,col,QTableWidgetItem(
                               str(self.ba[col][row]).strip('()')))
                     self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight)
-                    
+
             self.tblCoeff.blockSignals(False)
 
             self.tblCoeff.resizeColumnsToContents()
             self.tblCoeff.resizeRowsToContents()
             self.tblCoeff.clearSelection()
-            
+
             self._copy_to_clipboard()
-            
+
         else:
             self.frmQSettings.setVisible(False)
             self.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(False)
-            
 
 #------------------------------------------------------------------------------
     def load_dict(self):
