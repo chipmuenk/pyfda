@@ -513,10 +513,10 @@ class FilterCoeffs(QWidget):
         self.ba = [0, 0]
         self.ba[0] = np.array(fb.fil[0]['ba'][0], dtype = complex)
         self.ba[1] = np.array(fb.fil[0]['ba'][1], dtype = complex)
-        
+
         # set comboBoxes from dictionary
         self._load_q_settings()
-                
+
         self._refresh_table()
         style_widget(self.butSave, 'normal')
 
@@ -792,7 +792,10 @@ class FilterCoeffs(QWidget):
         """
 
         self._store_q_settings() # read comboboxes and store setting in filter dict
-        # change output format to 'frac' for self.ba
+        # always save quantized coefficients in fractional format
+        # -> change output format to 'frac' before quantizing and storing in self.ba
+        self.myQ.frmt = 'frac'
+
         for i in range(len(self.ba[0])):
             self.ba[0][i] = self.myQ.fix(self.ba[0][i])
             if i > 0: # don't quantize first "1" in denonimator polynome
