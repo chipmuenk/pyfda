@@ -561,9 +561,9 @@ class FilterCoeffs(QWidget):
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText()
                 }
-        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
+        self.myQ.setQobj(fb.fil[0]['q_coeff'])
         self._refresh_table()
-        
+
 #------------------------------------------------------------------------------
     def _load_q_settings(self):
         """
@@ -577,7 +577,7 @@ class FilterCoeffs(QWidget):
         set_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         set_cmb_box(self.cmbFormat, q_coeff['frmt']) 
 
-        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"])
+        self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
