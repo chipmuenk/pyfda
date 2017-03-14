@@ -89,16 +89,39 @@ class ItemDelegate(QStyledItemDelegate):
 #       # default editor is QLineEdit
 #        return QTextEdit(parent)
 #
-#    def setEditorData(self, editor, index):
-#        editor.setText(index.data())
+    def setEditorData(self, editor, index):
+        data = qstr(index.data())
+        print(data, type(data))
+        
+        #editor.setText(index.data())
+
+        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
+        
+        if frmt == 'frac': # fractional format
+            editor.setText("{0:.{1}g}".format(safe_eval(data), params['FMT_ba']))
+        else:
+            editor.setText("{0:>{1}}".format(self.parent.myQ.fix(data), self.parent.myQ.digits))    
+
+        #editor.setText(index.data())
 
     def setModelData(self, editor, model, index):
+        """
+        set data that is returned to the model when editor has finished
+        
+        editor: instance of e.g. QLineEdit
+        model:  instance of QAbstractTableModel
+        index:  instance of QModelIndex
+        """
 #        if isinstance(editor, QtGui.QTextEdit):
 #            model.setData(index, editor.toPlainText())
+        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
         if isinstance(editor, QComboBox):
             model.setData(index, editor.currentText())
         else:
-            super(ItemDelegate, self).setModelData(editor, model, index)
+            if frmt != 'frac':
+                model.setData(index, editor.text())
+            else:
+                super(ItemDelegate, self).setModelData(editor, model, index)
 
 class FilterCoeffs(QWidget):
     """
