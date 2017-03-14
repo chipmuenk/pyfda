@@ -827,11 +827,12 @@ class FilterCoeffs(QWidget):
         # -> change output format to 'frac' before quantizing and storing in self.ba
         self.myQ.frmt = 'frac'
 
-        for i in range(len(self.ba[0])):
-            self.ba[0][i] = self.myQ.fix(self.ba[0][i])
-            if i > 0: # don't quantize first "1" in denonimator polynome
-                self.ba[1][i] = self.myQ.fix(self.ba[1][i])
-#        self.ba = self.myQ.fix(self.ba)
+#        for i in range(len(self.ba[0])):
+#            self.ba[0][i] = self.myQ.fix(self.ba[0][i])
+#            if i > 0: # don't quantize first "1" in denonimator polynome
+#                self.ba[1][i] = self.myQ.fix(self.ba[1][i])
+        self.ba = self.myQ.fix(self.ba)
+        self.ba[1][0] = 1 # restore first "1" in denonimator polynome
         
         style_widget(self.butSave, 'changed')        
         self._refresh_table()
