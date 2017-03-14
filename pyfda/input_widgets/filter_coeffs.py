@@ -8,14 +8,7 @@ Tab-Widget for displaying and modifying filter coefficients
 """
 
 
-# TODO: FIR / IIR - Filter detection: Save always switches to IIR
-# TODO: Copy selection from table via QClipboard
-# TODO: Quantization
-# TODO: number of digits is limited to 12?!
-# TODO: File filter_pz.py", line 412, in _copy_item
-#    self.zpk[col][row] = safe_eval(item.text())
-# TypeError: can't convert complex to float
-#Fehler tritt nur auf wenn Tabellenwerte vorher reell waren?!
+
 	
 
 from __future__ import print_function, division, unicode_literals, absolute_import
@@ -37,14 +30,16 @@ from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, get_
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
+# TODO: FIR / IIR - Filter detection: Save always switches to IIR -> _filter_type
+# TODO: Copy selection from table via QClipboard
+# TODO: number of digits is limited to 12?!
 # TODO: FIR / IIR chaos
 # TODO: Edit coefficients in the selected output format
 # TODO: Clipboard functionality
 # TODO: enable / disable buttons, clean up UI
 # TODO: what happens with complex / nearly real coefficients?
-# TODO: Set = 0 functionality not implemented
 # TODO: Buttons with <Q> etc -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
-
+# TODO: Auto-Width (min. number of QI)
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
