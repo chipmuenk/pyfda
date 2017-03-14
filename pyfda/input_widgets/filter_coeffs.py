@@ -9,7 +9,7 @@ Tab-Widget for displaying and modifying filter coefficients
 
 
 
-	
+
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, six
@@ -71,13 +71,13 @@ class ItemDelegate(QStyledItemDelegate):
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
         frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
-  
+
         y = safe_eval(text)
 
         if frmt == 'frac': # fractional format
             return "{0:.{1}g}".format(safe_eval(text), params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.fix(y), self.parent.myQ.digits)       
+            return "{0:>{1}}".format(self.parent.myQ.fix(y), self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
 #    def createEditor(self, parent, options, index):
@@ -87,22 +87,22 @@ class ItemDelegate(QStyledItemDelegate):
     def setEditorData(self, editor, index):
         data = qstr(index.data())
         print(data, type(data))
-        
+
         #editor.setText(index.data())
 
         frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
-        
+
         if frmt == 'frac': # fractional format
             editor.setText("{0:.{1}g}".format(safe_eval(data), params['FMT_ba']))
         else:
-            editor.setText("{0:>{1}}".format(self.parent.myQ.fix(data), self.parent.myQ.digits))    
+            editor.setText("{0:>{1}}".format(self.parent.myQ.fix(data), self.parent.myQ.digits))
 
         #editor.setText(index.data())
 
     def setModelData(self, editor, model, index):
         """
         set data that is returned to the model when editor has finished
-        
+
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
         index:  instance of QModelIndex
@@ -117,6 +117,7 @@ class ItemDelegate(QStyledItemDelegate):
                 model.setData(index, editor.text())
             else:
                 super(ItemDelegate, self).setModelData(editor, model, index)
+
 
 class FilterCoeffs(QWidget):
     """
@@ -146,18 +147,18 @@ class FilterCoeffs(QWidget):
 #         longestText = ""
 #         ButLength = 0
 #         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
-# 
+#
 #         # Find the longest text + padding for subsequent bounding box calculation
 #         for item in butTexts:
 #             if len(item) > MaxTextlen:
 #                 MaxTextlen = len(item)
 #                 longestText = item + "mm" # this is the longest text + padding for
-# 
+#
 #         #Calculate the length for the buttons based on the longest ButtonText
 #         #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 #        butDelCell.setText(butTexts[1])
 #        butDelCell.setMaximumWidth(ButLength)
-# 
+#
 #==============================================================================
         # ---------------------------------------------
         # UI Elements for controlling the display
@@ -190,7 +191,7 @@ class FilterCoeffs(QWidget):
         self.spnRound.setRange(0,16)
         self.spnRound.setValue(params['FMT_ba'])
         self.spnRound.setToolTip("Display <i>d</i> digits.")
-        
+
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
@@ -198,11 +199,11 @@ class FilterCoeffs(QWidget):
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.spnRound)
-        layHDisplay.addStretch()        
+        layHDisplay.addStretch()
 
         # ---------------------------------------------
         # UI Elements for loading / storing
-        # ---------------------------------------------        
+        # ---------------------------------------------
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
@@ -229,7 +230,7 @@ class FilterCoeffs(QWidget):
 
         butDelCells = QPushButton(self)
         butDelCells.setIcon(QIcon(':/minus.svg'))
-        butDelCells.setIconSize(q_icon_size)        
+        butDelCells.setIconSize(q_icon_size)
         butDelCells.setToolTip("<span>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells.</span>")
 
@@ -266,7 +267,7 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addStretch()
 #---------------------------------------------------------
-        
+
         butSetZero = QPushButton("= 0", self)
         butSetZero.setToolTip("<span>Set coefficients = 0 with a magnitude &lt; &epsilon;.</span>")
         butSetZero.setIconSize(q_icon_size)
@@ -318,9 +319,9 @@ class FilterCoeffs(QWidget):
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        
+
         self.clipboard = QApplication.clipboard()
-        
+
         self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object
 
 
@@ -340,24 +341,24 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs3.addWidget(self.lblDot)
         layHButtonsCoeffs3.addWidget(self.ledQuantF)
         layHButtonsCoeffs3.addStretch()
-        
+
         layHButtonsCoeffs4 = QHBoxLayout()
         layHButtonsCoeffs4.addWidget(self.lblQOvfl)
         layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
         layHButtonsCoeffs4.addWidget(self.lblQuant)
         layHButtonsCoeffs4.addWidget(self.cmbQQuant)
         layHButtonsCoeffs4.addStretch()
-        
+
         layVButtonsQ = QVBoxLayout()
         layVButtonsQ.addLayout(layHButtonsCoeffs3)
         layVButtonsQ.addLayout(layHButtonsCoeffs4)
 
         self.frmQSettings = QFrame(self)
         self.frmQSettings.setLayout(layVButtonsQ)
-        
+
 
         layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHDisplay)  
+        layVBtns.addLayout(layHDisplay)
         layVBtns.addLayout(layHButtonsCoeffs1)
         layVBtns.addLayout(layHButtonsCoeffs2)
         layVBtns.addWidget(self.frmQSettings)
@@ -398,13 +399,13 @@ class FilterCoeffs(QWidget):
         self.butSave.clicked.connect(self._save_entries)
         butClear.clicked.connect(self._clear_table)
         butSetZero.clicked.connect(self._set_coeffs_zero)
-        
+
         self.cmbFormat.currentIndexChanged.connect(self._store_q_settings)
         self.cmbQOvfl.currentIndexChanged.connect(self._store_q_settings)
         self.cmbQQuant.currentIndexChanged.connect(self._store_q_settings)
         self.ledQuantF.editingFinished.connect(self._store_q_settings)
         self.ledQuantI.editingFinished.connect(self._store_q_settings)
-        
+
         butQuant.clicked.connect(self.quant_coeffs)
 
         self.tblCoeff.cellChanged.connect(self._copy_item)
@@ -413,11 +414,11 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _filter_type(self, fil_type=None):
         """
-        Get / set 'FIR' and 'IIR' filter type: 
+        Get / set 'FIR' and 'IIR' filter type:
             When type is not declared, read cmbFilterType combobox and set filter
             dict accordingly.
-            
-            When type is declared as 'auto', check whether all items of a = self.ba[1] 
+
+            When type is declared as 'auto', check whether all items of a = self.ba[1]
             are zero except for the first one. If true, it's an 'IIR', otherwise
             it's a 'FIR' filter.
             Set cmbFilterType combobox and filter dict accordingly.
@@ -433,7 +434,7 @@ class FilterCoeffs(QWidget):
                     ft = 'IIR'
                 else:
                     ft = 'FIR'
-                
+
             if fil_type == 'IIR': # filter type has been specified
                 ft = 'IIR'
             else:
@@ -449,10 +450,10 @@ class FilterCoeffs(QWidget):
             set_cmb_box(self.cmbFilterType, 'FIR')
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
-            
+
         fb.fil[0]['ft'] = ft
         self.tblCoeff.setColumnCount(self.col)
-        
+
         self.load_dict()
 
 #------------------------------------------------------------------------------
@@ -468,13 +469,13 @@ class FilterCoeffs(QWidget):
 
         params['FMT_ba'] = int(self.spnRound.text())
 
-        self.spnRound.setEnabled(self.cmbFormat.currentIndex() == 0) # only enabled for 
+        self.spnRound.setEnabled(self.cmbFormat.currentIndex() == 0) # only enabled for
         self.lblRound.setEnabled(self.cmbFormat.currentIndex() == 0) # format = decimal
-        
+
         if self.butEnable.isChecked():
 
             self.frmQSettings.setVisible(True)
-            self.butEnable.setIcon(QIcon(':/circle-check.svg'))            
+            self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(True)
 
             self._load_q_settings()
@@ -527,12 +528,12 @@ class FilterCoeffs(QWidget):
         """
         Load all entries from filter dict fb.fil[0]['ba'] into the shadow
         register self.ba and update the display.
-        
+
         The shadow register is a list of two ndarrays to allow different
-        lengths for b and a subarrays while adding / deleting items. 
+        lengths for b and a subarrays while adding / deleting items.
         The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
-        otherwise the filter dict would be modified inadvertedly. Enforcing the 
-        type np.complex is necessary, otherwise operations creating complex 
+        otherwise the filter dict would be modified inadvertedly. Enforcing the
+        type np.complex is necessary, otherwise operations creating complex
         coefficient values (or complex user entries) create errors.
         """
 
@@ -564,7 +565,7 @@ class FilterCoeffs(QWidget):
         col = self.tblCoeff.currentIndex().column()
         row = self.tblCoeff.currentIndex().row()
         item = self.tblCoeff.item(row,col)
-        
+
 
         if item:
             if item.text() != "":
@@ -577,9 +578,9 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
         """
-        read out the settings of the quantization comboboxes and store them in 
+        read out the settings of the quantization comboboxes and store them in
         filter dict. Update the fixpoint object.
-        """                         
+        """
         fb.fil[0]['q_coeff'] = {
                 'QI':int(self.ledQuantI.text()),
                 'QF':int(self.ledQuantF.text()),
@@ -595,13 +596,13 @@ class FilterCoeffs(QWidget):
         """
         load the quantization settings from the filter dict and set the widgets
         accordingly. Update the fixpoint object.
-        """                         
+        """
         q_coeff = fb.fil[0]['q_coeff']
         self.ledQuantI.setText(str(q_coeff['QI']))
-        self.ledQuantF.setText(str(q_coeff['QF']))                
-        set_cmb_box(self.cmbQQuant, q_coeff['quant']) 
+        self.ledQuantF.setText(str(q_coeff['QF']))
+        set_cmb_box(self.cmbQQuant, q_coeff['quant'])
         set_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
-        set_cmb_box(self.cmbFormat, q_coeff['frmt']) 
+        set_cmb_box(self.cmbFormat, q_coeff['frmt'])
 
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
@@ -647,14 +648,14 @@ class FilterCoeffs(QWidget):
     def _clear_table(self):
         """
         Clear table & initialize coeff for two poles and zeros @ origin,
-        a = b = [1; 0; 0]. Initialize with dtype complex to avoid errors 
+        a = b = [1; 0; 0]. Initialize with dtype complex to avoid errors
         if the data type becomes complex later on.
         """
         self.ba = np.array([[1, 0, 0], [1, 0, 0]], dtype = np.complex)
 
         self._refresh_table()
         style_widget(self.butSave, 'changed')
-        
+
 #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
@@ -663,6 +664,7 @@ class FilterCoeffs(QWidget):
         text = ""
         tab = "\t"
         cr = "\n"
+
         sel = self._get_selected(self.tblCoeff)
         if not np.any(sel): # nothing selected
             for r in range(self.num_rows - 1):
@@ -670,16 +672,16 @@ class FilterCoeffs(QWidget):
                     text += str(self.ba[c][r])
                     if c != self.num_cols:
                         text += tab
-                if r != self.num_rows:        
+                if r != self.num_rows:
                     text += cr
         else:
             pass
 
         self.clipboard.setText(text)
-        
+
         #self.textLabel.setText(self.clipboard.text())
-                
-        
+
+
 #==============================================================================
 #         void MyTableWidget::keyPressEvent(QKeyEvent* event) {
 #     // If Ctrl-C typed
@@ -688,7 +690,7 @@ class FilterCoeffs(QWidget):
 #     {
 #         QModelIndexList cells = selectedIndexes();
 #         qSort(cells); // Necessary, otherwise they are in column order
-# 
+#
 #         QString text;
 #         int currentRow = 0; // To determine when to insert newlines
 #         foreach (const QModelIndex& cell, cells) {
@@ -704,7 +706,7 @@ class FilterCoeffs(QWidget):
 #             currentRow = cell.row();
 #             text += cell.data().toString();
 #         }
-# 
+#
 #         QApplication::clipboard()->setText(text);
 #     }
 # }
@@ -739,7 +741,7 @@ class FilterCoeffs(QWidget):
         test and equalize if b and a subarray have different lengths:
         """
         D = len(self.ba[0]) - len(self.ba[1])
-            
+
         if D > 0: # b is longer than a
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
         elif D < 0: # a is longer than b
@@ -769,7 +771,7 @@ class FilterCoeffs(QWidget):
         self._equalize_ba_length()
         self._refresh_table()
         style_widget(self.butSave, 'changed')
-        
+
 
 #------------------------------------------------------------------------------
     def _add_cells(self):
@@ -778,17 +780,17 @@ class FilterCoeffs(QWidget):
         zeros. If nothing is selected, add one row at the bottom.
         """
         # get indices of all selected cells
-        sel = self._get_selected(self.tblCoeff)['sel'] 
+        sel = self._get_selected(self.tblCoeff)['sel']
 
         if not np.any(sel):
             sel[0] = [len(self.ba[0])]
             sel[1] = [len(self.ba[1])]
 
         self.ba[0] = np.insert(self.ba[0], sel[0], 0)
-        self.ba[1] = np.insert(self.ba[1], sel[1], 0)                
-            
+        self.ba[1] = np.insert(self.ba[1], sel[1], 0)
+
         # insert 'sel' contiguous rows  before 'row':
-        # self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))        
+        # self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))
 
         self._equalize_ba_length()
         self._refresh_table()
@@ -815,7 +817,7 @@ class FilterCoeffs(QWidget):
 
         style_widget(self.butSave, 'changed')
         self._refresh_table()
-        
+
 #------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
@@ -833,8 +835,8 @@ class FilterCoeffs(QWidget):
 #                self.ba[1][i] = self.myQ.fix(self.ba[1][i])
         self.ba = self.myQ.fix(self.ba)
         self.ba[1][0] = 1 # restore first "1" in denonimator polynome
-        
-        style_widget(self.butSave, 'changed')        
+
+        style_widget(self.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
