@@ -13,14 +13,8 @@ from __future__ import division, print_function, unicode_literals
 import logging
 logger = logging.getLogger(__name__)
 
-
 import numpy as np
-#from numpy import (pi, log10, exp, sqrt, sin, cos, tan, angle, arange,
-#                   linspace, array, zeros, ones)
-from numpy import binary_repr
 __version__ = 0.4
-
-# TODO: unify and test handling of scalar / array inputs and of vectorized functions
 
 def hex2(val, nbits):
     """
@@ -29,9 +23,12 @@ def hex2(val, nbits):
     """
     return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
-vbin  = np.vectorize(np.binary_repr)
-vhex2 = np.vectorize(hex2)
-mybin = np.frompyfunc(np.binary_repr, 2, 1)
+#vbin  = np.vectorize(np.binary_repr)
+#vhex2 = np.vectorize(hex2)
+
+# define ufuncs using numpys automatic typecasting
+bin2_u = np.frompyfunc(np.binary_repr, 2, 1)
+hex2_u = np.frompyfunc(hex2, 2, 1)
 
 #------------------------------------------------------------------------
 class Fixed(object):    
@@ -298,12 +295,13 @@ class Fixed(object):
         if self.frmt in {'hex', 'bin', 'int'}:
             yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
         if self.frmt == 'hex':
-            if not SCALAR:
-                return vhex2(yq, nbits=self.W)
-            else:
-                return hex2(yq, nbits=self.W)
+            return hex2_u(yq, self.W)
+#            if not SCALAR:
+#                return vhex2(yq, nbits=self.W)
+#            else:
+#                return hex2(yq, nbits=self.W)
         elif self.frmt == 'bin':
-            return mybin(yq, self.W)
+            return bin2_u(yq, self.W)
 #            if SCALAR:
 #                return np.binary_repr(yq, width=self.W)
 #            else:
