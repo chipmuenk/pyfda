@@ -800,17 +800,22 @@ class FilterCoeffs(QWidget):
         Set all coefficients = 0 in table with a magnitude less than eps
         """
         eps = float(self.ledSetEps.text())
-        num_rows, num_cols = self.tblCoeff.rowCount(),\
-                                        self.tblCoeff.columnCount()
-        for col in range(num_cols):
-            for row in range(num_rows):
-                item = self.tblCoeff.item(row, col)
-                if item:
-                    if abs(safe_eval(item.text())) < eps:
-                        item.setText(str(0.))
-                else:
-                    self.tblCoeff.setItem(row,col,QTableWidgetItem("0.0"))
+        sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
 
+        if not sel: # nothing selected, check whole table
+            self.ba[0] = self.ba[0] * np.logical_not(
+                                        np.isclose(self.ba[0], 0., rtol=0, atol = eps))
+            self.ba[1] = self.ba[1] * np.logical_not(
+                                        np.isclose(self.ba[1], 0., rtol=0, atol = eps))
+
+        else: # only check selected cells
+            for i in sel:
+                self.ba[i[0]][i[1]] = self.ba[i[0]][i[1]] * np.logical_not(
+                                         np.isclose(self.ba[i[0]][i[1]], 0., rtol=0, atol = eps))
+
+        style_widget(self.butSave, 'changed')
+        self._refresh_table()
+        
 #------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
