@@ -216,6 +216,24 @@ class Fixed(object):
         >>> 
     
         """
+
+        if np.shape(y):
+            # create empty arrays for result and overflows with same shape as y for speedup
+            SCALAR = False
+            y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
+            if y.dtype.type is np.string_:
+                np.char.replace(y, ' ', '') # remove all whitespace
+                y = y.astype(complex) # ensure that is y is a numeric type
+            yq = np.zeros(y.shape)
+            over_pos = over_neg = np.zeros(y.shape, dtype = bool)
+        else:
+            SCALAR = True
+            if isinstance(y, str):
+                y = y.replace(' ','') # whitespace is not allowed in complex number
+                y = complex(y)
+            over_pos = over_neg = yq = 0
+
+        # convert pseudo-complex (imag = 0) and complex values to real            
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
             logger.warn("Casting complex values to real before quantization!")
@@ -223,15 +241,6 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real()
 
-        if np.shape(y):
-            # create empty arrays for result and overflows with same shape as y for speedup
-            SCALAR = False
-            y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
-            yq = np.zeros(y.shape)
-            over_pos = over_neg = np.zeros(y.shape, dtype = bool)
-        else:
-            SCALAR = True
-            over_pos = over_neg = yq = 0
 #        except TypeError: # exception -> y is scalar or singleton array  
 #            SCALAR = True
 #            over_pos = over_neg = yq = 0
