@@ -199,16 +199,23 @@ class Fixed(object):
 
         if self.frmt == 'int':
             self.digits = int(np.ceil(np.log10(self.W) * np.log10(2.))) # required number of digits for dec. repr.
+            self.base = 10
         elif self.frmt == 'bin':
             self.digits = self.W # required number of digits for bin. repr.
+            self.base = 2
+        elif self.frmt == 'csd':
+            self.digits = self.W # required number of digits for bin. repr.
+            self.base = 2
         elif self.frmt == 'hex':
             self.digits = int(np.ceil(self.W / 4.)) # required number of digits for hex. repr.
+            self.base = 16
         elif self.frmt == 'frac':
             self.digits = 4
+            self.base = 0
         else:
             raise Exception(u'Unknown format "%s"!'%(self.frmt))
 
-
+#------------------------------------------------------------------------------       
     def fix(self, y):
         """
         Return fixed-point representation `yq` of `y` (scalar or array-like), 
