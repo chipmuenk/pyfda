@@ -257,6 +257,7 @@ class Fixed(object):
         """
 
         if np.shape(y):
+            print("array")
             # create empty arrays for result and overflows with same shape as y for speedup
             SCALAR = False
             y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
@@ -266,8 +267,11 @@ class Fixed(object):
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
         else:
+            print("scalar")
             SCALAR = True
-            if isinstance(y, str):
+            if not isinstance(y, (float, int, complex)):
+                y = qstr(y)
+#            if isinstance(y, str):
                 y = y.replace(' ','') # whitespace is not allowed in complex number
                 y = complex(y)
             over_pos = over_neg = yq = 0
@@ -325,8 +329,7 @@ class Fixed(object):
 
         return yq        
          
-#==============================================================================            
-            
+#------------------------------------------------------------------------------       
     def resetN(self):
         """ Reset overflow-counters of Fixed object"""
         self.N_over = 0
