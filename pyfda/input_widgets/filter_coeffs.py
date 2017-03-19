@@ -56,7 +56,7 @@ class ItemDelegate(QStyledItemDelegate):
     """
     def __init__(self, parent):
         """
-        Pass instance `parent` of parent class
+        Pass instance `parent` of parent class (FilterCoeffs)
         """
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
@@ -70,25 +70,33 @@ class ItemDelegate(QStyledItemDelegate):
         text:   string / QVariant to be rendered
         locale: locale for the text
         """ 
-        if not isinstance(text, six.text_type): #
-            text = text.toString() # needed for Python 2, doesn't work with Py3
-        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
+        text = qstr(text)
+#        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
 
         y = safe_eval(text)
 
-        if frmt == 'frac': # fractional format
-            return "{0:.{1}g}".format(safe_eval(text), params['FMT_ba'])
+#        if frmt == 'frac': # fractional format
+        if self.parent.myQ.frmt == 'frac':
+            return "{0:.{1}g}".format(y, params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.repr_fix(y), self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
-#    def createEditor(self, parent, options, index):
-#       # default editor is QLineEdit
-#        return QTextEdit(parent)
-#
+    def createEditor(self, parent, options, index):
+       # default editor is QLineEdit
+        return QLineEdit(parent)
+
     def setEditorData(self, editor, index):
+        """
+        pass the data to be edited to the editor
+        
+        editor: instance of e.g. QLineEdit
+        index:  instance of QModelIndex
+        """
         data = qstr(index.data())
         print(data, type(data))
+        print(index.column(), index.row())
+        print(self.parent.ba[index.column()][index.row()])
 
         #editor.setText(index.data())
 
@@ -113,14 +121,13 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        if isinstance(editor, QtGui.QTextEdit):
 #            model.setData(index, editor.toPlainText())
-        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
         if isinstance(editor, QComboBox):
             model.setData(index, editor.currentText())
         else:
-            if frmt != 'frac':
-                model.setData(index, editor.text())
-            else:
-                super(ItemDelegate, self).setModelData(editor, model, index)
+            text = qstr(editor.text())
+            model.setData(index, self.parent.myQ.fix_base(text))
+#            else:
+#                super(ItemDelegate, self).setModelData(editor, model, index)
 
 
 class FilterCoeffs(QWidget):
