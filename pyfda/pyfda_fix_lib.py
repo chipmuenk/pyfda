@@ -320,6 +320,38 @@ class Fixed(object):
         self.N_over = 0
         self.N_over_neg = 0
         self.N_over_pos = 0
+#------------------------------------------------------------------------------        
+    def repr_fix(self, y):
+        """
+        Return representation `yf` of `y` (scalar or array-like) in selected format
+        `yf.shape = y.shape`
+
+        Parameters
+        ----------        
+        y: scalar or array-like object in fractional format
+            to be transformed
+       
+        Returns
+        -------
+        yf: float or ndarray
+            with the same shape as `y`.
+            `yf` is formatted as set in `self.frmt` with `self.W` digits
+        """
+        yf = self.fix(y) # round / clip numbers
+        if self.frmt == 'frac':
+            return yf
+        if self.frmt in {'hex', 'bin', 'int'}:
+            yi = (np.round(yf * (1 << self.WF))).astype(int) # shift left by WF bits
+        if self.frmt == 'int':
+            return yi
+        elif self.frmt == 'hex':
+            return hex2_u(yi, self.W)
+        elif self.frmt == 'bin':
+            return bin2_u(yi, self.W)
+        else:
+            raise Exception('Unknown output format "%s"!'%(self.frmt))
+            return None
+
             
 class FIX_filt_MA(Fixed):
     """

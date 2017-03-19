@@ -77,7 +77,7 @@ class ItemDelegate(QStyledItemDelegate):
         if frmt == 'frac': # fractional format
             return "{0:.{1}g}".format(safe_eval(text), params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.fix(y), self.parent.myQ.digits)
+            return "{0:>{1}}".format(self.parent.myQ.repr_fix(y), self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
 #    def createEditor(self, parent, options, index):
@@ -95,7 +95,8 @@ class ItemDelegate(QStyledItemDelegate):
         if frmt == 'frac': # fractional format
             editor.setText("{0:.{1}g}".format(safe_eval(data), params['FMT_ba']))
         else:
-            editor.setText("{0:>{1}}".format(self.parent.myQ.fix(data), self.parent.myQ.digits))
+            editor.setText("{0:>{1}}".format(
+                    self.parent.myQ.repr_fix(data), self.parent.myQ.digits))
 
         #editor.setText(index.data())
 
