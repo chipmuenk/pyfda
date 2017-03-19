@@ -273,7 +273,7 @@ class Fixed(object):
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                    yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+yq)/(2*self.MSB)),
+                    yq - 2. * self.MSB*np.fix((np.sign(yq) * self.MSB+yq)/(2*self.MSB)),
                     yq)
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.overfl))
@@ -281,28 +281,8 @@ class Fixed(object):
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item() # convert singleton array to scalar
-        
-        if self.frmt == 'frac':
-            return yq
-        if self.frmt in {'hex', 'bin', 'int'}:
-            yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
-        if self.frmt == 'hex':
-            return hex2_u(yq, self.W)
-#            if not SCALAR:
-#                return vhex2(yq, nbits=self.W)
-#            else:
-#                return hex2(yq, nbits=self.W)
-        elif self.frmt == 'bin':
-            return bin2_u(yq, self.W)
-#            if SCALAR:
-#                return np.binary_repr(yq, width=self.W)
-#            else:
-#                return vbin(yq, width=self.W)
-        elif self.frmt == 'int':
-            return yq
-        else:
-            raise Exception('Unknown output format "%s"!'%(self.format))
-            return None
+
+        return yq        
          
 #==============================================================================            
             
