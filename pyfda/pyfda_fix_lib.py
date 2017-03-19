@@ -12,7 +12,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-__version__ = 0.4
+from .pyfda_lib import qstr
+__version__ = 0.5
 
 def hex2(val, nbits):
     """
@@ -25,8 +26,6 @@ def hex2(val, nbits):
     """
     return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
-#vbin  = np.vectorize(np.binary_repr)
-#vhex2 = np.vectorize(hex2)
 
 # define ufuncs using numpys automatic typecasting
 bin2_u = np.frompyfunc(np.binary_repr, 2, 1)
@@ -239,15 +238,6 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real()
 
-#        except TypeError: # exception -> y is scalar or singleton array  
-#            SCALAR = True
-#            over_pos = over_neg = yq = 0
-#        else: # no exception -> y is array:
-#            # create empty arrays for result and overflows with same shape as y for speedup
-#            SCALAR = False
-#            y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
-#            yq = np.zeros(y.shape)
-#            over_pos = over_neg = np.zeros(y.shape, dtype = bool)
         # Quantize inputs
         if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
              # largest integer i, such that i <= x (= binary truncation)
@@ -467,11 +457,7 @@ class FIX_filt_MA(Fixed):
 #
 #==============================================================================
              
-    
-# nested loop would be much slower!
-#  for k in range(Nx - len(bq)):
-#	for i in len(bq):
-#	  accu_q[k] = fixed(q_acc, (accu_q[k] + fixed(q_mul, x[k+i]*bq[i+1])))
+"""
 
 def csdigit(num, WI=0, WF=15):
     """
