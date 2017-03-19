@@ -1,12 +1,10 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #===========================================================================
-# dsp_fpga_fix_lib.py
 #
 # Fixpoint library for converting numpy scalars and arrays to quantized
 # numpy values
 #
-# (c) 2015 Christian Münker 
+# (c) 2015 - 2017 Christian Münker 
 #===========================================================================
 from __future__ import division, print_function, unicode_literals
 
@@ -18,8 +16,12 @@ __version__ = 0.4
 
 def hex2(val, nbits):
     """
-    Return `val` in hex format with a wordlength of `nbits`. In contrast to hex(),   
-    negative values are returned in two's complement format 
+    Return `val` in hex format with a wordlength of `nbits`. In contrast to the
+    built-in `hex()`, negative values are returned in two's complement format.
+
+    Returns
+    -------
+    A string in hex format
     """
     return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
@@ -175,20 +177,19 @@ class Fixed(object):
 
     def fix(self, y):
         """
-        Return fixed-point representation yq of y (scalar or array-like), 
+        Return fixed-point representation `yq` of `y` (scalar or array-like), 
         yq.shape = y.shape
 
         Parameters
         ----------        
-        y : scalar or array-like object
-            to be quantized
-    
+        y: scalar or array-like object
+            to be quantized in fractional format
         
         Returns
         -------
-        yq : float or ndarray with the same shape as y
-            The quantized input value(s) as a np.float64 or an ndarray with np.float64
-            If this is not what you want, see examples.
+        yq: float or ndarray
+            with the same shape as `y`.
+            The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
 
         Examples:
         ---------
