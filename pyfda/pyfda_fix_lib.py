@@ -459,128 +459,120 @@ class FIX_filt_MA(Fixed):
 #==============================================================================
              
 """
+ Canonical Signed Digit Functions
 
-def csdigit(num, WI=0, WF=15):
-    """
-     Returns the canonical signed digit representation of the input number.
-     Useful for simple DSP implementations of multipliers.
-        [digits,pos,neg,err]=csdigit(num,WI,WF)
-    
-     example csdigit(23) returns +0-00-.
-             Where +0-00-. is a representation of +1 in 2**5, -1 in 2**3 and -1 in 2**0 positions.
-             i.e. 23 = 32 - 8 -1
-    
-     example [a,p,n]=csdigit(23.5,6,2) returns
-                a = +0-000.-0
-                p=32
-                n=8.5
-                23.5 = 32 - 8 -.5
-    
-     num   : input number (decimal)
-     WI    : maximum digits to the left of the decimal point
-     WF    : digits to the right of decimal point
-     for example
-        csdigit(.25,2,2) represents xx.xx binary
-        csdigit(.25,0,4) represents .xxxx binary
-     Note: An error is generated if num does not fit inside the representation.
-           It is truncated to the specified resolution WF.
-     Note: A warning message is generated if num doesn't fit in the precision
-           specified. The returned value is truncated.
-     Note: The WI is not used except for a check for overflow and to add
-           leading zeros.
-    
-     Patrick J. Moran
-     AirSprite Technologies Inc.
-    
-     Copyright 2006, Patrick J. Moran for AirSprite Technologies Inc.
-     Redistribution and use in source and binary forms, with or without modification, 
-     are permitted provided that the following conditions are met:
-     
-        1. Redistributions of source code must retain the above copyright notice.
-        2. Any derivative of this work must credit the author, and must be made available to everyone.
-        3. The name of the author may not be used to endorse or promote products derived 
-           from this software without specific prior written permission.
-    
-     THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-     INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-     PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, 
-     INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-     OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY 
-     WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-     """
+ Handles:
+  * Decimals
+  *
+  *
 
-    def findstr(string, char):
-        """ return a list with the indices of all occurences of char in string """
-        idx = []
-        for i in range(len(string)):
-            if string[i] == char:
-                idx.append[i]
-        return idx
+ eg, +00-00+000.0 or 0.+0000-00+
+ Where: '+' is +1
+        '-' is -1
+
+ Harnesser
+ https://sourceforge.net/projects/pycsd/
+ License: GPL2
+"""
+
+def to_csd( num, places=0, debug=False ):
+    """ Convert the argument to CSD Format. """
+
+    if debug: print("Converting %f " % ( num ),)
+
+    # figure out binary range, special case for 0
+    if num == 0 :
+        return '0'
+    if np.fabs(num) < 1.0 :
+        n = 0
+    else :
+        n = np.ceil( np.log( np.fabs(num) * 3.0 / 2.0 , 2 ) )
+        
+    csd_digits = []
+
+    if debug: print("to %d.%d format" % ( n, places ))
+
+    # Hone in on the CSD code for the input number
+    remainder = num
+    previous_non_zero = False
+    n -= 1
+    
+    while( n >= -places):
             
-    if not num:
-        help(csdigit)
-        return
-    
-    targetNum=num;
-    num = abs(num)/(2**(-WF));
-    if num != np.floor(num):
-        if np.floor(num) == 0:
-            logger.error('Insufficient precision to represent this number!')
-        else:
-            logger.warning('Some precision has been lost. Returned value is truncated!')
-    
-    num = np.floor(num);
-    if num > 2**(WI+WF):
-        logger.error('Input number is too large for the requested bit representation.');
-    
-    binNum = np.binary_repr(num, WI + WF) # +1? 
-    digits=('0'+0) * np.ones(len(binNum))
-    #%allZeros=allZeros;
-    onesLoc = findstr(binNum, '1')
-    if onesLoc:
-        onesRun=find(diff(onesLoc)==1)
-        while not onesRun:
-            onesPointer=find(diff(onesLoc)==1)+1;
-            addIn=onesLoc(onesPointer(end));
-            adder=('0'+0)*np.ones(len(binNum))
-            adder[addIn]=('1'+0);
-            # keep track of the additional digits
-            digits[addIn]=('-'+0);
-            binAdder=char(adder);
-            binNum=dec2bin(bin2dec(binNum)+bin2dec(binAdder),WI+WF);
-            onesLoc=findstr(binNum,'1');
-            onesRun=find(diff(onesLoc)==1);
-            if len(binNum) > len(digits):
-                digits=['0'+0,digits] # add any additional leading zero
+        limit = pow(2.0,n+1) / 3.0
+
+        if debug: print ("  ", remainder, limit,)
+
+        # decimal point?
+        if n == -1 :
+            csd_digits.extend( ['.'] )
+
+        # convert the number
+        if previous_non_zero:
+            csd_digits.extend( ['0'] )
+            prev_non_zero = False
             
-    pos=bin2dec(binNum)*2**(-WF);
-    negLoc=find(digits==('-'+0));
-    neg=('0'+0) * np.ones(size(binNum));
-    neg[negLoc]='1'+0;
-    neg=bin2dec(char(neg))*2**(-WF);
-    digits[onesLoc]='+'+0;
-    if (len(digits)-WF)>WI:
-        logger.warning('Number overflowed for this CSD representation')
+        elif remainder > limit :
+            csd_digits.extend( ['+'] )
+            remainder -= pow(2.0, n )
+            prev_non_zero = True
+            
+        elif remainder < -limit :
+            csd_digits.extend( ['-'] )
+            remainder += pow(2.0, n )
+            prev_non_zero = True
+            
+        else :
+            csd_digits.extend( ['0'] )
+            prev_non_zero = False
+
+        n -= 1
+        
+        if debug: print(csd_digits)
+
+    # Always have something before the point
+    if np.fabs(num) < 1.0:
+        csd_digits.insert(0, '0')
+        
+    csd_str = "".join( csd_digits )
     
-    if len(digits)<WF:
-        digits=[digits,('0'+0) * np.ones(WF-len(digits))]
+    return csd_str
+
+
+
+def to_decimal( csd_str, debug=False ):
+    """ Convert the CSD string to a decimal """
+
+    if debug:
+        print ("Converting: ", csd_str)
+
+
+    #  Find out what the MSB power of two should be, keeping in
+    # mind we may have a fractional CSD number
+    try:
+        (m,n) = csd_str.split('.')
+        csd_str = csd_str.replace('.','') # get rid of point now...
+    except ValueError:
+        m = csd_str
+        n = ""
+        
+    msb_power = len(m)-1
     
-    #digits = char([digits[0:len(digits)-WF], '.'+0, digits[len(digits)-WF+1:-1])
-#    digits = char()
-    if targetNum < 0: # flip representation if negative
-        ntemp=neg
-        neg=pos
-        pos=ntemp
-        digits = strrep(digits,'+','p')
-        digits = strrep(digits,'-','+')
-        digits = strrep(digits,'p','-')
-    
-    # %digits=char(digits);
-    err = targetNum - (pos-neg)
-    
-    return (digits, pos, neg, err)
+    num = 0.0
+    for ii in xrange( len(csd_str) ):
+
+        power_of_two = 2.0**(msb_power-ii)
+        
+        if csd_str[ii] == '+' :
+            num += power_of_two
+        elif csd_str[ii] == '-' :
+            num -= power_of_two
+
+        if debug:
+            print('  "%s" (%d.%d); 2**%d = %d; Num=%f' % (
+                csd_str[ii], len(m), len(n), msb_power-ii, power_of_two, num))
+
+    return num    
 
 #######################################
 # If called directly, do some example #
