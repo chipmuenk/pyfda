@@ -15,7 +15,7 @@ import numpy as np
 from .pyfda_lib import qstr
 __version__ = 0.5
 
-def hex2(val, nbits):
+def hex_tc(val, nbits):
     """
     Return `val` in hex format with a wordlength of `nbits`. In contrast to the
     built-in `hex()`, negative values are returned in two's complement format.
@@ -28,8 +28,9 @@ def hex2(val, nbits):
 
 
 # define ufuncs using numpys automatic typecasting
-bin2_u = np.frompyfunc(np.binary_repr, 2, 1)
-hex2_u = np.frompyfunc(hex2, 2, 1)
+bin_u = np.frompyfunc(np.binary_repr, 2, 1)
+hex_tc_u = np.frompyfunc(hex_tc, 2, 1)
+int_tc_u = np.frompyfunc(int_tc, 3, 1)
 
 #------------------------------------------------------------------------
 class Fixed(object):    
@@ -335,9 +336,9 @@ class Fixed(object):
         if self.frmt == 'int':
             return yi
         elif self.frmt == 'hex':
-            return hex2_u(yi, self.W)
+            return hex_tc_u(yi, self.W)
         elif self.frmt == 'bin':
-            return bin2_u(yi, self.W)
+            return bin_u(yi, self.W)
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
             return None
