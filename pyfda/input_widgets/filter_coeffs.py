@@ -284,7 +284,7 @@ class FilterCoeffs(QWidget):
         butQuant.setText("Q!")
         butQuant.setIconSize(q_icon_size)
 
-        self.lblQIQF  = QLabel("QI.QF = ")
+        self.lblWIWF  = QLabel("WI.WF = ")
         self.lblQOvfl = QLabel("Ovfl.:")
         self.lblQuant = QLabel("Quant.:")
 
@@ -336,7 +336,7 @@ class FilterCoeffs(QWidget):
 
         layHButtonsCoeffs3 = QHBoxLayout()
         layHButtonsCoeffs3.addWidget(butQuant)
-        layHButtonsCoeffs3.addWidget(self.lblQIQF)
+        layHButtonsCoeffs3.addWidget(self.lblWIWF)
         layHButtonsCoeffs3.addWidget(self.ledQuantI)
         layHButtonsCoeffs3.addWidget(self.lblDot)
         layHButtonsCoeffs3.addWidget(self.ledQuantF)
@@ -582,8 +582,8 @@ class FilterCoeffs(QWidget):
         filter dict. Update the fixpoint object.
         """
         fb.fil[0]['q_coeff'] = {
-                'QI':int(self.ledQuantI.text()),
-                'QF':int(self.ledQuantF.text()),
+                'WI':int(self.ledQuantI.text()),
+                'WF':int(self.ledQuantF.text()),
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText()
@@ -598,8 +598,8 @@ class FilterCoeffs(QWidget):
         accordingly. Update the fixpoint object.
         """
         q_coeff = fb.fil[0]['q_coeff']
-        self.ledQuantI.setText(str(q_coeff['QI']))
-        self.ledQuantF.setText(str(q_coeff['QF']))
+        self.ledQuantI.setText(str(q_coeff['WI']))
+        self.ledQuantF.setText(str(q_coeff['WF']))
         set_cmb_box(self.cmbQQuant, q_coeff['quant'])
         set_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         set_cmb_box(self.cmbFormat, q_coeff['frmt'])
@@ -622,8 +622,8 @@ class FilterCoeffs(QWidget):
             fb.fil[0]['fc'] = 'Manual_FIR'
 
         fb.fil[0]["q_coeff"] = {
-                'QI':int(self.ledQuantI.text()),
-                'QF':int(self.ledQuantF.text()),
+                'WI':int(self.ledQuantI.text()),
+                'WF':int(self.ledQuantF.text()),
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText()

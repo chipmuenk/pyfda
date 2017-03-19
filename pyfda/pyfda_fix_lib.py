@@ -34,10 +34,10 @@ hex2_u = np.frompyfunc(hex2, 2, 1)
 class Fixed(object):    
     """
     Implement binary quantization of signed scalar or array-like objects 
-    in the form yq = QI.QF where QI and QF are the wordlength of integer resp. 
-    fractional part; total wordlength is W = QI + QF + 1 due to the sign bit.
+    in the form yq = WI.WF where WI and WF are the wordlength of integer resp. 
+    fractional part; total wordlength is W = WI + WF + 1 due to the sign bit.
     
-    q_obj = {'QI':1, 'QF':14, 'ovfl':'sat', 'quant':'round'} or
+    q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} or
     
     q_obj = {'Q':'1.14', 'ovfl':'sat', 'quant':'round'}
 
@@ -49,9 +49,9 @@ class Fixed(object):
     q_obj : dict 
         with 2 ... 4 elements defining quantization operation with the keys
             
-    * **'QI'** : integer word length, default: 0
+    * **'WI'** : integer word length, default: 0
       
-    * **'QF'** : fractional word length; default: 15; QI + QF + 1 = W (1 sign bit)
+    * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
       
     * **'quant'** : Quantization method, optional; default = 'floor'
       
@@ -133,19 +133,19 @@ class Fixed(object):
         store it as instance attribute
         """
         for key in q_obj.keys():
-            if key not in ['Q','QF','QI','quant','ovfl','frmt']:
+            if key not in ['Q','WF','WI','quant','ovfl','frmt']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
         # set default values for parameters if undefined:
         if 'Q' in q_obj:
             Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'         
-            q_obj['QI'] = int(Q_str[0])
-            q_obj['QF'] = int(Q_str[1])
+            q_obj['WI'] = int(Q_str[0])
+            q_obj['WF'] = int(Q_str[1])
         else:
-            if 'QI' not in q_obj: q_obj['QI'] = 0
-            else: q_obj['QI'] = int(q_obj['QI'])
-            if 'QF' not in q_obj: q_obj['QF'] = 15
-            else: q_obj['QF'] = int(q_obj['QF'])
+            if 'WI' not in q_obj: q_obj['WI'] = 0
+            else: q_obj['WI'] = int(q_obj['WI'])
+            if 'WF' not in q_obj: q_obj['WF'] = 15
+            else: q_obj['WF'] = int(q_obj['WF'])
         if 'quant' not in q_obj: q_obj['quant'] = 'floor'
         if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
         if 'frmt' not in q_obj: q_obj['frmt'] = 'frac'
@@ -154,12 +154,12 @@ class Fixed(object):
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt = str(q_obj['frmt']).lower()
-        self.QF = q_obj['QF']
-        self.QI = q_obj['QI']
-        self.W = self.QF + self.QI + 1
+        self.WF = q_obj['WF']
+        self.WI = q_obj['WI']
+        self.W = self.WF + self.WI + 1
         
-        self.LSB  = 2. ** (-q_obj['QF']) # value of LSB = 2 ^ (-WF)
-        self.MSB  = 2. ** q_obj['QI']    # value of MSB = 2 ^ WI
+        self.LSB  = 2. ** (-q_obj['WF']) # value of LSB = 2 ^ (-WF)
+        self.MSB  = 2. ** q_obj['WI']    # value of MSB = 2 ^ WI
 
         if self.frmt == 'int':
             self.digits = int(np.ceil(np.log10(self.W) * np.log10(2.))) # required number of digits for dec. repr.
@@ -190,10 +190,10 @@ class Fixed(object):
             The quantized input value(s) as a np.float64 or an ndarray with np.float64
             If this is not what you want, see examples.
 
-        Example:
-        --------
+        Examples:
+        ---------
           
-        >>> q_obj_a = {'QI':1, 'QF':6, 'ovfl':'sat', 'quant':'round'}
+        >>> q_obj_a = {'WI':1, 'WF':6, 'ovfl':'sat', 'quant':'round'}
         >>> myQa = Fixed(q_obj_a) # instantiate fixed-point object myQa
         >>> myQa.resetN()  # reset overflow counter
         >>> a = np.arange(0,5, 0.05) # create input signal
@@ -206,7 +206,7 @@ class Fixed(object):
         >>> b = np.arange(200, dtype = np.int16)
         >>> btype = np.result_type(b)
         >>> # MSB = 2**7, LSB = 2**2:
-        >>> q_obj_b = {'QI':7, 'QF':-2, 'ovfl':'wrap', 'quant':'round'} 
+        >>> q_obj_b = {'WI':7, 'WF':-2, 'ovfl':'wrap', 'quant':'round'} 
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
         >>> bq = myQb.fixed(b)
         >>> bq = bq.astype(btype) # restore original variable type
