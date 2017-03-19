@@ -332,6 +332,38 @@ class Fixed(object):
         self.N_over = 0
         self.N_over_neg = 0
         self.N_over_pos = 0
+
+#------------------------------------------------------------------------------       
+    def fix_base(self, y, frmt=None):
+        """
+        Return fixed-point representation `yq` of `y` (scalar or array-like), 
+        yq.shape = y.shape
+
+        Parameters
+        ----------        
+        y: scalar or array-like object
+            to be quantized with the numeric base specified by `frmt`.
+            
+        frmt: string (optional)
+            any of the formats `frac`, `int`, `bin`, `hex`)
+            When `frmt` is unspecified, the instance parameter `self.frmt` is used
+        
+        Returns
+        -------
+        yq: float or ndarray
+            with the same shape as `y`.
+            The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
+        """
+        if not frmt:
+            frmt = self.frmt
+        if frmt == 'frac':
+            return self.fix(y)
+        elif frmt in {'hex', 'bin', 'int'}:
+            return (int_tc_u(y, self.W, self.base) / (1 << self.WF))
+        else:
+            raise Exception('Unknown output format "%s"!'%(frmt))
+            return None
+
 #------------------------------------------------------------------------------        
     def repr_fix(self, y):
         """
