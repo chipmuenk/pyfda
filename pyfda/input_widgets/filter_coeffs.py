@@ -4,7 +4,7 @@ Created on Tue Nov 26 10:57:30 2013
 
 @author: Christian Muenker
 
-Tab-Widget for displaying and modifying filter coefficients
+Widget for displaying and modifying filter coefficients
 """
 
 
@@ -31,7 +31,6 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: FIR / IIR - Filter detection: Save always switches to IIR -> _filter_type
-# TODO: Copy selection from table via QClipboard
 # TODO: number of digits is limited to 12?!
 # TODO: FIR / IIR chaos
 # TODO: Edit coefficients in the selected output format
@@ -39,14 +38,14 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: enable / disable buttons, clean up UI
 # TODO: what happens with complex / nearly real coefficients?
 # TODO: Buttons with <Q> etc -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
-# TODO: Auto-Width (min. number of QI)
+# TODO: Auto-Width (min. number of WI)
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
     QTableWidget.
 
-    `displayText()` displays number with n_digits without sacrificing precision of
-    the data stored in the table.
+    `displayText()` displays the data stored in the table in various number formats
+    
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QTableWidgetItem and converted back when
@@ -65,9 +64,12 @@ class ItemDelegate(QStyledItemDelegate):
 
     def displayText(self, text, locale):
         """
-        Return `text` in the number format selected in `parent.cmbFormat`.
-        """
+        Return `text` in the number format selected in `parent.cmbFormat` for
+        display.
 
+        text:   string / QVariant to be rendered
+        locale: locale for the text
+        """ 
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
         frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
@@ -102,7 +104,8 @@ class ItemDelegate(QStyledItemDelegate):
 
     def setModelData(self, editor, model, index):
         """
-        set data that is returned to the model when editor has finished
+        Convert data that is returned to the model when editor has finished
+        back to fractional format.
 
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
