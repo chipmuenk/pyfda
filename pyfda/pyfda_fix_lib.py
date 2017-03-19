@@ -26,6 +26,40 @@ def hex_tc(val, nbits):
     """
     return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
+def int_tc(val, nbits, base):
+    """
+    Return `val` in int format with a wordlength of `nbits` and `base`. In 
+    contrast to int(), `val` is treated as two's complement number, i.e. the MSB
+    is regarded as a sign bit. When '
+
+    Parameters:
+    -----------
+    val: string
+            The value to be converted
+    
+    nbits: integer
+                wordlength
+                
+    base: integer
+                numeric base
+                
+    Returns:
+    --------
+    int2: integer
+            The result, converted to integer.
+    
+    """
+    nbits = int(abs(nbits))
+    base = int(abs(base))
+    if base not in {2, 10, 16}:
+        raise TypeError
+        return None
+    else:
+        i = int(val, base)
+        if i <= 0 or i < (1 << nbits): # less than 2 ^ nbits
+            return i
+        else:
+            return i - (1 << nbits) 
 
 # define ufuncs using numpys automatic typecasting
 bin_u = np.frompyfunc(np.binary_repr, 2, 1)
