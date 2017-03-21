@@ -61,10 +61,128 @@ def int_tc(val, nbits, base):
         else:
             return i - (1 << nbits) 
 
-# define ufuncs using numpys automatic typecasting
+"""
+ Canonical Signed Digit Functions
+
+ Handles:
+  * Decimals
+  *
+  *
+
+ eg, +00-00+000.0 or 0.+0000-00+
+ Where: '+' is +1
+        '-' is -1
+
+ Harnesser
+ https://sourceforge.net/projects/pycsd/
+ License: GPL2
+"""
+
+def dec2csd(num, places=0):
+    """ Convert the argument to CSD Format. """
+    debug=False 
+    if debug: print("Converting %f " % ( num ),)
+
+    # figure out binary range, special case for 0
+    if num == 0 :
+        return '0'
+    if np.fabs(num) < 1.0 :
+        n = 0
+    else:
+        n = np.ceil(np.log2(np.abs(num) * 1.5))
+        
+    csd_digits = []
+
+    if debug: print("to %d.%d format" % ( n, places ))
+
+    # Hone in on the CSD code for the input number
+    remainder = num
+    previous_non_zero = False
+    n -= 1
+    
+    while( n >= -places):
+            
+        limit = pow(2.0, n+1) / 3.0
+
+        if debug: print ("  ", remainder, limit,)
+
+        # decimal point?
+        if n == -1 :
+            csd_digits.extend( ['.'] )
+
+        # convert the number
+        if previous_non_zero:
+            csd_digits.extend( ['0'] )
+            prev_non_zero = False
+            
+        elif remainder > limit :
+            csd_digits.extend( ['+'] )
+            remainder -= pow(2.0, n )
+            prev_non_zero = True
+            
+        elif remainder < -limit :
+            csd_digits.extend( ['-'] )
+            remainder += pow(2.0, n )
+            prev_non_zero = True
+            
+        else :
+            csd_digits.extend( ['0'] )
+            prev_non_zero = False
+
+        n -= 1
+        
+        if debug: print(csd_digits)
+
+    # Always have something before the point
+    if np.fabs(num) < 1.0:
+        csd_digits.insert(0, '0')
+        
+    csd_str = "".join(csd_digits)
+    
+    return csd_str
+
+
+def csd2dec(csd_str):
+    debug=False 
+    """ Convert the CSD string to a decimal """
+
+    if debug:
+        print ("Converting: ", csd_str)
+
+    #  Find out what the MSB power of two should be, keeping in
+    # mind we may have a fractional CSD number
+    try:
+        (m,n) = csd_str.split('.')
+        csd_str = csd_str.replace('.','') # get rid of point now...
+    except ValueError:
+        m = csd_str
+        n = ""
+        
+    msb_power = len(m)-1
+    
+    num = 0.0
+    for ii in xrange( len(csd_str) ):
+
+        power_of_two = 2.0**(msb_power-ii)
+        
+        if csd_str[ii] == '+' :
+            num += power_of_two
+        elif csd_str[ii] == '-' :
+            num -= power_of_two
+
+        if debug:
+            print('  "%s" (%d.%d); 2**%d = %d; Num=%f' % (
+                csd_str[ii], len(m), len(n), msb_power-ii, power_of_two, num))
+
+    return num 
+#==============================================================================
+# Define ufuncs using numpys automatic type casting
+#==============================================================================
 bin_u = np.frompyfunc(np.binary_repr, 2, 1)
 hex_tc_u = np.frompyfunc(hex_tc, 2, 1)
 int_tc_u = np.frompyfunc(int_tc, 3, 1)
+csd2dec_u = np.frompyfunc(csd2dec, 1, 1)
+dec2csd_u = np.frompyfunc(dec2csd, 2, 1)
 
 #------------------------------------------------------------------------
 class Fixed(object):    
@@ -339,7 +457,7 @@ class Fixed(object):
 #------------------------------------------------------------------------------       
     def fix_base(self, y, frmt=None):
         """
-        Return fixed-point representation `yq` of `y` (scalar or array-like), 
+        Return fractional representation `yq` of `y` (scalar or array-like), 
         yq.shape = y.shape
 
         Parameters
@@ -354,7 +472,7 @@ class Fixed(object):
         Returns
         -------
         yq: float or ndarray
-            with the same shape as `y`.
+            with the same shape as `y` (fractional format).
             The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
         """
         if not frmt:
@@ -363,6 +481,9 @@ class Fixed(object):
             return self.fix(y)
         elif frmt in {'hex', 'bin', 'int'}:
             return (int_tc_u(y, self.W, self.base) / (1 << self.WF))
+        elif frmt == 'csd':
+            return csd2dec_u(y) / (1 << self.WF)
+            # TODO: check
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
@@ -387,7 +508,7 @@ class Fixed(object):
         yf = self.fix(y) # round / clip numbers
         if self.frmt == 'frac':
             return yf
-        if self.frmt in {'hex', 'bin', 'int'}:
+        if self.frmt in {'hex', 'bin', 'int', 'csd'}:
             yi = (np.round(yf * (1 << self.WF))).astype(int) # shift left by WF bits
         if self.frmt == 'int':
             return yi
@@ -395,6 +516,8 @@ class Fixed(object):
             return hex_tc_u(yi, self.W)
         elif self.frmt == 'bin':
             return bin_u(yi, self.W)
+        elif self.frmt == 'csd':
+            return dec2csd(yi, self.W)
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
             return None
@@ -514,121 +637,7 @@ class FIX_filt_MA(Fixed):
 #
 #==============================================================================
              
-"""
- Canonical Signed Digit Functions
-
- Handles:
-  * Decimals
-  *
-  *
-
- eg, +00-00+000.0 or 0.+0000-00+
- Where: '+' is +1
-        '-' is -1
-
- Harnesser
- https://sourceforge.net/projects/pycsd/
- License: GPL2
-"""
-
-def to_csd( num, places=0, debug=False ):
-    """ Convert the argument to CSD Format. """
-
-    if debug: print("Converting %f " % ( num ),)
-
-    # figure out binary range, special case for 0
-    if num == 0 :
-        return '0'
-    if np.fabs(num) < 1.0 :
-        n = 0
-    else :
-        n = np.ceil( np.log( np.fabs(num) * 3.0 / 2.0 , 2 ) )
-        
-    csd_digits = []
-
-    if debug: print("to %d.%d format" % ( n, places ))
-
-    # Hone in on the CSD code for the input number
-    remainder = num
-    previous_non_zero = False
-    n -= 1
-    
-    while( n >= -places):
-            
-        limit = pow(2.0,n+1) / 3.0
-
-        if debug: print ("  ", remainder, limit,)
-
-        # decimal point?
-        if n == -1 :
-            csd_digits.extend( ['.'] )
-
-        # convert the number
-        if previous_non_zero:
-            csd_digits.extend( ['0'] )
-            prev_non_zero = False
-            
-        elif remainder > limit :
-            csd_digits.extend( ['+'] )
-            remainder -= pow(2.0, n )
-            prev_non_zero = True
-            
-        elif remainder < -limit :
-            csd_digits.extend( ['-'] )
-            remainder += pow(2.0, n )
-            prev_non_zero = True
-            
-        else :
-            csd_digits.extend( ['0'] )
-            prev_non_zero = False
-
-        n -= 1
-        
-        if debug: print(csd_digits)
-
-    # Always have something before the point
-    if np.fabs(num) < 1.0:
-        csd_digits.insert(0, '0')
-        
-    csd_str = "".join( csd_digits )
-    
-    return csd_str
-
-
-
-def to_decimal( csd_str, debug=False ):
-    """ Convert the CSD string to a decimal """
-
-    if debug:
-        print ("Converting: ", csd_str)
-
-
-    #  Find out what the MSB power of two should be, keeping in
-    # mind we may have a fractional CSD number
-    try:
-        (m,n) = csd_str.split('.')
-        csd_str = csd_str.replace('.','') # get rid of point now...
-    except ValueError:
-        m = csd_str
-        n = ""
-        
-    msb_power = len(m)-1
-    
-    num = 0.0
-    for ii in xrange( len(csd_str) ):
-
-        power_of_two = 2.0**(msb_power-ii)
-        
-        if csd_str[ii] == '+' :
-            num += power_of_two
-        elif csd_str[ii] == '-' :
-            num -= power_of_two
-
-        if debug:
-            print('  "%s" (%d.%d); 2**%d = %d; Num=%f' % (
-                csd_str[ii], len(m), len(n), msb_power-ii, power_of_two, num))
-
-    return num    
+   
 
 #######################################
 # If called directly, do some example #
