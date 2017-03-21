@@ -70,16 +70,12 @@ class ItemDelegate(QStyledItemDelegate):
         text:   string / QVariant to be rendered
         locale: locale for the text
         """ 
-        text = qstr(text)
-#        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
+        data = qstr(text)
 
-        y = safe_eval(text)
-
-#        if frmt == 'frac': # fractional format
         if self.parent.myQ.frmt == 'frac':
-            return "{0:.{1}g}".format(y, params['FMT_ba'])
+            return "{0:.{1}g}".format(safe_eval(data), params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.repr_fix(y), self.parent.myQ.digits)
+            return "{0:>{1}}".format(self.parent.myQ.repr_fix(data), self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):
@@ -100,15 +96,11 @@ class ItemDelegate(QStyledItemDelegate):
 
         #editor.setText(index.data())
 
-        frmt = get_cmb_box(self.parent.cmbFormat, data=False).lower()
-
-        if frmt == 'frac': # fractional format
+        if self.parent.myQ.frmt == 'frac':
             editor.setText("{0:.{1}g}".format(safe_eval(data), params['FMT_ba']))
         else:
             editor.setText("{0:>{1}}".format(
                     self.parent.myQ.repr_fix(data), self.parent.myQ.digits))
-
-        #editor.setText(index.data())
 
     def setModelData(self, editor, model, index):
         """
@@ -124,8 +116,8 @@ class ItemDelegate(QStyledItemDelegate):
         if isinstance(editor, QComboBox):
             model.setData(index, editor.currentText())
         else:
-            text = qstr(editor.text())
-            model.setData(index, self.parent.myQ.fix_base(text))
+            data = qstr(editor.text())
+            model.setData(index, self.parent.myQ.fix_base(data))
 #            else:
 #                super(ItemDelegate, self).setModelData(editor, model, index)
 
