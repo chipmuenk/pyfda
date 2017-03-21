@@ -183,10 +183,10 @@ class FilterCoeffs(QWidget):
         self.butQEnable.setToolTip("<span>Show quantization options.</span>")
 
         self.cmbFormat = QComboBox(self)
-        qFormat = ['Frac', 'Int', 'Hex', 'Bin']
+        qFormat = ['Frac', 'Int', 'Hex', 'Bin', 'CSD']
         self.cmbFormat.addItems(qFormat)
         self.cmbFormat.setCurrentIndex(0) # 'frac'
-        self.cmbFormat.setToolTip('Set the display and output format.')
+        self.cmbFormat.setToolTip('Set the display format.')
         self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.lblRound = QLabel("Digits = ", self)
