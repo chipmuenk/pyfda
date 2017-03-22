@@ -665,10 +665,10 @@ class FilterCoeffs(QWidget):
         Copy table from self.ba to clipboard as CSV list
         """
         text = ""
-        tab = "\t"
-        cr = "\n"
+        tab = "\t"  # tab character
+        cr = "\n"   # newline character
 
-        sel = self._get_selected(self.tblCoeff)
+        sel = self._get_selected(self.tblCoeff)['sel']   
         if not np.any(sel): # nothing selected
             for r in range(self.num_rows - 1):
                 for c in range(self.num_cols - 1):
