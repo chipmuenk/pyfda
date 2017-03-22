@@ -670,8 +670,8 @@ class FilterCoeffs(QWidget):
 
         sel = self._get_selected(self.tblCoeff)['sel']   
         if not np.any(sel): # nothing selected
-            for r in range(self.num_rows - 1):
-                for c in range(self.num_cols - 1):
+            for r in range(self.num_rows):
+                for c in range(self.num_cols):
                     text += str(self.ba[c][r])
                     if c != self.num_cols:
                         text += tab
