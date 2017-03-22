@@ -678,7 +678,12 @@ class FilterCoeffs(QWidget):
                 if r != self.num_rows:
                     text += cr
         else:
-            pass
+            for r in sel[0]:
+                text += str(self.ba[0][r])
+            text += cr 
+            for r in sel[1]:
+                text += str(self.ba[1][r])
+            
 
         self.clipboard.setText(text)
 
