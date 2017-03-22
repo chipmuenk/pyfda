@@ -12,7 +12,7 @@ Widget for displaying and modifying filter coefficients
 
 
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, six
+import sys
 from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ from ..compat import (Qt, QApplication, QWidget, QLabel, QLineEdit, QComboBox,
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, get_cmb_box, qstr
+from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, qstr
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
