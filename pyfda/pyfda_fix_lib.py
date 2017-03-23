@@ -503,7 +503,7 @@ class Fixed(object):
        
         Returns
         -------
-        yf: float or ndarray
+        yf: string, float or ndarray of float of string
             with the same shape as `y`.
             `yf` is formatted as set in `self.frmt` with `self.W` digits
         """
