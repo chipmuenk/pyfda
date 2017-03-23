@@ -466,7 +466,7 @@ class Fixed(object):
             to be quantized with the numeric base specified by `frmt`.
             
         frmt: string (optional)
-            any of the formats `frac`, `int`, `bin`, `hex`)
+            any of the formats `frac`, `int`, `bin`, `hex`, `csd`)
             When `frmt` is unspecified, the instance parameter `self.frmt` is used
         
         Returns
@@ -477,12 +477,14 @@ class Fixed(object):
         """
         if not frmt:
             frmt = self.frmt
+        frmt = frmt.lower()
         if frmt == 'frac':
             return self.fix(y)
         elif frmt in {'hex', 'bin', 'int'}:
             return (int_tc_u(y, self.W, self.base) / (1 << self.WF))
         elif frmt == 'csd':
-            return csd2dec_u(y) / (1 << self.WF)
+            print(csd2dec(y) / (1 << self.WF))
+            return csd2dec(y) / (1 << self.WF)
             # TODO: check
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
@@ -517,7 +519,7 @@ class Fixed(object):
         elif self.frmt == 'bin':
             return bin_u(yi, self.W)
         elif self.frmt == 'csd':
-            return dec2csd(yi, self.W)
+            return dec2csd(yi, self.WF)
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
             return None
