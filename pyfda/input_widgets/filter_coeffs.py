@@ -64,13 +64,13 @@ class ItemDelegate(QStyledItemDelegate):
 
     def displayText(self, text, locale):
         """
-        Return `text` in the number format selected in `parent.cmbFormat` for
+        Return `text` in the number format selected in the fixpoint object for
         display.
 
-        text:   string / QVariant to be rendered
+        text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
         """ 
-        data = qstr(text)
+        data = qstr(text) # convert to "normal" string
 
         if self.parent.myQ.frmt == 'frac':
             return "{0:.{1}g}".format(safe_eval(data), params['FMT_ba'])
@@ -84,7 +84,10 @@ class ItemDelegate(QStyledItemDelegate):
 
     def setEditorData(self, editor, index):
         """
-        pass the data to be edited to the editor
+        Pass the data to be edited to the editor:
+        - retrieve data with max. available accuracy from self.ba
+        - requantize data according to settings in fixpoint object
+        - represent it in the selected format (int, hex, ...)
         
         editor: instance of e.g. QLineEdit
         index:  instance of QModelIndex
@@ -104,8 +107,9 @@ class ItemDelegate(QStyledItemDelegate):
 
     def setModelData(self, editor, model, index):
         """
-        Convert data that is returned to the model when editor has finished
-        back to fractional format.
+        When editor has finished, read the updated data from the editor,
+        convert it back to fractional format and store it in the model 
+        (= QTableWidget)
 
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
@@ -612,7 +616,7 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _save_entries(self):
         """
-        Save the values from self.ba to the filter BA dict.
+        Save the values from self.ba to the filter ba dict.
         """
 
         logger.debug("=====================\nFilterCoeff._save_entries called")
@@ -650,9 +654,10 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _clear_table(self):
         """
-        Clear table & initialize coeff for two poles and zeros @ origin,
+        Clear self.ba: Initialize coeff for two poles and zeros @ origin,
         a = b = [1; 0; 0]. Initialize with dtype complex to avoid errors
         if the data type becomes complex later on.
+        Refresh QTableWidget
         """
         self.ba = np.array([[1, 0, 0], [1, 0, 0]], dtype = np.complex)
 
@@ -761,12 +766,12 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _delete_cells(self):
         """
-        Delete all selected elements by:
+        Delete all selected elements in self.ba by:
         - determining the indices of all selected cells in the P and Z arrays
         - deleting elements with those indices
-        - equalizing the lengths of B and A array by appending the required
+        - equalizing the lengths of b and a array by appending the required
           number of zeros.
-        Finally, the table is refreshed from self.ba.
+        Finally, the QTableWidget is refreshed from self.ba.
         """
         # TODO: FIR and IIR need to be treated separately
         sel = self._get_selected(self.tblCoeff)['sel'] # get indices of all selected cells
@@ -784,8 +789,9 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _add_cells(self):
         """
-        Add the number of selected rows to the table and fill new cells with
+        Add the number of selected rows to self.ba and fill new cells with
         zeros. If nothing is selected, add one row at the bottom.
+        Refresh QTableWidget.
         """
         # get indices of all selected cells
         sel = self._get_selected(self.tblCoeff)['sel']
@@ -807,7 +813,8 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
         """
-        Set all coefficients = 0 in table with a magnitude less than eps
+        Set all coefficients = 0 in self.ba with a magnitude less than eps
+        and refresh QTableWidget
         """
         eps = float(self.ledSetEps.text())
         sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
@@ -829,7 +836,7 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
-        Quantize all coefficients and refresh table
+        Quantize all coefficients in self.ba and refresh QTableWidget
         """
 
         self._store_q_settings() # read comboboxes and store setting in filter dict
