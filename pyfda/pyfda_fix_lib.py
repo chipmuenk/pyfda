@@ -161,7 +161,7 @@ def csd2dec(csd_str):
     msb_power = len(m)-1
     
     num = 0.0
-    for ii in xrange( len(csd_str) ):
+    for ii in range( len(csd_str) ):
 
         power_of_two = 2.0**(msb_power-ii)
         
