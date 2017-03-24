@@ -134,8 +134,6 @@ def qstr(text):
     
     The current text / QVariant data as a string
     """
-
-    print(six.PY2, type(text))
     if "QString" in str(type(text)):
         # Python 3: convert QString -> str
         string = str(text)
@@ -144,11 +142,8 @@ def qstr(text):
         # Python 2: convert QVariant -> QString -> str
         string = str(text.toString())
     else:
-        # when `text` is of type str already
+        # `text` is of type str already
         string = text
-
-#    string = str(string) # QString -> String
-
     return string
 
 
