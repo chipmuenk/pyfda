@@ -391,7 +391,10 @@ class Fixed(object):
                 y = qstr(y)
 #            if isinstance(y, str):
                 y = y.replace(' ','') # whitespace is not allowed in complex number
-                y = complex(y)
+                try:
+                    y = complex(y)
+                except ValueError as e:
+                    print(y, '\n', e)
             over_pos = over_neg = yq = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real            
