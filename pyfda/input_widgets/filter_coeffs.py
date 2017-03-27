@@ -31,9 +31,7 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: FIR / IIR - Filter detection: Save always switches to IIR -> _filter_type
-# TODO: number of digits is limited to 12?!
 # TODO: FIR / IIR chaos
-# TODO: Edit coefficients in the selected output format
 # TODO: Clipboard functionality
 # TODO: enable / disable buttons, clean up UI
 # TODO: what happens with complex / nearly real coefficients?
