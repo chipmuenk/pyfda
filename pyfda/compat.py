@@ -38,36 +38,42 @@ except ImportError:
     HAS_QT5 = False
     
 
-class QFMetric(object):
-    """
-    Use QFontMetrics to measure / set the width of widgets depending on the
-    font properties and make properties accessible via class attributes:
-
-    wdg_pix_width  = QFMetrics.width("Hallo")#  calculate width in pixels
-    wdg_pix_height = QFMetric.H
-
-    # set widget (.e.g. QLineEdit) dimensions:
-    my_widget.setFixedSize(wdg_pix_width, wdg_pix_height)
-
-    """
-
-    def __init__(self, parent):
-#        super(QFMetric, self).__init__(parent)
-        myfont = QFont("", 0)
-        self.qfm = QFontMetrics(myfont)
-        # self.W0 = self.qfm.width("0") # width of "0" in pixels
-        # self.H = self.qfm.height() # height of "0" in pixels (too tight on some systems)
-
-        # define class attributes
-        test_label = QLabel("0")
-        test_edit = QLineEdit()
-        QFMetric.H = round(test_edit.sizeHint().height())
-        QFMetric.W0 = round(test_label.sizeHint().width())
-        # print("LabelW, LabelH, EditH:", QFMetric.W0, round(test_label.sizeHint().height()), QFMetric.H)
-
-    def width(self, mystring):
-        return self.qfm.width(mystring)
-
+#==============================================================================
+# class QFMetric(object):
+#     """
+#     Use QFontMetrics to measure / set the width of widgets depending on the
+#     font properties and make properties accessible via class attributes:
+# 
+#     wdg_pix_width  = QFMetrics.width("Hallo")#  calculate width in pixels
+#     wdg_pix_height = QFMetric.H
+# 
+#     # set widget (.e.g. QLineEdit) dimensions:
+#     my_widget.setFixedSize(wdg_pix_width, wdg_pix_height)
+# 
+#     # Alternative without importing QFontMetric explicitly: 
+#     my_widget.setFont(QFont("", 0)) # without this, returned dimensions are smaller?!
+#     W6 = my_widget.fontMetrics().boundingRect("000000").width()
+#     H = my_widget.sizeHint().height()
+#     """
+# 
+#     def __init__(self, parent):
+# #        super(QFMetric, self).__init__(parent)
+#         myfont = QFont("", 0)
+#         self.qfm = QFontMetrics(myfont)
+#         self.W0 = self.qfm.width("0") # width of "0" in pixels
+#         self.H = self.qfm.height() # height of "0" in pixels (too tight on some systems)
+# 
+#         # define class attributes
+#         test_label = QLabel("0")
+#         test_edit = QLineEdit()
+#         #QFMetric.H = round(test_edit.sizeHint().height())
+#         #QFMetric.W0 = round(test_label.sizeHint().width())
+#         # print("LabelW, LabelH, EditH:", QFMetric.W0, round(test_label.sizeHint().height()), QFMetric.H)
+# 
+#     def width(self, mystring):
+#         return self.qfm.width(mystring)
+# 
+#==============================================================================
 
 class QFD(QFileDialog):
     """

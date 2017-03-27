@@ -14,9 +14,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
-                      QCheckBox, QPushButton, QSpinBox, QComboBox, QFont,
-                      QTableWidget, QTableWidgetItem, Qt, QFMetric,
-                      QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
+                      QCheckBox, QPushButton, QSpinBox, QComboBox, QFont, QStyledItemDelegate,
+                      QTableWidget, QTableWidgetItem, Qt, QVBoxLayout, QHBoxLayout)
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
@@ -69,10 +68,6 @@ class FilterPZ(QWidget):
         """
         Intitialize the widget, consisting of:
         """
-        #  size for QLineEdit fields
-#        H  = QFMetric.H
-#        W8 = QFMetric.W0 * 8
-
         bfont = QFont()
         bfont.setBold(True)
 

@@ -90,8 +90,6 @@ class AmplitudeSpecs(QWidget):
         self.layVMain.addWidget(self.frmMain)
         self.layVMain.setContentsMargins(*params['wdg_margins'])
 
-        # self.qfm = QFMetric(self) # instance for calculating font metrics
-
         self.setLayout(self.layVMain)
 
         self.n_cur_labels = 0 # number of currently visible labels / qlineedits
@@ -178,11 +176,9 @@ class AmplitudeSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
-#            self.qlabels[i].setFixedSize(W_lbl, QFMetric.H) # set label dimensions
             
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-#            self.qlineedit[i].setFixedSize(QFMetric.W0 * 8, QFMetric.H) # set lineedit dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
