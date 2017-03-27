@@ -30,7 +30,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
-                      QVBoxLayout, QHBoxLayout, QFont)
+                      QVBoxLayout, QHBoxLayout)
 
 import numpy as np
 
@@ -220,12 +220,6 @@ near ``f_S/2`` (highpass).
         self.led_delays.setText(str(self.delays))        
         self.stages = int(abs(round(float(self.led_stages.text()))))
         self.led_stages.setText(str(self.stages))
-
-        self.led_delays.setFont(QFont("", 0)) # without this, returned dimensions are smaller?!
-        W6 = self.led_delays.fontMetrics().boundingRect("000000").width()
-        H = self.led_delays.sizeHint().height()
-        self.led_delays.setMinimumSize(W6, H) # set lineedit min. dimensions
-        self.led_stages.setMinimumSize(W6, H)
         
         self._store_entries()
 
