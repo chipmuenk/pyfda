@@ -64,8 +64,7 @@ class ItemDelegate(QStyledItemDelegate):
 
     def displayText(self, text, locale):
         """
-        Return `text` in the number format selected in the fixpoint object for
-        display.
+        Display `text` in the number format selected in the fixpoint object 
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
@@ -85,7 +84,7 @@ class ItemDelegate(QStyledItemDelegate):
     def setEditorData(self, editor, index):
         """
         Pass the data to be edited to the editor:
-        - retrieve data with max. available accuracy from self.ba
+        - retrieve data with full accuracy from self.ba
         - requantize data according to settings in fixpoint object
         - represent it in the selected format (int, hex, ...)
         
@@ -109,12 +108,13 @@ class ItemDelegate(QStyledItemDelegate):
         """
         When editor has finished, read the updated data from the editor,
         convert it back to fractional format and store it in the model 
-        (= QTableWidget)
+        (= QTableWidget) and in self.ba
 
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
         index:  instance of QModelIndex
         """
+        # check for different editor environments if needed and provide a default:
 #        if isinstance(editor, QtGui.QTextEdit):
 #            model.setData(index, editor.toPlainText())
         if isinstance(editor, QComboBox):
