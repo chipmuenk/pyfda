@@ -130,13 +130,16 @@ class ItemDelegate(QStyledItemDelegate):
         # check for different editor environments if needed and provide a default:
 #        if isinstance(editor, QtGui.QTextEdit):
 #            model.setData(index, editor.toPlainText())
-        if isinstance(editor, QComboBox):
-            model.setData(index, editor.currentText())
+#        elif isinstance(editor, QComboBox):
+#            model.setData(index, editor.currentText())
+#        else:
+#            super(ItemDelegate, self).setModelData(editor, model, index)
+        if self.parent.myQ.frmt == 'frac':
+            data = safe_eval(qstr(editor.text())) # raw data without fixpoint formatting 
         else:
-            data = qstr(editor.text())
-            model.setData(index, self.parent.myQ.fix_base(data))
-#            else:
-#                super(ItemDelegate, self).setModelData(editor, model, index)
+            data = self.parent.myQ.fix_base(qstr(editor.text())) # transform back to fractional
+        model.setData(index, data)                          # store in QTableWidget 
+        self.parent.ba[index.column()][index.row()] = data  # and in self.ba
 
 
 class FilterCoeffs(QWidget):
