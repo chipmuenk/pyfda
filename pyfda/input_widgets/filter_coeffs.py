@@ -78,8 +78,21 @@ class ItemDelegate(QStyledItemDelegate):
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):
-       # default editor is QLineEdit
-        return QLineEdit(parent)
+        """
+        Neet to set editor explicitly, otherwise QDoubleSpinBox instance is 
+        created when space is not sufficient?!
+        editor:  instance of e.g. QLineEdit (default)
+        index:   instance of QModelIndex
+        options: instance of QStyleOptionViewItemV4
+        """
+        line_edit = QLineEdit(parent)
+        H = int(round(line_edit.sizeHint().height()))
+        W = int(round(line_edit.sizeHint().width()))
+        line_edit.setMinimumSize(QSize(W, H)) #(160, 25));
+
+        return line_edit
+#        return QLineEdit(parent) # return object without instantiating      
+
 
     def setEditorData(self, editor, index):
         """
