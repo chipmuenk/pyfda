@@ -73,6 +73,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         if self.parent.myQ.frmt == 'frac':
             return "{0:.{1}g}".format(safe_eval(data), params['FMT_ba'])
+     #       return "{0:g}".format(safe_eval(data))
         else:
             return "{0:>{1}}".format(self.parent.myQ.repr_fix(data), self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
@@ -104,18 +105,16 @@ class ItemDelegate(QStyledItemDelegate):
         editor: instance of e.g. QLineEdit
         index:  instance of QModelIndex
         """
-        data = qstr(index.data())
-        print(data, type(data))
-        print(index.column(), index.row())
-        print(self.parent.ba[index.column()][index.row()])
-
-        #editor.setText(index.data())
+#        data = qstr(index.data()) # get data from QTableWidget
+        data = self.parent.ba[index.column()][index.row()] # data from self.ba
 
         if self.parent.myQ.frmt == 'frac':
-            editor.setText("{0:.{1}g}".format(safe_eval(data), params['FMT_ba']))
+            editor.setText(str(safe_eval(data))) # no string formatting, pass full resolution
         else:
             editor.setText("{0:>{1}}".format(
                     self.parent.myQ.repr_fix(data), self.parent.myQ.digits))
+#            print(self.parent.myQ.repr_fix(data), self.parent.myQ.digits)
+
 
     def setModelData(self, editor, model, index):
         """
@@ -431,7 +430,7 @@ class FilterCoeffs(QWidget):
 
         butQuant.clicked.connect(self.quant_coeffs)
 
-        self.tblCoeff.cellChanged.connect(self._copy_item)
+#        self.tblCoeff.cellChanged.connect(self._copy_item)
 #        self.tblCoeff.dropEvent.connect(self._copy_item)
 
 #------------------------------------------------------------------------------
