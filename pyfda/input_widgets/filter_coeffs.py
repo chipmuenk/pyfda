@@ -613,7 +613,6 @@ class FilterCoeffs(QWidget):
                 'frmt':self.cmbFormat.currentText()
                 }
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
-        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _load_q_settings(self):
