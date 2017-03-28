@@ -249,8 +249,9 @@ class FilterCoeffs(QWidget):
         butDelCells = QPushButton(self)
         butDelCells.setIcon(QIcon(':/minus.svg'))
         butDelCells.setIconSize(q_icon_size)
-        butDelCells.setToolTip("<span>Delete selected cell(s) from the table. "
-                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells.</span>")
+        butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
+                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
+                "When nothing is selected, add a row at the end.</SPAN>")
 
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
@@ -783,14 +784,19 @@ class FilterCoeffs(QWidget):
         - deleting elements with those indices
         - equalizing the lengths of b and a array by appending the required
           number of zeros.
+        When nothing is selected, delete the last row.
         Finally, the QTableWidget is refreshed from self.ba.
         """
         # TODO: FIR and IIR need to be treated separately
         sel = self._get_selected(self.tblCoeff)['sel'] # get indices of all selected cells
-
-        self.ba[0] = np.delete(self.ba[0], sel[0])
-#        if fb.fil[0]['ft'] == 'IIR': # not necessary?
-        self.ba[1] = np.delete(self.ba[1], sel[1])
+        if not np.any(sel) and len(self.ba[0] > 0):
+            self.ba[0] = np.delete(self.ba[0], -1)
+    #        if fb.fil[0]['ft'] == 'IIR': # not necessary?
+            self.ba[1] = np.delete(self.ba[1], -1)
+        else:
+            self.ba[0] = np.delete(self.ba[0], sel[0])
+    #        if fb.fil[0]['ft'] == 'IIR': # not necessary?
+            self.ba[1] = np.delete(self.ba[1], sel[1])
 
         # test and equalize if b and a array have different lengths:
         self._equalize_ba_length()
