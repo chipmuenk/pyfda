@@ -391,9 +391,7 @@ class FilterCoeffs(QWidget):
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
 
-        self.load_dict() # initialize table with default values from filter dict
-        # TODO: needed?
-        self._refresh_table()
+        self.load_dict() # initialize + refresh table with default values from filter dict
 
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemActivated.connect(self.save_coeffs) # nothing happens
