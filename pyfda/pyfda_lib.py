@@ -122,7 +122,7 @@ def extract_file_ext(file_type):
 #------------------------------------------------------------------------------
 def qstr(text):
     """
-    Convert text object to string.
+    Convert text object (QVariant, QSTring, string) to string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
@@ -165,9 +165,7 @@ def get_cmb_box(cmb_box, data=True):
     if data:
         idx = cmb_box.currentIndex()
         cmb_data = cmb_box.itemData(idx)
-        cmb_str = qstr(cmb_data)
-#        if not isinstance(cmb_data, six.text_type):
-#            cmb_data = cmb_data.toString() # needed for Python 2
+        cmb_str = qstr(cmb_data) # convert QVariant, QString, string to plain string
     else:
         cmb_str = cmb_box.currentText()
   
