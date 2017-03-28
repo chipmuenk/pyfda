@@ -498,11 +498,9 @@ class FilterCoeffs(QWidget):
                 set_cmb_box(self.cmbQOvfl, "none")
                 set_cmb_box(self.cmbQQuant, "none")
             self._store_q_settings() # store updated quantization settings
-                
+
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(True)
-
-            self._load_q_settings()
 
             # check whether filter is FIR and only needs one column
             if fb.fil[0]['ft'] == 'FIR':
