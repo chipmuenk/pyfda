@@ -418,11 +418,12 @@ class FilterCoeffs(QWidget):
         butClear.clicked.connect(self._clear_table)
         butSetZero.clicked.connect(self._set_coeffs_zero)
 
-        self.cmbFormat.currentIndexChanged.connect(self._store_q_settings)
-        self.cmbQOvfl.currentIndexChanged.connect(self._store_q_settings)
-        self.cmbQQuant.currentIndexChanged.connect(self._store_q_settings)
-        self.ledQuantF.editingFinished.connect(self._store_q_settings)
-        self.ledQuantI.editingFinished.connect(self._store_q_settings)
+        # refresh table after storing new settings
+        self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
+        self.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
+        self.cmbQQuant.currentIndexChanged.connect(self._refresh_table)
+        self.ledQuantF.editingFinished.connect(self._refresh_table)
+        self.ledQuantI.editingFinished.connect(self._refresh_table)
 
         butQuant.clicked.connect(self.quant_coeffs)
 
