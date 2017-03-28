@@ -7,10 +7,6 @@ Created on Tue Nov 26 10:57:30 2013
 Widget for displaying and modifying filter coefficients
 """
 
-
-
-
-
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 from pprint import pformat
@@ -32,10 +28,10 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: FIR / IIR - Filter detection: Save always switches to IIR -> _filter_type
 # TODO: FIR / IIR chaos
 # TODO: Clipboard functionality
-# TODO: enable / disable buttons, clean up UI
 # TODO: what happens with complex / nearly real coefficients?
+# TODO: prevent saving empty table
 # TODO: Buttons with <Q> etc -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
-# TODO: Auto-Width (min. number of WI)
+# TODO: editing neg. hex values and switching back to int gives a positive number
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
