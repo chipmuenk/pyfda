@@ -371,18 +371,17 @@ class FilterCoeffs(QWidget):
         layVButtonsQ = QVBoxLayout()
         layVButtonsQ.addLayout(layHButtonsCoeffs3)
         layVButtonsQ.addLayout(layHButtonsCoeffs4)
+        layVButtonsQ.setContentsMargins(0,5,0,0)
 
+        # This frame encompasses the Quantization Settings
         self.frmQSettings = QFrame(self)
         self.frmQSettings.setLayout(layVButtonsQ)
-
 
         layVBtns = QVBoxLayout()
         layVBtns.addLayout(layHDisplay)
         layVBtns.addLayout(layHButtonsCoeffs1)
         layVBtns.addLayout(layHButtonsCoeffs2)
         layVBtns.addWidget(self.frmQSettings)
-#        layVBtns.addLayout(layHButtonsCoeffs3)
-#        layVBtns.addLayout(self.layHButtonsCoeffs4)
 
         # This frame encompasses all the buttons
         frmMain = QFrame(self)
@@ -407,6 +406,7 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.itemChanged.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
         self.butEnable.clicked.connect(self._refresh_table)
+        self.butQEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.butClipboard.clicked.connect(self._copy_to_clipboard)
 
@@ -494,7 +494,17 @@ class FilterCoeffs(QWidget):
 
         if self.butEnable.isChecked():
 
-            self.frmQSettings.setVisible(True)
+            if self.butQEnable.isChecked():
+                self.frmQSettings.setVisible(True)
+                self.cmbFormat.setEnabled(True)
+            else:
+                self.frmQSettings.setVisible(False)
+                set_cmb_box(self.cmbFormat, "Frac")
+                self.cmbFormat.setEnabled(False)
+                set_cmb_box(self.cmbQOvfl, "none")
+                set_cmb_box(self.cmbQQuant, "none")
+            self._store_q_settings() # store updated quantization settings
+                
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(True)
 
