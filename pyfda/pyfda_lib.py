@@ -182,12 +182,14 @@ def set_cmb_box(cmb_box, string, data=False):
     or in a data field (data=True). When `string` is not found in the combobox entries,
      select the first entry. Signals are blocked during the update of the combobox.
      
-    Returns: nothing
+    Returns: the index of the found entry
     """
     if data:
         idx = cmb_box.findData(str(string)) # find index for data = string
     else:
         idx = cmb_box.findText(str(string)) # find index for text = string    
+
+    ret = idx
 
     if idx == -1: # data does not exist, use first entry instead
         idx = 0
@@ -196,6 +198,8 @@ def set_cmb_box(cmb_box, string, data=False):
     cmb_box.setCurrentIndex(idx) # set index
     cmb_box.blockSignals(False)
     
+    return ret
+
 #------------------------------------------------------------------------------
 def style_widget(widget, state):
     """
