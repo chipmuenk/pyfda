@@ -17,10 +17,9 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QApplication, QWidget, QLabel, QLineEdit, QComboBox,
-                      QFrame, QPushButton, QSpinBox, QFont, QIcon, QSize,
-                      QAbstractItemView, QTableWidget, QTableWidgetItem,
-                      QVBoxLayout, QHBoxLayout,
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
+                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize,
+                      QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
 
 import numpy as np
@@ -871,7 +870,6 @@ class FilterCoeffs(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
     app = QApplication(sys.argv)
     mainw = FilterCoeffs(None)
 
