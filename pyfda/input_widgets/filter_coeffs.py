@@ -61,7 +61,8 @@ class ItemDelegate(QStyledItemDelegate):
 
     def displayText(self, text, locale):
         """
-        Display `text` in the number format selected in the fixpoint object 
+        Display `text` in the selected fixpoint format with the selected number
+        of digits
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
@@ -70,7 +71,6 @@ class ItemDelegate(QStyledItemDelegate):
 
         if self.parent.myQ.frmt == 'frac':
             return "{0:.{1}g}".format(safe_eval(data), params['FMT_ba'])
-     #       return "{0:g}".format(safe_eval(data))
         else:
             return "{0:>{1}}".format(self.parent.myQ.repr_fix(data), self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
@@ -110,7 +110,6 @@ class ItemDelegate(QStyledItemDelegate):
         else:
             editor.setText("{0:>{1}}".format(
                     self.parent.myQ.repr_fix(data), self.parent.myQ.digits))
-#            print(self.parent.myQ.repr_fix(data), self.parent.myQ.digits)
 
 
     def setModelData(self, editor, model, index):
@@ -681,12 +680,12 @@ class FilterCoeffs(QWidget):
         """
         Copy table from self.ba to clipboard as CSV list
         """
-        text = ""
         tab = "\t"  # tab character
         cr = "\n"   # newline character
+        text = ""
 
         sel = self._get_selected(self.tblCoeff)['sel']   
-        if not np.any(sel): # nothing selected
+        if not np.any(sel): # nothing selected -> copy everything raw from ba
             for r in range(self.num_rows):
                 for c in range(self.num_cols):
                     text += str(self.ba[c][r])
