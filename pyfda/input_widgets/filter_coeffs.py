@@ -26,12 +26,21 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: Editing a cell doesn't trigger "data changed"
-# TODO: CSD is displayed with decimal point
-# TODO: fix handling of decimal point, W, WI, WF
-# TODO: Clipboard functionality
-# TODO: what happens with complex / nearly real coefficients?
-# TODO: Buttons with <Q> etc -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
 # TODO: editing neg. hex values and switching back to int gives a positive number
+# TODO: entering invalid numbers for hex, int etc. crashes program
+# TODO: CSD is displayed with decimal point
+# TODO: Clipboard functionality: - always use table display
+#                                - always return a horizontal table
+#                                - always return fractional data with full precision?
+# TODO: a[0] should always be = 1 and not editable. Howto display with e.g. Hex?
+
+# TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
+# TODO: fix handling of decimal point, W, WI, WF
+# TODO: what should "quantize" button do?
+# TODO: what happens with complex / nearly real coefficients?
+# TODO: Buttons with characters like <Q> etc 
+#               -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
+
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
