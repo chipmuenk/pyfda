@@ -5,6 +5,8 @@ Widget for plotting poles and zeros
 Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+import logging
+logger = logging.getLogger(__name__)
 
 from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout
 
@@ -197,9 +199,10 @@ class PlotPZ(QWidget):
     
         if b.any(): # coefficients were specified
             if len(b) < 2 and len(a) < 2:
-                raise TypeError(
-                'No proper filter coefficients: both b and a are scalars!')
-            # The coefficients are less than 1, normalize the coeficients
+                logger.error('No proper filter coefficients: both b and a are scalars!')
+                return z, p, k
+            
+            # The coefficients are less than 1, normalize the coefficients
             if np.max(b) > 1:
                 kn = np.max(b)
                 b = b / float(kn) 
@@ -217,10 +220,9 @@ class PlotPZ(QWidget):
             z = np.roots(b)
             k = kn/kd
         elif not (len(p) or len(z)): # P/Z were specified
-            raise TypeError(
-            'No proper filter coefficients: Either b,a or z,p must be specified!')          
-    
-    
+                logger.error('Either b,a or z,p must be specified!')
+                return z, p, k
+  
         # find multiple poles and zeros and their multiplicities
         if len(p) < 2: # single pole, [None] or [0]
             if not p or p == 0: # only zeros, create equal number of poles at origin
