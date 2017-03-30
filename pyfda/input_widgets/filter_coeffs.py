@@ -8,10 +8,10 @@ Widget for displaying and modifying filter coefficients
 """
 
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
-from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
+
+import sys
 
 from ..compat import (Qt, QtCore, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
                       QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize,
