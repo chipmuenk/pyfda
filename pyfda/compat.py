@@ -3,7 +3,7 @@ try:
     import PyQt5
     from PyQt5 import QtGui, QtCore
     from PyQt5.QtCore import pyqtSignal, Qt, QEvent, QT_VERSION_STR, QSize
-    from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QImage
+    from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QImage, QTextCursor
     from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QApplication,
                                  QScrollArea, QSplitter, QMessageBox,
                                  QWidget, QComboBox, QLabel, QLineEdit, QFrame,
