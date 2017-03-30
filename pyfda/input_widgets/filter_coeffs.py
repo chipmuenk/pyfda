@@ -629,11 +629,6 @@ class FilterCoeffs(QWidget):
         logger.debug("=====================\nFilterCoeff._save_entries called")
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
-        # TODO: The following doesn't work, needs to check whether this is IIR / FIR
-        if np.any(self.ba[1]): # any denominator coefficients?
-            fb.fil[0]['fc'] = 'Manual_IIR'
-        else:
-            fb.fil[0]['fc'] = 'Manual_FIR'
 
         fb.fil[0]["q_coeff"] = {
                 'WI':int(self.ledQuantI.text()),
@@ -643,7 +638,14 @@ class FilterCoeffs(QWidget):
                 'frmt':self.cmbFormat.currentText()
                 }
 
-        fil_save(fb.fil[0], self.ba, 'ba', __name__) # save as coeffs
+        # save, check and convert coeffs, check filter type            
+        fil_save(fb.fil[0], self.ba, 'ba', __name__) 
+        
+        if fb.fil[0]['ft'] == 'IIR':
+            fb.fil[0]['fc'] = 'Manual_IIR'
+        else:
+            fb.fil[0]['fc'] = 'Manual_FIR'
+
 
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
