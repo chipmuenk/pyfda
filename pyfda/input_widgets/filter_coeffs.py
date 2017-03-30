@@ -441,44 +441,24 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _filter_type(self, fil_type=None):
         """
-        Get / set 'FIR' and 'IIR' filter type:
-            When type is not declared, read cmbFilterType combobox and set filter
-            dict accordingly.
-
-            When type is declared as 'auto', check whether all items of a = self.ba[1]
-            are zero except for the first one. If true, it's an 'IIR', otherwise
-            it's a 'FIR' filter.
-            Set cmbFilterType combobox and filter dict accordingly.
+        Get / set 'FIR' and 'IIR' filter from cmbFilterType combobox and set filter
+            dict and table properties accordingly.
         """
-        if not fil_type: # no argument, read out combobox
-            if self.cmbFilterType.currentText() == 'IIR':
-                ft = 'IIR'
-            else:
-                ft = 'FIR'
-        else:
-            if fil_type == 'auto': # determine type of filter from coefficients
-                if np.any(self.ba[1][0:]):
-                    ft = 'IIR'
-                else:
-                    ft = 'FIR'
 
-            if fil_type == 'IIR': # filter type has been specified
-                ft = 'IIR'
-            else:
-                ft = 'IIR'
-
-        if ft == 'IIR':
+        if self.cmbFilterType.currentText() == 'IIR':
+            fb.fil[0]['ft'] = 'IIR'
             self.col = 2
             set_cmb_box(self.cmbFilterType, 'IIR')
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
+
         else:
+            fb.fil[0]['ft'] = 'FIR'
             self.col = 1
             set_cmb_box(self.cmbFilterType, 'FIR')
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
 
-        fb.fil[0]['ft'] = ft
         self.tblCoeff.setColumnCount(self.col)
 
         self.load_dict()
