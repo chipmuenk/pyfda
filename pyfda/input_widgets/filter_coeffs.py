@@ -34,6 +34,7 @@ import pyfda.pyfda_fix_lib as fix
 #                                - always return fractional data with full precision?
 # TODO: a[0] should always be = 1 and not editable. Howto display with e.g. Hex?
 
+# TODO: detect overflows during quantization and color cells
 # TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
 # TODO: fix handling of decimal point, W, WI, WF
 # TODO: what should "quantize" button do?
