@@ -700,7 +700,7 @@ class FilterCoeffs(QWidget):
                         text += self.tblCoeff.itemDelegate().text(item)
             text += cr
             for r in sel[1]:
-                item = self.tblCoeff.item(r,0)
+                item = self.tblCoeff.item(r,1)
                 if item:
                     if item.text() != "":
                         text += self.tblCoeff.itemDelegate().text(item)
