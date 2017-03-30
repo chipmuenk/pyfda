@@ -212,7 +212,7 @@ class FilterCoeffs(QWidget):
         self.butQEnable.setIcon(QIcon(':/menu.svg'))
         self.butQEnable.setIconSize(q_icon_size)
         self.butQEnable.setCheckable(True)
-        self.butQEnable.setChecked(True)
+        self.butQEnable.setChecked(False)
         self.butQEnable.setToolTip("<span>Show quantization options.</span>")
 
         self.cmbFormat = QComboBox(self)
