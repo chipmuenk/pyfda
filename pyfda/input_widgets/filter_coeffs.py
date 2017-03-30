@@ -107,7 +107,7 @@ class ItemDelegate(QStyledItemDelegate):
         - retrieve data with full accuracy from self.ba
         - requantize data according to settings in fixpoint object
         - represent it in the selected format (int, hex, ...)
-        
+
         editor: instance of e.g. QLineEdit
         index:  instance of QModelIndex
         """
@@ -551,8 +551,6 @@ class FilterCoeffs(QWidget):
             self.tblCoeff.resizeRowsToContents()
             self.tblCoeff.clearSelection()
 
-            self._copy_to_clipboard()
-
         else:
             self.frmQSettings.setVisible(False)
             self.butEnable.setIcon(QIcon(':/circle-x.svg'))
@@ -700,9 +698,11 @@ class FilterCoeffs(QWidget):
         cr = "\n"   # newline character
         text = ""
 
+        # TODO: FIR / IIR differentiation, always use table format
         sel = self._get_selected(self.tblCoeff)['sel']   
         if not np.any(sel): # nothing selected -> copy everything raw from ba
             for r in range(self.num_rows):
+#                text += qstr(self.tblCoeff.horizontalHeaderItem(r).text())
                 for c in range(self.num_cols):
                     text += str(self.ba[c][r])
                     if c != self.num_cols:
