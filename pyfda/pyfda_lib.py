@@ -1046,15 +1046,34 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         if np.ndim(arg) == 1: # arg = [b] -> FIR
             b = np.asarray(arg)
             a = np.zeros(len(b))
-            a[0] = 1
-            fil_dict['ft'] = 'FIR'
         else: # arg = [b,a]
             b = arg[0]
             a = arg[1]
-            if np.any(a):
-                fil_dict['ft'] = 'IIR'
+
+        if len(b) < 2: # no proper coefficients, initialize with a default
+            b = np.asarray([1,0])
+        if len(a) < 2: # no proper coefficients, initialize with a default
+            a = np.asarray([1,0])
+
+        a[0] = 1 # first coefficient of recursive filter parts always = 1
+
+        # Determine whether it's a FIR or IIR filter and set fil_dict accordingly
+        # Test whether all elements except the first one are zero
+        if not np.any(a[1:]):
+            #  same as:   elif np.all(a[1:] == 0)
+            fil_dict['ft'] = 'FIR'
+        else:
+            fil_dict['ft'] = 'IIR'
+            
+        # equalize if b and a subarrays have different lengths:
+        D = len(b) - len(a)
+        if D > 0: # b is longer than a -> fill up a with zeros
+            a = np.append(a, np.zeros(D))
+        elif D < 0: # a is longer than b -> fill up b with zeros
+            if fil_dict['ft'] == 'IIR':
+                b = np.append(b, np.zeros(-D)) # make filter causal, fill up b with zeros
             else:
-                fil_dict['ft'] = 'FIR'
+                a = a[:D] # discard last D elements of a (only zeros anyway)
 
         fil_dict['ba'] = [b, a]
 
