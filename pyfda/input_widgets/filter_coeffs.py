@@ -651,11 +651,6 @@ class FilterCoeffs(QWidget):
         self.sigFilterDesigned.emit() # -> filter_specs
         # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
 
-        logger.debug("_save_entries - coeffients / zpk updated:\n"
-            "b,a = %s\n\n"
-            "zpk = %s\n"
-            %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
-              ))
         style_widget(self.butSave, 'normal')
 
 #------------------------------------------------------------------------------
@@ -708,37 +703,6 @@ class FilterCoeffs(QWidget):
         self.clipboard.setText(text)
 
         #self.textLabel.setText(self.clipboard.text()) # read from clipboard
-
-
-#==============================================================================
-#         void MyTableWidget::keyPressEvent(QKeyEvent* event) {
-#     // If Ctrl-C typed
-#     // Or use event->matches(QKeySequence::Copy)
-#     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
-#     {
-#         QModelIndexList cells = selectedIndexes();
-#         qSort(cells); // Necessary, otherwise they are in column order
-#
-#         QString text;
-#         int currentRow = 0; // To determine when to insert newlines
-#         foreach (const QModelIndex& cell, cells) {
-#             if (text.length() == 0) {
-#                 // First item
-#             } else if (cell.row() != currentRow) {
-#                 // New row
-#                 text += '\n';
-#             } else {
-#                 // Next cell
-#                 text += '\t';
-#             }
-#             currentRow = cell.row();
-#             text += cell.data().toString();
-#         }
-#
-#         QApplication::clipboard()->setText(text);
-#     }
-# }
-#==============================================================================
 
 #------------------------------------------------------------------------------
     def _get_selected(self, table):
@@ -793,11 +757,9 @@ class FilterCoeffs(QWidget):
         sel = self._get_selected(self.tblCoeff)['sel'] # get indices of all selected cells
         if not np.any(sel) and len(self.ba[0] > 0):
             self.ba[0] = np.delete(self.ba[0], -1)
-    #        if fb.fil[0]['ft'] == 'IIR': # not necessary?
             self.ba[1] = np.delete(self.ba[1], -1)
         else:
             self.ba[0] = np.delete(self.ba[0], sel[0])
-    #        if fb.fil[0]['ft'] == 'IIR': # not necessary?
             self.ba[1] = np.delete(self.ba[1], sel[1])
 
         # test and equalize if b and a array have different lengths:
