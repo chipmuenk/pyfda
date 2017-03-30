@@ -57,10 +57,10 @@ class ItemDelegate(QStyledItemDelegate):
 
     def text(self, item):
         """
-        Return item text as transformed by self.displayText()
+        Return item text as string transformed by self.displayText()
         """
         # return qstr(item.text()) # convert to "normal" string
-        return self.displayText(item.text(), QtCore.QLocale())
+        return  qstr(self.displayText(item.text(), QtCore.QLocale()))
 
     def displayText(self, text, locale):
         """
