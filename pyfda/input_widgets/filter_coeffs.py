@@ -773,7 +773,7 @@ class FilterCoeffs(QWidget):
         if D > 0: # b is longer than a
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
         elif D < 0: # a is longer than b
-            if fb.fil[0] == 'IIR':
+            if fb.fil[0]['ft'] == 'IIR':
                 self.ba[0] = np.append(self.ba[0], np.zeros(-D))
             else:
                 self.ba[1] = self.ba[1][:D] # discard last D elements of a
