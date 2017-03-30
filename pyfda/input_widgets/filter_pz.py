@@ -7,11 +7,12 @@ Created on Tue Nov 26 10:57:30 2013
 Tab-Widget for displaying and modifying filter Poles and Zeros
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+import logging
+logger = logging.getLogger(__name__)
+
 import sys
 import six
 from pprint import pformat
-import logging
-logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
                       QCheckBox, QPushButton, QSpinBox, QComboBox, QFont, QStyledItemDelegate,
@@ -25,7 +26,10 @@ from pyfda.pyfda_lib import fil_save, safe_eval, rt_label
 from pyfda.pyfda_rc import params
 
 # TODO: correct scaling after insertion / deletion of cellsn
+# TODO: display P/Z in polar or cartesian format
 # TODO: order P/Z depending on frequency or magnitude
+# TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
+# TODO: Option for limiting P/Z to a selectable magnitude
 # TODO: display SOS graphically
 
 class ItemDelegate(QStyledItemDelegate):

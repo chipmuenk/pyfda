@@ -25,11 +25,11 @@ from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, qstr
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: FIR / IIR - Filter detection: Save always switches to IIR -> _filter_type
-# TODO: FIR / IIR chaos
+# TODO: Editing a cell doesn't trigger "data changed"
+# TODO: CSD is displayed with decimal point
+# TODO: fix handling of decimal point, W, WI, WF
 # TODO: Clipboard functionality
 # TODO: what happens with complex / nearly real coefficients?
-# TODO: prevent saving empty table
 # TODO: Buttons with <Q> etc -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
 # TODO: editing neg. hex values and switching back to int gives a positive number
 class ItemDelegate(QStyledItemDelegate):
