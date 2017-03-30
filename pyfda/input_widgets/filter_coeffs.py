@@ -813,17 +813,19 @@ class FilterCoeffs(QWidget):
         sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
 
         if not sel: # nothing selected, check whole table
-            self.ba[0] = self.ba[0] * np.logical_not(
-                                        np.isclose(self.ba[0], 0., rtol=0, atol = eps))
-            self.ba[1] = self.ba[1] * np.logical_not(
-                                        np.isclose(self.ba[1], 0., rtol=0, atol = eps))
+            b_0 = np.isclose(self.ba[0], 0., rtol=0, atol = eps)
+            a_0 = np.isclose(self.ba[1], 0., rtol=0, atol = eps) 
+
+            if np.any(b_0) or np.any(a_0): # found at least one coeff close to zero         
+                self.ba[0] = self.ba[0] * np.logical_not(b_0)
+                self.ba[1] = self.ba[1] * np.logical_not(a_0)
+                style_widget(self.butSave, 'changed')
 
         else: # only check selected cells
             for i in sel:
                 self.ba[i[0]][i[1]] = self.ba[i[0]][i[1]] * np.logical_not(
                                          np.isclose(self.ba[i[0]][i[1]], 0., rtol=0, atol = eps))
-
-        style_widget(self.butSave, 'changed')
+            style_widget(self.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
