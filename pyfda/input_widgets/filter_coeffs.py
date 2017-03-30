@@ -561,33 +561,35 @@ class FilterCoeffs(QWidget):
         style_widget(self.butSave, 'normal')
 
 #------------------------------------------------------------------------------
-    def _copy_item(self):
-        """
-        Copy the value from the current table item to self.ba
-        This is triggered every time a table item is edited.
-        When no item was selected, do nothing.
-
-        Triggered by  `tblCoeff.cellChanged`
-
-        """
-        # multiple selection:
-        #idx = self._get_selected(self.tblCoeff)['idx']
-        #for x in idx:
-        #    print(self.tblCoeff.item(x[0],x[1]).text())
-
-        col = self.tblCoeff.currentIndex().column()
-        row = self.tblCoeff.currentIndex().row()
-        item = self.tblCoeff.item(row,col)
-
-
-        if item:
-            if item.text() != "":
-                self.ba[col][row] = safe_eval(item.text())
-            else:
-                self.ba[col][row] = 0.
-
-        style_widget(self.butSave, 'changed')
-
+#==============================================================================
+#     def _copy_item(self):
+#         """
+#         Copy the value from the current table item to self.ba
+#         This is triggered every time a table item is edited.
+#         When no item was selected, do nothing.
+# 
+#         Triggered by  `tblCoeff.cellChanged`
+# 
+#         """
+#         # multiple selection:
+#         #idx = self._get_selected(self.tblCoeff)['idx']
+#         #for x in idx:
+#         #    print(self.tblCoeff.item(x[0],x[1]).text())
+# 
+#         col = self.tblCoeff.currentIndex().column()
+#         row = self.tblCoeff.currentIndex().row()
+#         item = self.tblCoeff.item(row,col)
+# 
+# 
+#         if item:
+#             if item.text() != "":
+#                 self.ba[col][row] = safe_eval(item.text())
+#             else:
+#                 self.ba[col][row] = 0.
+# 
+#         style_widget(self.butSave, 'changed')
+# 
+#==============================================================================
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
         """
