@@ -13,7 +13,7 @@ from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
+from ..compat import (Qt, QtCore, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
                       QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize,
                       QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
@@ -54,6 +54,13 @@ class ItemDelegate(QStyledItemDelegate):
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
 
+
+    def text(self, item):
+        """
+        Return item text as transformed by self.displayText()
+        """
+        # return qstr(item.text()) # convert to "normal" string
+        return self.displayText(item.text(), QtCore.QLocale())
 
     def displayText(self, text, locale):
         """
@@ -696,17 +703,23 @@ class FilterCoeffs(QWidget):
                         text += tab
                 if r != self.num_rows:
                     text += cr
-        else:
+        else: # copy only selected cells in selected format
+            tab = ", "
             for r in sel[0]:
-                text += str(self.ba[0][r])
-            text += cr 
+                item = self.tblCoeff.item(r,0)
+                if item:
+                    if item.text() != "":
+                        text += self.tblCoeff.itemDelegate().text(item)
+            text += cr
             for r in sel[1]:
-                text += str(self.ba[1][r])
-            
+                item = self.tblCoeff.item(r,0)
+                if item:
+                    if item.text() != "":
+                        text += self.tblCoeff.itemDelegate().text(item)
 
         self.clipboard.setText(text)
 
-        #self.textLabel.setText(self.clipboard.text())
+        #self.textLabel.setText(self.clipboard.text()) # read from clipboard
 
 
 #==============================================================================
