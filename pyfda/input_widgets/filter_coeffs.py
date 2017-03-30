@@ -260,7 +260,7 @@ class FilterCoeffs(QWidget):
         butDelCells.setIconSize(q_icon_size)
         butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-                "When nothing is selected, add a row at the end.</SPAN>")
+                "When nothing is selected, delete the last row.</SPAN>")
 
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
