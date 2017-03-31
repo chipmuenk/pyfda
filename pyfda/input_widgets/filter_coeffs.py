@@ -25,14 +25,13 @@ from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, qstr
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: Editing a cell doesn't trigger "data changed"
 # TODO: editing neg. hex values and switching back to int gives a positive number
 # TODO: entering invalid numbers for hex, int etc. crashes program
 # TODO: CSD is displayed with decimal point
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a horizontal table
 #                                - always return fractional data with full precision?
-# TODO: a[0] should always be = 1 and not editable. Howto display with e.g. Hex?
+# TODO: a[0] : Howto display with e.g. Hex? Bold font? Disabled?
 
 # TODO: detect overflows during quantization and color cells
 # TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
@@ -446,9 +445,6 @@ class FilterCoeffs(QWidget):
 
         butQuant.clicked.connect(self.quant_coeffs)
 
-#        self.tblCoeff.cellChanged.connect(self._copy_item)
-#        self.tblCoeff.dropEvent.connect(self._copy_item)
-
 #------------------------------------------------------------------------------
     def _filter_type(self, fil_type=None):
         """
@@ -518,7 +514,7 @@ class FilterCoeffs(QWidget):
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
                 set_cmb_box(self.cmbFilterType, 'IIR')
 
-            self.ba[1][0] = 1.0
+            self.ba[1][0] = 1.0 # restore fa[0] = 1 of denonimator polynome
                    
             self.tblCoeff.setRowCount(self.num_rows)
             self.tblCoeff.setColumnCount(self.num_cols)
@@ -538,11 +534,10 @@ class FilterCoeffs(QWidget):
                               str(self.ba[col][row]).strip('()')))
                     self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight)
 
-
+            # make a[0] unselectable
             if fb.fil[0]['ft'] == 'IIR':
                 item = self.tblCoeff.item(0,1)
-                item.setFlags( Qt.ItemIsSelectable |  Qt.ItemIsEnabled )
-                #item.setFlags(0)
+                item.setFlags( Qt.ItemIsSelectable )#|  Qt.ItemIsEnabled )
 
             self.tblCoeff.blockSignals(False)
 
@@ -579,36 +574,6 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
         style_widget(self.butSave, 'normal')
 
-#------------------------------------------------------------------------------
-#==============================================================================
-#     def _copy_item(self):
-#         """
-#         Copy the value from the current table item to self.ba
-#         This is triggered every time a table item is edited.
-#         When no item was selected, do nothing.
-# 
-#         Triggered by  `tblCoeff.cellChanged`
-# 
-#         """
-#         # multiple selection:
-#         #idx = self._get_selected(self.tblCoeff)['idx']
-#         #for x in idx:
-#         #    print(self.tblCoeff.item(x[0],x[1]).text())
-# 
-#         col = self.tblCoeff.currentIndex().column()
-#         row = self.tblCoeff.currentIndex().row()
-#         item = self.tblCoeff.item(row,col)
-# 
-# 
-#         if item:
-#             if item.text() != "":
-#                 self.ba[col][row] = safe_eval(item.text())
-#             else:
-#                 self.ba[col][row] = 0.
-# 
-#         style_widget(self.butSave, 'changed')
-# 
-#==============================================================================
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
         """
@@ -848,12 +813,7 @@ class FilterCoeffs(QWidget):
         # -> change output format to 'frac' before quantizing and storing in self.ba
         self.myQ.frmt = 'frac'
 
-#        for i in range(len(self.ba[0])):
-#            self.ba[0][i] = self.myQ.fix(self.ba[0][i])
-#            if i > 0: # don't quantize first "1" in denonimator polynome
-#                self.ba[1][i] = self.myQ.fix(self.ba[1][i])
         self.ba = self.myQ.fix(self.ba)
-        self.ba[1][0] = 1 # restore first "1" in denonimator polynome
 
         style_widget(self.butSave, 'changed')
         self._refresh_table()
