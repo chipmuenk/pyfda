@@ -154,7 +154,8 @@ class ItemDelegate(QStyledItemDelegate):
             data = self.parent.myQ.fix_base(qstr(editor.text())) # transform back to fractional
         model.setData(index, data)                          # store in QTableWidget 
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
-
+        style_widget(self.parent.butSave, 'changed')
+        
 
 class FilterCoeffs(QWidget):
     """
