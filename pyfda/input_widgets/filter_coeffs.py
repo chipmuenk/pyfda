@@ -31,7 +31,7 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a horizontal table
 #                                - always return fractional data with full precision?
-# TODO: a[0] : Howto display with e.g. Hex? Bold font? Disabled?
+# TODO: a[0] : Howto display with e.g. Hex?
 
 # TODO: detect overflows during quantization and color cells
 # TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
@@ -174,8 +174,8 @@ class FilterCoeffs(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
-        bfont = QFont()
-        bfont.setBold(True)
+        self.bfont = QFont()
+        self.bfont.setBold(True)
 #        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
 #==============================================================================
@@ -250,7 +250,7 @@ class FilterCoeffs(QWidget):
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setAlternatingRowColors(True)
         self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
-        self.tblCoeff.horizontalHeader().setFont(bfont)
+        self.tblCoeff.horizontalHeader().setFont(self.bfont)
 
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
@@ -537,7 +537,8 @@ class FilterCoeffs(QWidget):
             # make a[0] unselectable
             if fb.fil[0]['ft'] == 'IIR':
                 item = self.tblCoeff.item(0,1)
-                item.setFlags( Qt.ItemIsSelectable )#|  Qt.ItemIsEnabled )
+                item.setFlags(Qt.ItemIsSelectable)#|  Qt.ItemIsEnabled )
+                item.setFont(self.bfont)
 
             self.tblCoeff.blockSignals(False)
 
