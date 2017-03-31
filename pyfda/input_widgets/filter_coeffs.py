@@ -518,6 +518,8 @@ class FilterCoeffs(QWidget):
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
                 set_cmb_box(self.cmbFilterType, 'IIR')
 
+            self.ba[1][0] = 1.0
+                   
             self.tblCoeff.setRowCount(self.num_rows)
             self.tblCoeff.setColumnCount(self.num_cols)
             # Create strings for index column (vertical header), starting with "0"
@@ -535,6 +537,12 @@ class FilterCoeffs(QWidget):
                         self.tblCoeff.setItem(row,col,QTableWidgetItem(
                               str(self.ba[col][row]).strip('()')))
                     self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight)
+
+
+            if fb.fil[0]['ft'] == 'IIR':
+                item = self.tblCoeff.item(0,1)
+                item.setFlags( Qt.ItemIsSelectable |  Qt.ItemIsEnabled )
+                #item.setFlags(0)
 
             self.tblCoeff.blockSignals(False)
 
@@ -688,7 +696,6 @@ class FilterCoeffs(QWidget):
         cr = "\n"   # newline character
         text = ""
 
-        # TODO: FIR / IIR differentiation, always use table format
         sel = self._get_selected(self.tblCoeff)['sel']   
         if not np.any(sel): # nothing selected -> copy everything raw from ba
             for r in range(self.num_rows):
