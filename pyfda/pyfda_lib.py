@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr 30 10:29:42 2012
+Created 2012 - 2017
 
-@author: Muenker_2
+@author: Christian Muenker
 """
 #
-# Copyright (c) 2011 Christopher Felton, Christian Münker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -21,9 +20,6 @@ Created on Mon Apr 30 10:29:42 2012
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# The following is derived from the slides presented by
-# Alexander Kain for CS506/606 "Special Topics: Speech Signal Processing"
-# CSLU / OHSU, Spring Term 2011.
 
 from __future__ import division, print_function
 import os, sys, re, time
