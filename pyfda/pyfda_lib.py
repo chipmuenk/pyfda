@@ -26,7 +26,7 @@ Created on Mon Apr 30 10:29:42 2012
 # CSLU / OHSU, Spring Term 2011.
 
 from __future__ import division, print_function
-import os, sys, six, re
+import os, sys, re, time
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
@@ -1081,6 +1081,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         raise ValueError("Unknown input format {0:s}".format(format_in))
     
     fil_dict['creator'] = (format_in, sender)
+    fil_dict['time_designed'] = time.time()
     
     if convert:    
         fil_convert(fil_dict, format_in)

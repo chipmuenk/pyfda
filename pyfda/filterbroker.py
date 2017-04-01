@@ -202,6 +202,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'plt_tUnit':'s',
             'plt_phiUnit': 'rad',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $',
+            'time_designed' : -1,
             'wdg_dyn':{'win':'hann'}
             }
 
