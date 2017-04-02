@@ -20,9 +20,17 @@ def hex_tc(val, nbits):
     Return `val` in hex format with a wordlength of `nbits`. In contrast to the
     built-in `hex()`, negative values are returned in two's complement format.
 
+    Parameters
+    ----------
+    val: integer
+            The value to be converted in decimal integer format.
+    
+    nbits: integer
+            The wordlength
+
     Returns
     -------
-    A string in hex format
+    A string in two's complement hex format
     """
     return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
@@ -62,6 +70,7 @@ def int_tc(val, nbits, base):
             return i - (1 << nbits) 
 
 """
+==============================================================================
  Canonical Signed Digit Functions
 
  Handles:
