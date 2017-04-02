@@ -26,12 +26,11 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: editing neg. hex values and switching back to int gives a positive number
-# TODO: entering invalid numbers for hex, int etc. crashes program
 # TODO: CSD is displayed with decimal point
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a horizontal table
 #                                - always return fractional data with full precision?
-# TODO: a[0] : Howto display with e.g. Hex?
+# TODO: a[0] : Howto display with e.g. Hex? How to detect index in displayText?
 
 # TODO: detect overflows during quantization and color cells
 # TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
