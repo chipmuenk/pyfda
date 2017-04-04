@@ -67,6 +67,26 @@ class ItemDelegate(QStyledItemDelegate):
         """
         # return qstr(item.text()) # convert to "normal" string
         return  qstr(self.displayText(item.text(), QtCore.QLocale()))
+        
+    def paint(self, painter, option, index):
+        """
+        Paint 
+        
+        painter:  instance of QPainter
+        option: instance of QStyleOptionViewItem(V4?)
+        index:   instance of QModelIndex
+        """
+        style_option = option# QtGui.QStyleOptionViewItemV4(option)
+        # read text to be shown:
+        # cur_item = self.parent.tblCoeff.item(index.row(), index.column()) #index.data(Qt.DisplayRole)
+        if index.row() == 0 and index.column() == 1: # a[0]: always 1
+            style_option.text = "1!" # QString object
+            style_option.font.setBold(True)
+            # now paint the cell
+            self.parent.style().drawControl(QtGui.QStyle.CE_ItemViewItem, style_option, painter)
+        else:
+            #style_option.text = self.text(cur_item)
+            super(ItemDelegate, self).paint(painter, option, index) # default painter
 
     def displayText(self, text, locale):
         """
