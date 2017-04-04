@@ -318,7 +318,8 @@ class FilterCoeffs(QWidget):
 
         butQuant = QPushButton(self)
         butQuant.setToolTip("Quantize coefficients with selected settings.")
-        butQuant.setText("Q!")
+#        butQuant.setText("Q!")
+        butQuant.setIcon(QIcon(':/quantize.svg'))
         butQuant.setIconSize(q_icon_size)
 
         self.lblWIWF  = QLabel("WI.WF = ")

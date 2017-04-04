@@ -23,6 +23,7 @@
     <file alias="move.svg">images/icons/move.svg</file>
     <file alias="minus.svg">images/icons/minus.svg</file>
     <file alias="plus.svg">images/icons/plus.svg</file>
+    <file alias="quantize.svg">images/icons/quantize.svg</file>
     <file alias="trash.svg">images/icons/trash.svg</file>
     <file alias="upload.svg">images/icons/data-transfer-upload.svg</file>
     <file alias="wrench.svg">images/icons/wrench.svg</file>
