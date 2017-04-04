@@ -30,15 +30,13 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a horizontal table
 #                                - always return fractional data with full precision?
-# TODO: a[0] : Howto display with e.g. Hex? How to detect index in displayText?
+# TODO: a[0] : How to detect index in displayText? Or, center "=1" horizontally
+# TODO: Center table items in vertical direction
 
 # TODO: detect overflows during quantization and color cells
 # TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
 # TODO: fix handling of decimal point, W, WI, WF
-# TODO: what should "quantize" button do?
 # TODO: what happens with complex / nearly real coefficients?
-# TODO: Buttons with characters like <Q> etc 
-#               -> https://sarasoueidan.com/blog/icon-fonts-to-svg/
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -243,7 +241,7 @@ class FilterCoeffs(QWidget):
         # ---------------------------------------------
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("FIR filters only have zeros (b coefficients).")
+        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
         self.cmbFilterType.addItems(["FIR","IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -307,7 +305,8 @@ class FilterCoeffs(QWidget):
 #---------------------------------------------------------
 
         butSetZero = QPushButton("= 0", self)
-        butSetZero.setToolTip("<span>Set coefficients = 0 with a magnitude &lt; &epsilon;.</span>")
+        butSetZero.setToolTip("<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
+        "When nothing is selected, test the whole table.</span>")
         butSetZero.setIconSize(q_icon_size)
 
         self.lblEps = QLabel(self)
@@ -318,7 +317,7 @@ class FilterCoeffs(QWidget):
         self.ledSetEps.setText(str(1e-6))
 
         butQuant = QPushButton(self)
-        butQuant.setToolTip("<span>Quantize selected coefficients with specified settings."
+        butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
         "When nothing is selected, quantize the whole table.</span>")
 #        butQuant.setText("Q!")
         butQuant.setIcon(QIcon(':/quantize.svg'))
