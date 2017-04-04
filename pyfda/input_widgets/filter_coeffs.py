@@ -318,7 +318,8 @@ class FilterCoeffs(QWidget):
         self.ledSetEps.setText(str(1e-6))
 
         butQuant = QPushButton(self)
-        butQuant.setToolTip("Quantize coefficients with selected settings.")
+        butQuant.setToolTip("<span>Quantize selected coefficients with specified settings."
+        "When nothing is selected, quantize the whole table.</span>")
 #        butQuant.setText("Q!")
         butQuant.setIcon(QIcon(':/quantize.svg'))
         butQuant.setIconSize(q_icon_size)
