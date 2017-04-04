@@ -808,7 +808,7 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def quant_coeffs(self):
         """
-        Quantize all coefficients in self.ba and refresh QTableWidget
+        Quantize selected / all coefficients in self.ba and refresh QTableWidget
         """
 
         self._store_q_settings() # read comboboxes and store setting in filter dict
@@ -816,7 +816,12 @@ class FilterCoeffs(QWidget):
         # -> change output format to 'frac' before quantizing and storing in self.ba
         self.myQ.frmt = 'frac'
 
-        self.ba = self.myQ.fix(self.ba)
+        sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
+        if not sel: # nothing selected, check whole table
+            self.ba = self.myQ.fix(self.ba)
+        else:
+            for i in sel:
+                self.ba[i[0]][i[1]] = self.myQ.fix(self.ba[i[0]][i[1]])
 
         style_widget(self.butSave, 'changed')
         self._refresh_table()
