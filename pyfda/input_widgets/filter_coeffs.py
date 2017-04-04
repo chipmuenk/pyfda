@@ -209,7 +209,8 @@ class FilterCoeffs(QWidget):
                 "For high order systems, this might be slow.</span>")
 
         self.butQEnable = QPushButton(self)
-        self.butQEnable.setIcon(QIcon(':/menu.svg'))
+#        self.butQEnable.setIcon(QIcon(':/menu.svg'))
+        self.butQEnable.setIcon(QIcon(':/quantize_options.svg'))
         self.butQEnable.setIconSize(q_icon_size)
         self.butQEnable.setCheckable(True)
         self.butQEnable.setChecked(False)
