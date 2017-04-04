@@ -12,7 +12,7 @@ try:
                                  QTableWidget, QTableWidgetItem, QTextBrowser,
                                  QSizePolicy, QAbstractItemView,
                                  QHBoxLayout, QVBoxLayout, QGridLayout,
-                                 QStyledItemDelegate)
+                                 QStyledItemDelegate, QStyle)
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
     HAS_QT5 = True
@@ -22,7 +22,7 @@ except ImportError:
 
     from PyQt4 import QtGui, QtCore
     from PyQt4.QtCore import pyqtSignal, Qt, QEvent, QT_VERSION_STR, QSize
-    from PyQt4.QtGui import (QFont, QFontMetrics, QIcon, QImage,
+    from PyQt4.QtGui import (QFont, QFontMetrics, QIcon, QImage, QStyle,
                              QMainWindow, QTabWidget, QApplication,
                              QScrollArea, QSplitter, QMessageBox,
                              QWidget, QComboBox, QLabel, QLineEdit, QFrame,

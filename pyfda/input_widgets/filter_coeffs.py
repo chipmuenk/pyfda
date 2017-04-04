@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 import sys
 
-from ..compat import (Qt, QtCore, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
-                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize, 
+from ..compat import (Qt, QtCore, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
+                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize, QStyle,
                       QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate)
 
@@ -83,7 +83,7 @@ class ItemDelegate(QStyledItemDelegate):
             style_option.text = "1!" # QString object
             style_option.font.setBold(True)
             # now paint the cell
-            self.parent.style().drawControl(QtGui.QStyle.CE_ItemViewItem, style_option, painter)
+            self.parent.style().drawControl(QStyle.CE_ItemViewItem, style_option, painter)
         else:
             #style_option.text = self.text(cur_item)
             super(ItemDelegate, self).paint(painter, option, index) # default painter
