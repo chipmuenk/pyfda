@@ -17,8 +17,8 @@ __version__ = 0.5
 
 def hex_tc(val, nbits):
     """
-    Return `val` in hex format with a wordlength of `nbits`. In contrast to the
-    built-in `hex()`, negative values are returned in two's complement format.
+    Return `val` in hex format with a wordlength of `nbits` in two's complement
+    format. The built-in hex function returns args < 0 as negative values.
 
     Parameters
     ----------
@@ -87,9 +87,16 @@ def int_tc(val, nbits, base):
  License: GPL2
 """
 
-def dec2csd(num, places=0):
-    """ Convert the argument to CSD Format. """
-    debug=False 
+def dec2csd(dec_val, places=0):
+    """ 
+    Convert the argument `dec_val` to a string in CSD Format.
+    
+    Parameters:
+    -----------
+    
+    dec_val : 
+    
+    """
     if debug: print("Converting %f " % ( num ),)
 
     # figure out binary range, special case for 0
