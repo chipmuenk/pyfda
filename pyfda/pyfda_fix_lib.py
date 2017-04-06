@@ -53,10 +53,10 @@ def int_tc(val, nbits, base):
                 
     Returns:
     --------
-    int2: integer
+    int_tc: integer
             The result, converted to integer.
-    
     """
+    # TODO: add calculation of fractional formats?
     nbits = int(abs(nbits))
     base = int(abs(base))
     if base not in {2, 10, 16}:
@@ -103,12 +103,11 @@ def dec2csd(dec_val, WF=0):
     if dec_val == 0 :
         return '0'
     if np.fabs(dec_val) < 1.0 :
-        WI_csd = 0
+        k = 0
     else:
-        WI_csd = np.ceil(np.log2(np.abs(dec_val) * 1.5))
-        
+        k = np.ceil(np.log2(np.abs(dec_val) * 1.5))
 
-    if debug: print("to %d.%d format" % (WI_csd, places ))
+    if debug: print("to %d.%d format" % (k, WF ))
 
     # Initialize CSD calculation
     csd_digits = [] 
@@ -118,34 +117,34 @@ def dec2csd(dec_val, WF=0):
     
     while( k >= -WF): # has the last fractional digit been reached
             
-        limit = pow(2.0, WI_csd+1) / 3.0
+        limit = pow(2.0, k+1) / 3.0
 
         if debug: print ("  ", remainder, limit,)
 
         # decimal point?
-        if WI_csd == -1 :
+        if k == -1 :
             csd_digits.extend( ['.'] )
 
         # convert the number
-        if previous_non_zero:
+        if prev_non_zero:
             csd_digits.extend( ['0'] )
             prev_non_zero = False
             
         elif remainder > limit :
             csd_digits.extend( ['+'] )
-            remainder -= pow(2.0, WI_csd )
+            remainder -= pow(2.0, k )
             prev_non_zero = True
             
         elif remainder < -limit :
             csd_digits.extend( ['-'] )
-            remainder += pow(2.0, WI_csd )
+            remainder += pow(2.0, k )
             prev_non_zero = True
             
         else :
             csd_digits.extend( ['0'] )
             prev_non_zero = False
 
-        WI_csd -= 1
+        k -= 1
         
         if debug: print(csd_digits)
 
@@ -195,16 +194,18 @@ def csd2dec(csd_str):
     #  Find out what the MSB power of two should be, keeping in
     #  mind we may have a fractional CSD number:
     try:
-        (m,n) = csd_str.split('.')
-        csd_str = csd_str.replace('.','') # get rid of point now...
-    except ValueError:
-        m = csd_str
-        n = ""
-        
-    msb_power = len(m)-1
-    
+        (int_str, _) = csd_str.split('.') # split into integer and fractional bits
+        csd_str = csd_str.replace('.','') # join integer and fractional bits to one csd string
+    except ValueError: # no fractional part
+        int_str = csd_str
+        _ = ""
+
+    # Intialize calculation, start with the MSB (integer)  
+    msb_power = len(int_str)-1 # 
     dec_val = 0.0
-    for ii in range( len(csd_str) ):
+
+    # start from the MSB and work all the way down to the last digit    
+    for ii in range( len(csd_str) ): 
 
         power_of_two = 2.0**(msb_power-ii)
         
@@ -212,10 +213,12 @@ def csd2dec(csd_str):
             dec_val += power_of_two
         elif csd_str[ii] == '-' :
             dec_val -= power_of_two
+        # else 
+        #    ... all other values are ignored
 
         if debug:
             print('  "%s" (%d.%d); 2**%d = %d; Num=%f' % (
-                csd_str[ii], len(m), len(n), msb_power-ii, power_of_two, dec_val))
+                csd_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
 
     return dec_val 
 #==============================================================================
@@ -529,9 +532,7 @@ class Fixed(object):
         elif frmt in {'hex', 'bin', 'int'}:
             return (int_tc_u(y, self.W, self.base) / (1 << self.WF))
         elif frmt == 'csd':
-            print(csd2dec(y) / (1 << self.WF))
             return csd2dec(y) / (1 << self.WF)
-            # TODO: check
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
@@ -553,9 +554,12 @@ class Fixed(object):
             with the same shape as `y`.
             `yf` is formatted as set in `self.frmt` with `self.W` digits
         """
-        yf = self.fix(y) # round / clip numbers
-        if self.frmt == 'frac':
+        # round / clip numbers: yf is fractional with the required range and resolution
+        yf = self.fix(y)
+        if self.frmt == 'frac': # return quantized fractional value
             return yf
+        # no fractional format, scale with 2^WF to obtain integer representation
+        # TODO: allow fractional representation?
         if self.frmt in {'hex', 'bin', 'int', 'csd'}:
             yi = (np.round(yf * (1 << self.WF))).astype(int) # shift left by WF bits
         if self.frmt == 'int':
