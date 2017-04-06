@@ -97,33 +97,34 @@ def dec2csd(dec_val, places=0):
     dec_val : 
     
     """
-    if debug: print("Converting %f " % ( num ),)
+    debug=True 
+    if debug: print("Converting %f " % ( dec_val ),)
 
     # figure out binary range, special case for 0
-    if num == 0 :
+    if dec_val == 0 :
         return '0'
-    if np.fabs(num) < 1.0 :
-        n = 0
+    if np.fabs(dec_val) < 1.0 :
+        WI_csd = 0
     else:
-        n = np.ceil(np.log2(np.abs(num) * 1.5))
+        WI_csd = np.ceil(np.log2(np.abs(dec_val) * 1.5))
         
     csd_digits = []
 
-    if debug: print("to %d.%d format" % ( n, places ))
+    if debug: print("to %d.%d format" % (WI_csd, places ))
 
     # Hone in on the CSD code for the input number
-    remainder = num
+    remainder = dec_val
     previous_non_zero = False
-    n -= 1
+    WI_csd -= 1
     
-    while( n >= -places):
+    while( WI_csd >= -places):
             
-        limit = pow(2.0, n+1) / 3.0
+        limit = pow(2.0, WI_csd+1) / 3.0
 
         if debug: print ("  ", remainder, limit,)
 
         # decimal point?
-        if n == -1 :
+        if WI_csd == -1 :
             csd_digits.extend( ['.'] )
 
         # convert the number
@@ -133,24 +134,24 @@ def dec2csd(dec_val, places=0):
             
         elif remainder > limit :
             csd_digits.extend( ['+'] )
-            remainder -= pow(2.0, n )
+            remainder -= pow(2.0, WI_csd )
             prev_non_zero = True
             
         elif remainder < -limit :
             csd_digits.extend( ['-'] )
-            remainder += pow(2.0, n )
+            remainder += pow(2.0, WI_csd )
             prev_non_zero = True
             
         else :
             csd_digits.extend( ['0'] )
             prev_non_zero = False
 
-        n -= 1
+        WI_csd -= 1
         
         if debug: print(csd_digits)
 
     # Always have something before the point
-    if np.fabs(num) < 1.0:
+    if np.fabs(dec_val) < 1.0:
         csd_digits.insert(0, '0')
         
     csd_str = "".join(csd_digits)
@@ -176,21 +177,21 @@ def csd2dec(csd_str):
         
     msb_power = len(m)-1
     
-    num = 0.0
+    dec_val = 0.0
     for ii in range( len(csd_str) ):
 
         power_of_two = 2.0**(msb_power-ii)
         
         if csd_str[ii] == '+' :
-            num += power_of_two
+            dec_val += power_of_two
         elif csd_str[ii] == '-' :
-            num -= power_of_two
+            dec_val -= power_of_two
 
         if debug:
             print('  "%s" (%d.%d); 2**%d = %d; Num=%f' % (
-                csd_str[ii], len(m), len(n), msb_power-ii, power_of_two, num))
+                csd_str[ii], len(m), len(n), msb_power-ii, power_of_two, dec_val))
 
-    return num 
+    return dec_val 
 #==============================================================================
 # Define ufuncs using numpys automatic type casting
 #==============================================================================
