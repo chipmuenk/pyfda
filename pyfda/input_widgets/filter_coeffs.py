@@ -26,7 +26,6 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: editing neg. hex values and switching back to int gives a positive number
-# TODO: CSD is displayed with decimal point
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a horizontal table
 #                                - always return fractional data with full precision?
