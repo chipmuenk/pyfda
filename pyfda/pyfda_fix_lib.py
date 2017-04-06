@@ -569,7 +569,7 @@ class Fixed(object):
         elif self.frmt == 'bin':
             return bin_u(yi, self.W)
         elif self.frmt == 'csd':
-            return dec2csd(yi, self.WF)
+            return dec2csd(yi, 0) # second argument is number of fractional bits WF
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
             return None
