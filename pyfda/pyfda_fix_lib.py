@@ -69,34 +69,33 @@ def int_tc(val, nbits, base):
         else:
             return i - (1 << nbits) 
 
-"""
-==============================================================================
- Canonical Signed Digit Functions
 
- Handles:
-  * Decimals
-  *
-  *
+ 
 
- eg, +00-00+000.0 or 0.+0000-00+
- Where: '+' is +1
-        '-' is -1
 
- Harnesser
- https://sourceforge.net/projects/pycsd/
- License: GPL2
-"""
-
-def dec2csd(dec_val, places=0):
+def dec2csd(dec_val, WF=0):
     """ 
     Convert the argument `dec_val` to a string in CSD Format.
     
     Parameters:
     -----------
     
-    dec_val : 
+    dec_val : scalar (integer or real)
+              decimal value to be converted to CSD format
+    
+    WF: integer
+        number of fractional places. Default is WF = 0 (integer number)
+        
+    Returns:
+    --------
+    A string with the CSD value
+        
+    Original author: Harnesser
+    https://sourceforge.net/projects/pycsd/
+    License: GPL2
     
     """
+    
     debug=True 
     if debug: print("Converting %f " % ( dec_val ),)
 
@@ -108,16 +107,16 @@ def dec2csd(dec_val, places=0):
     else:
         WI_csd = np.ceil(np.log2(np.abs(dec_val) * 1.5))
         
-    csd_digits = []
 
     if debug: print("to %d.%d format" % (WI_csd, places ))
 
-    # Hone in on the CSD code for the input number
+    # Initialize CSD calculation
+    csd_digits = [] 
     remainder = dec_val
-    previous_non_zero = False
-    WI_csd -= 1
+    prev_non_zero = False
+    k -= 1 # current exponent in the CSD string under construction
     
-    while( WI_csd >= -places):
+    while( k >= -WF): # has the last fractional digit been reached
             
         limit = pow(2.0, WI_csd+1) / 3.0
 
@@ -160,14 +159,41 @@ def dec2csd(dec_val, places=0):
 
 
 def csd2dec(csd_str):
+    """
+    Convert the CSD string `csd_str` to a decimal, `csd_str` may contain '+' or 
+    '-', indicating whether the current bit is meant to positive or negative.
+    All other characters are simply ignored. 
+    
+    `csd_str` may be an integer or fractional CSD number.
+    
+    Parameters:
+    -----------
+    
+    csd_str : string
+    
+     A string with the CSD value to be converted, consisting of '+', '-', '.' 
+     and '0' characters.
+     
+    Returns:
+    --------
+    Real value of the CSD string
+    
+    Examples:
+    ---------
+    
+    +00- = +2³ - 2⁰ = +7
+    
+    -0+0 = -2³ + 2¹ = -6
+    
+    +0.-0- = 2¹ - 1/2¹ - 1/2³ = 1.375
+    
+    """
     debug=False 
-    """ Convert the CSD string to a decimal """
-
     if debug:
         print ("Converting: ", csd_str)
 
     #  Find out what the MSB power of two should be, keeping in
-    # mind we may have a fractional CSD number
+    #  mind we may have a fractional CSD number:
     try:
         (m,n) = csd_str.split('.')
         csd_str = csd_str.replace('.','') # get rid of point now...
