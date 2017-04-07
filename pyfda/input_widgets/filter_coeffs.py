@@ -778,7 +778,7 @@ class FilterCoeffs(QWidget):
     def _add_cells(self):
         """
         Add the number of selected rows to self.ba and fill new cells with
-        zeros. If nothing is selected, add one row at the bottom.
+        zeros from the bottom. If nothing is selected, add one row at the bottom.
         Refresh QTableWidget.
         """
         # get indices of all selected cells
