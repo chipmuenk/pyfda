@@ -27,12 +27,11 @@ import pyfda.pyfda_fix_lib as fix
 
 # TODO: editing neg. hex values and switching back to int gives a positive number
 # TODO: Clipboard functionality: - always use table display
-#                                - always return a horizontal table
+#                                - always return a vertical table
 #                                - always return fractional data with full precision?
 # TODO: a[0] : How to detect index in displayText? Or, center "=1" horizontally
 
 # TODO: detect overflows during quantization and color cells
-# TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
 # TODO: fix handling of decimal point, W, WI, WF
 
 class ItemDelegate(QStyledItemDelegate):
