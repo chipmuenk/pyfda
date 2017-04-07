@@ -682,7 +682,7 @@ class FilterCoeffs(QWidget):
         cr = "\n"   # newline character
         text = ""
 
-        sel = self._get_selected(self.tblCoeff)['sel']   
+        sel = self._get_selected(self.tblCoeff, reverse=False)['sel']   
         if not np.any(sel): # nothing selected -> copy everything raw from ba
             for r in range(self.num_rows):
 #                text += qstr(self.tblCoeff.horizontalHeaderItem(r).text())
@@ -711,20 +711,23 @@ class FilterCoeffs(QWidget):
         #self.textLabel.setText(self.clipboard.text()) # read from clipboard
 
 #------------------------------------------------------------------------------
-    def _get_selected(self, table):
+    def _get_selected(self, table, reverse=True):
         """
-        get selected cells and return:
-        - indices of selected cells
-        - list of selected cells per column, sorted in reverse
-        - current cell selection
+        Get selected cells in `table`and return a dictionary with the following keys:
+        
+        'idx': indices of selected cells as an unsorted list of tuples
+        
+        'sel': list of selected cells per column, by default sorted in reverse
+        
+        'cur':  current cell selection as a tuple
         """
         idx = []
         for _ in table.selectedItems():
             idx.append([_.column(), _.row(), ])
 
         sel = [0, 0]
-        sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse = True)
-        sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse = True)
+        sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse = reverse)
+        sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse = reverse)
 
         # use set comprehension to eliminate multiple identical entries
         # cols = sorted(list({i[0] for i in idx}))
