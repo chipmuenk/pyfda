@@ -844,11 +844,11 @@ class FilterCoeffs(QWidget):
         # -> change output format to 'frac' before quantizing and storing in self.ba
         self.myQ.frmt = 'frac'
 
-        sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
-        if not sel: # nothing selected, check whole table
+        idx = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
+        if not idx: # nothing selected, quantize all elements
             self.ba = self.myQ.fix(self.ba)
         else:
-            for i in sel:
+            for i in idx:
                 self.ba[i[0]][i[1]] = self.myQ.fix(self.ba[i[0]][i[1]])
 
         style_widget(self.butSave, 'changed')
