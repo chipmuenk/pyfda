@@ -35,7 +35,6 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: detect overflows during quantization and color cells
 # TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
 # TODO: fix handling of decimal point, W, WI, WF
-# TODO: what happens with complex / nearly real coefficients?
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -580,14 +579,12 @@ class FilterCoeffs(QWidget):
         The shadow register is a list of two ndarrays to allow different
         lengths for b and a subarrays while adding / deleting items.
         The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
-        otherwise the filter dict would be modified inadvertedly. Enforcing the
-        type np.complex is necessary, otherwise operations creating complex
-        coefficient values (or complex user entries) create errors.
+        otherwise the filter dict would be modified inadvertedly. 
         """
 
-        self.ba = [0, 0]
-        self.ba[0] = np.array(fb.fil[0]['ba'][0], dtype = complex)
-        self.ba[1] = np.array(fb.fil[0]['ba'][1], dtype = complex)
+        self.ba = [0., 0.]
+        self.ba[0] = np.array(fb.fil[0]['ba'][0])
+        self.ba[1] = np.array(fb.fil[0]['ba'][1])
 
         # set comboBoxes from dictionary
         self._load_q_settings()
@@ -663,12 +660,12 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _clear_table(self):
         """
-        Clear self.ba: Initialize coeff for two poles and zeros @ origin,
-        a = b = [1; 0; 0]. Initialize with dtype complex to avoid errors
-        if the data type becomes complex later on.
+        Clear self.ba: Initialize coeff for a poles and a zero @ origin,
+        a = b = [1; 0].
+
         Refresh QTableWidget
         """
-        self.ba = np.array([[1, 0, 0], [1, 0, 0]], dtype = np.complex)
+        self.ba = np.array([[1, 0], [1, 0]])
 
         self._refresh_table()
         style_widget(self.butSave, 'changed')
