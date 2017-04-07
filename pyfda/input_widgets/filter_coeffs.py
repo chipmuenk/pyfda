@@ -30,7 +30,6 @@ import pyfda.pyfda_fix_lib as fix
 #                                - always return a horizontal table
 #                                - always return fractional data with full precision?
 # TODO: a[0] : How to detect index in displayText? Or, center "=1" horizontally
-# TODO: Center table items in vertical direction
 
 # TODO: detect overflows during quantization and color cells
 # TDOD: _set_coeffs_zero triggers 'data changed' for a, b = 0 and when selecting cells
@@ -551,7 +550,7 @@ class FilterCoeffs(QWidget):
                     else: # no, construct it:
                         self.tblCoeff.setItem(row,col,QTableWidgetItem(
                               str(self.ba[col][row]).strip('()')))
-                    self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight)
+                    self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
 
             # make a[0] unselectable
             if fb.fil[0]['ft'] == 'IIR':
