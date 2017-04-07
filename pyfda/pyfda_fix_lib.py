@@ -447,9 +447,8 @@ class Fixed(object):
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
             logger.warn("Casting complex values to real before quantization!")
-            print("complex!")
             # quantizing complex objects is not supported yet
-            y = y.real()
+            y = y.real
 
         # Quantize inputs
         if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
