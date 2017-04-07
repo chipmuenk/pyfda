@@ -808,26 +808,32 @@ class FilterCoeffs(QWidget):
         and refresh QTableWidget
         """
         eps = float(self.ledSetEps.text())
-        sel = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
+        idx = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
 
         test_val = 0. # value against which array is tested
         targ_val = 0. # value which is set when condition is true
-        if not sel: # nothing selected, check whole table
+        
+        if not idx: # nothing selected, check whole table
             b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol = eps)
-            a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol = eps) 
-
             if np.any(b_0): # found at least one coeff where condition was true         
                 self.ba[0] = self.ba[0] * np.logical_not(b_0)
                 style_widget(self.butSave, 'changed')
-            if np.any(a_0):
-                self.ba[1] = self.ba[1] * np.logical_not(a_0)
-                style_widget(self.butSave, 'changed')
+            
+            if  fb.fil[0]['ft'] == 'IIR':
+                a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol = eps)
+                if np.any(a_0):
+                    self.ba[1] = self.ba[1] * np.logical_not(a_0)
+                    style_widget(self.butSave, 'changed')
 
         else: # only check selected cells
-            for i in sel:
-                self.ba[i[0]][i[1]] = self.ba[i[0]][i[1]] * np.logical_not(
-                                         np.isclose(self.ba[i[0]][i[1]], 0., rtol=0, atol = eps))
-            style_widget(self.butSave, 'changed')
+            changed = False
+            for i in idx:
+                if np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol = eps):
+                    self.ba[i[0]][i[1]] = targ_val
+                    changed = True
+            if changed:
+                # mark save button as changed
+                style_widget(self.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
