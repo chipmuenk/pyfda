@@ -701,6 +701,22 @@ class FilterCoeffs(QWidget):
                     if item.text() != "":
                         text += self.tblCoeff.itemDelegate().text(item)
 
+#==============================================================================
+#         else: # copy only selected cells in selected format
+#             tab = ", "
+#             for r in sel[0]:
+#                 item = self.tblCoeff.item(r,0)
+#                 if item:
+#                     if item.text() != "":
+#                         text += self.tblCoeff.itemDelegate().text(item)
+#             text += cr
+#             for r in sel[1]:
+#                 item = self.tblCoeff.item(r,1)
+#                 if item:
+#                     if item.text() != "":
+#                         text += self.tblCoeff.itemDelegate().text(item)
+# 
+#==============================================================================
         self.clipboard.setText(text)
 
         #self.textLabel.setText(self.clipboard.text()) # read from clipboard
