@@ -33,6 +33,7 @@ import pyfda.pyfda_fix_lib as fix
 
 # TODO: detect overflows during quantization and color cells
 # TODO: fix handling of decimal point, W, WI, WF
+# TODO: Remove "scalar" + CSD debug statement
 
 class ItemDelegate(QStyledItemDelegate):
     """
