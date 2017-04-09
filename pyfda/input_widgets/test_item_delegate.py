@@ -8,13 +8,12 @@ from PyQt4.QtGui import (QWidget, QLineEdit, QApplication, QFont,
                       QTableWidget, QTableWidgetItem, QVBoxLayout,
                       QStyledItemDelegate)
 from PyQt4.QtGui import QStyle
-from PyQt4 import Qt
+from PyQt4.QtCore import Qt
 import numpy as np
 
 class ItemDelegate(QStyledItemDelegate):
     """
-    The following methods are subclassed to replace display and editor of the
-    QTableWidget.
+    The following methods override the original methods of QTableWidgetItem.
     """
     def __init__(self, parent):
         """
@@ -23,22 +22,20 @@ class ItemDelegate(QStyledItemDelegate):
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
 
-        
-    def paint(self, painter, option, index):
+    def initStyleOption(self, option, index):
         """
-        painter:  instance of QPainter
-        option: instance of QStyleOptionViewItem(V4?)
-        index:   instance of QModelIndex
+        Initialize `option` with the values using the `index` index. When the 
+        item (0,1) is processed, it is styled especially. All other items are 
+        passed to the original `initStyleOption()` which then calls `displayText()`.
         """
-        style_option = option
-        # read text to be shown:
         if index.row() == 0 and index.column() == 1: # a[0]: always 1
-            style_option.text = "1!" # QString object
-            style_option.font.setBold(True)
-            # now paint the cell
-            self.parent.style().drawControl(QStyle.CE_ItemViewItem, style_option, painter)
+            option.text = "1!" # QString object
+            option.font.setBold(True) 
+            option.displayAlignment = Qt.AlignRight
+            #option.backgroundBrush ...
         else:
-            super(ItemDelegate, self).paint(painter, option, index) # default painter
+            # continue with the original `initStyleOption()`
+            super(ItemDelegate, self).initStyleOption(option, index)     
 
     def displayText(self, text, locale):
         """
