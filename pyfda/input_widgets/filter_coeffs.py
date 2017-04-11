@@ -527,7 +527,7 @@ class FilterCoeffs(QWidget):
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
                 qset_cmb_box(self.cmbFilterType, 'IIR')
 
-            self.ba[1][0] = 1.0 # restore fa[0] = 1 of denonimator polynome
+                self.ba[1][0] = 1.0 # restore fa[0] = 1 of denonimator polynome
                    
             self.tblCoeff.setRowCount(self.num_rows)
             self.tblCoeff.setColumnCount(self.num_cols)
