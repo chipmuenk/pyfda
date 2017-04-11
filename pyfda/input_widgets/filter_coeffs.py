@@ -21,7 +21,9 @@ from ..compat import (Qt, QtCore, QWidget, QLabel, QLineEdit, QComboBox, QApplic
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval, style_widget, set_cmb_box, qstr
+from pyfda.pyfda_lib import fil_save, safe_eval
+from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qstr, 
+                                qcopy_to_clipboard, qget_selected)
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
@@ -161,7 +163,7 @@ class ItemDelegate(QStyledItemDelegate):
             data = self.parent.myQ.fix_base(qstr(editor.text())) # transform back to fractional
         model.setData(index, data)                          # store in QTableWidget 
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
-        style_widget(self.parent.butSave, 'changed')
+        qstyle_widget(self.parent.butSave, 'changed')
         
 
 class FilterCoeffs(QWidget):
@@ -467,14 +469,14 @@ class FilterCoeffs(QWidget):
         if self.cmbFilterType.currentText() == 'IIR':
             fb.fil[0]['ft'] = 'IIR'
             self.col = 2
-            set_cmb_box(self.cmbFilterType, 'IIR')
+            qset_cmb_box(self.cmbFilterType, 'IIR')
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
 
         else:
             fb.fil[0]['ft'] = 'FIR'
             self.col = 1
-            set_cmb_box(self.cmbFilterType, 'FIR')
+            qset_cmb_box(self.cmbFilterType, 'FIR')
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
 
@@ -505,10 +507,10 @@ class FilterCoeffs(QWidget):
                 self.cmbFormat.setEnabled(True)
             else:
                 self.frmQSettings.setVisible(False)
-                set_cmb_box(self.cmbFormat, "Frac")
+                qset_cmb_box(self.cmbFormat, "Frac")
                 self.cmbFormat.setEnabled(False)
-                set_cmb_box(self.cmbQOvfl, "none")
-                set_cmb_box(self.cmbQQuant, "none")
+                qset_cmb_box(self.cmbQOvfl, "none")
+                qset_cmb_box(self.cmbQQuant, "none")
             self._store_q_settings() # store updated quantization settings
 
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))
@@ -519,12 +521,12 @@ class FilterCoeffs(QWidget):
                 self.num_cols = 1
                 self.tblCoeff.setColumnCount(1)
                 self.tblCoeff.setHorizontalHeaderLabels(["b"])
-                set_cmb_box(self.cmbFilterType, 'FIR')
+                qset_cmb_box(self.cmbFilterType, 'FIR')
             else:
                 self.num_cols = 2
                 self.tblCoeff.setColumnCount(2)
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-                set_cmb_box(self.cmbFilterType, 'IIR')
+                qset_cmb_box(self.cmbFilterType, 'IIR')
 
             self.ba[1][0] = 1.0 # restore fa[0] = 1 of denonimator polynome
                    
@@ -583,7 +585,8 @@ class FilterCoeffs(QWidget):
         self._load_q_settings()
 
         self._refresh_table()
-        style_widget(self.butSave, 'normal')
+        qstyle_widget(self.butSave, 'normal')
+        
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
@@ -609,9 +612,9 @@ class FilterCoeffs(QWidget):
         q_coeff = fb.fil[0]['q_coeff']
         self.ledQuantI.setText(str(q_coeff['WI']))
         self.ledQuantF.setText(str(q_coeff['WF']))
-        set_cmb_box(self.cmbQQuant, q_coeff['quant'])
-        set_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
-        set_cmb_box(self.cmbFormat, q_coeff['frmt'])
+        qset_cmb_box(self.cmbQQuant, q_coeff['quant'])
+        qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
+        qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
 
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
@@ -648,7 +651,7 @@ class FilterCoeffs(QWidget):
         self.sigFilterDesigned.emit() # -> filter_specs
         # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
 
-        style_widget(self.butSave, 'normal')
+        qstyle_widget(self.butSave, 'normal')
 
 #------------------------------------------------------------------------------
     def _clear_table(self):
@@ -716,31 +719,8 @@ class FilterCoeffs(QWidget):
 
         #self.textLabel.setText(self.clipboard.text()) # read from clipboard
 
-#------------------------------------------------------------------------------
-    def _get_selected(self, table, reverse=True):
-        """
-        Get selected cells in `table`and return a dictionary with the following keys:
-        
-        'idx': indices of selected cells as an unsorted list of tuples
-        
-        'sel': list of selected cells per column, by default sorted in reverse
-        
-        'cur':  current cell selection as a tuple
-        """
-        idx = []
-        for _ in table.selectedItems():
-            idx.append([_.column(), _.row(), ])
+        qstyle_widget(self.butSave, 'changed')
 
-        sel = [0, 0]
-        sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse = reverse)
-        sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse = reverse)
-
-        # use set comprehension to eliminate multiple identical entries
-        # cols = sorted(list({i[0] for i in idx}))
-        # rows = sorted(list({i[1] for i in idx}))
-        cur = (table.currentColumn(), table.currentRow())
-        # cur_idx_row = table.currentIndex().row()
-        return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
 
 #------------------------------------------------------------------------------
     def _equalize_ba_length(self):
@@ -769,7 +749,7 @@ class FilterCoeffs(QWidget):
         Finally, the QTableWidget is refreshed from self.ba.
         """
         # TODO: FIR and IIR need to be treated separately
-        sel = self._get_selected(self.tblCoeff)['sel'] # get indices of all selected cells
+        sel = qget_selected(self.tblCoeff)['sel'] # get indices of all selected cells
         if not np.any(sel) and len(self.ba[0] > 0):
             self.ba[0] = np.delete(self.ba[0], -1)
             self.ba[1] = np.delete(self.ba[1], -1)
@@ -791,7 +771,7 @@ class FilterCoeffs(QWidget):
         Refresh QTableWidget.
         """
         # get indices of all selected cells
-        sel = self._get_selected(self.tblCoeff)['sel']
+        sel = qget_selected(self.tblCoeff)['sel']
 
         if not np.any(sel):
             sel[0] = [len(self.ba[0])]
@@ -805,7 +785,7 @@ class FilterCoeffs(QWidget):
 
         self._equalize_ba_length()
         self._refresh_table()
-        style_widget(self.butSave, 'changed')
+        qstyle_widget(self.butSave, 'changed')
 
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
@@ -814,7 +794,7 @@ class FilterCoeffs(QWidget):
         and refresh QTableWidget
         """
         eps = float(self.ledSetEps.text())
-        idx = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
+        idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
 
         test_val = 0. # value against which array is tested
         targ_val = 0. # value which is set when condition is true
@@ -823,13 +803,13 @@ class FilterCoeffs(QWidget):
             b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol = eps)
             if np.any(b_0): # found at least one coeff where condition was true         
                 self.ba[0] = self.ba[0] * np.logical_not(b_0)
-                style_widget(self.butSave, 'changed')
+                qstyle_widget(self.butSave, 'changed')
             
             if  fb.fil[0]['ft'] == 'IIR':
                 a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol = eps)
                 if np.any(a_0):
                     self.ba[1] = self.ba[1] * np.logical_not(a_0)
-                    style_widget(self.butSave, 'changed')
+                    qstyle_widget(self.butSave, 'changed')
 
         else: # only check selected cells
             changed = False
@@ -839,7 +819,7 @@ class FilterCoeffs(QWidget):
                     changed = True
             if changed:
                 # mark save button as changed
-                style_widget(self.butSave, 'changed')
+                qstyle_widget(self.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -853,14 +833,14 @@ class FilterCoeffs(QWidget):
         # -> change output format to 'frac' before quantizing and storing in self.ba
         self.myQ.frmt = 'frac'
 
-        idx = self._get_selected(self.tblCoeff)['idx'] # get all selected indices
+        idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
             self.ba = self.myQ.fix(self.ba)
         else:
             for i in idx:
                 self.ba[i[0]][i[1]] = self.myQ.fix(self.ba[i[0]][i[1]])
 
-        style_widget(self.butSave, 'changed')
+        qstyle_widget(self.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------

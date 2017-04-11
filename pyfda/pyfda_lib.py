@@ -1444,17 +1444,6 @@ def rt_label(label, it = True):
     return html_label
 
 #------------------------------------------------------------------------------
-def HLine(QFrame, widget):
-    # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-    # solution 
-    """
-    Create a horizontal line
-    """
-    line = QFrame(widget)
-    line.setFrameShape(QFrame.HLine)
-    line.setFrameShadow(QFrame.Sunken)
-    return line
-
 
 if __name__=='__main__':
     pass
