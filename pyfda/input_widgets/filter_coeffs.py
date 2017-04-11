@@ -586,6 +586,10 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
         qstyle_widget(self.butSave, 'normal')
         
+    #------------------------------------------------------------------------------
+    def _copy_to_clipboard(self, tab = "\t", cr = None):
+        
+        qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard)
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
@@ -663,61 +667,6 @@ class FilterCoeffs(QWidget):
         self.ba = np.array([[1, 0], [1, 0]])
 
         self._refresh_table()
-        style_widget(self.butSave, 'changed')
-
-#------------------------------------------------------------------------------
-    def _copy_to_clipboard(self):
-        """
-        Copy table from self.ba to clipboard as CSV list
-        """
-        tab = "\t"  # tab character
-        cr = "\n"   # newline character
-        text = ""
-
-        sel = self._get_selected(self.tblCoeff, reverse=False)['sel']   
-        if not np.any(sel): # nothing selected -> copy everything raw from ba
-            for r in range(self.num_rows):
-#                text += qstr(self.tblCoeff.horizontalHeaderItem(r).text())
-                for c in range(self.num_cols):
-                    text += str(self.ba[c][r])
-                    if c != self.num_cols:
-                        text += tab
-                if r != self.num_rows:
-                    text += cr
-        else: # copy only selected cells in selected format
-            tab = ", "
-            for r in sel[0]:
-                item = self.tblCoeff.item(r,0)
-                if item:
-                    if item.text() != "":
-                        text += self.tblCoeff.itemDelegate().text(item)
-            text += cr
-            for r in sel[1]:
-                item = self.tblCoeff.item(r,1)
-                if item:
-                    if item.text() != "":
-                        text += self.tblCoeff.itemDelegate().text(item)
-
-#==============================================================================
-#         else: # copy only selected cells in selected format
-#             tab = ", "
-#             for r in sel[0]:
-#                 item = self.tblCoeff.item(r,0)
-#                 if item:
-#                     if item.text() != "":
-#                         text += self.tblCoeff.itemDelegate().text(item)
-#             text += cr
-#             for r in sel[1]:
-#                 item = self.tblCoeff.item(r,1)
-#                 if item:
-#                     if item.text() != "":
-#                         text += self.tblCoeff.itemDelegate().text(item)
-# 
-#==============================================================================
-        self.clipboard.setText(text)
-
-        #self.textLabel.setText(self.clipboard.text()) # read from clipboard
-
         qstyle_widget(self.butSave, 'changed')
 
 
