@@ -31,12 +31,11 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a vertical table
 #                                - always return fractional data with full precision?
-# TODO: a[0] : How to detect index in displayText? Or, center "=1" horizontally
 
 # TODO: detect overflows during quantization and color cells
 # TODO: fix handling of decimal point, W, WI, WF
 # TODO: Remove "scalar" + CSD debug statement
-
+# TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
@@ -748,7 +747,6 @@ class FilterCoeffs(QWidget):
         When nothing is selected, delete the last row.
         Finally, the QTableWidget is refreshed from self.ba.
         """
-        # TODO: FIR and IIR need to be treated separately
         sel = qget_selected(self.tblCoeff)['sel'] # get indices of all selected cells
         if not np.any(sel) and len(self.ba[0] > 0):
             self.ba[0] = np.delete(self.ba[0], -1)
