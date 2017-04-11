@@ -706,8 +706,11 @@ class FilterCoeffs(QWidget):
 
         # test and equalize if b and a array have different lengths:
         self._equalize_ba_length()
-        self._refresh_table()
-        style_widget(self.butSave, 'changed')
+        if len(self.ba[0]) < 2:
+            self._clear_table()
+        else:
+            self._refresh_table()
+            qstyle_widget(self.butSave, 'changed')
 
 
 #------------------------------------------------------------------------------
