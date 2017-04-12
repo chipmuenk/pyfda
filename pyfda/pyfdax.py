@@ -61,7 +61,7 @@ from pyfda import qrc_resources # contains all icons
 # edit pyfda.qrc, then
 # create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
 #   or          pyrcc5 pyfda.qrc -o qrc_resources.py
-# and manually replace "from from PyQt5 import QtCore"
+# and manually replace "from from PyQt4/5 import QtCore"
 #   by "from .compat import QtCore" in qrc_resources.py
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
