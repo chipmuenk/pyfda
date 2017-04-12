@@ -13,6 +13,7 @@ Author: Christian Muenker
 from __future__ import division, unicode_literals, print_function, absolute_import
 from collections import defaultdict
 from .frozendict import freeze_hierarchical
+from .compat import QSysInfo
 #import importlib
 #import logging
 #import six
@@ -218,4 +219,25 @@ fil[0] = defaultdict(lambda: 0.123)
 # Now, copy each key-value pair into the defaultdict
 for k in fil_init:
     fil[0].update({k:fil_init[k]})
+    
+
+"""
+Find out which OS and which OS version the application runs under
+"""
+if hasattr(QSysInfo, "WindowsVersion"):
+    OS = "WIN"
+    OS_ver = QSysInfo.WindowsVersion
+    cr = "\r\n" # Windows: carriage return + line feed
+elif hasattr(QSysInfo, "MacintoshVersion"):
+    OS = "MAC"
+    OS_ver = QSysInfo.MacintoshVersion
+    cr = "\r" # Mac: carriage return only
+else:
+    OS = "UNIX"
+    OS_ver = None
+    #TODO: Add some info about unix version
+    cr = "\n" # *nix: line feed only
+print(OS, OS_ver)       
+
+
 
