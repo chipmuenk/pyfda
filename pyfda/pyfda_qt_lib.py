@@ -7,20 +7,13 @@ Created 2012 - 2017
 Library with common routines for Qt widgets
 """
 
-
 from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
 import csv
 import numpy as np
-#from numpy import pi, log10, arctan
 
-from .compat import (Qt, QtCore, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
-                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize, QStyle,
-                      QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
-                      pyqtSignal, QEvent, QStyledItemDelegate,
-                      QSysInfo)
-
+from .compat import Qt, QtCore, QFrame, QFont, QEvent, QSysInfo
 
 #import pyfda.simpleeval as se
 
