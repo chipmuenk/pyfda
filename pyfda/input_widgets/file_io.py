@@ -51,7 +51,7 @@ else:
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_rc as rc 
 import pyfda.pyfda_fix_lib as fix_lib
-from pyfda.pyfda_lib import HLine, extract_file_ext
+from pyfda.pyfda_lib import extract_file_ext
 
 # TODO: Save P/Z as well if possible
 
@@ -102,15 +102,18 @@ class File_IO(QWidget):
         layVIO = QVBoxLayout()
         layVIO.addWidget(self.butSave) # save filter dict -> various formats
         layVIO.addWidget(self.butLoad) # load filter dict -> various formats
-        layVIO.addWidget(HLine(QFrame, self))
+        layVIO.addStretch(1)
+        
         layVIO.addWidget(self.butExport) # export coeffs -> various formats
         layVIO.addWidget(self.butImport) # export coeffs -> various formats
-        layVIO.addWidget(HLine(QFrame, self))
+        layVIO.addStretch(1)
 
         layHIO = QHBoxLayout()        
         layHIO.addWidget(lblSeparator)
         layHIO.addWidget(self.cmbSeparator)        
         layVIO.addLayout(layHIO)
+        layVIO.addStretch(20)
+        
 
         # This is the top level widget, encompassing the other widgets        
         frmMain = QFrame(self)
