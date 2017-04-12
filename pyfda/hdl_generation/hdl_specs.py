@@ -23,7 +23,7 @@ from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff
 import pyfda.pyfda_fix_lib as fix
-from pyfda.pyfda_lib import HLine, extract_file_ext
+from pyfda.pyfda_lib import extract_file_ext
 from pyfda.pyfda_rc import params
 
 from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
@@ -64,13 +64,26 @@ class HDLSpecs(QWidget):
         ifont = QFont()
         ifont.setItalic(True)
 
-        self.lblMyhdl1 = QLabel("Warning! This feature is only experimental, "
+        lblMsg = QLabel("Warning! This feature is only experimental, "
         "only HDL code for second order IIR filters under the name siir_hdl.v "
         " resp. siir_hdl.vhd are created at the moment. Files are saved "
         " in the pyFDA root directory.", self)
-        self.lblMyhdl1.setWordWrap(True)
-#        self.lblMyhdl1.setFont(bfont)
-        self.lblMyhdl2 = QLabel("Enter fixpoint signal formats as WI.WF:", self)
+        lblMsg.setWordWrap(True)
+        layHMsg = QHBoxLayout()
+        layHMsg.addWidget(lblMsg)   
+
+        self.frmMsg = QFrame(self)
+        self.frmMsg.setLayout(layHMsg)
+        self.frmMsg.setContentsMargins(*params['wdg_margins'])
+
+# =============================================================================
+# UI for quantization
+# =============================================================================
+        
+        lblHBtnsMsg = QLabel("Fixpoint signal / coeff. formats as WI.WF:", self)
+        lblHBtnsMsg.setFont(bfont)
+        self.layHBtnsMsg = QHBoxLayout()
+        self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
         ledMaxWid = 30 # Max. Width of QLineEdit fields
         qQuant = ['none', 'round', 'fix', 'floor']
@@ -83,7 +96,7 @@ class HDLSpecs(QWidget):
         lblOv = "Ovfl.:"
 
 # -------------------------------------------------------------------
-# UI for input format 
+# subUI -- self.layHButtonsHDL_i -- for input format 
 # -------------------------------------------------------------------
         self.lblWInput = QLabel("Input Format:", self)
         self.lblWInput.setFont(bifont)
@@ -108,9 +121,9 @@ class HDLSpecs(QWidget):
         self.layHButtonsHDL_i.addWidget(self.lblDotInput)
         self.layHButtonsHDL_i.addWidget(self.ledWFInput)
         
-# -------------------------------------------------------------------
-# UI for coefficient format 
-# -------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# subUI -- self.layHButtonsHDL_cc -- for coefficient format 
+# -----------------------------------------------------------------------------
         enb_coeff = False
         self.lblQCoeff = QLabel("Coeff. Format:", self)
         self.lblQCoeff.setFont(bifont)
@@ -166,9 +179,9 @@ class HDLSpecs(QWidget):
         self.layHButtonsHDL_cc.addWidget(self.cmbQuant_c)
         self.layHButtonsHDL_cc.setEnabled(False)
         
-# -------------------------------------------------------------------
-# UI for accumulator format / overflow behaviour
-# -------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# subUI -- self.layHButtonsHDL_ac -- for accumulator format / overflow behaviour
+# -----------------------------------------------------------------------------
         # ---------- Accumulator format --------------
         self.lblQAccu = QLabel("Accumulator Format:", self)
         self.lblQAccu.setFont(bifont)
@@ -215,10 +228,10 @@ class HDLSpecs(QWidget):
         self.layHButtonsHDL_ac.addWidget(self.lblQuant_a)
         self.layHButtonsHDL_ac.addWidget(self.cmbQuant_a)
 
-# -------------------------------------------------------------------
-# UI for output format and overflow behaviour
-# -------------------------------------------------------------------
-        # ---------- Output format --------------
+# -----------------------------------------------------------------------------
+# subUI -- self.layHButtonsHDL_o -- for output format and overflow behaviour
+# -----------------------------------------------------------------------------
+
         enb_o_ui = False
         self.lblQOutput = QLabel("Output Format:", self)
         self.lblQOutput.setFont(bifont)
@@ -265,7 +278,6 @@ class HDLSpecs(QWidget):
         self.cmbOvfl_o.setToolTip(tipOvfl)
         self.cmbOvfl_o.setEnabled(enb_o_ui)
 
-
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQuant_o.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbOvfl_o.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -291,11 +303,9 @@ class HDLSpecs(QWidget):
         self.layHButtonsHDL_h.addWidget(self.butExportHDL)
 
 # -------------------------------------------------------------------        
+
         layVBtns = QVBoxLayout()
-        layVBtns.addWidget(self.lblMyhdl1)
-        layVBtns.addWidget(HLine(QFrame, self))
-        layVBtns.addWidget(self.lblMyhdl2)
-        layVBtns.addWidget(HLine(QFrame, self))
+        layVBtns.addLayout(self.layHBtnsMsg)
         layVBtns.addLayout(self.layHButtonsHDL_i)
         
         layVBtns.addLayout(self.layHButtonsHDL_c)
@@ -311,13 +321,17 @@ class HDLSpecs(QWidget):
 
         # -------------------------------------------------------------------
         # This frame encompasses all the buttons            
-        frmMain = QFrame(self)
-        frmMain.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmMain.setLayout(layVBtns)
+        frmBtns = QFrame(self)
+        frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmBtns.setLayout(layVBtns)
 
-# -------------------------------------------------------------------
+    # -------------------------------------------------------------------
+    # Top level layout
+    # -------------------------------------------------------------------
         layVMain = QVBoxLayout()
-        layVMain.addWidget(frmMain)
+        layVMain.addWidget(self.frmMsg)
+#        layVMain.addWidget(self.frmFixpoint)
+        layVMain.addWidget(frmBtns)
         layVMain.setContentsMargins(*params['wdg_margins'])
         
         layVMain.addStretch()
