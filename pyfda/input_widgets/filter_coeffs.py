@@ -16,7 +16,7 @@ import sys
 from ..compat import (Qt, QtCore, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
                       QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize, QStyle,
                       QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
-                      pyqtSignal, QEvent, QStyledItemDelegate)
+                      pyqtSignal, QEvent, QStyledItemDelegate, QColor, QBrush)
 
 import numpy as np
 
@@ -65,10 +65,13 @@ class ItemDelegate(QStyledItemDelegate):
         passed to the original `initStyleOption()` which then calls `displayText()`.
         """
         if index.row() == 0 and index.column() == 1: # a[0]: always 1
-            option.text = "1!" # QString object
+            option.text = "1" # QString object
             option.font.setBold(True) 
-            option.displayAlignment = Qt.AlignRight
-            #option.backgroundBrush ...
+            option.displayAlignment = Qt.AlignRight | Qt.AlignCenter
+            # see http://zetcode.com/gui/pyqt5/painting/ : 
+            option.backgroundBrush = QBrush(Qt.BDiagPattern)#QColor(100, 200, 100, 200))
+            option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
+            # option.state           
         else:
             # continue with the original `initStyleOption()`
             super(ItemDelegate, self).initStyleOption(option, index)
