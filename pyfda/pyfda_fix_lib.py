@@ -97,8 +97,7 @@ def dec2csd(dec_val, WF=0):
 
     """
 
-    debug=True
-    if debug: print("Converting %f " % ( dec_val ),)
+    logger.debug("Converting {0:f}:".format(dec_val))
 
     # figure out binary range, special case for 0
     if dec_val == 0 :
@@ -108,7 +107,7 @@ def dec2csd(dec_val, WF=0):
     else:
         k = np.ceil(np.log2(np.abs(dec_val) * 1.5))
 
-    if debug: print("to %d.%d format" % (k, WF ))
+    logger.debug("to {0:d}.{1:d} format".format(k, WF))
 
     # Initialize CSD calculation
     csd_digits = []
@@ -120,7 +119,7 @@ def dec2csd(dec_val, WF=0):
 
         limit = pow(2.0, k+1) / 3.0
 
-        if debug: print ("  ", remainder, limit,)
+        logger.debug("\t{0} - {1}".format(remainder, limit))
 
         # decimal point?
         if k == -1 :
@@ -147,7 +146,7 @@ def dec2csd(dec_val, WF=0):
 
         k -= 1
 
-        if debug: print(csd_digits)
+        logger.debug(csd_digits)
 
     # Always have something before the point
     if np.fabs(dec_val) < 1.0:
@@ -188,9 +187,7 @@ def csd2dec(csd_str):
     +0.-0- = 2¹ - 1/2¹ - 1/2³ = 1.375
 
     """
-    debug=False
-    if debug:
-        print ("Converting: ", csd_str)
+    logger.debug("Converting: {0}".format(csd_str))
 
     #  Find out what the MSB power of two should be, keeping in
     #  mind we may have a fractional CSD number:
@@ -217,8 +214,7 @@ def csd2dec(csd_str):
         # else
         #    ... all other values are ignored
 
-        if debug:
-            print('  "%s" (%d.%d); 2**%d = %d; Num=%f' % (
+        logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4:d}; Num={5:f}'.format(
                 csd_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
 
     return dec_val
@@ -422,7 +418,6 @@ class Fixed(object):
         """
 
         if np.shape(y):
-            print("array")
             # create empty arrays for result and overflows with same shape as y for speedup
             SCALAR = False
             y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
@@ -432,7 +427,6 @@ class Fixed(object):
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
         else:
-            print("scalar")
             SCALAR = True
             if not isinstance(y, (float, int, complex)):
                 y = qstr(y)
@@ -441,7 +435,7 @@ class Fixed(object):
                 try:
                     y = complex(y)
                 except ValueError as e:
-                    print(y, '\n', e)
+                    logger.error(y, '\n', e)
             over_pos = over_neg = yq = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
