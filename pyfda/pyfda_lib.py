@@ -1107,7 +1107,10 @@ def fil_convert(fil_dict, format_in):
     
     if 'sos' in format_in:
         if 'zpk' not in format_in:
-            fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
+            try:
+                fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
+            except Exception as e:
+                logger.error(e)
             # check whether sos conversion has created a additional (superfluous)
             # pole and zero at the origin and delete them:
             z_0 = np.where(fil_dict['zpk'][0] == 0)[0]
@@ -1117,7 +1120,10 @@ def fil_convert(fil_dict, format_in):
                 fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1],p_0)
 
         if 'ba' not in format_in:
-            fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
+            try:
+                fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
+            except Exception as e:
+                logger.error(e)
             # check whether sos conversion has created additional (superfluous)
             # highest order polynomial with coefficient 0 and delete them
             if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
@@ -1127,7 +1133,10 @@ def fil_convert(fil_dict, format_in):
     elif 'zpk' in format_in: # z, p, k have been generated,convert to other formats
         zpk = fil_dict['zpk']
         if 'ba' not in format_in:
-            fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
+            try:
+                fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
+            except Exception as e:
+                logger.error(e)
         if 'sos' not in format_in:
             fil_dict['sos'] = [] # don't convert zpk -> SOS due to numerical inaccuracies
 #            try:
@@ -1138,7 +1147,10 @@ def fil_convert(fil_dict, format_in):
                 
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
-        fil_dict['zpk'] = list(sig.tf2zpk(b,a))
+        try:
+            fil_dict['zpk'] = list(sig.tf2zpk(b,a))
+        except Exception as e:
+            logger.error(e)
         fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
 #            try:
