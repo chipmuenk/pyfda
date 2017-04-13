@@ -23,8 +23,7 @@ from .compat import QSysInfo
 base_dir = ""
 
 # store old data when modifying a field for restoring if new data is invalid
-data_old = "" 
-
+data_old = ""
 
 # State of filter design: "ok", "changed", "error", "failed"
 design_filt_state = "changed"
