@@ -134,7 +134,9 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.ba[index.column()][index.row()] # data from self.ba
-
+        fb.data_old = data # store old data
+        print(fb.data_old)
+        
         if self.parent.myQ.frmt == 'frac':
             editor.setText(str(safe_eval(data))) # no string formatting, pass full resolution
         else:
