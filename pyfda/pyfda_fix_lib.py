@@ -105,7 +105,7 @@ def dec2csd(dec_val, WF=0):
     if np.fabs(dec_val) < 1.0 :
         k = 0
     else:
-        k = np.ceil(np.log2(np.abs(dec_val) * 1.5))
+        k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
 
     logger.debug("to {0:d}.{1:d} format".format(k, WF))
 
