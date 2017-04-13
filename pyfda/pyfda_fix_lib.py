@@ -12,7 +12,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-from .pyfda_lib import qstr
+from .pyfda_qt_lib import qstr
+from .filterbroker import data_old
 __version__ = 0.5
 
 def hex_tc(val, nbits):
