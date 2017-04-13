@@ -28,7 +28,7 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: editing neg. hex values and switching back to int gives a positive number
-# TODO: entering invalid literals for hex, int, bin crashes app in int_tc
+# TODO: storing data_old doesnt work
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a vertical table
 #                                - always return fractional data with full precision?
