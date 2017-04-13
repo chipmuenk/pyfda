@@ -28,13 +28,13 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: editing neg. hex values and switching back to int gives a positive number
+# TODO: entering invalid literals for hex, int, bin crashes app in int_tc
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a vertical table
 #                                - always return fractional data with full precision?
 
 # TODO: detect overflows during quantization and color cells
 # TODO: fix handling of decimal point, W, WI, WF
-# TODO: Remove "scalar" + CSD debug statement
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 class ItemDelegate(QStyledItemDelegate):
     """
