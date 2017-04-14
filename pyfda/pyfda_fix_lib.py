@@ -505,12 +505,11 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def fix_base(self, y, frmt=None):
         """
-        Return fractional representation `yq` of `y` (scalar or array-like),
-        yq.shape = y.shape
+        Return fractional representation `yq` of `y` (scalar)
 
         Parameters
         ----------
-        y: scalar or array-like object
+        y: scalar
             to be quantized with the numeric base specified by `frmt`.
 
         frmt: string (optional)
@@ -519,8 +518,7 @@ class Fixed(object):
 
         Returns
         -------
-        yq: float or ndarray
-            with the same shape as `y` (fractional format).
+        yq: float in fractional format
             The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
         """
         if not frmt:
