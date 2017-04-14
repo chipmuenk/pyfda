@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 from .pyfda_qt_lib import qstr
-from .filterbroker import data_old
+import pyfda.filterbroker as fb
+
 __version__ = 0.5
 
 def hex_tc(val, nbits):
@@ -64,14 +65,18 @@ def int_tc(val, nbits, base):
         raise TypeError
         return None
     else:
-        i = int(val, base)
-        if i <= 0 or i < (1 << nbits): # less than 2 ^ nbits
-            return i
-        else:
-            return i - (1 << nbits)
-
-
-
+        try:
+            i = int(val, base)
+            if i <= 0 or i < (1 << (nbits-1)): # less than Max/2
+                return i
+            else:
+                return i - (1 << nbits)
+        except ValueError:
+            logger.warn("Invalid literal {0:s}".format(val))
+            if fb.data_old:
+                return fb.data_old # restore old value
+            else:
+                return 0
 
 
 def dec2csd(dec_val, WF=0):
@@ -522,9 +527,23 @@ class Fixed(object):
             frmt = self.frmt
         frmt = frmt.lower()
         if frmt == 'frac':
-            return self.fix(y)
+            f = self.fix(y)
+            if f:
+                return f
+            elif fb.data_old:
+                return fb.data_old
+            else:
+                return 0
+                
         elif frmt in {'hex', 'bin', 'int'}:
-            return (int_tc_u(y, self.W, self.base) / (1 << self.WF))
+            int_ = int_tc(y, self.W, self.base)
+            if int_:
+                return (int_ / (1 << self.WF))
+            elif fb.data_old:
+                return fb.data_old # restore old value
+            else:
+                return 0
+
         elif frmt == 'csd':
             return csd2dec(y) / (1 << self.WF)
         else:
