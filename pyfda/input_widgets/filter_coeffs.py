@@ -27,7 +27,6 @@ from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qstr,
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: editing neg. hex values and switching back to int gives a positive number
 # TODO: storing data_old doesnt work
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a vertical table
@@ -136,7 +135,6 @@ class ItemDelegate(QStyledItemDelegate):
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.ba[index.column()][index.row()] # data from self.ba
         fb.data_old = data # store old data
-        print(fb.data_old)
         
         if self.parent.myQ.frmt == 'frac':
             editor.setText(str(safe_eval(data))) # no string formatting, pass full resolution
