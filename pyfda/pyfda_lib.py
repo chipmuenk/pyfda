@@ -65,11 +65,12 @@ def safe_eval(expr, alt_expr=0):
     try:
         # eliminate very small imaginary components due to rounding errors
         result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
-    except (SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+    except Exception as e:
         logger.warn(e)
         try:
             result = np.asscalar(np.real_if_close(se.simple_eval(alt_expr), tol = 100))
-        except (SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+        except Exception as e:
+            #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
             logger.warn(e)
             result = 0
     return result
