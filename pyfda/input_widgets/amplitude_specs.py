@@ -132,6 +132,8 @@ class AmplitudeSpecs(QWidget):
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_dict()
+                # store current entry in case new value can't be evaluated:
+                fb.data_old = source.text()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -236,7 +238,7 @@ class AmplitudeSpecs(QWidget):
             unit = str(self.cmbUnitsA.currentText())
             filt_type = fb.fil[0]['ft']
             amp_label = str(source.objectName())
-            amp_value = safe_eval(source.text())
+            amp_value = safe_eval(source.text(), fb.data_old)
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag

@@ -91,12 +91,13 @@ class ItemDelegate(QStyledItemDelegate):
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
         """ 
-        data = qstr(text) # convert to "normal" string
+        string = qstr(text) # convert to "normal" string
 
         if self.parent.myQ.frmt == 'frac':
-            return "{0:.{1}g}".format(safe_eval(data), params['FMT_ba'])
+            data = safe_eval(string, fb.data_old)
+            return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.repr_fix(data), self.parent.myQ.digits)
+            return "{0:>{1}}".format(self.parent.myQ.repr_fix(string), self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):

@@ -44,19 +44,36 @@ import pyfda.simpleeval as se
 
 #### General functions ########################################################
 
-def safe_eval(expr):
+def safe_eval(expr, alt_expr=0):
     """
-    try ... except wrapper around simple_eval to catch various errors
-    Error type could be used to start more specific actions (like, restore 
-    the previous value)
+    Try ... except wrapper around simple_eval to catch various errors
+    When evaluation fails, try evaluating `alt_expr`. When this also fails,
+    return 0 to avoid errors further downstream.
+
+    Parameters:
+    -----------
+    expr: string
+        String to be evaluated
+
+    alt_expr: string
+        String to be evaluated when evaluation of first string fails.
+
+    Returns
+    -------
+    float: the evaluated result or 0 when both arguments fail.
     """
     try:
         # eliminate very small imaginary components due to rounding errors
-        return np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
+        result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
     except (SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
         logger.warn(e)
-        return 0.
-            
+        try:
+            result = np.asscalar(np.real_if_close(se.simple_eval(alt_expr), tol = 100))
+        except (SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+            logger.warn(e)
+            result = 0
+    return result
+
 
 # taken from
 # http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
