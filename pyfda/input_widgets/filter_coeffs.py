@@ -168,7 +168,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.parent.myQ.frmt == 'frac':
-            data = safe_eval(qstr(editor.text())) # raw data without fixpoint formatting 
+            data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without fixpoint formatting 
         else:
             data = self.parent.myQ.fix_base(qstr(editor.text())) # transform back to fractional
         model.setData(index, data)                          # store in QTableWidget 
