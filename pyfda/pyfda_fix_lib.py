@@ -433,7 +433,9 @@ class Fixed(object):
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
         else:
             SCALAR = True
-            if not isinstance(y, (float, int, complex)):
+            # If y is not a number, convert to string, remove whitespace and convert
+            # to complex format:
+            if not np.issubdtype(type(y), np.number):
                 y = qstr(y)
 #            if isinstance(y, str):
                 y = y.replace(' ','') # whitespace is not allowed in complex number
