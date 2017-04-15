@@ -47,7 +47,7 @@ import pyfda.simpleeval as se
 def safe_eval(expr, alt_expr=0):
     """
     Try ... except wrapper around simple_eval to catch various errors
-    When evaluation fails, try evaluating `alt_expr`. When this also fails,
+    When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
     return 0 to avoid errors further downstream.
 
     Parameters:
@@ -62,16 +62,21 @@ def safe_eval(expr, alt_expr=0):
     -------
     float: the evaluated result or 0 when both arguments fail.
     """
+    fail_1 = fail_2 = False
     try:
         # eliminate very small imaginary components due to rounding errors
         result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
     except Exception as e:
         logger.warn(e)
+        fail_1 = True
+    if fail_1 or result is None:
         try:
             result = np.asscalar(np.real_if_close(se.simple_eval(alt_expr), tol = 100))
         except Exception as e:
             #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
             logger.warn(e)
+            fail_2 = True
+        if fail_2 or result is None:
             result = 0
     return result
 
