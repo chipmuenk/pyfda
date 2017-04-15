@@ -528,9 +528,9 @@ class Fixed(object):
         frmt = frmt.lower()
         if frmt == 'frac':
             f = self.fix(y)
-            if f:
+            if f is not None:
                 return f
-            elif fb.data_old:
+            elif fb.data_old is not None:
                 return fb.data_old
             else:
                 return 0
