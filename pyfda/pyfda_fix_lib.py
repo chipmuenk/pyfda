@@ -210,7 +210,7 @@ def csd2dec(csd_str):
     # start from the MSB and work all the way down to the last digit
     for ii in range( len(csd_str) ):
 
-        power_of_two = 2.0**(msb_power-ii)
+        power_of_two = 1 << (msb_power-ii) #2.0**(msb_power-ii)
 
         if csd_str[ii] == '+' :
             dec_val += power_of_two
