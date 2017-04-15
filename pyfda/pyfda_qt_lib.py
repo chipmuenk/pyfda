@@ -22,7 +22,7 @@ from .compat import Qt, QtCore, QFrame, QFont, QEvent, QSysInfo
 #------------------------------------------------------------------------------
 def qstr(text):
     """
-    Convert text object (QVariant, QSTring, string) to plain string.
+    Convert text (QVariant, QString, string) or numeric object to plain string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
@@ -30,9 +30,16 @@ def qstr(text):
     This is first converted from the QVariant container format to a
     QString, next to a "normal" non-unicode string.
 
-    Returns:
+    Parameter:
+    ----------
     
-    The current text / QVariant data as a string
+    text: QVariant, QString, string or numeric data type that can be converted
+      to string
+    
+    Returns:
+    --------
+    
+    The current `text` data as a string
     """
     if "QString" in str(type(text)):
         # Python 3: convert QString -> str
@@ -42,8 +49,8 @@ def qstr(text):
         # Python 2: convert QVariant -> QString -> str
         string = str(text.toString())
     else:
-        # `text` is of type str already
-        string = text
+        # `text` is numeric or of type str
+        string = str(text)
     return string
 
 
