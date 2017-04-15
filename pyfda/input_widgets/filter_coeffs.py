@@ -27,13 +27,20 @@ from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qstr,
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: storing data_old doesnt work
+# TODO: storing data_old in hex and bin format doesn't work reliably: 
+#          always use fixlib.repr_fix and fix_base to convert numbers?
+#          Currently, illegal inputs return "0" in hex and bin format. When 
+#           the old hex entry only contained decimals, the number is interpreted as hex
+#           and converted somehow ...
+        
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a vertical table
 #                                - always return fractional data with full precision?
 
-# TODO: detect overflows during quantization and color cells
-# TODO: fix handling of decimal point, W, WI, WF
+# TODO: detect overflows during quantization and color cells - 
+#      add another array to fix to store over / underflows
+# TODO: fix handling of decimal point, W, WI, WF in repr_fix(), fix_base() and 
+#       int_tc similar to dec2csd()?
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 class ItemDelegate(QStyledItemDelegate):
     """
