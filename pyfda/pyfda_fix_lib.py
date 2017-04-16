@@ -73,19 +73,14 @@ def base2dec(val_str, nbits, base):
 
     int_places = len(int_str)-1 # this could be used to shift the result    
     try:
-    else:
-        try:
-            i = int(val, base)
-            if i <= 0 or i < (1 << (nbits-1)): # less than Max/2
-                return i
-            else:
-                return i - (1 << nbits)
-        except ValueError:
-            logger.warn("Invalid literal {0:s}".format(val))
-            if fb.data_old:
-                return fb.data_old # restore old value
-            else:
-                return 0
+        i = int(val_str, base)
+        if i <= 0 or i < (1 << (nbits-1)): # less than Max/2
+            return i
+        else:
+            return i - (1 << nbits)
+    except ValueError:
+        logger.warn("Invalid literal {0:s}".format(val_str))
+        return None
 
 
 def dec2csd(dec_val, WF=0):
