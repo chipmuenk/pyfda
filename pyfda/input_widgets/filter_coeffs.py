@@ -246,10 +246,11 @@ class FilterCoeffs(QWidget):
         self.spnRound.setValue(params['FMT_ba'])
         self.spnRound.setToolTip("Display <i>d</i> digits.")
         
-        self.chkFracPoint = QCheckBox("Radix point", self)
-        self.chkFracPoint.setToolTip("<span>Show and use radix point (= decimal"
+        self.chkRadixPoint = QCheckBox("Radix point", self)
+        self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
                     " point for base 10) for fixpoint formats .</span>")
-        self.chkFracPoint.setVisible(False)
+        self.chkRadixPoint.setVisible(False)
+        self.radix_point = False
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
@@ -258,7 +259,7 @@ class FilterCoeffs(QWidget):
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.spnRound)
-        layHDisplay.addWidget(self.chkFracPoint)
+        layHDisplay.addWidget(self.chkRadixPoint)
         layHDisplay.addStretch()
 
         # ---------------------------------------------
@@ -513,7 +514,8 @@ class FilterCoeffs(QWidget):
         
         self.spnRound.setVisible(is_frac) # only enabled for
         self.lblRound.setVisible(is_frac) # format = 'frac'
-        self.chkFracPoint.setVisible(not is_frac)
+        self.chkRadixPoint.setVisible(not is_frac)
+        self.radix_point = self.chkRadixPoint.isChecked()
 
         if self.butEnable.isChecked():
 
