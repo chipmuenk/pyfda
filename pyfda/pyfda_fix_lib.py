@@ -15,6 +15,10 @@ import numpy as np
 from .pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
+# TODO: Overflows are not handled correctly
+# TODO: Overflow errors can occur for very large numbers?
+# TODO: Implment fractional point for int/hex/bin/csd?
+
 __version__ = 0.5
 
 def dec2hex(val, nbits):
@@ -577,7 +581,6 @@ class Fixed(object):
         if self.frmt == 'frac': # return quantized fractional value
             return yf
         # no fractional format, scale with 2^WF to obtain integer representation
-        # TODO: allow fractional representation?
         if self.frmt in {'hex', 'bin', 'int', 'csd'}:
             yi = (np.round(yf * (1 << self.WF))).astype(int) # shift left by WF bits
         if self.frmt == 'int':
