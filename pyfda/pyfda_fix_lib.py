@@ -226,11 +226,11 @@ def csd2dec(csd_str):
 #==============================================================================
 # Define ufuncs using numpys automatic type casting
 #==============================================================================
-bin_u = np.frompyfunc(np.binary_repr, 2, 1)
-hex_tc_u = np.frompyfunc(hex_tc, 2, 1)
-int_tc_u = np.frompyfunc(int_tc, 3, 1)
-csd2dec_u = np.frompyfunc(csd2dec, 1, 1)
-dec2csd_u = np.frompyfunc(dec2csd, 2, 1)
+#bin_u = np.frompyfunc(np.binary_repr, 2, 1)
+#hex_tc_u = np.frompyfunc(hex_tc, 2, 1)
+#base2dec_u = np.frompyfunc(base2dec, 3, 1)
+#csd2dec_u = np.frompyfunc(csd2dec, 1, 1)
+#dec2csd_u = np.frompyfunc(dec2csd, 2, 1)
 
 #------------------------------------------------------------------------
 class Fixed(object):
@@ -579,9 +579,9 @@ class Fixed(object):
         if self.frmt == 'int':
             return yi
         elif self.frmt == 'hex':
-            return hex_tc_u(yi, self.W)
+            return hex_tc(yi, self.W)
         elif self.frmt == 'bin':
-            return bin_u(yi, self.W)
+            return np.binary_repr(yi, self.W)
         elif self.frmt == 'csd':
             return dec2csd(yi, 0) # second argument is number of fractional bits WF
         else:
