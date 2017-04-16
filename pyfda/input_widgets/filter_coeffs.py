@@ -133,6 +133,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         Pass the data to be edited to the editor:
         - retrieve data with full accuracy from self.ba
+        - store data in fb.data_old in fractional format
         - requantize data according to settings in fixpoint object
         - represent it in the selected format (int, hex, ...)
 
@@ -141,14 +142,13 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.ba[index.column()][index.row()] # data from self.ba
-        fb.data_old = data # store old data
+        fb.data_old = data # store old data in fractional format
         
         if self.parent.myQ.frmt == 'frac':
-            editor.setText(str(safe_eval(data))) # no string formatting, pass full resolution
+            editor.setText(str(safe_eval(data, fb.data_old))) # no string formatting, pass full resolution
         else:
-            editor.setText("{0:>{1}}".format(
-                    self.parent.myQ.repr_fix(data), self.parent.myQ.digits))
-
+            editor.setText("{0:>{1}}".format(self.parent.myQ.repr_fix(data),
+                           self.parent.myQ.digits))
 
     def setModelData(self, editor, model, index):
         """
@@ -171,6 +171,7 @@ class ItemDelegate(QStyledItemDelegate):
             data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without fixpoint formatting 
         else:
             data = self.parent.myQ.fix_base(qstr(editor.text())) # transform back to fractional
+
         model.setData(index, data)                          # store in QTableWidget 
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
         qstyle_widget(self.parent.butSave, 'changed')
