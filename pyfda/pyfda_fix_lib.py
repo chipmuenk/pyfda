@@ -38,7 +38,7 @@ def dec2hex(val, nbits):
     -------
     A string in two's complement hex format
     """
-    return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
+    return "{0:x}".format(((val + (1 << nbits)) % (1 << nbits)).astype(np.int64))
 
 def base2dec(val_str, nbits, base):
     """
