@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 import sys
 
 from ..compat import (Qt, QtCore, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
-                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize, QStyle,
+                      QPushButton, QFrame, QSpinBox, QCheckBox, QFont, QIcon, QSize,
                       QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
                       pyqtSignal, QEvent, QStyledItemDelegate, QColor, QBrush)
 
@@ -22,7 +22,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qstr, 
+from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, 
                                 qcopy_to_clipboard, qget_selected)
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
@@ -244,6 +244,11 @@ class FilterCoeffs(QWidget):
         self.spnRound.setRange(0,16)
         self.spnRound.setValue(params['FMT_ba'])
         self.spnRound.setToolTip("Display <i>d</i> digits.")
+        
+        self.chkFracPoint = QCheckBox("Radix point", self)
+        self.chkFracPoint.setToolTip("<span>Show and use radix point (= decimal"
+                    " point for base 10) for fixpoint formats .</span>")
+        self.chkFracPoint.setVisible(False)
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
@@ -252,6 +257,7 @@ class FilterCoeffs(QWidget):
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.spnRound)
+        layHDisplay.addWidget(self.chkFracPoint)
         layHDisplay.addStretch()
 
         # ---------------------------------------------
@@ -501,9 +507,12 @@ class FilterCoeffs(QWidget):
         self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         params['FMT_ba'] = int(self.spnRound.text())
-
-        self.spnRound.setEnabled(self.cmbFormat.currentIndex() == 0) # only enabled for
-        self.lblRound.setEnabled(self.cmbFormat.currentIndex() == 0) # format = decimal
+        
+        is_frac = (qget_cmb_box(self.cmbFormat, data=False).lower() == 'frac')
+        
+        self.spnRound.setVisible(is_frac) # only enabled for
+        self.lblRound.setVisible(is_frac) # format = 'frac'
+        self.chkFracPoint.setVisible(not is_frac)
 
         if self.butEnable.isChecked():
 
