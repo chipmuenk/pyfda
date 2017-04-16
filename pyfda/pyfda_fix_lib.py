@@ -210,7 +210,7 @@ def csd2dec(csd_str):
     # start from the MSB and work all the way down to the last digit
     for ii in range( len(csd_str) ):
 
-        power_of_two = 1 << (msb_power-ii) #2.0**(msb_power-ii)
+        power_of_two = 2.0**(msb_power-ii)
 
         if csd_str[ii] == '+' :
             dec_val += power_of_two
@@ -219,7 +219,7 @@ def csd2dec(csd_str):
         # else
         #    ... all other values are ignored
 
-        logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4:d}; Num={5:f}'.format(
+        logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4}; Num={5:f}'.format(
                 csd_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
 
     return dec_val
