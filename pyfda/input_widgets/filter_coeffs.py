@@ -452,6 +452,7 @@ class FilterCoeffs(QWidget):
         self.butEnable.clicked.connect(self._refresh_table)
         self.butQEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
+        self.chkRadixPoint.clicked.connect(self._refresh_table)
         self.butClipboard.clicked.connect(self._copy_to_clipboard)
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
