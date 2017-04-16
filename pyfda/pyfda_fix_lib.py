@@ -446,7 +446,6 @@ class Fixed(object):
             # to complex format:
             if not np.issubdtype(type(y), np.number):
                 y = qstr(y)
-#            if isinstance(y, str):
                 y = y.replace(' ','') # whitespace is not allowed in complex number
                 try:
                     y = complex(y)
