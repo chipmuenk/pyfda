@@ -17,7 +17,7 @@ import pyfda.filterbroker as fb
 
 __version__ = 0.5
 
-def hex_tc(val, nbits):
+def dec2hex(val, nbits):
     """
     Return `val` in hex format with a wordlength of `nbits` in two's complement
     format. The built-in hex function returns args < 0 as negative values.
@@ -582,7 +582,7 @@ class Fixed(object):
         if self.frmt == 'int':
             return yi
         elif self.frmt == 'hex':
-            return hex_tc(yi, self.W)
+            return dec2hex(yi, self.W)
         elif self.frmt == 'bin':
             return np.binary_repr(yi, self.W)
         elif self.frmt == 'csd':
