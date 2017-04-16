@@ -64,6 +64,15 @@ def base2dec(val_str, nbits, base):
     if base not in {2, 10, 16}:
         raise TypeError
         return None
+    try:
+    #  Find the number of places before the fractional point (if there is one)
+        (int_str, _) = val_str.split('.') # split into integer and fractional bits
+        val_str = val_str.replace('.','') # join integer and fractional bits to one string
+    except ValueError: # no fractional part
+        int_str = val_str
+
+    int_places = len(int_str)-1 # this could be used to shift the result    
+    try:
     else:
         try:
             i = int(val, base)
