@@ -27,12 +27,6 @@ from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qstr,
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: storing data_old in hex and bin format doesn't work reliably: 
-#          always use fixlib.repr_fix and fix_base to convert numbers?
-#          Currently, illegal inputs return "0" in hex and bin format. When 
-#           the old hex entry only contained decimals, the number is interpreted as hex
-#           and converted somehow ...
-        
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a vertical table
 #                                - always return fractional data with full precision?

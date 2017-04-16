@@ -227,6 +227,8 @@ def csd2dec(csd_str):
                 csd_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
 
     return dec_val
+
+
 #==============================================================================
 # Define ufuncs using numpys automatic type casting
 #==============================================================================
@@ -539,7 +541,6 @@ class Fixed(object):
                 return 0
 
         elif frmt in {'hex', 'bin', 'int'}:
-
             int_ = base2dec(y, self.W, self.base)
             if int_ is not None:
                 return int_ / (1 << self.WF)
