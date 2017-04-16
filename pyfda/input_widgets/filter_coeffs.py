@@ -40,7 +40,7 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: detect overflows during quantization and color cells - 
 #      add another array to fix to store over / underflows
 # TODO: fix handling of decimal point, W, WI, WF in repr_fix(), fix_base() and 
-#       int_tc similar to dec2csd()?
+#       base2dec similar to dec2csd()?
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 class ItemDelegate(QStyledItemDelegate):
     """

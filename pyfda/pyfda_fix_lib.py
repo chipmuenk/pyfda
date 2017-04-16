@@ -36,11 +36,11 @@ def hex_tc(val, nbits):
     """
     return "{0:x}".format((val + (1 << nbits)) % (1 << nbits))
 
-def int_tc(val, nbits, base):
+def base2dec(val_str, nbits, base):
     """
-    Return `val` in int format with a wordlength of `nbits` and `base`. In
-    contrast to int(), `val` is treated as two's complement number, i.e. the MSB
-    is regarded as a sign bit. When '
+    Convert `val_str` with base `base` and a wordlength of `nbits` to decimal format. In
+    contrast to int(), `val_str` is treated as two's complement number, i.e. the MSB
+    is regarded as a sign bit. 
 
     Parameters:
     -----------
@@ -55,8 +55,8 @@ def int_tc(val, nbits, base):
 
     Returns:
     --------
-    int_tc: integer
-            The result, converted to integer.
+    integer
+            The result, converted to (decimal) integer.
     """
     # TODO: add calculation of fractional formats?
     nbits = int(abs(nbits))
@@ -534,9 +534,10 @@ class Fixed(object):
                 return fb.data_old
             else:
                 return 0
-                
+
         elif frmt in {'hex', 'bin', 'int'}:
-            int_ = int_tc(y, self.W, self.base)
+
+            int_ = base2dec(y, self.W, self.base)
             if int_:
                 return (int_ / (1 << self.WF))
             elif fb.data_old:
