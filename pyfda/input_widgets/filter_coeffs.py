@@ -164,7 +164,8 @@ class ItemDelegate(QStyledItemDelegate):
         if self.parent.myQ.frmt == 'frac':
             data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without fixpoint formatting 
         else:
-            data = self.parent.myQ.fix_base(qstr(editor.text())) # transform back to fractional
+            data = self.parent.myQ.base2frac(qstr(editor.text()),
+                                    self.parent.myQ.frmt, self.parent.radix_point) # transform back to fractional
 
         model.setData(index, data)                          # store in QTableWidget 
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba

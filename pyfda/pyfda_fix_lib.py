@@ -514,7 +514,7 @@ class Fixed(object):
         self.N_over_pos = 0
 
 #------------------------------------------------------------------------------
-    def fix_base(self, y, frmt=None, radix_point=False):
+    def base2frac(self, y, frmt=None, radix_point=False):
         """
         Return fractional representation `yq` of `y` (scalar)
 
@@ -532,7 +532,7 @@ class Fixed(object):
         yq: float in fractional format
             The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
         """
-        if not frmt:
+        if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
         if frmt == 'frac':
