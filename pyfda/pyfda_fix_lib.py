@@ -18,8 +18,9 @@ import pyfda.filterbroker as fb
 # TODO: Overflows are not handled correctly: For saturation, overflow yields the 
 #          min. number!
 # TODO: Illegal values in CSD return zero    
+# TODO: Negative Hex values are not treated correctly
 # TODO: Overflow errors can occur for very large numbers?
-# TODO: Implment fractional point for int/hex/bin/csd?
+# TODO: Implment fractional point for int/hex/bin/csd
 
 __version__ = 0.5
 
@@ -64,7 +65,6 @@ def base2dec(val_str, nbits, base):
     integer
             The result, converted to (decimal) integer.
     """
-    # TODO: add calculation of fractional formats?
     nbits = int(abs(nbits))
     base = int(abs(base))
     if base not in {2, 10, 16}:

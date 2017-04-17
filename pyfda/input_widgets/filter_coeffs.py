@@ -31,6 +31,7 @@ import pyfda.pyfda_fix_lib as fix
 #                                - always return a vertical table
 #                                - always return fractional data with full precision?
 
+# TODO: Set number format as W (WI) or WI.WF (W)
 # TODO: detect overflows during quantization and color cells - 
 #      add another array to fix to store over / underflows
 # TODO: fix handling of decimal point, W, WI, WF in frac2base(), base2frac() and 
@@ -86,7 +87,7 @@ class ItemDelegate(QStyledItemDelegate):
 
     def displayText(self, text, locale):
         """
-        Display `text` with selected fixpoint base and number of digits
+        Display `text` with selected fixpoint base and number of places
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
