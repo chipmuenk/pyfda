@@ -15,7 +15,9 @@ import numpy as np
 from .pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
-# TODO: Overflows are not handled correctly
+# TODO: Overflows are not handled correctly: For saturation, overflow yields the 
+#          min. number!
+# TODO: Illegal values in CSD return zero    
 # TODO: Overflow errors can occur for very large numbers?
 # TODO: Implment fractional point for int/hex/bin/csd?
 
@@ -582,7 +584,7 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or array-like object in fractional format
+        y: scalar or array-like object (numeric or string) in fractional format
             to be transformed
 
         Returns

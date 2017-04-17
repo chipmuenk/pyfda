@@ -36,6 +36,7 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: fix handling of decimal point, W, WI, WF in frac2base(), base2frac() and 
 #       base2dec similar to dec2csd()?
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
+# TODO: Need to refresh table after _load_q_settings?
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
@@ -85,8 +86,7 @@ class ItemDelegate(QStyledItemDelegate):
 
     def displayText(self, text, locale):
         """
-        Display `text` in the selected fixpoint format with the selected number
-        of digits
+        Display `text` with selected fixpoint base and number of digits
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
