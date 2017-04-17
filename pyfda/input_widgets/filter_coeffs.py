@@ -33,7 +33,7 @@ import pyfda.pyfda_fix_lib as fix
 
 # TODO: detect overflows during quantization and color cells - 
 #      add another array to fix to store over / underflows
-# TODO: fix handling of decimal point, W, WI, WF in repr_fix(), fix_base() and 
+# TODO: fix handling of decimal point, W, WI, WF in frac2base(), base2frac() and 
 #       base2dec similar to dec2csd()?
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 class ItemDelegate(QStyledItemDelegate):
@@ -97,7 +97,8 @@ class ItemDelegate(QStyledItemDelegate):
             data = safe_eval(string, fb.data_old)
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.repr_fix(string), self.parent.myQ.digits)
+            return "{0:>{1}}".format(self.parent.myQ.frac2base(string), 
+                                        self.parent.myQ.digits)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):
@@ -141,8 +142,9 @@ class ItemDelegate(QStyledItemDelegate):
         if self.parent.myQ.frmt == 'frac':
             editor.setText(str(safe_eval(data, fb.data_old))) # no string formatting, pass full resolution
         else:
-            editor.setText("{0:>{1}}".format(self.parent.myQ.repr_fix(data),
-                           self.parent.myQ.digits))
+            # integer format with base: pass requantized data with required number of places
+            editor.setText("{0:>{1}}".format(self.parent.myQ.frac2base(data),
+                                               self.parent.myQ.digits))
 
     def setModelData(self, editor, model, index):
         """
@@ -165,7 +167,7 @@ class ItemDelegate(QStyledItemDelegate):
             data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without fixpoint formatting 
         else:
             data = self.parent.myQ.base2frac(qstr(editor.text()),
-                                    self.parent.myQ.frmt, self.parent.radix_point) # transform back to fractional
+                                    self.parent.myQ.frmt) # transform back to fractional
 
         model.setData(index, data)                          # store in QTableWidget 
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
@@ -250,7 +252,6 @@ class FilterCoeffs(QWidget):
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
                     " point for base 10) for fixpoint formats .</span>")
         self.chkRadixPoint.setVisible(False)
-        self.radix_point = False
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
@@ -516,7 +517,6 @@ class FilterCoeffs(QWidget):
         self.spnRound.setVisible(is_frac) # only enabled for
         self.lblRound.setVisible(is_frac) # format = 'frac'
         self.chkRadixPoint.setVisible(not is_frac)
-        self.radix_point = self.chkRadixPoint.isChecked()
 
         if self.butEnable.isChecked():
 

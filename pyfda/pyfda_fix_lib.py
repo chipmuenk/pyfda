@@ -170,7 +170,7 @@ def dec2csd(dec_val, WF=0):
     return csd_str
 
 
-def csd2dec(csd_str, radix_point=False):
+def csd2dec(csd_str):
     """
     Convert the CSD string `csd_str` to a decimal, `csd_str` may contain '+' or
     '-', indicating whether the current bit is meant to positive or negative.
@@ -528,7 +528,7 @@ class Fixed(object):
         self.N_over_pos = 0
 
 #------------------------------------------------------------------------------
-    def base2frac(self, y, frmt=None, radix_point=False):
+    def base2frac(self, y, frmt=None):
         """
         Return fractional representation `yq` of `y` (scalar)
 
@@ -574,9 +574,10 @@ class Fixed(object):
             return None
 
 #------------------------------------------------------------------------------
-    def repr_fix(self, y, radix_point=False):
+    def frac2base(self, y):
         """
-        Return representation `yf` of `y` (scalar or array-like) in selected format
+        Return representation `yf` of `y` (scalar or array-like) with selected
+        fixpoint base and number format
         `yf.shape = y.shape`
 
         Parameters
@@ -604,7 +605,7 @@ class Fixed(object):
         elif self.frmt == 'bin':
             return np.binary_repr(yi, self.W)
         elif self.frmt == 'csd':
-            if radix_point:
+            if self.point:
                 return dec2csd(yi, self.WF) # yes, use fractional bits WF
             else:
                 return dec2csd(yi, 0) # no, treat as integer
