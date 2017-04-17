@@ -621,7 +621,8 @@ class FilterCoeffs(QWidget):
                 'WF':int(self.ledQuantF.text()),
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
-                'frmt':self.cmbFormat.currentText()
+                'frmt':self.cmbFormat.currentText(),
+                'point':self.chkRadixPoint.isChecked()
                 }
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
@@ -637,7 +638,7 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbQQuant, q_coeff['quant'])
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
-
+        self.chkRadixPoint.setChecked(q_coeff['point'])
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
@@ -655,7 +656,8 @@ class FilterCoeffs(QWidget):
                 'WF':int(self.ledQuantF.text()),
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
-                'frmt':self.cmbFormat.currentText()
+                'frmt':self.cmbFormat.currentText(),
+                'point':self.chkRadixPoint.isChecked()
                 }
 
         # save, check and convert coeffs, check filter type            

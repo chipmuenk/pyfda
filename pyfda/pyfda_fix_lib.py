@@ -259,7 +259,7 @@ class Fixed(object):
     Parameters
     ----------
     q_obj : dict
-        with 2 ... 4 elements defining quantization operation with the keys
+        defining quantization operation with the keys
 
     * **'WI'** : integer word length, default: 0
 
@@ -279,13 +279,22 @@ class Fixed(object):
       - 'wrap': do a two's complement wrap-around
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
+      
+    Additionally, the following keys define the base / display format for the 
+    fixpoint number:
 
     * **'frmt'** : Output format, optional; default = 'frac'
 
-      - 'frac' : (default) return result as a fraction
-      - 'int'  : return result in integer form, scaled by :math:`2^{WF}`
-      - 'bin'  : return result as binary string, scaled by :math:`2^{WF}`
-      - 'hex'  : return result as hex string, scaled by :math:`2^{WF}`
+      - 'frac' : (default) decimal fraction
+      - 'int'  : decimal integer, scaled by :math:`2^{WF}`
+      - 'bin'  : binary string, scaled by :math:`2^{WF}`
+      - 'hex'  : hex string, scaled by :math:`2^{WF}`
+      - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
+      
+    * **'point'** : Boolean, when True use / provide a radix point (default: False)
+    
+      - False: Scale the result of the quantization by `2^{W} = 2^{WI + WF + 1}`
+      - True : Scale the result of the quantization by `2^{WI}`
 
 
     Instance Attributes
@@ -301,6 +310,9 @@ class Fixed(object):
 
     frmt : string
         target output format ('frac', 'int', 'bin', 'hex')
+        
+    point : boolean
+        If True, use position of radix point for format conversion
 
     N_over : integer
         total number of overflows
@@ -345,7 +357,7 @@ class Fixed(object):
         store it as instance attribute
         """
         for key in q_obj.keys():
-            if key not in ['Q','WF','WI','quant','ovfl','frmt']:
+            if key not in ['Q','WF','WI','quant','ovfl','frmt','point']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
         # set default values for parameters if undefined:
@@ -361,11 +373,13 @@ class Fixed(object):
         if 'quant' not in q_obj: q_obj['quant'] = 'floor'
         if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
         if 'frmt' not in q_obj: q_obj['frmt'] = 'frac'
+        if 'point' not in q_obj: q_obj['point'] = 'false'
 
         self.q_obj = q_obj # store quant. dict in instance
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt = str(q_obj['frmt']).lower()
+        self.point = q_obj['point']
         self.WF = q_obj['WF']
         self.WI = q_obj['WI']
         self.W = self.WF + self.WI + 1
