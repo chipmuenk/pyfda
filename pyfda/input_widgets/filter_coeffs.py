@@ -30,7 +30,9 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: Clipboard functionality: - always use table display
 #                                - always return a vertical table
 #                                - always return fractional data with full precision?
-
+# TODO: Setting complex data (manually) crashes the app in setModelData():
+#    model.setData(index, data) "Type Error: Can't convert complex to float"
+# TODO: Strip parentheses of complex argument @ setEditorData()
 # TODO: Set number format as W (WI) or WI.WF (W)
 # TODO: detect overflows during quantization and color cells - 
 #      add another array to fix to store over / underflows
