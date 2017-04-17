@@ -34,6 +34,8 @@ import pyfda.pyfda_fix_lib as fix
 #    model.setData(index, data) "Type Error: Can't convert complex to float"
 # TODO: Strip parentheses of complex argument @ setEditorData()
 # TODO: Set number format as W (WI) or WI.WF (W)
+# TODO: Invalid arguments crash app in e.g. filter order -> safe_eval
+
 # TODO: detect overflows during quantization and color cells - 
 #      add another array to fix to store over / underflows
 # TODO: fix handling of decimal point, W, WI, WF in frac2base(), base2frac() and 
