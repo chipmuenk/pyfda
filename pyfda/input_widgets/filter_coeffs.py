@@ -94,7 +94,7 @@ class ItemDelegate(QStyledItemDelegate):
         string = qstr(text) # convert to "normal" string
 
         if self.parent.myQ.frmt == 'frac':
-            data = safe_eval(string, fb.data_old)
+            data = safe_eval(string)
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.frac2base(string), 
@@ -140,7 +140,8 @@ class ItemDelegate(QStyledItemDelegate):
         fb.data_old = data # store old data in fractional format
         
         if self.parent.myQ.frmt == 'frac':
-            editor.setText(str(safe_eval(data, fb.data_old))) # no string formatting, pass full resolution
+            # fractional format: pass data with full resolution
+            editor.setText(str(safe_eval(data))) 
         else:
             # integer format with base: pass requantized data with required number of places
             editor.setText("{0:>{1}}".format(self.parent.myQ.frac2base(data),
