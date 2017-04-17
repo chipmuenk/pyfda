@@ -98,7 +98,7 @@ class ItemDelegate(QStyledItemDelegate):
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.frac2base(string), 
-                                        self.parent.myQ.digits)
+                                        self.parent.myQ.places)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):
@@ -145,7 +145,7 @@ class ItemDelegate(QStyledItemDelegate):
         else:
             # integer format with base: pass requantized data with required number of places
             editor.setText("{0:>{1}}".format(self.parent.myQ.frac2base(data),
-                                               self.parent.myQ.digits))
+                                               self.parent.myQ.places))
 
     def setModelData(self, editor, model, index):
         """

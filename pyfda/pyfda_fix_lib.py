@@ -389,20 +389,21 @@ class Fixed(object):
         self.LSB  = 2. ** (-q_obj['WF']) # value of LSB = 2 ^ (-WF)
         self.MSB  = 2. ** q_obj['WI']    # value of MSB = 2 ^ WI
 
+        # Calculate required number of places for different bases
         if self.frmt == 'int':
-            self.digits = int(np.ceil(np.log10(self.W) * np.log10(2.))) # required number of digits for dec. repr.
+            self.places = int(np.ceil(np.log10(self.W) * np.log10(2.)))
             self.base = 10
         elif self.frmt == 'bin':
-            self.digits = self.W # required number of digits for bin. repr.
+            self.places = self.W
             self.base = 2
         elif self.frmt == 'csd':
-            self.digits = self.W # required number of digits for bin. repr.
+            self.places = self.W
             self.base = 2
         elif self.frmt == 'hex':
-            self.digits = int(np.ceil(self.W / 4.)) # required number of digits for hex. repr.
+            self.places = int(np.ceil(self.W / 4.))
             self.base = 16
         elif self.frmt == 'frac':
-            self.digits = 4
+            self.places = 4
             self.base = 0
         else:
             raise Exception(u'Unknown format "%s"!'%(self.frmt))
