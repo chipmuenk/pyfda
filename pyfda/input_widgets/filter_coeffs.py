@@ -95,6 +95,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
+        TODO: This routine is called again and again when an item is selected?!
         """ 
         string = qstr(text) # convert to "normal" string
 
