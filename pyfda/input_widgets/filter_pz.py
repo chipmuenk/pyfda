@@ -425,7 +425,7 @@ class FilterPZ(QWidget):
         the QLineEdit for setting the gain has to be treated separately.
         """
 
-        logger.debug("=====================\nFilterPZ._save_entries called")
+        logger.debug("_save_entries called")
 
         fb.fil[0]['N'] = len(self.zpk[0])
         if np.any(self.zpk[1]): # any non-zero poles?
@@ -441,8 +441,7 @@ class FilterPZ(QWidget):
         self.sigFilterDesigned.emit() # -> filter_specs
         # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
 
-        logger.debug("_save_entries - coeffients / zpk updated:\n"
-            "b,a = %s\n\n"
+        logger.debug("b,a = %s\n\n"
             "zpk = %s\n"
             %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
