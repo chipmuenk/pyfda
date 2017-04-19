@@ -536,11 +536,11 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def base2frac(self, y, frmt=None):
         """
-        Return fractional representation `yq` of `y` (scalar)
+        Return fractional, quantized representation `yq` of `y` (scalar)
 
         Parameters
         ----------
-        y: scalar
+        y: scalar or string
             to be quantized with the numeric base specified by `frmt`.
 
         frmt: string (optional)
@@ -555,8 +555,40 @@ class Fixed(object):
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
-        if frmt == 'frac':
+        print("y-shape", np.shape(y))
+
+        if frmt in {'hex', 'bin', 'int'}:
+
+        # Find the number of places before the first radix point (if there is one)
+        # and join integer and fractional parts:
+            val_str = str(y) # just to be sure ...
+            if val_str[0] == '.': # prepend '0' when the number starts with '.'
+                val_str = '0' + val_str
+            if val_str[0] not in {'+','-'}: # prepend '+' when sign is missing
+                val_str = '+' + val_str
+            
+            int_places = val_str.find('.') - 1 # subtract 1 for the sign
+            val_str = val_str.replace('.','') # join integer and fractional part
+   
+            if int_places == -1: # no dot found
+                int_places = len(val_str) - 1
+            frac_places = len(val_str) - int_places - 1
+
+            try:
+                int_ = int(val_str, self.base)
+                if frmt == 'bin':
+                    y = int_ / 1 << frac_places
+                if frmt == 'hex':
+                    y = int_ / 1 << (frac_places * 4)
+                else:
+                    y = int_ / 10 ** frac_places
+            except Exception as e:
+                logger.warn(e)
+                y = None
+                      
+        if frmt in {'frac', 'int', 'hex', 'bin'}:
             f = self.fix(y)
+            print("y, f",y,f)
             if f is not None:
                 return f
             elif fb.data_old is not None:
@@ -564,20 +596,70 @@ class Fixed(object):
             else:
                 return 0
 
-        elif frmt in {'hex', 'bin', 'int'}:
-            int_ = base2dec(y, self.W, self.base)
-            if int_ is not None:
-                return int_ / (1 << self.WF)
-            elif fb.data_old is not None:
-                return fb.data_old
-            else:
-                return 0.
+#
+#
+#            int_ = base2dec(y, self.W, self.base)
+#            if int_ is not None:
+#                return int_ / (1 << self.WF)
+#            elif fb.data_old is not None:
+#                return fb.data_old
+#            else:
+#                return 0.
 
         elif frmt == 'csd':
             return csd2dec(y) / (1 << self.WF)
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
+            
+#==============================================================================
+# def base2dec(val_str, nbits, base):
+#     """
+#     Convert `val_str` with base `base` and a wordlength of `nbits` to decimal format. In
+#     contrast to int(), `val_str` is treated as two's complement number, i.e. the MSB
+#     is regarded as a sign bit. 
+# 
+#     Parameters:
+#     -----------
+#     val: string
+#             The value to be converted
+# 
+#     nbits: integer
+#                 wordlength
+# 
+#     base: integer
+#                 numeric base
+# 
+#     Returns:
+#     --------
+#     integer
+#             The result, converted to (decimal) integer.
+#     """
+#     nbits = int(abs(nbits))
+#     base = int(abs(base))
+#     if base not in {2, 10, 16}:
+#         raise TypeError
+#         return None
+#     try:
+#     #  Find the number of places before the first fractional point (if there is one)
+#         (int_str, _) = val_str.split('.') # split into integer and fractional bits
+#         val_str = val_str.replace('.','') # join integer and fractional bits to one string
+#     except ValueError: # no fractional part
+#         int_str = val_str
+# 
+#     int_places = len(int_str)-1 # this could be used to shift the result    
+#     try:
+#         i = int(val_str, base)
+#         
+#         if i <= 0 or i < (1 << (nbits-1)): # less than Max/2
+#             return i
+#         else:
+#             return i - (1 << nbits)
+#     except ValueError:
+#         logger.warn("Invalid literal {0:s}".format(val_str))
+#         return None
+# 
+#==============================================================================
 
 #------------------------------------------------------------------------------
     def frac2base(self, y):
