@@ -510,7 +510,7 @@ class Fixed(object):
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
-                yq = np.where(over_pos, self.MSB-self.LSB, yq) # (cond, true, false)
+                yq = np.where(over_pos, (self.MSB-self.LSB), yq) # (cond, true, false)
                 yq = np.where(over_neg, -self.MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
