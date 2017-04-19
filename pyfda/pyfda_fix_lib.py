@@ -701,6 +701,9 @@ class Fixed(object):
             raise Exception('Unknown output format "%s"!'%(self.frmt))
             return None
 
+#==============================================================================
+# Filter classes inheriting from the Fixed class 
+#==============================================================================
 
 class FIX_filt_MA(Fixed):
     """
