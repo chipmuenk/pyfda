@@ -63,19 +63,30 @@ def safe_eval(expr, alt_expr=0):
     float: the evaluated result or 0 when both arguments fail.
     """
     fail_1 = fail_2 = False
-    try:
-        # eliminate very small imaginary components due to rounding errors
-        result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
-    except Exception as e:
-        logger.warn(e)
-        fail_1 = True
-    if fail_1 or result is None:
+    result = None
+    
+    if expr == "":
+        expr = None
+        logger.warn("Empty string not allowed as argument!")
+    else:
         try:
-            result = np.asscalar(np.real_if_close(se.simple_eval(alt_expr), tol = 100))
+            # eliminate very small imaginary components due to rounding errors
+            result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
         except Exception as e:
-            #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
             logger.warn(e)
-            fail_2 = True
+            fail_1 = True
+            
+    if fail_1 or result is None:
+        if expr == "":
+            expr = None
+            logger.warn("Fallback argument: Empty string not allowed!")
+        else:
+            try:
+                result = np.asscalar(np.real_if_close(se.simple_eval(alt_expr), tol = 100))
+            except Exception as e:
+                #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+                logger.warn("Fallback argument:", e)
+                fail_2 = True
         if fail_2 or result is None:
             result = 0
     return result
