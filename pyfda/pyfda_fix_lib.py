@@ -471,7 +471,7 @@ class Fixed(object):
                 try:
                     y = complex(y)
                 except ValueError as e:
-                    logger.error(y, '\n', e)
+                    logger.error("{0} \n {1}".format(y,e))
             over_pos = over_neg = yq = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
