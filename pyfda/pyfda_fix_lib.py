@@ -460,9 +460,12 @@ class Fixed(object):
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
         else:
             SCALAR = True
+            # get rid of errors that have occurred upstream
+            if y is None:
+                y = 0
             # If y is not a number, convert to string, remove whitespace and convert
             # to complex format:
-            if not np.issubdtype(type(y), np.number):
+            elif not np.issubdtype(type(y), np.number):
                 y = qstr(y)
                 y = y.replace(' ','') # whitespace is not allowed in complex number
                 try:
