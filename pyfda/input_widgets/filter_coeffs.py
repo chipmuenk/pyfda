@@ -470,7 +470,7 @@ class FilterCoeffs(QWidget):
         self.butEnable.clicked.connect(self._refresh_table)
         self.butQEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
-        self.chkRadixPoint.clicked.connect(self._refresh_table)
+        self.chkRadixPoint.clicked.connect(self._radix_point)
         self.butClipboard.clicked.connect(self._copy_to_clipboard)
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
@@ -516,6 +516,19 @@ class FilterCoeffs(QWidget):
         self.tblCoeff.setColumnCount(self.col)
 
         self.load_dict()
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+    def _radix_point(self):
+        """
+        Set variables and widgets depending on radix point
+        """
+        self.ledWI.setVisible(self.chkRadixPoint.isChecked())
+        self.lblDot.setVisible(self.chkRadixPoint.isChecked())
+        self.ledWF.setVisible(self.chkRadixPoint.isChecked())
+        self.ledW.setVisible(not self.chkRadixPoint.isChecked())
+
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _refresh_table(self):
