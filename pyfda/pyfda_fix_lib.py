@@ -539,7 +539,7 @@ class Fixed(object):
             except Exception as e:
                 logger.warn(e)
                 y = None
-                      
+        # quantize / saturate / wrap the fractional value           
         if frmt in {'frac', 'int', 'hex', 'bin'}:
             f = self.fix(y)
             print("y, f",y,f)
@@ -621,6 +621,13 @@ class Fixed(object):
         Return representation `yf` of `y` (scalar or array-like) with selected
         fixpoint base and number format
         `yf.shape = y.shape`
+
+        When `point = False` (use integer arithmetic), the fractional representation
+        is multiplied by 2**W (shifted right by W bits)
+
+        When `point = True` (use radix point), scale the fractional representation
+        by 2**WI (= shift left by WI bits) and convert integer & fractional part
+        separately.
 
         Parameters
         ----------
