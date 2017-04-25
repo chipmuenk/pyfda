@@ -357,25 +357,34 @@ class FilterCoeffs(QWidget):
         butQuant.setIcon(QIcon(':/quantize.svg'))
         butQuant.setIconSize(q_icon_size)
 
-        self.lblWIWF  = QLabel("WI.WF = ")
+        self.lblWIWF  = QLabel("W = ")
         self.lblQOvfl = QLabel("Ovfl.:")
         self.lblQuant = QLabel("Quant.:")
 
-        self.ledQuantI = QLineEdit(self)
-        self.ledQuantI.setToolTip("Specify number of integer bits.")
-        self.ledQuantI.setText("0")
-        self.ledQuantI.setMaxLength(2) # maximum of 2 digits
-        self.ledQuantI.setFixedWidth(30) # width of lineedit in points(?)
+        self.ledW = QLineEdit(self)
+        self.ledW.setToolTip("Specify wordlength.")
+        self.ledW.setText("16")
+        self.ledW.setMaxLength(2) # maximum of 2 digits
+        self.ledW.setFixedWidth(30) # width of lineedit in points(?)
+        self.ledW.setVisible(not self.chkRadixPoint.isChecked())
+
+        self.ledWI = QLineEdit(self)
+        self.ledWI.setToolTip("Specify number of integer bits.")
+        self.ledWI.setText("0")
+        self.ledWI.setMaxLength(2) # maximum of 2 digits
+        self.ledWI.setFixedWidth(30) # width of lineedit in points(?)
+        self.ledW.setVisible(self.chkRadixPoint.isChecked())
 
         self.lblDot = QLabel(self)
         self.lblDot.setText(".")
 
-        self.ledQuantF = QLineEdit(self)
-        self.ledQuantF.setToolTip("Specify number of fractional bits.")
-        self.ledQuantF.setText("15")
-        self.ledQuantF.setMaxLength(2) # maximum of 2 digits
-#        self.ledQuantF.setFixedWidth(30) # width of lineedit in points(?)
-        self.ledQuantF.setMaximumWidth(30)
+        self.ledWF = QLineEdit(self)
+        self.ledWF.setToolTip("Specify number of fractional bits.")
+        self.ledWF.setText("15")
+        self.ledWF.setMaxLength(2) # maximum of 2 digits
+#        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
+        self.ledWF.setMaximumWidth(30)
+        self.ledW.setVisible(self.chkRadixPoint.isChecked())
 
         self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
@@ -410,9 +419,10 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs3 = QHBoxLayout()
         layHButtonsCoeffs3.addWidget(butQuant)
         layHButtonsCoeffs3.addWidget(self.lblWIWF)
-        layHButtonsCoeffs3.addWidget(self.ledQuantI)
+        layHButtonsCoeffs3.addWidget(self.ledW)
+        layHButtonsCoeffs3.addWidget(self.ledWI)
         layHButtonsCoeffs3.addWidget(self.lblDot)
-        layHButtonsCoeffs3.addWidget(self.ledQuantF)
+        layHButtonsCoeffs3.addWidget(self.ledWF)
         layHButtonsCoeffs3.addStretch()
 
         layHButtonsCoeffs4 = QHBoxLayout()
@@ -476,8 +486,9 @@ class FilterCoeffs(QWidget):
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
         self.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
         self.cmbQQuant.currentIndexChanged.connect(self._refresh_table)
-        self.ledQuantF.editingFinished.connect(self._refresh_table)
-        self.ledQuantI.editingFinished.connect(self._refresh_table)
+        self.ledWF.editingFinished.connect(self._set_WIWF)
+        self.ledWI.editingFinished.connect(self._set_WIWF)
+        self.ledW.editingFinished.connect(self._set_W)
 
         butQuant.clicked.connect(self.quant_coeffs)
 
@@ -624,8 +635,8 @@ class FilterCoeffs(QWidget):
         filter dict. Update the fixpoint object.
         """
         fb.fil[0]['q_coeff'] = {
-                'WI':int(self.ledQuantI.text()),
-                'WF':int(self.ledQuantF.text()),
+                'WI':abs(int(self.ledWI.text())),
+                'WF':abs(int(self.ledWF.text())),
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText(),
@@ -640,8 +651,8 @@ class FilterCoeffs(QWidget):
         accordingly. Update the fixpoint object.
         """
         q_coeff = fb.fil[0]['q_coeff']
-        self.ledQuantI.setText(str(q_coeff['WI']))
-        self.ledQuantF.setText(str(q_coeff['WF']))
+        self.ledWI.setText(str(q_coeff['WI']))
+        self.ledWF.setText(str(q_coeff['WF']))
         qset_cmb_box(self.cmbQQuant, q_coeff['quant'])
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
@@ -659,8 +670,8 @@ class FilterCoeffs(QWidget):
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
         fb.fil[0]["q_coeff"] = {
-                'WI':int(self.ledQuantI.text()),
-                'WF':int(self.ledQuantF.text()),
+                'WI':int(self.ledWI.text()),
+                'WF':int(self.ledWF.text()),
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText(),
