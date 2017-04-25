@@ -518,6 +518,27 @@ class FilterCoeffs(QWidget):
         self.load_dict()
 
 #------------------------------------------------------------------------------
+    def _set_WIWF(self):
+        """
+        Set wordlength when WI or WF have been changed
+        """
+        WI = abs(int(safe_eval(self.ledWI.text(), self.myQ.WI)))
+        WF = abs(int(safe_eval(self.ledWF.text(), self.myQ.WF)))
+        self.ledW.setText(str(WF + WI + 1))
+        self._store_q_settings()
+        self._refresh_table()
+
+#------------------------------------------------------------------------------
+    def _set_W(self):
+        """
+        Set wordlength
+        """
+        W = abs(int(safe_eval(self.ledW.text(), self.myQ.W)))
+        self.ledWF.setText(str(W - self.myQ.WI - 1))
+        self._store_q_settings()
+        
+        self._refresh_table()
+
 #------------------------------------------------------------------------------
     def _radix_point(self):
         """
