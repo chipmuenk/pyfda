@@ -699,7 +699,7 @@ class FilterCoeffs(QWidget):
         Save the values from self.ba to the filter ba dict.
         """
 
-        logger.debug("=====================\nFilterCoeff._save_entries called")
+        logger.debug("_save_entries called")
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
