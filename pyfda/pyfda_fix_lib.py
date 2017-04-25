@@ -43,51 +43,7 @@ def dec2hex(val, nbits):
     """
     return "{0:x}".format(((val + (1 << nbits)) % (1 << nbits)).astype(np.int64))
 
-def base2dec(val_str, nbits, base):
-    """
-    Convert `val_str` with base `base` and a wordlength of `nbits` to decimal format. In
-    contrast to int(), `val_str` is treated as two's complement number, i.e. the MSB
-    is regarded as a sign bit. 
-
-    Parameters:
-    -----------
-    val: string
-            The value to be converted
-
-    nbits: integer
-                wordlength
-
-    base: integer
-                numeric base
-
-    Returns:
-    --------
-    integer
-            The result, converted to (decimal) integer.
-    """
-    nbits = int(abs(nbits))
-    base = int(abs(base))
-    if base not in {2, 10, 16}:
-        raise TypeError
-        return None
-    try:
-    #  Find the number of places before the fractional point (if there is one)
-        (int_str, _) = val_str.split('.') # split into integer and fractional bits
-        val_str = val_str.replace('.','') # join integer and fractional bits to one string
-    except ValueError: # no fractional part
-        int_str = val_str
-
-    int_places = len(int_str)-1 # this could be used to shift the result    
-    try:
-        i = int(val_str, base)
-        if i <= 0 or i < (1 << (nbits-1)): # less than Max/2
-            return i
-        else:
-            return i - (1 << nbits)
-    except ValueError:
-        logger.warn("Invalid literal {0:s}".format(val_str))
-        return None
-
+#------------------------------------------------------------------------------
 
 def dec2csd(dec_val, WF=0):
     """
@@ -555,8 +511,6 @@ class Fixed(object):
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
-        print("y-shape", np.shape(y))
-
         if frmt in {'hex', 'bin', 'int'}:
 
         # Find the number of places before the first radix point (if there is one)
