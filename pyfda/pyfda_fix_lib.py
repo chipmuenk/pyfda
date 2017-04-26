@@ -422,6 +422,7 @@ class Fixed(object):
             # If y is not a number, convert to string, remove whitespace and convert
             # to complex format:
             elif not np.issubdtype(type(y), np.number):
+                print(y, type(y))
                 y = qstr(y)
                 y = y.replace(' ','') # whitespace is not allowed in complex number
                 try:
@@ -515,7 +516,7 @@ class Fixed(object):
 
         # Find the number of places before the first radix point (if there is one)
         # and join integer and fractional parts:
-            val_str = str(y) # just to be sure ...
+            val_str = qstr(y) # just to be sure ...
             if val_str[0] == '.': # prepend '0' when the number starts with '.'
                 val_str = '0' + val_str
             if val_str[0] not in {'+','-'}: # prepend '+' when sign is missing
@@ -524,10 +525,13 @@ class Fixed(object):
             int_places = val_str.find('.') - 1 # subtract 1 for the sign
             val_str = val_str.replace('.','') # join integer and fractional part
    
-            if int_places == -1: # no dot found
+            if int_places == -1 or not self.point: # no dot found / selected
                 int_places = len(val_str) - 1
-            frac_places = len(val_str) - int_places - 1
+                frac_places = 0
+            else:
+                frac_places = len(val_str) - int_places - 1
 
+            # calculate the decimal value and scale it by the number of frac places:
             try:
                 int_ = int(val_str, self.base)
                 if frmt == 'bin':
