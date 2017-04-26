@@ -631,23 +631,47 @@ class Fixed(object):
             `yf` is formatted as set in `self.frmt` with `self.W` digits
         """
         # round / clip numbers: yf is fractional with the required range and resolution
-        yf = self.fix(y)
+        y_fix = self.fix(y)
         if self.frmt == 'frac': # return quantized fractional value
-            return yf
+            return y_fix
         # no fractional format, scale with 2^WF to obtain integer representation
-        if self.frmt in {'hex', 'bin', 'int', 'csd'}:
-            yi = (np.round(yf * (1 << self.WF))).astype(int) # shift left by WF bits
-        if self.frmt == 'int':
-            return yi
-        elif self.frmt == 'hex':
-            return dec2hex(yi, self.W)
-        elif self.frmt == 'bin':
-            return np.binary_repr(yi, self.W)
-        elif self.frmt == 'csd':
+        elif self.frmt in {'hex', 'bin', 'int', 'csd'}:
             if self.point:
-                return dec2csd(yi, self.WF) # yes, use fractional bits WF
+                yi_scale = y_fix * (1 << self.WI)
+                yi = (np.round(y_fix * (1 << self.WI))).astype(int)
+                yf_scale = (yi_scale - yi)
+                print("y", yi, yi_scale, yf_scale)
+                scale = 1 << self.WI # shift left by WI bits
             else:
-                return dec2csd(yi, 0) # no, treat as integer
+                scale = 1 << self.W # shift left by W bits
+            yi = (np.round(y_fix * scale)).astype(int) 
+            yf = (np.round((y_fix - yi)*(1 << self.WF))).astype(int)
+
+            if self.frmt == 'int':
+                y_str = str(yi)
+                #if self.point:
+                #    y_str = str(y_fix)
+                #else:
+                 #   y_str = str(yi)
+
+            elif self.frmt == 'hex':
+                if self.point:
+                    y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf, self.WF)
+                else:
+                    y_str = dec2hex(yi, self.W)
+
+            elif self.frmt == 'bin':
+                y_str = np.binary_repr(yi, self.W)
+                if self.point:
+                    y_str = y_str[:self.WI] + "." + y_str[-self.WF:]
+
+            else: # self.frmt = 'csd'
+                if self.point:
+                    y_str = dec2csd(yi, self.WF) # yes, use fractional bits WF
+                else:
+                    y_str = dec2csd(yi, 0) # no, treat as integer
+
+            return y_str
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
             return None
