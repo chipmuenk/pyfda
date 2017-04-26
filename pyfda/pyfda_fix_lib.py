@@ -550,16 +550,6 @@ class Fixed(object):
             else:
                 return 0
 
-#
-#
-#            int_ = base2dec(y, self.W, self.base)
-#            if int_ is not None:
-#                return int_ / (1 << self.WF)
-#            elif fb.data_old is not None:
-#                return fb.data_old
-#            else:
-#                return 0.
-
         elif frmt == 'csd':
             return csd2dec(y) / (1 << self.WF)
         else:
