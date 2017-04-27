@@ -40,6 +40,9 @@ import pyfda.pyfda_fix_lib as fix
 
 # TODO: detect overflows during quantization and color cells - 
 #      add another array to fix to store over / underflows
+# TODO: This ItemDelegate method displayText is called again and again when an 
+#        item is selected?!
+
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 # TODO: Need to refresh table after _load_q_settings?
 class ItemDelegate(QStyledItemDelegate):
@@ -95,7 +98,6 @@ class ItemDelegate(QStyledItemDelegate):
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
-        TODO: This routine is called again and again when an item is selected?!
         """ 
         string = qstr(text) # convert to "normal" string
 
