@@ -346,7 +346,7 @@ class Fixed(object):
         self.MSB  = 2. ** q_obj['WI']    # value of MSB = 2 ^ WI
 
         # Calculate required number of places for different bases
-        if self.frmt == 'int':
+        if self.frmt == 'dec':
             self.places = int(np.ceil(np.log10(self.W) * np.log10(2.)))
             self.base = 10
         elif self.frmt == 'bin':
@@ -512,7 +512,7 @@ class Fixed(object):
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
-        if frmt in {'hex', 'bin', 'int'}:
+        if frmt in {'hex', 'bin', 'dec'}:
 
         # Find the number of places before the first radix point (if there is one)
         # and join integer and fractional parts:
@@ -544,7 +544,7 @@ class Fixed(object):
                 logger.warn(e)
                 y = None
         # quantize / saturate / wrap the fractional value           
-        if frmt in {'frac', 'int', 'hex', 'bin'}:
+        if frmt in {'frac', 'dec', 'hex', 'bin'}:
             f = self.fix(y)
             print("y, f",y,f)
             if f is not None:
@@ -639,7 +639,7 @@ class Fixed(object):
         if self.frmt == 'frac': # return quantized fractional value
             return y_fix
         # no fractional format, scale with 2^WF to obtain integer representation
-        elif self.frmt in {'hex', 'bin', 'int', 'csd'}:
+        elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             if self.point:
                 yi_scale = y_fix * (1 << self.WI)
                 yi = (np.round(y_fix * (1 << self.WI))).astype(int)
@@ -651,7 +651,7 @@ class Fixed(object):
             yi = (np.round(y_fix * scale)).astype(int) 
             yf = (np.round((y_fix - yi)*(1 << self.WF))).astype(int)
 
-            if self.frmt == 'int':
+            if self.frmt == 'dec':
                 y_str = str(yi)
                 #if self.point:
                 #    y_str = str(y_fix)

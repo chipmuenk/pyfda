@@ -245,7 +245,7 @@ class FilterCoeffs(QWidget):
         self.butQEnable.setToolTip("<span>Show quantization options.</span>")
 
         self.cmbFormat = QComboBox(self)
-        qFormat = ['Frac', 'Int', 'Hex', 'Bin', 'CSD']
+        qFormat = ['Frac', 'Dec', 'Hex', 'Bin', 'CSD']
         self.cmbFormat.addItems(qFormat)
         self.cmbFormat.setCurrentIndex(0) # 'frac'
         self.cmbFormat.setToolTip('Set the display format.')
