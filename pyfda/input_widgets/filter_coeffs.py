@@ -592,16 +592,10 @@ class FilterCoeffs(QWidget):
 
         if self.butEnable.isChecked():
             self.frmQSettings.setVisible(not is_float) # hide all q-settings for float
-#==============================================================================
-#             if is_float: # disable requantization options
-#                 qset_cmb_box(self.cmbQOvfl, "none")
-#                 qset_cmb_box(self.cmbQQuant, "none")
-# 
-#             self._store_q_settings() # store updated quantization settings
-# 
-#==============================================================================
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(True)
+
+            self._store_q_settings() # store updated quantization / format settings
 
             # check whether filter is FIR and only needs one column
             if fb.fil[0]['ft'] == 'FIR':
