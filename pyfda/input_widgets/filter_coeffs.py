@@ -67,6 +67,31 @@ class ItemDelegate(QStyledItemDelegate):
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
 
+
+#==============================================================================
+#     def paint(self, painter, option, index):
+#         """
+#         Override painter
+#         
+#         painter: instance of QPainter
+#         option:  instance of QStyleOptionViewItemV4
+#         index:   instance of QModelIndex
+#         
+#         see http://www.mimec.org/node/305
+#         """
+#         index_role = index.data(Qt.AccessibleDescriptionRole).toString()
+#         
+#         if index_role == QtCore.QLatin1String("separator"):
+#             print("separator!")
+#             y = (option.rect.top() + option.rect.bottom()) / 2
+#             #        painter.setPen(option.palette.color( QPalette.Active, QPalette.Dark ) )
+#             painter.drawLine(option.rect.left(), y, option.rect.right(), y )
+#         else:
+#             # continue with the original `paint()` method
+#             super(ItemDelegate, self).paint(painter, option, index)
+# 
+#==============================================================================
+
     def initStyleOption(self, option, index):
         """
         Initialize `option` with the values using the `index` index. When the 
