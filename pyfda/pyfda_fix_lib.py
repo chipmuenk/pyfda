@@ -656,9 +656,9 @@ class Fixed(object):
 
                 if self.frmt == 'dec':
                     if self.point:
-                        y_str = str(y_fix * (1 << self.WI))# + '.' + str(yf)
+                        y_str = str(y_fix) # use fixpoint number as returned by fix()
                     else:
-                        y_str = str(yi)
+                        y_str = str(yi) # convert to integer with selected number of bits
 
                 elif self.frmt == 'hex':
                     if self.point and self.WF > 0:
