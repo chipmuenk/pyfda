@@ -15,12 +15,14 @@ import numpy as np
 from .pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
+# TODO: Correct fixpoint calculation for hex / csd: 
+# TODO: Editing Fixpoint numbers gives complety wrong results
+
 # TODO: Overflows are not handled correctly: For saturation, overflow yields the 
 #          min. number!
 # TODO: Illegal values in CSD return zero    
 # TODO: Negative Hex values are not treated correctly
 # TODO: Overflow errors can occur for very large numbers?
-# TODO: Implment fractional point for int/hex/bin/csd
 
 __version__ = 0.5
 
