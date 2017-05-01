@@ -45,6 +45,7 @@ import pyfda.pyfda_fix_lib as fix
 
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 # TODO: Need to refresh table after _load_q_settings?
+# TODO: convert to a proper Model-View-Architecture using QTableView
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
