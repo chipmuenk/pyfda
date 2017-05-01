@@ -604,8 +604,10 @@ class Fixed(object):
                     scale = 1 << self.WI # Radix point, shift left by WI bits
                 else:
                     scale = 1 << self.W # No Radix point, shift left by W bits
-                yi = np.round(np.modf(y_fix  * scale)[1]).astype(int) # integer part
-                yf = np.round(np.modf(y_fix  * (1 << self.WF))[0]).astype(int) # frac part
+                y_scale = y_fix  * scale # scaled fixpoint number
+                yi = np.round(np.modf(y_scale)[1]).astype(int) # integer part
+                # yf = np.modf(y_scale)[0] # frac part                
+                yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
                 print("y_fix, yi, yf = ", y_fix, yi, yf)
 
                 if self.frmt == 'dec':
@@ -616,7 +618,7 @@ class Fixed(object):
 
                 elif self.frmt == 'hex':
                     if self.point and self.WF > 0:
-                        y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf*(1 << self.WF) , self.WF)
+                        y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf, self.WF)
                     else:
                         y_str = dec2hex(yi, self.W)
 
