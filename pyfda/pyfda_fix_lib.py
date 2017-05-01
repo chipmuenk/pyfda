@@ -492,9 +492,9 @@ class Fixed(object):
         self.N_over_pos = 0
 
 #------------------------------------------------------------------------------
-    def base2float(self, y, frmt=None):
+    def frmt2float(self, y, frmt=None):
         """
-        Return floating point representation fixpoint number `y` (scalar) in 
+        Return floating point representation for fixpoint number `y` (scalar) in 
         specified format.
 
         Parameters

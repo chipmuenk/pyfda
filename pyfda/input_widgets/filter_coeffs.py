@@ -201,7 +201,7 @@ class ItemDelegate(QStyledItemDelegate):
         if self.parent.myQ.frmt == 'float':
             data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without fixpoint formatting 
         else:
-            data = self.parent.myQ.base2float(qstr(editor.text()),
+            data = self.parent.myQ.frmt2float(qstr(editor.text()),
                                     self.parent.myQ.frmt) # transform back to float
 
         model.setData(index, data)                          # store in QTableWidget 
