@@ -241,9 +241,9 @@ class Fixed(object):
     Additionally, the following keys define the base / display format for the 
     fixpoint number:
 
-    * **'frmt'** : Output format, optional; default = 'frac'
+    * **'frmt'** : Output format, optional; default = 'float'
 
-      - 'frac' : (default) decimal fraction
+      - 'float' : (default)
       - 'int'  : decimal integer, scaled by :math:`2^{WF}`
       - 'bin'  : binary string, scaled by :math:`2^{WF}`
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
@@ -267,7 +267,7 @@ class Fixed(object):
         Overflow behaviour ('wrap', 'sat', ...)
 
     frmt : string
-        target output format ('frac', 'int', 'bin', 'hex')
+        target output format ('float', 'dec', 'bin', 'hex', 'csd')
         
     point : boolean
         If True, use position of radix point for format conversion
@@ -330,7 +330,7 @@ class Fixed(object):
             else: q_obj['WF'] = int(q_obj['WF'])
         if 'quant' not in q_obj: q_obj['quant'] = 'floor'
         if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
-        if 'frmt' not in q_obj: q_obj['frmt'] = 'frac'
+        if 'frmt' not in q_obj: q_obj['frmt'] = 'float'
         if 'point' not in q_obj: q_obj['point'] = 'false'
 
         self.q_obj = q_obj # store quant. dict in instance
@@ -358,7 +358,7 @@ class Fixed(object):
         elif self.frmt == 'hex':
             self.places = int(np.ceil(self.W / 4.))
             self.base = 16
-        elif self.frmt == 'frac':
+        elif self.frmt == 'float':
             self.places = 4
             self.base = 0
         else:
@@ -373,7 +373,7 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or array-like object
-            to be quantized in fractional format
+            to be quantized in floating point format
 
         Returns
         -------
@@ -422,7 +422,6 @@ class Fixed(object):
             # If y is not a number, convert to string, remove whitespace and convert
             # to complex format:
             elif not np.issubdtype(type(y), np.number):
-                print(y, type(y))
                 y = qstr(y)
                 y = y.replace(' ','') # whitespace is not allowed in complex number
                 try:
@@ -491,9 +490,10 @@ class Fixed(object):
         self.N_over_pos = 0
 
 #------------------------------------------------------------------------------
-    def base2frac(self, y, frmt=None):
+    def base2float(self, y, frmt=None):
         """
-        Return fractional, quantized representation `yq` of `y` (scalar)
+        Return floating point representation fixpoint number `y` (scalar) in 
+        specified format.
 
         Parameters
         ----------
@@ -501,17 +501,21 @@ class Fixed(object):
             to be quantized with the numeric base specified by `frmt`.
 
         frmt: string (optional)
-            any of the formats `frac`, `int`, `bin`, `hex`, `csd`)
+            any of the formats `float`, `dec`, `bin`, `hex`, `csd`)
             When `frmt` is unspecified, the instance parameter `self.frmt` is used
 
         Returns
         -------
-        yq: float in fractional format
+        yq: float representation of fixpoint input
             The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
         """
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
+
+        if frmt == 'float':
+            return y
+            
         if frmt in {'hex', 'bin', 'dec'}:
 
         # Find the number of places before the first radix point (if there is one)
@@ -543,12 +547,11 @@ class Fixed(object):
             except Exception as e:
                 logger.warn(e)
                 y = None
-        # quantize / saturate / wrap the fractional value           
-        if frmt in {'frac', 'dec', 'hex', 'bin'}:
-            f = self.fix(y)
-            print("y, f",y,f)
-            if f is not None:
-                return f
+        # quantize / saturate / wrap the float value:        
+            yfix = self.fix(y)
+            print("y, yfix = ", y, yfix)
+            if yfix is not None:
+                return yfix
             elif fb.data_old is not None:
                 return fb.data_old
             else:
@@ -610,7 +613,7 @@ class Fixed(object):
 #==============================================================================
 
 #------------------------------------------------------------------------------
-    def frac2base(self, y):
+    def float2base(self, y):
         """
         Return representation `yf` of `y` (scalar or array-like) with selected
         fixpoint base and number format
@@ -634,51 +637,50 @@ class Fixed(object):
             with the same shape as `y`.
             `yf` is formatted as set in `self.frmt` with `self.W` digits
         """
-        # round / clip numbers: yf is fractional with the required range and resolution
-        y_fix = self.fix(y)
-        if self.frmt == 'frac': # return quantized fractional value
-            return y_fix
-        # no fractional format, scale with 2^WF to obtain integer representation
-        elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
-            if self.point:
-                yi_scale = y_fix * (1 << self.WI)
-                yi = (np.round(y_fix * (1 << self.WI))).astype(int)
-                yf_scale = (yi_scale - yi)
-                print("y", yi, yi_scale, yf_scale)
-                scale = 1 << self.WI # shift left by WI bits
-            else:
-                scale = 1 << self.W # shift left by W bits
-            yi = (np.round(y_fix * scale)).astype(int) 
-            yf = (np.round((y_fix - yi)*(1 << self.WF))).astype(int)
+        if self.frmt == 'float': # return float input value
+            return y
 
-            if self.frmt == 'dec':
-                y_str = str(yi)
-                #if self.point:
-                #    y_str = str(y_fix)
-                #else:
-                 #   y_str = str(yi)
-
-            elif self.frmt == 'hex':
-                if self.point:
-                    y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf, self.WF)
-                else:
-                    y_str = dec2hex(yi, self.W)
-
-            elif self.frmt == 'bin':
-                y_str = np.binary_repr(yi, self.W)
-                if self.point:
-                    y_str = y_str[:self.WI] + "." + y_str[-self.WF:]
-
-            else: # self.frmt = 'csd'
-                if self.point:
-                    y_str = dec2csd(yi, self.WF) # yes, use fractional bits WF
-                else:
-                    y_str = dec2csd(yi, 0) # no, treat as integer
-
-            return y_str
         else:
-            raise Exception('Unknown output format "%s"!'%(self.frmt))
-            return None
+            # quantize & treat overflows of y (float), yielding the float y_fix with fixpoint value
+            y_fix = self.fix(y)
+
+            if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
+            # fixpoint format, scale float with number of integer places
+                if self.point:
+                    scale = 1 << self.WI # Radix point, shift left by WI bits
+                else:
+                    scale = 1 << self.W # No Radix point, shift left by W bits
+                yi = np.round(np.modf(y_fix  * scale)[1]).astype(int) # integer part
+                yf = np.round(np.modf(y_fix  * (1 << self.WF))[0]).astype(int) # frac part
+                print("y_fix, yi, yf = ", y_fix, yi, yf)
+
+                if self.frmt == 'dec':
+                    if self.point:
+                        y_str = str(y_fix * (1 << self.WI))# + '.' + str(yf)
+                    else:
+                        y_str = str(yi)
+
+                elif self.frmt == 'hex':
+                    if self.point and self.WF > 0:
+                        y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf*(1 << self.WF) , self.WF)
+                    else:
+                        y_str = dec2hex(yi, self.W)
+
+                elif self.frmt == 'bin':
+                    y_str = np.binary_repr(yi, self.W)
+                    if self.point:
+                        y_str = y_str[:self.WI] + "." + y_str[self.WI:]# -self.WF:]
+
+                else: # self.frmt = 'csd'
+                    if self.point:
+                        y_str = dec2csd(yi, self.WF) # yes, use fractional bits WF
+                    else:
+                        y_str = dec2csd(yi, 0) # no, treat as integer
+
+                return y_str
+            else:
+                raise Exception('Unknown output format "%s"!'%(self.frmt))
+                return None
 
 #==============================================================================
 # Filter classes inheriting from the Fixed class 

@@ -101,11 +101,11 @@ class ItemDelegate(QStyledItemDelegate):
         """ 
         string = qstr(text) # convert to "normal" string
 
-        if self.parent.myQ.frmt == 'frac':
+        if self.parent.myQ.frmt == 'float':
             data = safe_eval(string)
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.frac2base(string), 
+            return "{0:>{1}}".format(self.parent.myQ.float2base(string), 
                                         self.parent.myQ.places)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
@@ -145,20 +145,20 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.ba[index.column()][index.row()] # data from self.ba
-        fb.data_old = data # store old data in fractional format
+        fb.data_old = data # store old data in floating point format
         
-        if self.parent.myQ.frmt == 'frac':
+        if self.parent.myQ.frmt == 'float':
             # fractional format: pass data with full resolution
             editor.setText(str(safe_eval(data))) 
         else:
             # integer format with base: pass requantized data with required number of places
-            editor.setText("{0:>{1}}".format(self.parent.myQ.frac2base(data),
+            editor.setText("{0:>{1}}".format(self.parent.myQ.float2base(data),
                                                self.parent.myQ.places))
 
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
-        convert it back to fractional format and store it in the model 
+        convert it back to floating point format and store it in the model 
         (= QTableWidget) and in self.ba
 
         editor: instance of e.g. QLineEdit
@@ -172,11 +172,11 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if self.parent.myQ.frmt == 'frac':
+        if self.parent.myQ.frmt == 'float':
             data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without fixpoint formatting 
         else:
-            data = self.parent.myQ.base2frac(qstr(editor.text()),
-                                    self.parent.myQ.frmt) # transform back to fractional
+            data = self.parent.myQ.base2float(qstr(editor.text()),
+                                    self.parent.myQ.frmt) # transform back to float
 
         model.setData(index, data)                          # store in QTableWidget 
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
@@ -236,18 +236,12 @@ class FilterCoeffs(QWidget):
         self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
                 "For high order systems, this might be slow.</span>")
 
-        self.butQEnable = QPushButton(self)
-#        self.butQEnable.setIcon(QIcon(':/menu.svg'))
-        self.butQEnable.setIcon(QIcon(':/quantize_options.svg'))
-        self.butQEnable.setIconSize(q_icon_size)
-        self.butQEnable.setCheckable(True)
-        self.butQEnable.setChecked(False)
-        self.butQEnable.setToolTip("<span>Show quantization options.</span>")
-
         self.cmbFormat = QComboBox(self)
-        qFormat = ['Frac', 'Dec', 'Hex', 'Bin', 'CSD']
+#        self.cmbFormat.addItem('Float')
+        qFormat = ['Float', 'Dec', 'Hex', 'Bin', 'CSD']
         self.cmbFormat.addItems(qFormat)
-        self.cmbFormat.setCurrentIndex(0) # 'frac'
+        self.cmbFormat.insertSeparator(1)
+        self.cmbFormat.setCurrentIndex(0) # 'float'
         self.cmbFormat.setToolTip('Set the display format.')
         self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -265,7 +259,6 @@ class FilterCoeffs(QWidget):
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
-        layHDisplay.addWidget(self.butQEnable)
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.spnRound)
@@ -470,7 +463,6 @@ class FilterCoeffs(QWidget):
 #        self.tblCoeff.itemChanged.connect(self.save_coeffs)
 #        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
         self.butEnable.clicked.connect(self._refresh_table)
-        self.butQEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.chkRadixPoint.clicked.connect(self._radix_point)
         self.butClipboard.clicked.connect(self._copy_to_clipboard)
@@ -565,26 +557,24 @@ class FilterCoeffs(QWidget):
         self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
 
         params['FMT_ba'] = int(self.spnRound.text())
+
+        # When format is 'float', disable all fixpoint options
+        is_float = (qget_cmb_box(self.cmbFormat, data=False).lower() == 'float')
         
-        is_frac = (qget_cmb_box(self.cmbFormat, data=False).lower() == 'frac')
-        
-        self.spnRound.setVisible(is_frac) # only enabled for
-        self.lblRound.setVisible(is_frac) # format = 'frac'
-        self.chkRadixPoint.setVisible(not is_frac)
+        self.spnRound.setVisible(is_float) # number of digits can only be selected 
+        self.lblRound.setVisible(is_float) # for format = 'float'
+        self.chkRadixPoint.setVisible(not is_float)
 
         if self.butEnable.isChecked():
-
-            if self.butQEnable.isChecked():
-                self.frmQSettings.setVisible(True)
-                self.cmbFormat.setEnabled(True)
-            else:
-                self.frmQSettings.setVisible(False)
-                qset_cmb_box(self.cmbFormat, "Frac")
-                self.cmbFormat.setEnabled(False)
-                qset_cmb_box(self.cmbQOvfl, "none")
-                qset_cmb_box(self.cmbQQuant, "none")
-            self._store_q_settings() # store updated quantization settings
-
+            self.frmQSettings.setVisible(not is_float) # hide all q-settings for float
+#==============================================================================
+#             if is_float: # disable requantization options
+#                 qset_cmb_box(self.cmbQOvfl, "none")
+#                 qset_cmb_box(self.cmbQQuant, "none")
+# 
+#             self._store_q_settings() # store updated quantization settings
+# 
+#==============================================================================
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(True)
 
@@ -855,8 +845,8 @@ class FilterCoeffs(QWidget):
 
         self._store_q_settings() # read comboboxes and store setting in filter dict
         # always save quantized coefficients in fractional format
-        # -> change output format to 'frac' before quantizing and storing in self.ba
-        self.myQ.frmt = 'frac'
+        # -> change output format to 'float' before quantizing and storing in self.ba
+        self.myQ.frmt = 'float'
 
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
