@@ -539,11 +539,11 @@ class Fixed(object):
             try:
                 int_ = int(val_str, self.base)
                 if frmt == 'bin':
-                    y = int_ / 1 << frac_places
+                    y = int_ / (1 << frac_places)
                 if frmt == 'hex':
-                    y = int_ / 1 << (frac_places * 4)
+                    y = int_ / (1 << (frac_places * 4))
                 else:
-                    y = int_ / 10 ** frac_places
+                    y = int_ / (10 ** frac_places)
             except Exception as e:
                 logger.warn(e)
                 y = None
