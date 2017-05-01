@@ -505,9 +505,9 @@ class FilterCoeffs(QWidget):
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
         self.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
         self.cmbQQuant.currentIndexChanged.connect(self._refresh_table)
-        self.ledWF.editingFinished.connect(self._set_WIWF)
-        self.ledWI.editingFinished.connect(self._set_WIWF)
-        self.ledW.editingFinished.connect(self._set_W)
+        self.ledWF.editingFinished.connect(self._WIWF_changed)
+        self.ledWI.editingFinished.connect(self._WIWF_changed)
+        self.ledW.editingFinished.connect(self._W_changed)
 
         butQuant.clicked.connect(self.quant_coeffs)
 
@@ -537,9 +537,9 @@ class FilterCoeffs(QWidget):
         self.load_dict()
 
 #------------------------------------------------------------------------------
-    def _set_WIWF(self):
+    def _WIWF_changed(self):
         """
-        Set wordlength when WI or WF have been changed
+        Set wordlength `W` when `WI` or `WF` have been changed
         """
         WI = abs(int(safe_eval(self.ledWI.text(), self.myQ.WI)))
         WF = abs(int(safe_eval(self.ledWF.text(), self.myQ.WF)))
@@ -548,12 +548,21 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
 
 #------------------------------------------------------------------------------
-    def _set_W(self):
+    def _W_changed(self):
         """
-        Set wordlength
+        Set fractional and integer length `WF` and `WI` when wordlength Ẁ` has
+        been changed. Try to preserve `WI`setting except when `WF`would become
+        negative.
         """
-        W = abs(int(safe_eval(self.ledW.text(), self.myQ.W)))
-        self.ledWF.setText(str(W - self.myQ.WI - 1))
+        W = int(safe_eval(self.ledW.text(), self.myQ.W))
+        if W < 2:
+            self.ledW.setText(str(self.myQ.W))
+        WF = W - self.myQ.WI - 1
+        if WF < 0:
+            self.ledWI.setText(str(W - 1))
+            WF = 0
+            
+        self.ledWF.setText(str(WF))
         self._store_q_settings()
         
         self._refresh_table()
@@ -702,6 +711,7 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.chkRadixPoint.setChecked(q_coeff['point'])
+
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
