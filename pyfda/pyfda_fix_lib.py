@@ -667,9 +667,11 @@ class Fixed(object):
                         y_str = dec2hex(yi, self.W)
 
                 elif self.frmt == 'bin':
-                    y_str = np.binary_repr(yi, self.W)
-                    if self.point:
-                        y_str = y_str[:self.WI] + "." + y_str[self.WI:]# -self.WF:]
+                    # calculate binary representation of fixpoint integer
+                    y_str = np.binary_repr(np.round(y_fix  * (1 << self.W)).astype(int), self.W)
+                    if self.point and self.WF > 0:
+                        # ... and instert the radix point if required
+                        y_str = y_str[:self.WI] + "." + y_str[self.WI:]
 
                 else: # self.frmt = 'csd'
                     if self.point:
