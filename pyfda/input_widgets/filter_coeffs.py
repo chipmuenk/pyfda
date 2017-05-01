@@ -130,7 +130,7 @@ class ItemDelegate(QStyledItemDelegate):
             data = safe_eval(string)
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.float2base(string), 
+            return "{0:>{1}}".format(self.parent.myQ.float2frmt(string), 
                                         self.parent.myQ.places)
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
@@ -177,7 +177,7 @@ class ItemDelegate(QStyledItemDelegate):
             editor.setText(str(safe_eval(data))) 
         else:
             # integer format with base: pass requantized data with required number of places
-            editor.setText("{0:>{1}}".format(self.parent.myQ.float2base(data),
+            editor.setText("{0:>{1}}".format(self.parent.myQ.float2frmt(data),
                                                self.parent.myQ.places))
 
     def setModelData(self, editor, model, index):

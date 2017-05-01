@@ -613,7 +613,7 @@ class Fixed(object):
 #==============================================================================
 
 #------------------------------------------------------------------------------
-    def float2base(self, y):
+    def float2frmt(self, y):
         """
         Return representation `yf` of `y` (scalar or array-like) with selected
         fixpoint base and number format
