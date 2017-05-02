@@ -19,6 +19,7 @@ import pyfda.filterbroker as fb
 # TODO: Illegal and fractional values in CSD return zero 
 
 # TODO: Editing Fixpoint numbers gives complety wrong scaling
+#       When ovfl = None and frmt = "dec", "none" is generated somewhere along the line
 
 # TODO: Overflows are not handled correctly: For saturation, overflow yields the 
 #          min. number!
@@ -431,7 +432,7 @@ class Fixed(object):
                 try:
                     y = complex(y)
                 except ValueError as e:
-                    logger.error("Argument {0} \n {1}".format(y,e))
+                    logger.error("Argument '{0}' yields \n {1}".format(y,e))
             over_pos = over_neg = yq = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
@@ -479,7 +480,7 @@ class Fixed(object):
                     yq - 2. * self.MSB*np.fix((np.sign(yq) * self.MSB+yq)/(2*self.MSB)),
                     yq)
             else:
-                raise Exception('Unknown overflow type "%s"!'%(self.overfl))
+                raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
         if SCALAR and isinstance(yq, np.ndarray):
@@ -547,7 +548,7 @@ class Fixed(object):
                     y = int_ / (1 << frac_places)
                 if frmt == 'hex':
                     y = int_ / (1 << (frac_places * 4))
-                else:
+                else: # 'dec'
                     y = int_ / (10 ** frac_places)
             except Exception as e:
                 logger.warn(e)
