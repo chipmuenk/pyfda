@@ -606,7 +606,7 @@ class Fixed(object):
                 if self.point:
                     scale = 1 << self.WI # Radix point, shift left by WI bits
                 else:
-                    scale = 1 << self.W # No Radix point, shift left by W bits
+                    scale = 1 << (self.W-1) # No Radix point, shift left by W-1 bits
                 y_scale = y_fix  * scale # scaled fixpoint number
                 yi = np.round(np.modf(y_scale)[1]).astype(int) # integer part
                 # yf = np.modf(y_scale)[0] # frac part                
