@@ -644,7 +644,23 @@ class Fixed(object):
                 return None
 
 
-# If called directly, do some example #
-#######################################
+########################################
+# If called directly, do some examples #
+########################################
 if __name__=='__main__':
-    pass
+    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}
+    myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
+    
+    y = 0.99
+    y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
+    print("W = ", myQ.W, myQ.LSB, myQ.MSB)
+
+    for point in [False, True]:
+        q_obj['point'] = point
+        myQ.setQobj(q_obj)
+        print("point = ", point)
+        for y in y_list:
+        
+            print("y -> y_fix", y, "->", myQ.fix(y))
+            print(myQ.frmt, myQ.float2frmt(y))
+
