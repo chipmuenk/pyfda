@@ -36,7 +36,6 @@ import pyfda.pyfda_fix_lib as fix
 #    somewhere downstream a "" string is created from this which causes an error 
 #    in safe_eval
 # TODO: Strip parentheses of complex argument @ setEditorData()
-# TODO: Set number format as W (WI) or WI.WF (W)
 
 # TODO: detect overflows during quantization and color cells - 
 #      add another array to fix to store over / underflows

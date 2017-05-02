@@ -15,13 +15,17 @@ import numpy as np
 from .pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
-# TODO: Correct fixpoint calculation for hex / csd: 
-# TODO: Editing Fixpoint numbers gives complety wrong results
+# TODO: Correct fixpoint calculation for negative fractional hex yields wrong results
+# TODO: Illegal and fractional values in CSD return zero 
+
+# TODO: Editing Fixpoint numbers gives complety wrong scaling
 
 # TODO: Overflows are not handled correctly: For saturation, overflow yields the 
 #          min. number!
-# TODO: Illegal values in CSD return zero    
-# TODO: Negative Hex values are not treated correctly
+
+   
+# TODO: Negative fractional hex values are not treated correctly
+
 # TODO: Overflow errors can occur for very large numbers?
 
 __version__ = 0.5
@@ -403,8 +407,6 @@ class Fixed(object):
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
         >>> bq = myQb.fixed(b)
         >>> bq = bq.astype(btype) # restore original variable type
-        >>>
-
         """
 
         if np.shape(y):
@@ -429,7 +431,7 @@ class Fixed(object):
                 try:
                     y = complex(y)
                 except ValueError as e:
-                    logger.error("{0} \n {1}".format(y,e))
+                    logger.error("Argument {0} \n {1}".format(y,e))
             over_pos = over_neg = yq = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
@@ -451,6 +453,7 @@ class Fixed(object):
         elif self.quant == 'rint':   yq = self.LSB * np.rint(y / self.LSB)
              # round towards nearest int
         elif self.quant == 'none':   yq = y
+            # return unquantized value
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
 
