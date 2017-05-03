@@ -536,20 +536,19 @@ class Fixed(object):
             val_str = val_str.replace('.','') # join integer and fractional part
    
             if int_places == -1 or not self.point: # no dot found / selected
-                int_places = len(val_str) - 1
-                frac_places = 0
+                places = len(val_str) - 1 # all digits
             else:
-                frac_places = len(val_str) - int_places - 1
-
+                places = len(val_str) - int_places - 1 # frac_places
+            
             # calculate the decimal value and scale it by the number of frac places:
             try:
                 int_ = int(val_str, self.base)
                 if frmt == 'bin':
-                    y = int_ / (1 << frac_places)
+                    y = int_ / (1 << places)
                 if frmt == 'hex':
-                    y = int_ / (1 << (frac_places * 4))
+                    y = int_ / (1 << (places * 4))
                 else: # 'dec'
-                    y = int_ / (10 ** frac_places)
+                    y = int_ / (10 ** places)
             except Exception as e:
                 logger.warn(e)
                 y = None
