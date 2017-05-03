@@ -329,7 +329,7 @@ class Fixed(object):
         if 'Q' in q_obj:
             Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'
             q_obj['WI'] = int(Q_str[0])
-            q_obj['WF'] = int(Q_str[1])
+            q_obj['WF'] = int(abs(Q_str[1]))
         else:
             if 'WI' not in q_obj: q_obj['WI'] = 0
             else: q_obj['WI'] = int(q_obj['WI'])
