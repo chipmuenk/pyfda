@@ -553,15 +553,20 @@ class Fixed(object):
    
             places = int_places
             
-            # calculate the decimal value and scale it by the number of frac places:
+            print("frmt, places = ", frmt, places)
+            print("y, val_str = ", y, val_str)
+            # (1) calculate the decimal value of the input string without dot
+            # (2) scale the integer depending the number of places and the base
             try:
-                int_ = int(val_str, self.base)
                 if frmt == 'bin':
-                    y = int_ / (1 << places)
-                if frmt == 'hex':
-                    y = int_ / (1 << (places * 4))
+                    scale = 1 << places           # * 2 **  (-places)
+                elif frmt == 'hex':
+                    scale = 1 << (places * 4)     # * 16 ** (-places)
                 else: # 'dec'
-                    y = int_ / (10 ** places)
+                    scale = 10 ** places          # * 10 ** (-places)
+
+                int_ = int(val_str, self.base)                    
+                y = int_ / scale
             except Exception as e:
                 logger.warn(e)
                 y = None
