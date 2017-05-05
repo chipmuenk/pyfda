@@ -523,7 +523,7 @@ class Fixed(object):
         if frmt == 'float':
             return y
             
-        if frmt in {'hex', 'bin', 'dec'}:
+        elif frmt in {'hex', 'bin', 'dec'}:
 
         # Find the number of places before the first radix point (if there is one)
         # and join integer and fractional parts:
