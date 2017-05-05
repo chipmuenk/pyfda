@@ -323,6 +323,13 @@ class FilterCoeffs(QWidget):
         butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                 "When nothing is selected, delete the last row.</SPAN>")
+                
+        butQuant = QPushButton(self)
+        butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
+        "When nothing is selected, quantize the whole table.</span>")
+#        butQuant.setText("Q!")
+        butQuant.setIcon(QIcon(':/quantize.svg'))
+        butQuant.setIconSize(q_icon_size)
 
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
@@ -350,6 +357,7 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(butAddCells)
         layHButtonsCoeffs1.addWidget(butDelCells)
+        layHButtonsCoeffs1.addWidget(butQuant)
         layHButtonsCoeffs1.addWidget(butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
@@ -369,13 +377,6 @@ class FilterCoeffs(QWidget):
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
-
-        butQuant = QPushButton(self)
-        butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
-        "When nothing is selected, quantize the whole table.</span>")
-#        butQuant.setText("Q!")
-        butQuant.setIcon(QIcon(':/quantize.svg'))
-        butQuant.setIconSize(q_icon_size)
 
         self.lblWIWF  = QLabel("W = ")
         self.lblQOvfl = QLabel("Ovfl.:")
@@ -440,7 +441,6 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs2.addStretch()
 
         layHButtonsCoeffs3 = QHBoxLayout()
-        layHButtonsCoeffs3.addWidget(butQuant)
         layHButtonsCoeffs3.addWidget(self.lblWIWF)
         layHButtonsCoeffs3.addWidget(self.ledW)
         layHButtonsCoeffs3.addWidget(self.ledWI)
