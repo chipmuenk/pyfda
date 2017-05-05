@@ -405,6 +405,9 @@ class FilterCoeffs(QWidget):
 #        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledWF.setMaximumWidth(30)
         self.ledW.setVisible(self.chkRadixPoint.isChecked())
+        
+        self.lblMSB = QLabel(self)
+        self.lblMSB.setText("(...)")        
 
         self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
@@ -443,6 +446,7 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs3.addWidget(self.ledWI)
         layHButtonsCoeffs3.addWidget(self.lblDot)
         layHButtonsCoeffs3.addWidget(self.ledWF)
+        layHButtonsCoeffs3.addWidget(self.lblMSB)       
         layHButtonsCoeffs3.addStretch()
 
         layHButtonsCoeffs4 = QHBoxLayout()
@@ -696,6 +700,8 @@ class FilterCoeffs(QWidget):
                 'frmt':self.cmbFormat.currentText(),
                 'point':self.chkRadixPoint.isChecked()
                 }
+        self.lblMSB.setText("("+str(-self.myQ.MSB) + "..." 
+                    + str(self.myQ.MSB - self.myQ.LSB) + ")")
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
@@ -712,6 +718,8 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.chkRadixPoint.setChecked(q_coeff['point'])
 
+        self.lblMSB.setText("("+str(-self.myQ.MSB) + "..." 
+                    + str(self.myQ.MSB - self.myQ.LSB) + ")")
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
