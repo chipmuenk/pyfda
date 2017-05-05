@@ -461,7 +461,8 @@ class Fixed(object):
 
         # Handle Overflow / saturation
         if   self.ovfl == 'none':
-            pass
+            return yq
+
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -self.MSB)
