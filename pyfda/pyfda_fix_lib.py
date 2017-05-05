@@ -498,8 +498,8 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):
         """
-        Return floating point representation for fixpoint number `y` (scalar) in 
-        specified format.
+        Return floating point representation for fixpoint scalar `y` (scalar) 
+        given in format `frmt`.
 
         Parameters
         ----------
@@ -512,8 +512,7 @@ class Fixed(object):
 
         Returns
         -------
-        yq: float representation of fixpoint input
-            The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
+        yq: float (`dtype=np.float64`) representation of fixpoint input.
         """
         if frmt is None:
             frmt = self.frmt
