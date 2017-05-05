@@ -407,6 +407,15 @@ class FilterCoeffs(QWidget):
         self.ledWF.setMaximumWidth(30)
         self.ledW.setVisible(self.chkRadixPoint.isChecked())
         
+        self.chkAutoScale = QCheckBox("Scale: Auto", self)  
+        self.chkAutoScale.setToolTip("Calculate scale factor from wordlength.")
+        self.chkAutoScale.setChecked(True)
+        
+        self.ledScale = QLineEdit(self)
+        self.ledScale.setToolTip("Set the scale for converting to binary representation.") 
+        self.ledScale.setText(str(2**16))
+        self.ledScale.setVisible(False)
+        
         self.lblMSB = QLabel(self)
         self.lblMSB.setText("(...)")        
 
@@ -446,7 +455,9 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs3.addWidget(self.ledWI)
         layHButtonsCoeffs3.addWidget(self.lblDot)
         layHButtonsCoeffs3.addWidget(self.ledWF)
-        layHButtonsCoeffs3.addWidget(self.lblMSB)       
+        layHButtonsCoeffs3.addWidget(self.chkAutoScale)
+        layHButtonsCoeffs3.addWidget(self.ledScale)
+#        layHButtonsCoeffs3.addWidget(self.lblMSB)       
         layHButtonsCoeffs3.addStretch()
 
         layHButtonsCoeffs4 = QHBoxLayout()
@@ -512,6 +523,9 @@ class FilterCoeffs(QWidget):
         self.ledWF.editingFinished.connect(self._WIWF_changed)
         self.ledWI.editingFinished.connect(self._WIWF_changed)
         self.ledW.editingFinished.connect(self._W_changed)
+        
+        self.chkAutoScale.clicked.connect(self._refresh_table)
+        self.ledScale.editingFinished.connect(self._refresh_table)
 
         butQuant.clicked.connect(self.quant_coeffs)
 
