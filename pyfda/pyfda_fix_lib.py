@@ -572,7 +572,7 @@ class Fixed(object):
                 y = None
         # quantize / saturate / wrap the float value:        
             yfix = self.fix(y)
-            print("y, yfix = ", y, yfix)
+            print("int_, scale, y, yfix = ", int_, scale, y, yfix)
             if yfix is not None:
                 return yfix
             elif fb.data_old is not None:
@@ -627,9 +627,9 @@ class Fixed(object):
                     scale = 1 << (self.W-1) # No Radix point, shift left by W-1 bits
                 y_scale = y_fix  * scale # scaled fixpoint number
                 yi = np.round(np.modf(y_scale)[1]).astype(int) # integer part
-                # yf = np.modf(y_scale)[0] # frac part                
+                # print("scale, y_scale, np.modf(yscale)[1]", scale, y_scale, np.modf(y_scale)[1])              
                 yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
-                print("y_fix, yi, yf = ", y_fix, yi, yf)
+                # print("y_fix, yi, yf = ", y_fix, yi, yf)
 
                 if self.frmt == 'dec':
                     if self.point:
