@@ -571,6 +571,7 @@ class Fixed(object):
             except Exception as e:
                 logger.warn(e)
                 y = None
+
         # quantize / saturate / wrap the float value:        
             yfix = self.fix(y)
             print("int_, scale, y, yfix = ", int_, scale, y, yfix)
@@ -582,11 +583,30 @@ class Fixed(object):
                 return 0
 
         elif frmt == 'csd':
+
+#        # Intialize calculation, start with the MSB (integer)
+#        msb_power = len(int_str)-1 #
+#        dec_val = 0.0
+#    
+#        # start from the MSB and work all the way down to the last digit
+#        for ii in range( len(val_str) ):
+#    
+#            power_of_two = 2.0**(msb_power-ii)
+#    
+#            if val_str[ii] == '+' :
+#                dec_val += power_of_two
+#            elif val_str[ii] == '-' :
+#                dec_val -= power_of_two
+#            # else
+#            #    ... all other values are ignored
+#    
+#            logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4}; Num={5:f}'.format(
+#                    val_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
+
             return csd2dec(y) / (1 << self.WF)
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
-            
 
 #------------------------------------------------------------------------------
     def float2frmt(self, y):
