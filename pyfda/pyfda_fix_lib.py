@@ -526,19 +526,32 @@ class Fixed(object):
 
         # Find the number of places before the first radix point (if there is one)
         # and join integer and fractional parts:
-            val_str = qstr(y) # just to be sure ...
+            val_str = qstr(y).replace(' ','') # just to be sure ...
+            val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
             if val_str[0] == '.': # prepend '0' when the number starts with '.'
                 val_str = '0' + val_str
-            if val_str[0] not in {'+','-'}: # prepend '+' when sign is missing
-                val_str = '+' + val_str
+            try:
+                int_str, frc_str = val_str.split('.') # split into integer and fractional places
+            except ValueError: # no fractional part
+                int_str = val_str
+                frc_str = ""
+
+            regex = {'bin' : '[0|1]',
+                     'csd' : '0|+|-',
+                     'dec' : '[0-9]',
+                     'hex' : '[0-9A-Fa-f]'
+                     }
+                     
+            # count number of valid digits in string
+            int_places = len(re.findall(regex[frmt], int_str))
+            frc_places = len(re.findall(regex[frmt], frc_str))
+            print("int_places, frc_places", int_places, frc_places)
             
-            int_places = val_str.find('.') - 1 # subtract 1 for the sign
+            # subtract one from int_places?
+            
             val_str = val_str.replace('.','') # join integer and fractional part
    
-            if int_places == -1 or not self.point: # no dot found / selected
-                places = len(val_str) - 1 # all digits
-            else:
-                places = len(val_str) - int_places - 1 # frac_places
+            places = int_places
             
             # calculate the decimal value and scale it by the number of frac places:
             try:
