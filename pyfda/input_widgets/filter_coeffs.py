@@ -278,8 +278,10 @@ class FilterCoeffs(QWidget):
         
         self.chkRadixPoint = QCheckBox("Radix point", self)
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
-                    " point for base 10) for fixpoint formats .</span>")
+                    " point for base 10) for fixpoint formats (still disabled).</span>")
         self.chkRadixPoint.setChecked(False)
+#TODO: currently disabled
+        self.chkRadixPoint.setCheckable(False)
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
@@ -387,14 +389,12 @@ class FilterCoeffs(QWidget):
         self.ledW.setText("16")
         self.ledW.setMaxLength(2) # maximum of 2 digits
         self.ledW.setFixedWidth(30) # width of lineedit in points(?)
-        self.ledW.setVisible(not self.chkRadixPoint.isChecked())
 
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip("Specify number of integer bits.")
         self.ledWI.setText("0")
         self.ledWI.setMaxLength(2) # maximum of 2 digits
         self.ledWI.setFixedWidth(30) # width of lineedit in points(?)
-        self.ledW.setVisible(self.chkRadixPoint.isChecked())
 
         self.lblDot = QLabel(self)
         self.lblDot.setText(".")
@@ -405,7 +405,6 @@ class FilterCoeffs(QWidget):
         self.ledWF.setMaxLength(2) # maximum of 2 digits
 #        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledWF.setMaximumWidth(30)
-        self.ledW.setVisible(self.chkRadixPoint.isChecked())
         
         self.chkAutoScale = QCheckBox("Scale: Auto", self)  
         self.chkAutoScale.setToolTip("Calculate scale factor from wordlength.")
@@ -414,7 +413,6 @@ class FilterCoeffs(QWidget):
         self.ledScale = QLineEdit(self)
         self.ledScale.setToolTip("Set the scale for converting to binary representation.") 
         self.ledScale.setText(str(2**16))
-        self.ledScale.setVisible(False)
         
         self.lblMSB = QLabel(self)
         self.lblMSB.setText("(...)")        
@@ -436,8 +434,6 @@ class FilterCoeffs(QWidget):
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.clipboard = QApplication.clipboard()
-
-        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object
 
 
         # ============== UI Layout =====================================
@@ -494,8 +490,6 @@ class FilterCoeffs(QWidget):
 #        layVMain.addStretch(1)
         self.setLayout(layVMain)
 
-        self.load_dict() # initialize + refresh table with default values from filter dict
-
         # ============== Signals & Slots ================================
 #        self.tblCoeff.itemActivated.connect(self.save_coeffs) # nothing happens
         # this works but fires multiple times _and_ fires every time cell is
@@ -528,6 +522,14 @@ class FilterCoeffs(QWidget):
         self.ledScale.editingFinished.connect(self._refresh_table)
 
         butQuant.clicked.connect(self.quant_coeffs)
+        
+        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object                        
+        self.load_dict() # initialize + refresh table with default values from filter dict
+        # TODO: this needs to be optimized - self._refresh is being called in both routines
+        self._radix_point()
+
+        
+        
 
 #------------------------------------------------------------------------------
     def _filter_type(self, fil_type=None):
@@ -553,6 +555,7 @@ class FilterCoeffs(QWidget):
         self.tblCoeff.setColumnCount(self.col)
 
         self.load_dict()
+
 
 #------------------------------------------------------------------------------
     def _WIWF_changed(self):
@@ -596,6 +599,15 @@ class FilterCoeffs(QWidget):
         self.ledW.setVisible(not self.chkRadixPoint.isChecked())
 
         self._refresh_table()
+        
+        #------------------------------------------------------------------------------
+    def _set_scale(self):
+        """
+        Set scale for calculating floating point value from fixpoint representation
+        and vice versa
+        """
+        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
+        self.ledScale.setText(str(self.scale))
 
 #------------------------------------------------------------------------------
     def _refresh_table(self):
@@ -615,6 +627,8 @@ class FilterCoeffs(QWidget):
         
         self.spnRound.setVisible(is_float) # number of digits can only be selected 
         self.lblRound.setVisible(is_float) # for format = 'float'
+        self.chkAutoScale.setVisible(not is_float)
+        self.ledScale.setEnabled(not self.chkAutoScale.isChecked())
         self.chkRadixPoint.setVisible(not is_float)
 
         if self.butEnable.isChecked():
