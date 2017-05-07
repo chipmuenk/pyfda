@@ -1,11 +1,15 @@
 <!DOCTYPE RCC><RCC version="1.0">
+
 <qresource>
     <file alias="action-redo.svg">images/icons/action-redo.svg</file>
     <file alias="action-undo.svg">images/icons/action-undo.svg</file>
     <file alias="brush.svg">images/icons/brush.svg</file>
     <file alias="camera-slr.svg">images/icons/camera-slr.svg</file>
     <file alias="circle-check.svg">images/icons/circle-check.svg</file>
+    <file alias="circle-x.svg">images/icons/circle-x.svg</file>    
+    <file alias="clipboard.svg">images/icons/clipboard.svg</file>
     <file alias="cog.svg">images/icons/cog.svg</file>
+    <file alias="download.svg">images/icons/data-transfer-download.svg</file>
     <file alias="ellipses_h.svg">images/icons/ellipses_h.svg</file>
     <file alias="ellipses_v.svg">images/icons/ellipses_v.svg</file>
     <file alias="file.svg">images/icons/file.svg</file>
@@ -13,8 +17,17 @@
     <file alias="grid-four-up.svg">images/icons/grid-four-up.svg</file>
     <file alias="home.svg">images/icons/home.svg</file>
     <file alias="lock-locked.svg">images/icons/lock-locked.svg</file>
+    <file alias="lock-unlocked.svg">images/icons/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/magnifying-glass.svg</file>
+    <file alias="menu.svg">images/icons/menu.svg</file>
     <file alias="move.svg">images/icons/move.svg</file>
+    <file alias="minus.svg">images/icons/minus.svg</file>
+    <file alias="plus.svg">images/icons/plus.svg</file>
+    <file alias="quantize.svg">images/icons/quantize.svg</file>
+    <file alias="quantize_options.svg">images/icons/quantize_options.svg</file>
+    <file alias="trash.svg">images/icons/trash.svg</file>
+    <file alias="upload.svg">images/icons/data-transfer-upload.svg</file>
+    <file alias="wrench.svg">images/icons/wrench.svg</file>
 
     <file alias="pyfda_icon.svg">images/icons/pyfda_icon.svg</file>
 </qresource>
@@ -35,15 +48,19 @@ fullscreen-exit.svg
 graph.svg
 grid-four-up.svg
 headphones.svg
-lock-unlocked.svg
 microphone.svg
-minus.svg
-move.svg
-plus.svg
+
 reload.svg
 resize-both.svg
 resize-height.svg
 resize-width.svg
 star.svg
-wrench.svg
 -->
+
+
+<!-- QtPy4: pyrcc4 pyfda.qrc -o qrc_resources.py -py3
+     QtPy5: pyrcc5 pyfda.qrc -o qrc_resources.py
+
+     manual edit in qrc_resources.py : 
+        from PyQtX import QtCore -> from .compat import QtCore  -->
+

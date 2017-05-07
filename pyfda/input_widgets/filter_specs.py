@@ -17,7 +17,7 @@ from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal, QtGui,
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-#from pyfda.pyfda_lib import HLine
+from pyfda.pyfda_lib import style_widget #HLine
 from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets import (select_filter, amplitude_specs,
@@ -226,6 +226,9 @@ class FilterSpecs(QWidget):
         self.a_specs.load_dict() # magnitude specs with unit
         self.w_specs.load_dict() # weight specification
         self.t_specs.load_dict() # target specs
+        
+        fb.design_filt_state = "ok"            
+        style_widget(self.butDesignFilt, "ok")
 
 #------------------------------------------------------------------------------
     def start_design_filt(self):
@@ -269,18 +272,19 @@ class FilterSpecs(QWidget):
             if err > 0:
                 raise AttributeError("Unknown design method.")
                 self.color_design_button("error")
-
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
             self.sel_fil.load_filter_order()
             self.w_specs.load_dict()
             self.f_specs.load_dict()
+
             self.color_design_button("ok")
 
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
 
         except Exception as e:
             logger.warning("start_design_filt:\n%s\n%s\n", e.__doc__, e)
+            
             self.color_design_button("error")
 
         logger.debug("start_design_filt - Results:\n"
@@ -294,23 +298,10 @@ class FilterSpecs(QWidget):
                 pformat(fb.fil[0]['zpk'])
               )
 
-
-#------------------------------------------------------------------------------
     def color_design_button(self, state):
-        """
-        Color the >> DESIGN FILTER << button according to the filter design state:
-        "ok":  green, filter has been designed, everything ok
-        "changed": yellow, filter specs have been changed
-        "error" : red, an error has occurred during filter design
-        "failed" : orange, filter fails to meet target specs
-
-        The actual colors are defined in pyfda_rc.py
-        """
-        self.butDesignFilt.setProperty("state", str(state))
         fb.design_filt_state = state
-        self.butDesignFilt.style().unpolish(self.butDesignFilt)
-        self.butDesignFilt.style().polish(self.butDesignFilt)
-        self.butDesignFilt.update()
+        style_widget(self.butDesignFilt, state)
+
 
 #------------------------------------------------------------------------------
 

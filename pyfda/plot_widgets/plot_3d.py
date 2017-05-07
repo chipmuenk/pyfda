@@ -27,14 +27,13 @@ from matplotlib.colors import LightSource
 #http://docs.enthought.com/mayavi/mayavi/mlab_running_scripts.html#running-mlab-scripts
 #http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html
 #http://docs.enthought.com/mayavi/mayavi/mlab.html#simple-scripting-with-mlab
-try:
+from pyfda.pyfda_versions import mod_version
+
+if mod_version('mayavi'):
     from mayavi import mlab
     MLAB = True
-    logger.info("Module mayavi loaded, fast 3D-plots available.")
-except ImportError:
+else:
     MLAB = False
-    logger.info("Module mayavi not found.")
-
 
 
 class Plot3D(QWidget):
@@ -212,8 +211,6 @@ class Plot3D(QWidget):
         self.chkContour2D.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.enable_update(state = False) # disable initially
-        logger.debug("UI initialized")
-
 
 #------------------------------------------------------------------------------
     def _init_cmb_colormap(self):

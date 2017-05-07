@@ -162,6 +162,7 @@ class InputTabWidgets(QWidget):
         - Update the input widgets that can / need to display filter data
         - Update all plot widgets via the signal sigFilterDesigned
         """
+        self.filter_specs.color_design_button("ok")
         self.filter_specs.sel_fil.load_dict() # update select_filter widget
         self.update_all()
 
@@ -181,8 +182,6 @@ class InputTabWidgets(QWidget):
             sender_name = self.sender().objectName()
         logger.debug("updateAll called by %s", sender_name)
 
-        self.filter_specs.color_design_button("ok")
-        # TODO: The following should be handled within FilterSpecs ?
         self.filter_specs.load_dict()
         self.filter_info.load_dict()
         self.filter_coeffs.load_dict()

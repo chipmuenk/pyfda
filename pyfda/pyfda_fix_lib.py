@@ -1,70 +1,273 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #===========================================================================
-# dsp_fpga_fix_lib.py
 #
 # Fixpoint library for converting numpy scalars and arrays to quantized
 # numpy values
 #
-# (c) 2015 Christian Münker 
+# (c) 2015 - 2017 Christian Münker
 #===========================================================================
 from __future__ import division, print_function, unicode_literals
 
+import re
 import logging
 logger = logging.getLogger(__name__)
 
-
 import numpy as np
-#from numpy import (pi, log10, exp, sqrt, sin, cos, tan, angle, arange,
-#                   linspace, array, zeros, ones)
-from numpy import binary_repr
-__version__ = 0.4
+from .pyfda_qt_lib import qstr
+import pyfda.filterbroker as fb
+
+# TODO: Correct fixpoint calculation for negative fractional hex yields wrong results
+# TODO: Illegal and fractional values in CSD return zero 
+
+# TODO: Editing Fixpoint numbers gives complety wrong scaling
+#       When ovfl = None and frmt = "dec", "none" is generated somewhere along the line
+
+# TODO: Overflows are not handled correctly: For saturation, overflow yields the 
+#          min. number!
+
+   
+# TODO: Negative fractional hex values are not treated correctly
+
+# TODO: Overflow errors can occur for very large numbers?
+
+__version__ = 0.5
+
+def dec2hex(val, nbits):
+    """
+    Return `val` in hex format with a wordlength of `nbits` in two's complement
+    format. The built-in hex function returns args < 0 as negative values.
+
+    Parameters
+    ----------
+    val: integer
+            The value to be converted in decimal integer format.
+
+    nbits: integer
+            The wordlength
+
+    Returns
+    -------
+    A string in two's complement hex format
+    """
+    return "{0:x}".format(((val + (1 << nbits)) % (1 << nbits)).astype(np.int64))
+
+#------------------------------------------------------------------------------
+
+def dec2csd(dec_val, WF=0):
+    """
+    Convert the argument `dec_val` to a string in CSD Format.
+
+    Parameters:
+    -----------
+
+    dec_val : scalar (integer or real)
+              decimal value to be converted to CSD format
+
+    WF: integer
+        number of fractional places. Default is WF = 0 (integer number)
+
+    Returns:
+    --------
+    A string with the CSD value
+
+    Original author: Harnesser
+    https://sourceforge.net/projects/pycsd/
+    License: GPL2
+
+    """
+
+    logger.debug("Converting {0:f}:".format(dec_val))
+
+    # figure out binary range, special case for 0
+    if dec_val == 0 :
+        return '0'
+    if np.fabs(dec_val) < 1.0 :
+        k = 0
+    else:
+        k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
+
+    logger.debug("to {0:d}.{1:d} format".format(k, WF))
+
+    # Initialize CSD calculation
+    csd_digits = []
+    remainder = dec_val
+    prev_non_zero = False
+    k -= 1 # current exponent in the CSD string under construction
+
+    while( k >= -WF): # has the last fractional digit been reached
+
+        limit = pow(2.0, k+1) / 3.0
+
+        logger.debug("\t{0} - {1}".format(remainder, limit))
+
+        # decimal point?
+        if k == -1 :
+            csd_digits.extend( ['.'] )
+
+        # convert the number
+        if prev_non_zero:
+            csd_digits.extend( ['0'] )
+            prev_non_zero = False
+
+        elif remainder > limit :
+            csd_digits.extend( ['+'] )
+            remainder -= pow(2.0, k )
+            prev_non_zero = True
+
+        elif remainder < -limit :
+            csd_digits.extend( ['-'] )
+            remainder += pow(2.0, k )
+            prev_non_zero = True
+
+        else :
+            csd_digits.extend( ['0'] )
+            prev_non_zero = False
+
+        k -= 1
+
+        logger.debug(csd_digits)
+
+    # Always have something before the point
+    if np.fabs(dec_val) < 1.0:
+        csd_digits.insert(0, '0')
+
+    csd_str = "".join(csd_digits)
+
+    return csd_str
+
+
+def csd2dec(csd_str):
+    """
+    Convert the CSD string `csd_str` to a decimal, `csd_str` may contain '+' or
+    '-', indicating whether the current bit is meant to positive or negative.
+    All other characters are simply ignored.
+
+    `csd_str` may be an integer or fractional CSD number.
+
+    Parameters:
+    -----------
+
+    csd_str : string
+
+     A string with the CSD value to be converted, consisting of '+', '-', '.'
+     and '0' characters.
+
+    Returns:
+    --------
+    Real value of the CSD string
+
+    Examples:
+    ---------
+
+    +00- = +2³ - 2⁰ = +7
+
+    -0+0 = -2³ + 2¹ = -6
+
+    +0.-0- = 2¹ - 1/2¹ - 1/2³ = 1.375
+
+    """
+    logger.debug("Converting: {0}".format(csd_str))
+
+    #  Find out what the MSB power of two should be, keeping in
+    #  mind we may have a fractional CSD number:
+    try:
+        (int_str, _) = csd_str.split('.') # split into integer and fractional bits
+        csd_str = csd_str.replace('.','') # join integer and fractional bits to one csd string
+    except ValueError: # no fractional part
+        int_str = csd_str
+        _ = ""
+
+    # Intialize calculation, start with the MSB (integer)
+    msb_power = len(int_str)-1 #
+    dec_val = 0.0
+
+    # start from the MSB and work all the way down to the last digit
+    for ii in range( len(csd_str) ):
+
+        power_of_two = 2.0**(msb_power-ii)
+
+        if csd_str[ii] == '+' :
+            dec_val += power_of_two
+        elif csd_str[ii] == '-' :
+            dec_val -= power_of_two
+        # else
+        #    ... all other values are ignored
+
+        logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4}; Num={5:f}'.format(
+                csd_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
+
+    return dec_val
+
+
+#==============================================================================
+# Define ufuncs using numpys automatic type casting
+#==============================================================================
+#bin_u = np.frompyfunc(np.binary_repr, 2, 1)
+#hex_tc_u = np.frompyfunc(hex_tc, 2, 1)
+#base2dec_u = np.frompyfunc(base2dec, 3, 1)
+#csd2dec_u = np.frompyfunc(csd2dec, 1, 1)
+#dec2csd_u = np.frompyfunc(dec2csd, 2, 1)
 
 #------------------------------------------------------------------------
-class Fixed(object):    
+class Fixed(object):
     """
-    Implement binary quantization of signed scalar or array-like objects 
-    in the form yq = QI.QF where QI and QF are the wordlength of integer resp. 
-    fractional part; total wordlength is W = QI + QF + 1 due to the sign bit.
-    
-    q_obj = {'QI':1, 'QF':14, 'ovfl':'sat', 'quant':'round'} or
-    
+    Implement binary quantization of signed scalar or array-like objects
+    in the form yq = WI.WF where WI and WF are the wordlength of integer resp.
+    fractional part; total wordlength is W = WI + WF + 1 due to the sign bit.
+
+    q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} or
+
     q_obj = {'Q':'1.14', 'ovfl':'sat', 'quant':'round'}
 
     myQ = Fixed(q_obj) # instantiate fixed-point object
-    
-        
+
+
     Parameters
     ----------
-    q_obj : dict 
-        with 2 ... 4 elements defining quantization operation with the keys
-            
-    * **'QI'** : integer word length, default: 0
-      
-    * **'QF'** : fractional word length; default: 15; QI + QF + 1 = W (1 sign bit)
-      
+    q_obj : dict
+        defining quantization operation with the keys
+
+    * **'WI'** : integer word length, default: 0
+
+    * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
+
     * **'quant'** : Quantization method, optional; default = 'floor'
-      
+
       - 'floor': (default) largest integer `I` such that :math:`I \\le x` (= binary truncation)
       - 'round': (binary) rounding
       - 'fix': round to nearest integer towards zero ('Betragsschneiden')
       - 'ceil': smallest integer `I`, such that :math:`I \\ge x`
-      - 'rint': round towards nearest int 
+      - 'rint': round towards nearest int
       - 'none': no quantization
-      
+
     * **'ovfl'** : Overflow method, optional; default = 'wrap'
-      
+
       - 'wrap': do a two's complement wrap-around
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
+      
+    Additionally, the following keys define the base / display format for the 
+    fixpoint number:
 
-    * **'frmt'** : Output format, optional; default = 'frac'
+    * **'frmt'** : Output format, optional; default = 'float'
 
-      - 'frac' : (default) return result as a fraction
-      - 'dec'  : return result in decimal form, scaled by :math:`2^{WF}`
-      - 'bin'  : return result as binary string, scaled by :math:`2^{WF}`
-      - 'hex'  : return result as hex string, scaled by :math:`2^{WF}`
-        
+      - 'float' : (default)
+      - 'int'  : decimal integer, scaled by :math:`2^{WF}`
+      - 'bin'  : binary string, scaled by :math:`2^{WF}`
+      - 'hex'  : hex string, scaled by :math:`2^{WF}`
+      - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
+      
+    * **'point'** : Boolean, when True use / provide a radix point, when False
+                    use an integer representation (default: False)
+          
+    * **'scale'** : Float, the factor between the fixpoint integer representation
+                    and its floating point value. The scale factor can be cal-
+                    culated automatically from the selected fixpoint format:
+                    
+      - `point = False`: Scale the integer representation by `2^{W} = 2^{WI + WF + 1}`
+      - `point = True` : Scale the integer representation by `2^{WI}`
+
+                    
 
     Instance Attributes
     -------------------
@@ -76,35 +279,45 @@ class Fixed(object):
 
     ovfl  : string
         Overflow behaviour ('wrap', 'sat', ...)
-        
+
     frmt : string
-        target output format ('frac', 'dec', 'bin')
+        target output format ('float', 'dec', 'bin', 'hex', 'csd')
+        
+    point : boolean
+        If True, use position of radix point for format conversion
+        
+    scale : float
+        The factor between integer fixpoint representation and the floating point
+        value.
 
     N_over : integer
         total number of overflows
 
     N_over_neg : integer
         number of negative overflows
-        
+
     N_over_pos : integer
-        number of positive overflows    
+        number of positive overflows
 
     LSB : float
         value of LSB (smallest quantization step)
-        
+
     MSB : float
         value of most significant bit (MSB)
-        
+
+    digits : integer (read only)
+        number of digits required for selected number format and wordlength
+
     Notes
     -----
     class Fixed() can be used like Matlabs quantizer object / function from the
-    fixpoint toolbox, see (Matlab) 'help round' and 'help quantizer/round' e.g. 
-    
+    fixpoint toolbox, see (Matlab) 'help round' and 'help quantizer/round' e.g.
+
     q_dsp = quantizer('fixed', 'round', [16 15], 'wrap'); % Matlab
-    
+
     q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
-    
-    
+
+
     """
     def __init__(self, q_obj):
         """
@@ -113,90 +326,145 @@ class Fixed(object):
         # test if all passed keys of quantizer object are known
         self.setQobj(q_obj)
         self.resetN() # initialize overflow-counter
-               
+
     def setQobj(self, q_obj):
         """
         Analyze quantization dict, complete and transform it if needed and
         store it as instance attribute
         """
         for key in q_obj.keys():
-            if key not in ['Q','QF','QI','quant','ovfl','frmt']:
+            if key not in ['Q','WF','WI','quant','ovfl','frmt','point','scale']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
         # set default values for parameters if undefined:
         if 'Q' in q_obj:
-            Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'         
-            q_obj['QI'] = int(Q_str[0])
-            q_obj['QF'] = int(Q_str[1])
+            Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'
+            q_obj['WI'] = int(Q_str[0])
+            q_obj['WF'] = int(abs(Q_str[1]))
         else:
-            if 'QI' not in q_obj: q_obj['QI'] = 0
-            else: q_obj['QI'] = int(q_obj['QI'])
-            if 'QF' not in q_obj: q_obj['QF'] = 15
-            else: q_obj['QF'] = int(q_obj['QF'])
-        if 'quant' not in q_obj: q_obj['quant'] = 'floor'
-        if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
-        if 'frmt' not in q_obj: q_obj['frmt'] = 'frac'
-        
-        self.q_obj = q_obj # store quant. dict in instance      
-        self.quant = str(q_obj['quant']).lower()
-        self.ovfl  = str(q_obj['ovfl']).lower()
-        self.frmt = str(q_obj['frmt']).lower()
-        self.QF = q_obj['QF']
-        self.QI = q_obj['QI']
-        
-        self.LSB  = 2. ** (-q_obj['QF']) # value of LSB = 2 ^ (-WF)
-        self.MSB  = 2. ** q_obj['QI']    # value of MSB = 2 ^ WI
-        
+            if 'WI' not in q_obj: q_obj['WI'] = 0
+            else: q_obj['WI'] = int(q_obj['WI'])
+            if 'WF' not in q_obj: q_obj['WF'] = 15
+            else: q_obj['WF'] = int(q_obj['WF'])
+        self.WF = q_obj['WF']
+        self.WI = q_obj['WI']
+        self.W = self.WF + self.WI + 1            
 
+        if 'quant' not in q_obj: q_obj['quant'] = 'floor'
+        self.quant = str(q_obj['quant']).lower()
+        
+        if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
+        self.ovfl  = str(q_obj['ovfl']).lower()
+        
+        if 'frmt' not in q_obj: q_obj['frmt'] = 'float'
+        self.frmt = str(q_obj['frmt']).lower()
+        
+        if 'point' not in q_obj: q_obj['point'] = 'false'
+        self.point = q_obj['point']
+        
+        if not hasattr(self, 'scale') or not self.scale or 'scale' not in q_obj:
+            if self.point:
+                q_obj['scale'] = 2**self.WI
+            else:
+                q_obj['scale'] = 2**self.W
+        self.scale = q_obj['scale']
+
+        self.q_obj = q_obj # store quant. dict in instance
+
+        self.LSB  = 2. ** -self.WF  # value of LSB = 2 ^ (-WF)
+        self.MSB  = 2. ** self.WI   # value of MSB = 2 ^ WI
+
+        # Calculate required number of places for different bases from total 
+        # number of bits:
+        if self.frmt == 'dec':
+            self.places = int(np.ceil(np.log10(self.W) * np.log10(2.)))
+            self.base = 10
+        elif self.frmt == 'bin':
+            self.places = self.W
+            self.base = 2
+        elif self.frmt == 'csd':
+            self.places = self.W
+            self.base = 2
+        elif self.frmt == 'hex':
+            self.places = int(np.ceil(self.W / 4.))
+            self.base = 16
+        elif self.frmt == 'float':
+            self.places = 4
+            self.base = 0
+        else:
+            raise Exception(u'Unknown format "%s"!'%(self.frmt))
+
+#------------------------------------------------------------------------------
     def fix(self, y):
         """
-        Return fixed-point representation yq of y (scalar or array-like), 
+        Return fixed-point representation `yq` of `y` (scalar or array-like),
         yq.shape = y.shape
 
         Parameters
-        ----------        
-        y : scalar or array-like object
-            to be quantized
-    
-        
+        ----------
+        y: scalar or array-like object
+            to be quantized in floating point format
+
         Returns
         -------
-        yq : ndarray
-            The quantized input value(s) as an ndarray with np.float64. If this is
-            not what you want, see examples.
+        yq: float or ndarray
+            with the same shape as `y`.
+            The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
 
-        Example:
-        --------
-          
-        >>> q_obj_a = {'QI':1, 'QF':6, 'ovfl':'sat', 'quant':'round'}
+        Examples:
+        ---------
+
+        >>> q_obj_a = {'WI':1, 'WF':6, 'ovfl':'sat', 'quant':'round'}
         >>> myQa = Fixed(q_obj_a) # instantiate fixed-point object myQa
         >>> myQa.resetN()  # reset overflow counter
         >>> a = np.arange(0,5, 0.05) # create input signal
-    
+
         >>> aq = myQa.fixed(a) # quantize input signal
         >>> plt.plot(a, aq) # plot quantized vs. original signal
         >>> print(myQa.N_over, "overflows!") # print number of overflows
-    
+
         >>> # Convert output to same format as input:
         >>> b = np.arange(200, dtype = np.int16)
         >>> btype = np.result_type(b)
         >>> # MSB = 2**7, LSB = 2**2:
-        >>> q_obj_b = {'QI':7, 'QF':-2, 'ovfl':'wrap', 'quant':'round'} 
+        >>> q_obj_b = {'WI':7, 'WF':-2, 'ovfl':'wrap', 'quant':'round'}
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
         >>> bq = myQb.fixed(b)
         >>> bq = bq.astype(btype) # restore original variable type
-        >>> 
-    
         """
-        try:
-            _ = len(y)
-        except TypeError: # exception -> y is scalar:   
-            over_pos = over_neg = yq = 0
-        else: # no exception -> y is array:
-            # create empty arrays for result and overflows with same shape as y
-            y = np.asarray(y)
+
+        if np.shape(y):
+            # create empty arrays for result and overflows with same shape as y for speedup
+            SCALAR = False
+            y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
+            if y.dtype.type is np.string_:
+                np.char.replace(y, ' ', '') # remove all whitespace
+                y = y.astype(complex) # ensure that is y is a numeric type
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
+        else:
+            SCALAR = True
+            # get rid of errors that have occurred upstream
+            if y is None:
+                y = 0
+            # If y is not a number, convert to string, remove whitespace and convert
+            # to complex format:
+            elif not np.issubdtype(type(y), np.number):
+                y = qstr(y)
+                y = y.replace(' ','') # whitespace is not allowed in complex number
+                try:
+                    y = complex(y)
+                except ValueError as e:
+                    logger.error("Argument '{0}' yields \n {1}".format(y,e))
+            over_pos = over_neg = yq = 0
+
+        # convert pseudo-complex (imag = 0) and complex values to real
+        y = np.real_if_close(y)
+        if np.iscomplexobj(y):
+            logger.warn("Casting complex values to real before quantization!")
+            # quantizing complex objects is not supported yet
+            y = y.real
+
         # Quantize inputs
         if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
              # largest integer i, such that i <= x (= binary truncation)
@@ -207,13 +475,16 @@ class Fixed(object):
         elif self.quant == 'ceil':   yq = self.LSB * np.ceil(y / self.LSB)
              # smallest integer i, such that i >= x
         elif self.quant == 'rint':   yq = self.LSB * np.rint(y / self.LSB)
-             # round towards nearest int 
+             # round towards nearest int
         elif self.quant == 'none':   yq = y
-        else: 
+            # return unquantized value
+        else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
-        
-        # Handle Overflow / saturation        
-        if   self.ovfl == 'none': pass
+
+        # Handle Overflow / saturation
+        if   self.ovfl == 'none':
+            return yq
+
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -self.MSB)
@@ -223,286 +494,234 @@ class Fixed(object):
             self.N_over_pos += np.sum(over_pos)
             self.N_over = self.N_over_neg + self.N_over_pos
 
-            # Replace overflows with Min/Max-Values (saturation):           
+            # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
-                yq = np.where(over_pos, self.MSB-self.LSB, yq) # (cond, true, false)
+                yq = np.where(over_pos, (self.MSB-self.LSB), yq) # (cond, true, false)
                 yq = np.where(over_neg, -self.MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                    yq - 2. * self.MSB*np.fix((np.sign(yq)* self.MSB+ yq)/(2*self.MSB)),
+                    yq - 2. * self.MSB*np.fix((np.sign(yq) * self.MSB+yq)/(2*self.MSB)),
                     yq)
             else:
-                raise Exception('Unknown overflow type "%s"!'%(self.overfl))
+                raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
-        if self.frmt in {'dec', 'hex', 'bin'}:
-            yq = (np.round(yq * 2. ** self.QF)).astype(int) # shift left by QF bits
-        if self.frmt == 'hex':
-            vhex = np.vectorize(hex) # vectorize python hex function for use with numpy array
- # TODO           not quite: neg. hex numbers should be written as twos complemente
-            # http://stackoverflow.com/questions/16427073/signed-integer-to-twos-complement-hexadecimal
-            return vhex(yq)
-        if self.frmt == 'bin':
-            return np.binary_repr(yq, width=(self.QF + self.QI + 1))
-        elif self.frmt in {'frac', 'dec'}:
-            return yq
-        else:
-            # float.hex() ?
-            raise Exception('Unknown output format "%s"!'%(self.format))
-            return None
-            
-            
+        if SCALAR and isinstance(yq, np.ndarray):
+            yq = yq.item() # convert singleton array to scalar
+
+        return yq
+
+#------------------------------------------------------------------------------
     def resetN(self):
         """ Reset overflow-counters of Fixed object"""
         self.N_over = 0
         self.N_over_neg = 0
         self.N_over_pos = 0
-            
-class FIX_filt_MA(Fixed):
-    """
-    Usage:
-    Q = FIX_filt_MA(q_mul, q_acc) # Instantiate fixpoint filter object 
-    x_bq = self.Q_mul.fxp_filt(x[k:k + len(bq)] * bq) 
-    
-    The fixpoint object has two different quantizers:
-    - q_mul describes requanitization after coefficient multiplication
-    - q_acc describes requanitization after each summation in the accumulator
-            (resp. in the common summation point)
-            
-    """
-    def __init__(self, q_mul, q_acc):
-        """
-        Initialize fixed object with q_obj
-        """
-        # test if all passed keys of quantizer object are known
-        self.Q_mul = Fixed(q_mul)
-        self.Q_mul.resetN() # reset overflow counter of Q_mul
-        self.Q_acc = Fixed(q_acc)
-        self.Q_acc.resetN() # reset overflow counter of Q_acc
-        self.resetN() # reset filter overflow-counter	
-	
 
-    def fxp_filt_df(self, x, bq, verbose = True):
+#------------------------------------------------------------------------------
+    def frmt2float(self, y, frmt=None):
         """
-        Calculate filter (direct form) response via difference equation with 
-        quantization
-        
+        Return floating point representation for fixpoint scalar `y` (scalar) 
+        given in format `frmt`.
+
         Parameters
         ----------
-        x : scalar or array-like
-            input value(s)
-        
-        bq : array-like
-            filter coefficients
-            
+        y: scalar or string
+            to be quantized with the numeric base specified by `frmt`.
+
+        frmt: string (optional)
+            any of the formats `float`, `dec`, `bin`, `hex`, `csd`)
+            When `frmt` is unspecified, the instance parameter `self.frmt` is used
+
         Returns
         -------
-        yq : ndarray
-            The quantized input value(s) as an ndarray with np.float64. If this is
-            not what you want, see examples.
-     
-        
+        yq: float (`dtype=np.float64`) representation of fixpoint input.
         """
+        if frmt is None:
+            frmt = self.frmt
+        frmt = frmt.lower()
 
-        # Initialize vectors (also speeds up calculation)
-        yq = accu_q = np.zeros(len(x))
-        x_bq = np.zeros(len(bq))
-        
-        for k in range(len(x) - len(bq)):
-            # weighted state-vector x at time k:
-            x_bq = self.Q_mul.fix(x[k:k + len(bq)] * bq) 
-            # sum up x_bq to get accu[k]
-            accu_q[k] = self.Q_acc.fix(sum(x_bq)) 
-        yq = accu_q # scaling at the output of the accumulator
-
-        if (self.Q_mul.N_over and verbose): print('Overflows in Multiplier:  ',
-                Fixed.Q_mul.N_over)
-        if (self.Q_acc.N_over and verbose): print('Overflows in Accumulator: ',
-                self.Q_acc.N_over)
-        self.N_over = self.Q_mul.N_over + self.Q_acc.N_over
-             
-        return yq
-    
-# nested loop would be much slower!
-#  for k in range(Nx - len(bq)):
-#	for i in len(bq):
-#	  accu_q[k] = fixed(q_acc, (accu_q[k] + fixed(q_mul, x[k+i]*bq[i+1])))
-
-#----------------------------------------------------------------------
-#============ not working yet =================================================
-# class FIX_filt_MA(Fixed):
-#     """
-#     yq = FIX_filt_MA.fixFilt(x,aq,bq,gq)
-# 	FIR-Filter mit verschiedenen internen Quantisierungen: 
-# 	q_mul beschreibt Requantisierung nach Koeffizientenmultiplikation
-# 	q_acc beschreibt Requantisierung bei jeder Summation im Akkumulator 
-# 	(bzw. gemeinsamen Summenpunkt)
-#     """
-#     def __init__(self, q_mul, q_acc):
-#         """
-#         Initialize fixed object with q_obj
-#         """
-#         # test if all passed keys of quantizer object are known
-#         self.setQobj(q_mul)
-#         self.resetN() # initialize overflow-counter	
-# 
-# 	
-# # Calculate filter response via difference equation with quantization:
-# 
-#     def fixFilt(x, bq, aq, gq, q_mul, q_acc, verbose = True):
-#         
-#         # Initialize vectors (also speeds up calculation)
-#     #    Nx = len(x)
-#     #    s = zeros(Nx) # not needed in this filter
-#         yq = accu_q = np.zeros(len(x))
-#     #    bq_len = len(bq)
-#         x_bq = np.zeros(len(bq))
-#         
-#         for k in range(len(x) - len(bq)):
-#             # weighted state-vector x at time k:
-#             x_bq, N_over_m = Fixed.fix(q_mul, x[k:k + len(bq)] * bq)
-#             # sum up x_bq to get accu[k]
-#             accu_q[k], N_over_a = Fixed.fix(q_acc, sum(x_bq))
-#         yq = accu_q * gq # scaling at the output of the accumulator
-#         s = x # copy state-vector
-#         if (N_over_m and verbose): print('Overflows in Multiplier:  ', N_over_m)
-#         if (N_over_a and verbose): print('Overflows in Accumulator: ', N_over_a)
-#
-#       return yq
-#
-#==============================================================================
-             
-    
-# nested loop would be much slower!
-#  for k in range(Nx - len(bq)):
-#	for i in len(bq):
-#	  accu_q[k] = fixed(q_acc, (accu_q[k] + fixed(q_mul, x[k+i]*bq[i+1])))
-
-def csdigit(num, WI=0, WF=15):
-    """
-     Returns the canonical signed digit representation of the input number.
-     Useful for simple DSP implementations of multipliers.
-        [digits,pos,neg,err]=csdigit(num,WI,WF)
-    
-     example csdigit(23) returns +0-00-.
-             Where +0-00-. is a representation of +1 in 2**5, -1 in 2**3 and -1 in 2**0 positions.
-             i.e. 23 = 32 - 8 -1
-    
-     example [a,p,n]=csdigit(23.5,6,2) returns
-                a = +0-000.-0
-                p=32
-                n=8.5
-                23.5 = 32 - 8 -.5
-    
-     num   : input number (decimal)
-     WI    : maximum digits to the left of the decimal point
-     WF    : digits to the right of decimal point
-     for example
-        csdigit(.25,2,2) represents xx.xx binary
-        csdigit(.25,0,4) represents .xxxx binary
-     Note: An error is generated if num does not fit inside the representation.
-           It is truncated to the specified resolution WF.
-     Note: A warning message is generated if num doesn't fit in the precision
-           specified. The returned value is truncated.
-     Note: The WI is not used except for a check for overflow and to add
-           leading zeros.
-    
-     Patrick J. Moran
-     AirSprite Technologies Inc.
-    
-     Copyright 2006, Patrick J. Moran for AirSprite Technologies Inc.
-     Redistribution and use in source and binary forms, with or without modification, 
-     are permitted provided that the following conditions are met:
-     
-        1. Redistributions of source code must retain the above copyright notice.
-        2. Any derivative of this work must credit the author, and must be made available to everyone.
-        3. The name of the author may not be used to endorse or promote products derived 
-           from this software without specific prior written permission.
-    
-     THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-     INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-     PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, 
-     INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-     LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-     OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY 
-     WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-     """
-
-    def findstr(string, char):
-        """ return a list with the indices of all occurences of char in string """
-        idx = []
-        for i in range(len(string)):
-            if string[i] == char:
-                idx.append[i]
-        return idx
+        if frmt == 'float':
+            return y
             
-    if not num:
-        help(csdigit)
-        return
-    
-    targetNum=num;
-    num = abs(num)/(2**(-WF));
-    if num != np.floor(num):
-        if np.floor(num) == 0:
-            logger.error('Insufficient precision to represent this number!')
+        elif frmt in {'hex', 'bin', 'dec'}:
+
+
+         # Find the number of places before the first radix point (if there is one)
+         # and join integer and fractional parts:
+            val_str = qstr(y).replace(' ','') # just to be sure ...
+            val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
+
+            if val_str[0] == '.': # prepend '0' when the number starts with '.'
+                val_str = '0' + val_str
+            try:
+                int_str, frc_str = val_str.split('.') # split into integer and fractional places
+            except ValueError: # no fractional part
+                int_str = val_str
+                frc_str = ""
+            val_str = val_str.replace('.','') # join integer and fractional part
+ 
+            regex = {'bin' : '[0|1]',
+                     'csd' : '0|+|-',
+                     'dec' : '[0-9]',
+                     'hex' : '[0-9A-Fa-f]'
+                     }
+                      
+            # count number of valid digits in string
+            int_places = len(re.findall(regex[frmt], int_str))
+            frc_places = len(re.findall(regex[frmt], frc_str))
+            print("int_places, frc_places", int_places, frc_places)
+            
+            # subtract one from int_places?
+            
+   
+            places = int_places
+            
+            print("frmt, places = ", frmt, places)
+            print("y, val_str = ", y, val_str)
+            # (1) calculate the decimal value of the input string without dot
+            # (2) scale the integer depending the number of places and the base
+
+            if not self.point:
+                scale = 1
+
+            elif frmt == 'bin':
+                scale = 1 << places           # * 2 **  (-places)
+            elif frmt == 'hex':
+                scale = 1 << (places * 4)     # * 16 ** (-places)
+            else: # 'dec'
+                scale = 10 ** places          # * 10 ** (-places)
+
+            # scale = 1
+            
+            try:
+                int_ = int(val_str, self.base)                    
+                y = int_ / self.scale * scale
+            except Exception as e:
+                logger.warn(e)
+                y = None
+
+        # quantize / saturate / wrap the float value:        
+            yfix = self.fix(y)
+            print("int_, scale, y, yfix = ", int_, self.scale, y, yfix)
+            if yfix is not None:
+                return yfix
+            elif fb.data_old is not None:
+                return fb.data_old
+            else:
+                return 0
+
+        elif frmt == 'csd':
+            return csd2dec(y) / (1 << self.WF)
+            
         else:
-            logger.warning('Some precision has been lost. Returned value is truncated!')
-    
-    num = np.floor(num);
-    if num > 2**(WI+WF):
-        logger.error('Input number is too large for the requested bit representation.');
-    
-    binNum = np.binary_repr(num, WI + WF) # +1? 
-    digits=('0'+0) * np.ones(len(binNum))
-    #%allZeros=allZeros;
-    onesLoc = findstr(binNum, '1')
-    if onesLoc:
-        onesRun=find(diff(onesLoc)==1)
-        while not onesRun:
-            onesPointer=find(diff(onesLoc)==1)+1;
-            addIn=onesLoc(onesPointer(end));
-            adder=('0'+0)*np.ones(len(binNum))
-            adder[addIn]=('1'+0);
-            # keep track of the additional digits
-            digits[addIn]=('-'+0);
-            binAdder=char(adder);
-            binNum=dec2bin(bin2dec(binNum)+bin2dec(binAdder),WI+WF);
-            onesLoc=findstr(binNum,'1');
-            onesRun=find(diff(onesLoc)==1);
-            if len(binNum) > len(digits):
-                digits=['0'+0,digits] # add any additional leading zero
-            
-    pos=bin2dec(binNum)*2**(-WF);
-    negLoc=find(digits==('-'+0));
-    neg=('0'+0) * np.ones(size(binNum));
-    neg[negLoc]='1'+0;
-    neg=bin2dec(char(neg))*2**(-WF);
-    digits[onesLoc]='+'+0;
-    if (len(digits)-WF)>WI:
-        logger.warning('Number overflowed for this CSD representation')
-    
-    if len(digits)<WF:
-        digits=[digits,('0'+0) * np.ones(WF-len(digits))]
-    
-    #digits = char([digits[0:len(digits)-WF], '.'+0, digits[len(digits)-WF+1:-1])
-#    digits = char()
-    if targetNum < 0: # flip representation if negative
-        ntemp=neg
-        neg=pos
-        pos=ntemp
-        digits = strrep(digits,'+','p')
-        digits = strrep(digits,'-','+')
-        digits = strrep(digits,'p','-')
-    
-    # %digits=char(digits);
-    err = targetNum - (pos-neg)
-    
-    return (digits, pos, neg, err)
+            raise Exception('Unknown output format "%s"!'%(frmt))
+            return None
 
-#######################################
-# If called directly, do some example #
-#######################################
+#------------------------------------------------------------------------------
+    def float2frmt(self, y):
+        """
+        Return representation `yf` of `y` (scalar or array-like) with selected
+        fixpoint base and number format
+        `yf.shape = y.shape`
+
+        When `point = False` (use integer arithmetic), the fractional representation
+        is multiplied by 2**W (shifted right by W bits)
+
+        When `point = True` (use radix point), scale the fractional representation
+        by 2**WI (= shift left by WI bits) and convert integer & fractional part
+        separately.
+
+        Parameters
+        ----------
+        y: scalar or array-like object (numeric or string) in fractional format
+            to be transformed
+
+        Returns
+        -------
+        yf: string, float or ndarray of float of string
+            with the same shape as `y`.
+            `yf` is formatted as set in `self.frmt` with `self.W` digits
+        """
+        if self.frmt == 'float': # return float input value
+            return y
+
+        else:
+            # quantize & treat overflows of y (float), yielding the float y_fix with fixpoint value
+            y_fix = self.fix(y)
+
+            if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
+            # fixpoint format, scale float with number of integer places
+                y_scale = self.scale * y_fix
+#==============================================================================
+#                 if self.point:
+#                     scale = 1 << self.WI # Radix point, shift left by WI bits
+#                 else:
+#                     scale = 1 << (self.W-1) # No Radix point, shift left by W-1 bits
+#                 y_scale = y_fix  * scale # scaled fixpoint number
+#==============================================================================
+                yi = np.round(np.modf(y_scale)[1]).astype(int) # integer part
+                # print("scale, y_scale, np.modf(yscale)[1]", scale, y_scale, np.modf(y_scale)[1])              
+                yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
+                # print("y_fix, yi, yf = ", y_fix, yi, yf)
+
+                if self.frmt == 'dec':
+                    if self.point:
+                        y_str = str(y_fix) # use fixpoint number as returned by fix()
+                    else:
+                        y_str = str(yi) # convert to integer with selected number of bits
+
+                elif self.frmt == 'hex':
+                    if self.point and self.WF > 0:
+                        y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf, self.WF)
+                    else:
+                        y_str = dec2hex(yi, self.W)
+
+                elif self.frmt == 'bin':
+                    # calculate binary representation of fixpoint integer
+                    y_str = np.binary_repr(np.round(y_fix  * (1 << self.W)).astype(int), self.W)
+                    if self.point and self.WF > 0:
+                        # ... and instert the radix point if required
+                        y_str = y_str[:self.WI] + "." + y_str[self.WI:]
+
+                else: # self.frmt = 'csd'
+                    if self.point:
+                        y_str = dec2csd(yi, self.WF) # yes, use fractional bits WF
+                    else:
+                        y_str = dec2csd(yi, 0) # no, treat as integer
+
+                return y_str
+            else:
+                raise Exception('Unknown output format "%s"!'%(self.frmt))
+                return None
+
+
+########################################
+# If called directly, do some examples #
+########################################
 if __name__=='__main__':
-    pass
+    import pprint
+    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}
+    myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
+    
+    y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
+    print("W = ", myQ.W, myQ.LSB, myQ.MSB)
+
+    for point in [False, True]:
+        q_obj['point'] = point
+        myQ.setQobj(q_obj)
+        print("point = ", point)
+        for y in y_list:
+            print("y -> y_fix", y, "->", myQ.fix(y))
+            print(myQ.frmt, myQ.float2frmt(y))
+            
+    print("\nTesting frmt2float()\n====================\n")
+    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}
+    pprint.pprint(q_obj)
+    myQ.setQobj(q_obj)
+    dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
+    for dec in dec_list:
+        print("{0} -> {1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
+   
+

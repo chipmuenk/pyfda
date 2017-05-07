@@ -7,16 +7,16 @@ Created on Tue Nov 26 10:57:30 2013
 Tab-Widget for displaying and modifying filter Poles and Zeros
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
-import six
-from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
+import sys
+import six
+from pprint import pformat
+
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
-                      QCheckBox, QPushButton, QSpinBox, QComboBox, QFont,
-                      QTableWidget, QTableWidgetItem, Qt, QFMetric,
-                      QVBoxLayout, QHBoxLayout, QStyledItemDelegate)
+                      QCheckBox, QPushButton, QSpinBox, QComboBox, QFont, QStyledItemDelegate,
+                      QTableWidget, QTableWidgetItem, Qt, QVBoxLayout, QHBoxLayout)
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
@@ -26,7 +26,10 @@ from pyfda.pyfda_lib import fil_save, safe_eval, rt_label
 from pyfda.pyfda_rc import params
 
 # TODO: correct scaling after insertion / deletion of cellsn
+# TODO: display P/Z in polar or cartesian format
 # TODO: order P/Z depending on frequency or magnitude
+# TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
+# TODO: Option for limiting P/Z to a selectable magnitude
 # TODO: display SOS graphically
 
 class ItemDelegate(QStyledItemDelegate):
@@ -47,7 +50,7 @@ class ItemDelegate(QStyledItemDelegate):
     def displayText(self, text, locale):
         if not isinstance(text, six.text_type): #
             text = text.toString() # needed for Python 2, doesn't work with Py3
-        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = FilterPZ.n_digits)
+        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_pz'])
 
 class FilterPZ(QWidget):
     """
@@ -56,7 +59,6 @@ class FilterPZ(QWidget):
 
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal()
-    n_digits = 3 # class attribute, initial setting for number of displayed digits
 
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
@@ -70,10 +72,6 @@ class FilterPZ(QWidget):
         """
         Intitialize the widget, consisting of:
         """
-        #  size for QLineEdit fields
-#        H  = QFMetric.H
-#        W8 = QFMetric.W0 * 8
-        
         bfont = QFont()
         bfont.setBold(True)
 
@@ -82,12 +80,12 @@ class FilterPZ(QWidget):
         longestText = ""
         ButLength = 0
         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set 0"]
-        
+
         for item in butTexts:
             if len(item) > MaxTextlen:
                 MaxTextlen = len(item)
                 longestText = item + "mm"
-        
+
         butAddRow = QPushButton(butTexts[0], self)
         ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
 
@@ -99,7 +97,7 @@ class FilterPZ(QWidget):
         lblRound = QLabel("Digits = ", self)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,9)
-        self.spnRound.setValue(FilterPZ.n_digits)
+        self.spnRound.setValue(params['FMT_pz'])
         self.spnRound.setToolTip("Display d digits.")
 
         self.lblNorm = QLabel("Normalize", self)
@@ -146,8 +144,8 @@ class FilterPZ(QWidget):
         butClear.setMaximumWidth(ButLength)
 
         butSave = QPushButton(butTexts[2], self)
-        butSave.setToolTip("Save P/Z and update all plots.\n"
-                                "No modifications are saved before!")
+        butSave.setToolTip("<span>Save P/Z and update all plots. "
+                                "No modifications are saved before!</span>")
         butSave.setMaximumWidth(ButLength)
 
         butLoad = QPushButton(butTexts[3], self)
@@ -161,7 +159,6 @@ class FilterPZ(QWidget):
         butSetZero.setMaximumWidth(ButLength)
 
         self.lblEps = QLabel("for " + rt_label("&epsilon; &lt;"), self)
-#        self.lblEps.setTextFormat(Qt.RichText)
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("<SPAN>Specify tolerance.</SPAN>")
         self.ledSetEps.setText(str(1e-6))
@@ -353,10 +350,10 @@ class FilterPZ(QWidget):
         TODO:
         Update zpk[2]?
 
-        Called by _store_entry()
+        Called by _copy_item()
         """
 
-        FilterPZ.n_digits = int(self.spnRound.text())
+        params['FMT_pz'] = int(self.spnRound.text())
 
         self.ledGain.setVisible(self.chkPZList.isChecked())
         self.lblGain.setVisible(self.chkPZList.isChecked())
@@ -369,6 +366,7 @@ class FilterPZ(QWidget):
             self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
             self.tblPZ.setRowCount(max(len(self.zpk[0]),len(self.zpk[1])))
 
+            self.tblPZ.blockSignals(True)
             for col in range(2):
                 for row in range(len(self.zpk[col])):
                     # set table item from self.zpk and strip '()' of complex numbers
@@ -378,6 +376,7 @@ class FilterPZ(QWidget):
                     else: # no, construct it:
                         self.tblPZ.setItem(row,col,QTableWidgetItem(
                               str(self.zpk[col][row]).strip('()')))
+            self.tblPZ.blockSignals(False)
 
             self.tblPZ.resizeColumnsToContents()
             self.tblPZ.resizeRowsToContents()
@@ -388,9 +387,14 @@ class FilterPZ(QWidget):
         """
         Load all entries from filter dict fb.fil[0]['zpk'] into the shadow
         register self.zpk and update the display.
-        """
+        The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
+        otherwise the filter dict would be modified inadvertedly. Enforcing the 
+        type np.complex is necessary, otherwise operations creating complex 
+        coefficient values (or complex user entries) create errors.
 
-        self.zpk = np.array(fb.fil[0]['zpk']) # this enforces a deep copy
+        """
+        # TODO: dtype=complex needs to be set for all subarrays
+        self.zpk = np.array(fb.fil[0]['zpk'])# this enforces a deep copy
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -400,7 +404,7 @@ class FilterPZ(QWidget):
         update the gain. This is triggered every time a table item is edited.
         When no item was selected, only the gain is updated.
 
-        Triggered by  `tblPZ.itemChanged` and `cmbNorm.activated`
+        Triggered by  `tblPZ.cellChanged` and `cmbNorm.activated`
 
         """
         col = self.tblPZ.currentIndex().column()
@@ -421,7 +425,7 @@ class FilterPZ(QWidget):
         the QLineEdit for setting the gain has to be treated separately.
         """
 
-        logger.debug("=====================\nFilterPZ._save_entries called")
+        logger.debug("_save_entries called")
 
         fb.fil[0]['N'] = len(self.zpk[0])
         if np.any(self.zpk[1]): # any non-zero poles?
@@ -437,8 +441,7 @@ class FilterPZ(QWidget):
         self.sigFilterDesigned.emit() # -> filter_specs
         # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
 
-        logger.debug("_save_entries - coeffients / zpk updated:\n"
-            "b,a = %s\n\n"
+        logger.debug("b,a = %s\n\n"
             "zpk = %s\n"
             %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
@@ -482,14 +485,13 @@ class FilterPZ(QWidget):
         - equalizing the lengths of P and Z array by appending the required
           number of zeros.
         - deleting all P/Z pairs
-        Finally, the table is updated from self.zpk.
+        Finally, the table is refreshed from self.zpk.
         """
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
         Z = [s[1] for s in sel if s[0] == 0] # all selected indices in 'Z' column
         P = [s[1] for s in sel if s[0] == 1] # all selected indices in 'P' column
-        print(Z,P)
 
-        # Delete array entries with selected indices. If nothing is selected 
+        # Delete array entries with selected indices. If nothing is selected
         # (Z and P are empty), delete the last row.
         if len(Z) < 1 and len(P) < 1:
             Z = [len(self.zpk[0])-1]

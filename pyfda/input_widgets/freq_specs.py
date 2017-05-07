@@ -105,6 +105,8 @@ class FreqSpecs(QWidget):
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_dict()
+                # store current entry in case new value can't be evaluated:
+                fb.data_old = source.text()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -130,7 +132,7 @@ class FreqSpecs(QWidget):
         """
         if self.spec_edited:
             f_label = str(event_source.objectName())
-            f_value = safe_eval(event_source.text()) / fb.fil[0]['f_S']
+            f_value = safe_eval(event_source.text(), fb.data_old) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
             self.sigSpecsChanged.emit() # -> filter_specs
@@ -167,11 +169,9 @@ class FreqSpecs(QWidget):
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
-#            self.qlabels[i].setFixedSize(W_lbl, QFMetric.H)
             
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-#            self.qlineedit[i].setFixedSize(QFMetric.W0 * 8, QFMetric.H) # set widget dimensions
             style_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels

@@ -40,24 +40,14 @@ class PlotTauG(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
         
-        self._init_axes()
-
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        
         self.draw() # initial drawing of tau_g
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.chkWarnings.clicked.connect(self.draw)
-
-
-#------------------------------------------------------------------------------
-    def _init_axes(self):
-        """Initialize and clear the axes
-        """
-
-        self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax.clear()
-        self.ax.hold(False)      
         
 #------------------------------------------------------------------------------
     def draw(self):
@@ -77,6 +67,7 @@ class PlotTauG(QWidget):
         """
         Draw group delay
         """
+        self.ax.clear()
         bb = fb.fil[0]['ba'][0]
         aa = fb.fil[0]['ba'][1]
 

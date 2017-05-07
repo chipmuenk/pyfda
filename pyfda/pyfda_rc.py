@@ -28,6 +28,8 @@ from __future__ import division, unicode_literals, absolute_import
 from pyfda import qrc_resources # contains all icons
 import logging
 logger = logging.getLogger(__name__)
+
+from .pyfda_versions import cmp_version
     
 # #############################################################################
 # General layout settings
@@ -46,8 +48,10 @@ THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the
 
 mpl_ms = 8 # base size for matplotlib markers
 # Various parameters for calculation and plotting
-params = {'N_FFT':  2048, # number of FFT points for plot commands (freqz etc.)
-          'FMT': '{:.3g}', # format string for QLineEdit fields
+params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
+          'FMT': '{:.3g}',  # format string for QLineEdit fields
+          'FMT_ba': 4,      # number of digits for coefficient table
+          'FMT_pz': 5,      # number of digits for Pole/Zero table
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
           'Z_Marker': [mpl_ms, 'b'], # size and color for zeros' marker
           'wdg_margins' : (2,1,2,0),  # R, T, L, B widget margins
@@ -108,13 +112,43 @@ log_config_file = "pyfda_log.conf"
 # Matplotlib layout settings
 # #############################################################################
 
+# common matplotlib widget settings
+mpl_rc = {'lines.linewidth'           : 1.5,
+          'lines.markersize'          : mpl_ms,         # markersize, in points
+          'font.family'               : 'sans-serif',#'serif',
+          'font.style'                : 'normal',
+          'mathtext.fontset'          : 'stixsans',#'stix',
+          'mathtext.fallback_to_cm'   : True,
+          'mathtext.default'          : 'it',
+          'font.size'                 : 12, 
+          'legend.fontsize'           : 12, 
+          'axes.labelsize'            : 12, 
+          'axes.titlesize'            : 14, 
+          'axes.linewidth'            : 1, # linewidth for coordinate system
+          'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
+          'grid.linestyle'            : ':',
+          'grid.linewidth'            : 0.5,
+          'xtick.direction'           : 'out',
+          'ytick.direction'           : 'out',
+          #'xtick.top'                 : False, 2.0 only
+          'figure.figsize'            : (5,4),
+          'figure.dpi'                : 100
+            }
+
+mpl_2 =  {'hatch.color'               : '#808080',
+          'hatch.linewidth'           : 0.5
+          }
+
+if cmp_version('matplotlib', '2.0') >= 0:
+    mpl_rc.update(mpl_2)
+
 # dark theme for matplotlib widgets
 mpl_rc_dark = {
             'axes.facecolor'    : 'black',
             'axes.labelcolor'   : 'white',
             'axes.edgecolor'    : 'white',
             'figure.facecolor'  : '#202020',
-            'figure.edgecolor'  : '#808080', # also color for hatched specs in |H(f)|
+            'figure.edgecolor'  : '#808080', # also color for hatched specs for mpl < 2.0
             'savefig.facecolor' : 'black',
             'savefig.edgecolor' : 'black', 
             'xtick.color'       : 'white',
@@ -140,7 +174,7 @@ mpl_rc_light = {
             'axes.labelcolor'   : 'black',
             'axes.edgecolor'    : 'black',
             'figure.facecolor'  : 'white',
-            'figure.edgecolor'  : '#808080', # also color for hatched specs in |H(f)|
+            'figure.edgecolor'  : '#808080', # also color for hatched specs for mpl < 2.0
             'savefig.facecolor' : 'white',
             'savefig.edgecolor' : 'white', 
             'xtick.color'       : 'black',
@@ -153,23 +187,6 @@ if CYC:
 else:
     mpl_rc_light.update({'axes.color_cycle': ['r', 'b', 'c', 'm', 'k']})    
             
-# common matplotlib widget settings
-mpl_rc = {'lines.linewidth'           : 1.5,
-          'lines.markersize'          : mpl_ms,         # markersize, in points
-          'font.family'               : 'sans-serif',#'serif',
-          'font.style'                : 'normal',
-          'mathtext.fontset'          : 'stixsans',#'stix',
-          'mathtext.fallback_to_cm'   : True,
-          'mathtext.default'          : 'it',
-          'font.size'                 : 12, 
-          'legend.fontsize'           : 12, 
-          'axes.labelsize'            : 12, 
-          'axes.titlesize'            : 14, 
-          'axes.linewidth'            : 1, # linewidth for coordinate system
-          'axes.formatter.use_mathtext': True, # use mathtext for scientific notation.
-          'figure.figsize'            : (5,4),
-          'figure.dpi'                : 100
-            }
 
 # --------------------- Matplotlib Fonts --------------------------------------
 import matplotlib.font_manager
@@ -394,6 +411,12 @@ qss_common = """
                     }
 
                 /* setFrameStyle(QFrame.StyledPanel|QFrame.Sunken) */
+                
+                QPushButton
+                {
+                width: 20px;
+                height: 20px;
+                }
 
                 QPushButton[state="normal"]{background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 white, stop: 0.5 lightgray, stop: 1.0 #C2C7CB);

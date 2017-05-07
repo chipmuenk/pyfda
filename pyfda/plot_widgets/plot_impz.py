@@ -246,6 +246,10 @@ class PlotImpz(QWidget):
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
+        if min(len(self.aa), len(self.bb)) < 2:
+            logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
+            return
+
         sos = np.asarray(fb.fil[0]['sos'])
 
         self.f_S  = fb.fil[0]['f_S']
@@ -393,32 +397,15 @@ class PlotImpz(QWidget):
         settling time.
         """
 
-        if len(self.aa) == 1:
-            if len(self.bb) == 1:
-                raise TypeError(
-                'No proper filter coefficients: len(a) = len(b) = 1 !')
-            else:
-                IIR = False
-        else:
-            if len(self.bb) == 1:
-                IIR = True
-            # Test whether all elements except first are zero
-            elif not np.any(self.aa[1:]) and self.aa[0] != 0:
-                #  same as:   elif np.all(a[1:] == 0) and a[0] <> 0:
-                IIR = False
-            else:
-                IIR = True
-    
         if N_user == 0: # set number of data points automatically
-            if IIR:
+            if fb.fil[0]['ft'] == 'IIR':
                 N = 100 # TODO: IIR: more intelligent algorithm needed
             else:
                 N = min(len(self.bb),  100) # FIR: N = number of coefficients (max. 100)
         else:
             N = N_user
-    
-        return N
 
+        return N
 
 #------------------------------------------------------------------------------
 

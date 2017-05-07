@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr 30 10:29:42 2012
+Created 2012 - 2017
 
-@author: Muenker_2
+@author: Christian Muenker
 """
 #
-# Copyright (c) 2011 Christopher Felton, Christian Münker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -21,12 +20,9 @@ Created on Mon Apr 30 10:29:42 2012
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# The following is derived from the slides presented by
-# Alexander Kain for CS506/606 "Special Topics: Speech Signal Processing"
-# CSLU / OHSU, Spring Term 2011.
 
 from __future__ import division, print_function
-import os, sys, six, re
+import os, sys, re, time
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
@@ -48,19 +44,53 @@ import pyfda.simpleeval as se
 
 #### General functions ########################################################
 
-def safe_eval(expr):
+def safe_eval(expr, alt_expr=0):
     """
-    try ... except wrapper around simple_eval to catch various errors
-    Error type could be used to start more specific actions (like, restore 
-    the previous value)
+    Try ... except wrapper around simple_eval to catch various errors
+    When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
+    return 0 to avoid errors further downstream.
+
+    Parameters:
+    -----------
+    expr: string
+        String to be evaluated
+
+    alt_expr: string
+        String to be evaluated when evaluation of first string fails.
+
+    Returns
+    -------
+    float: the evaluated result or 0 when both arguments fail.
     """
-    try:
-        # eliminate very small imaginary components due to rounding errors
-        return np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
-    except (SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
-        logger.warn(e)
-        return 0.
+    fail_1 = fail_2 = False
+    result = None
+    
+    if expr == "":
+        expr = None
+        logger.warn("Empty string not allowed as argument!")
+    else:
+        try:
+            # eliminate very small imaginary components due to rounding errors
+            result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
+        except Exception as e:
+            logger.warn(e)
+            fail_1 = True
             
+    if fail_1 or result is None:
+        if expr == "":
+            expr = None
+            logger.warn("Fallback argument: Empty string not allowed!")
+        else:
+            try:
+                result = np.asscalar(np.real_if_close(se.simple_eval(alt_expr), tol = 100))
+            except Exception as e:
+                #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+                logger.warn("Fallback argument:", e)
+                fail_2 = True
+        if fail_2 or result is None:
+            result = 0
+    return result
+
 
 # taken from
 # http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
@@ -120,9 +150,9 @@ def extract_file_ext(file_type):
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
 #------------------------------------------------------------------------------
-def read_cmb_box(cmb_box):
+def qstr(text):
     """
-    Read out current itemData of comboBox and convert it to string.
+    Convert text object (QVariant, QSTring, string) to string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
@@ -132,29 +162,84 @@ def read_cmb_box(cmb_box):
 
     Returns:
     
-    The current setting of combobox as string
+    The current text / QVariant data as a string
     """
-    idx = cmb_box.currentIndex()
-    cmb_data = cmb_box.itemData(idx)
-#        if hasattr(cmb_data, Qt.QVariant):
-    if not isinstance(cmb_data, six.text_type):
-#        if not isinstance(cmb_data, six.string_types):
-#        if not isinstance(cmb_data, str):
-        cmb_data = cmb_data.toString() # needed for Python 2
-    cmb_data = str(cmb_data)
+    if "QString" in str(type(text)):
+        # Python 3: convert QString -> str
+        string = str(text)
+#    elif not isinstance(text, six.text_type):
+    elif "QVariant" in str(type(text)):
+        # Python 2: convert QVariant -> QString -> str
+        string = str(text.toString())
+    else:
+        # `text` is of type str already
+        string = text
+    return string
 
-    return cmb_data
+
+#------------------------------------------------------------------------------
+def get_cmb_box(cmb_box, data=True):
+    """
+    Get current itemData or Text of comboBox and convert it to string.
+
+    In Python 3, python Qt objects are automatically converted to QVariant
+    when stored as "data" e.g. in a QComboBox and converted back when
+    retrieving. In Python 2, QVariant is returned when itemData is retrieved.
+    This is first converted from the QVariant container format to a
+    QString, next to a "normal" non-unicode string.
+
+    Returns:
     
+    The current text or data of combobox as a string
+    """
+    if data:
+        idx = cmb_box.currentIndex()
+        cmb_data = cmb_box.itemData(idx)
+        cmb_str = qstr(cmb_data) # convert QVariant, QString, string to plain string
+    else:
+        cmb_str = cmb_box.currentText()
+  
+    cmb_str = str(cmb_str)
+
+    return cmb_str
+
+#------------------------------------------------------------------------------
+def set_cmb_box(cmb_box, string, data=False):
+    """
+    Set combobox to the index corresponding to `string` in a text field (data = False)
+    or in a data field (data=True). When `string` is not found in the combobox entries,
+     select the first entry. Signals are blocked during the update of the combobox.
+     
+    Returns: the index of the found entry
+    """
+    if data:
+        idx = cmb_box.findData(str(string)) # find index for data = string
+    else:
+        idx = cmb_box.findText(str(string)) # find index for text = string    
+
+    ret = idx
+
+    if idx == -1: # data does not exist, use first entry instead
+        idx = 0
+        
+    cmb_box.blockSignals(True)
+    cmb_box.setCurrentIndex(idx) # set index
+    cmb_box.blockSignals(False)
+    
+    return ret
+
 #------------------------------------------------------------------------------
 def style_widget(widget, state):
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:  
     Color the >> DESIGN FILTER << button according to the filter design state:
-    "ok":  green, filter has been designed, everything ok
-    "changed": yellow, filter specs have been changed
-    "error" : red, an error has occurred during filter design
-    "failed" : orange, filter fails to meet target specs
-    "unused": grey
+    
+    - "normal": default, no color styling
+    - "ok":  green, filter has been designed, everything ok
+    - "changed": yellow, filter specs have been changed
+    - "error" : red, an error has occurred during filter design
+    - "failed" : orange, filter fails to meet target specs
+    - "unused": grey
     """
     state = str(state)
     if state == 'u':
@@ -168,6 +253,8 @@ def style_widget(widget, state):
     widget.style().unpolish(widget)
     widget.style().polish(widget)
     widget.update()
+    
+    #------------------------------------------------------------------------------
 
 
 def dB(lin, power = False):
@@ -989,15 +1076,34 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         if np.ndim(arg) == 1: # arg = [b] -> FIR
             b = np.asarray(arg)
             a = np.zeros(len(b))
-            a[0] = 1
-            fil_dict['ft'] = 'FIR'
         else: # arg = [b,a]
             b = arg[0]
             a = arg[1]
-            if np.any(a):
-                fil_dict['ft'] = 'IIR'
+
+        if len(b) < 2: # no proper coefficients, initialize with a default
+            b = np.asarray([1,0])
+        if len(a) < 2: # no proper coefficients, initialize with a default
+            a = np.asarray([1,0])
+
+        a[0] = 1 # first coefficient of recursive filter parts always = 1
+
+        # Determine whether it's a FIR or IIR filter and set fil_dict accordingly
+        # Test whether all elements except the first one are zero
+        if not np.any(a[1:]):
+            #  same as:   elif np.all(a[1:] == 0)
+            fil_dict['ft'] = 'FIR'
+        else:
+            fil_dict['ft'] = 'IIR'
+            
+        # equalize if b and a subarrays have different lengths:
+        D = len(b) - len(a)
+        if D > 0: # b is longer than a -> fill up a with zeros
+            a = np.append(a, np.zeros(D))
+        elif D < 0: # a is longer than b -> fill up b with zeros
+            if fil_dict['ft'] == 'IIR':
+                b = np.append(b, np.zeros(-D)) # make filter causal, fill up b with zeros
             else:
-                fil_dict['ft'] = 'FIR'
+                a = a[:D] # discard last D elements of a (only zeros anyway)
 
         fil_dict['ba'] = [b, a]
 
@@ -1005,6 +1111,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         raise ValueError("Unknown input format {0:s}".format(format_in))
     
     fil_dict['creator'] = (format_in, sender)
+    fil_dict['time_designed'] = time.time()
     
     if convert:    
         fil_convert(fil_dict, format_in)
@@ -1034,7 +1141,10 @@ def fil_convert(fil_dict, format_in):
     
     if 'sos' in format_in:
         if 'zpk' not in format_in:
-            fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
+            try:
+                fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
+            except Exception as e:
+                logger.error(e)
             # check whether sos conversion has created a additional (superfluous)
             # pole and zero at the origin and delete them:
             z_0 = np.where(fil_dict['zpk'][0] == 0)[0]
@@ -1044,7 +1154,10 @@ def fil_convert(fil_dict, format_in):
                 fil_dict['zpk'][1] = np.delete(fil_dict['zpk'][1],p_0)
 
         if 'ba' not in format_in:
-            fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
+            try:
+                fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
+            except Exception as e:
+                logger.error(e)
             # check whether sos conversion has created additional (superfluous)
             # highest order polynomial with coefficient 0 and delete them
             if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
@@ -1054,7 +1167,10 @@ def fil_convert(fil_dict, format_in):
     elif 'zpk' in format_in: # z, p, k have been generated,convert to other formats
         zpk = fil_dict['zpk']
         if 'ba' not in format_in:
-            fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
+            try:
+                fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
+            except Exception as e:
+                logger.error(e)
         if 'sos' not in format_in:
             fil_dict['sos'] = [] # don't convert zpk -> SOS due to numerical inaccuracies
 #            try:
@@ -1065,7 +1181,10 @@ def fil_convert(fil_dict, format_in):
                 
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
-        fil_dict['zpk'] = list(sig.tf2zpk(b,a))
+        try:
+            fil_dict['zpk'] = list(sig.tf2zpk(b,a))
+        except Exception as e:
+            logger.error(e)
         fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
 #            try:
@@ -1371,17 +1490,6 @@ def rt_label(label, it = True):
     return html_label
 
 #------------------------------------------------------------------------------
-def HLine(QFrame, widget):
-    # http://stackoverflow.com/questions/5671354/how-to-programmatically-make-a-horizontal-line-in-qt
-    # solution 
-    """
-    Create a horizontal line
-    """
-    line = QFrame(widget)
-    line.setFrameShape(QFrame.HLine)
-    line.setFrameShadow(QFrame.Sunken)
-    return line
-
 
 if __name__=='__main__':
     pass

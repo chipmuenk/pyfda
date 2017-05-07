@@ -116,6 +116,8 @@ class WeightSpecs(QWidget):
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_dict()
+                # store current entry in case new value can't be evaluated:
+                fb.data_old = source.text()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -192,7 +194,7 @@ class WeightSpecs(QWidget):
         """
         if self.spec_edited:
             w_label = str(widget.objectName())
-            w_value = safe_eval(widget.text())
+            w_value = safe_eval(widget.text(), fb.data_old)
             fb.fil[0].update({w_label:w_value})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag

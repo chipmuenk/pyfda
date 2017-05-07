@@ -13,6 +13,7 @@ Author: Christian Muenker
 from __future__ import division, unicode_literals, print_function, absolute_import
 from collections import defaultdict
 from .frozendict import freeze_hierarchical
+from .compat import QSysInfo
 #import importlib
 #import logging
 #import six
@@ -20,6 +21,9 @@ from .frozendict import freeze_hierarchical
 #logger = logging.getLogger(__name__)
 # Project base directory
 base_dir = ""
+
+# store old data when modifying a field for restoring if new data is invalid
+data_old = ""
 
 # State of filter design: "ok", "changed", "error", "failed"
 design_filt_state = "changed"
@@ -188,7 +192,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'ba':([1, 1, 1], [3, 0, 2]), # tuple of bb, aa
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
-            'q_coeff':{'QI':0, 'QF': 15, 'quant': 'round', 'ovfl': 'sat', 'frmt':'frac'},
+            'q_coeff':{'WI':0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat', 'frmt':'float', 'point':False},
             'sos': [],
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
             'amp_specs_unit':'dB',
@@ -202,6 +206,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'plt_tUnit':'s',
             'plt_phiUnit': 'rad',
             'plt_phiLabel': r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$  in rad ' + r'$\rightarrow $',
+            'time_designed' : -1,
             'wdg_dyn':{'win':'hann'}
             }
 
@@ -217,4 +222,25 @@ fil[0] = defaultdict(lambda: 0.123)
 # Now, copy each key-value pair into the defaultdict
 for k in fil_init:
     fil[0].update({k:fil_init[k]})
+    
+
+"""
+Find out which OS and which OS version the application runs under
+"""
+if hasattr(QSysInfo, "WindowsVersion"):
+    OS = "WIN"
+    OS_ver = QSysInfo.WindowsVersion
+    cr = "\r\n" # Windows: carriage return + line feed
+elif hasattr(QSysInfo, "MacintoshVersion"):
+    OS = "MAC"
+    OS_ver = QSysInfo.MacintoshVersion
+    cr = "\r" # Mac: carriage return only
+else:
+    OS = "UNIX"
+    OS_ver = None
+    #TODO: Add some info about unix version
+    cr = "\n" # *nix: line feed only
+print(OS, OS_ver)       
+
+
 

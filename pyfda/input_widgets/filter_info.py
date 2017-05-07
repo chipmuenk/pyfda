@@ -279,7 +279,7 @@ class FilterInfo(QWidget):
     
                 f_vals = np.asarray(f_vals) # convert to numpy array
     
-                logger.debug("input_info.showFiltPerf\nF_test = %s" %f_lbls)
+                logger.debug("F_test_labels = %s" %f_lbls)
                                
                 # Calculate frequency response at test frequencies
                 [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(np.float))
@@ -317,12 +317,12 @@ class FilterInfo(QWidget):
     
             self.targs_spec_passed = np.all(a_targs_pass)
             
-            logger.debug("H_targ = %s\n", a_targs,
-                "H_test = %s\n", a_test,
-                "H_test_dB = %s\n", a_test_dB,
-                "F_test = %s\n", f_vals,
-                "H_targ_pass = %s\n", a_targs_pass,
-                "passed: %s\n", self.targs_spec_passed)
+            logger.debug("H_targ = {0}\n" 
+                "H_test = {1}\n"
+                "H_test_dB = {2}\n"
+                "F_test = {3}\n" 
+                "H_targ_pass = {4}\n" 
+                "passed: {5}\n".format(a_targs,  a_test,  a_test_dB, f_vals, a_targs_pass,self.targs_spec_passed)) 
     
             self.tblFiltPerf.setRowCount(len(a_test)) # number of table rows
             self.tblFiltPerf.setColumnCount(5) # number of table columns

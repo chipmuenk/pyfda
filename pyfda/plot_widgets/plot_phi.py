@@ -56,7 +56,7 @@ class PlotPhi(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
         
-        self._init_axes()
+        self.ax = self.mplwidget.fig.add_subplot(111)
 
         self.draw() # initial drawing
 
@@ -66,13 +66,6 @@ class PlotPhi(QWidget):
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         
-    def _init_axes(self):
-        """Initialize and clear the axes
-        """
-#        self.ax = self.mplwidget.ax
-        self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax.clear()
-        self.ax.hold(False)
         
     def update_view(self):
         """
@@ -93,7 +86,7 @@ class PlotPhi(QWidget):
         """
         Re-calculate phi(f) and draw the figure
         """
-
+        self.ax.clear()
         self.unitPhi = self.cmbUnitsPhi.currentText()
 
         self.bb = fb.fil[0]['ba'][0]
