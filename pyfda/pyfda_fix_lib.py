@@ -257,11 +257,17 @@ class Fixed(object):
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
       
-    * **'point'** : Boolean, when True use / provide a radix point (default: False)
-    
-      - False: Scale the result of the quantization by `2^{W} = 2^{WI + WF + 1}`
-      - True : Scale the result of the quantization by `2^{WI}`
+    * **'point'** : Boolean, when True use / provide a radix point, when False
+                    use an integer representation (default: False)
+          
+    * **'scale'** : Float, the factor between the fixpoint integer representation
+                    and its floating point value. The scale factor can be cal-
+                    culated automatically from the selected fixpoint format:
+                    
+      - `point = False`: Scale the integer representation by `2^{W} = 2^{WI + WF + 1}`
+      - `point = True` : Scale the integer representation by `2^{WI}`
 
+                    
 
     Instance Attributes
     -------------------
@@ -279,6 +285,10 @@ class Fixed(object):
         
     point : boolean
         If True, use position of radix point for format conversion
+        
+    scale : float
+        The factor between integer fixpoint representation and the floating point
+        value.
 
     N_over : integer
         total number of overflows
@@ -323,7 +333,7 @@ class Fixed(object):
         store it as instance attribute
         """
         for key in q_obj.keys():
-            if key not in ['Q','WF','WI','quant','ovfl','frmt','point']:
+            if key not in ['Q','WF','WI','quant','ovfl','frmt','point','scale']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
         # set default values for parameters if undefined:
@@ -336,24 +346,36 @@ class Fixed(object):
             else: q_obj['WI'] = int(q_obj['WI'])
             if 'WF' not in q_obj: q_obj['WF'] = 15
             else: q_obj['WF'] = int(q_obj['WF'])
-        if 'quant' not in q_obj: q_obj['quant'] = 'floor'
-        if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
-        if 'frmt' not in q_obj: q_obj['frmt'] = 'float'
-        if 'point' not in q_obj: q_obj['point'] = 'false'
-
-        self.q_obj = q_obj # store quant. dict in instance
-        self.quant = str(q_obj['quant']).lower()
-        self.ovfl  = str(q_obj['ovfl']).lower()
-        self.frmt = str(q_obj['frmt']).lower()
-        self.point = q_obj['point']
         self.WF = q_obj['WF']
         self.WI = q_obj['WI']
-        self.W = self.WF + self.WI + 1
+        self.W = self.WF + self.WI + 1            
 
-        self.LSB  = 2. ** (-q_obj['WF']) # value of LSB = 2 ^ (-WF)
-        self.MSB  = 2. ** q_obj['WI']    # value of MSB = 2 ^ WI
+        if 'quant' not in q_obj: q_obj['quant'] = 'floor'
+        self.quant = str(q_obj['quant']).lower()
+        
+        if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
+        self.ovfl  = str(q_obj['ovfl']).lower()
+        
+        if 'frmt' not in q_obj: q_obj['frmt'] = 'float'
+        self.frmt = str(q_obj['frmt']).lower()
+        
+        if 'point' not in q_obj: q_obj['point'] = 'false'
+        self.point = q_obj['point']
+        
+        if not hasattr(self, 'scale') or not self.scale or 'scale' not in q_obj:
+            if self.point:
+                q_obj['scale'] = 2**self.WI
+            else:
+                q_obj['scale'] = 2**self.W
+        self.scale = q_obj['scale']
 
-        # Calculate required number of places for different bases
+        self.q_obj = q_obj # store quant. dict in instance
+
+        self.LSB  = 2. ** -self.WF  # value of LSB = 2 ^ (-WF)
+        self.MSB  = 2. ** self.WI   # value of MSB = 2 ^ WI
+
+        # Calculate required number of places for different bases from total 
+        # number of bits:
         if self.frmt == 'dec':
             self.places = int(np.ceil(np.log10(self.W) * np.log10(2.)))
             self.base = 10
@@ -525,10 +547,12 @@ class Fixed(object):
             
         elif frmt in {'hex', 'bin', 'dec'}:
 
-        # Find the number of places before the first radix point (if there is one)
-        # and join integer and fractional parts:
+
+         # Find the number of places before the first radix point (if there is one)
+         # and join integer and fractional parts:
             val_str = qstr(y).replace(' ','') # just to be sure ...
             val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
+
             if val_str[0] == '.': # prepend '0' when the number starts with '.'
                 val_str = '0' + val_str
             try:
@@ -536,13 +560,14 @@ class Fixed(object):
             except ValueError: # no fractional part
                 int_str = val_str
                 frc_str = ""
-
+            val_str = val_str.replace('.','') # join integer and fractional part
+ 
             regex = {'bin' : '[0|1]',
                      'csd' : '0|+|-',
                      'dec' : '[0-9]',
                      'hex' : '[0-9A-Fa-f]'
                      }
-                     
+                      
             # count number of valid digits in string
             int_places = len(re.findall(regex[frmt], int_str))
             frc_places = len(re.findall(regex[frmt], frc_str))
@@ -550,7 +575,6 @@ class Fixed(object):
             
             # subtract one from int_places?
             
-            val_str = val_str.replace('.','') # join integer and fractional part
    
             places = int_places
             
@@ -558,23 +582,29 @@ class Fixed(object):
             print("y, val_str = ", y, val_str)
             # (1) calculate the decimal value of the input string without dot
             # (2) scale the integer depending the number of places and the base
-            try:
-                if frmt == 'bin':
-                    scale = 1 << places           # * 2 **  (-places)
-                elif frmt == 'hex':
-                    scale = 1 << (places * 4)     # * 16 ** (-places)
-                else: # 'dec'
-                    scale = 10 ** places          # * 10 ** (-places)
 
+            if not self.point:
+                scale = 1
+
+            elif frmt == 'bin':
+                scale = 1 << places           # * 2 **  (-places)
+            elif frmt == 'hex':
+                scale = 1 << (places * 4)     # * 16 ** (-places)
+            else: # 'dec'
+                scale = 10 ** places          # * 10 ** (-places)
+
+            # scale = 1
+            
+            try:
                 int_ = int(val_str, self.base)                    
-                y = int_ / scale
+                y = int_ / self.scale * scale
             except Exception as e:
                 logger.warn(e)
                 y = None
 
         # quantize / saturate / wrap the float value:        
             yfix = self.fix(y)
-            print("int_, scale, y, yfix = ", int_, scale, y, yfix)
+            print("int_, scale, y, yfix = ", int_, self.scale, y, yfix)
             if yfix is not None:
                 return yfix
             elif fb.data_old is not None:
@@ -583,27 +613,8 @@ class Fixed(object):
                 return 0
 
         elif frmt == 'csd':
-
-#        # Intialize calculation, start with the MSB (integer)
-#        msb_power = len(int_str)-1 #
-#        dec_val = 0.0
-#    
-#        # start from the MSB and work all the way down to the last digit
-#        for ii in range( len(val_str) ):
-#    
-#            power_of_two = 2.0**(msb_power-ii)
-#    
-#            if val_str[ii] == '+' :
-#                dec_val += power_of_two
-#            elif val_str[ii] == '-' :
-#                dec_val -= power_of_two
-#            # else
-#            #    ... all other values are ignored
-#    
-#            logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4}; Num={5:f}'.format(
-#                    val_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
-
             return csd2dec(y) / (1 << self.WF)
+            
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
@@ -642,11 +653,14 @@ class Fixed(object):
 
             if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # fixpoint format, scale float with number of integer places
-                if self.point:
-                    scale = 1 << self.WI # Radix point, shift left by WI bits
-                else:
-                    scale = 1 << (self.W-1) # No Radix point, shift left by W-1 bits
-                y_scale = y_fix  * scale # scaled fixpoint number
+                y_scale = self.scale * y_fix
+#==============================================================================
+#                 if self.point:
+#                     scale = 1 << self.WI # Radix point, shift left by WI bits
+#                 else:
+#                     scale = 1 << (self.W-1) # No Radix point, shift left by W-1 bits
+#                 y_scale = y_fix  * scale # scaled fixpoint number
+#==============================================================================
                 yi = np.round(np.modf(y_scale)[1]).astype(int) # integer part
                 # print("scale, y_scale, np.modf(yscale)[1]", scale, y_scale, np.modf(y_scale)[1])              
                 yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
