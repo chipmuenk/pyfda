@@ -524,6 +524,12 @@ class Fixed(object):
         """
         Return floating point representation for fixpoint scalar `y` (scalar) 
         given in format `frmt`.
+        
+        - Construct string representation without radix point, count number of
+          fractional places.
+        - Calculate integer representation of string, taking the base into account
+        - When result is negative, calculate two's complement for `W` bits
+        - Scale with `2** -W`
 
         Parameters
         ----------
