@@ -371,8 +371,12 @@ class Fixed(object):
 
         self.q_obj = q_obj # store quant. dict in instance
 
-        self.LSB  = 2. ** -self.WF  # value of LSB = 2 ^ (-WF)
-        self.MSB  = 2. ** self.WI   # value of MSB = 2 ^ WI
+        if self.point:        
+            self.LSB  = 2. ** -self.WF  # value of LSB = 2 ^ (-WF)
+            self.MSB  = 2. ** self.WI   # value of MSB = 2 ^ WI
+        else:
+            self.LSB = 1
+            self.MSB = 2. ** (self.W-1)
 
         # Calculate required number of places for different bases from total 
         # number of bits:
@@ -465,7 +469,8 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        # Quantize inputs
+        # Quantize inputs: Multiply with MSB and quantize in relation to LSB
+        y *= self.MSB
         if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
              # largest integer i, such that i <= x (= binary truncation)
         elif self.quant == 'round':  yq = self.LSB * np.round(y / self.LSB)
@@ -481,6 +486,9 @@ class Fixed(object):
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
 
+        # "De-Scale" with MSB
+        yq = yq / self.MSB
+        
         # Handle Overflow / saturation
         if   self.ovfl == 'none':
             return yq
