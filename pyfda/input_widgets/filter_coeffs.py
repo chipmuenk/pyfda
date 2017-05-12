@@ -227,7 +227,10 @@ class FilterCoeffs(QWidget):
         - two bottom rows with action buttons
         """
         self.bfont = QFont()
-        self.bfont.setBold(True)
+        self.bfont.setBold(True) 
+        self.bifont = QFont()
+        self.bifont.setBold(True)
+        self.bifont.setItalic(True)
 #        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
 #==============================================================================
@@ -381,6 +384,7 @@ class FilterCoeffs(QWidget):
         self.ledSetEps.setText(str(1e-6))
 
         self.lblWIWF  = QLabel("W = ")
+        self.lblWIWF.setFont(self.bifont)
         self.lblQOvfl = QLabel("Ovfl.:")
         self.lblQuant = QLabel("Quant.:")
 
