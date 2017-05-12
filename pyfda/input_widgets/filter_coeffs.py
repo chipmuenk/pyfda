@@ -410,16 +410,21 @@ class FilterCoeffs(QWidget):
 #        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledWF.setMaximumWidth(30)
         
-        self.chkAutoScale = QCheckBox("Scale: Auto", self)  
+        self.lblScale = QLabel("Scale = ", self) 
+        self.ledScale = QLineEdit(self)
+        self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.") 
+        self.ledScale.setText(str(2**16))
+
+        self.chkAutoScale = QCheckBox("Auto", self)  
         self.chkAutoScale.setToolTip("Calculate scale factor from wordlength.")
         self.chkAutoScale.setChecked(True)
         
-        self.ledScale = QLineEdit(self)
-        self.ledScale.setToolTip("Set the scale for converting to binary representation.") 
-        self.ledScale.setText(str(2**16))
-        
+
+        self.lblLSB = QLabel(self)
+        self.lblLSB.setText("LSB:")
+
         self.lblMSB = QLabel(self)
-        self.lblMSB.setText("(...)")        
+        self.lblMSB.setText("MSB:")
 
         self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
@@ -449,27 +454,34 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
         layHButtonsCoeffs2.addStretch()
 
-        layHButtonsCoeffs3 = QHBoxLayout()
-        layHButtonsCoeffs3.addWidget(self.lblWIWF)
-        layHButtonsCoeffs3.addWidget(self.ledW)
-        layHButtonsCoeffs3.addWidget(self.ledWI)
-        layHButtonsCoeffs3.addWidget(self.lblDot)
-        layHButtonsCoeffs3.addWidget(self.ledWF)
-        layHButtonsCoeffs3.addWidget(self.chkAutoScale)
-        layHButtonsCoeffs3.addWidget(self.ledScale)
-#        layHButtonsCoeffs3.addWidget(self.lblMSB)       
-        layHButtonsCoeffs3.addStretch()
+        layHCoeffs_W = QHBoxLayout()
+        layHCoeffs_W.addWidget(self.lblWIWF)
+        layHCoeffs_W.addWidget(self.ledW)
+        layHCoeffs_W.addWidget(self.ledWI)
+        layHCoeffs_W.addWidget(self.lblDot)
+        layHCoeffs_W.addWidget(self.ledWF)
+        layHCoeffs_W.addWidget(self.lblScale)
+        layHCoeffs_W.addWidget(self.ledScale)
+        layHCoeffs_W.addWidget(self.chkAutoScale)
+    
+        layHCoeffs_W.addStretch()
 
-        layHButtonsCoeffs4 = QHBoxLayout()
-        layHButtonsCoeffs4.addWidget(self.lblQOvfl)
-        layHButtonsCoeffs4.addWidget(self.cmbQOvfl)
-        layHButtonsCoeffs4.addWidget(self.lblQuant)
-        layHButtonsCoeffs4.addWidget(self.cmbQQuant)
-        layHButtonsCoeffs4.addStretch()
-
+        layHCoeffsQOpt = QHBoxLayout()
+        layHCoeffsQOpt.addWidget(self.lblQOvfl)
+        layHCoeffsQOpt.addWidget(self.cmbQOvfl)
+        layHCoeffsQOpt.addWidget(self.lblQuant)
+        layHCoeffsQOpt.addWidget(self.cmbQQuant)
+        layHCoeffsQOpt.addStretch()
+        
+        layHCoeffs_MSB_LSB = QHBoxLayout()
+        layHCoeffs_MSB_LSB.addWidget(self.lblLSB)        
+        layHCoeffs_MSB_LSB.addWidget(self.lblMSB)
+        layHCoeffs_MSB_LSB.addStretch()
+        
         layVButtonsQ = QVBoxLayout()
-        layVButtonsQ.addLayout(layHButtonsCoeffs3)
-        layVButtonsQ.addLayout(layHButtonsCoeffs4)
+        layVButtonsQ.addLayout(layHCoeffs_W)
+        layVButtonsQ.addLayout(layHCoeffsQOpt)
+        layVButtonsQ.addLayout(layHCoeffs_MSB_LSB)        
         layVButtonsQ.setContentsMargins(0,5,0,0)
 
         # This frame encompasses the Quantization Settings
@@ -532,8 +544,6 @@ class FilterCoeffs(QWidget):
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._radix_point()
 
-        
-        
 
 #------------------------------------------------------------------------------
     def _filter_type(self, fil_type=None):
@@ -732,8 +742,12 @@ class FilterCoeffs(QWidget):
                 'frmt':self.cmbFormat.currentText(),
                 'point':self.chkRadixPoint.isChecked()
                 }
-        self.lblMSB.setText("("+str(-self.myQ.MSB) + "..." 
-                    + str(self.myQ.MSB - self.myQ.LSB) + ")")
+        self.lblLSB.setText("LSB: {0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
+        self.lblMSB.setText("MSB: {0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
+        
+        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
+        self.ledScale.setText(str(self.scale))
+
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
@@ -750,8 +764,12 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.chkRadixPoint.setChecked(q_coeff['point'])
 
-        self.lblMSB.setText("("+str(-self.myQ.MSB) + "..." 
-                    + str(self.myQ.MSB - self.myQ.LSB) + ")")
+        self.lblLSB.setText("LSB: {0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
+        self.lblMSB.setText("MSB: {0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
+        
+        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
+        self.ledScale.setText(str(self.scale))
+
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
