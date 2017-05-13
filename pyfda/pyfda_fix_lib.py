@@ -496,7 +496,7 @@ class Fixed(object):
 
         # Handle Overflow / saturation in relation to MSB
         if   self.ovfl == 'none':
-            return yq.astype(int)
+            return yq.astype(np.int64)
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -self.MSB)
@@ -519,7 +519,7 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
-        yq = yq.astype(int)
+        yq = yq.astype(np.int64)
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item() # convert singleton array to scalar
@@ -556,8 +556,9 @@ class Fixed(object):
 
         Returns
         -------
-        yq: float (`dtype=np.float64`) representation of fixpoint input.
+        yq: integer (`dtype=np.int64`) representation of fixpoint input.
         """
+
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
