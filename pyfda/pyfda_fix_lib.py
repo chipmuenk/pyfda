@@ -614,26 +614,24 @@ class Fixed(object):
             # (1) calculate the decimal value of the input string without dot
             # (2) scale the integer depending the number of places and the base
 
+            try:
+                int_ = int(val_str, self.base)
+                # formats without negative sign need to be treated separately:
+                if frmt in {'bin', 'hex'} and int_ >= self.MSB:              
+                    int_ = int_ - 2 * self.MSB      
+
+            except Exception as e:
+                logger.warn(e)
+                int_ = None
+
             if not self.point:
                 frmt_scale = 1
-
             elif frmt == 'bin':
                 frmt_scale = 1 << places           # * 2 **  (-places)
             elif frmt == 'hex':
                 frmt_scale = 1 << (places * 4)     # * 16 ** (-places)
             else: # 'dec'
                 frmt_scale = 10 ** places          # * 10 ** (-places)
-
-            # scale = 1
-
-            try:
-                int_ = int(val_str, self.base)
-#                if int_ >= self.MSB:
-#                    int_ = int_ - self.MSB
-            #    y = int_ # / self.MSB * frmt_scale
-            except Exception as e:
-                logger.warn(e)
-                y = None
 
         # quantize / saturate / wrap the integer value        
             yfix = self.fix(int_, frac=False) # treat argument y as integer 
