@@ -399,15 +399,25 @@ class Fixed(object):
             raise Exception(u'Unknown format "%s"!'%(self.frmt))
 
 #------------------------------------------------------------------------------
-    def fix(self, y):
+    def fix(self, y, frac = True):
         """
-        Return fixed-point representation `yq` of `y` (scalar or array-like),
-        yq.shape = y.shape
+        Return fixed-point integer representation `yq` of `y` (scalar or array-like),
+        `yq.shape = y.shape`.
+
+        `y` is multiplied by `self.MSB` before requantizing and 
+
+        Saturation / two's complement wrapping happens outside the range +/- MSB,  
+        requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
         Parameters
         ----------
         y: scalar or array-like object
             to be quantized in floating point format
+
+        frac: Boolean
+            When `False` (default), y is treated as an integer that doesn't have 
+            to be scaled with self.MSB. If `True`, it is multiplied by `self.MSB`
+            before requantizing and saturating.
 
         Returns
         -------
@@ -469,8 +479,10 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        # Quantize inputs: Multiply with MSB and quantize in relation to LSB
-        y *= self.MSB
+        if frac:  # y is a float, scale with MSB          
+            y = y * self.MSB#  * self.scale
+
+        # Quantize input in relation to LSB
         if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
              # largest integer i, such that i <= x (= binary truncation)
         elif self.quant == 'round':  yq = self.LSB * np.round(y / self.LSB)
@@ -616,9 +628,9 @@ class Fixed(object):
                 logger.warn(e)
                 y = None
 
-        # quantize / saturate / wrap the float value:        
-            yfix = self.fix(y)
-            print("int_, scale, y, yfix = ", int_, self.scale, y, yfix)
+        # quantize / saturate / wrap the integer value        
+            yfix = self.fix(y, frac=False) # treat argument y as integer 
+            print("int_, MSB, scale, y, yfix = ", int_, self.MSB, self.scale, y, yfix)
             if yfix is not None:
                 return yfix
             elif fb.data_old is not None:
