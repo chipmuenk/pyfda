@@ -414,11 +414,15 @@ class FilterCoeffs(QWidget):
         self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.") 
         self.ledScale.setText(str(1))        
 
+        self.lblLSBtxt = QLabel(self)
+        self.lblLSBtxt.setText("LSB =")
+        self.lblLSBtxt.setFont(self.bifont)
         self.lblLSB = QLabel(self)
-        self.lblLSB.setText("LSB:")
 
+        self.lblMSBtxt = QLabel(self)
+        self.lblMSBtxt.setText("MSB =")
+        self.lblMSBtxt.setFont(self.bifont)
         self.lblMSB = QLabel(self)
-        self.lblMSB.setText("MSB:")
 
         self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
@@ -467,8 +471,12 @@ class FilterCoeffs(QWidget):
         layHCoeffsQOpt.addStretch()
         
         layHCoeffs_MSB_LSB = QHBoxLayout()
-        layHCoeffs_MSB_LSB.addWidget(self.lblLSB)        
+
+        layHCoeffs_MSB_LSB.addWidget(self.lblMSBtxt)
         layHCoeffs_MSB_LSB.addWidget(self.lblMSB)
+        layHCoeffs_MSB_LSB.addStretch()
+        layHCoeffs_MSB_LSB.addWidget(self.lblLSBtxt)
+        layHCoeffs_MSB_LSB.addWidget(self.lblLSB)
         layHCoeffs_MSB_LSB.addStretch()
         
         layVButtonsQ = QVBoxLayout()
@@ -732,14 +740,16 @@ class FilterCoeffs(QWidget):
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText(),
                 'point':self.chkRadixPoint.isChecked()
-                }
-        self.lblLSB.setText("LSB: {0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
-        self.lblMSB.setText("MSB: {0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
+                } 
+        self.myQ.setQobj(fb.fil[0]['q_coeff'])
+        
+        self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
+        self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         
         self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
         self.ledScale.setText(str(self.scale))
 
-        self.myQ.setQobj(fb.fil[0]['q_coeff'])
+
 
 #------------------------------------------------------------------------------
     def _load_q_settings(self):
@@ -755,8 +765,8 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.chkRadixPoint.setChecked(q_coeff['point'])
 
-        self.lblLSB.setText("LSB: {0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
-        self.lblMSB.setText("MSB: {0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
+        self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
+        self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         
         self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
         self.ledScale.setText(str(self.scale))
