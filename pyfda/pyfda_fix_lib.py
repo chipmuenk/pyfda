@@ -603,13 +603,7 @@ class Fixed(object):
             # count number of valid digits in string
             int_places = len(re.findall(regex[frmt], int_str))
             frc_places = len(re.findall(regex[frmt], frc_str))
-            print("int_places, frc_places", int_places, frc_places)
-
-
-
-            places = int_places
-
-            print("frmt, places = ", frmt, places)
+            print("frm, int_places, frc_places", frmt, int_places, frc_places)
             print("y, val_str = ", y, val_str)
             # (1) calculate the decimal value of the input string without dot
             # (2) scale the integer depending the number of places and the base
@@ -627,14 +621,14 @@ class Fixed(object):
             if not self.point:
                 frmt_scale = 1
             elif frmt == 'bin':
-                frmt_scale = 1 << places           # * 2 **  (-places)
+                frmt_scale = 1 << int_places           # * 2 **  (-places)
             elif frmt == 'hex':
-                frmt_scale = 1 << (places * 4)     # * 16 ** (-places)
+                frmt_scale = 1 << (int_places * 4)     # * 16 ** (-places)
             else: # 'dec'
-                frmt_scale = 10 ** places          # * 10 ** (-places)
+                frmt_scale = 10 ** int_places          # * 10 ** (-places)
 
         # quantize / saturate / wrap the integer value        
-            yfix = self.fix(int_, frac=False) # treat argument y as integer 
+            yfix = self.fix(int_, frac=False) / frmt_scale # treat argument y as integer 
             print("y, int_, MSB, scale, y, yfix = ", y, int_, self.MSB, self.scale, yfix)
             if yfix is not None:
                 return yfix
