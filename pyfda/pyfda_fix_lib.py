@@ -409,7 +409,7 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or array-like object
-            to be quantized in floating point format
+            in floating point format to be quantized 
 
         frac: Boolean
             When `False` (default), y is treated as an integer that doesn't have 
@@ -542,8 +542,9 @@ class Fixed(object):
         - Construct string representation without radix point, count number of
           fractional places.
         - Calculate integer representation of string, taking the base into account
-        - When result is negative, calculate two's complement for `W` bits
+        (- When result is negative, calculate two's complement for `W` bits)
         - Scale with `2** -W`
+        - Scale with the number of fractional places (depending on format!)
 
         Parameters
         ----------
@@ -593,12 +594,11 @@ class Fixed(object):
             int_places = len(re.findall(regex[frmt], int_str))
             frc_places = len(re.findall(regex[frmt], frc_str))
             print("int_places, frc_places", int_places, frc_places)
-            
-            # subtract one from int_places?
-            
-   
+
+
+
             places = int_places
-            
+
             print("frmt, places = ", frmt, places)
             print("y, val_str = ", y, val_str)
             # (1) calculate the decimal value of the input string without dot
@@ -643,16 +643,18 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def float2frmt(self, y):
         """
-        Return representation `yf` of `y` (scalar or array-like) with selected
-        fixpoint base and number format
+        Return fixpoint representation `yf` of `y` (scalar or array-like) with 
+        selected fixpoint base and number format.
+
+        `float2frmt()` is called a.o. by `itemDelegate.displayText()`
+
         `yf.shape = y.shape`
 
         When `point = False` (use integer arithmetic), the fractional representation
-        is multiplied by 2**W (shifted right by W bits)
+        is multiplied by self.MSB (2**W-1, shift right by W-1 bits)
 
         When `point = True` (use radix point), scale the fractional representation
-        by 2**WI (= shift left by WI bits) and convert integer & fractional part
-        separately.
+        by 2**WI (= shift left by WI bits).
 
         Parameters
         ----------
@@ -661,7 +663,7 @@ class Fixed(object):
 
         Returns
         -------
-        yf: string, float or ndarray of float of string
+        yf: string, float or ndarray of float or string
             with the same shape as `y`.
             `yf` is formatted as set in `self.frmt` with `self.W` digits
         """
@@ -669,7 +671,8 @@ class Fixed(object):
             return y
 
         else:
-            # quantize & treat overflows of y (float), yielding the float y_fix with fixpoint value
+            # quantize & treat overflows of y (float), returning an integer in
+            # the range -self.MSB ... self.MSB
             y_fix = self.fix(y)
 
             if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
