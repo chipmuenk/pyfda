@@ -413,12 +413,7 @@ class FilterCoeffs(QWidget):
         self.lblScale = QLabel("Scale = ", self) 
         self.ledScale = QLineEdit(self)
         self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.") 
-        self.ledScale.setText(str(2**16))
-
-        self.chkAutoScale = QCheckBox("Auto", self)  
-        self.chkAutoScale.setToolTip("Calculate scale factor from wordlength.")
-        self.chkAutoScale.setChecked(True)
-        
+        self.ledScale.setText(str(1))        
 
         self.lblLSB = QLabel(self)
         self.lblLSB.setText("LSB:")
@@ -462,7 +457,6 @@ class FilterCoeffs(QWidget):
         layHCoeffs_W.addWidget(self.ledWF)
         layHCoeffs_W.addWidget(self.lblScale)
         layHCoeffs_W.addWidget(self.ledScale)
-        layHCoeffs_W.addWidget(self.chkAutoScale)
     
         layHCoeffs_W.addStretch()
 
@@ -534,7 +528,6 @@ class FilterCoeffs(QWidget):
         self.ledWI.editingFinished.connect(self._WIWF_changed)
         self.ledW.editingFinished.connect(self._W_changed)
         
-        self.chkAutoScale.clicked.connect(self._refresh_table)
         self.ledScale.editingFinished.connect(self._refresh_table)
 
         butQuant.clicked.connect(self.quant_coeffs)
@@ -641,8 +634,7 @@ class FilterCoeffs(QWidget):
         
         self.spnRound.setVisible(is_float) # number of digits can only be selected 
         self.lblRound.setVisible(is_float) # for format = 'float'
-        self.chkAutoScale.setVisible(not is_float)
-        self.ledScale.setEnabled(not self.chkAutoScale.isChecked())
+        self.ledScale.setEnabled(True)
         self.chkRadixPoint.setVisible(not is_float)
 
         if self.butEnable.isChecked():
