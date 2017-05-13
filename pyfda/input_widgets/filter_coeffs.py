@@ -283,8 +283,7 @@ class FilterCoeffs(QWidget):
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
                     " point for base 10) for fixpoint formats (still disabled).</span>")
         self.chkRadixPoint.setChecked(False)
-#TODO: currently disabled
-        self.chkRadixPoint.setCheckable(False)
+        self.chkRadixPoint.setCheckable(True)
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
