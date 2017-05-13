@@ -136,7 +136,7 @@ def dec2csd(dec_val, WF=0):
     return csd_str
 
 
-def csd2dec(csd_str):
+def csd2dec(csd_str, int_places=0):
     """
     Convert the CSD string `csd_str` to a decimal, `csd_str` may contain '+' or
     '-', indicating whether the current bit is meant to positive or negative.
@@ -636,7 +636,7 @@ class Fixed(object):
                 return 0
 
         elif frmt == 'csd':
-            return csd2dec(y) / (1 << self.WF)
+            return csd2dec(int_, int_places) #/ (1 << self.WF)
             
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
