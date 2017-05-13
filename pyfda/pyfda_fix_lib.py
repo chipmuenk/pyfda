@@ -688,19 +688,11 @@ class Fixed(object):
             y_fix = self.fix(y)
 
             if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
-            # fixpoint format, scale float with number of integer places
-                y_scale = self.scale * y_fix
-#==============================================================================
-#                 if self.point:
-#                     scale = 1 << self.WI # Radix point, shift left by WI bits
-#                 else:
-#                     scale = 1 << (self.W-1) # No Radix point, shift left by W-1 bits
-#                 y_scale = y_fix  * scale # scaled fixpoint number
-#==============================================================================
-                yi = np.round(np.modf(y_scale)[1]).astype(int) # integer part
-                # print("scale, y_scale, np.modf(yscale)[1]", scale, y_scale, np.modf(y_scale)[1])              
+            # fixpoint format, transform to string
+
+                yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
                 yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
-                # print("y_fix, yi, yf = ", y_fix, yi, yf)
+                print("y_fix, yi, yf = ", y_fix, yi, yf)
 
                 if self.frmt == 'dec':
                     if self.point:
@@ -713,10 +705,9 @@ class Fixed(object):
                         y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf, self.WF)
                     else:
                         y_str = dec2hex(yi, self.W)
-
                 elif self.frmt == 'bin':
                     # calculate binary representation of fixpoint integer
-                    y_str = np.binary_repr(np.round(y_fix  * (1 << self.W)).astype(int), self.W)
+                    y_str = np.binary_repr(yi, self.W)
                     if self.point and self.WF > 0:
                         # ... and instert the radix point if required
                         y_str = y_str[:self.WI] + "." + y_str[self.WI:]
