@@ -363,10 +363,7 @@ class Fixed(object):
         self.point = q_obj['point']
         
         if not hasattr(self, 'scale') or not self.scale or 'scale' not in q_obj:
-            if self.point:
-                q_obj['scale'] = 2**self.WI
-            else:
-                q_obj['scale'] = 2**self.W
+            q_obj['scale'] = 1.
         self.scale = q_obj['scale']
 
         self.q_obj = q_obj # store quant. dict in instance
@@ -607,14 +604,14 @@ class Fixed(object):
             # (2) scale the integer depending the number of places and the base
 
             if not self.point:
-                scale = 1
+                frmt_scale = 1
 
             elif frmt == 'bin':
-                scale = 1 << places           # * 2 **  (-places)
+                frmt_scale = 1 << places           # * 2 **  (-places)
             elif frmt == 'hex':
-                scale = 1 << (places * 4)     # * 16 ** (-places)
+                frmt_scale = 1 << (places * 4)     # * 16 ** (-places)
             else: # 'dec'
-                scale = 10 ** places          # * 10 ** (-places)
+                frmt_scale = 10 ** places          # * 10 ** (-places)
 
             # scale = 1
             
