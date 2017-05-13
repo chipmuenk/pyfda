@@ -687,10 +687,11 @@ class Fixed(object):
                 print("y_fix, yi, yf = ", y_fix, yi, yf)
 
                 if self.frmt == 'dec':
-                    if self.point:
-                        y_str = str(y_fix) # use fixpoint number as returned by fix()
-                    else:
-                        y_str = str(yi) # convert to integer with selected number of bits
+                    y_str = str(y_fix) # use fixpoint number as returned by fix()
+#                    if True: #self.point:
+#                        y_str = str(y_fix) # use fixpoint number as returned by fix()
+#                    else:
+#                        y_str = str(yi) # convert to integer with selected number of bits
 
                 elif self.frmt == 'hex':
                     if self.point and self.WF > 0:
