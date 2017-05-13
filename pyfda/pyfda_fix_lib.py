@@ -421,9 +421,8 @@ class Fixed(object):
 
         Returns
         -------
-        yq: float or ndarray
-            with the same shape as `y`.
-            The quantized input value(s) as a scalar or ndarray with `dtype=np.float64`.
+        yq: integer scalar or ndarray
+            with the same shape as `y`, in the range `-self.MSB` ... `self.MSB`
 
         Examples:
         ---------
@@ -498,13 +497,9 @@ class Fixed(object):
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
 
-        # "De-Scale" with MSB
-        yq = yq / self.MSB
-        
-        # Handle Overflow / saturation
+        # Handle Overflow / saturation in relation to MSB
         if   self.ovfl == 'none':
-            return yq
-
+            return yq.astype(int)
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -self.MSB)
@@ -526,6 +521,8 @@ class Fixed(object):
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
+
+        yq = yq.astype(int)
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item() # convert singleton array to scalar
