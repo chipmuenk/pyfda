@@ -533,11 +533,21 @@ class Fixed(object):
         self.N_over_neg = 0
         self.N_over_pos = 0
 
+
 #------------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):
         """
-        Return floating point representation for fixpoint scalar `y` (scalar) 
-        given in format `frmt`.
+        Return floating point representation for fixpoint scalar `y` given in 
+        format `frmt`, using `frmt2int()` internally.
+        """
+        y_int = self.frmt2int(y, frmt)
+        print("y from frmt2int =", y, y_int, y_int / self.MSB)
+        return y_int / self.MSB
+        
+#------------------------------------------------------------------------------
+    def frmt2int(self, y, frmt=None):
+        """
+        Return integer representation for fixpoint scalar `y` given in format `frmt`.
         
         - Construct string representation without radix point, count number of
           fractional places.
