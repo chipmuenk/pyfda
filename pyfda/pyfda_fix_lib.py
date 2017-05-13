@@ -593,13 +593,13 @@ class Fixed(object):
                 int_str = val_str
                 frc_str = ""
             val_str = val_str.replace('.','') # join integer and fractional part
- 
+
             regex = {'bin' : '[0|1]',
                      'csd' : '0|+|-',
                      'dec' : '[0-9]',
                      'hex' : '[0-9A-Fa-f]'
                      }
-                      
+
             # count number of valid digits in string
             int_places = len(re.findall(regex[frmt], int_str))
             frc_places = len(re.findall(regex[frmt], frc_str))
@@ -625,17 +625,19 @@ class Fixed(object):
                 frmt_scale = 10 ** places          # * 10 ** (-places)
 
             # scale = 1
-            
+
             try:
-                int_ = int(val_str, self.base)                    
-                y = int_ / self.scale * scale
+                int_ = int(val_str, self.base)
+#                if int_ >= self.MSB:
+#                    int_ = int_ - self.MSB
+            #    y = int_ # / self.MSB * frmt_scale
             except Exception as e:
                 logger.warn(e)
                 y = None
 
         # quantize / saturate / wrap the integer value        
-            yfix = self.fix(y, frac=False) # treat argument y as integer 
-            print("int_, MSB, scale, y, yfix = ", int_, self.MSB, self.scale, y, yfix)
+            yfix = self.fix(int_, frac=False) # treat argument y as integer 
+            print("y, int_, MSB, scale, y, yfix = ", y, int_, self.MSB, self.scale, yfix)
             if yfix is not None:
                 return yfix
             elif fb.data_old is not None:
@@ -645,10 +647,12 @@ class Fixed(object):
 
         elif frmt == 'csd':
             return csd2dec(int_, int_places) #/ (1 << self.WF)
-            
+
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
+
+
 
 #------------------------------------------------------------------------------
     def float2frmt(self, y):
