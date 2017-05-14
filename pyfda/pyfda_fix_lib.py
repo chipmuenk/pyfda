@@ -676,24 +676,20 @@ class Fixed(object):
 
         else:
             # quantize & treat overflows of y (float), returning an integer in
-            # the range -self.MSB ... self.MSB
-            y_fix = self.fix(y)
+            # the range -2**(W-1) ... 2**(W-1)
+            y_fix = self.fix(y) * self.LSB
 
             if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # fixpoint format, transform to string
 
                 yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
 #                yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
-                yf = np.round(np.modf(y_fix)[0])* (1 << self.WF).astype(int) # integer part
+                yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # integer part
 
                 print("y_fix, yi, yf = ", y_fix, yi, yf)
 
                 if self.frmt == 'dec':
-                    y_str = str(y_fix) # use fixpoint number as returned by fix()
-#                    if True: #self.point:
-#                        y_str = str(y_fix) # use fixpoint number as returned by fix()
-#                    else:
-#                        y_str = str(yi) # convert to integer with selected number of bits
+                    y_str = str(y_fix * self.LSB) # use fixpoint number as returned by fix()
 
                 elif self.frmt == 'hex':
                     if self.point and self.WF > 0:
