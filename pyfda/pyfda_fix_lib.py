@@ -469,6 +469,7 @@ class Fixed(object):
             over_pos = over_neg = yq = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
+        MSB = 1 << (self.W - 1)
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
             logger.warn("Casting complex values to real before quantization!")
@@ -476,18 +477,18 @@ class Fixed(object):
             y = y.real
 
         if frac:  # y is a float, scale with MSB          
-            y = y * self.MSB#  * self.scale
+            y = y * MSB # self.MSB#  * self.scale
 
         # Quantize input in relation to LSB
-        if   self.quant == 'floor':  yq = self.LSB * np.floor(y / self.LSB)
+        if   self.quant == 'floor':  yq = np.floor(y)
              # largest integer i, such that i <= x (= binary truncation)
-        elif self.quant == 'round':  yq = self.LSB * np.round(y / self.LSB)
+        elif self.quant == 'round':  yq = np.round(y)
              # rounding, also = binary rounding
-        elif self.quant == 'fix':    yq = self.LSB * np.fix(y / self.LSB)
+        elif self.quant == 'fix':    yq = np.fix(y)
              # round to nearest integer towards zero ("Betragsschneiden")
-        elif self.quant == 'ceil':   yq = self.LSB * np.ceil(y / self.LSB)
+        elif self.quant == 'ceil':   yq = np.ceil(y)
              # smallest integer i, such that i >= x
-        elif self.quant == 'rint':   yq = self.LSB * np.rint(y / self.LSB)
+        elif self.quant == 'rint':   yq = np.rint(y)
              # round towards nearest int
         elif self.quant == 'none':   yq = y
             # return unquantized value
@@ -499,8 +500,8 @@ class Fixed(object):
             return yq #.astype(np.int64)
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
-            over_neg = (yq < -self.MSB)
-            over_pos = (yq >= self.MSB)
+            over_neg = (yq < -MSB)
+            over_pos = (yq >= MSB)
             # No. of pos. / neg. / all overflows occured since last reset:
             self.N_over_neg += np.sum(over_neg)
             self.N_over_pos += np.sum(over_pos)
@@ -508,18 +509,17 @@ class Fixed(object):
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
-                yq = np.where(over_pos, (self.MSB-self.LSB), yq) # (cond, true, false)
-                yq = np.where(over_neg, -self.MSB, yq)
+                yq = np.where(over_pos, (MSB-1), yq) # (cond, true, false)
+                yq = np.where(over_neg, -MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                    yq - 2. * self.MSB*np.fix((np.sign(yq) * self.MSB+yq)/(2*self.MSB)),
-                    yq)
+                    yq - 2. * MSB*np.fix((np.sign(yq) * MSB+yq)/(2*MSB)), yq)
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
-        # yq = yq.astype(np.int64)
+        yq = yq.astype(np.int64)
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item() # convert singleton array to scalar
