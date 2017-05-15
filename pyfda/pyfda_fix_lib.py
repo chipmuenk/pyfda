@@ -702,7 +702,7 @@ class Fixed(object):
                         y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
                 else: # self.frmt = 'csd'
                     if self.point:
-                        y_str = dec2csd(y_fix, self.WF) # yes, use fractional bits WF
+                        y_str = dec2csd(y_fix_lsb, self.WF) # yes, use fractional bits WF
                     else:
                         y_str = dec2csd(y_fix, 0) # no, treat as integer
 
