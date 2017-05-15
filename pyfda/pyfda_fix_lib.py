@@ -602,8 +602,7 @@ class Fixed(object):
 
             # count number of valid digits in string
             int_places = len(re.findall(regex[frmt], int_str))
-            frc_places = len(re.findall(regex[frmt], frc_str))
-            print("frm, int_places, frc_places", frmt, int_places, frc_places)
+            print("frm, int_places", frmt, int_places)
             print("y, val_str = ", y, val_str)
             # (1) calculate the decimal value of the input string without dot
             # (2) scale the integer depending the number of places and the base
