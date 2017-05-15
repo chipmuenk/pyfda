@@ -16,6 +16,7 @@ import numpy as np
 from .pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
+# TODO: Scaling parameter is not used yet
 # TODO: Illegal values in CSD return zero, 
 # TODO: int_places calculation for CSD doesn't always make sense
 # TODO: Various error related to radix point:
