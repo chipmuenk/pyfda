@@ -572,7 +572,6 @@ class Fixed(object):
                 int_str, _ = val_str.split('.') # split into integer and fractional places
             except ValueError: # no fractional part
                 int_str = val_str
-            val_str = val_str.replace('.','') # join integer and fractional part
 
             regex = {'bin' : '[0|1]',
                      'csd' : '0|\+|\-',
@@ -598,20 +597,27 @@ class Fixed(object):
             
         elif frmt in {'hex', 'bin'}:
             try:
-                y_int = int(val_str, self.base)
-                # formats without negative sign need to be treated separately:
+                y_int = int(raw_str, self.base)
+                # two's complement formatsneed to be treated separately:
                 if frmt in {'bin', 'hex'} and y_int >= self.MSB:              
-                    y_int = y_int - 2 * self.MSB      
+                    y_int = y_int - 2 * self.MSB
+                # quantize / saturate / wrap the integer value:
+                if self.point:
+                    y_fix = self.fix(y_int * self.LSB)
+                else:
+                    y_fix = self.fix(y_int, frac = False)
+                # scale integer fixpoint value
+                y_float = y_fix / 2**(self.W-1)
 
             except Exception as e:
                 logger.warn(e)
                 y_int = None
+                y_float = None
 
             logger.debug("MSB = {0} |  LSB = {1} | scale = {2}\n"
               "y = {3} | y_int = {4} | y_fix = {5} | y_float = {6}".format(self.MSB, self.LSB, self.scale, y, y_int, y_fix, y_float))
 
             if y_float is not None:
-                y_float = y_fix / 2**(self.W-1)   
                 return y_float
             elif fb.data_old is not None:
                 return fb.data_old
@@ -619,10 +625,12 @@ class Fixed(object):
                 return 0
 
         elif frmt == 'csd':
-            return csd2dec(val_str, int_places)
+            y_float = csd2dec(raw_str, int_places) / 2**(self.W-1)
             
             logger.debug("MSB = {0} |  scale = {1}\n"
               "y = {2}  | y_float = {3}".format(self.MSB, self.scale, y, y_float))
+            return y_float
+
 
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
