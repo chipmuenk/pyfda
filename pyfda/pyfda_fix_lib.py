@@ -601,7 +601,7 @@ class Fixed(object):
                      }
 
             # count number of valid digits in string
-            int_places = len(re.findall(regex[frmt], int_str))
+            int_places = len(re.findall(regex[frmt], int_str)) - 1
             print("frm, int_places", frmt, int_places)
             print("y, val_str = ", y, val_str)
             # (1) calculate the decimal value of the input string without dot
@@ -701,8 +701,7 @@ class Fixed(object):
                     y_str = np.binary_repr(y_fix, self.W)
                     if self.point and self.WF > 0:
                         # ... and instert the radix point if required
-                        y_str = y_str[:self.WI] + "." + y_str[self.WI:]
-
+                        y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
                 else: # self.frmt = 'csd'
                     if self.point:
                         y_str = dec2csd(y_fix, self.WF) # yes, use fractional bits WF
