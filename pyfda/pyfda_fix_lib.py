@@ -538,7 +538,7 @@ class Fixed(object):
     def frmt2float(self, y, frmt=None):
         """
         Return floating point representation for fixpoint scalar `y` given in 
-        format `frmt`, using `frmt2int()` internally.        
+        format `frmt`.    
         
         - Construct string representation without radix point, count number of
           fractional places.
@@ -558,7 +558,7 @@ class Fixed(object):
 
         Returns
         -------
-        yq: integer (`dtype=np.int64`) representation of fixpoint input.
+        yq: floating point (`dtype=np.float64`) representation of fixpoint input.
         """
 
         if frmt is None:
