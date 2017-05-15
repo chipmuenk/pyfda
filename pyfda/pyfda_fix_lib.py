@@ -595,7 +595,14 @@ class Fixed(object):
             # (1) calculate the decimal value of the input string without dot
             # (2) scale the integer depending the number of places and the base
 
-        if frmt in {'hex', 'bin', 'dec'}:
+        if frmt == 'dec':
+            y_float = float(val_str)
+            if self.point:
+                return y_float
+            else:
+                return y_float / self.MSB
+            
+        elif frmt in {'hex', 'bin'}:
             try:
                 y_int = int(val_str, self.base)
                 # formats without negative sign need to be treated separately:
