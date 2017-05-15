@@ -627,9 +627,7 @@ class Fixed(object):
                 frmt_scale = 10 ** int_places          # * 10 ** (-places)
 
         # quantize / saturate / wrap the integer value        
-            yfix = self.fix(int_, frac=False) / frmt_scale # treat argument y as integer 
-            if yfix is not None:
-                return yfix
+            y_fix = self.fix(int_, frac=False) / frmt_scale # treat argument int_ as integer in fix()
             print("MSB = {0} |  scale = {1} | frmt_scale = {2}\n"
               "y = {3} | y_int = {4} | y_fix = {5}".format(self.MSB, self.scale, frmt_scale, y, int_, y_fix))
             if y_fix is not None:
