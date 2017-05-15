@@ -628,9 +628,11 @@ class Fixed(object):
 
         # quantize / saturate / wrap the integer value        
             yfix = self.fix(int_, frac=False) / frmt_scale # treat argument y as integer 
-            print("y, int_, MSB, scale, y, yfix = ", y, int_, self.MSB, self.scale, yfix)
             if yfix is not None:
                 return yfix
+            print("MSB = {0} |  scale = {1} | frmt_scale = {2}\n"
+              "y = {3} | y_int = {4} | y_fix = {5}".format(self.MSB, self.scale, frmt_scale, y, int_, y_fix))
+            if y_fix is not None:
             elif fb.data_old is not None:
                 return fb.data_old
             else:
