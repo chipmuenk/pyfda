@@ -592,7 +592,7 @@ class Fixed(object):
             val_str = val_str.replace('.','') # join integer and fractional part
 
             regex = {'bin' : '[0|1]',
-                     'csd' : '0|+|-',
+                     'csd' : '0|/+|/-',
                      'dec' : '[0-9]',
                      'hex' : '[0-9A-Fa-f]'
                      }
