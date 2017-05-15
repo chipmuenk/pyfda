@@ -606,14 +606,14 @@ class Fixed(object):
 
         if frmt in {'hex', 'bin', 'dec'}:
             try:
-                int_ = int(val_str, self.base)
+                y_int = int(val_str, self.base)
                 # formats without negative sign need to be treated separately:
-                if frmt in {'bin', 'hex'} and int_ >= self.MSB:              
-                    int_ = int_ - 2 * self.MSB      
+                if frmt in {'bin', 'hex'} and y_int >= self.MSB:              
+                    y_int = y_int - 2 * self.MSB      
 
             except Exception as e:
                 logger.warn(e)
-                int_ = None
+                y_int = None
 
             if not self.point:
                 frmt_scale = 1
@@ -625,9 +625,10 @@ class Fixed(object):
                 frmt_scale = 10 ** int_places          # * 10 ** (-places)
 
         # quantize / saturate / wrap the integer value        
-            y_fix = self.fix(int_, frac=False) / frmt_scale # treat argument int_ as integer in fix()
+            y_fix = self.fix(y_int/frmt_scale, frac=False)# / frmt_scale # treat argument int_ as integer in fix()
             print("MSB = {0} |  scale = {1} | frmt_scale = {2}\n"
-              "y = {3} | y_int = {4} | y_fix = {5}".format(self.MSB, self.scale, frmt_scale, y, int_, y_fix))
+              "y = {3} | y_int = {4} | y_fix = {5}".format(self.MSB, self.scale, frmt_scale, y, y_int, y_fix))
+
             if y_fix is not None:
                 return y_fix * self.LSB
             elif fb.data_old is not None:
