@@ -677,19 +677,20 @@ class Fixed(object):
         else:
             # quantize & treat overflows of y (float), returning an integer in
             # the range -2**(W-1) ... 2**(W-1)
-            y_fix = self.fix(y) * self.LSB
+            y_fix = self.fix(y)
+            y_fix_lsb = y_fix * self.LSB
 
             if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # fixpoint format, transform to string
 
-                yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
+                yi = np.round(np.modf(y_fix_lsb)[1]).astype(int) # integer part
 #                yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
-                yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # integer part
+                yf = np.round(np.modf(y_fix_lsb)[0] * (1 << self.WF)).astype(int) # integer part
 
-                print("y_fix, yi, yf = ", y_fix, yi, yf)
+                print("y_fix, yi, yf = ", y_fix_lsb, yi, yf)
 
                 if self.frmt == 'dec':
-                    y_str = str(y_fix * self.LSB) # use fixpoint number as returned by fix()
+                    y_str = str(y_fix_lsb) # use fixpoint number as returned by fix()
 
                 elif self.frmt == 'hex':
                     if self.point and self.WF > 0:
@@ -698,16 +699,16 @@ class Fixed(object):
                         y_str = dec2hex(yi, self.W)
                 elif self.frmt == 'bin':
                     # calculate binary representation of fixpoint integer
-                    y_str = np.binary_repr(yi, self.W)
+                    y_str = np.binary_repr(y_fix, self.W)
                     if self.point and self.WF > 0:
                         # ... and instert the radix point if required
                         y_str = y_str[:self.WI] + "." + y_str[self.WI:]
 
                 else: # self.frmt = 'csd'
                     if self.point:
-                        y_str = dec2csd(yi, self.WF) # yes, use fractional bits WF
+                        y_str = dec2csd(y_fix, self.WF) # yes, use fractional bits WF
                     else:
-                        y_str = dec2csd(yi, 0) # no, treat as integer
+                        y_str = dec2csd(y_fix, 0) # no, treat as integer
 
                 return y_str
             else:
