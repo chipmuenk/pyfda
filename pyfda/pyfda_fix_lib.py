@@ -611,17 +611,6 @@ class Fixed(object):
               "y = {3} | y_int = {4} | y_fix = {5} | y_float = {6}".format(self.MSB, self.LSB, self.scale, y, y_int, y_fix, y_float))
 
             if y_float is not None:
-            if not self.point:
-                frmt_scale = 1
-            elif frmt == 'bin':
-                frmt_scale = 1 << int_places           # * 2 **  (-places)
-            elif frmt == 'hex':
-                frmt_scale = 1 << (int_places * 4)     # * 16 ** (-places)
-            else: # 'dec'
-                frmt_scale = 10 ** int_places          # * 10 ** (-places)
-
-        # quantize / saturate / wrap the integer value        
-            y_fix = self.fix(y_int/frmt_scale, frac=False)# / frmt_scale # treat argument int_ as integer in fix()
                 y_float = y_fix / 2**(self.W-1)   
                 return y_float
             elif fb.data_old is not None:
