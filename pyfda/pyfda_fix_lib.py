@@ -578,8 +578,6 @@ class Fixed(object):
             return y
             
         elif frmt in {'hex', 'bin', 'dec'}:
-
-
          # Find the number of places before the first radix point (if there is one)
          # and join integer and fractional parts:
             val_str = qstr(y).replace(' ','') # just to be sure ...
@@ -588,10 +586,9 @@ class Fixed(object):
             if val_str[0] == '.': # prepend '0' when the number starts with '.'
                 val_str = '0' + val_str
             try:
-                int_str, frc_str = val_str.split('.') # split into integer and fractional places
+                int_str, _ = val_str.split('.') # split into integer and fractional places
             except ValueError: # no fractional part
                 int_str = val_str
-                frc_str = ""
             val_str = val_str.replace('.','') # join integer and fractional part
 
             regex = {'bin' : '[0|1]',
@@ -631,6 +628,7 @@ class Fixed(object):
             print("MSB = {0} |  scale = {1} | frmt_scale = {2}\n"
               "y = {3} | y_int = {4} | y_fix = {5}".format(self.MSB, self.scale, frmt_scale, y, int_, y_fix))
             if y_fix is not None:
+                return y_fix * self.LSB
             elif fb.data_old is not None:
                 return fb.data_old
             else:
