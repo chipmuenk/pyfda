@@ -541,7 +541,7 @@ class Fixed(object):
         format `frmt`, using `frmt2int()` internally.
         """
         y_int = self.frmt2int(y, frmt)
-        print("y from frmt2int =", y, y_int, y_int / self.MSB)
+        print("y | y_int | y_int / MSB, y_int * LSB from frmt2int =", y, y_int, y_int / self.MSB, y_int * self.LSB)
         return y_int / self.MSB
         
 #------------------------------------------------------------------------------
