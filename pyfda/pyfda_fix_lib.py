@@ -582,8 +582,10 @@ class Fixed(object):
 
             # count number of valid digits in string
             int_places = len(re.findall(regex[frmt], int_str)) - 1
-            print("frm, int_places", frmt, int_places)
-            print("y, val_str = ", y, val_str)
+            raw_str = val_str.replace('.','') # join integer and fractional part  
+            
+            logger.debug("frmt, int_places", frmt, int_places)
+            logger.debug("y, raw_str = ", y, val_str)
             # (1) calculate the decimal value of the input string without dot
             # (2) scale the integer depending the number of places and the base
 
@@ -605,6 +607,10 @@ class Fixed(object):
                 logger.warn(e)
                 y_int = None
 
+            logger.debug("MSB = {0} |  LSB = {1} | scale = {2}\n"
+              "y = {3} | y_int = {4} | y_fix = {5} | y_float = {6}".format(self.MSB, self.LSB, self.scale, y, y_int, y_fix, y_float))
+
+            if y_float is not None:
             if not self.point:
                 frmt_scale = 1
             elif frmt == 'bin':
@@ -616,12 +622,7 @@ class Fixed(object):
 
         # quantize / saturate / wrap the integer value        
             y_fix = self.fix(y_int/frmt_scale, frac=False)# / frmt_scale # treat argument int_ as integer in fix()
-            print("MSB = {0} |  scale = {1} | frmt_scale = {2}\n"
-              "y = {3} | y_int = {4} | y_fix = {5}".format(self.MSB, self.scale, frmt_scale, y, y_int, y_fix))
-
-            if y_fix is not None:
                 y_float = y_fix / 2**(self.W-1)   
-                print("y_float = ", y_float)
                 return y_float
             elif fb.data_old is not None:
                 return fb.data_old
@@ -630,6 +631,9 @@ class Fixed(object):
 
         elif frmt == 'csd':
             return csd2dec(val_str, int_places)
+            
+            logger.debug("MSB = {0} |  scale = {1}\n"
+              "y = {2}  | y_float = {3}".format(self.MSB, self.scale, y, y_float))
 
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
