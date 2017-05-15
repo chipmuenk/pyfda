@@ -16,19 +16,11 @@ import numpy as np
 from .pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
-# TODO: Correct fixpoint calculation for negative fractional hex yields wrong results
-# TODO: Illegal and fractional values in CSD return zero 
-
-# TODO: Editing Fixpoint numbers gives complety wrong scaling
-#       When ovfl = None and frmt = "dec", "none" is generated somewhere along the line
-
-# TODO: Overflows are not handled correctly: For saturation, overflow yields the 
-#          min. number!
-
-   
-# TODO: Negative fractional hex values are not treated correctly
-
-# TODO: Overflow errors can occur for very large numbers?
+# TODO: Illegal values in CSD return zero, 
+# TODO: int_places calculation for CSD doesn't always make sense
+# TODO: Various error related to radix point:
+#       - Frmt2float for negative fractional hex yields wrong results
+#       - WI > 0 yields wrong scaling for decimal?
 
 __version__ = 0.5
 
