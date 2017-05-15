@@ -676,8 +676,7 @@ class Fixed(object):
             # fixpoint format, transform to string
 
                 yi = np.round(np.modf(y_fix_lsb)[1]).astype(int) # integer part
-#                yf = np.round(np.modf(y_fix * (1 << self.WI))[0]  * (1 << self.WF)).astype(int) # frac part as integer
-                yf = np.round(np.modf(y_fix_lsb)[0] * (1 << self.WF)).astype(int) # integer part
+                yf = np.round(np.modf(y_fix_lsb)[0] * (1 << self.WF)).astype(int) # frac part as integer
 
                 logger.debug("y_fix, yi, yf = ", y_fix_lsb, yi, yf)
 
