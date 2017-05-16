@@ -389,7 +389,7 @@ class Fixed(object):
             raise Exception(u'Unknown format "%s"!'%(self.frmt))
 
 #------------------------------------------------------------------------------
-    def fix(self, y, frac = True):
+    def fix(self, y, from_float=True, to_float=False):
         """
         Return fixed-point integer representation `yq` of `y` (scalar or array-like),
         `yq.shape = y.shape`.
@@ -404,10 +404,15 @@ class Fixed(object):
         y: scalar or array-like object
             in floating point format to be quantized 
 
-        frac: Boolean
-            When `False` (default), y is treated as an integer that doesn't have 
-            to be scaled with self.MSB. If `True`, it is multiplied by `self.MSB`
-            before requantizing and saturating.
+        from_float: Boolean
+            When `True` (default), y is is multiplied by `1<<(W-1)` before 
+            requantizing and saturating. When `False, it is treated as an 
+            integer that doesn't have to be scaled. 
+
+        to_float: Boolean
+            When `False` (default), fix() returns an integer that is scaled
+            with `1<<(W-1)`. When `True`, a Float is returned. 
+
 
         Returns
         -------
@@ -462,15 +467,15 @@ class Fixed(object):
             over_pos = over_neg = yq = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
-        MSB = 1 << (self.W - 1)
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
             logger.warn("Casting complex values to real before quantization!")
             # quantizing complex objects is not supported yet
             y = y.real
 
-        if frac:  # y is a float, scale with MSB          
-            y = y * MSB # self.MSB#  * self.scale
+        MSB = 1 << (self.W - 1) #   * self.scale
+        if from_float:  # y is a float, scale with MSB          
+            y = y * MSB 
 
         # Quantize input in relation to LSB
         if   self.quant == 'floor':  yq = np.floor(y)
@@ -490,7 +495,7 @@ class Fixed(object):
 
         # Handle Overflow / saturation in relation to MSB
         if   self.ovfl == 'none':
-            return yq #.astype(np.int64)
+            pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -MSB)
@@ -512,7 +517,10 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
-        yq = yq.astype(np.int64)
+        if to_float:
+            yq = yq / MSB
+        else:
+            yq = yq.astype(np.int64)
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item() # convert singleton array to scalar
@@ -606,7 +614,7 @@ class Fixed(object):
                 if self.point:
                     y_fix = self.fix(y_int * self.LSB)
                 else:
-                    y_fix = self.fix(y_int, frac = False)
+                    y_fix = self.fix(y_int, from_float = False)
                 # scale integer fixpoint value
                 y_float = y_fix / 2**(self.W-1)
 
