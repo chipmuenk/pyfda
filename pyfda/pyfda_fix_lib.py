@@ -652,16 +652,16 @@ class Fixed(object):
         elif frmt in {'hex', 'bin'}:
             try:
                 y_int = int(raw_str, self.base)
-                # two's complement formatsneed to be treated separately:
-                if frmt in {'bin', 'hex'} and y_int >= self.MSB:              
-                    y_int = y_int - 2 * self.MSB
+                # two's complement formats need to be treated separately
+                if frmt in {'bin', 'hex'} and y_int >= (1 << (self.W-1)):             
+                    y_int = y_int - (1 << self.W)
                 # quantize / saturate / wrap the integer value:
                 if self.point:
-                    y_fix = self.fix(y_int * self.LSB)
+                    y_float = self.fix(y_int * self.LSB) * self.LSB
                 else:
-                    y_fix = self.fix(y_int, from_float = False)
+                    y_float = self.fix(y_int, from_float = False) / self.MSB
                 # scale integer fixpoint value
-                y_float = y_fix / 2**(self.W-1)
+                #y_float = y_fix / self.MSB#2**(self.W-1)
 
             except Exception as e:
                 logger.warn(e)
