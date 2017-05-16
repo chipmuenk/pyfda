@@ -20,7 +20,7 @@ import pyfda.filterbroker as fb
 # TODO: Illegal values in CSD return zero, 
 # TODO: int_places calculation for CSD doesn't always make sense
 # TODO: Various error related to radix point:
-#       - Frmt2float for negative fractional hex yields wrong results
+#       - Frmt2float for fractional hex yields wrong results
 #       - WI > 0 yields wrong scaling for decimal?
 
 __version__ = 0.5
