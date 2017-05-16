@@ -25,6 +25,51 @@ import pyfda.filterbroker as fb
 
 __version__ = 0.5
 
+def bin2hex(bin_str, frac=False):
+    """
+    Convert number `bin_str` in binary format to hex formatted string.
+    When `frac=False` (default), `bin_str` is prepended with zeros until 
+    the number of bits is a multiple of 4. For a fractional part (`frac = True`),
+    zeros are appended.
+    """
+
+    wmap ={'0000': '0',
+           '0001': '1',
+           '0010': '2',
+           '0011': '3',
+           '0100': '4',
+           '0101': '5',
+           '0110': '6',
+           '0111': '7',
+           '1000': '8',
+           '1001': '9',
+           '1010': 'A',
+           '1011': 'B',
+           '1100': 'C',
+           '1101': 'D',
+           '1110': 'E',
+           '1111': 'F'}
+
+    i = 0
+    hex_str = ""
+
+    # append or prepend zeros to bin_str until the length is a multiple of 4 bits
+    while (len(bin_str) % 4 != 0):
+        if frac: # fractional part, append zeros
+            bin_str = bin_str + "0"
+        else: # integer, prepend zeros
+            bin_str = "0" + bin_str
+
+    while (i < len(bin_str)):
+        hex_str = hex_str + wmap[bin_str[i:i + 4]]
+        i = i + 4
+
+    hex_str = hex_str.strip("0")
+    hex_str = "0" if len(hex_str) == 0 else hex_str
+
+    return hex_str
+
+
 def dec2hex(val, nbits):
     """
     Return `val` in hex format with a wordlength of `nbits` in two's complement
