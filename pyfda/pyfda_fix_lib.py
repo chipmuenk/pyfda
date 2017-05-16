@@ -685,7 +685,6 @@ class Fixed(object):
               "y = {2}  | y_float = {3}".format(self.MSB, self.scale, y, y_float))
             return y_float
 
-
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
@@ -739,14 +738,16 @@ class Fixed(object):
 
                 elif self.frmt == 'hex':
                     if self.point and self.WF > 0:
-                        y_str = dec2hex(yi, self.WI) + '.' + dec2hex(yf, self.WF)
+                        y_str_bin_i = np.binary_repr(y_fix, self.W)[:self.WI+1]
+                        y_str_bin_f = np.binary_repr(y_fix, self.W)[self.WI+1:]
+                        y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
                     else:
                         y_str = dec2hex(yi, self.W)
                 elif self.frmt == 'bin':
                     # calculate binary representation of fixpoint integer
                     y_str = np.binary_repr(y_fix, self.W)
                     if self.point and self.WF > 0:
-                        # ... and instert the radix point if required
+                        # ... and insert the radix point if required
                         y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
                 else: # self.frmt = 'csd'
                     if self.point:
