@@ -498,7 +498,7 @@ class Fixed(object):
         else:
             SCALAR = True
             # get rid of errors that have occurred upstream
-            if y is None:
+            if y is None or str(y) == "":
                 y = 0
             # If y is not a number, convert to string, remove whitespace and convert
             # to complex format:
