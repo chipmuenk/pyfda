@@ -519,7 +519,7 @@ class Fixed(object):
             y = y.real
 
         MSB = 1 << (self.W - 1) #   * self.scale
-        if from_float:  # y is a float, scale with MSB          
+        if from_float:  # y is a float, scale with MSB
             y = y * MSB 
 
         # Quantize input in relation to LSB
@@ -668,8 +668,8 @@ class Fixed(object):
                 y_int = None
                 y_float = None
 
-            logger.debug("MSB = {0} |  LSB = {1} | scale = {2}\n"
-              "y = {3} | y_int = {4} | y_fix = {5} | y_float = {6}".format(self.MSB, self.LSB, self.scale, y, y_int, y_fix, y_float))
+            print("MSB = {0} |  LSB = {1} | scale = {2}\n"
+              "y = {3} | y_int = {4} | y_float = {5}".format(self.MSB, self.LSB, self.scale, y, y_int, y_float))
 
             if y_float is not None:
                 return y_float
