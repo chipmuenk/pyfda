@@ -23,7 +23,7 @@ import numpy as np
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
 from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, 
-                                qcopy_to_clipboard, qget_selected)
+                                qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
@@ -274,6 +274,7 @@ class FilterCoeffs(QWidget):
         self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.lblRound = QLabel("Digits = ", self)
+        self.lblRound.setFont(self.bifont)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,16)
         self.spnRound.setValue(params['FMT_ba'])
@@ -351,12 +352,18 @@ class FilterCoeffs(QWidget):
         butClear.setIconSize(q_icon_size)
         butClear.setToolTip("Clear all entries.")
 
-        self.butClipboard = QPushButton(self)
-        self.butClipboard.setIcon(QIcon(':/clipboard.svg'))
-        self.butClipboard.setIconSize(q_icon_size)
-        self.butClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
+
+        self.butToClipboard = QPushButton(self)
+        self.butToClipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.butToClipboard.setIconSize(q_icon_size)
+        self.butToClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
                             "displayed. When nothing is selected, the whole table "
                             "is copied with full precision in decimal format. </span>")
+        self.butFromClipboard = QPushButton(self)
+        self.butFromClipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.butFromClipboard.setIconSize(q_icon_size)
+        self.butFromClipboard.setToolTip("<span>Copy clipboard TO table. </span>")
+
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(butAddCells)
@@ -365,7 +372,8 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1.addWidget(butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
-        layHButtonsCoeffs1.addWidget(self.butClipboard)
+        layHButtonsCoeffs1.addWidget(self.butToClipboard)
+        layHButtonsCoeffs1.addWidget(self.butFromClipboard)        
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addStretch()
 #---------------------------------------------------------
@@ -516,7 +524,9 @@ class FilterCoeffs(QWidget):
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.chkRadixPoint.clicked.connect(self._radix_point)
-        self.butClipboard.clicked.connect(self._copy_to_clipboard)
+        self.butToClipboard.clicked.connect(self._copy_to_clipboard)
+        self.butFromClipboard.clicked.connect(self._copy_from_clipboard)
+
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 
@@ -726,6 +736,12 @@ class FilterCoeffs(QWidget):
     def _copy_to_clipboard(self, tab = "\t", cr = None):
         
         qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard)
+        
+    #------------------------------------------------------------------------------
+    def _copy_from_clipboard(self, tab = "\t", cr = None):
+        
+        self.ba = qcopy_from_clipboard(self.clipboard)
+
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
