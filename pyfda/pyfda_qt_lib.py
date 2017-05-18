@@ -321,9 +321,12 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
         if cr is not None:
             line_term = cr   
             
-            
         t = io.StringIO(text)
-            
+        
+#        dialect = csv.Sniffer.sniff(t)
+#        print("header:",dialect.has_header)
+#        print("delimiter:", dialect.delimiter)
+#        print("terminator:", dialect.lineterminator)        
         
 #        data_iter = csv.reader(text, delimiter = delim, lineterminator = line_term)
         data_iter = csv.reader(t, dialect='excel')
@@ -335,11 +338,6 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
 #        var = np.asarray(data, dtype = float)
         
         return var
-        dialect = csv.Sniffer.sniff(text)
-        print("header:",dialect.has_header)
-        print("delimiter:", dialect.delimiter)
-        print("terminator:", dialect.lineterminator)
-        return source.text() # read from clipboard
     else:
         logger.error("Unknown object {0}, cannot copy data.".format(source_type))
 
