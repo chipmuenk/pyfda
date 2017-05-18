@@ -10,7 +10,9 @@ Library with common routines for Qt widgets
 from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
+from pprint import pprint
 import csv
+import io
 import numpy as np
 
 from .compat import Qt, QtCore, QFrame, QFont, QEvent, QSysInfo
@@ -246,9 +248,9 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
         return text
         
 #------------------------------------------------------------------------------
-def qcopy_from_clipboard(source):
+def qcopy_from_clipboard(source, tab = None, cr = None):
     """
-    Copy table to clipboard as CSV list
+    Copy data from clipboard to table
     
     Parameters:
     -----------
@@ -257,7 +259,10 @@ def qcopy_from_clipboard(source):
             Source of the data, this should be a QClipboard instance.
             
             If source is not a QClipBoard instance, return an error.
-    
+            
+    table : object
+            Instance of QTableWidget
+                
     tab : String (default: "\t")
           Tabulator character for separating columns
           
@@ -267,11 +272,69 @@ def qcopy_from_clipboard(source):
             Windows: Carriage return + line feed
             MacOS  : Carriage return
             *nix   : Line feed
+            
+    Returns:
+    --------
+            
+    var:    numpy array
+                containing table data
+    
     """
     source_type = str(source.__class__.__name__)
     if "clipboard" in source_type.lower() :
+        # mime = source.mimeData()
+        # pprint(mime.formats())
         text = source.text()
+
+        print(type(text), len(text))
+        text = str(text)
+
+        print(text, np.shape(text))
+               
+        if "\t" in text:
+            delim = "\t"
+            print("tab")
+        elif "," in text:
+            delim = ","
+            print("komma")
+        elif "|" in text:
+            delim = "|"
+            print("line")
+        else:
+            delim = " "
+            print("blank")
+            
+        if "\r\n" in text:
+            line_term = "\r\n"
+            print("windows")
+        elif "\r" in text:
+            line_term = "\r"
+            print("nix")
+        elif "\n" in text:
+            line_term = "\n"
+            print("os")
+        else:
+            print("no lineterm")
+
+        if tab is not None:
+            delim = tab
+        if cr is not None:
+            line_term = cr   
+            
+            
+        t = io.StringIO(text)
+            
         
+#        data_iter = csv.reader(text, delimiter = delim, lineterminator = line_term)
+        data_iter = csv.reader(t, dialect='excel')
+        for row in data_iter:
+            print(row)
+#        data = [data for data in data_iter]
+#        print(type(data), np.shape(data))
+        
+#        var = np.asarray(data, dtype = float)
+        
+        return var
         dialect = csv.Sniffer.sniff(text)
         print("header:",dialect.has_header)
         print("delimiter:", dialect.delimiter)
