@@ -14,12 +14,9 @@ logger = logging.getLogger(__name__)
 import csv
 import io
 import numpy as np
+from .pyfda_lib import CRLF, PY3
 
 from .compat import Qt, QtCore, QFrame, QFont, QEvent, QSysInfo
-
-#import pyfda.simpleeval as se
-
-
 
 #------------------------------------------------------------------------------
 def qstr(text):
@@ -206,16 +203,8 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
             *nix   : Line feed
     """
     if not cr:
-        if hasattr(QSysInfo, "WindowsVersion"):
-            print("Win!", QSysInfo.WindowsVersion)
-            cr = "\r\n" # Windows: carriage return + line feed
-        elif hasattr(QSysInfo, "MacintoshVersion"):
-            print("Mac!", QSysInfo.MacintoshVersion)
-            cr = "\r" # Mac: carriage return only
-        else:
-            print("*nix!")
-            cr = "\n" # *nix: line feed only
-
+        cr = CRLF
+        
     text = ""
 
     sel = qget_selected(table, reverse=False)['sel']   

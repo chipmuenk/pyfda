@@ -121,6 +121,25 @@ SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.
 
 PY3 = sys.version_info > (3,) # True for Python 3 
 
+print("Running on a")
+if hasattr(QSysInfo, "WindowsVersion"):
+    print("Windows System, version", QSysInfo.WindowsVersion)
+    OS = "win"
+    CRLF = "\r\n" # Windows: carriage return + line feed, Hex 0D 0A
+elif hasattr(QSysInfo, "MacintoshVersion"):
+    print("Macintosh, version", QSysInfo.MacintoshVersion)
+    OS = "mac"
+    CRLF = "\r" # Mac: carriage return only, Hex 0D
+else:
+    print("Unix / Linux system.")
+    OS = "unix"
+    CRLF = "\n" # Unix / Linux: line feed only, Hex 0A
+
+        
+logger.info(mod_version())
+print(mod_version())
+###############################################################################
+
 #### General functions ########################################################
 
 def safe_eval(expr, alt_expr=0):
