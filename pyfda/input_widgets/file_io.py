@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
                                 qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
 
+from pyfda.pyfda_lib import PY3
+
 
 from ..compat import (QtCore, QFD, Qt,
                       QWidget, QPushButton, QComboBox, QLabel, QFont, QFrame,
@@ -372,8 +374,13 @@ class File_IO(QWidget):
             file_type_err = False
             try:
                 if file_type == '.csv':
-                    with io.open(file_name, 'r') as f: # no binary mode here!
+                    if PY3:
+                        mode = 'r'# don't read in binary mode (data as bytes) under Py 3
+                    else:
+                        mode = 'rb' # do read in binary mode under Py 2 (why?!)
+                    with io.open(file_name, mode) as f: 
                         fb.fil[0]['ba'] = qcopy_from_clipboard(f)
+
                 else:
                     with io.open(file_name, 'rb') as f:
                         if file_type == '.mat':
