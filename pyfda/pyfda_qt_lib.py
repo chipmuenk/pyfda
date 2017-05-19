@@ -236,6 +236,49 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
     else:
         return text
         
+#==============================================================================
+# http://stackoverflow.com/questions/6081008/dump-a-numpy-array-into-a-csv-file#6081043
+#     # Write an example CSV file with headers on first line
+#     with open('example.csv', 'w') as fp:
+#         fp.write('''\
+#     col1,col2,col3
+#     1,100.1,string1
+#     2,222.2,second string
+#     ''')
+#     
+#     # Read it as a Numpy record array
+#     ar = np.recfromcsv('example.csv')
+#     print(repr(ar))
+#     # rec.array([(1, 100.1, 'string1'), (2, 222.2, 'second string')], 
+#     #           dtype=[('col1', '<i4'), ('col2', '<f8'), ('col3', 'S13')])
+#     
+#     # Write as a CSV file with headers on first line
+#     with open('out.csv', 'w') as fp:
+#         fp.write(','.join(ar.dtype.names) + '\n')
+#         np.savetxt(fp, ar, '%s', ',')
+#     
+#     # Note that this example does not consider strings with commas, which would require quotes.
+#         
+#==============================================================================
+
+#==============================================================================
+#     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
+#     ##if you want to write in column:
+# 
+#     for x in np.nditer(a.T, order='C'): 
+#             file.write(str(x))
+#             file.write("\n")
+# 
+#     ## If you want to write in row: ## 
+# 
+#     writer= csv.writer(file, delimiter=',')
+#     for x in np.nditer(a.T, order='C'): 
+#             row.append(str(x))
+#     writer.writerow(row)
+# 
+#==============================================================================
+        
+        
 #------------------------------------------------------------------------------
 def qcopy_from_clipboard(source, tab = None, cr = None):
     """
