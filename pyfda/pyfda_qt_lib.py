@@ -256,14 +256,12 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
     -----------
             
     source: object
-            Source of the data, this should be a QClipboard instance.
+            Source of the data, this should be a QClipboard instance or an 
+            opened file handle.
             
-            If source is not a QClipBoard instance, return an error.
-            
-    table : object
-            Instance of QTableWidget
+            If source is neither, return an error.
                 
-    tab : String (default: "\t")
+    tab : String (default: None)
           Tabulator character for separating columns
           
     cr : String (default: None)
@@ -273,10 +271,15 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
             MacOS  : Carriage return
             *nix   : Line feed
             
+    header : Boolean (default: None)
+            When `header=True`, treat first row as a header that will be discarded.
+        
+    Flags that are zero, will be guessed by csv.Sniffer().
+            
     Returns:
     --------
             
-    var:    numpy array
+    numpy array
                 containing table data
     
     """
