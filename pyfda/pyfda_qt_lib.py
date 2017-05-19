@@ -337,29 +337,36 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
         raise IOError
         return None
 
+    try:        
+        dialect = csv.Sniffer().sniff(f.readline()) # test the first line
+        f.seek(0)                                   # and reset the file pointer
+        headers = csv.Sniffer().has_header(f.read(1000)) # True when header detected
         
-    dialect = csv.Sniffer().sniff(f.readline()) # test the first line
-    f.seek(0)                                   # and reset the file pointer
-    headers = csv.Sniffer().has_header(f.readline()) # True when header detected
-
-    delimiter = dialect.delimiter
-    lineterminator = dialect.lineterminator
-    quotechar = dialect.quotechar
-    print("delimiter:", repr(delimiter))
-    print("terminator:", repr(lineterminator))   
-    print("quotechar:", repr(quotechar))  
+        delimiter = dialect.delimiter
+        lineterminator = dialect.lineterminator
+        quotechar = dialect.quotechar
+        print("delimiter:", repr(delimiter))
+        print("terminator:", repr(lineterminator))   
+        print("quotechar:", repr(quotechar))
+        
     
+    except csv.Error as e:
+        logger.error("Error during CSV analysis:\n{0}".format(e)) 
+        dialect = csv.get_dialect('excel-tab') # fall back
+        headers = False
+
     # override settings found by sniffer
     if tab is not None:
-        delimiter = tab
-        dialect.delimiter = delimiter
+        dialect.delimiter = tab
     if cr is not None:
-        lineterminator = cr   
+        dialect.lineterminator = cr   
 
     # dialect = 'excel-tab" #  # 'excel', #"unix" 
     data_iter = csv.reader(f, dialect=dialect)
     f.seek(0) 
     if headers:
+        print("headers: ", next(data_iter, None)) # py3 and py2 
+    
 
 
 #==============================================================================
