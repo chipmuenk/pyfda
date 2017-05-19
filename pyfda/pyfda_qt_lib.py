@@ -315,8 +315,14 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
                 containing table data
     
     """
-    source_type = str(source.__class__.__name__)
-    if "clipboard" in source_type.lower() :
+    source_class = str(source.__class__.__name__).lower()
+    print(type(source))
+    if "textiowrapper" in source_class or "bufferedreader" in source_class : #"_io.TextIOWrapper"
+        # ^ Python 3 ('r' mode)            ^ Python 2 ('rb' mode)
+        print("Using {0}".format(source))
+        f = source # pass handle to opened file
+    
+    elif "clipboard" in source_class:
         # mime = source.mimeData()
         if PY3:
             text = source.text()
