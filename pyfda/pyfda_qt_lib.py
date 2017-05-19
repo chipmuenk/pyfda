@@ -372,7 +372,12 @@ def qcopy_from_clipboard(source, tab = None, cr = None, header = None):
         print(row)
         data_list.append(row)        
 
-# TODO: Type conversion, what to do with string data, transpose array if needed, headers
+# TODO: Type conversion (in calling method?), what to do with string data
+# TODO: Conversion via frmt2float?! Depending on frmt?
+# TODO: Automatic transpose of array if needed
+# TODO: Check dimensions of array, cut, transpose or throw an error
+# TODO: manual / automatic selection of headers / tab / cr / transpose / ...
+# TODO: Icons
     try:
         print(type(data_list))
         data_arr = np.array(data_list)
