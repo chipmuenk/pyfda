@@ -293,30 +293,34 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
             
         f = io.StringIO(text)
 
-        if tab is not None:
-            delim = tab
-        if cr is not None:
-            line_term = cr   
-            
-        t = io.StringIO(text)
-        
-#        dialect = csv.Sniffer.sniff(t)
-#        print("header:",dialect.has_header)
-#        print("delimiter:", dialect.delimiter)
-#        print("terminator:", dialect.lineterminator)        
-        
-#        data_iter = csv.reader(text, delimiter = delim, lineterminator = line_term)
-        data_iter = csv.reader(t, dialect='excel')
-        for row in data_iter:
-            print(row)
-#        data = [data for data in data_iter]
-#        print(type(data), np.shape(data))
-        
-#        var = np.asarray(data, dtype = float)
-        
-        return var
     else:
-        logger.error("Unknown object {0}, cannot copy data.".format(source_type))
+        logger.error("Unknown object {0}, cannot copy data.".format(source_class))
+        raise IOError
+        return None
+
+        
+    dialect = csv.Sniffer().sniff(f.readline()) # test the first line
+    f.seek(0)                                   # and reset the file pointer
+    headers = csv.Sniffer().has_header(f.readline()) # True when header detected
+
+    delimiter = dialect.delimiter
+    lineterminator = dialect.lineterminator
+    quotechar = dialect.quotechar
+    print("delimiter:", repr(delimiter))
+    print("terminator:", repr(lineterminator))   
+    print("quotechar:", repr(quotechar))  
+    
+    # override settings found by sniffer
+    if tab is not None:
+        delimiter = tab
+        dialect.delimiter = delimiter
+    if cr is not None:
+        lineterminator = cr   
+
+    # dialect = 'excel-tab" #  # 'excel', #"unix" 
+    data_iter = csv.reader(f, dialect=dialect)
+    f.seek(0) 
+    if headers:
 
 
 #==============================================================================
