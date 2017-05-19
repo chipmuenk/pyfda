@@ -10,7 +10,7 @@ Library with common routines for Qt widgets
 from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
-from pprint import pprint
+
 import csv
 import io
 import numpy as np
@@ -283,7 +283,6 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
     source_type = str(source.__class__.__name__)
     if "clipboard" in source_type.lower() :
         # mime = source.mimeData()
-        # pprint(mime.formats())
         text = source.text()
 
         print(type(text), len(text))
@@ -291,30 +290,8 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
 
         print(text, np.shape(text))
                
-        if "\t" in text:
-            delim = "\t"
-            print("tab")
-        elif "," in text:
-            delim = ","
-            print("komma")
-        elif "|" in text:
-            delim = "|"
-            print("line")
-        else:
-            delim = " "
-            print("blank")
             
-        if "\r\n" in text:
-            line_term = "\r\n"
-            print("windows")
-        elif "\r" in text:
-            line_term = "\r"
-            print("nix")
-        elif "\n" in text:
-            line_term = "\n"
-            print("os")
-        else:
-            print("no lineterm")
+        f = io.StringIO(text)
 
         if tab is not None:
             delim = tab
