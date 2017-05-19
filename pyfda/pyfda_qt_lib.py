@@ -318,15 +318,13 @@ def qcopy_from_clipboard(source, tab = None, cr = None):
     source_type = str(source.__class__.__name__)
     if "clipboard" in source_type.lower() :
         # mime = source.mimeData()
-        text = source.text()
-
-        print(type(text), len(text))
-        text = str(text)
-
+        if PY3:
+            text = source.text()
+        else:
+            text = unicode(source.text()) # Py 2 needs unicode here (why?)
         print(text, np.shape(text))
-               
             
-        f = io.StringIO(text)
+        f = io.StringIO(text) # pass handle to text
 
     else:
         logger.error("Unknown object {0}, cannot copy data.".format(source_class))
