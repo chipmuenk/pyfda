@@ -741,6 +741,7 @@ class FilterCoeffs(QWidget):
     def _copy_from_clipboard(self, tab = "\t", cr = None):
         
         self.ba = qcopy_from_clipboard(self.clipboard)
+        self._refresh_table()
 
 
 #------------------------------------------------------------------------------
