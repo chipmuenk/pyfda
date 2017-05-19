@@ -23,6 +23,7 @@ Created 2012 - 2017
 
 from __future__ import division, print_function
 import os, sys, re, time
+import codecs
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
@@ -70,6 +71,19 @@ try:
     VERSION.update({'myhdl': VERSION_HDL})
 except ImportError:
     logger.info("Module myhdl not found.")
+
+def b(s):
+    """
+    Handle binary data in the same way under py2 and py3: 
+    Py2: keep string data as string data
+    Py3: convert string data to byte
+    """
+    if PY3:
+        # first 256 characters of Latin 1 (ISO8859-1) are identical to the
+        # first 256 characters of unicode
+        return codecs.latin_1_encode(s)[0] # return as binary data
+    else:
+        return s # return as string
 
 
 def cmp_version(mod, version):
