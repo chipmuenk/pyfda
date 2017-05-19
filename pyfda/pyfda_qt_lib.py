@@ -385,6 +385,7 @@ def qcopy_from_clipboard(source, tab = None, cr = None, header = None):
         return None
     except ValueError as e:
         logger.error("ValueError:%s!\n%s", e)
+        return None
 
 
 #==============================================================================
