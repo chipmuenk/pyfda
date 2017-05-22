@@ -280,7 +280,7 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
         
         
 #------------------------------------------------------------------------------
-def qcopy_from_clipboard(source, tab = None, cr = None, header = None):
+def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True):
     """
     Copy data from clipboard to table
     
@@ -383,8 +383,13 @@ def qcopy_from_clipboard(source, tab = None, cr = None, header = None):
         data_arr = np.array(data_list)
         cols, rows = np.shape(data_arr)
         print("cols = {0}, rows = {1}, data_arr = \n".format(cols, rows, data_arr))
-        print(data_arr.T)
-        return data_arr.T
+        if transpose:
+            print(data_arr.T)
+            return data_arr.T
+        else:
+            print(data_arr)
+            return data_arr
+            
     except TypeError as e:
         logger.error("TypeError: %s!\n%s", e, data_list)
         return None
