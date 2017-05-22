@@ -555,6 +555,26 @@ class FilterCoeffs(QWidget):
         self._radix_point()
 
 
+ 
+    
+    #------------------------------------------------------------------------------
+    def set_raw_data(self, ba_str):
+        """
+        Store data in the table in raw (string) format
+        """
+#        self.num_cols, self.num_rows = np.shape(ba_str)
+#        print("cols = {0}, rows = {1}".format(self.num_cols, self.num_rows))
+#        ba_list = [[]]
+#
+#        for col in range(self.num_cols):
+#            if col > 0:
+#                ba_list.append([])
+#                for row in range(self.num_rows):
+#                    ba_list[col].append(ba_str[col][row])
+                    
+        self.ba = np.array(ba_str)
+        return
+
 #------------------------------------------------------------------------------
     def _filter_type(self, fil_type=None):
         """
@@ -741,7 +761,9 @@ class FilterCoeffs(QWidget):
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self, tab = "\t", cr = None):
         
-        self.ba = qcopy_from_clipboard(self.clipboard)
+        ba_str = qcopy_from_clipboard(self.clipboard)
+        self.set_raw_data(ba_str)
+        
         self._refresh_table()
 
 
