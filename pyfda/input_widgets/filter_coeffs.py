@@ -684,6 +684,8 @@ class FilterCoeffs(QWidget):
         """
 
         self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
+        print("self.num_rows = {0}".format(self.num_rows))
+        print("np.shape(ba)", np.shape(self.ba))
 
         params['FMT_ba'] = int(self.spnRound.text())
 
