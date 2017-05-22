@@ -555,6 +555,27 @@ class FilterCoeffs(QWidget):
         self._radix_point()
 
 
+
+#------------------------------------------------------------------------------
+    def get_raw_data(self, ba_str):
+        """
+        Read data from the table in raw (string) format and return a 2D-list 
+        """
+        self.tblCoeff.setRowCount(self.num_rows)
+        self.tblCoeff.setColumnCount(self.num_cols)
+
+        ba_str = [] # list of strings
+        for col in range(self.num_cols):
+            tmp_list = []
+            for row in range(self.num_rows):
+                # get table item from ba_str and strip '()' of complex numbers
+                item = self.tblCoeff.item(row, col)
+                if item: # does item exist?
+                    tmp_list.append(item.text())
+                else: # no, construct it:
+                    tmp_list.append("0")
+            ba_str.append(tmp_list)
+        return ba_str
  
     
     #------------------------------------------------------------------------------
