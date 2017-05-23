@@ -213,9 +213,9 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
             #                text += qstr(self.tblCoeff.horizontalHeaderItem(r).text())
             for c in range(table.columnCount()):
                 text += str(var[c][r])
-                if c != table.columnCount():
+                if c != table.columnCount() - 1: # don't add tab after last column
                     text += tab
-            if r != table.rowCount():
+            if r != table.rowCount() - 1: # don't add CRLF after last row
                 text += cr
     else: # copy only selected cells in selected format
         tab = ", "
