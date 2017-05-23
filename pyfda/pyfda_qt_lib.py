@@ -204,10 +204,10 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
     """
     if not cr:
         cr = CRLF
-        
+
     text = ""
 
-    sel = qget_selected(table, reverse=False)['sel']   
+    sel = qget_selected(table, reverse=False)['sel']
     if not np.any(sel): # nothing selected -> copy everything raw from ba
         for r in range(table.rowCount()):
             #                text += qstr(self.tblCoeff.horizontalHeaderItem(r).text())
