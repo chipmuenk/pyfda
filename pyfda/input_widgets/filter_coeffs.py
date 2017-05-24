@@ -688,8 +688,10 @@ class FilterCoeffs(QWidget):
         Called at the end of nearly every method.
         """
 
-        self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
-        print("self.num_rows = {0}".format(self.num_rows))
+        try:
+            self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
+        except IndexError:
+            self.num_rows = len(self.ba[0])
         print("np.shape(ba)", np.shape(self.ba))
 
         params['FMT_ba'] = int(self.spnRound.text())
