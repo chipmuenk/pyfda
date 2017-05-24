@@ -206,9 +206,11 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
         cr = CRLF
 
     text = ""
-
     sel = qget_selected(table, reverse=False)['sel']
-    if not np.any(sel): # nothing selected -> copy everything raw from ba
+    if not np.any(sel):
+        # nothing selected -> copy everything raw from self.ba along the table
+        # dimensions
+        # TODO: WTF?!
         for r in range(table.rowCount()):
             #                text += qstr(self.tblCoeff.horizontalHeaderItem(r).text())
             for c in range(table.columnCount()):
@@ -217,6 +219,7 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
                     text += tab
             if r != table.rowCount() - 1: # don't add CRLF after last row
                 text += cr
+        #text = np.array_str(var, precision=15)
     else: # copy only selected cells in selected format
         for r in sel[0]:
             item = table.item(r,0)
@@ -317,7 +320,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True)
     
     """
     source_class = str(source.__class__.__name__).lower()
-    print(type(source))
+    # print(type(source))
     if "textiowrapper" in source_class or "bufferedreader" in source_class : #"_io.TextIOWrapper"
         # ^ Python 3 ('r' mode)            ^ Python 2 ('rb' mode)
         print("Using {0}".format(source))
