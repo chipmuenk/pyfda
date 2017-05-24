@@ -559,7 +559,7 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def get_raw_data(self, ba_str):
         """
-        Read data from the table in raw (string) format and return a 2D-list 
+        Read data from the table in raw (string) format and return as 2D-list 
         """
         self.tblCoeff.setRowCount(self.num_rows)
         self.tblCoeff.setColumnCount(self.num_cols)
@@ -765,6 +765,9 @@ class FilterCoeffs(QWidget):
         
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self, tab = "\t", cr = None):
+        """
+        Copy data from coefficient table to clipboard in CSV format.
+        """
         
         qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard)
         
