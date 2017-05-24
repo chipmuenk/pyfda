@@ -677,8 +677,13 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _refresh_table(self):
         """
-        (Re-)Create the displayed table from self.ba with the
-        desired number format.
+        (Re-)Create the displayed table from self.ba (numpy float array). Data 
+        is displayed via `ItemDelegate.displayText()` in the number format set
+        by `self.frmt`.
+        
+        The table dimensions are set according to the dimensions of `self.ba`:
+        - self.ba[0] -> b coefficients
+        - self.ba[1] -> a coefficients
 
         Called at the end of nearly every method.
         """
@@ -757,18 +762,17 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def load_dict(self):
         """
-        Load all entries from filter dict fb.fil[0]['ba'] into the shadow
-        register self.ba and update the display.
+        Load all entries from filter dict `fb.fil[0]['ba']` into the coefficient
+        register `self.ba` and update the display via `self._refresh_table()`.
 
-        The shadow register is a list of two ndarrays to allow different
-        lengths for b and a subarrays while adding / deleting items.
-        The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
-        otherwise the filter dict would be modified inadvertedly. 
+        The filter dict is a "normal" 2D-numpy float array for the b and a coefficients
+        while the coefficient register `self.ba` is a list of two float ndarrays to allow
+        for different lengths of b and a subarrays while adding / deleting items. 
         """
 
-        self.ba = [0., 0.]
-        self.ba[0] = np.array(fb.fil[0]['ba'][0])
-        self.ba[1] = np.array(fb.fil[0]['ba'][1])
+        self.ba = [0., 0.] # initial list with two elements
+        self.ba[0] = np.array(fb.fil[0]['ba'][0]) # deep copy from filter dict to 
+        self.ba[1] = np.array(fb.fil[0]['ba'][1]) # coefficient register
 
         # set comboBoxes from dictionary
         self._load_q_settings()
@@ -793,8 +797,8 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
         """
-        read out the settings of the quantization comboboxes and store them in
-        filter dict. Update the fixpoint object.
+        Read out the settings of the quantization comboboxes and store them in
+        the filter dict. Update the fixpoint object.
         """
         fb.fil[0]['q_coeff'] = {
                 'WI':abs(int(self.ledWI.text())),
@@ -839,7 +843,7 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _save_dict(self):
         """
-        Save the values from self.ba to the filter ba dict.
+        Save the coefficient register `self.ba` to the filter dict `fb.fil[0]['ba']`.
         """
 
         logger.debug("_save_entries called")
