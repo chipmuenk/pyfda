@@ -338,8 +338,9 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True)
         raise IOError
         return None
 
-    try:        
-        dialect = csv.Sniffer().sniff(f.readline()) # test the first line
+    try:  
+        # test the first line for delimiters (of the given selection)
+        dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' ']) 
         f.seek(0)                                   # and reset the file pointer
         headers = csv.Sniffer().has_header(f.read(1000)) # True when header detected
         
