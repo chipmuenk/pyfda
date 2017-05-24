@@ -218,18 +218,19 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
             if r != table.rowCount() - 1: # don't add CRLF after last row
                 text += cr
     else: # copy only selected cells in selected format
-        tab = ", "
         for r in sel[0]:
             item = table.item(r,0)
             if item:
                 if item.text() != "":
-                    text += table.itemDelegate().text(item)
+                    text += table.itemDelegate().text(item) + tab
+        text.rstrip(tab) # remove last tab delimiter again
         text += cr
         for r in sel[1]:
             item = table.item(r,1)
             if item:
                 if item.text() != "":
-                    text += table.itemDelegate().text(item)
+                    text += table.itemDelegate().text(item) + tab
+        text.rstrip(tab) # remove last tab delimiter again
                     
     if "clipboard" in str(target.__class__.__name__).lower() :
         target.setText(text)
