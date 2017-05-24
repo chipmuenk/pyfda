@@ -557,7 +557,7 @@ class FilterCoeffs(QWidget):
 
 
 #------------------------------------------------------------------------------
-    def get_raw_data(self, ba_str):
+    def get_raw_data(self):
         """
         Read data from the table in raw (string) format and return as 2D-list 
         """
