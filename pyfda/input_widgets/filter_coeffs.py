@@ -533,7 +533,7 @@ class FilterCoeffs(QWidget):
         butDelCells.clicked.connect(self._delete_cells)
         butAddCells.clicked.connect(self._add_cells)
         butLoad.clicked.connect(self.load_dict)
-        self.butSave.clicked.connect(self._save_entries)
+        self.butSave.clicked.connect(self._save_dict)
         butClear.clicked.connect(self._clear_table)
         butSetZero.clicked.connect(self._set_coeffs_zero)
 
@@ -837,7 +837,7 @@ class FilterCoeffs(QWidget):
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
-    def _save_entries(self):
+    def _save_dict(self):
         """
         Save the values from self.ba to the filter ba dict.
         """
