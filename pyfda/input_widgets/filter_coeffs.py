@@ -316,14 +316,14 @@ class FilterCoeffs(QWidget):
 
 
         butAddCells = QPushButton(self)
-        butAddCells.setIcon(QIcon(':/plus.svg'))
+        butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
         butAddCells.setIconSize(q_icon_size)
         butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
                                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                                 "When nothing is selected, add a row at the end.</SPAN>")
 
         butDelCells = QPushButton(self)
-        butDelCells.setIcon(QIcon(':/minus.svg'))
+        butDelCells.setIcon(QIcon(':/row_delete.svg'))
         butDelCells.setIconSize(q_icon_size)
         butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
