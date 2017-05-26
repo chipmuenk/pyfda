@@ -316,14 +316,14 @@ class FilterCoeffs(QWidget):
 
 
         butAddCells = QPushButton(self)
-        butAddCells.setIcon(QIcon(':/plus.svg'))
+        butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
         butAddCells.setIconSize(q_icon_size)
         butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
                                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                                 "When nothing is selected, add a row at the end.</SPAN>")
 
         butDelCells = QPushButton(self)
-        butDelCells.setIcon(QIcon(':/minus.svg'))
+        butDelCells.setIcon(QIcon(':/row_delete.svg'))
         butDelCells.setIconSize(q_icon_size)
         butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
@@ -354,13 +354,13 @@ class FilterCoeffs(QWidget):
 
 
         self.butToClipboard = QPushButton(self)
-        self.butToClipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
         self.butToClipboard.setIconSize(q_icon_size)
         self.butToClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
                             "displayed. When nothing is selected, the whole table "
                             "is copied with full precision in decimal format. </span>")
         self.butFromClipboard = QPushButton(self)
-        self.butFromClipboard.setIcon(QIcon(':/clipboard.svg'))
+        self.butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
         self.butFromClipboard.setIconSize(q_icon_size)
         self.butFromClipboard.setToolTip("<span>Copy clipboard TO table. </span>")
 

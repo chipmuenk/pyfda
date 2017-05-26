@@ -259,7 +259,7 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         # GRID:
-        self.a_gr = self.addAction(QIcon(':/grid-four-up.svg'), 'Grid', self.toggle_grid)
+        self.a_gr = self.addAction(QIcon(':/grid.svg'), 'Grid', self.toggle_grid)
         self.a_gr.setToolTip('Toggle Grid')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
