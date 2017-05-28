@@ -176,7 +176,7 @@ def qget_selected(table, reverse=True):
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
+def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=False):
     """
     Copy table to clipboard as CSV list
     
@@ -208,32 +208,50 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
     text = ""
     sel = qget_selected(table, reverse=False)['sel']
     if not np.any(sel):
-        # nothing selected -> copy everything raw from self.ba along the table
+        # nothing selected -> copy everything raw from the table data array 
         # dimensions
-        # TODO: WTF?!
-        for r in range(table.rowCount()):
-            #                text += qstr(self.tblCoeff.horizontalHeaderItem(r).text())
+        if transpose: # rows are horizontal
             for c in range(table.columnCount()):
-                text += str(var[c][r])
-                if c != table.columnCount() - 1: # don't add tab after last column
-                    text += tab
-            if r != table.rowCount() - 1: # don't add CRLF after last row
-                text += cr
-        #text = np.array_str(var, precision=15)
-    else: # copy only selected cells in selected format
+                for r in range(table.rowCount()):
+                    text += str(data[c][r])
+                    if r != table.rowCount() - 1: # don't add tab after last column
+                        text += tab
+                if c != table.columnCount() - 1: # don't add CRLF after last row
+                    text += cr               
+        else:  # rows are vertical
+            for r in range(table.rowCount()):
+                for c in range(table.columnCount()):
+                    text += str(data[c][r])
+                    if c != table.columnCount() - 1: # don't add tab after last column
+                        text += tab
+                if r != table.rowCount() - 1: # don't add CRLF after last row
+                    text += cr               
+        #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
+    else: # copy only selected cells in displayed format
+        if sel[0] is None:
+            m0 = -1
+        if sel[1] is None:
+            m1 = -1
+        l = max(m0, m1)
+        print("l", l)
         for r in sel[0]:
             item = table.item(r,0)
             if item:
                 if item.text() != "":
                     text += table.itemDelegate().text(item) + tab
         text.rstrip(tab) # remove last tab delimiter again
-        text += cr
-        for r in sel[1]:
-            item = table.item(r,1)
-            if item:
-                if item.text() != "":
-                    text += table.itemDelegate().text(item) + tab
-        text.rstrip(tab) # remove last tab delimiter again
+        if sel[1] is not None:
+            text += cr # add a CELF when there are two columns
+            for r in sel[1]:
+                item = table.item(r,1)
+                if item:
+                    if item.text() != "":
+                        text += table.itemDelegate().text(item) + tab
+            text.rstrip(tab) # remove last tab delimiter again
+            
+        text = [list(i) for i in zip(*text)] # transpose list
+        
+        print(text)
                     
     if "clipboard" in str(target.__class__.__name__).lower() :
         target.setText(text)
@@ -284,7 +302,7 @@ def qcopy_to_clipboard(table, var, target, tab = "\t", cr = None):
         
         
 #------------------------------------------------------------------------------
-def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True):
+def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True):
     """
     Copy data from clipboard to table
     
@@ -344,8 +362,14 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True)
     try:  
         # test the first line for delimiters (of the given selection)
         dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' ']) 
-        f.seek(0)                                   # and reset the file pointer
-        headers = csv.Sniffer().has_header(f.read(1000)) # True when header detected
+        f.seek(0)                               # and reset the file pointer
+        if header == "auto":                                  
+            header = csv.Sniffer().has_header(f.read(1000)) # True when header detected
+            f.seek(0)  
+        elif header== "true":
+            header = True
+        else:
+            header = False
         
         delimiter = dialect.delimiter
         lineterminator = dialect.lineterminator
@@ -358,7 +382,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True)
     except csv.Error as e:
         logger.error("Error during CSV analysis:\n{0}".format(e)) 
         dialect = csv.get_dialect('excel-tab') # fall back
-        headers = False
+        header = False
 
     # override settings found by sniffer
     if tab is not None:
@@ -369,7 +393,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True)
     # dialect = 'excel-tab" #  # 'excel', #"unix" 
     data_iter = csv.reader(f, dialect=dialect)
     f.seek(0) 
-    if headers:
+    if header:
         print("headers: ", next(data_iter, None)) # py3 and py2 
     
     data_list = []
@@ -395,11 +419,8 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=None, transpose=True)
             print(data_arr)
             return data_arr
             
-    except TypeError as e:
-        logger.error("TypeError: %s!\n%s", e, data_list)
-        return None
-    except ValueError as e:
-        logger.error("ValueError:%s!\n%s", e)
+    except (TypeError, ValueError) as e:
+        logger.error("{0}\n{1}".format(e, data_list))
         return None
 
 
