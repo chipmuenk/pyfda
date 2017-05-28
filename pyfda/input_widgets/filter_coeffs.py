@@ -773,11 +773,18 @@ class FilterCoeffs(QWidget):
         
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self, tab = "\t", cr = None):
-        
+        """
+        Read data from clipboard and copy it to self.ba as array of strings
+        """
         ba_str = qcopy_from_clipboard(self.clipboard)
 
-        num_cols, num_rows = np.shape(ba_str)
-        print("cols = {0}, rows = {1}".format(num_cols, num_rows))
+        try:
+            num_cols, num_rows = np.shape(ba_str)
+            print("cols = {0}, rows = {1}".format(num_cols, num_rows))
+        except(TypeError, ValueError) as e:
+            logger.error(e)
+            return
+
         ba_list = [[]]
 
         for col in range(num_cols):
@@ -788,9 +795,8 @@ class FilterCoeffs(QWidget):
 
         self.ba = np.array(ba_str) 
         print("raw_data:", type(self.ba[0][0]), np.shape(ba_str))
-        
-        self._refresh_table()
 
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
