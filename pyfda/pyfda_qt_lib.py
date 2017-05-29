@@ -228,20 +228,16 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
                     text += cr               
         #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
     else: # copy only selected cells in displayed format
-        if sel[0] is None:
-            m0 = -1
-        if sel[1] is None:
-            m1 = -1
-        l = max(m0, m1)
-        print("l", l)
-        for r in sel[0]:
-            item = table.item(r,0)
-            if item:
-                if item.text() != "":
-                    text += table.itemDelegate().text(item) + tab
-        text.rstrip(tab) # remove last tab delimiter again
+        if sel[0] is not None:
+            for r in sel[0]:
+                item = table.item(r,0)
+                if item:
+                    if item.text() != "":
+                        text += table.itemDelegate().text(item) + tab
+            text.rstrip(tab) # remove last tab delimiter again
+
         if sel[1] is not None:
-            text += cr # add a CELF when there are two columns
+            text += cr # add a CRLF when there are two columns
             for r in sel[1]:
                 item = table.item(r,1)
                 if item:
@@ -251,7 +247,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
             
         text = [list(i) for i in zip(*text)] # transpose list
         
-        print(text)
+        print("qcopy_to_clipboard\n", text)
                     
     if "clipboard" in str(target.__class__.__name__).lower() :
         target.setText(text)
