@@ -921,7 +921,7 @@ class FilterCoeffs(QWidget):
         Finally, the QTableWidget is refreshed from self.ba.
         """
         sel = qget_selected(self.tblCoeff)['sel'] # get indices of all selected cells
-        if not np.any(sel) and len(self.ba[0] > 0):
+        if not np.any(sel) and len(self.ba[0]) > 0:
             self.ba[0] = np.delete(self.ba[0], -1)
             self.ba[1] = np.delete(self.ba[1], -1)
         else:
