@@ -794,23 +794,22 @@ class FilterCoeffs(QWidget):
        #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
         
         if np.ndim(ba_str) > 1:
-
-        try:
             num_cols, num_rows = np.shape(ba_str)
-            print("cols = {0}, rows = {1}".format(num_cols, num_rows))
-        except(TypeError, ValueError) as e:
-            logger.error(e)
-            return
+            self.ba = [[],[]]
+            self.ba[0] = ba_str[0]
+            if num_cols > 1:
+                self.ba[1] = ba_str[1]
+        elif np.dim(ba_str) == 1:
+            num_rows = len(ba_str)
+            self.ba[0] = ba_str[0]
+            num_cols = 1
+        else:
+            logger.error("Data from clipboard is a single value or None.")
+            return None
+        if num_cols == 1:
+            self.ba[1] = [1]
 
-        ba_list = [[]]
-
-        for col in range(num_cols):
-            if col > 0:
-                ba_list.append([])
-                for row in range(self.num_rows):
-                    ba_list[col].append(ba_str[col][row])
-
-        _ = list(ba_str)
+        self._equalize_ba_length()
 #            
 #        try:
 #            num_cols, num_rows = np.shape(ba_str)
@@ -828,10 +827,6 @@ class FilterCoeffs(QWidget):
 #                    ba_list[col].append(ba_str[col][row])
 #
 #        self.ba = list(ba_str)
-        
-        self.ba = _
-        print("ndim(ba_str)", np.ndim(_))
-        print("raw_data:", type(self.ba[0][0]), np.shape(ba_str))
 
         self._refresh_table()
 
