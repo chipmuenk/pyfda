@@ -793,7 +793,10 @@ class FilterCoeffs(QWidget):
                 for row in range(self.num_rows):
                     ba_list[col].append(ba_str[col][row])
 
-        self.ba = np.array(ba_str) 
+        _ = list(ba_str)
+        
+        self.ba = _
+        print("ndim(ba_str)", np.ndim(_))
         print("raw_data:", type(self.ba[0][0]), np.shape(ba_str))
 
         self._refresh_table()
