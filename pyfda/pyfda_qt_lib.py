@@ -228,31 +228,59 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
                     text += cr               
         #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
     else: # copy only selected cells in displayed format
-        if sel[0] is not None:
-            for r in sel[0]:
-                item = table.item(r,0)
-                if item:
-                    if item.text() != "":
-                        text += table.itemDelegate().text(item) + tab
-            text.rstrip(tab) # remove last tab delimiter again
+        if transpose:
+            if sel[0] is not None:
+                for r in sel[0]:
+                    item = table.item(r,0)
+                    if item:
+                        if item.text() != "":
+                            text += table.itemDelegate().text(item) + tab
+                text.rstrip(tab) # remove last tab delimiter again
 
-        if sel[1] is not None:
-            text += cr # add a CRLF when there are two columns
-            for r in sel[1]:
-                item = table.item(r,1)
-                if item:
-                    if item.text() != "":
-                        text += table.itemDelegate().text(item) + tab
-            text.rstrip(tab) # remove last tab delimiter again
-            
-        text = [list(i) for i in zip(*text)] # transpose list
-        
+            if sel[1] is not None:
+                text += cr # add a CRLF when there are two columns
+                for r in sel[1]:
+                    item = table.item(r,1)
+                    if item:
+                        if item.text() != "":
+                            text += table.itemDelegate().text(item) + tab
+                text.rstrip(tab) # remove last tab delimiter again
+                print("transposed\n", text)
+        else:
+            if sel[0] is not None:
+                l0 = len(sel[0])
+            else:
+                l0 = -1
+            if sel[1] is not None:
+                l1 = len(sel[1])
+            else:
+                l1 = -1
+            l = max(l0, l1)
+            for r in range(l):
+                if r in sel[0]:
+                    item = table.item(r,0)
+                    if item:
+                        if item.text() != "":
+                            text += table.itemDelegate().text(item) + tab
+                if r in sel[1]:
+                    item = table.item(r,1)
+                    if item:
+                        if item.text() != "":
+                            text += table.itemDelegate().text(item)
+                text += cr
+            text.rstrip(cr) # remove last CRLF
+
         print("qcopy_to_clipboard\n", text)
-                    
-    if "clipboard" in str(target.__class__.__name__).lower() :
+
+    if "clipboard" in str(target.__class__.__name__).lower():
         target.setText(text)
     else:
         return text
+
+    # numpy.loadtxt  textfile -> array
+    # numpy.savetxt array -> textfile
+    # numpy.genfromtxt textfile -> array (with missing values)
+    # numpy.recfromcsv
         
 #==============================================================================
 # http://stackoverflow.com/questions/6081008/dump-a-numpy-array-into-a-csv-file#6081043
