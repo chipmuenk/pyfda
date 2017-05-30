@@ -811,6 +811,23 @@ class FilterCoeffs(QWidget):
                     ba_list[col].append(ba_str[col][row])
 
         _ = list(ba_str)
+#            
+#        try:
+#            num_cols, num_rows = np.shape(ba_str)
+#            print("cols = {0}, rows = {1}".format(num_cols, num_rows))
+#        except(TypeError, ValueError) as e:
+#            logger.error(e)
+#            return
+        
+#        ba_list = [[]]
+#
+#        for col in range(num_cols):
+#            if col > 0:
+#                ba_list.append([])
+#                for row in range(num_rows):
+#                    ba_list[col].append(ba_str[col][row])
+#
+#        self.ba = list(ba_str)
         
         self.ba = _
         print("ndim(ba_str)", np.ndim(_))
