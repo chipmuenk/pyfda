@@ -176,7 +176,7 @@ def qget_selected(table, reverse=True):
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=False):
+def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=False):
     """
     Copy table to clipboard as CSV list
     
@@ -201,6 +201,9 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
             Windows: Carriage return + line feed
             MacOS  : Carriage return
             *nix   : Line feed
+    horizontal : Boolean
+            When `False` (default), generate the table in "horizontal" shape,
+            i.e. with one or two columns with coefficient data
     """
     if not cr:
         cr = CRLF
@@ -210,7 +213,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
     if not np.any(sel):
         # nothing selected -> copy everything raw from the table data array 
         # dimensions
-        if transpose: # rows are horizontal
+        if horizontal: # rows are horizontal
             for c in range(table.columnCount()):
                 for r in range(table.rowCount()):
                     text += str(data[c][r])
@@ -228,7 +231,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
                     text += cr               
         #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
     else: # copy only selected cells in displayed format
-        if transpose:
+        if horizontal:
             if sel[0] is not None:
                 for r in sel[0]:
                     item = table.item(r,0)
@@ -245,7 +248,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
                         if item.text() != "":
                             text += table.itemDelegate().text(item) + tab
                 text.rstrip(tab) # remove last tab delimiter again
-                print("transposed\n", text)
+                print("horizontal\n", text)
         else:
             if sel[0] is not None:
                 l0 = len(sel[0])
