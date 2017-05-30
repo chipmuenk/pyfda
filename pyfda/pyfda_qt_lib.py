@@ -185,7 +185,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
     table : object
             Instance of QTableWidget
             
-    var:    object
+    data:   object
             Instance of the variable containing table data
             
     target: object
@@ -201,6 +201,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
             Windows: Carriage return + line feed
             MacOS  : Carriage return
             *nix   : Line feed
+            
     horizontal : Boolean
             When `False` (default), generate the table in "horizontal" shape,
             i.e. with one or two columns with coefficient data
@@ -211,8 +212,8 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
     text = ""
     sel = qget_selected(table, reverse=False)['sel']
     if not np.any(sel):
-        # nothing selected -> copy everything raw from the table data array 
-        # dimensions
+        # nothing selected -> copy the array data in float format (but only the
+        # cells visible in the table)
         if horizontal: # rows are horizontal
             for c in range(table.columnCount()):
                 for r in range(table.rowCount()):
