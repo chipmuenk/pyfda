@@ -919,7 +919,13 @@ class FilterCoeffs(QWidget):
         """
         test and equalize if b and a subarray have different lengths:
         """
-        D = len(self.ba[0]) - len(self.ba[1])
+        try:
+            a_len = len(self.ba[1])
+        except IndexError:
+            self.ba.append(np.array(1))
+            a_len = 1
+
+        D = len(self.ba[0]) - a_len
 
         if D > 0: # b is longer than a
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
