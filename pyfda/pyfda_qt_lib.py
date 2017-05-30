@@ -330,7 +330,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
         
         
 #------------------------------------------------------------------------------
-def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True):
+def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
     """
     Copy data from clipboard to table
     
@@ -341,7 +341,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True
             Source of the data, this should be a QClipboard instance or an 
             opened file handle.
             
-            If source is neither, return an error.
+            If `source` is neither, return an error.
                 
     tab : String (default: None)
           Tabulator character for separating columns
@@ -440,7 +440,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True
         data_arr = np.array(data_list)
         cols, rows = np.shape(data_arr)
         print("cols = {0}, rows = {1}, data_arr = \n".format(cols, rows, data_arr))
-        if transpose:
+        if not horizontal:
             print(data_arr.T)
             return data_arr.T
         else:
