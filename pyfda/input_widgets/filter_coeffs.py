@@ -210,7 +210,10 @@ class ItemDelegate(QStyledItemDelegate):
 
 class FilterCoeffs(QWidget):
     """
-    Create widget for viewing / editing / entering data
+    Create widget with a (sort of) model-view architecture for viewing / 
+    editing / entering data contained in the list `self.ba`. 
+    
+    Views / formats are handled by the ItemDelegate() class.
     """
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
 
@@ -658,9 +661,9 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _refresh_table(self):
         """
-        (Re-)Create the displayed table from self.ba (numpy float array). Data 
-        is displayed via `ItemDelegate.displayText()` in the number format set
-        by `self.frmt`.
+        (Re-)Create the displayed table from `self.ba` (list with 2 columns of 
+        float scalars). Data is displayed via `ItemDelegate.displayText()` in
+        the number format set by `self.frmt`.
         
         The table dimensions are set according to the dimensions of `self.ba`:
         - self.ba[0] -> b coefficients
