@@ -786,9 +786,14 @@ class FilterCoeffs(QWidget):
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self, tab = "\t", cr = None):
         """
-        Read data from clipboard and copy it to self.ba as array of strings
+        Read data from clipboard and copy it to `self.ba` as array of strings
+        # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         ba_str = qcopy_from_clipboard(self.clipboard)
+        
+       #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
+        
+        if np.ndim(ba_str) > 1:
 
         try:
             num_cols, num_rows = np.shape(ba_str)
