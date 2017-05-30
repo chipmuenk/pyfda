@@ -211,8 +211,17 @@ class ItemDelegate(QStyledItemDelegate):
 class FilterCoeffs(QWidget):
     """
     Create widget with a (sort of) model-view architecture for viewing / 
-    editing / entering data contained in the list `self.ba`. 
-    
+    editing / entering data contained in `self.ba` which is a list of two numpy
+    arrays:
+
+    - `self.ba[0]` contains the numerator coefficients ("b")
+    - `self.ba[1]` contains the denominator coefficients ("a")
+
+    The list don't neccessarily have the same length but they are always defined.
+    For FIR filters, `self.ba[1][0] = 1`, all other elements are zero.
+
+    The length of both lists can be egalized with `self._equalize_ba_length()`.
+
     Views / formats are handled by the ItemDelegate() class.
     """
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
@@ -749,7 +758,7 @@ class FilterCoeffs(QWidget):
     def load_dict(self):
         """
         Load all entries from filter dict `fb.fil[0]['ba']` into the coefficient
-        register `self.ba` and update the display via `self._refresh_table()`.
+        list `self.ba` and update the display via `self._refresh_table()`.
 
         The filter dict is a "normal" 2D-numpy float array for the b and a coefficients
         while the coefficient register `self.ba` is a list of two float ndarrays to allow
