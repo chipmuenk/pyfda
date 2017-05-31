@@ -798,7 +798,7 @@ class FilterCoeffs(QWidget):
         if np.ndim(ba_str) > 1:
             num_cols, num_rows = np.shape(ba_str)
             transpose = num_cols > num_rows # need to transpose data
-        elif np.dim(ba_str) == 1:
+        elif np.ndim(ba_str) == 1:
             num_rows = len(ba_str)
             num_cols = 1
             transpose = False
