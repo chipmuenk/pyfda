@@ -895,7 +895,8 @@ class FilterCoeffs(QWidget):
                 'point':self.chkRadixPoint.isChecked()
                 }
 
-        # save, check and convert coeffs, check filter type            
+        # save, check and convert coeffs, check filter type 
+        print("saving: format", type(self.ba), type(self.ba[0]), type(self.ba[0][0]))      
         fil_save(fb.fil[0], self.ba, 'ba', __name__) 
         
         if fb.fil[0]['ft'] == 'IIR':
