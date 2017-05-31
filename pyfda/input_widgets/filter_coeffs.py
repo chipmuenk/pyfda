@@ -785,32 +785,42 @@ class FilterCoeffs(QWidget):
         
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self, tab = "\t", cr = None):
+        
         """
         Read data from clipboard and copy it to `self.ba` as array of strings
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         ba_str = qcopy_from_clipboard(self.clipboard)
         
-       #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
+        #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
+        # data = self.parent.myQ.frmt2float(qstr(editor.text()), self.parent.myQ.frmt) # transform back to float
         
         if np.ndim(ba_str) > 1:
             num_cols, num_rows = np.shape(ba_str)
-            self.ba = [[],[]]
-            self.ba[0] = ba_str[0]
-            if num_cols > 1:
-                self.ba[1] = ba_str[1]
+            transpose = num_cols > num_rows # need to transpose data
         elif np.dim(ba_str) == 1:
             num_rows = len(ba_str)
-            self.ba[0] = ba_str[0]
             num_cols = 1
+            transpose = False
         else:
             logger.error("Data from clipboard is a single value or None.")
             return None
-        if num_cols == 1:
-            self.ba[1] = [1]
+
+        if transpose:
+            self.ba = [[],[]]
+            for c in num_cols:
+                self.ba[0].append(float(ba_str[c][0]))
+                if num_rows > 1:
+                    self.ba[1].append(float(ba_str[c][1]))
+        else:
+            self.ba[0] = [float(s) for s in ba_str[0]]
+            if num_cols > 1:
+                self.ba[1] = [float(s) for s in ba_str[1]]
+            else:
+                self.ba[1] = [1]
 
         self._equalize_ba_length()
-#            
+#
 #        try:
 #            num_cols, num_rows = np.shape(ba_str)
 #            print("cols = {0}, rows = {1}".format(num_cols, num_rows))
