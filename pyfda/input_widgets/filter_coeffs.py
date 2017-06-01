@@ -934,7 +934,7 @@ class FilterCoeffs(QWidget):
 
         Refresh QTableWidget
         """
-        self.ba = np.array([[1, 0], [1, 0]])
+        self.ba = [[1, 0], [1, 0]]
 
         self._refresh_table()
         qstyle_widget(self.butSave, 'changed')
