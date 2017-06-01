@@ -808,7 +808,8 @@ class FilterCoeffs(QWidget):
         else:
             logger.error("Data from clipboard is a single value or None.")
             return None
-
+        print("copy_from_clipboard: c x r:", num_cols, num_rows)
+        print("type self.ba[0]:", type(self.ba[0]))
         if transpose:
             self.ba = [[],[]]
             for c in num_cols:

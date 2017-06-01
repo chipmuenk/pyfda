@@ -232,10 +232,12 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
                     text += cr               
         #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
     else: # copy only selected cells in displayed format
+        if horizontal: # one or two tab separated rows
         if horizontal:
             if sel[0] is not None:
                 for r in sel[0]:
                     item = table.item(r,0)
+                    print("0,",r)
                     if item  and item.text() != "":
                             text += table.itemDelegate().text(item) + tab
                 text.rstrip(tab) # remove last tab delimiter again
@@ -244,11 +246,13 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
                 text += cr # add a CRLF when there are two columns
                 for r in sel[1]:
                     item = table.item(r,1)
+                    print("1,",r)
                     if item and item.text() != "":
                             text += table.itemDelegate().text(item) + tab
                 text.rstrip(tab) # remove last tab delimiter again
                 print("horizontal\n", text)
-        else:
+        else: # one or two columns
+            sel_c = []
             if sel[0] is not None:
                 l0 = len(sel[0])
             else:
