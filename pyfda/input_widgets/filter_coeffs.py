@@ -794,6 +794,9 @@ class FilterCoeffs(QWidget):
         
         #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
         # data = self.parent.myQ.frmt2float(qstr(editor.text()), self.parent.myQ.frmt) # transform back to float
+
+        conv = self.myQ.frmt2float
+        frmt = self.myQ.frmt
         
         if np.ndim(ba_str) > 1:
             num_cols, num_rows = np.shape(ba_str)
@@ -809,13 +812,13 @@ class FilterCoeffs(QWidget):
         if transpose:
             self.ba = [[],[]]
             for c in num_cols:
-                self.ba[0].append(float(ba_str[c][0]))
+                self.ba[0].append(conv(ba_str[c][0], frmt))
                 if num_rows > 1:
-                    self.ba[1].append(float(ba_str[c][1]))
+                    self.ba[1].append(conv(ba_str[c][1], frmt))
         else:
-            self.ba[0] = [float(s) for s in ba_str[0]]
+            self.ba[0] = [conv(s, frmt) for s in ba_str[0]]
             if num_cols > 1:
-                self.ba[1] = [float(s) for s in ba_str[1]]
+                self.ba[1] = [conv(s, frmt) for s in ba_str[1]]
             else:
                 self.ba[1] = [1]
 
