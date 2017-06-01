@@ -606,6 +606,8 @@ class Fixed(object):
         -------
         yq: floating point (`dtype=np.float64`) representation of fixpoint input.
         """
+        if y == "":
+            return 0
 
         if frmt is None:
             frmt = self.frmt
