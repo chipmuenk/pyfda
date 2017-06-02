@@ -369,6 +369,12 @@ class FilterCoeffs(QWidget):
         self.butFromClipboard.setIconSize(q_icon_size)
         self.butFromClipboard.setToolTip("<span>Copy clipboard TO table. </span>")
 
+        
+        butSettingsClipboard = QPushButton(self)
+        butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
+        butSettingsClipboard.setIconSize(q_icon_size)
+        butSettingsClipboard.setToolTip("<span>Adjust settings for CSV format and whether "
+                                "to copy to/from clipboard or file.</span>")
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(butAddCells)
@@ -379,6 +385,7 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1.addWidget(self.butToClipboard)
         layHButtonsCoeffs1.addWidget(self.butFromClipboard)        
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
+        layHButtonsCoeffs1.addWidget(butSettingsClipboard) 
         layHButtonsCoeffs1.addStretch()
 #---------------------------------------------------------
 
