@@ -614,7 +614,11 @@ class Fixed(object):
         frmt = frmt.lower()
 
         if frmt == 'float':
-            return y
+            if y.dtype.char in {'S', 'U'}: # string / unicode data type
+                return float(y)
+                # TODO: what about complex strings?
+            else:
+                return y
             
         else:
          # Find the number of places before the first radix point (if there is one)
