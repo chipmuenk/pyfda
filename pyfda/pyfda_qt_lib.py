@@ -207,37 +207,45 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=Fa
             When `False` (default), generate the table in "horizontal" shape,
             i.e. with one or two columns with coefficient data
     """
-    text = ""
-    sel = qget_selected(table, reverse=False)['sel']
-    if not np.any(sel):
-        # nothing selected -> copy the array data in float format (but only the
-        # cells visible in the table)
+    def array2csv(data, col_cnt, row_cnt, horizontal):
+        """
+        Convert 1- or 2D array of strings to a tab- or comma-separated value
+        string.
+        """
+        text = ""
         if horizontal: # rows are horizontal
-            for c in range(table.columnCount()):
-                for r in range(table.rowCount()):
+            for c in range(col_cnt):
+                for r in range(row_cnt):
                     text += str(data[c][r])
-                    if r != table.rowCount() - 1: # don't add tab after last column
+                    if r != row_cnt - 1: # don't add tab after last column
                         text += tab
-                if c != table.columnCount() - 1: # don't add CRLF after last row
+                if c != col_cnt - 1: # don't add CRLF after last row
                     text += cr               
         else:  # rows are vertical
-            for r in range(table.rowCount()):
-                for c in range(table.columnCount()):
+            for r in range(row_cnt):
+                for c in range(col_cnt):
                     text += str(data[c][r])
-                    if c != table.columnCount() - 1: # don't add tab after last column
+                    if c != col_cnt - 1: # don't add tab after last column
                         text += tab
-                if r != table.rowCount() - 1: # don't add CRLF after last row
-                    text += cr               
-        #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
+                if r != row_cnt - 1: # don't add CRLF after last row
+                    text += cr
+        return text
+   #---------------------------------------------------------------------------
     
     if not cr:
         cr = params['CRLF']
     if not tab:
         tab = params['DELIM']
 
+    text = ""
+    sel = qget_selected(table, reverse=False)['sel']
+    if not np.any(sel):
+        # nothing selected -> copy the array data in float format (but only those
+        # with indices visible in the table)
+        text = array2csv(data, table.columnCount(), table.rowCount(), horizontal)
+
     else: # copy only selected cells in displayed format
         if horizontal: # one or two tab separated rows
-        if horizontal:
             if sel[0] is not None:
                 for r in sel[0]:
                     item = table.item(r,0)
