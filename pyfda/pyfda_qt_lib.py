@@ -370,6 +370,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=Fal
                 containing table data
     
     """
+    
     source_class = str(source.__class__.__name__).lower()
     # print(type(source))
     if "textiowrapper" in source_class or "bufferedreader" in source_class : #"_io.TextIOWrapper"
@@ -424,7 +425,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=Fal
         dialect.lineterminator = cr   
 
     # dialect = 'excel-tab" #  # 'excel', #"unix" 
-    data_iter = csv.reader(f, dialect=dialect)
+    data_iter = csv.reader(f, dialect=dialect) # returns an iterator
     f.seek(0) 
     if header:
         print("headers: ", next(data_iter, None)) # py3 and py2 
