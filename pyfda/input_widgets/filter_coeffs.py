@@ -387,17 +387,19 @@ class FilterCoeffs(QWidget):
         "When nothing is selected, test the whole table.</span>")
         butSetZero.setIconSize(q_icon_size)
 
-        self.lblEps = QLabel(self)
-        self.lblEps.setText("for b, a <")
+        lblEps = QLabel(self)
+        lblEps.setText("for b, a <")
 
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
 
-        self.lblWIWF  = QLabel("W = ")
-        self.lblWIWF.setFont(self.bifont)
-        self.lblQOvfl = QLabel("Ovfl.:")
-        self.lblQuant = QLabel("Quant.:")
+        lblWIWF  = QLabel("W = ", self)
+        lblWIWF.setFont(self.bifont)
+        lblQOvfl = QLabel("Ovfl.:", self)
+        lblQOvfl.setFont(self.bifont)
+        lblQuant = QLabel("Quant.:", self)
+        lblQuant.setFont(self.bifont)
 
         self.ledW = QLineEdit(self)
         self.ledW.setToolTip("Specify wordlength.")
@@ -411,8 +413,8 @@ class FilterCoeffs(QWidget):
         self.ledWI.setMaxLength(2) # maximum of 2 digits
         self.ledWI.setFixedWidth(30) # width of lineedit in points(?)
 
-        self.lblDot = QLabel(self)
-        self.lblDot.setText(".")
+        self.lblDot = QLabel(".", self) # class attribute, visibility is toggled
+        self.lblDot.setFont(self.bfont)
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip("Specify number of fractional bits.")
@@ -468,12 +470,12 @@ class FilterCoeffs(QWidget):
 
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(butSetZero)
-        layHButtonsCoeffs2.addWidget(self.lblEps)
+        layHButtonsCoeffs2.addWidget(lblEps)
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
         layHButtonsCoeffs2.addStretch()
 
         layHCoeffs_W = QHBoxLayout()
-        layHCoeffs_W.addWidget(self.lblWIWF)
+        layHCoeffs_W.addWidget(lblWIWF)
         layHCoeffs_W.addWidget(self.ledW)
         layHCoeffs_W.addWidget(self.ledWI)
         layHCoeffs_W.addWidget(self.lblDot)
@@ -484,10 +486,11 @@ class FilterCoeffs(QWidget):
         layHCoeffs_W.addStretch()
 
         layHCoeffsQOpt = QHBoxLayout()
-        layHCoeffsQOpt.addWidget(self.lblQOvfl)
+        layHCoeffsQOpt.addWidget(lblQOvfl)
         layHCoeffsQOpt.addWidget(self.cmbQOvfl)
-        layHCoeffsQOpt.addWidget(self.lblQuant)
+        layHCoeffsQOpt.addWidget(lblQuant)
         layHCoeffsQOpt.addWidget(self.cmbQQuant)
+        layHCoeffsQOpt.addWidget(self.butQuant)
         layHCoeffsQOpt.addStretch()
         
         layHCoeffs_MSB_LSB = QHBoxLayout()
