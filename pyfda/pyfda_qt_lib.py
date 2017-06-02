@@ -266,25 +266,18 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=Fa
         else: # one or two columns
             sel_c = []
             if sel[0] is not None:
-                l0 = len(sel[0])
-            else:
-                l0 = -1
+                sel_c.append(0)
             if sel[1] is not None:
-                l1 = len(sel[1])
-            else:
-                l1 = -1
-            l = max(l0, l1)
-            for r in range(l):
-                if r in sel[0]:
-                    item = table.item(r,0)
-                    if item and item.text() != "":
-                            text += table.itemDelegate().text(item) + tab
-                if r in sel[1]:
-                    item = table.item(r,1)
-                    if item and item.text() != "":
-                            text += table.itemDelegate().text(item)
-                text += cr
-            text.rstrip(cr) # remove last CRLF
+                sel_c.append(1)
+            for c in sel_c:
+                for r in range(table.rowCount()): # iterate over whole table
+                    if r in sel[c]: # selected item?
+                        item = table.item(r,c)
+                        print(c,r)
+                        if item and item.text() != "":
+                                if len(text) > 0: # not first element
+                                    text += cr
+                                text += table.itemDelegate().text(item)
 
         print("qcopy_to_clipboard\n", text)
 
