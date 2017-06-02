@@ -795,7 +795,7 @@ class FilterCoeffs(QWidget):
         #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
         # data = self.parent.myQ.frmt2float(qstr(editor.text()), self.parent.myQ.frmt) # transform back to float
 
-        conv = self.myQ.frmt2float
+        conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
         
         if np.ndim(ba_str) > 1:
@@ -809,7 +809,6 @@ class FilterCoeffs(QWidget):
             logger.error("Data from clipboard is a single value or None.")
             return None
         print("copy_from_clipboard: c x r:", num_cols, num_rows)
-        print("type self.ba[0]:", type(self.ba[0]))
         if transpose:
             self.ba = [[],[]]
             for c in num_cols:
@@ -910,7 +909,7 @@ class FilterCoeffs(QWidget):
                 }
 
         # save, check and convert coeffs, check filter type 
-        print("saving: format", type(self.ba), type(self.ba[0]), type(self.ba[0][0]))      
+        # print("saving: format", type(self.ba), type(self.ba[0]), type(self.ba[0][0]))      
         fil_save(fb.fil[0], self.ba, 'ba', __name__) 
         
         if fb.fil[0]['ft'] == 'IIR':
