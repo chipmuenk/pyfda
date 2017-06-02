@@ -275,6 +275,12 @@ class FilterCoeffs(QWidget):
         self.butEnable.setChecked(True)
         self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
                 "For high order systems, this might be slow.</span>")
+                
+        self.cmbFilterType = QComboBox(self)
+        self.cmbFilterType.setObjectName("comboFilterType")
+        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
+        self.cmbFilterType.addItems(["FIR","IIR"])
+        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.cmbFormat = QComboBox(self)
 #        self.cmbFormat.addItem('Float')
@@ -293,6 +299,7 @@ class FilterCoeffs(QWidget):
         self.spnRound.setToolTip("Display <i>d</i> digits.")
         
         self.chkRadixPoint = QCheckBox("Radix point", self)
+        self.chkRadixPoint.setFont(self.bifont)
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
                     " point for base 10) for fixpoint formats (still disabled).</span>")
         self.chkRadixPoint.setChecked(False)
@@ -301,6 +308,7 @@ class FilterCoeffs(QWidget):
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
+        layHDisplay.addWidget(self.cmbFilterType)        
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.spnRound)
@@ -310,12 +318,6 @@ class FilterCoeffs(QWidget):
         # ---------------------------------------------
         # UI Elements for loading / storing
         # ---------------------------------------------
-        self.cmbFilterType = QComboBox(self)
-        self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
-        self.cmbFilterType.addItems(["FIR","IIR"])
-        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setAlternatingRowColors(True)
         self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
@@ -358,17 +360,16 @@ class FilterCoeffs(QWidget):
         butClear.setToolTip("Clear all entries.")
 
 
-        self.butToClipboard = QPushButton(self)
-        self.butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
-        self.butToClipboard.setIconSize(q_icon_size)
-        self.butToClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
+        butToClipboard = QPushButton(self)
+        butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
+        butToClipboard.setIconSize(q_icon_size)
+        butToClipboard.setToolTip("<span>Copy table to clipboard, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
                             "is copied with full precision in decimal format. </span>")
-        self.butFromClipboard = QPushButton(self)
-        self.butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
-        self.butFromClipboard.setIconSize(q_icon_size)
-        self.butFromClipboard.setToolTip("<span>Copy clipboard TO table. </span>")
-
+        butFromClipboard = QPushButton(self)
+        butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
+        butFromClipboard.setIconSize(q_icon_size)
+        butToClipboard.setIconSize(q_icon_size)
         
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
@@ -382,9 +383,8 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1.addWidget(butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
-        layHButtonsCoeffs1.addWidget(self.butToClipboard)
-        layHButtonsCoeffs1.addWidget(self.butFromClipboard)        
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
+        layHButtonsCoeffs1.addWidget(butToClipboard)
+        layHButtonsCoeffs1.addWidget(butFromClipboard)
         layHButtonsCoeffs1.addWidget(butSettingsClipboard) 
         layHButtonsCoeffs1.addStretch()
 #---------------------------------------------------------
@@ -546,8 +546,8 @@ class FilterCoeffs(QWidget):
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.chkRadixPoint.clicked.connect(self._radix_point)
-        self.butToClipboard.clicked.connect(self._copy_to_clipboard)
-        self.butFromClipboard.clicked.connect(self._copy_from_clipboard)
+        butToClipboard.clicked.connect(self._copy_to_clipboard)
+        butFromClipboard.clicked.connect(self._copy_from_clipboard)
 
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
