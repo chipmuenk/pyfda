@@ -341,13 +341,6 @@ class FilterCoeffs(QWidget):
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                 "When nothing is selected, delete the last row.</SPAN>")
                 
-        self.butQuant = QPushButton(self)
-        self.butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
-        "When nothing is selected, quantize the whole table.</span>")
-#        butQuant.setText("Q!")
-        self.butQuant.setIcon(QIcon(':/quantize.svg'))
-        self.butQuant.setIconSize(q_icon_size)
-
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
@@ -380,7 +373,6 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(butAddCells)
         layHButtonsCoeffs1.addWidget(butDelCells)
-        layHButtonsCoeffs1.addWidget(self.butQuant)
         layHButtonsCoeffs1.addWidget(butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
@@ -459,6 +451,14 @@ class FilterCoeffs(QWidget):
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        
+        self.butQuant = QPushButton(self)
+        self.butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
+        "When nothing is selected, quantize the whole table.</span>")
+#        butQuant.setText("Q!")
+        self.butQuant.setIcon(QIcon(':/quantize.svg'))
+        self.butQuant.setIconSize(q_icon_size)
+
 
         self.clipboard = QApplication.clipboard()
 
@@ -699,7 +699,6 @@ class FilterCoeffs(QWidget):
 
         if self.butEnable.isChecked():
             self.frmQSettings.setVisible(not is_float) # hide all q-settings for float
-            self.butQuant.setEnabled(not is_float)
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(True)
 
