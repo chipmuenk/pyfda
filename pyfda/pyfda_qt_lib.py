@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 import csv
 import io
 import numpy as np
-from .pyfda_lib import CRLF, PY3
+from .pyfda_lib import PY3
+from .pyfda_rc import params 
 
 from .compat import Qt, QtCore, QFrame, QFont, QEvent, QSysInfo
 
@@ -176,7 +177,7 @@ def qget_selected(table, reverse=True):
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=False):
+def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=False):
     """
     Copy table to clipboard as CSV list
     
@@ -206,9 +207,6 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
             When `False` (default), generate the table in "horizontal" shape,
             i.e. with one or two columns with coefficient data
     """
-    if not cr:
-        cr = CRLF
-
     text = ""
     sel = qget_selected(table, reverse=False)['sel']
     if not np.any(sel):
@@ -231,6 +229,12 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, horizontal=Fa
                 if r != table.rowCount() - 1: # don't add CRLF after last row
                     text += cr               
         #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
+    
+    if not cr:
+        cr = params['CRLF']
+    if not tab:
+        tab = params['DELIM']
+
     else: # copy only selected cells in displayed format
         if horizontal: # one or two tab separated rows
         if horizontal:
