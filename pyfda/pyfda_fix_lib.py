@@ -695,6 +695,8 @@ class Fixed(object):
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
 
+    frmt2float_vec = np.vectorize(frmt2float)
+
 #------------------------------------------------------------------------------
     def float2frmt(self, y):
         """
