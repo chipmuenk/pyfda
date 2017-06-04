@@ -284,7 +284,7 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         if figureoptions is not None:
-            self.a_op = self.addAction(QIcon(':/cog.svg'), 'Customize', self.edit_parameters)
+            self.a_op = self.addAction(QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip('Edit curves line and axes parameters')
 
 #        self.buttons = {}

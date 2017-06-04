@@ -210,7 +210,19 @@ class ItemDelegate(QStyledItemDelegate):
 
 class FilterCoeffs(QWidget):
     """
-    Create widget for viewing / editing / entering data
+    Create widget with a (sort of) model-view architecture for viewing / 
+    editing / entering data contained in `self.ba` which is a list of two numpy
+    arrays:
+
+    - `self.ba[0]` contains the numerator coefficients ("b")
+    - `self.ba[1]` contains the denominator coefficients ("a")
+
+    The list don't neccessarily have the same length but they are always defined.
+    For FIR filters, `self.ba[1][0] = 1`, all other elements are zero.
+
+    The length of both lists can be egalized with `self._equalize_ba_length()`.
+
+    Views / formats are handled by the ItemDelegate() class.
     """
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
 
@@ -263,6 +275,12 @@ class FilterCoeffs(QWidget):
         self.butEnable.setChecked(True)
         self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
                 "For high order systems, this might be slow.</span>")
+                
+        self.cmbFilterType = QComboBox(self)
+        self.cmbFilterType.setObjectName("comboFilterType")
+        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
+        self.cmbFilterType.addItems(["FIR","IIR"])
+        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         self.cmbFormat = QComboBox(self)
 #        self.cmbFormat.addItem('Float')
@@ -281,6 +299,7 @@ class FilterCoeffs(QWidget):
         self.spnRound.setToolTip("Display <i>d</i> digits.")
         
         self.chkRadixPoint = QCheckBox("Radix point", self)
+        self.chkRadixPoint.setFont(self.bifont)
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
                     " point for base 10) for fixpoint formats (still disabled).</span>")
         self.chkRadixPoint.setChecked(False)
@@ -289,6 +308,7 @@ class FilterCoeffs(QWidget):
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
+        layHDisplay.addWidget(self.cmbFilterType)        
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.spnRound)
@@ -298,12 +318,6 @@ class FilterCoeffs(QWidget):
         # ---------------------------------------------
         # UI Elements for loading / storing
         # ---------------------------------------------
-        self.cmbFilterType = QComboBox(self)
-        self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
-        self.cmbFilterType.addItems(["FIR","IIR"])
-        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setAlternatingRowColors(True)
         self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
@@ -329,13 +343,6 @@ class FilterCoeffs(QWidget):
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                 "When nothing is selected, delete the last row.</SPAN>")
                 
-        self.butQuant = QPushButton(self)
-        self.butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
-        "When nothing is selected, quantize the whole table.</span>")
-#        butQuant.setText("Q!")
-        self.butQuant.setIcon(QIcon(':/quantize.svg'))
-        self.butQuant.setIconSize(q_icon_size)
-
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
@@ -353,28 +360,32 @@ class FilterCoeffs(QWidget):
         butClear.setToolTip("Clear all entries.")
 
 
-        self.butToClipboard = QPushButton(self)
-        self.butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
-        self.butToClipboard.setIconSize(q_icon_size)
-        self.butToClipboard.setToolTip("<span>Copy table to clipboard, selected items are copied as "
+        butToClipboard = QPushButton(self)
+        butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
+        butToClipboard.setIconSize(q_icon_size)
+        butToClipboard.setToolTip("<span>Copy table to clipboard, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
                             "is copied with full precision in decimal format. </span>")
-        self.butFromClipboard = QPushButton(self)
-        self.butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
-        self.butFromClipboard.setIconSize(q_icon_size)
-        self.butFromClipboard.setToolTip("<span>Copy clipboard TO table. </span>")
-
+        butFromClipboard = QPushButton(self)
+        butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
+        butFromClipboard.setIconSize(q_icon_size)
+        butToClipboard.setIconSize(q_icon_size)
+        
+        butSettingsClipboard = QPushButton(self)
+        butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
+        butSettingsClipboard.setIconSize(q_icon_size)
+        butSettingsClipboard.setToolTip("<span>Adjust settings for CSV format and whether "
+                                "to copy to/from clipboard or file.</span>")
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(butAddCells)
         layHButtonsCoeffs1.addWidget(butDelCells)
-        layHButtonsCoeffs1.addWidget(self.butQuant)
         layHButtonsCoeffs1.addWidget(butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
-        layHButtonsCoeffs1.addWidget(self.butToClipboard)
-        layHButtonsCoeffs1.addWidget(self.butFromClipboard)        
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
+        layHButtonsCoeffs1.addWidget(butToClipboard)
+        layHButtonsCoeffs1.addWidget(butFromClipboard)
+        layHButtonsCoeffs1.addWidget(butSettingsClipboard) 
         layHButtonsCoeffs1.addStretch()
 #---------------------------------------------------------
 
@@ -383,17 +394,19 @@ class FilterCoeffs(QWidget):
         "When nothing is selected, test the whole table.</span>")
         butSetZero.setIconSize(q_icon_size)
 
-        self.lblEps = QLabel(self)
-        self.lblEps.setText("for b, a <")
+        lblEps = QLabel(self)
+        lblEps.setText("for b, a <")
 
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(1e-6))
 
-        self.lblWIWF  = QLabel("W = ")
-        self.lblWIWF.setFont(self.bifont)
-        self.lblQOvfl = QLabel("Ovfl.:")
-        self.lblQuant = QLabel("Quant.:")
+        lblWIWF  = QLabel("W = ", self)
+        lblWIWF.setFont(self.bifont)
+        lblQOvfl = QLabel("Ovfl.:", self)
+        lblQOvfl.setFont(self.bifont)
+        lblQuant = QLabel("Quant.:", self)
+        lblQuant.setFont(self.bifont)
 
         self.ledW = QLineEdit(self)
         self.ledW.setToolTip("Specify wordlength.")
@@ -407,8 +420,8 @@ class FilterCoeffs(QWidget):
         self.ledWI.setMaxLength(2) # maximum of 2 digits
         self.ledWI.setFixedWidth(30) # width of lineedit in points(?)
 
-        self.lblDot = QLabel(self)
-        self.lblDot.setText(".")
+        self.lblDot = QLabel(".", self) # class attribute, visibility is toggled
+        self.lblDot.setFont(self.bfont)
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip("Specify number of fractional bits.")
@@ -447,6 +460,14 @@ class FilterCoeffs(QWidget):
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        
+        self.butQuant = QPushButton(self)
+        self.butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
+        "When nothing is selected, quantize the whole table.</span>")
+#        butQuant.setText("Q!")
+        self.butQuant.setIcon(QIcon(':/quantize.svg'))
+        self.butQuant.setIconSize(q_icon_size)
+
 
         self.clipboard = QApplication.clipboard()
 
@@ -456,12 +477,12 @@ class FilterCoeffs(QWidget):
 
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(butSetZero)
-        layHButtonsCoeffs2.addWidget(self.lblEps)
+        layHButtonsCoeffs2.addWidget(lblEps)
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
         layHButtonsCoeffs2.addStretch()
 
         layHCoeffs_W = QHBoxLayout()
-        layHCoeffs_W.addWidget(self.lblWIWF)
+        layHCoeffs_W.addWidget(lblWIWF)
         layHCoeffs_W.addWidget(self.ledW)
         layHCoeffs_W.addWidget(self.ledWI)
         layHCoeffs_W.addWidget(self.lblDot)
@@ -472,10 +493,11 @@ class FilterCoeffs(QWidget):
         layHCoeffs_W.addStretch()
 
         layHCoeffsQOpt = QHBoxLayout()
-        layHCoeffsQOpt.addWidget(self.lblQOvfl)
+        layHCoeffsQOpt.addWidget(lblQOvfl)
         layHCoeffsQOpt.addWidget(self.cmbQOvfl)
-        layHCoeffsQOpt.addWidget(self.lblQuant)
+        layHCoeffsQOpt.addWidget(lblQuant)
         layHCoeffsQOpt.addWidget(self.cmbQQuant)
+        layHCoeffsQOpt.addWidget(self.butQuant)
         layHCoeffsQOpt.addStretch()
         
         layHCoeffs_MSB_LSB = QHBoxLayout()
@@ -524,8 +546,8 @@ class FilterCoeffs(QWidget):
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.chkRadixPoint.clicked.connect(self._radix_point)
-        self.butToClipboard.clicked.connect(self._copy_to_clipboard)
-        self.butFromClipboard.clicked.connect(self._copy_from_clipboard)
+        butToClipboard.clicked.connect(self._copy_to_clipboard)
+        butFromClipboard.clicked.connect(self._copy_from_clipboard)
 
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
@@ -658,9 +680,9 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _refresh_table(self):
         """
-        (Re-)Create the displayed table from self.ba (numpy float array). Data 
-        is displayed via `ItemDelegate.displayText()` in the number format set
-        by `self.frmt`.
+        (Re-)Create the displayed table from `self.ba` (list with 2 columns of 
+        float scalars). Data is displayed via `ItemDelegate.displayText()` in
+        the number format set by `self.frmt`.
         
         The table dimensions are set according to the dimensions of `self.ba`:
         - self.ba[0] -> b coefficients
@@ -687,7 +709,6 @@ class FilterCoeffs(QWidget):
 
         if self.butEnable.isChecked():
             self.frmQSettings.setVisible(not is_float) # hide all q-settings for float
-            self.butQuant.setEnabled(not is_float)
             self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(True)
 
@@ -746,7 +767,7 @@ class FilterCoeffs(QWidget):
     def load_dict(self):
         """
         Load all entries from filter dict `fb.fil[0]['ba']` into the coefficient
-        register `self.ba` and update the display via `self._refresh_table()`.
+        list `self.ba` and update the display via `self._refresh_table()`.
 
         The filter dict is a "normal" 2D-numpy float array for the b and a coefficients
         while the coefficient register `self.ba` is a list of two float ndarrays to allow
@@ -766,35 +787,68 @@ class FilterCoeffs(QWidget):
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self, tab = "\t", cr = None):
         """
-        Copy data from coefficient table to clipboard in CSV format.
+        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
         """
         
         qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard)
         
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self, tab = "\t", cr = None):
+        
         """
-        Read data from clipboard and copy it to self.ba as array of strings
+        Read data from clipboard and copy it to `self.ba` as array of strings
+        # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         ba_str = qcopy_from_clipboard(self.clipboard)
+        
+        #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
+        # data = self.parent.myQ.frmt2float(qstr(editor.text()), self.parent.myQ.frmt) # transform back to float
 
-        try:
+        conv = self.myQ.frmt2float # frmt2float_vec?
+        frmt = self.myQ.frmt
+        
+        if np.ndim(ba_str) > 1:
             num_cols, num_rows = np.shape(ba_str)
-            print("cols = {0}, rows = {1}".format(num_cols, num_rows))
-        except(TypeError, ValueError) as e:
-            logger.error(e)
-            return
+            transpose = num_cols > num_rows # need to transpose data
+        elif np.ndim(ba_str) == 1:
+            num_rows = len(ba_str)
+            num_cols = 1
+            transpose = False
+        else:
+            logger.error("Data from clipboard is a single value or None.")
+            return None
+        print("copy_from_clipboard: c x r:", num_cols, num_rows)
+        if transpose:
+            self.ba = [[],[]]
+            for c in num_cols:
+                self.ba[0].append(conv(ba_str[c][0], frmt))
+                if num_rows > 1:
+                    self.ba[1].append(conv(ba_str[c][1], frmt))
+        else:
+            self.ba[0] = [conv(s, frmt) for s in ba_str[0]]
+            if num_cols > 1:
+                self.ba[1] = [conv(s, frmt) for s in ba_str[1]]
+            else:
+                self.ba[1] = [1]
 
-        ba_list = [[]]
-
-        for col in range(num_cols):
-            if col > 0:
-                ba_list.append([])
-                for row in range(self.num_rows):
-                    ba_list[col].append(ba_str[col][row])
-
-        self.ba = np.array(ba_str) 
-        print("raw_data:", type(self.ba[0][0]), np.shape(ba_str))
+        self._equalize_ba_length()
+#
+#        try:
+#            num_cols, num_rows = np.shape(ba_str)
+#            print("cols = {0}, rows = {1}".format(num_cols, num_rows))
+#        except(TypeError, ValueError) as e:
+#            logger.error(e)
+#            return
+        
+#        ba_list = [[]]
+#
+#        for col in range(num_cols):
+#            if col > 0:
+#                ba_list.append([])
+#                for row in range(num_rows):
+#                    ba_list[col].append(ba_str[col][row])
+#
+#        self.ba = list(ba_str)
 
         self._refresh_table()
 
@@ -863,7 +917,8 @@ class FilterCoeffs(QWidget):
                 'point':self.chkRadixPoint.isChecked()
                 }
 
-        # save, check and convert coeffs, check filter type            
+        # save, check and convert coeffs, check filter type 
+        # print("saving: format", type(self.ba), type(self.ba[0]), type(self.ba[0][0]))      
         fil_save(fb.fil[0], self.ba, 'ba', __name__) 
         
         if fb.fil[0]['ft'] == 'IIR':
@@ -888,7 +943,7 @@ class FilterCoeffs(QWidget):
 
         Refresh QTableWidget
         """
-        self.ba = np.array([[1, 0], [1, 0]])
+        self.ba = [[1, 0], [1, 0]]
 
         self._refresh_table()
         qstyle_widget(self.butSave, 'changed')
@@ -899,7 +954,13 @@ class FilterCoeffs(QWidget):
         """
         test and equalize if b and a subarray have different lengths:
         """
-        D = len(self.ba[0]) - len(self.ba[1])
+        try:
+            a_len = len(self.ba[1])
+        except IndexError:
+            self.ba.append(np.array(1))
+            a_len = 1
+
+        D = len(self.ba[0]) - a_len
 
         if D > 0: # b is longer than a
             self.ba[1] = np.append(self.ba[1], np.zeros(D))
@@ -921,7 +982,9 @@ class FilterCoeffs(QWidget):
         Finally, the QTableWidget is refreshed from self.ba.
         """
         sel = qget_selected(self.tblCoeff)['sel'] # get indices of all selected cells
-        if not np.any(sel) and len(self.ba[0] > 0):
+        print("delete_cells", type(self.ba), np.shape(self.ba[0]), self.ba[0])
+        print("sel[0]", sel[0])
+        if not np.any(sel) and len(self.ba[0]) > 0:
             self.ba[0] = np.delete(self.ba[0], -1)
             self.ba[1] = np.delete(self.ba[1], -1)
         else:

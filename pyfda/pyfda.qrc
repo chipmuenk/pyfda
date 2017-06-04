@@ -8,7 +8,7 @@
     <file alias="circle-check.svg">images/icons/dark/circle-check.svg</file>
     <file alias="circle-x.svg">images/icons/dark/circle-x.svg</file>    
     <file alias="clipboard.svg">images/icons/dark/clipboard.svg</file>
-    <file alias="cog.svg">images/icons/dark/cog.svg</file>
+    <file alias="settings.svg">images/icons/dark/cog.svg</file>
     <file alias="download.svg">images/icons/dark/data-transfer-download.svg</file>
     <file alias="ellipses_h.svg">images/icons/dark/ellipses_h.svg</file>
     <file alias="ellipses_v.svg">images/icons/dark/ellipses_v.svg</file>

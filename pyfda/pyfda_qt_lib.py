@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 import csv
 import io
 import numpy as np
-from .pyfda_lib import CRLF, PY3
+from .pyfda_lib import PY3
+from .pyfda_rc import params 
 
 from .compat import Qt, QtCore, QFrame, QFont, QEvent, QSysInfo
 
@@ -176,7 +177,7 @@ def qget_selected(table, reverse=True):
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=False):
+def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=False):
     """
     Copy table to clipboard as CSV list
     
@@ -185,7 +186,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
     table : object
             Instance of QTableWidget
             
-    var:    object
+    data:   object
             Instance of the variable containing table data
             
     target: object
@@ -201,62 +202,94 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
             Windows: Carriage return + line feed
             MacOS  : Carriage return
             *nix   : Line feed
+            
+    horizontal : Boolean
+            When `False` (default), generate the table in "horizontal" shape,
+            i.e. with one or two columns with coefficient data
     """
+    def array2csv(data, col_cnt, row_cnt, horizontal):
+        """
+        Convert 1- or 2D array of strings to a tab- or comma-separated value
+        string.
+        """
+        text = ""
+        if horizontal: # rows are horizontal
+            for c in range(col_cnt):
+                for r in range(row_cnt):
+                    text += str(data[c][r])
+                    if r != row_cnt - 1: # don't add tab after last column
+                        text += tab
+                if c != col_cnt - 1: # don't add CRLF after last row
+                    text += cr               
+        else:  # rows are vertical
+            for r in range(row_cnt):
+                for c in range(col_cnt):
+                    text += str(data[c][r])
+                    if c != col_cnt - 1: # don't add tab after last column
+                        text += tab
+                if r != row_cnt - 1: # don't add CRLF after last row
+                    text += cr
+        return text
+   #---------------------------------------------------------------------------
+    
     if not cr:
-        cr = CRLF
+        cr = params['CRLF']
+    if not tab:
+        tab = params['DELIM']
 
     text = ""
     sel = qget_selected(table, reverse=False)['sel']
     if not np.any(sel):
-        # nothing selected -> copy everything raw from the table data array 
-        # dimensions
-        if transpose: # rows are horizontal
-            for c in range(table.columnCount()):
-                for r in range(table.rowCount()):
-                    text += str(data[c][r])
-                    if r != table.rowCount() - 1: # don't add tab after last column
-                        text += tab
-                if c != table.columnCount() - 1: # don't add CRLF after last row
-                    text += cr               
-        else:  # rows are vertical
-            for r in range(table.rowCount()):
-                for c in range(table.columnCount()):
-                    text += str(data[c][r])
-                    if c != table.columnCount() - 1: # don't add tab after last column
-                        text += tab
-                if r != table.rowCount() - 1: # don't add CRLF after last row
-                    text += cr               
-        #text = np.array_str(data[:table.columnCount][:table.rowCount], precision=15)
+        # nothing selected -> copy the array data in float format (but only those
+        # with indices visible in the table)
+        text = array2csv(data, table.columnCount(), table.rowCount(), horizontal)
+
     else: # copy only selected cells in displayed format
-        if sel[0] is None:
-            m0 = -1
-        if sel[1] is None:
-            m1 = -1
-        l = max(m0, m1)
-        print("l", l)
-        for r in sel[0]:
-            item = table.item(r,0)
-            if item:
-                if item.text() != "":
-                    text += table.itemDelegate().text(item) + tab
-        text.rstrip(tab) # remove last tab delimiter again
-        if sel[1] is not None:
-            text += cr # add a CELF when there are two columns
-            for r in sel[1]:
-                item = table.item(r,1)
-                if item:
-                    if item.text() != "":
-                        text += table.itemDelegate().text(item) + tab
-            text.rstrip(tab) # remove last tab delimiter again
-            
-        text = [list(i) for i in zip(*text)] # transpose list
-        
-        print(text)
-                    
-    if "clipboard" in str(target.__class__.__name__).lower() :
+        if horizontal: # one or two tab separated rows
+            if sel[0] is not None:
+                for r in sel[0]:
+                    item = table.item(r,0)
+                    print("0,",r)
+                    if item  and item.text() != "":
+                            text += table.itemDelegate().text(item) + tab
+                text.rstrip(tab) # remove last tab delimiter again
+
+            if sel[1] is not None:
+                text += cr # add a CRLF when there are two columns
+                for r in sel[1]:
+                    item = table.item(r,1)
+                    print("1,",r)
+                    if item and item.text() != "":
+                            text += table.itemDelegate().text(item) + tab
+                text.rstrip(tab) # remove last tab delimiter again
+                print("horizontal\n", text)
+        else: # one or two columns
+            sel_c = []
+            if sel[0] is not None:
+                sel_c.append(0)
+            if sel[1] is not None:
+                sel_c.append(1)
+            for c in sel_c:
+                for r in range(table.rowCount()): # iterate over whole table
+                    if r in sel[c]: # selected item?
+                        item = table.item(r,c)
+                        print(c,r)
+                        if item and item.text() != "":
+                                if len(text) > 0: # not first element
+                                    text += cr
+                                text += table.itemDelegate().text(item)
+
+        print("qcopy_to_clipboard\n", text)
+
+    if "clipboard" in str(target.__class__.__name__).lower():
         target.setText(text)
     else:
         return text
+
+    # numpy.loadtxt  textfile -> array
+    # numpy.savetxt array -> textfile
+    # numpy.genfromtxt textfile -> array (with missing values)
+    # numpy.recfromcsv
         
 #==============================================================================
 # http://stackoverflow.com/questions/6081008/dump-a-numpy-array-into-a-csv-file#6081043
@@ -302,7 +335,7 @@ def qcopy_to_clipboard(table, data, target, tab = "\t", cr = None, transpose=Fal
         
         
 #------------------------------------------------------------------------------
-def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True):
+def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
     """
     Copy data from clipboard to table
     
@@ -313,7 +346,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True
             Source of the data, this should be a QClipboard instance or an 
             opened file handle.
             
-            If source is neither, return an error.
+            If `source` is neither, return an error.
                 
     tab : String (default: None)
           Tabulator character for separating columns
@@ -337,6 +370,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True
                 containing table data
     
     """
+    
     source_class = str(source.__class__.__name__).lower()
     # print(type(source))
     if "textiowrapper" in source_class or "bufferedreader" in source_class : #"_io.TextIOWrapper"
@@ -391,7 +425,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True
         dialect.lineterminator = cr   
 
     # dialect = 'excel-tab" #  # 'excel', #"unix" 
-    data_iter = csv.reader(f, dialect=dialect)
+    data_iter = csv.reader(f, dialect=dialect) # returns an iterator
     f.seek(0) 
     if header:
         print("headers: ", next(data_iter, None)) # py3 and py2 
@@ -412,7 +446,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, transpose=True
         data_arr = np.array(data_list)
         cols, rows = np.shape(data_arr)
         print("cols = {0}, rows = {1}, data_arr = \n".format(cols, rows, data_arr))
-        if transpose:
+        if not horizontal:
             print(data_arr.T)
             return data_arr.T
         else:

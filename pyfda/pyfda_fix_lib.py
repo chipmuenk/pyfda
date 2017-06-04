@@ -606,13 +606,19 @@ class Fixed(object):
         -------
         yq: floating point (`dtype=np.float64`) representation of fixpoint input.
         """
+        if y == "":
+            return 0
 
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
 
         if frmt == 'float':
-            return y
+            if y.dtype.char in {'S', 'U'}: # string / unicode data type
+                return float(y)
+                # TODO: what about complex strings?
+            else:
+                return y
             
         else:
          # Find the number of places before the first radix point (if there is one)
@@ -688,6 +694,8 @@ class Fixed(object):
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
+
+    frmt2float_vec = np.vectorize(frmt2float)
 
 #------------------------------------------------------------------------------
     def float2frmt(self, y):

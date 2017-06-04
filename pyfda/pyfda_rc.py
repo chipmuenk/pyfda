@@ -29,7 +29,7 @@ from pyfda import qrc_resources # contains all icons
 import logging
 logger = logging.getLogger(__name__)
 
-from .pyfda_lib import cmp_version
+from .pyfda_lib import cmp_version, CRLF
 
 # #############################################################################
 # General layout settings
@@ -49,6 +49,8 @@ THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the
 mpl_ms = 8 # base size for matplotlib markers
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
+          'CRLF': CRLF,     # get OS-dependend line break from pyfda_lib
+          'DELIM': '\t',      # default delimiter for CSV-files and clipboard
           'FMT': '{:.3g}',  # format string for QLineEdit fields
           'FMT_ba': 4,      # number of digits for coefficient table
           'FMT_pz': 5,      # number of digits for Pole/Zero table
