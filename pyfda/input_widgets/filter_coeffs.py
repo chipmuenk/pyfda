@@ -27,8 +27,7 @@ from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: Clipboard functionality: - always use table display
-#                                - always return a vertical table
+# TODO: Clipboard functionality: - always return a vertical table
 #                                - always return fractional data with full precision?
 # TODO: Setting complex data (manually) crashes the app in setModelData():
 #    model.setData(index, data) "Type Error: Can't convert complex to float"
