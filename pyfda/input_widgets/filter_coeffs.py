@@ -302,7 +302,7 @@ class FilterCoeffs(QWidget):
         self.chkRadixPoint = QCheckBox("Radix point", self)
         self.chkRadixPoint.setFont(self.bifont)
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
-                    " point for base 10) for fixpoint formats (still disabled).</span>")
+                    " point for base 10) for fixpoint formats.</span>")
         self.chkRadixPoint.setChecked(False)
         self.chkRadixPoint.setCheckable(True)
 
