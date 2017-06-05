@@ -17,7 +17,11 @@ import numpy as np
 from .pyfda_lib import PY3
 from .pyfda_rc import params 
 
-from .compat import Qt, QtCore, QFrame, QFont, QEvent, QSysInfo
+from .compat import (Qt, QWidget, QFont, QEvent,
+                     QFrame, QCheckBox, 
+                     QPushButton, QVBoxLayout)
+
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 def qstr(text):
