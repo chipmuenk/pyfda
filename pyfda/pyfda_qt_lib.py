@@ -22,6 +22,41 @@ from .compat import (Qt, QWidget, QFont, QEvent,
                      QPushButton, QVBoxLayout)
 
 #------------------------------------------------------------------------------
+class QPopup(QWidget):
+    def __init__(self, parent):
+        super(QPopup, self).__init__(parent)
+        
+        QWidget.__init__(self)
+        
+        self.parent = parent # instance of the parent (not the base) class
+
+        self.chkHorizontal = QCheckBox("Horizontal orientation", self)
+        # self.chkHorizontal.setFont(self.bifont)
+        self.chkHorizontal.setToolTip("<span>Set horizontal orientation of table"
+                    " (transposed).</span>")
+        self.chkHorizontal.setChecked(params['CSV']['horizontal'])
+
+        butClose = QPushButton(self)
+        butClose.setText("Close")
+#        butClose.setDefault(self, True)        
+        layVMain = QVBoxLayout()
+        # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
+        layVMain.addWidget(self.chkHorizontal)
+        layVMain.addWidget(butClose)
+        layVMain.setContentsMargins(*params['wdg_margins'])
+#        layVMain.addStretch(1)
+        self.setLayout(layVMain) 
+
+        # ============== Signals & Slots ================================
+        butClose.clicked.connect(self.close)
+        self.chkHorizontal.clicked.connect(self.set_horizontal)
+        # self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
+
+    def set_horizontal(self):
+        try:
+            params['CSV']['horizontal'] =  self.chkHorizontal.isChecked()
+        except KeyError as e:
+            logger.error(e)
 
 #------------------------------------------------------------------------------
 def qstr(text):

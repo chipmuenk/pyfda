@@ -22,7 +22,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, 
+from pyfda.pyfda_qt_lib import (QPopup, qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, 
                                 qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
@@ -227,6 +227,8 @@ class FilterCoeffs(QWidget):
 
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
+        
+        self.opt_widget = None # handle for pop-up options widget
 
         self._construct_UI()
 
@@ -545,9 +547,9 @@ class FilterCoeffs(QWidget):
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.chkRadixPoint.clicked.connect(self._radix_point)
+        butSettingsClipboard.clicked.connect(self._copy_options)
         butToClipboard.clicked.connect(self._copy_to_clipboard)
         butFromClipboard.clicked.connect(self._copy_from_clipboard)
-
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 
@@ -782,6 +784,17 @@ class FilterCoeffs(QWidget):
 
         self._refresh_table()
         qstyle_widget(self.butSave, 'normal')
+
+    #------------------------------------------------------------------------------
+    def _copy_options(self):
+        """
+        Set options for copying to/from clipboard or file.
+        """
+        if self.opt_widget is None:
+            self.w = QPopup(self) # important: Handle must be class attribute
+            # self.w.setGeometry(QtCore.QRect(100, 100, 400, 200))
+            
+            self.w.show() # modeless dialog, i.e. non-blocking
         
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self, tab = "\t", cr = None):
