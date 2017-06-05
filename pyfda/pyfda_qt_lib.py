@@ -216,7 +216,7 @@ def qget_selected(table, reverse=True):
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=False):
+def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
     """
     Copy table to clipboard as CSV list
     
@@ -246,13 +246,13 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=Fa
             When `False` (default), generate the table in "horizontal" shape,
             i.e. with one or two columns with coefficient data
     """
-    def array2csv(data, col_cnt, row_cnt, horizontal):
+    def array2csv(data, col_cnt, row_cnt):
         """
         Convert 1- or 2D array of strings to a tab- or comma-separated value
         string.
         """
         text = ""
-        if horizontal: # rows are horizontal
+        if params['CSV']['horizontal']: # rows are horizontal
             for c in range(col_cnt):
                 for r in range(row_cnt):
                     text += str(data[c][r])
@@ -281,14 +281,13 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=Fa
     if not np.any(sel):
         # nothing selected -> copy the array data in float format (but only those
         # with indices visible in the table)
-        text = array2csv(data, table.columnCount(), table.rowCount(), horizontal)
+        text = array2csv(data, table.columnCount(), table.rowCount())
 
     else: # copy only selected cells in displayed format
-        if horizontal: # one or two tab separated rows
+        if params['CSV']['horizontal']: # one or two tab separated rows
             if sel[0] is not None:
                 for r in sel[0]:
                     item = table.item(r,0)
-                    print("0,",r)
                     if item  and item.text() != "":
                             text += table.itemDelegate().text(item) + tab
                 text.rstrip(tab) # remove last tab delimiter again
@@ -297,7 +296,6 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None, horizontal=Fa
                 text += cr # add a CRLF when there are two columns
                 for r in sel[1]:
                     item = table.item(r,1)
-                    print("1,",r)
                     if item and item.text() != "":
                             text += table.itemDelegate().text(item) + tab
                 text.rstrip(tab) # remove last tab delimiter again
@@ -472,7 +470,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=Fal
     data_list = []
     for row in data_iter:
         print(row)
-        data_list.append(row)        
+        data_list.append(row)
 
 # TODO: Type conversion (in calling method?), what to do with string data
 # TODO: Conversion via frmt2float?! Depending on frmt?
@@ -485,7 +483,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=Fal
         data_arr = np.array(data_list)
         cols, rows = np.shape(data_arr)
         print("cols = {0}, rows = {1}, data_arr = \n".format(cols, rows, data_arr))
-        if not horizontal:
+        if not params['CSV']['horizontal']:
             print(data_arr.T)
             return data_arr.T
         else:
