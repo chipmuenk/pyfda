@@ -52,6 +52,10 @@ params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.
           'CRLF': CRLF,     # get OS-dependend line break from pyfda_lib
           'DELIM': '\t',      # default delimiter for CSV-files and clipboard
           'FMT': '{:.3g}',  # format string for QLineEdit fields
+          'CSV': {'horizontal': False,
+                  'delim' : '\t',
+                  'crlf'  : CRLF,
+                  'header': False},
           'FMT_ba': 4,      # number of digits for coefficient table
           'FMT_pz': 5,      # number of digits for Pole/Zero table
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
