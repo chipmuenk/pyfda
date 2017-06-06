@@ -27,8 +27,8 @@ from pyfda.pyfda_qt_lib import (QPopup, qstyle_widget, qset_cmb_box, qget_cmb_bo
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: Clipboard functionality: - always return a vertical table
-#                                - always return fractional data with full precision?
+# TODO: Clipboard functionality:  - always return fractional data with full precision?
+#                                 - for fixpoint formats, always return format
 # TODO: Setting complex data (manually) crashes the app in setModelData():
 #    model.setData(index, data) "Type Error: Can't convert complex to float"
 #   -> need to implement a proper model-view architecture, QTableView instead of QTableWidget
@@ -42,8 +42,7 @@ import pyfda.pyfda_fix_lib as fix
 #        item is selected?!
 
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
-# TODO: Need to refresh table after _load_q_settings?
-# TODO: convert to a proper Model-View-Architecture using QTableView
+# TODO: convert to a proper Model-View-Architecture using QTableView?
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
@@ -696,7 +695,7 @@ class FilterCoeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
         except IndexError:
             self.num_rows = len(self.ba[0])
-        print("np.shape(ba)", np.shape(self.ba))
+        logger.debug("_refresh: np.shape(ba)", np.shape(self.ba))
 
         params['FMT_ba'] = int(self.spnRound.text())
 
@@ -812,9 +811,6 @@ class FilterCoeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         ba_str = qcopy_from_clipboard(self.clipboard)
-        
-        #  def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
-        # data = self.parent.myQ.frmt2float(qstr(editor.text()), self.parent.myQ.frmt) # transform back to float
 
         conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
@@ -829,7 +825,7 @@ class FilterCoeffs(QWidget):
         else:
             logger.error("Data from clipboard is a single value or None.")
             return None
-        print("copy_from_clipboard: c x r:", num_cols, num_rows)
+        logger.debug("_copy_from_clipboard: c x r:", num_cols, num_rows)
         if transpose:
             self.ba = [[],[]]
             for c in num_cols:
@@ -844,23 +840,6 @@ class FilterCoeffs(QWidget):
                 self.ba[1] = [1]
 
         self._equalize_ba_length()
-#
-#        try:
-#            num_cols, num_rows = np.shape(ba_str)
-#            print("cols = {0}, rows = {1}".format(num_cols, num_rows))
-#        except(TypeError, ValueError) as e:
-#            logger.error(e)
-#            return
-        
-#        ba_list = [[]]
-#
-#        for col in range(num_cols):
-#            if col > 0:
-#                ba_list.append([])
-#                for row in range(num_rows):
-#                    ba_list[col].append(ba_str[col][row])
-#
-#        self.ba = list(ba_str)
 
         self._refresh_table()
 
@@ -929,8 +908,7 @@ class FilterCoeffs(QWidget):
                 'point':self.chkRadixPoint.isChecked()
                 }
 
-        # save, check and convert coeffs, check filter type 
-        # print("saving: format", type(self.ba), type(self.ba[0]), type(self.ba[0][0]))      
+        # save, check and convert coeffs, check filter type       
         fil_save(fb.fil[0], self.ba, 'ba', __name__) 
         
         if fb.fil[0]['ft'] == 'IIR':
@@ -994,8 +972,7 @@ class FilterCoeffs(QWidget):
         Finally, the QTableWidget is refreshed from self.ba.
         """
         sel = qget_selected(self.tblCoeff)['sel'] # get indices of all selected cells
-        print("delete_cells", type(self.ba), np.shape(self.ba[0]), self.ba[0])
-        print("sel[0]", sel[0])
+
         if not np.any(sel) and len(self.ba[0]) > 0:
             self.ba[0] = np.delete(self.ba[0], -1)
             self.ba[1] = np.delete(self.ba[1], -1)
@@ -1010,7 +987,6 @@ class FilterCoeffs(QWidget):
         else:
             self._refresh_table()
             qstyle_widget(self.butSave, 'changed')
-
 
 #------------------------------------------------------------------------------
     def _add_cells(self):
