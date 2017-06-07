@@ -75,12 +75,22 @@ class CSV_option_box(QWidget):
 
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
-        self.chkHorizontal.clicked.connect(self.set_horizontal)
-        # self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
+        self.chkHorizontal.clicked.connect(self._store_settings)
+        self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
+        self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
+        self.cmbHeader.currentIndexChanged.connect(self._store_settings)
+       
 
-    def set_horizontal(self):
+    def _store_settings(self):
         try:
             params['CSV']['horizontal'] =  self.chkHorizontal.isChecked()
+            params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
+            params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator, data=True)
+            params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
+           
+        except KeyError as e:
+            logger.error(e)
+            
         except KeyError as e:
             logger.error(e)
 
