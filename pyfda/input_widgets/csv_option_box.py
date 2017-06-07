@@ -34,7 +34,6 @@ class CSV_option_box(QWidget):
         for d in delim:
             self.cmbDelimiter.addItem(d[0],d[1])
         self.cmbDelimiter.setToolTip("Delimiter between data fields.")
-        qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
 
         lblTerminator = QLabel("Line Terminator:", self)
         terminator = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n')]
@@ -43,14 +42,11 @@ class CSV_option_box(QWidget):
                 " This depends a.o. on the operating system.")
         for t in terminator:
             self.cmbLineTerminator.addItem(t[0], t[1])
-        qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'], data=True)        
 
         self.chkHorizontal = QCheckBox("Horizontal orientation", self)
         # self.chkHorizontal.setFont(self.bifont)
         self.chkHorizontal.setToolTip("<span>Set horizontal orientation of table"
                     " (transposed).</span>")
-        self.chkHorizontal.setChecked(params['CSV']['horizontal'])
-
         butClose = QPushButton(self)
         butClose.setText("Close")
 #        butClose.setDefault(self, True)  
@@ -81,6 +77,8 @@ class CSV_option_box(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(1)
         self.setLayout(layVMain) 
+        
+        self._load_settings()
 
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
@@ -100,6 +98,16 @@ class CSV_option_box(QWidget):
         except KeyError as e:
             logger.error(e)
             
+    def _load_settings(self):
+        """
+        Load settings of all widgets from `pyfda_rc`.
+        """
+        try:
+            qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
+            qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'], data=True)
+            qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
+            self.chkHorizontal.setChecked(params['CSV']['horizontal'])
+
         except KeyError as e:
             logger.error(e)
 
