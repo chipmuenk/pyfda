@@ -28,7 +28,7 @@ class CSV_option_box(QWidget):
         
         self.parent = parent # instance of the parent (not the base) class
 
-        lblDelimiter = QLabel("CSV-Delimiter:")
+        lblDelimiter = QLabel("CSV-Delimiter:", self)
         delim = [('Auto','auto'), (',',','), (';', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('|', '|')]
         self.cmbDelimiter = QComboBox(self)
         for d in delim:
@@ -36,7 +36,7 @@ class CSV_option_box(QWidget):
         self.cmbDelimiter.setToolTip("Delimiter between data fields.")
         qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
 
-        lblTerminator = QLabel("Line Terminator:")
+        lblTerminator = QLabel("Line Terminator:", self)
         terminator = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n')]
         self.cmbLineTerminator = QComboBox(self)
         self.cmbLineTerminator.setToolTip("<span>Terminator at the end of a data row."
@@ -62,6 +62,7 @@ class CSV_option_box(QWidget):
         layLineTerminator.addWidget(lblTerminator)
         layLineTerminator.addWidget(self.cmbLineTerminator)
         
+        lblHeader = QLabel("Enable header", self)
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addLayout(layDelimiter)
