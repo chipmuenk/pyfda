@@ -37,12 +37,11 @@ class CSV_option_box(QWidget):
         qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
 
         lblTerminator = QLabel("Line Terminator:")
-        terminators = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n')]
-                
+        terminator = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n')]
         self.cmbLineTerminator = QComboBox(self)
         self.cmbLineTerminator.setToolTip("<span>Terminator at the end of a data row."
                 " This depends a.o. on the operating system.")
-        for t in terminators:
+        for t in terminator:
             self.cmbLineTerminator.addItem(t[0], t[1])
         qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'], data=True)        
 
