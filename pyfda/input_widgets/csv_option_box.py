@@ -44,10 +44,6 @@ class CSV_option_box(QWidget):
         for t in terminator:
             self.cmbLineTerminator.addItem(t[0], t[1])
 
-        self.chkHorizontal = QCheckBox("Horizontal orientation", self)
-        # self.chkHorizontal.setFont(self.bifont)
-        self.chkHorizontal.setToolTip("<span>Set horizontal orientation of table"
-                    " (transposed).</span>")
         butClose = QPushButton(self)
         butClose.setText("Close")
 #        butClose.setDefault(self, True)  
@@ -59,6 +55,11 @@ class CSV_option_box(QWidget):
         layLineTerminator.addWidget(lblTerminator)
         layLineTerminator.addWidget(self.cmbLineTerminator)
         
+        self.chkHorizontal = QCheckBox("Horizontal orientation", self)
+        # self.chkHorizontal.setFont(self.bifont)
+        self.chkHorizontal.setToolTip("<span>Set horizontal orientation of table"
+                    " (transposed).</span>")
+                    
         lblHeader = QLabel("Enable header", self)
         header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
         self.cmbHeader = QComboBox(self)
@@ -74,10 +75,11 @@ class CSV_option_box(QWidget):
         layVMain.addLayout(layDelimiter)
         layVMain.addLayout(layLineTerminator)
         layVMain.addWidget(self.chkHorizontal)
+        layVMain.addLayout(layHHeader)
         layVMain.addWidget(butClose)
         layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(1)
-        self.setLayout(layVMain) 
+        self.setLayout(layVMain)
         
         self._load_settings()
 
@@ -95,10 +97,10 @@ class CSV_option_box(QWidget):
             params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator, data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
-           
+
         except KeyError as e:
             logger.error(e)
-            
+
     def _load_settings(self):
         """
         Load settings of all widgets from `pyfda_rc`.
@@ -111,6 +113,7 @@ class CSV_option_box(QWidget):
 
         except KeyError as e:
             logger.error(e)
+            
 
 #==============================================================================
 
