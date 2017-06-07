@@ -22,13 +22,16 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
-from pyfda.pyfda_qt_lib import (QPopup, qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, 
+from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, 
                                 qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
+from .csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: Clipboard functionality:  - always return fractional data with full precision?
 #                                 - for fixpoint formats, always return format
+#                                 - CSD data is copied with leading blanks
+
 # TODO: Setting complex data (manually) crashes the app in setModelData():
 #    model.setData(index, data) "Type Error: Can't convert complex to float"
 #   -> need to implement a proper model-view architecture, QTableView instead of QTableWidget
@@ -790,7 +793,7 @@ class FilterCoeffs(QWidget):
         Set options for copying to/from clipboard or file.
         """
         if self.opt_widget is None:
-            self.w = QPopup(self) # important: Handle must be class attribute
+            self.w = CSV_option_box(self) # important: Handle must be class attribute
             # self.w.setGeometry(QtCore.QRect(100, 100, 400, 200))
             
             self.w.show() # modeless dialog, i.e. non-blocking
