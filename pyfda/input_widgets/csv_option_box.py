@@ -27,6 +27,7 @@ class CSV_option_box(QWidget):
         QWidget.__init__(self)
         
         self.parent = parent # instance of the parent (not the base) class
+        self.setWindowTitle("CSV Options")
 
         lblDelimiter = QLabel("CSV-Delimiter:", self)
         delim = [('Auto','auto'), (',',','), (';', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('|', '|')]
