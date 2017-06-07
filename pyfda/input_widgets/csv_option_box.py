@@ -63,6 +63,15 @@ class CSV_option_box(QWidget):
         layLineTerminator.addWidget(self.cmbLineTerminator)
         
         lblHeader = QLabel("Enable header", self)
+        header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
+        self.cmbHeader = QComboBox(self)
+        self.cmbHeader.setToolTip("First row is a header.")
+        for h in header:
+            self.cmbHeader.addItem(h[0], h[1])
+        layHHeader = QHBoxLayout()
+        layHHeader.addWidget(lblHeader)
+        layHHeader.addWidget(self.cmbHeader)
+        
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addLayout(layDelimiter)

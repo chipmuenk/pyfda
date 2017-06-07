@@ -55,7 +55,7 @@ params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.
           'CSV': {'horizontal': False,
                   'delimiter' : '\t',
                   'lineterminator'  : CRLF,
-                  'header': False},
+                  'header': 'auto'},
           'FMT_ba': 4,      # number of digits for coefficient table
           'FMT_pz': 5,      # number of digits for Pole/Zero table
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
