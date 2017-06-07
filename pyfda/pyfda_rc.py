@@ -53,8 +53,8 @@ params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.
           'DELIM': '\t',      # default delimiter for CSV-files and clipboard
           'FMT': '{:.3g}',  # format string for QLineEdit fields
           'CSV': {'horizontal': False,
-                  'delim' : '\t',
-                  'crlf'  : CRLF,
+                  'delimiter' : '\t',
+                  'lineterminator'  : CRLF,
                   'header': False},
           'FMT_ba': 4,      # number of digits for coefficient table
           'FMT_pz': 5,      # number of digits for Pole/Zero table
