@@ -29,9 +29,9 @@ class CSV_option_box(QWidget):
         self.parent = parent # instance of the parent (not the base) class
 
         lblDelimiter = QLabel("CSV-Delimiter:")
-        delims = [('Auto','auto'), (',',','), (';', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('|', '|')]
+        delim = [('Auto','auto'), (',',','), (';', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('|', '|')]
         self.cmbDelimiter = QComboBox(self)
-        for d in delims:
+        for d in delim:
             self.cmbDelimiter.addItem(d[0],d[1])
         self.cmbDelimiter.setToolTip("Delimiter between data fields.")
         qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
