@@ -55,11 +55,17 @@ class CSV_option_box(QDialog):
         layHLineTerminator.addWidget(lblTerminator)
         layHLineTerminator.addWidget(self.cmbLineTerminator)
 
+        lblOrientation = QLabel("Table orientation", self)
+        orientation = [('Auto/Vert.', 'auto'), ('Vertical', 'vert'), ('Horizontal', 'horiz')]
+        self.cmbOrientation = QComboBox(self)
+        self.cmbOrientation.setToolTip("<span>Select orientation of table.</span>")
+        for o in orientation:
+            self.cmbOrientation.addItem(o[0], o[1])
         
-        self.chkHorizontal = QCheckBox("Horizontal orientation", self)
-        # self.chkHorizontal.setFont(self.bifont)
-        self.chkHorizontal.setToolTip("<span>Set horizontal orientation of table"
-                    " (transposed).</span>")
+        layHOrientation = QHBoxLayout()
+        layHOrientation.addWidget(lblOrientation)
+        layHOrientation.addWidget(self.cmbOrientation)
+
                     
         lblHeader = QLabel("Enable header", self)
         header = [('Auto', 'auto'), ('On', 'on'), ('Off', 'off')]
@@ -75,6 +81,7 @@ class CSV_option_box(QDialog):
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addLayout(layHDelimiter)
         layVMain.addLayout(layHLineTerminator)
+        layVMain.addLayout(layHOrientation)
         layVMain.addLayout(layHHeader)
         layVMain.addWidget(butClose)
         layVMain.setContentsMargins(*params['wdg_margins'])
@@ -85,7 +92,7 @@ class CSV_option_box(QDialog):
 
         # ============== Signals & Slots ================================
         butClose.clicked.connect(self.close)
-        self.chkHorizontal.clicked.connect(self._store_settings)
+        self.cmbOrientation.currentIndexChanged.connect(self._store_settings)
         self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
         self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
         self.cmbHeader.currentIndexChanged.connect(self._store_settings)
@@ -93,7 +100,7 @@ class CSV_option_box(QDialog):
 
     def _store_settings(self):
         try:
-            params['CSV']['horizontal'] =  self.chkHorizontal.isChecked()
+            params['CSV']['orientation'] =  qget_cmb_box(self.cmbOrientation, data=True)
             params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator, data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
@@ -109,7 +116,7 @@ class CSV_option_box(QDialog):
             qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
             qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'], data=True)
             qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
-            self.chkHorizontal.setChecked(params['CSV']['horizontal'])
+            qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
 
         except KeyError as e:
             logger.error(e)
