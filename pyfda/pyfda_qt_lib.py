@@ -462,7 +462,7 @@ def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=Fal
         data_arr = np.array(data_list)
         cols, rows = np.shape(data_arr)
         print("cols = {0}, rows = {1}, data_arr = \n".format(cols, rows, data_arr))
-        if not params['CSV']['horizontal']:
+        if params['CSV']['orientation'] == 'vert':
             print(data_arr.T)
             return data_arr.T
         else:
