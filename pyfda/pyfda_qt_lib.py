@@ -254,7 +254,14 @@ def qcopy_to_clipboard(table, data, target):
                 if r != num_rows - 1: # don't add CRLF after last row
                     text += cr
 
+    #=======================================================================
+    # Copy only selected cells
+    #=======================================================================
     else: # copy only selected cells in displayed format
+        if orientation_horiz: # one or two tab separated rows
+            print("sel:", np.shape(sel), sel)
+            if header: # add the table header
+                text += table.horizontalHeaderItem(0).text() + tab
             if sel[0] is not None:
                 for r in sel[0]:
                     item = table.item(r,0)
@@ -428,8 +435,8 @@ def qcopy_from_clipboard(source):
         print("delimiter:", repr(delimiter))
         print("terminator:", repr(lineterminator))   
         print("quotechar:", repr(quotechar))
-        
-    
+
+
     except csv.Error as e:
         logger.error("Error during CSV analysis:\n{0}".format(e)) 
         dialect = csv.get_dialect('excel-tab') # fall back
