@@ -47,13 +47,14 @@ class CSV_option_box(QDialog):
         butClose = QPushButton(self)
         butClose.setText("Close")
 #        butClose.setDefault(self, True)  
-        layDelimiter = QHBoxLayout()
-        layDelimiter.addWidget(lblDelimiter)  
-        layDelimiter.addWidget(self.cmbDelimiter)
+        layHDelimiter = QHBoxLayout()
+        layHDelimiter.addWidget(lblDelimiter)  
+        layHDelimiter.addWidget(self.cmbDelimiter)
         
-        layLineTerminator = QHBoxLayout()
-        layLineTerminator.addWidget(lblTerminator)
-        layLineTerminator.addWidget(self.cmbLineTerminator)
+        layHLineTerminator = QHBoxLayout()
+        layHLineTerminator.addWidget(lblTerminator)
+        layHLineTerminator.addWidget(self.cmbLineTerminator)
+
         
         self.chkHorizontal = QCheckBox("Horizontal orientation", self)
         # self.chkHorizontal.setFont(self.bifont)
@@ -72,9 +73,8 @@ class CSV_option_box(QDialog):
         
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
-        layVMain.addLayout(layDelimiter)
-        layVMain.addLayout(layLineTerminator)
-        layVMain.addWidget(self.chkHorizontal)
+        layVMain.addLayout(layHDelimiter)
+        layVMain.addLayout(layHLineTerminator)
         layVMain.addLayout(layHHeader)
         layVMain.addWidget(butClose)
         layVMain.setContentsMargins(*params['wdg_margins'])
