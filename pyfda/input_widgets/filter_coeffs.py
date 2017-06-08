@@ -817,18 +817,18 @@ class FilterCoeffs(QWidget):
         
         if np.ndim(ba_str) > 1:
             num_cols, num_rows = np.shape(ba_str)
-            transpose = num_cols > num_rows # need to transpose data
+            orientation_horiz = num_cols > num_rows # need to transpose data
         elif np.ndim(ba_str) == 1:
             num_rows = len(ba_str)
             num_cols = 1
-            transpose = False
+            orientation_horiz = False
         else:
             logger.error("Data from clipboard is a single value or None.")
             return None
         logger.debug("_copy_from_clipboard: c x r:", num_cols, num_rows)
-        if transpose:
+        if orientation_horiz:
             self.ba = [[],[]]
-            for c in num_cols:
+            for c in range(num_cols):
                 self.ba[0].append(conv(ba_str[c][0], frmt))
                 if num_rows > 1:
                     self.ba[1].append(conv(ba_str[c][1], frmt))
