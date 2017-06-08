@@ -21,14 +21,14 @@ from pyfda.compat import (Qt, pyqtSignal,
 
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
-    close_signal = pyqtSignal()
-    def __init__(self, parent):
-        super(CSV_option_box, self).__init__(parent)
-        
-        
-        self.parent = parent # instance of the parent (not the base) class
-        self.setWindowTitle("CSV Options")
 
+    def __init__(self, parent):
+        super(CSV_option_box, self).__init__(parent)    
+        self._init_UI()
+
+    def _init_UI(self):
+        """ initialize the User Interface """
+        self.setWindowTitle("CSV Options")
         lblDelimiter = QLabel("CSV-Delimiter:", self)
         delim = [('Auto','auto'), (',',','), (';', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('|', '|')]
         self.cmbDelimiter = QComboBox(self)
