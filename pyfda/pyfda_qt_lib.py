@@ -264,6 +264,8 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
 
             if sel[1] is not None:
                 text += cr # add a CRLF when there are two columns
+                if header: # add the table header
+                    text += table.horizontalHeaderItem(1).text() + tab
                 for r in sel[1]:
                     item = table.item(r,1)
                     if item and item.text() != "":
@@ -276,8 +278,15 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
                 sel_c.append(0)
             if sel[1] is not None:
                 sel_c.append(1)
-            for c in sel_c:
-                for r in range(table.rowCount()): # iterate over whole table
+
+            if header:
+                for c in sel_c:
+                    text += table.horizontalHeaderItem(c).text() + tab
+                text.rstrip(tab) # remove last tab
+                text += cr
+                
+            for r in range(num_rows): # iterate over whole table
+                for c in sel_c:
                     if r in sel[c]: # selected item?
                         item = table.item(r,c)
                         print(c,r)
