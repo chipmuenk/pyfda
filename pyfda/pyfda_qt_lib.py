@@ -207,31 +207,27 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
             When `False` (default), generate the table in "horizontal" shape,
             i.e. with one or two columns with coefficient data
     """
-    def array2csv(data, col_cnt, row_cnt):
-        """
-        Convert 1- or 2D array of strings to a tab- or comma-separated value
-        string.
-        """
-        text = ""
-        if params['CSV']['horizontal']: # rows are horizontal
-            for c in range(col_cnt):
-                for r in range(row_cnt):
+
+    #=======================================================================
+    # Nothing selected, copy complete table
+    #=======================================================================
+    if not np.any(sel):       
+        if orientation_horiz: # rows are horizontal
+            for c in range(num_cols):
+                for r in range(num_rows):
                     text += str(data[c][r])
-                    if r != row_cnt - 1: # don't add tab after last column
+                    if r != num_rows - 1: # don't add tab after last column
                         text += tab
-                if c != col_cnt - 1: # don't add CRLF after last row
+                if c != num_cols - 1: # don't add CRLF after last row
                     text += cr               
         else:  # rows are vertical
-            for r in range(row_cnt):
-                for c in range(col_cnt):
+            for r in range(num_rows):
+                for c in range(num_cols):
                     text += str(data[c][r])
-                    if c != col_cnt - 1: # don't add tab after last column
+                    if c != num_cols - 1: # don't add tab after last column
                         text += tab
-                if r != row_cnt - 1: # don't add CRLF after last row
+                if r != num_rows - 1: # don't add CRLF after last row
                     text += cr
-        return text
-   #---------------------------------------------------------------------------
-    
     if not cr:
         cr = params['CRLF']
     if not tab:
