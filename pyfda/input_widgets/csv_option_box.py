@@ -30,7 +30,7 @@ class CSV_option_box(QDialog):
         """ initialize the User Interface """
         self.setWindowTitle("CSV Options")
         lblDelimiter = QLabel("CSV-Delimiter:", self)
-        delim = [('Auto','auto'), (',',','), (';', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('|', '|')]
+        delim = [('Auto','auto'), ('< , >',','), ('< ; >', ';'), ('<TAB>', '\t'), ('<SPACE>', ' '), ('< | >', '|')]
         self.cmbDelimiter = QComboBox(self)
         for d in delim:
             self.cmbDelimiter.addItem(d[0],d[1])
