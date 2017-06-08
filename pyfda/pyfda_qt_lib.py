@@ -203,8 +203,8 @@ def qcopy_to_clipboard(table, data, target):
             MacOS  : Carriage return
             *nix   : Line feed
             
-    horizontal : Boolean
-            When `False` (default), generate the table in "horizontal" shape,
+    orientation : Boolean
+            When `vert` (default), generate the table in "vertical" shape,
             i.e. with one or two columns with coefficient data
     """
 
