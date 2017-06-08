@@ -436,10 +436,11 @@ def qcopy_from_clipboard(source):
         header = False
 
     # override settings found by sniffer
-    if tab is not None:
-        dialect.delimiter = tab
-    if cr is not None:
-        dialect.lineterminator = cr   
+    # TODO: Use setting from pyfda_rc
+#    if not None:
+#        dialect.delimiter = tab
+#    if not None:
+#        dialect.lineterminator = cr   
 
     # dialect = 'excel-tab" #  # 'excel', #"unix" 
     data_iter = csv.reader(f, dialect=dialect) # returns an iterator
