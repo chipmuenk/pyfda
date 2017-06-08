@@ -15,16 +15,16 @@ logger = logging.getLogger(__name__)
 
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
-from pyfda.compat import (QWidget, QFont, QLabel, QComboBox,
-                     QFrame, QCheckBox, 
+from pyfda.compat import (Qt, pyqtSignal,
+        QDialog, QFont, QLabel, QComboBox, QFrame, QCheckBox, 
                      QPushButton, QVBoxLayout, QHBoxLayout)
 
 #------------------------------------------------------------------------------
-class CSV_option_box(QWidget):
+class CSV_option_box(QDialog):
+    close_signal = pyqtSignal()
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)
         
-        QWidget.__init__(self)
         
         self.parent = parent # instance of the parent (not the base) class
         self.setWindowTitle("CSV Options")

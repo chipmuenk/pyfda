@@ -231,7 +231,6 @@ class FilterCoeffs(QWidget):
         super(FilterCoeffs, self).__init__(parent)
         
         self.opt_widget = None # handle for pop-up options widget
-
         self._construct_UI()
 
     def _construct_UI(self):
@@ -792,11 +791,9 @@ class FilterCoeffs(QWidget):
         """
         Set options for copying to/from clipboard or file.
         """
-        if self.opt_widget is None:
-            self.w = CSV_option_box(self) # important: Handle must be class attribute
-            # self.w.setGeometry(QtCore.QRect(100, 100, 400, 200))
-            
-            self.w.show() # modeless dialog, i.e. non-blocking
+        self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
+        #self.opt_widget.show() # modeless dialog, i.e. non-blocking
+        self.opt_widget.exec_() # modal dialog (blocking)
         
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self, tab = "\t", cr = None):
