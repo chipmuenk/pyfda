@@ -49,13 +49,14 @@ THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the
 mpl_ms = 8 # base size for matplotlib markers
 # Various parameters for calculation and plotting
 params = {'N_FFT':  2048,   # number of FFT points for plot commands (freqz etc.)
-          'CRLF': CRLF,     # get OS-dependend line break from pyfda_lib
-          'DELIM': '\t',      # default delimiter for CSV-files and clipboard
           'FMT': '{:.3g}',  # format string for QLineEdit fields
-          'CSV': {'horizontal': False,
-                  'delimiter' : '\t',
-                  'lineterminator'  : CRLF,
-                  'header': 'auto'},
+          'CSV':    # format options and parameters for CSV-files and clipboard
+                  {
+                  'delimiter' : '\t', # default delimiter
+                  'lineterminator'  : CRLF, # OS-dependend line break from pyfda_lib
+                  'orientation': 'auto', # 'auto', 'vert', 'horiz'# table orientation
+                  'header': 'auto' # 'auto', 'on', 'off'
+                  }, 
           'FMT_ba': 4,      # number of digits for coefficient table
           'FMT_pz': 5,      # number of digits for Pole/Zero table
           'P_Marker': [mpl_ms, 'r'], # size and color for poles' marker
