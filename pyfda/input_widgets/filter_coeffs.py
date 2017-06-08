@@ -796,7 +796,7 @@ class FilterCoeffs(QWidget):
         self.opt_widget.exec_() # modal dialog (blocking)
         
     #------------------------------------------------------------------------------
-    def _copy_to_clipboard(self, tab = "\t", cr = None):
+    def _copy_to_clipboard(self):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
         """

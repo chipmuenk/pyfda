@@ -177,7 +177,7 @@ def qget_selected(table, reverse=True):
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
+def qcopy_to_clipboard(table, data, target):
     """
     Copy table to clipboard as CSV list
     
@@ -351,7 +351,7 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
         
         
 #------------------------------------------------------------------------------
-def qcopy_from_clipboard(source, tab=None, cr=None, header=False, horizontal=False):
+def qcopy_from_clipboard(source):
     """
     Copy data from clipboard to table
     
