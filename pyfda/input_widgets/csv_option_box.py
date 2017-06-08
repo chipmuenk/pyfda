@@ -126,4 +126,12 @@ class CSV_option_box(QDialog):
 
 
 if __name__=='__main__':
-    pass
+    from ..compat import QApplication
+    import sys
+    app = QApplication(sys.argv)
+    mainw = CSV_option_box(None)
+
+    app.setActiveWindow(mainw)
+    mainw.show()
+
+    sys.exit(app.exec_())
