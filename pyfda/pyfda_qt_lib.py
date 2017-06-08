@@ -208,6 +208,31 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
             i.e. with one or two columns with coefficient data
     """
 
+    text = ""
+    if params['CSV']['header'] in {'auto', 'on'}:
+        header = True
+    elif params['CSV']['header'] == 'off':
+        header = False
+    else:
+        logger.error("Unknown key '{0}' for params['CSV']['header']"
+                                        .format(params['CSV']['header']))
+
+    if params['CSV']['orientation'] in {'auto', 'vert'}:
+        orientation_horiz = False
+    elif params['CSV']['orientation'] == 'horiz':
+        orientation_horiz = True
+    else:
+        logger.error("Unknown key '{0}' for params['CSV']['orientation']"
+                                        .format(params['CSV']['orientation']))
+
+    tab = params['CSV']['delimiter']
+    cr = params['CSV']['lineterminator']
+
+    num_cols = table.columnCount()
+    num_rows = table.rowCount()
+
+    sel = qget_selected(table, reverse=False)['sel']
+
     #=======================================================================
     # Nothing selected, copy complete table
     #=======================================================================
@@ -228,20 +253,8 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
                         text += tab
                 if r != num_rows - 1: # don't add CRLF after last row
                     text += cr
-    if not cr:
-        cr = params['CRLF']
-    if not tab:
-        tab = params['DELIM']
-
-    text = ""
-    sel = qget_selected(table, reverse=False)['sel']
-    if not np.any(sel):
-        # nothing selected -> copy the array data in float format (but only those
-        # with indices visible in the table)
-        text = array2csv(data, table.columnCount(), table.rowCount())
 
     else: # copy only selected cells in displayed format
-        if params['CSV']['horizontal']: # one or two tab separated rows
             if sel[0] is not None:
                 for r in sel[0]:
                     item = table.item(r,0)
