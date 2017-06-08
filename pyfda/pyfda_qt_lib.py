@@ -196,8 +196,8 @@ def qcopy_to_clipboard(table, data, target, tab = None, cr = None):
     tab : String (default: "\t")
           Tabulator character for separating columns
           
-    cr : String (default: None)
-            Linefeed character for separating rows. When nothing is selected,
+    cr : String (default: CRLF, as determined by pyfda_lib)
+            Line termination character for separating rows. When nothing is selected,
             the character is selected depending on the operating system:
             Windows: Carriage return + line feed
             MacOS  : Carriage return

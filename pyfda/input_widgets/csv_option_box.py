@@ -40,7 +40,7 @@ class CSV_option_box(QDialog):
         terminator = [('Auto','auto'), ('CRLF (Win)', '\r\n'), ('CR (Mac)', '\r'), ('LF (Unix)', '\n')]
         self.cmbLineTerminator = QComboBox(self)
         self.cmbLineTerminator.setToolTip("<span>Terminator at the end of a data row."
-                " This depends a.o. on the operating system.")
+                " (depending on the operating system).")
         for t in terminator:
             self.cmbLineTerminator.addItem(t[0], t[1])
 
