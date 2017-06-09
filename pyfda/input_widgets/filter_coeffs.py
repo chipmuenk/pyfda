@@ -779,7 +779,7 @@ class FilterCoeffs(QWidget):
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
         """
         
-        qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard)
+        qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard, self.myQ.frmt)
         
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self, tab = "\t", cr = None):

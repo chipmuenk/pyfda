@@ -177,7 +177,7 @@ def qget_selected(table, reverse=True):
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target):
+def qcopy_to_clipboard(table, data, target, frmt):
     """
     Copy table to clipboard as CSV list
     
@@ -192,6 +192,9 @@ def qcopy_to_clipboard(table, data, target):
     target: object
             Target where the data is being copied to. If the object is a QClipboard
             instance, copy the text there, otherwise simply return the text.
+            
+    frmt: string
+            Expected number format ('float', 'hex', ...)
     
     tab : String (default: "\t")
           Tabulator character for separating columns
