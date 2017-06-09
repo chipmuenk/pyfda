@@ -242,6 +242,8 @@ def qcopy_to_clipboard(table, data, target, frmt):
     if not np.any(sel):       
         if orientation_horiz: # rows are horizontal
             for c in range(num_cols):
+                if header: # add the table header
+                    text += table.horizontalHeaderItem(c).text() + tab
                 for r in range(num_rows):
                     text += str(data[c][r])
                     if r != num_rows - 1: # don't add tab after last column
@@ -249,6 +251,10 @@ def qcopy_to_clipboard(table, data, target, frmt):
                 if c != num_cols - 1: # don't add CRLF after last row
                     text += cr               
         else:  # rows are vertical
+            if header: # add the table header
+                for c in range(num_cols):
+                    text += table.horizontalHeaderItem(c).text() + tab
+                text = text.rstrip(tab) + cr
             for r in range(num_rows):
                 for c in range(num_cols):
                     text += str(data[c][r])
