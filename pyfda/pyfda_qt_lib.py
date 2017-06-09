@@ -270,7 +270,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
                     item = table.item(r,0)
                     if item  and item.text() != "":
                             text += table.itemDelegate().text(item) + tab
-                text.rstrip(tab) # remove last tab delimiter again
+                text = text.rstrip(tab) # remove last tab delimiter again
 
             if sel[1] is not None:
                 text += cr # add a CRLF when there are two columns
@@ -280,7 +280,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
                     item = table.item(r,1)
                     if item and item.text() != "":
                             text += table.itemDelegate().text(item) + tab
-                text.rstrip(tab) # remove last tab delimiter again
+                text = text.rstrip(tab) # remove last tab delimiter again
                 print("horizontal\n", text)
         else: # one or two columns
             sel_c = []
@@ -292,8 +292,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
             if header:
                 for c in sel_c:
                     text += table.horizontalHeaderItem(c).text() + tab
-                text.rstrip(tab) # remove last tab
-                text += cr
+                text = text.rstrip(tab) + cr # remove last tab + terminate line
                 
             for r in range(num_rows): # iterate over whole table
                 for c in sel_c:
