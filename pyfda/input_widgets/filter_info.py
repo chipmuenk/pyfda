@@ -15,21 +15,21 @@ from ..compat import (QtGui, QWidget, QLabel, QFont, QCheckBox, QFrame,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
                       QVBoxLayout, QHBoxLayout, QSplitter, Qt)
 
-try:
-    from docutils.core import publish_string 
-    HAS_DOCUTILS = True
-except ImportError:
-    HAS_DOCUTILS = False
-
 import numpy as np
 from numpy import pi, log10
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import lin2unit
+from pyfda.pyfda_lib import lin2unit, mod_version
 from pyfda.pyfda_rc import params
 # TODO: Passband and stopband info should show min / max values for each band
+
+if mod_version('docutils') is not None:
+    from docutils.core import publish_string
+    HAS_DOCUTILS = True
+else:
+    HAS_DOCUTILS = False
 
 class FilterInfo(QWidget):
     """
