@@ -249,7 +249,9 @@ def qcopy_to_clipboard(table, data, target, frmt):
     num_rows = table.rowCount()
 
     sel = qget_selected(table, reverse=False)['sel']
-    
+
+    # when nothing is selected, select whole table for fixpoint (non-float) formats
+    # otherwise, data would be copied from the raw data, not from the view (= table)    
     if not np.any(sel) and frmt != 'float':
         sel = qget_selected(table, reverse=False, select_all = True)['sel']
 
@@ -418,7 +420,6 @@ def qcopy_from_clipboard(source):
             
     numpy array of strings
                 containing table data
-    
     """
     
     source_class = str(source.__class__.__name__).lower()
@@ -446,7 +447,6 @@ def qcopy_from_clipboard(source):
 #------------------------------------------------------------------------------
 # Get CSV parameter settings
 #------------------------------------------------------------------------------
-
     try:
         header = params['CSV']['header'].lower()       
         if header in {'auto', 'on', 'off'}:
@@ -518,12 +518,6 @@ def qcopy_from_clipboard(source):
         print(row)
         data_list.append(row)
 
-# TODO: Type conversion (in calling method?), what to do with string data
-# TODO: Conversion via frmt2float?! Depending on frmt?
-# TODO: Automatic transpose of array if needed
-# TODO: Check dimensions of array, cut, transpose or throw an error
-# TODO: manual / automatic selection of headers / tab / cr / transpose / ...
-# TODO: Icons
     try:
         print(type(data_list))
         data_arr = np.array(data_list)
@@ -542,22 +536,6 @@ def qcopy_from_clipboard(source):
 
 
 #==============================================================================
-#         else: # copy only selected cells in selected format
-#             tab = ", "
-#             for r in sel[0]:
-#                 item = self.tblCoeff.item(r,0)
-#                 if item:
-#                     if item.text() != "":
-#                         text += self.tblCoeff.itemDelegate().text(item)
-#             text += cr
-#             for r in sel[1]:
-#                 item = self.tblCoeff.item(r,1)
-#                 if item:
-#                     if item.text() != "":
-#                         text += self.tblCoeff.itemDelegate().text(item)
-# 
-#==============================================================================
-
 
 if __name__=='__main__':
     pass

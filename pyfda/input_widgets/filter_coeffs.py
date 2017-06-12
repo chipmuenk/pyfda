@@ -28,9 +28,7 @@ from .csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: Clipboard functionality:  - always return fractional data with full precision?
-#                                 - for fixpoint formats, always return format
-#                                 - CSD data is copied with leading blanks
+# TODO: Clipboard functionality: CSD data is copied with leading blanks
 
 # TODO: Setting complex data (manually) crashes the app in setModelData():
 #    model.setData(index, data) "Type Error: Can't convert complex to float"
