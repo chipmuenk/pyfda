@@ -160,7 +160,16 @@ def qget_selected(table, reverse=True):
     'sel': list of selected cells per column, by default sorted in reverse
     
     'cur':  current cell selection as a tuple
+
+    Flags:
+
+    'select_all' : select all table items and create a list
+
+    'reverse' : return selected fields upside down
     """
+    if select_all:
+        table.selectAll()
+
     idx = []
     for _ in table.selectedItems():
         idx.append([_.column(), _.row(), ])
@@ -168,6 +177,9 @@ def qget_selected(table, reverse=True):
     sel = [0, 0]
     sel[0] = sorted([i[1] for i in idx if i[0] == 0], reverse = reverse)
     sel[1] = sorted([i[1] for i in idx if i[0] == 1], reverse = reverse)
+
+    if select_all:
+        table.clearSelection()
 
     # use set comprehension to eliminate multiple identical entries
     # cols = sorted(list({i[0] for i in idx}))
@@ -235,6 +247,9 @@ def qcopy_to_clipboard(table, data, target, frmt):
     num_rows = table.rowCount()
 
     sel = qget_selected(table, reverse=False)['sel']
+    
+    if not np.any(sel) and frmt != 'float':
+        sel = qget_selected(table, reverse=False, select_all = True)['sel']
 
     #=======================================================================
     # Nothing selected, copy complete table
