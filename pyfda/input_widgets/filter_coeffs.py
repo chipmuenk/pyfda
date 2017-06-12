@@ -293,13 +293,13 @@ class FilterCoeffs(QWidget):
         self.cmbFormat.setToolTip('Set the display format.')
         self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.lblRound = QLabel("Digits = ", self)
-        self.lblRound.setFont(self.bifont)
         self.spnRound = QSpinBox(self)
         self.spnRound.setRange(0,16)
         self.spnRound.setValue(params['FMT_ba'])
-        self.spnRound.setToolTip("Display <i>d</i> digits.")
-        
+        self.spnRound.setToolTip("Number of digits to display digits.")
+        self.lblRound = QLabel("Digits", self)
+        self.lblRound.setFont(self.bifont)
+     
         self.chkRadixPoint = QCheckBox("Radix point", self)
         self.chkRadixPoint.setFont(self.bifont)
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
@@ -312,8 +312,8 @@ class FilterCoeffs(QWidget):
         layHDisplay.addWidget(self.butEnable)
         layHDisplay.addWidget(self.cmbFilterType)        
         layHDisplay.addWidget(self.cmbFormat)
-        layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.spnRound)
+        layHDisplay.addWidget(self.lblRound)
         layHDisplay.addWidget(self.chkRadixPoint)
         layHDisplay.addStretch()
 
@@ -470,13 +470,10 @@ class FilterCoeffs(QWidget):
         self.butQuant.setIcon(QIcon(':/quantize.svg'))
         self.butQuant.setIconSize(q_icon_size)
 
-
         self.clipboard = QApplication.clipboard()
 
 
         # ============== UI Layout =====================================
-
-
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(butSetZero)
         layHButtonsCoeffs2.addWidget(lblEps)
@@ -540,11 +537,6 @@ class FilterCoeffs(QWidget):
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
-#        self.tblCoeff.itemActivated.connect(self.save_coeffs) # nothing happens
-        # this works but fires multiple times _and_ fires every time cell is
-        # changed by program as well!
-#        self.tblCoeff.itemChanged.connect(self.save_coeffs)
-#        self.tblCoeff.selectionModel().currentChanged.connect(self.save_coeffs)
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
         self.chkRadixPoint.clicked.connect(self._radix_point)
@@ -772,18 +764,16 @@ class FilterCoeffs(QWidget):
         self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
         #self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.opt_widget.exec_() # modal dialog (blocking)
-        
+
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
         """
-        
         qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard, self.myQ.frmt)
-        
+
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self):
-        
         """
         Read data from clipboard and copy it to `self.ba` as array of strings
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
@@ -792,7 +782,7 @@ class FilterCoeffs(QWidget):
 
         conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
-        
+
         if np.ndim(ba_str) > 1:
             num_cols, num_rows = np.shape(ba_str)
             orientation_horiz = num_cols > num_rows # need to transpose data
@@ -843,8 +833,6 @@ class FilterCoeffs(QWidget):
         self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
         self.ledScale.setText(str(self.scale))
 
-
-
 #------------------------------------------------------------------------------
     def _load_q_settings(self):
         """
@@ -861,7 +849,7 @@ class FilterCoeffs(QWidget):
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        
+
         self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
         self.ledScale.setText(str(self.scale))
 
