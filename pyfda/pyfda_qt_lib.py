@@ -151,7 +151,7 @@ def qhline(widget):
     
 #------------------------------------------------------------------------------
 
-def qget_selected(table, reverse=True):
+def qget_selected(table, select_all=False, reverse=True):
     """
     Get selected cells in `table`and return a dictionary with the following keys:
     
@@ -187,6 +187,8 @@ def qget_selected(table, reverse=True):
     cur = (table.currentColumn(), table.currentRow())
     # cur_idx_row = table.currentIndex().row()
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
+    
+
     
 #------------------------------------------------------------------------------
 def qcopy_to_clipboard(table, data, target, frmt):
@@ -260,11 +262,9 @@ def qcopy_to_clipboard(table, data, target, frmt):
                 if use_header: # add the table header
                     text += table.horizontalHeaderItem(c).text() + tab
                 for r in range(num_rows):
-                    text += str(data[c][r])
-                    if r != num_rows - 1: # don't add tab after last column
-                        text += tab
-                if c != num_cols - 1: # don't add CRLF after last row
-                    text += cr               
+                    text += str(data[c][r]) + tab
+                text = text.rstrip(tab) + cr
+            text = text.rstrip(cr) # delete last cr
         else:  # rows are vertical
             if use_header: # add the table header
                 for c in range(num_cols):
@@ -272,11 +272,9 @@ def qcopy_to_clipboard(table, data, target, frmt):
                 text = text.rstrip(tab) + cr
             for r in range(num_rows):
                 for c in range(num_cols):
-                    text += str(data[c][r])
-                    if c != num_cols - 1: # don't add tab after last column
-                        text += tab
-                if r != num_rows - 1: # don't add CRLF after last row
-                    text += cr
+                    text += str(data[c][r]) + tab
+                text = text.rstrip(tab) + cr
+            text = text.rstrip(cr) # delete CRLF after last row
 
     #=======================================================================
     # Copy only selected cells
@@ -313,7 +311,8 @@ def qcopy_to_clipboard(table, data, target, frmt):
             if use_header:
                 for c in sel_c:
                     text += table.horizontalHeaderItem(c).text() + tab
-                text = text.rstrip(tab) + cr # remove last tab + terminate line
+                    # cr is added further below
+                text.rstrip(tab)
                 
             for r in range(num_rows): # iterate over whole table
                 for c in sel_c:
@@ -321,9 +320,9 @@ def qcopy_to_clipboard(table, data, target, frmt):
                         item = table.item(r,c)
                         print(c,r)
                         if item and item.text() != "":
-                                if len(text) > 0: # not first element
-                                    text += cr
-                                text += table.itemDelegate().text(item)
+                            text += table.itemDelegate().text(item) + tab
+                text = text.rstrip(tab) + cr
+            text.rstrip(cr)
 
         print("qcopy_to_clipboard\n", text)
 
@@ -472,42 +471,46 @@ def qcopy_from_clipboard(source):
         logger.error(e)
 
     try:
-        header = params['CSV']['header']
+        if header == 'auto' or tab == 'auto' or cr == 'auto':
         # test the first line for delimiters (of the given selection)
-        dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' ']) 
-        f.seek(0)                               # and reset the file pointer
-        if header == "auto":                                  
-            header = csv.Sniffer().has_header(f.read(1000)) # True when header detected
-            f.seek(0)  
-        elif header== "true":
-            header = True
+            dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' ']) 
+            f.seek(0)                               # and reset the file pointer
         else:
-            header = False
-        
-        delimiter = dialect.delimiter
-        lineterminator = dialect.lineterminator
-        quotechar = dialect.quotechar
-        print("delimiter:", repr(delimiter))
-        print("terminator:", repr(lineterminator))   
-        print("quotechar:", repr(quotechar))
+            dialect = csv.get_dialect('excel-tab') # fall back, alternatives: 'excel', 'unix'
 
+        if header == "auto":                                  
+            use_header = csv.Sniffer().has_header(f.read(1000)) # True when header detected
+            f.seek(0)  
 
     except csv.Error as e:
         logger.error("Error during CSV analysis:\n{0}".format(e)) 
         dialect = csv.get_dialect('excel-tab') # fall back
-        header = False
+        use_header = False
 
-    # override settings found by sniffer
-    # TODO: Use setting from pyfda_rc
-#    if not None:
-#        dialect.delimiter = tab
-#    if not None:
-#        dialect.lineterminator = cr   
+    if header == 'on':
+        use_header = True
+    if header == 'off':
+        use_header = False
+    # case 'auto' has been treated above
 
-    # dialect = 'excel-tab" #  # 'excel', #"unix" 
-    data_iter = csv.reader(f, dialect=dialect) # returns an iterator
-    f.seek(0) 
-    if header:
+    delimiter = dialect.delimiter
+    lineterminator = dialect.lineterminator
+    quotechar = dialect.quotechar
+
+    if tab is not 'auto':
+        delimiter = tab
+        
+    if cr is not 'auto':
+        lineterminator = cr 
+        
+    print("using delimiter:", repr(delimiter))
+    print("using terminator:", repr(lineterminator))   
+    print("using quotechar:", repr(quotechar))
+    print("using header:", use_header)
+
+    data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
+    # f.seek(0) 
+    if use_header:
         print("headers: ", next(data_iter, None)) # py3 and py2 
     
     data_list = []
