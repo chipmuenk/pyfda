@@ -254,7 +254,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
     #=======================================================================
     # Nothing selected, copy complete table
     #=======================================================================
-    if not np.any(sel):       
+    if not np.any(sel): 
         if orientation_horiz: # rows are horizontal
             for c in range(num_cols):
                 if use_header: # add the table header
@@ -282,7 +282,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
     # Copy only selected cells
     #=======================================================================
     else: # copy only selected cells in displayed format
-        if orientation_horiz: # one or two tab separated rows
+        if orientation_horiz: # horizontal orientation, one or two rows
             print("sel:", np.shape(sel), sel)
             if use_header: # add the table header
                 text += table.horizontalHeaderItem(0).text() + tab
@@ -303,7 +303,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
                             text += table.itemDelegate().text(item) + tab
                 text = text.rstrip(tab) # remove last tab delimiter again
                 print("horizontal\n", text)
-        else: # one or two columns
+        else: # vertical orientation, one or two columns
             sel_c = []
             if sel[0]:
                 sel_c.append(0)
