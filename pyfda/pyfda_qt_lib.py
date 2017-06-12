@@ -286,14 +286,14 @@ def qcopy_to_clipboard(table, data, target, frmt):
             print("sel:", np.shape(sel), sel)
             if header: # add the table header
                 text += table.horizontalHeaderItem(0).text() + tab
-            if sel[0] is not None:
+            if sel[0]:
                 for r in sel[0]:
                     item = table.item(r,0)
                     if item  and item.text() != "":
                             text += table.itemDelegate().text(item) + tab
                 text = text.rstrip(tab) # remove last tab delimiter again
 
-            if sel[1] is not None:
+            if sel[1]: # returns False for []
                 text += cr # add a CRLF when there are two columns
                 if header: # add the table header
                     text += table.horizontalHeaderItem(1).text() + tab
@@ -305,9 +305,9 @@ def qcopy_to_clipboard(table, data, target, frmt):
                 print("horizontal\n", text)
         else: # one or two columns
             sel_c = []
-            if sel[0] is not None:
+            if sel[0]:
                 sel_c.append(0)
-            if sel[1] is not None:
+            if sel[1]:
                 sel_c.append(1)
 
             if header:
