@@ -726,10 +726,10 @@ class FilterCoeffs(QWidget):
                               str(self.ba[col][row]).strip('()')))
                     self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
 
-            # make a[0] unselectable
+            # make a[0] selectable but not editable       
             if fb.fil[0]['ft'] == 'IIR':
                 item = self.tblCoeff.item(0,1)
-                item.setFlags(Qt.ItemIsSelectable)#|  Qt.ItemIsEnabled )
+                item.setFlags(Qt.ItemIsSelectable| Qt.ItemIsEnabled)
                 item.setFont(self.bfont)
 
             self.tblCoeff.blockSignals(False)
