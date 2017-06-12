@@ -225,9 +225,9 @@ def qcopy_to_clipboard(table, data, target, frmt):
 
     text = ""
     if params['CSV']['header'] in {'auto', 'on'}:
-        header = True
+        use_header = True
     elif params['CSV']['header'] == 'off':
-        header = False
+        use_header = False
     else:
         logger.error("Unknown key '{0}' for params['CSV']['header']"
                                         .format(params['CSV']['header']))
@@ -257,7 +257,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
     if not np.any(sel):       
         if orientation_horiz: # rows are horizontal
             for c in range(num_cols):
-                if header: # add the table header
+                if use_header: # add the table header
                     text += table.horizontalHeaderItem(c).text() + tab
                 for r in range(num_rows):
                     text += str(data[c][r])
@@ -266,7 +266,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
                 if c != num_cols - 1: # don't add CRLF after last row
                     text += cr               
         else:  # rows are vertical
-            if header: # add the table header
+            if use_header: # add the table header
                 for c in range(num_cols):
                     text += table.horizontalHeaderItem(c).text() + tab
                 text = text.rstrip(tab) + cr
@@ -284,7 +284,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
     else: # copy only selected cells in displayed format
         if orientation_horiz: # one or two tab separated rows
             print("sel:", np.shape(sel), sel)
-            if header: # add the table header
+            if use_header: # add the table header
                 text += table.horizontalHeaderItem(0).text() + tab
             if sel[0]:
                 for r in sel[0]:
@@ -295,7 +295,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
 
             if sel[1]: # returns False for []
                 text += cr # add a CRLF when there are two columns
-                if header: # add the table header
+                if use_header: # add the table header
                     text += table.horizontalHeaderItem(1).text() + tab
                 for r in sel[1]:
                     item = table.item(r,1)
@@ -310,7 +310,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
             if sel[1]:
                 sel_c.append(1)
 
-            if header:
+            if use_header:
                 for c in sel_c:
                     text += table.horizontalHeaderItem(c).text() + tab
                 text = text.rstrip(tab) + cr # remove last tab + terminate line
