@@ -782,7 +782,7 @@ class FilterCoeffs(QWidget):
         qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard, self.myQ.frmt)
         
     #------------------------------------------------------------------------------
-    def _copy_from_clipboard(self, tab = "\t", cr = None):
+    def _copy_from_clipboard(self):
         
         """
         Read data from clipboard and copy it to `self.ba` as array of strings
