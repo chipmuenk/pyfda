@@ -1,61 +1,39 @@
 <!DOCTYPE RCC><RCC version="1.0">
 
 <qresource>
-    <file alias="action-redo.svg">images/icons/action-redo.svg</file>
-    <file alias="action-undo.svg">images/icons/action-undo.svg</file>
-    <file alias="brush.svg">images/icons/brush.svg</file>
-    <file alias="camera-slr.svg">images/icons/camera-slr.svg</file>
-    <file alias="circle-check.svg">images/icons/circle-check.svg</file>
-    <file alias="circle-x.svg">images/icons/circle-x.svg</file>    
-    <file alias="clipboard.svg">images/icons/clipboard.svg</file>
-    <file alias="cog.svg">images/icons/cog.svg</file>
-    <file alias="download.svg">images/icons/data-transfer-download.svg</file>
-    <file alias="ellipses_h.svg">images/icons/ellipses_h.svg</file>
-    <file alias="ellipses_v.svg">images/icons/ellipses_v.svg</file>
-    <file alias="file.svg">images/icons/file.svg</file>
-    <file alias="fullscreen-enter.svg">images/icons/fullscreen-enter.svg</file>
-    <file alias="grid-four-up.svg">images/icons/grid-four-up.svg</file>
-    <file alias="home.svg">images/icons/home.svg</file>
-    <file alias="lock-locked.svg">images/icons/lock-locked.svg</file>
-    <file alias="lock-unlocked.svg">images/icons/lock-unlocked.svg</file>    
-    <file alias="magnifying-glass.svg">images/icons/magnifying-glass.svg</file>
-    <file alias="menu.svg">images/icons/menu.svg</file>
-    <file alias="move.svg">images/icons/move.svg</file>
-    <file alias="minus.svg">images/icons/minus.svg</file>
-    <file alias="plus.svg">images/icons/plus.svg</file>
-    <file alias="quantize.svg">images/icons/quantize.svg</file>
-    <file alias="quantize_options.svg">images/icons/quantize_options.svg</file>
-    <file alias="trash.svg">images/icons/trash.svg</file>
-    <file alias="upload.svg">images/icons/data-transfer-upload.svg</file>
-    <file alias="wrench.svg">images/icons/wrench.svg</file>
+    <file alias="action-redo.svg">images/icons/dark/action-redo.svg</file>
+    <file alias="action-undo.svg">images/icons/dark/action-undo.svg</file>
+    <file alias="brush.svg">images/icons/dark/brush.svg</file>
+    <file alias="camera-slr.svg">images/icons/dark/camera-slr.svg</file>
+    <file alias="circle-check.svg">images/icons/dark/circle-check.svg</file>
+    <file alias="circle-x.svg">images/icons/dark/circle-x.svg</file>    
+    <file alias="clipboard.svg">images/icons/dark/clipboard.svg</file>
+    <file alias="settings.svg">images/icons/dark/cog.svg</file>
+    <file alias="download.svg">images/icons/dark/data-transfer-download.svg</file>
+    <file alias="ellipses_h.svg">images/icons/dark/ellipses_h.svg</file>
+    <file alias="ellipses_v.svg">images/icons/dark/ellipses_v.svg</file>
+    <file alias="file.svg">images/icons/dark/file.svg</file>
+    <file alias="from_clipboard.svg">images/icons/dark/appbar.from_clipboard.svg</file>
+    <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
+    <file alias="grid.svg">images/icons/dark/grid-four-up.svg</file>
+    <file alias="home.svg">images/icons/dark/home.svg</file>
+    <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
+    <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
+    <file alias="magnifying-glass.svg">images/icons/dark/magnifying-glass.svg</file>
+    <file alias="move.svg">images/icons/dark/move.svg</file>
+    <file alias="row_delete.svg">images/icons/dark/appbar.cell.row.delete.svg</file>
+    <file alias="row_insert_above.svg">images/icons/dark/appbar.cell.insert.above.svg</file>
+    <file alias="quantize.svg">images/icons/dark/quantize.svg</file>
+    <file alias="to_clipboard.svg">images/icons/dark/appbar.to_clipboard.svg</file>
+    <file alias="trash.svg">images/icons/dark/trash.svg</file>
+    <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>
 
     <file alias="pyfda_icon.svg">images/icons/pyfda_icon.svg</file>
 </qresource>
+
+
 </RCC>
 
-<!--
-Available for future extensions:
-
-arrow-left.svg
-arrow-right.svg
-audio-spectrum.svg
-audio.svg
-bookmark.svg
-check.svg
-folder.svg
-fullscreen-enter.svg
-fullscreen-exit.svg
-graph.svg
-grid-four-up.svg
-headphones.svg
-microphone.svg
-
-reload.svg
-resize-both.svg
-resize-height.svg
-resize-width.svg
-star.svg
--->
 
 
 <!-- QtPy4: pyrcc4 pyfda.qrc -o qrc_resources.py -py3

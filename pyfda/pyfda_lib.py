@@ -23,6 +23,7 @@ Created 2012 - 2017
 
 from __future__ import division, print_function
 import os, sys, re, time
+import codecs
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
@@ -34,13 +35,116 @@ from numpy import pi, log10, arctan
 #matplotlib.use("Qt4Agg")
 
 import scipy.signal as sig
-from scipy import __version__ as _scipy_version
 
 #import logging
 from distutils.version import LooseVersion
-SOS_AVAIL = LooseVersion(_scipy_version) >= LooseVersion("0.16")
+
 
 import pyfda.simpleeval as se
+
+####### VERSIONS and related stuff ############################################
+# ================ Required Modules ============================
+# ==
+# == When one of the following imports fails, terminate the program
+from numpy import __version__ as VERSION_NP
+from scipy import __version__ as VERSION_SCI
+from matplotlib import __version__ as VERSION_MPL
+from .compat import QT_VERSION_STR, QSysInfo # imports pyQt
+
+VERSION = {}
+VERSION.update({'python_long': sys.version})
+VERSION.update({'python': ".".join(map(str, sys.version_info[:3]))})
+VERSION.update({'matplotlib': VERSION_MPL})
+VERSION.update({'pyqt': QT_VERSION_STR})
+VERSION.update({'numpy': VERSION_NP})
+VERSION.update({'scipy': VERSION_SCI})
+
+# ================ Optional Modules ============================
+try:
+    from mayavi import __version__ as VERSION_MAYAVI
+    VERSION.update({'mayavi': VERSION_MAYAVI})
+except ImportError:
+    logger.info("Module 'mayavi' not found.")
+    
+try:
+    from myhdl import __version__ as VERSION_HDL
+    VERSION.update({'myhdl': VERSION_HDL})
+except ImportError:
+    logger.info("Module 'myhdl' not found.")
+    
+try:
+    from docutils import __version__ as VERSION_DOCUTILS
+    VERSION.update({'docutils': VERSION_DOCUTILS})
+except ImportError:
+    logger.info("Module 'docutils' not found.")
+
+def b(s):
+    """
+    Handle binary data in the same way under py2 and py3: 
+    Py2: keep string data as string data
+    Py3: convert string data to byte
+    """
+    if PY3:
+        # first 256 characters of Latin 1 (ISO8859-1) are identical to the
+        # first 256 characters of unicode
+        return codecs.latin_1_encode(s)[0] # return as binary data
+    else:
+        return s # return as string
+
+
+def cmp_version(mod, version):
+    """
+    Compare version number of installed module `mod` against string `version` and 
+    return 1, 0 or -1 if the installed version is greater, equal or less than 
+    the number in `version`.
+    """
+    if LooseVersion(VERSION[mod]) > LooseVersion(version):
+        return 1
+    elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
+        return 0
+    else:
+        return -1
+
+def mod_version(mod = None):
+    """
+    Return the version of the module 'mod'. If the module is not found, return
+    None. When no module is specified, return a string with all modules and 
+    their versions sorted alphabetically.
+    """
+    if mod:
+        if mod in VERSION:
+            return LooseVersion(VERSION[mod])
+        else:
+            return None
+    else:
+        v = ""
+        keys = sorted(list(VERSION.keys()))
+        for k in keys:
+            v += "{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
+        return v   
+
+SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
+
+PY3 = sys.version_info > (3,) # True for Python 3 
+
+print("Running on a")
+if hasattr(QSysInfo, "WindowsVersion"):
+    print("Windows System, version", QSysInfo.WindowsVersion)
+    OS = "win"
+    CRLF = "\r\n" # Windows: carriage return + line feed, Hex 0D 0A
+elif hasattr(QSysInfo, "MacintoshVersion"):
+    print("Macintosh, version", QSysInfo.MacintoshVersion)
+    OS = "mac"
+    CRLF = "\r" # Mac: carriage return only, Hex 0D
+else:
+    print("Unix / Linux system.")
+    OS = "unix"
+    CRLF = "\n" # Unix / Linux: line feed only, Hex 0A
+
+        
+logger.info(mod_version())
+print(mod_version())
+###############################################################################
 
 #### General functions ########################################################
 

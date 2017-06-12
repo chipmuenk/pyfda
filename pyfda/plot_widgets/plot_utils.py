@@ -259,7 +259,7 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         # GRID:
-        self.a_gr = self.addAction(QIcon(':/grid-four-up.svg'), 'Grid', self.toggle_grid)
+        self.a_gr = self.addAction(QIcon(':/grid.svg'), 'Grid', self.toggle_grid)
         self.a_gr.setToolTip('Toggle Grid')
         self.a_gr.setCheckable(True)
         self.a_gr.setChecked(True)
@@ -284,7 +284,7 @@ class MyMplToolbar(NavigationToolbar):
         # --------------------------------------
 
         if figureoptions is not None:
-            self.a_op = self.addAction(QIcon(':/cog.svg'), 'Customize', self.edit_parameters)
+            self.a_op = self.addAction(QIcon(':/settings.svg'), 'Customize', self.edit_parameters)
             self.a_op.setToolTip('Edit curves line and axes parameters')
 
 #        self.buttons = {}

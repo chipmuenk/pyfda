@@ -17,7 +17,7 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import H_mag
+from pyfda.pyfda_lib import H_mag, mod_version
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -27,7 +27,6 @@ from matplotlib.colors import LightSource
 #http://docs.enthought.com/mayavi/mayavi/mlab_running_scripts.html#running-mlab-scripts
 #http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html
 #http://docs.enthought.com/mayavi/mayavi/mlab.html#simple-scripting-with-mlab
-from pyfda.pyfda_versions import mod_version
 
 if mod_version('mayavi'):
     from mayavi import mlab
