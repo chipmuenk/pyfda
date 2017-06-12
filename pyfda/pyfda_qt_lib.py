@@ -429,6 +429,33 @@ def qcopy_from_clipboard(source):
         raise IOError
         return None
 
+#------------------------------------------------------------------------------
+# Get CSV parameter settings
+#------------------------------------------------------------------------------
+
+    try:
+        header = params['CSV']['header'].lower()       
+        if header in {'auto', 'on', 'off'}:
+            pass
+        else:
+            header = 'auto'
+            logger.error("Unknown key '{0}' for params['CSV']['header'], using {1} instead."
+                                            .format(params['CSV']['header']), header)
+
+        orientation_horiz = params['CSV']['orientation'].lower()
+        if orientation_horiz in {'auto', 'vert', 'horiz'}:
+            pass
+        else:
+            orientation_horiz = 'vert'
+            logger.error("Unknown key '{0}' for params['CSV']['orientation'], using {1} instead."
+                                        .format(params['CSV']['orientation']), orientation_horiz)
+
+        tab = params['CSV']['delimiter'].lower()
+        cr = params['CSV']['lineterminator'].lower()
+
+    except KeyError as e:
+        logger.error(e)
+
     try:
         header = params['CSV']['header']
         # test the first line for delimiters (of the given selection)
