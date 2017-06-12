@@ -498,10 +498,10 @@ def qcopy_from_clipboard(source):
     quotechar = dialect.quotechar
 
     if tab is not 'auto':
-        delimiter = tab
+        delimiter = str(tab)
         
     if cr is not 'auto':
-        lineterminator = cr 
+        lineterminator = str(cr)
         
     print("using delimiter:", repr(delimiter))
     print("using terminator:", repr(lineterminator))   
