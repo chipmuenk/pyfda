@@ -378,26 +378,31 @@ def qcopy_from_clipboard(source):
             opened file handle.
             
             If `source` is neither, return an error.
+            
+    The following keys from pyfda_lib.params['CSV'] are evaluated
                 
-    tab : String (default: None)
-          Tabulator character for separating columns
+    'delimiter' : string (default: <tab>)
+          Character for separating columns
           
-    cr : String (default: None)
-            Linefeed character for separating rows. When nothing is selected,
+    'lineterminator' : string (default: As used by the operating system)
+            Character for terminating rows. By default,
             the character is selected depending on the operating system:
             Windows: Carriage return + line feed
             MacOS  : Carriage return
             *nix   : Line feed
             
-    header : Boolean (default: None)
-            When `header=True`, treat first row as a header that will be discarded.
+    'orientation' : string
+            This string determines with which the orientation the table is read.
+            
+    'header ': string (default: 'auto')
+            When `header='on'`, treat first row as a header that will be discarded.
         
-    Flags that are zero, will be guessed by csv.Sniffer().
+    Parameters that are 'auto', will be guessed by csv.Sniffer().
             
     Returns:
     --------
             
-    numpy array
+    numpy array of strings
                 containing table data
     
     """
