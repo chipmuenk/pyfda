@@ -9,7 +9,7 @@ before_install:
   - df -h
   - ulimit -a
   - pip install -U pip wheel setuptools
-  - pip install numpy nose six docutils matplotlib
+  - pip install numpy nose six docutils matplotlib pyqt4
   - pip install -v -U scipy
   - python -V
 
