@@ -1,4 +1,20 @@
 language: python
+
+# from http://qosvn.physik.uni-ulm.de/trac/qudi/browser/.travis.yml?rev=4d902d3b6464ef2bb22aa535358537b57b382518
+#env:
+#	  global:
+#     - SETUP_XVFB=True
+#	    - CONDA_CHANNELS="qttesting"
+#	    - CONDA_DEPENDENCIES="jedi jupyter lxml matplotlib numpy openssl pip pygments pyparsing python-dateutil pyzmq scipy sip six tornado traitlets"
+#	    - PIP_DEPENDENCIES="fysom gitpython hdf5storage lmfit pydaqmx pyvisa pyvisa-py qtpy rpyc ruamel.yaml smmap spidev i2cdev"
+#	
+#	  matrix:
+#	    - PYTHON_VERSION=3.4 USE_QT_API=PyQt4
+#	    - PYTHON_VERSION=3.4 USE_QT_API=PyQt5
+#	    - PYTHON_VERSION=3.5 USE_QT_API=PyQt4
+#	    - PYTHON_VERSION=3.5 USE_QT_API=PyQt5
+
+
 python:
  - "2.7"
  # - "3.3"
@@ -11,15 +27,24 @@ before_install:
   
   - sudo mkdir -p /downloads
   - sudo chmod a+rw /downloads
+  - curl -L https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.2/sip-4.19.2.tar.gz  -o /downloads/sip.tar.gz 
   - curl -L https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12/PyQt4_gpl_x11-4.12.tar.gz -o /downloads/pyqt4.tar.gz
   #- curl -L http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.3/PyQt-x11-gpl-4.11.3.tar.gz -o /downloads/pyqt4.tar.gz
   # Builds
-  - sudo mkdir -p /builds
-  - sudo chmod a+rw /builds
-  
+   - sudo mkdir -p /builds
+   - sudo chmod a+rw /builds
+
   # Qt4
-  - pushd /builds
+   - pushd /builds
   
+  # SIP
+   - tar xzf /downloads/sip.tar.gz --keep-newer-files
+   - pushd sip-4.19.2
+   - python configure.py
+   - make
+   - sudo make install
+   - popd
+   
   # PyQt4
   - tar xzf /downloads/pyqt4.tar.gz --keep-newer-files
   - pushd PyQt4_gpl_x11-4.12 # .tar
