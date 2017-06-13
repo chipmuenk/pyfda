@@ -31,19 +31,19 @@ before_install:
   - curl -L https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12/PyQt4_gpl_x11-4.12.tar.gz -o /downloads/pyqt4.tar.gz
   #- curl -L http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.11.3/PyQt-x11-gpl-4.11.3.tar.gz -o /downloads/pyqt4.tar.gz
   # Builds
-   - sudo mkdir -p /builds
-   - sudo chmod a+rw /builds
+  - sudo mkdir -p /builds
+  - sudo chmod a+rw /builds
 
   # Qt4
-   - pushd /builds
+  - pushd /builds
   
   # SIP
-   - tar xzf /downloads/sip.tar.gz --keep-newer-files
-   - pushd sip-4.19.2
-   - python configure.py
-   - make
-   - sudo make install
-   - popd
+  - tar xzf /downloads/sip.tar.gz --keep-newer-files
+  - pushd sip-4.19.2
+  - python configure.py
+  - make
+  - sudo make install
+  - popd
    
   # PyQt4
   - tar xzf /downloads/pyqt4.tar.gz --keep-newer-files
