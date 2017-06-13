@@ -22,8 +22,8 @@ from pyfda import qrc_resources # contains all icons
 # create with pyrcc4 pyfda.qrc -o qrc_resources.py -py3
 from pyfda.filter_tree_builder import FilterTreeBuilder
 
-#from pyfda.input_widgets import input_tab_widgets
-from pyfda.input_widgets import input_tab_widgets as input_tab_widgets
+from pyfda.input_widgets import input_tab_widgets
+#from pyfda.input_widgets import input_tab_widgets as input_tab_widgets
 
 from pyfda.plot_widgets import plot_tab_widgets
 #from pyfda.plot_widgets import plot_tab_widgets_test as plot_tab_widgets
