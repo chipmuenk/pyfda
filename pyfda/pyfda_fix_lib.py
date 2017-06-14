@@ -13,7 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-from .pyfda_qt_lib import qstr
+from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
 # TODO: Scaling parameter is not used yet
@@ -604,7 +604,7 @@ class Fixed(object):
 
         Returns
         -------
-        yq: floating point (`dtype=np.float64`) representation of fixpoint input.
+        floating point (`dtype=np.float64`) representation of fixpoint input.
         """
         if y == "":
             return 0
@@ -774,12 +774,12 @@ class Fixed(object):
                 raise Exception('Unknown output format "%s"!'%(self.frmt))
                 return None
 
-
 ########################################
 # If called directly, do some examples #
 ########################################
 if __name__=='__main__':
     import pprint
+
     q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}
     myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
     
@@ -801,5 +801,3 @@ if __name__=='__main__':
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
         print("{0} -> {1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
-   
-
