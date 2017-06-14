@@ -615,7 +615,11 @@ class Fixed(object):
 
         if frmt == 'float':
             if y.dtype.char in {'S', 'U'}: # string / unicode data type
-                return float(y)
+                try:
+                    y_float = float(y)
+                except ValueError as e:
+                    y_float = None
+                return y_float
                 # TODO: what about complex strings?
             else:
                 return y
@@ -649,12 +653,16 @@ class Fixed(object):
             # (2) scale the integer depending the number of places and the base
 
         if frmt == 'dec':
-            y_float = float(val_str)
+            try:
+                y_float = float(val_str)
+            except Exception as e:
+                logger.warn(e)
+                y_float = None
             if self.point:
                 return y_float
             else:
                 return y_float / self.MSB
-            
+
         elif frmt in {'hex', 'bin'}:
             try:
                 y_int = int(raw_str, self.base)
