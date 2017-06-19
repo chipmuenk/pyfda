@@ -74,7 +74,8 @@ class SelectFilter(QWidget):
         self.cmbResponseType.setToolTip("Select filter response type.")
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("<span>Select the kind of filter (recursive, transversal, ...).</span>")
+        self.cmbFilterType.setToolTip(
+          "<span>Select the filter type (recursive (Infinite Impulse Response), nonRecursive (Finite IR).</span>")
         self.cmbFilterClass = QComboBox(self)
         self.cmbFilterClass.setObjectName("comboFilterClass")
         self.cmbFilterClass.setToolTip("Select the filter design class.")
@@ -96,7 +97,8 @@ class SelectFilter(QWidget):
             try:
                 self.cmbResponseType.addItem(rc.rt_names[rt], rt)
             except KeyError as e:
-                logger.warn("KeyError: {0} has no corresponding full name in rc.rt_names.".format(e))
+                logger.warning(
+                  "KeyError: {0} has no corresponding full name in rc.rt_names.".format(e))
         idx = self.cmbResponseType.findData('LP') # find index for 'LP'
 
         if idx == -1: # Key 'LP' does not exist, use first entry instead
@@ -119,23 +121,17 @@ class SelectFilter(QWidget):
         #----------------------------------------------------------------------
 
         layHFilWdg = QHBoxLayout() # container for filter subwidgets
-        layHFilWdg.addWidget(self.cmbResponseType)# QtCore.Qt.AlignLeft)
+        layHFilWdg.addWidget(self.cmbResponseType) #LP, HP, BP, etc.
         layHFilWdg.addStretch()
-        layHFilWdg.addWidget(self.cmbFilterType)
+        layHFilWdg.addWidget(self.cmbFilterType)   #FIR, IIR
         layHFilWdg.addStretch()
-        layHFilWdg.addWidget(self.cmbFilterClass)
+        layHFilWdg.addWidget(self.cmbFilterClass)  #bessel, elliptic, etc.
 
         #----------------------------------------------------------------------
         # Layout for dynamic filter subwidgets (empty frame)
         #----------------------------------------------------------------------
         # see Summerfield p. 278
         self.layHDynWdg = QHBoxLayout() # for additional dynamic subwidgets
-##        self.frmDynWdg = QFrame(self) # collect subwidgets in frame (no border)
-##        self.frmDynWdg.setObjectName("wdg_frmDynWdg")
-
-        #Debugging: enable next line to show border of frmDnyWdg
-        #self.frmDynWdg.setFrameStyle(QFrame.StyledPanel|QFrame.Raised)
-##        self.frmDynWdg.setLayout(self.layHDynWdg)
 
         #----------------------------------------------------------------------
         # Filter Order Subwidgets
@@ -160,7 +156,6 @@ class SelectFilter(QWidget):
         self.layVAllWdg = QVBoxLayout()
         self.layVAllWdg.addLayout(layHFilWdg)
         self.layVAllWdg.addLayout(self.layHDynWdg)
-##        self.layVAllWdg.addWidget(self.frmDynWdg)
         self.layVAllWdg.addLayout(layHOrdWdg)
 
 #==============================================================================
@@ -174,7 +169,6 @@ class SelectFilter(QWidget):
         self.setLayout(layHMain)
 
 #==============================================================================
-#        self.setLayout(layVAllWdg)
 
         #------------------------------------------------------------
         # SIGNALS & SLOTS
@@ -456,15 +450,11 @@ class SelectFilter(QWidget):
             if ff.fil_inst.wdg:
                 self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
-                
-##                self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
-##                self.layHDynWdg.setContentsMargins(0, 0, 0, 0)
-# #               self.frmDynWdg.setVisible(self.dyn_wdg_fil != None)
 
                 ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
         except AttributeError as e:
-            logger.warn(e)
+            logger.warning(e)
 
 #------------------------------------------------------------------------------
 
