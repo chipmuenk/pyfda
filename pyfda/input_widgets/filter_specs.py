@@ -247,8 +247,7 @@ class FilterSpecs(QWidget):
             pformat(fb.fil[0]), str(fb.fil[0]['fc']), str(fb.fil[0]['rt']),
                          str(fb.fil[0]['fo']))
 
-        logger.info("startDesignFilt using: %s\nmethod: %s\n",
-            str(type(ff.fil_inst)), str(fb.fil[0]['fc']))
+        logger.info("start_design_filt using method: %s", str(fb.fil[0]['fc']))
 
         try:
             #----------------------------------------------------------------------
@@ -270,33 +269,39 @@ class FilterSpecs(QWidget):
             #-----------------------------------------------------------------------
 
             if err > 0:
-                raise AttributeError("Unknown design method.")
+                if (err == 18):
+                    raise AttributeError("Freq and/or Amp specs may be too close to max.")
+                else:
+                    raise AttributeError("Unknown design method.")
                 self.color_design_button("error")
+
             # Update filter order. weights and freq display in case they
             # have been changed by the design algorithm
+
             self.sel_fil.load_filter_order()
             self.w_specs.load_dict()
             self.f_specs.load_dict()
-
             self.color_design_button("ok")
 
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
+            logger.debug("start_design_filt - Results:\n"
+                "F_PB = %s, F_SB = %s "
+                "Filter order N = %s\n"
+                "NDim fil[0]['ba'] = %s\n\n"
+                "b,a = %s\n\n"
+                "zpk = %s\n",
+                str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
+                str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
+                pformat(fb.fil[0]['zpk']))
+
+            logger.info ('Filter designed, order ' + str(fb.fil[0]['N']))
 
         except Exception as e:
-            logger.warning("start_design_filt:\n%s\n%s\n", e.__doc__, e)
-            
+            if ('__doc__' in e):
+                logger.warning("start_design_filt:\n %s\n %s\n", e.__doc__, e)
+            else:
+                logger.warning("start_design_filt:\n %s \n", e)
             self.color_design_button("error")
-
-        logger.debug("start_design_filt - Results:\n"
-            "F_PB = %s, F_SB = %s\n"
-            "Filter order N = %s\n"
-            "NDim fil[0]['ba'] = %s\n\n"
-            "b,a = %s\n\n"
-            "zpk = %s\n",
-            str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
-            str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
-                pformat(fb.fil[0]['zpk'])
-              )
 
     def color_design_button(self, state):
         fb.design_filt_state = state
