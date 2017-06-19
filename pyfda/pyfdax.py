@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
+from .compat import QtCore
 # get dir for this file and store as base_dir in filterbroker
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,12 +29,24 @@ class DynFileHandler(logging.FileHandler):
             filename = os.path.join(base_dir, filename) # no, use basedir
         logging.FileHandler.__init__(self, filename, mode)
 
+class QEditHandler(logging.Handler):
+    """
+    subclass Handler to also log messages to textWidget on main display
+    Overrides stdout to print messages to textWidget (XStream)
+    """
+    def __init__(self):
+        logging.Handler.__init__(self)
+
+    def emit(self, record):
+        msg = self.format(record)
+        if msg: XStream.stdout().write('%s'%msg)
+
 # "register" custom class DynFileHandler as an attribute for the logging module
 # to use it inside the logging config file and pass file name / path and mode
 # as parameters:
 logging.DynFileHandler = DynFileHandler
+logging.QEditHandler = QEditHandler
 logging.config.fileConfig(os.path.join(base_dir, rc.log_config_file))#, disable_existing_loggers=True)
-logging.info("Using logging config file {0}.".format(rc.log_config_file))
 
 if not os.path.exists(rc.save_dir):
     home_dir = pyfda_lib.get_home_dir()
@@ -41,12 +54,36 @@ if not os.path.exists(rc.save_dir):
         rc.save_dir, home_dir)
     rc.save_dir = home_dir
 
+class XStream(QtCore.QObject):
+    """
+    subclass for log messages on main display
+    Overrides stdout to print messages to textWidget 
+    """
+    _stdout = None
+    messageWritten = QtCore.pyqtSignal(str)
+    def flush( self ):
+        pass
+    def fileno( self ):
+        return -1
+    def write( self, msg ):
+        if ( not self.signalsBlocked() ):
+            self.messageWritten.emit(msg)
+
+    @staticmethod
+    def stdout():
+        if ( not XStream._stdout ):
+            XStream._stdout = XStream()
+            sys.stdout = XStream._stdout
+        return XStream._stdout
+
+
 #==============================================================================
 import pyfda.filterbroker as fb
 fb.base_dir = base_dir
 
 from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
-                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout)
+                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout,
+                     QGridLayout, QTextBrowser, QVBoxLayout, QLabel, QtGui)
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid 
@@ -55,7 +92,6 @@ if HAS_QT5:
     matplotlib.use("Qt5Agg")
 else:
     matplotlib.use("Qt4Agg")
-    
 
 from pyfda import qrc_resources # contains all icons
 # edit pyfda.qrc, then
@@ -68,7 +104,7 @@ from pyfda.filter_tree_builder import FilterTreeBuilder
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
-
+#==============================================================================
 
 class pyFDA(QMainWindow):
     """
@@ -81,14 +117,13 @@ class pyFDA(QMainWindow):
     """
 
     def __init__(self, parent=None):
-        QMainWindow.__init__(self)
+        super(QMainWindow,self).__init__()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        
-        
+
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
-        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt', comment_char='#')                                  
+        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt', comment_char='#')
         self._construct_UI()
 
     def _construct_UI(self):
@@ -103,25 +138,30 @@ class pyFDA(QMainWindow):
         self.main_widget = QWidget(self) # this widget contains all subwidget groups
 
         layHMain = QHBoxLayout(self.main_widget) # horizontal layout of all groups
+        laySub1  = QSplitter(QtCore.Qt.Horizontal)
+        laySub2  = QSplitter(QtCore.Qt.Vertical)
 
         # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
+        self.statusWin     = QtGui.QPlainTextEdit(self)  # status window
+        self.statusWin.setReadOnly(True)
 
-        if SPLITTER: # use splitter design (variable ratio for input / plot subwidget sizes)
-            splitter = QSplitter(QtCore.Qt.Horizontal)
-            splitter.addWidget(self.inputTabWidgets)
-            splitter.addWidget(self.pltTabWidgets)            
-            splitter.setStretchFactor(1,4) # relative initial sizes of subwidgets
-#            splitter.setSizes([200,600]) # absolute initial sizes of subwidgets
-            layHMain.addWidget(splitter)
-            layHMain.setContentsMargins(*rc.params['wdg_margins'])
+        self._title = QtGui.QLabel('Status Log')
+        self._title.setAlignment(QtCore.Qt.AlignCenter)
 
-        else: # no splitter design, only use layHMain layout
-            self.inputTabWidgets.setMaximumWidth(420)
-            layHMain.addWidget(self.inputTabWidgets)
-            layHMain.addWidget(self.pltTabWidgets)
-            layHMain.setContentsMargins(0, 0, 0, 0) # R, T, L, B
+        laySub1.addWidget(self.inputTabWidgets)
+        laySub1.addWidget(self.pltTabWidgets)
+        laySub1.setStretchFactor(1,4) # relative initial sizes of subwidgets
+
+        # Add status window underneath split windows
+        laySub2.addWidget(laySub1)
+        laySub2.addWidget(self._title)
+        laySub2.addWidget(self.statusWin)
+        laySub2.setStretchFactor(0,12) # relative initial sizes of subwidgets
+
+        layHMain.addWidget(laySub2)
+        layHMain.setContentsMargins(*rc.params['wdg_margins'])
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
     
@@ -169,6 +209,7 @@ class pyFDA(QMainWindow):
         # trigger the close event in response to sigQuit generated in another subwidget:
         self.inputTabWidgets.filter_specs.sigQuit.connect(self.close)
 
+        XStream.stdout().messageWritten.connect (self.statusWin.appendPlainText)
 
         logger.info("Main routine initialized, using Qt {0}".format(QT_VERSION_STR))
 
@@ -229,7 +270,7 @@ def main():
             logger.info('Using system style "{0}".'.format(rc.qss_rc))
             print(qstyle, "found")
         else:
-            logger.warn('Style "{0}" not found, falling back to default style.'.format(rc.qss_rc))
+            logger.warning('Style "{0}" not found, falling back to default style.'.format(rc.qss_rc))
             print("not found")
         app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
