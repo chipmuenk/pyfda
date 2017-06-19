@@ -127,6 +127,15 @@ SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.
 
 PY3 = sys.version_info > (3,) # True for Python 3 
 
+# Amplitude max, min values to prevent scipy aborts
+# (Linear values)
+MIN_PB_AMP = 0.00001
+MAX_IPB_AMP = 0.85
+MAX_FPB_AMP = 0.65
+MIN_SB_AMP = 0.000001
+MAX_ISB_AMP = 0.65
+MAX_FSB_AMP = 0.45
+
 print("Running on a")
 if hasattr(QSysInfo, "WindowsVersion"):
     print("Windows System, version", QSysInfo.WindowsVersion)
@@ -144,8 +153,8 @@ else:
         
 logger.info(mod_version())
 print(mod_version())
-###############################################################################
 
+###############################################################################
 #### General functions ########################################################
 
 def safe_eval(expr, alt_expr=0):
@@ -418,21 +427,40 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
        
     Returns the result as a float.
     """
+
+    # Add limits to avoid errors
+    valChange = False
+    if (unit_value < 0): valChange = True
     unit_value = abs(unit_value)
     if unit == 'dB':
         if "PB" in amp_label: # passband
             if filt_type == 'IIR':
                 lin_value = 1. - 10.**(-unit_value / 20.)
+                if (lin_value > MAX_IPB_AMP): lin_value = MAX_IPB_AMP; valChange=True
             else: 
                 lin_value = (10.**(unit_value / 20.) - 1) / (10.**(unit_value / 20.) + 1)
+                if (lin_value > MAX_FPB_AMP): lin_value = MAX_FPB_AMP; valChange=True
         else: # stopband
             lin_value = 10.**(-unit_value / 20)
+            if (lin_value < MIN_SB_AMP): lin_value = MIN_SB_AMP; valChange=True
+            if filt_type == 'IIR':
+                if (lin_value > MAX_ISB_AMP): lin_value = MAX_ISB_AMP; valChange=True
+            else:
+                if (lin_value > MAX_FSB_AMP): lin_value = MAX_FSB_AMP; valChange=True
     elif unit == 'W':
         lin_value = np.sqrt(unit_value)
+        if (lin_value < MIN_PB_AMP): lin_value = MIN_PB_AMP; valChange=True
+        if (lin_value > MAX_FPB_AMP): lin_value = MAX_FPB_AMP; valChange=True
     else:
         lin_value = unit_value
-    return lin_value
+        if (lin_value < MIN_PB_AMP): lin_value = MIN_PB_AMP; valChange=True
+        if "PB" in amp_label: # passband
+            if (lin_value > MAX_FPB_AMP): lin_value = MAX_FPB_AMP; valChange=True
+        else:
+            if (lin_value > MAX_FSB_AMP): lin_value = MAX_FSB_AMP; valChange=True
 
+    if (valChange): logger.warning("We changed an Amplitude Spec to be reasonable")
+    return lin_value
 
 
 def cround(x, n_dig = 0):
