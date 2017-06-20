@@ -18,7 +18,10 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, style_widget, safe_eval
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
-MIN_FREQ_STEP = 0.0001
+MIN_FREQ_STEP = 1e-4
+MIN_FREQ = 0.0 # min. frequency
+MAX_FREQ = 0.5 # max. frequency (normalize w.r.t. f_S)
+
 
 class FreqSpecs(QWidget):
     """
@@ -272,17 +275,19 @@ class FreqSpecs(QWidget):
         # Make sure freqs are in range and self correct
         # cannot design filters with negative freqs, so Zero is minFreq
         # f_specs have been converted to Fs freqs [0:0.5], so test against that
-
-        mval = 0.0
-        xval = 0.5
-        valC = False
+        val_changed = False
         for i in range(self.n_cur_labels):
             # test against dict range values
-            if (f_specs[i] <= mval): f_specs[i] = mval+MIN_FREQ_STEP;valC=True
-            if (f_specs[i] >= xval): f_specs[i] = xval-MIN_FREQ_STEP;valC=True
+            if f_specs[i] <= MIN_FREQ:
+                f_specs[i] = MIN_FREQ + MIN_FREQ_STEP
+                val_changed = True
+            if f_specs[i] >= MAX_FREQ:
+                f_specs[i] = MAX_FREQ - MIN_FREQ_STEP
+                val_changed = True
+
             fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
 
-        if (valC): logger.warning("We changed a Frequency Spec to be reasonable")
+        if val_changed: logger.warning("We changed a Frequency Spec to be reasonable")
 
         self.load_dict()
 
