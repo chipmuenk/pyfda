@@ -427,10 +427,10 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
        
     Returns the result as a float.
     """
-    val_change = False # flag for changed values
+    val_changed = False # flag for changed values
     if np.iscomplex(unit_value) or unit_value < 0:
         unit_value = abs(unit_value)
-        val_change = True
+        val_changed = True
 
     if unit == 'dB':
         if "PB" in amp_label: # passband
@@ -450,29 +450,29 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
     if "PB" in amp_label: # passband
         if lin_value < MIN_PB_AMP:
             lin_value = MIN_PB_AMP
-            val_change = True
+            val_changed = True
         if filt_type == 'IIR':
             if lin_value > MAX_IPB_AMP:
                 lin_value = MAX_IPB_AMP
-                val_change = True
+                val_changed = True
         elif filt_type == 'FIR':
             if lin_value > MAX_FPB_AMP:
                 lin_value = MAX_FPB_AMP
-                val_change = True
+                val_changed = True
     else: # stopband
         if lin_value < MIN_SB_AMP:
             lin_value = MIN_SB_AMP
-            val_change = True
+            val_changed = True
         if filt_type == 'IIR':
             if lin_value > MAX_ISB_AMP:
                 lin_value = MAX_ISB_AMP
-                val_change = True
+                val_changed = True
         elif filt_type == 'FIR':
             if lin_value > MAX_FSB_AMP:
                 lin_value = MAX_FSB_AMP
-                val_change = True
+                val_changed = True
         
-    if val_change: logger.warning("We changed an Amplitude Spec to be reasonable")
+    if val_changed: logger.warning("We changed an Amplitude Spec to be reasonable")
     return lin_value
 
 
