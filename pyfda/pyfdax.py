@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Mainwindow  for the pyFDA app
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see LICENSE in root directory for details)
 
-Authors: Julia Beike, Christian Muenker and Michael Winkler
+"""
+Mainwindow for the pyFDA app
+
+
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-SPLITTER = True
+
 import sys, os
 #from sip import setdestroyonexit
 import logging
