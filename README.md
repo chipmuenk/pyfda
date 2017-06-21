@@ -7,6 +7,7 @@ pyFDA
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Google Group](https://img.shields.io/badge/Google%20Group-pyFDA-red.svg)](https://groups.google.com/forum/#!forum/pyfda)
 [![Travis-CI](https://img.shields.io/travis/chipmuenk/pyFDA.svg)](https://travis-ci.org/travis-ci/travis-web.svg?branch=master)
+[![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/)
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.
 
