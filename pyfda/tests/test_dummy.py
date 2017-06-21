@@ -22,11 +22,11 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         self.assertEqual(self.y_list, self.y_list)
 
-    def test_dummy_fail(self):
-        """
-        This test fails      
-        """        
-        self.assertEqual(self.y_list, [])
+#    def test_dummy_fail(self):
+#        """
+#        This test fails      
+#        """        
+#        self.assertEqual(self.y_list, [])
 
 
 if __name__=='__main__':
