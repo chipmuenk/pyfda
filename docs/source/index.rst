@@ -12,6 +12,11 @@ Contents:
    :maxdepth: 2
    
    README
+   
+:mod:`pyfda` -- Main package
+****************************
+.. automodule:: pyfda
+	:members:
 
 
 
