@@ -41,7 +41,7 @@ If you use the Anaconda distribution, you can install pyfda from my Anaconda cha
 
     conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
 
-Unfortunately, Anaconda insists on providing OS- and Python-specific versions for `pyfda`. I'm working on that, help is appreciated ...
+Again, there is only one version for all platforms.
 
 #### setup.py
     
@@ -125,15 +125,15 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### Release 0.1
 
 The following features are still missing for the first release. 
-* Not all filter specifications are handled properly (issues #36 and #40), this is addressed currently and will be fixed in 0.1rc4
-* Scrolling and resizing of widgets has some flaws creating problems with small screens
+* Fixpoint representations with radix point are not scaled correctly
+* Coefficient export to files needs to be integrated into the corresponding subwidget
+* Pole / zero modification and export needs to be backported from coefficient widget
 
 ### Release 0.2
 * **myHDL support**
     * Export of VHDL / Verilog netlists for basic filter topologies
     * Fixpoint simulation results in pyFDA widgets
 * **Filter coefficients and poles / zeros**
-  * Display coefficients / poles and zeros with fewer digits while keeping full precision internally
   * Group multiple poles / zeros (SOS)
   * Load coefficients / poles and zeros in various formats 
 * **Filter Manager**
@@ -146,7 +146,6 @@ The following features are still missing for the first release.
 * Add a tracking cursor
 * Graphical modification of poles / zeros
 * Export of filter properties as PDF / HTML files
-* Show error messages and warnings in the GUI
 * Design, analysis and export of filters as second-order sections
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
 * Export of Python filter objects
