@@ -1,4 +1,4 @@
-API documentaiton
+API documentation
 =================
 
 :mod:`pyfda` -- Main package
