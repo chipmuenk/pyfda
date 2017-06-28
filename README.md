@@ -30,21 +30,22 @@ Optional libraries:
 ### Installing pyFDA
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
 
-#### pip
-This is the most convenient way:
-
-    pip install pyfda
-
 #### conda
 If you use the Anaconda distribution, you can install pyfda from my Anaconda channel `Chipmuenk` using
 
     conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
 
-Again, there is only one version for all platforms.
+or, shorter:
 
-#### setup.py
-    
-Download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
+    conda install -c Chipmuenk pyfda
+
+#### pip
+Otherwise, you can install from PyPI using
+
+    pip install pyfda
+
+#### setup.py   
+You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
 
     >> python setup.py install
 
@@ -59,13 +60,13 @@ In any case, the start script `pyfdax` has been created in `<python>/Scripts` wh
 
 For development and debugging, you can also run pyFDA using
 
-    In [1]: %run -m pyfda.pyfdax :# IPython or
+    In [1]: %run -m pyfda.pyfdax # IPython or
     >> python -m pyfda.pyfdax    # plain python interpreter
     
 All individual files from pyFDA can be run using e.g.
 
     In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
-    >> python -m pyfda.input_widgets.input_pz  # plain python interpreter
+    >> python -m pyfda.input_widgets.input_pz       # plain python interpreter
    
 ### Customization
 
