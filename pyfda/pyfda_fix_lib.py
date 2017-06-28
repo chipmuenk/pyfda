@@ -328,6 +328,15 @@ class Fixed(object):
         The factor between integer fixpoint representation and the floating point
         value.
 
+    ovr_flag : integer or integer array (same shape as input argument)
+        overflow flag   0 : no overflow
+
+                        +1: positive overflow
+
+                        -1: negative overflow
+
+        has occured during last fixpoint conversion
+
     N_over : integer
         total number of overflows
 
@@ -433,6 +442,8 @@ class Fixed(object):
         else:
             raise Exception(u'Unknown format "%s"!'%(self.frmt))
 
+        self.ovr_flag = 0
+
 #------------------------------------------------------------------------------
     def fix(self, y, from_float=True, to_float=False):
         """
@@ -495,6 +506,7 @@ class Fixed(object):
                 y = y.astype(complex) # ensure that is y is a numeric type
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
+            self.ovr_flag = np.zeros(y.shape, dtype = int)
         else:
             SCALAR = True
             # get rid of errors that have occurred upstream
@@ -510,6 +522,7 @@ class Fixed(object):
                 except ValueError as e:
                     logger.error("Argument '{0}' yields \n {1}".format(y,e))
             over_pos = over_neg = yq = 0
+            self.ovr_flag = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
         y = np.real_if_close(y)
@@ -545,6 +558,8 @@ class Fixed(object):
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < -MSB)
             over_pos = (yq >= MSB)
+            # create flag / array of flags for pos. / neg. overflows
+            self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
             self.N_over_neg += np.sum(over_neg)
             self.N_over_pos += np.sum(over_pos)
