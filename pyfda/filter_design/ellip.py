@@ -28,17 +28,12 @@ import scipy.signal as sig
 from scipy.signal import ellipord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 from .common import Common
-from ..compat import (QWidget, QFrame, pyqtSignal,
-                      QCheckBox, QVBoxLayout, QHBoxLayout)
-
-import logging
-logger = logging.getLogger(__name__)
 
 __version__ = "2.0"
 
 filter_classes = {'Ellip':'Elliptic'}
     
-class Ellip(QWidget):
+class Ellip(object):
 
     if SOS_AVAIL:
         FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
@@ -72,10 +67,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 
         """
 
-    sigFiltChanged = pyqtSignal()
-
     def __init__(self):
-        QWidget.__init__(self)
 
         self.ft = 'IIR'
 
@@ -93,10 +85,11 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
             'BS': {'man':{}, 'min':{}},
             'BP': {'man':{}, 'min':{}},
             }
-        self.wdg = True  # has additional dynamic widgets (for non-causal and Complex BP/BS)
+        self.wdg = False  # has no additional dynamic widgets
         
         self.hdl = ('iir_sos', 'df') # filter topologies
 
+            
         self.info_doc = []
         self.info_doc.append('ellip()\n========')
         self.info_doc.append(sig.ellip.__doc__)
@@ -109,29 +102,10 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         names given in self.wdg :
         These subwidgets are instantiated dynamically when needed in 
         select_filter.py using the handle to the filter instance, fb.fil_inst.
+        (empty method, nothing to do in this filter)
         """
-        self.chkNonCausal = QCheckBox("NonCausal", self)
-        self.chkNonCausal.setToolTip("Designs Non-Causal Filter with Zero Phase.")
-        self.chkNonCausal.setObjectName('wdg_lbl_el_0')
-        self.chkNonCausal.setChecked(False)
-        self.chkComplex   = QCheckBox("ComplexFilter", self)
-        self.chkComplex.setToolTip("Designs BP or BS Filter for complex data.")
-        self.chkComplex.setObjectName('wdg_lbl_el_1')
-        self.chkComplex.setChecked(False)
-
-        #--------------------------------------------------
-        #  Layout for filter optional subwidgets
-        self.layHWin = QHBoxLayout()
-        self.layHWin.setObjectName('wdg_layGWin')
-        self.layHWin.addWidget(self.chkNonCausal)
-        self.layHWin.addWidget(self.chkComplex)
-        self.layHWin.addStretch() 
-        self.layHWin.setContentsMargins(0,0,0,0)
-
-        # Widget containing all subwidgets 
-        self.wdg_fil = QWidget(self)
-        self.wdg_fil.setObjectName('wdg_fil')
-        self.wdg_fil.setLayout(self.layHWin)
+        pass
+        
 
     def destruct_UI(self):
         """
@@ -139,6 +113,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         (empty method, nothing to do in this filter)
         """
         pass
+
 
     def _get_params(self, fil_dict):
         """
@@ -164,6 +139,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+
     def _save(self, fil_dict, arg):
         """
         Convert results of filter design to all available formats (pz, ba, sos)
@@ -184,8 +160,6 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
             else: # BP or BS - two corner frequencies
                 fil_dict['F_PB'] = self.F_PBC[0] / 2.
                 fil_dict['F_PB2'] = self.F_PBC[1] / 2.
-
-        self.sigFiltChanged.emit()
                 
 #------------------------------------------------------------------------------
 #
@@ -201,7 +175,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
                                                           analog=self.analog)
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='low', analog=self.analog, output=self.FRMT))
-
+                            
     def LPman(self, fil_dict):
         """Elliptic LP filter, manual order"""
         self._get_params(fil_dict)
@@ -261,30 +235,7 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import sys
-    from ..compat import QApplication
     import pyfda.filterbroker as fb # importing filterbroker initializes all its globals 
-
-    app = QApplication (sys.argv)
-
-    # ellip filter widget
     filt = Ellip()        # instantiate filter
-    filt.construct_UI()
-    wdg_ma = getattr (filt, 'wdg_fil')
-
-    layVDynWdg = QVBoxLayout()
-    layVDynWdg.addWidget(wdg_ma, stretch = 1)
-
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
-
-    form = QFrame()
-    form.setFrameStyle (QFrame.StyledPanel|QFrame.Sunken)
-    form.setLayout (layVDynWdg)
-
-    form.show()
-
-    app.exec_()
-
-#-----------------------------------------------------------------------------
-

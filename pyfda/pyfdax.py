@@ -142,29 +142,33 @@ class pyFDA(QMainWindow):
         self.main_widget = QWidget(self) # this widget contains all subwidget groups
 
         layHMain = QHBoxLayout(self.main_widget) # horizontal layout of all groups
-        laySub1  = QSplitter(QtCore.Qt.Horizontal)
-        laySub2  = QSplitter(QtCore.Qt.Vertical)
+        laySubWin  = QSplitter(QtCore.Qt.Horizontal)
+        laySubRight  = QSplitter(QtCore.Qt.Vertical)
 
         # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
         self.statusWin     = QtGui.QPlainTextEdit(self)  # status window
+        mSize = QtGui.QFontMetrics(self.statusWin.font())
+        rowHt = mSize.lineSpacing()
+        self.statusWin.setFixedHeight(4*rowHt+4)
         self.statusWin.setReadOnly(True)
 
-        self._title = QtGui.QLabel('Status Log')
-        self._title.setAlignment(QtCore.Qt.AlignCenter)
+        #self._title = QtGui.QLabel('Status Log')
+        #self._title.setAlignment(QtCore.Qt.AlignCenter)
 
-        laySub1.addWidget(self.inputTabWidgets)
-        laySub1.addWidget(self.pltTabWidgets)
-        laySub1.setStretchFactor(1,4) # relative initial sizes of subwidgets
+        # Add status window underneath plot Tab Widgets
+        laySubRight.addWidget(self.pltTabWidgets)
+        #laySub.addWidget(self._title)
+        laySubRight.addWidget(self.statusWin)
+        laySubRight.setStretchFactor(0,0) # relative initial sizes of subwidgets
+        #laySubRight.setStretchFactor(1,1) # relative initial sizes of subwidgets
 
-        # Add status window underneath split windows
-        laySub2.addWidget(laySub1)
-        laySub2.addWidget(self._title)
-        laySub2.addWidget(self.statusWin)
-        laySub2.setStretchFactor(0,12) # relative initial sizes of subwidgets
+        laySubWin.addWidget(self.inputTabWidgets)
+        laySubWin.addWidget(laySubRight)
+        laySubWin.setStretchFactor(1,4) # relative initial sizes of subwidgets
 
-        layHMain.addWidget(laySub2)
+        layHMain.addWidget(laySubWin)
         layHMain.setContentsMargins(*rc.params['wdg_margins'])
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
