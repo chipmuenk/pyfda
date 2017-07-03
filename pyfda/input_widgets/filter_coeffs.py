@@ -104,11 +104,33 @@ class ItemDelegate(QStyledItemDelegate):
             # see http://zetcode.com/gui/pyqt5/painting/ : 
             option.backgroundBrush = QBrush(Qt.BDiagPattern)#QColor(100, 200, 100, 200))
             option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
-            # option.state           
+            # no super(ItemDelegate, self).initStyleOption... display ends here
         else:
-            # continue with the original `initStyleOption()`
+            #option.palette.setColor(QPalette.Window, QColor(Qt.red))
+            #option.palette.setColor(QPalette.Base, QColor(Qt.green))
+            # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
         
+#==============================================================================
+#     def paint(self, painter, option, index):
+#
+#         """
+#         painter: instance of QPainter (default)
+#         option:  instance of QStyleOptionViewItemV4
+#         index:   instance of QModelIndex
+#         """
+#         logger.debug("Ovr_flag:".format(self.parent.myQ.ovr_flag))
+#         print("paint_ovr:{0}.{1}:{2}".format(index.row(), index.column(), self.parent.myQ.ovr_flag))
+#         #option.backgroundBrush = QBrush(QColor(000, 100, 100, 200)) # lightGray
+#             #option.backgroundBrush.setColor(QColor(000, 100, 100, 200))
+#         # continue with the original `paint()` method
+#         #option.palette.setColor(QPalette.Window, QColor(Qt.red))
+#         #option.palette.setColor(QPalette.Base, QColor(Qt.green))
+#         super(ItemDelegate, self).paint(painter, option, index)
+#         #painter.restore()
+#
+#==============================================================================
+
     def text(self, item):
         """
         Return item text as string transformed by self.displayText()
@@ -122,6 +144,9 @@ class ItemDelegate(QStyledItemDelegate):
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
+
+        The instance parameter myQ.ovr_flag is set to +1 or -1 for positive /
+        negative overflows, else it is 0.
         """ 
         string = qstr(text) # convert to "normal" string
 
@@ -131,6 +156,7 @@ class ItemDelegate(QStyledItemDelegate):
         else:
             return "{0:>{1}}".format(self.parent.myQ.float2frmt(string), 
                                         self.parent.myQ.places)
+
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):
@@ -149,12 +175,11 @@ class ItemDelegate(QStyledItemDelegate):
         return line_edit
 #        return QLineEdit(parent) # return object without instantiating      
 
-    def updateEditorGeometry(self, editor, option, index):
-        """
-        Updates the editor for the item specified by index according to the option given
-        """
-        super(ItemDelegate, self).updateEditorGeometry(editor, option, index) # default
-        # TODO: implement
+#    def updateEditorGeometry(self, editor, option, index):
+#        """
+#        Updates the editor for the item specified by index according to the option given
+#        """
+#        super(ItemDelegate, self).updateEditorGeometry(editor, option, index) # default
         
     def setEditorData(self, editor, index):
         """
@@ -170,12 +195,12 @@ class ItemDelegate(QStyledItemDelegate):
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.ba[index.column()][index.row()] # data from self.ba
         fb.data_old = data # store old data in floating point format
-        
+
         if self.parent.myQ.frmt == 'float':
-            # fractional format: pass data with full resolution
+            # floating point format: pass data with full resolution
             editor.setText(str(safe_eval(data))) 
         else:
-            # integer format with base: pass requantized data with required number of places
+            # fixpoint format with base: pass requantized data with required number of places
             editor.setText("{0:>{1}}".format(self.parent.myQ.float2frmt(data),
                                                self.parent.myQ.places))
 
@@ -189,6 +214,7 @@ class ItemDelegate(QStyledItemDelegate):
         model:  instance of QAbstractTableModel
         index:  instance of QModelIndex
         """
+
         # check for different editor environments if needed and provide a default:
 #        if isinstance(editor, QtGui.QTextEdit):
 #            model.setData(index, editor.toPlainText())
