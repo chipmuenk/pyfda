@@ -110,7 +110,19 @@ class ItemDelegate(QStyledItemDelegate):
             #option.palette.setColor(QPalette.Base, QColor(Qt.green))
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
-        
+            print("style_b:{0}.{1}={2}".format(index.row(), index.column(), self.parent.myQ.ovr_flag ))
+            # test whether fixpoint conversion during displayText() created an overflow:
+            if self.parent.myQ.ovr_flag > 0:
+                option.backgroundBrush = QBrush(Qt.Dense3Pattern)
+                # ConicalGradientPattern # SolidPattern #CrossPattern #Dense1 ... 7Pattern
+                # DiagCrossPattern
+                option.backgroundBrush.setColor(QColor(100, 0, 0, 100))
+                #option.palette.setColor(QPalette.Base, QColor(100, 100, 100, 200))
+            elif self.parent.myQ.ovr_flag < 0:
+                option.backgroundBrush = QBrush(Qt.Dense2Pattern)
+                option.backgroundBrush.setColor(QColor(0, 0, 100, 100))
+
+
 #==============================================================================
 #     def paint(self, painter, option, index):
 #
