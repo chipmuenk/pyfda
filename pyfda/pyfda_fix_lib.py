@@ -218,6 +218,11 @@ def csd2dec(csd_str, int_places=0):
     msb_power = len(int_str)-1 #
     dec_val = 0.0
 
+    illegal_chars = re.sub('[+-0 ]', '', csd_str) # test for illegal characters
+    if illegal_chars:
+        logger.warn("Invalid character(s) {0} for CSD string!".format(illegal_chars))
+        return None
+
     # start from the MSB and work all the way down to the last digit
     for ii in range( len(csd_str) ):
 
