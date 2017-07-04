@@ -323,7 +323,7 @@ class FilterCoeffs(QWidget):
         qFormat = ['Float', 'Dec', 'Hex', 'Bin', 'CSD']
         self.cmbFormat.addItems(qFormat)
         self.cmbFormat.insertSeparator(1)
-        self.cmbFormat.setCurrentIndex(0) # 'float'
+        qset_cmb_box(self.cmbFormat, 'float')
         self.cmbFormat.setToolTip('Set the display format.')
         self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -484,13 +484,13 @@ class FilterCoeffs(QWidget):
         self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
         self.cmbQQuant.addItems(qQuant)
-        self.cmbQQuant.setCurrentIndex(1) # 'round'
+        qset_cmb_box(self.cmbQQuant, 'round')
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
 
         self.cmbQOvfl = QComboBox(self)
         qOvfl = ['none', 'wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
-        self.cmbQOvfl.setCurrentIndex(2) # 'sat'
+        qset_cmb_box(self.cmbQOvfl, 'sat')
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
 
         # ComboBox size is adjusted automatically to fit the longest element
