@@ -488,7 +488,7 @@ class FilterCoeffs(QWidget):
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
 
         self.cmbQOvfl = QComboBox(self)
-        qOvfl = ['none', 'wrap', 'sat']
+        qOvfl = ['wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
         qset_cmb_box(self.cmbQOvfl, 'sat')
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
