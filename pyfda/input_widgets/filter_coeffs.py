@@ -96,6 +96,8 @@ class ItemDelegate(QStyledItemDelegate):
         Initialize `option` with the values using the `index` index. When the 
         item (0,1) is processed, it is styled especially. All other items are 
         passed to the original `initStyleOption()` which then calls `displayText()`.
+        Afterwards, check whether an fixpoint overflow has occured and color item
+        background accordingly.
         """
         if index.row() == 0 and index.column() == 1: # a[0]: always 1
             option.text = "1" # QString object
@@ -104,23 +106,19 @@ class ItemDelegate(QStyledItemDelegate):
             # see http://zetcode.com/gui/pyqt5/painting/ : 
             option.backgroundBrush = QBrush(Qt.BDiagPattern)#QColor(100, 200, 100, 200))
             option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
-            # no super(ItemDelegate, self).initStyleOption... display ends here
+            # don't continue with default initStyleOption... display routine ends here
         else:
-            #option.palette.setColor(QPalette.Window, QColor(Qt.red))
-            #option.palette.setColor(QPalette.Base, QColor(Qt.green))
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
-            print("style_b:{0}.{1}={2}".format(index.row(), index.column(), self.parent.myQ.ovr_flag ))
             # test whether fixpoint conversion during displayText() created an overflow:
             if self.parent.myQ.ovr_flag > 0:
-                option.backgroundBrush = QBrush(Qt.Dense3Pattern)
-                # ConicalGradientPattern # SolidPattern #CrossPattern #Dense1 ... 7Pattern
-                # DiagCrossPattern
-                option.backgroundBrush.setColor(QColor(100, 0, 0, 100))
-                #option.palette.setColor(QPalette.Base, QColor(100, 100, 100, 200))
+                # Color item backgrounds with pos. Overflows red
+                option.backgroundBrush = QBrush(Qt.SolidPattern)
+                option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
             elif self.parent.myQ.ovr_flag < 0:
-                option.backgroundBrush = QBrush(Qt.Dense2Pattern)
-                option.backgroundBrush.setColor(QColor(0, 0, 100, 100))
+                # Color item backgrounds with neg. Overflows blue
+                option.backgroundBrush = QBrush(Qt.SolidPattern)
+                option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
 
 
 #==============================================================================
