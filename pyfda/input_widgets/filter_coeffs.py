@@ -37,8 +37,6 @@ import pyfda.pyfda_fix_lib as fix
 #    in safe_eval
 # TODO: Strip parentheses of complex argument @ setEditorData()
 
-# TODO: detect overflows during quantization and color cells - 
-#      add another array to fix to store over / underflows
 # TODO: This ItemDelegate method displayText is called again and again when an 
 #        item is selected?!
 
