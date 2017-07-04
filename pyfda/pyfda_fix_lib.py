@@ -637,9 +637,9 @@ class Fixed(object):
                 return y_float
                 # TODO: what about complex strings?
             else:
-                return y
-            
-        else:
+                y_float = y
+
+        else: # {'dec', 'bin', 'hex', 'csd'}
          # Find the number of places before the first radix point (if there is one)
          # and join integer and fractional parts:
             val_str = qstr(y).replace(' ','') # just to be sure ...
@@ -670,13 +670,12 @@ class Fixed(object):
         if frmt == 'dec':
             try:
                 y_float = float(val_str)
+                if not self.point:
+                    y_float = y_float / self.MSB
+
             except Exception as e:
                 logger.warn(e)
                 y_float = None
-            if self.point:
-                return y_float
-            else:
-                return y_float / self.MSB
 
         elif frmt in {'hex', 'bin'}:
             try:
@@ -700,23 +699,25 @@ class Fixed(object):
             print("MSB = {0} |  LSB = {1} | scale = {2}\n"
               "y = {3} | y_int = {4} | y_float = {5}".format(self.MSB, self.LSB, self.scale, y, y_int, y_float))
 
-            if y_float is not None:
-                return y_float
-            elif fb.data_old is not None:
-                return fb.data_old
-            else:
-                return 0
-
         elif frmt == 'csd':
-            y_float = csd2dec(raw_str, int_places) / 2**(self.W-1)
-            
+            y_float = csd2dec(raw_str, int_places)
+            if y_float is not None:
+                y_float = y_float / 2**(self.W-1)
+
             logger.debug("MSB = {0} |  scale = {1}\n"
               "y = {2}  | y_float = {3}".format(self.MSB, self.scale, y, y_float))
-            return y_float
 
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
+
+        if y_float is not None:
+            return y_float
+        elif fb.data_old is not None:
+            return fb.data_old
+        else:
+            return 0
+
 
 #------------------------------------------------------------------------------
     def float2frmt(self, y):
