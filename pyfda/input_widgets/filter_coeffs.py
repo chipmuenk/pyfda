@@ -316,10 +316,24 @@ class FilterCoeffs(QWidget):
         self.cmbFilterType.addItems(["FIR","IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
+        fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
         self.cmbFormat = QComboBox(self)
-#        self.cmbFormat.addItem('Float')
-        qFormat = ['Float', 'Dec', 'Hex', 'Bin', 'CSD']
-        self.cmbFormat.addItems(qFormat)
+        model = self.cmbFormat.model()
+        item = QtGui.QStandardItem('Float')
+        item.setData('child', Qt.AccessibleDescriptionRole)
+        model.appendRow(item)
+
+        item = QtGui.QStandardItem('Fixpoint')
+        item.setData('parent', Qt.AccessibleDescriptionRole)
+        item.setData(0, QtGui.QFont.Bold)
+        item.setFlags(item.flags() & ~Qt.ItemIsEnabled)# | Qt.ItemIsSelectable))
+        model.appendRow(item)
+
+        for idx in range(len(fix_formats)):
+            item = QtGui.QStandardItem(fix_formats[idx])
+#            item.setForeground(QtGui.QColor('red'))
+            model.appendRow(item)
+
         self.cmbFormat.insertSeparator(1)
         qset_cmb_box(self.cmbFormat, 'float')
         self.cmbFormat.setToolTip('Set the display format.')
@@ -331,7 +345,7 @@ class FilterCoeffs(QWidget):
         self.spnRound.setToolTip("Number of digits to display digits.")
         self.lblRound = QLabel("Digits", self)
         self.lblRound.setFont(self.bifont)
-     
+
         self.chkRadixPoint = QCheckBox("Radix point", self)
         self.chkRadixPoint.setFont(self.bifont)
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
