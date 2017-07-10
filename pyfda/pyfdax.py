@@ -85,7 +85,7 @@ class XStream(QtCore.QObject):
 import pyfda.filterbroker as fb
 fb.base_dir = base_dir
 
-from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication,
+from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication, QFontMetrics,
                      QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit,
                      QGridLayout, QTextBrowser, QVBoxLayout, QLabel, QtGui)
 import matplotlib
@@ -148,8 +148,8 @@ class pyFDA(QMainWindow):
         # Instantiate subwidget groups
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-        self.statusWin     = QtGui.QPlainTextEdit(self)  # status window
-        mSize = QtGui.QFontMetrics(self.statusWin.font())
+        self.statusWin     = QPlainTextEdit(self)  # status window
+        mSize = QFontMetrics(self.statusWin.font())
         rowHt = mSize.lineSpacing()
         self.statusWin.setFixedHeight(4*rowHt+4)
         self.statusWin.setReadOnly(True)
