@@ -37,8 +37,6 @@ import pyfda.pyfda_fix_lib as fix
 #    in safe_eval
 # TODO: Strip parentheses of complex argument @ setEditorData()
 
-# TODO: detect overflows during quantization and color cells - 
-#      add another array to fix to store over / underflows
 # TODO: This ItemDelegate method displayText is called again and again when an 
 #        item is selected?!
 
@@ -96,6 +94,8 @@ class ItemDelegate(QStyledItemDelegate):
         Initialize `option` with the values using the `index` index. When the 
         item (0,1) is processed, it is styled especially. All other items are 
         passed to the original `initStyleOption()` which then calls `displayText()`.
+        Afterwards, check whether an fixpoint overflow has occured and color item
+        background accordingly.
         """
         if index.row() == 0 and index.column() == 1: # a[0]: always 1
             option.text = "1" # QString object
@@ -104,23 +104,19 @@ class ItemDelegate(QStyledItemDelegate):
             # see http://zetcode.com/gui/pyqt5/painting/ : 
             option.backgroundBrush = QBrush(Qt.BDiagPattern)#QColor(100, 200, 100, 200))
             option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
-            # no super(ItemDelegate, self).initStyleOption... display ends here
+            # don't continue with default initStyleOption... display routine ends here
         else:
-            #option.palette.setColor(QPalette.Window, QColor(Qt.red))
-            #option.palette.setColor(QPalette.Base, QColor(Qt.green))
             # continue with the original `initStyleOption()` and call displayText()
             super(ItemDelegate, self).initStyleOption(option, index)
-            print("style_b:{0}.{1}={2}".format(index.row(), index.column(), self.parent.myQ.ovr_flag ))
             # test whether fixpoint conversion during displayText() created an overflow:
             if self.parent.myQ.ovr_flag > 0:
-                option.backgroundBrush = QBrush(Qt.Dense3Pattern)
-                # ConicalGradientPattern # SolidPattern #CrossPattern #Dense1 ... 7Pattern
-                # DiagCrossPattern
-                option.backgroundBrush.setColor(QColor(100, 0, 0, 100))
-                #option.palette.setColor(QPalette.Base, QColor(100, 100, 100, 200))
+                # Color item backgrounds with pos. Overflows red
+                option.backgroundBrush = QBrush(Qt.SolidPattern)
+                option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
             elif self.parent.myQ.ovr_flag < 0:
-                option.backgroundBrush = QBrush(Qt.Dense2Pattern)
-                option.backgroundBrush.setColor(QColor(0, 0, 100, 100))
+                # Color item backgrounds with neg. Overflows blue
+                option.backgroundBrush = QBrush(Qt.SolidPattern)
+                option.backgroundBrush.setColor(QColor(0, 0, 100, 80))
 
 
 #==============================================================================
@@ -320,12 +316,26 @@ class FilterCoeffs(QWidget):
         self.cmbFilterType.addItems(["FIR","IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
+        fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
         self.cmbFormat = QComboBox(self)
-#        self.cmbFormat.addItem('Float')
-        qFormat = ['Float', 'Dec', 'Hex', 'Bin', 'CSD']
-        self.cmbFormat.addItems(qFormat)
+        model = self.cmbFormat.model()
+        item = QtGui.QStandardItem('Float')
+        item.setData('child', Qt.AccessibleDescriptionRole)
+        model.appendRow(item)
+
+        item = QtGui.QStandardItem('Fixpoint')
+        item.setData('parent', Qt.AccessibleDescriptionRole)
+        item.setData(0, QtGui.QFont.Bold)
+        item.setFlags(item.flags() & ~Qt.ItemIsEnabled)# | Qt.ItemIsSelectable))
+        model.appendRow(item)
+
+        for idx in range(len(fix_formats)):
+            item = QtGui.QStandardItem(fix_formats[idx])
+#            item.setForeground(QtGui.QColor('red'))
+            model.appendRow(item)
+
         self.cmbFormat.insertSeparator(1)
-        self.cmbFormat.setCurrentIndex(0) # 'float'
+        qset_cmb_box(self.cmbFormat, 'float')
         self.cmbFormat.setToolTip('Set the display format.')
         self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
@@ -335,7 +345,7 @@ class FilterCoeffs(QWidget):
         self.spnRound.setToolTip("Number of digits to display digits.")
         self.lblRound = QLabel("Digits", self)
         self.lblRound.setFont(self.bifont)
-     
+
         self.chkRadixPoint = QCheckBox("Radix point", self)
         self.chkRadixPoint.setFont(self.bifont)
         self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
@@ -486,13 +496,13 @@ class FilterCoeffs(QWidget):
         self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
         self.cmbQQuant.addItems(qQuant)
-        self.cmbQQuant.setCurrentIndex(1) # 'round'
+        qset_cmb_box(self.cmbQQuant, 'round')
         self.cmbQQuant.setToolTip("Select the kind of quantization.")
 
         self.cmbQOvfl = QComboBox(self)
-        qOvfl = ['none', 'wrap', 'sat']
+        qOvfl = ['wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
-        self.cmbQOvfl.setCurrentIndex(2) # 'sat'
+        qset_cmb_box(self.cmbQOvfl, 'sat')
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
 
         # ComboBox size is adjusted automatically to fit the longest element
