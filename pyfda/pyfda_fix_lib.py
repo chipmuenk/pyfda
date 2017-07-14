@@ -659,6 +659,10 @@ class Fixed(object):
                      'dec' : '[0-9]',
                      'hex' : '[0-9A-Fa-f]'
                      }
+            frmt_scale = {'bin' : 2,
+                          'csd' : 2,
+                          'dec' : 1,
+                          'hex' : 16}
 
             # count number of valid digits in string, using regex pattern
             int_places = len(re.findall(frmt_regex[frmt], int_str)) - 1
