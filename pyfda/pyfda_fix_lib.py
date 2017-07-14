@@ -752,46 +752,44 @@ class Fixed(object):
         if self.frmt == 'float': # return float input value unchanged
             return y
 
-        else:
+        elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # quantize & treat overflows of y (float), returning an integer in
             # the range -2**(W-1) ... 2**(W-1)
             y_fix = self.fix(y)
             y_fix_lsb = y_fix * self.LSB
 
-            if self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # fixpoint format, transform to string
+            yi = np.round(np.modf(y_fix_lsb)[1]).astype(int) # integer part
+            yf = np.round(np.modf(y_fix_lsb)[0] * (1 << self.WF)).astype(int) # frac part as integer
 
-                yi = np.round(np.modf(y_fix_lsb)[1]).astype(int) # integer part
-                yf = np.round(np.modf(y_fix_lsb)[0] * (1 << self.WF)).astype(int) # frac part as integer
+            logger.debug("y_fix={0}, yi={1}, yf={2}".format(y_fix_lsb, yi, yf))
 
-                logger.debug("y_fix={0}, yi={1}, yf={2}".format(y_fix_lsb, yi, yf))
+            if self.frmt == 'dec':
+                y_str = str(y_fix_lsb) # use fixpoint number as returned by fix()
 
-                if self.frmt == 'dec':
-                    y_str = str(y_fix_lsb) # use fixpoint number as returned by fix()
+            elif self.frmt == 'hex':
+                if self.point and self.WF > 0:
+                    y_str_bin_i = np.binary_repr(y_fix, self.W)[:self.WI+1]
+                    y_str_bin_f = np.binary_repr(y_fix, self.W)[self.WI+1:]
+                    y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
+                else:
+                    y_str = dec2hex(yi, self.W)
+            elif self.frmt == 'bin':
+                # calculate binary representation of fixpoint integer
+                y_str = np.binary_repr(y_fix, self.W)
+                if self.point and self.WF > 0:
+                    # ... and insert the radix point if required
+                    y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
+            else: # self.frmt = 'csd'
+                if self.point:
+                    y_str = dec2csd(y_fix_lsb, self.WF) # yes, use fractional bits WF
+                else:
+                    y_str = dec2csd(y_fix, 0) # no, treat as integer
 
-                elif self.frmt == 'hex':
-                    if self.point and self.WF > 0:
-                        y_str_bin_i = np.binary_repr(y_fix, self.W)[:self.WI+1]
-                        y_str_bin_f = np.binary_repr(y_fix, self.W)[self.WI+1:]
-                        y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
-                    else:
-                        y_str = dec2hex(yi, self.W)
-                elif self.frmt == 'bin':
-                    # calculate binary representation of fixpoint integer
-                    y_str = np.binary_repr(y_fix, self.W)
-                    if self.point and self.WF > 0:
-                        # ... and insert the radix point if required
-                        y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
-                else: # self.frmt = 'csd'
-                    if self.point:
-                        y_str = dec2csd(y_fix_lsb, self.WF) # yes, use fractional bits WF
-                    else:
-                        y_str = dec2csd(y_fix, 0) # no, treat as integer
-
-                return y_str
-            else:
-                raise Exception('Unknown output format "%s"!'%(self.frmt))
-                return None
+            return y_str
+        else:
+            raise Exception('Unknown output format "%s"!'%(self.frmt))
+            return None
 
 ########################################
 # If called directly, do some examples #
