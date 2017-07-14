@@ -684,8 +684,8 @@ class Fixed(object):
         elif frmt in {'hex', 'bin'}:
             try:
                 y_int = int(raw_str, self.base)
-                # two's complement formats need to be treated separately
-                if frmt in {'bin', 'hex'} and y_int >= (1 << (self.W-1)):             
+                # check for negative (two's complement) numbers
+                if y_int >= (1 << (self.W-1)):
                     y_int = y_int - (1 << self.W)
                 # quantize / saturate / wrap the integer value:
                 if self.point:
