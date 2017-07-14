@@ -451,10 +451,8 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def fix(self, y, from_float=True, to_float=False):
         """
-        Return fixed-point integer representation `yq` of `y` (scalar or array-like),
-        `yq.shape = y.shape`.
-
-        `y` is multiplied by `self.MSB` before requantizing and 
+        Return fixed-point integer or fractional representation for `y` 
+        (scalar or array-like) with the same shape as `y`.
 
         Saturation / two's complement wrapping happens outside the range +/- MSB,  
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
@@ -465,7 +463,7 @@ class Fixed(object):
             in floating point format to be quantized 
 
         from_float: Boolean
-            When `True` (default), y is is multiplied by `1<<(W-1)` before 
+            When `True` (default), y is is multiplied by `MSB = 1<<(W-1)` before 
             requantizing and saturating. When `False, it is treated as an 
             integer that doesn't have to be scaled. 
 
@@ -476,7 +474,7 @@ class Fixed(object):
 
         Returns
         -------
-        yq: integer scalar or ndarray
+        integer scalar or ndarray
             with the same shape as `y`, in the range `-self.MSB` ... `self.MSB`
 
         Examples:
@@ -656,23 +654,25 @@ class Fixed(object):
             except ValueError: # no fractional part
                 int_str = val_str
 
-            regex = {'bin' : '[0|1]',
+            frmt_regex = {'bin' : '[0|1]',
                      'csd' : '0|\+|\-',
                      'dec' : '[0-9]',
                      'hex' : '[0-9A-Fa-f]'
                      }
 
-            # count number of valid digits in string
-            int_places = len(re.findall(regex[frmt], int_str)) - 1
+            # count number of valid digits in string, using regex pattern
+            int_places = len(re.findall(frmt_regex[frmt], int_str)) - 1
             raw_str = val_str.replace('.','') # join integer and fractional part  
             
             logger.debug("frmt, int_places", frmt, int_places)
             logger.debug("y, raw_str = ", y, val_str)
-            # (1) calculate the decimal value of the input string without dot
-            # (2) scale the integer depending the number of places and the base
 
+        # (1) calculate the decimal value of the input string without dot
+        # (2) scale the integer depending the number of places and the base
         if frmt == 'dec':
             try:
+                # try to convert string -> float directly, taking radix 
+                # point position into account 
                 y_float = float(val_str)
                 if not self.point:
                     y_float = y_float / self.MSB
@@ -726,18 +726,16 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def float2frmt(self, y):
         """
-        Return fixpoint representation `yf` of `y` (scalar or array-like) with 
-        selected fixpoint base and number format.
+        Called a.o. by `itemDelegate.displayText()` for on-the-fly number 
+        conversion, return fixpoint representation for `y` (scalar or array-like) 
+        with numeric format `self.frmt` and `self.W` bits. The result has the 
+        same shape as `y`.
 
-        `float2frmt()` is called a.o. by `itemDelegate.displayText()`
+        When `point = False` (use integer arithmetic), the floating point value
+        is multiplied by self.MSB (2**W-1, shift right by W-1 bits). 
 
-        `yf.shape = y.shape`
-
-        When `point = False` (use integer arithmetic), the fractional representation
-        is multiplied by self.MSB (2**W-1, shift right by W-1 bits)
-
-        When `point = True` (use radix point), scale the fractional representation
-        by 2**WI (= shift left by WI bits).
+        When `point = True` (use radix point), the fractional representation is
+        scaled by 2**WI (= shift left by WI bits).
 
         Parameters
         ----------
@@ -746,11 +744,12 @@ class Fixed(object):
 
         Returns
         -------
-        yf: string, float or ndarray of float or string
-            with the same shape as `y`.
-            `yf` is formatted as set in `self.frmt` with `self.W` digits
+        A string, a float or an ndarray of float or string is returned in the 
+        numeric format set in `self.frmt`. It has the same shape as `y`. For all
+        formats except `float` a fixpoint representation with `self.W` binary 
+        digits is returned.
         """
-        if self.frmt == 'float': # return float input value
+        if self.frmt == 'float': # return float input value unchanged
             return y
 
         else:
