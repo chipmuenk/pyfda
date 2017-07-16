@@ -497,16 +497,8 @@ class FilterCoeffs(QWidget):
         layHCoeffs_W.addStretch()
         
         #-------------------------------------------------------------------
-
-        self.lblLSBtxt = QLabel(self)
-        self.lblLSBtxt.setText("LSB =")
-        self.lblLSBtxt.setFont(self.bifont)
-        self.lblLSB = QLabel(self)
-
-        self.lblMSBtxt = QLabel(self)
-        self.lblMSBtxt.setText("MSB =")
-        self.lblMSBtxt.setFont(self.bifont)
-        self.lblMSB = QLabel(self)
+        #   QFormat settings
+        # ---------------------------------------------------------------------        
 
         self.cmbQQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
@@ -530,6 +522,33 @@ class FilterCoeffs(QWidget):
 #        butQuant.setText("Q!")
         self.butQuant.setIcon(QIcon(':/quantize.svg'))
         self.butQuant.setIconSize(q_icon_size)
+        self.lblLSBtxt = QLabel(self)
+        self.lblLSBtxt.setText("LSB =")
+        self.lblLSBtxt.setFont(self.bifont)
+        self.lblLSB = QLabel(self)
+
+        self.lblMSBtxt = QLabel(self)
+        self.lblMSBtxt.setText("MSB =")
+        self.lblMSBtxt.setFont(self.bifont)
+        self.lblMSB = QLabel(self)
+        
+        layHCoeffsQOpt = QHBoxLayout()
+        layHCoeffsQOpt.addWidget(lblQOvfl)
+        layHCoeffsQOpt.addWidget(self.cmbQOvfl)
+        layHCoeffsQOpt.addWidget(lblQuant)
+        layHCoeffsQOpt.addWidget(self.cmbQQuant)
+        layHCoeffsQOpt.addWidget(self.butQuant)
+        layHCoeffsQOpt.addStretch()
+
+        layHCoeffs_MSB_LSB = QHBoxLayout()
+        layHCoeffs_MSB_LSB.addWidget(self.lblMSBtxt)
+        layHCoeffs_MSB_LSB.addWidget(self.lblMSB)
+        layHCoeffs_MSB_LSB.addStretch()
+        layHCoeffs_MSB_LSB.addWidget(self.lblLSBtxt)
+        layHCoeffs_MSB_LSB.addWidget(self.lblLSB)
+        layHCoeffs_MSB_LSB.addStretch()
+        
+
         
         # ---------------------------------------------------------------------
         #   Coefficient table widget
@@ -553,23 +572,6 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs2.addWidget(lblEps)
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
         layHButtonsCoeffs2.addStretch()
-
-        layHCoeffsQOpt = QHBoxLayout()
-        layHCoeffsQOpt.addWidget(lblQOvfl)
-        layHCoeffsQOpt.addWidget(self.cmbQOvfl)
-        layHCoeffsQOpt.addWidget(lblQuant)
-        layHCoeffsQOpt.addWidget(self.cmbQQuant)
-        layHCoeffsQOpt.addWidget(self.butQuant)
-        layHCoeffsQOpt.addStretch()
-        
-        layHCoeffs_MSB_LSB = QHBoxLayout()
-
-        layHCoeffs_MSB_LSB.addWidget(self.lblMSBtxt)
-        layHCoeffs_MSB_LSB.addWidget(self.lblMSB)
-        layHCoeffs_MSB_LSB.addStretch()
-        layHCoeffs_MSB_LSB.addWidget(self.lblLSBtxt)
-        layHCoeffs_MSB_LSB.addWidget(self.lblLSB)
-        layHCoeffs_MSB_LSB.addStretch()
         
         layVButtonsQ = QVBoxLayout()
         layVButtonsQ.addLayout(layHCoeffsQOpt)
@@ -701,14 +703,22 @@ class FilterCoeffs(QWidget):
         qfrmt = qget_cmb_box(self.cmbQFrmt) # data=False?
         is_qfrac = False
         if qfrmt == 'qint':
+            W = int(safe_eval(self.ledW.text(), self.myQ.W))
+            self.ledWI.setText(str(W - 1))
+            self.ledWF.setText("0")
+            self.myQ.scale = 2. ** W
             print("qint")
-        elif qfrmt == 'qfrac':
+        elif qfrmt == 'qnfrac': # normalized fractional format
+            self.ledWI.setText("0")
+            self.ledWF.setText(str(W - 1))
+            self.myQ.scale = 1.
+        else: # qfrmt == 'qfrac':
             is_qfrac = True
+
         self.ledWI.setEnabled(is_qfrac)
         self.lblDot.setEnabled(is_qfrac)
         self.ledWF.setEnabled(is_qfrac)
-        #self.ledW.setVisible(not self.chkRadixPoint.isChecked())
-
+        self.ledW.setEnabled(not is_qfrac)
 
         self._refresh_table()
         
