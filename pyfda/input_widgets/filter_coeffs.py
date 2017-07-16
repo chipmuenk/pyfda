@@ -697,13 +697,18 @@ class FilterCoeffs(QWidget):
         """
         Set variables and widgets depending on radix point
         """
-        self.ledWI.setEnabled(self.chkRadixPoint.isChecked())
-        self.lblDot.setEnabled(self.chkRadixPoint.isChecked())
-        self.ledWF.setEnabled(self.chkRadixPoint.isChecked())
-        #self.ledW.setVisible(not self.chkRadixPoint.isChecked())
+
         qfrmt = qget_cmb_box(self.cmbQFrmt) # data=False?
+        is_qfrac = False
         if qfrmt == 'qint':
             print("qint")
+        elif qfrmt == 'qfrac':
+            is_qfrac = True
+        self.ledWI.setEnabled(is_qfrac)
+        self.lblDot.setEnabled(is_qfrac)
+        self.ledWF.setEnabled(is_qfrac)
+        #self.ledW.setVisible(not self.chkRadixPoint.isChecked())
+
 
         self._refresh_table()
         
