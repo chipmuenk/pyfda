@@ -900,27 +900,6 @@ class FilterCoeffs(QWidget):
 
         self._refresh_table()
 
-#------------------------------------------------------------------------------
-    def _store_q_settings(self):
-        """
-        Read out the settings of the quantization comboboxes and store them in
-        the filter dict. Update the fixpoint object.
-        """
-        fb.fil[0]['q_coeff'] = {
-                'WI':abs(int(self.ledWI.text())),
-                'WF':abs(int(self.ledWF.text())),
-                'quant':self.cmbQQuant.currentText(),
-                'ovfl':self.cmbQOvfl.currentText(),
-                'frmt':self.cmbFormat.currentText(),
-                'point':self.chkRadixPoint.isChecked()               
-                } 
-        self.myQ.setQobj(fb.fil[0]['q_coeff'])
-        
-        self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
-        self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        
-        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
-        self.ledScale.setText(str(self.scale))
 
 #------------------------------------------------------------------------------
     def _load_q_settings(self):
@@ -943,6 +922,28 @@ class FilterCoeffs(QWidget):
         self.ledScale.setText(str(self.scale))
 
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
+
+#------------------------------------------------------------------------------
+    def _store_q_settings(self):
+        """
+        Read out the settings of the quantization comboboxes and store them in
+        the filter dict. Update the fixpoint object.
+        """
+        fb.fil[0]['q_coeff'] = {
+                'WI':abs(int(self.ledWI.text())),
+                'WF':abs(int(self.ledWF.text())),
+                'quant':self.cmbQQuant.currentText(),
+                'ovfl':self.cmbQOvfl.currentText(),
+                'frmt':self.cmbFormat.currentText(),
+                'scale':self.ledScale.text(),
+                'point':self.chkRadixPoint.isChecked()
+                }
+        self.myQ.setQobj(fb.fil[0]['q_coeff'])
+
+        self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
+        self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
+
+        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
 
 #------------------------------------------------------------------------------
     def _save_dict(self):
