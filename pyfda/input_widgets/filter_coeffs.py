@@ -596,7 +596,8 @@ class FilterCoeffs(QWidget):
         # ============== Signals & Slots ================================
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
-        self.cmbQFrmt.currentIndexChanged.connect(self._radix_point)
+
+        self.cmbQFrmt.currentIndexChanged.connect(self._set_number_format)
         butSettingsClipboard.clicked.connect(self._copy_options)
         butToClipboard.clicked.connect(self._copy_to_clipboard)
         butFromClipboard.clicked.connect(self._copy_from_clipboard)
@@ -625,7 +626,7 @@ class FilterCoeffs(QWidget):
         self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object                        
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
-        self._radix_point()
+        self._set_number_format()
 
 
 #------------------------------------------------------------------------------
@@ -693,7 +694,7 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
 
 #------------------------------------------------------------------------------
-    def _radix_point(self):
+    def _set_number_format(self):
         """
         Set one of three number formats: Integer, fractional, normalized fractional
         """
