@@ -704,10 +704,10 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _radix_point(self):
         """
-        Set variables and widgets depending on radix point
+        Set one of three number formats: Integer, fractional, normalized fractional
         """
 
-        qfrmt = qget_cmb_box(self.cmbQFrmt) # data=False?
+        qfrmt = qget_cmb_box(self.cmbQFrmt)
         is_qfrac = False
         if qfrmt == 'qint':
             W = int(safe_eval(self.ledW.text(), self.myQ.W))
