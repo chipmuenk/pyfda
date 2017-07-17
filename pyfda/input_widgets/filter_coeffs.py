@@ -678,21 +678,25 @@ class FilterCoeffs(QWidget):
     def _W_changed(self):
         """
         Set fractional and integer length `WF` and `WI` when wordlength Ẁ` has
-        been changed. Try to preserve `WI`setting except when `WF`would become
-        negative.
+        been changed. Try to preserve `WI` or `WF` settings depending on the
+        number format (integer or fractional).
         """
         W = int(safe_eval(self.ledW.text(), self.myQ.W))
         if W < 2:
-            self.ledW.setText(str(self.myQ.W))
-        WF = W - self.myQ.WI - 1
-        if WF < 0:
-            self.ledWI.setText(str(W - 1))
-            WF = 0
-            
-        self.ledWF.setText(str(WF))
-        self._store_q_settings()
-        
-        self._refresh_table()
+            self.ledW.setText(str(self.myQ.W)) # fall back to previous value
+        else:
+            if qget_cmb_box(self.cmbQFrmt) == 'qint': # integer format, preserve WI bits
+                WI = W - self.myQ.WF - 1
+                self.ledWI.setText(str(WI))
+            else: # fractional format, preserve WF bits
+                WF = W - self.myQ.WI - 1
+                if WF < 0:
+                    self.ledWI.setText(str(W - 1))
+                    WF = 0
+                self.ledWF.setText(str(WF))
+
+            self._store_q_settings()
+            self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _radix_point(self):
