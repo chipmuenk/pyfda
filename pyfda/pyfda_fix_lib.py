@@ -384,7 +384,7 @@ class Fixed(object):
         store it as instance attribute
         """
         for key in q_obj.keys():
-            if key not in ['Q','WF','WI','quant','ovfl','frmt','point','scale']:
+            if key not in ['Q','WF','WI','quant','ovfl','frmt','scale']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
         # set default values for parameters if undefined:
@@ -410,21 +410,18 @@ class Fixed(object):
         if 'frmt' not in q_obj: q_obj['frmt'] = 'float'
         self.frmt = str(q_obj['frmt']).lower()
         
-        if 'point' not in q_obj: q_obj['point'] = 'false'
-        self.point = q_obj['point']
-        
         if not hasattr(self, 'scale') or not self.scale or 'scale' not in q_obj:
             q_obj['scale'] = 1.
         self.scale = q_obj['scale']
 
         self.q_obj = q_obj # store quant. dict in instance
 
-        if self.point:        
-            self.LSB  = 2. ** -self.WF  # value of LSB = 2 ^ (-WF)
-            self.MSB  = 2. ** self.WI   # value of MSB = 2 ^ WI
-        else:
-            self.LSB = 1
-            self.MSB = 2. ** (self.W-1)
+        #if self.point:
+        self.LSB  = 2. ** -self.WF  # value of LSB = 2 ^ (-WF)
+        self.MSB  = 2. ** self.WI   # value of MSB = 2 ^ WI
+        #else:
+        #    self.LSB = 1
+        #    self.MSB = 2. ** (self.W-1)
 
         # Calculate required number of places for different bases from total 
         # number of bits:
@@ -535,7 +532,7 @@ class Fixed(object):
 
         MSB = 1 << (self.W - 1) #   * self.scale
         if from_float:  # y is a float, scale with MSB
-            y = y * MSB 
+             y = y * self.MSB
 
         # Quantize input in relation to LSB
         if   self.quant == 'floor':  yq = np.floor(y)
@@ -558,8 +555,8 @@ class Fixed(object):
             pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
-            over_neg = (yq < -MSB)
-            over_pos = (yq >= MSB)
+            over_neg = (yq < -self.MSB)
+            over_pos = (yq >= self.MSB)
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
@@ -569,18 +566,18 @@ class Fixed(object):
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
-                yq = np.where(over_pos, (MSB-1), yq) # (cond, true, false)
-                yq = np.where(over_neg, -MSB, yq)
+                yq = np.where(over_pos, (self.MSB-1), yq) # (cond, true, false)
+                yq = np.where(over_neg, -self.MSB, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                    yq - 2. * MSB*np.fix((np.sign(yq) * MSB+yq)/(2*MSB)), yq)
+                    yq - 2. * self.MSB*np.fix((np.sign(yq) * self.MSB+yq)/(2*self.MSB)), yq)
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
         if to_float:
-            yq = yq / MSB
+            yq = yq / self.MSB
         else:
             yq = yq.astype(np.int64)
 
@@ -678,8 +675,7 @@ class Fixed(object):
                 # try to convert string -> float directly, taking radix 
                 # point position into account 
                 y_float = float(val_str)
-                if not self.point:
-                    y_float = y_float / self.MSB
+                y_float = y_float / self.MSB
 
             except Exception as e:
                 logger.warn(e)
@@ -692,10 +688,9 @@ class Fixed(object):
                 if y_int >= (1 << (self.W-1)):
                     y_int = y_int - (1 << self.W)
                 # quantize / saturate / wrap the integer value:
-                if self.point:
-                    y_float = self.fix(y_int * self.LSB) * self.LSB
-                else:
-                    y_float = self.fix(y_int, from_float = False) / self.MSB
+
+# TODO:                 # y_float = self.fix(y_int * self.LSB) * self.LSB
+                y_float = self.fix(y_int, from_float = False) / self.MSB
                 # scale integer fixpoint value
                 #y_float = y_fix / self.MSB#2**(self.W-1)
 
@@ -772,7 +767,7 @@ class Fixed(object):
                 y_str = str(y_fix_lsb) # use fixpoint number as returned by fix()
 
             elif self.frmt == 'hex':
-                if self.point and self.WF > 0:
+                if self.WF > 0:
                     y_str_bin_i = np.binary_repr(y_fix, self.W)[:self.WI+1]
                     y_str_bin_f = np.binary_repr(y_fix, self.W)[self.WI+1:]
                     y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
@@ -781,11 +776,11 @@ class Fixed(object):
             elif self.frmt == 'bin':
                 # calculate binary representation of fixpoint integer
                 y_str = np.binary_repr(y_fix, self.W)
-                if self.point and self.WF > 0:
+                if self.WF > 0:
                     # ... and insert the radix point if required
                     y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
             else: # self.frmt = 'csd'
-                if self.point:
+                if self.WF > 0:
                     y_str = dec2csd(y_fix_lsb, self.WF) # yes, use fractional bits WF
                 else:
                     y_str = dec2csd(y_fix, 0) # no, treat as integer

@@ -339,13 +339,6 @@ class FilterCoeffs(QWidget):
         self.spnRound.setToolTip("Number of digits to display.")
         self.lblRound = QLabel("Digits", self)
         self.lblRound.setFont(self.bifont)
-
-        self.chkRadixPoint = QCheckBox("Radix point", self)
-        self.chkRadixPoint.setFont(self.bifont)
-        self.chkRadixPoint.setToolTip("<span>Show and use radix point (= decimal"
-                    " point for base 10) for fixpoint formats.</span>")
-        self.chkRadixPoint.setChecked(False)
-        self.chkRadixPoint.setCheckable(True)
         
         self.cmbQFrmt = QComboBox(self)
         q_formats = [('Integer', 'qint' ), ('Norm. Frac.', 'qnfrac'), ('Fractional', 'qfrac')]
@@ -367,7 +360,6 @@ class FilterCoeffs(QWidget):
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.spnRound)
         layHDisplay.addWidget(self.lblRound)
-        layHDisplay.addWidget(self.chkRadixPoint)
         layHDisplay.addWidget(self.cmbQFrmt)
         layHDisplay.addWidget(self.lbl_W)
         layHDisplay.addWidget(self.ledW)
@@ -604,7 +596,6 @@ class FilterCoeffs(QWidget):
         # ============== Signals & Slots ================================
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
-        self.chkRadixPoint.clicked.connect(self._radix_point)
         self.cmbQFrmt.currentIndexChanged.connect(self._radix_point)
         butSettingsClipboard.clicked.connect(self._copy_options)
         butToClipboard.clicked.connect(self._copy_to_clipboard)
@@ -767,7 +758,6 @@ class FilterCoeffs(QWidget):
         self.spnRound.setVisible(is_float) # number of digits can only be selected 
         self.lblRound.setVisible(is_float) # for format = 'float'
         self.ledScale.setEnabled(True)
-        self.chkRadixPoint.setVisible(not is_float)
         self.cmbQFrmt.setVisible(not is_float)
         self.lbl_W.setVisible(not is_float)
         self.ledW.setVisible(not is_float)
@@ -918,7 +908,6 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.ledScale.setText(str(q_coeff['scale']))
-        self.chkRadixPoint.setChecked(q_coeff['point'])
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
@@ -937,8 +926,7 @@ class FilterCoeffs(QWidget):
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText(),
-                'scale':self.ledScale.text(),
-                'point':self.chkRadixPoint.isChecked()
+                'scale':self.ledScale.text()
                 }
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 

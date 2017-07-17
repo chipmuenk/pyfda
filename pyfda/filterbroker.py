@@ -192,7 +192,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'ba':([1, 1, 1], [3, 0, 2]), # tuple of bb, aa
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
-            'q_coeff':{'WI':0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat', 'frmt':'float', 'point':False},
+            'q_coeff':{'WI':0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat', 'frmt':'float', 'scale': 1},
             'sos': [],
             'creator':('ba','filterbroker'), #(format ['ba', 'zpk', 'sos'], routine)
             'amp_specs_unit':'dB',
