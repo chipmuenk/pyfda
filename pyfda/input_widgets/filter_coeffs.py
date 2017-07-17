@@ -730,6 +730,8 @@ class FilterCoeffs(QWidget):
         """
         scale = safe_eval(self.ledScale.text(), self.myQ.scale)
         self.ledScale.setText(str(abs(scale)))
+        self._store_q_settings()
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _refresh_table(self):
