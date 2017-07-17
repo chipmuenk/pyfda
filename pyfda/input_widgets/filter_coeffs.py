@@ -732,8 +732,8 @@ class FilterCoeffs(QWidget):
         Set scale for calculating floating point value from fixpoint representation
         and vice versa
         """
-        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
-        self.ledScale.setText(str(self.scale))
+        scale = safe_eval(self.ledScale.text(), self.myQ.scale)
+        self.ledScale.setText(str(abs(scale)))
 
 #------------------------------------------------------------------------------
     def _refresh_table(self):
@@ -913,13 +913,11 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbQQuant, q_coeff['quant'])
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
+        self.ledScale.setText(str(q_coeff['scale']))
         self.chkRadixPoint.setChecked(q_coeff['point'])
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-
-        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
-        self.ledScale.setText(str(self.scale))
 
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
@@ -942,8 +940,6 @@ class FilterCoeffs(QWidget):
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-
-        self.scale = safe_eval(self.ledScale.text(), self.myQ.scale)
 
 #------------------------------------------------------------------------------
     def _save_dict(self):
