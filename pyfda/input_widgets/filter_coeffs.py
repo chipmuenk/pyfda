@@ -709,11 +709,11 @@ class FilterCoeffs(QWidget):
 
         qfrmt = qget_cmb_box(self.cmbQFrmt)
         is_qfrac = False
+        W = int(safe_eval(self.ledW.text(), self.myQ.W))
         if qfrmt == 'qint':
-            W = int(safe_eval(self.ledW.text(), self.myQ.W))
             self.ledWI.setText(str(W - 1))
             self.ledWF.setText("0")
-            self.ledScale.setText(str(2. ** W))
+            self.ledScale.setText(str(int(2. ** W)))
             print("qint")
         elif qfrmt == 'qnfrac': # normalized fractional format
             self.ledWI.setText("0")
@@ -727,6 +727,7 @@ class FilterCoeffs(QWidget):
         self.ledWF.setEnabled(is_qfrac)
         self.ledW.setEnabled(not is_qfrac)
 
+        self._store_q_settings()
         self._refresh_table()
         
         #------------------------------------------------------------------------------
