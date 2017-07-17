@@ -627,7 +627,7 @@ class FilterCoeffs(QWidget):
         self.ledWI.editingFinished.connect(self._WIWF_changed)
         self.ledW.editingFinished.connect(self._W_changed)
         
-        self.ledScale.editingFinished.connect(self._refresh_table)
+        self.ledScale.editingFinished.connect(self._set_scale)
 
         self.butQuant.clicked.connect(self.quant_coeffs)
         
@@ -710,12 +710,12 @@ class FilterCoeffs(QWidget):
             W = int(safe_eval(self.ledW.text(), self.myQ.W))
             self.ledWI.setText(str(W - 1))
             self.ledWF.setText("0")
-            self.myQ.scale = 2. ** W
+            self.ledScale.setText(str(2. ** W))
             print("qint")
         elif qfrmt == 'qnfrac': # normalized fractional format
             self.ledWI.setText("0")
             self.ledWF.setText(str(W - 1))
-            self.myQ.scale = 1.
+            self.ledScale.setText("1")
         else: # qfrmt == 'qfrac':
             is_qfrac = True
 
@@ -961,6 +961,7 @@ class FilterCoeffs(QWidget):
                 'quant':self.cmbQQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText(),
+                'scale':self.ledScale.text(),
                 'point':self.chkRadixPoint.isChecked()
                 }
 
