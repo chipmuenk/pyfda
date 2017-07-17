@@ -954,15 +954,7 @@ class FilterCoeffs(QWidget):
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
-        fb.fil[0]["q_coeff"] = {
-                'WI':int(self.ledWI.text()),
-                'WF':int(self.ledWF.text()),
-                'quant':self.cmbQQuant.currentText(),
-                'ovfl':self.cmbQOvfl.currentText(),
-                'frmt':self.cmbFormat.currentText(),
-                'scale':self.ledScale.text(),
-                'point':self.chkRadixPoint.isChecked()
-                }
+        self._store_q_settings()
 
         # save, check and convert coeffs, check filter type       
         fil_save(fb.fil[0], self.ba, 'ba', __name__) 
