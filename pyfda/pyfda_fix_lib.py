@@ -303,8 +303,7 @@ class Fixed(object):
                     use an integer representation (default: False)
           
     * **'scale'** : Float, the factor between the fixpoint integer representation
-                    and its floating point value. The scale factor can be cal-
-                    culated automatically from the selected fixpoint format:
+                    and its floating point value. 
                     
       - `point = False`: Scale the integer representation by `2^{W} = 2^{WI + WF + 1}`
       - `point = True` : Scale the integer representation by `2^{WI}`
@@ -409,10 +408,10 @@ class Fixed(object):
         
         if 'frmt' not in q_obj: q_obj['frmt'] = 'float'
         self.frmt = str(q_obj['frmt']).lower()
-        
+
         if not hasattr(self, 'scale') or not self.scale or 'scale' not in q_obj:
             q_obj['scale'] = 1.
-        self.scale = q_obj['scale']
+        self.scale = float(q_obj['scale'])
 
         self.q_obj = q_obj # store quant. dict in instance
 
@@ -530,10 +529,11 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        MSB = 1 << (self.W - 1) #   * self.scale
+# TODO: 
         if from_float:  # y is a float, scale with MSB
              y = y * self.MSB
 
+        y = y * self.scale
         # Quantize input in relation to LSB
         if   self.quant == 'floor':  yq = np.floor(y)
              # largest integer i, such that i <= x (= binary truncation)
