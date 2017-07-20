@@ -445,7 +445,7 @@ class Fixed(object):
         self.ovr_flag = 0
 
 #------------------------------------------------------------------------------
-    def fix(self, y, from_float=True, to_float=False):
+    def fix(self, y): #, from_float=True, to_float=False
         """
         Return fixed-point integer or fractional representation for `y` 
         (scalar or array-like) with the same shape as `y`.
@@ -530,7 +530,6 @@ class Fixed(object):
             y = y.real
 
 # TODO: 
-        if from_float:  # y is a float, scale with MSB
              y = y * self.MSB
 
         y = y * self.scale
