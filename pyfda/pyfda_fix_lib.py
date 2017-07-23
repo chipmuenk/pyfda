@@ -445,6 +445,7 @@ class Fixed(object):
         self.ovr_flag = 0
 
 #------------------------------------------------------------------------------
+    def fix(self, y, scaling=True):
         """
         Return fixed-point integer or fractional representation for `y` 
         (scalar or array-like) with the same shape as `y`.
@@ -522,7 +523,10 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        y = y * self.scale
+        y_in = y # y before scaling
+        y = y / self.LSB
+        if scaling:
+            y = y * self.scale
         # Quantize input in relation to LSB
         if   self.quant == 'floor':  yq = np.floor(y)
              # largest integer i, such that i <= x (= binary truncation)
@@ -539,6 +543,8 @@ class Fixed(object):
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
 
+
+        logger.debug("y_in={0:.3g} | y={1:.3g} | yq={2:.3g}".format(np.float(y_in), y, yq))
         # Handle Overflow / saturation in relation to MSB
         if   self.ovfl == 'none':
             pass
@@ -565,9 +571,7 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
-        if to_float:
-            yq = yq / self.MSB
-        else:
+        if self.WF == 0:
             yq = yq.astype(np.int64)
 
         if SCALAR and isinstance(yq, np.ndarray):
@@ -654,18 +658,16 @@ class Fixed(object):
             int_places = len(re.findall(frmt_regex[frmt], int_str)) - 1
             raw_str = val_str.replace('.','') # join integer and fractional part  
             
-            logger.debug("frmt, int_places", frmt, int_places)
-            logger.debug("y, raw_str = ", y, val_str)
+            logger.debug("frmt:{0}, int_places={1}".format(frmt, int_places))
+            logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
 
         # (1) calculate the decimal value of the input string using float()
         #     which takes the number of decimal places into account.
         # (2) divide by scale
         if frmt == 'dec':
+            # try to convert string -> float directly with decimal point position
             try:
-                # try to convert string -> float directly usingg decimal point position
-                y_float = float(val_str)
-                y_float = y_float / self.MSB
-
+                y_float = self.fix(val_str, scaling=True)
             except Exception as e:
                 logger.warn(e)
                 y_float = None
@@ -679,29 +681,28 @@ class Fixed(object):
                 # quantize / saturate / wrap the integer value:
 
 # TODO:                 # y_float = self.fix(y_int * self.LSB) * self.LSB
-                y_float = self.fix(y_int, from_float = False) / self.MSB
-                # scale integer fixpoint value
-                #y_float = y_fix / self.MSB#2**(self.W-1)
-
+                # y_float = self.fix(y_int, from_float = False) / self.MSB
+                y_f = y_int * self.LSB / self.scale
+                y_float = self.fix(y_f, scaling=True) #/ (self.base**int_places)
             except Exception as e:
                 logger.warn(e)
                 y_int = None
                 y_float = None
 
-            print("MSB = {0} |  LSB = {1} | scale = {2}\n"
-              "y = {3} | y_int = {4} | y_float = {5}".format(self.MSB, self.LSB, self.scale, y, y_int, y_float))
+            logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
+            logger.debug("y_in={0} | y_int={1} | y_f={2:g}".format(y, y_int, y_f))
 
         elif frmt == 'csd':
             y_float = csd2dec(raw_str, int_places)
             if y_float is not None:
                 y_float = y_float / 2**(self.W-1)
 
-            logger.debug("MSB = {0} |  scale = {1}\n"
-              "y = {2}  | y_float = {3}".format(self.MSB, self.scale, y, y_float))
-
         else:
             raise Exception('Unknown output format "%s"!'%(frmt))
             return None
+
+        if frmt != "float": logger.debug("MSB={0:g} |  scale={1:g} | "
+              "y={2} | y_float={3:g}".format(self.MSB, self.scale, y, y_float))
 
         if y_float is not None:
             return y_float
@@ -749,7 +750,7 @@ class Fixed(object):
             yi = np.round(np.modf(y_fix_lsb)[1]).astype(int) # integer part
             yf = np.round(np.modf(y_fix_lsb)[0] * (1 << self.WF)).astype(int) # frac part as integer
 
-            logger.debug("y_fix={0}, yi={1}, yf={2}".format(y_fix_lsb, yi, yf))
+            # logger.debug("y_fix={0}, yi={1}, yf={2}".format(y_fix, yi, yf))
 
             if self.frmt == 'dec':
                 y_str = str(y_fix_lsb) # use fixpoint number as returned by fix()
