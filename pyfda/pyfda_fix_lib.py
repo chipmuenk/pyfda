@@ -16,11 +16,14 @@ import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
-# TODO: Scaling parameter is not used yet
-# TODO: int_places calculation for CSD doesn't always make sense
 # TODO: Various errors related to radix point:
-#       - Frmt2float for fractional hex yields wrong results
-#       - WI > 0 yields wrong scaling for decimal?
+#       - Frmt2float for integer formats yields wrong results, scale parameter
+#         is not used correctly
+# TODO: Positive overflow saturation value is wrong: 0 or 3.0 instead of 0.99999
+#         resp. 3.9999
+# TODO: Entering values outside the FP range as non-float returns 0 and doesn't
+#       flag an overflow
+
 
 __version__ = 0.5
 
@@ -524,10 +527,11 @@ class Fixed(object):
             y = y.real
 
         y_in = y # y before scaling
-        y = y / self.LSB
+        # convert to "fixpoint integer" for requantizing in relation to LSB
+        y = y / self.LSB 
         if scaling:
             y = y * self.scale
-        # Quantize input in relation to LSB
+
         if   self.quant == 'floor':  yq = np.floor(y)
              # largest integer i, such that i <= x (= binary truncation)
         elif self.quant == 'round':  yq = np.round(y)
@@ -543,6 +547,8 @@ class Fixed(object):
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
 
+        # revert to original fractional scale
+        yq = yq * self.LSB
 
         logger.debug("y_in={0:.3g} | y={1:.3g} | yq={2:.3g}".format(np.float(y_in), y, yq))
         # Handle Overflow / saturation in relation to MSB
@@ -673,6 +679,7 @@ class Fixed(object):
                 y_float = None
 
         elif frmt in {'hex', 'bin'}:
+            # try to convert string without radix point
             try:
                 y_int = int(raw_str, self.base)
                 # check for negative (two's complement) numbers
