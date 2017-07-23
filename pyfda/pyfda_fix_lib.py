@@ -456,17 +456,11 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or array-like object
-            in floating point format to be quantized 
+            in floating point format to be quantized
 
-        from_float: Boolean
-            When `True` (default), y is is multiplied by `MSB = 1<<(W-1)` before 
-            requantizing and saturating. When `False, it is treated as an 
-            integer that doesn't have to be scaled. 
-
-        to_float: Boolean
-            When `False` (default), fix() returns an integer that is scaled
-            with `1<<(W-1)`. When `True`, a Float is returned. 
-
+        scaling: Boolean
+            When `True` (default), `y` is multiplied by `self.scale` before 
+            requantizing and saturating.
 
         Returns
         -------
@@ -667,12 +661,12 @@ class Fixed(object):
             logger.debug("frmt, int_places", frmt, int_places)
             logger.debug("y, raw_str = ", y, val_str)
 
-        # (1) calculate the decimal value of the input string without dot
-        # (2) scale the integer depending the number of places and the base
+        # (1) calculate the decimal value of the input string using float()
+        #     which takes the number of decimal places into account.
+        # (2) divide by scale
         if frmt == 'dec':
             try:
-                # try to convert string -> float directly, taking radix 
-                # point position into account 
+                # try to convert string -> float directly usingg decimal point position
                 y_float = float(val_str)
                 y_float = y_float / self.MSB
 
@@ -751,8 +745,7 @@ class Fixed(object):
             return y
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
-            # quantize & treat overflows of y (float), returning an integer in
-            # the range -2**(W-1) ... 2**(W-1)
+            # quantize & treat overflows of y (float), returning a float
             y_fix = self.fix(y)
             y_fix_lsb = y_fix * self.LSB
 
