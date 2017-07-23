@@ -716,15 +716,13 @@ class Fixed(object):
     def float2frmt(self, y):
         """
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number 
-        conversion, return fixpoint representation for `y` (scalar or array-like) 
+        conversion. Returns fixpoint representation for `y` (scalar or array-like) 
         with numeric format `self.frmt` and `self.W` bits. The result has the 
         same shape as `y`.
 
-        When `point = False` (use integer arithmetic), the floating point value
-        is multiplied by self.MSB (2**W-1, shift right by W-1 bits). 
-
-        When `point = True` (use radix point), the fractional representation is
-        scaled by 2**WI (= shift left by WI bits).
+        The float is multiplied by `self.scale` and quantized / saturated 
+        using fix() for all formats before it is converted to different number
+        formats.
 
         Parameters
         ----------
