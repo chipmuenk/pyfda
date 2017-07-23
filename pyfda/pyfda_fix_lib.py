@@ -445,7 +445,6 @@ class Fixed(object):
         self.ovr_flag = 0
 
 #------------------------------------------------------------------------------
-    def fix(self, y): #, from_float=True, to_float=False
         """
         Return fixed-point integer or fractional representation for `y` 
         (scalar or array-like) with the same shape as `y`.
@@ -522,9 +521,6 @@ class Fixed(object):
             logger.warn("Casting complex values to real before quantization!")
             # quantizing complex objects is not supported yet
             y = y.real
-
-# TODO: 
-             y = y * self.MSB
 
         y = y * self.scale
         # Quantize input in relation to LSB
