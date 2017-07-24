@@ -388,6 +388,11 @@ class Fixed(object):
                 'dec' : r'[^0-9|.|,|\-]',
                 'hex' : r'[^0-9A-Fa-f|.|,|\-]'
                         }
+#        self.frmt_scale = {'bin' : 2,
+#              'csd' : 2,
+#              'dec' : 1,
+#              'hex' : 16}
+
 
 
     def setQobj(self, q_obj):
@@ -658,10 +663,7 @@ class Fixed(object):
             try:
                 int_str, _ = val_str.split('.') # split into integer and fractional places
             except ValueError: # no fractional part
-                int_str = val_str
-                          'csd' : 2,
-                          'dec' : 1,
-                          'hex' : 16}
+                val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
 
             logger.debug("frmt:{0}, int_places={1}".format(frmt, int_places))
             logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
