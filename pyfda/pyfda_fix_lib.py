@@ -569,7 +569,7 @@ class Fixed(object):
         # revert to original fractional scale
         yq = yq * self.LSB
         
-        logger.debug("y_in={0:.3g} | y={1:.3g} | yq={2:.3g}".format(np.float64(y_in), y, yq))
+        logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
         # Handle Overflow / saturation in relation to MSB
         if   self.ovfl == 'none':
             pass
