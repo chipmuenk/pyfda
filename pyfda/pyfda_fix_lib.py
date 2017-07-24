@@ -373,6 +373,7 @@ class Fixed(object):
     q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
 
     """
+
     def __init__(self, q_obj):
         """
         Initialize fixed object with dict q_obj
@@ -392,7 +393,6 @@ class Fixed(object):
 #              'csd' : 2,
 #              'dec' : 1,
 #              'hex' : 16}
-
 
 
     def setQobj(self, q_obj):
@@ -686,7 +686,8 @@ class Fixed(object):
                 else:
                     return 0
 
-        # (1) calculate the decimal value of the input string using float()
+
+        # (1) calculate the decimal value of the input string using np.float64()
         #     which takes the number of decimal places into account.
         # (2) divide by scale
         if frmt == 'dec':
@@ -727,6 +728,7 @@ class Fixed(object):
 
         if frmt != "float": logger.debug("MSB={0:g} |  scale={1:g} | "
               "y={2} | y_float={3}".format(self.MSB, self.scale, y, y_float))
+
         if y_float is not None:
             return y_float
         elif fb.data_old is not None:
@@ -765,31 +767,36 @@ class Fixed(object):
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # quantize & treat overflows of y (float), returning a float
             y_fix = self.fix(y)
-            # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
-            y_fix_int = int(np.round(y_fix / self.LSB))
-            # split into fractional and integer part, both represented as integer
-            yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
-            yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # frac part as integer
-
             # logger.debug("y={0} | y_fix={1}".format(y, y_fix))
             if self.frmt == 'dec':
+                if self.WF == 0:
+                    y_fix = np.int64(y_fix) # get rid of trailing zero
+
                 y_str = str(y_fix) # use fixpoint number as returned by fix()
 
-            elif self.frmt == 'hex':
-                if self.WF > 0:
-                    y_str_bin_i = np.binary_repr(y_fix_int, self.W)[:self.WI+1]
-                    y_str_bin_f = np.binary_repr(y_fix_int, self.W)[self.WI+1:]
-                    y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
-                else:
-                    y_str = dec2hex(yi, self.W)
-            elif self.frmt == 'bin':
-                # calculate binary representation of fixpoint integer
-                y_str = np.binary_repr(y_fix_int, self.W)
-                if self.WF > 0:
-                    # ... and insert the radix point if required
-                    y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
-            else: # self.frmt = 'csd'
+            elif self.frmt == 'csd':
                 y_str = dec2csd(y_fix, self.WF) # convert with WF fractional bits
+
+            else: # bin or hex
+                # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
+                y_fix_int = np.int64(np.round(y_fix / self.LSB))
+                # split into fractional and integer part, both represented as integer
+                yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
+                yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # frac part as integer
+
+                if self.frmt == 'hex':
+                    if self.WF > 0:
+                        y_str_bin_i = np.binary_repr(y_fix_int, self.W)[:self.WI+1]
+                        y_str_bin_f = np.binary_repr(y_fix_int, self.W)[self.WI+1:]
+                        y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
+                    else:
+                        y_str = dec2hex(yi, self.W)
+                else: # self.frmt == 'bin':
+                    # calculate binary representation of fixpoint integer
+                    y_str = np.binary_repr(y_fix_int, self.W)
+                    if self.WF > 0:
+                        # ... and insert the radix point if required
+                        y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
 
                 # logger.debug("yi={0} | yf={1} | y_str={2}".format(yi, yf, y_str))
             return y_str
