@@ -458,7 +458,7 @@ class Fixed(object):
         self.ovr_flag = 0
 
 #------------------------------------------------------------------------------
-    def fix(self, y, scaling=True):
+    def fix(self, y, scaling='mult'):
         """
         Return fixed-point integer or fractional representation for `y` 
         (scalar or array-like) with the same shape as `y`.
@@ -471,9 +471,10 @@ class Fixed(object):
         y: scalar or array-like object
             in floating point format to be quantized
 
-        scaling: Boolean
-            When `True` (default), `y` is multiplied by `self.scale` before 
-            requantizing and saturating.
+        scaling: String
+            When `scaling='mult'` (default), `y` is multiplied by `self.scale` before 
+            requantizing and saturating, when `scaling='div'`, 
+            `y` is divided by `self.scale`.
 
         Returns
         -------
@@ -539,7 +540,7 @@ class Fixed(object):
         y_in = y # y before scaling
         # convert to "fixpoint integer" for requantizing in relation to LSB
         y = y / self.LSB 
-        if scaling:
+        if scaling == 'mult':
             y = y * self.scale
 
         if   self.quant == 'floor':  yq = np.floor(y)
@@ -587,6 +588,8 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
+        if scaling == 'div':
+            yq = yq / self.scale
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item() # convert singleton array to scalar
@@ -669,7 +672,7 @@ class Fixed(object):
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
-                y_float = self.fix(val_str, scaling=True)
+                y_float = self.fix(val_str, scaling='div')
             except Exception as e:
                 logger.warn(e)
                 y_float = None
@@ -683,7 +686,8 @@ class Fixed(object):
                     y_int = y_int - (1 << self.W)
                 # quantize / saturate / wrap the integer value:
 
-                y_float = self.fix(y_f, scaling=True) #/ (self.base**int_places)
+                y_f = y_int * self.LSB
+                y_float = self.fix(y_f, scaling='div')
             except Exception as e:
                 logger.warn(e)
                 y_int = None
