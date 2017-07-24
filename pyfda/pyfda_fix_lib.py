@@ -424,7 +424,7 @@ class Fixed(object):
 
         if not hasattr(self, 'scale') or not self.scale or 'scale' not in q_obj:
             q_obj['scale'] = 1.
-        self.scale = float(q_obj['scale'])
+        self.scale = np.float64(q_obj['scale'])
 
         self.q_obj = q_obj # store quant. dict in instance
 
@@ -587,8 +587,6 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
 
-        if self.WF == 0:
-            yq = yq.astype(np.int64)
 
         if SCALAR and isinstance(yq, np.ndarray):
             yq = yq.item() # convert singleton array to scalar
@@ -639,7 +637,7 @@ class Fixed(object):
         if frmt == 'float':
             if y.dtype.char in {'S', 'U'}: # string / unicode data type
                 try:
-                    y_float = float(y)
+                    y_float = np.float64(y)
                 except ValueError as e:
                     y_float = None
                 return y_float

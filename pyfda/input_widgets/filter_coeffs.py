@@ -1057,7 +1057,7 @@ class FilterCoeffs(QWidget):
         Set all coefficients = 0 in self.ba with a magnitude less than eps
         and refresh QTableWidget
         """
-        eps = float(self.ledSetEps.text())
+        eps = np.float64(self.ledSetEps.text())
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
 
         test_val = 0. # value against which array is tested
