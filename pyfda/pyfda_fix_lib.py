@@ -446,16 +446,16 @@ class Fixed(object):
         # Calculate required number of places for different bases from total 
         # number of bits:
         if self.frmt == 'dec':
-            self.places = int(np.ceil(np.log10(self.W) * np.log10(2.)))
+            self.places = int(np.ceil(np.log10(self.W) * np.log10(2.))) + 1
             self.base = 10
         elif self.frmt == 'bin':
-            self.places = self.W
+            self.places = self.W + 1
             self.base = 2
         elif self.frmt == 'csd':
-            self.places = self.W
+            self.places = self.W + 1
             self.base = 2
         elif self.frmt == 'hex':
-            self.places = int(np.ceil(self.W / 4.))
+            self.places = int(np.ceil(self.W / 4.)) + 1
             self.base = 16
         elif self.frmt == 'float':
             self.places = 4
