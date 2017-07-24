@@ -17,8 +17,10 @@ from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
 # TODO: Various errors related to radix point:
-#       - Frmt2float for integer formats yields wrong results, scale parameter
+#       - Frmt2float for hex format yields wrong results, scale parameter
 #         is not used correctly
+# TODO: When the number of trailing digits is changed in hex and bin format,
+#           the scaling is changed as well
 # TODO: Positive overflow saturation value is wrong: 0 or 3.0 instead of 0.99999
 #         resp. 3.9999
 # TODO: Entering values outside the FP range as non-float returns 0 and doesn't
@@ -370,7 +372,6 @@ class Fixed(object):
 
     q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
 
-
     """
     def __init__(self, q_obj):
         """
@@ -684,9 +685,6 @@ class Fixed(object):
                     y_int = y_int - (1 << self.W)
                 # quantize / saturate / wrap the integer value:
 
-# TODO:                 # y_float = self.fix(y_int * self.LSB) * self.LSB
-                # y_float = self.fix(y_int, from_float = False) / self.MSB
-                y_f = y_int * self.LSB / self.scale
                 y_float = self.fix(y_f, scaling=True) #/ (self.base**int_places)
             except Exception as e:
                 logger.warn(e)
