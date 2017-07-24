@@ -780,22 +780,21 @@ class Fixed(object):
 if __name__=='__main__':
     import pprint
 
-    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}
+    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
     myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
     
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
     print("W = ", myQ.W, myQ.LSB, myQ.MSB)
 
-    for point in [False, True]:
-        q_obj['point'] = point
-        myQ.setQobj(q_obj)
-        print("point = ", point)
-        for y in y_list:
-            print("y -> y_fix", y, "->", myQ.fix(y))
-            print(myQ.frmt, myQ.float2frmt(y))
+    myQ.setQobj(q_obj)
+
+    print("\nTesting float2frmt()\n====================\n")       
+    for y in y_list:
+        print("y -> y_fix", y, "->", myQ.fix(y))
+        print(myQ.frmt, myQ.float2frmt(y))
             
     print("\nTesting frmt2float()\n====================\n")
-    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}
+    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec'}
     pprint.pprint(q_obj)
     myQ.setQobj(q_obj)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
