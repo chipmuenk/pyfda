@@ -722,8 +722,8 @@ class Fixed(object):
                 y_float = y_float / 2**(self.W-1)
 
         else:
-            raise Exception('Unknown output format "%s"!'%(frmt))
-            return None
+            logger.error('Unknown output format "%s"!'.format(frmt))
+            y_float = None
 
         if frmt != "float": logger.debug("MSB={0:g} |  scale={1:g} | "
               "y={2} | y_float={3}".format(self.MSB, self.scale, y, y_float))
