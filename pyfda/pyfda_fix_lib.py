@@ -707,7 +707,7 @@ class Fixed(object):
                 y_int = int(raw_str, self.base)
                 # check for negative (two's complement) numbers
                 if y_int >= (1 << (self.W-1)):
-                    y_int = y_int - (1 << self.W)
+                    y_int = y_int - (1 << int(np.ceil(np.log2(y_int))))
                 # quantize / saturate / wrap the integer value:
 
                 y_f = y_int * self.LSB
