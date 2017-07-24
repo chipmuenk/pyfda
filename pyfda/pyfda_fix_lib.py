@@ -565,8 +565,8 @@ class Fixed(object):
 
         # revert to original fractional scale
         yq = yq * self.LSB
-
-        logger.debug("y_in={0:.3g} | y={1:.3g} | yq={2:.3g}".format(np.float(y_in), y, yq))
+        
+        logger.debug("y_in={0:.3g} | y={1:.3g} | yq={2:.3g}".format(np.float64(y_in), y, yq))
         # Handle Overflow / saturation in relation to MSB
         if   self.ovfl == 'none':
             pass
@@ -664,9 +664,10 @@ class Fixed(object):
                 int_str, _ = val_str.split('.') # split into integer and fractional places
             except ValueError: # no fractional part
                 val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
+                logger.debug("frmt:{0}, int_places={1}".format(frmt, int_places))
+                logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
 
-            logger.debug("frmt:{0}, int_places={1}".format(frmt, int_places))
-            logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
+            else:
 
         # (1) calculate the decimal value of the input string using float()
         #     which takes the number of decimal places into account.
@@ -696,7 +697,7 @@ class Fixed(object):
                 y_float = None
 
             logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
-            logger.debug("y_in={0} | y_int={1} | y_f={2:g}".format(y, y_int, y_f))
+            logger.debug("y_in={0} | y_int={1}".format(y, y_int))
 
         elif frmt == 'csd':
             y_float = csd2dec(raw_str, int_places)
@@ -708,8 +709,7 @@ class Fixed(object):
             return None
 
         if frmt != "float": logger.debug("MSB={0:g} |  scale={1:g} | "
-              "y={2} | y_float={3:g}".format(self.MSB, self.scale, y, y_float))
-
+              "y={2} | y_float={3}".format(self.MSB, self.scale, y, y_float))
         if y_float is not None:
             return y_float
         elif fb.data_old is not None:
@@ -754,8 +754,7 @@ class Fixed(object):
             yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
             yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # frac part as integer
 
-            # logger.debug("y_fix={0}, yi={1}, yf={2}".format(y_fix, yi, yf))
-
+            # logger.debug("y={0} | y_fix={1}".format(y, y_fix))
             if self.frmt == 'dec':
                 y_str = str(y_fix) # use fixpoint number as returned by fix()
 
@@ -775,6 +774,7 @@ class Fixed(object):
             else: # self.frmt = 'csd'
                 y_str = dec2csd(y_fix, self.WF) # convert with WF fractional bits
 
+                # logger.debug("yi={0} | yf={1} | y_str={2}".format(yi, yf, y_str))
             return y_str
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
