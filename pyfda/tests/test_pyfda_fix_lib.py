@@ -13,7 +13,7 @@ from pyfda import pyfda_fix_lib as fix_lib
 class TestSequenceFunctions(unittest.TestCase):
         
     def setUp(self):
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ = fix_lib.Fixed(q_obj) # instantiate fixpoint object with settings above
     
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]

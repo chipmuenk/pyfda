@@ -436,12 +436,11 @@ class Fixed(object):
 
         self.q_obj = q_obj # store quant. dict in instance
 
-        #if self.point:
-        self.LSB  = 2. ** -self.WF  # value of LSB = 2 ^ (-WF)
-        self.MSB  = 2. ** self.WI   # value of MSB = 2 ^ WI
-        #else:
-        #    self.LSB = 1
-        #    self.MSB = 2. ** (self.W-1)
+        self.LSB = 2. ** -self.WF  # value of LSB 
+        self.MSB = 2. ** (self.WI - 1)   # value of MSB 
+
+        self.MAX =  2. * self.MSB - self.LSB
+        self.MIN = -2. * self.MSB
 
         # Calculate required number of places for different bases from total 
         # number of bits:
@@ -486,8 +485,9 @@ class Fixed(object):
 
         Returns
         -------
-        integer scalar or ndarray
-            with the same shape as `y`, in the range `-self.MSB` ... `self.MSB`
+        float scalar or ndarray
+            with the same shape as `y`, in the range 
+            `-2*self.MSB` ... `2*self.MSB-self.LSB`
 
         Examples:
         ---------
@@ -570,13 +570,14 @@ class Fixed(object):
         yq = yq * self.LSB
         
         logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
+
         # Handle Overflow / saturation in relation to MSB
         if   self.ovfl == 'none':
             pass
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
-            over_neg = (yq < -self.MSB)
-            over_pos = (yq >= self.MSB)
+            over_neg = (yq < self.MIN)
+            over_pos = (yq >= self.MAX)
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
@@ -586,12 +587,12 @@ class Fixed(object):
 
             # Replace overflows with Min/Max-Values (saturation):
             if self.ovfl == 'sat':
-                yq = np.where(over_pos, (self.MSB-1), yq) # (cond, true, false)
-                yq = np.where(over_neg, -self.MSB, yq)
+                yq = np.where(over_pos, self.MAX, yq) # (cond, true, false)
+                yq = np.where(over_neg, self.MIN, yq)
             # Replace overflows by two's complement wraparound (wrap)
             elif self.ovfl == 'wrap':
                 yq = np.where(over_pos | over_neg,
-                    yq - 2. * self.MSB*np.fix((np.sign(yq) * self.MSB+yq)/(2*self.MSB)), yq)
+                    yq - 4. * self.MSB*np.fix((np.sign(yq) * 2 * self.MSB+yq)/(4*self.MSB)), yq)
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
