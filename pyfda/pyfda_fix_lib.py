@@ -655,19 +655,36 @@ class Fixed(object):
 
         else: # {'dec', 'bin', 'hex', 'csd'}
          # Find the number of places before the first radix point (if there is one)
-         # and join integer and fractional parts:
          # and join integer and fractional parts
+         # when returned string is empty, skip general conversions and rely on error handling
+         # of individual routines
+            val_str = re.sub(self.FRMT_REGEX[frmt],r'', qstr(y)) # remove illegal characters
+            if len(val_str) > 0:
 
-            if val_str[0] == '.': # prepend '0' when the number starts with '.'
-                val_str = '0' + val_str
-            try:
-                int_str, _ = val_str.split('.') # split into integer and fractional places
-            except ValueError: # no fractional part
                 val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
+    
+                if val_str[0] == '.': # prepend '0' when the number starts with '.'
+                    val_str = '0' + val_str
+                try:
+                    int_str, frc_str = val_str.split('.') # split into integer and fractional places
+                except ValueError: # no fractional part
+                    int_str = val_str
+                    frc_str = ''
+
+                # count number of valid digits in string
+                int_places = len(int_str)-1
+                frc_places = len(frc_str)
+                raw_str = val_str.replace('.','') # join integer and fractional part  
+                
                 logger.debug("frmt:{0}, int_places={1}".format(frmt, int_places))
                 logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
 
             else:
+                logger.warning('No valid characters for format {0}!'.format(frmt))
+                if fb.data_old is not None:
+                    return fb.data_old
+                else:
+                    return 0
 
         # (1) calculate the decimal value of the input string using float()
         #     which takes the number of decimal places into account.
