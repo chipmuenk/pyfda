@@ -9,15 +9,15 @@ Created on Wed Jun 14 11:57:19 2017
 import unittest
 from pyfda import pyfda_fix_lib as fix_lib
 
-   
+
 class TestSequenceFunctions(unittest.TestCase):
-        
+
     def setUp(self):
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ = fix_lib.Fixed(q_obj) # instantiate fixpoint object with settings above
-    
+
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
-        
+
 #
 #    def test_shuffle(self):
 #        # make sure the shuffled sequence does not lose any elements
@@ -33,79 +33,123 @@ class TestSequenceFunctions(unittest.TestCase):
 #        self.assertRaises(ValueError, random.sample, self.seq, 20)
 #        for element in random.sample(self.seq, 5):
 #            self.assertTrue(element in self.seq)
-
-    def test_fix(self):
+    def test_write_q_obj(self):
         """
-        Test the actual fixpoint quantization and saturation routine. The 'frmt'
+        Check whether parameters are written correctly to the fixpoint instance
+        """
+        q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
+        self.myQ.setQobj(q_obj)
+        self.assertEqual(q_obj, self.myQ.q_obj)
+
+    def test_fix_no_ovfl(self):
+        """
+        Test the actual fixpoint quantization without saturation / wrap-around. The 'frmt'
         keyword is not regarded here.
         """
         # return fixpoint numbers as float (no saturation, no quantization)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'point': False}        
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list, to_float=True))
+        yq_list = list(self.myQ.fix(self.y_list))
         yq_list_goal = self.y_list
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (no saturation, rounding)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'point': False}        
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list, to_float=True))
+        yq_list = list(self.myQ.fix(self.y_list))
         yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
         self.assertEqual(yq_list, yq_list_goal)
 
-        # return fixpoint numbers as float w/ saturation + rounding
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}        
-        self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list, to_float=True))
-        yq_list_goal = [-1, -1, -0.5, 0, 0.5, 0.875, 0.875, 0.875, 0.875]
-        self.assertEqual(yq_list, yq_list_goal)
-        
-        # saturation behaviour
-        yq_list = list(self.myQ.fix(self.y_list))
-        yq_list_goal = [-8, -8, -4, 0, 4, 7, 7, 7, 7]
-        self.assertEqual(yq_list, yq_list_goal)
-        
-        # saturation, one extra int bit
-        q_obj = {'WI':1, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'point': False}        
+        # wrap around behaviour with 'fix' quantization; fractional representation
+        q_obj = {'WI':5, 'WF':2, 'ovfl':'wrap', 'quant':'fix', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
-        yq_list_goal = [-16, -16, -8, 0, 8, 14, 15, 15, 15]
+        yq_list_goal = [-8.75, -8.0, -4.0, 0.0, 4.0, 7.0, 7.75, 8.0, 8.75]
         self.assertEqual(yq_list, yq_list_goal)
-        
-        # no saturation behaviour
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'point': False}        
+
+        # return fixpoint numbers as integer (no saturation, rounding)
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
         self.assertEqual(yq_list, yq_list_goal)
 
-        # wrap around behaviour
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'wrap', 'quant':'round', 'frmt': 'dec', 'point': False}        
+    def test_fix_ovfl(self):
+        """
+        Test saturation / wrap-around
+        """
+        # return fixpoint numbers as float w/ saturation + rounding
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
-        yq_list_goal = [7, -8, -4, 0, 4, 7, -8, -8, -7]
+        yq_list_goal = [-1, -1, -0.5, 0, 0.5, 0.875, 0.875, 0.875, 0.875]
         self.assertEqual(yq_list, yq_list_goal)
         
-        # wrap around behaviour with 'fix' quantization
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'wrap', 'quant':'fix', 'frmt': 'dec', 'point': False}        
+        # saturation, one extra int bit
+        q_obj = {'WI':1, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
-        yq_list_goal = [-8, -8, -4, 0, 4, 7, 7, -8, -8]
-        self.assertEqual(yq_list, yq_list_goal)       
+        yq_list_goal = [-1.125, -1.0, -0.5, 0.0, 0.5, 0.875, 1.0, 1.0, 1.125]
+        self.assertEqual(yq_list, yq_list_goal)
 
-    def test_frmt(self):
+
+        q_obj = {'WI':3, 'WF':1, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        # integer representation
+        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list_goal = [-8, -8, -4, 0, 4, 7, 7.5, 7.5, 7.5]
+        self.assertEqual(yq_list, yq_list_goal)
+
+
+        # wrap around behaviour / floor quantization
+        q_obj = {'WI':3, 'WF':1, 'ovfl':'wrap', 'quant':'floor', 'frmt': 'dec', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list_goal = [7.0, -8.0, -4, 0, 4, 7, 7.5, -8, -7.5]
+        self.assertEqual(yq_list, yq_list_goal)
+
+
+    def test_float2frmt(self):
         """
-        Test conversion to number formats
+        Test conversion from float to number formats
         """
         # wrap around behaviour with 'round' quantization
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'point': False}        
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.float2frmt, self.y_list))
         yq_list_goal = ['0111', '1000', '1100', '0000', '0100', '0111', '1000', '1000', '1001']
-        self.assertEqual(yq_list, yq_list_goal)       
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # wrap around behaviour with 'round' quantization
+        q_obj = {'WI':1, 'WF':2, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 2}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.float2frmt, self.y_list))
+        yq_list_goal = ['01.11', '10.00', '11.00', '00.00', '01.00', '01.11', '10.00', '10.00', '10.01']
+        self.assertEqual(yq_list, yq_list_goal)
+
+    def test_frmt2float(self):
+        """
+        Test conversion from number formats to float
+        """
+        # wrap around behaviour with 'round' quantization
+        y_list = ['1.111', '1.000', '1.100', '0.000', '0.100', '0.111', '1.000', '1.000', '1.001']
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 1}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.frmt2float, y_list))
+        yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # wrap around behaviour with 'round' quantization
+        y_list = ['0111', '1000', '1100', '0000', '0100', '0111', '1000', '1000', '1001']
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'bin', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.frmt2float, y_list))
+        yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
+        self.assertEqual(yq_list, yq_list_goal)
+
 
 
 if __name__=='__main__':
     unittest.main()
-    
-# run tests with python -m pyfda.tests.test_pyfda_fix_lib
+
+# run tests with python -m pyfda.tests.test_pyfda_fix_lib 
