@@ -299,15 +299,9 @@ class Fixed(object):
       - 'bin'  : binary string, scaled by :math:`2^{WF}`
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
-      
-    * **'point'** : Boolean, when True use / provide a radix point, when False
-                    use an integer representation (default: False)
           
     * **'scale'** : Float, the factor between the fixpoint integer representation
                     and its floating point value. 
-                    
-      - `point = False`: Scale the integer representation by `2^{W} = 2^{WI + WF + 1}`
-      - `point = True` : Scale the integer representation by `2^{WI}`
 
                     
 
