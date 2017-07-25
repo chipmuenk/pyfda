@@ -109,22 +109,28 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
 
-    def test_float2frmt(self):
+    def test_float2frmt_bin(self):
         """
-        Test conversion from float to number formats
+        Conversion from float to binary format
         """
-        # wrap around behaviour with 'round' quantization
+        # Integer case: Q3.0, scale = 8
         q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.float2frmt, self.y_list))
         yq_list_goal = ['0111', '1000', '1100', '0000', '0100', '0111', '1000', '1000', '1001']
         self.assertEqual(yq_list, yq_list_goal)
+        # same but vectorized function
+        yq_arr = list(self.myQ.float2frmt(self.y_list))
+        self.assertEqual(yq_arr, yq_list_goal)
 
-        # wrap around behaviour with 'round' quantization
+        # same but with Q1.2 format and scale = 2
         q_obj = {'WI':1, 'WF':2, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 2}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.float2frmt, self.y_list))
-        yq_list_goal = ['01.11', '10.00', '11.00', '00.00', '01.00', '01.11', '10.00', '10.00', '10.01']
+        yq_list_goal = ['10.00', '10.00', '11.00', '00.00', '01.00', '01.11', '01.11', '01.11', '01.11']
+        self.assertEqual(yq_list, yq_list_goal)
+        # same but vectorized function
+        yq_list = list(self.myQ.float2frmt(self.y_list))
         self.assertEqual(yq_list, yq_list_goal)
 
     def test_frmt2float_bin(self):
