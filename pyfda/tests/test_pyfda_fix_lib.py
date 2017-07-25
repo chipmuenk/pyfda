@@ -40,6 +40,10 @@ class TestSequenceFunctions(unittest.TestCase):
         q_obj = {'WI':7, 'WF':3, 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
         self.myQ.setQobj(q_obj)
         self.assertEqual(q_obj, self.myQ.q_obj)
+        # check whether Q : 7.3 is resolved correctly as WI:7, WF: 3
+        q_obj2 = {'Q': '7.3', 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
+        self.myQ.setQobj(q_obj2)
+        self.assertEqual(q_obj, self.myQ.q_obj)
 
     def test_fix_no_ovfl(self):
         """

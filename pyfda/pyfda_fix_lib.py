@@ -271,6 +271,9 @@ class Fixed(object):
 
     * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
 
+    * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated 
+                 to`WI` and `WF` and deleted afterwards.
+
     * **'quant'** : Quantization method, optional; default = 'floor'
 
       - 'floor': (default) largest integer `I` such that :math:`I \\le x` (= binary truncation)
@@ -401,7 +404,9 @@ class Fixed(object):
         if 'Q' in q_obj:
             Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'
             q_obj['WI'] = int(Q_str[0])
-            q_obj['WF'] = int(abs(Q_str[1]))
+            q_obj['WF'] = abs(int(Q_str[1]))
+            # remove 'Q' to avoid ambiguities in case 'WI' / 'WF' are set directly
+            del q_obj['Q'] 
         else:
             if 'WI' not in q_obj: q_obj['WI'] = 0
             else: q_obj['WI'] = int(q_obj['WI'])
