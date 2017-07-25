@@ -126,7 +126,10 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Conversion from float to binary format
         """
-        # Integer case: Q3.0, scale = 8
+        # Integer case: Q3.0, scale = 8, scalar parameter
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        # Integer case: Q3.0, scale = 8, scalar parameter
         q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.float2frmt, self.y_list))
