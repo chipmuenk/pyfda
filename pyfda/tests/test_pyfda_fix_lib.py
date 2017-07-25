@@ -127,24 +127,25 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = ['01.11', '10.00', '11.00', '00.00', '01.00', '01.11', '10.00', '10.00', '10.01']
         self.assertEqual(yq_list, yq_list_goal)
 
-    def test_frmt2float(self):
+    def test_frmt2float_bin(self):
         """
-        Test conversion from number formats to float
+        Test conversion from binary format to float
         """
         # wrap around behaviour with 'round' quantization
-        y_list = ['1.111', '1.000', '1.100', '0.000', '0.100', '0.111', '1.000', '1.000', '1.001']
+        y_list = ['100.000', '11.000', '10.000', '1,000', '1,001', '1.100', '1.111', '0.000', '0.100', '0.111', '01.000']
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
+        yq_list_goal = [-1, -1, -1, -1, -0.875, -0.5,-0.125,  0, 0.5, 0.875, 0.875]
+        # TODO: Test fails for overflows -1 -> 0, -2 -> 0, -3 -> -1 (ok), -4 -> -1 
         self.assertEqual(yq_list, yq_list_goal)
 
-        # wrap around behaviour with 'round' quantization
-        y_list = ['0111', '1000', '1100', '0000', '0100', '0111', '1000', '1000', '1001']
+        # same for integer case
+        y_list = ['11000', '1000', '1001', '1100', '1111', '0000', '0100', '0111', '01000']
         q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'bin', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
+        yq_list_goal = [-1, -1, -0.875, -0.5,-0.125,  0, 0.5, 0.875, 0.875]
         self.assertEqual(yq_list, yq_list_goal)
 
 
