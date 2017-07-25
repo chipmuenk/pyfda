@@ -248,16 +248,6 @@ def csd2dec(csd_str, int_places=0):
 
     return dec_val
 
-
-#==============================================================================
-# Define ufuncs using numpys automatic type casting
-#==============================================================================
-#bin_u = np.frompyfunc(np.binary_repr, 2, 1)
-#hex_tc_u = np.frompyfunc(hex_tc, 2, 1)
-#base2dec_u = np.frompyfunc(base2dec, 3, 1)
-#csd2dec_u = np.frompyfunc(csd2dec, 1, 1)
-#dec2csd_u = np.frompyfunc(dec2csd, 2, 1)
-
 #------------------------------------------------------------------------
 class Fixed(object):
     """
@@ -639,6 +629,8 @@ class Fixed(object):
         -------
         floating point (`dtype=np.float64`) representation of fixpoint input.
         """
+        csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+
         if y == "":
             return 0
 
@@ -765,6 +757,29 @@ class Fixed(object):
         formats except `float` a fixpoint representation with `self.W` binary 
         digits is returned.
         """
+        #======================================================================
+        # Define vectorized functions for dec -> frmt  using numpys 
+        # automatic type casting
+        #======================================================================
+        """
+        Vectorized function for inserting binary point in string `bin_str` 
+        after position `pos`.
+
+        Usage:  insert_binary_point(bin_str, pos)
+
+        Parameters: bin_str : string
+                    pos     : integer
+        """
+        insert_binary_point = np.vectorize(lambda bin_str, pos:(
+                                    bin_str[:pos+1] + "." + bin_str[pos+1:]))
+        
+        dec2bin_vec = np.frompyfunc(np.binary_repr, 2, 1)
+        dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
+        bin2hex_vec = np.frompyfunc(bin2hex, 2, 1)
+        dec2hex_vec = np.frompyfunc(dec2hex, 2, 1)
+        #dec2hex_vec = 
+        #======================================================================
+
         if self.frmt == 'float': # return float input value unchanged
             return y
 
@@ -779,7 +794,7 @@ class Fixed(object):
                 y_str = str(y_fix) # use fixpoint number as returned by fix()
 
             elif self.frmt == 'csd':
-                y_str = dec2csd(y_fix, self.WF) # convert with WF fractional bits
+                y_str = dec2csd_vec(y_fix, self.WF) # convert with WF fractional bits
 
             else: # bin or hex
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
@@ -797,10 +812,11 @@ class Fixed(object):
                         y_str = dec2hex(yi, self.W)
                 else: # self.frmt == 'bin':
                     # calculate binary representation of fixpoint integer
-                    y_str = np.binary_repr(y_fix_int, self.W)
+                    y_str = dec2bin_vec(y_fix_int, self.W)
+
                     if self.WF > 0:
                         # ... and insert the radix point if required
-                        y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
+                        y_str = insert_binary_point(y_str, self.WI)
 
                 # logger.debug("yi={0} | yf={1} | y_str={2}".format(yi, yf, y_str))
             return y_str
