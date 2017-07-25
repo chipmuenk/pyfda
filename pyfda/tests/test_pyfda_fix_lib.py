@@ -17,6 +17,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.myQ = fix_lib.Fixed(q_obj) # instantiate fixpoint object with settings above
 
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
+        # list with various invalid strings
+        self.y_list_validate = ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
 
 #
 #    def test_shuffle(self):
@@ -50,6 +52,13 @@ class TestSequenceFunctions(unittest.TestCase):
         Test the actual fixpoint quantization without saturation / wrap-around. The 'frmt'
         keyword is not regarded here.
         """
+        # return fixpoint numbers as float (no saturation, no quantization)
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
+        self.myQ.setQobj(q_obj)
+        # test handling of invalid inputs - scalar inputs
+        yq_list = list(map(self.myQ.fix, self.y_list_validate))
+        yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21, 3.21]
+        self.assertEqual(yq_list, yq_list_goal)
         # return fixpoint numbers as float (no saturation, no quantization)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)

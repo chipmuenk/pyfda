@@ -519,18 +519,22 @@ class Fixed(object):
             # to complex format:
             elif not np.issubdtype(type(y), np.number):
                 y = qstr(y)
-                y = y.replace(' ','') # whitespace is not allowed in complex number
+                y = y.replace(' ','') # remove all whitespace
                 try:
-                    y = complex(y)
-                except ValueError as e:
-                    logger.error("Argument '{0}' yields \n {1}".format(y,e))
+                    y = float(y)
+                except (TypeError, ValueError):
+                    try:
+                        y = complex(y)
+                    except (TypeError, ValueError) as e:
+                        logger.error("Argument '{0}' yields \n {1}".format(y,e))
+                        y = 0.0
             over_pos = over_neg = yq = 0
             self.ovr_flag = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
-            logger.warn("Casting complex values to real before quantization!")
+            logger.warning("Casting complex values to real before quantization!")
             # quantizing complex objects is not supported yet
             y = y.real
 
