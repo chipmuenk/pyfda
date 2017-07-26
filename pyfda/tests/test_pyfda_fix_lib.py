@@ -105,6 +105,16 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
         self.assertEqual(yq_list, yq_list_goal)
 
+        # input list of strings
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        y_string = ['-1.1', '-1.0', '-0.5', '0', '0.5', '0.9', '0.99', '1.0', '1.1']
+        yq_list = list(self.myQ.fix(y_string))
+        yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
+        self.assertEqual(yq_list, yq_list_goal)
+
+
+    def test_fix_saturation(self):
     def test_fix_ovfl(self):
         """
         Test saturation / wrap-around
