@@ -509,17 +509,19 @@ class Fixed(object):
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
             self.ovr_flag = np.zeros(y.shape, dtype = int)
 
-            if y.dtype.type is np.string_:
-                np.char.replace(y, ' ', '') # remove all whitespace
+            if np.issubdtype(y.dtype, np.number):
+                pass
+            elif y.dtype.kind in {'U', 'S'}: # string or unicode
                 try:
-                    y = y.astype(np.float64) # conversion to float
+                    y = y.astype(np.float64) # try to convert to float
                 except (TypeError, ValueError):
                     try:
-                        y = y.astype(complex) # ... or to complex
+                        np.char.replace(y, ' ', '') # remove all whitespace
+                        y = y.astype(complex) # try to convert to complex
                     except (TypeError, ValueError) as e:
                         logger.error("Argument '{0}' yields \n {1}".format(y,e))
                         y = np.zeros(y.shape)
-            elif not np.issubdtype(y.dtype, np.number):
+            else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
                              "cannot convert to float.".format(y, y.dtype))
                 y = np.zeros(y.shape)
