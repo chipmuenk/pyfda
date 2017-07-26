@@ -59,11 +59,28 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list = list(map(self.myQ.fix, self.y_list_validate))
         yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21, 3.21]
         self.assertEqual(yq_list, yq_list_goal)
+        # same in vector format
+        yq_list = list(self.myQ.fix(self.y_list_validate))
+        yq_list_goal = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.assertListEqual(yq_list, yq_list_goal)
+
         # return fixpoint numbers as float (no saturation, no quantization)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
         yq_list_goal = self.y_list
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # test scaling (multiply by scaling factor)
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 2}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(self.myQ.fix(self.y_list) / 2.)
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # test scaling (divide by scaling factor)
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 2}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(self.myQ.fix(self.y_list, scaling='div') * 2.)
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (no saturation, rounding)
