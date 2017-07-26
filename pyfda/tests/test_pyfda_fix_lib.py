@@ -174,9 +174,18 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Conversion from float to binary format
         """
-        # Integer case: Q3.0, scale = 8, scalar parameter
-        q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'scale': 8}
+        # Integer case: Q3.0, scale = 1, scalar parameter
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 8}
         self.myQ.setQobj(q_obj)
+        # test handling of invalid inputs - scalar inputs
+        yq_list = list(map(self.myQ.float2frmt, self.y_list_validate))
+        yq_list_goal = ["0000", "0000", "0111", "0001", "0000", "0011", "0011"]
+        self.assertEqual(yq_list, yq_list_goal)
+        # same in vector format
+        yq_list = list(self.myQ.float2frmt(self.y_list_validate))
+        yq_list_goal = ["0000", "0000", "0111", "0001", "0000", "0011", "0011"]
+        self.assertListEqual(yq_list, yq_list_goal)
+
         # Integer case: Q3.0, scale = 8, scalar parameter
         q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'bin', 'scale': 8}
         self.myQ.setQobj(q_obj)
