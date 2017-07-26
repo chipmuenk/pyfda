@@ -7,6 +7,7 @@ Created on Wed Jun 14 11:57:19 2017
 
 
 import unittest
+import numpy as np
 from pyfda import pyfda_fix_lib as fix_lib
 
 
@@ -108,7 +109,22 @@ class TestSequenceFunctions(unittest.TestCase):
         """
         Test saturation / wrap-around
         """
-        # return fixpoint numbers as float w/ saturation + rounding
+        y_list_ovfl = [-np.inf, -3.2, -2.2, -1.2, -1.0, -0.5, 0, 0.5, 0.8, 1.0, 1.2, 2.2, 3.2, np.inf]
+        # Integer representation, saturation
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(self.myQ.fix(y_list_ovfl))
+        yq_list_goal = [-8.0, -8.0, -8.0, -8.0, -8.0, -4.0, 0.0, 4.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0]
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # Fractional representation, saturation
+        q_obj = {'WI':3, 'WF':1, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(self.myQ.fix(y_list_ovfl))
+        yq_list_goal = [-8, -8, -8, -8, -8, -4, 0, 4, 6.5, 7.5, 7.5, 7.5, 7.5, 7.5]
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # normalized fractional representation, saturation
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
