@@ -84,7 +84,7 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list = list(self.myQ.fix(self.y_list, scaling='div') * 2.)
         self.assertEqual(yq_list, yq_list_goal)
 
-        # return fixpoint numbers as float (no saturation, rounding)
+        # return fixpoint numbers as float (rounding)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
@@ -207,7 +207,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
         yq_list_goal = [-1, -1, -1, -1, -0.875, -0.5,-0.125,  0, 0.5, 0.875, 0.875]
-        # TODO: Test fails for overflows -1 -> 0, -2 -> 0, -3 -> -1 (ok), -4 -> -1 
+        # TODO: Test fails for overflows -1 -> 0, -2 -> 0, -3 -> -1 (ok), -4 -> -1
         self.assertEqual(yq_list, yq_list_goal)
 
         # same for integer case
@@ -223,4 +223,4 @@ class TestSequenceFunctions(unittest.TestCase):
 if __name__=='__main__':
     unittest.main()
 
-# run tests with python -m pyfda.tests.test_pyfda_fix_lib 
+# run tests with python -m pyfda.tests.test_pyfda_fix_lib
