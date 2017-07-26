@@ -501,15 +501,28 @@ class Fixed(object):
         """
 
         if np.shape(y):
-            # create empty arrays for result and overflows with same shape as y for speedup
+            # create empty arrays for result and overflows with same shape as y
+            # for speedup, test for invalid types
             SCALAR = False
             y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
-            if y.dtype.type is np.string_:
-                np.char.replace(y, ' ', '') # remove all whitespace
-                y = y.astype(complex) # ensure that is y is a numeric type
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
             self.ovr_flag = np.zeros(y.shape, dtype = int)
+
+            if y.dtype.type is np.string_:
+                np.char.replace(y, ' ', '') # remove all whitespace
+                try:
+                    y = y.astype(np.float64) # conversion to float
+                except (TypeError, ValueError):
+                    try:
+                        y = y.astype(complex) # ... or to complex
+                    except (TypeError, ValueError) as e:
+                        logger.error("Argument '{0}' yields \n {1}".format(y,e))
+                        y = np.zeros(y.shape)
+            elif not np.issubdtype(y.dtype, np.number):
+                logger.error("Argument '{0}' is of type '{1}',\n"
+                             "cannot convert to float.".format(y, y.dtype))
+                y = np.zeros(y.shape)
         else:
             SCALAR = True
             # get rid of errors that have occurred upstream
