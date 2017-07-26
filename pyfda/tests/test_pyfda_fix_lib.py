@@ -98,7 +98,7 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = [-8.75, -8.0, -4.0, 0.0, 4.0, 7.0, 7.75, 8.0, 8.75]
         self.assertEqual(yq_list, yq_list_goal)
 
-        # return fixpoint numbers as integer (no saturation, rounding)
+        # return fixpoint numbers as integer (rounding)
         q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fix(self.y_list))
@@ -115,11 +115,11 @@ class TestSequenceFunctions(unittest.TestCase):
 
 
     def test_fix_saturation(self):
-    def test_fix_ovfl(self):
         """
-        Test saturation / wrap-around
+        Test saturation
         """
         y_list_ovfl = [-np.inf, -3.2, -2.2, -1.2, -1.0, -0.5, 0, 0.5, 0.8, 1.0, 1.2, 2.2, 3.2, np.inf]
+
         # Integer representation, saturation
         q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
@@ -149,13 +149,18 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
 
-        q_obj = {'WI':3, 'WF':1, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
-        # integer representation
-        yq_list = list(self.myQ.fix(self.y_list))
-        yq_list_goal = [-8, -8, -4, 0, 4, 7, 7.5, 7.5, 7.5]
-        self.assertEqual(yq_list, yq_list_goal)
+    def test_fix_wrap(self):
+        """
+        Test wrap around
+        """
+        y_list_ovfl = [-np.inf, -3.2, -2.2, -1.2, -1.0, -0.5, 0, 0.5, 0.8, 1.0, 1.2, 2.2, 3.2, np.inf]
 
+        # Integer representation, wrap
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'dec', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        yq_list = self.myQ.fix(y_list_ovfl)
+        yq_list_goal = [np.nan, 6.0, -2.0, 6.0, -8.0, -4.0, 0.0, 4.0, 6.0, -8.0, -6.0, 2.0, -6.0, np.nan]
+        np.testing.assert_array_equal(yq_list, yq_list_goal)
 
         # wrap around behaviour / floor quantization
         q_obj = {'WI':3, 'WF':1, 'ovfl':'wrap', 'quant':'floor', 'frmt': 'dec', 'scale': 8}
