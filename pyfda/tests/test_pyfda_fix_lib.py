@@ -9,7 +9,7 @@ Created on Wed Jun 14 11:57:19 2017
 import unittest
 import numpy as np
 from pyfda import pyfda_fix_lib as fix_lib
-
+# TODO: Add test case for complex numbers
 
 class TestSequenceFunctions(unittest.TestCase):
 
@@ -18,6 +18,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.myQ = fix_lib.Fixed(q_obj) # instantiate fixpoint object with settings above
 
         self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
+        self.y_list_cmplx = [-1.1j + 0.1, -1.0 - 0.3j, -0.5-0.5j, 0j, 0.5j, 0.9, 0.99+0.3j, 1j, 1.1]
         # list with various invalid strings
         self.y_list_validate = ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
 
@@ -113,7 +114,33 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
         self.assertEqual(yq_list, yq_list_goal)
 
+    def test_fix_no_ovfl_cmplx(self):
+        """
+        Test the actual fixpoint quantization without saturation / wrap-around. The 'frmt'
+        keyword is not regarded here.
+        """
 
+        # return fixpoint numbers as float (no saturation, no quantization)
+        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
+        self.myQ.setQobj(q_obj)
+        # test handling of complex inputs - scalar inputs
+        yq_list = list(map(self.myQ.fix, self.y_list_cmplx))
+        yq_list_goal = [0.1, -1.0, -0.5, 0.0, 0.0, 0.9, 0.99, 0.0, 1.1]
+        self.assertEqual(yq_list, yq_list_goal)
+        # same in array format
+        yq_list = list(self.myQ.fix(self.y_list_cmplx))
+        self.assertListEqual(yq_list, yq_list_goal)
+#==============================================================================
+#         # same in scalar string format        
+#         y_list = np.array(self.y_list_cmplx).astype(np.string_)
+#         yq_list = list(map(self.myQ.fix, y_list))
+#         self.assertEqual(yq_list, yq_list_goal)
+#         # same in vector string format        
+#         y_list = np.array(self.y_list_cmplx).astype(np.string_)
+#         yq_list = list(self.myQ.fix(y_list))
+#         self.assertEqual(yq_list, yq_list_goal)
+# 
+#==============================================================================
     def test_fix_saturation(self):
         """
         Test saturation
