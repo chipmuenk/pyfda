@@ -1101,10 +1101,10 @@ class FilterCoeffs(QWidget):
 
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
-            self.ba = self.myQ.fix(self.ba)
+            self.ba = self.myQ.fixp(self.ba, scaling='div')
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ.fix(self.ba[i[0]][i[1]])
+                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'div')
 
         qstyle_widget(self.butSave, 'changed')
         self._refresh_table()
