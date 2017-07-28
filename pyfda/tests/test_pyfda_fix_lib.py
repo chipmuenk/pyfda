@@ -58,51 +58,51 @@ class TestSequenceFunctions(unittest.TestCase):
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
         # test handling of invalid inputs - scalar inputs
-        yq_list = list(map(self.myQ.fix, self.y_list_validate))
+        yq_list = list(map(self.myQ.fixp, self.y_list_validate))
         yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21, 3.21]
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
-        yq_list = list(self.myQ.fix(self.y_list_validate))
+        yq_list = list(self.myQ.fixp(self.y_list_validate))
         yq_list_goal = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.assertListEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (no saturation, no quantization)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = self.y_list
         self.assertEqual(yq_list, yq_list_goal)
 
         # test scaling (multiply by scaling factor)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 2}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list) / 2.)
+        yq_list = list(self.myQ.fixp(self.y_list) / 2.)
         self.assertEqual(yq_list, yq_list_goal)
 
         # test scaling (divide by scaling factor)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 2}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list, scaling='div') * 2.)
+        yq_list = list(self.myQ.fixp(self.y_list, scaling='div') * 2.)
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (rounding)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
         self.assertEqual(yq_list, yq_list_goal)
 
         # wrap around behaviour with 'fix' quantization; fractional representation
         q_obj = {'WI':5, 'WF':2, 'ovfl':'wrap', 'quant':'fix', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-8.75, -8.0, -4.0, 0.0, 4.0, 7.0, 7.75, 8.0, 8.75]
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as integer (rounding)
         q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
         self.assertEqual(yq_list, yq_list_goal)
 
@@ -110,7 +110,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
         y_string = ['-1.1', '-1.0', '-0.5', '0', '0.5', '0.9', '0.99', '1.0', '1.1']
-        yq_list = list(self.myQ.fix(y_string))
+        yq_list = list(self.myQ.fixp(y_string))
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
         self.assertEqual(yq_list, yq_list_goal)
 
@@ -124,20 +124,20 @@ class TestSequenceFunctions(unittest.TestCase):
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
         # test handling of complex inputs - scalar inputs
-        yq_list = list(map(self.myQ.fix, self.y_list_cmplx))
+        yq_list = list(map(self.myQ.fixp, self.y_list_cmplx))
         yq_list_goal = [0.1, -1.0, -0.5, 0.0, 0.0, 0.9, 0.99, 0.0, 1.1]
         self.assertEqual(yq_list, yq_list_goal)
         # same in array format
-        yq_list = list(self.myQ.fix(self.y_list_cmplx))
+        yq_list = list(self.myQ.fixp(self.y_list_cmplx))
         self.assertListEqual(yq_list, yq_list_goal)
 #==============================================================================
 #         # same in scalar string format        
 #         y_list = np.array(self.y_list_cmplx).astype(np.string_)
-#         yq_list = list(map(self.myQ.fix, y_list))
+#         yq_list = list(map(self.myQ.fixp, y_list))
 #         self.assertEqual(yq_list, yq_list_goal)
 #         # same in vector string format        
 #         y_list = np.array(self.y_list_cmplx).astype(np.string_)
-#         yq_list = list(self.myQ.fix(y_list))
+#         yq_list = list(self.myQ.fixp(y_list))
 #         self.assertEqual(yq_list, yq_list_goal)
 # 
 #==============================================================================
@@ -150,28 +150,28 @@ class TestSequenceFunctions(unittest.TestCase):
         # Integer representation, saturation
         q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(y_list_ovfl))
+        yq_list = list(self.myQ.fixp(y_list_ovfl))
         yq_list_goal = [-8.0, -8.0, -8.0, -8.0, -8.0, -4.0, 0.0, 4.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0]
         self.assertEqual(yq_list, yq_list_goal)
 
         # Fractional representation, saturation
         q_obj = {'WI':3, 'WF':1, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(y_list_ovfl))
+        yq_list = list(self.myQ.fixp(y_list_ovfl))
         yq_list_goal = [-8, -8, -8, -8, -8, -4, 0, 4, 6.5, 7.5, 7.5, 7.5, 7.5, 7.5]
         self.assertEqual(yq_list, yq_list_goal)
 
         # normalized fractional representation, saturation
         q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-1, -1, -0.5, 0, 0.5, 0.875, 0.875, 0.875, 0.875]
         self.assertEqual(yq_list, yq_list_goal)
         
         # saturation, one extra int bit
         q_obj = {'WI':1, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-1.125, -1.0, -0.5, 0.0, 0.5, 0.875, 1.0, 1.0, 1.125]
         self.assertEqual(yq_list, yq_list_goal)
 
@@ -185,14 +185,14 @@ class TestSequenceFunctions(unittest.TestCase):
         # Integer representation, wrap
         q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
-        yq_list = self.myQ.fix(y_list_ovfl)
+        yq_list = self.myQ.fixp(y_list_ovfl)
         yq_list_goal = [np.nan, 6.0, -2.0, 6.0, -8.0, -4.0, 0.0, 4.0, 6.0, -8.0, -6.0, 2.0, -6.0, np.nan]
         np.testing.assert_array_equal(yq_list, yq_list_goal)
 
         # wrap around behaviour / floor quantization
         q_obj = {'WI':3, 'WF':1, 'ovfl':'wrap', 'quant':'floor', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
-        yq_list = list(self.myQ.fix(self.y_list))
+        yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [7.0, -8.0, -4, 0, 4, 7, 7.5, -8, -7.5]
         self.assertEqual(yq_list, yq_list_goal)
 

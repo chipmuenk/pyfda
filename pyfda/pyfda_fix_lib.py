@@ -454,7 +454,7 @@ class Fixed(object):
         self.ovr_flag = 0
 
 #------------------------------------------------------------------------------
-    def fix(self, y, scaling='mult'):
+    def fixp(self, y, scaling='mult'):
         """
         Return fixed-point integer or fractional representation for `y` 
         (scalar or array-like) with the same shape as `y`.
@@ -707,7 +707,7 @@ class Fixed(object):
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
-                y_float = self.fix(val_str, scaling='div')
+                y_float = self.fixp(val_str, scaling='div')
             except Exception as e:
                 logger.warn(e)
                 y_float = None
@@ -722,7 +722,7 @@ class Fixed(object):
                 # quantize / saturate / wrap the integer value:
 
                 y_f = y_int * self.LSB
-                y_float = self.fix(y_f, scaling='div')
+                y_float = self.fixp(y_f, scaling='div')
             except Exception as e:
                 logger.warn(e)
                 y_int = None
@@ -760,7 +760,7 @@ class Fixed(object):
         same shape as `y`.
 
         The float is multiplied by `self.scale` and quantized / saturated 
-        using fix() for all formats before it is converted to different number
+        using fixp() for all formats before it is converted to different number
         formats.
 
         Parameters
@@ -803,13 +803,13 @@ class Fixed(object):
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # quantize & treat overflows of y (float), returning a float
-            y_fix = self.fix(y)
+            y_fix = self.fixp(y, scaling='mult')
             # logger.debug("y={0} | y_fix={1}".format(y, y_fix))
             if self.frmt == 'dec':
                 if self.WF == 0:
-                    y_fix = np.int64(y_fix) # get rid of trailing zero
+                    y_fix = np.int64(y_fix, scaling='mult') # get rid of trailing zero
 
-                y_str = str(y_fix) # use fixpoint number as returned by fix()
+                y_str = str(y_fix) # use fixpoint number as returned by fixp()
 
             elif self.frmt == 'csd':
                 y_str = dec2csd_vec(y_fix, self.WF) # convert with WF fractional bits
@@ -861,7 +861,7 @@ if __name__=='__main__':
 
     print("\nTesting float2frmt()\n====================\n")       
     for y in y_list:
-        print("y -> y_fix", y, "->", myQ.fix(y))
+        print("y -> y_fix", y, "->", myQ.fixp(y, scaling='mult'))
         print(myQ.frmt, myQ.float2frmt(y))
             
     print("\nTesting frmt2float()\n====================\n")
