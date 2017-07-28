@@ -706,7 +706,7 @@ class FilterCoeffs(QWidget):
         if qfrmt == 'qint':
             self.ledWI.setText(str(W - 1))
             self.ledWF.setText("0")
-            self.ledScale.setText(str(int(2. ** (W-1))))
+            self.ledScale.setText(str(int(2. ** W)))
         elif qfrmt == 'qnfrac': # normalized fractional format
             self.ledWI.setText("0")
             self.ledWF.setText(str(W - 1))
