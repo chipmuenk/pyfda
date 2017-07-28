@@ -683,6 +683,7 @@ class FilterCoeffs(QWidget):
         if qget_cmb_box(self.cmbQFrmt) == 'qint': # integer format, preserve WI bits
             WI = W - self.myQ.WF - 1
             self.ledWI.setText(str(WI))
+            self.ledScale.setText(str(int(2. ** W)))
         else: # fractional format, preserve WF bit setting
             WF = W - self.myQ.WI - 1
             if WF < 0:
@@ -705,7 +706,7 @@ class FilterCoeffs(QWidget):
         if qfrmt == 'qint':
             self.ledWI.setText(str(W - 1))
             self.ledWF.setText("0")
-            self.ledScale.setText(str(int(2. ** (W-1))))
+            self.ledScale.setText(str(int(2. ** W)))
         elif qfrmt == 'qnfrac': # normalized fractional format
             self.ledWI.setText("0")
             self.ledWF.setText(str(W - 1))
@@ -717,6 +718,7 @@ class FilterCoeffs(QWidget):
         self.lblDot.setEnabled(is_qfrac)
         self.ledWF.setEnabled(is_qfrac)
         self.ledW.setEnabled(not is_qfrac)
+        self.ledScale.setEnabled(is_qfrac)
 
         self._store_q_settings()
         self._refresh_table()
@@ -750,7 +752,7 @@ class FilterCoeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
         except IndexError:
             self.num_rows = len(self.ba[0])
-        logger.debug("_refresh: np.shape(ba)", np.shape(self.ba))
+        logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
 
         params['FMT_ba'] = int(self.spnRound.text())
 
@@ -759,8 +761,7 @@ class FilterCoeffs(QWidget):
         
         self.spnRound.setVisible(is_float) # number of digits can only be selected 
         self.lblRound.setVisible(is_float) # for format = 'float'
-        self.ledScale.setEnabled(True)
-        self.cmbQFrmt.setVisible(not is_float)
+        self.cmbQFrmt.setVisible(not is_float) # hide unneeded widgets for format = 'float'
         self.lbl_W.setVisible(not is_float)
         self.ledW.setVisible(not is_float)
 
@@ -1100,10 +1101,10 @@ class FilterCoeffs(QWidget):
 
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
-            self.ba = self.myQ.fix(self.ba)
+            self.ba = self.myQ.fixp(self.ba, scaling='div')
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ.fix(self.ba[i[0]][i[1]])
+                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'div')
 
         qstyle_widget(self.butSave, 'changed')
         self._refresh_table()

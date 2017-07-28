@@ -246,16 +246,6 @@ def csd2dec(csd_str, int_places=0):
 
     return dec_val
 
-
-#==============================================================================
-# Define ufuncs using numpys automatic type casting
-#==============================================================================
-#bin_u = np.frompyfunc(np.binary_repr, 2, 1)
-#hex_tc_u = np.frompyfunc(hex_tc, 2, 1)
-#base2dec_u = np.frompyfunc(base2dec, 3, 1)
-#csd2dec_u = np.frompyfunc(csd2dec, 1, 1)
-#dec2csd_u = np.frompyfunc(dec2csd, 2, 1)
-
 #------------------------------------------------------------------------
 class Fixed(object):
     """
@@ -278,6 +268,9 @@ class Fixed(object):
     * **'WI'** : integer word length, default: 0
 
     * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
+
+    * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated 
+                 to`WI` and `WF` and deleted afterwards.
 
     * **'quant'** : Quantization method, optional; default = 'floor'
 
@@ -304,15 +297,9 @@ class Fixed(object):
       - 'bin'  : binary string, scaled by :math:`2^{WF}`
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
-      
-    * **'point'** : Boolean, when True use / provide a radix point, when False
-                    use an integer representation (default: False)
           
     * **'scale'** : Float, the factor between the fixpoint integer representation
                     and its floating point value. 
-                    
-      - `point = False`: Scale the integer representation by `2^{W} = 2^{WI + WF + 1}`
-      - `point = True` : Scale the integer representation by `2^{WI}`
 
                     
 
@@ -409,7 +396,9 @@ class Fixed(object):
         if 'Q' in q_obj:
             Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'
             q_obj['WI'] = int(Q_str[0])
-            q_obj['WF'] = int(abs(Q_str[1]))
+            q_obj['WF'] = abs(int(Q_str[1]))
+            # remove 'Q' to avoid ambiguities in case 'WI' / 'WF' are set directly
+            del q_obj['Q'] 
         else:
             if 'WI' not in q_obj: q_obj['WI'] = 0
             else: q_obj['WI'] = int(q_obj['WI'])
@@ -463,7 +452,7 @@ class Fixed(object):
         self.ovr_flag = 0
 
 #------------------------------------------------------------------------------
-    def fix(self, y, scaling='mult'):
+    def fixp(self, y, scaling='mult'):
         """
         Return fixed-point integer or fractional representation for `y` 
         (scalar or array-like) with the same shape as `y`.
@@ -510,15 +499,30 @@ class Fixed(object):
         """
 
         if np.shape(y):
-            # create empty arrays for result and overflows with same shape as y for speedup
+            # create empty arrays for result and overflows with same shape as y
+            # for speedup, test for invalid types
             SCALAR = False
             y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
-            if y.dtype.type is np.string_:
-                np.char.replace(y, ' ', '') # remove all whitespace
-                y = y.astype(complex) # ensure that is y is a numeric type
             yq = np.zeros(y.shape)
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
             self.ovr_flag = np.zeros(y.shape, dtype = int)
+
+            if np.issubdtype(y.dtype, np.number):
+                pass
+            elif y.dtype.kind in {'U', 'S'}: # string or unicode
+                try:
+                    y = y.astype(np.float64) # try to convert to float
+                except (TypeError, ValueError):
+                    try:
+                        np.char.replace(y, ' ', '') # remove all whitespace
+                        y = y.astype(complex) # try to convert to complex
+                    except (TypeError, ValueError) as e:
+                        logger.error("Argument '{0}' yields \n {1}".format(y,e))
+                        y = np.zeros(y.shape)
+            else:
+                logger.error("Argument '{0}' is of type '{1}',\n"
+                             "cannot convert to float.".format(y, y.dtype))
+                y = np.zeros(y.shape)
         else:
             SCALAR = True
             # get rid of errors that have occurred upstream
@@ -528,18 +532,22 @@ class Fixed(object):
             # to complex format:
             elif not np.issubdtype(type(y), np.number):
                 y = qstr(y)
-                y = y.replace(' ','') # whitespace is not allowed in complex number
+                y = y.replace(' ','') # remove all whitespace
                 try:
-                    y = complex(y)
-                except ValueError as e:
-                    logger.error("Argument '{0}' yields \n {1}".format(y,e))
+                    y = float(y)
+                except (TypeError, ValueError):
+                    try:
+                        y = complex(y)
+                    except (TypeError, ValueError) as e:
+                        logger.error("Argument '{0}' yields \n {1}".format(y,e))
+                        y = 0.0
             over_pos = over_neg = yq = 0
             self.ovr_flag = 0
 
         # convert pseudo-complex (imag = 0) and complex values to real
         y = np.real_if_close(y)
         if np.iscomplexobj(y):
-            logger.warn("Casting complex values to real before quantization!")
+            logger.warning("Casting complex values to real before quantization!")
             # quantizing complex objects is not supported yet
             y = y.real
 
@@ -637,6 +645,8 @@ class Fixed(object):
         -------
         floating point (`dtype=np.float64`) representation of fixpoint input.
         """
+        csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+
         if y == "":
             return 0
 
@@ -695,7 +705,7 @@ class Fixed(object):
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
-                y_float = self.fix(val_str, scaling='div')
+                y_float = self.fixp(val_str, scaling='div')
             except Exception as e:
                 logger.warn(e)
                 y_float = None
@@ -710,7 +720,7 @@ class Fixed(object):
                 # quantize / saturate / wrap the integer value:
 
                 y_f = y_int * self.LSB
-                y_float = self.fix(y_f, scaling='div')
+                y_float = self.fixp(y_f, scaling='div')
             except Exception as e:
                 logger.warn(e)
                 y_int = None
@@ -748,7 +758,7 @@ class Fixed(object):
         same shape as `y`.
 
         The float is multiplied by `self.scale` and quantized / saturated 
-        using fix() for all formats before it is converted to different number
+        using fixp() for all formats before it is converted to different number
         formats.
 
         Parameters
@@ -763,21 +773,44 @@ class Fixed(object):
         formats except `float` a fixpoint representation with `self.W` binary 
         digits is returned.
         """
+        #======================================================================
+        # Define vectorized functions for dec -> frmt  using numpys 
+        # automatic type casting
+        #======================================================================
+        """
+        Vectorized function for inserting binary point in string `bin_str` 
+        after position `pos`.
+
+        Usage:  insert_binary_point(bin_str, pos)
+
+        Parameters: bin_str : string
+                    pos     : integer
+        """
+        insert_binary_point = np.vectorize(lambda bin_str, pos:(
+                                    bin_str[:pos+1] + "." + bin_str[pos+1:]))
+        
+        dec2bin_vec = np.frompyfunc(np.binary_repr, 2, 1)
+        dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
+        bin2hex_vec = np.frompyfunc(bin2hex, 2, 1)
+        dec2hex_vec = np.frompyfunc(dec2hex, 2, 1)
+        #dec2hex_vec = 
+        #======================================================================
+
         if self.frmt == 'float': # return float input value unchanged
             return y
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # quantize & treat overflows of y (float), returning a float
-            y_fix = self.fix(y)
+            y_fix = self.fixp(y, scaling='mult')
             # logger.debug("y={0} | y_fix={1}".format(y, y_fix))
             if self.frmt == 'dec':
                 if self.WF == 0:
-                    y_fix = np.int64(y_fix) # get rid of trailing zero
+                    y_fix = np.int64(y_fix, scaling='mult') # get rid of trailing zero
 
-                y_str = str(y_fix) # use fixpoint number as returned by fix()
+                y_str = str(y_fix) # use fixpoint number as returned by fixp()
 
             elif self.frmt == 'csd':
-                y_str = dec2csd(y_fix, self.WF) # convert with WF fractional bits
+                y_str = dec2csd_vec(y_fix, self.WF) # convert with WF fractional bits
 
             else: # bin or hex
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
@@ -795,12 +828,16 @@ class Fixed(object):
                         y_str = dec2hex(yi, self.W)
                 else: # self.frmt == 'bin':
                     # calculate binary representation of fixpoint integer
-                    y_str = np.binary_repr(y_fix_int, self.W)
+                    y_str = dec2bin_vec(y_fix_int, self.W)
+
                     if self.WF > 0:
                         # ... and insert the radix point if required
-                        y_str = y_str[:self.WI+1] + "." + y_str[self.WI+1:]
+                        y_str = insert_binary_point(y_str, self.WI)
 
                 # logger.debug("yi={0} | yf={1} | y_str={2}".format(yi, yf, y_str))
+            if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
+                y_str = y_str.item() # convert singleton array to scalar
+
             return y_str
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
@@ -822,7 +859,7 @@ if __name__=='__main__':
 
     print("\nTesting float2frmt()\n====================\n")       
     for y in y_list:
-        print("y -> y_fix", y, "->", myQ.fix(y))
+        print("y -> y_fix", y, "->", myQ.fixp(y, scaling='mult'))
         print(myQ.frmt, myQ.float2frmt(y))
             
     print("\nTesting frmt2float()\n====================\n")
