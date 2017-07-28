@@ -17,15 +17,13 @@ from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
 # TODO: Various errors related to radix point:
-#       - Frmt2float for hex format yields wrong results, scale parameter
+#       Frmt2float for hex format yields wrong results, scale parameter
 #         is not used correctly, entering a radix point in integer mode is ignored
 # TODO: When the number of trailing digits is changed in hex and bin format,
 #           the scaling is changed as well
 # TODO: Entering a negative sign for a negative hex or bin number yields a negative
 #       overflow (instead of the expected positive number)
-# TODO: Positive overflow saturation value is wrong: 0 or 3.0 instead of 0.99999
-#         resp. 3.9999
-# TODO: Entering values outside the FP range as non-float returns 0 and doesn't
+# TODO: Entering values outside the FP range as non-float doesn't
 #       flag an overflow
 # TODO: Let Fix.setObj change individual attributes as well
 
