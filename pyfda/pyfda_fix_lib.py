@@ -837,6 +837,9 @@ class Fixed(object):
                         y_str = insert_binary_point(y_str, self.WI)
 
                 # logger.debug("yi={0} | yf={1} | y_str={2}".format(yi, yf, y_str))
+            if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
+                y_str = y_str.item() # convert singleton array to scalar
+
             return y_str
         else:
             raise Exception('Unknown output format "%s"!'%(self.frmt))
