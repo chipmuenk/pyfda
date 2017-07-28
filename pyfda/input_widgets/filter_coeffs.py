@@ -761,6 +761,7 @@ class FilterCoeffs(QWidget):
         
         self.spnRound.setVisible(is_float) # number of digits can only be selected 
         self.lblRound.setVisible(is_float) # for format = 'float'
+        self.cmbQFrmt.setVisible(not is_float) # hide unneeded widgets for format = 'float'
         self.lbl_W.setVisible(not is_float)
         self.ledW.setVisible(not is_float)
 
