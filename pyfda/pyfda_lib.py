@@ -157,7 +157,7 @@ print(mod_version())
 ###############################################################################
 #### General functions ########################################################
 
-def safe_eval(expr, alt_expr=0):
+def safe_eval(expr, alt_expr=0, type="float"):
     """
     Try ... except wrapper around simple_eval to catch various errors
     When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
@@ -170,6 +170,9 @@ def safe_eval(expr, alt_expr=0):
 
     alt_expr: string
         String to be evaluated when evaluation of first string fails.
+        
+    type: string
+        Expected type of returned variable
 
     Returns
     -------
@@ -183,8 +186,10 @@ def safe_eval(expr, alt_expr=0):
         logger.warn("Empty string not allowed as argument!")
     else:
         try:
-            # eliminate very small imaginary components due to rounding errors
-            result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
+            if type == 'float':
+                result = se.simple_eval(expr).real
+                # eliminate very small imaginary components due to rounding errors
+                #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
         except Exception as e:
             logger.warn(e)
             fail_1 = True
@@ -195,7 +200,8 @@ def safe_eval(expr, alt_expr=0):
             logger.warn("Fallback argument: Empty string not allowed!")
         else:
             try:
-                result = np.asscalar(np.real_if_close(se.simple_eval(alt_expr), tol = 100))
+                if type == 'float':
+                    result = se.simple_eval(alt_expr).real
             except Exception as e:
                 #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
                 logger.warn("Fallback argument:", e)
