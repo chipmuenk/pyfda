@@ -683,7 +683,7 @@ class FilterCoeffs(QWidget):
         if qget_cmb_box(self.cmbQFrmt) == 'qint': # integer format, preserve WI bits
             WI = W - self.myQ.WF - 1
             self.ledWI.setText(str(WI))
-            self.ledScale.setText(str(int(2. ** W)))
+            self.ledScale.setText(str(1 << (W-1)))
         else: # fractional format, preserve WF bit setting
             WF = W - self.myQ.WI - 1
             if WF < 0:
@@ -706,7 +706,7 @@ class FilterCoeffs(QWidget):
         if qfrmt == 'qint':
             self.ledWI.setText(str(W - 1))
             self.ledWF.setText("0")
-            self.ledScale.setText(str(int(2. ** W)))
+            self.ledScale.setText(str(1 << (W-1)))
         elif qfrmt == 'qnfrac': # normalized fractional format
             self.ledWI.setText("0")
             self.ledWF.setText(str(W - 1))
