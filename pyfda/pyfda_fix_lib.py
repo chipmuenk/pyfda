@@ -516,9 +516,10 @@ class Fixed(object):
                     try:
                         np.char.replace(y, ' ', '') # remove all whitespace
                         y = y.astype(complex) # try to convert to complex
-                    except (TypeError, ValueError) as e:
-                        logger.error("Argument '{0}' yields \n {1}".format(y,e))
-                        y = np.zeros(y.shape)
+                    except (TypeError, ValueError) as e: # try converting elements individually
+                        y = list(map(lambda y_scalar: 
+                            self.fixp(y_scalar, scaling=scaling), y))
+
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
                              "cannot convert to float.".format(y, y.dtype))

@@ -63,7 +63,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
         yq_list = list(self.myQ.fixp(self.y_list_validate))
-        yq_list_goal = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        yq_list_goal = [0, 0, 123.0, 1.23, 0, 3.21, 3.21]
         self.assertListEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (no saturation, no quantization)
@@ -204,13 +204,15 @@ class TestSequenceFunctions(unittest.TestCase):
         # Integer case: Q3.0, scale = 1, scalar parameter
         q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'bin', 'scale': 8}
         self.myQ.setQobj(q_obj)
+
         # test handling of invalid inputs - scalar inputs
         yq_list = list(map(self.myQ.float2frmt, self.y_list_validate))
-        yq_list_goal = ["0000", "0000", "0111", "0001", "0000", "0011", "0011"]
+        yq_list_goal = ["0000", "0000", "0111", "0111", "0000", "0111", "0111"]
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
         yq_list = list(self.myQ.float2frmt(self.y_list_validate))
-        yq_list_goal = ["0000", "0000", "0111", "0001", "0000", "0011", "0011"]
+        yq_list_goal = ["0000", "0000", "0111", "0111", "0000", "0111", "0111"]
+        # input       ['1.1.1', 'xxx', '123', '1.23',    '', 1.23j + 3.21, '3.21 + 1.23 j']
         self.assertListEqual(yq_list, yq_list_goal)
 
         # Integer case: Q3.0, scale = 8, scalar parameter
