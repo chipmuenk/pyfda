@@ -805,7 +805,7 @@ class Fixed(object):
             # logger.debug("y={0} | y_fix={1}".format(y, y_fix))
             if self.frmt == 'dec':
                 if self.WF == 0:
-                    y_fix = np.int64(y_fix, scaling='mult') # get rid of trailing zero
+                    y_fix = np.int64(y_fix) # get rid of trailing zero
 
                 y_str = str(y_fix) # use fixpoint number as returned by fixp()
 
