@@ -262,6 +262,7 @@ class FilterCoeffs(QWidget):
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
         
+        self.eps = 1.e-6 # initialize toleracce attribute
         self.opt_widget = None # handle for pop-up options widget
         self._construct_UI()
 
@@ -447,7 +448,7 @@ class FilterCoeffs(QWidget):
 
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
-        self.ledSetEps.setText(str(1e-6))
+        self.ledSetEps.setText(str(self.eps))
 
         lblQOvfl = QLabel("Ovfl.:", self)
         lblQOvfl.setFont(self.bifont)
@@ -609,6 +610,7 @@ class FilterCoeffs(QWidget):
         butLoad.clicked.connect(self.load_dict)
         self.butSave.clicked.connect(self._save_dict)
         butClear.clicked.connect(self._clear_table)
+        self.ledSetEps.editingFinished.connect(self._set_eps)
         butSetZero.clicked.connect(self._set_coeffs_zero)
 
         # refresh table after storing new settings
@@ -618,7 +620,7 @@ class FilterCoeffs(QWidget):
         self.ledWF.editingFinished.connect(self._WIWF_changed)
         self.ledWI.editingFinished.connect(self._WIWF_changed)
         self.ledW.editingFinished.connect(self._W_changed)
-        
+
         self.ledScale.editingFinished.connect(self._set_scale)
 
         self.butQuant.clicked.connect(self.quant_coeffs)
@@ -1052,26 +1054,37 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
         qstyle_widget(self.butSave, 'changed')
 
+
+#------------------------------------------------------------------------------
+    def _set_eps(self):
+        """
+        Set all coefficients = 0 in self.ba with a magnitude less than eps
+        and refresh QTableWidget
+        """
+        eps = safe_eval(self.ledSetEps.text(), return_type='float', sign='pos')
+        self.ledSetEps.setText(str(eps))
+        self.eps = eps
+
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
         """
         Set all coefficients = 0 in self.ba with a magnitude less than eps
         and refresh QTableWidget
         """
-        eps = np.float64(self.ledSetEps.text())
+        self._set_eps()
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
 
         test_val = 0. # value against which array is tested
         targ_val = 0. # value which is set when condition is true
         
         if not idx: # nothing selected, check whole table
-            b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol=eps)
+            b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol=self.eps)
             if np.any(b_0): # found at least one coeff where condition was true         
                 self.ba[0] = self.ba[0] * np.logical_not(b_0)
                 qstyle_widget(self.butSave, 'changed')
             
             if  fb.fil[0]['ft'] == 'IIR':
-                a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol=eps)
+                a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol=self.eps)
                 if np.any(a_0):
                     self.ba[1] = self.ba[1] * np.logical_not(a_0)
                     qstyle_widget(self.butSave, 'changed')
@@ -1079,7 +1092,7 @@ class FilterCoeffs(QWidget):
         else: # only check selected cells
             changed = False
             for i in idx:
-                if np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=eps):
+                if np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=self.eps):
                     self.ba[i[0]][i[1]] = targ_val
                     changed = True
             if changed:
