@@ -1065,13 +1065,13 @@ class FilterCoeffs(QWidget):
         targ_val = 0. # value which is set when condition is true
         
         if not idx: # nothing selected, check whole table
-            b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol = eps)
+            b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol=eps)
             if np.any(b_0): # found at least one coeff where condition was true         
                 self.ba[0] = self.ba[0] * np.logical_not(b_0)
                 qstyle_widget(self.butSave, 'changed')
             
             if  fb.fil[0]['ft'] == 'IIR':
-                a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol = eps)
+                a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol=eps)
                 if np.any(a_0):
                     self.ba[1] = self.ba[1] * np.logical_not(a_0)
                     qstyle_widget(self.butSave, 'changed')
@@ -1079,7 +1079,7 @@ class FilterCoeffs(QWidget):
         else: # only check selected cells
             changed = False
             for i in idx:
-                if np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol = eps):
+                if np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=eps):
                     self.ba[i[0]][i[1]] = targ_val
                     changed = True
             if changed:
