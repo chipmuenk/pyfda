@@ -157,7 +157,7 @@ print(mod_version())
 ###############################################################################
 #### General functions ########################################################
 
-def safe_eval(expr, alt_expr=0, type="float"):
+def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """
     Try ... except wrapper around simple_eval to catch various errors
     When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
@@ -171,44 +171,86 @@ def safe_eval(expr, alt_expr=0, type="float"):
     alt_expr: string
         String to be evaluated when evaluation of first string fails.
         
-    type: string
-        Expected type of returned variable
+    return_type: string
+        Type of returned variable ['float' (default) / 'complex' / 'int']
+        
+    sign: string
+        enforce positive / negative sign of result ['pos' / None (default) / 'neg'
 
     Returns
     -------
-    float: the evaluated result or 0 when both arguments fail.
+    float (default) / complex / int : the evaluated result or 0 when both arguments fail.
     """
-    fail_1 = fail_2 = False
-    result = None
     
-    if expr == "":
-        expr = None
-        logger.warn("Empty string not allowed as argument!")
-    else:
-        try:
-            if type == 'float':
-                result = se.simple_eval(expr).real
-                # eliminate very small imaginary components due to rounding errors
-                #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
-        except Exception as e:
-            logger.warn(e)
-            fail_1 = True
-            
-    if fail_1 or result is None:
-        if expr == "":
-            expr = None
-            logger.warn("Fallback argument: Empty string not allowed!")
+    result = None
+    fallback = ""
+
+    for ex in [expr, alt_expr]:
+        if ex == "":
+            result = None
+            logger.error("Empty string passed to safe_eval!")
         else:
             try:
-                if type == 'float':
-                    result = se.simple_eval(alt_expr).real
-            except Exception as e:
-                #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
-                logger.warn("Fallback argument:", e)
-                fail_2 = True
-        if fail_2 or result is None:
-            result = 0
+                ex_num = se.simple_eval(ex)
+                if return_type == 'complex':
+                    return ex_num
+                if return_type == 'float':
+                    result = ex_num.real
+                    # eliminate very small imaginary components due to rounding errors
+                    #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
+                elif return_type == 'int':
+                    result = np.int64(ex_num)
+            except (se.InvalidExpression, se.FunctionNotDefined, Exception, SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+            
+            #Exception as e:
+                    logger.error(fallback + 'save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
+                    
+        if result is not None:
+            break # break out of for loop when
+        fallback = "Fallback: "
+
+    if result is None:
+        result = 0
+    if sign == 'pos':
+        result = np.abs(result)
+    elif sign == 'neg':
+        result = -np.abs(result)
     return result
+        
+
+        
+        
+        
+#    if expr == "":
+#        expr = None
+#        logger.warn("Empty string not allowed as argument!")
+#    else:
+#        try:
+#            if type == 'float':
+#                result = se.simple_eval(expr).real
+#                # eliminate very small imaginary components due to rounding errors
+#                #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
+#            elif type == 'int':
+#                result = np.int64(se.simple_eval(expr))
+#        except Exception as e:
+#            logger.warn(e)
+#            fail_1 = True
+            
+#    if fail_1 or result is None:
+#        if expr == "":
+#            expr = None
+#            logger.warn("Fallback argument: Empty string not allowed!")
+#        else:
+#            try:
+#                if type == 'float':
+#                    result = se.simple_eval(alt_expr).real
+#            except Exception as e:
+#                #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+#                logger.warn("Fallback argument:", e)
+#                fail_2 = True
+#        if fail_2 or result is None:
+#            result = 0
+#    return result
 
 
 # taken from
