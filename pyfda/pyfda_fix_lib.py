@@ -712,13 +712,15 @@ class Fixed(object):
                 y_float = None
 
         elif frmt in {'hex', 'bin'}:
-            # try to convert string without radix point
+            # - try to convert string without radix point
+            # - scale with number of fractional places
+            # - transform numbers in negative 2's complement to negative  numbers
             try:
                 y_int = int(raw_str, self.base) / self.base**frc_places
                 # check for negative (two's complement) numbers
-                if y_int >= (1 << (int_places)):
-                   y_int = y_int - (1 << int(np.ceil(np.log2(y_int))))
-                # quantize / saturate / wrap the integer value:
+                if y_int >=  self.base ** int_places: # (1 << (int_places)):
+                   y_int = y_int - (1 << int(np.ceil(np.log2(y_int) / np.log2(self.base))))
+                # quantize / saturate / wrap & scale the integer value:
                 y_float = self.fixp(y_int, scaling='div')
             except Exception as e:
                 logger.warn(e)
