@@ -714,14 +714,12 @@ class Fixed(object):
         elif frmt in {'hex', 'bin'}:
             # try to convert string without radix point
             try:
-                y_int = int(raw_str, self.base)
+                y_int = int(raw_str, self.base) / self.base**frc_places
                 # check for negative (two's complement) numbers
-                if y_int >= (1 << (self.W-1)):
-                    y_int = y_int - (1 << int(np.ceil(np.log2(y_int))))
+                if y_int >= (1 << (int_places)):
+                   y_int = y_int - (1 << int(np.ceil(np.log2(y_int))))
                 # quantize / saturate / wrap the integer value:
-
-                y_f = y_int * self.LSB
-                y_float = self.fixp(y_f, scaling='div')
+                y_float = self.fixp(y_int, scaling='div')
             except Exception as e:
                 logger.warn(e)
                 y_int = None
