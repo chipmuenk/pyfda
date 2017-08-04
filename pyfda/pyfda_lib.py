@@ -65,13 +65,13 @@ try:
     VERSION.update({'mayavi': VERSION_MAYAVI})
 except ImportError:
     logger.info("Module 'mayavi' not found.")
-    
+
 try:
     from myhdl import __version__ as VERSION_HDL
     VERSION.update({'myhdl': VERSION_HDL})
 except ImportError:
     logger.info("Module 'myhdl' not found.")
-    
+
 try:
     from docutils import __version__ as VERSION_DOCUTILS
     VERSION.update({'docutils': VERSION_DOCUTILS})
@@ -80,7 +80,7 @@ except ImportError:
 
 def b(s):
     """
-    Handle binary data in the same way under py2 and py3: 
+    Handle binary data in the same way under py2 and py3:
     Py2: keep string data as string data
     Py3: convert string data to byte
     """
@@ -94,8 +94,8 @@ def b(s):
 
 def cmp_version(mod, version):
     """
-    Compare version number of installed module `mod` against string `version` and 
-    return 1, 0 or -1 if the installed version is greater, equal or less than 
+    Compare version number of installed module `mod` against string `version` and
+    return 1, 0 or -1 if the installed version is greater, equal or less than
     the number in `version`.
     """
     if LooseVersion(VERSION[mod]) > LooseVersion(version):
@@ -108,7 +108,7 @@ def cmp_version(mod, version):
 def mod_version(mod = None):
     """
     Return the version of the module 'mod'. If the module is not found, return
-    None. When no module is specified, return a string with all modules and 
+    None. When no module is specified, return a string with all modules and
     their versions sorted alphabetically.
     """
     if mod:
@@ -121,15 +121,15 @@ def mod_version(mod = None):
         keys = sorted(list(VERSION.keys()))
         for k in keys:
             v += "{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
-        return v   
+        return v
 
 SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
 
-PY3 = sys.version_info > (3,) # True for Python 3 
+PY3 = sys.version_info > (3,) # True for Python 3
 
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)
-MIN_PB_AMP  = 1e-5  # min pass band ripple 
+MIN_PB_AMP  = 1e-5  # min pass band ripple
 MAX_IPB_AMP = 0.85  # max pass band ripple IIR
 MAX_FPB_AMP = 0.65  # max pass band ripple FIR
 MIN_SB_AMP  = 1e-6  # max stop band attenuation
@@ -150,7 +150,7 @@ else:
     OS = "unix"
     CRLF = "\n" # Unix / Linux: line feed only, Hex 0A
 
-        
+
 logger.info(mod_version())
 print(mod_version())
 
@@ -170,18 +170,18 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
     alt_expr: string
         String to be evaluated when evaluation of first string fails.
-        
+
     return_type: string
         Type of returned variable ['float' (default) / 'complex' / 'int']
-        
+
     sign: string
-        enforce positive / negative sign of result ['pos' / None (default) / 'neg'
+        enforce positive / negative sign of result ['pos' / None (default) / 'neg']
 
     Returns
     -------
     float (default) / complex / int : the evaluated result or 0 when both arguments fail.
     """
-    
+
     result = None
     fallback = ""
 
@@ -201,10 +201,10 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                 elif return_type == 'int':
                     result = np.int64(ex_num)
             except (se.InvalidExpression, se.FunctionNotDefined, Exception, SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
-            
+
             #Exception as e:
                     logger.error(fallback + 'save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
-                    
+
         if result is not None:
             break # break out of for loop when
         fallback = "Fallback: "
@@ -216,11 +216,11 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     elif sign == 'neg':
         result = -np.abs(result)
     return result
-        
 
-        
-        
-        
+
+
+
+
 #    if expr == "":
 #        expr = None
 #        logger.warn("Empty string not allowed as argument!")
@@ -235,7 +235,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 #        except Exception as e:
 #            logger.warn(e)
 #            fail_1 = True
-            
+
 #    if fail_1 or result is None:
 #        if expr == "":
 #            expr = None
@@ -260,16 +260,16 @@ def valid(path):
     if path and os.path.isdir(path):
         return True
     return False
- 
+
 def env(name):
     """Get value for environment variable"""
     return os.environ.get( name, '' )
- 
+
 def get_home_dir():
     """Return the user's home directory"""
     if sys.platform != 'win32':
         return os.path.expanduser( '~' )
- 
+
     homeDir = env( 'USERPROFILE' )
     if not valid(homeDir):
         homeDir = env( 'HOME' )
@@ -282,15 +282,15 @@ def get_home_dir():
                 if not valid(homeDir) :
                     homeDir = 'C:\\'
     return homeDir
-    
+
 #------------------------------------------------------------------------------
 def prune_file_ext(file_type):
     """
     Prune file extension, e.g. '(*.txt)' from file type description returned
     by QFileDialog
     """
-    # regular expression: re.sub(pattern, repl, string) 
-    #  Return the string obtained by replacing the leftmost non-overlapping 
+    # regular expression: re.sub(pattern, repl, string)
+    #  Return the string obtained by replacing the leftmost non-overlapping
     #  occurrences of the pattern in string by repl
     #   '.' means any character
     #   '+' means one or more
@@ -300,11 +300,11 @@ def prune_file_ext(file_type):
 
     return re.sub('\([^\)]+\)', '', file_type)
 
-#------------------------------------------------------------------------------        
+#------------------------------------------------------------------------------
 def extract_file_ext(file_type):
     """
-    Extract list with file extension(s), e.g. '.vhd' from type description 
-    (e.g. 'VHDL (*.vhd)') returned by QFileDialog 
+    Extract list with file extension(s), e.g. '.vhd' from type description
+    (e.g. 'VHDL (*.vhd)') returned by QFileDialog
     """
 
     ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
@@ -322,7 +322,7 @@ def qstr(text):
     QString, next to a "normal" non-unicode string.
 
     Returns:
-    
+
     The current text / QVariant data as a string
     """
     if "QString" in str(type(text)):
@@ -350,7 +350,7 @@ def get_cmb_box(cmb_box, data=True):
     QString, next to a "normal" non-unicode string.
 
     Returns:
-    
+
     The current text or data of combobox as a string
     """
     if data:
@@ -359,7 +359,7 @@ def get_cmb_box(cmb_box, data=True):
         cmb_str = qstr(cmb_data) # convert QVariant, QString, string to plain string
     else:
         cmb_str = cmb_box.currentText()
-  
+
     cmb_str = str(cmb_str)
 
     return cmb_str
@@ -370,31 +370,31 @@ def set_cmb_box(cmb_box, string, data=False):
     Set combobox to the index corresponding to `string` in a text field (data = False)
     or in a data field (data=True). When `string` is not found in the combobox entries,
      select the first entry. Signals are blocked during the update of the combobox.
-     
+
     Returns: the index of the found entry
     """
     if data:
         idx = cmb_box.findData(str(string)) # find index for data = string
     else:
-        idx = cmb_box.findText(str(string)) # find index for text = string    
+        idx = cmb_box.findText(str(string)) # find index for text = string
 
     ret = idx
 
     if idx == -1: # data does not exist, use first entry instead
         idx = 0
-        
+
     cmb_box.blockSignals(True)
     cmb_box.setCurrentIndex(idx) # set index
     cmb_box.blockSignals(False)
-    
+
     return ret
 
 #------------------------------------------------------------------------------
 def style_widget(widget, state):
     """
-    Apply the "state" defined in pyfda_rc.py to the widget, e.g.:  
+    Apply the "state" defined in pyfda_rc.py to the widget, e.g.:
     Color the >> DESIGN FILTER << button according to the filter design state:
-    
+
     - "normal": default, no color styling
     - "ok":  green, filter has been designed, everything ok
     - "changed": yellow, filter specs have been changed
@@ -414,7 +414,7 @@ def style_widget(widget, state):
     widget.style().unpolish(widget)
     widget.style().polish(widget)
     widget.update()
-    
+
     #------------------------------------------------------------------------------
 
 
@@ -427,24 +427,24 @@ def dB(lin, power = False):
         return 10. * np.log10(lin)
     else:
         return 20 * np.log10(lin)
-        
+
 def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
     """
-    Convert linear amplitude specification to dB or W, depending on filter 
+    Convert linear amplitude specification to dB or W, depending on filter
     type ('FIR' or 'IIR') and whether the specifications belong to passband
     or stopband. This is determined by checking whether amp_label contains
     the strings 'PB' or 'SB' :
-    
-    - Passband: 
-       IIR: A_dB = -20 log10(1 - lin_value) 
-       
-       FIR: A_dB =  20 log10((1 + lin_value)/(1 - lin_value)) 
-                
-    - Stopband: 
+
+    - Passband:
+       IIR: A_dB = -20 log10(1 - lin_value)
+
+       FIR: A_dB =  20 log10((1 + lin_value)/(1 - lin_value))
+
+    - Stopband:
         A_dB = -20 log10(lin_value)
-    
+
     Returns the result as a float.
-    """     
+    """
     if unit == 'dB':
         if "PB" in amp_label: # passband
             if filt_type == 'IIR':
@@ -457,22 +457,22 @@ def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
         unit_value = lin_value * lin_value
     else:
         unit_value = lin_value
-            
+
     return unit_value
 
 
 def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
     """
     Convert amplitude specification in dB or W to linear specs:
-    
-    - Passband: 
+
+    - Passband:
        IIR: A_PB_lin = 1 - 10 ** (-unit_value/20)
-       
+
        FIR: A_PB_lin = (10 ** (unit_value/20) - 1)/ (10 ** (unit_value/20) + 1)
-       
-    - Stopband: 
+
+    - Stopband:
        A_SB_lin = -10 ** (-unit_value/20)
-       
+
     Returns the result as a float.
     """
     val_changed = False # flag for changed values
@@ -484,7 +484,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
         if "PB" in amp_label: # passband
             if filt_type == 'IIR':
                 lin_value = 1. - 10.**(-unit_value / 20.)
-            else: 
+            else:
                 lin_value = (10.**(unit_value / 20.) - 1) / (10.**(unit_value / 20.) + 1)
 
         else: # stopband
@@ -494,7 +494,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
     else:
         lin_value = unit_value
 
-    # Add limits to avoid errors        
+    # Add limits to avoid errors
     if "PB" in amp_label: # passband
         if lin_value < MIN_PB_AMP:
             lin_value = MIN_PB_AMP
@@ -519,7 +519,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
             if lin_value > MAX_FSB_AMP:
                 lin_value = MAX_FSB_AMP
                 val_changed = True
-        
+
     if val_changed: logger.warning("We changed an Amplitude Spec to be reasonable")
     return lin_value
 
@@ -616,7 +616,7 @@ def cmplx_sort(p):
 def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
     """
     Determine unique roots and their multiplicities from a list of roots.
-    
+
     Parameters
     ----------
     p : array_like
@@ -639,34 +639,34 @@ def unique_roots(p, tol=1e-3, magsort = False, rtype='min', rdist='euclidian'):
         How to measure the distance between roots: 'euclid' is the euclidian
         distance. 'manhattan' is less common, giving the
         sum of the differences of real and imaginary parts.
-    
+
     Returns
     -------
     pout : list
         The list of unique roots, sorted from low to high (only for real roots).
     mult : list
         The multiplicity of each root.
-    
+
     Notes
     -----
     This utility function is not specific to roots but can be used for any
     sequence of values for which uniqueness and multiplicity has to be
     determined. For a more general routine, see `numpy.unique`.
-    
+
     Examples
     --------
     >>> vals = [0, 1.3, 1.31, 2.8, 1.25, 2.2, 10.3]
     >>> uniq, mult = unique_roots(vals, tol=2e-2, rtype='avg')
-    
+
     Check which roots have multiplicity larger than 1:
-    
+
     >>> uniq[mult > 1]
     array([ 1.305])
-    
+
     Find multiples of complex roots on the unit circle:
     >>> vals = np.roots(1,2,3,2,1)
     uniq, mult = unique_roots(vals, rtype='avg')
-    
+
     """
 
     def manhattan(a,b):
@@ -872,7 +872,7 @@ a :  array_like (optional, default = 1 for FIR-filter)
 whole : boolean (optional, default : False)
      Only when True calculate group delay around
      the complete unit circle (0 ... 2 pi)
-     
+
 verbose : boolean (optional, default : True)
     Print warnings about frequency point with undefined group delay (amplitude = 0)
 
@@ -963,12 +963,12 @@ where::
 
 where :math:`H(e^{j\\omega T})` is calculated via the DFT at NFFT points and
 the derivative
-of the polynomial terms :math:`b_k z^{-k}` using 
+of the polynomial terms :math:`b_k z^{-k}` using
 
 .. math::
 
     \\frac{\\partial} {\\partial \\omega} b_k e^{-jk\\omega T} = -b_k jkT e^{-jk\\omega T}.
-    
+
 This is equivalent to muliplying the polynome with a ramp `k`,
 yielding the "ramped" function :math:`H_R(e^{j\\omega T})`.
 
@@ -1046,7 +1046,7 @@ Examples
 #        except TypeError: b=1; ob=0     # b is a scalar or empty -> order of b = 0
 #        else:
 #            ob = len(b)-1             # order of b(z)
-#    
+#
 #        if analog:
 #            a_b = np.convolve(a,b)
 #            if ob > 1:
@@ -1054,13 +1054,13 @@ Examples
 #            else:
 #                br_a = 0
 #            ar_b = np.convolve(a[1:] * np.arange(1,oa), b)
-#    
+#
 #            num = np.fft.fft(ar_b - br_a, nfft)
 #            den = np.fft.fft(a_b,nfft)
 #        else:
 #            oc = oa + ob                  # order of c(z)
 #            cr = c * np.arange(0,oc+1) # multiply with ramp -> derivative of c wrt 1/z
-#    
+#
 #            num = np.fft.fft(cr,nfft) #
 #            den = np.fft.fft(c,nfft)  #
 #    #
@@ -1072,7 +1072,7 @@ Examples
 #                print ('f = {0} '.format((fs*i/nfft)))
 #                num[i] = 0
 #                den[i] = 1
-#    
+#
 #        if analog: # this doesn't work yet
 #            tau_g = np.real(num / den)
 #        else:
@@ -1082,7 +1082,7 @@ Examples
 #            nfft = nfft/2
 #            tau_g = tau_g[0:nfft]
 #            w = w[0:nfft]
-#    
+#
 #        return w, tau_g
 #
 #    else:
@@ -1120,36 +1120,36 @@ Examples
     gd[~singular] = np.real(num[~singular] / den[~singular]) - a.size + 1
     return w, gd
 
-#==================================================================     
+#==================================================================
 def expand_lim(ax, eps_x, eps_y = None):
 #==================================================================
     """
     Expand the xlim and ylim-values of passed axis by eps
-    
+
     Parameters
     ----------
-    
+
     ax : axes object
-    
+
     eps_x : float
             factor by which x-axis limits are expanded
-            
+
     eps_y : float
             factor by which y-axis limits are expanded. If eps_y is None, eps_x
             is used for eps_y as well.
-    
-    
+
+
     Returns
     -------
     nothing
     """
-    
+
     if not eps_y:
         eps_y = eps_x
-    xmin,xmax,ymin,ymax = ax.axis()                            
+    xmin,xmax,ymin,ymax = ax.axis()
     dx = (xmax - xmin) * eps_x
     dy = (ymax - ymin) * eps_y
-    ax.axis((xmin-dx,xmax+dx,ymin-dy,ymax+dy))      
+    ax.axis((xmin-dx,xmax+dx,ymin-dy,ymax+dy))
 
 #==================================================================
 def format_ticks(ax, xy, scale=1., format="%.1f"):
@@ -1157,36 +1157,36 @@ def format_ticks(ax, xy, scale=1., format="%.1f"):
     """
     Reformat numbers at x or y - axis. The scale can be changed to display
     e.g. MHz instead of Hz. The number format can be changed as well.
-    
+
     Parameters
     ----------
-    
+
     ax : axes object
-    
+
     xy : string, either 'x', 'y' or 'xy'
          select corresponding axis (axes) for reformatting
-    
+
     scale : real (default: 1.)
             rescaling factor for the axes
-    
+
     format : string (default: %.1f)
              define C-style number formats
-    
+
     Returns
     -------
     nothing
-    
-    
+
+
     Examples
     --------
     Scale all numbers of x-Axis by 1000, e.g. for displaying ms instead of s.
-    
+
     >>> format_ticks('x',1000.)
-    
+
     Two decimal places for numbers on x- and y-axis
-    
+
     >>> format_ticks('xy',1., format = "%.2f")
-    
+
     """
     if xy == 'x' or xy == 'xy':
 #        locx,labelx = ax.get_xticks(), ax.get_xticklabels() # get location and content of xticks
@@ -1203,37 +1203,37 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
     Save filter design ``arg`` in the format specified as ``format_in`` in
     the dictionary ``fil_dict``. The format can be either poles / zeros / gain,
     filter coefficients (polynomes) or second-order sections.
-    
+
     Convert the filter design to the other formats if ``convert`` is True.
-    
+
     Parameters
     ----------
-    
+
     fil_dict : dict
         The dictionary where the filter design is saved to.
-    
+
     arg : various formats
         The actual filter design
-        
+
     format_in : string
         Specifies how the filter design in 'arg' is passed:
-            
-        - 'ba' : Coefficient form: Filter coefficients in FIR format 
+
+        - 'ba' : Coefficient form: Filter coefficients in FIR format
                  (b, one dimensional) are automatically converted to IIR format (b, a).
-        
+
         - 'zpk' : Zero / pole / gain format: When only zeroes are specified,
                   poles and gain are added automatically.
-        
+
         - 'sos' : Second-order sections
-        
+
     sender : string
         The name of the method that calculated the filter. This name is stored
         in ``fil_dict`` together with ``format_in``.
-        
+
     convert : boolean
         When convert = True, convert arg to the other formats.
     """
-    
+
     if format_in == 'sos':
             fil_dict['sos'] = arg
             fil_dict['ft'] = 'IIR'
@@ -1261,11 +1261,11 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         else:
             format_error = True
 
-        if format_error:        
+        if format_error:
             raise ValueError("Unknown 'zpk' format {0}".format(arg))
 
-            
-    elif format_in == 'ba': 
+
+    elif format_in == 'ba':
         if np.ndim(arg) == 1: # arg = [b] -> FIR
             b = np.asarray(arg)
             a = np.zeros(len(b))
@@ -1287,7 +1287,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
             fil_dict['ft'] = 'FIR'
         else:
             fil_dict['ft'] = 'IIR'
-            
+
         # equalize if b and a subarrays have different lengths:
         D = len(b) - len(a)
         if D > 0: # b is longer than a -> fill up a with zeros
@@ -1302,11 +1302,11 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
-    
+
     fil_dict['creator'] = (format_in, sender)
     fil_dict['time_designed'] = time.time()
-    
-    if convert:    
+
+    if convert:
         fil_convert(fil_dict, format_in)
 
 #==============================================================================
@@ -1320,18 +1320,18 @@ def fil_convert(fil_dict, format_in):
     ----------
     fil_dict :  dictionary
          filter dictionary
-    
+
     format_in :  string or set of strings
          format(s) generated by the filter design routine. Must be one of
          'sos' : a list of second order sections - all other formats can easily
                  be derived from this format
          'zpk': [z,p,k] where z is the array of zeros, p the array of poles and
-             k is a scalar with the gain - the polynomial form can be derived 
+             k is a scalar with the gain - the polynomial form can be derived
              from this format quite accurately
          'ba' : [b, a] where b and a are the polynomial coefficients - finding
                    the roots of the a and b polynomes may fail for higher orders
     """
-    
+
     if 'sos' in format_in:
         if 'zpk' not in format_in:
             try:
@@ -1354,8 +1354,8 @@ def fil_convert(fil_dict, format_in):
             # check whether sos conversion has created additional (superfluous)
             # highest order polynomial with coefficient 0 and delete them
             if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
-                fil_dict['ba'][0] = np.delete(fil_dict['ba'][0],-1) 
-                fil_dict['ba'][1] = np.delete(fil_dict['ba'][1],-1) 
+                fil_dict['ba'][0] = np.delete(fil_dict['ba'][0],-1)
+                fil_dict['ba'][1] = np.delete(fil_dict['ba'][1],-1)
 
     elif 'zpk' in format_in: # z, p, k have been generated,convert to other formats
         zpk = fil_dict['zpk']
@@ -1371,7 +1371,7 @@ def fil_convert(fil_dict, format_in):
 #            except ValueError:
 #                fil_dict['sos'] = []
 #                print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
-                
+
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         try:
@@ -1389,12 +1389,12 @@ def fil_convert(fil_dict, format_in):
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
 
-        
+
 def sos2zpk(sos):
     """
-    - Taken from scipy/signal/filter_design.py - edit to eliminate first 
-    order section 
-    
+    - Taken from scipy/signal/filter_design.py - edit to eliminate first
+    order section
+
     Return zeros, poles, and gain of a series of second-order sections
     Parameters
     ----------
@@ -1427,7 +1427,7 @@ def sos2zpk(sos):
 #        if sos[section, -1] == 0: # first order section
         p[2*section:2*(section+1)] = zpk[1]
         k *= zpk[2]
-        
+
     return z, p, k
 
 
@@ -1445,10 +1445,10 @@ def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
     Calculate the parameters required by the Remez exchange algorithm to
     construct a finite impulse response (FIR) filter that approximately
     meets the specified design.
-    
+
     Parameters
     ----------
-    
+
     freqs : list
         A monotonic sequence of band edges specified in Hertz. All elements
         must be non-negative and less than 1/2 the sampling frequency as
@@ -1471,20 +1471,20 @@ def remezord(freqs,amps,rips,Hz=1,alg='ichige'):
         Filter length approximation algorithm. May be either 'herrmann',
         'kaiser' or 'ichige'. Depending on the specifications, some of
         the algorithms may give better results than the others.
-    
+
     Returns
     -------
-    
+
     numtaps,bands,desired,weight -- See help for the remez function.
-    
+
     Examples
     --------
         We want to design a lowpass with the band edges of 40 resp. 50 Hz and a
         sampling frequency of 200 Hz, a passband peak ripple of 10%
         and a stop band ripple of 0.01 or 40 dB.
-        
+
         >>> (L, F, A, W) = remezord([40, 50], [1, 0], [0.1, 0.01], Hz = 200)
-    
+
     """
 
     # Make sure the parameters are floating point numpy arrays:
@@ -1559,7 +1559,7 @@ def ceil_odd(x):
     Return the smallest odd integer not less than x. x can be integer or float.
     """
     return round_odd(x+1)
-    
+
 def floor_odd(x):
     """
     Return the largest odd integer not larger than x. x can be integer or float.
@@ -1572,7 +1572,7 @@ def ceil_even(x):
     Return the smallest even integer not less than x. x can be integer or float.
     """
     return round_even(x+1)
-    
+
 def floor_even(x):
     """
     Return the largest even integer not larger than x. x can be integer or float.
@@ -1586,9 +1586,9 @@ def remlplen_herrmann(fp,fs,dp,ds):
     fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
     fp and fs must be normalized with respect to the sampling frequency.
     Note that the filter order is one less than the filter length.
-    
+
     Uses approximation algorithm described by Herrmann et al.:
-    
+
     O. Herrmann, L.R. Raviner, and D.S.K. Chan, Practical Design Rules for
     Optimum Finite Impulse Response Low-Pass Digital Filters, Bell Syst. Tech.
     Jour., 52(6):769-799, Jul./Aug. 1973.
@@ -1611,9 +1611,9 @@ def remlplen_kaiser(fp,fs,dp,ds):
     fp, stopband frequency fs, passband ripple dp, and stopband ripple ds.
     fp and fs must be normalized with respect to the sampling frequency.
     Note that the filter order is one less than the filter length.
-    
+
     Uses approximation algorithm described by Kaiser:
-    
+
     J.F. Kaiser, Nonrecursive Digital Filter Design Using I_0-sinh Window
     function, Proc. IEEE Int. Symp. Circuits and Systems, 20-23, April 1974.
     """
@@ -1647,7 +1647,7 @@ def remlplen_ichige(fp,fs,dp,ds):
     N4 = N3+DN
 
     return int(N4)
-    
+
 #-------------------------------------------------------------
 def rt_label(label, it = True):
     """
@@ -1659,24 +1659,24 @@ def rt_label(label, it = True):
 
     label : string
         Name for the label to be converted, containing '_' for subscripts
-        
+
     Returns
     -------
-    
+
     html_label : string
         HTML - formatted label
-    
+
     Examples
     --------
-        
+
         >>> rt_label("F_SB")
         <b><i>F<sub>SB</sub></i></b>
-         
+
     """
     if "_" in label:
         label = label.replace('_', '<sub>')
         label += "</sub>"
-    if it:    
+    if it:
         html_label = "<b><i>"+label+"</i></b>"
     else:
         html_label = "<b>"+label+"</b>"
