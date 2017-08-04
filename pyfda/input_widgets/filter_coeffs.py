@@ -231,7 +231,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(qstr(editor.text()), fb.data_old, type='float') # raw data without fixpoint formatting 
+            data = safe_eval(qstr(editor.text()), fb.data_old, return_type='float') # raw data without fixpoint formatting 
         else:
             data = self.parent.myQ.frmt2float(qstr(editor.text()),
                                     self.parent.myQ.frmt) # transform back to float
@@ -662,8 +662,8 @@ class FilterCoeffs(QWidget):
         """
         Set wordlength `W` when `WI` or `WF` have been changed
         """
-        WI = abs(int(safe_eval(self.ledWI.text(), self.myQ.WI)))
-        WF = abs(int(safe_eval(self.ledWF.text(), self.myQ.WF)))
+        WI = safe_eval(self.ledWI.text(), self.myQ.WI, return_type='int')
+        WF = safe_eval(self.ledWF.text(), self.myQ.WF, return_type='int', sign='pos')
         self.ledW.setText(str(WF + WI + 1))
         self._store_q_settings()
         self._refresh_table()
@@ -675,7 +675,7 @@ class FilterCoeffs(QWidget):
         been changed. Try to preserve `WI` or `WF` settings depending on the
         number format (integer or fractional).
         """
-        W = int(abs(safe_eval(self.ledW.text(), self.myQ.W)))
+        W = safe_eval(self.ledW.text(), self.myQ.W, return_type='int', sign='pos')
 
         if W < 2:
             logger.warn("W must be > 1, restoring previous value.")
@@ -704,7 +704,7 @@ class FilterCoeffs(QWidget):
 
         qfrmt = qget_cmb_box(self.cmbQFrmt)
         is_qfrac = False
-        W = int(safe_eval(self.ledW.text(), self.myQ.W))
+        W = safe_eval(self.ledW.text(), self.myQ.W, return_type='int', sign='pos')
         if qfrmt == 'qint':
             self.ledWI.setText(str(W - 1))
             self.ledWF.setText("0")
@@ -731,8 +731,8 @@ class FilterCoeffs(QWidget):
         Set scale for calculating floating point value from fixpoint representation
         and vice versa
         """
-        scale = safe_eval(self.ledScale.text(), self.myQ.scale)
-        self.ledScale.setText(str(abs(scale)))
+        scale = safe_eval(self.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
+        self.ledScale.setText(str(scale))
         self._store_q_settings()
         self._refresh_table()
 
