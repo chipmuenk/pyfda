@@ -211,7 +211,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
         # same in vector format
         yq_list = list(self.myQ.float2frmt(self.y_list_validate))
-        yq_list_goal = ["0000", "0000", "0111", "0111", "0000", "0111", "0111"]
         # input       ['1.1.1', 'xxx', '123', '1.23',    '', 1.23j + 3.21, '3.21 + 1.23 j']
         self.assertListEqual(yq_list, yq_list_goal)
 
