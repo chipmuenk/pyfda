@@ -16,15 +16,13 @@ import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
-# TODO: Various errors related to radix point:
-#       Frmt2float for hex format yields wrong results, scale parameter
-#         is not used correctly, entering a radix point in integer mode is ignored
-# TODO: When the number of trailing digits is changed in hex and bin format,
-#           the scaling is changed as well
-# TODO: Entering a negative sign for a negative hex or bin number yields a negative
-#       overflow (instead of the expected positive number)
+# TODO: Entering a negative sign with a negative 2sComp. hex or bin number yields 
+#       the negative minimum (but no overflow) instead of the expected positive number
+# TODO: Hex scaling is wrong by a factor of 2 - float2frmt or frmt2float?
 # TODO: Entering values outside the FP range as non-float doesn't
-#       flag an overflow
+#       flag an overflow / yields incorrect results
+# TODO: dec2hex doesn't yield uppercase hex
+# TODO: Vecorization for hex functions
 # TODO: Let Fix.setObj change individual attributes as well
 
 
@@ -712,9 +710,11 @@ class Fixed(object):
                 y_float = None
 
         elif frmt in {'hex', 'bin'}:
-            # - try to convert string without radix point
-            # - scale with number of fractional places
-            # - transform numbers in negative 2's complement to negative  numbers
+            # - Glue integer and fractional part to a string without radix point
+            # - Divide by <base> ** <number of fractional places> forcorrect scaling
+            # - Transform numbers in negative 2's complement to negative floats.
+            #   This is the case when the number is larger than <base> ** (int_places-1)
+            # - Calculate the fixpoint representation for correct saturation / quantization
             try:
                 y_int = int(raw_str, self.base) / self.base**frc_places
                 # check for negative (two's complement) numbers
