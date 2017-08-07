@@ -716,19 +716,22 @@ class Fixed(object):
             #   This is the case when the number is larger than <base> ** (int_places-1)
             # - Calculate the fixpoint representation for correct saturation / quantization
             try:
-                y_int = int(raw_str, self.base) / self.base**frc_places
+                y_dec = int(raw_str, self.base) / self.base**frc_places
                 # check for negative (two's complement) numbers
-                if y_int >=  self.base ** int_places: # (1 << (int_places)):
-                   y_int = y_int - (1 << int(np.ceil(np.log2(y_int) / np.log2(self.base))))
+                logger.warning("base - frc_places:{0}-{1}".format(self.base, frc_places) )
+                if y_dec >=  self.base ** int_places: # (1 << (int_places)):
+                    logger.warning("2sComp:{0}-{1}".format(y_dec, 1 << int(np.ceil(np.log2(y_dec)  ))))# / np.log2(self.base)))) )
+                    #y_dec = y_dec - (1 << int(np.ceil(np.log2(y_dec) )))# / np.log2(self.base))))
+                    y_dec = y_dec - 2 * self.base ** int_places
                 # quantize / saturate / wrap & scale the integer value:
-                y_float = self.fixp(y_int, scaling='div')
+                y_float = self.fixp(y_dec, scaling='div')
             except Exception as e:
                 logger.warn(e)
-                y_int = None
+                y_dec = None
                 y_float = None
 
             logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
-            logger.debug("y_in={0} | y_int={1}".format(y, y_int))
+            logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
 
         elif frmt == 'csd':
             y_float = csd2dec(raw_str, int_places)
