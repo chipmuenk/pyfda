@@ -14,9 +14,10 @@ logger = logging.getLogger(__name__)
 import sys
 
 from ..compat import (Qt, QtCore, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
-                      QPushButton, QFrame, QSpinBox, QCheckBox, QFont, QIcon, QSize,
-                      QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout,
-                      pyqtSignal, QEvent, QStyledItemDelegate, QColor, QBrush, QPalette)
+                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize,
+                      QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, QGridLayout,
+                      pyqtSignal, QEvent, QStyledItemDelegate, QColor, QBrush, QPalette,
+                      QSizePolicy)
 
 import numpy as np
 
@@ -318,7 +319,7 @@ class FilterCoeffs(QWidget):
         item.setData('child', Qt.AccessibleDescriptionRole)
         model.appendRow(item)
 
-        item = QtGui.QStandardItem('Fixpoint')
+        item = QtGui.QStandardItem('Fixp.:')
         item.setData('parent', Qt.AccessibleDescriptionRole)
         item.setData(0, QtGui.QFont.Bold)
         item.setFlags(item.flags() & ~Qt.ItemIsEnabled)# | Qt.ItemIsSelectable))
@@ -444,7 +445,7 @@ class FilterCoeffs(QWidget):
         butSetZero.setIconSize(q_icon_size)
 
         lblEps = QLabel(self)
-        lblEps.setText("for b, a <")
+        lblEps.setText("<b><i>for b, a</i> &lt;</b>")
 
         self.ledSetEps = QLineEdit(self)
         self.ledSetEps.setToolTip("Specify eps value.")
@@ -475,7 +476,7 @@ class FilterCoeffs(QWidget):
 #        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledWF.setMaximumWidth(30)
         
-        self.lblScale = QLabel("Scale = ", self) 
+        self.lblScale = QLabel("<b><i>Scale</i> =</b>", self) 
         self.ledScale = QLineEdit(self)
         self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.") 
         self.ledScale.setText(str(1))        
@@ -493,55 +494,69 @@ class FilterCoeffs(QWidget):
         #   QFormat settings
         # ---------------------------------------------------------------------        
 
-        self.cmbQQuant = QComboBox(self)
-        qQuant = ['none', 'round', 'fix', 'floor']
-        self.cmbQQuant.addItems(qQuant)
-        qset_cmb_box(self.cmbQQuant, 'round')
-        self.cmbQQuant.setToolTip("Select the kind of quantization.")
-
         self.cmbQOvfl = QComboBox(self)
         qOvfl = ['wrap', 'sat']
         self.cmbQOvfl.addItems(qOvfl)
         qset_cmb_box(self.cmbQOvfl, 'sat')
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
-
         # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+     
+        layHQOvflOpt = QHBoxLayout()
+        layHQOvflOpt.addWidget(lblQOvfl)
+        layHQOvflOpt.addWidget(self.cmbQOvfl)
+        layHQOvflOpt.addStretch()
+ 
+        self.cmbQuant = QComboBox(self)
+        qQuant = ['none', 'round', 'fix', 'floor']
+        self.cmbQuant.addItems(qQuant)
+        qset_cmb_box(self.cmbQuant, 'round')
+        self.cmbQuant.setToolTip("Select the kind of quantization.")
+        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
+        layHQuantOpt = QHBoxLayout()
+        layHQuantOpt.addWidget(lblQuant)
+        layHQuantOpt.addWidget(self.cmbQuant)
+        layHQuantOpt.addStretch()
         
         self.butQuant = QPushButton(self)
-        self.butQuant.setToolTip("<span>Quantize selected coefficients with specified settings. "
-        "When nothing is selected, quantize the whole table.</span>")
-#        butQuant.setText("Q!")
+        self.butQuant.setToolTip("<span>Quantize selected coefficients / "
+        "whole table with specified settings.</span>")
         self.butQuant.setIcon(QIcon(':/quantize.svg'))
         self.butQuant.setIconSize(q_icon_size)
-        self.lblLSBtxt = QLabel(self)
-        self.lblLSBtxt.setText("LSB =")
-        self.lblLSBtxt.setFont(self.bifont)
-        self.lblLSB = QLabel(self)
-
-        self.lblMSBtxt = QLabel(self)
-        self.lblMSBtxt.setText("MSB =")
-        self.lblMSBtxt.setFont(self.bifont)
+        self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        
+        lblMSBtxt = QLabel(self)
+        lblMSBtxt.setText("<b><i>MSB</i><sub>10</sub> =</b>")
         self.lblMSB = QLabel(self)
-        
-        layHCoeffsQOpt = QHBoxLayout()
-        layHCoeffsQOpt.addWidget(lblQOvfl)
-        layHCoeffsQOpt.addWidget(self.cmbQOvfl)
-        layHCoeffsQOpt.addWidget(lblQuant)
-        layHCoeffsQOpt.addWidget(self.cmbQQuant)
-        layHCoeffsQOpt.addWidget(self.butQuant)
-        layHCoeffsQOpt.addStretch()
+        layHMSB = QHBoxLayout()
+        layHMSB.addWidget(lblMSBtxt)
+        layHMSB.addWidget(self.lblMSB)
+        layHMSB.addStretch()
 
-        layHCoeffs_MSB_LSB = QHBoxLayout()
-        layHCoeffs_MSB_LSB.addWidget(self.lblMSBtxt)
-        layHCoeffs_MSB_LSB.addWidget(self.lblMSB)
-        layHCoeffs_MSB_LSB.addStretch()
-        layHCoeffs_MSB_LSB.addWidget(self.lblLSBtxt)
-        layHCoeffs_MSB_LSB.addWidget(self.lblLSB)
-        layHCoeffs_MSB_LSB.addStretch()
-        
+        lblLSBtxt = QLabel(self)
+        lblLSBtxt.setText("<b><i>LSB</i><sub>10</sub> =</b>")
+        self.lblLSB = QLabel(self) # 
+        layHLSB = QHBoxLayout()
+        layHLSB.addWidget(lblLSBtxt)
+        layHLSB.addWidget(self.lblLSB)
+        layHLSB.addStretch()
 
+        layGCoeffsQOpt = QGridLayout()
+        layGCoeffsQOpt.addLayout(layHQOvflOpt,0,0)
+        layGCoeffsQOpt.addLayout(layHQuantOpt, 0,1)
+        layGCoeffsQOpt.addWidget(self.butQuant, 0, 2, Qt.AlignCenter)
+        layGCoeffsQOpt.addLayout(layHMSB,1,0)
+        layGCoeffsQOpt.addLayout(layHLSB,1,1)
+
+        lblMAXtxt = QLabel(self)
+        lblMAXtxt.setText("<b><i>Max =</i></b>")
+        self.lblMAX = QLabel(self)
+        
+        layHCoeffs_MAX = QHBoxLayout()
+        layHCoeffs_MAX.addWidget(lblMAXtxt)
+        layHCoeffs_MAX.addWidget(self.lblMAX)
+        layHCoeffs_MAX.addStretch()
         
         # ---------------------------------------------------------------------
         #   Coefficient table widget
@@ -567,9 +582,9 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs2.addStretch()
         
         layVButtonsQ = QVBoxLayout()
-        layVButtonsQ.addLayout(layHCoeffsQOpt)
-        layVButtonsQ.addLayout(layHCoeffs_MSB_LSB)
-        layVButtonsQ.addLayout(layHCoeffs_W)
+        layVButtonsQ.addLayout(layGCoeffsQOpt)
+        layVButtonsQ.addLayout(layHCoeffs_W)        
+        layVButtonsQ.addLayout(layHCoeffs_MAX)
         layVButtonsQ.setContentsMargins(0,5,0,0)
 
         # This frame encompasses the Quantization Settings
@@ -616,7 +631,7 @@ class FilterCoeffs(QWidget):
         # refresh table after storing new settings
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
         self.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
-        self.cmbQQuant.currentIndexChanged.connect(self._refresh_table)
+        self.cmbQuant.currentIndexChanged.connect(self._refresh_table)
         self.ledWF.editingFinished.connect(self._WIWF_changed)
         self.ledWI.editingFinished.connect(self._WIWF_changed)
         self.ledW.editingFinished.connect(self._W_changed)
@@ -909,14 +924,14 @@ class FilterCoeffs(QWidget):
         q_coeff = fb.fil[0]['q_coeff']
         self.ledWI.setText(str(q_coeff['WI']))
         self.ledWF.setText(str(q_coeff['WF']))
-        qset_cmb_box(self.cmbQQuant, q_coeff['quant'])
+        qset_cmb_box(self.cmbQuant, q_coeff['quant'])
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.ledScale.setText(str(q_coeff['scale']))
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-
+        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX)))
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
@@ -928,7 +943,7 @@ class FilterCoeffs(QWidget):
         fb.fil[0]['q_coeff'] = {
                 'WI':abs(int(self.ledWI.text())),
                 'WF':abs(int(self.ledWF.text())),
-                'quant':self.cmbQQuant.currentText(),
+                'quant':self.cmbQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText(),
                 'scale':self.ledScale.text()
@@ -937,7 +952,7 @@ class FilterCoeffs(QWidget):
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-
+        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX)))
 #------------------------------------------------------------------------------
     def _save_dict(self):
         """
