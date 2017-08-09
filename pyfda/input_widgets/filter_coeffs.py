@@ -23,7 +23,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, 
+from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
                                 qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
 from .csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params
@@ -34,11 +34,11 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: Setting complex data (manually) crashes the app in setModelData():
 #    model.setData(index, data) "Type Error: Can't convert complex to float"
 #   -> need to implement a proper model-view architecture, QTableView instead of QTableWidget
-#    somewhere downstream a "" string is created from this which causes an error 
+#    somewhere downstream a "" string is created from this which causes an error
 #    in safe_eval
 # TODO: Strip parentheses of complex argument @ setEditorData()
 
-# TODO: This ItemDelegate method displayText is called again and again when an 
+# TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 
 # TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
@@ -49,7 +49,7 @@ class ItemDelegate(QStyledItemDelegate):
     QTableWidget.
 
     `displayText()` displays the data stored in the table in various number formats
-    
+
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QTableWidgetItem and converted back when
@@ -70,15 +70,15 @@ class ItemDelegate(QStyledItemDelegate):
 #     def paint(self, painter, option, index):
 #         """
 #         Override painter
-#         
+#
 #         painter: instance of QPainter
 #         option:  instance of QStyleOptionViewItemV4
 #         index:   instance of QModelIndex
-#         
+#
 #         see http://www.mimec.org/node/305
 #         """
 #         index_role = index.data(Qt.AccessibleDescriptionRole).toString()
-#         
+#
 #         if index_role == QtCore.QLatin1String("separator"):
 #             print("separator!")
 #             y = (option.rect.top() + option.rect.bottom()) / 2
@@ -87,22 +87,22 @@ class ItemDelegate(QStyledItemDelegate):
 #         else:
 #             # continue with the original `paint()` method
 #             super(ItemDelegate, self).paint(painter, option, index)
-# 
+#
 #==============================================================================
 
     def initStyleOption(self, option, index):
         """
-        Initialize `option` with the values using the `index` index. When the 
-        item (0,1) is processed, it is styled especially. All other items are 
+        Initialize `option` with the values using the `index` index. When the
+        item (0,1) is processed, it is styled especially. All other items are
         passed to the original `initStyleOption()` which then calls `displayText()`.
         Afterwards, check whether an fixpoint overflow has occured and color item
         background accordingly.
         """
         if index.row() == 0 and index.column() == 1: # a[0]: always 1
             option.text = "1" # QString object
-            option.font.setBold(True) 
+            option.font.setBold(True)
             option.displayAlignment = Qt.AlignRight | Qt.AlignCenter
-            # see http://zetcode.com/gui/pyqt5/painting/ : 
+            # see http://zetcode.com/gui/pyqt5/painting/ :
             option.backgroundBrush = QBrush(Qt.BDiagPattern)#QColor(100, 200, 100, 200))
             option.backgroundBrush.setColor(QColor(100, 100, 100, 200))
             # don't continue with default initStyleOption... display routine ends here
@@ -156,21 +156,21 @@ class ItemDelegate(QStyledItemDelegate):
 
         The instance parameter myQ.ovr_flag is set to +1 or -1 for positive /
         negative overflows, else it is 0.
-        """ 
+        """
         string = qstr(text) # convert to "normal" string
 
         if self.parent.myQ.frmt == 'float':
             data = safe_eval(string)
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.float2frmt(string), 
+            return "{0:>{1}}".format(self.parent.myQ.float2frmt(string),
                                         self.parent.myQ.places)
 
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
 
     def createEditor(self, parent, options, index):
         """
-        Neet to set editor explicitly, otherwise QDoubleSpinBox instance is 
+        Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
         created when space is not sufficient?!
         editor:  instance of e.g. QLineEdit (default)
         index:   instance of QModelIndex
@@ -182,14 +182,14 @@ class ItemDelegate(QStyledItemDelegate):
         line_edit.setMinimumSize(QSize(W, H)) #(160, 25));
 
         return line_edit
-#        return QLineEdit(parent) # return object without instantiating      
+#        return QLineEdit(parent) # return object without instantiating
 
 #    def updateEditorGeometry(self, editor, option, index):
 #        """
 #        Updates the editor for the item specified by index according to the option given
 #        """
 #        super(ItemDelegate, self).updateEditorGeometry(editor, option, index) # default
-        
+
     def setEditorData(self, editor, index):
         """
         Pass the data to be edited to the editor:
@@ -207,7 +207,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         if self.parent.myQ.frmt == 'float':
             # floating point format: pass data with full resolution
-            editor.setText(str(safe_eval(data))) 
+            editor.setText(str(safe_eval(data)))
         else:
             # fixpoint format with base: pass requantized data with required number of places
             editor.setText("{0:>{1}}".format(self.parent.myQ.float2frmt(data),
@@ -216,7 +216,7 @@ class ItemDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
-        convert it back to floating point format and store it in the model 
+        convert it back to floating point format and store it in the model
         (= QTableWidget) and in self.ba
 
         editor: instance of e.g. QLineEdit
@@ -232,19 +232,19 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(qstr(editor.text()), fb.data_old, return_type='float') # raw data without fixpoint formatting 
+            data = safe_eval(qstr(editor.text()), fb.data_old, return_type='float') # raw data without fixpoint formatting
         else:
             data = self.parent.myQ.frmt2float(qstr(editor.text()),
                                     self.parent.myQ.frmt) # transform back to float
 
-        model.setData(index, data)                          # store in QTableWidget 
+        model.setData(index, data)                          # store in QTableWidget
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
         qstyle_widget(self.parent.butSave, 'changed')
-        
+
 
 class FilterCoeffs(QWidget):
     """
-    Create widget with a (sort of) model-view architecture for viewing / 
+    Create widget with a (sort of) model-view architecture for viewing /
     editing / entering data contained in `self.ba` which is a list of two numpy
     arrays:
 
@@ -262,7 +262,7 @@ class FilterCoeffs(QWidget):
 
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
-        
+
         self.eps = 1.e-6 # initialize toleracce attribute
         self.opt_widget = None # handle for pop-up options widget
         self._construct_UI()
@@ -275,7 +275,7 @@ class FilterCoeffs(QWidget):
         - two bottom rows with action buttons
         """
         self.bfont = QFont()
-        self.bfont.setBold(True) 
+        self.bfont.setBold(True)
         self.bifont = QFont()
         self.bifont.setBold(True)
         self.bifont.setItalic(True)
@@ -311,7 +311,7 @@ class FilterCoeffs(QWidget):
         self.butEnable.setChecked(True)
         self.butEnable.setToolTip("<span>Show filter coefficients as an editable table."
                 "For high order systems, this might be slow.</span>")
-                
+
         fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
         self.cmbFormat = QComboBox(self)
         model = self.cmbFormat.model()
@@ -341,15 +341,15 @@ class FilterCoeffs(QWidget):
         self.spnRound.setToolTip("Number of digits to display.")
         self.lblRound = QLabel("Digits", self)
         self.lblRound.setFont(self.bifont)
-        
+
         self.cmbQFrmt = QComboBox(self)
         q_formats = [('Integer', 'qint' ), ('Norm. Frac.', 'qnfrac'), ('Fractional', 'qfrac')]
         for q in q_formats:
             self.cmbQFrmt.addItem(*q)
-            
+
         self.lbl_W  = QLabel("W = ", self)
         self.lbl_W.setFont(self.bifont)
-        
+
         self.ledW = QLineEdit(self)
         self.ledW.setToolTip("Specify total wordlength.")
         self.ledW.setText("16")
@@ -358,7 +358,7 @@ class FilterCoeffs(QWidget):
 
         layHDisplay = QHBoxLayout()
         layHDisplay.setAlignment(Qt.AlignLeft)
-        layHDisplay.addWidget(self.butEnable)       
+        layHDisplay.addWidget(self.butEnable)
         layHDisplay.addWidget(self.cmbFormat)
         layHDisplay.addWidget(self.spnRound)
         layHDisplay.addWidget(self.lblRound)
@@ -391,7 +391,7 @@ class FilterCoeffs(QWidget):
         butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                 "When nothing is selected, delete the last row.</SPAN>")
-                
+
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
@@ -419,7 +419,7 @@ class FilterCoeffs(QWidget):
         butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
         butFromClipboard.setIconSize(q_icon_size)
         butToClipboard.setIconSize(q_icon_size)
-        
+
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
         butSettingsClipboard.setIconSize(q_icon_size)
@@ -427,7 +427,7 @@ class FilterCoeffs(QWidget):
                                 "to copy to/from clipboard or file.</span>")
 
         layHButtonsCoeffs1 = QHBoxLayout()
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType) 
+        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addWidget(butAddCells)
         layHButtonsCoeffs1.addWidget(butDelCells)
         layHButtonsCoeffs1.addWidget(butClear)
@@ -435,9 +435,12 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1.addWidget(butLoad)
         layHButtonsCoeffs1.addWidget(butToClipboard)
         layHButtonsCoeffs1.addWidget(butFromClipboard)
-        layHButtonsCoeffs1.addWidget(butSettingsClipboard) 
+        layHButtonsCoeffs1.addWidget(butSettingsClipboard)
         layHButtonsCoeffs1.addStretch()
-#---------------------------------------------------------
+
+        #-------------------------------------------------------------------
+        #   Eps / set zero settings
+        # ---------------------------------------------------------------------
 
         butSetZero = QPushButton("= 0", self)
         butSetZero.setToolTip("<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
@@ -451,13 +454,16 @@ class FilterCoeffs(QWidget):
         self.ledSetEps.setToolTip("Specify eps value.")
         self.ledSetEps.setText(str(self.eps))
 
-        lblQOvfl = QLabel("Ovfl.:", self)
-        lblQOvfl.setFont(self.bifont)
-        lblQuant = QLabel("Quant.:", self)
-        lblQuant.setFont(self.bifont)
+        layHButtonsCoeffs2 = QHBoxLayout()
+        layHButtonsCoeffs2.addWidget(butSetZero)
+        layHButtonsCoeffs2.addWidget(lblEps)
+        layHButtonsCoeffs2.addWidget(self.ledSetEps)
+        layHButtonsCoeffs2.addStretch()
 
-#------------------------------------------------------------------------------
-        lbl_Q  = QLabel("Q = ", self)
+        #-------------------------------------------------------------------
+        #   QFormat and scale settings
+        # ---------------------------------------------------------------------
+        lbl_Q = QLabel("Q =", self)
         lbl_Q.setFont(self.bifont)
 
         self.ledWI = QLineEdit(self)
@@ -475,24 +481,36 @@ class FilterCoeffs(QWidget):
         self.ledWF.setMaxLength(2) # maximum of 2 digits
 #        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
         self.ledWF.setMaximumWidth(30)
-        
-        self.lblScale = QLabel("<b><i>Scale</i> =</b>", self) 
-        self.ledScale = QLineEdit(self)
-        self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.") 
-        self.ledScale.setText(str(1))        
 
-        layHCoeffs_W = QHBoxLayout()
-        layHCoeffs_W.addWidget(lbl_Q)
-        layHCoeffs_W.addWidget(self.ledWI)
-        layHCoeffs_W.addWidget(self.lblDot)
-        layHCoeffs_W.addWidget(self.ledWF)
-        layHCoeffs_W.addWidget(self.lblScale)
-        layHCoeffs_W.addWidget(self.ledScale)
-        layHCoeffs_W.addStretch()
-        
+        self.lblScale = QLabel("<b><i>Scale</i> =</b>", self)
+        self.ledScale = QLineEdit(self)
+        self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.")
+        self.ledScale.setText(str(1))
+
+        layHWI_WF = QHBoxLayout()
+        layHWI_WF.addWidget(lbl_Q)
+        layHWI_WF.addWidget(self.ledWI)
+        layHWI_WF.addWidget(self.lblDot)
+        layHWI_WF.addWidget(self.ledWF)
+        layHWI_WF.addStretch()
+
+        layHScale = QHBoxLayout()
+        layHScale.addWidget(self.lblScale)
+        layHScale.addWidget(self.ledScale)
+        layHScale.addStretch()
+
+        layHW_Scale = QHBoxLayout()
+        layHW_Scale.addLayout(layHWI_WF)
+        layHW_Scale.addLayout(layHScale)
+
         #-------------------------------------------------------------------
-        #   QFormat settings
-        # ---------------------------------------------------------------------        
+        #   Quantization / Overflow / MSB / LSB settings
+        # ---------------------------------------------------------------------
+
+        lblQOvfl = QLabel("Ovfl.:", self)
+        lblQOvfl.setFont(self.bifont)
+        lblQuant = QLabel("Quant.:", self)
+        lblQuant.setFont(self.bifont)
 
         self.cmbQOvfl = QComboBox(self)
         qOvfl = ['wrap', 'sat']
@@ -501,12 +519,12 @@ class FilterCoeffs(QWidget):
         self.cmbQOvfl.setToolTip("Select overflow behaviour.")
         # ComboBox size is adjusted automatically to fit the longest element
         self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-     
+
         layHQOvflOpt = QHBoxLayout()
         layHQOvflOpt.addWidget(lblQOvfl)
         layHQOvflOpt.addWidget(self.cmbQOvfl)
         layHQOvflOpt.addStretch()
- 
+
         self.cmbQuant = QComboBox(self)
         qQuant = ['none', 'round', 'fix', 'floor']
         self.cmbQuant.addItems(qQuant)
@@ -518,14 +536,14 @@ class FilterCoeffs(QWidget):
         layHQuantOpt.addWidget(lblQuant)
         layHQuantOpt.addWidget(self.cmbQuant)
         layHQuantOpt.addStretch()
-        
+
         self.butQuant = QPushButton(self)
         self.butQuant.setToolTip("<span>Quantize selected coefficients / "
         "whole table with specified settings.</span>")
         self.butQuant.setIcon(QIcon(':/quantize.svg'))
         self.butQuant.setIconSize(q_icon_size)
         self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        
+
         lblMSBtxt = QLabel(self)
         lblMSBtxt.setText("<b><i>MSB</i><sub>10</sub> =</b>")
         self.lblMSB = QLabel(self)
@@ -536,31 +554,35 @@ class FilterCoeffs(QWidget):
 
         lblLSBtxt = QLabel(self)
         lblLSBtxt.setText("<b><i>LSB</i><sub>10</sub> =</b>")
-        self.lblLSB = QLabel(self) # 
+        self.lblLSB = QLabel(self) #
         layHLSB = QHBoxLayout()
         layHLSB.addWidget(lblLSBtxt)
         layHLSB.addWidget(self.lblLSB)
         layHLSB.addStretch()
 
-        layGCoeffsQOpt = QGridLayout()
-        layGCoeffsQOpt.addLayout(layHQOvflOpt,0,0)
-        layGCoeffsQOpt.addLayout(layHQuantOpt, 0,1)
-        layGCoeffsQOpt.addWidget(self.butQuant, 0, 2, Qt.AlignCenter)
-        layGCoeffsQOpt.addLayout(layHMSB,1,0)
-        layGCoeffsQOpt.addLayout(layHLSB,1,1)
+        layGQOpt = QGridLayout()
+        layGQOpt.addLayout(layHQOvflOpt,0,0)
+        layGQOpt.addLayout(layHQuantOpt, 0,1)
+        layGQOpt.addWidget(self.butQuant, 0, 2, Qt.AlignCenter)
+        layGQOpt.addLayout(layHMSB,1,0)
+        layGQOpt.addLayout(layHLSB,1,1)
+
+        #-------------------------------------------------------------------
+        #   Display MAX
+        # ---------------------------------------------------------------------
 
         lblMAXtxt = QLabel(self)
         lblMAXtxt.setText("<b><i>Max =</i></b>")
         self.lblMAX = QLabel(self)
-        
+
         layHCoeffs_MAX = QHBoxLayout()
         layHCoeffs_MAX.addWidget(lblMAXtxt)
         layHCoeffs_MAX.addWidget(self.lblMAX)
         layHCoeffs_MAX.addStretch()
-        
+
         # ---------------------------------------------------------------------
         #   Coefficient table widget
-        # ---------------------------------------------------------------------        
+        # ---------------------------------------------------------------------
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setAlternatingRowColors(True)
         self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
@@ -574,20 +596,15 @@ class FilterCoeffs(QWidget):
         # Create clipboard instance
         self.clipboard = QApplication.clipboard()
 
-        # ============== UI Layout =====================================
-        layHButtonsCoeffs2 = QHBoxLayout()
-        layHButtonsCoeffs2.addWidget(butSetZero)
-        layHButtonsCoeffs2.addWidget(lblEps)
-        layHButtonsCoeffs2.addWidget(self.ledSetEps)
-        layHButtonsCoeffs2.addStretch()
-        
+        # ============== Main UI Layout =====================================
+
         layVButtonsQ = QVBoxLayout()
-        layVButtonsQ.addLayout(layGCoeffsQOpt)
-        layVButtonsQ.addLayout(layHCoeffs_W)        
+        layVButtonsQ.addLayout(layHW_Scale)
+        layVButtonsQ.addLayout(layGQOpt)
         layVButtonsQ.addLayout(layHCoeffs_MAX)
         layVButtonsQ.setContentsMargins(0,5,0,0)
 
-        # This frame encompasses the Quantization Settings
+        # This frame encompasses all Quantization Settings
         self.frmQSettings = QFrame(self)
         self.frmQSettings.setLayout(layVButtonsQ)
 
@@ -639,8 +656,8 @@ class FilterCoeffs(QWidget):
         self.ledScale.editingFinished.connect(self._set_scale)
 
         self.butQuant.clicked.connect(self.quant_coeffs)
-        
-        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object                        
+
+        self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()
@@ -695,7 +712,7 @@ class FilterCoeffs(QWidget):
         if W < 2:
             logger.warn("W must be > 1, restoring previous value.")
             W = self.myQ.W # fall back to previous value
-        self.ledW.setText(str(W)) 
+        self.ledW.setText(str(W))
 
         if qget_cmb_box(self.cmbQFrmt) == 'qint': # integer format, preserve WI bits
             WI = W - self.myQ.WF - 1
@@ -739,7 +756,7 @@ class FilterCoeffs(QWidget):
 
         self._store_q_settings()
         self._refresh_table()
-        
+
         #------------------------------------------------------------------------------
     def _set_scale(self):
         """
@@ -754,10 +771,10 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _refresh_table(self):
         """
-        (Re-)Create the displayed table from `self.ba` (list with 2 columns of 
+        (Re-)Create the displayed table from `self.ba` (list with 2 columns of
         float scalars). Data is displayed via `ItemDelegate.displayText()` in
         the number format set by `self.frmt`.
-        
+
         The table dimensions are set according to the dimensions of `self.ba`:
         - self.ba[0] -> b coefficients
         - self.ba[1] -> a coefficients
@@ -775,8 +792,8 @@ class FilterCoeffs(QWidget):
 
         # When format is 'float', disable all fixpoint options
         is_float = (qget_cmb_box(self.cmbFormat, data=False).lower() == 'float')
-        
-        self.spnRound.setVisible(is_float) # number of digits can only be selected 
+
+        self.spnRound.setVisible(is_float) # number of digits can only be selected
         self.lblRound.setVisible(is_float) # for format = 'float'
         self.cmbQFrmt.setVisible(not is_float) # hide unneeded widgets for format = 'float'
         self.lbl_W.setVisible(not is_float)
@@ -802,7 +819,7 @@ class FilterCoeffs(QWidget):
                 qset_cmb_box(self.cmbFilterType, 'IIR')
 
                 self.ba[1][0] = 1.0 # restore fa[0] = 1 of denonimator polynome
-                   
+
             self.tblCoeff.setRowCount(self.num_rows)
             self.tblCoeff.setColumnCount(self.num_cols)
             # Create strings for index column (vertical header), starting with "0"
@@ -821,7 +838,7 @@ class FilterCoeffs(QWidget):
                               str(self.ba[col][row]).strip('()')))
                     self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
 
-            # make a[0] selectable but not editable       
+            # make a[0] selectable but not editable
             if fb.fil[0]['ft'] == 'IIR':
                 item = self.tblCoeff.item(0,1)
                 item.setFlags(Qt.ItemIsSelectable| Qt.ItemIsEnabled)
@@ -846,11 +863,11 @@ class FilterCoeffs(QWidget):
 
         The filter dict is a "normal" 2D-numpy float array for the b and a coefficients
         while the coefficient register `self.ba` is a list of two float ndarrays to allow
-        for different lengths of b and a subarrays while adding / deleting items. 
+        for different lengths of b and a subarrays while adding / deleting items.
         """
 
         self.ba = [0., 0.] # initial list with two elements
-        self.ba[0] = np.array(fb.fil[0]['ba'][0]) # deep copy from filter dict to 
+        self.ba[0] = np.array(fb.fil[0]['ba'][0]) # deep copy from filter dict to
         self.ba[1] = np.array(fb.fil[0]['ba'][1]) # coefficient register
 
         # set comboBoxes from dictionary
@@ -928,6 +945,7 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.ledScale.setText(str(q_coeff['scale']))
+
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
@@ -965,9 +983,9 @@ class FilterCoeffs(QWidget):
 
         self._store_q_settings()
 
-        # save, check and convert coeffs, check filter type       
-        fil_save(fb.fil[0], self.ba, 'ba', __name__) 
-        
+        # save, check and convert coeffs, check filter type
+        fil_save(fb.fil[0], self.ba, 'ba', __name__)
+
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
         else:
@@ -1091,13 +1109,13 @@ class FilterCoeffs(QWidget):
 
         test_val = 0. # value against which array is tested
         targ_val = 0. # value which is set when condition is true
-        
+
         if not idx: # nothing selected, check whole table
             b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol=self.eps)
-            if np.any(b_0): # found at least one coeff where condition was true         
+            if np.any(b_0): # found at least one coeff where condition was true
                 self.ba[0] = self.ba[0] * np.logical_not(b_0)
                 qstyle_widget(self.butSave, 'changed')
-            
+
             if  fb.fil[0]['ft'] == 'IIR':
                 a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol=self.eps)
                 if np.any(a_0):
