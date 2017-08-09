@@ -21,7 +21,9 @@ import pyfda.filterbroker as fb
 # TODO: Hex scaling is wrong by a factor of 2 - float2frmt or frmt2float?
 # TODO: Entering values outside the FP range as non-float doesn't
 #       flag an overflow / yields incorrect results
+# TODO: Entering the maximum allowed value displays an overflow?!
 # TODO: dec2hex doesn't yield uppercase hex
+# TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
 # TODO: Vecorization for hex functions
 # TODO: Let Fix.setObj change individual attributes as well
 
