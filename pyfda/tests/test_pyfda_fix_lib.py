@@ -255,7 +255,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'hex', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.float2frmt, self.y_list))
-        yq_list_goal = ['7', '8',   'c', '0', '4', '7', '8', '8', '9']
+        yq_list_goal = ['7', '8',   'C', '0', '4', '7', '8', '8', '9']
         #self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
         self.assertEqual(yq_list, yq_list_goal)
         # same but vectorized function
