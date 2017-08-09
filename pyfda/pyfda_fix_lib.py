@@ -22,7 +22,6 @@ import pyfda.filterbroker as fb
 # TODO: Entering values outside the FP range as non-float doesn't
 #       flag an overflow / yields incorrect results
 # TODO: Entering the maximum allowed value displays an overflow?!
-# TODO: dec2hex doesn't yield uppercase hex
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
 # TODO: Vecorization for hex functions
 # TODO: Let Fix.setObj change individual attributes as well
@@ -92,7 +91,7 @@ def dec2hex(val, nbits):
     -------
     A string in two's complement hex format
     """
-    return "{0:x}".format(((val + (1 << nbits)) % (1 << nbits)).astype(np.int64))
+    return "{0:X}".format(np.int64((val + (1 << nbits)) % (1 << nbits)))
 
 #------------------------------------------------------------------------------
 
