@@ -928,11 +928,11 @@ class FilterCoeffs(QWidget):
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.ledScale.setText(str(q_coeff['scale']))
+        self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX)))
-        self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
