@@ -34,7 +34,7 @@ import pyfda.filterbroker as fb
 
 __version__ = 0.5
 
-def bin2hex(bin_str):
+def bin2hex(bin_str, frac=False):
     """
     Convert number `bin_str` in binary format to hex formatted string.
     When `frac=False` (default), `bin_str` is prepended with zeros until 
@@ -62,9 +62,12 @@ def bin2hex(bin_str):
     i = 0
     hex_str = ""
 
-    # prepend zeros to bin_str until the length is a multiple of 4 bits
+    # appende / prepend zeros to bin_str until the length is a multiple of 4 bits
     while (len(bin_str) % 4 != 0):
-        bin_str = "0" + bin_str
+        if frac:
+            bin_str = "0" + bin_str
+        else:
+            bin_str = bin_str + "0"
 
     while (i < len(bin_str)): # map 4 binary bits to one hex digit
         hex_str = hex_str + wmap[bin_str[i:i + 4]]
