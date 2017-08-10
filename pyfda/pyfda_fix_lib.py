@@ -18,7 +18,7 @@ import pyfda.filterbroker as fb
 
 # TODO: Entering a negative sign with a negative 2sComp. hex or bin number yields 
 #       the negative minimum (but no overflow) instead of the expected positive number
-# TODO: Hex scaling is wrong by a factor of 2 - float2frmt or frmt2float?
+# TODO: Hex frmt2float resets the first '1'?
 # TODO: Entering values outside the FP range as non-float doesn't
 #       flag an overflow / yields incorrect results
 # TODO: Entering the maximum allowed value displays an overflow?!
