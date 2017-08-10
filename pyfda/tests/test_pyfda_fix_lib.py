@@ -46,7 +46,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.myQ.setQobj(q_obj)
         self.assertEqual(q_obj, self.myQ.q_obj)
         # check whether Q : 7.3 is resolved correctly as WI:7, WF: 3
-        q_obj2 = {'Q': '7.3', 'ovfl':'none', 'quant':'fix', 'frmt': 'hex', 'scale': 17}
+        q_obj2 = {'Q': '7.3'}
         self.myQ.setQobj(q_obj2)
         self.assertEqual(q_obj, self.myQ.q_obj)
 
@@ -68,26 +68,23 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertListEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (no saturation, no quantization)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
-        self.myQ.setQobj(q_obj)
+        # use global list
         yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = self.y_list
         self.assertEqual(yq_list, yq_list_goal)
 
         # test scaling (multiply by scaling factor)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 2}
+        q_obj = {'scale': 2}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fixp(self.y_list) / 2.)
         self.assertEqual(yq_list, yq_list_goal)
 
         # test scaling (divide by scaling factor)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 2}
-        self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fixp(self.y_list, scaling='div') * 2.)
         self.assertEqual(yq_list, yq_list_goal)
 
         # return fixpoint numbers as float (rounding)
-        q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 1}
+        q_obj = {'quant':'round', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fixp(self.y_list))
         yq_list_goal = [-1.125, -1.0, -0.5, 0, 0.5, 0.875, 1.0, 1.0, 1.125]
@@ -100,7 +97,7 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = [-8.75, -8.0, -4.0, 0.0, 4.0, 7.0, 7.75, 8.0, 8.75]
         self.assertEqual(yq_list, yq_list_goal)
 
-        # return fixpoint numbers as integer (rounding)
+        # return fixpoint numbers as integer (rounding), overflow 'none'
         q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(self.myQ.fixp(self.y_list))
@@ -108,8 +105,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
 
         # input list of strings
-        q_obj = {'WI':3, 'WF':0, 'ovfl':'none', 'quant':'round', 'frmt': 'dec', 'scale': 8}
-        self.myQ.setQobj(q_obj)
         y_string = ['-1.1', '-1.0', '-0.5', '0', '0.5', '0.9', '0.99', '1.0', '1.1']
         yq_list = list(self.myQ.fixp(y_string))
         yq_list_goal = [-9, -8, -4, 0, 4, 7, 8, 8, 9]
@@ -120,7 +115,6 @@ class TestSequenceFunctions(unittest.TestCase):
         Test the actual fixpoint quantization without saturation / wrap-around. The 'frmt'
         keyword is not regarded here.
         """
-
         # return fixpoint numbers as float (no saturation, no quantization)
         q_obj = {'WI':0, 'WF':3, 'ovfl':'none', 'quant':'none', 'frmt': 'dec', 'scale': 1}
         self.myQ.setQobj(q_obj)
@@ -324,7 +318,6 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = [63, -64, -63, -31, -30, 1, 0, 0, 2, 10, 42, 58, 63]
 
         self.assertEqual(yq_list, yq_list_goal)
-
 
         # saturation behaviour with 'round' quantization
         y_list = ['100.000', '1,000', '1,1', '1.5', '1.E', '1.F', '0.000', '0.100', '0.7', '0.8','3.0', '2.0', '07.00', '070.01']

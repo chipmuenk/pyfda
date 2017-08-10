@@ -24,7 +24,6 @@ import pyfda.filterbroker as fb
 # TODO: Entering the maximum allowed value displays an overflow?!
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
 # TODO: Vecorization for hex functions
-# TODO: Let Fix.setObj change individual attributes as well
 
 
 __version__ = 0.5
@@ -266,7 +265,8 @@ class Fixed(object):
     * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
 
     * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated 
-                 to`WI` and `WF` and deleted afterwards.
+                 to`WI` and `WF` and deleted afterwards. When both `Q` and `WI` / `WF`
+                 are given, `Q` takes precedence
 
     * **'quant'** : Quantization method, optional; default = 'floor'
 
@@ -388,33 +388,33 @@ class Fixed(object):
             if key not in ['Q','WF','WI','quant','ovfl','frmt','scale']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
+        q_obj_default = {'WI':0, 'WF':15, 'quant':'round', 'ovfl':'sat', 
+                         'frmt':'float', 'scale':1}
+
+        # missing key-value pairs are either taken from default dict or from 
+        # class attributes
+        for k in q_obj_default.keys():
+            if k not in q_obj.keys():
+                if not hasattr(self, k):
+                    q_obj[k] = q_obj_default[k]
+                else:
+                    q_obj[k] = getattr(self, k)
+
         # set default values for parameters if undefined:
         if 'Q' in q_obj:
             Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'
             q_obj['WI'] = int(Q_str[0])
             q_obj['WF'] = abs(int(Q_str[1]))
             # remove 'Q' to avoid ambiguities in case 'WI' / 'WF' are set directly
-            del q_obj['Q'] 
-        else:
-            if 'WI' not in q_obj: q_obj['WI'] = 0
-            else: q_obj['WI'] = int(q_obj['WI'])
-            if 'WF' not in q_obj: q_obj['WF'] = 15
-            else: q_obj['WF'] = int(q_obj['WF'])
-        self.WF = q_obj['WF']
-        self.WI = q_obj['WI']
-        self.W = self.WF + self.WI + 1            
+            del q_obj['Q']
 
-        if 'quant' not in q_obj: q_obj['quant'] = 'floor'
+        # store parameters as class attributes            
+        self.WI    = int(q_obj['WI'])
+        self.WF    = int(abs(q_obj['WF']))
+        self.W     = self.WF + self.WI + 1            
         self.quant = str(q_obj['quant']).lower()
-        
-        if 'ovfl' not in q_obj: q_obj['ovfl'] = 'wrap'
         self.ovfl  = str(q_obj['ovfl']).lower()
-        
-        if 'frmt' not in q_obj: q_obj['frmt'] = 'float'
-        self.frmt = str(q_obj['frmt']).lower()
-
-        if not hasattr(self, 'scale') or not self.scale or 'scale' not in q_obj:
-            q_obj['scale'] = 1.
+        self.frmt  = str(q_obj['frmt']).lower()
         self.scale = np.float64(q_obj['scale'])
 
         self.q_obj = q_obj # store quant. dict in instance
