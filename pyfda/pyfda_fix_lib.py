@@ -9,6 +9,7 @@
 from __future__ import division, print_function, unicode_literals
 
 import re
+import six
 import logging
 logger = logging.getLogger(__name__)
 
@@ -16,14 +17,19 @@ import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
+# TODO: Python2: frmt2float yields zero for all non-floats!
+# TODO: Entering the maximum allowed value displays an overflow?!
 # TODO: Entering a negative sign with a negative 2sComp. hex or bin number yields 
 #       the negative minimum (but no overflow) instead of the expected positive number
-# TODO: Hex frmt2float resets the first '1'?
+# TODO: Overflows in wrap mode are not flagged
 # TODO: Entering values outside the FP range as non-float doesn't
 #       flag an overflow / yields incorrect results
-# TODO: Entering the maximum allowed value displays an overflow?!
+
+# TODO: Hex frmt2float resets the first '1'?
+# TODO: Hex float2frmt always has a wraparound behaviour
+
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
-# TODO: Vecorization for hex functions
+# TODO: Vecorization for hex / csd functions
 
 
 __version__ = 0.5
