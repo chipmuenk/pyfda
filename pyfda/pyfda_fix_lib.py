@@ -79,10 +79,11 @@ def bin2hex(bin_str, frac=False):
     return hex_str
 
 
-def dec2hex(val, nbits):
+def dec2hex(val, nbits, WF=0):
     """
     Return `val` in hex format with a wordlength of `nbits` in two's complement
     format. The built-in hex function returns args < 0 as negative values.
+    When val >= 2**nbits, it is "wrapped" around to the range 0 ... 2**nbits-1
 
     Parameters
     ----------
