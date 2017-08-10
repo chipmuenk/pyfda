@@ -314,6 +314,12 @@ class Fixed(object):
     q_obj : dict
         A copy of the quantization dictionary (see above)
 
+    WI : integer
+        number of integer bits
+
+    WF : integer
+        number of fractional bits
+
     quant : string
         Quantization behaviour ('floor', 'round', ...)
 
@@ -322,9 +328,6 @@ class Fixed(object):
 
     frmt : string
         target output format ('float', 'dec', 'bin', 'hex', 'csd')
-        
-    point : boolean
-        If True, use position of radix point for format conversion
         
     scale : float
         The factor between integer fixpoint representation and the floating point
