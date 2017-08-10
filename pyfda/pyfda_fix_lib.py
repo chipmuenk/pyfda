@@ -652,15 +652,16 @@ class Fixed(object):
         frmt = frmt.lower()
 
         if frmt == 'float':
-            if y.dtype.char in {'S', 'U'}: # string / unicode data type
+            # this handles floats, np scalars + arrays and strings / string arrays
+            try:
+                y_float = np.float64(y) 
+            except ValueError:
                 try:
-                    y_float = np.float64(y)
-                except ValueError as e:
+                    y_float = np.complex(y).real
+                except Exception as e:
                     y_float = None
-                return y_float
-                # TODO: what about complex strings?
-            else:
-                y_float = y
+                    logger.warning("Can't convert {0}: {1}".format(y,e))
+            return y_float
 
         else: # {'dec', 'bin', 'hex', 'csd'}
          # Find the number of places before the first radix point (if there is one)
