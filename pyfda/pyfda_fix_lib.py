@@ -23,6 +23,7 @@ import pyfda.filterbroker as fb
 # TODO: Overflows in wrap mode are not flagged
 # TODO: Entering values outside the FP range as non-float doesn't
 #       flag an overflow / yields incorrect results
+# TODO: Max display is wrong when scale is varied
 
 # TODO: Hex frmt2float resets the first '1'?
 # TODO: Hex float2frmt always has a wraparound behaviour
@@ -112,8 +113,8 @@ def dec2hex(val, nbits, WF=0):
     -------
     A string in two's complement hex format
     """
+    
     return "{0:X}".format(np.int64((val + (1 << nbits)) % (1 << nbits)))
-
 #------------------------------------------------------------------------------
 
 def dec2csd(dec_val, WF=0):
