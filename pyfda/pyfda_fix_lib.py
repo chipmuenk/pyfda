@@ -23,7 +23,6 @@ import pyfda.filterbroker as fb
 # TODO: Overflows in wrap mode are not flagged
 # TODO: Entering values outside the FP range as non-float doesn't
 #       flag an overflow / yields incorrect results
-# TODO: Max display is wrong when scale is varied
 
 # TODO: Hex frmt2float resets the first '1'?
 # TODO: Hex float2frmt always has a wraparound behaviour
@@ -493,7 +492,8 @@ class Fixed(object):
         scaling: String
             When `scaling='mult'` (default), `y` is multiplied by `self.scale` before 
             requantizing and saturating, when `scaling='div'`, 
-            `y` is divided by `self.scale`.
+            `y` is divided by `self.scale`. For all other settings, `y` is transformed
+            unscaled.
 
         Returns
         -------
@@ -782,7 +782,7 @@ class Fixed(object):
 
 
 #------------------------------------------------------------------------------
-    def float2frmt(self, y):
+    def float2frmt(self, y, scaling='mult'):
         """
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number 
         conversion. Returns fixpoint representation for `y` (scalar or array-like) 
@@ -796,6 +796,11 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or array-like decimal number (numeric or string) to be transformed
+        
+        scaling: string
+            determines whether the float is multiplied (`mult`), divided (`div`)
+            or not scaled (`none`) before fixpoint conversion. This argument is 
+            passed to the actual `fixp()` method
 
         Returns
         -------
@@ -829,7 +834,7 @@ class Fixed(object):
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # return a quantized & saturated / wrapped fixpoint (type float) for y
-            y_fix = self.fixp(y, scaling='mult')
+            y_fix = self.fixp(y, scaling=scaling)
 
             if self.frmt == 'dec':
                 if self.WF == 0:

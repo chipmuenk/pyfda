@@ -950,7 +950,7 @@ class FilterCoeffs(QWidget):
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX)))
+        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
@@ -970,7 +970,7 @@ class FilterCoeffs(QWidget):
 
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX)))
+        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
 #------------------------------------------------------------------------------
     def _save_dict(self):
         """
