@@ -779,8 +779,7 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or array-like object (numeric or string) in fractional format
-            to be transformed
+        y: scalar or array-like decimal number (numeric or string) to be transformed
 
         Returns
         -------
@@ -812,13 +811,13 @@ class Fixed(object):
         #dec2hex_vec = 
         #======================================================================
 
-        if self.frmt == 'float': # return float input value unchanged
+        if self.frmt == 'float': # return float input value unchanged (no string)
             return y
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
-            # quantize & treat overflows of y (float), returning a float
+            # return a quantized & saturated / wrapped fixpoint (type float) for y
             y_fix = self.fixp(y, scaling='mult')
-            # logger.debug("y={0} | y_fix={1}".format(y, y_fix))
+
             if self.frmt == 'dec':
                 if self.WF == 0:
                     y_fix = np.int64(y_fix) # get rid of trailing zero
@@ -832,19 +831,19 @@ class Fixed(object):
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
                 y_fix_int = np.int64(np.round(y_fix / self.LSB))
                 # split into fractional and integer part, both represented as integer
-                yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
-                yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # frac part as integer
+                # yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
+                # yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # frac part as integer
 
+                y_str = dec2bin_vec(y_fix_int, self.W) # (array of) string with 2's complement binary
                 if self.frmt == 'hex':
                     if self.WF > 0:
-                        y_str_bin_i = np.binary_repr(y_fix_int, self.W)[:self.WI+1]
-                        y_str_bin_f = np.binary_repr(y_fix_int, self.W)[self.WI+1:]
+                        y_str_bin_i = y_str[:self.WI+1]
+                        y_str_bin_f = y_str[self.WI+1:]
                         y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
                     else:
-                        y_str = dec2hex(yi, self.W)
+                        y_str = bin2hex(y_str)# dec2hex(yi, self.W)
                 else: # self.frmt == 'bin':
                     # calculate binary representation of fixpoint integer
-                    y_str = dec2bin_vec(y_fix_int, self.W)
 
                     if self.WF > 0:
                         # ... and insert the radix point if required
