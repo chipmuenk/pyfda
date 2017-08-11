@@ -18,7 +18,6 @@ from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
 # TODO: Python2: frmt2float yields zero for all non-floats!
-# TODO: Entering the maximum allowed value displays an overflow?!
 # TODO: Entering a negative sign with a negative 2sComp. hex or bin number yields 
 #       the negative minimum (but no overflow) instead of the expected positive number
 # TODO: Overflows in wrap mode are not flagged
@@ -593,7 +592,7 @@ class Fixed(object):
         else:
             # Bool. vectors with '1' for every neg./pos overflow:
             over_neg = (yq < self.MIN)
-            over_pos = (yq >= self.MAX)
+            over_pos = (yq > self.MAX)
             # create flag / array of flags for pos. / neg. overflows
             self.ovr_flag = over_pos.astype(int) - over_neg.astype(int)
             # No. of pos. / neg. / all overflows occured since last reset:
