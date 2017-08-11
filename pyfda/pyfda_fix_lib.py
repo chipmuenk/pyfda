@@ -33,12 +33,11 @@ import pyfda.filterbroker as fb
 
 __version__ = 0.5
 
-def bin2hex(bin_str, frac=False):
+def bin2hex(bin_str, WI=0):
     """
     Convert number `bin_str` in binary format to hex formatted string.
-    When `frac=False` (default), `bin_str` is prepended with zeros until 
-    the number of bits is a multiple of 4. For a fractional part (`frac = True`),
-    zeros are appended.
+    `bin_str` is prepended / appended with zeros until the number of bits before
+    and after the radix point (position given by `WI`) is a multiple of 4. 
     """
 
     wmap ={'0000': '0',
@@ -58,28 +57,45 @@ def bin2hex(bin_str, frac=False):
            '1110': 'E',
            '1111': 'F'}
 
-    i = 0
     hex_str = ""
 
-    # append / prepend zeros to bin_str until the length is a multiple of 4 bits
-    while (len(bin_str) % 4 != 0):
-        if frac:
-            bin_str = bin_str + "0"
-        else:
-            bin_str = "0" + bin_str
+    if WI > 0:
+        # slice string with integer bits and prepend with zeros to obtain a multiple of 4 length
+        bin_i_str = bin_str[:WI+1]
+        while (len(bin_i_str) % 4 != 0):
+            bin_i_str = "0" + bin_i_str
+        
+        i = 0
+        while (i < len(bin_i_str)): # map chunks of 4 binary bits to one hex digit
+            hex_str = hex_str + wmap[bin_i_str[i:i + 4]]
+            i = i + 4
+    else:
+        hex_str = bin_str[0] # copy MSB as sign bit
+            
+    WF = len(bin_str) - WI - 1
+    # slice string with fractional bits and append with zeros to obtain a multiple of 4 length
+    if WF > 0:
+        hex_str = hex_str + '.'
+        bin_f_str = bin_str[WI+1:]
 
-    while (i < len(bin_str)): # map 4 binary bits to one hex digit
-        hex_str = hex_str + wmap[bin_str[i:i + 4]]
-        i = i + 4
+        while (len(bin_f_str) % 4 != 0):
+            bin_f_str = bin_f_str + "0"
 
-    hex_str = hex_str.lstrip("0") # remove leading zeros
+        i = 0
+        while (i < len(bin_f_str)): # map chunks of 4 binary bits to one hex digit
+            hex_str = hex_str + wmap[bin_f_str[i:i + 4]]
+            i = i + 4
+
+    # hex_str = hex_str.lstrip("0") # remove leading zeros
     hex_str = "0" if len(hex_str) == 0 else hex_str
-
     return hex_str
 
+bin2hex_vec = np.frompyfunc(bin2hex, 2, 1)
 
 def dec2hex(val, nbits, WF=0):
     """
+    --- currently not used, no unit test ---
+    
     Return `val` in hex format with a wordlength of `nbits` in two's complement
     format. The built-in hex function returns args < 0 as negative values.
     When val >= 2**nbits, it is "wrapped" around to the range 0 ... 2**nbits-1
@@ -803,11 +819,8 @@ class Fixed(object):
         insert_binary_point = np.vectorize(lambda bin_str, pos:(
                                     bin_str[:pos+1] + "." + bin_str[pos+1:]))
         
-        dec2bin_vec = np.frompyfunc(np.binary_repr, 2, 1)
+        binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
         dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
-        bin2hex_vec = np.frompyfunc(bin2hex, 2, 1)
-        dec2hex_vec = np.frompyfunc(dec2hex, 2, 1)
-        #dec2hex_vec = 
         #======================================================================
 
         if self.frmt == 'float': # return float input value unchanged (no string)
@@ -829,26 +842,19 @@ class Fixed(object):
             else: # bin or hex
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
                 y_fix_int = np.int64(np.round(y_fix / self.LSB))
-                # split into fractional and integer part, both represented as integer
-                # yi = np.round(np.modf(y_fix)[1]).astype(int) # integer part
-                # yf = np.round(np.modf(y_fix)[0] * (1 << self.WF)).astype(int) # frac part as integer
+                # convert to (array of) string with 2's complement binary
+                y_bin_str = binary_repr_vec(y_fix_int, self.W) 
 
-                y_str = dec2bin_vec(y_fix_int, self.W) # (array of) string with 2's complement binary
                 if self.frmt == 'hex':
-                    if self.WF > 0:
-                        y_str_bin_i = y_str[:self.WI+1]
-                        y_str_bin_f = y_str[self.WI+1:]
-                        y_str = bin2hex(y_str_bin_i) + "." + bin2hex(y_str_bin_f, frac=True)
-                    else:
-                        y_str = bin2hex(y_str)# dec2hex(yi, self.W)
+                    y_str = bin2hex_vec(y_bin_str, self.WI)
+                    
                 else: # self.frmt == 'bin':
-                    # calculate binary representation of fixpoint integer
-
+                    # insert radix point if required
                     if self.WF > 0:
-                        # ... and insert the radix point if required
-                        y_str = insert_binary_point(y_str, self.WI)
+                        y_str = insert_binary_point(y_bin_str, self.WI)
+                    else:
+                        y_str = y_bin_str
 
-                # logger.debug("yi={0} | yf={1} | y_str={2}".format(yi, yf, y_str))
             if isinstance(y_str, np.ndarray) and np.ndim(y_str) < 1:
                 y_str = y_str.item() # convert singleton array to scalar
 
