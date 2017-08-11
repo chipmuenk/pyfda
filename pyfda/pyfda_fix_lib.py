@@ -198,6 +198,7 @@ def dec2csd(dec_val, WF=0):
 
     return csd_str
 
+dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
 
 def csd2dec(csd_str, int_places=0):
     """
@@ -826,7 +827,6 @@ class Fixed(object):
                                     bin_str[:pos+1] + "." + bin_str[pos+1:]))
         
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
-        dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
         #======================================================================
 
         if self.frmt == 'float': # return float input value unchanged (no string)
