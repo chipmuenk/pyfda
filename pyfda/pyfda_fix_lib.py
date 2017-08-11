@@ -62,18 +62,18 @@ def bin2hex(bin_str, frac=False):
     i = 0
     hex_str = ""
 
-    # appende / prepend zeros to bin_str until the length is a multiple of 4 bits
+    # append / prepend zeros to bin_str until the length is a multiple of 4 bits
     while (len(bin_str) % 4 != 0):
         if frac:
-            bin_str = "0" + bin_str
-        else:
             bin_str = bin_str + "0"
+        else:
+            bin_str = "0" + bin_str
 
     while (i < len(bin_str)): # map 4 binary bits to one hex digit
         hex_str = hex_str + wmap[bin_str[i:i + 4]]
         i = i + 4
 
-    hex_str = hex_str.strip("0")
+    hex_str = hex_str.lstrip("0") # remove leading zeros
     hex_str = "0" if len(hex_str) == 0 else hex_str
 
     return hex_str

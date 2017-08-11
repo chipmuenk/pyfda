@@ -9,7 +9,7 @@ Created on Wed Jun 14 11:57:19 2017
 import unittest
 import numpy as np
 from pyfda import pyfda_fix_lib as fix_lib
-from pyfda.pyfda_fix_lib import dec2hex
+from pyfda.pyfda_fix_lib import dec2hex, bin2hex
 # TODO: Add test case for complex numbers
 
 class TestSequenceFunctions(unittest.TestCase):
@@ -255,15 +255,18 @@ class TestSequenceFunctions(unittest.TestCase):
         # Integer case: Q6.0, scale = 64, scalar parameter, test dec2hex
         q_obj = {'WI':6, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'hex', 'scale': 64}
         self.myQ.setQobj(q_obj)
-        y_list = [-65, -64, -63, -31, -1, 0, 1, 31, 32, 63, 64, 65]
+        y_list = [-64, -63, -31, -1, 0, 1, 31, 32, 63]
         yq_list_d2h = list(map(lambda x: dec2hex(np.int(x), nbits=7), y_list))
-        yq_list_goal = ['40', '40', '41', '61', '7F', '0', '1', '1F', '20', '3F', '3F', '3F']
+        yq_list_goal = ['40', '41', '61', '7F', '0', '1', '1F', '20', '3F']
         #self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
         self.assertEqual(yq_list_d2h, yq_list_goal)
         # same but vectorized function
         #yq_arr = list(self.myQ.float2frmt(self.y_list))
         #self.assertEqual(yq_arr, yq_list_goal)
 
+        yb_list = map(lambda x: np.binary_repr(x, width=7), y_list)
+        yq_list_b2h = list(map(bin2hex, yb_list))
+        self.assertEqual(yq_list_b2h, yq_list_goal)        
 
         # Integer case: Q3.0, scale = 8, scalar parameter, test float2frmt and dec2hex
         q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'hex', 'scale': 8}
