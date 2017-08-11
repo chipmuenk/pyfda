@@ -348,11 +348,19 @@ class TestSequenceFunctions(unittest.TestCase):
         Test conversion from hex format to float
         """
         # saturation behaviour with 'round' quantization for integer case
-        y_list = ['0100', '100', '3F', '1F', '1E', '1', '0', '', '2', 'A', '2A', '3A.0', '070.01']
+        y_list = ['100', '10', '3F', '1E', '1F', '0', '00', '', '1', '2', 'A', 'A.0', 'F', '070.01']
+        q_obj = {'WI':4, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'hex', 'scale': 1}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.frmt2float, y_list))
+        yq_list_goal = [-16, -16, -16, -2, -1, 0, 0, 0, 1, 2, 10, 10, 15, 15]
+        self.assertEqual(yq_list, yq_list_goal)
+
+
+        y_list = ['0100', '100', '3F', '1F', '1E', '1F', '0', '', '1', '2', 'A', '2A', '3A.0', '070.01']
         q_obj = {'WI':5, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'hex', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [63, -64, -63, -31, -30, 1, 0, 0, 2, 10, 42, 58, 63]
+        yq_list_goal = [63, -64, -63, -31, -30, -1, 0, 0, 1, 2, 10, 42, 58, 63]
 
         self.assertEqual(yq_list, yq_list_goal)
 
