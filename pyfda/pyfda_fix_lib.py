@@ -264,6 +264,8 @@ def csd2dec(csd_str, int_places=0):
 
     return dec_val
 
+csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+
 #------------------------------------------------------------------------
 class Fixed(object):
     """
@@ -669,7 +671,6 @@ class Fixed(object):
         -------
         floating point (`dtype=np.float64`) representation of fixpoint input.
         """
-        csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
 
         if y == "":
             return 0
