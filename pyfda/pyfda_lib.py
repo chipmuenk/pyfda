@@ -22,7 +22,9 @@ Created 2012 - 2017
 
 
 from __future__ import division, print_function
-import os, sys, re, time
+import os, platform
+import sys, re, time
+import struct
 import codecs
 import logging
 logger = logging.getLogger(__name__)
@@ -36,9 +38,7 @@ from numpy import pi, log10, arctan
 
 import scipy.signal as sig
 
-#import logging
 from distutils.version import LooseVersion
-
 
 import pyfda.simpleeval as se
 
@@ -49,11 +49,14 @@ import pyfda.simpleeval as se
 from numpy import __version__ as VERSION_NP
 from scipy import __version__ as VERSION_SCI
 from matplotlib import __version__ as VERSION_MPL
-from .compat import QT_VERSION_STR, QSysInfo # imports pyQt
+from .compat import QT_VERSION_STR # imports pyQt
+
+PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
 
 VERSION = {}
-VERSION.update({'python_long': sys.version})
-VERSION.update({'python': ".".join(map(str, sys.version_info[:3]))})
+# VERSION.update({'python_long': sys.version})
+VERSION.update({'python': ".".join(map(str, sys.version_info[:3])) 
+                            + " (" + str(PY32_64) + " Bit)"})
 VERSION.update({'matplotlib': VERSION_MPL})
 VERSION.update({'pyqt': QT_VERSION_STR})
 VERSION.update({'numpy': VERSION_NP})
@@ -64,19 +67,19 @@ try:
     from mayavi import __version__ as VERSION_MAYAVI
     VERSION.update({'mayavi': VERSION_MAYAVI})
 except ImportError:
-    logger.info("Module 'mayavi' not found.")
+    pass
 
 try:
     from myhdl import __version__ as VERSION_HDL
     VERSION.update({'myhdl': VERSION_HDL})
 except ImportError:
-    logger.info("Module 'myhdl' not found.")
+    pass
 
 try:
     from docutils import __version__ as VERSION_DOCUTILS
     VERSION.update({'docutils': VERSION_DOCUTILS})
 except ImportError:
-    logger.info("Module 'docutils' not found.")
+    pass
 
 def b(s):
     """
@@ -120,7 +123,7 @@ def mod_version(mod = None):
         v = ""
         keys = sorted(list(VERSION.keys()))
         for k in keys:
-            v += "{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
+            v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
         return v
 
 SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
@@ -136,23 +139,16 @@ MIN_SB_AMP  = 1e-6  # max stop band attenuation
 MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
 MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
-print("Running on a")
-if hasattr(QSysInfo, "WindowsVersion"):
-    print("Windows System, version", QSysInfo.WindowsVersion)
-    OS = "win"
-    CRLF = "\r\n" # Windows: carriage return + line feed, Hex 0D 0A
-elif hasattr(QSysInfo, "MacintoshVersion"):
-    print("Macintosh, version", QSysInfo.MacintoshVersion)
-    OS = "mac"
-    CRLF = "\r" # Mac: carriage return only, Hex 0D
-else:
-    print("Unix / Linux system.")
-    OS = "unix"
-    CRLF = "\n" # Unix / Linux: line feed only, Hex 0A
-
-
-logger.info(mod_version())
-print(mod_version())
+OS = platform.system()
+OS_VER = platform.release()
+if OS == "Windows":
+    CRLF = "\r\n" # Windows: carriage return + line feed
+elif OS == "Darwin":
+    CRLF = "\r" # Mac: carriage return only
+else: # OS == "Linux":
+    CRLF = "\n" # *nix: line feed only
+logger.info("Operating System: {0} {1}".format(OS, OS_VER))
+logger.info("Found the following modules:" + "\n" + mod_version())
 
 ###############################################################################
 #### General functions ########################################################
@@ -217,40 +213,6 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
         result = -np.abs(result)
     return result
 
-
-
-
-
-#    if expr == "":
-#        expr = None
-#        logger.warn("Empty string not allowed as argument!")
-#    else:
-#        try:
-#            if type == 'float':
-#                result = se.simple_eval(expr).real
-#                # eliminate very small imaginary components due to rounding errors
-#                #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
-#            elif type == 'int':
-#                result = np.int64(se.simple_eval(expr))
-#        except Exception as e:
-#            logger.warn(e)
-#            fail_1 = True
-
-#    if fail_1 or result is None:
-#        if expr == "":
-#            expr = None
-#            logger.warn("Fallback argument: Empty string not allowed!")
-#        else:
-#            try:
-#                if type == 'float':
-#                    result = se.simple_eval(alt_expr).real
-#            except Exception as e:
-#                #(SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
-#                logger.warn("Fallback argument:", e)
-#                fail_2 = True
-#        if fail_2 or result is None:
-#            result = 0
-#    return result
 
 
 # taken from

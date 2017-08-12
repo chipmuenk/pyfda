@@ -23,12 +23,8 @@ data_old = ""
 # State of filter design: "ok", "changed", "error", "failed"
 design_filt_state = "changed"
 
-# module myhdl found?
-MYHDL = False
-
 # see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
 # see http://stackoverflow.com/questions/2447353/getattr-on-a-module
-
 
 #==============================================================================
 # The entries in this file are only used as initial / default entries and

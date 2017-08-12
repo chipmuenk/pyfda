@@ -13,18 +13,17 @@ from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
 
 SCROLL = True
 
-import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
+from pyfda.pyfda_lib import mod_version
 
 from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
                                 filter_info, filter_pz)
-try:
-    import myhdl
-except ImportError:
-    fb.MYHDL = False
-else:
-    fb.MYHDL = True
+
+if mod_version("myhdl"):
     from pyfda.hdl_generation import hdl_specs
+    HAS_MYHDL = True
+else:
+    HAS_MYHDL = False
 
 
 class InputTabWidgets(QWidget):
@@ -39,9 +38,6 @@ class InputTabWidgets(QWidget):
 
     def __init__(self, parent):
         
-        if fb.MYHDL:
-            logger.info("Info: Module myHDL v{0} found -> filter synthesis enabled!".format(myhdl.__version__))
-
         super(InputTabWidgets, self).__init__(parent)
 
         self.filter_specs = filter_specs.FilterSpecs(self)
@@ -54,7 +50,7 @@ class InputTabWidgets(QWidget):
         self.filter_pz.setObjectName("filter_pz")
         self.filter_info = filter_info.FilterInfo(self)
         self.filter_info.setObjectName("filter_info")
-        if fb.MYHDL:
+        if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs(self)
 
         self._construct_UI()
@@ -70,7 +66,7 @@ class InputTabWidgets(QWidget):
         tabWidget.addTab(self.filter_coeffs, 'b,a')
         tabWidget.addTab(self.filter_pz, 'P/Z')
         tabWidget.addTab(self.filter_info, 'Info')
-        if fb.MYHDL:
+        if HAS_MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
         layVMain = QVBoxLayout()
@@ -149,7 +145,7 @@ class InputTabWidgets(QWidget):
 
         self.filter_specs.color_design_button("changed")
         self.filter_info.load_dict()
-        if fb.MYHDL:
+        if HAS_MYHDL:
             self.hdlSpecs.update_UI()
         logger.debug("Emit sigSpecsChanged!")
         self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs

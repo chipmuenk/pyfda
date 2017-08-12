@@ -221,8 +221,6 @@ class pyFDA(QMainWindow):
 
         XStream.stdout().messageWritten.connect (self.statusWin.appendPlainText)
 
-        logger.info("Main routine initialized, using Qt {0}".format(QT_VERSION_STR))
-
 #==============================================================================
 # #------------------------------------------------------------------------------
 #     def aboutWindow(self):
@@ -293,7 +291,7 @@ def main():
 
     screen_resolution = app.desktop().screenGeometry()
     screen_h, screen_w = screen_resolution.height(), screen_resolution.width()
-    logger.info("Available screen resolution: %d x %d", screen_w, screen_h)
+    logger.info("Starting pyfda with screen resolution: %d x %d", screen_w, screen_h)
 
     if screen_h < 800:
         delta = 50
