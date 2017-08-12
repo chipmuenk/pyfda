@@ -112,9 +112,6 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 # Default savedir for filter coefficients, filter dicts etc.
 save_dir = "D:/Daten"
 
-# Config file for logger
-log_config_file = "pyfda_log.conf"
-
 # #############################################################################
 # Matplotlib layout settings
 # #############################################################################

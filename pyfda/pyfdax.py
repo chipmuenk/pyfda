@@ -5,22 +5,21 @@
 
 """
 Mainwindow for the pyFDA app
-
-
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-
 import sys, os
+
+log_config_file = "pyfda_log.conf"
+base_dir = os.path.dirname(os.path.abspath(__file__)) # dir of this file (pyfdax.py)
+log_config_dir_file = os.path.join(base_dir, log_config_file)
+
+
 #from sip import setdestroyonexit
 import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from pyfda import pyfda_lib
-from pyfda import pyfda_rc as rc
-from .compat import QtCore
-# get dir for this file and store as base_dir in filterbroker
-base_dir = os.path.dirname(os.path.abspath(__file__))
+from .compat import QtCore # needed for XStream
 
 class DynFileHandler(logging.FileHandler):
     """
@@ -32,31 +31,6 @@ class DynFileHandler(logging.FileHandler):
         if not os.path.isabs(filename): # path to logging file given in config_file?
             filename = os.path.join(base_dir, filename) # no, use basedir
         logging.FileHandler.__init__(self, filename, mode)
-
-class QEditHandler(logging.Handler):
-    """
-    subclass Handler to also log messages to textWidget on main display
-    Overrides stdout to print messages to textWidget (XStream)
-    """
-    def __init__(self):
-        logging.Handler.__init__(self)
-
-    def emit(self, record):
-        msg = self.format(record)
-        if msg: XStream.stdout().write('%s'%msg)
-
-# "register" custom class DynFileHandler as an attribute for the logging module
-# to use it inside the logging config file and pass file name / path and mode
-# as parameters:
-logging.DynFileHandler = DynFileHandler
-logging.QEditHandler = QEditHandler
-logging.config.fileConfig(os.path.join(base_dir, rc.log_config_file))#, disable_existing_loggers=True)
-
-if not os.path.exists(rc.save_dir):
-    home_dir = pyfda_lib.get_home_dir()
-    logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
-        rc.save_dir, home_dir)
-    rc.save_dir = home_dir
 
 class XStream(QtCore.QObject):
     """
@@ -80,9 +54,37 @@ class XStream(QtCore.QObject):
             sys.stdout = XStream._stdout
         return XStream._stdout
 
+class QEditHandler(logging.Handler):
+    """
+    subclass Handler to also log messages to textWidget on main display
+    Overrides stdout to print messages to textWidget (XStream)
+    """
+    def __init__(self):
+        logging.Handler.__init__(self)
+
+    def emit(self, record):
+        msg = self.format(record)
+        if msg: XStream.stdout().write('%s'%msg)
+
+# "register" custom class DynFileHandler as an attribute for the logging module
+# to use it inside the logging config file and pass file name / path and mode
+# as parameters:
+logging.DynFileHandler = DynFileHandler
+logging.QEditHandler = QEditHandler
+logging.config.fileConfig(os.path.join(base_dir, log_config_file))#, disable_existing_loggers=True)
+
+from pyfda import pyfda_lib
+from pyfda import pyfda_rc as rc
+if not os.path.exists(rc.save_dir):
+    home_dir = pyfda_lib.get_home_dir()
+    logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
+        rc.save_dir, home_dir)
+    rc.save_dir = home_dir
+
 
 #==============================================================================
 import pyfda.filterbroker as fb
+# store as base_dir (= pyfdax.py directory) in filterbroker
 fb.base_dir = base_dir
 
 from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication, QFontMetrics,
