@@ -16,13 +16,10 @@ import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
-# TODO: Python2: frmt2float yields zero for all non-floats!
-# TODO: Entering a negative sign with a negative 2sComp. hex or bin number yields 
+# TODO: Python2: frmt2float or float2frmt yields zero for bin / hex / dec (not for csd / float)!
+# TODO: Entering a negative sign with a negative 2sComp. hex or bin number yields
 #       the negative minimum (but no overflow) instead of the expected positive number
-# TODO: Overflows in wrap mode are not flagged
-# TODO: Entering values outside the FP range as non-float doesn't yield correct results?
 
-# TODO: Hex frmt2float resets the first '1'?
 
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
 # TODO: Vecorization for hex / csd functions (frmt2float)
@@ -34,7 +31,7 @@ def bin2hex(bin_str, WI=0):
     """
     Convert number `bin_str` in binary format to hex formatted string.
     `bin_str` is prepended / appended with zeros until the number of bits before
-    and after the radix point (position given by `WI`) is a multiple of 4. 
+    and after the radix point (position given by `WI`) is a multiple of 4.
     """
 
     wmap ={'0000': '0',
@@ -61,14 +58,14 @@ def bin2hex(bin_str, WI=0):
         bin_i_str = bin_str[:WI+1]
         while (len(bin_i_str) % 4 != 0):
             bin_i_str = "0" + bin_i_str
-        
+
         i = 0
         while (i < len(bin_i_str)): # map chunks of 4 binary bits to one hex digit
             hex_str = hex_str + wmap[bin_i_str[i:i + 4]]
             i = i + 4
     else:
         hex_str = bin_str[0] # copy MSB as sign bit
-            
+
     WF = len(bin_str) - WI - 1
     # slice string with fractional bits and append with zeros to obtain a multiple of 4 length
     if WF > 0:
@@ -92,7 +89,7 @@ bin2hex_vec = np.frompyfunc(bin2hex, 2, 1)
 def dec2hex(val, nbits, WF=0):
     """
     --- currently not used, no unit test ---
-    
+
     Return `val` in hex format with a wordlength of `nbits` in two's complement
     format. The built-in hex function returns args < 0 as negative values.
     When val >= 2**nbits, it is "wrapped" around to the range 0 ... 2**nbits-1
@@ -109,7 +106,7 @@ def dec2hex(val, nbits, WF=0):
     -------
     A string in two's complement hex format
     """
-    
+
     return "{0:X}".format(np.int64((val + (1 << nbits)) % (1 << nbits)))
 #------------------------------------------------------------------------------
 
@@ -289,7 +286,7 @@ class Fixed(object):
 
     * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
 
-    * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated 
+    * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated
                  to`WI` and `WF` and deleted afterwards. When both `Q` and `WI` / `WF`
                  are given, `Q` takes precedence
 
@@ -307,8 +304,8 @@ class Fixed(object):
       - 'wrap': do a two's complement wrap-around
       - 'sat' : saturate at minimum / maximum value
       - 'none': no overflow; the integer word length is ignored
-      
-    Additionally, the following keys define the base / display format for the 
+
+    Additionally, the following keys define the base / display format for the
     fixpoint number:
 
     * **'frmt'** : Output format, optional; default = 'float'
@@ -318,11 +315,11 @@ class Fixed(object):
       - 'bin'  : binary string, scaled by :math:`2^{WF}`
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
-          
-    * **'scale'** : Float, the factor between the fixpoint integer representation
-                    and its floating point value. 
 
-                    
+    * **'scale'** : Float, the factor between the fixpoint integer representation
+                    and its floating point value.
+
+
 
     Instance Attributes
     -------------------
@@ -343,7 +340,7 @@ class Fixed(object):
 
     frmt : string
         target output format ('float', 'dec', 'bin', 'hex', 'csd')
-        
+
     scale : float
         The factor between integer fixpoint representation and the floating point
         value.
@@ -416,10 +413,10 @@ class Fixed(object):
             if key not in ['Q','WF','WI','quant','ovfl','frmt','scale']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
-        q_obj_default = {'WI':0, 'WF':15, 'quant':'round', 'ovfl':'sat', 
+        q_obj_default = {'WI':0, 'WF':15, 'quant':'round', 'ovfl':'sat',
                          'frmt':'float', 'scale':1}
 
-        # missing key-value pairs are either taken from default dict or from 
+        # missing key-value pairs are either taken from default dict or from
         # class attributes
         for k in q_obj_default.keys():
             if k not in q_obj.keys():
@@ -436,10 +433,10 @@ class Fixed(object):
             # remove 'Q' to avoid ambiguities in case 'WI' / 'WF' are set directly
             del q_obj['Q']
 
-        # store parameters as class attributes            
+        # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
         self.WF    = int(abs(q_obj['WF']))
-        self.W     = self.WF + self.WI + 1            
+        self.W     = self.WF + self.WI + 1
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt  = str(q_obj['frmt']).lower()
@@ -447,13 +444,13 @@ class Fixed(object):
 
         self.q_obj = q_obj # store quant. dict in instance
 
-        self.LSB = 2. ** -self.WF  # value of LSB 
-        self.MSB = 2. ** (self.WI - 1)   # value of MSB 
+        self.LSB = 2. ** -self.WF  # value of LSB
+        self.MSB = 2. ** (self.WI - 1)   # value of MSB
 
         self.MAX =  2. * self.MSB - self.LSB
         self.MIN = -2. * self.MSB
 
-        # Calculate required number of places for different bases from total 
+        # Calculate required number of places for different bases from total
         # number of bits:
         if self.frmt == 'dec':
             self.places = int(np.ceil(np.log10(self.W) * np.log10(2.))) + 1
@@ -478,10 +475,10 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
         """
-        Return fixed-point integer or fractional representation for `y` 
+        Return fixed-point integer or fractional representation for `y`
         (scalar or array-like) with the same shape as `y`.
 
-        Saturation / two's complement wrapping happens outside the range +/- MSB,  
+        Saturation / two's complement wrapping happens outside the range +/- MSB,
         requantization (round, floor, fix, ...) is applied on the ratio `y / LSB`.
 
         Parameters
@@ -490,15 +487,15 @@ class Fixed(object):
             in floating point format to be quantized
 
         scaling: String
-            When `scaling='mult'` (default), `y` is multiplied by `self.scale` before 
-            requantizing and saturating, when `scaling='div'`, 
+            When `scaling='mult'` (default), `y` is multiplied by `self.scale` before
+            requantizing and saturating, when `scaling='div'`,
             `y` is divided by `self.scale`. For all other settings, `y` is transformed
             unscaled.
 
         Returns
         -------
         float scalar or ndarray
-            with the same shape as `y`, in the range 
+            with the same shape as `y`, in the range
             `-2*self.MSB` ... `2*self.MSB-self.LSB`
 
         Examples:
@@ -542,7 +539,7 @@ class Fixed(object):
                         np.char.replace(y, ' ', '') # remove all whitespace
                         y = y.astype(complex) # try to convert to complex
                     except (TypeError, ValueError) as e: # try converting elements individually
-                        y = list(map(lambda y_scalar: 
+                        y = list(map(lambda y_scalar:
                             self.fixp(y_scalar, scaling=scaling), y))
 
             else:
@@ -579,7 +576,7 @@ class Fixed(object):
 
         y_in = y # y before scaling
         # convert to "fixpoint integer" for requantizing in relation to LSB
-        y = y / self.LSB 
+        y = y / self.LSB
         if scaling == 'mult':
             y = y * self.scale
 
@@ -600,7 +597,7 @@ class Fixed(object):
 
         # revert to original fractional scale
         yq = yq * self.LSB
-        
+
         logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
         # Handle Overflow / saturation in relation to MSB
@@ -648,9 +645,9 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def frmt2float(self, y, frmt=None):
         """
-        Return floating point representation for fixpoint scalar `y` given in 
-        format `frmt`.    
-        
+        Return floating point representation for fixpoint scalar `y` given in
+        format `frmt`.
+
         - Construct string representation without radix point, count number of
           fractional places.
         - Calculate integer representation of string, taking the base into account
@@ -682,7 +679,7 @@ class Fixed(object):
         if frmt == 'float':
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
-                y_float = np.float64(y) 
+                y_float = np.float64(y)
             except ValueError:
                 try:
                     y_float = np.complex(y).real
@@ -700,7 +697,7 @@ class Fixed(object):
             if len(val_str) > 0:
 
                 val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
-    
+
                 if val_str[0] == '.': # prepend '0' when the number starts with '.'
                     val_str = '0' + val_str
                 try:
@@ -738,9 +735,9 @@ class Fixed(object):
 
         elif frmt in {'hex', 'bin'}:
             # - Glue integer and fractional part to a string without radix point
-            # - Divide by <base> ** <number of fractional places> forcorrect scaling
+            # - Divide by <base> ** <number of fractional places> for correct scaling
+            # - Strip MSBs outside fixpoint range
             # - Transform numbers in negative 2's complement to negative floats.
-            #   This is the case when the number is larger than <base> ** (int_places-1)
             # - Calculate the fixpoint representation for correct saturation / quantization
             try:
                 y_dec = int(raw_str, self.base) / self.base**frc_places
@@ -783,37 +780,37 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def float2frmt(self, y, scaling='mult'):
         """
-        Called a.o. by `itemDelegate.displayText()` for on-the-fly number 
-        conversion. Returns fixpoint representation for `y` (scalar or array-like) 
-        with numeric format `self.frmt` and `self.W` bits. The result has the 
+        Called a.o. by `itemDelegate.displayText()` for on-the-fly number
+        conversion. Returns fixpoint representation for `y` (scalar or array-like)
+        with numeric format `self.frmt` and `self.W` bits. The result has the
         same shape as `y`.
 
-        The float is multiplied by `self.scale` and quantized / saturated 
+        The float is multiplied by `self.scale` and quantized / saturated
         using fixp() for all formats before it is converted to different number
         formats.
 
         Parameters
         ----------
         y: scalar or array-like decimal number (numeric or string) to be transformed
-        
+
         scaling: string
             determines whether the float is multiplied (`mult`), divided (`div`)
-            or not scaled (`none`) before fixpoint conversion. This argument is 
+            or not scaled (`none`) before fixpoint conversion. This argument is
             passed to the actual `fixp()` method
 
         Returns
         -------
-        A string, a float or an ndarray of float or string is returned in the 
+        A string, a float or an ndarray of float or string is returned in the
         numeric format set in `self.frmt`. It has the same shape as `y`. For all
-        formats except `float` a fixpoint representation with `self.W` binary 
+        formats except `float` a fixpoint representation with `self.W` binary
         digits is returned.
         """
         #======================================================================
-        # Define vectorized functions for dec -> frmt  using numpys 
+        # Define vectorized functions for dec -> frmt  using numpys
         # automatic type casting
         #======================================================================
         """
-        Vectorized function for inserting binary point in string `bin_str` 
+        Vectorized function for inserting binary point in string `bin_str`
         after position `pos`.
 
         Usage:  insert_binary_point(bin_str, pos)
@@ -823,7 +820,7 @@ class Fixed(object):
         """
         insert_binary_point = np.vectorize(lambda bin_str, pos:(
                                     bin_str[:pos+1] + "." + bin_str[pos+1:]))
-        
+
         binary_repr_vec = np.frompyfunc(np.binary_repr, 2, 1)
         #======================================================================
 
@@ -847,11 +844,11 @@ class Fixed(object):
                 # represent fixpoint number as integer in the range -2**(W-1) ... 2**(W-1)
                 y_fix_int = np.int64(np.round(y_fix / self.LSB))
                 # convert to (array of) string with 2's complement binary
-                y_bin_str = binary_repr_vec(y_fix_int, self.W) 
+                y_bin_str = binary_repr_vec(y_fix_int, self.W)
 
                 if self.frmt == 'hex':
                     y_str = bin2hex_vec(y_bin_str, self.WI)
-                    
+
                 else: # self.frmt == 'bin':
                     # insert radix point if required
                     if self.WF > 0:
@@ -875,17 +872,17 @@ if __name__=='__main__':
 
     q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
     myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
-    
+
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
     print("W = ", myQ.W, myQ.LSB, myQ.MSB)
 
     myQ.setQobj(q_obj)
 
-    print("\nTesting float2frmt()\n====================\n")       
+    print("\nTesting float2frmt()\n====================\n")
     for y in y_list:
         print("y -> y_fix", y, "->", myQ.fixp(y, scaling='mult'))
         print(myQ.frmt, myQ.float2frmt(y))
-            
+
     print("\nTesting frmt2float()\n====================\n")
     q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec'}
     pprint.pprint(q_obj)
