@@ -710,13 +710,11 @@ class Fixed(object):
                 # count number of valid digits in string
                 int_places = len(int_str)-1
                 frc_places = len(frc_str)
-                raw_str = val_str.replace('.','') # join integer and fractional part  
-                
-                logger.debug("frmt:{0}, int_places={1}".format(frmt, int_places))
+                raw_str = val_str.replace('.','') # join integer and fractional part
+
                 logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
 
             else:
-                logger.warning('No valid characters for format {0}!'.format(frmt))
                 if fb.data_old is not None:
                     return fb.data_old
                 else:
@@ -743,10 +741,6 @@ class Fixed(object):
             try:
                 y_dec = int(raw_str, self.base) / self.base**frc_places
                 # check for negative (two's complement) numbers
-                logger.warning("base - frc_places:{0}-{1}".format(self.base, frc_places) )
-                if y_dec >=  self.base ** int_places: # (1 << (int_places)):
-                    logger.warning("2sComp:{0}-{1}".format(y_dec, 1 << int(np.ceil(np.log2(y_dec)  ))))# / np.log2(self.base)))) )
-                    #y_dec = y_dec - (1 << int(np.ceil(np.log2(y_dec) )))# / np.log2(self.base))))
                     y_dec = y_dec - 2 * self.base ** int_places
                 # quantize / saturate / wrap & scale the integer value:
                 y_float = self.fixp(y_dec, scaling='div')
