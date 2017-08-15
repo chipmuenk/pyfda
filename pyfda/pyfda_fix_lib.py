@@ -693,7 +693,8 @@ class Fixed(object):
          # and join integer and fractional parts
          # when returned string is empty, skip general conversions and rely on error handling
          # of individual routines
-            val_str = re.sub(self.FRMT_REGEX[frmt],r'', qstr(y)) # remove illegal characters
+         # remove illegal characters and trailing zeros
+            val_str = re.sub(self.FRMT_REGEX[frmt],r'', qstr(y)).lstrip('0')
             if len(val_str) > 0:
 
                 val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
