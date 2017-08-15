@@ -715,10 +715,7 @@ class Fixed(object):
                 logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
 
             else:
-                if fb.data_old is not None:
-                    return fb.data_old
-                else:
-                    return 0
+                return 0.0
 
 
         # (1) calculate the decimal value of the input string using np.float64()
@@ -766,10 +763,8 @@ class Fixed(object):
 
         if y_float is not None:
             return y_float
-        elif fb.data_old is not None:
-            return fb.data_old
         else:
-            return 0
+            return 0.0
 
 
 #------------------------------------------------------------------------------
