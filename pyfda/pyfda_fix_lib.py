@@ -726,7 +726,7 @@ class Fixed(object):
             try:
                 y_float = self.fixp(val_str, scaling='div')
             except Exception as e:
-                logger.warn(e)
+                logger.warning(e)
                 y_float = None
 
         elif frmt in {'hex', 'bin'}:
@@ -742,7 +742,7 @@ class Fixed(object):
                 # quantize / saturate / wrap & scale the integer value:
                 y_float = self.fixp(y_dec, scaling='div')
             except Exception as e:
-                logger.warn(e)
+                logger.warning(e)
                 y_dec = None
                 y_float = None
 
