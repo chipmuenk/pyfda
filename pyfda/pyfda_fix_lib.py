@@ -737,8 +737,28 @@ class Fixed(object):
             # - Calculate the fixpoint representation for correct saturation / quantization
             try:
                 y_dec = int(raw_str, self.base) / self.base**frc_places
-                # check for negative (two's complement) numbers
-                    y_dec = y_dec - 2 * self.base ** int_places
+
+                if y_dec == 0:  # avoid log2(0)
+                    return 0
+
+                int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0)
+                # When number is outside fixpoint range, discard MSBs:
+                if int_bits > self.WI + 1:
+                    if frmt == 'hex':
+                        raw_str = np.binary_repr(int(raw_str, 16))
+                    raw_str = raw_str[int_bits - self.WI - 1:] # discard the upper bits
+
+                    y_dec = int(raw_str, 2) / self.base**frc_places # recalculate y_dec
+
+                    if y_dec == 0: # avoid log2(0)
+                        return 0
+
+                    int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0) # ... and int_bits
+                # now, y_dec is in the correct range:
+                if int_bits <= self.WI: # positive number
+                    pass
+                elif int_bits == self.WI + 1: # negative, calculate 2's complemente
+                    y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
                 y_float = self.fixp(y_dec, scaling='div')
             except Exception as e:
