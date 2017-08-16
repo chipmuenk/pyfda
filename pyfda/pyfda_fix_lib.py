@@ -138,7 +138,7 @@ def dec2csd(dec_val, WF=0):
     # figure out binary range, special case for 0
     if dec_val == 0 :
         return '0'
-    if np.fabs(dec_val) < 1.0 :
+    if np.abs(dec_val) < 1.0 :
         k = 0
     else:
         k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
