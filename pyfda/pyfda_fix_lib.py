@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 from pyfda.pyfda_qt_lib import qstr
-import pyfda.filterbroker as fb
 
 # TODO: Python2: frmt2float or float2frmt yields zero for bin / hex / dec (not for csd / float)!
 # TODO: Entering a negative sign with a hex or bin number always yields zero
