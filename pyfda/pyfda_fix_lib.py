@@ -17,11 +17,11 @@ from pyfda.pyfda_qt_lib import qstr
 import pyfda.filterbroker as fb
 
 # TODO: Python2: frmt2float or float2frmt yields zero for bin / hex / dec (not for csd / float)!
-# TODO: Entering a negative sign with a negative 2sComp. hex or bin number yields
-#       the negative minimum (but no overflow) instead of the expected positive number
-
+# TODO: Entering a negative sign with a hex or bin number always yields zero
 
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
+#       The problem only occurs __just_ below -1 or +1 - there should be no zero in
+#       before the binary point
 # TODO: Vecorization for hex / csd functions (frmt2float)
 
 
