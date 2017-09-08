@@ -199,7 +199,7 @@ def csd2dec(csd_str, int_places=0):
     """
     Convert the CSD string `csd_str` to a decimal, `csd_str` may contain '+' or
     '-', indicating whether the current bit is meant to positive or negative.
-    All other characters are simply ignored.
+    All other characters are simply ignored (= replaced by zero).
 
     `csd_str` may be an integer or fractional CSD number.
 
@@ -697,6 +697,8 @@ class Fixed(object):
 
                 if val_str[0] == '.': # prepend '0' when the number starts with '.'
                     val_str = '0' + val_str
+# TODO: This does not work with csd?!
+
                 try:
                     int_str, frc_str = val_str.split('.') # split into integer and fractional places
                 except ValueError: # no fractional part
