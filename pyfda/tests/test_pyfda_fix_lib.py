@@ -9,7 +9,7 @@ Created on Wed Jun 14 11:57:19 2017
 import unittest
 import numpy as np
 from pyfda import pyfda_fix_lib as fix_lib
-from pyfda.pyfda_fix_lib import bin2hex
+from pyfda.pyfda_fix_lib import bin2hex, dec2csd
 # TODO: Add test case for complex numbers
 
 class TestSequenceFunctions(unittest.TestCase):
@@ -252,7 +252,7 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list = list(self.myQ.float2frmt(self.y_list_validate))
         self.assertListEqual(yq_list, yq_list_goal)
         
-        # Integer case: Q6.0, scale = 64, scalar parameter, test bin2hex (Q-params are not used)
+        # Integer case: Q6.0, scale = 1, scalar parameter, test bin2hex (Q-params are not used)
         q_obj = {'WI':6, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'hex', 'scale': 1}
         self.myQ.setQobj(q_obj)
         y_list = [-64, -63, -31, -1, 0, 1, 31, 32, 63]
@@ -283,6 +283,57 @@ class TestSequenceFunctions(unittest.TestCase):
         # same but vectorized function
         yq_arr = list(self.myQ.float2frmt(self.y_list))
         self.assertEqual(yq_arr, yq_list_goal)
+        
+    def test_float2frmt_csd(self):
+        """
+        Conversion from float and dec to CSD format
+        """
+        # Integer case: Q3.0, scale = 1, scalar parameter
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 1}
+        self.myQ.setQobj(q_obj)
+
+        # test handling of invalid inputs - scalar inputs
+        yq_list = list(map(self.myQ.float2frmt, self.y_list_validate))
+        yq_list_goal = ["0", "0", "+00-", "+", "0", "+0-", "+0-"]
+        # input:  ['1.1.1', 'xxx', '123', '1.23', '', 1.23j + 3.21, '3.21 + 1.23 j']
+        self.assertEqual(yq_list, yq_list_goal)
+        # same in vector format
+        yq_list = list(self.myQ.float2frmt(self.y_list_validate))
+        self.assertListEqual(yq_list, yq_list_goal)
+
+        # Integer case: Q6.0, scale = 1, scalar parameter, test bin2hex (Q-params are not used)
+        q_obj = {'WI':6, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 1}
+        self.myQ.setQobj(q_obj)
+        y_list = [-64, -63, -31, -1, 0, 1, 31, 32, 63]
+        yq_list_goal = ['-000000', '-00000+', '-0000+', '-', '0', '+', '+0000-', '+00000', '+00000-']
+        yq_list_d2c = list(map(lambda x: dec2csd(x, WF = 0), y_list))
+        self.assertEqual(yq_list_d2c, yq_list_goal)
+        # same with float2frmt (scalar)
+        yq_list = list(map(self.myQ.float2frmt, y_list))
+        self.assertEqual(yq_list, yq_list_goal)
+        # same, vectorized
+        yq_list = list(self.myQ.float2frmt(y_list))
+        self.assertEqual(yq_list, yq_list_goal)        
+
+        # Fractional case: Q0.6, scalar, test float2frmt       
+        self.myQ.setQobj({'Q':'0.6', 'scale':1./64})
+        yq_list = list(map(self.myQ.float2frmt, y_list))
+        yq_list_goal = ['-.000000',  '-.00000+', '-.0+0+0+', '0.00000-', '0', '0.00000+', '+.0-0-0-', '+.0-0-0-', '+.00000-']
+# TODO: 3rd argument should be: '-.0000+', 7th argument should be '+.0000-', 8th argument should be '+.00000'
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # Integer case: Q3.0, scale = 8, scalar parameter, test float2frmt
+        q_obj = {'WI':3, 'WF':0, 'ovfl':'wrap', 'quant':'round', 'frmt': 'csd', 'scale': 8}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.float2frmt, self.y_list))
+        yq_list_goal = ['+00-', '-000', '-00', '0', '+00', '+00-', '-000', '-000', '-00+']
+        #['7', '8',   'C', '0', '4', '7', '8', '8', '9']
+        #self.y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.9, 0.99, 1.0, 1.1]
+        self.assertEqual(yq_list, yq_list_goal)
+        # same but vectorized function
+        yq_arr = list(self.myQ.float2frmt(self.y_list))
+        self.assertEqual(yq_arr, yq_list_goal)
+
 
     def test_frmt2float_float(self):
         """
