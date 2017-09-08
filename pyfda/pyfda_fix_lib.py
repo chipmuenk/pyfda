@@ -17,10 +17,12 @@ from pyfda.pyfda_qt_lib import qstr
 
 # TODO: Python2: frmt2float or float2frmt yields zero for bin / hex / dec (not for csd / float)!
 # TODO: Entering a negative sign with a hex or bin number always yields zero
+# TODO: Absolute value for WI is taken, no negative WI specifications possible
 
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
 #       The problem only occurs __just_ below -1 or +1 - there should be no zero in
 #       before the binary point
+# TODO: csd2dec doesn't respect wordlength specifications
 # TODO: Vecorization for hex / csd functions (frmt2float)
 
 
