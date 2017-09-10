@@ -154,6 +154,7 @@ def dec2csd(dec_val, WF=0):
 
     while( k >= -WF): # has the last fractional digit been reached
 
+
         limit = pow(2.0, k+1) / 3.0
 
         logger.debug("\t{0} - {1}".format(remainder, limit))
@@ -172,7 +173,7 @@ def dec2csd(dec_val, WF=0):
                 else:
                     csd_digits.extend( ['0.'] )
             else:
-                csd_digits.extend( ['.'] )               
+                csd_digits.extend( ['.'] )
 
         # convert the number
         if prev_non_zero:
@@ -202,6 +203,7 @@ def dec2csd(dec_val, WF=0):
 #        csd_digits.insert(0, '0')
 
     csd_str = "".join(csd_digits)
+
 #    if WF > 0:
 #        csd_str = csd_str[:-WF] + "." + csd_str[-WF:]
 
