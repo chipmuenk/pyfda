@@ -785,7 +785,7 @@ class Fixed(object):
 
             y_float = csd2dec(raw_str)
             if y_float is not None:
-                y_float = y_float / 2**(self.W-1)
+                y_float = y_float / 2**frc_places
 
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
