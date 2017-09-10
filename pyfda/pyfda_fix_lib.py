@@ -160,7 +160,19 @@ def dec2csd(dec_val, WF=0):
 
         # decimal point?
         if k == -1 :
-            csd_digits.extend( ['.'] )
+            if csd_digits == []:
+                if dec_val > limit:
+                    remainder -= 1
+                    csd_digits.extend(['+.'])
+                    prev_non_zero = True
+                elif dec_val < -limit:
+                    remainder += 1
+                    csd_digits.extend(['-.'])
+                    prev_non_zero = True
+                else:
+                    csd_digits.extend( ['0.'] )
+            else:
+                csd_digits.extend( ['.'] )               
 
         # convert the number
         if prev_non_zero:
