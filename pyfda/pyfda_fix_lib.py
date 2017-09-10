@@ -780,6 +780,9 @@ class Fixed(object):
             logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
 
         elif frmt == 'csd':
+            # - Glue integer and fractional part to a string without radix point
+            # - Divide by 2 ** <number of fractional places> for correct scaling
+
             y_float = csd2dec(raw_str)
             if y_float is not None:
                 y_float = y_float / 2**(self.W-1)
