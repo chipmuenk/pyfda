@@ -202,6 +202,8 @@ def dec2csd(dec_val, WF=0):
 #        csd_digits.insert(0, '0')
 
     csd_str = "".join(csd_digits)
+#    if WF > 0:
+#        csd_str = csd_str[:-WF] + "." + csd_str[-WF:]
 
     return csd_str
 
