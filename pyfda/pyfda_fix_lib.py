@@ -186,8 +186,8 @@ def dec2csd(dec_val, WF=0):
         logger.debug(csd_digits)
 
     # Always have something before the point
-    if np.fabs(dec_val) < 1.0:
-        csd_digits.insert(0, '0')
+#    if np.abs(dec_val) < 1.0:
+#        csd_digits.insert(0, '0')
 
     csd_str = "".join(csd_digits)
 
