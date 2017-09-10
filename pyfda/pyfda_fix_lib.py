@@ -195,7 +195,7 @@ def dec2csd(dec_val, WF=0):
 
 dec2csd_vec = np.frompyfunc(dec2csd, 2, 1)
 
-def csd2dec(csd_str, int_places=0):
+def csd2dec(csd_str):
     """
     Convert the CSD string `csd_str` to a decimal, `csd_str` may contain '+' or
     '-', indicating whether the current bit is meant to positive or negative.
@@ -768,7 +768,7 @@ class Fixed(object):
             logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
 
         elif frmt == 'csd':
-            y_float = csd2dec(raw_str, int_places)
+            y_float = csd2dec(raw_str)
             if y_float is not None:
                 y_float = y_float / 2**(self.W-1)
 
