@@ -451,6 +451,8 @@ class TestSequenceFunctions(unittest.TestCase):
         yq_list_goal = [-63, -16, -2, -1, 0, 0, 0, 1, 2, 10, 9.75, 15, 0]
         self.assertEqual(yq_list, yq_list_goal)
 
+# TODO: test csd2dec, csd2dec_vec
+
 #==============================================================================
 #         # same for Q5.0 quantization
 #         y_list = ['0100', '100', 'F0', '3F', '1F', '1E', '0', '', '1', '2', 'A', '2A', '3A.0', '070.01']
