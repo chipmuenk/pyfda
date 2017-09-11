@@ -403,10 +403,10 @@ class FilterCoeffs(QWidget):
         butLoad.setIconSize(q_icon_size)
         butLoad.setToolTip("Reload coefficients.")
 
-        butClear = QPushButton(self)
-        butClear.setIcon(QIcon(':/trash.svg'))
-        butClear.setIconSize(q_icon_size)
-        butClear.setToolTip("Clear all entries.")
+        self.butClear = QPushButton(self)
+        self.butClear.setIcon(QIcon(':/trash.svg'))
+        self.butClear.setIconSize(q_icon_size)
+        self.butClear.setToolTip("Clear all entries.")
 
 
         butToClipboard = QPushButton(self)
@@ -430,7 +430,7 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addWidget(butAddCells)
         layHButtonsCoeffs1.addWidget(butDelCells)
-        layHButtonsCoeffs1.addWidget(butClear)
+        layHButtonsCoeffs1.addWidget(self.butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
         layHButtonsCoeffs1.addWidget(butToClipboard)
@@ -442,10 +442,10 @@ class FilterCoeffs(QWidget):
         #   Eps / set zero settings
         # ---------------------------------------------------------------------
 
-        butSetZero = QPushButton("= 0", self)
-        butSetZero.setToolTip("<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
+        self.butSetZero = QPushButton("= 0", self)
+        self.butSetZero.setToolTip("<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
         "When nothing is selected, test the whole table.</span>")
-        butSetZero.setIconSize(q_icon_size)
+        self.butSetZero.setIconSize(q_icon_size)
 
         lblEps = QLabel(self)
         lblEps.setText("<b><i>for b, a</i> &lt;</b>")
@@ -455,7 +455,7 @@ class FilterCoeffs(QWidget):
         self.ledSetEps.setText(str(self.eps))
 
         layHButtonsCoeffs2 = QHBoxLayout()
-        layHButtonsCoeffs2.addWidget(butSetZero)
+        layHButtonsCoeffs2.addWidget(self.butSetZero)
         layHButtonsCoeffs2.addWidget(lblEps)
         layHButtonsCoeffs2.addWidget(self.ledSetEps)
         layHButtonsCoeffs2.addStretch()
@@ -641,9 +641,9 @@ class FilterCoeffs(QWidget):
         butAddCells.clicked.connect(self._add_cells)
         butLoad.clicked.connect(self.load_dict)
         self.butSave.clicked.connect(self._save_dict)
-        butClear.clicked.connect(self._clear_table)
+        self.butClear.clicked.connect(self._clear_table)
         self.ledSetEps.editingFinished.connect(self._set_eps)
-        butSetZero.clicked.connect(self._set_coeffs_zero)
+        self.butSetZero.clicked.connect(self._set_coeffs_zero)
 
         # refresh table after storing new settings
         self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
