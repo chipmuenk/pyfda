@@ -81,13 +81,30 @@ def qget_cmb_box(cmb_box, data=True):
     return cmb_str
 
 #------------------------------------------------------------------------------
-def qset_cmb_box(cmb_box, string, data=False):
+def qset_cmb_box(cmb_box, string, data=False, fireSignals=False):
     """
-    Set combobox to the index corresponding to `string` in a text field (data = False)
-    or in a data field (data=True). When `string` is not found in the combobox entries,
-     select the first entry. Signals are blocked during the update of the combobox.
-     
-    Returns: the index of the found entry
+    Set combobox to the index corresponding to `string` in a text field (`data = False`)
+    or in a data field (`data=True`). When `string` is not found in the combobox entries,
+    select the first entry. Signals are blocked during the update of the combobox unless
+    `fireSignals` is set `True`.
+
+    Parameters:
+    -----------
+
+    string: string
+        The label in the text or data field to be selected. When the string is
+        not found, select the first entry of the combo box.
+
+    data: Boolean (default: False)
+        Whether the string refers to the data or text fields of the combo box
+
+    fireSignals: Boolean (default: True)
+        When False, fire a signal if the index is changed (useful for GUI testing)
+
+    Returns:
+    --------
+        The index of the string. When the string was not found in the combo box,
+        return index -1.
     """
     if data:
         idx = cmb_box.findData(str(string)) # find index for data = string
@@ -99,7 +116,7 @@ def qset_cmb_box(cmb_box, string, data=False):
     if idx == -1: # data does not exist, use first entry instead
         idx = 0
         
-    cmb_box.blockSignals(True)
+    cmb_box.blockSignals(not fireSignals)
     cmb_box.setCurrentIndex(idx) # set index
     cmb_box.blockSignals(False)
     
