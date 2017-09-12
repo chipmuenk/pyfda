@@ -95,11 +95,8 @@ class FilterInfo(QWidget):
         self.tblFiltPerf.verticalHeader().setFont(bfont)
 
         self.txtFiltInfoBox = QTextBrowser(self)
-
         self.txtFiltDict = QTextBrowser(self)
-
         self.txtFiltTree = QTextBrowser(self)
-
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmMain)
@@ -186,6 +183,8 @@ class FilterInfo(QWidget):
         specs are violated, colour the table entry in red.
         """
         
+        antiC = False
+
         def _find_min_max(self, f_start, f_stop, unit = 'dB'):
             """
             Find minimum and maximum magnitude and the corresponding frequencies
@@ -194,6 +193,19 @@ class FilterInfo(QWidget):
             """
             w = np.linspace(f_start, f_stop, params['N_FFT'])*2*np.pi
             [w, H] = sig.freqz(bb, aa)
+
+            # add antiCausals if we have them
+            if (antiC):
+               #
+               # Evaluate transfer function of anticausal half on the same freq grid.
+               #
+               wa, ha = sig.freqz(bbA, aaA)
+               ha = ha.conjugate()
+               #
+               # Total transfer function is the product
+               #
+               H = H*ha
+
             f = w / (2.0 * pi) # frequency normalized to f_S
             H_abs = abs(H)
             H_max = max(H_abs)
@@ -211,7 +223,13 @@ class FilterInfo(QWidget):
 
             bb = fb.fil[0]['ba'][0]
             aa = fb.fil[0]['ba'][1]
-    
+            if 'baA' in fb.fil[0]:
+                antiC = True
+                bbA = fb.fil[0]['baA'][0]
+                aaA = fb.fil[0]['baA'][1]
+                bbA = bbA.conjugate()
+                aaA = aaA.conjugate()
+
             f_S  = fb.fil[0]['f_S']
     
             f_lbls = []
@@ -283,8 +301,13 @@ class FilterInfo(QWidget):
                                
                 # Calculate frequency response at test frequencies
                 [w_test, a_test] = sig.freqz(bb, aa, 2.0 * pi * f_vals.astype(np.float))
-                
-            
+                # add antiCausals if we have them
+                if (antiC):
+                   wa, ha = sig.freqz(bbA, aaA, 2.0 * pi * f_vals.astype(np.float))
+                   ha = ha.conjugate()
+                   a_test = a_test*ha
+
+
             (F_min, H_min, F_max, H_max) = _find_min_max(self, 0, 1, unit = 'V')    
             # append frequencies and values for min. and max. filter reponse to 
             # test vector

@@ -52,6 +52,20 @@ class ItemDelegate(QStyledItemDelegate):
             text = text.toString() # needed for Python 2, doesn't work with Py3
         return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_pz'])
 
+class ItemDelegateAnti(QStyledItemDelegate):
+    """
+    The following methods are subclassed to replace display and editor of the
+    QTableWidget.
+
+    `displayText()` displays number with n_digits without sacrificing precision of
+    the data stored in the table.
+
+    """
+    def displayText(self, text, locale):
+        if not isinstance(text, six.text_type): #
+            text = text.toString() # needed for Python 2, doesn't work with Py3
+        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_pz'])
+
 class FilterPZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
@@ -127,6 +141,19 @@ class FilterPZ(QWidget):
         self.tblPZ.setColumnCount(2)
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
+#       Table of antiCausal Zeros/Poles (for now not editable)
+        self.anti   = False 
+        self.tblPZA = QTableWidget(self)
+        self.tblPZA.setAlternatingRowColors(True) # alternating row colors)
+        self.tblPZA.setObjectName("tblPZA")
+
+        self.tblPZA.horizontalHeader().setHighlightSections(True) # highlight when selected
+        self.tblPZA.horizontalHeader().setFont(bfont)
+
+        self.tblPZA.verticalHeader().setHighlightSections(True)
+        self.tblPZA.verticalHeader().setFont(bfont)
+        self.tblPZA.setColumnCount(2)
+        self.tblPZA.setItemDelegate(ItemDelegateAnti(self))
 
         butAddRow.setToolTip("<SPAN>Select <i>N</i> existing rows "
                              "to insert <i>N</i> new rows above last selected cell. "
@@ -207,6 +234,7 @@ class FilterPZ(QWidget):
         layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addWidget(frmMain)
         layVMain.addWidget(self.tblPZ)
+        layVMain.addWidget(self.tblPZA)
 
         layVMain.setContentsMargins(*params['wdg_margins'])
 
@@ -382,6 +410,28 @@ class FilterPZ(QWidget):
             self.tblPZ.resizeRowsToContents()
             self.tblPZ.clearSelection()
 
+#           Add antiCausals if they exist
+            if self.anti:
+                self.tblPZA.setHorizontalHeaderLabels(["AntiCausalZeros", "AntiCausalPoles"])
+                self.tblPZA.setRowCount(max(len(self.zpkA[0]),len(self.zpkA[1])))
+
+                self.tblPZA.blockSignals(True)
+                for col in range(2):
+                    for row in range(len(self.zpkA[col])):
+                        # set table item from self.zpk and strip '()' of complex numbers
+                        item = self.tblPZA.item(row, col)
+                        if item: # does item exist?
+                            item.setText(str(self.zpkA[col][row]).strip('()'))
+                        else: # no, construct it:
+                            self.tblPZA.setItem(row,col,QTableWidgetItem(
+                                  str(self.zpkA[col][row]).strip('()')))
+                self.tblPZA.blockSignals(False)
+
+                self.tblPZA.resizeColumnsToContents()
+                self.tblPZA.resizeRowsToContents()
+                self.tblPZA.clearSelection()
+
+
 #------------------------------------------------------------------------------
     def load_dict(self):
         """
@@ -393,8 +443,17 @@ class FilterPZ(QWidget):
         coefficient values (or complex user entries) create errors.
 
         """
-        # TODO: dtype=complex needs to be set for all subarrays
         self.zpk = np.array(fb.fil[0]['zpk'])# this enforces a deep copy
+
+        if 'zpkA' in fb.fil[0]:
+
+            # AntiCausals are not stored as reciprocals, compute them
+            self.zpkA = np.array(fb.fil[0]['zpkA'])
+            self.zpkA[0] = 1./self.zpkA[0]
+            self.zpkA[1] = 1./self.zpkA[1]
+            self.anti = True 
+        else:
+            self.anti = False
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -454,6 +513,7 @@ class FilterPZ(QWidget):
         """
         self.zpk = np.array([[0, 0], [0, 0], 1])
         self.Hmax_last = 1.0
+        self.anti = False
 
         self._refresh_table()
 

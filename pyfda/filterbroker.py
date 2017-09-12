@@ -49,6 +49,7 @@ fil_classes = {# IIR:
             'Cheby2':{'name':'Chebychev 2', 'mod':'pyfda.filter_design.cheby2'},
             'Bessel':{'name':'Bessel',      'mod':'pyfda.filter_design.bessel'},
             'Ellip' :{'name':'Elliptic',    'mod':'pyfda.filter_design.ellip'},
+            'EllipZeroPhz' :{'name':'EllipticZeroPhase',    'mod':'pyfda.filter_design.ellip_zero'},
 
             # FIR:
             'Equiripple':{'name':'Equiripple',  'mod':'pyfda.filter_design.equiripple'},
@@ -190,6 +191,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'W_PB':1, 'W_PB2':1, 'W_SB':1, 'W_SB2':1,
             #
             'ba':([1, 1, 1], [3, 0, 2]), # tuple of bb, aa
+            # causal zeros/poles/gain
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
             'q_coeff':{'WI':0, 'WF': 15, 'quant': 'round', 'ovfl': 'sat', 'frmt':'float', 'point':False},

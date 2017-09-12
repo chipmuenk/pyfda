@@ -15,6 +15,7 @@ import scipy.signal as sig
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.pyfda_lib import calc_Hcomplex
 
 
 class PlotPhi(QWidget):
@@ -89,14 +90,11 @@ class PlotPhi(QWidget):
         self.ax.clear()
         self.unitPhi = self.cmbUnitsPhi.currentText()
 
-        self.bb = fb.fil[0]['ba'][0]
-        self.aa = fb.fil[0]['ba'][1]
-
         wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
         f_S = fb.fil[0]['f_S']
 
-        [W,H] = sig.freqz(self.bb, self.aa, worN = params['N_FFT'],
-                        whole = wholeF)
+        #W,H = calc_Hcomplex (fb.fil[0], params['N_FFT'], wholeF)
+        W,H = calc_Hcomplex (fb.fil[0], params['N_FFT'], True)
 
         F = W / (2 * np.pi) * f_S
 

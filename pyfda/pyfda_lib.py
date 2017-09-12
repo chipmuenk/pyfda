@@ -1257,7 +1257,12 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
     
     fil_dict['creator'] = (format_in, sender)
     fil_dict['time_designed'] = time.time()
-    
+
+    # Remove any antiCausal zero/poles
+    if 'zpkA' in fil_dict: fil_dict.pop('zpkA')
+    if 'baA' in fil_dict: fil_dict.pop('baA')
+    if 'rpk' in fil_dict: fil_dict.pop('rpk')
+
     if convert:    
         fil_convert(fil_dict, format_in)
 
@@ -1634,6 +1639,45 @@ def rt_label(label, it = True):
         html_label = "<b>"+label+"</b>"
     return html_label
 
+#------------------------------------------------------------------------------
+
+def calc_Hcomplex(fil_dict, param, wholeF):
+    """
+    Calculate the complex frequency response H(f), consider antiCausal poles/zeros
+    return the H function and also the W function
+    Use fil_dict to gather poles/zeros, frequency ranges
+    """
+
+    # causal poles/zeros
+    bc  = fil_dict['ba'][0]
+    ac  = fil_dict['ba'][1]
+
+    # standard call to signal freqz
+    W, H = sig.freqz(bc, ac, worN = param, whole = wholeF) 
+
+    # test to include Anti-Causal poles/zeros
+    if ('baA' in fil_dict):
+
+       # Grab causal, anticausal ba's from dictionary
+
+       ba  = fil_dict['baA'][0]
+       aa  = fil_dict['baA'][1]
+       ba  = ba.conjugate()
+       aa  = aa.conjugate()
+
+       # Evaluate transfer function of anticausal half on the same freq grid.
+       # This is done by conjugating a and b prior to the call, and conjugating
+       # h after the call.
+
+       wa, ha = sig.freqz(ba, aa, worN = param, whole=True)
+       ha = ha.conjugate()
+
+       # Total transfer function is the product of causal response and antiCausal response
+
+       H = H*ha
+
+    return (W, H)
+    
 #------------------------------------------------------------------------------
 
 if __name__=='__main__':

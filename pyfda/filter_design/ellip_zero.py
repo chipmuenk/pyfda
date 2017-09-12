@@ -1,47 +1,45 @@
 # -*- coding: utf-8 -*-
 """
-Design ellip-Filters (LP, HP, BP, BS) with fixed or minimum order, return
-the filter design in zeros, poles, gain (zpk) format
+Design elliptic Filters (LP, HP, BP, BS) with zero phase in fixed or minimum order,
+return the filter design in zeros, poles, gain (zpk) format
 
 Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling its __init__ method.
 
-Version info:   
-    1.0: initial working release
-    1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
-         - mark private methods as private
-    1.2: new API using fil_save (enable SOS features when available)
-    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
-    1.4: module attribute `filter_classes` contains class name and combo box name
-         instead of class attribute `name`
-         `FRMT` is now a class attribute
-    2.0: Specify the parameters for each subwidget as tuples in a dict where the
-         first element controls whether the widget is visible and / or enabled.
-         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
-         is read and merged with the first one.
+Version info:
+    2.0: initial working release
 
-Author: Christian Muenker
+Author: Christian Muenker/Nelson
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
+import numpy as np
 from scipy.signal import ellipord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+
 from .common import Common
+from ..compat import (QWidget, QFrame, pyqtSignal,
+                      QCheckBox, QVBoxLayout, QHBoxLayout)
+
+import logging
+logger = logging.getLogger(__name__)
 
 __version__ = "2.0"
 
-filter_classes = {'Ellip':'Elliptic'}
-    
-class Ellip(object):
+filter_classes = {'EllipZeroPhz':'EllipticWZeroPhase'}
 
-    if SOS_AVAIL:
-        FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
-    else:
-        FRMT = 'zpk'
+class EllipZeroPhz(QWidget):
+
+#    Since we are also using poles/residues -> let's force zpk
+#    if SOS_AVAIL:
+#       output format of filter design routines 'zpk' / 'ba' / 'sos'
+#        FRMT = 'sos' 
+#    else:
+    FRMT = 'zpk'
         
     info = """
-**Elliptic filters**
+**Elliptic filters with zero phase**
 
 (also known as Cauer filters) have the steepest rate of transition between the 
 frequency response’s passband and stopband of all IIR filters. This comes
@@ -51,15 +49,26 @@ comparison to Chebychev filters.
  
 As the passband ripple :math:`A_PB` approaches 0, the elliptical filter becomes
 a Chebyshev type II filter. As the stopband ripple :math:`A_SB` approaches 0,
-it becomes a Chebyshev type I filter. As both approach 0, it becomes a Butterworth
+it becomes a Chebyshev type I filter. As both approach 0, becomes a Butterworth
 filter (butter).
 
 For the filter design, the order :math:`N`, minimum stopband attenuation
 :math:`A_SB` and the critical frequency / frequencies :math:`F_PB` where the 
 gain first drops below the maximum passband ripple :math:`-A_PB` have to be specified.
 
-The ``ellipord()`` helper routine calculates the minimum order :math:`N` and the 
+The ``ellipord()`` helper routine calculates the minimum order :math:`N` and 
 critical passband frequency :math:`F_C` from pass and stop band specifications.
+
+The Zero Phase Elliptic Filter squares an elliptic filter designed in
+a way to produce the required Amplitude specifications. So initially the
+amplitude specs design an elliptic filter with the square root of the amp specs.
+The filter is then squared to produce a zero phase filter.
+The filter coefficients are applied to the signal data in a backward and forward
+time fashion.  This filter can only be applied to stored signal data (not
+real-time streaming data that comes in a forward time order).
+
+We are forcing the order N of the filter to be even.  This simplifies the poles/zeros
+to be complex (no real values).
 
 **Design routines:**
 
@@ -67,29 +76,33 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 
         """
 
+    sigFiltChanged = pyqtSignal()
+
     def __init__(self):
+        QWidget.__init__(self)
 
         self.ft = 'IIR'
 
-        c = Common()                   
+        c = Common()
         self.rt_dict = c.rt_base_iir
-        
+
         self.rt_dict_add = {
             'COM':{'man':{'msg':('a',
-                 "Enter the filter order <b><i>N</i></b>, the minimum stop "
-                 "band attenuation <b><i>A<sub>SB</sub></i></b> and the frequency or "
-                 "frequencies <b><i>F<sub>C</sub></i></b>  where the gain first drops "
-                 "below the maximum passband ripple <b><i>-A<sub>PB</sub></i></b> .")}},
+             "Enter the filter order <b><i>N</i></b>, the minimum stop "
+             "band attenuation <b><i>A<sub>SB</sub></i></b> and frequency or "
+             "frequencies <b><i>F<sub>C</sub></i></b>  where gain first drops "
+             "below the max passband ripple <b><i>-A<sub>PB</sub></i></b> .")}},
             'LP': {'man':{}, 'min':{}},
             'HP': {'man':{}, 'min':{}},
             'BS': {'man':{}, 'min':{}},
             'BP': {'man':{}, 'min':{}},
             }
-        self.wdg = False  # has no additional dynamic widgets
-        
+
+#       has additional dynamic widgets (for non-causal and Complex BP/BS)
+        self.wdg = True
+
         self.hdl = ('iir_sos', 'df') # filter topologies
 
-            
         self.info_doc = []
         self.info_doc.append('ellip()\n========')
         self.info_doc.append(sig.ellip.__doc__)
@@ -98,14 +111,28 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
 
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the 
+        Create additional subwidget(s) needed for filter design with the
         names given in self.wdg :
-        These subwidgets are instantiated dynamically when needed in 
+        These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
-        (empty method, nothing to do in this filter)
         """
-        pass
-        
+        self.chkComplex   = QCheckBox("ComplexFilter", self)
+        self.chkComplex.setToolTip("Designs BP or BS Filter for complex data.")
+        self.chkComplex.setObjectName('wdg_lbl_el')
+        self.chkComplex.setChecked(False)
+
+        #--------------------------------------------------
+        #  Layout for filter optional subwidgets
+        self.layHWin = QHBoxLayout()
+        self.layHWin.setObjectName('wdg_layGWin')
+        #self.layHWin.addWidget(self.chkComplex)
+        self.layHWin.addStretch() 
+        self.layHWin.setContentsMargins(0,0,0,0)
+
+        # Widget containing all subwidgets
+        self.wdg_fil = QWidget(self)
+        self.wdg_fil.setObjectName('wdg_fil')
+        self.wdg_fil.setLayout(self.layHWin)
 
     def destruct_UI(self):
         """
@@ -114,53 +141,186 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         """
         pass
 
-
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
+        For zero phase filter, we take square root of amplitude specs
+        since we later square filter.  Define design around smallest amp spec
         """
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.analog = False # set to True for analog filters
         self.N     = fil_dict['N']
+
+        # force N to be even
+        self.N     = (self.N+1)/2*2
         self.F_PB  = fil_dict['F_PB'] * 2
         self.F_SB  = fil_dict['F_SB'] * 2
         self.F_PB2 = fil_dict['F_PB2'] * 2
         self.F_SB2 = fil_dict['F_SB2'] * 2
         self.F_PBC = None
 
-        self.A_PB = lin2unit(fil_dict['A_PB'], 'IIR', 'A_PB', unit='dB')
-        self.A_SB = lin2unit(fil_dict['A_SB'], 'IIR', 'A_SB', unit='dB')
-        
+        # find smallest spec'd linear value and rewrite dictionary
+        ampPB = fil_dict['A_PB']
+        ampSB = fil_dict['A_SB']
+
+        # take square roots of amp specs so resulting squared
+        # filter will meet specifications
+        if (ampPB < ampSB):
+            ampSB = np.sqrt(ampPB)
+            ampPB = np.sqrt(1+ampPB)-1
+        else:
+            ampPB = np.sqrt(1+ampSB)-1
+            ampSB = np.sqrt(ampSB)
+        self.A_PB = lin2unit(ampPB, 'IIR', 'A_PB', unit='dB')
+        self.A_SB = lin2unit(ampSB, 'IIR', 'A_SB', unit='dB')
+        #logger.warning("design with "+str(self.A_PB)+","+str(self.A_SB))
+
         # ellip filter routines support only one amplitude spec for
         # pass- and stop band each
         if str(fil_dict['rt']) == 'BS':
-            fil_dict['A_PB2'] = fil_dict['A_PB']
+            fil_dict['A_PB2'] = self.A_PB
         elif str(fil_dict['rt']) == 'BP':
-            fil_dict['A_SB2'] = fil_dict['A_SB']
+            fil_dict['A_SB2'] = self.A_SB
+
+#   partial fraction expansion to define residue vector
+    def _partial(self, k, p, z, norder):
+        # create diff array
+        diff = p - z
+
+        # now compute residual vector
+        cone = complex(1.,0.)
+        residues = np.zeros(norder, complex)
+        for i in range(norder):
+            residues[i] =  k * (diff[i] / p[i])
+            for j in range(norder):
+                if (j != i):
+                    residues[i] = residues[i] * (cone + diff[j]/(p[i] - p[j]))
+
+        # now compute DC term for new expansion
+        sumRes = 0.
+        for i in range(norder):
+            sumRes = sumRes + residues[i].real
+
+        dc = k - sumRes
+
+        return (dc, residues)
+
+#
+# Take a causal filter and square it. The result has the square
+#  of the amplitude response of the input, and zero phase. Filter
+#  is noncausal.
+# Input:
+#   k - gain in pole/zero form
+#   p - numpy array of poles
+#   z - numpy array of zeros
+#   g - gain in pole/residue form
+#   r - numpy array of residues
+#   nn- order of filter
+
+# Output:
+#   kn - new gain (pole/zero)
+#   pn - new poles
+#   zn - new zeros  (numpy array)
+#   gn - new gain (pole/residue)
+#   rn - new residues
+
+    def _sqCausal (self, k, p, z, g, r, nn):
+
+#       Anticausal poles have conjugate-reciprocal symmetry
+#       Starting anticausal residues are conjugates (adjusted below)
+
+        pA = np.conj(1./p)   # antiCausal poles
+        zA = np.conj(z)      # antiCausal zeros (store reciprocal)
+        rA = np.conj(r)      # antiCausal residues (to start)
+        rC = np.zeros(nn, complex)
+
+#       Adjust residues. Causal part first.
+        for j in range(nn):
+
+#           Evaluate the anticausal filter at each causal pole
+            tmpx = rA / (1. - p[j]/pA)
+            ztmp = g + np.sum(tmpx)
+
+#           Adjust residue
+            rC[j] = r[j]*ztmp
+
+#       anticausal residues are just conjugates of causal residues
+#        r3 = np.conj(r2)
+
+#       Compute the constant term
+        dc2 = (g + np.sum(r))*g - np.sum(rC)
+
+#       Populate output (2nn elements)
+        gn = dc2.real
+
+#       Drop complex poles/residues in LHP, keep only UHP
+
+        pA = np.conj(p)  #store AntiCasual pole (reciprocal)
+        p0 = np.zeros(int(nn/2), complex)
+        r0 = np.zeros(int(nn/2), complex)
+        cnt = 0
+        for j in range(nn):
+            if (p[j].imag > 0.0):
+                p0[cnt] = p[j]
+                r0[cnt] = rC[j]
+                cnt = cnt+1
+
+#       Let operator know we squared filter
+#        logger.info('After squaring filter, order: '+str(nn*2))
+
+#       For now and our case, only store causal residues
+#       Filters are symmetric and can generate antiCausal residues
+        return (pA, zA, gn, p0, r0)
 
 
+#   custom save of filter dictionary
     def _save(self, fil_dict, arg):
         """
-        Convert results of filter design to all available formats (pz, ba, sos)
-        and store them in the global filter dictionary. 
-        
-        Corner frequencies and order calculated for minimum filter order are 
+        First design initial elliptic filter meeting sqRoot Amp specs;
+         - Then create residue vector from poles/zeros;
+         - Then square filter (k,p,z and dc,p,r) to get zero phase filter;
+         - Then Convert results of filter design to all available formats (pz, pr, ba, sos)
+        and store them in the global filter dictionary.
+
+        Corner frequencies and order calculated for minimum filter order are
         also stored to allow for an easy subsequent manual filter optimization.
         """
         fil_save(fil_dict, arg, self.FRMT, __name__)
 
-        # For min. filter order algorithms, update filter dictionary with calculated
+        # For min. filter order algorithms, update filter dict with calculated
         # new values for filter order N and corner frequency(s) F_PBC
-        if str(fil_dict['fo']) == 'min': 
-            fil_dict['N'] = self.N 
+        if str(fil_dict['fo']) == 'min':
+            if (self.N%2)== 1:
+                self.N = self.N+1
+            fil_dict['N'] = self.N
 
             if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
-                fil_dict['F_PB'] = self.F_PBC / 2. # HP or LP - single  corner frequency
+#               HP or LP - single  corner frequency
+                fil_dict['F_PB'] = self.F_PBC / 2.
             else: # BP or BS - two corner frequencies
                 fil_dict['F_PB'] = self.F_PBC[0] / 2.
                 fil_dict['F_PB2'] = self.F_PBC[1] / 2.
-                
+
+#       Now generate poles/residues for custom file save of new parameters
+        z = fil_dict['zpk'][0]
+        p = fil_dict['zpk'][1]
+        k = fil_dict['zpk'][2]
+        n = len(z)
+        gain, residues = self._partial (k, p, z, n)
+
+        pA, zA, gn, pC, rC = self._sqCausal (k, p, z, gain, residues, n)
+        fil_dict['rpk'] = [rC, pC, gn]
+        fil_dict['zpkA'] = [zA, pA, k]
+
+#       save antiCausal b,a also (fil_save has stored causal b,a)
+        try:
+           fil_dict['baA'] = sig.zpk2tf(zA, pA, k)
+        except Exception as e:
+           logger.error(e)
+
+        self.sigFiltChanged.emit()
+
 #------------------------------------------------------------------------------
 #
 #         DESIGN ROUTINES
@@ -173,12 +333,19 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                           analog=self.analog)
+#       force even N
+        if (self.N%2)== 1:
+            self.N = self.N+1
+        #logger.warning("and "+str(self.F_PBC) + " " + str(self.N))
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='low', analog=self.analog, output=self.FRMT))
-                            
+
     def LPman(self, fil_dict):
         """Elliptic LP filter, manual order"""
         self._get_params(fil_dict)
+#       force even N
+        if (self.N%2)== 1:
+            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                             btype='low', analog=self.analog, output=self.FRMT))
 
@@ -188,12 +355,17 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                           analog=self.analog)
+#       force even N
+        if (self.N%2)== 1:
+            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         """Elliptic HP filter, manual order"""
         self._get_params(fil_dict)
+        if (self.N%2)== 1:
+            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
@@ -205,15 +377,21 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog=self.analog)
+        #logger.warning(" "+str(self.F_PBC) + " " + str(self.N))
+        if (self.N%2)== 1:
+            self.N = self.N+1
+        #logger.warning("-"+str(self.F_PBC) + " " + str(self.A_SB))
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='bandpass', analog=self.analog, output=self.FRMT))
-                            
+
     def BPman(self, fil_dict):
         """Elliptic BP filter, manual order"""
         self._get_params(fil_dict)
-        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, 
-            [self.F_PB,self.F_PB2], btype='bandpass', analog=self.analog, 
-                                                                output=self.FRMT))
+        if (self.N%2)== 1:
+            self.N = self.N+1
+        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB,
+            [self.F_PB,self.F_PB2], btype='bandpass', analog=self.analog,
+                                                            output=self.FRMT))
 
     # BS: F_SB[0] > F_PB[0], F_SB[1] < F_PB[1] --------------------------------
     def BSmin(self, fil_dict):
@@ -222,20 +400,49 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB,
                                                         analog=self.analog)
+#       force even N
+        if (self.N%2)== 1:
+            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='bandstop', analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         """Elliptic BS filter, manual order"""
         self._get_params(fil_dict)
-        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, 
-            [self.F_PB,self.F_PB2], btype='bandstop', analog=self.analog, 
-                                                                output=self.FRMT))
-                            
+        if (self.N%2)== 1:
+            self.N = self.N+1
+        self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB,
+            [self.F_PB,self.F_PB2], btype='bandstop', analog=self.analog,
+                                                            output=self.FRMT))
+
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import pyfda.filterbroker as fb # importing filterbroker initializes all its globals 
-    filt = Ellip()        # instantiate filter
+    import sys
+    from ..compat import QApplication
+# importing filterbroker initializes all its globals
+    import pyfda.filterbroker as fb
+
+    app = QApplication (sys.argv)
+
+    # ellip filter widget
+    filt = EllipZeroPhz()        # instantiate filter
+    filt.construct_UI()
+    wdg_ma = getattr (filt, 'wdg_fil')
+
+    layVDynWdg = QVBoxLayout()
+    layVDynWdg.addWidget(wdg_ma, stretch = 1)
+
     filt.LPman(fb.fil[0])  # design a low-pass with parameters from global dict
     print(fb.fil[0][filt.FRMT]) # return results in default format
+
+    form = QFrame()
+    form.setFrameStyle (QFrame.StyledPanel|QFrame.Sunken)
+    form.setLayout (layVDynWdg)
+
+    form.show()
+
+    app.exec_()
+
+#-----------------------------------------------------------------------------
+

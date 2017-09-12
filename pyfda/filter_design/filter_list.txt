@@ -11,6 +11,7 @@ equiripple.py
 firwin.py
 cheby2.py
 ellip.py
+ellip_zero.py
 butter.py
 bessel.py
 ma.py
