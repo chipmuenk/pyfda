@@ -627,6 +627,9 @@ class FilterCoeffs(QWidget):
         self.setLayout(layVMain)
 
         # ============== Signals & Slots ================================
+        # wdg.textChanged() is emitted when contents of widget changes
+        # wdg.textEdited() is only emitted for user changes
+        # wdg.editingFinished() is only emitted for user changes
         self.butEnable.clicked.connect(self._refresh_table)
         self.spnRound.editingFinished.connect(self._refresh_table)
 
@@ -707,6 +710,8 @@ class FilterCoeffs(QWidget):
         been changed. Try to preserve `WI` or `WF` settings depending on the
         number format (integer or fractional).
         """
+        
+        # if self.ledW.isModified() ... self.ledW.setModified(False)
         W = safe_eval(self.ledW.text(), self.myQ.W, return_type='int', sign='pos')
 
         if W < 2:
@@ -763,6 +768,7 @@ class FilterCoeffs(QWidget):
         Set scale for calculating floating point value from fixpoint representation
         and vice versa
         """
+        # if self.ledScale.isModified() ... self.ledScale.setModified(False)
         scale = safe_eval(self.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
         self.ledScale.setText(str(scale))
         self._store_q_settings()
