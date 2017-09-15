@@ -273,9 +273,9 @@ def extract_file_ext(file_type):
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
 #------------------------------------------------------------------------------
-def qstr(text):
+def qstr(data):
     """
-    Convert text object (QVariant, QSTring, string) to string.
+    Convert object (QVariant, QSTring, string, number) to string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
     when stored as "data" e.g. in a QComboBox and converted back when
@@ -287,16 +287,12 @@ def qstr(text):
 
     The current text / QVariant data as a string
     """
-    if "QString" in str(type(text)):
-        # Python 3: convert QString -> str
-        string = str(text)
-#    elif not isinstance(text, six.text_type):
-    elif "QVariant" in str(type(text)):
+    if "QVariant" in str(type(data)):
         # Python 2: convert QVariant -> QString -> str
-        string = str(text.toString())
+        string = str(data.toString())
     else:
-        # `text` is of type str already
-        string = text
+        # `data` is of type str already, is numeric or is a QString (Py3)
+        string = str(data)
     return string
 
 
