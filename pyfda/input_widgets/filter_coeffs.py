@@ -48,14 +48,14 @@ class ItemDelegate(QStyledItemDelegate):
     The following methods are subclassed to replace display and editor of the
     QTableWidget.
 
-    `displayText()` displays the data stored in the table in various number formats
+    - `displayText()` displays the data stored in the table in various number formats
 
+    - `createEditor()` creates a line edit instance for editing table entries
 
-    In Python 3, python Qt objects are automatically converted to QVariant
-    when stored as "data" e.g. in a QTableWidgetItem and converted back when
-    retrieved. In Python 2, QVariant is returned when itemData is retrieved.
-    This is first converted from the QVariant container format to a
-    QString, next to a "normal" non-unicode string.
+    - `setEditorData()` pass data with full precision and in selected format to editor
+
+    - `setModelData()` pass edited data back to model (`self.ba`)
+
 
     """
     def __init__(self, parent):
@@ -193,8 +193,8 @@ class ItemDelegate(QStyledItemDelegate):
     def setEditorData(self, editor, index):
         """
         Pass the data to be edited to the editor:
-        - retrieve data with full accuracy from self.ba
-        - store data in fb.data_old in fractional format
+        - retrieve data with full accuracy from self.ba (in float format)
+        - store data in fb.data_old in float format
         - requantize data according to settings in fixpoint object
         - represent it in the selected format (int, hex, ...)
 
