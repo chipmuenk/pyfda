@@ -8,6 +8,7 @@ Created on Wed Jun 14 11:57:19 2017
 
 import sys
 import unittest
+import pytest
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 
 from ...compat import Qt, QtTest, QApplication, QTableWidgetItem
@@ -23,29 +24,35 @@ class FilterCoeffsTest(unittest.TestCase):
         '''Create the GUI'''
         self.form = FilterCoeffs(None)
 
-    def set_cmb_box(self, name, arg):
+    def set_cmb_box(self, cmb_wdg, arg):
         """
         Set combobox `name` to item `arg`. Throw an error if the item
         doesn't exist in the combobox list.
         """
-        name.setCurrentIndex(-1) # insure that cmbbox always fires an index changed signal
-        ret = qset_cmb_box(name, arg, fireSignals=True)
-        self.assertIsNot(ret, -1) # assert that arg exists in combo box
+        if not cmb_wdg.isVisible():
+            self.fail("Widget is not visible.")
+        elif not cmb_wdg.isEnabled():
+            self.fail("Widget is not enabled.")
+        else:
+            cmb_wdg.setCurrentIndex(-1) # insure that cmbbox always fires an index changed signal
+            ret = qset_cmb_box(cmb_wdg, arg, fireSignals=True)
+            self.assertIsNot(ret, -1) # assert that arg exists in combo box
 
     def set_table_value(self, col, row, val):
         item = self.form.tblCoeff.item(row, col)
         if item: # does item exist?
             item.setText(str(val))
         else: # no, construct it:
-            self.form.setItem(row, col, QTableWidgetItem(str(val)))
+            self.form.tblCoeff.setItem(row, col, QTableWidgetItem(str(val)))
+        return self.form.tblCoeff.item(row, col).text()
 
     def get_table_value(self, col, row):
         item = self.form.tblCoeff.item(row, col)
-        return item.text()
+        return str(item.text())
 
-    def set_lineedit_value(self, name, arg):
-        name.clear()
-        QtTest.QTest.keyClicks(name, arg)
+    def set_lineedit_value(self, edit_wdg, arg):
+        edit_wdg.clear()
+        QtTest.QTest.keyClicks(edit_wdg, arg)
         # name.setText(str(arg))
         # QtTest.QTest.keyPress(name.setText(), Qt.Key_Enter, NULL, 100)
         # QtTest.QTest.keyRelease(name.setText(), Qt.Key_Enter, NULL, 100)
@@ -92,7 +99,7 @@ class FilterCoeffsTest(unittest.TestCase):
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 2)
 
-        qset_cmb_box(self.form.cmbFilterType, 'FIR', fireSignals=True)
+        self.set_cmb_box(self.form.cmbFilterType, 'FIR')
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 3)
         self.assertEqual(self.form.tblCoeff.columnCount(), 1)
@@ -114,17 +121,18 @@ class FilterCoeffsTest(unittest.TestCase):
     def test_write_table(self):
         """Test writing to table in various formats"""
         self.initialize_form()
-        self.initialize_fixpoint_format()
+        #self.initialize_fixpoint_format()
 
-        self.set_table_value(1,0, 25) # row, col, value
-        self.assertEqual(self.get_table_value(1,0), "25")
+        ret = self.set_table_value(1,1, 25) # row, col, value
+        print("set\n", ret)
+        self.assertEqual(self.get_table_value(1,1), "25")
 
         self.set_cmb_box(self.form.cmbFormat, 'Dec')
         self.set_cmb_box(self.form.cmbQFrmt, 'Integer')
         self.assertEqual(self.form.ledScale.text(), "8")
         self.set_cmb_box(self.form.cmbFormat, 'Float')
 
-        self.assertEqual(self.get_table_value(1,0), "15")
+        self.assertEqual(self.get_table_value(1,1), "15")
 
         self.assertEqual(self.form.tblCoeff.rowCount(), 2)
 
