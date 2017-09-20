@@ -204,13 +204,14 @@ class ItemDelegate(QStyledItemDelegate):
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.ba[index.column()][index.row()] # data from self.ba
         fb.data_old = data # store old data in floating point format
+        data_str = qstr(safe_eval(data))
 
         if self.parent.myQ.frmt == 'float':
             # floating point format: pass data with full resolution
-            editor.setText(str(safe_eval(data)))
+            editor.setText(data_str)
         else:
             # fixpoint format with base: pass requantized data with required number of places
-            editor.setText("{0:>{1}}".format(self.parent.myQ.float2frmt(data),
+            editor.setText("{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
                                                self.parent.myQ.places))
 
     def setModelData(self, editor, model, index):
