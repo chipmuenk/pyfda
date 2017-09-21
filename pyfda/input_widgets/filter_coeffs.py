@@ -29,6 +29,11 @@ from .csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
+# TODO: Under Python 2 (and pyQt4?) entering non-float data displays all zeros.
+#       However, after a refresh the data is correct
+#       -> frmt2float works correctly
+#       -> float2frmt is called with "0" after editing?
+#
 # TODO: Clipboard functionality: CSD data is copied with leading blanks
 
 # TODO: Setting complex data (manually) crashes the app in setModelData():
@@ -41,7 +46,6 @@ import pyfda.pyfda_fix_lib as fix
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 
-# TODO: FIR and IIR need to be treated separately in _add / _delete_cells?
 # TODO: convert to a proper Model-View-Architecture using QTableView?
 class ItemDelegate(QStyledItemDelegate):
     """
