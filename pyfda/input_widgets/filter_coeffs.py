@@ -780,6 +780,19 @@ class FilterCoeffs(QWidget):
         self._refresh_table()
 
 #------------------------------------------------------------------------------
+    def _refresh_table_item(self, row, col):
+        """
+        Refresh the table item with the index `row, col` from self.ba
+        """
+        item = self.tblCoeff.item(row, col)
+        if item: # does item exist?
+            item.setText(str(self.ba[col][row]).strip('()'))
+        else: # no, construct it:
+            self.tblCoeff.setItem(row,col,QTableWidgetItem(
+                  str(self.ba[col][row]).strip('()')))
+        self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
+
+#------------------------------------------------------------------------------
     def _refresh_table(self):
         """
         (Re-)Create the displayed table from `self.ba` (list with 2 columns of
@@ -792,7 +805,6 @@ class FilterCoeffs(QWidget):
 
         Called at the end of nearly every method.
         """
-
         try:
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
         except IndexError:
@@ -840,14 +852,7 @@ class FilterCoeffs(QWidget):
             self.tblCoeff.blockSignals(True)
             for col in range(self.num_cols):
                 for row in range(self.num_rows):
-                    # set table item from self.ba and strip '()' of complex numbers
-                    item = self.tblCoeff.item(row, col)
-                    if item: # does item exist?
-                        item.setText(str(self.ba[col][row]).strip('()'))
-                    else: # no, construct it:
-                        self.tblCoeff.setItem(row,col,QTableWidgetItem(
-                              str(self.ba[col][row]).strip('()')))
-                    self.tblCoeff.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
+                    self._refresh_table_item(row, col)
 
             # make a[0] selectable but not editable
             if fb.fil[0]['ft'] == 'IIR':
