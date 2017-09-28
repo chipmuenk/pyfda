@@ -29,11 +29,6 @@ from .csv_option_box import CSV_option_box
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: Under Python 2 (and pyQt4?) entering non-float data displays all zeros.
-#       However, after a refresh the data is correct
-#       -> frmt2float works correctly
-#       -> float2frmt is called with "0" after editing?
-#
 # TODO: Clipboard functionality: CSD data is copied with leading blanks
 
 # TODO: Setting complex data (manually) crashes the app in setModelData():
@@ -181,6 +176,9 @@ class ItemDelegate(QStyledItemDelegate):
         options: instance of QStyleOptionViewItemV4
         """
         line_edit = QLineEdit(parent)
+        # TODO: connect this to _refresh_table_item?
+        # line_edit = QStyledItemDelegate.createEditor(self, parent, options, index) ?
+        # line_edit.editing.finished.connect.parent._refresh_table_item(index)
         H = int(round(line_edit.sizeHint().height()))
         W = int(round(line_edit.sizeHint().width()))
         line_edit.setMinimumSize(QSize(W, H)) #(160, 25));
@@ -660,6 +658,9 @@ class FilterCoeffs(QWidget):
         self.ledWF.editingFinished.connect(self._WIWF_changed)
         self.ledWI.editingFinished.connect(self._WIWF_changed)
         self.ledW.editingFinished.connect(self._W_changed)
+        # TODO: the whole table is refreshed when the editor is closed, this
+        #        is very inefficient -> move routine to ItemDelegate() class?
+        self.tblCoeff.itemDelegate().closeEditor.connect(self._refresh_table)
 
         self.ledScale.editingFinished.connect(self._set_scale)
 
