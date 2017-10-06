@@ -127,7 +127,7 @@ class ItemDelegateAnti(QStyledItemDelegate):
         """
         Pass instance `parent` of parent class (FilterPZ)
         """
-        super(ItemDelegate, self).__init__(parent)
+        super(ItemDelegateAnti, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
 
     def displayText(self, text, locale):
