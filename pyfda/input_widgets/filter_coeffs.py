@@ -219,8 +219,9 @@ class ItemDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
-        convert it back to floating point format and store it in the model
-        (= QTableWidget) and in self.ba
+        convert it back to floating point format and store it in both the model
+        (= QTableWidget) and in self.ba. Finally, refresh the table item to 
+        display it in the selected format (via `float2frmt()`).
 
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
@@ -243,6 +244,7 @@ class ItemDelegate(QStyledItemDelegate):
         model.setData(index, data)                          # store in QTableWidget
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
         qstyle_widget(self.parent.butSave, 'changed')
+        self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
 
 
 class FilterCoeffs(QWidget):
@@ -658,9 +660,6 @@ class FilterCoeffs(QWidget):
         self.ledWF.editingFinished.connect(self._WIWF_changed)
         self.ledWI.editingFinished.connect(self._WIWF_changed)
         self.ledW.editingFinished.connect(self._W_changed)
-        # TODO: the whole table is refreshed when the editor is closed, this
-        #        is very inefficient -> move routine to ItemDelegate() class?
-        self.tblCoeff.itemDelegate().closeEditor.connect(self._refresh_table)
 
         self.ledScale.editingFinished.connect(self._set_scale)
 
