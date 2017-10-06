@@ -176,15 +176,11 @@ class ItemDelegate(QStyledItemDelegate):
         options: instance of QStyleOptionViewItemV4
         """
         line_edit = QLineEdit(parent)
-        # TODO: connect this to _refresh_table_item?
-        # line_edit = QStyledItemDelegate.createEditor(self, parent, options, index) ?
-        # line_edit.editing.finished.connect.parent._refresh_table_item(index)
         H = int(round(line_edit.sizeHint().height()))
         W = int(round(line_edit.sizeHint().width()))
         line_edit.setMinimumSize(QSize(W, H)) #(160, 25));
 
         return line_edit
-#        return QLineEdit(parent) # return object without instantiating
 
 #    def updateEditorGeometry(self, editor, option, index):
 #        """
