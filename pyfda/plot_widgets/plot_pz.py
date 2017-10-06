@@ -87,6 +87,18 @@ class PlotPZ(QWidget):
         
         zpk = fb.fil[0]['zpk']
 
+        # add antiCausals if they exist (must take reciprocal to plot)
+        if 'zpkA' in fb.fil[0]:
+            zA = fb.fil[0]['zpkA'][0]
+            zA = 1./zA
+	    # ToDo: simplify this
+            pA = fb.fil[0]['zpkA'][1]
+            pA = 1./pA
+            zC = np.append(zpk[0],zA)
+            pC = np.append(zpk[1],pA)
+            zpk[0] = zC
+            zpk[1] = pC
+
         self.ax.clear()
 
         [z, p, k] = self.zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax, verbose = False, 
@@ -220,8 +232,8 @@ class PlotPZ(QWidget):
             z = np.roots(b)
             k = kn/kd
         elif not (len(p) or len(z)): # P/Z were specified
-                logger.error('Either b,a or z,p must be specified!')
-                return z, p, k
+            logger.error('Either b,a or z,p must be specified!')
+            return z, p, k
   
         # find multiple poles and zeros and their multiplicities
         if len(p) < 2: # single pole, [None] or [0]
@@ -303,11 +315,9 @@ class PlotPZ(QWidget):
         ax.set_ylim((yl[0]-Dy*0.05, yl[1] + Dy*0.05))
     #    print(ax.get_xlim(),ax.get_ylim())
     
-    
         return z, p, k
 
 #
-
 #------------------------------------------------------------------------------
 
 def main():
