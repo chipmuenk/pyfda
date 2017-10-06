@@ -243,7 +243,6 @@ class PlotImpz(QWidget):
         self.lblFreqUnit.setText(rt_label(fb.fil[0]['freq_specs_unit']))
         self.load_dict()
         
-        
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
         if min(len(self.aa), len(self.bb)) < 2:
@@ -251,6 +250,8 @@ class PlotImpz(QWidget):
             return
 
         sos = np.asarray(fb.fil[0]['sos'])
+        antiCausal = 'zpkA' in fb.fil[0]
+        causal     = not (antiCausal)
 
         self.f_S  = fb.fil[0]['f_S']
         
@@ -301,12 +302,13 @@ class PlotImpz(QWidget):
             logger.error('Unknown stimulus "{0}"'.format(stim))
             return
 
-        if len(sos) > 0: # has second order sections        
+        if len(sos) > 0 and (causal): # has second order sections and is causal
             h = sig.sosfilt(sos, x)
-            dc = sig.freqz(self.bb, self.aa, [0])
-        else: # no second order sections for current filter 
+        elif (antiCausal):
+            h = sig.filtfilt(self.bb, self.aa, x, -1, None)
+        else: # no second order sections or antiCausals for current filter 
             h = sig.lfilter(self.bb, self.aa, x)
-            dc = sig.freqz(self.bb, self.aa, [0])
+        dc = sig.freqz(self.bb, self.aa, [0])
         
         if stim == "StepErr":
             h = h - abs(dc[1]) # subtract DC value from response
@@ -399,7 +401,7 @@ class PlotImpz(QWidget):
 
         if N_user == 0: # set number of data points automatically
             if fb.fil[0]['ft'] == 'IIR':
-                N = 100 # TODO: IIR: more intelligent algorithm needed
+                N = 100 # TODO: IIR: more intelligent algorithm needed (based on transients)
             else:
                 N = min(len(self.bb),  100) # FIR: N = number of coefficients (max. 100)
         else:
