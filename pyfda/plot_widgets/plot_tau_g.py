@@ -15,6 +15,9 @@ from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import grpdelay
 from pyfda.plot_widgets.plot_utils import MplWidget
 
+# TODO: Anticausal filter have no group delay. But is a filter with
+#       'baA' always anticausal or maybe just acausal?
+
 
 class PlotTauG(QWidget):
 
@@ -76,6 +79,10 @@ class PlotTauG(QWidget):
 
         [w, tau_g] = grpdelay(bb,aa, params['N_FFT'], whole = wholeF, 
             verbose = self.chkWarnings.isChecked())
+
+        # Zero phase filters have no group delay (Causal+AntiCausal)
+        if 'baA' in fb.fil[0]:
+           tau_g = np.zeros(tau_g.size)
 
         F = w / (2 * np.pi) * fb.fil[0]['f_S']
 
