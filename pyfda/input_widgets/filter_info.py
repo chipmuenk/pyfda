@@ -192,14 +192,14 @@ class FilterInfo(QWidget):
             [f_start, f_stop].
             """
             w = np.linspace(f_start, f_stop, params['N_FFT'])*2*np.pi
-            [w, H] = sig.freqz(bb, aa)
+            [w, H] = sig.freqz(bb, aa, worN = w)
 
             # add antiCausals if we have them
             if (antiC):
                #
                # Evaluate transfer function of anticausal half on the same freq grid.
                #
-               wa, ha = sig.freqz(bbA, aaA)
+               wa, ha = sig.freqz(bbA, aaA, worN = w)
                ha = ha.conjugate()
                #
                # Total transfer function is the product
