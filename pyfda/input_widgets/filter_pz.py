@@ -15,8 +15,11 @@ import six
 from pprint import pformat
 
 from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
+                      QBrush, QColor, QSize,
                       QCheckBox, QPushButton, QSpinBox, QComboBox, QFont, QStyledItemDelegate,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout, QHBoxLayout)
+
+from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr)
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
@@ -38,20 +41,79 @@ class ItemDelegate(QStyledItemDelegate):
     The following methods are subclassed to replace display and editor of the
     QTableWidget.
 
-    `displayText()` displays number with n_digits without sacrificing precision of
-    the data stored in the table.
+    - `displayText()` displays the data stored in the table in various number formats
 
-    In Python 3, python Qt objects are automatically converted to QVariant
-    when stored as "data" e.g. in a QTableWidgetItem and converted back when
-    retrieved. In Python 2, QVariant is returned when itemData is retrieved.
-    This is first converted from the QVariant container format to a
-    QString, next to a "normal" non-unicode string.
+    - `createEditor()` creates a line edit instance for editing table entries
+
+    - `setEditorData()` pass data with full precision and in selected format to editor
+
+    - `setModelData()` pass edited data back to model (`self.ba`)
+
 
     """
+    def __init__(self, parent):
+        """
+        Pass instance `parent` of parent class (FilterPZ)
+        """
+        super(ItemDelegate, self).__init__(parent)
+        self.parent = parent # instance of the parent (not the base) class
+
+
+    def initStyleOption(self, option, index):
+        """
+        Initialize `option` with the values using the `index` index. All items are
+        passed to the original `initStyleOption()` which then calls `displayText()`.
+
+        Afterwards, check whether a pole (index.column() == 1 )is outside the
+        UC and color item background accordingly (not implemented yet).
+        """
+        # continue with the original `initStyleOption()` and call displayText()
+        super(ItemDelegate, self).initStyleOption(option, index)
+        # test whether fixpoint conversion during displayText() created an overflow:
+        if index.column() == 1 and False:
+            # Color item backgrounds with pos. Overflows red
+            option.backgroundBrush = QBrush(Qt.SolidPattern)
+            option.backgroundBrush.setColor(QColor(100, 0, 0, 80))
+
+    def text(self, item):
+        """
+        Return item text as string transformed by self.displayText()
+        """
+        # return qstr(item.text()) # convert to "normal" string
+        return  qstr(self.displayText(item.text(), QtCore.QLocale()))
+
     def displayText(self, text, locale):
-        if not isinstance(text, six.text_type): #
-            text = text.toString() # needed for Python 2, doesn't work with Py3
-        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_pz'])
+        """
+        Display `text` with selected format (cartesian / polar - to be implemented)
+        and number of places
+
+        text:   string / QVariant from QTableWidget to be rendered
+        locale: locale for the text
+
+        """
+        string = qstr(text) # convert to "normal" string
+
+        if True:
+            data = safe_eval(string, return_type='auto')
+            return "{0:.{1}g}".format(data, params['FMT_pz'])
+        else:
+            pass
+
+    def createEditor(self, parent, options, index):
+        """
+        Neet to set editor explicitly, otherwise QDoubleSpinBox instance is
+        created when space is not sufficient?!
+        editor:  instance of e.g. QLineEdit (default)
+        index:   instance of QModelIndex
+        options: instance of QStyleOptionViewItemV4
+        """
+        line_edit = QLineEdit(parent)
+        H = int(round(line_edit.sizeHint().height()))
+        W = int(round(line_edit.sizeHint().width()))
+        line_edit.setMinimumSize(QSize(W, H)) #(160, 25));
+
+        return line_edit
+
 
 class ItemDelegateAnti(QStyledItemDelegate):
     """
