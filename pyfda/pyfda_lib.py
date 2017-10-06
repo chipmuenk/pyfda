@@ -188,8 +188,10 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
         else:
             try:
                 ex_num = se.simple_eval(ex)
-                if return_type == '' or return_type =='auto' or return_type == 'cmplx':
+                if return_type == 'cmplx':
                     result = ex_num
+                elif return_type == '' or return_type =='auto':
+                    result = np.real_if_close(ex_num).item()
                 elif return_type == 'float':
                     result = ex_num.real
                     # eliminate very small imaginary components due to rounding errors
