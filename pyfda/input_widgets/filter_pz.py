@@ -478,7 +478,8 @@ class FilterPZ(QWidget):
             self.tblPZ.resizeRowsToContents()
             self.tblPZ.clearSelection()
 
-#           Add antiCausals if they exist
+            self.tblPZA.setVisible(self.anti) # only display anticausal P/Z when present
+            #   Add antiCausals if they exist
             if self.anti:
                 self.tblPZA.setHorizontalHeaderLabels(["AntiCausalZeros", "AntiCausalPoles"])
                 self.tblPZA.setRowCount(max(len(self.zpkA[0]),len(self.zpkA[1])))
