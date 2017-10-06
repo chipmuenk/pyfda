@@ -168,7 +168,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
         String to be evaluated when evaluation of first string fails.
 
     return_type: string
-        Type of returned variable ['float' (default) / 'complex' / 'int']
+        Type of returned variable ['float' (default) / 'cmplx' / 'int' / '' or 'auto']
 
     sign: string
         enforce positive / negative sign of result ['pos' / None (default) / 'neg']
@@ -188,9 +188,9 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
         else:
             try:
                 ex_num = se.simple_eval(ex)
-                if return_type == 'complex':
-                    return ex_num
-                if return_type == 'float':
+                if return_type == '' or return_type =='auto' or return_type == 'cmplx':
+                    result = ex_num
+                elif return_type == 'float':
                     result = ex_num.real
                     # eliminate very small imaginary components due to rounding errors
                     #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
