@@ -60,12 +60,17 @@ class ItemDelegateAnti(QStyledItemDelegate):
 
     `displayText()` displays number with n_digits without sacrificing precision of
     the data stored in the table.
-
     """
+    def __init__(self, parent):
+        """
+        Pass instance `parent` of parent class (FilterPZ)
+        """
+        super(ItemDelegate, self).__init__(parent)
+        self.parent = parent # instance of the parent (not the base) class
+
     def displayText(self, text, locale):
-        if not isinstance(text, six.text_type): #
-            text = text.toString() # needed for Python 2, doesn't work with Py3
-        return "{:.{n_digits}g}".format(safe_eval(text), n_digits = params['FMT_pz'])
+        return "{:.{n_digits}g}".format(safe_eval(qstr(text), return_type='cmplx'), 
+                n_digits = params['FMT_pz'])
 
 class FilterPZ(QWidget):
     """
