@@ -17,6 +17,7 @@ from matplotlib import rcParams
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.pyfda_lib import calc_Hcomplex
 
 class PlotHf(QWidget):
 
@@ -370,7 +371,7 @@ class PlotHf(QWidget):
             phi = np.angle(np.nan_to_num(self.H_c)) 
         #-----------------------------------------------------------
             self.ax_p.plot(self.F,np.unwrap(phi)*scale,
-                               'b--', label = "Phase")
+                               'g-.', label = "Phase")
         #-----------------------------------------------------------
             self.ax_p.set_ylabel(phi_str)
             nbins = len(self.ax.get_yticks()) # number of ticks on main y-axis
@@ -415,11 +416,11 @@ class PlotHf(QWidget):
         (Re-)Calculate the complex frequency response H(f)
         """
 
-#        whole = fb.fil[0]['freqSpecsRangeType'] != 'half'
-
         # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
-        [self.W, self.H_cplx] = sig.freqz(fb.fil[0]['ba'][0], fb.fil[0]['ba'][1],
-            worN = params['N_FFT'], whole = True) # bb, aa, N_FFT, 0 ... 2 pi
+        w, h = calc_Hcomplex (fb.fil[0], params['N_FFT'], True)
+
+        self.W = w
+        self.H_cplx = h
 
 #------------------------------------------------------------------------------
     def draw(self):
