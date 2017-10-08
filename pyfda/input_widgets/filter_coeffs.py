@@ -390,17 +390,17 @@ class FilterCoeffs(QWidget):
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all entries.")
 
-
         butToClipboard = QPushButton(self)
         butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
         butToClipboard.setIconSize(q_icon_size)
         butToClipboard.setToolTip("<span>Copy table to clipboard, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
                             "is copied with full precision in decimal format. </span>")
+
         butFromClipboard = QPushButton(self)
         butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
         butFromClipboard.setIconSize(q_icon_size)
-        butToClipboard.setIconSize(q_icon_size)
+        butFromClipboard.setToolTip("<span>Copy clipboard to table.</span>")
 
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
