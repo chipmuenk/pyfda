@@ -208,7 +208,7 @@ def qget_selected(table, select_all=False, reverse=True):
 
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target, frmt):
+def qcopy_to_clipboard(table, data, target, frmt='float'):
     """
     Copy table to clipboard as CSV list
     
@@ -225,7 +225,7 @@ def qcopy_to_clipboard(table, data, target, frmt):
             instance, copy the text there, otherwise simply return the text.
             
     frmt: string
-            Expected number format ('float', 'hex', ...)
+            Expected number format: 'float' (default), 'hex', ...
     
     tab : String (default: "\t")
           Tabulator character for separating columns
