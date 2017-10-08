@@ -336,12 +336,12 @@ class FilterCoeffs(QWidget):
         self.cmbFormat.setToolTip('Set the display format.')
         self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
-        self.spnRound = QSpinBox(self)
-        self.spnRound.setRange(0,16)
-        self.spnRound.setValue(params['FMT_ba'])
-        self.spnRound.setToolTip("Number of digits to display.")
-        self.lblRound = QLabel("Digits", self)
-        self.lblRound.setFont(self.bifont)
+        self.spnDigits = QSpinBox(self)
+        self.spnDigits.setRange(0,16)
+        self.spnDigits.setValue(params['FMT_ba'])
+        self.spnDigits.setToolTip("Number of digits to display.")
+        self.lblDigits = QLabel("Digits", self)
+        self.lblDigits.setFont(self.bifont)
 
         self.cmbQFrmt = QComboBox(self)
         q_formats = [('Integer', 'qint' ), ('Norm. Frac.', 'qnfrac'), ('Fractional', 'qfrac')]
@@ -361,8 +361,8 @@ class FilterCoeffs(QWidget):
         layHDisplay.setAlignment(Qt.AlignLeft)
         layHDisplay.addWidget(self.butEnable)
         layHDisplay.addWidget(self.cmbFormat)
-        layHDisplay.addWidget(self.spnRound)
-        layHDisplay.addWidget(self.lblRound)
+        layHDisplay.addWidget(self.spnDigits)
+        layHDisplay.addWidget(self.lblDigits)
         layHDisplay.addWidget(self.cmbQFrmt)
         layHDisplay.addWidget(self.lbl_W)
         layHDisplay.addWidget(self.ledW)
@@ -632,7 +632,7 @@ class FilterCoeffs(QWidget):
         # wdg.textEdited() is only emitted for user changes
         # wdg.editingFinished() is only emitted for user changes
         self.butEnable.clicked.connect(self._refresh_table)
-        self.spnRound.editingFinished.connect(self._refresh_table)
+        self.spnDigits.editingFinished.connect(self._refresh_table)
 
         self.cmbQFrmt.currentIndexChanged.connect(self._set_number_format)
         butSettingsClipboard.clicked.connect(self._copy_options)
@@ -807,13 +807,13 @@ class FilterCoeffs(QWidget):
             self.num_rows = len(self.ba[0])
         logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
 
-        params['FMT_ba'] = int(self.spnRound.text())
+        params['FMT_ba'] = int(self.spnDigits.text())
 
         # When format is 'float', disable all fixpoint options
         is_float = (qget_cmb_box(self.cmbFormat, data=False).lower() == 'float')
 
-        self.spnRound.setVisible(is_float) # number of digits can only be selected
-        self.lblRound.setVisible(is_float) # for format = 'float'
+        self.spnDigits.setVisible(is_float) # number of digits can only be selected
+        self.lblDigits.setVisible(is_float) # for format = 'float'
         self.cmbQFrmt.setVisible(not is_float) # hide unneeded widgets for format = 'float'
         self.lbl_W.setVisible(not is_float)
         self.ledW.setVisible(not is_float)
