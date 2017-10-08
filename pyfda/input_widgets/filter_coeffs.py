@@ -282,25 +282,6 @@ class FilterCoeffs(QWidget):
         self.bifont.setItalic(True)
 #        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
-#==============================================================================
-#          #Which Button holds the longest Text?
-#         MaxTextlen = 0
-#         longestText = ""
-#         ButLength = 0
-#         butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set Zero", "< Q >"]
-#
-#         # Find the longest text + padding for subsequent bounding box calculation
-#         for item in butTexts:
-#             if len(item) > MaxTextlen:
-#                 MaxTextlen = len(item)
-#                 longestText = item + "mm" # this is the longest text + padding for
-#
-#         #Calculate the length for the buttons based on the longest ButtonText
-#         #ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
-#        butDelCell.setText(butTexts[1])
-#        butDelCell.setMaximumWidth(ButLength)
-#
-#==============================================================================
         # ---------------------------------------------
         # UI Elements for controlling the display
         # ---------------------------------------------
