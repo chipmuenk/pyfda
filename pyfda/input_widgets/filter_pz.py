@@ -660,9 +660,35 @@ class FilterPZ(QWidget):
             else:
                 self.zpk[1] = [1]
 
-        # self._equalize_ba_length()
+        self._equalize_columns()
 
         self._refresh_table()
+
+#------------------------------------------------------------------------------
+    def _equalize_columns(self):
+        """
+        test and equalize if P and Z subarray have different lengths:
+        """
+        try:
+            p_len = len(self.zpk[1])
+        except IndexError:
+            p_len = 0
+
+        try:
+            z_len = len(self.zpk[0])
+        except IndexError:
+            z_len = 0
+
+        D = z_len - p_len
+
+        if D > 0: # more zeros than poles
+            self.zpk[1] = np.append(self.zpk[1], np.zeros(D))
+        elif D < 0: # more poles than zeros
+            self.zpk[0] = np.append(self.zpk[0], np.zeros(-D))        
+#            if fb.fil[0]['ft'] == 'IIR':
+#                self.zpk[0] = np.append(self.zpk[0], np.zeros(-D))
+#            else:
+#                self.zpk[1] = self.zpk[1][:D] # discard last D elements of a
 
 #------------------------------------------------------------------------------
 
