@@ -11,22 +11,24 @@ import logging
 logger = logging.getLogger(__name__)
 
 import sys
-import six
 from pprint import pformat
 
-from ..compat import (QtCore, QWidget, QLabel, QLineEdit, pyqtSignal, QFrame, QEvent,
-                      QBrush, QColor, QSize,
-                      QCheckBox, QPushButton, QSpinBox, QComboBox, QFont, QStyledItemDelegate,
-                      QTableWidget, QTableWidgetItem, Qt, QVBoxLayout, QHBoxLayout)
+from ..compat import (QtCore, QWidget, QApplication, QLineEdit, pyqtSignal, QEvent,
+                      QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
+                      QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr)
+from pyfda.pyfda_qt_lib import (qstr, qcopy_to_clipboard, qcopy_from_clipboard,
+                                qget_cmb_box)
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval, rt_label
+from pyfda.pyfda_lib import fil_save, safe_eval
+
 from pyfda.pyfda_rc import params
+
+from .filter_pz_ui import FilterPZ_UI
 
 # TODO: correct scaling after insertion / deletion of cells
 # TODO: display P/Z in polar or cartesian format -> display text
@@ -34,7 +36,6 @@ from pyfda.pyfda_rc import params
 # TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
 # TODO: Option for limiting P/Z to a selectable magnitude
 # TODO: display SOS graphically
-# TODO: Hide table with anti-causal P/Z when none exist?
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -57,7 +58,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
-
+        
 
     def initStyleOption(self, option, index):
         """
@@ -148,53 +149,15 @@ class FilterPZ(QWidget):
         self.Hmax_last = 1  # initial setting for maximum gain
         self.norm_last = "" # initial setting for previous combobox
 
-        self._construct_UI()
+        self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
+        self._construct_UI() # construct the rest of the UI
 
     def _construct_UI(self):
         """
-        Intitialize the widget, consisting of:
+        Intitialize the widget
         """
-        bfont = QFont()
-        bfont.setBold(True)
-
-        # Find which button holds the longest text:
-        MaxTextlen = 0
-        longestText = ""
-        ButLength = 0
-        butTexts = ["Add", "Delete", "Save", "Load", "Clear", "Set 0"]
-
-        for item in butTexts:
-            if len(item) > MaxTextlen:
-                MaxTextlen = len(item)
-                longestText = item + "mm"
-
-        butAddRow = QPushButton(butTexts[0], self)
-        ButLength = butAddRow.fontMetrics().boundingRect(longestText).width()
-
-        self.chkPZList = QCheckBox("Show table", self)
-        self.chkPZList.setChecked(True)
-        self.chkPZList.setToolTip("<span>Show filter Poles / Zeros as an editable table. "
-                                  "For high order systems, this might be slow. </span>")
-
-        lblRound = QLabel("Digits = ", self)
-        self.spnRound = QSpinBox(self)
-        self.spnRound.setRange(0,9)
-        self.spnRound.setValue(params['FMT_pz'])
-        self.spnRound.setToolTip("Display d digits.")
-
-        self.lblNorm = QLabel("Normalize", self)
-        self.cmbNorm = QComboBox(self)
-        self.cmbNorm.addItems(["None", "1", "Max"])
-        self.cmbNorm.setToolTip("<span>Set the gain <i>k</i> so that H(f)<sub>max</sub> is "
-                                "either 1 or the max. of the previous system.</span>")
-
-        self.lblGain = QLabel(rt_label("k = "), self)
-        self.ledGain = QLineEdit(self)
-        self.ledGain.setToolTip("Specify gain factor <i>k</i>.")
-        self.ledGain.setText(str(1.))
-        self.ledGain.setObjectName("ledGain")
-#        self.ledGain.setFixedSize(W8, H)
-        self.ledGain.installEventFilter(self)
+        # Create clipboard instance
+        self.clipboard = QApplication.clipboard()
 
         self.tblPZ = QTableWidget(self)
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
@@ -202,10 +165,10 @@ class FilterPZ(QWidget):
         self.tblPZ.setObjectName("tblPZ")
 
         self.tblPZ.horizontalHeader().setHighlightSections(True) # highlight when selected
-        self.tblPZ.horizontalHeader().setFont(bfont)
+        self.tblPZ.horizontalHeader().setFont(self.ui.bfont)
 
         self.tblPZ.verticalHeader().setHighlightSections(True)
-        self.tblPZ.verticalHeader().setFont(bfont)
+        self.tblPZ.verticalHeader().setFont(self.ui.bfont)
         self.tblPZ.setColumnCount(2)
         self.tblPZ.setItemDelegate(ItemDelegate(self))
 
@@ -216,91 +179,17 @@ class FilterPZ(QWidget):
         self.tblPZA.setObjectName("tblPZA")
 
         self.tblPZA.horizontalHeader().setHighlightSections(True) # highlight when selected
-        self.tblPZA.horizontalHeader().setFont(bfont)
+        self.tblPZA.horizontalHeader().setFont(self.ui.bfont)
 
         self.tblPZA.verticalHeader().setHighlightSections(True)
-        self.tblPZA.verticalHeader().setFont(bfont)
+        self.tblPZA.verticalHeader().setFont(self.ui.bfont)
         self.tblPZA.setColumnCount(2)
         self.tblPZA.setItemDelegate(ItemDelegateAnti(self))
 
-        butAddRow.setToolTip("<SPAN>Select <i>N</i> existing rows "
-                             "to insert <i>N</i> new rows above last selected cell. "
-                             "When nothing is selected, add a row at the end.</SPAN>")
-        butAddRow.setMaximumWidth(ButLength)
-
-        butDelCell = QPushButton(butTexts[1], self)
-        butDelCell.setToolTip("<span>Delete selected cell(s) from the table. "
-                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-                "If nothing is selected, delete the last row.</span>")
-        butDelCell.setMaximumWidth(ButLength)
-
-        butClear = QPushButton(butTexts[4], self)
-        butClear.setToolTip("Clear all entries.")
-        butClear.setMaximumWidth(ButLength)
-
-        butSave = QPushButton(butTexts[2], self)
-        butSave.setToolTip("<span>Save P/Z and update all plots. "
-                                "No modifications are saved before!</span>")
-        butSave.setMaximumWidth(ButLength)
-
-        butLoad = QPushButton(butTexts[3], self)
-        butLoad.setToolTip("Reload P / Z.")
-        butLoad.setMaximumWidth(ButLength)
-
-        butSetZero = QPushButton(butTexts[5], self)
-        butSetZero.setToolTip("<SPAN>Set selected cells = 0 when magnitude "
-                            "&lt; &epsilon;. When nothing is selected, apply to "
-                            "all cells.</SPAN>")
-        butSetZero.setMaximumWidth(ButLength)
-
-        self.lblEps = QLabel("for " + rt_label("&epsilon; &lt;"), self)
-        self.ledSetEps = QLineEdit(self)
-        self.ledSetEps.setToolTip("<SPAN>Specify tolerance.</SPAN>")
-        self.ledSetEps.setText(str(1e-6))
-#        self.ledSetEps.setFixedSize(W8, H)
-
-        # ============== UI Layout =====================================
-        layHChkBoxes = QHBoxLayout()
-        layHChkBoxes.addWidget(self.chkPZList)
-        layHChkBoxes.addStretch(1)
-        layHChkBoxes.addWidget(lblRound)
-        layHChkBoxes.addWidget(self.spnRound)
-
-        layHGain = QHBoxLayout()
-        layHGain.addWidget(self.lblGain)
-        layHGain.addWidget(self.ledGain)
-#        layHChkBoxes.addStretch(1)
-        layHGain.addWidget(self.lblNorm)
-        layHGain.addWidget(self.cmbNorm)
-        layHGain.addStretch()
-
-        layHButtonsPZs1 = QHBoxLayout()
-        layHButtonsPZs1.addWidget(butAddRow)
-        layHButtonsPZs1.addWidget(butDelCell)
-        layHButtonsPZs1.addWidget(butSave)
-        layHButtonsPZs1.addWidget(butLoad)
-        layHButtonsPZs1.addStretch()
-
-        layHButtonsPZs2 = QHBoxLayout()
-        layHButtonsPZs2.addWidget(butClear)
-        layHButtonsPZs2.addWidget(butSetZero)
-        layHButtonsPZs2.addWidget(self.lblEps)
-        layHButtonsPZs2.addWidget(self.ledSetEps)
-        layHButtonsPZs2.addStretch()
-
-        layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHChkBoxes)
-        layVBtns.addLayout(layHGain)
-        layVBtns.addLayout(layHButtonsPZs1)
-        layVBtns.addLayout(layHButtonsPZs2)
-
-        # This frame encompasses all the buttons
-        frmMain = QFrame(self)
-        frmMain.setLayout(layVBtns)
 
         layVMain = QVBoxLayout()
         layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
-        layVMain.addWidget(frmMain)
+        layVMain.addWidget(self.ui)
         layVMain.addWidget(self.tblPZ)
         layVMain.addWidget(self.tblPZA)
 
@@ -314,23 +203,29 @@ class FilterPZ(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.spnRound.editingFinished.connect(self._refresh_table)
-        butLoad.clicked.connect(self.load_dict)
-        self.chkPZList.clicked.connect(self.load_dict)
+        self.ui.spnDigits.editingFinished.connect(self._refresh_table)
+        self.ui.butLoad.clicked.connect(self.load_dict)
+        self.ui.butEnable.clicked.connect(self.load_dict)
 
-        butSave.clicked.connect(self._save_entries)
+        self.ui.butSave.clicked.connect(self._save_entries)
 
-        butDelCell.clicked.connect(self._delete_cells)
-        butAddRow.clicked.connect(self._add_rows)
-        butClear.clicked.connect(self._clear_table)
+        self.ui.butDelCells.clicked.connect(self._delete_cells)
+        self.ui.butAddCells.clicked.connect(self._add_rows)
+        self.ui.butClear.clicked.connect(self._clear_table)
+        
+        self.ui.butToClipboard.clicked.connect(self._copy_to_clipboard)
+        self.ui.butFromClipboard.clicked.connect(self._copy_from_clipboard)
 
-        butSetZero.clicked.connect(self._zero_PZ)
+
+        self.ui.butSetZero.clicked.connect(self._zero_PZ)
         # signal itemChanged is also triggered programmatically,
         # itemSelectionChanged is only triggered when entering cell
         # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
 
         self.tblPZ.cellChanged.connect(self._copy_item)
-        self.cmbNorm.activated.connect(self._copy_item)
+        self.ui.cmbNorm.activated.connect(self._copy_item)
+        
+        self.ui.ledGain.installEventFilter(self)
         #----------------------------------------------------------------------
 
         # Every time a table item is edited, call self._copy_item to copy the
@@ -380,6 +275,7 @@ class FilterPZ(QWidget):
 
         return super(FilterPZ, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
+
     def _store_gain(self, source):
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
@@ -402,7 +298,7 @@ class FilterPZ(QWidget):
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
 
-        norm = self.cmbNorm.currentText()
+        norm = self.ui.cmbNorm.currentText()
         if norm != "None":
             b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2])
             [w, H] = freqz(b, a)
@@ -427,15 +323,14 @@ class FilterPZ(QWidget):
         Called by eventFilter, _normalize_gain() and _refresh_table()
         """
 
-        self.ledGain.setVisible(self.chkPZList.isChecked())
-        self.lblGain.setVisible(self.chkPZList.isChecked())
+        self.ui.ledGain.setVisible(self.ui.butEnable.isChecked())
+        self.ui.lblGain.setVisible(self.ui.butEnable.isChecked())
 
-        if self.chkPZList.isChecked():
-            if not self.ledGain.hasFocus():  # no focus, round the gain
-                self.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+        if self.ui.butEnable.isChecked():
+            if not self.ui.ledGain.hasFocus():  # no focus, round the gain
+                self.ui.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
             else: # widget has focus, show gain with full precision
-                self.ledGain.setText(str(self.zpk[2]))
-
+                self.ui.ledGain.setText(str(self.zpk[2]))
 
 #------------------------------------------------------------------------------
     def _refresh_table(self):
@@ -449,13 +344,13 @@ class FilterPZ(QWidget):
         Called by _copy_item()
         """
 
-        params['FMT_pz'] = int(self.spnRound.text())
+        params['FMT_pz'] = int(self.ui.spnDigits.text())
 
-        self.ledGain.setVisible(self.chkPZList.isChecked())
-        self.lblGain.setVisible(self.chkPZList.isChecked())
-        self.tblPZ.setVisible(self.chkPZList.isChecked())
+        self.ui.ledGain.setVisible(self.ui.butEnable.isChecked())
+        self.ui.lblGain.setVisible(self.ui.butEnable.isChecked())
+        self.tblPZ.setVisible(self.ui.butEnable.isChecked())
 
-        if self.chkPZList.isChecked():
+        if self.ui.butEnable.isChecked():
 
             self._restore_gain()
 
@@ -663,7 +558,7 @@ class FilterPZ(QWidget):
         Set all P/Zs = 0 with a magnitude less than eps and delete P/Z pairs
         afterwards.
         """
-        eps = abs(safe_eval(self.ledSetEps.text()))
+        eps = abs(safe_eval(self.ui.ledSetEps.text()))
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
         if not sel:
             self.zpk[0] = self.zpk[0] * np.logical_not(
@@ -693,6 +588,61 @@ class FilterPZ(QWidget):
         if len(self.zpk[0]) < 1 : # no P / Z, add 1 row
             self.zpk[0] = np.append(self.zpk[0], 0.)
             self.zpk[1] = np.append(self.zpk[1], 0.)
+
+    #------------------------------------------------------------------------------
+    def _to_cartesian(self, string):
+        """
+        Convert input to cartesian format depending on the setting of cmbPZFrmt
+        """
+        if qget_cmb_box(self.ui.cmbPZFrmt) == 'Cartesian':
+            return string
+        else:
+            return string
+
+    #------------------------------------------------------------------------------
+    def _copy_to_clipboard(self):
+        """
+        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
+        """
+        qcopy_to_clipboard(self.tblPZ, self.zpk, self.clipboard)
+
+    #------------------------------------------------------------------------------
+    def _copy_from_clipboard(self):
+        """
+        Read data from clipboard and copy it to `self.zpk` as array of strings
+        # TODO: More checks for swapped row <-> col, single values, wrong data type ...
+        """
+        clp_str = qcopy_from_clipboard(self.clipboard)
+        
+        conv = self._to_cartesian # routine for converting to cartesian coordinates
+
+        if np.ndim(clp_str) > 1:
+            num_cols, num_rows = np.shape(clp_str)
+            orientation_horiz = num_cols > num_rows # need to transpose data
+        elif np.ndim(clp_str) == 1:
+            num_rows = len(clp_str)
+            num_cols = 1
+            orientation_horiz = False
+        else:
+            logger.error("Data from clipboard is a single value or None.")
+            return None
+        logger.debug("_copy_from_clipboard: c x r:", num_cols, num_rows)
+        if orientation_horiz:
+            self.zpk = [[],[]]
+            for c in range(num_cols):
+                self.zpk[0].append(conv(clp_str[c][0]))
+                if num_rows > 1:
+                    self.zpk[1].append(conv(clp_str[c][1]))
+        else:
+            self.zpk[0] = [conv(s) for s in clp_str[0]]
+            if num_cols > 1:
+                self.zpk[1] = [conv(s) for s in clp_str[1]]
+            else:
+                self.zpk[1] = [1]
+
+        # self._equalize_ba_length()
+
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
 
