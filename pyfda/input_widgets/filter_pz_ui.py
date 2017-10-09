@@ -35,7 +35,6 @@ class FilterPZ_UI(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
-        self.eps = 1.e-6 # initialize toleracce attribute
         
         self.bfont = QFont()
         self.bfont.setBold(True)
@@ -198,13 +197,13 @@ class FilterPZ_UI(QWidget):
         lblEps = QLabel(self)
         lblEps.setText("<b><i>for &epsilon;</i> &lt;</b>")
 
-        self.ledSetEps = QLineEdit(self)
-        self.ledSetEps.setToolTip("Specify eps value.")
+        self.ledEps = QLineEdit(self)
+        self.ledEps.setToolTip("Specify tolerance value.")
 
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(self.butSetZero)
         layHButtonsCoeffs2.addWidget(lblEps)
-        layHButtonsCoeffs2.addWidget(self.ledSetEps)
+        layHButtonsCoeffs2.addWidget(self.ledEps)
         layHButtonsCoeffs2.addStretch()
 
         layVBtns = QVBoxLayout()
@@ -224,7 +223,7 @@ class FilterPZ_UI(QWidget):
         
         #------------------- set initial values from dict ----------------------
         self.spnDigits.setValue(params['FMT_pz'])
-        self.ledSetEps.setText(str(self.eps))
+        self.ledEps.setText(str(self.parent.eps))
         
         self.setLayout(layVMain)
 

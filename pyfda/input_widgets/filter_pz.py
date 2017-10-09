@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 import sys
 from pprint import pformat
 
-from ..compat import (QtCore, QWidget, QApplication, QLineEdit, pyqtSignal, QEvent,
-                      QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
+from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent,
+                      QBrush, QColor, QSize, QStyledItemDelegate,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.pyfda_qt_lib import (qstr, qcopy_to_clipboard, qcopy_from_clipboard,
@@ -33,6 +33,8 @@ from .filter_pz_ui import FilterPZ_UI
 # TODO: correct scaling after insertion / deletion of cells
 # TODO: display P/Z in polar or cartesian format -> display text
 # TODO: order P/Z depending on frequency or magnitude
+# TODO: _equalize_PZ_length?
+# TODO: store / load gain (k) from / to clipboard
 # TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
 # TODO: Option for limiting P/Z to a selectable magnitude
 # TODO: display SOS graphically
@@ -146,6 +148,7 @@ class FilterPZ(QWidget):
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.norm_last = "" # initial setting for previous combobox
+        self.eps = 1.e-4 # tolerance value for setting P/Z to zero
 
         self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
         self._construct_UI() # construct the rest of the UI
@@ -224,6 +227,7 @@ class FilterPZ(QWidget):
         self.ui.cmbNorm.activated.connect(self._copy_item)
         
         self.ui.ledGain.installEventFilter(self)
+        self.ui.ledEps.editingFinished.connect(self._set_eps)
         #----------------------------------------------------------------------
 
         # Every time a table item is edited, call self._copy_item to copy the
@@ -281,7 +285,7 @@ class FilterPZ(QWidget):
         RETURN key.
         """
         if self.spec_edited:
-            self.zpk[2] = safe_eval(source.text())
+            self.zpk[2] = safe_eval(source.text(), alt_expr = str(self.zpk[2]))
             self.spec_edited = False # reset flag
 
 #------------------------------------------------------------------------------
@@ -289,12 +293,14 @@ class FilterPZ(QWidget):
         """
         Normalize the gain factor so that the maximum of |H(f)| stays 1 or a
         previously stored maximum value of |H(f)|. Do this every time a P or Z
-        has been change.
+        has been changed.
 
         Called by _copy_item()
         """
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
+        logger.error("self.zpk[2] = {0}".format(self.zpk[2]))
+        self.zpk[2] = np.real_if_close(self.zpk[2])
 
         norm = self.ui.cmbNorm.currentText()
         if norm != "None":
@@ -325,6 +331,13 @@ class FilterPZ(QWidget):
         self.ui.lblGain.setVisible(self.ui.butEnable.isChecked())
 
         if self.ui.butEnable.isChecked():
+            if len(self.zpk) == 3:
+                pass
+            elif len(self.zpk) == 2: # k is missing in zpk:
+                self.zpk.append(1.) # use k = 1
+            else:
+                logger.error("P/Z list zpk has wrong length {0}".format(len(self.zpk)))
+                
             if not self.ui.ledGain.hasFocus():  # no focus, round the gain
                 self.ui.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
             else: # widget has focus, show gain with full precision
@@ -551,22 +564,29 @@ class FilterPZ(QWidget):
         self._refresh_table()
 
 #------------------------------------------------------------------------------
+    def _set_eps(self):
+        """
+        Set tolerance value 
+        """
+        self.eps = safe_eval(self.ui.ledEps.text(), alt_expr=self.eps, sign='pos')
+        self.ui.ledEps.setText(str(self.eps))
+        
+#------------------------------------------------------------------------------
     def _zero_PZ(self):
         """
         Set all P/Zs = 0 with a magnitude less than eps and delete P/Z pairs
         afterwards.
         """
-        eps = abs(safe_eval(self.ui.ledSetEps.text()))
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
         if not sel:
             self.zpk[0] = self.zpk[0] * np.logical_not(
-                                        np.isclose(self.zpk[0], 0., rtol=0, atol = eps))
+                                        np.isclose(self.zpk[0], 0., rtol=0, atol = self.eps))
             self.zpk[1] = self.zpk[1] * np.logical_not(
-                                        np.isclose(self.zpk[1], 0., rtol=0, atol = eps))
+                                        np.isclose(self.zpk[1], 0., rtol=0, atol = self.eps))
         else:
             for i in sel:
                 self.zpk[i[0]][i[1]] = self.zpk[i[0]][i[1]] * np.logical_not(
-                                         np.isclose(self.zpk[i[0]][i[1]], 0., rtol=0, atol = eps))
+                                         np.isclose(self.zpk[i[0]][i[1]], 0., rtol=0, atol = self.eps))
         self._delete_PZ_pairs()
         self._refresh_table()
 

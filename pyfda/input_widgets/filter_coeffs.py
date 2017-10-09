@@ -431,14 +431,14 @@ class FilterCoeffs(QWidget):
         lblEps = QLabel(self)
         lblEps.setText("<b><i>for b, a</i> &lt;</b>")
 
-        self.ledSetEps = QLineEdit(self)
-        self.ledSetEps.setToolTip("Specify eps value.")
-        self.ledSetEps.setText(str(self.eps))
+        self.ledEps = QLineEdit(self)
+        self.ledEps.setToolTip("Specify tolerance value.")
+        self.ledEps.setText(str(self.eps))
 
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(self.butSetZero)
         layHButtonsCoeffs2.addWidget(lblEps)
-        layHButtonsCoeffs2.addWidget(self.ledSetEps)
+        layHButtonsCoeffs2.addWidget(self.ledEps)
         layHButtonsCoeffs2.addStretch()
 
         #-------------------------------------------------------------------
@@ -626,7 +626,7 @@ class FilterCoeffs(QWidget):
         butLoad.clicked.connect(self.load_dict)
         self.butSave.clicked.connect(self._save_dict)
         self.butClear.clicked.connect(self._clear_table)
-        self.ledSetEps.editingFinished.connect(self._set_eps)
+        self.ledEps.editingFinished.connect(self._set_eps)
         self.butSetZero.clicked.connect(self._set_coeffs_zero)
 
         # refresh table after storing new settings
@@ -1086,9 +1086,8 @@ class FilterCoeffs(QWidget):
         Set all coefficients = 0 in self.ba with a magnitude less than eps
         and refresh QTableWidget
         """
-        eps = safe_eval(self.ledSetEps.text(), return_type='float', sign='pos')
-        self.ledSetEps.setText(str(eps))
-        self.eps = eps
+        self.eps = safe_eval(self.ledEps.text(), return_type='float', sign='pos', alt_expr=self.eps)
+        self.ledEps.setText(str(self.eps))
 
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
