@@ -35,6 +35,8 @@ from .filter_pz_ui import FilterPZ_UI
 # TODO: order P/Z depending on frequency or magnitude
 # TODO: _equalize_PZ_length?
 # TODO: store / load gain (k) from / to clipboard
+# TODO: Save is not highlighted when something has been changed
+# TODO: Gain needs to be disabled for option max  and 1
 # TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
 # TODO: Option for limiting P/Z to a selectable magnitude
 # TODO: display SOS graphically
@@ -615,9 +617,12 @@ class FilterPZ(QWidget):
         Convert input to cartesian format depending on the setting of cmbPZFrmt
         """
         if qget_cmb_box(self.ui.cmbPZFrmt) == 'Cartesian':
-            return string
+            # TODO: Type is not recognized correctly
+            cmplx = np.array(string)
+            return cmplx.astype(np.complex)
         else:
-            return string
+            cmplx = np.array(string)
+            return cmplx.astype(np.complex)
 
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
