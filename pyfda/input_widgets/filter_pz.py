@@ -14,7 +14,7 @@ import sys
 from pprint import pformat
 
 from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent,
-                      QBrush, QColor, QSize, QStyledItemDelegate,
+                      QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.pyfda_qt_lib import (qstr, qcopy_to_clipboard, qcopy_from_clipboard,
@@ -299,8 +299,10 @@ class FilterPZ(QWidget):
         """
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
-        logger.error("self.zpk[2] = {0}".format(self.zpk[2]))
         self.zpk[2] = np.real_if_close(self.zpk[2])
+        if np.iscomplex(self.zpk[2]):
+            logger.warning("Casting complex to real for gain k!")
+            self.zpk[2] = np.abs(self.zpk[2])
 
         norm = self.ui.cmbNorm.currentText()
         if norm != "None":
@@ -666,7 +668,6 @@ class FilterPZ(QWidget):
 
 if __name__ == '__main__':
 
-    from ..compat import QApplication
     app = QApplication(sys.argv)
     mainw = FilterPZ(None)
 
