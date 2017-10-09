@@ -16,16 +16,15 @@ import sys
 from ..compat import (Qt, QtCore, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
                       QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize,
                       QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, QGridLayout,
-                      pyqtSignal, QEvent, QStyledItemDelegate, QColor, QBrush, QPalette,
-                      QSizePolicy)
+                      pyqtSignal, QStyledItemDelegate, QColor, QBrush, QSizePolicy)
 
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
+from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, CSV_option_box,
                                 qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
-from .csv_option_box import CSV_option_box
+ 
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 

@@ -49,8 +49,6 @@ class ItemDelegate(QStyledItemDelegate):
     - `setEditorData()` pass data with full precision and in selected format to editor
 
     - `setModelData()` pass edited data back to model (`self.ba`)
-
-
     """
     def __init__(self, parent):
         """
