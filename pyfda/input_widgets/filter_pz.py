@@ -447,6 +447,8 @@ class FilterPZ(QWidget):
         row = self.tblPZ.currentIndex().row()
         item = self.tblPZ.item(row,col)
 
+        self.ui.ledGain.setEnabled(qget_cmb_box(self.ui.cmbNorm, data=False) == 'None')
+
         if item:
             if item.text() != "":
                 self.zpk[col][row] = safe_eval(item.text())

@@ -101,7 +101,8 @@ class FilterPZ_UI(QWidget):
 
         self.lblGain = QLabel(rt_label("k = "), self)
         self.ledGain = QLineEdit(self)
-        self.ledGain.setToolTip("Specify gain factor <i>k</i>.")
+        self.ledGain.setToolTip("<span>Specify gain factor <i>k</i>"
+                                " (only possible for Normalize = 'None').</span>")
         self.ledGain.setText(str(1.))
         self.ledGain.setObjectName("ledGain")
 #        self.ledGain.installEventFilter(self)
