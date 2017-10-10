@@ -331,9 +331,6 @@ class FilterPZ(QWidget):
         Called by eventFilter, _normalize_gain() and _refresh_table()
         """
 
-        self.ui.ledGain.setVisible(self.ui.butEnable.isChecked())
-        self.ui.lblGain.setVisible(self.ui.butEnable.isChecked())
-
         if self.ui.butEnable.isChecked():
             if len(self.zpk) == 3:
                 pass
@@ -361,9 +358,10 @@ class FilterPZ(QWidget):
 
         params['FMT_pz'] = int(self.ui.spnDigits.text())
 
-        self.ui.ledGain.setVisible(self.ui.butEnable.isChecked())
-        self.ui.lblGain.setVisible(self.ui.butEnable.isChecked())
+        # self.ui.ledGain.setVisible(self.ui.butEnable.isChecked())
+        # TODO: enable widgets here
         self.tblPZ.setVisible(self.ui.butEnable.isChecked())
+        self.tblPZA.setVisible(self.ui.butEnable.isChecked())
 
         if self.ui.butEnable.isChecked():
 
