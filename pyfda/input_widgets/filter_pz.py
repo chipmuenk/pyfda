@@ -116,6 +116,37 @@ class ItemDelegate(QStyledItemDelegate):
         line_edit.setMinimumSize(QSize(W, H)) #(160, 25));
 
         return line_edit
+    
+    def setModelData(self, editor, model, index):
+        """
+        When editor has finished, read the updated data from the editor,
+        convert it back to floating point format and store it in both the model
+        (= QTableWidget) and in self.ba. Finally, refresh the table item to 
+        display it in the selected format (via `float2frmt()`).
+
+        editor: instance of e.g. QLineEdit
+        model:  instance of QAbstractTableModel
+        index:  instance of QModelIndex
+        """
+
+        # check for different editor environments if needed and provide a default:
+#        if isinstance(editor, QtGui.QTextEdit):
+#            model.setData(index, editor.toPlainText())
+#        elif isinstance(editor, QComboBox):
+#            model.setData(index, editor.currentText())
+#        else:
+#            super(ItemDelegate, self).setModelData(editor, model, index)
+        if qget_cmb_box(self.parent.ui.cmbPZFrmt, data=False) == 'Cartesian':
+            data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without reformatting
+        else:
+            data = safe_eval(qstr(editor.text()), fb.data_old) # same for now
+            
+        model.setData(index, data)                          # store in QTableWidget
+        self.parent.zpk[index.column()][index.row()] = data  # and in self.ba
+        qstyle_widget(self.parent.ui.butSave, 'changed')
+        self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
+        self.parent._normalize_gain() # recalculate gain
+
 
 
 class ItemDelegateAnti(QStyledItemDelegate):
@@ -224,9 +255,6 @@ class FilterPZ(QWidget):
         # signal itemChanged is also triggered programmatically,
         # itemSelectionChanged is only triggered when entering cell
         # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
-
-        self.tblPZ.cellChanged.connect(self._copy_item)
-        self.ui.cmbNorm.activated.connect(self._copy_item)
         
         self.ui.ledGain.installEventFilter(self)
         self.ui.ledEps.editingFinished.connect(self._set_eps)
@@ -445,29 +473,6 @@ class FilterPZ(QWidget):
         else:
             self.anti = False
         self._refresh_table()
-
-#------------------------------------------------------------------------------
-    def _copy_item(self):
-        """
-        Copy the value from the current table item to self.zpk and normalize /
-        update the gain. This is triggered every time a table item is edited.
-        When no item was selected, only the gain is updated.
-
-        Triggered by  `tblPZ.cellChanged` and `cmbNorm.activated`
-
-        """
-        col = self.tblPZ.currentIndex().column()
-        row = self.tblPZ.currentIndex().row()
-        item = self.tblPZ.item(row,col)
-
-        self.ui.ledGain.setEnabled(qget_cmb_box(self.ui.cmbNorm, data=False) == 'None')
-
-        if item:
-            if item.text() != "":
-                self.zpk[col][row] = safe_eval(item.text())
-            else:
-                self.zpk[col][row] = 0.
-        self._normalize_gain()
 
 #------------------------------------------------------------------------------
     def _save_entries(self):
