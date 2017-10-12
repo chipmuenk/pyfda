@@ -330,7 +330,7 @@ class FilterPZ(QWidget):
         """
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
-        self.zpk[2] = np.real_if_close(self.zpk[2])
+        self.zpk[2] = np.real_if_close(self.zpk[2]).item()
         if np.iscomplex(self.zpk[2]):
             logger.warning("Casting complex to real for gain k!")
             self.zpk[2] = np.abs(self.zpk[2])
