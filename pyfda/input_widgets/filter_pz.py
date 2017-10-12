@@ -117,6 +117,25 @@ class ItemDelegate(QStyledItemDelegate):
 
         return line_edit
     
+    def setEditorData(self, editor, index):
+        """
+        Pass the data to be edited to the editor:
+        - retrieve data with full accuracy from self.ba (in float format)
+        - store data in fb.data_old in float format
+        - requantize data according to settings in fixpoint object
+        - represent it in the selected format (int, hex, ...)
+
+        editor: instance of e.g. QLineEdit
+        index:  instance of QModelIndex
+        """
+#        data = qstr(index.data()) # get data from QTableWidget
+        data = self.parent.zpk[index.column()][index.row()] # data from self.ba
+        fb.data_old = data # store old data in floating point format
+        data_str = qstr(safe_eval(data, return_type="auto"))
+
+        editor.setText(data_str)
+
+    
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
@@ -138,9 +157,9 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if qget_cmb_box(self.parent.ui.cmbPZFrmt, data=False) == 'Cartesian':
-            data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without reformatting
+            data = safe_eval(qstr(editor.text()), fb.data_old, return_type="auto") # raw data without reformatting
         else:
-            data = safe_eval(qstr(editor.text()), fb.data_old) # same for now
+            data = safe_eval(qstr(editor.text()), fb.data_old, return_type="auto") # same for now
 
         model.setData(index, data)                          # store in QTableWidget
         self.parent.zpk[index.column()][index.row()] = data  # and in self.ba
