@@ -53,8 +53,8 @@ class FilterPZ_UI(QWidget):
         self.butEnable.setIconSize(q_icon_size)
         self.butEnable.setCheckable(True)
         self.butEnable.setChecked(True)
-        self.butEnable.setToolTip("<span>Show poles and zeros as an editable table."
-                " For high order systems, this might be slow.</span>")
+        self.butEnable.setToolTip("<span>Show / hide poles and zeros in an editable table."
+                " For high order systems, the table display might be slow.</span>")
 
         self.cmbPZFrmt = QComboBox(self)
         pz_formats = ['Cartesian', 'Polar']
@@ -105,7 +105,6 @@ class FilterPZ_UI(QWidget):
                                 " (only possible for Normalize = 'None').</span>")
         self.ledGain.setText(str(1.))
         self.ledGain.setObjectName("ledGain")
-#        self.ledGain.installEventFilter(self)
         
         layHGain = QHBoxLayout()
         layHGain.addWidget(self.lblNorm)
@@ -118,11 +117,11 @@ class FilterPZ_UI(QWidget):
         # UI Elements for loading / storing / manipulating cells and rows
         # ---------------------------------------------
 
-        self.cmbFilterType = QComboBox(self)
-        self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
-        self.cmbFilterType.addItems(["FIR","IIR"])
-        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+#        self.cmbFilterType = QComboBox(self)
+#        self.cmbFilterType.setObjectName("comboFilterType")
+#        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
+#        self.cmbFilterType.addItems(["FIR","IIR"])
+#        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
 
         self.butAddCells = QPushButton(self)
@@ -175,7 +174,7 @@ class FilterPZ_UI(QWidget):
                                 "to copy to/from clipboard or file.</span>")
 
         layHButtonsCoeffs1 = QHBoxLayout()
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
+#        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
         layHButtonsCoeffs1.addWidget(self.butAddCells)
         layHButtonsCoeffs1.addWidget(self.butDelCells)
         layHButtonsCoeffs1.addWidget(self.butClear)
