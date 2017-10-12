@@ -52,7 +52,7 @@ class ItemDelegate(QStyledItemDelegate):
 
     - `setEditorData()` pass data with full precision and in selected format to editor
 
-    - `setModelData()` pass edited data back to model (`self.ba`)
+    - `setModelData()` pass edited data back to model (`self.zpk`)
     """
     def __init__(self, parent):
         """
@@ -120,9 +120,10 @@ class ItemDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
-        convert it back to floating point format and store it in both the model
-        (= QTableWidget) and in self.ba. Finally, refresh the table item to 
-        display it in the selected format (via `float2frmt()`).
+        convert it to floating point format and store it in both the model
+        (= QTableWidget) and in self.zpk. Finally, refresh the table item to
+        display it in the selected format (via `to be defined`) and normalize
+        the gain.
 
         editor: instance of e.g. QLineEdit
         model:  instance of QAbstractTableModel
@@ -140,7 +141,7 @@ class ItemDelegate(QStyledItemDelegate):
             data = safe_eval(qstr(editor.text()), fb.data_old) # raw data without reformatting
         else:
             data = safe_eval(qstr(editor.text()), fb.data_old) # same for now
-            
+
         model.setData(index, data)                          # store in QTableWidget
         self.parent.zpk[index.column()][index.row()] = data  # and in self.ba
         qstyle_widget(self.parent.ui.butSave, 'changed')
@@ -399,8 +400,6 @@ class FilterPZ(QWidget):
 
         params['FMT_pz'] = int(self.ui.spnDigits.text())
 
-        # self.ui.ledGain.setVisible(self.ui.butEnable.isChecked())
-        # TODO: enable widgets here
         self.tblPZ.setVisible(self.ui.butEnable.isChecked())
         self.tblPZA.setVisible(self.ui.butEnable.isChecked())
 
@@ -452,14 +451,17 @@ class FilterPZ(QWidget):
 #------------------------------------------------------------------------------
     def load_dict(self):
         """
-        Load all entries from filter dict fb.fil[0]['zpk'] into the shadow
-        register self.zpk and update the display.
+        Load all entries from filter dict fb.fil[0]['zpk'] into the Zero/Pole/Gain list
+        self.zpk and update the display via `self._refresh_table()`.
         The explicit np.array( ... ) statement enforces a deep copy of fb.fil[0],
-        otherwise the filter dict would be modified inadvertedly. Enforcing the 
-        type np.complex is necessary, otherwise operations creating complex 
-        coefficient values (or complex user entries) create errors.
+        otherwise the filter dict would be modified inadvertedly.
 
+        The filter dict is a "normal" numpy float array for z / p / k values
+        The ZPK register `self.zpk` should be a list of float ndarrays to allow
+        for different lengths of z / p / k subarrays while adding / deleting items.?
         """
+        # TODO: check the above
+        
         self.zpk = np.array(fb.fil[0]['zpk'])# this enforces a deep copy
         qstyle_widget(self.ui.butSave, 'normal')
 
