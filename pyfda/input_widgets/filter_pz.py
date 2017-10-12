@@ -514,6 +514,7 @@ class FilterPZ(QWidget):
         self.Hmax_last = 1.0
         self.anti = False
 
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -566,6 +567,7 @@ class FilterPZ(QWidget):
             self.zpk[0] = np.append(self.zpk[0], np.zeros(-D))
 
         self._delete_PZ_pairs()
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -585,6 +587,7 @@ class FilterPZ(QWidget):
         self.zpk[0] = np.insert(self.zpk[0], row, np.zeros(sel))
         self.zpk[1] = np.insert(self.zpk[1], row, np.zeros(sel))
 
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -612,6 +615,7 @@ class FilterPZ(QWidget):
                 self.zpk[i[0]][i[1]] = self.zpk[i[0]][i[1]] * np.logical_not(
                                          np.isclose(self.zpk[i[0]][i[1]], 0., rtol=0, atol = self.eps))
         self._delete_PZ_pairs()
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
@@ -686,7 +690,7 @@ class FilterPZ(QWidget):
                 self.zpk[1] = [1]
 
         self._equalize_columns()
-
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------

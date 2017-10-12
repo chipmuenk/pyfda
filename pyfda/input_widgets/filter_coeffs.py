@@ -920,7 +920,7 @@ class FilterCoeffs(QWidget):
                 self.ba[1] = [1]
 
         self._equalize_ba_length()
-
+        qstyle_widget(self.butSave, 'changed')
         self._refresh_table()
 
 
