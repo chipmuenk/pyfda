@@ -345,6 +345,19 @@ class FilterPZ(QWidget):
                 self.ui.ledGain.setText(str(self.zpk[2]))
 
 #------------------------------------------------------------------------------
+    def _refresh_table_item(self, row, col):
+        """
+        Refresh the table item with the index `row, col` from self.zpk
+        """
+        item = self.tblPZ.item(row, col)
+        if item: # does item exist?
+            item.setText(str(self.zpk[col][row]).strip('()'))
+        else: # no, construct it:
+            self.tblPZ.setItem(row,col,QTableWidgetItem(
+                  str(self.zpk[col][row]).strip('()')))
+        self.tblPZ.item(row, col).setTextAlignment(Qt.AlignRight|Qt.AlignCenter)
+
+#------------------------------------------------------------------------------
     def _refresh_table(self):
         """
         (Re-)Create the displayed table from self.zpk with the
@@ -375,13 +388,8 @@ class FilterPZ(QWidget):
             self.tblPZ.blockSignals(True)
             for col in range(2):
                 for row in range(len(self.zpk[col])):
-                    # set table item from self.zpk and strip '()' of complex numbers
-                    item = self.tblPZ.item(row, col)
-                    if item: # does item exist?
-                        item.setText(str(self.zpk[col][row]).strip('()'))
-                    else: # no, construct it:
-                        self.tblPZ.setItem(row,col,QTableWidgetItem(
-                              str(self.zpk[col][row]).strip('()')))
+                    self._refresh_table_item(row, col)
+                        
             self.tblPZ.blockSignals(False)
 
             self.tblPZ.resizeColumnsToContents()
