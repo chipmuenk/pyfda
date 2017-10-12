@@ -18,7 +18,7 @@ from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QIcon,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
 from pyfda.pyfda_qt_lib import (qstr, qcopy_to_clipboard, qcopy_from_clipboard,
-                                qget_cmb_box)
+                                qget_cmb_box, qstyle_widget)
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
@@ -433,6 +433,7 @@ class FilterPZ(QWidget):
 
         """
         self.zpk = np.array(fb.fil[0]['zpk'])# this enforces a deep copy
+        qstyle_widget(self.ui.butSave, 'normal')
 
         if 'zpkA' in fb.fil[0]:
 
