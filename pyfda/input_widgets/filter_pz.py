@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 import sys
 from pprint import pformat
 
-from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent,
+from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QIcon,
                       QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
@@ -365,6 +365,8 @@ class FilterPZ(QWidget):
 
         if self.ui.butEnable.isChecked():
 
+            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
+
             self._restore_gain()
 
             self.tblPZ.setHorizontalHeaderLabels(["Zeros", "Poles"])
@@ -408,6 +410,8 @@ class FilterPZ(QWidget):
                 self.tblPZA.resizeRowsToContents()
                 self.tblPZA.clearSelection()
 
+        else: # disable widgets
+           self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
 
 #------------------------------------------------------------------------------
     def load_dict(self):

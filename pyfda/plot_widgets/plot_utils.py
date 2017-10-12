@@ -208,7 +208,7 @@ class MyMplToolbar(NavigationToolbar):
 #---------------- Construct Toolbar using QRC icons ---------------------------
 
         # ENABLE:
-        self.a_en = self.addAction(QIcon(':/circle-check.svg'), 'Enable Update', self.enable_update)
+        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_update)
         self.a_en.setToolTip('Enable / disable plot update')
         self.a_en.setCheckable(True)
         self.a_en.setChecked(True)
@@ -410,9 +410,9 @@ class MyMplToolbar(NavigationToolbar):
         else:
             self.enabled = not self.enabled
         if self.enabled:
-            self.a_en.setIcon(QIcon(':/circle-check.svg'))
-        else:
             self.a_en.setIcon(QIcon(':/circle-x.svg'))
+        else:
+            self.a_en.setIcon(QIcon(':/circle-check.svg'))
 
         self.a_ho.setEnabled(self.enabled)
         self.a_ba.setEnabled(self.enabled)

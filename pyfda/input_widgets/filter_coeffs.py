@@ -285,7 +285,7 @@ class FilterCoeffs(QWidget):
         # UI Elements for controlling the display
         # ---------------------------------------------
         self.butEnable = QPushButton(self)
-        self.butEnable.setIcon(QIcon(':/circle-check.svg'))
+        self.butEnable.setIcon(QIcon(':/circle-x.svg'))
         q_icon_size = self.butEnable.iconSize() # <- uncomment this for manual sizing
         self.butEnable.setIconSize(q_icon_size)
         self.butEnable.setCheckable(True)
@@ -800,7 +800,7 @@ class FilterCoeffs(QWidget):
 
         if self.butEnable.isChecked():
             self.frmQSettings.setVisible(not is_float) # hide all q-settings for float
-            self.butEnable.setIcon(QIcon(':/circle-check.svg'))
+            self.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(True)
 
             self._store_q_settings() # store updated quantization / format settings
@@ -844,7 +844,7 @@ class FilterCoeffs(QWidget):
 
         else:
             self.frmQSettings.setVisible(False)
-            self.butEnable.setIcon(QIcon(':/circle-x.svg'))
+            self.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(False)
 
 #------------------------------------------------------------------------------

@@ -48,8 +48,8 @@ class FilterPZ_UI(QWidget):
         # ---------------------------------------------
         
         self.butEnable = QPushButton(self)
-        self.butEnable.setIcon(QIcon(':/circle-check.svg'))
-        q_icon_size = self.butEnable.iconSize() # <- uncomment this for manual sizing
+        self.butEnable.setIcon(QIcon(':/circle-x.svg'))
+        q_icon_size = self.butEnable.iconSize() # <- set this for manual icon sizing
         self.butEnable.setIconSize(q_icon_size)
         self.butEnable.setCheckable(True)
         self.butEnable.setChecked(True)
