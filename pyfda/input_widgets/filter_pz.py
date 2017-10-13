@@ -264,6 +264,7 @@ class FilterPZ(QWidget):
         self.ui.butEnable.clicked.connect(self.load_dict)
 
         self.ui.butSave.clicked.connect(self._save_entries)
+        self.ui.cmbNorm.activated.connect(self._normalize_gain)
 
         self.ui.butDelCells.clicked.connect(self._delete_cells)
         self.ui.butAddCells.clicked.connect(self._add_rows)
