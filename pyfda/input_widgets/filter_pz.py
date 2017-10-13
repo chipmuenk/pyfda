@@ -30,13 +30,15 @@ from pyfda.pyfda_rc import params
 
 from .filter_pz_ui import FilterPZ_UI
 
-# TODO: correct scaling after insertion / deletion of cells
 # TODO: display P/Z in polar or cartesian format -> display text
 # TODO: order P/Z depending on frequency or magnitude
 # TODO: _equalize_PZ_length?
 # TODO: store / load gain (k) from / to clipboard
-# TODO: Save is not highlighted when something has been changed
+
+# TODO: correct scaling after insertion / deletion of cells
 # TODO: Gain needs to be disabled for option max  and 1
+# TODO: Gain scaling doesn't work anymore
+
 # TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
 # TODO: Option for limiting P/Z to a selectable magnitude
 # TODO: display SOS graphically
@@ -344,8 +346,8 @@ class FilterPZ(QWidget):
         Normalize the gain factor so that the maximum of |H(f)| stays 1 or a
         previously stored maximum value of |H(f)|. Do this every time a P or Z
         has been changed.
+        Called by setModelData() and when cmbNorm is activated
 
-        Called by _copy_item()
         """
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
@@ -414,7 +416,8 @@ class FilterPZ(QWidget):
         TODO:
         Update zpk[2]?
 
-        Called by _copy_item()
+        Called by: load_dict(), _clear_table(), _zero_PZ(), _delete_cells(), 
+                add_row(), _copy_from_clipboard()
         """
 
         params['FMT_pz'] = int(self.ui.spnDigits.text())
