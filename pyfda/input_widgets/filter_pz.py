@@ -202,10 +202,10 @@ class FilterPZ(QWidget):
         super(FilterPZ, self).__init__(parent)
 
         self.Hmax_last = 1  # initial setting for maximum gain
-        self.norm_last = "" # initial setting for previous combobox
         self.eps = 1.e-4 # tolerance value for setting P/Z to zero
 
         self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
+        self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm
         self._construct_UI() # construct the rest of the UI
 
     def _construct_UI(self):
@@ -349,6 +349,10 @@ class FilterPZ(QWidget):
         Called by setModelData() and when cmbNorm is activated
 
         """
+        norm = self.ui.cmbNorm.currentText()
+        self.ui.ledGain.setEnabled(norm == 'None')
+        if norm != self.norm_last:
+            qstyle_widget(self.ui.butSave, 'changed')
         if not np.isfinite(self.zpk[2]):
             self.zpk[2] = 1.
         self.zpk[2] = np.real_if_close(self.zpk[2]).item()
@@ -356,7 +360,6 @@ class FilterPZ(QWidget):
             logger.warning("Casting complex to real for gain k!")
             self.zpk[2] = np.abs(self.zpk[2])
 
-        norm = self.ui.cmbNorm.currentText()
         if norm != "None":
             b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2])
             [w, H] = freqz(b, a)
@@ -369,7 +372,7 @@ class FilterPZ(QWidget):
                 if norm != self.norm_last: # setting has been changed -> 'Max'
                     self.Hmax_last = Hmax # use current design to set Hmax_last
                 self.zpk[2] = self.zpk[2] / Hmax * self.Hmax_last
-            self.norm_last = norm # store current setting of combobox
+        self.norm_last = norm # store current setting of combobox
 
         self._restore_gain()
 
