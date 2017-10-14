@@ -613,7 +613,6 @@ class FilterPZ(QWidget):
         self.zpk[0] = np.insert(self.zpk[0], row, np.zeros(sel))
         self.zpk[1] = np.insert(self.zpk[1], row, np.zeros(sel))
 
-        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
