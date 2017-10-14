@@ -350,7 +350,7 @@ class FilterPZ(QWidget):
         Called by setModelData() and when cmbNorm is activated
 
         """
-        norm = self.ui.cmbNorm.currentText()
+        norm = qget_cmb_box(self.ui.cmbNorm, data=False)
         self.ui.ledGain.setEnabled(norm == 'None')
         if norm != self.norm_last:
             qstyle_widget(self.ui.butSave, 'changed')
