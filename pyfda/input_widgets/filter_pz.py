@@ -32,12 +32,7 @@ from .filter_pz_ui import FilterPZ_UI
 
 # TODO: display P/Z in polar or cartesian format -> display text
 # TODO: order P/Z depending on frequency or magnitude
-# TODO: _equalize_PZ_length?
 # TODO: store / load gain (k) from / to clipboard
-
-# TODO: correct scaling after insertion / deletion of cells
-# TODO: Gain needs to be disabled for option max  and 1
-# TODO: Gain scaling doesn't work anymore
 
 # TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
 # TODO: Option for limiting P/Z to a selectable magnitude
