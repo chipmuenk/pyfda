@@ -1259,7 +1259,8 @@ def fil_convert(fil_dict, format_in):
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
         try:
-            fil_dict['zpk'] = list(sig.tf2zpk(b,a))
+            zpk = sig.tf2zpk(b,a)
+            fil_dict['zpk'] = [zpk[0].astype(np.complex), zpk[1].astype(np.complex), zpk[2]]
         except Exception as e:
             logger.error(e)
         fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
