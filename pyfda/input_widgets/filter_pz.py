@@ -588,6 +588,7 @@ class FilterPZ(QWidget):
             self.zpk[0] = np.append(self.zpk[0], np.zeros(-D))
 
         self._delete_PZ_pairs()
+        self._normalize_gain()
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
@@ -635,6 +636,7 @@ class FilterPZ(QWidget):
                 self.zpk[i[0]][i[1]] = self.zpk[i[0]][i[1]] * np.logical_not(
                                          np.isclose(self.zpk[i[0]][i[1]], 0., rtol=0, atol = self.eps))
         self._delete_PZ_pairs()
+        self._normalize_gain()
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
