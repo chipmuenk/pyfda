@@ -17,7 +17,7 @@ from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal, QtGui,
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
-from pyfda.pyfda_lib import style_widget #HLine
+from pyfda.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params
 
 from pyfda.input_widgets import (select_filter, amplitude_specs,
@@ -228,7 +228,7 @@ class FilterSpecs(QWidget):
         self.t_specs.load_dict() # target specs
         
         fb.design_filt_state = "ok"            
-        style_widget(self.butDesignFilt, "ok")
+        qstyle_widget(self.butDesignFilt, "ok")
 
 #------------------------------------------------------------------------------
     def start_design_filt(self):
@@ -305,7 +305,7 @@ class FilterSpecs(QWidget):
 
     def color_design_button(self, state):
         fb.design_filt_state = state
-        style_widget(self.butDesignFilt, state)
+        qstyle_widget(self.butDesignFilt, state)
 
 
 #------------------------------------------------------------------------------

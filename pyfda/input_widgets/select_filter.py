@@ -20,7 +20,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
 import pyfda.pyfda_rc as rc
-from pyfda.pyfda_lib import get_cmb_box
+from pyfda.pyfda_qt_lib import qget_cmb_box
 
 
 class SelectFilter(QWidget):
@@ -105,12 +105,12 @@ class SelectFilter(QWidget):
             idx = 0
 
         self.cmbResponseType.setCurrentIndex(idx) # set initial index
-        rt = get_cmb_box(self.cmbResponseType)
+        rt = qget_cmb_box(self.cmbResponseType)
 
         for ft in fb.fil_tree[rt]:
             self.cmbFilterType.addItem(rc.ft_names[ft], ft)
         self.cmbFilterType.setCurrentIndex(0) # set initial index
-        ft = get_cmb_box(self.cmbFilterType)
+        ft = qget_cmb_box(self.cmbFilterType)
 
         for fc in fb.fil_tree[rt][ft]:
             self.cmbFilterClass.addItem(fb.fil_classes[fc]['name'], fc)
@@ -212,7 +212,7 @@ class SelectFilter(QWidget):
         filter type combo box to the old setting
         """
         # Read current setting of comboBox as string and store it in the filter dict
-        fb.fil[0]['rt'] = self.rt = get_cmb_box(self.cmbResponseType)
+        fb.fil[0]['rt'] = self.rt = qget_cmb_box(self.cmbResponseType)
 
         # Get list of available filter types for new rt
         ft_list = list(fb.fil_tree[self.rt].keys()) # explicit list() needed for Py3
@@ -244,7 +244,7 @@ class SelectFilter(QWidget):
           displayed text (e.g. "Chebychev 1") and hidden data (e.g. "cheby1")
         """
         # Read out current setting of comboBox and convert to string
-        fb.fil[0]['ft'] = self.ft = get_cmb_box(self.cmbFilterType)
+        fb.fil[0]['ft'] = self.ft = qget_cmb_box(self.cmbFilterType)
 #
         logger.debug("InputFilter.set_filter_type triggered: {0}".format(self.ft))
 
@@ -288,7 +288,7 @@ class SelectFilter(QWidget):
         - update dynamic widgets (if fc has changed and if there are any)
         - call load filter order
         """
-        fb.fil[0]['fc'] = fc = get_cmb_box(self.cmbFilterClass)
+        fb.fil[0]['fc'] = fc = qget_cmb_box(self.cmbFilterClass)
 
         if fc != self.fc_last: # fc has changed:
 

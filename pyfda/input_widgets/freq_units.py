@@ -16,7 +16,8 @@ from ..compat import (QtCore,
 
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, get_cmb_box, safe_eval
+from pyfda.pyfda_lib import rt_label, safe_eval
+from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 
@@ -198,7 +199,7 @@ class FreqUnits(QWidget):
             again.
             """
             if self.spec_edited:
-                fb.fil[0].update({'f_S':safe_eval(source.text())})
+                fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'])})
                 self._freq_range(emit_sig_range = False) # update plotting range
                 self.sigSpecsChanged.emit() # -> input_widgets
                 self.spec_edited = False # reset flag, changed entry has been saved
@@ -231,7 +232,7 @@ class FreqUnits(QWidget):
         sigUnitChanged signal
         """
 
-        rangeType = get_cmb_box(self.cmbFRange)
+        rangeType = qget_cmb_box(self.cmbFRange)
 
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
         if rangeType == 'whole':
