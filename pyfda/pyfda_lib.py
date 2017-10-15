@@ -1155,7 +1155,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
             else:
                 a = a[:D] # discard last D elements of a (only zeros anyway)
 
-        fil_dict['ba'] = [b, a]
+        fil_dict['ba'] = [b.astype(np.complex), a.astype(np.complex)]
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
