@@ -200,7 +200,7 @@ class ItemDelegate(QStyledItemDelegate):
         index:  instance of QModelIndex
         """
 #        data = qstr(index.data()) # get data from QTableWidget
-        data_str = qstr(self.parent.ba[index.column()][index.row()])
+        data_str = qstr(safe_eval(self.parent.ba[index.column()][index.row()], return_type="auto"))
 
         if self.parent.myQ.frmt == 'float':
             # floating point format: pass data with full resolution
