@@ -1077,8 +1077,6 @@ class FilterCoeffs(QWidget):
 
         self._equalize_ba_length()
         self._refresh_table()
-        qstyle_widget(self.butSave, 'changed')
-
 
 #------------------------------------------------------------------------------
     def _set_eps(self):
