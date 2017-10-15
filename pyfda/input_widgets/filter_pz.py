@@ -126,7 +126,7 @@ class ItemDelegate(QStyledItemDelegate):
         index:  instance of QModelIndex
         """
 #        data = qstr(index.data()) # get data from QTableWidget
-        data = self.parent.zpk[index.column()][index.row()] # data from self.ba
+        data = self.parent.zpk[index.column()][index.row()]
         fb.data_old = data # store old data in floating point format
         data_str = qstr(safe_eval(data, return_type="auto"))
 

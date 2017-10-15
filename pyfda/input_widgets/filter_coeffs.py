@@ -29,12 +29,15 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: Clipboard functionality: CSD data is copied with leading blanks
+# TODO: fb.data_old needed?!
+# TODO: copy back handling of complex data from filter_pz to here
 
 # TODO: Setting complex data (manually) crashes the app in setModelData():
 #    model.setData(index, data) "Type Error: Can't convert complex to float"
 #   -> need to implement a proper model-view architecture, QTableView instead of QTableWidget
 #    somewhere downstream a "" string is created from this which causes an error
 #    in safe_eval
+
 # TODO: Strip parentheses of complex argument @ setEditorData()
 
 # TODO: This ItemDelegate method displayText is called again and again when an
