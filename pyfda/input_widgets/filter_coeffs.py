@@ -161,7 +161,7 @@ class ItemDelegate(QStyledItemDelegate):
         string = qstr(text) # convert to "normal" string
 
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(string)
+            data = safe_eval(string, return_type='auto')
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.float2frmt(string),
@@ -204,7 +204,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.ba[index.column()][index.row()] # data from self.ba
         fb.data_old = data # store old data in floating point format
-        data_str = qstr(safe_eval(data))
+        data_str = qstr(safe_eval(data, return_type='auto'))
 
         if self.parent.myQ.frmt == 'float':
             # floating point format: pass data with full resolution
@@ -234,7 +234,7 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(qstr(editor.text()), fb.data_old, return_type='float') # raw data without fixpoint formatting
+            data = safe_eval(qstr(editor.text()), fb.data_old, return_type='auto') # raw data without fixpoint formatting
         else:
             data = self.parent.myQ.frmt2float(qstr(editor.text()),
                                     self.parent.myQ.frmt) # transform back to float
