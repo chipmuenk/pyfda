@@ -158,13 +158,13 @@ class ItemDelegate(QStyledItemDelegate):
         The instance parameter myQ.ovr_flag is set to +1 or -1 for positive /
         negative overflows, else it is 0.
         """
-        string = qstr(text) # convert to "normal" string
+        data_str = qstr(text) # convert to "normal" string
 
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(string, return_type='auto')
+            data = safe_eval(data_str, return_type='auto') # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.float2frmt(string),
+            return "{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
                                         self.parent.myQ.places)
 
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
