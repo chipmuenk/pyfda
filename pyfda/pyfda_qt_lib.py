@@ -382,7 +382,7 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
                 if use_header: # add the table header
                     text += table.horizontalHeaderItem(c).text() + tab
                 for r in range(num_rows):
-                    text += str(data[c][r]) + tab
+                    text += str(safe_eval(data[c][r], return_type='auto')) + tab
                 text = text.rstrip(tab) + cr
             text = text.rstrip(cr) # delete last cr
         else:  # rows are vertical
@@ -392,7 +392,7 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
                 text = text.rstrip(tab) + cr
             for r in range(num_rows):
                 for c in range(num_cols):
-                    text += str(data[c][r]) + tab
+                    text += str(safe_eval(data[c][r], return_type='auto')) + tab
                 text = text.rstrip(tab) + cr
             text = text.rstrip(cr) # delete CRLF after last row
 
