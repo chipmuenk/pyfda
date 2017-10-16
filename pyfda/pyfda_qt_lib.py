@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 import csv
 import io
 import numpy as np
-from .pyfda_lib import PY3
+from .pyfda_lib import PY3, safe_eval
 from .pyfda_rc import params 
 
 from .compat import (QFrame, QLabel, QComboBox, QDialog, QPushButton,
@@ -408,7 +408,7 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
                 for r in sel[0]:
                     item = table.item(r,0)
                     if item  and item.text() != "":
-                            text += table.itemDelegate().text(item) + tab
+                            text += table.itemDelegate().text(item).lstrip(" ") + tab
                 text = text.rstrip(tab) # remove last tab delimiter again
 
             if sel[1]: # returns False for []
@@ -440,7 +440,7 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
                         item = table.item(r,c)
                         print(c,r)
                         if item and item.text() != "":
-                            text += table.itemDelegate().text(item) + tab
+                            text += table.itemDelegate().text(item).lstrip(" ") + tab
                 text = text.rstrip(tab) + cr
             text.rstrip(cr)
 
