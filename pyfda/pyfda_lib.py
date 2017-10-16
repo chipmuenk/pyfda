@@ -274,28 +274,6 @@ def extract_file_ext(file_type):
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
 #------------------------------------------------------------------------------
-def qstr(data):
-    """
-    Convert object (QVariant, QSTring, string, number) to string.
-
-    In Python 3, python Qt objects are automatically converted to QVariant
-    when stored as "data" e.g. in a QComboBox and converted back when
-    retrieving. In Python 2, QVariant is returned when itemData is retrieved.
-    This is first converted from the QVariant container format to a
-    QString, next to a "normal" non-unicode string.
-
-    Returns:
-
-    The current text / QVariant data as a string
-    """
-    if "QVariant" in str(type(data)):
-        # Python 2: convert QVariant -> QString -> str
-        string = str(data.toString())
-    else:
-        # `data` is of type str already, is numeric or is a QString (Py3)
-        string = str(data)
-    return string
-
 
 def dB(lin, power = False):
     """
@@ -1177,7 +1155,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
             else:
                 a = a[:D] # discard last D elements of a (only zeros anyway)
 
-        fil_dict['ba'] = [b, a]
+        fil_dict['ba'] = [b.astype(np.complex), a.astype(np.complex)]
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))

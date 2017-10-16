@@ -127,9 +127,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.zpk[index.column()][index.row()]
-        fb.data_old = data # store old data in floating point format
         data_str = qstr(safe_eval(data, return_type="auto"))
-
         editor.setText(data_str)
 
     
@@ -154,9 +152,11 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if qget_cmb_box(self.parent.ui.cmbPZFrmt, data=False) == 'Cartesian':
-            data = safe_eval(qstr(editor.text()), fb.data_old, return_type="auto") # raw data without reformatting
+            data = safe_eval(qstr(editor.text()),
+                             self.parent.zpk[index.column()][index.row()], return_type="auto") # raw data without reformatting
         else:
-            data = safe_eval(qstr(editor.text()), fb.data_old, return_type="auto") # same for now
+            data = safe_eval(qstr(editor.text()),
+                             self.parent.zpk[index.column()][index.row()], return_type="auto") # same for now
 
         model.setData(index, data)                          # store in QTableWidget
         self.parent.zpk[index.column()][index.row()] = data  # and in self.ba

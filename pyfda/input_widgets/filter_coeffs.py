@@ -29,7 +29,6 @@ from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
 # TODO: Clipboard functionality: CSD data is copied with leading blanks
-# TODO: fb.data_old needed?!
 # TODO: copy back handling of complex data from filter_pz to here
 
 # TODO: Setting complex data (manually) crashes the app in setModelData():
@@ -158,13 +157,13 @@ class ItemDelegate(QStyledItemDelegate):
         The instance parameter myQ.ovr_flag is set to +1 or -1 for positive /
         negative overflows, else it is 0.
         """
-        string = qstr(text) # convert to "normal" string
+        data_str = qstr(text) # convert to "normal" string
 
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(string, return_type='auto')
+            data = safe_eval(data_str, return_type='auto') # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
         else:
-            return "{0:>{1}}".format(self.parent.myQ.float2frmt(string),
+            return "{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
                                         self.parent.myQ.places)
 
 # see: http://stackoverflow.com/questions/30615090/pyqt-using-qtextedit-as-editor-in-a-qstyleditemdelegate
@@ -194,7 +193,6 @@ class ItemDelegate(QStyledItemDelegate):
         """
         Pass the data to be edited to the editor:
         - retrieve data with full accuracy from self.ba (in float format)
-        - store data in fb.data_old in float format
         - requantize data according to settings in fixpoint object
         - represent it in the selected format (int, hex, ...)
 
@@ -202,9 +200,7 @@ class ItemDelegate(QStyledItemDelegate):
         index:  instance of QModelIndex
         """
 #        data = qstr(index.data()) # get data from QTableWidget
-        data = self.parent.ba[index.column()][index.row()] # data from self.ba
-        fb.data_old = data # store old data in floating point format
-        data_str = qstr(safe_eval(data, return_type='auto'))
+        data_str = qstr(safe_eval(self.parent.ba[index.column()][index.row()], return_type="auto"))
 
         if self.parent.myQ.frmt == 'float':
             # floating point format: pass data with full resolution
@@ -234,7 +230,8 @@ class ItemDelegate(QStyledItemDelegate):
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
         if self.parent.myQ.frmt == 'float':
-            data = safe_eval(qstr(editor.text()), fb.data_old, return_type='auto') # raw data without fixpoint formatting
+            data = safe_eval(qstr(editor.text()), 
+                             self.parent.ba[index.column()][index.row()], return_type='auto') # raw data without fixpoint formatting
         else:
             data = self.parent.myQ.frmt2float(qstr(editor.text()),
                                     self.parent.myQ.frmt) # transform back to float
@@ -1080,8 +1077,6 @@ class FilterCoeffs(QWidget):
 
         self._equalize_ba_length()
         self._refresh_table()
-        qstyle_widget(self.butSave, 'changed')
-
 
 #------------------------------------------------------------------------------
     def _set_eps(self):
