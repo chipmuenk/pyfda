@@ -387,11 +387,13 @@ class FilterPZ(QWidget):
                 self.zpk.append(1.) # use k = 1
             else:
                 logger.error("P/Z list zpk has wrong length {0}".format(len(self.zpk)))
-                
+
+            k = safe_eval(self.zpk[2], return_type='auto')
+
             if not self.ui.ledGain.hasFocus():  # no focus, round the gain
-                self.ui.ledGain.setText(str(params['FMT'].format(self.zpk[2])))
+                self.ui.ledGain.setText(str(params['FMT'].format(k)))
             else: # widget has focus, show gain with full precision
-                self.ui.ledGain.setText(str(self.zpk[2]))
+                self.ui.ledGain.setText(str(k))
 
 #------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
