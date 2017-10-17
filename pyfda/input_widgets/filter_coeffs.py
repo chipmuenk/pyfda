@@ -944,8 +944,8 @@ class FilterCoeffs(QWidget):
         the filter dict. Update the fixpoint object.
         """
         fb.fil[0]['q_coeff'] = {
-                'WI':abs(int(self.ledWI.text())),
-                'WF':abs(int(self.ledWF.text())),
+                'WI':safe_eval(self.ledWI.text(), self.myQ.WI, return_type='int'),
+                'WF':safe_eval(self.ledWF.text(), self.myQ.WF, return_type='int', sign='pos'),
                 'quant':self.cmbQuant.currentText(),
                 'ovfl':self.cmbQOvfl.currentText(),
                 'frmt':self.cmbFormat.currentText(),
