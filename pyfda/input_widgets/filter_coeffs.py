@@ -28,21 +28,14 @@ from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# TODO: Clipboard functionality: CSD data is copied with leading blanks
-# TODO: copy back handling of complex data from filter_pz to here
-
-# TODO: Setting complex data (manually) crashes the app in setModelData():
-#    model.setData(index, data) "Type Error: Can't convert complex to float"
-#   -> need to implement a proper model-view architecture, QTableView instead of QTableWidget
-#    somewhere downstream a "" string is created from this which causes an error
-#    in safe_eval
-
-# TODO: Strip parentheses of complex argument @ setEditorData()
-
+# TODO: implement checking for complex-valued filters somewhere (pyfda_lib?),
+#       h[n] detects complex data (although it isn't)
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
+# TODO: negative values for WI don't work correctly
 
 # TODO: convert to a proper Model-View-Architecture using QTableView?
+
 class ItemDelegate(QStyledItemDelegate):
     """
     The following methods are subclassed to replace display and editor of the
