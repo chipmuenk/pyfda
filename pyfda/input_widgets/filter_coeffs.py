@@ -671,11 +671,9 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
     def _WIWF_changed(self):
         """
-        Set wordlength `W` when `WI` or `WF` have been changed
+        Store values for 'WI' and 'WF' when either has been changed, 
+        update wordlength `W` accordingly and update table
         """
-        WI = safe_eval(self.ledWI.text(), self.myQ.WI, return_type='int')
-        WF = safe_eval(self.ledWF.text(), self.myQ.WF, return_type='int', sign='pos')
-        self.ledW.setText(str(WF + WI + 1))
         self._store_q_settings()
         self._refresh_table()
 
