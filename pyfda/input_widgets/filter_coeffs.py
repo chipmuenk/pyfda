@@ -933,6 +933,7 @@ class FilterCoeffs(QWidget):
 
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
+        self.ledW.setText(str(self.myQ.W))
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
@@ -951,11 +952,8 @@ class FilterCoeffs(QWidget):
                 'frmt':self.cmbFormat.currentText(),
                 'scale':self.ledScale.text()
                 }
-        self.myQ.setQobj(fb.fil[0]['q_coeff'])
+        self._load_q_settings() # update widgets and the fixpoint object self.myQ
 
-        self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
-        self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
 #------------------------------------------------------------------------------
     def _save_dict(self):
         """
