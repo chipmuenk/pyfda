@@ -358,7 +358,7 @@ class FilterPZ(QWidget):
 
         if norm != "None":
             b, a = zpk2tf(self.zpk[0], self.zpk[1], self.zpk[2])
-            [w, H] = freqz(b, a)
+            [w, H] = freqz(b, a, whole=True)
             Hmax = max(abs(H))
             if not np.isfinite(Hmax) or Hmax > 1e4 or Hmax < 1e-4:
                 Hmax = 1.
