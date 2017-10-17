@@ -30,6 +30,8 @@ import pyfda.pyfda_fix_lib as fix
 
 # TODO: implement checking for complex-valued filters somewhere (pyfda_lib?),
 #       h[n] detects complex data (although it isn't)
+# TODO: Fixpoint coefficients do not properly convert complex -> float when saving
+#       the filter?
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
@@ -1122,7 +1124,7 @@ class FilterCoeffs(QWidget):
         self._store_q_settings() # read comboboxes and store setting in filter dict
         # always save quantized coefficients in fractional format
         # -> change output format to 'float' before quantizing and storing in self.ba
-# TODO: restore value after conversion?!
+
         self.myQ.frmt = 'float'
 
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
