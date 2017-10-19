@@ -36,6 +36,8 @@ import pyfda.pyfda_fix_lib as fix
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
 
+# TODO: switching between IIR / FIR resets resets attribute "filter changed"
+
 # TODO: convert to a proper Model-View-Architecture using QTableView?
 
 class ItemDelegate(QStyledItemDelegate):
