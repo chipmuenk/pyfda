@@ -645,7 +645,8 @@ class FilterPZ(QWidget):
                 changed = True
         else:
             for i in sel: # check only selected cells
-                if np.isclose(self.zpk[i[0]][i[1]], test_val, rtol=0, atol = self.eps):
+                if np.logical_and(np.isclose(self.zpk[i[0]][i[1]], test_val, rtol=0, atol = self.eps),
+                                  (self.zpk[i[0]][i[1]] != targ_val)):
                     self.zpk[i[0]][i[1]] = targ_val
                     changed = True
 

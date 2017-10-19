@@ -1091,28 +1091,31 @@ class FilterCoeffs(QWidget):
 
         test_val = 0. # value against which array is tested
         targ_val = 0. # value which is set when condition is true
+        changed = False
 
         if not idx: # nothing selected, check whole table
-            b_0 = np.isclose(self.ba[0], test_val, rtol=0, atol=self.eps)
-            if np.any(b_0): # found at least one coeff where condition was true
-                self.ba[0] = self.ba[0] * np.logical_not(b_0)
-                qstyle_widget(self.butSave, 'changed')
+            b_close = np.logical_and(np.isclose(self.ba[0], test_val, rtol=0, atol=self.eps),
+                                    (self.ba[0] != targ_val))
+            if np.any(b_close): # found at least one coeff where condition was true
+                self.ba[0] = np.where(b_close, targ_val, self.ba[0])
+                changed = True
 
             if  fb.fil[0]['ft'] == 'IIR':
-                a_0 = np.isclose(self.ba[1], test_val, rtol=0, atol=self.eps)
-                if np.any(a_0):
-                    self.ba[1] = self.ba[1] * np.logical_not(a_0)
-                    qstyle_widget(self.butSave, 'changed')
+                a_close = np.logical_and(np.isclose(self.ba[1], test_val, rtol=0, atol=self.eps),
+                                    (self.ba[1] != targ_val))
+                if np.any(a_close):
+                    self.ba[1] = np.where(a_close, targ_val, self.ba[1])
+                    changed = True
 
         else: # only check selected cells
-            changed = False
             for i in idx:
-                if np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=self.eps):
+                if np.logical_and(np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=self.eps),
+                                  (self.ba[i[0]][i[1]] != targ_val)):
                     self.ba[i[0]][i[1]] = targ_val
                     changed = True
-            if changed:
-                # mark save button as changed
-                qstyle_widget(self.butSave, 'changed')
+        if changed:
+            qstyle_widget(self.butSave, 'changed') # mark save button as changed
+
         self._refresh_table()
 
 #------------------------------------------------------------------------------
