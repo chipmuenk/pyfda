@@ -34,7 +34,7 @@ import scipy.signal as sig
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even
+from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even, safe_eval
 
 
 # TODO: min order for Hilbert & Differentiator
@@ -83,6 +83,8 @@ is estimated using Ichige's algorithm.
 
     def __init__(self):
         QWidget.__init__(self)
+
+        self.grid_density = 16
 
         self.ft = 'FIR'
         
@@ -179,7 +181,7 @@ is estimated using Ichige's algorithm.
         self.lbl_remez_1 = QLabel("Grid Density", self)
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
         self.led_remez_1 = QLineEdit(self)
-        self.led_remez_1.setText("16")
+        self.led_remez_1.setText(str(self.grid_density))
         self.led_remez_1.setObjectName('wdg_led_remez_1')
         self.led_remez_1.setToolTip("Number of frequency points for Remez algorithm. Increase the\n"
                                     "number to reduce frequency overshoot in the transition region.")
@@ -210,7 +212,8 @@ is estimated using Ichige's algorithm.
         and converted to integer) and store parameter settings in filter 
         dictionary
         """
-        self.grid_density = int(abs(round(float(self.led_remez_1.text()))))
+        self.grid_density = safe_eval(self.led_remez_1.text(), self.grid_density, 
+                                      return_type='int', sign='pos' )
         self.led_remez_1.setText(str(self.grid_density))
 
         if not 'wdg_fil' in fb.fil[0]:
