@@ -27,7 +27,10 @@ class PlotImpz(QWidget):
         super(PlotImpz, self).__init__(parent)
 
         self.ACTIVE_3D = False
+        # initial settings for line edit widgets
         self.stim_freq = 0.02
+        self.A = 1.0
+        self.bottom = -80
         self._init_UI()
 
     def _init_UI(self):
@@ -39,8 +42,8 @@ class PlotImpz(QWidget):
 
         self.lblLogBottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
-        self.ledLogBottom.setText("-80")
-        self.ledLogBottom.setToolTip("Minimum display value for log. scale.")
+        self.ledLogBottom.setText(str(self.bottom))
+        self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbldB = QLabel("dB")
         
         self.lblPltStim = QLabel(self)
