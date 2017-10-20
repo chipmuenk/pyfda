@@ -1057,7 +1057,7 @@ def format_ticks(ax, xy, scale=1., format="%.1f"):
 
 def fil_save(fil_dict, arg, format_in, sender, convert = True):
     """
-    Save filter design ``arg`` in the format specified as ``format_in`` in
+    Save filter design ``arg`` given in the format specified as ``format_in`` in
     the dictionary ``fil_dict``. The format can be either poles / zeros / gain,
     filter coefficients (polynomes) or second-order sections.
 
@@ -1124,7 +1124,10 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
 
     elif format_in == 'ba':
         if np.ndim(arg) == 1: # arg = [b] -> FIR
-            b = np.asarray(arg)
+            # convert to type array, trim trailing zeros which correspond to
+            # (superfluous) highest order polynomial with coefficient 0 as they
+            # cause trouble when converting to zpk format
+            b = np.trim_zeros(np.asarray(arg))
             a = np.zeros(len(b))
         else: # arg = [b,a]
             b = arg[0]
@@ -1140,7 +1143,6 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         # Determine whether it's a FIR or IIR filter and set fil_dict accordingly
         # Test whether all elements except the first one are zero
         if not np.any(a[1:]):
-            #  same as:   elif np.all(a[1:] == 0)
             fil_dict['ft'] = 'FIR'
         else:
             fil_dict['ft'] = 'IIR'
@@ -1155,6 +1157,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
             else:
                 a = a[:D] # discard last D elements of a (only zeros anyway)
 
+        fil_dict['N'] = len(b) - 1 # correct filter order accordingly
         fil_dict['ba'] = [b.astype(np.complex), a.astype(np.complex)]
 
     else:

@@ -627,19 +627,33 @@ class FilterPZ(QWidget):
         Set all P/Zs = 0 with a magnitude less than eps and delete P/Z pairs
         afterwards.
         """
+        changed = False
+        targ_val = 0.
+        test_val = 0
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
-        if not sel:
-            self.zpk[0] = self.zpk[0] * np.logical_not(
-                                        np.isclose(self.zpk[0], 0., rtol=0, atol = self.eps))
-            self.zpk[1] = self.zpk[1] * np.logical_not(
-                                        np.isclose(self.zpk[1], 0., rtol=0, atol = self.eps))
+
+        if not sel: # nothing selected, check all cells
+            z_close = np.logical_and(np.isclose(self.zpk[0], test_val, rtol=0, atol = self.eps),
+                                     (self.zpk[0] != targ_val))
+            p_close = np.logical_and(np.isclose(self.zpk[1], test_val, rtol=0, atol = self.eps),
+                                     (self.zpk[1] != targ_val))
+            if z_close.any():
+                self.zpk[0] = np.where(z_close, targ_val, self.zpk[0])
+                changed = True
+            if p_close.any():
+                self.zpk[1] = np.where(p_close, targ_val, self.zpk[1])
+                changed = True
         else:
-            for i in sel:
-                self.zpk[i[0]][i[1]] = self.zpk[i[0]][i[1]] * np.logical_not(
-                                         np.isclose(self.zpk[i[0]][i[1]], 0., rtol=0, atol = self.eps))
+            for i in sel: # check only selected cells
+                if np.logical_and(np.isclose(self.zpk[i[0]][i[1]], test_val, rtol=0, atol = self.eps),
+                                  (self.zpk[i[0]][i[1]] != targ_val)):
+                    self.zpk[i[0]][i[1]] = targ_val
+                    changed = True
+
         self._delete_PZ_pairs()
         self._normalize_gain()
-        qstyle_widget(self.ui.butSave, 'changed')
+        if changed:
+            qstyle_widget(self.ui.butSave, 'changed') # mark save button as changed
         self._refresh_table()
 
 #------------------------------------------------------------------------------
