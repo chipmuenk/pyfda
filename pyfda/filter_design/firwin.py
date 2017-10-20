@@ -33,7 +33,7 @@ from importlib import import_module
 import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, remezord, round_odd
+from pyfda.pyfda_lib import fil_save, remezord, round_odd, safe_eval
 from .common import Common
 
 
@@ -220,12 +220,12 @@ class Firwin(QWidget):
         if N_args > 1 :
             self.lbl_firwin_2.setText(self.winArgs[1] + ":")
             self.firWindow = (self.fir_window_name,
-                                      float(self.led_firwin_1.text()), 
-                                      float(self.led_firwin_2.text()))
+                                      safe_eval(self.led_firwin_1.text(), return_type='float'), 
+                                      safe_eval(self.led_firwin_2.text(), return_type='float'))
         elif N_args > 0 :
             self.lbl_firwin_1.setText(self.winArgs[0] + ":")
             self.firWindow = (self.fir_window_name,
-                                      float(self.led_firwin_1.text()))
+                                      safe_eval(self.led_firwin_1.text(), return_type='float'))
         else:
             self.firWindow = self.fir_window_name
 
