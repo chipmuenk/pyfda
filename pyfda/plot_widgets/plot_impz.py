@@ -75,8 +75,8 @@ class PlotImpz(QWidget):
 
         self.ledNPoints = QLineEdit(self)
         self.ledNPoints.setText("0")
-        self.ledNPoints.setToolTip("Number of points to calculate and display.\n"
-                                   "N = 0 selects automatically.")
+        self.ledNPoints.setToolTip("<span>Number of points to calculate and display. "
+                                   "N = 0 selects automatically.</span>")
 
         layHControls = QHBoxLayout()
         
@@ -267,7 +267,9 @@ class PlotImpz(QWidget):
 
         self.f_S  = fb.fil[0]['f_S']
         
-        N = self.calc_n_points(abs(int(self.ledNPoints.text())))
+        N = self.calc_n_points(safe_eval(self.ledNPoints.text(), 0, return_type='int', sign='pos'))
+        self.ledNPoints.setText(str(N))
+
         self.A = safe_eval(self.ledAmp.text(), self.A, return_type='float')
         self.ledAmp.setText(str(self.A))
 
