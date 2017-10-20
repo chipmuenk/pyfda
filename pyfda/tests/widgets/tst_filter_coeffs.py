@@ -7,7 +7,7 @@ Created on Wed Jun 14 11:57:19 2017
 
 
 import sys
-# import unittest
+import unittest
 import pytest
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 
@@ -60,7 +60,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
     def initialize_form(self):
         """ utility function for initializing the form """
-        self.form.spnRound.setValue(4)
+        self.form.spnDigits.setValue(4)
         self.form.ledScale.setText("1.5")
         self.set_cmb_box(self.form.cmbFilterType, 'FIR')
         self.set_cmb_box(self.form.cmbFormat, 'Float')
@@ -82,7 +82,7 @@ class FilterCoeffsTest(unittest.TestCase):
 
     def test_defaults(self):
         """Test GUI setting in its default state"""
-        self.assertEqual(self.form.spnRound.value(), 4)
+        self.assertEqual(self.form.spnDigits.value(), 4)
         self.assertEqual(self.form.ledW.text(), "16")
         self.assertEqual(self.form.ledWF.text(), "0")
         self.assertEqual(self.form.ledWI.text(), "15")
@@ -160,4 +160,3 @@ if __name__=='__main__':
     unittest.main()
 
 # run tests with python -m pyfda.tests.widgets.test_filter_coeffs
-# or, using pytest: python -m pytest tests/
