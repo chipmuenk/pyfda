@@ -53,13 +53,19 @@ class PlotImpz(QWidget):
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw", "RandN", "RandU"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
-        
-        self.lblFreq = QLabel("<i>f</i>&nbsp; =", self)
 
+        self.lblAmp = QLabel("<i>A</i>&nbsp; =", self)
+        self.ledAmp = QLineEdit(self)
+        self.ledAmp.setText(str(self.A))
+        self.ledAmp.setToolTip("Stimulus amplitude.")
+        self.ledAmp.setObjectName("stimAmp")
+
+        self.lblFreq = QLabel("<i>f</i>&nbsp; =", self)
         self.ledFreq = QLineEdit(self)
         self.ledFreq.setText(str(self.stim_freq))
         self.ledFreq.setToolTip("Stimulus frequency.")
-        
+        self.ledFreq.setObjectName("stimFreq")
+
         self.lblFreqUnit = QLabel("f_S", self)
 
         self.lblNPoints = QLabel("<i>N</i>&nbsp; =", self)
@@ -87,6 +93,8 @@ class PlotImpz(QWidget):
         layHControls.addWidget(self.lblStimulus)
         layHControls.addWidget(self.cmbStimulus)
         layHControls.addStretch(2)
+        layHControls.addWidget(self.lblAmp)
+        layHControls.addWidget(self.ledAmp)
         layHControls.addWidget(self.lblFreq)
         layHControls.addWidget(self.ledFreq)
         layHControls.addWidget(self.lblFreqUnit)
@@ -115,6 +123,7 @@ class PlotImpz(QWidget):
         self.chkPltStim.clicked.connect(self.draw)
 #        self.cmbStimulus.currentIndexChanged.connect(self.draw)
         self.cmbStimulus.activated.connect(self.draw)
+        self.ledAmp.editingFinished.connect(self.draw)
         self.ledFreq.installEventFilter(self) 
 
         self.draw() # initial calculation and drawing
@@ -256,45 +265,48 @@ class PlotImpz(QWidget):
         self.f_S  = fb.fil[0]['f_S']
         
         N = self.calc_n_points(abs(int(self.ledNPoints.text())))
+        self.A = safe_eval(self.ledAmp.text(), self.A, return_type='float')
+        self.ledAmp.setText(str(self.A))
 
         t = np.linspace(0, N/self.f_S, N, endpoint=False)
         # calculate h[n]
         if stim == "Pulse":
             x = np.zeros(N)
+            x[0] = self.A # create dirac impulse as input signal
             x[0] =1.0 # create dirac impulse as input signal
             title_str = r'Impulse Response'
             H_str = r'$h[n]$'
         elif stim == "Step":
-            x = np.ones(N) # create step function
+            x = self.A * np.ones(N) # create step function
             title_str = r'Step Response'
             H_str = r'$h_{\epsilon}[n]$'
         elif stim == "StepErr":
-            x = np.ones(N) # create step function
+            x = self.A * np.ones(N) # create step function
             title_str = r'Settling Error'
             H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif stim in {"Sine", "Rect"}:
-            x = np.sin(2 * np.pi * t * float(self.ledFreq.text()))
+            x = self.A * np.sin(2 * np.pi * t * float(self.ledFreq.text()))
             if stim == "Sine":
                 title_str = r'Transient Response to Sine Signal'
                 H_str = r'$y_{\sin}[n]$'
             else:
-                x = np.sign(x)
+                x = self.A * np.sign(x)
                 title_str = r'Transient Response to Rect. Signal'
                 H_str = r'$y_{rect}[n]$'
 
         elif stim == "Saw":
-            x = sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
+            x = self.A * sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
             title_str = r'Transient Response to Sawtooth Signal'
             H_str = r'$y_{saw}[n]$'
 
         elif stim == "RandN":
-            x = np.random.randn(N)
+            x = self.A * np.random.randn(N)
             title_str = r'Transient Response to Gaussian Noise'
             H_str = r'$y_{gauss}[n]$'
 
         elif stim == "RandU":
-            x = np.random.rand(N)-0.5
+            x = self.A * (np.random.rand(N)-0.5)
             title_str = r'Transient Response to Uniform Noise'
             H_str = r'$y_{uni}[n]$'
 
