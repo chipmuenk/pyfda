@@ -149,7 +149,8 @@ class PlotImpz(QWidget):
 
         def _store_entry(source):
             if self.spec_edited:
-                self.stim_freq = safe_eval(source.text()) / fb.fil[0]['f_S']
+                self.stim_freq = safe_eval(source.text(), self.stim_freq * fb.fil[0]['f_S'],
+                                            return_type='float') / fb.fil[0]['f_S']
                 self.spec_edited = False # reset flag
                 self.draw()
                 
