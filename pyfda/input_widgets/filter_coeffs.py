@@ -36,8 +36,6 @@ import pyfda.pyfda_fix_lib as fix
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
 
-# TODO: switching between IIR / FIR resets resets attribute "filter changed"
-
 # TODO: convert to a proper Model-View-Architecture using QTableView?
 
 class ItemDelegate(QStyledItemDelegate):
@@ -351,7 +349,8 @@ class FilterCoeffs(QWidget):
 
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("Select between IIR and FIR filte for manual entry.")
+        self.cmbFilterType.setToolTip("<span>Select between IIR and FIR filter for manual entry."
+                                      "Changing the type reloads the filter from the filter dict.</span>")
         self.cmbFilterType.addItems(["FIR","IIR"])
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
