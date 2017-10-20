@@ -27,8 +27,9 @@ Version info:
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import buttord
-
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+import logging
+logger = logging.getLogger(__name__)
 
 __version__ = "2.0"
 
@@ -147,7 +148,6 @@ For scipy 0.18 and higher, more design options have been implemented
         """
         pass
 
-
         self.info_doc = []
         self.info_doc.append('bessel()\n========')
         self.info_doc.append(sig.bessel.__doc__)
@@ -159,7 +159,13 @@ For scipy 0.18 and higher, more design options have been implemented
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-        self.N     = fil_dict['N']
+
+        #in scipy, Bessel filter order is limited to 25
+        self.N = fil_dict['N'] if fil_dict['N'] < 26 else 25
+        if (fil_dict['N'] != self.N):
+            logger.warn("Bessel orders limited to 25 in scipy")
+            fil_dict['N'] = self.N
+
         self.F_PB  = fil_dict['F_PB'] * 2 # Frequencies are normalized to f_Nyq
         self.F_SB  = fil_dict['F_SB'] * 2
         self.F_PB2 = fil_dict['F_PB2'] * 2

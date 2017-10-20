@@ -208,12 +208,12 @@ class FilterFactory(object):
                 getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
-                err_string = "\nError calling method '{0}' of class '{1}':\n{2}"\
+                err_string = "Error calling method '{0}' of class '{1}':   {2}"\
                                     .format(method, type(fil_inst).__name__, e)
                 self.err_code = 18
                 
         if self.err_code > 0:
-                logger.error("Err. Code {0}:\n{1}".format(self.err_code, err_string))
+                logger.error("ErrCode {0}: {1}".format(self.err_code, err_string))
             
         return self.err_code
         
@@ -254,4 +254,4 @@ if __name__ == '__main__':
     print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fb.fil[0], fc = "cheby1"),"\n")
     
     print("LPman, fc = cheby1:", fil_factory.call_fil_method("LPman", fc = "cheby1"),"\n") # fails
-   
+

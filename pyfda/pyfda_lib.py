@@ -1198,11 +1198,24 @@ def fil_convert(fil_dict, format_in):
     """
 
     if 'sos' in format_in:
+
+        # check for bad coeffs before converting IIR filt
+        # this is the same defn used by scipy (tolerance of 1e-14)
+        if (fil_dict['ft'] == 'IIR'):
+            chk = np.asarray(fil_dict['sos'])
+            chk = np.absolute(chk)
+            nSections = chk.shape[0]
+            for section in range(nSections):
+                b1 = chk[section, :3]
+                a1 = chk[section, 3:]
+                if ((np.amin(b1)) < 1e-14 and np.amin(b1) > 0):
+                    raise ValueError('Bad coefficients, Order N is too high')
+
         if 'zpk' not in format_in:
             try:
                 fil_dict['zpk'] = list(sig.sos2zpk(fil_dict['sos']))
             except Exception as e:
-                logger.error(e)
+                raise ValueError(e)
             # check whether sos conversion has created a additional (superfluous)
             # pole and zero at the origin and delete them:
             z_0 = np.where(fil_dict['zpk'][0] == 0)[0]
@@ -1215,7 +1228,7 @@ def fil_convert(fil_dict, format_in):
             try:
                 fil_dict['ba'] = list(sig.sos2tf(fil_dict['sos']))
             except Exception as e:
-                logger.error(e)
+                raise ValueError(e)
             # check whether sos conversion has created additional (superfluous)
             # highest order polynomial with coefficient 0 and delete them
             if fil_dict['ba'][0][-1] == 0 and fil_dict['ba'][1][-1] == 0:
@@ -1228,7 +1241,7 @@ def fil_convert(fil_dict, format_in):
             try:
                 fil_dict['ba'] = sig.zpk2tf(zpk[0], zpk[1], zpk[2])
             except Exception as e:
-                logger.error(e)
+                raise ValueError(e)
         if 'sos' not in format_in:
             fil_dict['sos'] = [] # don't convert zpk -> SOS due to numerical inaccuracies
 #            try:
@@ -1243,7 +1256,7 @@ def fil_convert(fil_dict, format_in):
             zpk = sig.tf2zpk(b,a)
             fil_dict['zpk'] = [zpk[0].astype(np.complex), zpk[1].astype(np.complex), zpk[2]]
         except Exception as e:
-            logger.error(e)
+            raise ValueError(e)
         fil_dict['sos'] = [] # don't convert ba -> SOS due to numerical inaccuracies
 #        if SOS_AVAIL:
 #            try:
@@ -1564,8 +1577,8 @@ def calc_Hcomplex(fil_dict, param, wholeF):
     # standard call to signal freqz
     W, H = sig.freqz(bc, ac, worN = param, whole = wholeF) 
 
-    # test to include Anti-Causal poles/zeros
-    if ('baA' in fil_dict):
+    # test for NonCausal filter
+    if ('rpk' in fil_dict):
 
        # Grab causal, anticausal ba's from dictionary
 

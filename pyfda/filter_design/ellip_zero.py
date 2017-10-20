@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 __version__ = "2.0"
 
-filter_classes = {'EllipZeroPhz':'EllipticWZeroPhase'}
+filter_classes = {'EllipZeroPhz':'EllipZeroPhz'}
 
 class EllipZeroPhz(QWidget):
 
@@ -150,10 +150,12 @@ to be complex (no real values).
         """
         # Frequencies are normalized to f_Nyq = f_S/2, ripple specs are in dB
         self.analog = False # set to True for analog filters
-        self.N     = fil_dict['N']
+        self.manual = False # default is normal design
+        self.N     = int(fil_dict['N'])
 
         # force N to be even
-        self.N     = (self.N+1)/2*2
+        if (self.N % 2) == 1:
+            self.N += 1
         self.F_PB  = fil_dict['F_PB'] * 2
         self.F_SB  = fil_dict['F_SB'] * 2
         self.F_PB2 = fil_dict['F_PB2'] * 2
@@ -290,11 +292,9 @@ to be complex (no real values).
 
         # For min. filter order algorithms, update filter dict with calculated
         # new values for filter order N and corner frequency(s) F_PBC
-        if str(fil_dict['fo']) == 'min':
-            if (self.N%2)== 1:
-                self.N = self.N+1
-            fil_dict['N'] = self.N
 
+        fil_dict['N'] = self.N
+        if str(fil_dict['fo']) == 'min':
             if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
 #               HP or LP - single  corner frequency
                 fil_dict['F_PB'] = self.F_PBC / 2.
@@ -303,21 +303,24 @@ to be complex (no real values).
                 fil_dict['F_PB2'] = self.F_PBC[1] / 2.
 
 #       Now generate poles/residues for custom file save of new parameters
-        z = fil_dict['zpk'][0]
-        p = fil_dict['zpk'][1]
-        k = fil_dict['zpk'][2]
-        n = len(z)
-        gain, residues = self._partial (k, p, z, n)
+        if (not self.manual):
+            z = fil_dict['zpk'][0]
+            p = fil_dict['zpk'][1]
+            k = fil_dict['zpk'][2]
+            n = len(z)
+            gain, residues = self._partial (k, p, z, n)
 
-        pA, zA, gn, pC, rC = self._sqCausal (k, p, z, gain, residues, n)
-        fil_dict['rpk'] = [rC, pC, gn]
-        fil_dict['zpkA'] = [zA, pA, k]
+            pA, zA, gn, pC, rC = self._sqCausal (k, p, z, gain, residues, n)
+            fil_dict['rpk'] = [rC, pC, gn]
 
-#       save antiCausal b,a also (fil_save has stored causal b,a)
-        try:
-           fil_dict['baA'] = sig.zpk2tf(zA, pA, k)
-        except Exception as e:
-           logger.error(e)
+#           save antiCausal b,a (nonReciprocal) also [easier to compute h(n)
+            try:
+               fil_dict['baA'] = sig.zpk2tf(zA, pA, k)
+            except Exception as e:
+               logger.error(e)
+
+#       'rpk' is our signal that this is a non-Causal filter with zero phase
+#       inserted into fil dictionary after fil_save and convert
 
         self.sigFiltChanged.emit()
 
@@ -335,7 +338,7 @@ to be complex (no real values).
                                                           analog=self.analog)
 #       force even N
         if (self.N%2)== 1:
-            self.N = self.N+1
+            self.N += 1
         #logger.warning("and "+str(self.F_PBC) + " " + str(self.N))
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='low', analog=self.analog, output=self.FRMT))
@@ -343,9 +346,6 @@ to be complex (no real values).
     def LPman(self, fil_dict):
         """Elliptic LP filter, manual order"""
         self._get_params(fil_dict)
-#       force even N
-        if (self.N%2)== 1:
-            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                             btype='low', analog=self.analog, output=self.FRMT))
 
@@ -357,15 +357,13 @@ to be complex (no real values).
                                                           analog=self.analog)
 #       force even N
         if (self.N%2)== 1:
-            self.N = self.N+1
+            self.N += 1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         """Elliptic HP filter, manual order"""
         self._get_params(fil_dict)
-        if (self.N%2)== 1:
-            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
@@ -379,7 +377,7 @@ to be complex (no real values).
             [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog=self.analog)
         #logger.warning(" "+str(self.F_PBC) + " " + str(self.N))
         if (self.N%2)== 1:
-            self.N = self.N+1
+            self.N += 1
         #logger.warning("-"+str(self.F_PBC) + " " + str(self.A_SB))
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='bandpass', analog=self.analog, output=self.FRMT))
@@ -387,8 +385,6 @@ to be complex (no real values).
     def BPman(self, fil_dict):
         """Elliptic BP filter, manual order"""
         self._get_params(fil_dict)
-        if (self.N%2)== 1:
-            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB,
             [self.F_PB,self.F_PB2], btype='bandpass', analog=self.analog,
                                                             output=self.FRMT))
@@ -402,15 +398,13 @@ to be complex (no real values).
                                                         analog=self.analog)
 #       force even N
         if (self.N%2)== 1:
-            self.N = self.N+1
+            self.N += 1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='bandstop', analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         """Elliptic BS filter, manual order"""
         self._get_params(fil_dict)
-        if (self.N%2)== 1:
-            self.N = self.N+1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB,
             [self.F_PB,self.F_PB2], btype='bandstop', analog=self.analog,
                                                             output=self.FRMT))
