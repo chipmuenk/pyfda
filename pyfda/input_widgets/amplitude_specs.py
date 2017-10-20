@@ -182,6 +182,7 @@ class AmplitudeSpecs(QWidget):
             
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
+            self.qlineedit[i].setToolTip("Define amplitudes positive")
             qstyle_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels

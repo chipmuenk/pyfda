@@ -76,7 +76,9 @@ class FilterSpecs(QWidget):
         layVFrm.setContentsMargins(*params['wdg_margins'])
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
+        self.butDesignFilt.setToolTip("Design Filter with chosen specs")
         self.butQuit = QPushButton("Quit", self)
+        self.butQuit.setToolTip("Exit pyfda tool")
         layHButtons = QHBoxLayout()
         layHButtons.addWidget(self.butDesignFilt)  # <Design Filter> button
         layHButtons.addWidget(self.butQuit)        # <Quit> button
@@ -270,7 +272,7 @@ class FilterSpecs(QWidget):
 
             if err > 0:
                 if (err == 18):
-                    raise AttributeError("Freq and/or Amp specs may be too close to max.")
+                    raise AttributeError("Filter Specifications cannot be designed, please relax specs")
                 else:
                     raise AttributeError("Unknown design method.")
                 self.color_design_button("error")
@@ -300,7 +302,7 @@ class FilterSpecs(QWidget):
             if ('__doc__' in e):
                 logger.warning("start_design_filt:\n %s\n %s\n", e.__doc__, e)
             else:
-                logger.warning("start_design_filt:\n %s \n", e)
+                logger.warning("%s", e)
             self.color_design_button("error")
 
     def color_design_button(self, state):

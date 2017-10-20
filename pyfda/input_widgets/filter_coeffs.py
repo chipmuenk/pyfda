@@ -968,14 +968,13 @@ class FilterCoeffs(QWidget):
 
         self._store_q_settings()
 
-        # save, check and convert coeffs, check filter type
-        fil_save(fb.fil[0], self.ba, 'ba', __name__)
-
         if fb.fil[0]['ft'] == 'IIR':
             fb.fil[0]['fc'] = 'Manual_IIR'
         else:
             fb.fil[0]['fc'] = 'Manual_FIR'
 
+        # save, check and convert coeffs, check filter type
+        fil_save(fb.fil[0], self.ba, 'ba', __name__)
 
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test

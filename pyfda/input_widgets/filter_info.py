@@ -223,7 +223,9 @@ class FilterInfo(QWidget):
 
             bb = fb.fil[0]['ba'][0]
             aa = fb.fil[0]['ba'][1]
-            if 'baA' in fb.fil[0]:
+
+            #'rpk' means nonCausal filter
+            if 'rpk' in fb.fil[0]:
                 antiC = True
                 bbA = fb.fil[0]['baA'][0]
                 aaA = fb.fil[0]['baA'][1]
