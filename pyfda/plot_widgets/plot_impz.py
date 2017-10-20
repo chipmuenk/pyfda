@@ -269,8 +269,10 @@ class PlotImpz(QWidget):
 
         self.f_S  = fb.fil[0]['f_S']
         
-        N = self.calc_n_points(safe_eval(self.ledNPoints.text(), 0, return_type='int', sign='pos'))
-        self.ledNPoints.setText(str(N))
+        N_entry = safe_eval(self.ledNPoints.text(), 0, return_type='int', sign='pos')
+        N = self.calc_n_points(N_entry)
+        if N_entry != 0: # automatic calculation
+            self.ledNPoints.setText(str(N))
 
         self.A = safe_eval(self.ledAmp.text(), self.A, return_type='float')
         self.ledAmp.setText(str(self.A))
