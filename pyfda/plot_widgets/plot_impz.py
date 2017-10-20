@@ -54,7 +54,7 @@ class PlotImpz(QWidget):
         
         self.lblStimulus = QLabel("Type = ", self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Sine", "Rect", "Saw", "RandN", "RandU"])
+        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw", "RandN", "RandU"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
 
         self.lblAmp = QLabel("<i>A</i>&nbsp; =", self)
@@ -243,7 +243,7 @@ class PlotImpz(QWidget):
         """
         log = self.chkLog.isChecked()
         stim = str(self.cmbStimulus.currentText())
-        periodic_sig = stim in {"Sine","Rect", "Saw"}
+        periodic_sig = stim in {"Cos", "Sine","Rect", "Saw"}
         self.lblLogBottom.setVisible(log)
         self.ledLogBottom.setVisible(log)
         self.lbldB.setVisible(log)
@@ -272,13 +272,14 @@ class PlotImpz(QWidget):
         self.ledAmp.setText(str(self.A))
 
         t = np.linspace(0, N/self.f_S, N, endpoint=False)
+
+        title_str = r'Impulse Response' # default
+        H_str = r'$h[n]$' # default
+
         # calculate h[n]
         if stim == "Pulse":
             x = np.zeros(N)
             x[0] = self.A # create dirac impulse as input signal
-            x[0] =1.0 # create dirac impulse as input signal
-            title_str = r'Impulse Response'
-            H_str = r'$h[n]$'
         elif stim == "Step":
             x = self.A * np.ones(N) # create step function
             title_str = r'Step Response'
@@ -288,6 +289,12 @@ class PlotImpz(QWidget):
             title_str = r'Settling Error'
             H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
+        elif stim in {"Cos"}:
+            x = self.A * np.cos(2 * np.pi * t * float(self.ledFreq.text()))
+            if stim == "Cos":
+                title_str = r'Transient Response to Cosine Signal'
+                H_str = r'$y_{\cos}[n]$'
+
         elif stim in {"Sine", "Rect"}:
             x = self.A * np.sin(2 * np.pi * t * float(self.ledFreq.text()))
             if stim == "Sine":
