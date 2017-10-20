@@ -343,7 +343,7 @@ class File_IO(QWidget):
         """
         Save filter as zipped binary numpy array or pickle object
         """
-        file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl);;Custom rpk (*.txt)")
+        file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl);;Text file pole/residue (*.txt)")
         dlg = QFD(self)
         # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileName_(
@@ -373,7 +373,7 @@ class File_IO(QWidget):
                             self.file_dump(f)
                     else:
                         file_type_err = True
-                        logger.error('filter has no residues/poles')
+                        logger.error('filter has no residues/poles, cannot save txt file')
                 else:
                     with io.open(file_name, 'wb') as f:
                         if file_type == '.npz':

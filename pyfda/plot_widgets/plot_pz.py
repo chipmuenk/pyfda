@@ -88,12 +88,11 @@ class PlotPZ(QWidget):
         zpk = fb.fil[0]['zpk']
 
         # add antiCausals if they exist (must take reciprocal to plot)
-        if 'zpkA' in fb.fil[0]:
-            zA = fb.fil[0]['zpkA'][0]
-            zA = 1./zA
-	    # ToDo: simplify this
-            pA = fb.fil[0]['zpkA'][1]
-            pA = 1./pA
+        if 'rpk' in fb.fil[0]:
+            zA = fb.fil[0]['zpk'][0]
+            zA = np.conj(1./zA)
+            pA = fb.fil[0]['zpk'][1]
+            pA = np.conj(1./pA)
             zC = np.append(zpk[0],zA)
             pC = np.append(zpk[1],pA)
             zpk[0] = zC
@@ -101,7 +100,7 @@ class PlotPZ(QWidget):
 
         self.ax.clear()
 
-        [z, p, k] = self.zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax, verbose = False, 
+        [z,p,k] = self.zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax, verbose = False,
             mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
 
         self.ax.set_title(r'Pole / Zero Plot')
