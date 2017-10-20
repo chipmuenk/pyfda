@@ -17,7 +17,8 @@ import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import H_mag, mod_version
+from pyfda.pyfda_lib import H_mag, mod_version, safe_eval
+from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -123,7 +124,7 @@ class Plot3D(QWidget):
         self.diaAlpha.setFixedHeight(30)
         self.diaAlpha.setFixedWidth(30)
         self.diaAlpha.setWrapping(False)
-        self.diaAlpha.setToolTip("Set transparency for surf and 3D-contour plot.")
+        self.diaAlpha.setToolTip("<span>Set transparency for surf and contour plots.</span>")
 
         self.lblHatch = QLabel("Stride", self)
         self.diaHatch = QDial(self)
@@ -133,7 +134,7 @@ class Plot3D(QWidget):
         self.diaHatch.setFixedHeight(30)
         self.diaHatch.setFixedWidth(30)
         self.diaHatch.setWrapping(False)
-        self.diaHatch.setToolTip("Set hatching for H(jw).")
+        self.diaHatch.setToolTip("Set line density for various plots.")
 
         self.chkContour2D = QCheckBox("Contour2D", self)
         self.chkContour2D.setObjectName("chkContour2D")
@@ -210,6 +211,7 @@ class Plot3D(QWidget):
         self.chkContour2D.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.enable_update(state = False) # disable initially
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
 
 #------------------------------------------------------------------------------
     def _init_cmb_colormap(self):
@@ -333,11 +335,15 @@ class Plot3D(QWidget):
                 self.ledTop.setText(str(self.zmax))
         else: # finishing a lineEdit field triggered the slot
             if self.log:
-                self.zmin_dB = float(self.ledBottom.text())
-                self.zmax_dB = float(self.ledTop.text())
+                self.zmin_dB = safe_eval(self.ledBottom.text(), self.zmin_dB, return_type='float')
+                self.ledBottom.setText(str(self.zmin_dB))
+                self.zmax_dB = safe_eval(self.ledTop.text(), self.zmax_dB, return_type='float')
+                self.ledTop.setText(str(self.zmax_dB))
             else:
-                self.zmin = float(self.ledBottom.text())
-                self.zmax = float(self.ledTop.text())
+                self.zmin = safe_eval(self.ledBottom.text(), self.zmin, return_type='float')
+                self.ledBottom.setText(str(self.zmin))
+                self.zmax = safe_eval(self.ledTop.text(), self.zmax, return_type='float')
+                self.ledTop.setText(str(self.zmax))
 
         self.draw()
 
@@ -377,6 +383,12 @@ class Plot3D(QWidget):
         stride = 10 - self.diaHatch.value() 
         NL = 3 * self.diaHatch.value() + 5
         
+        surf_enabled = qget_cmb_box(self.cmbMode3D, data=False) in {'Surf', 'Contour'}
+        self.cmbColormap.setEnabled(surf_enabled)
+        self.chkColormap_r.setEnabled(surf_enabled)
+        self.chkLighting.setEnabled(surf_enabled)
+        self.chkColBar.setEnabled(surf_enabled)
+        self.diaAlpha.setEnabled(surf_enabled or self.chkContour2D.isChecked())
 
         #cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
         #scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)

@@ -54,7 +54,7 @@ class PlotPZ(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-#        self.btnWhatever.clicked.connect(self.draw)
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
 
 #------------------------------------------------------------------------------
     def _init_axes(self):

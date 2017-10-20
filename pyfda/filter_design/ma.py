@@ -35,7 +35,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, pyqtSignal, QCheckBox,
 import numpy as np
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import fil_save, fil_convert, ceil_even, ceil_odd, floor_odd
+from pyfda.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
 
 __version__ = "2.0"
 
@@ -70,7 +70,9 @@ near ``f_S/2`` (highpass).
     def __init__(self):
         QWidget.__init__(self)       
 
-        
+        self.delays = 12 # number of delays per stage
+        self.stages = 1 # number of stages
+
         self.ft = 'FIR'
 
         self.rt_dicts = ()
@@ -148,14 +150,14 @@ near ``f_S/2`` (highpass).
         try:
             self.led_delays.setText(str(fb.fil[0]['N']))
         except KeyError:
-            self.led_delays.setText("12")
+            self.led_delays.setText(str(self.delays))
         self.led_delays.setObjectName('wdg_led_ma_0')
         self.led_delays.setToolTip("Set number of delays per stage")
 
         self.lbl_stages = QLabel("<b>Stages =</ b>", self)
         self.lbl_stages.setObjectName('wdg_lbl_ma_1')
         self.led_stages = QLineEdit(self)
-        self.led_stages.setText("1")
+        self.led_stages.setText(str(self.stages))
         
         self.led_stages.setObjectName('wdg_led_ma_1')
         self.led_stages.setToolTip("Set number of stages ")
@@ -216,9 +218,9 @@ near ``f_S/2`` (highpass).
         Update UI when line edit field is changed (here, only the text is read
         and converted to integer) and resize the textfields according to content.
         """
-        self.delays = int(abs(round(float(self.led_delays.text()))))
+        self.delays = safe_eval(self.led_delays.text(), self.delays, return_type='int', sign='pos')
         self.led_delays.setText(str(self.delays))        
-        self.stages = int(abs(round(float(self.led_stages.text()))))
+        self.stages = safe_eval(self.led_stages.text(), self.stages, return_type='int', sign='pos')
         self.led_stages.setText(str(self.stages))
         
         self._store_entries()

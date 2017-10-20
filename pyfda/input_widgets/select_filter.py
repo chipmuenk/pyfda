@@ -19,6 +19,7 @@ from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFrame,
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
+from pyfda.pyfda_lib import safe_eval
 import pyfda.pyfda_rc as rc
 from pyfda.pyfda_qt_lib import qget_cmb_box
 
@@ -398,7 +399,7 @@ class SelectFilter(QWidget):
 
         # read manual filter order, convert to positive integer and store it
         # in filter dictionary.
-        ordn = int(abs(float(self.ledOrderN.text())))
+        ordn = safe_eval(self.ledOrderN.text(), fb.fil[0]['N'], return_type='int', sign='pos')
         self.ledOrderN.setText(str(ordn))
         fb.fil[0].update({'N' : ordn})
 

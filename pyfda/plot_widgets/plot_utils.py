@@ -9,7 +9,7 @@ http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-r
 """
 from __future__ import print_function, division, unicode_literals
 
-from ..compat import (QtCore, QApplication, QWidget, QLabel,
+from ..compat import (QtCore, QApplication, QWidget, QLabel, pyqtSignal,
                       QSizePolicy, QIcon, QImage, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
@@ -188,6 +188,9 @@ class MyMplToolbar(NavigationToolbar):
 
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
+
+    sigEnabled = pyqtSignal() # emitted when toolbar has been enabled / disabled
+
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
 
@@ -426,6 +429,8 @@ class MyMplToolbar(NavigationToolbar):
         self.a_sv.setEnabled(self.enabled)
         self.a_cb.setEnabled(self.enabled)
         self.a_op.setEnabled(self.enabled)
+
+        self.sigEnabled.emit()
 
 #------------------------------------------------------------------------------
     def mpl2Clip(self):
