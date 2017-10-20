@@ -320,23 +320,24 @@ class PlotImpz(QWidget):
             H_i_str = r'$\Im\{$' + H_str + '$\}$'
             H_str = r'$\Re\{$' + H_str + '$\}$'
         if log:
-            bottom = float(self.ledLogBottom.text())
+            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom, return_type='float')
+            self.ledLogBottom.setText(self.bottom)
             H_str = r'$|$ ' + H_str + '$|$ in dB'
-            h = np.maximum(20 * np.log10(abs(h)), bottom)
+            h = np.maximum(20 * np.log10(abs(h)), self.bottom)
             if self.cmplx:
-                h_i = np.maximum(20 * np.log10(abs(h_i)), bottom)
+                h_i = np.maximum(20 * np.log10(abs(h_i)), self.bottom)
                 H_i_str = r'$\log$ ' + H_i_str + ' in dB'
         else:
-            bottom = 0
+            self.bottom = 0
 
         self._init_axes()
 
 
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=bottom, markerfmt='o', label = '$h[n]$')
+        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt='o', label = '$h[n]$')
         stem_fmt = params['mpl_stimuli']
         if self.chkPltStim.isChecked():
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=bottom, label = 'Stim.', **stem_fmt)
+            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=self.bottom, label = 'Stim.', **stem_fmt)
             ms.set_mfc(stem_fmt['mfc'])
             ms.set_mec(stem_fmt['mec'])
             ms.set_ms(stem_fmt['ms'])
@@ -350,7 +351,7 @@ class PlotImpz(QWidget):
         self.ax_r.set_title(title_str)
 
         if self.cmplx:
-            [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=bottom,
+            [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=self.bottom,
                                                 markerfmt='d', label = '$h_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
