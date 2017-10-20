@@ -18,6 +18,7 @@ import scipy.signal as sig
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import H_mag, mod_version, safe_eval
+from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.plot_widgets.plot_utils import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -382,6 +383,12 @@ class Plot3D(QWidget):
         stride = 10 - self.diaHatch.value() 
         NL = 3 * self.diaHatch.value() + 5
         
+        surf_enabled = qget_cmb_box(self.cmbMode3D, data=False) in {'Surf', 'Contour'}
+        self.cmbColormap.setEnabled(surf_enabled)
+        self.chkColormap_r.setEnabled(surf_enabled)
+        self.chkLighting.setEnabled(surf_enabled)
+        self.chkColBar.setEnabled(surf_enabled)
+        self.diaAlpha.setEnabled(surf_enabled or self.chkContour2D.isChecked())
 
         #cNorm  = colors.Normalize(vmin=0, vmax=values[-1])
         #scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
