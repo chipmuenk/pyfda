@@ -123,7 +123,7 @@ class Plot3D(QWidget):
         self.diaAlpha.setFixedHeight(30)
         self.diaAlpha.setFixedWidth(30)
         self.diaAlpha.setWrapping(False)
-        self.diaAlpha.setToolTip("Set transparency for surf and 3D-contour plot.")
+        self.diaAlpha.setToolTip("<span>Set transparency for surf and contour plots.</span>")
 
         self.lblHatch = QLabel("Stride", self)
         self.diaHatch = QDial(self)
@@ -133,7 +133,7 @@ class Plot3D(QWidget):
         self.diaHatch.setFixedHeight(30)
         self.diaHatch.setFixedWidth(30)
         self.diaHatch.setWrapping(False)
-        self.diaHatch.setToolTip("Set hatching for H(jw).")
+        self.diaHatch.setToolTip("Set line density for various plots.")
 
         self.chkContour2D = QCheckBox("Contour2D", self)
         self.chkContour2D.setObjectName("chkContour2D")
