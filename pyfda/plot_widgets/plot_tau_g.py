@@ -51,6 +51,7 @@ class PlotTauG(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.chkWarnings.clicked.connect(self.draw)
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
         
 #------------------------------------------------------------------------------
     def draw(self):

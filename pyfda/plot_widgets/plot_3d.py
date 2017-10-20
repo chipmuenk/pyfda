@@ -210,6 +210,7 @@ class Plot3D(QWidget):
         self.chkContour2D.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.enable_update(state = False) # disable initially
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
 
 #------------------------------------------------------------------------------
     def _init_cmb_colormap(self):

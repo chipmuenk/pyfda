@@ -115,7 +115,7 @@ class PlotHf(QWidget):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
-        
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)        
         
 #------------------------------------------------------------------------------
     def init_axes(self):

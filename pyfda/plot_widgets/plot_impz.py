@@ -128,6 +128,7 @@ class PlotImpz(QWidget):
         self.cmbStimulus.activated.connect(self.draw)
         self.ledAmp.editingFinished.connect(self.draw)
         self.ledFreq.installEventFilter(self) 
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
 
         self.draw() # initial calculation and drawing
 

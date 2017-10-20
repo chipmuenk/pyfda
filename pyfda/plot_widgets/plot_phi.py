@@ -69,7 +69,7 @@ class PlotPhi(QWidget):
 #        #=============================================
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
-        
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)        
         
     def update_view(self):
         """
