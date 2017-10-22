@@ -213,11 +213,20 @@ class PlotImpz(QWidget):
         if self.cmplx:
             self.ax_r = self.mplwidget.fig.add_subplot(211)
             self.ax_r.clear()
+            self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_r.get_yaxis().tick_left() # remove axis ticks right
+
             self.ax_i = self.mplwidget.fig.add_subplot(212, sharex = self.ax_r)
             self.ax_i.clear()
+            self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_i.get_yaxis().tick_left() # remove axis ticks right
+
         else:
             self.ax_r = self.mplwidget.fig.add_subplot(111)
             self.ax_r.clear()
+            self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_r.get_yaxis().tick_left() # remove axis ticks right
+
 
         self.mplwidget.fig.subplots_adjust(hspace = 0.5)  
 

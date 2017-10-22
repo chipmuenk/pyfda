@@ -61,6 +61,9 @@ class PlotPhi(QWidget):
         self.setLayout(self.mplwidget.layVMainMpl)
         
         self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
+        self.ax.get_yaxis().tick_left() # remove axis ticks right
+
 
         self.draw() # initial drawing
 

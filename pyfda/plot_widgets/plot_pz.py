@@ -63,7 +63,9 @@ class PlotPZ(QWidget):
 #        self.ax = self.mplwidget.ax
         self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.clear()
-        
+        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
+        self.ax.get_yaxis().tick_left() # remove axis ticks right
+
 #------------------------------------------------------------------------------
     def update_specs(self):
         """
