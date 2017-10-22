@@ -76,7 +76,7 @@ class FilterSpecs(QWidget):
         layVFrm.setContentsMargins(*params['wdg_margins'])
 
         self.butDesignFilt = QPushButton("DESIGN FILTER", self)
-        self.butDesignFilt.setToolTip("Design Filter with chosen specs")
+        self.butDesignFilt.setToolTip("Design filter with chosen specs")
         self.butQuit = QPushButton("Quit", self)
         self.butQuit.setToolTip("Exit pyfda tool")
         layHButtons = QHBoxLayout()
@@ -272,7 +272,7 @@ class FilterSpecs(QWidget):
 
             if err > 0:
                 if (err == 18):
-                    raise AttributeError("Filter Specifications cannot be designed, please relax specs")
+                    raise AttributeError("Filter cannot be designed, please relax specifications.")
                 else:
                     raise AttributeError("Unknown design method.")
                 self.color_design_button("error")
@@ -299,7 +299,7 @@ class FilterSpecs(QWidget):
             logger.info ('Filter designed, order ' + str(fb.fil[0]['N']))
 
         except Exception as e:
-            if ('__doc__' in e):
+            if ('__doc__' in str(e)):
                 logger.warning("start_design_filt:\n %s\n %s\n", e.__doc__, e)
             else:
                 logger.warning("%s", e)

@@ -208,9 +208,12 @@ class FilterFactory(object):
                 getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
-                err_string = "Error calling method '{0}' of class '{1}':   {2}"\
+                err_string = "Error calling method '{0}' of class '{1}':\n{2}"\
                                     .format(method, type(fil_inst).__name__, e)
-                self.err_code = 18
+                if "order n is too high" in str(e).lower():
+                    self.err_code = 18
+                else: 
+                    self.err_code = 30
                 
         if self.err_code > 0:
                 logger.error("ErrCode {0}: {1}".format(self.err_code, err_string))
