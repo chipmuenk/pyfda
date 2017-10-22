@@ -16,7 +16,7 @@ from ..compat import (QtCore, Qt, QEvent, pyqtSignal,
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, safe_eval
-from pyfda.pyfda_qt_lib import qstyle_widget
+from pyfda.pyfda_qt_lib import qstyle_widget, qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 
@@ -220,7 +220,7 @@ class AmplitudeSpecs(QWidget):
         Store unit for amplitude in filter dictionary, reload amplitude spec 
         entries via load_dict and fire a sigUnitChanged signal
         """
-        fb.fil[0]['amp_specs_unit'] = str(self.cmbUnitsA.currentText())
+        fb.fil[0]['amp_specs_unit'] = qget_cmb_box(self.cmbUnitsA, data=False)
         self.load_dict()
 
         self.sigUnitChanged.emit() # -> input_widgets
