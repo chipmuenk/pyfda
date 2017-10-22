@@ -59,8 +59,8 @@ class AmplitudeSpecs(QWidget):
         self.cmbUnitsA = QComboBox(self)
         self.cmbUnitsA.addItems(amp_units)
         self.cmbUnitsA.setObjectName("cmbUnitsA")
-        self.cmbUnitsA.setToolTip("Set unit for amplitude specifications:\n"
-        "dB is attenuation (positive values)\nV and W are less than 1.")
+        self.cmbUnitsA.setToolTip("<span>Unit for amplitude specifications:"
+        " dB is attenuation (&gt; 0); levels in V and W have to be &lt; 1.</span>")
 
         # fit size dynamically to largest element:
         self.cmbUnitsA.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -164,7 +164,7 @@ class AmplitudeSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
-        state = new_labels[0]        
+        state = new_labels[0]
         new_labels = new_labels[1:]
 
 #        W_lbl = max([self.qfm.width(l) for l in new_labels]) # max. label width in pixel
@@ -176,13 +176,20 @@ class AmplitudeSpecs(QWidget):
         elif num_new_labels > self.n_cur_labels: # more new labels, create / show new ones
             self._show_entries(num_new_labels)
 
+        tool_tipp = "Amplitude specifications for filter: "
+        tool_tipp_sb = "Min. attenuation resp. maximum level in stop band"
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
-            
+
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
-            self.qlineedit[i].setToolTip("Define amplitudes positive")
+
+            if "sb" in new_labels[i].lower():
+                self.qlineedit[i].setToolTip("<span>" + tool_tipp + tool_tipp_sb + " (&gt; 0).</span>")
+            elif "pb" in new_labels[i].lower():
+                self.qlineedit[i].setToolTip("<span>" + tool_tipp +
+                              "Maximum pass band ripple (&gt; 0).<span/>")
             qstyle_widget(self.qlineedit[i], state)
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels

@@ -49,11 +49,6 @@ class TargetSpecs(QWidget):
                                 " StopBand (SB) Frequencies are maximally attenuated</span>")
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
-        self.a_specs.setToolTip("<span>Define Amplitude specs for filter;"
-                                " Amplitudes in dB (positive values), Volts/Watts less than 1;"
-                                " PassBand (PB) Amp defines ripple max in passband;"
-                                " StopBand (SB) Amp defines min attenuation in stopband</span>")
-
         self.a_specs.setVisible(True)
         """
         LAYOUT
