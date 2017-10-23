@@ -67,12 +67,12 @@ realized gain in the specified frequency bands using the **Remez** exchange algo
 The filter design algorithm is known as **Parks-McClellan** algorithm, in
 Matlab (R) it is called ``firpm``.
 
-Manual filter order design requires specifying the frequency bands (:math:`A_PB`,
-:math:`A_SB` etc.), the filter order :math:`N` and weight factors for the different
-pass and stop bands.
+Manual filter order design requires specifying the frequency bands (:math:`F_PB`,
+:math:`f_SB` etc.), the filter order :math:`N` and weight factors :math:`W_PB`,
+:math:`W_SB` etc.) for individual bands.
 
 The minimum order and the weight factors needed to fulfill the target specifications
-is estimated using Ichige's algorithm.
+is estimated from frequency and amplitude specifications using Ichige's algorithm.
 
 **Design routines:**
 
@@ -93,19 +93,19 @@ is estimated using Ichige's algorithm.
         self.rt_dict = {
             'COM': {'man': {'fo':('a', 'N'),
                             'msg':('a', 
-                                "Enter desired filter order <b><i>N</i></b>, corner "
+                                "<span>Enter desired filter order <b><i>N</i></b>, corner "
                                 "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
-                                "&nbsp; and <b><i>F<sub>SB</sub></i></b>, and a weight "
-                                "value <b><i>W</i></b>&nbsp; for each band. Amplitude specs "
-                                "are not used for the design.")
+                                "&nbsp; and <b><i>F<sub>SB</sub></i></b>&nbsp;, and relative weight "
+                                "values <b><i>W&nbsp; </i></b> (1 ... 10<sup>6</sup>) to specifiy how well "
+                                "the bands are approximated.</span>")
                             },
                     'min': {'fo':('d', 'N'),
                             'msg': ('a',
-                                "Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
+                                "<span>Enter the maximum pass band ripple <b><i>A<sub>PB</sub></i></b>, "
                                 "minimum stop band attenuation <b><i>A<sub>SB</sub></i></b> "
                                 "and the corresponding corner frequencies of pass and "
                                 "stop band(s), <b><i>F<sub>PB</sub></i></b>&nbsp; and "
-                                "<b><i>F<sub>SB</sub></i></b> .")
+                                "<b><i>F<sub>SB</sub></i></b> .</span>")
                             }
                 },
             'LP': {'man':{'wspecs': ('a','W_PB','W_SB'),
