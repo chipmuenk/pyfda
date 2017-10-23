@@ -138,12 +138,11 @@ class SelectFilter(QWidget):
         # Filter Order Subwidgets
         #----------------------------------------------------------------------
         self.lblOrder =  QLabel("<b>Order:</b>")
-        self.lblOrder.setToolTip("Set Order (#Taps) of filter.")
         self.chkMinOrder = QCheckBox("Minimum", self)
-        self.chkMinOrder.setToolTip("Design determines minimum number of taps.")
+        self.chkMinOrder.setToolTip("<span>Minimum filter order / # of taps is determined automatically.</span>")
         self.lblOrderN = QLabel("<b><i>N =</i></b>")
         self.ledOrderN = QLineEdit(str(fb.fil[0]['N']),self)
-        self.lblOrderN.setToolTip("Set Order (#Taps) Manually.")
+        self.ledOrderN.setToolTip("Filter order (# of taps - 1).")
 
         #--------------------------------------------------
         #  Layout for filter order subwidgets
