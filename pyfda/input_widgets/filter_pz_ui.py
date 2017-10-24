@@ -61,7 +61,7 @@ class FilterPZ_UI(QWidget):
         for pz in pz_formats:
             self.cmbPZFrmt.addItem(pz)
         self.cmbPZFrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbPZFrmt.setEnabled(False)
+        # self.cmbPZFrmt.setEnabled(False)
         self.cmbPZFrmt.setToolTip("<span>Set display format for poles and zeros."
                                   " At the moment, only cartesian format is enabled.</span>")
 
