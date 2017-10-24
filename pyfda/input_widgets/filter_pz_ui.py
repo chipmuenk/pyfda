@@ -57,13 +57,14 @@ class FilterPZ_UI(QWidget):
                 " For high order systems, the table display might be slow.</span>")
 
         self.cmbPZFrmt = QComboBox(self)
-        pz_formats = ['Cartesian', 'Polar']
+        pz_formats = ['Rect', 'Polar']
         for pz in pz_formats:
             self.cmbPZFrmt.addItem(pz)
         self.cmbPZFrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         # self.cmbPZFrmt.setEnabled(False)
-        self.cmbPZFrmt.setToolTip("<span>Set display format for poles and zeros."
-                                  " At the moment, only cartesian format is enabled.</span>")
+        self.cmbPZFrmt.setToolTip("<span>Set display format for poles and zeros to"
+                                  " either rectangular, x + jy, or polar, r * exp(j&Omega;)"
+                                  " (not editable yet).</span>")
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0,16)
