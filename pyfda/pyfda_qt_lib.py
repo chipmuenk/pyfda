@@ -319,28 +319,15 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
             Instance of QTableWidget
             
     data:   object
-            Instance of the variable containing table data
+            Instance of the numpy variable containing table data
             
     target: object
             Target where the data is being copied to. If the object is a QClipboard
             instance, copy the text there, otherwise simply return the text.
             
     frmt: string
-            Expected number format: 'float' (default), 'hex', ...
-    
-    tab : String (default: "\t")
-          Tabulator character for separating columns
-          
-    cr : String (default: CRLF, as determined by pyfda_lib)
-            Line termination character for separating rows. When nothing is selected,
-            the character is selected depending on the operating system:
-            Windows: Carriage return + line feed
-            MacOS  : Carriage return
-            *nix   : Line feed
-            
-    orientation : Boolean
-            When `vert` (default), generate the table in "vertical" shape,
-            i.e. with one or two columns with coefficient data
+           when frmt='float', copy data from model, otherwise from the view 
+           using the tables itemDelegate() methods.
     """
 
     text = ""
@@ -368,14 +355,16 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
 
     sel = qget_selected(table, reverse=False)['sel']
 
-    # when nothing is selected, select whole table for fixpoint (non-float) formats
-    # otherwise, data would be copied from the raw data, not from the view (= table)    
+    #============================================================================
+    # Nothing selected, but cell format is non-float: 
+    # -> select whole table, copy all cells further down below:
+    #============================================================================
     if not np.any(sel) and frmt != 'float':
         sel = qget_selected(table, reverse=False, select_all = True)['sel']
 
-    #=======================================================================
-    # Nothing selected, copy complete table
-    #=======================================================================
+    #============================================================================
+    # Nothing selected, copy complete table from the model (data) in float format:
+    #============================================================================
     if not np.any(sel): 
         if orientation_horiz: # rows are horizontal
             for c in range(num_cols):
@@ -384,7 +373,7 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
                 for r in range(num_rows):
                     text += str(safe_eval(data[c][r], return_type='auto')) + tab
                 text = text.rstrip(tab) + cr
-            text = text.rstrip(cr) # delete last cr
+            text = text.rstrip(cr) # delete last CR
         else:  # rows are vertical
             if use_header: # add the table header
                 for c in range(num_cols):
@@ -394,12 +383,12 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
                 for c in range(num_cols):
                     text += str(safe_eval(data[c][r], return_type='auto')) + tab
                 text = text.rstrip(tab) + cr
-            text = text.rstrip(cr) # delete CRLF after last row
+            text = text.rstrip(cr) # delete CR after last row
 
     #=======================================================================
-    # Copy only selected cells
+    # Copy only selected cells in displayed format:
     #=======================================================================
-    else: # copy only selected cells in displayed format
+    else:
         if orientation_horiz: # horizontal orientation, one or two rows
             print("sel:", np.shape(sel), sel)
             if use_header: # add the table header
@@ -443,8 +432,6 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
                             text += table.itemDelegate().text(item).lstrip(" ") + tab
                 text = text.rstrip(tab) + cr
             text.rstrip(cr)
-
-        print("qcopy_to_clipboard\n", text)
 
     if "clipboard" in str(target.__class__.__name__).lower():
         target.setText(text)
