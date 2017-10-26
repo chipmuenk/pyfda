@@ -145,13 +145,18 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if qget_cmb_box(self.parent.ui.cmbPZFrmt, data=False) == 'Cartesian':
-            data = safe_eval(qstr(editor.text()),
-                             self.parent.zpk[index.column()][index.row()], return_type="auto") # raw data without reformatting
-        else:
-            data = safe_eval(qstr(editor.text()),
-                             self.parent.zpk[index.column()][index.row()], return_type="auto") # same for now
 
+# =============================================================================
+#         if qget_cmb_box(self.parent.ui.cmbPZFrmt) == 'cartesian':
+#             data = safe_eval(qstr(editor.text()),
+#                              self.parent.zpk[index.column()][index.row()], return_type="auto") # raw data without reformatting
+#         else:
+#             data = safe_eval(qstr(editor.text()),
+#                              self.parent.zpk[index.column()][index.row()], return_type="auto") # same for now
+# 
+# =============================================================================
+
+        data = self.parent.frmt2float(qstr(editor.text()))
         model.setData(index, data)                          # store in QTableWidget
         self.parent.zpk[index.column()][index.row()] = data  # and in self.ba
         qstyle_widget(self.parent.ui.butSave, 'changed')
@@ -644,6 +649,30 @@ class FilterPZ(QWidget):
         else:
             logger.error("Unknown format {0}.".format(frmt))
     #------------------------------------------------------------------------------
+    def frmt2float(self, text):
+        """
+        Convert format defined by cmbPZFrmt to float (real or complex) 
+        """
+        if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
+            return safe_eval(qstr(text.strip()), return_type='auto')
+        else:
+            polar_str = qstr(text).split(self.angle_char, maxsplit=1)
+            if len(polar_str) < 2:
+                r = safe_eval(text.strip(" ∠°"), return_type='auto')
+                x = r.real
+                y = r.imag
+            else:
+                r = safe_eval(polar_str[0].strip())
+                if "°" in polar_str[1]:
+                    scale = np.pi / 180. # angle in degrees
+                else:
+                    scale = 1. # angle in rad
+                phi = safe_eval(polar_str[1].strip(" ∠°rad")) * scale
+                x = r * np.cos(phi)
+                y = r * np.sin(phi)
+            return x + 1j * y
+
+        #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
@@ -658,7 +687,7 @@ class FilterPZ(QWidget):
         """
         clp_str = qcopy_from_clipboard(self.clipboard)
         
-        conv = self._to_cartesian # routine for converting to cartesian coordinates
+        conv = self.frmt2float # routine for converting to cartesian coordinates
 
         if np.ndim(clp_str) > 1:
             num_cols, num_rows = np.shape(clp_str)
