@@ -89,15 +89,9 @@ class ItemDelegate(QStyledItemDelegate):
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
-
         """
-        string = qstr(text) # convert to "normal" string
-
-        if True:
-            data = safe_eval(string, return_type='auto')
-            return "{0:.{1}g}".format(data, params['FMT_pz'])
-        else:
-            pass
+        
+        return self.parent.float2frmt(text)
 
     def createEditor(self, parent, options, index):
         """
@@ -127,7 +121,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.zpk[index.column()][index.row()]
-        data_str = qstr(safe_eval(data, return_type="auto"))
+        data_str = self.parent.float2frmt(data)# qstr(safe_eval(data, return_type="auto"))
         editor.setText(data_str)
 
     
@@ -198,6 +192,7 @@ class FilterPZ(QWidget):
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.eps = 1.e-4 # tolerance value for setting P/Z to zero
+        self.angle_char = "∠" # character used to indicate angle
 
         self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm
@@ -238,6 +233,7 @@ class FilterPZ(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        self.ui.cmbPZFrmt.activated.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
         self.ui.butLoad.clicked.connect(self.load_dict)
         self.ui.butEnable.clicked.connect(self.load_dict)
@@ -625,18 +621,28 @@ class FilterPZ(QWidget):
             self.zpk[1] = np.append(self.zpk[1], 0.)
 
     #------------------------------------------------------------------------------
-    def _to_cartesian(self, string):
+    def float2frmt(self, text):
         """
-        Convert input to cartesian format depending on the setting of cmbPZFrmt
+        Convert number "text" (real or complex or string) to the format defined 
+        by cmbPZFrmt.
+        
+        Returns: 
+            string
         """
-        if qget_cmb_box(self.ui.cmbPZFrmt) == 'Cartesian':
-            # TODO: Type is not recognized correctly
-            cmplx = np.array(string)
-            return cmplx.astype(np.complex)
+        # convert to "normal" string and prettify via safe_eval:
+        data = safe_eval(qstr(text), return_type='auto')
+        frmt = qget_cmb_box(self.ui.cmbPZFrmt) # get selected format
+        
+        if frmt == 'cartesian' or not (type(data) == complex):
+            return "{0:.{1}g}".format(data, params['FMT_pz'])
+        elif frmt == 'polar_rad':
+            r, phi = np.absolute(data), np.angle(data, deg=False)
+            return "{0:.{2}g}; {3}{1:.{2}g} rad".format(r, phi, params['FMT_pz'], self.angle_char)
+        elif frmt == 'polar_deg':
+            r, phi = np.absolute(data), np.angle(data, deg=True)
+            return "{0:.{2}g}; ∠{1:.{2}g} °".format(r, phi, params['FMT_pz'])
         else:
-            cmplx = np.array(string)
-            return cmplx.astype(np.complex)
-
+            logger.error("Unknown format {0}.".format(frmt))
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
