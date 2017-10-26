@@ -358,7 +358,7 @@ class PlotImpz(QWidget):
             H_str = r'$\Re\{$' + H_str + '$\}$'
         if log:
             self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom, return_type='float')
-            self.ledLogBottom.setText(self.bottom)
+            self.ledLogBottom.setText(str(self.bottom))
             H_str = r'$|$ ' + H_str + '$|$ in dB'
             h = np.maximum(20 * np.log10(abs(h)), self.bottom)
             if self.cmplx:
@@ -368,7 +368,6 @@ class PlotImpz(QWidget):
             self.bottom = 0
 
         self._init_axes()
-
 
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt='o', label = '$h[n]$')
