@@ -42,6 +42,7 @@ class InputTabWidgets(QWidget):
 
         self.filter_specs = filter_specs.FilterSpecs(self)
         self.filter_specs.setObjectName("filter_specs")
+
         self.file_io = file_io.File_IO(self)
         self.file_io.setObjectName("inputFiles")
         self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
@@ -50,6 +51,7 @@ class InputTabWidgets(QWidget):
         self.filter_pz.setObjectName("filter_pz")
         self.filter_info = filter_info.FilterInfo(self)
         self.filter_info.setObjectName("filter_info")
+
         if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs(self)
 
@@ -62,10 +64,16 @@ class InputTabWidgets(QWidget):
         tabWidget.setObjectName("input_tabs")
 
         tabWidget.addTab(self.filter_specs, 'Specs')
-        tabWidget.addTab(self.file_io, 'Files')
+        tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         tabWidget.addTab(self.filter_coeffs, 'b,a')
+        tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
         tabWidget.addTab(self.filter_pz, 'P/Z')
+        tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
+        tabWidget.addTab(self.file_io, 'Files')
+        tabWidget.setTabToolTip(3, "Import and export filter designs and coefficients.")
         tabWidget.addTab(self.filter_info, 'Info')
+        tabWidget.setTabToolTip(4, "<span>Display the achieved filter specifications"
+                                   " and more info about the filter design algorithm.</span>")        
         if HAS_MYHDL:
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
