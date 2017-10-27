@@ -925,15 +925,15 @@ class FilterCoeffs(QWidget):
         load the quantization settings from the filter dict and set the widgets
         accordingly. Update the fixpoint object.
         """
-        q_coeff = fb.fil[0]['q_coeff']
+        self.myQ.setQobj(fb.fil[0]['q_coeff'])
+        q_coeff = self.myQ.q_obj
+
         self.ledWI.setText(str(q_coeff['WI']))
         self.ledWF.setText(str(q_coeff['WF']))
         qset_cmb_box(self.cmbQuant, q_coeff['quant'])
         qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
         self.ledScale.setText(str(q_coeff['scale']))
-
-        self.myQ.setQobj(fb.fil[0]['q_coeff'])
 
         self.ledW.setText(str(self.myQ.W))
         self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
