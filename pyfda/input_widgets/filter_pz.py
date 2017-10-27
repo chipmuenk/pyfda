@@ -11,6 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import sys
+import re
 from pprint import pformat
 
 from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QIcon,
@@ -30,11 +31,10 @@ from pyfda.pyfda_rc import params
 
 from .filter_pz_ui import FilterPZ_UI
 
-# TODO: display P/Z in polar or cartesian format -> display text
-# TODO: order P/Z depending on frequency or magnitude
+# TODO: sort P/Z depending on frequency, magnitude, real or imag. part
 # TODO: store / load gain (k) from / to clipboard
 
-# TODO: Option for mirroring P/Z (w/ and without copying) along the UC or the x-axis
+# TODO: Option for mirroring P/Z (w/ and without copying) at the UC or the x-axis
 # TODO: Option for limiting P/Z to a selectable magnitude
 # TODO: display SOS graphically
 
@@ -89,15 +89,9 @@ class ItemDelegate(QStyledItemDelegate):
 
         text:   string / QVariant from QTableWidget to be rendered
         locale: locale for the text
-
         """
-        string = qstr(text) # convert to "normal" string
-
-        if True:
-            data = safe_eval(string, return_type='auto')
-            return "{0:.{1}g}".format(data, params['FMT_pz'])
-        else:
-            pass
+        
+        return self.parent.cmplx2frmt(text)
 
     def createEditor(self, parent, options, index):
         """
@@ -127,7 +121,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.zpk[index.column()][index.row()]
-        data_str = qstr(safe_eval(data, return_type="auto"))
+        data_str = self.parent.cmplx2frmt(data)# qstr(safe_eval(data, return_type="auto"))
         editor.setText(data_str)
 
     
@@ -151,13 +145,10 @@ class ItemDelegate(QStyledItemDelegate):
 #            model.setData(index, editor.currentText())
 #        else:
 #            super(ItemDelegate, self).setModelData(editor, model, index)
-        if qget_cmb_box(self.parent.ui.cmbPZFrmt, data=False) == 'Cartesian':
-            data = safe_eval(qstr(editor.text()),
-                             self.parent.zpk[index.column()][index.row()], return_type="auto") # raw data without reformatting
-        else:
-            data = safe_eval(qstr(editor.text()),
-                             self.parent.zpk[index.column()][index.row()], return_type="auto") # same for now
 
+        # convert entered string to complex, pass the old value as default
+        data = self.parent.frmt2cmplx(qstr(editor.text()), 
+                                      self.parent.zpk[index.column()][index.row()])
         model.setData(index, data)                          # store in QTableWidget
         self.parent.zpk[index.column()][index.row()] = data  # and in self.ba
         qstyle_widget(self.parent.ui.butSave, 'changed')
@@ -198,6 +189,7 @@ class FilterPZ(QWidget):
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.eps = 1.e-4 # tolerance value for setting P/Z to zero
+        self.angle_char = "∠" # character used to indicate angle
 
         self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm
@@ -238,6 +230,7 @@ class FilterPZ(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        self.ui.cmbPZFrmt.activated.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
         self.ui.butLoad.clicked.connect(self.load_dict)
         self.ui.butEnable.clicked.connect(self.load_dict)
@@ -625,19 +618,75 @@ class FilterPZ(QWidget):
             self.zpk[1] = np.append(self.zpk[1], 0.)
 
     #------------------------------------------------------------------------------
-    def _to_cartesian(self, string):
+    def cmplx2frmt(self, text):
         """
-        Convert input to cartesian format depending on the setting of cmbPZFrmt
+        Convert number "text" (real or complex or string) to the format defined 
+        by cmbPZFrmt.
+        
+        Returns: 
+            string
         """
-        if qget_cmb_box(self.ui.cmbPZFrmt) == 'Cartesian':
-            # TODO: Type is not recognized correctly
-            cmplx = np.array(string)
-            return cmplx.astype(np.complex)
+        # convert to "normal" string and prettify via safe_eval:
+        data = safe_eval(qstr(text), return_type='auto')
+        frmt = qget_cmb_box(self.ui.cmbPZFrmt) # get selected format
+        
+        if frmt == 'cartesian' or not (type(data) == complex):
+            return "{0:.{1}g}".format(data, params['FMT_pz'])
+        elif frmt == 'polar_rad':
+            r, phi = np.absolute(data), np.angle(data, deg=False)
+            return "{0:.{2}g} * {3}{1:.{2}g} rad".format(r, phi, params['FMT_pz'], self.angle_char)
+        elif frmt == 'polar_deg':
+            r, phi = np.absolute(data), np.angle(data, deg=True)
+            return "{0:.{2}g} * {3}{1:.{2}g}°".format(r, phi, params['FMT_pz'], self.angle_char)
         else:
-            cmplx = np.array(string)
-            return cmplx.astype(np.complex)
+            logger.error("Unknown format {0}.".format(frmt))
 
     #------------------------------------------------------------------------------
+    def frmt2cmplx(self, text, default=0.):
+        """
+        Convert format defined by cmbPZFrmt to real or complex
+        """
+        conv_error = False
+        text = qstr(text.replace(" ", "")) # convert to "proper" string without blanks
+        if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
+            return safe_eval(text, default, return_type='auto')
+        else:
+            if "<" in text:
+                polar_str = text.split('*' + "<", maxsplit=1)
+            else:
+                polar_str = text.split('*' + self.angle_char, maxsplit=1)
+            if len(polar_str) < 2: # input is real or imaginary
+                r = safe_eval(re.sub('∠°','', text), default, return_type='auto')
+                x = r.real
+                y = r.imag
+            else:
+                r = safe_eval(polar_str[0], "1.18j", return_type='auto')
+                if r == 1.18j:
+                    conv_error = True # dirty hack to test whether conversion has failed
+                else:
+                    r = np.abs(r)
+
+                if "°" in polar_str[1]:
+                    scale = np.pi / 180. # angle in degrees
+                else:
+                    scale = 1. # angle in rad
+                polar_str[1] = re.sub('[<∠°]|rad', '', polar_str[1])
+                phi = safe_eval(polar_str[1], "12.7j", return_type='auto') * scale
+                if phi == 12.7j:
+                    conv_error = True # same dirty hack as above
+                else:
+                    phi = phi.real # just in case ...
+
+                if not conv_error:
+                    x = r * np.cos(phi)
+                    y = r * np.sin(phi)
+                else:
+                    x = default.real
+                    y = default.imag
+                    logger.error("Expression {0} could not be evaluated.".format(text))
+            return x + 1j * y
+
+        #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
@@ -652,7 +701,7 @@ class FilterPZ(QWidget):
         """
         clp_str = qcopy_from_clipboard(self.clipboard)
         
-        conv = self._to_cartesian # routine for converting to cartesian coordinates
+        conv = self.frmt2cmplx # routine for converting to cartesian coordinates
 
         if np.ndim(clp_str) > 1:
             num_cols, num_rows = np.shape(clp_str)
