@@ -64,7 +64,8 @@ class FilterPZ_UI(QWidget):
         self.cmbPZFrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         # self.cmbPZFrmt.setEnabled(False)
         self.cmbPZFrmt.setToolTip("<span>Set display format for poles and zeros to"
-                                  " either cartesian [x + jy] or polar [r * exp(j&Omega;)]</span>")
+                                  " either cartesian (x + jy) or polar (r * &ang; &Omega;)."
+                                  " You can also use '&lt;' for entering the angle.</span>")
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0,16)
