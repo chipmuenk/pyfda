@@ -91,7 +91,10 @@ class ItemDelegate(QStyledItemDelegate):
         locale: locale for the text
         """
         
-        return self.parent.cmplx2frmt(text)
+        return self.parent.cmplx2frmt(text, places=params['FMT_pz'])
+        #r, phi = np.absolute(data), np.angle(data, deg=False)
+        #return "{0:.{2}g} * {3}{1:.{2}g} rad".format(r, phi, params['FMT_pz'], self.angle_char)
+
 
     def createEditor(self, parent, options, index):
         """
@@ -119,7 +122,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
 #        data = qstr(index.data()) # get data from QTableWidget
         data = self.parent.zpk[index.column()][index.row()]
-        data_str = self.parent.cmplx2frmt(data)# qstr(safe_eval(data, return_type="auto"))
+        data_str = self.parent.cmplx2frmt(data, places=-1)# qstr(safe_eval(data, return_type="auto"))
         editor.setText(data_str)
 
     
@@ -616,7 +619,7 @@ class FilterPZ(QWidget):
             self.zpk[1] = np.append(self.zpk[1], 0.)
 
     #------------------------------------------------------------------------------
-    def cmplx2frmt(self, text):
+    def cmplx2frmt(self, text, places=-1):
         """
         Convert number "text" (real or complex or string) to the format defined 
         by cmbPZFrmt.
@@ -627,15 +630,36 @@ class FilterPZ(QWidget):
         # convert to "normal" string and prettify via safe_eval:
         data = safe_eval(qstr(text), return_type='auto')
         frmt = qget_cmb_box(self.ui.cmbPZFrmt) # get selected format
-        
+
+        if places == -1:
+            full_prec = True
+        else:
+            full_prec = False
+
         if frmt == 'cartesian' or not (type(data) == complex):
-            return "{0:.{1}g}".format(data, params['FMT_pz'])
+            if full_prec:
+                return "{0}".format(data)
+            else:
+                return "{0:.{plcs}g}".format(data, plcs=places)
+
         elif frmt == 'polar_rad':
             r, phi = np.absolute(data), np.angle(data, deg=False)
-            return "{0:.{2}g} * {3}{1:.{2}g} rad".format(r, phi, params['FMT_pz'], self.angle_char)
+            if full_prec:
+                return "{r} * {angle_char}{p} rad"\
+                    .format(r=r, p=phi, angle_char=self.angle_char)
+            else:
+                return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g} rad"\
+                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+
         elif frmt == 'polar_deg':
             r, phi = np.absolute(data), np.angle(data, deg=True)
-            return "{0:.{2}g} * {3}{1:.{2}g}°".format(r, phi, params['FMT_pz'], self.angle_char)
+            if full_prec:
+                return "{r} * {angle_char}{p}°"\
+                    .format(r=r, p=phi, angle_char=self.angle_char)
+            else:
+                return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g}°"\
+                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+
         else:
             logger.error("Unknown format {0}.".format(frmt))
 
