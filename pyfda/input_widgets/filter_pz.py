@@ -111,10 +111,8 @@ class ItemDelegate(QStyledItemDelegate):
     def setEditorData(self, editor, index):
         """
         Pass the data to be edited to the editor:
-        - retrieve data with full accuracy from self.ba (in float format)
-        - store data in fb.data_old in float format
-        - requantize data according to settings in fixpoint object
-        - represent it in the selected format (int, hex, ...)
+        - retrieve data with full accuracy (`places=-1`) from `zpk` (in float format)
+        - represent it in the selected format (Cartesian, polar, ...)
 
         editor: instance of e.g. QLineEdit
         index:  instance of QModelIndex
@@ -129,7 +127,7 @@ class ItemDelegate(QStyledItemDelegate):
         """
         When editor has finished, read the updated data from the editor,
         convert it to floating point format and store it in both the model
-        (= QTableWidget) and in self.zpk. Finally, refresh the table item to
+        (= QTableWidget) and in `zpk`. Finally, refresh the table item to
         display it in the selected format (via `to be defined`) and normalize
         the gain.
 
