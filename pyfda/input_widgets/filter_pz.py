@@ -187,7 +187,7 @@ class FilterPZ(QWidget):
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.eps = 1.e-4 # tolerance value for setting P/Z to zero
-        self.angle_char = "∠" # character used to indicate angle
+        self.angle_char = "<" # character used to indicate angle, "∠" gives problems with some encodings
 
         self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm
@@ -649,12 +649,9 @@ class FilterPZ(QWidget):
         if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
             return safe_eval(text, default, return_type='auto')
         else:
-            if "<" in text:
-                polar_str = text.split('*' + "<", maxsplit=1)
-            else:
-                polar_str = text.split('*' + self.angle_char, maxsplit=1)
+            polar_str = text.split('*' + self.angle_char, maxsplit=1)
             if len(polar_str) < 2: # input is real or imaginary
-                r = safe_eval(re.sub('∠°','', text), default, return_type='auto')
+                r = safe_eval(re.sub('['+self.angle_char+'<∠°]','', text), default, return_type='auto')
                 x = r.real
                 y = r.imag
             else:
@@ -668,7 +665,7 @@ class FilterPZ(QWidget):
                     scale = np.pi / 180. # angle in degrees
                 else:
                     scale = 1. # angle in rad
-                polar_str[1] = re.sub('[<∠°]|rad', '', polar_str[1])
+                polar_str[1] = re.sub('['+self.angle_char+'<∠°]|rad', '', polar_str[1])
                 phi = safe_eval(polar_str[1], "12.7j", return_type='auto') * scale
                 if phi == 12.7j:
                     conv_error = True # same dirty hack as above
