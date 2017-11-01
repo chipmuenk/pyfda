@@ -418,11 +418,8 @@ class PlotHf(QWidget):
         (Re-)Calculate the complex frequency response H(f)
         """
 
-        # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
-        w, h = calc_Hcomplex (fb.fil[0], params['N_FFT'], True)
-
-        self.W = w
-        self.H_cplx = h
+        # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
+        self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], True)
 
 #------------------------------------------------------------------------------
     def draw(self):
@@ -485,18 +482,22 @@ class PlotHf(QWidget):
 
         f_lim = fb.fil[0]['freqSpecsRange']
 
-        # shift, scale and select frequency range to be displayed:
-        # W -> F, H_cplx -> H_c
-        self.H_c = self.H_cplx
+        #========= select frequency range to be displayed =====================
+        #=== shift, scale and select: W -> F, H_cplx -> H_c
         self.F = self.W / (2 * np.pi) * self.f_S
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-            self.H_c = np.fft.fftshift(self.H_cplx)
+            # shift H and F by f_S/2
+            self.H_c = np.fft.fftshift(self.H_cmplx)
             self.F -= self.f_S/2.
         elif fb.fil[0]['freqSpecsRangeType'] == 'half':
-            self.H_c = self.H_cplx[0:params['N_FFT']//2]
+            # only use the first half of H and F
+            self.H_c = self.H_cmplx[0:params['N_FFT']//2]
             self.F = self.F[0:params['N_FFT']//2]
-
+        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+            # use H and F as calculated
+            self.H_c = self.H_cmplx
+            
         # now calculate mag / real / imaginary part of H_c:
         if self.linphase: # remove the linear phase
             self.H_c = self.H_c * np.exp(1j * self.W[0:len(self.F)] * fb.fil[0]["N"]/2.)
@@ -511,15 +512,11 @@ class PlotHf(QWidget):
             H = self.H_c.imag
             H_str = r'$\Im \{H(\mathrm{e}^{\mathrm{j} \Omega})\}$'
 
-
-        # clear the axes and (re)draw the plot
+        #================ Main Plotting Routine =========================
+        #===  clear the axes and (re)draw the plot (if selectable)
         if self.ax.get_navigate():
-
             self.ax.clear()
 
-            #================ Main Plotting Routine =========================
-            
-                                                
             if self.unitA == 'dB':
                 A_lim = [20*np.log10(A_min) -10, 20*np.log10(1+A_max) +1]
                 self.H_plt = 20*np.log10(abs(H))
@@ -538,8 +535,10 @@ class PlotHf(QWidget):
             self.ax.plot(self.F, self.H_plt, label = 'H(f)')
             self.draw_phase(self.ax)
             #-----------------------------------------------------------
-
-            if self.specs: self.plot_spec_limits(self.ax)
+            
+            #============= Set Limits and draw specs =========================
+            if self.specs: 
+                self.plot_spec_limits(self.ax)
 
             #     self.ax_bounds = [self.ax.get_ybound()[0], self.ax.get_ybound()[1]]#, self.ax.get]
             self.ax.set_xlim(f_lim)
@@ -557,7 +556,6 @@ class PlotHf(QWidget):
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
-
 
 #------------------------------------------------------------------------------
 
