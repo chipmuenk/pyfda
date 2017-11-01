@@ -18,7 +18,6 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 # TODO: Anticausal filter have no group delay. But is a filter with
 #       'baA' always anticausal or maybe just acausal?
 
-
 class PlotTauG(QWidget):
 
     def __init__(self, parent):
@@ -42,11 +41,8 @@ class PlotTauG(QWidget):
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
-        
-        self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
 
+        self.init_axes()        
         self.draw() # initial drawing of tau_g
 
         #----------------------------------------------------------------------
@@ -56,42 +52,65 @@ class PlotTauG(QWidget):
         self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
         
 #------------------------------------------------------------------------------
-    def draw(self):
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
-            self.draw_taug()
-            
-#------------------------------------------------------------------------------
-    def update_view(self):
+    def init_axes(self):
         """
-        Update frequency range etc. without recalculating group delay.
+        Initialize and clear the axes
         """
-        self.draw()
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
+        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
+        self.ax.get_yaxis().tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
-    def draw_taug(self):
+    def calc_tau_g(self):
         """
-        Draw group delay
+        (Re-)Calculate the complex frequency response H(f)
         """
-        self.ax.clear()
         bb = fb.fil[0]['ba'][0]
         aa = fb.fil[0]['ba'][1]
 
-        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
-        f_S = fb.fil[0]['f_S']
-
-        [w, tau_g] = grpdelay(bb,aa, params['N_FFT'], whole = wholeF, 
+        # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
+        self.W, self.tau_g = grpdelay(bb, aa, params['N_FFT'], whole = True,
             verbose = self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
-           tau_g = np.zeros(tau_g.size)
+           self.tau_g = np.zeros(self.tau_g.size)
 
-        F = w / (2 * np.pi) * fb.fil[0]['f_S']
+#------------------------------------------------------------------------------
+    def draw(self):
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
+        if self.mplwidget.mplToolbar.enabled:
+            self.calc_tau_g()
+            self.update_view()
+#            self.mplwidget.fig.set_facecolor((0.5,0.5,0.5))
+        else:
+            pass
+#            self.mplwidget.fig.set_facecolor((1,1,1))
+#------------------------------------------------------------------------------
+    def update_view(self):
+        """
+        Draw the figure with new limits, scale etc without recalculating H(f)
+        """
+        #========= select frequency range to be displayed =====================
+        #=== shift, scale and select: W -> F, H_cplx -> H_c
+        f_S2 = fb.fil[0]['f_S'] / 2.
+        F = self.W * f_S2 / np.pi
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-            tau_g = np.fft.fftshift(tau_g)
-            F = F - f_S / 2.
+            # shift tau_g and F by f_S/2
+            tau_g = np.fft.fftshift(self.tau_g)
+            F -= f_S2
+        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+            # only use the first half of H and F
+            tau_g = self.tau_g[0:params['N_FFT']//2]
+            F = F[0:params['N_FFT']//2]
+        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+            # use H and F as calculated
+            tau_g = self.tau_g
+
+        #================ Main Plotting Routine =========================
+        #===  clear the axes and (re)draw the plot
             
         if fb.fil[0]['freq_specs_unit'] in {'f_S', 'f_Ny'}:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $'
@@ -100,11 +119,11 @@ class PlotTauG(QWidget):
                 + ' in ' + fb.fil[0]['plt_tUnit'] + r' $ \rightarrow $'
             tau_g = tau_g / fb.fil[0]['f_S']
 
-
         #---------------------------------------------------------
+        self.ax.clear() # need to clear, doesn't overwrite
         line_tau_g, = self.ax.plot(F, tau_g, label = "Group Delay")
         #---------------------------------------------------------
-                   
+
         self.ax.set_title(r'Group Delay $ \tau_g$')
         self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
         self.ax.set_ylabel(tau_str)
@@ -113,7 +132,7 @@ class PlotTauG(QWidget):
         self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         self.redraw()
-        
+
 #------------------------------------------------------------------------------
     def redraw(self):
         """
