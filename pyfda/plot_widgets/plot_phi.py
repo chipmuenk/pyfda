@@ -59,11 +59,8 @@ class PlotPhi(QWidget):
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
-        
-        self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
 
+        self.init_axes()
 
         self.draw() # initial drawing
 
@@ -73,40 +70,65 @@ class PlotPhi(QWidget):
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)        
-        
-    def update_view(self):
-        """
-        place holder; should update only the limits without recalculating
-        the phase
-        """
-        self.draw()
 
+#------------------------------------------------------------------------------
+    def init_axes(self):
+        """
+        Initialize and clear the axes
+        """
+#        self.ax = self.mplwidget.ax
+        self.ax = self.mplwidget.fig.add_subplot(111)
+        self.ax.clear()
+        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
+        self.ax.get_yaxis().tick_left() # remove axis ticks right
+
+#------------------------------------------------------------------------------
+    def calc_hf(self):
+        """
+        (Re-)Calculate the complex frequency response H(f)
+        """
+        # calculate H_cplx(W) (complex) for W = 0 ... 2 pi:
+        self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], wholeF=True)
+        # replace nan and inf by finite values, otherwise np.unwrap yields
+        # an array full of nans
+        self.H_cmplx = np.nan_to_num(self.H_cmplx) 
+
+#------------------------------------------------------------------------------
     def draw(self):
         """
-        main entry point for drawing the phase
+        Main entry point: 
+        Re-calculate |H(f)| and draw the figure if enabled
         """
         self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
-            self.draw_phi()
+            self.calc_hf()
+            self.update_view()
 
-    def draw_phi(self):
+#------------------------------------------------------------------------------
+    def update_view(self):
         """
-        Re-calculate phi(f) and draw the figure
+        Draw the figure with new limits, scale etc without recalculating H(f)
         """
-        self.ax.clear()
+
         self.unitPhi = self.cmbUnitsPhi.currentText()
 
-        wholeF = fb.fil[0]['freqSpecsRangeType'] != 'half'
-        f_S = fb.fil[0]['f_S']
+        f_S2 = fb.fil[0]['f_S'] / 2.
 
-        #W,H = calc_Hcomplex (fb.fil[0], params['N_FFT'], wholeF)
-        W,H = calc_Hcomplex (fb.fil[0], params['N_FFT'], True)
-
-        F = W / (2 * np.pi) * f_S
+        #========= select frequency range to be displayed =====================
+        #=== shift, scale and select: W -> F, H_cplx -> H_c
+        F = self.W * f_S2 / np.pi
 
         if fb.fil[0]['freqSpecsRangeType'] == 'sym':
-            H = np.fft.fftshift(H)
-            F = F - f_S / 2.
+            # shift H and F by f_S/2
+            H = np.fft.fftshift(self.H_cmplx)
+            F -= f_S2
+        elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+            # only use the first half of H and F
+            H = self.H_cmplx[0:params['N_FFT']//2]
+            F = F[0:params['N_FFT']//2]
+        else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+            # use H and F as calculated
+            H = self.H_cmplx
 
         y_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$ in '
         if self.unitPhi == 'rad':
@@ -121,9 +143,6 @@ class PlotPhi(QWidget):
         fb.fil[0]['plt_phiLabel'] = y_str
         fb.fil[0]['plt_phiUnit'] = self.unitPhi
         
-        # replace nan and inf by finite values, otherwise np.unwrap yields
-        # an array full of nans
-        H = np.nan_to_num(H) 
         if self.chkWrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:
