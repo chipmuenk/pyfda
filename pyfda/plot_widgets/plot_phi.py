@@ -148,8 +148,8 @@ class PlotPhi(QWidget):
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
 
-        self.ax.clear() # need to clear, doesn't overwrite 
         #---------------------------------------------------------
+        self.ax.clear() # need to clear, doesn't overwrite 
         line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------
 

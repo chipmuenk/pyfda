@@ -412,7 +412,6 @@ class PlotHf(QWidget):
 #        self.draw()
 
 #------------------------------------------------------------------------------
-
     def calc_hf(self):
         """
         (Re-)Calculate the complex frequency response H(f)
@@ -515,7 +514,6 @@ class PlotHf(QWidget):
         #================ Main Plotting Routine =========================
         #===  clear the axes and (re)draw the plot (if selectable)
         if self.ax.get_navigate():
-            self.ax.clear()
 
             if self.unitA == 'dB':
                 A_lim = [20*np.log10(A_min) -10, 20*np.log10(1+A_max) +1]
@@ -532,6 +530,7 @@ class PlotHf(QWidget):
                 H_str += ' in W ' + r'$\rightarrow $'
 
             #-----------------------------------------------------------
+            self.ax.clear()
             self.ax.plot(self.F, self.H_plt, label = 'H(f)')
             self.draw_phase(self.ax)
             #-----------------------------------------------------------
