@@ -10,15 +10,14 @@ from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame
 
 
 import numpy as np
-import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.plot_utils import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
 
-# TODO: calc_Hcomplex does not take wholeF = False as an argument, always 
-#       plotting over the whole frequency range?
+# TODO: ax.clear() should not be neccessary for each replot?
+# TODO: Canvas should be grey when disabled
 
 
 class PlotPhi(QWidget):

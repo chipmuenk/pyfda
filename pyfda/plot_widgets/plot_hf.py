@@ -24,7 +24,8 @@ class PlotHf(QWidget):
 # TODO: inset plot should have useful preset range, depending on filter type,
 #       stop band or pass band should be selectable as well as lin / log scale
 # TODO: position and size of inset plot should be selectable
-
+# TODO: ax.clear() should not be neccessary for each replot?
+# TODO: Canvas should be grey when disabled
 
     def __init__(self, parent): 
         super(PlotHf, self).__init__(parent)
