@@ -172,6 +172,7 @@ class FreqSpecs(QWidget):
         logger.debug("update_UI: {0}-{1}-{2}".format(
                             fb.fil[0]['rt'],fb.fil[0]['fc'],fb.fil[0]['fo']))
 
+        f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
             self.qlabels[i].setText(rt_label(new_labels[i]))
@@ -179,6 +180,13 @@ class FreqSpecs(QWidget):
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             qstyle_widget(self.qlineedit[i], state)
+
+            if "sb" in new_labels[i].lower():
+                self.qlineedit[i].setToolTip("<span>Corner frequency for (this) stop band" + f_range + ".</span>")
+            elif "pb" in new_labels[i].lower():
+                self.qlineedit[i].setToolTip("<span>Corner frequency for (this) pass band" + f_range + ".</span>")
+            else:
+                self.qlineedit[i].setToolTip("<span>Corner frequency for (this) band" + f_range + ".</span>")
 
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display

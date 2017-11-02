@@ -43,10 +43,6 @@ class TargetSpecs(QWidget):
 
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
-        self.f_specs.setToolTip("<span>Define Frequency specs for filter;"
-                                " Frequencies are valid between 0 and f_S;"
-                                " PassBand (PB) Frequencies are passed through filter;"
-                                " StopBand (SB) Frequencies are maximally attenuated</span>")
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
         self.a_specs.setVisible(True)
