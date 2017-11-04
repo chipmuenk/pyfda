@@ -17,7 +17,7 @@ import numpy as np
 from .pyfda_lib import PY3, safe_eval
 from .pyfda_rc import params 
 
-from .compat import (QFrame, QLabel, QComboBox, QDialog, QPushButton,
+from .compat import (QFrame, QLabel, QComboBox, QDialog, QPushButton, QVariant,
                      QHBoxLayout, QVBoxLayout)
 
 #------------------------------------------------------------------------------
@@ -144,14 +144,17 @@ def qstr(text):
     """
     if "QString" in str(type(text)):
         # Python 3: convert QString -> str
-        string = str(text)
+        string = text.toUtf8()
+        #string = str(text)
 #    elif not isinstance(text, six.text_type):
     elif "QVariant" in str(type(text)):
         # Python 2: convert QVariant -> QString -> str
-        string = str(text.toString())
+        string = QVariant(text).toString()
+        #string = str(text.toString())
     else:
         # `text` is numeric or of type str
         string = str(text)
+        
     return string
 
 

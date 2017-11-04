@@ -669,7 +669,7 @@ class FilterPZ(QWidget):
         Convert format defined by cmbPZFrmt to real or complex
         """
         conv_error = False
-        text = qstr(text.replace(" ", "")) # convert to "proper" string without blanks
+        text = qstr(text).replace(" ", "") # convert to "proper" string without blanks
         if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
             return safe_eval(text, default, return_type='auto')
         else:
