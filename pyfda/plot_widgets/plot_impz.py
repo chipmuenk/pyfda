@@ -343,13 +343,15 @@ class PlotImpz(QWidget):
             h = sig.sosfilt(sos, x)
         elif (antiCausal):
             h = sig.filtfilt(self.bb, self.aa, x, -1, None)
-        else: # no second order sections or antiCausals for current filter 
+        else: # no second order sections or antiCausals for current filter
             h = sig.lfilter(self.bb, self.aa, x)
+
         dc = sig.freqz(self.bb, self.aa, [0])
-        
+
         if stim == "StepErr":
             h = h - abs(dc[1]) # subtract DC value from response
 
+        h = np.real_if_close(h, tol = 1e3)  # tol specified in multiples of machine eps
         self.cmplx = np.any(np.iscomplex(h))
         if self.cmplx:
             h_i = h.imag

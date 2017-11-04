@@ -1267,7 +1267,9 @@ def fil_convert(fil_dict, format_in):
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
-
+        
+    # eliminate complex coefficients created by numerical inaccuracies
+    fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100) # tol specified in multiples of machine eps
 
 def sos2zpk(sos):
     """
