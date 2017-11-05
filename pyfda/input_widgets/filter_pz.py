@@ -673,7 +673,7 @@ class FilterPZ(QWidget):
         if qget_cmb_box(self.ui.cmbPZFrmt) == 'cartesian':
             return safe_eval(text, default, return_type='auto')
         else:
-            polar_str = text.split('*' + self.angle_char, maxsplit=1)
+            polar_str = text.split('*' + self.angle_char, 1)
             if len(polar_str) < 2: # input is real or imaginary
                 r = safe_eval(re.sub('['+self.angle_char+'<∠°]','', text), default, return_type='auto')
                 x = r.real
