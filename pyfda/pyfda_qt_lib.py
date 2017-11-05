@@ -140,22 +140,31 @@ def qstr(text):
     Returns:
     --------
     
-    The current `text` data as a string
+    The current `text` data as a unicode (utf8) string
     """
-    if "QString" in str(type(text)):
+    text_type = str(type(text)).lower()
+
+    if "qstring" in text_type:
         # Python 3: convert QString -> str
-        string = text.toUtf8()
         #string = str(text)
+        # Convert QString -> Utf8
+        string = text.toUtf8()
 #    elif not isinstance(text, six.text_type):
-    elif "QVariant" in str(type(text)):
-        # Python 2: convert QVariant -> QString -> str
-        string = QVariant(text).toString()
+    elif "qvariant" in text_type:
+        # Python 2: convert QVariant -> QString
+        string = text.toString()
+        #string = QVariant(text).toString()
         #string = str(text.toString())
+    elif "unicode" in text_type:
+        return text
     else:
         # `text` is numeric or of type str
         string = str(text)
         
-    return string
+    if not PY3:
+        return unicode(string, 'utf8')
+    else:
+        return str(string) # convert QString -> str
 
 
 #------------------------------------------------------------------------------
