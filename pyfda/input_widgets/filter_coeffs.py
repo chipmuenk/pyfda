@@ -949,10 +949,10 @@ class FilterCoeffs(QWidget):
         fb.fil[0]['q_coeff'] = {
                 'WI':safe_eval(self.ledWI.text(), self.myQ.WI, return_type='int'),
                 'WF':safe_eval(self.ledWF.text(), self.myQ.WF, return_type='int', sign='pos'),
-                'quant':self.cmbQuant.currentText(),
-                'ovfl':self.cmbQOvfl.currentText(),
-                'frmt':self.cmbFormat.currentText(),
-                'scale':self.ledScale.text()
+                'quant':qstr(self.cmbQuant.currentText()),
+                'ovfl':qstr(self.cmbQOvfl.currentText()),
+                'frmt':qstr(self.cmbFormat.currentText()),
+                'scale':qstr(self.ledScale.text())
                 }
         self._load_q_settings() # update widgets and the fixpoint object self.myQ
 
