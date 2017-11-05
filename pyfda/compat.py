@@ -6,7 +6,7 @@ try:
                               QObject, QVariant)
     from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor, 
                                 QBrush, QPalette)
-    from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QApplication,
+    from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QApplication, QRadioButton,
                                  QScrollArea, QSplitter, QMessageBox, QDialog,
                                  QWidget, QComboBox, QLabel, QLineEdit, QFrame,
                                  QPushButton, QCheckBox, QToolButton, QSpinBox, QDial,
@@ -27,7 +27,7 @@ except ImportError:
                               QObject, QVariant)
     from PyQt4.QtGui import (QFont, QFontMetrics, QIcon, QImage, QColor, QBrush, QStyle,
                              QPalette, 
-                             QMainWindow, QTabWidget, QApplication,
+                             QMainWindow, QTabWidget, QApplication, QRadioButton,
                              QScrollArea, QSplitter, QMessageBox, QDialog,
                              QWidget, QComboBox, QLabel, QLineEdit, QFrame,
                              QPushButton, QCheckBox, QToolButton, QSpinBox, QDial,

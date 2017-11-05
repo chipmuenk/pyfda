@@ -17,9 +17,8 @@ import numpy as np
 from .pyfda_lib import PY3, safe_eval
 from .pyfda_rc import params 
 
-from .compat import (QFrame, QLabel, QComboBox, QDialog, QPushButton, QVariant,
+from .compat import (QFrame, QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
                      QHBoxLayout, QVBoxLayout)
-
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
 
@@ -75,6 +74,13 @@ class CSV_option_box(QDialog):
         layHHeader = QHBoxLayout()
         layHHeader.addWidget(lblHeader)
         layHHeader.addWidget(self.cmbHeader)
+        
+        self.radClipboard = QRadioButton("Clipboard", self)
+        self.radFile = QRadioButton("File", self)
+        self.radClipboard.setChecked(True)
+        layHClipFile = QHBoxLayout()
+        layHClipFile.addWidget(self.radClipboard)
+        layHClipFile.addWidget(self.radFile)
 
         layVMain = QVBoxLayout()
         # layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
@@ -82,6 +88,7 @@ class CSV_option_box(QDialog):
         layVMain.addLayout(layHLineTerminator)
         layVMain.addLayout(layHOrientation)
         layVMain.addLayout(layHHeader)
+        layVMain.addLayout(layHClipFile)
         layVMain.addWidget(butClose)
         layVMain.setContentsMargins(*params['wdg_margins'])
 #        layVMain.addStretch(1)
@@ -95,6 +102,8 @@ class CSV_option_box(QDialog):
         self.cmbDelimiter.currentIndexChanged.connect(self._store_settings)
         self.cmbLineTerminator.currentIndexChanged.connect(self._store_settings)
         self.cmbHeader.currentIndexChanged.connect(self._store_settings)
+        self.radClipboard.clicked.connect(self._store_settings)
+        self.radFile.clicked.connect(self._store_settings)
 
 
     def _store_settings(self):
@@ -103,6 +112,7 @@ class CSV_option_box(QDialog):
             params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
             params['CSV']['lineterminator'] = qget_cmb_box(self.cmbLineTerminator, data=True)
             params['CSV']['header'] = qget_cmb_box(self.cmbHeader, data=True)
+            params['CSV']['clipboard'] = self.radClipboard.isChecked()
 
         except KeyError as e:
             logger.error(e)
@@ -116,6 +126,8 @@ class CSV_option_box(QDialog):
             qset_cmb_box(self.cmbLineTerminator, params['CSV']['lineterminator'], data=True)
             qset_cmb_box(self.cmbHeader, params['CSV']['header'], data=True)
             qset_cmb_box(self.cmbOrientation, params['CSV']['orientation'], data=True)
+            self.radClipboard.setChecked(params['CSV']['clipboard'])
+            self.radFile.setChecked(not params['CSV']['clipboard'])
 
         except KeyError as e:
             logger.error(e)
