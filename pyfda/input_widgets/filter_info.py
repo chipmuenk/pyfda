@@ -161,7 +161,7 @@ class FilterInfo(QWidget):
             else:
                 self.txtFiltInfoBox.append('\nPython module docstring:\n')
                 for doc in ff.fil_inst.info_doc:
-                    self.txtFiltInfoBox.append(self.cleanDoc(doc))
+                    self.txtFiltInfoBox.append(self._clean_doc(doc))
 
         self.txtFiltInfoBox.moveCursor(QTextCursor.Start)
 
