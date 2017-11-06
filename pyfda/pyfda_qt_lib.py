@@ -593,9 +593,7 @@ def qtext2table(parent):
         else:
 
     else:
-        logger.error("Unknown object {0}, cannot copy data.".format(source_class))
-        raise IOError
-        return None
+        f = import_coeffs(parent)
 
 #------------------------------------------------------------------------------
 # Get CSV parameter settings
