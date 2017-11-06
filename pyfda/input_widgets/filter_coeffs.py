@@ -877,7 +877,7 @@ class FilterCoeffs(QWidget):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
         """
-        qtable2text(self.tblCoeff, self.ba, self.clipboard, self.myQ.frmt)
+        qtable2text(self.tblCoeff, self.ba, self, self.myQ.frmt)
 
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self):
@@ -885,7 +885,7 @@ class FilterCoeffs(QWidget):
         Read data from clipboard and copy it to `self.ba` as array of strings
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        ba_str = qtext2table(self.clipboard)
+        ba_str = qtext2table(self)
 
         conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
