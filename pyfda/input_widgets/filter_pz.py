@@ -708,9 +708,12 @@ class FilterPZ(QWidget):
         #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
-        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
+        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format
+        or to file using a selected format
         """
-        qtable2text(self.tblPZ, self.zpk, self.clipboard)
+        # pass table instance, numpy data and current class for accessing the 
+        # clipboard instance or for constructing a QFileDialog instance
+        qtable2text(self.tblPZ, self.zpk, self)
 
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self):
@@ -718,7 +721,7 @@ class FilterPZ(QWidget):
         Read data from clipboard and copy it to `self.zpk` as array of strings
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        clp_str = qtext2table(self.clipboard)
+        clp_str = qtext2table(self)
         
         conv = self.frmt2cmplx # routine for converting to cartesian coordinates
 
