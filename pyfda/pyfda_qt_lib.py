@@ -591,6 +591,14 @@ def qtext2table(parent):
             logger.error("No clipboard instance defined!")
             return None
         else:
+            if PY3:
+                text = parent.clipboard.text()
+            else:
+                text = unicode(parent.clipboard.text()) # Py 2 needs unicode here (why?)
+
+            logger.info("Importing:\n{0}\n{1}".format(np.shape(text), text))
+
+            f = io.StringIO(text) # pass handle to text
 
     else:
         f = import_coeffs(parent)
