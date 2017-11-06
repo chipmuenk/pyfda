@@ -9,8 +9,7 @@ import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
-                                qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
+from pyfda.pyfda_qt_lib import qstr, qtext2table
 
 from pyfda.pyfda_lib import PY3
 
@@ -531,7 +530,7 @@ class File_IO(QWidget):
                     else:
                         mode = 'rb' # do read in binary mode under Py 2 (why?!)
                     with io.open(file_name, mode) as f: 
-                        fb.fil[0]['ba'] = qcopy_from_clipboard(f)
+                        fb.fil[0]['ba'] = qtext2table(f)
 
                 else:
                     with io.open(file_name, 'rb') as f:

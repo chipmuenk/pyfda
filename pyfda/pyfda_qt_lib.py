@@ -333,9 +333,9 @@ def qget_selected(table, select_all=False, reverse=True):
 
     
 #------------------------------------------------------------------------------
-def qcopy_to_clipboard(table, data, target, frmt='float'):
+def qtable2text(table, data, target, frmt='float'):
     """
-    Copy table to clipboard as CSV list
+    Transform table to CSV formatted text and copy to clipboard or file
     
     Parameters:
     -----------
@@ -352,6 +352,28 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
     frmt: string
            when frmt='float', copy data from model, otherwise from the view 
            using the tables itemDelegate() methods.
+
+    The following keys from the dict pyfda_lib.params['CSV'] are evaluated:
+         
+    'delimiter' : string (default: <tab>)
+          Character for separating columns
+ 
+    'lineterminator' : string (default: As used by the operating system)
+            Character for terminating rows. By default,
+            the character is selected depending on the operating system:
+            Windows: Carriage return + line feed
+            MacOS  : Carriage return
+            *nix   : Line feed
+
+    'orientation' : string
+            This string determines with which the orientation the table is read.
+
+    'header': string (default: 'auto')
+            When `header='on'`, treat first row as a header that will be discarded.
+
+    'clipboard': Boolean (default: True)
+            When 'clipboard' = True, copy data from clipboard, else use a file
+
     """
 
     text = ""
@@ -511,20 +533,20 @@ def qcopy_to_clipboard(table, data, target, frmt='float'):
         
         
 #------------------------------------------------------------------------------
-def qcopy_from_clipboard(source):
+def qtext2table(source):
     """
-    Copy data from clipboard to table
-    
+    Copy data from clipboard or file to table
+
     Parameters:
     -----------
-            
+
     source: object
             Source of the data, this should be a QClipboard instance or an 
             opened file handle.
-            
+
             If `source` is neither, return an error.
-            
-    The following keys from pyfda_lib.params['CSV'] are evaluated
+
+    The following keys from the dict pyfda_lib.params['CSV'] are evaluated:
                 
     'delimiter' : string (default: <tab>)
           Character for separating columns
@@ -539,18 +561,20 @@ def qcopy_from_clipboard(source):
     'orientation' : string
             This string determines with which the orientation the table is read.
             
-    'header ': string (default: 'auto')
+    'header': string (default: 'auto')
             When `header='on'`, treat first row as a header that will be discarded.
-        
-    Parameters that are 'auto', will be guessed by csv.Sniffer().
             
+    'clipboard': Boolean (default: True)
+            When 'clipboard' = True, copy data from clipboard, else use a file
+
+    Parameters that are 'auto', will be guessed by csv.Sniffer().
+
     Returns:
     --------
-            
+
     numpy array of strings
                 containing table data
     """
-    
     source_class = str(source.__class__.__name__).lower()
     # print(type(source))
     if "textiowrapper" in source_class or "bufferedreader" in source_class : #"_io.TextIOWrapper"

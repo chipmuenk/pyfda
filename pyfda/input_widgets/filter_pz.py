@@ -18,7 +18,7 @@ from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QIcon,
                       QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
-from pyfda.pyfda_qt_lib import (qstr, qcopy_to_clipboard, qcopy_from_clipboard,
+from pyfda.pyfda_qt_lib import (qstr, qtable2text, qtext2table,
                                 qget_cmb_box, qstyle_widget)
 
 import numpy as np
@@ -710,7 +710,7 @@ class FilterPZ(QWidget):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
         """
-        qcopy_to_clipboard(self.tblPZ, self.zpk, self.clipboard)
+        qtable2text(self.tblPZ, self.zpk, self.clipboard)
 
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self):
@@ -718,7 +718,7 @@ class FilterPZ(QWidget):
         Read data from clipboard and copy it to `self.zpk` as array of strings
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        clp_str = qcopy_from_clipboard(self.clipboard)
+        clp_str = qtext2table(self.clipboard)
         
         conv = self.frmt2cmplx # routine for converting to cartesian coordinates
 

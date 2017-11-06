@@ -23,7 +23,7 @@ import numpy as np
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
 from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, CSV_option_box,
-                                qcopy_to_clipboard, qcopy_from_clipboard, qget_selected)
+                                qtable2text, qtext2table, qget_selected)
  
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
@@ -877,7 +877,7 @@ class FilterCoeffs(QWidget):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
         """
-        qcopy_to_clipboard(self.tblCoeff, self.ba, self.clipboard, self.myQ.frmt)
+        qtable2text(self.tblCoeff, self.ba, self.clipboard, self.myQ.frmt)
 
     #------------------------------------------------------------------------------
     def _copy_from_clipboard(self):
@@ -885,7 +885,7 @@ class FilterCoeffs(QWidget):
         Read data from clipboard and copy it to `self.ba` as array of strings
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        ba_str = qcopy_from_clipboard(self.clipboard)
+        ba_str = qtext2table(self.clipboard)
 
         conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
