@@ -333,7 +333,7 @@ def qget_selected(table, select_all=False, reverse=True):
 
     
 #------------------------------------------------------------------------------
-def qtable2text(table, data, target, frmt='float'):
+def qtable2text(table, data, parent, frmt='float'):
     """
     Transform table to CSV formatted text and copy to clipboard or file
     
@@ -345,9 +345,9 @@ def qtable2text(table, data, target, frmt='float'):
     data:   object
             Instance of the numpy variable containing table data
             
-    target: object
-            Target where the data is being copied to. If the object is a QClipboard
-            instance, copy the text there, otherwise simply return the text.
+    parent: parent class
+            Used to get the clipboard instance from the parent class (if copying 
+            to clipboard) or to construct a QFileDialog instance (if copying to a file)
             
     frmt: string
            when frmt='float', copy data from model, otherwise from the view 
@@ -479,8 +479,13 @@ def qtable2text(table, data, target, frmt='float'):
                 text = text.rstrip(tab) + cr
             text.rstrip(cr)
 
-    if "clipboard" in str(target.__class__.__name__).lower():
-        target.setText(text)
+    if params['CSV']['clipboard']:
+#        if "clipboard" in str(target.__class__.__name__).lower():
+#            target.setText(text)
+        if hasattr(parent, 'clipboard'):
+            parent.clipboard.setText(text)
+        else:
+            logger.error("No clipboard instance defined!")
     else:
         return text
 
@@ -533,7 +538,7 @@ def qtable2text(table, data, target, frmt='float'):
         
         
 #------------------------------------------------------------------------------
-def qtext2table(source):
+def qtext2table(parent):
     """
     Copy data from clipboard or file to table
 
@@ -575,22 +580,17 @@ def qtext2table(source):
     numpy array of strings
                 containing table data
     """
-    source_class = str(source.__class__.__name__).lower()
-    # print(type(source))
-    if "textiowrapper" in source_class or "bufferedreader" in source_class : #"_io.TextIOWrapper"
-        # ^ Python 3 ('r' mode)            ^ Python 2 ('rb' mode)
-        print("Using {0}".format(source))
-        f = source # pass handle to opened file
-    
-    elif "clipboard" in source_class:
-        # mime = source.mimeData()
-        if PY3:
-            text = source.text()
+
+#    source_class = str(source.__class__.__name__).lower()
+    if params['CSV']['clipboard']:
+#        if not "clipboard" in source_class:
+#            logger.error("Unknown object {0}, cannot copy data.".format(source_class))
+#            raise IOError
+#            return None
+        if not hasattr(parent, 'clipboard'):
+            logger.error("No clipboard instance defined!")
+            return None
         else:
-            text = unicode(source.text()) # Py 2 needs unicode here (why?)
-        print(text, np.shape(text))
-            
-        f = io.StringIO(text) # pass handle to text
 
     else:
         logger.error("Unknown object {0}, cannot copy data.".format(source_class))
