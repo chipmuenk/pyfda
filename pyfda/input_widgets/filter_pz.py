@@ -25,7 +25,7 @@ import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval
+from pyfda.pyfda_lib import fil_save, safe_eval, uni_chr
 
 from pyfda.pyfda_rc import params
 
@@ -190,7 +190,8 @@ class FilterPZ(QWidget):
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.eps = 1.e-4 # tolerance value for setting P/Z to zero
-        self.angle_char = "<" # character used to indicate angle, "∠" gives problems with some encodings
+        self.angle_char = "<" # "∠" may give problems with some encodings
+        self.angle_char = uni_chr(int('2220', 16))
 
         self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm

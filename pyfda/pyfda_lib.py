@@ -94,6 +94,16 @@ def b(s):
     else:
         return s # return as string
 
+def uni_chr(c):
+    """
+    Convert code point value (integer between 1 ... 65536) to one-character unicode string.
+    The reverse operation (`ord(u)`) works the same way in py2 and py3.
+    """
+    if PY3:
+        return chr(c)
+    else:
+        return unichr(c)
+
 
 def cmp_version(mod, version):
     """
