@@ -176,10 +176,13 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     Returns
     -------
     float (default) / complex / int : the evaluated result or 0 when both arguments fail.
-    """
 
+    function attribute `err` contains number of errors that have occurred during 
+    evaluation (0 / 1 / 2)
+    """
     result = None
     fallback = ""
+    safe_eval.err = 0 # initialize function attribute
 
     for ex in [expr, alt_expr]:
         if ex == "":
@@ -198,14 +201,15 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
                 elif return_type == 'int':
                     result = np.int64(ex_num)
-            except (se.InvalidExpression, se.FunctionNotDefined, Exception, SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
+            except (se.InvalidExpression, se.FunctionNotDefined, Exception, 
+                    SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
 
-            #Exception as e:
                     logger.error(fallback + 'save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
 
         if result is not None:
-            break # break out of for loop when
+            break # break out of for loop when evaluation has succeeded
         fallback = "Fallback: "
+        safe_eval.err += 1
 
     if result is None:
         result = 0
