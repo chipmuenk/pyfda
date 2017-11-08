@@ -25,7 +25,7 @@ import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval
+from pyfda.pyfda_lib import fil_save, safe_eval, uni_chr
 
 from pyfda.pyfda_rc import params
 
@@ -190,7 +190,8 @@ class FilterPZ(QWidget):
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.eps = 1.e-4 # tolerance value for setting P/Z to zero
-        self.angle_char = "<" # character used to indicate angle, "∠" gives problems with some encodings
+        self.angle_char = "<" # "∠" may give problems with some encodings
+        self.angle_char = uni_chr(int('2220', 16))
 
         self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm
@@ -660,6 +661,15 @@ class FilterPZ(QWidget):
                 return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g}°"\
                     .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
 
+        elif frmt == 'polar_pi':
+            r, phi = np.absolute(data), np.angle(data, deg=False) / np.pi
+            if full_prec:
+                return "{r} * {angle_char}{p} pi"\
+                    .format(r=r, p=phi, angle_char=self.angle_char)
+            else:
+                return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g} pi"\
+                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+
         else:
             logger.error("Unknown format {0}.".format(frmt))
 
@@ -679,22 +689,22 @@ class FilterPZ(QWidget):
                 x = r.real
                 y = r.imag
             else:
-                r = safe_eval(polar_str[0], "1.18j", return_type='auto')
-                if r == 1.18j:
-                    conv_error = True # dirty hack to test whether conversion has failed
-                else:
-                    r = np.abs(r)
+                r = safe_eval(polar_str[0], sign='pos')
+                if safe_eval.err > 0:
+                    conv_error = True
 
                 if "°" in polar_str[1]:
                     scale = np.pi / 180. # angle in degrees
+                elif re.search('π$|pi$', polar_str[1]):
+                    scale = np.pi
                 else:
                     scale = 1. # angle in rad
-                polar_str[1] = re.sub('['+self.angle_char+'<∠°]|rad', '', polar_str[1])
-                phi = safe_eval(polar_str[1], "12.7j", return_type='auto') * scale
-                if phi == 12.7j:
-                    conv_error = True # same dirty hack as above
-                else:
-                    phi = phi.real # just in case ...
+
+                # remove right-most special characters (regex $)
+                polar_str[1] = re.sub('['+self.angle_char+'<∠°π]$|rad$|pi$', '', polar_str[1])
+                phi = safe_eval(polar_str[1]) * scale
+                if safe_eval.err > 0:
+                    conv_error = True
 
                 if not conv_error:
                     x = r * np.cos(phi)

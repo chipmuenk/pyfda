@@ -27,10 +27,10 @@ class DynFileHandler(logging.FileHandler):
     the logging filepath and -name
     """
     def __init__(self, *args):
-        filename, mode = args
+        filename, mode, encoding = args
         if not os.path.isabs(filename): # path to logging file given in config_file?
             filename = os.path.join(base_dir, filename) # no, use basedir
-        logging.FileHandler.__init__(self, filename, mode)
+        logging.FileHandler.__init__(self, filename, mode, encoding)
 
 class XStream(QtCore.QObject):
     """

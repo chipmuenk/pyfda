@@ -13,7 +13,7 @@ from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
                       QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
 from pyfda.pyfda_qt_lib import qset_cmb_box, CSV_option_box
-from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_lib import rt_label, uni_chr
 from pyfda.pyfda_rc import params
 
 class FilterPZ_UI(QWidget):
@@ -58,13 +58,15 @@ class FilterPZ_UI(QWidget):
 
         self.cmbPZFrmt = QComboBox(self)
         pz_formats = [('Cartesian', 'cartesian'), ('Polar (rad)', 'polar_rad'),
-                      ('Polar (°)', 'polar_deg')] # display text, data
+                      ('Polar (pi)', 'polar_pi'), ('Polar (°)', 'polar_deg')] # display text, data
+        # π: u'3C0, °: u'B0, ∠: u'2220
         for pz in pz_formats:
             self.cmbPZFrmt.addItem(*pz)
         self.cmbPZFrmt.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         # self.cmbPZFrmt.setEnabled(False)
         self.cmbPZFrmt.setToolTip("<span>Set display format for poles and zeros to"
-                                  " either cartesian (x + jy) or polar (r * &ang; &Omega;).</span>")
+                                  " either cartesian (x + jy) or polar (r * &ang; &Omega;)."
+                                  " Type 'o' for '&deg;', '&lt;' for '&ang;' and 'pi' for '&pi;'.</span>")
 
         self.spnDigits = QSpinBox(self)
         self.spnDigits.setRange(0,16)
