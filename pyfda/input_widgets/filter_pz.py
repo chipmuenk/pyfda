@@ -680,6 +680,8 @@ class FilterPZ(QWidget):
                 y = r.imag
             else:
                 r = safe_eval(polar_str[0], "1.18j", return_type='auto')
+                logger.warning("r error: {0}".format(safe_eval.err))
+
                 if r == 1.18j:
                     conv_error = True # dirty hack to test whether conversion has failed
                 else:
@@ -691,6 +693,7 @@ class FilterPZ(QWidget):
                     scale = 1. # angle in rad
                 polar_str[1] = re.sub('['+self.angle_char+'<∠°]|rad', '', polar_str[1])
                 phi = safe_eval(polar_str[1], "12.7j", return_type='auto') * scale
+                logger.warning("phi error: {0}".format(safe_eval.err))
                 if phi == 12.7j:
                     conv_error = True # same dirty hack as above
                 else:
