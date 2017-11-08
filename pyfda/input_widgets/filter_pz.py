@@ -661,6 +661,15 @@ class FilterPZ(QWidget):
                 return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g}°"\
                     .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
 
+        elif frmt == 'polar_pi':
+            r, phi = np.absolute(data), np.angle(data, deg=False) / np.pi
+            if full_prec:
+                return "{r} * {angle_char}{p} pi"\
+                    .format(r=r, p=phi, angle_char=self.angle_char)
+            else:
+                return "{r:.{plcs}g} * {angle_char}{p:.{plcs}g} pi"\
+                    .format(r=r, p=phi, plcs=places, angle_char=self.angle_char)
+
         else:
             logger.error("Unknown format {0}.".format(frmt))
 
@@ -686,6 +695,8 @@ class FilterPZ(QWidget):
 
                 if "°" in polar_str[1]:
                     scale = np.pi / 180. # angle in degrees
+                elif re.search('π$|pi$', polar_str[1]):
+                    scale = np.pi
                 else:
                     scale = 1. # angle in rad
 
