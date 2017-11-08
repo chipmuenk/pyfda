@@ -680,25 +680,20 @@ class FilterPZ(QWidget):
                 x = r.real
                 y = r.imag
             else:
-                r = safe_eval(polar_str[0], "1.18j", return_type='auto')
-                logger.warning("r error: {0}".format(safe_eval.err))
-
-                if r == 1.18j:
-                    conv_error = True # dirty hack to test whether conversion has failed
-                else:
-                    r = np.abs(r)
+                r = safe_eval(polar_str[0], sign='pos')
+                if safe_eval.err > 0:
+                    conv_error = True
 
                 if "°" in polar_str[1]:
                     scale = np.pi / 180. # angle in degrees
                 else:
                     scale = 1. # angle in rad
-                polar_str[1] = re.sub('['+self.angle_char+'<∠°]|rad', '', polar_str[1])
-                phi = safe_eval(polar_str[1], "12.7j", return_type='auto') * scale
-                logger.warning("phi error: {0}".format(safe_eval.err))
-                if phi == 12.7j:
-                    conv_error = True # same dirty hack as above
-                else:
-                    phi = phi.real # just in case ...
+
+                # remove right-most special characters (regex $)
+                polar_str[1] = re.sub('['+self.angle_char+'<∠°π]$|rad$|pi$', '', polar_str[1])
+                phi = safe_eval(polar_str[1]) * scale
+                if safe_eval.err > 0:
+                    conv_error = True
 
                 if not conv_error:
                     x = r * np.cos(phi)
