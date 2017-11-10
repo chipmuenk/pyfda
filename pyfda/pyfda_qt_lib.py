@@ -337,7 +337,7 @@ def qget_selected(table, select_all=False, reverse=True):
 
     
 #------------------------------------------------------------------------------
-def qtable2text(table, data, parent, frmt='float'):
+def qtable2text(table, data, parent, key, frmt='float', comment=""):
     """
     Transform table to CSV formatted text and copy to clipboard or file
     
@@ -353,9 +353,17 @@ def qtable2text(table, data, parent, frmt='float'):
             Used to get the clipboard instance from the parent class (if copying 
             to clipboard) or to construct a QFileDialog instance (if copying to a file)
             
+    key:  string    
+            Key for accessing data in *.npz file or Matlab workspace (*.mat)
+            
     frmt: string
            when frmt='float', copy data from model, otherwise from the view 
            using the tables itemDelegate() methods.
+           
+    comment: string
+            comment string indicating the type of data to be copied (e.g. 
+            "filter coefficients ")
+
 
     The following keys from the dict pyfda_lib.params['CSV'] are evaluated:
          
@@ -380,10 +388,19 @@ def qtable2text(table, data, parent, frmt='float'):
 
     """
 #------------------------------------------------------------------------------
-    def export_coeffs(self, ba):
+    def export_coeffs(self, data, key, comment=""):
         """
         Export filter coefficients in various formats - see also
         Summerfield p. 192 ff
+        
+        Parameters
+        ----------
+        
+        data: CSV data
+            
+        key: string
+            Key for accessing data in *.npz file or Matlab workspace (*.mat)
+            When key == 'ba', exporting to Xilinx Coeff format is enabled.
         """
         dlg = QFD(self)
 
@@ -422,16 +439,16 @@ def qtable2text(table, data, parent, frmt='float'):
                 else: # binary format
                     with io.open(file_name, 'wb') as f:
                         if file_type == '.mat':
-                            savemat(f, mdict={'ba':ba})
+                            savemat(f, mdict={key:data})
                         elif file_type == '.csv':
-                            np.savetxt(f, ba, delimiter = ', ')
+                            np.savetxt(f, data, delimiter = ', ')
                             # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
                         elif file_type == '.npy':
                             # can only store one array in the file:
-                            np.save(f, ba)
+                            np.save(f, data)
                         elif file_type == '.npz':
                             # would be possible to store multiple arrays in the file
-                            np.savez(f, ba = ba)
+                            np.savez(f, key = data)
                         elif file_type == '.xls':
                             # see
                             # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
@@ -443,8 +460,8 @@ def qtable2text(table, data, parent, frmt='float'):
                             worksheet.write(0, 0, 'b', bold)
                             worksheet.write(0, 1, 'a', bold)
                             for col in range(2):
-                                for row in range(np.shape(ba)[1]):
-                                    worksheet.write(row+1, col, ba[col][row]) # vertical
+                                for row in range(np.shape(data)[1]):
+                                    worksheet.write(row+1, col, data[col][row]) # vertical
                             workbook.save(f)
 
                         elif file_type == '.xlsx':
@@ -462,8 +479,8 @@ def qtable2text(table, data, parent, frmt='float'):
 
                             # Write some numbers, with row/column notation.
                             for col in range(2):
-                                for row in range(np.shape(ba)[1]):
-                                    worksheet.write(row+1, col, ba[col][row]) # vertical
+                                for row in range(np.shape(data)[1]):
+                                    worksheet.write(row+1, col, data[col][row]) # vertical
                 #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
 
 
@@ -488,6 +505,7 @@ def qtable2text(table, data, parent, frmt='float'):
             # http://simple-odspy.sourceforge.net/
             # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
 
+            #------------------------------------------------------------------------------
 
     text = ""
     if params['CSV']['header'] in {'auto', 'on'}:
@@ -600,7 +618,7 @@ def qtable2text(table, data, parent, frmt='float'):
         else:
             logger.error("No clipboard instance defined!")
     else:
-        export_coeffs(parent, text)
+        export_coeffs(parent, text, key, comment=comment)
 
     # numpy.loadtxt  textfile -> array
     # numpy.savetxt array -> textfile
@@ -651,18 +669,22 @@ def qtable2text(table, data, parent, frmt='float'):
         
         
 #------------------------------------------------------------------------------
-def qtext2table(parent):
+def qtext2table(parent, key, comment = ""):
     """
     Copy data from clipboard or file to table
 
     Parameters:
     -----------
 
-    source: object
-            Source of the data, this should be a QClipboard instance or an 
-            opened file handle.
-
-            If `source` is neither, return an error.
+    parent: object
+            parent instance, having a QClipboard and / or a QFileDialog instance.
+            
+    key: string
+            Key for accessing data in *.npz file or Matlab workspace (*.mat)
+    
+    comment: string
+            comment string stating the type of data to be copied (e.g. 
+            "filter coefficients ")
 
     The following keys from the dict pyfda_lib.params['CSV'] are evaluated:
                 
@@ -695,15 +717,27 @@ def qtext2table(parent):
     """
 
 #------------------------------------------------------------------------------
-    def import_coeffs(self):
+    def import_coeffs(parent, key, comment):
         """
         Import filter coefficients from a file
+        
+        Parameters
+        ----------
+        self: handle to calling instance        
+
+        key: string
+            Key for accessing data in *.npz file or Matlab workspace (*.mat)
+            
+        comment: string
+            comment string stating the type of data to be copied (e.g. 
+            "filter coefficients ")
+        
         """
         file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
         "Zipped Binary Numpy Array(*.npz);;Comma / Tab Separated Values (*.csv)")
-        dlg = QFD(self)
+        dlg = QFD(parent)
         file_name, file_type = dlg.getOpenFileName_(
-                caption = "Import filter coefficients ",
+                caption = "Import "+ comment + "file",
                 directory = rc.save_dir, filter = file_filters)
         file_name = str(file_name) # QString -> str
 
@@ -731,31 +765,27 @@ def qtext2table(parent):
                 else:
                     with io.open(file_name, 'rb') as f:
                         if file_type == '.mat':
-                            return loadmat(f)['ba']
-                            #data = loadmat(f)
-                            #fb.fil[0]['ba'] = data['ba']
+                            return loadmat(f)[key]
                         elif file_type == '.npy':
-                            return np.load(f) # returns numpy array
-                            #fb.fil[0]['ba'] = np.load(f)
+                            return np.load(f)
                             # can only store one array in the file
                         elif file_type == '.npz':
-                            return np.load(f)['ba'] # returns numpy array
-                            #fb.fil[0]['ba'] = np.load(f)['ba']
+                            return np.load(f)[key] # returns numpy array
                             # would be possible to store several arrays in one file
                         else:
                             logger.error('Unknown file type "{0}"'.format(file_type))
                             file_type_err = True
 
                 if not file_type_err:
-                    logger.info('Loaded coefficient file\n"{0}"'.format(file_name))
-                    self.sigFilterLoaded.emit()
+                    logger.info('Successfully loaded \n"{0}"'.format(file_name))
+                    parent.sigFilterLoaded.emit()
                     rc.save_dir = os.path.dirname(file_name)
 
             except IOError as e:
                 logger.error("Failed loading {0}!\n{1}".format(file_name, e))
     # -------------------------------------------------------------------------
 #    source_class = str(source.__class__.__name__).lower()
-    if params['CSV']['clipboard']:
+    if params['CSV']['clipboard']: # data from clipboard
 #        if not "clipboard" in source_class:
 #            logger.error("Unknown object {0}, cannot copy data.".format(source_class))
 #            raise IOError
@@ -773,8 +803,12 @@ def qtext2table(parent):
 
             f = io.StringIO(text) # pass handle to text
 
-    else:
-        f = import_coeffs(parent)
+    else: # data from file
+        f = import_coeffs(parent, key, comment)
+        if isinstance(f, np.ndarray):
+            return f
+        else:
+            print("file import type {0}:".format(type(f)))
 
 #    source_class = str(source.__class__.__name__).lower()
 #    # print(type(source))
@@ -875,7 +909,7 @@ def qtext2table(parent):
         data_list.append(row)
 
     try:
-        print(type(data_list))
+        logger.info("Type of data list: {0}".format(type(data_list)))
         data_arr = np.array(data_list)
         cols, rows = np.shape(data_arr)
         logger.info("cols = {0}, rows = {1}, data_arr = {2}\n".format(cols, rows, data_arr))

@@ -245,7 +245,7 @@ class FilterPZ(QWidget):
         self.ui.butClear.clicked.connect(self._clear_table)
         
         self.ui.butToClipboard.clicked.connect(self._copy_to_clipboard)
-        self.ui.butFromClipboard.clicked.connect(self._copy_from_clipboard)
+        self.ui.butFromClipboard.clicked.connect(self._copy_to_table)
 
 
         self.ui.butSetZero.clicked.connect(self._zero_PZ)
@@ -397,7 +397,7 @@ class FilterPZ(QWidget):
         Update zpk[2]?
 
         Called by: load_dict(), _clear_table(), _zero_PZ(), _delete_cells(), 
-                add_row(), _copy_from_clipboard()
+                add_row(), _copy_to_table()
         """
 
         params['FMT_pz'] = int(self.ui.spnDigits.text())
@@ -723,39 +723,39 @@ class FilterPZ(QWidget):
         """
         # pass table instance, numpy data and current class for accessing the 
         # clipboard instance or for constructing a QFileDialog instance
-        qtable2text(self.tblPZ, self.zpk, self)
+        qtable2text(self.tblPZ, self.zpk, self, 'zpk')
 
     #------------------------------------------------------------------------------
-    def _copy_from_clipboard(self):
+    def _copy_to_table(self):
         """
-        Read data from clipboard and copy it to `self.zpk` as array of strings
+        Read data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        clp_str = qtext2table(self)
+        data_str = qtext2table(self, key='zpk', comment="poles / zeros ")
         
         conv = self.frmt2cmplx # routine for converting to cartesian coordinates
 
-        if np.ndim(clp_str) > 1:
-            num_cols, num_rows = np.shape(clp_str)
+        if np.ndim(data_str) > 1:
+            num_cols, num_rows = np.shape(data_str)
             orientation_horiz = num_cols > num_rows # need to transpose data
-        elif np.ndim(clp_str) == 1:
-            num_rows = len(clp_str)
+        elif np.ndim(data_str) == 1:
+            num_rows = len(data_str)
             num_cols = 1
             orientation_horiz = False
         else:
             logger.error("Data from clipboard is a single value or None.")
             return None
-        logger.debug("_copy_from_clipboard: c x r:", num_cols, num_rows)
+        logger.debug("_copy_to_table: c x r:", num_cols, num_rows)
         if orientation_horiz:
             self.zpk = [[],[]]
             for c in range(num_cols):
-                self.zpk[0].append(conv(clp_str[c][0]))
+                self.zpk[0].append(conv(data_str[c][0]))
                 if num_rows > 1:
-                    self.zpk[1].append(conv(clp_str[c][1]))
+                    self.zpk[1].append(conv(data_str[c][1]))
         else:
-            self.zpk[0] = [conv(s) for s in clp_str[0]]
+            self.zpk[0] = [conv(s) for s in data_str[0]]
             if num_cols > 1:
-                self.zpk[1] = [conv(s) for s in clp_str[1]]
+                self.zpk[1] = [conv(s) for s in data_str[1]]
             else:
                 self.zpk[1] = [1]
 

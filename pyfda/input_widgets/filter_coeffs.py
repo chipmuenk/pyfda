@@ -614,7 +614,7 @@ class FilterCoeffs(QWidget):
         self.cmbQFrmt.currentIndexChanged.connect(self._set_number_format)
         butSettingsClipboard.clicked.connect(self._copy_options)
         butToClipboard.clicked.connect(self._copy_to_clipboard)
-        butFromClipboard.clicked.connect(self._copy_from_clipboard)
+        butFromClipboard.clicked.connect(self._copy_to_table)
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 
@@ -875,42 +875,43 @@ class FilterCoeffs(QWidget):
     #------------------------------------------------------------------------------
     def _copy_to_clipboard(self):
         """
-        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format.
+        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format
+        or to file.
         """
-        qtable2text(self.tblCoeff, self.ba, self, self.myQ.frmt)
+        qtable2text(self.tblCoeff, self.ba, self, 'ba', self.myQ.frmt)
 
     #------------------------------------------------------------------------------
-    def _copy_from_clipboard(self):
+    def _copy_to_table(self):
         """
-        Read data from clipboard and copy it to `self.ba` as array of strings
+        Read data from clipboard / file and copy it to `self.ba` as float / cmplx
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        ba_str = qtext2table(self)
+        data_str = qtext2table(self, key='ba', comment="filter coefficients ")
 
         conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
 
-        if np.ndim(ba_str) > 1:
-            num_cols, num_rows = np.shape(ba_str)
+        if np.ndim(data_str) > 1:
+            num_cols, num_rows = np.shape(data_str)
             orientation_horiz = num_cols > num_rows # need to transpose data
-        elif np.ndim(ba_str) == 1:
-            num_rows = len(ba_str)
+        elif np.ndim(data_str) == 1:
+            num_rows = len(data_str)
             num_cols = 1
             orientation_horiz = False
         else:
-            logger.error("Data from clipboard is a single value or None.")
+            logger.error("Imported data is a single value or None.")
             return None
-        logger.debug("_copy_from_clipboard: c x r:", num_cols, num_rows)
+        logger.debug("_copy_to_table: c x r:", num_cols, num_rows)
         if orientation_horiz:
             self.ba = [[],[]]
             for c in range(num_cols):
-                self.ba[0].append(conv(ba_str[c][0], frmt))
+                self.ba[0].append(conv(data_str[c][0], frmt))
                 if num_rows > 1:
-                    self.ba[1].append(conv(ba_str[c][1], frmt))
+                    self.ba[1].append(conv(data_str[c][1], frmt))
         else:
-            self.ba[0] = [conv(s, frmt) for s in ba_str[0]]
+            self.ba[0] = [conv(s, frmt) for s in data_str[0]]
             if num_cols > 1:
-                self.ba[1] = [conv(s, frmt) for s in ba_str[1]]
+                self.ba[1] = [conv(s, frmt) for s in data_str[1]]
             else:
                 self.ba[1] = [1]
 
@@ -992,7 +993,7 @@ class FilterCoeffs(QWidget):
 
         Refresh QTableWidget
         """
-        self.ba = [[1, 0], [1, 0]]
+        self.ba = [np.asarray([1, 0]), np.asarray([1, 0])]
 
         self._refresh_table()
         qstyle_widget(self.butSave, 'changed')
