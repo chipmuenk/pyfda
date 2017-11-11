@@ -207,8 +207,6 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = np.real_if_close(ex_num).item()
                 elif return_type == 'float':
                     result = ex_num.real
-                    # eliminate very small imaginary components due to rounding errors
-                    #result = np.asscalar(np.real_if_close(se.simple_eval(expr), tol = 100))
                 elif return_type == 'int':
                     result = np.int64(ex_num)
             except (se.InvalidExpression, se.FunctionNotDefined, Exception, 
