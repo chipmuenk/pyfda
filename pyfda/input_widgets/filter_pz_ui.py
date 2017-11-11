@@ -158,17 +158,18 @@ class FilterPZ_UI(QWidget):
         self.butClear.setToolTip("Clear all entries.")
 
 
-        self.butToClipboard = QPushButton(self)
-        self.butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
-        self.butToClipboard.setIconSize(q_icon_size)
-        self.butToClipboard.setToolTip("<span>Copy table to clipboard, SELECTED items are copied as "
+        self.butFromTable = QPushButton(self)
+        self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
+        self.butFromTable.setIconSize(q_icon_size)
+        self.butFromTable.setToolTip("<span>"
+                            "Copy table to clipboard / file, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
-                            "is copied with full precision in decimal format. </span>")
+                            "is copied with full precision in decimal format.</span>")
         
-        self.butFromClipboard = QPushButton(self)
-        self.butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
-        self.butFromClipboard.setIconSize(q_icon_size)
-        self.butFromClipboard.setToolTip("<span>Copy clipboard to table.</span>")
+        self.butToTable = QPushButton(self)
+        self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
+        self.butToTable.setIconSize(q_icon_size)
+        self.butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
 
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
@@ -183,8 +184,8 @@ class FilterPZ_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(self.butLoad)
-        layHButtonsCoeffs1.addWidget(self.butToClipboard)
-        layHButtonsCoeffs1.addWidget(self.butFromClipboard)
+        layHButtonsCoeffs1.addWidget(self.butFromTable)
+        layHButtonsCoeffs1.addWidget(self.butToTable)
         layHButtonsCoeffs1.addWidget(butSettingsClipboard)
         layHButtonsCoeffs1.addStretch()
 

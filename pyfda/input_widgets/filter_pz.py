@@ -244,8 +244,8 @@ class FilterPZ(QWidget):
         self.ui.butAddCells.clicked.connect(self._add_rows)
         self.ui.butClear.clicked.connect(self._clear_table)
         
-        self.ui.butToClipboard.clicked.connect(self._copy_to_clipboard)
-        self.ui.butFromClipboard.clicked.connect(self._copy_to_table)
+        self.ui.butFromTable.clicked.connect(self._copy_from_table)
+        self.ui.butToTable.clicked.connect(self._copy_to_table)
 
 
         self.ui.butSetZero.clicked.connect(self._zero_PZ)
@@ -716,7 +716,7 @@ class FilterPZ(QWidget):
             return x + 1j * y
 
         #------------------------------------------------------------------------------
-    def _copy_to_clipboard(self):
+    def _copy_from_table(self):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format
         or to file using a selected format

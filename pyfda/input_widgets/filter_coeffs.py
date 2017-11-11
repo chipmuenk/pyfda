@@ -386,17 +386,18 @@ class FilterCoeffs(QWidget):
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all entries.")
 
-        butToClipboard = QPushButton(self)
-        butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
-        butToClipboard.setIconSize(q_icon_size)
-        butToClipboard.setToolTip("<span>Copy table to clipboard, SELECTED items are copied as "
+        butFromTable = QPushButton(self)
+        butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
+        butFromTable.setIconSize(q_icon_size)
+        butFromTable.setToolTip("<span>"
+                            "Copy table to clipboard / file, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
                             "is copied with full precision in decimal format. </span>")
 
-        butFromClipboard = QPushButton(self)
-        butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
-        butFromClipboard.setIconSize(q_icon_size)
-        butFromClipboard.setToolTip("<span>Copy clipboard to table.</span>")
+        butToTable = QPushButton(self)
+        butToTable.setIcon(QIcon(':/from_clipboard.svg'))
+        butToTable.setIconSize(q_icon_size)
+        butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
 
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
@@ -411,8 +412,8 @@ class FilterCoeffs(QWidget):
         layHButtonsCoeffs1.addWidget(self.butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(butLoad)
-        layHButtonsCoeffs1.addWidget(butToClipboard)
-        layHButtonsCoeffs1.addWidget(butFromClipboard)
+        layHButtonsCoeffs1.addWidget(butFromTable)
+        layHButtonsCoeffs1.addWidget(butToTable)
         layHButtonsCoeffs1.addWidget(butSettingsClipboard)
         layHButtonsCoeffs1.addStretch()
 
@@ -613,8 +614,8 @@ class FilterCoeffs(QWidget):
 
         self.cmbQFrmt.currentIndexChanged.connect(self._set_number_format)
         butSettingsClipboard.clicked.connect(self._copy_options)
-        butToClipboard.clicked.connect(self._copy_to_clipboard)
-        butFromClipboard.clicked.connect(self._copy_to_table)
+        butFromTable.clicked.connect(self._copy_from_table)
+        butToTable.clicked.connect(self._copy_to_table)
 
         self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
 
@@ -873,7 +874,7 @@ class FilterCoeffs(QWidget):
         self.opt_widget.exec_() # modal dialog (blocking)
 
     #------------------------------------------------------------------------------
-    def _copy_to_clipboard(self):
+    def _copy_from_table(self):
         """
         Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format
         or to file.
@@ -1022,6 +1023,7 @@ class FilterCoeffs(QWidget):
                 self.ba[0] = np.append(self.ba[0], np.zeros(-D))
             else:
                 self.ba[1] = self.ba[1][:D] # discard last D elements of a
+        logger.error("type ba: {0} - {1}".format(type(self.ba[0]), type(self.ba[1])))
 
 #------------------------------------------------------------------------------
     def _delete_cells(self):
