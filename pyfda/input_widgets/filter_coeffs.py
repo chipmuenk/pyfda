@@ -915,6 +915,9 @@ class FilterCoeffs(QWidget):
             else:
                 self.ba[1] = [1]
 
+        self.ba[0] = np.asarray(self.ba[0])
+        self.ba[1] = np.asarray(self.ba[1])
+
         self._equalize_ba_length()
         qstyle_widget(self.butSave, 'changed')
         self._refresh_table()

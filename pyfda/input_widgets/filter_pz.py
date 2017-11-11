@@ -759,6 +759,9 @@ class FilterPZ(QWidget):
             else:
                 self.zpk[1] = [1]
 
+        self.zpk[0] = np.asarray(self.zpk[0])
+        self.zpk[1] = np.asarray(self.zpk[1])
+
         self._equalize_columns()
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()

@@ -1172,7 +1172,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
                 a = a[:D] # discard last D elements of a (only zeros anyway)
 
         fil_dict['N'] = len(b) - 1 # correct filter order accordingly
-        fil_dict['ba'] = [b.astype(np.complex), a.astype(np.complex)]
+        fil_dict['ba'] = [np.array(b, dtype=np.complex), np.array(a, dtype=np.complex)]
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
