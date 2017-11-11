@@ -28,6 +28,8 @@ from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
+# from .filter_coeffs_ui import FilterCoeffs_UI
+
 # TODO: implement checking for complex-valued filters somewhere (pyfda_lib?),
 #       h[n] detects complex data (although it isn't)
 # TODO: Fixpoint coefficients do not properly convert complex -> float when saving
@@ -261,6 +263,9 @@ class FilterCoeffs(QWidget):
 
         self.eps = 1.e-6 # initialize toleracce attribute
         self.opt_widget = None # handle for pop-up options widget
+
+        #self.ui = FilterCoeffs_UI(self) # create the UI part with buttons etc.
+
         self._construct_UI()
 
     def _construct_UI(self):
@@ -1023,7 +1028,6 @@ class FilterCoeffs(QWidget):
                 self.ba[0] = np.append(self.ba[0], np.zeros(-D))
             else:
                 self.ba[1] = self.ba[1][:D] # discard last D elements of a
-        logger.error("type ba: {0} - {1}".format(type(self.ba[0]), type(self.ba[1])))
 
 #------------------------------------------------------------------------------
     def _delete_cells(self):
