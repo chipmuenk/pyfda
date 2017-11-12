@@ -191,7 +191,6 @@ class FilterPZ_UI(QWidget):
         #-------------------------------------------------------------------
         #   Eps / set zero settings
         # ---------------------------------------------------------------------
-
         self.butSetZero = QPushButton("= 0", self)
         self.butSetZero.setToolTip("<span>Set selected poles / zeros = 0 with a magnitude &lt; &epsilon;. "
         "When nothing is selected, test the whole table.</span>")
@@ -209,27 +208,26 @@ class FilterPZ_UI(QWidget):
         layHButtonsCoeffs2.addWidget(self.ledEps)
         layHButtonsCoeffs2.addStretch()
 
-        layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHDisplay)
-        layVBtns.addLayout(layHGain)
-        layVBtns.addLayout(layHButtonsCoeffs1)
-        layVBtns.addLayout(layHButtonsCoeffs2)
-
-        # This frame encompasses all the buttons
+        # ########################  Main UI Layout ############################
+        # layout for frame (UI widget)
+        layVMainF = QVBoxLayout()
+        layVMainF.addLayout(layHDisplay)
+        layVMainF.addLayout(layHGain)
+        layVMainF.addLayout(layHButtonsCoeffs1)
+        layVMainF.addLayout(layHButtonsCoeffs2)
+        # This frame encompasses all UI elements
         frmMain = QFrame(self)
-        frmMain.setLayout(layVBtns)
+        frmMain.setLayout(layVMainF)
 
         layVMain = QVBoxLayout()
         layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addWidget(frmMain)
         layVMain.setContentsMargins(*params['wdg_margins'])
+        self.setLayout(layVMain)
         
-        #------------------- set initial values from dict ----------------------
+        #--- set initial values from dict / signal slot connections------------
         self.spnDigits.setValue(params['FMT_pz'])
         self.ledEps.setText(str(self.parent.eps))
-        
-        self.setLayout(layVMain)
-
         butSettingsClipboard.clicked.connect(self._copy_options)
         
     #------------------------------------------------------------------------------
