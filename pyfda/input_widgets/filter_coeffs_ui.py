@@ -383,3 +383,18 @@ class FilterCoeffs_UI(QWidget):
         self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
         #self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.opt_widget.exec_() # modal dialog (blocking)
+
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    """ Test with python -m pyfda.input_widgets.filter_coeffs_ui """
+    import sys
+    from ..compat import QApplication
+
+    app = QApplication(sys.argv)
+    mainw = FilterCoeffs_UI(None)
+
+    app.setActiveWindow(mainw)
+    mainw.show()
+
+    sys.exit(app.exec_())
