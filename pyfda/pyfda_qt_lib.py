@@ -524,7 +524,9 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         logger.error("Unknown key '{0}' for params['CSV']['orientation']"
                                         .format(params['CSV']['orientation']))
 
-    tab = params['CSV']['delimiter']
+    delim = params['CSV']['delimiter']
+    if delim == 'auto': # 'auto' doesn't make sense when exporting
+        delim = ","
     cr = params['CSV']['lineterminator']
 
     num_cols = table.columnCount()
@@ -546,20 +548,20 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         if orientation_horiz: # rows are horizontal
             for c in range(num_cols):
                 if use_header: # add the table header
-                    text += table.horizontalHeaderItem(c).text() + tab
+                    text += table.horizontalHeaderItem(c).text() + delim
                 for r in range(num_rows):
-                    text += str(safe_eval(data[c][r], return_type='auto')) + tab
-                text = text.rstrip(tab) + cr
+                    text += str(safe_eval(data[c][r], return_type='auto')) + delim
+                text = text.rstrip(delim) + cr
             text = text.rstrip(cr) # delete last CR
         else:  # rows are vertical
             if use_header: # add the table header
                 for c in range(num_cols):
-                    text += table.horizontalHeaderItem(c).text() + tab
-                text = text.rstrip(tab) + cr
+                    text += table.horizontalHeaderItem(c).text() + delim
+                text = text.rstrip(delim) + cr
             for r in range(num_rows):
                 for c in range(num_cols):
-                    text += str(safe_eval(data[c][r], return_type='auto')) + tab
-                text = text.rstrip(tab) + cr
+                    text += str(safe_eval(data[c][r], return_type='auto')) + delim
+                text = text.rstrip(delim) + cr
             text = text.rstrip(cr) # delete CR after last row
 
     #=======================================================================
@@ -569,23 +571,23 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         if orientation_horiz: # horizontal orientation, one or two rows
             print("sel:", np.shape(sel), sel)
             if use_header: # add the table header
-                text += table.horizontalHeaderItem(0).text() + tab
+                text += table.horizontalHeaderItem(0).text() + delim
             if sel[0]:
                 for r in sel[0]:
                     item = table.item(r,0)
                     if item  and item.text() != "":
-                            text += table.itemDelegate().text(item).lstrip(" ") + tab
-                text = text.rstrip(tab) # remove last tab delimiter again
+                            text += table.itemDelegate().text(item).lstrip(" ") + delim
+                text = text.rstrip(delim) # remove last tab delimiter again
 
             if sel[1]: # returns False for []
                 text += cr # add a CRLF when there are two columns
                 if use_header: # add the table header
-                    text += table.horizontalHeaderItem(1).text() + tab
+                    text += table.horizontalHeaderItem(1).text() + delim
                 for r in sel[1]:
                     item = table.item(r,1)
                     if item and item.text() != "":
-                            text += table.itemDelegate().text(item) + tab
-                text = text.rstrip(tab) # remove last tab delimiter again
+                            text += table.itemDelegate().text(item) + delim
+                text = text.rstrip(delim) # remove last tab delimiter again
                 print("horizontal\n", text)
         else: # vertical orientation, one or two columns
             sel_c = []
@@ -596,9 +598,9 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
 
             if use_header:
                 for c in sel_c:
-                    text += table.horizontalHeaderItem(c).text() + tab
+                    text += table.horizontalHeaderItem(c).text() + delim
                     # cr is added further below
-                text.rstrip(tab)
+                text.rstrip(delim)
                 
             for r in range(num_rows): # iterate over whole table
                 for c in sel_c:
@@ -606,8 +608,8 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
                         item = table.item(r,c)
                         print(c,r)
                         if item and item.text() != "":
-                            text += table.itemDelegate().text(item).lstrip(" ") + tab
-                text = text.rstrip(tab) + cr
+                            text += table.itemDelegate().text(item).lstrip(" ") + delim
+                text = text.rstrip(delim) + cr
             text.rstrip(cr)
 
     if params['CSV']['clipboard']:
@@ -868,7 +870,7 @@ def qtext2table(parent, key, comment = ""):
 
         if header == "auto":                                  
             use_header = csv.Sniffer().has_header(f.read(1000)) # True when header detected
-            f.seek(0)  
+            f.seek(0)
 
     except csv.Error as e:
         logger.error("Error during CSV analysis:\n{0}".format(e)) 
@@ -885,10 +887,10 @@ def qtext2table(parent, key, comment = ""):
     lineterminator = dialect.lineterminator
     quotechar = dialect.quotechar
 
-    if tab is not 'auto':
+    if tab != 'auto':
         delimiter = str(tab)
         
-    if cr is not 'auto':
+    if cr != 'auto':
         lineterminator = str(cr)
         
     logger.info("using delimiter {0}, terminator {1} and quotechar {2}"\
