@@ -6,7 +6,9 @@ Created 2012 - 2017
 
 Library with common routines for Qt widgets
 """
-
+# TODO: import data from files doesn't update FIR / IIR and data changed
+# TODO: export data?
+# TODO: export COE, Actel
 from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
@@ -569,7 +571,6 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
     #=======================================================================
     else:
         if orientation_horiz: # horizontal orientation, one or two rows
-            print("sel:", np.shape(sel), sel)
             if use_header: # add the table header
                 text += table.horizontalHeaderItem(0).text() + delim
             if sel[0]:
@@ -588,7 +589,6 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
                     if item and item.text() != "":
                             text += table.itemDelegate().text(item) + delim
                 text = text.rstrip(delim) # remove last tab delimiter again
-                print("horizontal\n", text)
         else: # vertical orientation, one or two columns
             sel_c = []
             if sel[0]:
@@ -733,6 +733,10 @@ def qtext2table(parent, key, comment = ""):
         comment: string
             comment string stating the type of data to be copied (e.g. 
             "filter coefficients ")
+            
+        Returns
+        -------
+        numpy array or file name
         
         """
         file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
@@ -755,24 +759,18 @@ def qtext2table(parent, key, comment = ""):
             file_type_err = False
             try:
                 if file_type == '.csv':
-                    return file_name
-#                    if PY3:
-#                        mode = 'r'# don't read in binary mode (data as bytes) under Py 3
-#                    else:
-#                        mode = 'rb' # do read in binary mode under Py 2 (why?!)
-#                    with io.open(file_name, mode) as f:
-#                        return f
-                        #fb.fil[0]['ba'] = qcopy_from_clipboard(f)
-
+#                    return file_name
+                    with io.open(file_name, 'r') as f:
+                        data_arr = csv2text(f)
                 else:
                     with io.open(file_name, 'rb') as f:
                         if file_type == '.mat':
-                            return loadmat(f)[key]
+                            data_arr = loadmat(f)[key]
                         elif file_type == '.npy':
-                            return np.load(f)
+                            data_arr = np.load(f)
                             # can only store one array in the file
                         elif file_type == '.npz':
-                            return np.load(f)[key] # returns numpy array
+                            data_arr = np.load(f)[key] # returns numpy array
                             # would be possible to store several arrays in one file
                         else:
                             logger.error('Unknown file type "{0}"'.format(file_type))
@@ -780,18 +778,14 @@ def qtext2table(parent, key, comment = ""):
 
                 if not file_type_err:
                     logger.info('Successfully loaded \n"{0}"'.format(file_name))
-                    parent.sigFilterLoaded.emit()
                     rc.save_dir = os.path.dirname(file_name)
+                    return data_arr
 
             except IOError as e:
                 logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+                return None
     # -------------------------------------------------------------------------
-#    source_class = str(source.__class__.__name__).lower()
     if params['CSV']['clipboard']: # data from clipboard
-#        if not "clipboard" in source_class:
-#            logger.error("Unknown object {0}, cannot copy data.".format(source_class))
-#            raise IOError
-#            return None
         if not hasattr(parent, 'clipboard'):
             logger.error("No clipboard instance defined!")
             return None
@@ -803,59 +797,46 @@ def qtext2table(parent, key, comment = ""):
 
             logger.info("Importing:\n{0}\n{1}".format(np.shape(text), text))
 
-            f = io.StringIO(text) # pass handle to text
+            return csv2text(io.StringIO(text)) # pass handle to text
 
     else: # data from file
-        f = import_coeffs(parent, key, comment)
-        if isinstance(f, np.ndarray):
-            return f
-        else:
-            print("file import type {0}:".format(type(f)))
+        f_data = import_coeffs(parent, key, comment)
+        return f_data
 
-#    source_class = str(source.__class__.__name__).lower()
-#    # print(type(source))
-#    if "textiowrapper" in source_class or "bufferedreader" in source_class : #"_io.TextIOWrapper"
-#        # ^ Python 3 ('r' mode)            ^ Python 2 ('rb' mode)
-#        print("Using {0}".format(source))
-#        f = source # pass handle to opened file
-#    
-#    elif "clipboard" in source_class:
-#        # mime = source.mimeData()
-#        if PY3:
-#            text = source.text()
-#        else:
-#            text = unicode(source.text()) # Py 2 needs unicode here (why?)
-#        print(text, np.shape(text))
-#            
-#        f = io.StringIO(text) # pass handle to text
-#
-#    else:
-#        logger.error("Unknown object {0}, cannot copy data.".format(source_class))
-#        raise IOError
-#        return None
 
-#------------------------------------------------------------------------------
-# Get CSV parameter settings
-#------------------------------------------------------------------------------
+
+def csv2text(f):
+    """
+    Convert comma-separated values, passed either as file object or text object
+    to numpy array, taking into accout the settings of the CSV dict.
+    
+    Returns
+    -------
+    numpy.array
+    """
+    #------------------------------------------------------------------------------
+    # Get CSV parameter settings
+    #------------------------------------------------------------------------------
+    CSV_dict = params['CSV']
     try:
-        header = params['CSV']['header'].lower()       
+        header = CSV_dict['header'].lower()       
         if header in {'auto', 'on', 'off'}:
             pass
         else:
             header = 'auto'
-            logger.error("Unknown key '{0}' for params['CSV']['header'], using {1} instead."
-                                            .format(params['CSV']['header']), header)
+            logger.error("Unknown key '{0}' for CSV_dict['header'], using {1} instead."
+                                            .format(CSV_dict['header']), header)
 
-        orientation_horiz = params['CSV']['orientation'].lower()
+        orientation_horiz = CSV_dict['orientation'].lower()
         if orientation_horiz in {'auto', 'vert', 'horiz'}:
             pass
         else:
             orientation_horiz = 'vert'
-            logger.error("Unknown key '{0}' for params['CSV']['orientation'], using {1} instead."
-                                        .format(params['CSV']['orientation']), orientation_horiz)
+            logger.error("Unknown key '{0}' for CSV_dict['orientation'], using {1} instead."
+                                        .format(CSV_dict['orientation']), orientation_horiz)
 
-        tab = params['CSV']['delimiter'].lower()
-        cr = params['CSV']['lineterminator'].lower()
+        tab = CSV_dict['delimiter'].lower()
+        cr = CSV_dict['lineterminator'].lower()
 
     except KeyError as e:
         logger.error(e)
@@ -906,9 +887,12 @@ def qtext2table(parent, key, comment = ""):
         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2 
     
     data_list = []
-    for row in data_iter:
-        logger.info("{0}".format(row))
-        data_list.append(row)
+    try:
+        for row in data_iter:
+            logger.info("{0}".format(row))
+            data_list.append(row)
+    except csv.Error as e:
+        logger.error("Error during CSV reading:\n{0}".format(e))
 
     try:
         logger.info("Type of data list: {0}".format(type(data_list)))
