@@ -27,8 +27,7 @@ class FilterCoeffs_UI(QWidget):
 
     def __init__(self, parent):
         super(FilterCoeffs_UI, self).__init__(parent)
-#        self.parent = parent # instance of the parent (not the base) class
-        self.eps = 1.e-6 # initialize toleracce attribute
+        self.eps = 1.e-6 # initialize tolerance value
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -385,7 +384,6 @@ class FilterCoeffs_UI(QWidget):
         self.opt_widget.exec_() # modal dialog (blocking)
 
 #------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     """ Test with python -m pyfda.input_widgets.filter_coeffs_ui """
     import sys
