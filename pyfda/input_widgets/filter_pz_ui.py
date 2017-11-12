@@ -26,8 +26,9 @@ class FilterPZ_UI(QWidget):
         Pass instance `parent` of parent class (FilterCoeffs)
         """
         super(FilterPZ_UI, self).__init__(parent)
-        self.parent = parent # instance of the parent (not the base) class
-
+#        self.parent = parent # instance of the parent (not the base) class
+        self.eps = 1.e-4 # # tolerance value for e.g. setting P/Z to zero
+        
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -227,7 +228,7 @@ class FilterPZ_UI(QWidget):
         
         #--- set initial values from dict / signal slot connections------------
         self.spnDigits.setValue(params['FMT_pz'])
-        self.ledEps.setText(str(self.parent.eps))
+        self.ledEps.setText(str(self.eps))
         butSettingsClipboard.clicked.connect(self._copy_options)
         
     #------------------------------------------------------------------------------
@@ -239,3 +240,17 @@ class FilterPZ_UI(QWidget):
         self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
         #self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.opt_widget.exec_() # modal dialog (blocking)
+
+#------------------------------------------------------------------------------
+if __name__ == '__main__':
+    """ Test with python -m pyfda.input_widgets.filter_pz_ui """
+    import sys
+    from ..compat import QApplication
+
+    app = QApplication(sys.argv)
+    mainw = FilterPZ_UI(None)
+
+    app.setActiveWindow(mainw)
+    mainw.show()
+
+    sys.exit(app.exec_())

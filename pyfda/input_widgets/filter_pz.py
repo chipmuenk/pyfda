@@ -189,7 +189,6 @@ class FilterPZ(QWidget):
         super(FilterPZ, self).__init__(parent)
 
         self.Hmax_last = 1  # initial setting for maximum gain
-        self.eps = 1.e-4 # tolerance value for setting P/Z to zero
         self.angle_char = "<" # "∠" may give problems with some encodings
         self.angle_char = uni_chr(int('2220', 16))
 
@@ -564,8 +563,8 @@ class FilterPZ(QWidget):
         """
         Set tolerance value 
         """
-        self.eps = safe_eval(self.ui.ledEps.text(), alt_expr=self.eps, sign='pos')
-        self.ui.ledEps.setText(str(self.eps))
+        self.ui.eps = safe_eval(self.ui.ledEps.text(), alt_expr=self.ui.eps, sign='pos')
+        self.ui.ledEps.setText(str(self.ui.eps))
         
 #------------------------------------------------------------------------------
     def _zero_PZ(self):
@@ -579,9 +578,9 @@ class FilterPZ(QWidget):
         sel = self._get_selected(self.tblPZ)['idx'] # get all selected indices
 
         if not sel: # nothing selected, check all cells
-            z_close = np.logical_and(np.isclose(self.zpk[0], test_val, rtol=0, atol = self.eps),
+            z_close = np.logical_and(np.isclose(self.zpk[0], test_val, rtol=0, atol = self.ui.eps),
                                      (self.zpk[0] != targ_val))
-            p_close = np.logical_and(np.isclose(self.zpk[1], test_val, rtol=0, atol = self.eps),
+            p_close = np.logical_and(np.isclose(self.zpk[1], test_val, rtol=0, atol = self.ui.eps),
                                      (self.zpk[1] != targ_val))
             if z_close.any():
                 self.zpk[0] = np.where(z_close, targ_val, self.zpk[0])
@@ -591,7 +590,7 @@ class FilterPZ(QWidget):
                 changed = True
         else:
             for i in sel: # check only selected cells
-                if np.logical_and(np.isclose(self.zpk[i[0]][i[1]], test_val, rtol=0, atol = self.eps),
+                if np.logical_and(np.isclose(self.zpk[i[0]][i[1]], test_val, rtol=0, atol = self.ui.eps),
                                   (self.zpk[i[0]][i[1]] != targ_val)):
                     self.zpk[i[0]][i[1]] = targ_val
                     changed = True
@@ -610,7 +609,7 @@ class FilterPZ(QWidget):
         """
         for z in range(len(self.zpk[0])-1, -1, -1): # start at the bottom
             for p in range(len(self.zpk[1])-1, -1, -1):
-                if np.isclose(self.zpk[0][z], self.zpk[1][p], rtol = 0, atol = self.eps):
+                if np.isclose(self.zpk[0][z], self.zpk[1][p], rtol = 0, atol = self.ui.eps):
                     self.zpk[0] = np.delete(self.zpk[0], z)
                     self.zpk[1] = np.delete(self.zpk[1], p)
                     break # ... out of loop
@@ -793,7 +792,6 @@ class FilterPZ(QWidget):
 #                self.zpk[1] = self.zpk[1][:D] # discard last D elements of a
 
 #------------------------------------------------------------------------------
-
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
