@@ -28,7 +28,7 @@ from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr,
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-# from .filter_coeffs_ui import FilterCoeffs_UI
+from .filter_coeffs_ui import FilterCoeffs_UI
 
 # TODO: implement checking for complex-valued filters somewhere (pyfda_lib?),
 #       h[n] detects complex data (although it isn't)
@@ -261,11 +261,8 @@ class FilterCoeffs(QWidget):
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
 
-        self.eps = 1.e-6 # initialize toleracce attribute
         self.opt_widget = None # handle for pop-up options widget
-
-        #self.ui = FilterCoeffs_UI(self) # create the UI part with buttons etc.
-
+        self.ui = FilterCoeffs_UI(self) # create the UI part with buttons etc.
         self._construct_UI()
 
     def _construct_UI(self):
@@ -275,294 +272,9 @@ class FilterCoeffs(QWidget):
         - coefficient table
         - two bottom rows with action buttons
         """
-        self.bfont = QFont()
-        self.bfont.setBold(True)
-        self.bifont = QFont()
-        self.bifont.setBold(True)
-        self.bifont.setItalic(True)
-#        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
-        # ---------------------------------------------
-        # UI Elements for controlling the display
-        # ---------------------------------------------
-        self.butEnable = QPushButton(self)
-        self.butEnable.setIcon(QIcon(':/circle-x.svg'))
-        q_icon_size = self.butEnable.iconSize() # <- uncomment this for manual sizing
-        self.butEnable.setIconSize(q_icon_size)
-        self.butEnable.setCheckable(True)
-        self.butEnable.setChecked(True)
-        self.butEnable.setToolTip("<span>Show / hide filter coefficients as an editable table."
-                "For high order systems, table display might be slow.</span>")
-
-        fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
-        self.cmbFormat = QComboBox(self)
-        model = self.cmbFormat.model()
-        item = QtGui.QStandardItem('Float')
-        item.setData('child', Qt.AccessibleDescriptionRole)
-        model.appendRow(item)
-
-        item = QtGui.QStandardItem('Fixp.:')
-        item.setData('parent', Qt.AccessibleDescriptionRole)
-        item.setData(0, QtGui.QFont.Bold)
-        item.setFlags(item.flags() & ~Qt.ItemIsEnabled)# | Qt.ItemIsSelectable))
-        model.appendRow(item)
-
-        for idx in range(len(fix_formats)):
-            item = QtGui.QStandardItem(fix_formats[idx])
-#            item.setForeground(QtGui.QColor('red'))
-            model.appendRow(item)
-
-        self.cmbFormat.insertSeparator(1)
-        qset_cmb_box(self.cmbFormat, 'float')
-        self.cmbFormat.setToolTip('Set the display format.')
-        self.cmbFormat.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.spnDigits = QSpinBox(self)
-        self.spnDigits.setRange(0,16)
-        self.spnDigits.setValue(params['FMT_ba'])
-        self.spnDigits.setToolTip("Number of digits to display.")
-        self.lblDigits = QLabel("Digits", self)
-        self.lblDigits.setFont(self.bifont)
-
-        self.cmbQFrmt = QComboBox(self)
-        q_formats = [('Integer', 'qint' ), ('Norm. Frac.', 'qnfrac'), ('Fractional', 'qfrac')]
-        for q in q_formats:
-            self.cmbQFrmt.addItem(*q)
-
-        self.lbl_W  = QLabel("W = ", self)
-        self.lbl_W.setFont(self.bifont)
-
-        self.ledW = QLineEdit(self)
-        self.ledW.setToolTip("Specify total wordlength.")
-        self.ledW.setText("16")
-        self.ledW.setMaxLength(2) # maximum of 2 digits
-        self.ledW.setFixedWidth(30) # width of lineedit in points(?)
-
-        layHDisplay = QHBoxLayout()
-        layHDisplay.setAlignment(Qt.AlignLeft)
-        layHDisplay.addWidget(self.butEnable)
-        layHDisplay.addWidget(self.cmbFormat)
-        layHDisplay.addWidget(self.spnDigits)
-        layHDisplay.addWidget(self.lblDigits)
-        layHDisplay.addWidget(self.cmbQFrmt)
-        layHDisplay.addWidget(self.lbl_W)
-        layHDisplay.addWidget(self.ledW)
-        layHDisplay.addStretch()
-
-        # ---------------------------------------------
-        # UI Elements for loading / storing / manipulating cells and rows
-        # ---------------------------------------------
-
-        self.cmbFilterType = QComboBox(self)
-        self.cmbFilterType.setObjectName("comboFilterType")
-        self.cmbFilterType.setToolTip("<span>Select between IIR and FIR filter for manual entry."
-                                      "Changing the type reloads the filter from the filter dict.</span>")
-        self.cmbFilterType.addItems(["FIR","IIR"])
-        self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-
-        butAddCells = QPushButton(self)
-        butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
-        butAddCells.setIconSize(q_icon_size)
-        butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
-                                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-                                "When nothing is selected, add a row at the end.</SPAN>")
-
-        butDelCells = QPushButton(self)
-        butDelCells.setIcon(QIcon(':/row_delete.svg'))
-        butDelCells.setIconSize(q_icon_size)
-        butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
-                "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
-                "When nothing is selected, delete the last row.</SPAN>")
-
-        self.butSave = QPushButton(self)
-        self.butSave.setIcon(QIcon(':/upload.svg'))
-        self.butSave.setIconSize(q_icon_size)
-        self.butSave.setToolTip("<span>Save coefficients and update all plots. "
-                                "No modifications are saved before!</span>")
-
-        butLoad = QPushButton(self)
-        butLoad.setIcon(QIcon(':/download.svg'))
-        butLoad.setIconSize(q_icon_size)
-        butLoad.setToolTip("Reload coefficients.")
-
-        self.butClear = QPushButton(self)
-        self.butClear.setIcon(QIcon(':/trash.svg'))
-        self.butClear.setIconSize(q_icon_size)
-        self.butClear.setToolTip("Clear all entries.")
-
-        butFromTable = QPushButton(self)
-        butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
-        butFromTable.setIconSize(q_icon_size)
-        butFromTable.setToolTip("<span>"
-                            "Copy table to clipboard / file, SELECTED items are copied as "
-                            "displayed. When nothing is selected, the whole table "
-                            "is copied with full precision in decimal format. </span>")
-
-        butToTable = QPushButton(self)
-        butToTable.setIcon(QIcon(':/from_clipboard.svg'))
-        butToTable.setIconSize(q_icon_size)
-        butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
-
-        butSettingsClipboard = QPushButton(self)
-        butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
-        butSettingsClipboard.setIconSize(q_icon_size)
-        butSettingsClipboard.setToolTip("<span>Adjust settings for CSV format and whether "
-                                "to copy to/from clipboard or file.</span>")
-
-        layHButtonsCoeffs1 = QHBoxLayout()
-        layHButtonsCoeffs1.addWidget(self.cmbFilterType)
-        layHButtonsCoeffs1.addWidget(butAddCells)
-        layHButtonsCoeffs1.addWidget(butDelCells)
-        layHButtonsCoeffs1.addWidget(self.butClear)
-        layHButtonsCoeffs1.addWidget(self.butSave)
-        layHButtonsCoeffs1.addWidget(butLoad)
-        layHButtonsCoeffs1.addWidget(butFromTable)
-        layHButtonsCoeffs1.addWidget(butToTable)
-        layHButtonsCoeffs1.addWidget(butSettingsClipboard)
-        layHButtonsCoeffs1.addStretch()
-
-        #-------------------------------------------------------------------
-        #   Eps / set zero settings
-        # ---------------------------------------------------------------------
-
-        self.butSetZero = QPushButton("= 0", self)
-        self.butSetZero.setToolTip("<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
-        "When nothing is selected, test the whole table.</span>")
-        self.butSetZero.setIconSize(q_icon_size)
-
-        lblEps = QLabel(self)
-        lblEps.setText("<b><i>for b, a</i> &lt;</b>")
-
-        self.ledEps = QLineEdit(self)
-        self.ledEps.setToolTip("Specify tolerance value.")
-        self.ledEps.setText(str(self.eps))
-
-        layHButtonsCoeffs2 = QHBoxLayout()
-        layHButtonsCoeffs2.addWidget(self.butSetZero)
-        layHButtonsCoeffs2.addWidget(lblEps)
-        layHButtonsCoeffs2.addWidget(self.ledEps)
-        layHButtonsCoeffs2.addStretch()
-
-        #-------------------------------------------------------------------
-        #   QFormat and scale settings
-        # ---------------------------------------------------------------------
-        lbl_Q = QLabel("Q =", self)
-        lbl_Q.setFont(self.bifont)
-
-        self.ledWI = QLineEdit(self)
-        self.ledWI.setToolTip("Specify number of integer bits.")
-        self.ledWI.setText("0")
-        self.ledWI.setMaxLength(2) # maximum of 2 digits
-        self.ledWI.setFixedWidth(30) # width of lineedit in points(?)
-
-        self.lblDot = QLabel(".", self) # class attribute, visibility is toggled
-        self.lblDot.setFont(self.bfont)
-
-        self.ledWF = QLineEdit(self)
-        self.ledWF.setToolTip("Specify number of fractional bits.")
-        self.ledWF.setText("15")
-        self.ledWF.setMaxLength(2) # maximum of 2 digits
-#        self.ledWF.setFixedWidth(30) # width of lineedit in points(?)
-        self.ledWF.setMaximumWidth(30)
-
-        self.lblScale = QLabel("<b><i>Scale</i> =</b>", self)
-        self.ledScale = QLineEdit(self)
-        self.ledScale.setToolTip("Set the scale for converting float to fixpoint representation.")
-        self.ledScale.setText(str(1))
-
-        layHWI_WF = QHBoxLayout()
-        layHWI_WF.addWidget(lbl_Q)
-        layHWI_WF.addWidget(self.ledWI)
-        layHWI_WF.addWidget(self.lblDot)
-        layHWI_WF.addWidget(self.ledWF)
-        layHWI_WF.addStretch()
-
-        layHScale = QHBoxLayout()
-        layHScale.addWidget(self.lblScale)
-        layHScale.addWidget(self.ledScale)
-        layHScale.addStretch()
-
-        layHW_Scale = QHBoxLayout()
-        layHW_Scale.addLayout(layHWI_WF)
-        layHW_Scale.addLayout(layHScale)
-
-        #-------------------------------------------------------------------
-        #   Quantization / Overflow / MSB / LSB settings
-        # ---------------------------------------------------------------------
-
-        lblQOvfl = QLabel("Ovfl.:", self)
-        lblQOvfl.setFont(self.bifont)
-        lblQuant = QLabel("Quant.:", self)
-        lblQuant.setFont(self.bifont)
-
-        self.cmbQOvfl = QComboBox(self)
-        qOvfl = ['wrap', 'sat']
-        self.cmbQOvfl.addItems(qOvfl)
-        qset_cmb_box(self.cmbQOvfl, 'sat')
-        self.cmbQOvfl.setToolTip("Select overflow behaviour.")
-        # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        layHQOvflOpt = QHBoxLayout()
-        layHQOvflOpt.addWidget(lblQOvfl)
-        layHQOvflOpt.addWidget(self.cmbQOvfl)
-        layHQOvflOpt.addStretch()
-
-        self.cmbQuant = QComboBox(self)
-        qQuant = ['none', 'round', 'fix', 'floor']
-        self.cmbQuant.addItems(qQuant)
-        qset_cmb_box(self.cmbQuant, 'round')
-        self.cmbQuant.setToolTip("Select the kind of quantization.")
-        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        layHQuantOpt = QHBoxLayout()
-        layHQuantOpt.addWidget(lblQuant)
-        layHQuantOpt.addWidget(self.cmbQuant)
-        layHQuantOpt.addStretch()
-
-        self.butQuant = QPushButton(self)
-        self.butQuant.setToolTip("<span>Quantize selected coefficients / "
-        "whole table with specified settings.</span>")
-        self.butQuant.setIcon(QIcon(':/quantize.svg'))
-        self.butQuant.setIconSize(q_icon_size)
-        self.butQuant.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-
-        lblMSBtxt = QLabel(self)
-        lblMSBtxt.setText("<b><i>MSB</i><sub>10</sub> =</b>")
-        self.lblMSB = QLabel(self)
-        layHMSB = QHBoxLayout()
-        layHMSB.addWidget(lblMSBtxt)
-        layHMSB.addWidget(self.lblMSB)
-        layHMSB.addStretch()
-
-        lblLSBtxt = QLabel(self)
-        lblLSBtxt.setText("<b><i>LSB</i><sub>10</sub> =</b>")
-        self.lblLSB = QLabel(self) #
-        layHLSB = QHBoxLayout()
-        layHLSB.addWidget(lblLSBtxt)
-        layHLSB.addWidget(self.lblLSB)
-        layHLSB.addStretch()
-
-        layGQOpt = QGridLayout()
-        layGQOpt.addLayout(layHQOvflOpt,0,0)
-        layGQOpt.addLayout(layHQuantOpt, 0,1)
-        layGQOpt.addWidget(self.butQuant, 0, 2, Qt.AlignCenter)
-        layGQOpt.addLayout(layHMSB,1,0)
-        layGQOpt.addLayout(layHLSB,1,1)
-
-        #-------------------------------------------------------------------
-        #   Display MAX
-        # ---------------------------------------------------------------------
-
-        lblMAXtxt = QLabel(self)
-        lblMAXtxt.setText("<b><i>Max =</i></b>")
-        self.lblMAX = QLabel(self)
-
-        layHCoeffs_MAX = QHBoxLayout()
-        layHCoeffs_MAX.addWidget(lblMAXtxt)
-        layHCoeffs_MAX.addWidget(self.lblMAX)
-        layHCoeffs_MAX.addStretch()
+        # Create clipboard instance
+        self.clipboard = QApplication.clipboard()
 
         # ---------------------------------------------------------------------
         #   Coefficient table widget
@@ -570,85 +282,61 @@ class FilterCoeffs(QWidget):
         self.tblCoeff = QTableWidget(self)
         self.tblCoeff.setAlternatingRowColors(True)
         self.tblCoeff.horizontalHeader().setHighlightSections(True) # highlight when selected
-        self.tblCoeff.horizontalHeader().setFont(self.bfont)
+        self.tblCoeff.horizontalHeader().setFont(self.ui.bfont)
 
 #        self.tblCoeff.QItemSelectionModel.Clear
         self.tblCoeff.setDragEnabled(True)
 #        self.tblCoeff.setDragDropMode(QAbstractItemView.InternalMove) # doesn't work like intended
         self.tblCoeff.setItemDelegate(ItemDelegate(self))
 
-        # Create clipboard instance
-        self.clipboard = QApplication.clipboard()
-
         # ============== Main UI Layout =====================================
-
-        layVButtonsQ = QVBoxLayout()
-        layVButtonsQ.addLayout(layHW_Scale)
-        layVButtonsQ.addLayout(layGQOpt)
-        layVButtonsQ.addLayout(layHCoeffs_MAX)
-        layVButtonsQ.setContentsMargins(0,5,0,0)
-
-        # This frame encompasses all Quantization Settings
-        self.frmQSettings = QFrame(self)
-        self.frmQSettings.setLayout(layVButtonsQ)
-
-        layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHDisplay)
-        layVBtns.addLayout(layHButtonsCoeffs1)
-        layVBtns.addLayout(layHButtonsCoeffs2)
-        layVBtns.addWidget(self.frmQSettings)
-
-        # This frame encompasses all the buttons
-        frmMain = QFrame(self)
-        frmMain.setLayout(layVBtns)
-
         layVMain = QVBoxLayout()
         layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
-        layVMain.addWidget(frmMain)
+        layVMain.addWidget(self.ui)
         layVMain.addWidget(self.tblCoeff)
+
         layVMain.setContentsMargins(*params['wdg_margins'])
-#        layVMain.addStretch(1)
+
         self.setLayout(layVMain)
-
-        # ============== Signals & Slots ================================
-        # wdg.textChanged() is emitted when contents of widget changes
-        # wdg.textEdited() is only emitted for user changes
-        # wdg.editingFinished() is only emitted for user changes
-        self.butEnable.clicked.connect(self._refresh_table)
-        self.spnDigits.editingFinished.connect(self._refresh_table)
-
-        self.cmbQFrmt.currentIndexChanged.connect(self._set_number_format)
-        butSettingsClipboard.clicked.connect(self._copy_options)
-        butFromTable.clicked.connect(self._copy_from_table)
-        butToTable.clicked.connect(self._copy_to_table)
-
-        self.cmbFilterType.currentIndexChanged.connect(self._filter_type)
-
-        butDelCells.clicked.connect(self._delete_cells)
-        butAddCells.clicked.connect(self._add_cells)
-        butLoad.clicked.connect(self.load_dict)
-        self.butSave.clicked.connect(self._save_dict)
-        self.butClear.clicked.connect(self._clear_table)
-        self.ledEps.editingFinished.connect(self._set_eps)
-        self.butSetZero.clicked.connect(self._set_coeffs_zero)
-
-        # refresh table after storing new settings
-        self.cmbFormat.currentIndexChanged.connect(self._refresh_table)
-        self.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
-        self.cmbQuant.currentIndexChanged.connect(self._refresh_table)
-        self.ledWF.editingFinished.connect(self._WIWF_changed)
-        self.ledWI.editingFinished.connect(self._WIWF_changed)
-        self.ledW.editingFinished.connect(self._W_changed)
-
-        self.ledScale.editingFinished.connect(self._set_scale)
-
-        self.butQuant.clicked.connect(self.quant_coeffs)
 
         self.myQ = fix.Fixed(fb.fil[0]["q_coeff"]) # initialize fixpoint object
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()
 
+        # ============== Signals & Slots ================================
+        # wdg.textChanged() is emitted when contents of widget changes
+        # wdg.textEdited() is only emitted for user changes
+        # wdg.editingFinished() is only emitted for user changes
+        self.ui.butEnable.clicked.connect(self._refresh_table)
+        self.ui.spnDigits.editingFinished.connect(self._refresh_table)
+
+        self.ui.cmbQFrmt.currentIndexChanged.connect(self._set_number_format)
+        self.ui.butFromTable.clicked.connect(self._copy_from_table)
+        self.ui.butToTable.clicked.connect(self._copy_to_table)
+
+        self.ui.cmbFilterType.currentIndexChanged.connect(self._filter_type)
+
+        self.ui.butDelCells.clicked.connect(self._delete_cells)
+        self.ui.butAddCells.clicked.connect(self._add_cells)
+        self.ui.butLoad.clicked.connect(self.load_dict)
+        self.ui.butSave.clicked.connect(self._save_dict)
+        self.ui.butClear.clicked.connect(self._clear_table)
+        self.ui.ledEps.editingFinished.connect(self._set_eps)
+        self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
+
+        # refresh table after storing new settings
+        self.ui.cmbFormat.currentIndexChanged.connect(self._refresh_table)
+        self.ui.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
+        self.ui.cmbQuant.currentIndexChanged.connect(self._refresh_table)
+        self.ui.ledWF.editingFinished.connect(self._WIWF_changed)
+        self.ui.ledWI.editingFinished.connect(self._WIWF_changed)
+        self.ui.ledW.editingFinished.connect(self._W_changed)
+
+        self.ui.ledScale.editingFinished.connect(self._set_scale)
+
+        self.ui.butQuant.clicked.connect(self.quant_coeffs)
+        # =====================================================================
 
 #------------------------------------------------------------------------------
     def _filter_type(self, fil_type=None):
@@ -657,17 +345,17 @@ class FilterCoeffs(QWidget):
             dict and table properties accordingly.
         """
 
-        if self.cmbFilterType.currentText() == 'IIR':
+        if self.ui.cmbFilterType.currentText() == 'IIR':
             fb.fil[0]['ft'] = 'IIR'
             self.col = 2
-            qset_cmb_box(self.cmbFilterType, 'IIR')
+            qset_cmb_box(self.ui.cmbFilterType, 'IIR')
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
 
         else:
             fb.fil[0]['ft'] = 'FIR'
             self.col = 1
-            qset_cmb_box(self.cmbFilterType, 'FIR')
+            qset_cmb_box(self.ui.cmbFilterType, 'FIR')
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
 
@@ -693,24 +381,24 @@ class FilterCoeffs(QWidget):
         number format (integer or fractional).
         """
         
-        # if self.ledW.isModified() ... self.ledW.setModified(False)
-        W = safe_eval(self.ledW.text(), self.myQ.W, return_type='int', sign='pos')
+        # if self.ui.ledW.isModified() ... self.ui.ledW.setModified(False)
+        W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
 
         if W < 2:
             logger.warn("W must be > 1, restoring previous value.")
             W = self.myQ.W # fall back to previous value
-        self.ledW.setText(str(W))
+        self.ui.ledW.setText(str(W))
 
-        if qget_cmb_box(self.cmbQFrmt) == 'qint': # integer format, preserve WI bits
+        if qget_cmb_box(self.ui.cmbQFrmt) == 'qint': # integer format, preserve WI bits
             WI = W - self.myQ.WF - 1
-            self.ledWI.setText(str(WI))
-            self.ledScale.setText(str(1 << (W-1)))
+            self.ui.ledWI.setText(str(WI))
+            self.ui.ledScale.setText(str(1 << (W-1)))
         else: # fractional format, preserve WF bit setting
             WF = W - self.myQ.WI - 1
             if WF < 0:
-                self.ledWI.setText(str(W - 1))
+                self.ui.ledWI.setText(str(W - 1))
                 WF = 0
-            self.ledWF.setText(str(WF))
+            self.ui.ledWF.setText(str(WF))
 
         self._store_q_settings()
         self._refresh_table()
@@ -721,25 +409,25 @@ class FilterCoeffs(QWidget):
         Set one of three number formats: Integer, fractional, normalized fractional
         """
 
-        qfrmt = qget_cmb_box(self.cmbQFrmt)
+        qfrmt = qget_cmb_box(self.ui.cmbQFrmt)
         is_qfrac = False
-        W = safe_eval(self.ledW.text(), self.myQ.W, return_type='int', sign='pos')
+        W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
         if qfrmt == 'qint':
-            self.ledWI.setText(str(W - 1))
-            self.ledWF.setText("0")
-            self.ledScale.setText(str(1 << (W-1)))
+            self.ui.ledWI.setText(str(W - 1))
+            self.ui.ledWF.setText("0")
+            self.ui.ledScale.setText(str(1 << (W-1)))
         elif qfrmt == 'qnfrac': # normalized fractional format
-            self.ledWI.setText("0")
-            self.ledWF.setText(str(W - 1))
-            self.ledScale.setText("1")
+            self.ui.ledWI.setText("0")
+            self.ui.ledWF.setText(str(W - 1))
+            self.ui.ledScale.setText("1")
         else: # qfrmt == 'qfrac':
             is_qfrac = True
 
-        self.ledWI.setEnabled(is_qfrac)
-        self.lblDot.setEnabled(is_qfrac)
-        self.ledWF.setEnabled(is_qfrac)
-        self.ledW.setEnabled(not is_qfrac)
-        self.ledScale.setEnabled(is_qfrac)
+        self.ui.ledWI.setEnabled(is_qfrac)
+        self.ui.lblDot.setEnabled(is_qfrac)
+        self.ui.ledWF.setEnabled(is_qfrac)
+        self.ui.ledW.setEnabled(not is_qfrac)
+        self.ui.ledScale.setEnabled(is_qfrac)
 
         self._store_q_settings()
         self._refresh_table()
@@ -750,9 +438,9 @@ class FilterCoeffs(QWidget):
         Set scale for calculating floating point value from fixpoint representation
         and vice versa
         """
-        # if self.ledScale.isModified() ... self.ledScale.setModified(False)
-        scale = safe_eval(self.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
-        self.ledScale.setText(str(scale))
+        # if self.ui.ledScale.isModified() ... self.ui.ledScale.setModified(False)
+        scale = safe_eval(self.ui.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
+        self.ui.ledScale.setText(str(scale))
         self._store_q_settings()
         self._refresh_table()
 
@@ -788,20 +476,20 @@ class FilterCoeffs(QWidget):
             self.num_rows = len(self.ba[0])
         logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
 
-        params['FMT_ba'] = int(self.spnDigits.text())
+        params['FMT_ba'] = int(self.ui.spnDigits.text())
 
         # When format is 'float', disable all fixpoint options
-        is_float = (qget_cmb_box(self.cmbFormat, data=False).lower() == 'float')
+        is_float = (qget_cmb_box(self.ui.cmbFormat, data=False).lower() == 'float')
 
-        self.spnDigits.setVisible(is_float) # number of digits can only be selected
-        self.lblDigits.setVisible(is_float) # for format = 'float'
-        self.cmbQFrmt.setVisible(not is_float) # hide unneeded widgets for format = 'float'
-        self.lbl_W.setVisible(not is_float)
-        self.ledW.setVisible(not is_float)
+        self.ui.spnDigits.setVisible(is_float) # number of digits can only be selected
+        self.ui.lblDigits.setVisible(is_float) # for format = 'float'
+        self.ui.cmbQFrmt.setVisible(not is_float) # hide unneeded widgets for format = 'float'
+        self.ui.lbl_W.setVisible(not is_float)
+        self.ui.ledW.setVisible(not is_float)
 
-        if self.butEnable.isChecked():
-            self.frmQSettings.setVisible(not is_float) # hide all q-settings for float
-            self.butEnable.setIcon(QIcon(':/circle-x.svg'))
+        if self.ui.butEnable.isChecked():
+            self.ui.frmQSettings.setVisible(not is_float) # hide all q-settings for float
+            self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(True)
 
             self._store_q_settings() # store updated quantization / format settings
@@ -811,12 +499,12 @@ class FilterCoeffs(QWidget):
                 self.num_cols = 1
                 self.tblCoeff.setColumnCount(1)
                 self.tblCoeff.setHorizontalHeaderLabels(["b"])
-                qset_cmb_box(self.cmbFilterType, 'FIR')
+                qset_cmb_box(self.ui.cmbFilterType, 'FIR')
             else:
                 self.num_cols = 2
                 self.tblCoeff.setColumnCount(2)
                 self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-                qset_cmb_box(self.cmbFilterType, 'IIR')
+                qset_cmb_box(self.ui.cmbFilterType, 'IIR')
 
                 self.ba[1][0] = 1.0 # restore fa[0] = 1 of denonimator polynome
 
@@ -835,7 +523,7 @@ class FilterCoeffs(QWidget):
             if fb.fil[0]['ft'] == 'IIR':
                 item = self.tblCoeff.item(0,1)
                 item.setFlags(Qt.ItemIsSelectable| Qt.ItemIsEnabled)
-                item.setFont(self.bfont)
+                item.setFont(self.ui.bfont)
 
             self.tblCoeff.blockSignals(False)
 
@@ -844,8 +532,8 @@ class FilterCoeffs(QWidget):
             self.tblCoeff.clearSelection()
 
         else:
-            self.frmQSettings.setVisible(False)
-            self.butEnable.setIcon(QIcon(':/circle-check.svg'))
+            self.ui.frmQSettings.setVisible(False)
+            self.ui.butEnable.setIcon(QIcon(':/circle-check.svg'))
             self.tblCoeff.setVisible(False)
 
 #------------------------------------------------------------------------------
@@ -867,7 +555,7 @@ class FilterCoeffs(QWidget):
         self._load_q_settings()
 
         self._refresh_table()
-        qstyle_widget(self.butSave, 'normal')
+        qstyle_widget(self.ui.butSave, 'normal')
 
     #------------------------------------------------------------------------------
     def _copy_options(self):
@@ -925,7 +613,7 @@ class FilterCoeffs(QWidget):
         self.ba[1] = np.asarray(self.ba[1])
 
         self._equalize_ba_length()
-        qstyle_widget(self.butSave, 'changed')
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 
@@ -938,17 +626,17 @@ class FilterCoeffs(QWidget):
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
         q_coeff = self.myQ.q_obj
 
-        self.ledWI.setText(str(q_coeff['WI']))
-        self.ledWF.setText(str(q_coeff['WF']))
-        qset_cmb_box(self.cmbQuant, q_coeff['quant'])
-        qset_cmb_box(self.cmbQOvfl,  q_coeff['ovfl'])
-        qset_cmb_box(self.cmbFormat, q_coeff['frmt'])
-        self.ledScale.setText(str(q_coeff['scale']))
+        self.ui.ledWI.setText(str(q_coeff['WI']))
+        self.ui.ledWF.setText(str(q_coeff['WF']))
+        qset_cmb_box(self.ui.cmbQuant, q_coeff['quant'])
+        qset_cmb_box(self.ui.cmbQOvfl,  q_coeff['ovfl'])
+        qset_cmb_box(self.ui.cmbFormat, q_coeff['frmt'])
+        self.ui.ledScale.setText(str(q_coeff['scale']))
 
-        self.ledW.setText(str(self.myQ.W))
-        self.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
-        self.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
+        self.ui.ledW.setText(str(self.myQ.W))
+        self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
+        self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
+        self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
@@ -957,12 +645,12 @@ class FilterCoeffs(QWidget):
         the filter dict. Update the fixpoint object.
         """
         fb.fil[0]['q_coeff'] = {
-                'WI':safe_eval(self.ledWI.text(), self.myQ.WI, return_type='int'),
-                'WF':safe_eval(self.ledWF.text(), self.myQ.WF, return_type='int', sign='pos'),
-                'quant':qstr(self.cmbQuant.currentText()),
-                'ovfl':qstr(self.cmbQOvfl.currentText()),
-                'frmt':qstr(self.cmbFormat.currentText()),
-                'scale':qstr(self.ledScale.text())
+                'WI':safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
+                'WF':safe_eval(self.ui.ledWF.text(), self.myQ.WF, return_type='int', sign='pos'),
+                'quant':qstr(self.ui.cmbQuant.currentText()),
+                'ovfl':qstr(self.ui.cmbQOvfl.currentText()),
+                'frmt':qstr(self.ui.cmbFormat.currentText()),
+                'scale':qstr(self.ui.ledScale.text())
                 }
         self._load_q_settings() # update widgets and the fixpoint object self.myQ
 
@@ -992,7 +680,7 @@ class FilterCoeffs(QWidget):
         self.sigFilterDesigned.emit() # -> filter_specs
         # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
 
-        qstyle_widget(self.butSave, 'normal')
+        qstyle_widget(self.ui.butSave, 'normal')
 
 #------------------------------------------------------------------------------
     def _clear_table(self):
@@ -1005,7 +693,7 @@ class FilterCoeffs(QWidget):
         self.ba = [np.asarray([1, 0]), np.asarray([1, 0])]
 
         self._refresh_table()
-        qstyle_widget(self.butSave, 'changed')
+        qstyle_widget(self.ui.butSave, 'changed')
 
 
 #------------------------------------------------------------------------------
@@ -1055,7 +743,7 @@ class FilterCoeffs(QWidget):
             self._clear_table()
         else:
             self._refresh_table()
-            qstyle_widget(self.butSave, 'changed')
+            qstyle_widget(self.ui.butSave, 'changed')
 
 #------------------------------------------------------------------------------
     def _add_cells(self):
@@ -1086,8 +774,8 @@ class FilterCoeffs(QWidget):
         Set all coefficients = 0 in self.ba with a magnitude less than eps
         and refresh QTableWidget
         """
-        self.eps = safe_eval(self.ledEps.text(), return_type='float', sign='pos', alt_expr=self.eps)
-        self.ledEps.setText(str(self.eps))
+        self.ui.eps = safe_eval(self.ui.ledEps.text(), return_type='float', sign='pos', alt_expr=self.ui.eps)
+        self.ui.ledEps.setText(str(self.ui.eps))
 
 #------------------------------------------------------------------------------
     def _set_coeffs_zero(self):
@@ -1103,14 +791,14 @@ class FilterCoeffs(QWidget):
         changed = False
 
         if not idx: # nothing selected, check whole table
-            b_close = np.logical_and(np.isclose(self.ba[0], test_val, rtol=0, atol=self.eps),
+            b_close = np.logical_and(np.isclose(self.ba[0], test_val, rtol=0, atol=self.ui.eps),
                                     (self.ba[0] != targ_val))
             if np.any(b_close): # found at least one coeff where condition was true
                 self.ba[0] = np.where(b_close, targ_val, self.ba[0])
                 changed = True
 
             if  fb.fil[0]['ft'] == 'IIR':
-                a_close = np.logical_and(np.isclose(self.ba[1], test_val, rtol=0, atol=self.eps),
+                a_close = np.logical_and(np.isclose(self.ba[1], test_val, rtol=0, atol=self.ui.eps),
                                     (self.ba[1] != targ_val))
                 if np.any(a_close):
                     self.ba[1] = np.where(a_close, targ_val, self.ba[1])
@@ -1118,12 +806,12 @@ class FilterCoeffs(QWidget):
 
         else: # only check selected cells
             for i in idx:
-                if np.logical_and(np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=self.eps),
+                if np.logical_and(np.isclose(self.ba[i[0]][i[1]], test_val, rtol=0, atol=self.ui.eps),
                                   (self.ba[i[0]][i[1]] != targ_val)):
                     self.ba[i[0]][i[1]] = targ_val
                     changed = True
         if changed:
-            qstyle_widget(self.butSave, 'changed') # mark save button as changed
+            qstyle_widget(self.ui.butSave, 'changed') # mark save button as changed
 
         self._refresh_table()
 
@@ -1146,13 +834,13 @@ class FilterCoeffs(QWidget):
             for i in idx:
                 self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'div')
 
-        qstyle_widget(self.butSave, 'changed')
+        qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-
+    """ Test with python -m pyfda.input_widgets.filter_coeffs """
     app = QApplication(sys.argv)
     mainw = FilterCoeffs(None)
 

@@ -11,19 +11,13 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QtCore, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
-                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize,
-                      QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, QGridLayout,
-                      pyqtSignal, QStyledItemDelegate, QColor, QBrush, QSizePolicy)
+from ..compat import (Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox,
+                      QPushButton, QFrame, QSpinBox, QFont, QIcon,
+                      QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
 
-import numpy as np
-
-import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, CSV_option_box,
-                                qtable2text, qtext2table, qget_selected)
+from pyfda.pyfda_qt_lib import qset_cmb_box, CSV_option_box
  
 from pyfda.pyfda_rc import params
-
 
 
 class FilterCoeffs_UI(QWidget):
@@ -33,11 +27,8 @@ class FilterCoeffs_UI(QWidget):
 
     def __init__(self, parent):
         super(FilterCoeffs_UI, self).__init__(parent)
-        self.parent = parent # instance of the parent (not the base) class
-
+#        self.parent = parent # instance of the parent (not the base) class
         self.eps = 1.e-6 # initialize toleracce attribute
-        self.opt_widget = None # handle for pop-up options widget
-
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -51,7 +42,14 @@ class FilterCoeffs_UI(QWidget):
         self.bifont.setItalic(True)
 #        q_icon_size = QSize(20, 20) # optional, size is derived from butEnable
 
+        #######################################################################
+        # frmMain
+        #
+        # This frame contains all the buttons
+        #######################################################################
         # ---------------------------------------------
+        # layHDisplay
+        #
         # UI Elements for controlling the display
         # ---------------------------------------------
         self.butEnable = QPushButton(self)
@@ -118,10 +116,11 @@ class FilterCoeffs_UI(QWidget):
         layHDisplay.addWidget(self.ledW)
         layHDisplay.addStretch()
 
-        # ---------------------------------------------
+        # -----------------------------------------------------------------
+        # layHButtonsCoeffs1
+        #
         # UI Elements for loading / storing / manipulating cells and rows
-        # ---------------------------------------------
-
+        # -----------------------------------------------------------------
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip("<span>Select between IIR and FIR filter for manual entry."
@@ -130,17 +129,17 @@ class FilterCoeffs_UI(QWidget):
         self.cmbFilterType.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
 
-        butAddCells = QPushButton(self)
-        butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
-        butAddCells.setIconSize(q_icon_size)
-        butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
+        self.butAddCells = QPushButton(self)
+        self.butAddCells.setIcon(QIcon(':/row_insert_above.svg'))
+        self.butAddCells.setIconSize(q_icon_size)
+        self.butAddCells.setToolTip("<SPAN>Select cells to insert a new cell above each selected cell. "
                                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                                 "When nothing is selected, add a row at the end.</SPAN>")
 
-        butDelCells = QPushButton(self)
-        butDelCells.setIcon(QIcon(':/row_delete.svg'))
-        butDelCells.setIconSize(q_icon_size)
-        butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
+        self.butDelCells = QPushButton(self)
+        self.butDelCells.setIcon(QIcon(':/row_delete.svg'))
+        self.butDelCells.setIconSize(q_icon_size)
+        self.butDelCells.setToolTip("<SPAN>Delete selected cell(s) from the table. "
                 "Use &lt;SHIFT&gt; or &lt;CTRL&gt; to select multiple cells. "
                 "When nothing is selected, delete the last row.</SPAN>")
 
@@ -150,28 +149,28 @@ class FilterCoeffs_UI(QWidget):
         self.butSave.setToolTip("<span>Save coefficients and update all plots. "
                                 "No modifications are saved before!</span>")
 
-        butLoad = QPushButton(self)
-        butLoad.setIcon(QIcon(':/download.svg'))
-        butLoad.setIconSize(q_icon_size)
-        butLoad.setToolTip("Reload coefficients.")
+        self.butLoad = QPushButton(self)
+        self.butLoad.setIcon(QIcon(':/download.svg'))
+        self.butLoad.setIconSize(q_icon_size)
+        self.butLoad.setToolTip("Reload coefficients.")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
         self.butClear.setIconSize(q_icon_size)
         self.butClear.setToolTip("Clear all entries.")
 
-        butFromTable = QPushButton(self)
-        butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
-        butFromTable.setIconSize(q_icon_size)
-        butFromTable.setToolTip("<span>"
+        self.butFromTable = QPushButton(self)
+        self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
+        self.butFromTable.setIconSize(q_icon_size)
+        self.butFromTable.setToolTip("<span>"
                             "Copy table to clipboard / file, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
                             "is copied with full precision in decimal format. </span>")
 
-        butToTable = QPushButton(self)
-        butToTable.setIcon(QIcon(':/from_clipboard.svg'))
-        butToTable.setIconSize(q_icon_size)
-        butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
+        self.butToTable = QPushButton(self)
+        self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
+        self.butToTable.setIconSize(q_icon_size)
+        self.butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
 
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
@@ -181,20 +180,21 @@ class FilterCoeffs_UI(QWidget):
 
         layHButtonsCoeffs1 = QHBoxLayout()
         layHButtonsCoeffs1.addWidget(self.cmbFilterType)
-        layHButtonsCoeffs1.addWidget(butAddCells)
-        layHButtonsCoeffs1.addWidget(butDelCells)
+        layHButtonsCoeffs1.addWidget(self.butAddCells)
+        layHButtonsCoeffs1.addWidget(self.butDelCells)
         layHButtonsCoeffs1.addWidget(self.butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
-        layHButtonsCoeffs1.addWidget(butLoad)
-        layHButtonsCoeffs1.addWidget(butFromTable)
-        layHButtonsCoeffs1.addWidget(butToTable)
+        layHButtonsCoeffs1.addWidget(self.butLoad)
+        layHButtonsCoeffs1.addWidget(self.butFromTable)
+        layHButtonsCoeffs1.addWidget(self.butToTable)
         layHButtonsCoeffs1.addWidget(butSettingsClipboard)
         layHButtonsCoeffs1.addStretch()
 
-        #-------------------------------------------------------------------
-        #   Eps / set zero settings
+        #----------------------------------------------------------------------
+        # layHButtonsCoeffs2
+        #
+        # Eps / set zero settings
         # ---------------------------------------------------------------------
-
         self.butSetZero = QPushButton("= 0", self)
         self.butSetZero.setToolTip("<span>Set selected coefficients = 0 with a magnitude &lt; &epsilon;. "
         "When nothing is selected, test the whole table.</span>")
@@ -205,7 +205,6 @@ class FilterCoeffs_UI(QWidget):
 
         self.ledEps = QLineEdit(self)
         self.ledEps.setToolTip("Specify tolerance value.")
-        self.ledEps.setText(str(self.eps))
 
         layHButtonsCoeffs2 = QHBoxLayout()
         layHButtonsCoeffs2.addWidget(self.butSetZero)
@@ -213,8 +212,15 @@ class FilterCoeffs_UI(QWidget):
         layHButtonsCoeffs2.addWidget(self.ledEps)
         layHButtonsCoeffs2.addStretch()
 
+        #######################################################################
+        # frmQSettings
+        #
+        # This frame contains all quantization settings
+        #######################################################################
         #-------------------------------------------------------------------
-        #   QFormat and scale settings
+        # layHW_Scale
+        #
+        # QFormat and scale settings
         # ---------------------------------------------------------------------
         lbl_Q = QLabel("Q =", self)
         lbl_Q.setFont(self.bifont)
@@ -257,9 +263,10 @@ class FilterCoeffs_UI(QWidget):
         layHW_Scale.addLayout(layHScale)
 
         #-------------------------------------------------------------------
-        #   Quantization / Overflow / MSB / LSB settings
+        # layGQOpt
+        #
+        # Quantization / Overflow / MSB / LSB settings
         # ---------------------------------------------------------------------
-
         lblQOvfl = QLabel("Ovfl.:", self)
         lblQOvfl.setFont(self.bifont)
         lblQuant = QLabel("Quant.:", self)
@@ -323,7 +330,6 @@ class FilterCoeffs_UI(QWidget):
         #-------------------------------------------------------------------
         #   Display MAX
         # ---------------------------------------------------------------------
-
         lblMAXtxt = QLabel(self)
         lblMAXtxt.setText("<b><i>Max =</i></b>")
         self.lblMAX = QLabel(self)
@@ -333,39 +339,39 @@ class FilterCoeffs_UI(QWidget):
         layHCoeffs_MAX.addWidget(self.lblMAX)
         layHCoeffs_MAX.addStretch()
 
-        # Create clipboard instance
-        self.clipboard = QApplication.clipboard()
-
-        # ============== Main UI Layout =====================================
-
+        #######################################################################
+        # Now put all the coefficient HBoxes into frmQSettings
+        # ---------------------------------------------------------------------
         layVButtonsQ = QVBoxLayout()
         layVButtonsQ.addLayout(layHW_Scale)
         layVButtonsQ.addLayout(layGQOpt)
         layVButtonsQ.addLayout(layHCoeffs_MAX)
         layVButtonsQ.setContentsMargins(0,5,0,0)
-
         # This frame encompasses all Quantization Settings
         self.frmQSettings = QFrame(self)
         self.frmQSettings.setLayout(layVButtonsQ)
 
-        layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHDisplay)
-        layVBtns.addLayout(layHButtonsCoeffs1)
-        layVBtns.addLayout(layHButtonsCoeffs2)
-        layVBtns.addWidget(self.frmQSettings)
-
-        # This frame encompasses all the buttons
+        # ########################  Main UI Layout ############################
+        # layout for frame (UI widget)
+        layVMainF = QVBoxLayout()
+        layVMainF.addLayout(layHDisplay)
+        layVMainF.addLayout(layHButtonsCoeffs1)
+        layVMainF.addLayout(layHButtonsCoeffs2)
+        layVMainF.addWidget(self.frmQSettings)
+        # This frame encompasses all UI elements
         frmMain = QFrame(self)
-        frmMain.setLayout(layVBtns)
+        frmMain.setLayout(layVMainF)
 
         layVMain = QVBoxLayout()
         layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addWidget(frmMain)
-        layVMain.addWidget(self.tblCoeff)
         layVMain.setContentsMargins(*params['wdg_margins'])
-#        layVMain.addStretch(1)
         self.setLayout(layVMain)
+        #######################################################################
 
+        #--- set initial values from dict / signal slot connections------------
+        self.spnDigits.setValue(params['FMT_ba'])
+        self.ledEps.setText(str(self.eps))
         butSettingsClipboard.clicked.connect(self._copy_options)
         
     #------------------------------------------------------------------------------
