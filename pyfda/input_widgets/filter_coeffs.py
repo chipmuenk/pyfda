@@ -339,30 +339,34 @@ class FilterCoeffs(QWidget):
         # =====================================================================
 
 #------------------------------------------------------------------------------
-    def _filter_type(self, fil_type=None):
+    def _filter_type(self, ftype=None):
         """
         Get / set 'FIR' and 'IIR' filter from cmbFilterType combobox and set filter
             dict and table properties accordingly.
+
+        When argument fil_type is not None, set the combobox accordingly.
+
+        Reload from filter dict unless ftype is specified [does this make sense?!]
         """
+        if ftype in {'FIR', 'IIR'}:
+            ret=qset_cmb_box(self.ui.cmbFilterType, ftype)
+            if ret == -1:
+                logger.warning("Unknown filter type {0}".format(ftype))
 
         if self.ui.cmbFilterType.currentText() == 'IIR':
             fb.fil[0]['ft'] = 'IIR'
             self.col = 2
-            qset_cmb_box(self.ui.cmbFilterType, 'IIR')
             self.tblCoeff.setColumnCount(2)
             self.tblCoeff.setHorizontalHeaderLabels(["b", "a"])
-
         else:
             fb.fil[0]['ft'] = 'FIR'
             self.col = 1
-            qset_cmb_box(self.ui.cmbFilterType, 'FIR')
             self.tblCoeff.setColumnCount(1)
             self.tblCoeff.setHorizontalHeaderLabels(["b"])
 
-        self.tblCoeff.setColumnCount(self.col)
-
-        self.load_dict()
-
+        if not ftype:
+            self._refresh_table()
+            # self.load_dict() overwrites current info - is this ok?
 
 #------------------------------------------------------------------------------
     def _WIWF_changed(self):
@@ -602,12 +606,18 @@ class FilterCoeffs(QWidget):
                 self.ba[0].append(conv(data_str[c][0], frmt))
                 if num_rows > 1:
                     self.ba[1].append(conv(data_str[c][1], frmt))
+            if num_rows > 1:
+                self._filter_type(ftype='IIR')
+            else:
+                self._filter_type(ftype='FIR')
         else:
             self.ba[0] = [conv(s, frmt) for s in data_str[0]]
             if num_cols > 1:
                 self.ba[1] = [conv(s, frmt) for s in data_str[1]]
+                self._filter_type(ftype='IIR')
             else:
                 self.ba[1] = [1]
+                self._filter_type(ftype='FIR')
 
         self.ba[0] = np.asarray(self.ba[0])
         self.ba[1] = np.asarray(self.ba[1])
