@@ -236,7 +236,7 @@ class ItemDelegate(QStyledItemDelegate):
 
         model.setData(index, data)                          # store in QTableWidget
         self.parent.ba[index.column()][index.row()] = data  # and in self.ba
-        qstyle_widget(self.parent.butSave, 'changed')
+        qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
 
 
