@@ -597,7 +597,6 @@ def qtext2table(parent, key, comment = ""):
 
     Returns:
     --------
-
     numpy array of strings
                 containing table data
     """
@@ -605,7 +604,7 @@ def qtext2table(parent, key, comment = ""):
     if params['CSV']['clipboard']: # data from clipboard
         if not hasattr(parent, 'clipboard'):
             logger.error("No clipboard instance defined!")
-            return None
+            data_arr = None
         else:
             if PY3:
                 text = parent.clipboard.text()
@@ -613,13 +612,15 @@ def qtext2table(parent, key, comment = ""):
                 text = unicode(parent.clipboard.text()) # Py 2 needs unicode here (why?)
 
             logger.info("Importing:\n{0}\n{1}".format(np.shape(text), text))
-
-            return csv2text(io.StringIO(text)) # pass handle to text
+            # pass handle to text and convert to numpy array:
+            data_arr = csv2text(io.StringIO(text)) 
 
     else: # data from file
-        f_data = import_coeffs(parent, key, comment)
-        return f_data
+        data_arr = import_coeffs(parent, key, comment)
+        # pass data as numpy array
+        logger.info("Imported data from file:{0}\n{1}".format(np.shape(data_arr), data_arr))
 
+    return data_arr
 
 
 #------------------------------------------------------------------------------
