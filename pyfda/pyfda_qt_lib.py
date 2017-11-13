@@ -388,6 +388,9 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
     'clipboard': Boolean (default: True)
             When 'clipboard' = True, copy data to clipboard, else use a file
 
+    Returns
+    -------
+    Nothing, text is exported to clipboard or to file via export_coeffs
     """
 
     text = ""
@@ -619,6 +622,7 @@ def qtext2table(parent, key, comment = ""):
 
 
 
+#------------------------------------------------------------------------------
 def csv2text(f):
     """
     Convert comma-separated values, passed either as file object or text object
@@ -694,8 +698,6 @@ def csv2text(f):
     logger.info("Type of passed text is '{0}'".format(type(f)))
 
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
-#    except:
-#        data_iter = iter(f) # convert to iterator
         
     if use_header:
         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2 
