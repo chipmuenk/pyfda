@@ -718,73 +718,6 @@ def qtext2table(parent, key, comment = ""):
                 containing table data
     """
 
-#------------------------------------------------------------------------------
-    def import_coeffs(parent, key, comment):
-        """
-        Import filter coefficients from a file
-        
-        Parameters
-        ----------
-        self: handle to calling instance        
-
-        key: string
-            Key for accessing data in *.npz file or Matlab workspace (*.mat)
-            
-        comment: string
-            comment string stating the type of data to be copied (e.g. 
-            "filter coefficients ")
-            
-        Returns
-        -------
-        numpy array or file name
-        
-        """
-        file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
-        "Zipped Binary Numpy Array(*.npz);;Comma / Tab Separated Values (*.csv)")
-        dlg = QFD(parent)
-        file_name, file_type = dlg.getOpenFileName_(
-                caption = "Import "+ comment + "file",
-                directory = rc.save_dir, filter = file_filters)
-        file_name = str(file_name) # QString -> str
-
-        for t in extract_file_ext(file_filters): # extract the list of file extensions
-            if t in str(file_type):
-                file_type = t
-
-        if file_name != '': # cancelled file operation returns empty string
-
-            # strip extension from returned file name (if any) + append file type:
-            file_name = os.path.splitext(file_name)[0] + file_type
-
-            file_type_err = False
-            try:
-                if file_type == '.csv':
-#                    return file_name
-                    with io.open(file_name, 'r') as f:
-                        data_arr = csv2text(f)
-                else:
-                    with io.open(file_name, 'rb') as f:
-                        if file_type == '.mat':
-                            data_arr = loadmat(f)[key]
-                        elif file_type == '.npy':
-                            data_arr = np.load(f)
-                            # can only store one array in the file
-                        elif file_type == '.npz':
-                            data_arr = np.load(f)[key] # returns numpy array
-                            # would be possible to store several arrays in one file
-                        else:
-                            logger.error('Unknown file type "{0}"'.format(file_type))
-                            file_type_err = True
-
-                if not file_type_err:
-                    logger.info('Successfully loaded \n"{0}"'.format(file_name))
-                    rc.save_dir = os.path.dirname(file_name)
-                    return data_arr
-
-            except IOError as e:
-                logger.error("Failed loading {0}!\n{1}".format(file_name, e))
-                return None
-    # -------------------------------------------------------------------------
     if params['CSV']['clipboard']: # data from clipboard
         if not hasattr(parent, 'clipboard'):
             logger.error("No clipboard instance defined!")
@@ -910,6 +843,71 @@ def csv2text(f):
         logger.error("{0}\n{1}".format(e, data_list))
         return None
 
+#------------------------------------------------------------------------------
+def import_coeffs(parent, key, comment):
+    """
+    Import filter coefficients from a file
+
+    Parameters
+    ----------
+    parent: handle to calling instance
+
+    key: string
+        Key for accessing data in *.npz file or Matlab workspace (*.mat)
+
+    comment: string
+        comment string stating the type of data to be copied (e.g.
+        "filter coefficients ") for user message while opening file
+
+    Returns
+    -------
+    numpy array
+
+    """
+    file_filters = ("Matlab-Workspace (*.mat);;Binary Numpy Array (*.npy);;"
+    "Zipped Binary Numpy Array(*.npz);;Comma / Tab Separated Values (*.csv)")
+    dlg = QFD(parent)
+    file_name, file_type = dlg.getOpenFileName_(
+            caption = "Import "+ comment + "file",
+            directory = rc.save_dir, filter = file_filters)
+    file_name = str(file_name) # QString -> str
+
+    for t in extract_file_ext(file_filters): # extract the list of file extensions
+        if t in str(file_type):
+            file_type = t
+
+    if file_name != '': # cancelled file operation returns empty string
+
+        # strip extension from returned file name (if any) + append file type:
+        file_name = os.path.splitext(file_name)[0] + file_type
+
+        file_type_err = False
+        try:
+            if file_type == '.csv':
+                with io.open(file_name, 'r') as f:
+                    data_arr = csv2text(f)
+            else:
+                with io.open(file_name, 'rb') as f:
+                    if file_type == '.mat':
+                        data_arr = loadmat(f)[key]
+                    elif file_type == '.npy':
+                        data_arr = np.load(f)
+                        # contains only one array
+                    elif file_type == '.npz':
+                        data_arr = np.load(f)[key]
+                        # pick the array `key` from the dict
+                    else:
+                        logger.error('Unknown file type "{0}"'.format(file_type))
+                        file_type_err = True
+
+            if not file_type_err:
+                logger.info('Successfully loaded \n"{0}"'.format(file_name))
+                rc.save_dir = os.path.dirname(file_name)
+                return data_arr # returns numpy array
+
+        except IOError as e:
+            logger.error("Failed loading {0}!\n{1}".format(file_name, e))
+            return None
 
 #==============================================================================
 
