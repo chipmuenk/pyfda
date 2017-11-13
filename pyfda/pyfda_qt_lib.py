@@ -389,125 +389,6 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
             When 'clipboard' = True, copy data to clipboard, else use a file
 
     """
-#------------------------------------------------------------------------------
-    def export_coeffs(self, data, key, comment=""):
-        """
-        Export filter coefficients in various formats - see also
-        Summerfield p. 192 ff
-        
-        Parameters
-        ----------
-        
-        data: CSV data
-            
-        key: string
-            Key for accessing data in *.npz file or Matlab workspace (*.mat)
-            When key == 'ba', exporting to Xilinx Coeff format is enabled.
-        """
-        dlg = QFD(self)
-
-        file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
-            ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
-
-        if fb.fil[0]['ft'] == 'FIR':
-            file_filters += ";;Xilinx coefficient format (*.coe)"
-
-#        # Add further file types when modules are available:
-#        if XLWT:
-#            file_filters += ";;Excel Worksheet (.xls)"
-#        if XLSX:
-#            file_filters += ";;Excel 2007 Worksheet (.xlsx)"
-
-        # return selected file name (with or without extension) and filter (Linux: full text)
-        file_name, file_type = dlg.getSaveFileName_(
-                caption = "Export filter coefficients as",
-                directory = rc.save_dir, filter = file_filters)
-        file_name = str(file_name) # QString -> str needed for Python 2
-
-        for t in extract_file_ext(file_filters): # extract the list of file extensions
-            if t in str(file_type):
-                file_type = t
-
-        if file_name != '': # cancelled file operation returns empty string
-            # strip extension from returned file name (if any) + append file type:
-            file_name = os.path.splitext(file_name)[0] +  file_type
-
-#            ba = fb.fil[0]['ba']
-            file_type_err = False
-            try:
-                if file_type == '.coe': # text / string format
-                    with io.open(file_name, 'w', encoding="utf8") as f:
-                        self.save_file_coe(f)
-                else: # binary format
-                    with io.open(file_name, 'wb') as f:
-                        if file_type == '.mat':
-                            savemat(f, mdict={key:data})
-                        elif file_type == '.csv':
-                            np.savetxt(f, data, delimiter = ', ')
-                            # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
-                        elif file_type == '.npy':
-                            # can only store one array in the file:
-                            np.save(f, data)
-                        elif file_type == '.npz':
-                            # would be possible to store multiple arrays in the file
-                            np.savez(f, key = data)
-                        elif file_type == '.xls':
-                            # see
-                            # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
-                            # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
-                            # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
-                            workbook = xlwt.Workbook(encoding="utf-8")
-                            worksheet = workbook.add_sheet("Python Sheet 1")
-                            bold = xlwt.easyxf('font: bold 1')
-                            worksheet.write(0, 0, 'b', bold)
-                            worksheet.write(0, 1, 'a', bold)
-                            for col in range(2):
-                                for row in range(np.shape(data)[1]):
-                                    worksheet.write(row+1, col, data[col][row]) # vertical
-                            workbook.save(f)
-
-                        elif file_type == '.xlsx':
-                            # from https://pypi.python.org/pypi/XlsxWriter
-                            # Create an new Excel file and add a worksheet.
-                            workbook = xlsx.Workbook(f)
-                            worksheet = workbook.add_worksheet()
-                            # Widen the first column to make the text clearer.
-                            worksheet.set_column('A:A', 20)
-                            # Add a bold format to use to highlight cells.
-                            bold = workbook.add_format({'bold': True})
-                            # Write labels with formatting.
-                            worksheet.write('A1', 'b', bold)
-                            worksheet.write('B1', 'a', bold)
-
-                            # Write some numbers, with row/column notation.
-                            for col in range(2):
-                                for row in range(np.shape(data)[1]):
-                                    worksheet.write(row+1, col, data[col][row]) # vertical
-                #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
-
-
-                            # Insert an image - useful for documentation export ?!.
-                #            worksheet.insert_image('B5', 'logo.png')
-
-                            workbook.close()
-
-                        else:
-                            logger.error('Unknown file type "%s"', file_type)
-                            file_type_err = True
-
-                        if not file_type_err:
-                            logger.info('Filter saved as "%s"', file_name)
-                            rc.save_dir = os.path.dirname(file_name) # save new dir
-
-            except IOError as e:
-                logger.error('Failed saving "%s"!\n%s\n', file_name, e)
-
-
-            # Download the Simple ods py module:
-            # http://simple-odspy.sourceforge.net/
-            # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
-
-            #------------------------------------------------------------------------------
 
     text = ""
     if params['CSV']['header'] in {'auto', 'on'}:
@@ -908,6 +789,137 @@ def import_coeffs(parent, key, comment):
         except IOError as e:
             logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             return None
+#------------------------------------------------------------------------------
+def export_coeffs(parent, data, key, comment=""):
+    """
+    Export filter coefficients in various formats - see also
+    Summerfield p. 192 ff
+
+    Parameters
+    ----------
+    parent: handle to calling instance
+
+    data: CSV data
+
+    key: string
+        Key for accessing data in *.npz file or Matlab workspace (*.mat)
+        When key == 'ba', exporting to Xilinx Coeff format is enabled.
+
+    comment: string
+        comment string stating the type of data to be copied (e.g.
+        "filter coefficients ") for user message while opening file
+
+    """
+    dlg = QFD(parent)
+
+    file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
+        ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
+
+    if fb.fil[0]['ft'] == 'FIR':
+        file_filters += ";;Xilinx coefficient format (*.coe)"
+
+#        # Add further file types when modules are available:
+#        if XLWT:
+#            file_filters += ";;Excel Worksheet (.xls)"
+#        if XLSX:
+#            file_filters += ";;Excel 2007 Worksheet (.xlsx)"
+
+    # return selected file name (with or without extension) and filter (Linux: full text)
+    file_name, file_type = dlg.getSaveFileName_(
+            caption = "Export filter coefficients as",
+            directory = rc.save_dir, filter = file_filters)
+    file_name = str(file_name) # QString -> str needed for Python 2
+
+    for t in extract_file_ext(file_filters): # extract the list of file extensions
+        if t in str(file_type):
+            file_type = t
+
+    if file_name != '': # cancelled file operation returns empty string
+        # strip extension from returned file name (if any) + append file type:
+        file_name = os.path.splitext(file_name)[0] +  file_type
+
+#            ba = fb.fil[0]['ba']
+        file_type_err = False
+        try:
+            if file_type == '.coe': # text / string format
+                with io.open(file_name, 'w', encoding="utf8") as f:
+                    parent.save_file_coe(f)
+            elif file_type == '.csv':
+                with io.open(file_name, 'w', encoding="utf8") as f:
+                    #np.savetxt(f, data, delimiter = ', ')
+                    CSV_dict=params['CSV']
+                    writer = csv.writer(f, delimiter=CSV_dict['delimiter'],
+                                   lineterminator=CSV_dict['lineterminator'])
+                    writer.writerows(data)
+            else: # binary format
+                with io.open(file_name, 'wb') as f:
+                    if file_type == '.mat':
+                        savemat(f, mdict={key:data})
+                        # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
+                    elif file_type == '.npy':
+                        # can only store one array in the file:
+                        np.save(f, data)
+                    elif file_type == '.npz':
+                        # would be possible to store multiple arrays in the file
+                        np.savez(f, key = data)
+                    elif file_type == '.xls':
+                        # see
+                        # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
+                        # https://github.com/python-excel/xlwt/blob/master/xlwt/examples/num_formats.py
+                        # http://reliablybroken.com/b/2011/07/styling-your-excel-data-with-xlwt/
+                        workbook = xlwt.Workbook(encoding="utf-8")
+                        worksheet = workbook.add_sheet("Python Sheet 1")
+                        bold = xlwt.easyxf('font: bold 1')
+                        worksheet.write(0, 0, 'b', bold)
+                        worksheet.write(0, 1, 'a', bold)
+                        for col in range(2):
+                            for row in range(np.shape(data)[1]):
+                                worksheet.write(row+1, col, data[col][row]) # vertical
+                        workbook.save(f)
+
+                    elif file_type == '.xlsx':
+                        # from https://pypi.python.org/pypi/XlsxWriter
+                        # Create an new Excel file and add a worksheet.
+                        workbook = xlsx.Workbook(f)
+                        worksheet = workbook.add_worksheet()
+                        # Widen the first column to make the text clearer.
+                        worksheet.set_column('A:A', 20)
+                        # Add a bold format to use to highlight cells.
+                        bold = workbook.add_format({'bold': True})
+                        # Write labels with formatting.
+                        worksheet.write('A1', 'b', bold)
+                        worksheet.write('B1', 'a', bold)
+
+                        # Write some numbers, with row/column notation.
+                        for col in range(2):
+                            for row in range(np.shape(data)[1]):
+                                worksheet.write(row+1, col, data[col][row]) # vertical
+            #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
+
+
+                        # Insert an image - useful for documentation export ?!.
+            #            worksheet.insert_image('B5', 'logo.png')
+
+                        workbook.close()
+
+                    else:
+                        logger.error('Unknown file type "%s"', file_type)
+                        file_type_err = True
+
+                    if not file_type_err:
+                        logger.info('Filter saved as "%s"', file_name)
+                        rc.save_dir = os.path.dirname(file_name) # save new dir
+
+        except IOError as e:
+            logger.error('Failed saving "%s"!\n%s\n', file_name, e)
+
+
+        # Download the Simple ods py module:
+        # http://simple-odspy.sourceforge.net/
+        # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
+
+            #------------------------------------------------------------------------------
+
 
 #==============================================================================
 
