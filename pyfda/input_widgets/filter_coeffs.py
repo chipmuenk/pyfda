@@ -478,7 +478,7 @@ class FilterCoeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
         except IndexError:
             self.num_rows = len(self.ba[0])
-        logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
+        logger.warning("np.shape(ba) = {0}".format(np.shape(self.ba)))
 
         params['FMT_ba'] = int(self.ui.spnDigits.text())
 
@@ -585,6 +585,7 @@ class FilterCoeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, key='ba', comment="filter coefficients ")
+        logger.info("imported data: dim - shape = {0} - {1}".format(np.dim(data_str), np.shape(data_str)))
 
         conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
@@ -599,7 +600,7 @@ class FilterCoeffs(QWidget):
         else:
             logger.error("Imported data is a single value or None.")
             return None
-        logger.debug("_copy_to_table: c x r:", num_cols, num_rows)
+        logger.info("_copy_to_table: c x r = {0} x {1}".format(num_cols, num_rows))
         if orientation_horiz:
             self.ba = [[],[]]
             for c in range(num_cols):
