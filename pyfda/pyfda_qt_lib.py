@@ -336,8 +336,6 @@ def qget_selected(table, select_all=False, reverse=True):
     # cur_idx_row = table.currentIndex().row()
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
     
-
-    
 #------------------------------------------------------------------------------
 def qtable2text(table, data, parent, key, frmt='float', comment=""):
     """
@@ -609,8 +607,8 @@ def qtext2table(parent, key, comment = ""):
             if PY3:
                 text = parent.clipboard.text()
             else:
-                text = unicode(parent.clipboard.text()) # Py 2 needs unicode here (why?)
-
+                # Explicit conversion to unicode for Py 2 
+                text = unicode(parent.clipboard.text())
             logger.info("Importing:\n{0}\n{1}".format(np.shape(text), text))
             # pass handle to text and convert to numpy array:
             data_arr = csv2array(io.StringIO(text)) 
@@ -628,7 +626,12 @@ def csv2array(f):
     """
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
-    
+
+    Parameter
+    ---------
+    f: handle to file or file-like object:
+        f = io.open(file_name, 'r') or f = io.StringIO(text)
+
     Returns
     -------
     numpy.array
@@ -661,6 +664,9 @@ def csv2array(f):
         logger.error(e)
 
     try:
+        #------------------------------------------------------------------------------
+        # Analyze CSV object
+        #------------------------------------------------------------------------------
         if header == 'auto' or tab == 'auto' or cr == 'auto':
         # test the first line for delimiters (of the given selection)
             dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' ']) 
@@ -673,7 +679,7 @@ def csv2array(f):
             f.seek(0)
 
     except csv.Error as e:
-        logger.error("Error during CSV analysis:\n{0}".format(e)) 
+        logger.error("Error during CSV analysis:\n{0}".format(e))
         dialect = csv.get_dialect('excel-tab') # fall back
         use_header = False
 
@@ -689,20 +695,21 @@ def csv2array(f):
 
     if tab != 'auto':
         delimiter = str(tab)
-        
+
     if cr != 'auto':
         lineterminator = str(cr)
-        
+
     logger.info("using delimiter {0}, terminator {1} and quotechar {2}"\
-                .format(repr(delimiter), repr(lineterminator), repr(quotechar))) 
+                .format(repr(delimiter), repr(lineterminator), repr(quotechar)))
     logger.info("using header '{0}'".format(use_header))
     logger.info("Type of passed text is '{0}'".format(type(f)))
-
+    #------------------------------------------------
+    # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
-        
+    #------------------------------------------------
     if use_header:
         logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2 
-    
+
     data_list = []
     try:
         for row in data_iter:
@@ -730,7 +737,7 @@ def csv2array(f):
 #------------------------------------------------------------------------------
 def import_data(parent, key, comment):
     """
-    Import data from a file
+    Import data from a file and convert it to a numpy array.
 
     Parameters
     ----------
@@ -802,7 +809,9 @@ def export_data(parent, data, key, comment=""):
     ----------
     parent: handle to calling instance
 
-    data: CSV data
+    data: string
+        formatted as CSV data, i.e. rows of elements separated by 'delimiter', 
+        terminated by 'lineterminator'
 
     key: string
         Key for accessing data in *.npz file or Matlab workspace (*.mat)
@@ -814,6 +823,10 @@ def export_data(parent, data, key, comment=""):
 
     """
     dlg = QFD(parent)
+    
+    logger.warning("imported data: type{0}|dim{1}|shape{2}\n{3}"\
+                   .format(type(data), np.ndim(data), np.shape(data), data))
+
 
     file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
         ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")

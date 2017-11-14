@@ -585,7 +585,8 @@ class FilterCoeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, key='ba', comment="filter coefficients ")
-        logger.info("imported data: dim - shape = {0} - {1}".format(np.dim(data_str), np.shape(data_str)))
+        logger.warning("imported data: dim - shape = {0} - {1} - {2}\n{3}"\
+                       .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
         conv = self.myQ.frmt2float # frmt2float_vec?
         frmt = self.myQ.frmt
