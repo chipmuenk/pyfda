@@ -856,6 +856,8 @@ def export_data(parent, data, key, comment=""):
 
 #            ba = fb.fil[0]['ba']
         file_type_err = False
+        delim = params['CSV']['delimiter']
+        lineterm = params['CSV']['lineterminator']
         try:
             if file_type == '.coe': # text / string format
                 with io.open(file_name, 'w', encoding="utf8") as f:
@@ -863,9 +865,8 @@ def export_data(parent, data, key, comment=""):
             elif file_type == '.csv':
                 with io.open(file_name, 'w', encoding="utf8") as f:
                     #np.savetxt(f, data, delimiter = ', ')
-                    CSV_dict=params['CSV']
-                    writer = csv.writer(f, delimiter=CSV_dict['delimiter'],
-                                   lineterminator=CSV_dict['lineterminator'])
+                    writer = csv.writer(f, delimiter=delim,
+                                   lineterminator=lineterm)
                     writer.writerows(data)
             else: # binary format
                 with io.open(file_name, 'wb') as f:
