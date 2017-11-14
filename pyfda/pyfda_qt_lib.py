@@ -873,8 +873,9 @@ def export_data(parent, data, key, comment=""):
                         savemat(f, mdict={key:data})
                         # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
                     elif file_type == '.npy':
-                        # can only store one array in the file:
-                        np.save(f, data)
+                        # can only store one array in the file, no pickled data
+                        # for Py2 <-> 3 compatibility
+                        np.save(f, np_data, allow_pickle=False)
                     elif file_type == '.npz':
                         # would be possible to store multiple arrays in the file
                         np.savez(f, key = data)
