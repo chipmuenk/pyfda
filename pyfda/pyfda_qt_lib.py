@@ -390,7 +390,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
 
     Returns
     -------
-    Nothing, text is exported to clipboard or to file via export_coeffs
+    Nothing, text is exported to clipboard or to file via export_data
     """
 
     text = ""
@@ -504,7 +504,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         else:
             logger.error("No clipboard instance defined!")
     else:
-        export_coeffs(parent, text, key, comment=comment)
+        export_data(parent, text, key, comment=comment)
 
     # numpy.loadtxt  textfile -> array
     # numpy.savetxt array -> textfile
@@ -616,9 +616,9 @@ def qtext2table(parent, key, comment = ""):
             data_arr = csv2text(io.StringIO(text)) 
 
     else: # data from file
-        data_arr = import_coeffs(parent, key, comment)
+        data_arr = import_data(parent, key, comment)
         # pass data as numpy array
-        logger.info("Imported data from file:{0}\n{1}".format(np.shape(data_arr), data_arr))
+        logger.info("Imported data from file. shape = {0}\n{1}".format(np.shape(data_arr), data_arr))
 
     return data_arr
 
@@ -728,9 +728,9 @@ def csv2text(f):
         return None
 
 #------------------------------------------------------------------------------
-def import_coeffs(parent, key, comment):
+def import_data(parent, key, comment):
     """
-    Import filter coefficients from a file
+    Import data from a file
 
     Parameters
     ----------
@@ -793,7 +793,7 @@ def import_coeffs(parent, key, comment):
             logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             return None
 #------------------------------------------------------------------------------
-def export_coeffs(parent, data, key, comment=""):
+def export_data(parent, data, key, comment=""):
     """
     Export filter coefficients in various formats - see also
     Summerfield p. 192 ff
