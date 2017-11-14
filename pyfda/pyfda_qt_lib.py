@@ -613,7 +613,7 @@ def qtext2table(parent, key, comment = ""):
 
             logger.info("Importing:\n{0}\n{1}".format(np.shape(text), text))
             # pass handle to text and convert to numpy array:
-            data_arr = csv2text(io.StringIO(text)) 
+            data_arr = csv2array(io.StringIO(text)) 
 
     else: # data from file
         data_arr = import_data(parent, key, comment)
@@ -624,9 +624,9 @@ def qtext2table(parent, key, comment = ""):
 
 
 #------------------------------------------------------------------------------
-def csv2text(f):
+def csv2array(f):
     """
-    Convert comma-separated values, passed either as file object or text object
+    Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
     
     Returns
@@ -769,7 +769,7 @@ def import_data(parent, key, comment):
         try:
             if file_type == '.csv':
                 with io.open(file_name, 'r') as f:
-                    data_arr = csv2text(f)
+                    data_arr = csv2array(f)
             else:
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.mat':
