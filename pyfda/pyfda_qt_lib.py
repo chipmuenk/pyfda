@@ -864,11 +864,12 @@ def export_data(parent, data, key, comment=""):
                     parent.save_file_coe(f)
             elif file_type == '.csv':
                 with io.open(file_name, 'w', encoding="utf8") as f:
-                    #np.savetxt(f, data, delimiter = ', ')
                     writer = csv.writer(f, delimiter=delim,
                                    lineterminator=lineterm)
                     writer.writerows(data)
             else: # binary format
+                np_data = csv2array(io.StringIO(data))
+
                 with io.open(file_name, 'wb') as f:
                     if file_type == '.mat':
                         savemat(f, mdict={key:data})
@@ -913,7 +914,6 @@ def export_data(parent, data, key, comment=""):
                             for row in range(np.shape(data)[1]):
                                 worksheet.write(row+1, col, data[col][row]) # vertical
             #                    worksheet.write(row, col, coeffs[col][row]) # horizontal
-
 
                         # Insert an image - useful for documentation export ?!.
             #            worksheet.insert_image('B5', 'logo.png')
