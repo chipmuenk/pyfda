@@ -104,6 +104,24 @@ def uni_chr(c):
     else:
         return unichr(c)
 
+def unicode_23(string):
+    """
+    Parameter
+    ---------
+    string: str
+        This is a unicode string under Python 3 and a "normal" string under Python 2.
+
+    Returns
+    -------
+    unicode string
+
+    Convert string to unicode string under Python 2.x. Python 3.x uses unicode
+    strings anyway.
+    """
+    if PY3:
+        return string
+    else:
+        return unicode(string)
 
 def cmp_version(mod, version):
     """
