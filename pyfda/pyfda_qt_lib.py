@@ -500,6 +500,8 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         else:
             logger.error("No clipboard instance defined!")
     else:
+        if not PY3:
+            text = unicode(text)
         export_data(parent, text, key, comment=comment)
         
 #==============================================================================
@@ -822,17 +824,15 @@ def export_data(parent, data, key, comment=""):
         # strip extension from returned file name (if any) + append file type:
         file_name = os.path.splitext(file_name)[0] +  file_type
         file_type_err = False
-        delim = params['CSV']['delimiter']
-        lineterm = params['CSV']['lineterminator']
+        
         try:
             if file_type == '.coe': # text / string format
                 with io.open(file_name, 'w', encoding="utf8") as f:
                     parent.save_file_coe(f)
             elif file_type == '.csv':
-                with io.open(file_name, 'w', encoding="utf8") as f:
-                    writer = csv.writer(f, delimiter=delim,
-                                   lineterminator=lineterm)
-                    writer.writerows(data)
+                with io.open(file_name, 'w', encoding='utf8') as f:
+                    f.write(data)
+    
             else: # binary format
                 np_data = csv2array(io.StringIO(data))
 
