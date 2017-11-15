@@ -20,7 +20,7 @@ import datetime
 import numpy as np
 from scipy.io import loadmat, savemat
 
-from .pyfda_lib import PY3, safe_eval, extract_file_ext
+from .pyfda_lib import PY3, unicode_23, safe_eval
 from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 import pyfda.pyfda_fix_lib as fix_lib
 from .pyfda_rc import params
@@ -141,6 +141,32 @@ class CSV_option_box(QDialog):
 
         except KeyError as e:
             logger.error(e)
+#------------------------------------------------------------------------------
+def prune_file_ext(file_type):
+    """
+    Prune file extension, e.g. '(*.txt)' from file type description returned
+    by QFileDialog
+    """
+    # regular expression: re.sub(pattern, repl, string)
+    #  Return the string obtained by replacing the leftmost non-overlapping
+    #  occurrences of the pattern in string by repl
+    #   '.' means any character
+    #   '+' means one or more
+    #   '[^a]' means except for 'a'
+    # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
+    # '(' must be escaped as '\('
+
+    return re.sub('\([^\)]+\)', '', file_type)
+
+#------------------------------------------------------------------------------
+def extract_file_ext(file_type):
+    """
+    Extract list with file extension(s), e.g. '.vhd' from type description
+    (e.g. 'VHDL (*.vhd)') returned by QFileDialog
+    """
+
+    ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
+    return [t.strip('(*)') for t in ext_list] # remove '(*)'
    
 #------------------------------------------------------------------------------
 def qtable2text(table, data, parent, key, frmt='float', comment=""):

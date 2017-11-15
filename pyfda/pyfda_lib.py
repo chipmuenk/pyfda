@@ -280,31 +280,8 @@ def get_home_dir():
     return homeDir
 
 #------------------------------------------------------------------------------
-def prune_file_ext(file_type):
-    """
-    Prune file extension, e.g. '(*.txt)' from file type description returned
-    by QFileDialog
-    """
-    # regular expression: re.sub(pattern, repl, string)
-    #  Return the string obtained by replacing the leftmost non-overlapping
-    #  occurrences of the pattern in string by repl
-    #   '.' means any character
-    #   '+' means one or more
-    #   '[^a]' means except for 'a'
-    # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
-    # '(' must be escaped as '\('
-
-    return re.sub('\([^\)]+\)', '', file_type)
 
 #------------------------------------------------------------------------------
-def extract_file_ext(file_type):
-    """
-    Extract list with file extension(s), e.g. '.vhd' from type description
-    (e.g. 'VHDL (*.vhd)') returned by QFileDialog
-    """
-
-    ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
-    return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
 #------------------------------------------------------------------------------
 
