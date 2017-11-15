@@ -151,6 +151,7 @@ MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
 OS = platform.system()
 OS_VER = platform.release()
+# TODO: use os.linesep?
 if OS == "Windows":
     CRLF = "\r\n" # Windows: carriage return + line feed
 elif OS == "Darwin":
