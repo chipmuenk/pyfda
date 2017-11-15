@@ -18,8 +18,8 @@ from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QIcon,
                       QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
-from pyfda.pyfda_qt_lib import (qstr, qtable2text, qtext2table,
-                                qget_cmb_box, qstyle_widget)
+from pyfda.pyfda_qt_lib import qstr, qget_cmb_box, qstyle_widget
+from pyfda.pyfda_io_lib import qtable2text, qtext2table
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf

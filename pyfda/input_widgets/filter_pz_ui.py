@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
                       QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
-from pyfda.pyfda_qt_lib import qset_cmb_box, CSV_option_box
+from pyfda.pyfda_qt_lib import qset_cmb_box
+from pyfda.pyfda_io_lib import CSV_option_box
 from pyfda.pyfda_lib import rt_label, uni_chr
 from pyfda.pyfda_rc import params
 

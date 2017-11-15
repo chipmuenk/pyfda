@@ -13,17 +13,16 @@ logger = logging.getLogger(__name__)
 
 import sys
 
-from ..compat import (Qt, QtCore, QtGui, QWidget, QLabel, QLineEdit, QComboBox, QApplication,
-                      QPushButton, QFrame, QSpinBox, QFont, QIcon, QSize,
-                      QTableWidget, QTableWidgetItem, QVBoxLayout, QHBoxLayout, QGridLayout,
-                      pyqtSignal, QStyledItemDelegate, QColor, QBrush, QSizePolicy)
+from ..compat import (Qt, QtCore, QWidget, QLineEdit, QApplication,
+                      QIcon, QSize, QTableWidget, QTableWidgetItem, QVBoxLayout,
+                      pyqtSignal, QStyledItemDelegate, QColor, QBrush)
 
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, safe_eval
-from pyfda.pyfda_qt_lib import (qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, CSV_option_box,
-                                qtable2text, qtext2table, qget_selected)
+from pyfda.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, qget_selected
+from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
  
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
@@ -478,7 +477,7 @@ class FilterCoeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
         except IndexError:
             self.num_rows = len(self.ba[0])
-        logger.warning("np.shape(ba) = {0}".format(np.shape(self.ba)))
+        logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
 
         params['FMT_ba'] = int(self.ui.spnDigits.text())
 
@@ -585,7 +584,7 @@ class FilterCoeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, key='ba', comment="filter coefficients ")
-        logger.warning("imported data: dim - shape = {0} - {1} - {2}\n{3}"\
+        logger.debug("importing data: dim - shape = {0} - {1} - {2}\n{3}"\
                        .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
         conv = self.myQ.frmt2float # frmt2float_vec?
