@@ -9,9 +9,7 @@ import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QFD, Qt,
-                      QWidget, QPushButton, QLabel, QFont, QFrame,
-                      QVBoxLayout, QHBoxLayout)
+from ..compat import QtCore, QFD, Qt, QWidget, QPushButton, QFont, QFrame, QVBoxLayout
 
 import numpy as np
 
@@ -47,9 +45,7 @@ else:
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_rc as rc
-from pyfda.pyfda_lib import extract_file_ext
-
-# TODO: Save P/Z as well if possible
+from pyfda.pyfda_io_lib import extract_file_ext
 
 class File_IO(QWidget):
     """
