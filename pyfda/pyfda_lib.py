@@ -261,6 +261,7 @@ def env(name):
     """Get value for environment variable"""
     return os.environ.get( name, '' )
 
+#------------------------------------------------------------------------------
 def get_home_dir():
     """Return the user's home directory"""
     if sys.platform != 'win32':
@@ -280,6 +281,9 @@ def get_home_dir():
     return homeDir
 
 #------------------------------------------------------------------------------
+def get_log_dir():
+    """Return the user's logging directory"""
+    pass
 
 #------------------------------------------------------------------------------
 
