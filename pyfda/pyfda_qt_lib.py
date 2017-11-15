@@ -12,16 +12,9 @@ from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
 
-import numpy as np
-from scipy.io import loadmat, savemat
-
 from .pyfda_lib import PY3
-from .pyfda_rc import params
-import pyfda.pyfda_rc as rc
-import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-from .compat import (QFrame, QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
-                     QFD, QHBoxLayout, QVBoxLayout)
+from .compat import QFrame
 
 #------------------------------------------------------------------------------
 def qstr(text):
