@@ -12,9 +12,8 @@ from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
 
-import os
+import os, re, io
 import csv
-import io
 import datetime
 
 import numpy as np
@@ -656,12 +655,11 @@ def export_data(parent, data, key, comment=""):
         file_type_err = False
 
         try:
-            if file_type == '.coe': # pass filename
-                save_file_coe(file_name)
-                
-            elif file_type in {'.csv', '.txt'}: # text / string format
+            if file_type in {'.coe', '.csv', '.txt'}: # text / string format
                 with io.open(file_name, 'w', encoding="utf8") as f:
-                    if file_type == '.csv':
+                    if file_type == '.coe':
+                        save_file_coe(f)
+                    elif file_type == '.csv':
                         f.write(data)
                     else:
                         f.write(data)
