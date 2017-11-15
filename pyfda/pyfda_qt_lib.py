@@ -495,45 +495,13 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
             text.rstrip(cr)
 
     if params['CSV']['clipboard']:
-#        if "clipboard" in str(target.__class__.__name__).lower():
-#            target.setText(text)
         if hasattr(parent, 'clipboard'):
             parent.clipboard.setText(text)
         else:
             logger.error("No clipboard instance defined!")
     else:
         export_data(parent, text, key, comment=comment)
-
-    # numpy.loadtxt  textfile -> array
-    # numpy.savetxt array -> textfile
-    # numpy.genfromtxt textfile -> array (with missing values)
-    # numpy.recfromcsv
         
-#==============================================================================
-# http://stackoverflow.com/questions/6081008/dump-a-numpy-array-into-a-csv-file#6081043
-#     # Write an example CSV file with headers on first line
-#     with open('example.csv', 'w') as fp:
-#         fp.write('''\
-#     col1,col2,col3
-#     1,100.1,string1
-#     2,222.2,second string
-#     ''')
-#     
-#     # Read it as a Numpy record array
-#     ar = np.recfromcsv('example.csv')
-#     print(repr(ar))
-#     # rec.array([(1, 100.1, 'string1'), (2, 222.2, 'second string')], 
-#     #           dtype=[('col1', '<i4'), ('col2', '<f8'), ('col3', 'S13')])
-#     
-#     # Write as a CSV file with headers on first line
-#     with open('out.csv', 'w') as fp:
-#         fp.write(','.join(ar.dtype.names) + '\n')
-#         np.savetxt(fp, ar, '%s', ',')
-#     
-#     # Note that this example does not consider strings with commas, which would require quotes.
-#         
-#==============================================================================
-
 #==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
 #     ##if you want to write in column:
@@ -853,8 +821,6 @@ def export_data(parent, data, key, comment=""):
     if file_name != '': # cancelled file operation returns empty string
         # strip extension from returned file name (if any) + append file type:
         file_name = os.path.splitext(file_name)[0] +  file_type
-
-#            ba = fb.fil[0]['ba']
         file_type_err = False
         delim = params['CSV']['delimiter']
         lineterm = params['CSV']['lineterminator']
