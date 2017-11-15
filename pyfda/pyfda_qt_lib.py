@@ -793,10 +793,9 @@ def export_data(parent, data, key, comment=""):
 
     """
     dlg = QFD(parent)
-    
+
     logger.warning("imported data: type{0}|dim{1}|shape{2}\n{3}"\
                    .format(type(data), np.ndim(data), np.shape(data), data))
-
 
     file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
         ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
@@ -824,7 +823,7 @@ def export_data(parent, data, key, comment=""):
         # strip extension from returned file name (if any) + append file type:
         file_name = os.path.splitext(file_name)[0] +  file_type
         file_type_err = False
-        
+
         try:
             if file_type == '.coe': # text / string format
                 with io.open(file_name, 'w', encoding="utf8") as f:
@@ -832,7 +831,7 @@ def export_data(parent, data, key, comment=""):
             elif file_type == '.csv':
                 with io.open(file_name, 'w', encoding='utf8') as f:
                     f.write(data)
-    
+
             else: # binary format
                 np_data = csv2array(io.StringIO(data))
 
