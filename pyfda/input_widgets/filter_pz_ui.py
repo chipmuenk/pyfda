@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Sun Oct  8 16:13:50 2017
@@ -12,8 +11,9 @@ logger = logging.getLogger(__name__)
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
                       QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
-from pyfda.pyfda_qt_lib import qset_cmb_box, CSV_option_box
-from pyfda.pyfda_lib import rt_label, uni_chr
+from pyfda.pyfda_qt_lib import qset_cmb_box
+from pyfda.pyfda_io_lib import CSV_option_box
+from pyfda.pyfda_lib import rt_label
 from pyfda.pyfda_rc import params
 
 class FilterPZ_UI(QWidget):
@@ -27,8 +27,9 @@ class FilterPZ_UI(QWidget):
         Pass instance `parent` of parent class (FilterCoeffs)
         """
         super(FilterPZ_UI, self).__init__(parent)
-        self.parent = parent # instance of the parent (not the base) class
-
+#        self.parent = parent # instance of the parent (not the base) class
+        self.eps = 1.e-4 # # tolerance value for e.g. setting P/Z to zero
+        
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -158,17 +159,18 @@ class FilterPZ_UI(QWidget):
         self.butClear.setToolTip("Clear all entries.")
 
 
-        self.butToClipboard = QPushButton(self)
-        self.butToClipboard.setIcon(QIcon(':/to_clipboard.svg'))
-        self.butToClipboard.setIconSize(q_icon_size)
-        self.butToClipboard.setToolTip("<span>Copy table to clipboard, SELECTED items are copied as "
+        self.butFromTable = QPushButton(self)
+        self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
+        self.butFromTable.setIconSize(q_icon_size)
+        self.butFromTable.setToolTip("<span>"
+                            "Copy table to clipboard / file, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
-                            "is copied with full precision in decimal format. </span>")
+                            "is copied with full precision in decimal format.</span>")
         
-        self.butFromClipboard = QPushButton(self)
-        self.butFromClipboard.setIcon(QIcon(':/from_clipboard.svg'))
-        self.butFromClipboard.setIconSize(q_icon_size)
-        self.butFromClipboard.setToolTip("<span>Copy clipboard to table.</span>")
+        self.butToTable = QPushButton(self)
+        self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
+        self.butToTable.setIconSize(q_icon_size)
+        self.butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
 
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
@@ -183,15 +185,14 @@ class FilterPZ_UI(QWidget):
         layHButtonsCoeffs1.addWidget(self.butClear)
         layHButtonsCoeffs1.addWidget(self.butSave)
         layHButtonsCoeffs1.addWidget(self.butLoad)
-        layHButtonsCoeffs1.addWidget(self.butToClipboard)
-        layHButtonsCoeffs1.addWidget(self.butFromClipboard)
+        layHButtonsCoeffs1.addWidget(self.butFromTable)
+        layHButtonsCoeffs1.addWidget(self.butToTable)
         layHButtonsCoeffs1.addWidget(butSettingsClipboard)
         layHButtonsCoeffs1.addStretch()
 
         #-------------------------------------------------------------------
         #   Eps / set zero settings
         # ---------------------------------------------------------------------
-
         self.butSetZero = QPushButton("= 0", self)
         self.butSetZero.setToolTip("<span>Set selected poles / zeros = 0 with a magnitude &lt; &epsilon;. "
         "When nothing is selected, test the whole table.</span>")
@@ -209,27 +210,26 @@ class FilterPZ_UI(QWidget):
         layHButtonsCoeffs2.addWidget(self.ledEps)
         layHButtonsCoeffs2.addStretch()
 
-        layVBtns = QVBoxLayout()
-        layVBtns.addLayout(layHDisplay)
-        layVBtns.addLayout(layHGain)
-        layVBtns.addLayout(layHButtonsCoeffs1)
-        layVBtns.addLayout(layHButtonsCoeffs2)
-
-        # This frame encompasses all the buttons
+        # ########################  Main UI Layout ############################
+        # layout for frame (UI widget)
+        layVMainF = QVBoxLayout()
+        layVMainF.addLayout(layHDisplay)
+        layVMainF.addLayout(layHGain)
+        layVMainF.addLayout(layHButtonsCoeffs1)
+        layVMainF.addLayout(layHButtonsCoeffs2)
+        # This frame encompasses all UI elements
         frmMain = QFrame(self)
-        frmMain.setLayout(layVBtns)
+        frmMain.setLayout(layVMainF)
 
         layVMain = QVBoxLayout()
         layVMain.setAlignment(Qt.AlignTop) # this affects only the first widget (intended here)
         layVMain.addWidget(frmMain)
         layVMain.setContentsMargins(*params['wdg_margins'])
-        
-        #------------------- set initial values from dict ----------------------
-        self.spnDigits.setValue(params['FMT_pz'])
-        self.ledEps.setText(str(self.parent.eps))
-        
         self.setLayout(layVMain)
-
+        
+        #--- set initial values from dict / signal slot connections------------
+        self.spnDigits.setValue(params['FMT_pz'])
+        self.ledEps.setText(str(self.eps))
         butSettingsClipboard.clicked.connect(self._copy_options)
         
     #------------------------------------------------------------------------------
@@ -241,3 +241,17 @@ class FilterPZ_UI(QWidget):
         self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
         #self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.opt_widget.exec_() # modal dialog (blocking)
+
+#------------------------------------------------------------------------------
+if __name__ == '__main__':
+    """ Test with python -m pyfda.input_widgets.filter_pz_ui """
+    import sys
+    from ..compat import QApplication
+
+    app = QApplication(sys.argv)
+    mainw = FilterPZ_UI(None)
+
+    app.setActiveWindow(mainw)
+    mainw.show()
+
+    sys.exit(app.exec_())

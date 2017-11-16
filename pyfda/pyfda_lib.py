@@ -94,7 +94,7 @@ def b(s):
     else:
         return s # return as string
 
-def uni_chr(c):
+def unichr_23(c):
     """
     Convert code point value (integer between 1 ... 65536) to one-character unicode string.
     The reverse operation (`ord(u)`) works the same way in py2 and py3.
@@ -104,6 +104,24 @@ def uni_chr(c):
     else:
         return unichr(c)
 
+def unicode_23(string):
+    """
+    Parameter
+    ---------
+    string: str
+        This is a unicode string under Python 3 and a "normal" string under Python 2.
+
+    Returns
+    -------
+    unicode string
+
+    Convert string to unicode string under Python 2.x. Python 3.x uses unicode
+    strings anyway.
+    """
+    if PY3:
+        return string
+    else:
+        return unicode(string)
 
 def cmp_version(mod, version):
     """
@@ -151,6 +169,7 @@ MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
 OS = platform.system()
 OS_VER = platform.release()
+# TODO: use os.linesep?
 if OS == "Windows":
     CRLF = "\r\n" # Windows: carriage return + line feed
 elif OS == "Darwin":
@@ -242,6 +261,7 @@ def env(name):
     """Get value for environment variable"""
     return os.environ.get( name, '' )
 
+#------------------------------------------------------------------------------
 def get_home_dir():
     """Return the user's home directory"""
     if sys.platform != 'win32':
@@ -261,31 +281,11 @@ def get_home_dir():
     return homeDir
 
 #------------------------------------------------------------------------------
-def prune_file_ext(file_type):
-    """
-    Prune file extension, e.g. '(*.txt)' from file type description returned
-    by QFileDialog
-    """
-    # regular expression: re.sub(pattern, repl, string)
-    #  Return the string obtained by replacing the leftmost non-overlapping
-    #  occurrences of the pattern in string by repl
-    #   '.' means any character
-    #   '+' means one or more
-    #   '[^a]' means except for 'a'
-    # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
-    # '(' must be escaped as '\('
-
-    return re.sub('\([^\)]+\)', '', file_type)
+def get_log_dir():
+    """Return the user's logging directory"""
+    pass
 
 #------------------------------------------------------------------------------
-def extract_file_ext(file_type):
-    """
-    Extract list with file extension(s), e.g. '.vhd' from type description
-    (e.g. 'VHDL (*.vhd)') returned by QFileDialog
-    """
-
-    ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
-    return [t.strip('(*)') for t in ext_list] # remove '(*)'
 
 #------------------------------------------------------------------------------
 
@@ -1172,13 +1172,13 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
                 a = a[:D] # discard last D elements of a (only zeros anyway)
 
         fil_dict['N'] = len(b) - 1 # correct filter order accordingly
-        fil_dict['ba'] = [b.astype(np.complex), a.astype(np.complex)]
+        fil_dict['ba'] = [np.array(b, dtype=np.complex), np.array(a, dtype=np.complex)]
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
 
     fil_dict['creator'] = (format_in, sender)
-    fil_dict['time_designed'] = time.time()
+    fil_dict['timestamp'] = time.time()
 
     # Remove any antiCausal zero/poles
     if 'zpkA' in fil_dict: fil_dict.pop('zpkA')
