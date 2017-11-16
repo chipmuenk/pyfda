@@ -864,7 +864,9 @@ class Fixed(object):
                 if self.WF == 0:
                     y_fix = np.int64(y_fix) # get rid of trailing zero
 
-                y_str = str(y_fix) # use fixpoint number as returned by fixp()
+                # element wise conversion from integer (%d) to string
+                # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
+                y_str = np.char.mod('%d', y_fix) 
 
             elif self.frmt == 'csd':
                 y_str = dec2csd_vec(y_fix, self.WF) # convert with WF fractional bits
