@@ -517,10 +517,8 @@ def csv2array(f):
         cols, rows = np.shape(data_arr)
         logger.debug("cols = {0}, rows = {1}, data_arr = {2}\n".format(cols, rows, data_arr))
         if params['CSV']['orientation'] == 'vert':
-            logger.debug("{0}".format(data_arr.T))
             return data_arr.T
         else:
-            logger.debug("{0}".format(data_arr))
             return data_arr
             
     except (TypeError, ValueError) as e:
