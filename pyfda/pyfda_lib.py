@@ -1178,7 +1178,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
         raise ValueError("Unknown input format {0:s}".format(format_in))
 
     fil_dict['creator'] = (format_in, sender)
-    fil_dict['time_designed'] = time.time()
+    fil_dict['timestamp'] = time.time()
 
     # Remove any antiCausal zero/poles
     if 'zpkA' in fil_dict: fil_dict.pop('zpkA')
