@@ -19,7 +19,7 @@ import datetime
 import numpy as np
 from scipy.io import loadmat, savemat
 
-from .pyfda_lib import PY3, unicode_23, safe_eval
+from .pyfda_lib import unicode_23, safe_eval
 from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 import pyfda.pyfda_fix_lib as fix_lib
 from .pyfda_rc import params
@@ -331,9 +331,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         else:
             logger.error("No clipboard instance defined!")
     else:
-        if not PY3:
-            text = unicode(text)
-        export_data(parent, text, key, comment=comment)
+        export_data(parent, unicode_23(text), key, comment=comment)
         
 #==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -405,15 +403,10 @@ def qtext2table(parent, key, comment = ""):
             logger.error("No clipboard instance defined!")
             data_arr = None
         else:
-            if PY3:
-                text = parent.clipboard.text()
-            else:
-                # Explicit conversion to unicode for Py 2 
-                text = unicode(parent.clipboard.text())
+            text = unicode_23(parent.clipboard.text())
             logger.debug("Importing data from clipboard:\n{0}\n{1}".format(np.shape(text), text))
             # pass handle to text and convert to numpy array:
             data_arr = csv2array(io.StringIO(text)) 
-
     else: # data from file
         data_arr = import_data(parent, key, comment)
         # pass data as numpy array
