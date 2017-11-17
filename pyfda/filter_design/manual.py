@@ -35,10 +35,15 @@ FRMT = 'ba' # default output format of filter design routines 'zpk' / 'ba' / 'so
 msg_man = ('a', "Design the filter using the P/Z or the b/a widget. "
                 "The target specs are only used for entering and displaying spec limits.")
                 
-info_str =  ('In manual filter design mode the filter is designed by entering / editing '
-        'poles and zeros ("P/Z" tab) or coefficients ("b,a" tab). Use the info tab '
-        'or the magnitude frequency response (select "Show Specs") to check whether '
-        'the designed filter fulfills the specs in the "Target Specs" fields.')
+info_str =\
+"""
+**Manual Filter Design** 
+
+Manual filter design mode is selected automatically when entering / editing
+poles and zeros ("P/Z" tab) or coefficients ("b,a" tab). Use the info tab
+or the magnitude frequency response (select "Show Specs") to check whether
+the designed filter fulfills the target specs.
+"""
 
 class Manual_FIR(object):
     
