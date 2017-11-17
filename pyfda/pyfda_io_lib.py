@@ -576,8 +576,13 @@ def import_data(parent, fkey, comment):
                         data_arr = np.load(f)
                         # contains only one array
                     elif file_type == '.npz':
-                        data_arr = np.load(f)[key]
-                        # pick the array `key` from the dict
+                        fdict = np.load(f)
+                        if fkey not in fdict:
+                            file_type_err = True
+                            raise IOError("Key '{0}' not in file '{1}'.\nKeys found: {2}"\
+                                         .format(fkey, file_name, fdict.files))
+                        else:
+                            data_arr = fdict[fkey] # pick the array `fkey` from the dict
                     else:
                         logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
@@ -657,7 +662,7 @@ def export_data(parent, data, fkey, comment=""):
 
                 with io.open(file_name, 'wb') as f:
                     if file_type == '.mat':
-                        savemat(f, mdict={key:data})
+                        savemat(f, mdict={fkey:np_data})
                         # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
                     elif file_type == '.npy':
                         # can only store one array in the file, no pickled data
@@ -665,7 +670,8 @@ def export_data(parent, data, fkey, comment=""):
                         np.save(f, np_data, allow_pickle=False)
                     elif file_type == '.npz':
                         # would be possible to store multiple arrays in the file
-                        np.savez(f, key = data)
+                        fdict = {fkey:np_data}
+                        np.savez(f, **fdict) # unpack kw list (only one here)
                     elif file_type == '.xls':
                         # see
                         # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
