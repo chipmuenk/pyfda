@@ -168,7 +168,7 @@ def extract_file_ext(file_type):
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
    
 #------------------------------------------------------------------------------
-def qtable2text(table, data, parent, key, frmt='float', comment=""):
+def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
     """
     Transform table to CSV formatted text and copy to clipboard or file
     
@@ -184,7 +184,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
             Used to get the clipboard instance from the parent class (if copying 
             to clipboard) or to construct a QFileDialog instance (if copying to a file)
             
-    key:  string    
+    fkey:  string    
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
             
     frmt: string
@@ -331,7 +331,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         else:
             logger.error("No clipboard instance defined!")
     else:
-        export_data(parent, unicode_23(text), key, comment=comment)
+        export_data(parent, unicode_23(text), fkey, comment=comment)
         
 #==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -352,7 +352,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         
         
 #------------------------------------------------------------------------------
-def qtext2table(parent, key, comment = ""):
+def qtext2table(parent, fkey, comment = ""):
     """
     Copy data from clipboard or file to table
 
@@ -362,7 +362,7 @@ def qtext2table(parent, key, comment = ""):
     parent: object
             parent instance, having a QClipboard and / or a QFileDialog instance.
             
-    key: string
+    fkey: string
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
     
     comment: string
@@ -408,7 +408,7 @@ def qtext2table(parent, key, comment = ""):
             # pass handle to text and convert to numpy array:
             data_arr = csv2array(io.StringIO(text)) 
     else: # data from file
-        data_arr = import_data(parent, key, comment)
+        data_arr = import_data(parent, fkey, comment)
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0}\n{1}".format(np.shape(data_arr), data_arr))
 
@@ -526,7 +526,7 @@ def csv2array(f):
         return None
 
 #------------------------------------------------------------------------------
-def import_data(parent, key, comment):
+def import_data(parent, fkey, comment):
     """
     Import data from a file and convert it to a numpy array.
 
@@ -534,8 +534,8 @@ def import_data(parent, key, comment):
     ----------
     parent: handle to calling instance
 
-    key: string
-        Key for accessing data in *.npz file or Matlab workspace (*.mat)
+    fkey: string
+        Key for accessing data in *.npz or Matlab workspace (*.mat) file.
 
     comment: string
         comment string stating the type of data to be copied (e.g.
@@ -571,7 +571,7 @@ def import_data(parent, key, comment):
             else:
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.mat':
-                        data_arr = loadmat(f)[key]
+                        data_arr = loadmat(f)[fkey]
                     elif file_type == '.npy':
                         data_arr = np.load(f)
                         # contains only one array
@@ -591,7 +591,7 @@ def import_data(parent, key, comment):
             logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             return None
 #------------------------------------------------------------------------------
-def export_data(parent, data, key, comment=""):
+def export_data(parent, data, fkey, comment=""):
     """
     Export coefficients or pole/zero data in various formats
     Parameters
@@ -602,9 +602,9 @@ def export_data(parent, data, key, comment=""):
         formatted as CSV data, i.e. rows of elements separated by 'delimiter', 
         terminated by 'lineterminator'
 
-    key: string
-        Key for accessing data in *.npz file or Matlab workspace (*.mat)
-        When key == 'ba', exporting to Xilinx Coeff format is enabled.
+    fkey: string
+        Key for accessing data in *.npz or Matlab workspace (*.mat) file.
+        When fkey == 'ba', exporting to FPGA coefficients format is enabled.
 
     comment: string
         comment string stating the type of data to be copied (e.g.
