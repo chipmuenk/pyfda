@@ -128,7 +128,7 @@ class PlotImpz(QWidget):
         self.cmbStimulus.activated.connect(self.draw)
         self.ledAmp.editingFinished.connect(self.draw)
         self.ledFreq.installEventFilter(self) 
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
 
         self.draw() # initial calculation and drawing
 
@@ -201,7 +201,7 @@ class PlotImpz(QWidget):
             self.ledFreq.setText(str(self.stim_freq * fb.fil[0]['f_S']))
 
 #------------------------------------------------------------------------------
-    def _init_axes(self):
+    def init_axes(self):
         # clear the axes and (re)draw the plot
         #
         try:
@@ -242,8 +242,16 @@ class PlotImpz(QWidget):
         self.draw()
 
 #------------------------------------------------------------------------------
-    def draw(self):
+    def enable_ui(self):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
         self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
+        if self.mplwidget.mplToolbar.enabled:
+            # self.init_axes() # called by self.draw
+            self.draw()
+#------------------------------------------------------------------------------
+    def draw(self):
         if self.mplwidget.mplToolbar.enabled:
             self.draw_impz()
 
@@ -369,7 +377,7 @@ class PlotImpz(QWidget):
         else:
             self.bottom = 0
 
-        self._init_axes()
+        self.init_axes()
 
         #================ Main Plotting Routine =========================
         [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt='o', label = '$h[n]$')

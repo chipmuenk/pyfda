@@ -22,23 +22,26 @@ class PlotTauG(QWidget):
 
     def __init__(self, parent):
         super(PlotTauG, self).__init__(parent)
+        self.verbose = False # suppress warnings
 
-
-        self.chkWarnings = QCheckBox("Enable Warnings", self)
-        self.chkWarnings.setChecked(False)
-        self.chkWarnings.setToolTip("Print warnings about singular group delay")
-
-        layHControls = QHBoxLayout()
-        layHControls.addStretch(10)
-        layHControls.addWidget(self.chkWarnings)
-        
-        # This widget encompasses all control subwidgets:
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
-        self.frmControls.setLayout(layHControls)
-
+# =============================================================================
+# #### not needed at the moment ###
+#         self.chkWarnings = QCheckBox("Enable Warnings", self)
+#         self.chkWarnings.setChecked(False)
+#         self.chkWarnings.setToolTip("Print warnings about singular group delay")
+# 
+#         layHControls = QHBoxLayout()
+#         layHControls.addStretch(10)
+#         layHControls.addWidget(self.chkWarnings)
+#         
+#         # This widget encompasses all control subwidgets:
+#         self.frmControls = QFrame(self)
+#         self.frmControls.setObjectName("frmControls")
+#         self.frmControls.setLayout(layHControls)
+# 
+# =============================================================================
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+#        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
@@ -48,9 +51,8 @@ class PlotTauG(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.chkWarnings.clicked.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
-        
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
+
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
@@ -71,22 +73,28 @@ class PlotTauG(QWidget):
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
         self.W, self.tau_g = grpdelay(bb, aa, params['N_FFT'], whole = True,
-            verbose = self.chkWarnings.isChecked())
+            verbose = self.verbose) # self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:
            self.tau_g = np.zeros(self.tau_g.size)
 
 #------------------------------------------------------------------------------
+    def enable_ui(self):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+#        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
+        if self.mplwidget.mplToolbar.enabled:
+            self.init_axes()
+            self.draw()
+
+#------------------------------------------------------------------------------
     def draw(self):
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.calc_tau_g()
             self.update_view()
-#            self.mplwidget.fig.set_facecolor((0.5,0.5,0.5))
-        else:
-            pass
-#            self.mplwidget.fig.set_facecolor((1,1,1))
+
 #------------------------------------------------------------------------------
     def update_view(self):
         """

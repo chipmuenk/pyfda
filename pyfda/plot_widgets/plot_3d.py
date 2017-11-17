@@ -210,8 +210,9 @@ class Plot3D(QWidget):
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
         self.mplwidget.mplToolbar.enable_update(state = False) # disable initially
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
+
 
 #------------------------------------------------------------------------------
     def _init_cmb_colormap(self):
@@ -265,7 +266,7 @@ class Plot3D(QWidget):
         self.draw() # initial plot
 
 #------------------------------------------------------------------------------
-    def _init_axes(self):
+    def init_axes(self):
         """
         Initialize and clear the axes to get rid of colorbar
         The azimuth / elevation / distance settings of the camera are restored
@@ -349,22 +350,30 @@ class Plot3D(QWidget):
 
 
 #------------------------------------------------------------------------------
+    def enable_ui(self):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
+        if self.mplwidget.mplToolbar.enabled:
+            self.init_axes()
+            self.draw()
+
+#------------------------------------------------------------------------------
     def draw(self):
         """
         Main drawing entry point: Check whether updating is enabled in the
         toolbar and then perform the actual plot
         """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.draw_3d()
-
 
 #------------------------------------------------------------------------------
     def draw_3d(self):
         """
         Draw various 3D plots
         """
-        self._init_axes()
+        self.init_axes()
 
         bb = fb.fil[0]['ba'][0]
         aa = fb.fil[0]['ba'][1]

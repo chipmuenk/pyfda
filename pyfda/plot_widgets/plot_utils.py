@@ -74,6 +74,7 @@ class MplWidget(QWidget):
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_update(state = True)
+        self.mplToolbar.sigEnabled.connect(self.clear_disabled_figure)
 
         #=============================================
         # Widget layout with QHBox / QVBox
@@ -121,6 +122,17 @@ class MplWidget(QWidget):
 #        self.pltCanv.updateGeometry()
 #        self.pltCanv.adjustSize() #  resize the parent widget to fit its content
         self.pltCanv.draw() # now (re-)draw the figure
+
+#------------------------------------------------------------------------------
+    def clear_disabled_figure(self):
+        """
+        Clear the figure when it is disabled in the mplToolbar
+        """
+        if not self.mplToolbar.enabled:
+            self.fig.clf()
+            self.pltCanv.draw()
+        else:
+            self.redraw()
 
 #------------------------------------------------------------------------------
     def plt_full_view(self):
