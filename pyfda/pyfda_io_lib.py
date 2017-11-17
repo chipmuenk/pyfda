@@ -168,7 +168,7 @@ def extract_file_ext(file_type):
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
    
 #------------------------------------------------------------------------------
-def qtable2text(table, data, parent, key, frmt='float', comment=""):
+def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
     """
     Transform table to CSV formatted text and copy to clipboard or file
     
@@ -184,7 +184,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
             Used to get the clipboard instance from the parent class (if copying 
             to clipboard) or to construct a QFileDialog instance (if copying to a file)
             
-    key:  string    
+    fkey:  string    
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
             
     frmt: string
@@ -331,7 +331,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         else:
             logger.error("No clipboard instance defined!")
     else:
-        export_data(parent, unicode_23(text), key, comment=comment)
+        export_data(parent, unicode_23(text), fkey, comment=comment)
         
 #==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
@@ -352,7 +352,7 @@ def qtable2text(table, data, parent, key, frmt='float', comment=""):
         
         
 #------------------------------------------------------------------------------
-def qtext2table(parent, key, comment = ""):
+def qtext2table(parent, fkey, comment = ""):
     """
     Copy data from clipboard or file to table
 
@@ -362,7 +362,7 @@ def qtext2table(parent, key, comment = ""):
     parent: object
             parent instance, having a QClipboard and / or a QFileDialog instance.
             
-    key: string
+    fkey: string
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
     
     comment: string
@@ -408,7 +408,7 @@ def qtext2table(parent, key, comment = ""):
             # pass handle to text and convert to numpy array:
             data_arr = csv2array(io.StringIO(text)) 
     else: # data from file
-        data_arr = import_data(parent, key, comment)
+        data_arr = import_data(parent, fkey, comment)
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0}\n{1}".format(np.shape(data_arr), data_arr))
 
@@ -526,7 +526,7 @@ def csv2array(f):
         return None
 
 #------------------------------------------------------------------------------
-def import_data(parent, key, comment):
+def import_data(parent, fkey, comment):
     """
     Import data from a file and convert it to a numpy array.
 
@@ -534,8 +534,8 @@ def import_data(parent, key, comment):
     ----------
     parent: handle to calling instance
 
-    key: string
-        Key for accessing data in *.npz file or Matlab workspace (*.mat)
+    fkey: string
+        Key for accessing data in *.npz or Matlab workspace (*.mat) file.
 
     comment: string
         comment string stating the type of data to be copied (e.g.
@@ -571,13 +571,18 @@ def import_data(parent, key, comment):
             else:
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.mat':
-                        data_arr = loadmat(f)[key]
+                        data_arr = loadmat(f)[fkey]
                     elif file_type == '.npy':
                         data_arr = np.load(f)
                         # contains only one array
                     elif file_type == '.npz':
-                        data_arr = np.load(f)[key]
-                        # pick the array `key` from the dict
+                        fdict = np.load(f)
+                        if fkey not in fdict:
+                            file_type_err = True
+                            raise IOError("Key '{0}' not in file '{1}'.\nKeys found: {2}"\
+                                         .format(fkey, file_name, fdict.files))
+                        else:
+                            data_arr = fdict[fkey] # pick the array `fkey` from the dict
                     else:
                         logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
@@ -591,11 +596,9 @@ def import_data(parent, key, comment):
             logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             return None
 #------------------------------------------------------------------------------
-def export_data(parent, data, key, comment=""):
+def export_data(parent, data, fkey, comment=""):
     """
-    Export filter coefficients in various formats - see also
-    Summerfield p. 192 ff
-
+    Export coefficients or pole/zero data in various formats
     Parameters
     ----------
     parent: handle to calling instance
@@ -604,25 +607,26 @@ def export_data(parent, data, key, comment=""):
         formatted as CSV data, i.e. rows of elements separated by 'delimiter', 
         terminated by 'lineterminator'
 
-    key: string
-        Key for accessing data in *.npz file or Matlab workspace (*.mat)
-        When key == 'ba', exporting to Xilinx Coeff format is enabled.
+    fkey: string
+        Key for accessing data in *.npz or Matlab workspace (*.mat) file.
+        When fkey == 'ba', exporting to FPGA coefficients format is enabled.
 
     comment: string
         comment string stating the type of data to be copied (e.g.
         "filter coefficients ") for user message while opening file
 
     """
-    dlg = QFD(parent)
+    dlg = QFD(parent) # create instance for QFileDialog
 
-    logger.warning("imported data: type{0}|dim{1}|shape{2}\n{3}"\
+    logger.debug("imported data: type{0}|dim{1}|shape{2}\n{3}"\
                    .format(type(data), np.ndim(data), np.shape(data), data))
 
     file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
         ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
 
     if fb.fil[0]['ft'] == 'FIR':
-        file_filters += ";;Xilinx coefficient format (*.coe)"
+        file_filters += (";;Xilinx FIR coefficient format (*.coe)"
+                         ";;Microsemi FIR coefficient format (*.txt)")
 
 #        # Add further file types when modules are available:
 #        if XLWT:
@@ -649,17 +653,18 @@ def export_data(parent, data, key, comment=""):
             if file_type in {'.coe', '.csv', '.txt'}: # text / string format
                 with io.open(file_name, 'w', encoding="utf8") as f:
                     if file_type == '.coe':
-                        save_file_coe(f)
-                    elif file_type == '.csv':
+                        export_coe_xilinx(f)
+                    elif file_type == '.txt':
+                        export_coe_microsemi(f)
+                    else: # csv format
                         f.write(data)
-                    else:
-                        f.write(data)
+
             else: # binary format
                 np_data = csv2array(io.StringIO(data))
 
                 with io.open(file_name, 'wb') as f:
                     if file_type == '.mat':
-                        savemat(f, mdict={key:data})
+                        savemat(f, mdict={fkey:np_data})
                         # newline='\n', header='', footer='', comments='# ', fmt='%.18e'
                     elif file_type == '.npy':
                         # can only store one array in the file, no pickled data
@@ -667,7 +672,8 @@ def export_data(parent, data, key, comment=""):
                         np.save(f, np_data, allow_pickle=False)
                     elif file_type == '.npz':
                         # would be possible to store multiple arrays in the file
-                        np.savez(f, key = data)
+                        fdict = {fkey:np_data}
+                        np.savez(f, **fdict) # unpack kw list (only one here)
                     elif file_type == '.xls':
                         # see
                         # http://www.dev-explorer.com/articles/excel-spreadsheets-and-python
@@ -724,10 +730,10 @@ def export_data(parent, data, key, comment=""):
         # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
 
 #------------------------------------------------------------------------------
-def save_file_coe(f):
+def export_coe_xilinx(f):
     """
-    Save filter coefficients in Xilinx coefficient format, specifying
-    the number base and the quantized coefficients
+    Save FIR filter coefficients in Xilinx coefficient format as file '*.coe', specifying
+    the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fix_lib.Fixed(fb.fil[0]['q_coeff']) # instantiate fixpoint object
 
@@ -737,7 +743,7 @@ def save_file_coe(f):
         qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
         coe_radix = 10
 
-    # Quantize coefficients to decimal / hex format, returns an array of strings
+    # Quantize coefficients to decimal / hex integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
     date_frmt = "%d-%B-%Y %H:%M:%S" # select date format
@@ -761,6 +767,38 @@ def save_file_coe(f):
 
     f.write(unicode_23(xil_str)) # convert to unicode for Python 2
 
+#------------------------------------------------------------------------------
+def export_coe_microsemi(f):
+    """
+    Save FIR filter coefficients in Actel coefficient format as file '*.txt'. 
+    Coefficients have to be in integer format, the last line has to be empty.
+    For (anti)aymmetric filter only one half of the coefficients must be 
+    specified?
+    """
+    qc = fix_lib.Fixed(fb.fil[0]['q_coeff']) # instantiate fixpoint object
+    qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
+    # Quantize coefficients to decimal integer format, returning an array of strings
+    bq = qc.float2frmt(fb.fil[0]['ba'][0])
+
+    coeff_str = "coefficient_set_1\n"
+    for b in bq:
+        coeff_str += str(b) + "\n"
+
+    f.write(unicode_23(coeff_str)) # convert to unicode for Python 2
+
+#------------------------------------------------------------------------------
+def export_coe_TI(f):
+    """
+    Save FIR filter coefficients in TI coefficient format
+    Coefficient have to be specified by an identifier 'b0 ... b191' followed
+    by the coefficient in normalized fractional format, e.g.
+    
+    b0 .053647 
+    b1 -.27485 
+    b2 .16497
+    ...
+    """
+    pass
 
 #==============================================================================
 
