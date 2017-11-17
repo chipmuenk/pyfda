@@ -107,19 +107,20 @@ class MplWidget(QWidget):
         """
         Redraw the figure with new properties (grid, linewidth)
         """
-#        self.ax.grid(self.mplToolbar.grid)
-        for ax in self.fig.axes:
-            ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
-#        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
-            if self.mplToolbar.lock_zoom:
-                ax.axis(self.limits) # restore old limits
-            else:
-                self.limits = ax.axis() # save old limits
-        self.fig.tight_layout(pad = 0.2)
+        # only execute when at least one axis exists -> tight_layout crashes otherwise
+        if self.fig.axes:
+            for ax in self.fig.axes:
+                ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
+    #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
+                if self.mplToolbar.lock_zoom:
+                    ax.axis(self.limits) # restore old limits
+                else:
+                    self.limits = ax.axis() # save old limits
+
+            self.fig.tight_layout(pad = 0.2)
 #        self.pltCanv.updateGeometry()
 #        self.pltCanv.adjustSize() #  resize the parent widget to fit its content
         self.pltCanv.draw() # now (re-)draw the figure
-#
 
 #------------------------------------------------------------------------------
     def plt_full_view(self):
