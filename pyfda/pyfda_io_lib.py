@@ -593,9 +593,7 @@ def import_data(parent, key, comment):
 #------------------------------------------------------------------------------
 def export_data(parent, data, key, comment=""):
     """
-    Export filter coefficients in various formats - see also
-    Summerfield p. 192 ff
-
+    Export coefficients or pole/zero data in various formats
     Parameters
     ----------
     parent: handle to calling instance
@@ -613,9 +611,9 @@ def export_data(parent, data, key, comment=""):
         "filter coefficients ") for user message while opening file
 
     """
-    dlg = QFD(parent)
+    dlg = QFD(parent) # create instance for QFileDialog
 
-    logger.warning("imported data: type{0}|dim{1}|shape{2}\n{3}"\
+    logger.debug("imported data: type{0}|dim{1}|shape{2}\n{3}"\
                    .format(type(data), np.ndim(data), np.shape(data), data))
 
     file_filters = ("CSV (*.csv);;Matlab-Workspace (*.mat)"
@@ -726,8 +724,8 @@ def export_data(parent, data, key, comment=""):
 #------------------------------------------------------------------------------
 def save_file_coe(f):
     """
-    Save filter coefficients in Xilinx coefficient format, specifying
-    the number base and the quantized coefficients
+    Save FIR filter coefficients in Xilinx coefficient format as file '*.coe', specifying
+    the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fix_lib.Fixed(fb.fil[0]['q_coeff']) # instantiate fixpoint object
 
@@ -737,7 +735,7 @@ def save_file_coe(f):
         qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
         coe_radix = 10
 
-    # Quantize coefficients to decimal / hex format, returns an array of strings
+    # Quantize coefficients to decimal / hex integer format, returning an array of strings
     bq = qc.float2frmt(fb.fil[0]['ba'][0])
 
     date_frmt = "%d-%B-%Y %H:%M:%S" # select date format
