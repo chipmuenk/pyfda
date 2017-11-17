@@ -23,7 +23,7 @@ from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff
 import pyfda.pyfda_fix_lib as fix
-from pyfda.pyfda_lib import extract_file_ext
+from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_rc import params
 
 from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object

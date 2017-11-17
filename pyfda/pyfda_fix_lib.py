@@ -16,6 +16,8 @@ import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 
 # TODO: Python2: frmt2float or float2frmt yields zero for bin / hex / dec (not for csd / float)!
+# TODO: Python2: frmt2float:684if y == "": unicode equal comparison failed 
+#                to convert both arguments to unicode
 # TODO: Entering a negative sign with a hex or bin number always yields zero
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
 
@@ -862,7 +864,9 @@ class Fixed(object):
                 if self.WF == 0:
                     y_fix = np.int64(y_fix) # get rid of trailing zero
 
-                y_str = str(y_fix) # use fixpoint number as returned by fixp()
+                # element wise conversion from integer (%d) to string
+                # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
+                y_str = np.char.mod('%d', y_fix) 
 
             elif self.frmt == 'csd':
                 y_str = dec2csd_vec(y_fix, self.WF) # convert with WF fractional bits
