@@ -131,7 +131,6 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 
 The following features are still missing for the first release. 
 * Fixpoint representations with radix point are not always scaled correctly
-* Interaction with disabled plot widgets is still possible
 * log and configuration files are installed in read-only directories on non-Windows systems
 
 ### Release 0.2
