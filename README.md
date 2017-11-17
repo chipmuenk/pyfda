@@ -15,7 +15,7 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
 ### Prerequisites
-* Python versions: **2.7** or **3.3 ... 3.5** (3.6 untested yet)
+* Python versions: **2.7** or **3.3 ... 3.6**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
   * **(Py)Qt4** or **(Py)Qt5**. When both libraries are installed, PyQt5 is used.
@@ -31,18 +31,21 @@ Optional libraries:
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
 
 #### conda
-If you use the Anaconda distribution, you can install pyfda from my Anaconda channel `Chipmuenk` using
-
-    conda install --channel https://conda.anaconda.org/Chipmuenk pyfda
-
-or, shorter:
+If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel `Chipmuenk` using
 
     conda install -c Chipmuenk pyfda
+resp.
+
+    conda update  -c Chipmuenk pyfda
 
 #### pip
 Otherwise, you can install from PyPI using
 
     pip install pyfda
+
+or update using
+
+    pip install pyfda --upgrade
 
 #### setup.py   
 You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
@@ -125,17 +128,19 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### Release 0.1
 
 The following features are still missing for the first release. 
-* Fixpoint representations with radix point are not scaled correctly
-* Coefficient export to files needs to be integrated into the corresponding subwidget
-* Pole / zero modification and export needs to be backported from coefficient widget
+* Fixpoint representations with radix point are not always scaled correctly
+* Interaction with disabled plot widgets is still possible
+* log and configuration files are installed in read-only directories on non-Windows systems
 
 ### Release 0.2
-* **myHDL support**
-    * Export of VHDL / Verilog netlists for basic filter topologies
+* **HDL synthesis**
+    * Use a templating engine or myHDL to generate synthesizable VHDL / Verilog netlists for basic filter topologies
     * Fixpoint simulation results in pyFDA widgets
 * **Filter coefficients and poles / zeros**
-  * Group multiple poles / zeros (SOS)
-  * Load coefficients / poles and zeros in various formats 
+  * Display and edit second-order sections (SOS) in PZ editor
+* **Didactic improvements**
+  * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
+  * Apply filter on audio files (in the h[n] widget) to hear the filtering effect
 * **Filter Manager**
   * Store multiple designs in one filter dict
   * Compare multiple designs in plots
@@ -150,9 +155,4 @@ The following features are still missing for the first release.
 * Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
 * Export of Python filter objects
 * Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
-
-### Further ideas are
-* Wave-Digital Filters
-* test filters in real-time with a audio stream
-* ...
 
