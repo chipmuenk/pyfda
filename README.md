@@ -85,15 +85,17 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 ### The following features are currently implemented:
 
 * **Filter design**
-    * **Design methods** from scipy.signal: Equiripple, Firwin, Movine Average, Bessel, Butterworth, Elliptic, Chebychev 1 and Chebychev 2
+    * **Design methods**: Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebychev 1 and 2 (from scipy.signal and custom methods)
     * **Second-Order Sections** are used in the filter design when available for more robust filter design and analysis
     * **Remember all specifications** when changing filter design methods
     * **Fine-tune** manually the filter order and corner frequencies calculated by minimum order algorithms
     * **Compare filter designs** for a given set of specifications and different design methods
-    * **Filter coefficients and poles / zeroes** can be displayed, edited and quantized
-* **Clearly structured GUI**
+    * **Filter coefficients and poles / zeroes** can be displayed, edited and quantized in various formats
+* **Clearly structured User Interface**
     * only widgets needed for the currently selected design method are visible
     * enhanced matplotlib NavigationToolbar (nicer icons, additional functions)
+    * display help files (own / Python docstrings) as rich text
+    * tooltips for all control and entry widgets
 * **Common interface for all filter design methods:**
     * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
     * specify ripple and attenuations in dB, as voltage or as power ratios
@@ -112,7 +114,6 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
     * Save and load filter designs in pickled and in numpy's NPZ-format
     * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R) or in Matlab (R) workspace format
     * Export coefficients in FPGA vendor specific formats like Xilinx (R) COE-format
-* **Display help files** (own / Python docstrings) as rich text 
 
 **More screenshots from the current version:**
 <table>
