@@ -730,7 +730,7 @@ class FilterPZ(QWidget):
         Read data from clipboard / file and copy it to `self.zpk` as array of complex
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = qtext2table(self, key='zpk', comment="poles / zeros ")
+        data_str = qtext2table(self, 'zpk', comment="poles / zeros ")
         
         conv = self.frmt2cmplx # routine for converting to cartesian coordinates
 

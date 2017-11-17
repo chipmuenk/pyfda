@@ -583,7 +583,7 @@ class FilterCoeffs(QWidget):
         Read data from clipboard / file and copy it to `self.ba` as float / cmplx
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
-        data_str = qtext2table(self, key='ba', comment="filter coefficients ")
+        data_str = qtext2table(self, 'ba', comment="filter coefficients ")
         logger.debug("importing data: dim - shape = {0} - {1} - {2}\n{3}"\
                        .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 
