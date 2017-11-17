@@ -47,17 +47,17 @@ class PlotPZ(QWidget):
         # make this the central widget, taking all available space:
  #       self.setCentralWidget(self.mplwidget)
         
-        self._init_axes()
+        self.init_axes()
 
         self.draw() # calculate and draw poles and zeros
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
 
 #------------------------------------------------------------------------------
-    def _init_axes(self):
+    def init_axes(self):
         """Initialize and clear the axes
         """
 #        self.ax = self.mplwidget.ax
@@ -73,6 +73,16 @@ class PlotPZ(QWidget):
         -- not yet implemented, just use draw() for the moment
         """
         self.draw()
+
+#------------------------------------------------------------------------------
+    def enable_ui(self):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        # self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled) # no control widgets
+        if self.mplwidget.mplToolbar.enabled:
+            self.init_axes()
+            self.draw()
 
 #------------------------------------------------------------------------------
     def draw(self):

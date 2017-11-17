@@ -68,7 +68,7 @@ class PlotPhi(QWidget):
 #        #=============================================
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)        
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)        
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -93,12 +93,21 @@ class PlotPhi(QWidget):
         self.H_cmplx = np.nan_to_num(self.H_cmplx) 
 
 #------------------------------------------------------------------------------
+    def enable_ui(self):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
+        if self.mplwidget.mplToolbar.enabled:
+            self.init_axes()
+            self.draw()
+
+#------------------------------------------------------------------------------
     def draw(self):
         """
         Main entry point: 
         Re-calculate |H(f)| and draw the figure if enabled
         """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.calc_hf()
             self.update_view()

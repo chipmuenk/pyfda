@@ -116,7 +116,7 @@ class PlotHf(QWidget):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.draw)        
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)        
         
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -422,11 +422,20 @@ class PlotHf(QWidget):
         self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], True)
 
 #------------------------------------------------------------------------------
+    def enable_ui(self):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
+        if self.mplwidget.mplToolbar.enabled:
+            self.init_axes()
+            self.draw()
+
+#------------------------------------------------------------------------------
     def draw(self):
         """
         Re-calculate |H(f)| and draw the figure if enabled
         """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
         if self.mplwidget.mplToolbar.enabled:
             self.calc_hf()
             self.update_view()
