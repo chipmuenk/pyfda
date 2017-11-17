@@ -92,25 +92,26 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
     * **Compare filter designs** for a given set of specifications and different design methods
     * **Filter coefficients and poles / zeroes** can be displayed, edited and quantized
 * **Clearly structured GUI**
- * only widgets needed for the currently selected design method are visible
- * enhanced matplotlib NavigationToolbar (nicer icons, additional functions)
+    * only widgets needed for the currently selected design method are visible
+    * enhanced matplotlib NavigationToolbar (nicer icons, additional functions)
 * **Common interface for all filter design methods:**
- * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
- * specify ripple and attenuations in dB, as voltage or as power ratios
- * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
+    * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
+    * specify ripple and attenuations in dB, as voltage or as power ratios
+    * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
 * **Graphical Analyses**
- * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
- * Phase response (wrapped / unwrapped)
- * Group delay
- * Pole / Zero plot
- * Impulse response and step response (lin / log)
- * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
+    * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
+    * Phase response (wrapped / unwrapped)
+    * Group delay
+    * Pole / Zero plot
+    * Impulse response and step response (lin / log)
+    * 3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display
 * **Modular architecture**, facilitating the implementation of new filter design and analysis methods
- * Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. 
- * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
+    * Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI. 
+    * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
 * **Saving and loading**
- * Save and load filter designs in pickled and in numpy's NPZ-format
- * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPZ-format, in Excel (R) or in Matlab (R) workspace format
+    * Save and load filter designs in pickled and in numpy's NPZ-format
+    * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R) or in Matlab (R) workspace format
+    * Export coefficients in FPGA vendor specific formats like Xilinx (R) COE-format
 * **Display help files** (own / Python docstrings) as rich text 
 
 **More screenshots from the current version:**
