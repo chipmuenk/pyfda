@@ -625,7 +625,8 @@ def export_data(parent, data, fkey, comment=""):
         ";;Binary Numpy Array (*.npy);;Zipped Binary Numpy Array (*.npz)")
 
     if fb.fil[0]['ft'] == 'FIR':
-        file_filters += ";;Xilinx coefficient format (*.coe)"
+        file_filters += (";;Xilinx FIR coefficient format (*.coe)"
+                         ";;Microsemi FIR coefficient format (*.txt)")
 
 #        # Add further file types when modules are available:
 #        if XLWT:
@@ -652,11 +653,12 @@ def export_data(parent, data, fkey, comment=""):
             if file_type in {'.coe', '.csv', '.txt'}: # text / string format
                 with io.open(file_name, 'w', encoding="utf8") as f:
                     if file_type == '.coe':
-                        save_file_coe(f)
-                    elif file_type == '.csv':
+                        export_coe_xilinx(f)
+                    elif file_type == '.txt':
+                        export_coe_microsemi(f)
+                    else: # csv format
                         f.write(data)
-                    else:
-                        f.write(data)
+
             else: # binary format
                 np_data = csv2array(io.StringIO(data))
 
@@ -728,7 +730,7 @@ def export_data(parent, data, fkey, comment=""):
         # http://codextechnicanum.blogspot.de/2014/02/write-ods-for-libreoffice-calc-from_1.html
 
 #------------------------------------------------------------------------------
-def save_file_coe(f):
+def export_coe_xilinx(f):
     """
     Save FIR filter coefficients in Xilinx coefficient format as file '*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
@@ -765,6 +767,38 @@ def save_file_coe(f):
 
     f.write(unicode_23(xil_str)) # convert to unicode for Python 2
 
+#------------------------------------------------------------------------------
+def export_coe_microsemi(f):
+    """
+    Save FIR filter coefficients in Actel coefficient format as file '*.txt'. 
+    Coefficients have to be in integer format, the last line has to be empty.
+    For (anti)aymmetric filter only one half of the coefficients must be 
+    specified?
+    """
+    qc = fix_lib.Fixed(fb.fil[0]['q_coeff']) # instantiate fixpoint object
+    qc.setQobj({'frmt':'dec'}) # select decimal format in all other cases
+    # Quantize coefficients to decimal integer format, returning an array of strings
+    bq = qc.float2frmt(fb.fil[0]['ba'][0])
+
+    coeff_str = "coefficient_set_1\n"
+    for b in bq:
+        coeff_str += str(b) + "\n"
+
+    f.write(unicode_23(coeff_str)) # convert to unicode for Python 2
+
+#------------------------------------------------------------------------------
+def export_coe_TI(f):
+    """
+    Save FIR filter coefficients in TI coefficient format
+    Coefficient have to be specified by an identifier 'b0 ... b191' followed
+    by the coefficient in normalized fractional format, e.g.
+    
+    b0 .053647 
+    b1 -.27485 
+    b2 .16497
+    ...
+    """
+    pass
 
 #==============================================================================
 
