@@ -87,7 +87,7 @@ def bin2hex(bin_str, WI=0):
     hex_str = "0" if len(hex_str) == 0 else hex_str
     return hex_str
 
-bin2hex_vec = np.frompyfunc(bin2hex, 2, 1)
+bin2hex_vec =np.vectorize(bin2hex) # safer than frompyfunction()
 
 def dec2hex(val, nbits, WF=0):
     """
