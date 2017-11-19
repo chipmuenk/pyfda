@@ -22,7 +22,7 @@ Created 2012 - 2017
 
 
 from __future__ import division, print_function
-import os, platform
+import os, platform, tempfile
 import sys, re, time
 import struct
 import codecs
@@ -81,47 +81,23 @@ try:
 except ImportError:
     pass
 
-def b(s):
-    """
-    Handle binary data in the same way under py2 and py3:
-    Py2: keep string data as string data
-    Py3: convert string data to byte
-    """
-    if PY3:
-        # first 256 characters of Latin 1 (ISO8859-1) are identical to the
-        # first 256 characters of unicode
-        return codecs.latin_1_encode(s)[0] # return as binary data
-    else:
-        return s # return as string
+PY3 = sys.version_info > (3,) # True for Python 3
+OS  = platform.system()
+OS_VER = platform.release()
+CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n" 
 
-def unichr_23(c):
-    """
-    Convert code point value (integer between 1 ... 65536) to one-character unicode string.
-    The reverse operation (`ord(u)`) works the same way in py2 and py3.
-    """
-    if PY3:
-        return chr(c)
-    else:
-        return unichr(c)
-
-def unicode_23(string):
-    """
-    Parameter
-    ---------
-    string: str
-        This is a unicode string under Python 3 and a "normal" string under Python 2.
-
-    Returns
-    -------
-    unicode string
-
-    Convert string to unicode string under Python 2.x. Python 3.x uses unicode
-    strings anyway.
-    """
-    if PY3:
-        return string
-    else:
-        return unicode(string)
+#def b(s):
+#    """
+#    Handle binary data in the same way under py2 and py3:
+#    Py2: keep string data as string data
+#    Py3: convert string data to byte
+#    """
+#    if PY3:
+#        # first 256 characters of Latin 1 (ISO8859-1) are identical to the
+#        # first 256 characters of unicode
+#        return codecs.latin_1_encode(s)[0] # return as binary data
+#    else:
+#        return s # return as string
 
 def cmp_version(mod, version):
     """
@@ -153,10 +129,71 @@ def mod_version(mod = None):
         for k in keys:
             v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
         return v
+    
+#------------------------------------------------------------------------------
+# taken from http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
+def valid(path):
+    """ Check whether path exists and is valid"""
+    if path and os.path.isdir(path):
+        return True
+    return False
+
+def env(name):
+    """Get value for environment variable"""
+    return os.environ.get( name, '' )
+
+def get_home_dir():
+    """Return the user's home directory"""
+    if OS != "Windows":
+    # set user and logging directories for Mac and Linux when started as user or
+    # sudo user
+        _USERNAME = os.getenv("SUDO_USER") or os.getenv("USER") 
+        home_dir = os.path.expanduser('~'+_USERNAME)
+        log_dir = '/var/log/'
+        if not valid(log_dir):
+            log_dir = tempfile.gettempdir()
+        # create ".pyfda" directory?
+        #return os.path.expanduser( '~' )
+    else:
+        # home_dir = os.path.expanduser(os.getenv('USERPROFILE'))
+        home_dir = env( 'USERPROFILE' )
+        if not valid(home_dir):
+            home_dir = env( 'HOME' )
+            if not valid(home_dir) :
+                home_dir = '%s%s' % (env('HOMEDRIVE'),env('HOMEPATH'))
+                if not valid(home_dir) :
+                    home_dir = env( 'SYSTEMDRIVE' )
+                    if home_dir and (not home_dir.endswith('\\')) :
+                        home_dir += '\\'
+                    if not valid(home_dir) :
+                        home_dir = 'C:\\'
+        log_dir = home_dir
+    return home_dir#, log_dir
+
+#------------------------------------------------------------------------------
+def get_conf_dir():
+    """Return the user's configuration directory"""
+    if OS == 'Windows':
+        pass
+    else:
+        pass
+#------------------------------------------------------------------------------
+def get_tmp_dir():
+    """Return the user's logging directory"""
+    return tempfile.gettempdir()
+
+#------------------------------------------------------------------------------
+
+logger.info("Operating System: {0} {1}".format(OS, OS_VER))
+logger.info("Found the following modules:" + "\n" + mod_version())
+
+
+
+
 
 SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
 
-PY3 = sys.version_info > (3,) # True for Python 3
+
 
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)
@@ -167,17 +204,41 @@ MIN_SB_AMP  = 1e-6  # max stop band attenuation
 MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
 MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
-OS = platform.system()
-OS_VER = platform.release()
-# TODO: use os.linesep?
-if OS == "Windows":
-    CRLF = "\r\n" # Windows: carriage return + line feed
-elif OS == "Darwin":
-    CRLF = "\r" # Mac: carriage return only
-else: # OS == "Linux":
-    CRLF = "\n" # *nix: line feed only
-logger.info("Operating System: {0} {1}".format(OS, OS_VER))
-logger.info("Found the following modules:" + "\n" + mod_version())
+    
+# https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory-in-python
+
+###############################################################################
+#### Py2/3 functions ########################################################
+
+def unichr_23(c):
+    """
+    Convert code point value (integer between 1 ... 65536) to one-character unicode string.
+    The reverse operation (`ord(u)`) works the same way in py2 and py3.
+    """
+    if PY3:
+        return chr(c)
+    else:
+        return unichr(c)
+
+def unicode_23(string):
+    """
+    Parameter
+    ---------
+    string: str
+        This is a unicode string under Python 3 and a "normal" string under Python 2.
+
+    Returns
+    -------
+    unicode string
+
+    Convert string to unicode string under Python 2.x. Python 3.x uses unicode
+    strings anyway.
+    """
+    if PY3:
+        return string
+    else:
+        return unicode(string)
+
 
 ###############################################################################
 #### General functions ########################################################
@@ -247,43 +308,6 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     return result
 
 
-# taken from
-# http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
-def valid(path):
-    """ Check whether path is valid"""
-    if path and os.path.isdir(path):
-        return True
-    return False
-
-def env(name):
-    """Get value for environment variable"""
-    return os.environ.get( name, '' )
-
-#------------------------------------------------------------------------------
-def get_home_dir():
-    """Return the user's home directory"""
-    if sys.platform != 'win32':
-        return os.path.expanduser( '~' )
-
-    homeDir = env( 'USERPROFILE' )
-    if not valid(homeDir):
-        homeDir = env( 'HOME' )
-        if not valid(homeDir) :
-            homeDir = '%s%s' % (env('HOMEDRIVE'),env('HOMEPATH'))
-            if not valid(homeDir) :
-                homeDir = env( 'SYSTEMDRIVE' )
-                if homeDir and (not homeDir.endswith('\\')) :
-                    homeDir += '\\'
-                if not valid(homeDir) :
-                    homeDir = 'C:\\'
-    return homeDir
-
-#------------------------------------------------------------------------------
-def get_log_dir():
-    """Return the user's logging directory"""
-    pass
-
-#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 
