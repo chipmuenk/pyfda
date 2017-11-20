@@ -5,7 +5,7 @@ try:
     from PyQt5.QtCore import (pyqtSignal, Qt, QEvent, QT_VERSION_STR, QSize, QSysInfo, 
                               QObject, QVariant)
     from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor, 
-                                QBrush, QPalette)
+                                QBrush, QPalette, QPixmap)
     from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QApplication, QRadioButton,
                                  QScrollArea, QSplitter, QMessageBox, QDialog,
                                  QWidget, QComboBox, QLabel, QLineEdit, QFrame,
@@ -26,7 +26,7 @@ except ImportError:
     from PyQt4.QtCore import (pyqtSignal, Qt, QEvent, QT_VERSION_STR, QSize, QSysInfo,
                               QObject, QVariant)
     from PyQt4.QtGui import (QFont, QFontMetrics, QIcon, QImage, QColor, QBrush, QStyle,
-                             QPalette, 
+                             QPalette, QPixmap, 
                              QMainWindow, QTabWidget, QApplication, QRadioButton,
                              QScrollArea, QSplitter, QMessageBox, QDialog,
                              QWidget, QComboBox, QLabel, QLineEdit, QFrame,
