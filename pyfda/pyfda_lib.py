@@ -166,6 +166,12 @@ def get_home_dir():
                         home_dir = 'C:\\'
     return home_dir
 
+#------------------------------------------------------------------------------
+def get_temp_dir():
+    """Return the temporary directory"""
+    return tempfile.gettempdir()
+
+
 def get_log_dir():
     """Return the logging directory"""
     log_dir = '/var/log/'
@@ -180,10 +186,7 @@ def get_conf_dir():
         pass
     else:
         pass
-#------------------------------------------------------------------------------
-def get_tmp_dir():
-    """Return the user's logging directory"""
-    return tempfile.gettempdir()
+
 
 #------------------------------------------------------------------------------
 
@@ -191,7 +194,9 @@ logger.info("Operating System: {0} {1}".format(OS, OS_VER))
 logger.info("Found the following modules:" + "\n" + mod_version())
 
 SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
-
+HOME_DIR = get_home_dir()
+TEMP_DIR = get_temp_dir()
+LOG_DIR = get_log_dir()
 
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)
