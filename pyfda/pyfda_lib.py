@@ -187,12 +187,7 @@ def get_tmp_dir():
 logger.info("Operating System: {0} {1}".format(OS, OS_VER))
 logger.info("Found the following modules:" + "\n" + mod_version())
 
-
-
-
-
 SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
-
 
 
 # Amplitude max, min values to prevent scipy aborts
