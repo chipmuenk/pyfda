@@ -9,7 +9,8 @@ import sys, os, io
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QtCore, QFD, Qt, QWidget, QPushButton, QFont, QFrame, QVBoxLayout
+from ..compat import (QtCore, QFD, Qt, QWidget, QPushButton, QFont, QFrame,
+                      QVBoxLayout, QMessageBox)
 
 import numpy as np
 
@@ -67,7 +68,7 @@ class File_IO(QWidget):
         # widget / subwindow for parameter selection
         self.butSave = QPushButton("Save Filter", self)
         self.butLoad = QPushButton("Load Filter", self)
-
+        self.butAbout = QPushButton("About", self)
 
         # ============== UI Layout =====================================
         bfont = QFont()
@@ -83,6 +84,7 @@ class File_IO(QWidget):
         layVIO = QVBoxLayout()
         layVIO.addWidget(self.butSave) # save filter dict -> various formats
         layVIO.addWidget(self.butLoad) # load filter dict -> various formats
+        layVIO.addWidget(self.butAbout) # pop-up "About" window
 
         # This is the top level widget, encompassing the other widgets
         frmMain = QFrame(self)
@@ -102,6 +104,7 @@ class File_IO(QWidget):
         #----------------------------------------------------------------------
         self.butSave.clicked.connect(self.save_filter)
         self.butLoad.clicked.connect(self.load_filter)
+        self.butAbout.clicked.connect(self.about_window)
 
 #------------------------------------------------------------------------------
     def load_filter(self):
@@ -352,7 +355,17 @@ class File_IO(QWidget):
 
             except IOError as e:
                 logger.error('Failed saving "%s"!\n%s\n', file_name, e)
-
+                
+#------------------------------------------------------------------------------
+    def about_window(self):
+         """
+         Display an "About" window with copyright and version info
+         """
+         QMessageBox.about(self, "About pyFDA",
+                             ("(c) 2013 - 17 Christian Münker\n\n"
+         "A graphical tool for designing, analyzing and synthesizing digital filters")
+         )
+ 
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':

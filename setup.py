@@ -68,7 +68,7 @@ setup(
     package_data={'pyfda': ['pyfda_log.conf', 'pyfda_log_debug.conf',
                             'filter_design/filter_list.txt'],
                   },
-
+    # https://stackoverflow.com/questions/2026876/packaging-python-applications-with-configuration-files
     # include files that get installed OUTSIDE the package
     data_files = [
 #        ('', ['README.rst']),
