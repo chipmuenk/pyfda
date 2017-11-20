@@ -87,9 +87,8 @@ import pyfda.filterbroker as fb
 # store as base_dir (= pyfdax.py directory) in filterbroker
 fb.base_dir = base_dir
 
-from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication, QFontMetrics,
-                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit,
-                     QGridLayout, QTextBrowser, QVBoxLayout, QLabel, QtGui)
+from .compat import (HAS_QT5, QtCore, QMainWindow, QApplication, QFontMetrics,
+                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
 import matplotlib
 # specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
 # to avoid 
