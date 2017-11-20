@@ -45,7 +45,7 @@ else:
 
 import pyfda.version as version
 import pyfda.pyfda_lib as pyfda_lib
-import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
+import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 from pyfda.pyfda_io_lib import extract_file_ext
 
@@ -364,40 +364,40 @@ class File_IO(QWidget):
          """
          Display an "About" window with copyright and version infos
          """
-         def to_clipboard(self):
+         def to_clipboard(my_string):
              """
-             Copy version info to clipboard, only dummy method at the moment
+             Copy version info to clipboard
              """
-             logger.warning("should copy to clipboard, not implemented yet")
+             mapping = [ ('<br>','\n'), ('<hr>','\n---------\n'), ('<b>',''), ('</b>','')]
+             for k, v in mapping:
+                 my_string = my_string.replace(k, v)
+             fb.clipboard.setText(my_string)
 
-         info_string = ("<b>pyfda</b> Version {0} - {1} (c) 2013 - 17 Christian Münker<br>"
-         "Design, analyze and synthesize digital filters<hr>"\
-         .format(version.__version__, version.__git_version__))
+         info_string = ("<b>pyfda</b> Version {0} (c) 2013 - 17 Christian Münker<br>"
+         "Design, analyze and synthesize digital filters<hr>".format(version.__version__))
 
          versions_string =("<b>Operating System:</b> {0} {1}<br><br>"
          "<b>Imported Modules</b><br>{2}"
-
            .format(pyfda_lib.OS, pyfda_lib.OS_VER,
                  pyfda_lib.mod_version().replace("\n", "<br>")))
-         
-         dir_string = ("<br><b>User Directories</b><br>Home: {0}<br>Logging: {1}<br>Temp: {2}"\
+
+         dir_string = ("<br><b>User Directories</b><br>Home   : {0}<br>Logging: {1}<br>Temp   : {2}"\
                        .format(pyfda_lib.HOME_DIR, pyfda_lib.LOG_DIR, pyfda_lib.TEMP_DIR))
+
+         about_string = info_string + versions_string + dir_string
 
          #msg = QMessageBox.about(self, "About pyFDA", info_string)
          butClipboard = QPushButton("To Clipboard")
          msg = QMessageBox(self)
          msg.setIconPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(32, Qt.SmoothTransformation))
-
          msg.addButton(butClipboard, QMessageBox.ActionRole)
-
-         msg.setText(info_string + versions_string + dir_string)
+         msg.setText(about_string)
          # msg.setInformativeText("This is additional information")
          #msg.setDetailedText(versions_string) # adds a button that opens another textwindow
          msg.setWindowTitle("About pyFDA")
-
          msg.setStandardButtons(QMessageBox.Ok) # | QMessageBox.Cancel
 
-         butClipboard.clicked.connect(to_clipboard)
+         butClipboard.clicked.connect(lambda: to_clipboard(about_string))
 
          retval = msg.exec_()
 
