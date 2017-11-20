@@ -272,8 +272,8 @@ class FilterCoeffs(QWidget):
         - two bottom rows with action buttons
         """
 
-        # Create clipboard instance
-        self.clipboard = QApplication.clipboard()
+        # handle to central clipboard instance
+        self.clipboard = fb.clipboard
 
         # ---------------------------------------------------------------------
         #   Coefficient table widget

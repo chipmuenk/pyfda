@@ -200,8 +200,8 @@ class FilterPZ(QWidget):
         """
         Intitialize the widget
         """
-        # Create clipboard instance
-        self.clipboard = QApplication.clipboard()
+        # instantiate central clipboard
+        self.clipboard = fb.clipboard
 
         self.tblPZ = QTableWidget(self)
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable

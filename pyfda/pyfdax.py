@@ -126,6 +126,9 @@ class pyFDA(QMainWindow):
         super(QMainWindow,self).__init__()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
+        # create clipboard instance that can be accessed from other modules
+        fb.clipboard = QApplication.clipboard()
+
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
         # read directory with filterDesigns and construct filter tree from it
