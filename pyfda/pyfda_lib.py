@@ -149,9 +149,6 @@ def get_home_dir():
     # sudo user
         _USERNAME = os.getenv("SUDO_USER") or os.getenv("USER") 
         home_dir = os.path.expanduser('~'+_USERNAME)
-        log_dir = '/var/log/'
-        if not valid(log_dir):
-            log_dir = tempfile.gettempdir()
         # create ".pyfda" directory?
         #return os.path.expanduser( '~' )
     else:
@@ -167,8 +164,14 @@ def get_home_dir():
                         home_dir += '\\'
                     if not valid(home_dir) :
                         home_dir = 'C:\\'
-        log_dir = home_dir
-    return home_dir#, log_dir
+    return home_dir
+
+def get_log_dir():
+    """Return the logging directory"""
+    log_dir = '/var/log/'
+    if not valid(log_dir):
+        log_dir = get_temp_dir()
+    return log_dir
 
 #------------------------------------------------------------------------------
 def get_conf_dir():

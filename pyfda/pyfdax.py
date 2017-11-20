@@ -222,17 +222,6 @@ class pyFDA(QMainWindow):
         XStream.stdout().messageWritten.connect (self.statusWin.appendPlainText)
 
 #==============================================================================
-# #------------------------------------------------------------------------------
-#     def aboutWindow(self):
-#         """
-#         Display an "About" window
-#         """
-#         QMessageBox.about(self, "About pyFDA",
-#                                 ("(c) 2013 - 15 Christian Münker\n\n"
-#         "A graphical tool for designing, analyzing and synthesizing digital filters")
-#         )
-# 
-# #------------------------------------------------------------------------------
 #     def statusMessage(self, message):
 #         """
 #         Display a message in the statusbar.
