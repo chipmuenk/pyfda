@@ -10,10 +10,10 @@ http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-r
 from __future__ import print_function, division, unicode_literals
 
 from ..compat import (QtCore, QApplication, QWidget, QLabel, pyqtSignal,
-                      QSizePolicy, QIcon, QImage, QVBoxLayout,
+                      QSizePolicy, QIcon, QImage, QPixmap, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
-import os, sys
+import sys
 import six
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
@@ -29,7 +29,7 @@ except ImportError:
     figureoptions = None
 
 from pyfda import pyfda_rc
-from pyfda import pyfda_lib
+import pyfda.filterbroker as fb
 from pyfda import qrc_resources # contains all icons
 
 # read user settings for linewidth, font size etc. and apply them to matplotlib
@@ -288,8 +288,7 @@ class MyMplToolbar(NavigationToolbar):
         self.a_sv = self.addAction(QIcon(':/file.svg'), 'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
 
-        self.cb = None #will be used for the clipboard
-        self.temp_file = os.path.join(pyfda_lib.get_home_dir(), 'tempMPL.png')
+        self.cb = fb.clipboard
 
         self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'Save', self.mpl2Clip)
         self.a_cb.setToolTip('Copy to clipboard in png format.')
@@ -451,13 +450,31 @@ class MyMplToolbar(NavigationToolbar):
         Save current figure to temporary file and copy it to the clipboard.
         """
         try:
-            self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
-            #  savefig(fname, dpi=None, facecolor='w', edgecolor='w',
-            #  orientation='portrait', papertype=None, format=None,
-            #  transparent=False):
-            temp_img = QImage(self.temp_file)
-            self.cb = QApplication.clipboard()
-            self.cb.setImage(temp_img)
+# =============================================================================
+#             self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
+#             #  savefig(fname, dpi=None, facecolor='w', edgecolor='w',
+#             #  orientation='portrait', papertype=None, format=None,
+#             #  transparent=False):
+#             temp_img = QImage(self.temp_file)
+#             self.cb = fb.clipboard# 
+#             # self.cb.QApplication.clipboard()
+#             self.cb.setImage(temp_img)
+#             
+# =============================================================================
+            # construct image from raw rgba data, this changes the colormap:
+            #size = self.canvas.size()
+            #width, height = size.width(), size.height()
+            #im = QImage(self.canvas.buffer_rgba(), width, height, QImage.Format_ARGB32)
+            #self.cb.setImage(im)
+            #im.save('test.png')
+            #-----------------------------------------------
+            ## grab canvas directly as a pixmap resp as QImage:
+            #im = QPixmap(self.canvas.grab())
+            #self.cb.setPixmap(QPixmap(im)) 
+
+            im = QImage(self.canvas.grab())
+            self.cb.setImage(im)
+
         except:
             print('Error copying figure to clipboard')
             errorMsg = "Sorry: %s\n\n:%s\n"%(sys.exc_type, sys.exc_value)
