@@ -469,11 +469,11 @@ class MyMplToolbar(NavigationToolbar):
             #im.save('test.png')
             #-----------------------------------------------
             ## grab canvas directly as a pixmap resp as QImage:
-            #im = QPixmap(self.canvas.grab())
-            #self.cb.setPixmap(QPixmap(im)) 
+            im = QPixmap(self.canvas.grab())
+            self.cb.setPixmap(im)
 
-            im = QImage(self.canvas.grab())
-            self.cb.setImage(im)
+            #im = QImage(self.canvas.grab())
+            #self.cb.setImage(im)
 
         except:
             print('Error copying figure to clipboard')
