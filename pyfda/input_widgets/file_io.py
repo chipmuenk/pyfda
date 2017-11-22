@@ -45,6 +45,7 @@ else:
 
 import pyfda.version as version
 import pyfda.pyfda_lib as pyfda_lib
+import pyfda.dirs_finder as dirs
 import pyfda.filterbroker as fb
 import pyfda.pyfda_rc as rc
 from pyfda.pyfda_io_lib import extract_file_ext
@@ -378,11 +379,11 @@ class File_IO(QWidget):
 
          versions_string =("<b>Operating System:</b> {0} {1}<br><br>"
          "<b>Imported Modules</b><br>{2}"
-           .format(pyfda_lib.OS, pyfda_lib.OS_VER,
+           .format(dirs.OS, dirs.OS_VER,
                  pyfda_lib.mod_version().replace("\n", "<br>")))
 
          dir_string = ("<br><b>User Directories</b><br>Home   : {0}<br>Logging: {1}<br>Temp   : {2}"\
-                       .format(pyfda_lib.HOME_DIR, pyfda_lib.LOG_DIR, pyfda_lib.TEMP_DIR))
+                       .format(dirs.HOME_DIR, dirs.LOG_DIR, dirs.TEMP_DIR))
 
          about_string = info_string + versions_string + dir_string
 

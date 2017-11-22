@@ -8,6 +8,7 @@ Mainwindow for the pyFDA app
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
+import pyfda.dirs_finder as dirs
 
 log_config_file = "pyfda_log.conf"
 base_dir = os.path.dirname(os.path.abspath(__file__)) # dir of this file (pyfdax.py)

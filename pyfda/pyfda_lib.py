@@ -22,7 +22,7 @@ Created 2012 - 2017
 
 
 from __future__ import division, print_function
-import os, platform, tempfile
+import os, platform
 import sys, re, time
 import struct
 import codecs
@@ -82,22 +82,7 @@ except ImportError:
     pass
 
 PY3 = sys.version_info > (3,) # True for Python 3
-OS  = platform.system()
-OS_VER = platform.release()
 CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n" 
-
-#def b(s):
-#    """
-#    Handle binary data in the same way under py2 and py3:
-#    Py2: keep string data as string data
-#    Py3: convert string data to byte
-#    """
-#    if PY3:
-#        # first 256 characters of Latin 1 (ISO8859-1) are identical to the
-#        # first 256 characters of unicode
-#        return codecs.latin_1_encode(s)[0] # return as binary data
-#    else:
-#        return s # return as string
 
 def cmp_version(mod, version):
     """
@@ -130,73 +115,12 @@ def mod_version(mod = None):
             v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
         return v
     
-#------------------------------------------------------------------------------
-# taken from http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
-def valid(path):
-    """ Check whether path exists and is valid"""
-    if path and os.path.isdir(path):
-        return True
-    return False
-
-def env(name):
-    """Get value for environment variable"""
-    return os.environ.get( name, '' )
-
-def get_home_dir():
-    """Return the user's home directory"""
-    if OS != "Windows":
-    # set user and logging directories for Mac and Linux when started as user or
-    # sudo user
-        _USERNAME = os.getenv("SUDO_USER") or os.getenv("USER") 
-        home_dir = os.path.expanduser('~'+_USERNAME)
-        # create ".pyfda" directory?
-        #return os.path.expanduser( '~' )
-    else:
-        # home_dir = os.path.expanduser(os.getenv('USERPROFILE'))
-        home_dir = env( 'USERPROFILE' )
-        if not valid(home_dir):
-            home_dir = env( 'HOME' )
-            if not valid(home_dir) :
-                home_dir = '%s%s' % (env('HOMEDRIVE'),env('HOMEPATH'))
-                if not valid(home_dir) :
-                    home_dir = env( 'SYSTEMDRIVE' )
-                    if home_dir and (not home_dir.endswith('\\')) :
-                        home_dir += '\\'
-                    if not valid(home_dir) :
-                        home_dir = 'C:\\'
-    return home_dir
-
-#------------------------------------------------------------------------------
-def get_temp_dir():
-    """Return the temporary directory"""
-    return tempfile.gettempdir()
-
-
-def get_log_dir():
-    """Return the logging directory"""
-    log_dir = '/var/log/'
-    if not valid(log_dir):
-        log_dir = get_temp_dir()
-    return log_dir
-
-#------------------------------------------------------------------------------
-def get_conf_dir():
-    """Return the user's configuration directory"""
-    if OS == 'Windows':
-        pass
-    else:
-        pass
-
 
 #------------------------------------------------------------------------------
 
-logger.info("Operating System: {0} {1}".format(OS, OS_VER))
 logger.info("Found the following modules:" + "\n" + mod_version())
 
 SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
-HOME_DIR = get_home_dir()
-TEMP_DIR = get_temp_dir()
-LOG_DIR = get_log_dir()
 
 # Amplitude max, min values to prevent scipy aborts
 # (Linear values)

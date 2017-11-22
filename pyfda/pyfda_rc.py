@@ -30,6 +30,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .pyfda_lib import cmp_version, CRLF
+from .dirs_finder import HOME_DIR
 
 # #############################################################################
 # General layout settings
@@ -111,7 +112,7 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 # in filterbroker.py
 
 # Default savedir for filter coefficients, filter dicts etc.
-save_dir = "D:/Daten"
+save_dir = HOME_DIR
 
 # #############################################################################
 # Matplotlib layout settings
