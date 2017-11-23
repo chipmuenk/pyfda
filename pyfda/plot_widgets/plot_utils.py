@@ -452,9 +452,6 @@ class MyMplToolbar(NavigationToolbar):
         try:
 # =============================================================================
 #             self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
-#             #  savefig(fname, dpi=None, facecolor='w', edgecolor='w',
-#             #  orientation='portrait', papertype=None, format=None,
-#             #  transparent=False):
 #             temp_img = QImage(self.temp_file)
 #             self.cb = fb.clipboard# 
 #             # self.cb.QApplication.clipboard()
@@ -469,12 +466,11 @@ class MyMplToolbar(NavigationToolbar):
             #im.save('test.png')
             #-----------------------------------------------
             ## grab canvas directly as a pixmap resp as QImage:
-            im = QPixmap(self.canvas.grab())
-            self.cb.setPixmap(im)
+            #im = QPixmap(self.canvas.grab())
+            #self.cb.setPixmap(im)
 
-            #im = QImage(self.canvas.grab())
-            #self.cb.setImage(im)
-
+            im = QImage(self.canvas.grab()) # set format?!
+            self.cb.setImage(im)
         except:
             print('Error copying figure to clipboard')
             errorMsg = "Sorry: %s\n\n:%s\n"%(sys.exc_type, sys.exc_value)
