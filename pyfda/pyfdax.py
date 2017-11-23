@@ -242,6 +242,10 @@ class pyFDA(QMainWindow):
             "Quit pyFDA?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
+            # Clear clipboard before exit to avoid error message on older Qt versions
+            # "QClipboard: Unable to receive an event from the clipboard manager 
+            # in a reasonable time
+            fb.clipboard.clear()
             event.accept()
         else:
             event.ignore()
