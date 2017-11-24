@@ -8,17 +8,21 @@
 """
 from __future__ import print_function
 import os
+import shutil
 import platform
 import tempfile
 import time
-print("dirfinder is here!")
-time.sleep(5)
 
 OS     = platform.system()
 OS_VER = platform.release()
 
+log_conf_file = 'pyfda_log.conf'
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file (dirs_finder.py)
+
 #------------------------------------------------------------------------------
 # taken from http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
+
 def valid(path):
     """ Check whether path exists and is valid"""
     if path and os.path.isdir(path):
@@ -36,8 +40,6 @@ def get_home_dir():
     # sudo user
         USERNAME = os.getenv('SUDO_USER') or os.getenv('USER') 
         home_dir = os.path.expanduser('~'+USERNAME)
-        # create ".pyfda" directory?
-        #return os.path.expanduser( '~' )
     else:
         USERNAME = os.getenv('USER')
         # home_dir = os.path.expanduser(os.getenv('USERPROFILE'))
@@ -54,6 +56,7 @@ def get_home_dir():
                         home_dir = 'C:\\'
     return home_dir
 
+HOME_DIR = get_home_dir()        
 #------------------------------------------------------------------------------ 
 
 TEMP_DIR = tempfile.gettempdir()
@@ -75,20 +78,38 @@ def get_log_dir():
             return log_dir_pyfda
         except (IOError, OSError) as e:
             print("Error creating {0}:\n{1}".format(log_dir_pyfda, e))
-        else:
             return log_dir
 
-    return 
+LOG_DIR  = get_log_dir()
 
 #------------------------------------------------------------------------------
 def get_conf_dir():
     """Return the user's configuration directory"""
     return get_home_dir()
+    conf_dir = os.path.join(HOME_DIR, 'pyfda')
 
+    if valid(conf_dir) and os.access(conf_dir, os.W_OK):
+        return conf_dir
+    else:
+        try:
+            os.mkdir(conf_dir)
+            print("Creating config directory \n{0}".format(conf_dir))
+            return conf_dir
+        except (IOError, OSError) as e:
+            print("Error creating {0}:\n{1}".format(conf_dir, e))
+            return home_dir
 
-HOME_DIR = get_home_dir()
-
-LOG_DIR  = get_log_dir()
 CONF_DIR = get_conf_dir()
+#------------------------------------------------------------------------------
+
+USER_LOG_CONF_FILE = os.path.join(CONF_DIR, log_conf_file)
+
+if not os.path.isfile(USER_LOG_CONF_FILE):
+    try:
+        shutil.copyfile(os.path.join(BASE_DIR, log_conf_file), USER_LOG_CONF_FILE)
+    except IOError as e:
+        print(e)
+        
+    
 
 print("Operating System: {0} {1}".format(OS, OS_VER)) # logger.info?
