@@ -8,11 +8,11 @@ Mainwindow for the pyFDA app
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-import pyfda.dirs_finder as dirs
+import pyfda.dirs_finder as dirs # initial import constructs file paths
 
-log_config_file = "pyfda_log.conf"
-base_dir = os.path.dirname(os.path.abspath(__file__)) # dir of this file (pyfdax.py)
-log_config_dir_file = os.path.join(base_dir, log_config_file)
+#log_config_file = "pyfda_log.conf"
+#base_dir = os.path.dirname(os.path.abspath(__file__)) # dir of this file (pyfdax.py)
+#log_config_dir_file = os.path.join(dirs.BASE_DIR, log_config_file)
 
 
 #from sip import setdestroyonexit
@@ -29,8 +29,10 @@ class DynFileHandler(logging.FileHandler):
     """
     def __init__(self, *args):
         filename, mode, encoding = args
+        if filename == '':
+            filename = "pyfda_log_YYMMDD_HHMMSS.log"
         if not os.path.isabs(filename): # path to logging file given in config_file?
-            filename = os.path.join(base_dir, filename) # no, use basedir
+            filename = os.path.join(dirs.LOG_DIR, filename) # no, use basedir
         logging.FileHandler.__init__(self, filename, mode, encoding)
 
 class XStream(QtCore.QObject):
@@ -72,7 +74,8 @@ class QEditHandler(logging.Handler):
 # as parameters:
 logging.DynFileHandler = DynFileHandler
 logging.QEditHandler = QEditHandler
-logging.config.fileConfig(os.path.join(base_dir, log_config_file))#, disable_existing_loggers=True)
+# The following is unneeded?
+# logging.config.fileConfig(os.path.join(dirs.BASE_DIR, log_config_file))#, disable_existing_loggers=True)
 
 from pyfda import pyfda_lib
 from pyfda import pyfda_rc as rc
@@ -86,7 +89,7 @@ if not os.path.exists(rc.save_dir):
 #==============================================================================
 import pyfda.filterbroker as fb
 # store as base_dir (= pyfdax.py directory) in filterbroker
-fb.base_dir = base_dir
+fb.base_dir = dirs.BASE_DIR
 
 from .compat import (HAS_QT5, QtCore, QMainWindow, QApplication, QFontMetrics,
                      QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)

@@ -11,12 +11,12 @@ import os
 import shutil
 import platform
 import tempfile
-import time
+import datetime
 
 OS     = platform.system()
 OS_VER = platform.release()
 
-log_conf_file = 'pyfda_log.conf'
+# TODO: rc.save_dir, fb.base_dir, conf file name, pyfda subdir is not created
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file (dirs_finder.py)
 
@@ -69,7 +69,7 @@ def get_log_dir():
             log_dir = TEMP_DIR
         else:
             return None
-    log_dir_pyfda = os.path.join(log_dir, 'pyfda')
+    log_dir_pyfda = os.path.join(log_dir, '.pyfda')
     if valid(log_dir_pyfda) and os.access(log_dir_pyfda, os.W_OK): # R_OK for readable
         return log_dir_pyfda
     else:
@@ -81,12 +81,12 @@ def get_log_dir():
             return log_dir
 
 LOG_DIR  = get_log_dir()
-
+LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%b%d-%H%M%S"))
 #------------------------------------------------------------------------------
 def get_conf_dir():
     """Return the user's configuration directory"""
     return get_home_dir()
-    conf_dir = os.path.join(HOME_DIR, 'pyfda')
+    conf_dir = os.path.join(HOME_DIR, '.pyfda')
 
     if valid(conf_dir) and os.access(conf_dir, os.W_OK):
         return conf_dir
@@ -97,19 +97,22 @@ def get_conf_dir():
             return conf_dir
         except (IOError, OSError) as e:
             print("Error creating {0}:\n{1}".format(conf_dir, e))
-            return home_dir
+            return HOME_DIR
 
 CONF_DIR = get_conf_dir()
+LOG_CONF_FILE = 'pyfda_log.conf'
 #------------------------------------------------------------------------------
 
-USER_LOG_CONF_FILE = os.path.join(CONF_DIR, log_conf_file)
+USER_LOG_CONF_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
 
 if not os.path.isfile(USER_LOG_CONF_FILE):
+    # copy default configuration file to user directory if it doesn't exist
     try:
-        shutil.copyfile(os.path.join(BASE_DIR, log_conf_file), USER_LOG_CONF_FILE)
+        shutil.copyfile(os.path.join(BASE_DIR, LOG_CONF_FILE), USER_LOG_CONF_FILE)
     except IOError as e:
         print(e)
-        
-    
+#------------------------------------------------------------------------------
+# This is for storing where the last file was saved        
+SAVE_DIR = HOME_DIR
 
 print("Operating System: {0} {1}".format(OS, OS_VER)) # logger.info?
