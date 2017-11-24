@@ -9,19 +9,17 @@ http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-r
 """
 from __future__ import print_function, division, unicode_literals
 
-from ..compat import (QtCore, QApplication, QWidget, QLabel, pyqtSignal,
-                      QSizePolicy, QIcon, QImage, QPixmap, QVBoxLayout,
+from ..compat import (QtCore, QWidget, QLabel, pyqtSignal,
+                      QSizePolicy, QIcon, QImage, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
 import sys
 import six
-import io
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 #from matplotlib.backend_bases import cursors as mplCursors
 from matplotlib.figure import Figure
 from matplotlib.transforms import Bbox
-#from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import rcParams
 
 try:
@@ -451,33 +449,22 @@ class MyMplToolbar(NavigationToolbar):
         Save current figure to temporary file and copy it to the clipboard.
         """
         try:
-# =============================================================================
-#             self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
-#             temp_img = QImage(self.temp_file)
-#             self.cb = fb.clipboard# 
-#             # self.cb.QApplication.clipboard()
-#             self.cb.setImage(temp_img)
-#             
-# =============================================================================
-            # construct image from raw rgba data, this changes the colormap:
+            #---- Copy to temporary file ---------------
+            #self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
+            #temp_img = QImage(self.temp_file)
+            #self.cb = fb.clipboard# 
+            #self.cb.setImage(temp_img)
+            
+            # ---- Construct image from raw rgba data, this changes the colormap -----
             #size = self.canvas.size()
             #width, height = size.width(), size.height()
             #im = QImage(self.canvas.buffer_rgba(), width, height, QImage.Format_ARGB32)
             #self.cb.setImage(im)
-            #im.save('test.png')
-            #-----------------------------------------------
-            ## grab canvas directly as a pixmap resp as QImage:
+
+            #---- Grab canvas directly as a pixmap resp as QImage:
             #im = QPixmap(self.canvas.grab())
             #self.cb.setPixmap(im)
-            buff = io.BytesIO()
-            bbox = self.canvas.size()
-            self.canvas.figure.savefig(buff, type="png", dpi=300)#, bbox_inches=bbox, **kwargs)
-            #ax.axis("on")
-            buff.seek(0)
-            img = QImage(buff)
-            #img = plt.imread(buff )
-
-            #img = QImage(self.canvas.grab()) # set format?!
+            img = QImage(self.canvas.grab())
             self.cb.setImage(img)
         except:
             print('Error copying figure to clipboard')
