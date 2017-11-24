@@ -15,6 +15,7 @@ from ..compat import (QtCore, QApplication, QWidget, QLabel, pyqtSignal,
 
 import sys
 import six
+import io
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 #from matplotlib.backend_bases import cursors as mplCursors
@@ -468,10 +469,17 @@ class MyMplToolbar(NavigationToolbar):
             ## grab canvas directly as a pixmap resp as QImage:
             #im = QPixmap(self.canvas.grab())
             #self.cb.setPixmap(im)
+            buff = io.BytesIO()
+            bbox = self.canvas.size()
+            self.canvas.figure.savefig(buff, type="png", dpi=300)#, bbox_inches=bbox, **kwargs)
+            #ax.axis("on")
+            buff.seek(0)
+            img = QImage(buff)
+            #img = plt.imread(buff )
 
-            im = QImage(self.canvas.grab()) # set format?!
-            self.cb.setImage(im)
+            #img = QImage(self.canvas.grab()) # set format?!
+            self.cb.setImage(img)
         except:
             print('Error copying figure to clipboard')
-            errorMsg = "Sorry: %s\n\n:%s\n"%(sys.exc_type, sys.exc_value)
+            errorMsg = "Sorry: {0}".format(sys.exc_info())
             print(errorMsg)
