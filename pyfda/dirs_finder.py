@@ -54,22 +54,20 @@ def get_home_dir():
                         home_dir = 'C:\\'
     return home_dir
 
-#------------------------------------------------------------------------------
-def get_temp_dir():
-    """Return the temporary directory"""
-    return tempfile.gettempdir()
+#------------------------------------------------------------------------------ 
 
+TEMP_DIR = tempfile.gettempdir()
 
 def get_log_dir():
     """Return the logging directory"""
     log_dir = '/var/log/'
-    if not valid(log_dir):# or not writable(log_dir):nd valid(get_temp_dir()):
-        if valid (get_temp_dir):# and writable(get_temp_dir)
-            log_dir = get_temp_dir()
+    if not valid(log_dir):
+        if valid (TEMP_DIR):
+            log_dir = TEMP_DIR
         else:
             return None
     log_dir_pyfda = os.path.join(log_dir, 'pyfda')
-    if valid(log_dir_pyfda): # and writable ...
+    if valid(log_dir_pyfda) and os.access(log_dir_pyfda, os.W_OK): # R_OK for readable
         return log_dir_pyfda
     else:
         try:
@@ -89,7 +87,7 @@ def get_conf_dir():
 
 
 HOME_DIR = get_home_dir()
-TEMP_DIR = get_temp_dir()
+
 LOG_DIR  = get_log_dir()
 CONF_DIR = get_conf_dir()
 
