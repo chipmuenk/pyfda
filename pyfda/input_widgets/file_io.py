@@ -382,8 +382,10 @@ class File_IO(QWidget):
            .format(dirs.OS, dirs.OS_VER,
                  pyfda_lib.mod_version().replace("\n", "<br>")))
 
-         dir_string = ("<br><b>User Directories</b><br>Home   : {0}<br>Logging: {1}<br>Temp   : {2}"\
-                       .format(dirs.HOME_DIR, dirs.LOG_DIR, dirs.TEMP_DIR))
+         dir_string = ("<br><b>User Directories</b><br>Home   : {0}<br>Config: {1}<br>Base : {2}"\
+                       .format(dirs.HOME_DIR, dirs.LOG_DIR, dirs.BASE_DIR))
+         dir_string += ("<br>Logging: {0}<br>Temp: {1}<br>User Log   : {2}"\
+                       .format(dirs.LOG_DIR, dirs.TEMP_DIR, dirs.USER_LOG_CONF_FILE))
 
          about_string = info_string + versions_string + dir_string
 
