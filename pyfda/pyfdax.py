@@ -29,7 +29,7 @@ except ImportError:
 from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics,
                      QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
 
-
+#========================= Setup the loggers ==================================
 class DynFileHandler(logging.FileHandler):
     """
     subclass FileHandler with a customized handler for dynamic definition of
@@ -38,10 +38,10 @@ class DynFileHandler(logging.FileHandler):
     def __init__(self, *args):
         filename, mode, encoding = args
         if filename == '':
-            filename = "pyfda_log_YYMMDD_HHMMSS.log"
+            filename = dirs.LOG_FILE # use name including data and time
         if not os.path.isabs(filename): # path to logging file given in config_file?
-            filename = os.path.join(dirs.LOG_DIR, filename) # no, use basedir
-        logging.FileHandler.__init__(self, filename, mode, encoding)
+            dirs.USER_LOG_FILE = os.path.join(dirs.LOG_DIR, filename) # no, use default dir
+        logging.FileHandler.__init__(self, dirs.USER_LOG_FILE, mode, encoding)
 
 class XStream(QtCore.QObject):
     """
@@ -82,22 +82,11 @@ class QEditHandler(logging.Handler):
 # as parameters:
 logging.DynFileHandler = DynFileHandler
 logging.QEditHandler = QEditHandler
-# The following is unneeded?
 logging.config.fileConfig(dirs.USER_LOG_CONF_FILE)#, disable_existing_loggers=True)
+#==============================================================================
 
 from pyfda import pyfda_rc as rc
-from pyfda import pyfda_lib
-if not os.path.exists(dirs.save_dir):
-    home_dir = pyfda_lib.get_home_dir()
-    logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
-        dirs.save_dir, home_dir)
-    dirs.save_dir = home_dir
-
-#==============================================================================
 import pyfda.filterbroker as fb
-# store as base_dir (= pyfdax.py directory) in filterbroker
-fb.base_dir = dirs.BASE_DIR
-
 from pyfda import qrc_resources # contains all icons
 # edit pyfda.qrc, then
 # create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
@@ -105,7 +94,6 @@ from pyfda import qrc_resources # contains all icons
 # and manually replace "from from PyQt4/5 import QtCore"
 #   by "from .compat import QtCore" in qrc_resources.py
 from pyfda.filter_tree_builder import FilterTreeBuilder
-
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
