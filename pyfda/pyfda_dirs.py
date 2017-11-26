@@ -16,10 +16,7 @@ import datetime
 OS     = platform.system()
 OS_VER = platform.release()
 
-# TODO: fb.base_dir, conf file name, pyfda subdir is not created
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file (dirs_finder.py)
-
+INSTALL_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
 #------------------------------------------------------------------------------
 # taken from http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
 
@@ -36,11 +33,12 @@ def env(name):
 def get_home_dir():
     """Return the user's home directory"""
     if OS != "Windows":
-    # set user and logging directories for Mac and Linux when started as user or
+    # set home directory from user name for Mac and Linux when started as user or
     # sudo user
         USERNAME = os.getenv('SUDO_USER') or os.getenv('USER') 
         home_dir = os.path.expanduser('~'+USERNAME)
     else:
+        # same for windows
         USERNAME = os.getenv('USER')
         # home_dir = os.path.expanduser(os.getenv('USERPROFILE'))
         home_dir = env( 'USERPROFILE' )
@@ -63,7 +61,7 @@ TEMP_DIR = tempfile.gettempdir()
 
 def get_log_dir():
     """Return the logging directory"""
-    log_dir = '/var/log/'
+    log_dir = '/var/log/' # usually a good choice for Linux / Unix / MAC OS
     if not valid(log_dir):
         if valid (TEMP_DIR):
             log_dir = TEMP_DIR
@@ -82,10 +80,10 @@ def get_log_dir():
 
 LOG_DIR  = get_log_dir()
 LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%b%d-%H%M%S"))
+USER_LOG_FILE = os.path.join(LOG_DIR, LOG_FILE) # this can be updated in pyfdax.py
 #------------------------------------------------------------------------------
 def get_conf_dir():
     """Return the user's configuration directory"""
-    return get_home_dir()
     conf_dir = os.path.join(HOME_DIR, '.pyfda')
 
     if valid(conf_dir) and os.access(conf_dir, os.W_OK):
@@ -93,7 +91,7 @@ def get_conf_dir():
     else:
         try:
             os.mkdir(conf_dir)
-            print("Creating config directory \n{0}".format(conf_dir))
+            print("Creating config directory \n'{0}'".format(conf_dir))
             return conf_dir
         except (IOError, OSError) as e:
             print("Error creating {0}:\n{1}".format(conf_dir, e))
@@ -106,9 +104,10 @@ LOG_CONF_FILE = 'pyfda_log.conf'
 USER_LOG_CONF_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
 
 if not os.path.isfile(USER_LOG_CONF_FILE):
-    # copy default configuration file to user directory if it doesn't exist
+    # copy default logging configuration file to user directory if it doesn't exist
+    # This file can be easily edited by the user without admin access rights
     try:
-        shutil.copyfile(os.path.join(BASE_DIR, LOG_CONF_FILE), USER_LOG_CONF_FILE)
+        shutil.copyfile(os.path.join(INSTALL_DIR, LOG_CONF_FILE), USER_LOG_CONF_FILE)
     except IOError as e:
         print(e)
 #------------------------------------------------------------------------------
