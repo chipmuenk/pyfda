@@ -16,7 +16,7 @@ import datetime
 OS     = platform.system()
 OS_VER = platform.release()
 
-# TODO: rc.save_dir, fb.base_dir, conf file name, pyfda subdir is not created
+# TODO: fb.base_dir, conf file name, pyfda subdir is not created
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file (dirs_finder.py)
 
@@ -112,7 +112,7 @@ if not os.path.isfile(USER_LOG_CONF_FILE):
     except IOError as e:
         print(e)
 #------------------------------------------------------------------------------
-# This is for storing where the last file was saved        
-SAVE_DIR = HOME_DIR
+# This is the place holder for storing where the last file was saved
+save_dir = HOME_DIR
 
 print("Operating System: {0} {1}".format(OS, OS_VER)) # logger.info?

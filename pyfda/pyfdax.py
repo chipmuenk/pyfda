@@ -8,7 +8,8 @@ Mainwindow for the pyFDA app
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-import pyfda.dirs_finder as dirs # initial import constructs file paths
+from pyfda import pyfda_rc as rc
+import pyfda.pyfda_dirs as dirs # initial import constructs file paths
 
 #log_config_file = "pyfda_log.conf"
 #base_dir = os.path.dirname(os.path.abspath(__file__)) # dir of this file (pyfdax.py)
@@ -78,12 +79,11 @@ logging.QEditHandler = QEditHandler
 # logging.config.fileConfig(os.path.join(dirs.BASE_DIR, log_config_file))#, disable_existing_loggers=True)
 
 from pyfda import pyfda_lib
-from pyfda import pyfda_rc as rc
-if not os.path.exists(rc.save_dir):
+if not os.path.exists(dirs.save_dir):
     home_dir = pyfda_lib.get_home_dir()
     logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
-        rc.save_dir, home_dir)
-    rc.save_dir = home_dir
+        dirs.save_dir, home_dir)
+    dirs.save_dir = home_dir
 
 
 #==============================================================================

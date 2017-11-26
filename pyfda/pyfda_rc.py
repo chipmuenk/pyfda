@@ -30,7 +30,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .pyfda_lib import cmp_version, CRLF
-from .dirs_finder import HOME_DIR
+from .pyfda_dirs import HOME_DIR
 
 # #############################################################################
 # General layout settings
