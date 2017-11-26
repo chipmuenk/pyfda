@@ -196,12 +196,18 @@ class FilterPZ(QWidget):
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm
         self._construct_UI() # construct the rest of the UI
 
+        self.load_dict() # initialize table from filterbroker
+        self._refresh_table() # initialize table with values
+
+        self.setup_signal_slot() # setup signal-slot connections and eventFilters
+
+
     def _construct_UI(self):
         """
         Intitialize the widget
         """
-        # Create clipboard instance
-        self.clipboard = QApplication.clipboard()
+        # instantiate central clipboard
+        self.clipboard = fb.clipboard
 
         self.tblPZ = QTableWidget(self)
 #        self.tblPZ.setEditTriggers(QTableWidget.AllEditTriggers) # make everything editable
@@ -225,9 +231,11 @@ class FilterPZ(QWidget):
 
         self.setLayout(layVMain)
 
-        self.load_dict() # initialize table from filterbroker
-        self._refresh_table()
 
+    def setup_signal_slot(self):
+        """
+        Setup signal-slot connections
+        """
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -246,19 +254,20 @@ class FilterPZ(QWidget):
         self.ui.butFromTable.clicked.connect(self._copy_from_table)
         self.ui.butToTable.clicked.connect(self._copy_to_table)
 
-
         self.ui.butSetZero.clicked.connect(self._zero_PZ)
-        # signal itemChanged is also triggered programmatically,
-        # itemSelectionChanged is only triggered when entering cell
-        # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
-        
+
         self.ui.ledGain.installEventFilter(self)
         self.ui.ledEps.editingFinished.connect(self._set_eps)
-        #----------------------------------------------------------------------
 
+        #----------------------------------------------------------------------
+        # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
+        #
         # Every time a table item is edited, call self._copy_item to copy the
         # item content to self.zpk. This is triggered by the itemChanged signal.
         # The event filter monitors the focus of the input fields.
+
+        # signal itemChanged is also triggered programmatically,
+        # itemSelectionChanged is only triggered when entering cell
 
 #------------------------------------------------------------------------------
 

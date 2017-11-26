@@ -23,7 +23,7 @@ from .pyfda_lib import unicode_23, safe_eval
 from .pyfda_qt_lib import qget_selected, qget_cmb_box, qset_cmb_box
 import pyfda.pyfda_fix_lib as fix_lib
 from .pyfda_rc import params
-import pyfda.pyfda_rc as rc
+import pyfda.pyfda_dirs as dirs
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
 from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
@@ -551,7 +551,7 @@ def import_data(parent, fkey, comment):
     dlg = QFD(parent)
     file_name, file_type = dlg.getOpenFileName_(
             caption = "Import "+ comment + "file",
-            directory = rc.save_dir, filter = file_filters)
+            directory = dirs.save_dir, filter = file_filters)
     file_name = str(file_name) # QString -> str
 
     for t in extract_file_ext(file_filters): # extract the list of file extensions
@@ -589,7 +589,7 @@ def import_data(parent, fkey, comment):
 
             if not file_type_err:
                 logger.info('Successfully loaded \n"{0}"'.format(file_name))
-                rc.save_dir = os.path.dirname(file_name)
+                dirs.save_dir = os.path.dirname(file_name)
                 return data_arr # returns numpy array
 
         except IOError as e:
@@ -637,7 +637,7 @@ def export_data(parent, data, fkey, comment=""):
     # return selected file name (with or without extension) and filter (Linux: full text)
     file_name, file_type = dlg.getSaveFileName_(
             caption = "Export filter coefficients as",
-            directory = rc.save_dir, filter = file_filters)
+            directory = dirs.save_dir, filter = file_filters)
     file_name = str(file_name) # QString -> str needed for Python 2
 
     for t in extract_file_ext(file_filters): # extract the list of file extensions
@@ -719,7 +719,7 @@ def export_data(parent, data, fkey, comment=""):
 
                     if not file_type_err:
                         logger.info('Filter saved as "%s"', file_name)
-                        rc.save_dir = os.path.dirname(file_name) # save new dir
+                        dirs.save_dir = os.path.dirname(file_name) # save new dir
 
         except IOError as e:
             logger.error('Failed saving "%s"!\n%s\n', file_name, e)

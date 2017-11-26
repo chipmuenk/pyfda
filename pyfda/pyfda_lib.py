@@ -81,18 +81,75 @@ try:
 except ImportError:
     pass
 
-def b(s):
+try:
+    from xlwt import __version__ as VERSION_XLWT
+    VERSION.update({'xlwt': VERSION_XLWT})
+except ImportError:
+    pass
+
+try:
+    from xlsxwriter import __version__ as VERSION_XLSX
+    VERSION.update({'xlsx': VERSION_XLSX})
+except ImportError:
+    pass
+
+PY3 = sys.version_info > (3,) # True for Python 3
+CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n" 
+
+def cmp_version(mod, version):
     """
-    Handle binary data in the same way under py2 and py3:
-    Py2: keep string data as string data
-    Py3: convert string data to byte
+    Compare version number of installed module `mod` against string `version` and
+    return 1, 0 or -1 if the installed version is greater, equal or less than
+    the number in `version`. If `mod` is not installed, return -2.
     """
-    if PY3:
-        # first 256 characters of Latin 1 (ISO8859-1) are identical to the
-        # first 256 characters of unicode
-        return codecs.latin_1_encode(s)[0] # return as binary data
+    if mod not in VERSION:
+        return -2
+    elif LooseVersion(VERSION[mod]) > LooseVersion(version):
+        return 1
+    elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
+        return 0
     else:
-        return s # return as string
+        return -1
+
+def mod_version(mod = None):
+    """
+    Return the version of the module 'mod'. If the module is not found, return
+    None. When no module is specified, return a string with all modules and
+    their versions sorted alphabetically.
+    """
+    if mod:
+        if mod in VERSION:
+            return LooseVersion(VERSION[mod])
+        else:
+            return None
+    else:
+        v = ""
+        keys = sorted(list(VERSION.keys()))
+        for k in keys:
+            v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
+        return v
+    
+
+#------------------------------------------------------------------------------
+
+logger.info("Found the following modules:" + "\n" + mod_version())
+
+SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
+
+# Amplitude max, min values to prevent scipy aborts
+# (Linear values)
+MIN_PB_AMP  = 1e-5  # min pass band ripple
+MAX_IPB_AMP = 0.85  # max pass band ripple IIR
+MAX_FPB_AMP = 0.65  # max pass band ripple FIR
+MIN_SB_AMP  = 1e-6  # max stop band attenuation
+MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
+MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
+
+    
+# https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory-in-python
+
+###############################################################################
+#### Py2/3 functions ########################################################
 
 def unichr_23(c):
     """
@@ -123,61 +180,6 @@ def unicode_23(string):
     else:
         return unicode(string)
 
-def cmp_version(mod, version):
-    """
-    Compare version number of installed module `mod` against string `version` and
-    return 1, 0 or -1 if the installed version is greater, equal or less than
-    the number in `version`.
-    """
-    if LooseVersion(VERSION[mod]) > LooseVersion(version):
-        return 1
-    elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
-        return 0
-    else:
-        return -1
-
-def mod_version(mod = None):
-    """
-    Return the version of the module 'mod'. If the module is not found, return
-    None. When no module is specified, return a string with all modules and
-    their versions sorted alphabetically.
-    """
-    if mod:
-        if mod in VERSION:
-            return LooseVersion(VERSION[mod])
-        else:
-            return None
-    else:
-        v = ""
-        keys = sorted(list(VERSION.keys()))
-        for k in keys:
-            v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
-        return v
-
-SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.16 or higher
-
-PY3 = sys.version_info > (3,) # True for Python 3
-
-# Amplitude max, min values to prevent scipy aborts
-# (Linear values)
-MIN_PB_AMP  = 1e-5  # min pass band ripple
-MAX_IPB_AMP = 0.85  # max pass band ripple IIR
-MAX_FPB_AMP = 0.65  # max pass band ripple FIR
-MIN_SB_AMP  = 1e-6  # max stop band attenuation
-MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
-MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
-
-OS = platform.system()
-OS_VER = platform.release()
-# TODO: use os.linesep?
-if OS == "Windows":
-    CRLF = "\r\n" # Windows: carriage return + line feed
-elif OS == "Darwin":
-    CRLF = "\r" # Mac: carriage return only
-else: # OS == "Linux":
-    CRLF = "\n" # *nix: line feed only
-logger.info("Operating System: {0} {1}".format(OS, OS_VER))
-logger.info("Found the following modules:" + "\n" + mod_version())
 
 ###############################################################################
 #### General functions ########################################################
@@ -247,43 +249,6 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     return result
 
 
-# taken from
-# http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
-def valid(path):
-    """ Check whether path is valid"""
-    if path and os.path.isdir(path):
-        return True
-    return False
-
-def env(name):
-    """Get value for environment variable"""
-    return os.environ.get( name, '' )
-
-#------------------------------------------------------------------------------
-def get_home_dir():
-    """Return the user's home directory"""
-    if sys.platform != 'win32':
-        return os.path.expanduser( '~' )
-
-    homeDir = env( 'USERPROFILE' )
-    if not valid(homeDir):
-        homeDir = env( 'HOME' )
-        if not valid(homeDir) :
-            homeDir = '%s%s' % (env('HOMEDRIVE'),env('HOMEPATH'))
-            if not valid(homeDir) :
-                homeDir = env( 'SYSTEMDRIVE' )
-                if homeDir and (not homeDir.endswith('\\')) :
-                    homeDir += '\\'
-                if not valid(homeDir) :
-                    homeDir = 'C:\\'
-    return homeDir
-
-#------------------------------------------------------------------------------
-def get_log_dir():
-    """Return the user's logging directory"""
-    pass
-
-#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 

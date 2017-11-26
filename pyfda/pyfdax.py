@@ -9,18 +9,27 @@ Mainwindow for the pyFDA app
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 
-log_config_file = "pyfda_log.conf"
-base_dir = os.path.dirname(os.path.abspath(__file__)) # dir of this file (pyfdax.py)
-log_config_dir_file = os.path.join(base_dir, log_config_file)
-
-
 #from sip import setdestroyonexit
 import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from .compat import QtCore # needed for XStream
+import pyfda.pyfda_dirs as dirs # initial import constructs file paths
 
+import matplotlib
+# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
+# to avoid 
+# "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
+try:
+    import PyQt5
+    matplotlib.use("Qt5Agg")
+except ImportError:
+    matplotlib.use("Qt4Agg")
+
+from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics,
+                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
+
+#========================= Setup the loggers ==================================
 class DynFileHandler(logging.FileHandler):
     """
     subclass FileHandler with a customized handler for dynamic definition of
@@ -28,9 +37,11 @@ class DynFileHandler(logging.FileHandler):
     """
     def __init__(self, *args):
         filename, mode, encoding = args
+        if filename == '':
+            filename = dirs.LOG_FILE # use name including data and time
         if not os.path.isabs(filename): # path to logging file given in config_file?
-            filename = os.path.join(base_dir, filename) # no, use basedir
-        logging.FileHandler.__init__(self, filename, mode, encoding)
+            dirs.USER_LOG_FILE = os.path.join(dirs.LOG_DIR, filename) # no, use default dir
+        logging.FileHandler.__init__(self, dirs.USER_LOG_FILE, mode, encoding)
 
 class XStream(QtCore.QObject):
     """
@@ -71,34 +82,11 @@ class QEditHandler(logging.Handler):
 # as parameters:
 logging.DynFileHandler = DynFileHandler
 logging.QEditHandler = QEditHandler
-logging.config.fileConfig(os.path.join(base_dir, log_config_file))#, disable_existing_loggers=True)
-
-from pyfda import pyfda_lib
-from pyfda import pyfda_rc as rc
-if not os.path.exists(rc.save_dir):
-    home_dir = pyfda_lib.get_home_dir()
-    logger.info('save_dir "%s" specified in pyfda_rc.py doesn\'t exist, using "%s" instead.\n',
-        rc.save_dir, home_dir)
-    rc.save_dir = home_dir
-
-
+logging.config.fileConfig(dirs.USER_LOG_CONF_FILE)#, disable_existing_loggers=True)
 #==============================================================================
+
+from pyfda import pyfda_rc as rc
 import pyfda.filterbroker as fb
-# store as base_dir (= pyfdax.py directory) in filterbroker
-fb.base_dir = base_dir
-
-from .compat import (HAS_QT5, QT_VERSION_STR, QtCore, QMainWindow, QApplication, QFontMetrics,
-                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit,
-                     QGridLayout, QTextBrowser, QVBoxLayout, QLabel, QtGui)
-import matplotlib
-# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
-# to avoid 
-# "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
-if HAS_QT5:
-    matplotlib.use("Qt5Agg")
-else:
-    matplotlib.use("Qt4Agg")
-
 from pyfda import qrc_resources # contains all icons
 # edit pyfda.qrc, then
 # create with   pyrcc4 pyfda.qrc -o qrc_resources.py -py3
@@ -106,7 +94,6 @@ from pyfda import qrc_resources # contains all icons
 # and manually replace "from from PyQt4/5 import QtCore"
 #   by "from .compat import QtCore" in qrc_resources.py
 from pyfda.filter_tree_builder import FilterTreeBuilder
-
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
@@ -125,6 +112,9 @@ class pyFDA(QMainWindow):
     def __init__(self, parent=None):
         super(QMainWindow,self).__init__()
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+        # create clipboard instance that can be accessed from other modules
+        fb.clipboard = QApplication.clipboard()
 
         # initialize the FilterTreeBuilder class with the filter directory and
         # the filter file as parameters:         
@@ -222,17 +212,6 @@ class pyFDA(QMainWindow):
         XStream.stdout().messageWritten.connect (self.statusWin.appendPlainText)
 
 #==============================================================================
-# #------------------------------------------------------------------------------
-#     def aboutWindow(self):
-#         """
-#         Display an "About" window
-#         """
-#         QMessageBox.about(self, "About pyFDA",
-#                                 ("(c) 2013 - 15 Christian Münker\n\n"
-#         "A graphical tool for designing, analyzing and synthesizing digital filters")
-#         )
-# 
-# #------------------------------------------------------------------------------
 #     def statusMessage(self, message):
 #         """
 #         Display a message in the statusbar.
@@ -250,6 +229,10 @@ class pyFDA(QMainWindow):
             "Quit pyFDA?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
+            # Clear clipboard before exit to avoid error message on older Qt versions
+            # "QClipboard: Unable to receive an event from the clipboard manager 
+            # in a reasonable time
+            fb.clipboard.clear()
             event.accept()
         else:
             event.ignore()

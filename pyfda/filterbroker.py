@@ -14,6 +14,9 @@ from __future__ import division, unicode_literals, print_function, absolute_impo
 from collections import defaultdict
 from .frozendict import freeze_hierarchical
 
+# Handle to central clipboard instance
+clipboard = None
+
 # Project base directory
 base_dir = ""
 

@@ -110,9 +110,6 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 # Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
 # in filterbroker.py
 
-# Default savedir for filter coefficients, filter dicts etc.
-save_dir = "D:/Daten"
-
 # #############################################################################
 # Matplotlib layout settings
 # #############################################################################

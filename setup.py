@@ -13,7 +13,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-# VERSION contains ... well ... the version in the form  __version__ = '0.1b10'
+# version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
 version_nr = {}
 with open("pyfda/version.py") as fp:
     exec(fp.read(), version_nr)
@@ -22,8 +22,8 @@ setup(
     name = 'pyfda',
     # see PEP440 for versioning information
     version = version_nr['__version__'],   
-    description = ('pyFDA is a python tool with a user-friendly GUI for designing and analysing discrete time '
-                 'filters.'),
+    description = ('pyFDA is a python tool with a user-friendly GUI for designing '
+                 'and analysing discrete time filters.'),
     long_description = long_description,
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
@@ -57,6 +57,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
@@ -68,7 +69,7 @@ setup(
     package_data={'pyfda': ['pyfda_log.conf', 'pyfda_log_debug.conf',
                             'filter_design/filter_list.txt'],
                   },
-
+    # https://stackoverflow.com/questions/2026876/packaging-python-applications-with-configuration-files
     # include files that get installed OUTSIDE the package
     data_files = [
 #        ('', ['README.rst']),
