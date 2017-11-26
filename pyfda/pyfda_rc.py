@@ -30,7 +30,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .pyfda_lib import cmp_version, CRLF
-from .pyfda_dirs import HOME_DIR
 
 # #############################################################################
 # General layout settings
@@ -110,9 +109,6 @@ ft_names = {"IIR":"IIR", "FIR":"FIR"}
 
 # Dictionary dm_names is created dynamically by FilterTreeBuilder and stored
 # in filterbroker.py
-
-# Default savedir for filter coefficients, filter dicts etc.
-save_dir = HOME_DIR
 
 # #############################################################################
 # Matplotlib layout settings
