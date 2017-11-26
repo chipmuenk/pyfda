@@ -100,9 +100,11 @@ def cmp_version(mod, version):
     """
     Compare version number of installed module `mod` against string `version` and
     return 1, 0 or -1 if the installed version is greater, equal or less than
-    the number in `version`.
+    the number in `version`. If `mod` is not installed, return -2.
     """
-    if LooseVersion(VERSION[mod]) > LooseVersion(version):
+    if mod not in VERSION:
+        return -2
+    elif LooseVersion(VERSION[mod]) > LooseVersion(version):
         return 1
     elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
         return 0
