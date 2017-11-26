@@ -81,6 +81,18 @@ try:
 except ImportError:
     pass
 
+try:
+    from xlwt import __version__ as VERSION_XLWT
+    VERSION.update({'xlwt': VERSION_XLWT})
+except ImportError:
+    pass
+
+try:
+    from xlsxwriter import __version__ as VERSION_XLSX
+    VERSION.update({'xlsx': VERSION_XLSX})
+except ImportError:
+    pass
+
 PY3 = sys.version_info > (3,) # True for Python 3
 CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n" 
 
