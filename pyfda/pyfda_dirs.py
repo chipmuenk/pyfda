@@ -61,26 +61,33 @@ TEMP_DIR = tempfile.gettempdir()
 
 def get_log_dir():
     """Return the logging directory"""
-    log_dir = '/var/log/' # usually a good choice for Linux / Unix / MAC OS
-    if not valid(log_dir):
-        if valid (TEMP_DIR):
-            log_dir = TEMP_DIR
-        else:
-            return None
-    log_dir_pyfda = os.path.join(log_dir, '.pyfda')
-    if valid(log_dir_pyfda) and os.access(log_dir_pyfda, os.W_OK): # R_OK for readable
-        return log_dir_pyfda
-    else:
-        try:
-            os.mkdir(log_dir_pyfda)
+
+     # list of base directories for constructing the logging directory
+    log_dirs = ['/var/log/', TEMP_DIR]
+    for d in log_dirs:
+        log_dir_pyfda = os.path.join(d, '.pyfda')
+        # check whether directory /..../.pyfda exists and is writable
+        if valid(log_dir_pyfda) and os.access(log_dir_pyfda, os.W_OK): # R_OK for readable
             return log_dir_pyfda
-        except (IOError, OSError) as e:
-            print("Error creating {0}:\n{1}".format(log_dir_pyfda, e))
-            return log_dir
+        # check whether directory .../.pyfda can be created:
+        elif valid(d) and os.access(d, os.W_OK):
+            try:
+                os.mkdir(log_dir_pyfda)
+                print("Created logging directory {0}".format(log_dir_pyfda))
+                return log_dir_pyfda
+            except (IOError, OSError) as e:
+                print("ERROR creating {0}:\n{1}\nUsing '{2}'".format(log_dir_pyfda, e, d))
+                return d # use base directory instead if it is writable
+    print("ERROR: No suitable directory found for logging.")
+    return None
 
 LOG_DIR  = get_log_dir()
-LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%b%d-%H%M%S"))
-USER_LOG_FILE = os.path.join(LOG_DIR, LOG_FILE) # this can be updated in pyfdax.py
+if LOG_DIR:
+    LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%b%d-%H%M%S"))
+    USER_LOG_FILE = os.path.join(LOG_DIR, LOG_FILE) # this can be updated in pyfdax.py
+else:
+    LOG_FILE = None
+    USER_LOG_FILE = None
 #------------------------------------------------------------------------------
 def get_conf_dir():
     """Return the user's configuration directory"""
