@@ -12,6 +12,15 @@ logger = logging.getLogger(__name__)
 from ..compat import (QtCore, QFD, Qt, QWidget, QPushButton, QFont, QFrame,
                       QVBoxLayout, QMessageBox, QPixmap)
 
+import pyfda.version as version
+import pyfda.pyfda_lib as pyfda_lib
+import pyfda.pyfda_dirs as dirs
+import pyfda.filterbroker as fb
+from pyfda.pyfda_rc import params
+from pyfda.pyfda_io_lib import extract_file_ext
+
+from pyfda import qrc_resources # contains all icons
+
 import numpy as np
 
 try:
@@ -19,21 +28,17 @@ try:
 except:
     import pickle
 
-try:
-    import xlwt
-except ImportError:
+if pyfda_lib.mod_version('xlwt') == None:
     XLWT = False
-    logger.info("Module xlwt not installed -> no *.xls coefficient export")
 else:
     XLWT = True
+    import xlwt
 
-try:
-    import XlsxWriter as xlsx
-except ImportError:
+if pyfda_lib.mod_version('xlsxwriter') == None:
     XLSX = False
-    logger.info("Module XlsxWriter not installed -> no *.xlsx coefficient export")
 else:
     XLSX = True
+    import xlsxwriter as xlsx
 
 #try:
 #    import xlrd
@@ -43,14 +48,6 @@ else:
 #else:
 #    XLRD = True
 
-import pyfda.version as version
-import pyfda.pyfda_lib as pyfda_lib
-import pyfda.dirs_finder as dirs
-import pyfda.filterbroker as fb
-import pyfda.pyfda_rc as rc
-from pyfda.pyfda_io_lib import extract_file_ext
-
-from pyfda import qrc_resources # contains all icons
 
 class File_IO(QWidget):
     """
@@ -98,7 +95,7 @@ class File_IO(QWidget):
         layVMain.setAlignment(Qt.AlignTop)
 #        layVMain.addLayout(layVIO)
         layVMain.addWidget(frmMain)
-        layVMain.setContentsMargins(*rc.params['wdg_margins'])
+        layVMain.setContentsMargins(*params['wdg_margins'])
 
 
         self.setLayout(layVMain)
@@ -119,7 +116,7 @@ class File_IO(QWidget):
         file_filters = ("Zipped Binary Numpy Array (*.npz);;Pickled (*.pkl)")
         dlg = QFD(self)
         file_name, file_type = dlg.getOpenFileName_(
-                caption = "Load filter ", directory = rc.save_dir,
+                caption = "Load filter ", directory = dirs.save_dir,
                 filter = file_filters)
         file_name = str(file_name) # QString -> str
 
@@ -159,7 +156,7 @@ class File_IO(QWidget):
                         logger.info('Loaded filter "%s"', file_name)
                          # emit signal -> InputTabWidgets.load_all:
                         self.sigFilterLoaded.emit()
-                        rc.save_dir = os.path.dirname(file_name)
+                        dirs.save_dir = os.path.dirname(file_name)
             except IOError as e:
                 logger.error("Failed loading %s!\n%s", file_name, e)
             except Exception as e:
@@ -315,7 +312,7 @@ class File_IO(QWidget):
         dlg = QFD(self)
         # return selected file name (with or without extension) and filter (Linux: full text)
         file_name, file_type = dlg.getSaveFileName_(
-                caption = "Save filter as", directory = rc.save_dir,
+                caption = "Save filter as", directory = dirs.save_dir,
                 filter = file_filters)
 
         file_name = str(file_name)  # QString -> str() needed for Python 2.x
@@ -355,7 +352,7 @@ class File_IO(QWidget):
 
                 if not file_type_err:
                     logger.info('Filter saved as "%s"', file_name)
-                    rc.save_dir = os.path.dirname(file_name) # save new dir
+                    dirs.save_dir = os.path.dirname(file_name) # save new dir
 
             except IOError as e:
                 logger.error('Failed saving "%s"!\n%s\n', file_name, e)
