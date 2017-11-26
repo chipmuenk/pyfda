@@ -12,19 +12,22 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
                       QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
-
 import numpy as np
 
-from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
-               instance, instances, intbv, traceSignals, 
-               Simulation, StopSimulation)
-    
+#from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
+#               instance, instances, intbv, traceSignals, 
+#               Simulation, StopSimulation)
+import myhdl  
+
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.filter_factory as ff
 import pyfda.pyfda_fix_lib as fix
+import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_io_lib import extract_file_ext
+from pyfda.pyfda_qt_lib import qstr
 from pyfda.pyfda_rc import params
+from pyfda.pyfda_lib import safe_eval
 
 from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
 
@@ -65,9 +68,8 @@ class HDLSpecs(QWidget):
         ifont.setItalic(True)
 
         lblMsg = QLabel("Warning! This feature is only experimental, "
-        "only HDL code for second order IIR filters under the name siir_hdl.v "
-        " resp. siir_hdl.vhd are created at the moment. Files are saved "
-        " in the pyFDA root directory.", self)
+        "only HDL code for second order IIR filters can be created at the moment. "
+        "The quantization settings are not used for code generation and simulation.", self)
         lblMsg.setWordWrap(True)
         layHMsg = QHBoxLayout()
         layHMsg.addWidget(lblMsg)   
@@ -363,20 +365,24 @@ class HDLSpecs(QWidget):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
-        qI_i = int(self.ledWIInput.text())
-        qF_i = int(self.ledWFInput.text())
-        
-        qI_o = int(self.ledWIOutput.text())
-        qF_o = int(self.ledWFOutput.text())
-        
+        self.qI_i = safe_eval(self.ledWIInput.text(), return_type='int', sign='pos')
+        self.qF_i = safe_eval(self.ledWFInput.text(), return_type='int', sign='pos')
+        self.ledWIInput.setText(qstr(self.qI_i))
+        self.ledWFInput.setText(qstr(self.qF_i))
+
+        self.qI_o = safe_eval(self.ledWIOutput.text(), return_type='int', sign='pos')
+        self.qF_o = safe_eval(self.ledWFOutput.text(), return_type='int', sign='pos')
+        self.ledWIOutput.setText(qstr(self.qI_o))
+        self.ledWFOutput.setText(qstr(self.qF_o))
+
         qQuant_o = self.cmbQuant_o.currentText()
         qOvfl_o = self.cmbOvfl_o.currentText()
         
-        q_obj_o =  {'WI':qI_o, 'WF': qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
+        q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
         myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
 
 
-        self.W = (qI_i + qF_i + 1, qF_i) # Matlab format: (W,WF)
+        self.W = (self.qI_i + self.qF_i + 1, self.qF_i) # Matlab format: (W,WF)
 
         # @todo: always use sos?  The filter object is setup to always
         # @todo: generate a second order filter
@@ -385,9 +391,9 @@ class HDLSpecs(QWidget):
         zpk =  fb.fil[0]['zpk']
         sos = fb.fil[0]['sos']
 
-        print("W = ", self.W)
-        print('b =', coeffs[0][0:3])
-        print('a =', coeffs[1][0:3])
+        logger.info("W = {0}".format(self.W))
+        logger.info('b = {0}'.format(coeffs[0][0:3]))
+        logger.info('a = {0}'.format(coeffs[1][0:3]))
 
         # =============== adapted from C. Felton's SIIR example =============
         self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
@@ -408,33 +414,37 @@ class HDLSpecs(QWidget):
         file_types = "Verilog (*.v);;VHDL (*.vhd)"
 
         hdl_file, hdl_filter = dlg.getSaveFileName_(
-                caption="Save HDL as", directory=fb.base_dir,
+                caption="Save HDL as", directory=dirs.save_dir,
                 filter=file_types)
-        hdl_file = os.path.normpath(str(hdl_file))
-        hdl_type = extract_file_ext(hdl_filter)[0] # return '.v' or '.vhd'
+        hdl_file = str(hdl_file)
 
-        hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
-        if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
-            os.mkdir(hdl_dir_name)
-        fb.base_dir = hdl_dir_name # make this directory the new default / base dir
-
-        # return the filename without suffix
-        hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
-
-        self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
+        if hdl_file != "": # "operation cancelled" gives back an empty string
+            hdl_file = os.path.normpath(hdl_file)
+            hdl_type = extract_file_ext(hdl_filter)[0] # return '.v' or '.vhd'
     
-        if str(hdl_type) == '.vhd':
-            self.flt.hdl_target = 'vhdl'
-            suffix = '.vhd'
-        else:
-            self.flt.hdl_target = 'verilog'
-            suffix = '.v'
-            
-        logger.info('Creating hdl_file "{0}"'.format(
-                    os.path.join(hdl_dir_name, hdl_file_name + suffix)))
+            hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
+            if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
+                os.mkdir(hdl_dir_name)
+            dirs.save_dir = hdl_dir_name # make this directory the new default / base dir
+    
+            # return the filename without suffix
+            hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
 
-        self.flt.convert()
-        logger.info("HDL conversion finished!")
+            if str(hdl_type) == '.vhd':
+                self.flt.hdl_target = 'vhdl'
+                suffix = '.vhd'
+            else:
+                self.flt.hdl_target = 'verilog'
+                suffix = '.v'
+
+                
+            logger.info('Creating hdl_file "{0}"'.format(
+                        os.path.join(hdl_dir_name, hdl_file_name + suffix)))
+
+            self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
+
+            self.flt.convert()
+            logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
     def simFixPoint(self):
@@ -448,39 +458,45 @@ class HDLSpecs(QWidget):
         plt_types = "png (*.png);;svg (*.svg)"
 
         plt_file, plt_type = dlg.getSaveFileName_(
-                caption = "Save plots as", directory=fb.base_dir,
+                caption = "Save plots as", directory=dirs.save_dir,
                 filter = plt_types)
-        plt_file = os.path.normpath(str(plt_file))
-        plt_type = str(plt_type)
-        
-        logger.info('Using plot filename "%s"', plt_file)
-        
-        plt_dir_name = os.path.dirname(plt_file)  # extract the directory path
-        if not os.path.isdir(plt_dir_name): # create directory if it doesn't exist
-            os.mkdir(plt_dir_name)
-        fb.base_dir = plt_dir_name # make this directory the new default / base dir
-        
-        # return the filename without suffix
-        plt_file_name = os.path.splitext(os.path.basename(plt_file))[0]
+        plt_file = str(plt_file)
 
-        self.setupHDL(file_name = plt_file_name, dir_name = plt_dir_name)
-        
-        logger.info('Creating plot file "{0}"'.format(
-                    os.path.join(plt_dir_name, plt_file_name)))
+        if plt_file != "":
+            plt_file = os.path.normpath(plt_file)
+            plt_type = str(plt_type)
+            
+            logger.info('Using plot filename "%s"', plt_file)
+            
+            plt_dir_name = os.path.dirname(plt_file)  # extract the directory path
+            if not os.path.isdir(plt_dir_name): # create directory if it doesn't exist
+                os.mkdir(plt_dir_name)
+            dirs.save_dir = plt_dir_name # make this directory the new default / base dir
 
-        logger.info("Fixpoint simulation setup")
-        tb = self.flt.simulate_freqz(num_loops=3, Nfft=1024)
-        clk = Signal(False)
-        ts  = Signal(False)
-        x   = Signal(intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
-        y   = Signal(intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
+#            plt_file_name = os.path.splitext(os.path.basename(plt_file))[0] # filename without suffix
+            plt_file_name = os.path.basename(plt_file)
+            
+            logger.info('Creating plot file "{0}"'.format(
+                        os.path.join(plt_dir_name, plt_file_name)))
 
-        sim = Simulation(tb)
-        logger.info("Fixpoint simulation started")
-        sim.run()
-        logger.info("Fixpoint plotting started")
-        self.flt.plot_response()
-        logger.info("Fixpoint plotting finished")
+            self.setupHDL(file_name = plt_file_name, dir_name = plt_dir_name)
+
+            logger.info("Fixpoint simulation setup")
+            tb = self.flt.simulate_freqz(num_loops=3, Nfft=1024)
+            clk = myhdl.Signal(False)
+            ts  = myhdl.Signal(False)
+            x   = myhdl.Signal(myhdl.intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
+            y   = myhdl.Signal(myhdl.intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
+            
+            try:
+                sim = myhdl.Simulation(tb)
+                logger.info("Fixpoint simulation started")
+                sim.run()
+                logger.info("Fixpoint plotting started")
+                self.flt.plot_response()
+                logger.info("Fixpoint plotting finished")
+            except myhdl.SimulationError as e:
+                logger.warning("Simulation failed:\n{0}".format(e))
 
 #------------------------------------------------------------------------------
 
