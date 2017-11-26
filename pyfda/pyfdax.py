@@ -8,20 +8,27 @@ Mainwindow for the pyFDA app
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
-from pyfda import pyfda_rc as rc
-import pyfda.pyfda_dirs as dirs # initial import constructs file paths
-
-#log_config_file = "pyfda_log.conf"
-#base_dir = os.path.dirname(os.path.abspath(__file__)) # dir of this file (pyfdax.py)
-#log_config_dir_file = os.path.join(dirs.BASE_DIR, log_config_file)
-
 
 #from sip import setdestroyonexit
 import logging
 import logging.config
 logger = logging.getLogger(__name__)
 
-from .compat import QtCore # needed for XStream
+import pyfda.pyfda_dirs as dirs # initial import constructs file paths
+
+import matplotlib
+# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
+# to avoid 
+# "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
+try:
+    import PyQt5
+    matplotlib.use("Qt5Agg")
+except ImportError:
+    matplotlib.use("Qt4Agg")
+
+from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics,
+                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
+
 
 class DynFileHandler(logging.FileHandler):
     """
@@ -76,8 +83,9 @@ class QEditHandler(logging.Handler):
 logging.DynFileHandler = DynFileHandler
 logging.QEditHandler = QEditHandler
 # The following is unneeded?
-# logging.config.fileConfig(os.path.join(dirs.BASE_DIR, log_config_file))#, disable_existing_loggers=True)
+logging.config.fileConfig(dirs.USER_LOG_CONF_FILE)#, disable_existing_loggers=True)
 
+from pyfda import pyfda_rc as rc
 from pyfda import pyfda_lib
 if not os.path.exists(dirs.save_dir):
     home_dir = pyfda_lib.get_home_dir()
@@ -85,22 +93,10 @@ if not os.path.exists(dirs.save_dir):
         dirs.save_dir, home_dir)
     dirs.save_dir = home_dir
 
-
 #==============================================================================
 import pyfda.filterbroker as fb
 # store as base_dir (= pyfdax.py directory) in filterbroker
 fb.base_dir = dirs.BASE_DIR
-
-from .compat import (HAS_QT5, QtCore, QMainWindow, QApplication, QFontMetrics,
-                     QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
-import matplotlib
-# specify matplotlib backend for systems that have both PyQt4 and PyQt5 installed
-# to avoid 
-# "RuntimeError: the PyQt4.QtCore and PyQt5.QtCore modules both wrap the QObject class"
-if HAS_QT5:
-    matplotlib.use("Qt5Agg")
-else:
-    matplotlib.use("Qt4Agg")
 
 from pyfda import qrc_resources # contains all icons
 # edit pyfda.qrc, then
