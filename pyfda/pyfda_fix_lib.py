@@ -834,12 +834,10 @@ class Fixed(object):
         formats except `float` a fixpoint representation with `self.W` binary
         digits is returned.
         """
-        #======================================================================
-        # Define vectorized functions for dec -> frmt  using numpys
-        # automatic type casting
-        #======================================================================
+
         """
-        Vectorized function for inserting binary point in string `bin_str`
+        Define vectorized functions using numpys automatic type casting:
+        Vectorized functions for inserting binary point in string `bin_str`
         after position `pos`.
 
         Usage:  insert_binary_point(bin_str, pos)
