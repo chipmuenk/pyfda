@@ -831,13 +831,6 @@ class FilterCoeffs(QWidget):
         """
         Quantize selected / all coefficients in self.ba and refresh QTableWidget
         """
-
-        self._store_q_settings() # read comboboxes and store setting in filter dict
-        # always save quantized coefficients in fractional format
-        # -> change output format to 'float' before quantizing and storing in self.ba
-
-        self.myQ.frmt = 'float'
-
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
             self.ba = self.myQ.fixp(self.ba, scaling='div')

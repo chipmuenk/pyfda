@@ -501,10 +501,10 @@ class Fixed(object):
             in floating point format to be quantized
 
         scaling: String
-            When `scaling='mult'` (default), `y` is multiplied by `self.scale` before
-            requantizing and saturating, when `scaling='div'`,
-            `y` is divided by `self.scale`. For all other settings, `y` is transformed
-            unscaled.
+            When `scaling='mult'` (default), `y` is multiplied by `self.scale` 
+            *before* quantizing and saturating, when `scaling='div'`,
+            `y` is divided by `self.scale` *after* quantizing / saturating.
+            For all other settings, `y` is transformed unscaled.
 
         Returns
         -------
@@ -687,7 +687,8 @@ class Fixed(object):
             - Calculate decimal, fractional representation `y_dec` of string,
               using the base and the number of fractional places
             (- Calculate two's complement for `W` bits for negative bin and hex numbers)
-            - Calculate fixpoint float representation `y_float = fixp(y_dec, scaling='div')`
+            - Calculate fixpoint float representation `y_float = fixp(y_dec, scaling='div')`,
+              dividing the result by `scale`.
 
         Parameters
         ----------
