@@ -448,7 +448,7 @@ class PlotImpz(QWidget):
 
         if N_user == 0: # set number of data points automatically
             if fb.fil[0]['ft'] == 'IIR':
-                N = 100 # TODO: IIR: more intelligent algorithm needed (based on transients)
+                N = 100
             else:
                 N = min(len(self.bb),  100) # FIR: N = number of coefficients (max. 100)
         else:

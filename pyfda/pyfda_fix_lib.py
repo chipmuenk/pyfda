@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-#===========================================================================
-#
-# Fixpoint library for converting numpy scalars and arrays to quantized
-# numpy values
+"""
+Fixpoint library for converting numpy scalars and arrays to quantized
+numpy values
+"""
 #
 # (c) 2015 - 2017 Christian Münker
 #===========================================================================
@@ -534,6 +534,10 @@ class Fixed(object):
         >>> bq = bq.astype(btype) # restore original variable type
         """
 
+        #======================================================================
+        # (1) : Convert input argument into proper floating point scalars /
+        #        arrays and initialize flags
+        #======================================================================
         if np.shape(y):
             # create empty arrays for result and overflows with same shape as y
             # for speedup, test for invalid types
@@ -552,10 +556,9 @@ class Fixed(object):
                     try:
                         np.char.replace(y, ' ', '') # remove all whitespace
                         y = y.astype(complex) # try to convert to complex
-                    except (TypeError, ValueError) as e: # try converting elements individually
+                    except (TypeError, ValueError) as e: # try converting elements recursively
                         y = list(map(lambda y_scalar:
                             self.fixp(y_scalar, scaling=scaling), y))
-
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
                              "cannot convert to float.".format(y, y.dtype))
@@ -588,12 +591,20 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        y_in = y # y before scaling
-        # convert to "fixpoint integer" for requantizing in relation to LSB
+        y_in = y # y before scaling / quantizing
+        #======================================================================
+        # (2) : Multiply by `scale` factor before requantization and saturation
+        #       when `scaling='mult'`
+        #======================================================================
         y = y / self.LSB
         if scaling == 'mult':
             y = y * self.scale
 
+        #======================================================================
+        # (3) : Divide by LSB and apply selected quantization method to convert
+        #       floating point inputs to "fixpoint integers" arrays
+        #       Next, multiply by LSB to restore original scale
+        #=====================================================================
         if   self.quant == 'floor':  yq = np.floor(y)
              # largest integer i, such that i <= x (= binary truncation)
         elif self.quant == 'round':  yq = np.round(y)
@@ -609,12 +620,13 @@ class Fixed(object):
         else:
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
 
-        # revert to original fractional scale
         yq = yq * self.LSB
-
         logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
-        # Handle Overflow / saturation in relation to MSB
+        #======================================================================
+        # (4) : Handle Overflow / saturation in relation to MSB
+        #=====================================================================
+
         if   self.ovfl == 'none':
             pass
         else:
@@ -639,6 +651,12 @@ class Fixed(object):
             else:
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
+        #======================================================================
+        # (5) : Divide result by `scale` factor when `scaling='div'`
+        #       - frmt2float()
+        #       - filter_coeffs when quantizing the coefficients
+        #       float2frmt passes on the scaling argument
+        #======================================================================
 
         if scaling == 'div':
             yq = yq / self.scale
@@ -662,12 +680,14 @@ class Fixed(object):
         Return floating point representation for fixpoint scalar `y` given in
         format `frmt`.
 
-        - Construct string representation without radix point, count number of
-          fractional places.
-        - Calculate integer representation of string, taking the base into account
-        (- When result is negative, calculate two's complement for `W` bits)
-        - Scale with `2** -W`
-        - Scale with the number of fractional places (depending on format!)
+        * When input format is float, return unchanged
+        * else:
+            - Remove illegal characters and leading '0's
+            - Count number of fractional places `frc_places` and remove radix point
+            - Calculate decimal, fractional representation `y_dec` of string,
+              using the base and the number of fractional places
+            (- Calculate two's complement for `W` bits for negative bin and hex numbers)
+            - Calculate fixpoint float representation `y_float = fixp(y_dec, scaling='div')`
 
         Parameters
         ----------
@@ -680,7 +700,7 @@ class Fixed(object):
 
         Returns
         -------
-        floating point (`dtype=np.float64`) representation of fixpoint input.
+        quantized floating point (`dtype=np.float64`) representation of input string
         """
 
         if y == "":
@@ -804,7 +824,6 @@ class Fixed(object):
             return y_float
         else:
             return 0.0
-
 
 #------------------------------------------------------------------------------
     def float2frmt(self, y, scaling='mult'):
