@@ -745,10 +745,8 @@ class Fixed(object):
                 raw_str = val_str.replace('.','') # join integer and fractional part
 
                 logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
-
             else:
                 return 0.0
-
 
         # (1) calculate the decimal value of the input string using np.float64()
         #     which takes the number of decimal places into account.
@@ -875,12 +873,13 @@ class Fixed(object):
 
             if self.frmt == 'dec':
                 if self.WF == 0:
-                    y_fix = np.int64(y_fix) # get rid of trailing zero
-
-                # element wise conversion from integer (%d) to string
+                    y_str = np.int64(y_fix) # get rid of trailing zero
+                    # y_str = np.char.mod('%d', y_fix)
+                # elementwise conversion from integer (%d) to string
                 # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
-                y_str = np.char.mod('%d', y_fix) 
-
+                else:
+                    # y_str = np.char.mod('%f',y_fix)
+                    y_str = y_fix
             elif self.frmt == 'csd':
                 y_str = dec2csd_vec(y_fix, self.WF) # convert with WF fractional bits
 
