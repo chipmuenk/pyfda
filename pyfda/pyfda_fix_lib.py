@@ -735,15 +735,13 @@ class Fixed(object):
                     val_str = '0' + val_str
 # TODO: This does not work with csd?!
 
+                # count number of fractional places in string
                 try:
-                    int_str, frc_str = val_str.split('.') # split into integer and fractional places
+                    _, frc_str = val_str.split('.') # split into integer and fractional places
+                    frc_places = len(frc_str)
                 except ValueError: # no fractional part
-                    int_str = val_str
-                    frc_str = ''
+                    frc_places = 0
 
-                # count number of valid digits in string
-                int_places = len(int_str)-1
-                frc_places = len(frc_str)
                 raw_str = val_str.replace('.','') # join integer and fractional part
 
                 logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
