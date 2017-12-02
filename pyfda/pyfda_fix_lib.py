@@ -15,9 +15,6 @@ logger = logging.getLogger(__name__)
 import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 
-# TODO: Python2: frmt2float or float2frmt yields zero for bin / hex / dec (not for csd / float)!
-# TODO: Python2: frmt2float:684if y == "": unicode equal comparison failed 
-#                to convert both arguments to unicode
 # TODO: Entering a negative sign with a hex or bin number always yields zero
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
 
