@@ -159,6 +159,11 @@ class ItemDelegate(QStyledItemDelegate):
         if self.parent.myQ.frmt == 'float':
             data = safe_eval(data_str, return_type='auto') # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
+
+        elif self.parent.myQ.frmt == 'dec' and self.parent.myQ.WF > 0:
+            # decimal fixpoint representation with fractional part
+            return "{0:.{1}g}".format(self.parent.myQ.float2frmt(data_str),
+                                        params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
                                         self.parent.myQ.places)
