@@ -159,6 +159,11 @@ class ItemDelegate(QStyledItemDelegate):
         if self.parent.myQ.frmt == 'float':
             data = safe_eval(data_str, return_type='auto') # convert to float
             return "{0:.{1}g}".format(data, params['FMT_ba'])
+
+        elif self.parent.myQ.frmt == 'dec' and self.parent.myQ.WF > 0:
+            # decimal fixpoint representation with fractional part
+            return "{0:.{1}g}".format(self.parent.myQ.float2frmt(data_str),
+                                        params['FMT_ba'])
         else:
             return "{0:>{1}}".format(self.parent.myQ.float2frmt(data_str),
                                         self.parent.myQ.places)
@@ -831,19 +836,12 @@ class FilterCoeffs(QWidget):
         """
         Quantize selected / all coefficients in self.ba and refresh QTableWidget
         """
-
-        self._store_q_settings() # read comboboxes and store setting in filter dict
-        # always save quantized coefficients in fractional format
-        # -> change output format to 'float' before quantizing and storing in self.ba
-
-        self.myQ.frmt = 'float'
-
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
-            self.ba = self.myQ.fixp(self.ba, scaling='div')
+            self.ba = self.myQ.fixp(self.ba, scaling='mult') / self.myQ.scale #scaling='div')
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'div')
+                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'mult') / self.myQ.scale
 
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
