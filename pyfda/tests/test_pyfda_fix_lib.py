@@ -441,15 +441,39 @@ class TestSequenceFunctions(unittest.TestCase):
         Test conversion from csd format to float and dec
         """
         # saturation behaviour with 'round' quantization for integer case
-        y_list = ['-00000+', '-0000', '-0', '-', '0', '00', '', '+', '+0', '+0+0', '+0+0.0-', '+000-','020.01']
+        y_list = ['-00000+', '-0000', '-0.0-', '-', '0', '00', '', '.+', '+', '+0', '+0+0', '+0+0.0-', '+000-','+0000', '020.01']
 
-# TODO: 1st element should be 0? 10th element should be 10, not 9.75
-#       Saturation does not work, neither does setting the Q format
         q_obj = {'WI':4, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [-63, -16, -2, -1, 0, 0, 0, 1, 2, 10, 9.75, 15, 0]
+        yq_list_goal = [-16, -16, -2, -1, 0, 0, 0, 0, 1, 2, 10, 10, 15, 15, 0]
         self.assertEqual(yq_list, yq_list_goal)
+
+        # same with scale=2    
+        q_obj = {'WI':4, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 2}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.frmt2float, y_list))
+        yq_list_goal = [-16, -16, -4, -2, 0, 0, 0, 1, 2, 4, 15, 15, 15, 15, 0]
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # same with Q5.2 quantization        
+        q_obj = {'WI':5, 'WF':2, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 1}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.frmt2float, y_list))
+        yq_list_goal = [-32, -16, -2.25, -1, 0, 0, 0, 0.5, 1, 2, 10, 9.75, 15, 16, 0]
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # same with Q5.2 quantization        
+        q_obj = {'WI':5, 'WF':2, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 0.25}
+        self.myQ.setQobj(q_obj)
+        yq_list = list(map(self.myQ.frmt2float, y_list))
+        yq_list_goal = [-15.75, -4, -0.5, -0.25, 0, 0, 0, 0.0, 0.25, 0.5, 2.5, 2.5, 3.75, 4, 0]
+        self.assertEqual(yq_list, yq_list_goal)
+
+        # same but vectorized
+        # yq_list = self.myQ.frmt2float(y_list)
+        # self.assertEqual(yq_list, yq_list_goal)
+
 
 # TODO: test csd2dec, csd2dec_vec
 
