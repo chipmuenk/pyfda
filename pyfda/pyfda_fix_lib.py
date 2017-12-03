@@ -212,7 +212,7 @@ def csd2dec(csd_str):
     '-', indicating whether the current bit is meant to positive or negative.
     All other characters are simply ignored (= replaced by zero).
 
-    `csd_str` may be an integer or fractional CSD number.
+    `csd_str` has to be an integer CSD number.
 
     Parameters:
     -----------
@@ -233,22 +233,11 @@ def csd2dec(csd_str):
 
     -0+0 = -2³ + 2¹ = -6
 
-    +0.-0- = 2¹ - 1/2¹ - 1/2³ = 1.375
-
     """
     logger.debug("Converting: {0}".format(csd_str))
 
-    #  Find out what the MSB power of two should be, keeping in
-    #  mind we may have a fractional CSD number:
-    try:
-        (int_str, _) = csd_str.split('.') # split into integer and fractional bits
-        csd_str = csd_str.replace('.','') # join integer and fractional bits to one csd string
-    except ValueError: # no fractional part
-        int_str = csd_str
-        _ = ""
-
     # Intialize calculation, start with the MSB (integer)
-    msb_power = len(int_str)-1 #
+    msb_power = len(csd_str)-1 #
     dec_val = 0.0
 
     # start from the MSB and work all the way down to the last digit
@@ -263,8 +252,8 @@ def csd2dec(csd_str):
         # else
         #    ... all other values are ignored
 
-        logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4}; Num={5:f}'.format(
-                csd_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
+        logger.debug('  "{0:s}" (QI = {1:d}); 2**{2:d} = {3}; Num={4:f}'.format(
+                csd_str[ii], len(csd_str), msb_power-ii, power_of_two, dec_val))
 
     return dec_val
 
