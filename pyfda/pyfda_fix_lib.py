@@ -152,7 +152,7 @@ def dec2csd(dec_val, WF=0):
 
         limit = pow(2.0, k+1) / 3.0
 
-        logger.debug("\t{0} - {1}".format(remainder, limit))
+        # logger.debug("\t{0} - {1}".format(remainder, limit))
 
         # decimal point?
         if k == -1 :
@@ -196,6 +196,8 @@ def dec2csd(dec_val, WF=0):
 #        csd_digits.insert(0, '0')
 
     csd_str = "".join(csd_digits)
+    
+    logger.debug("CSD result = {0}".format(csd_str))
 
 #    if WF > 0:
 #        csd_str = csd_str[:-WF] + "." + csd_str[-WF:]
