@@ -17,13 +17,12 @@ from pyfda.pyfda_qt_lib import qstr
 
 # TODO: Entering a negative sign with a hex or bin number always yields zero
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
+# TODO: Simplify handling of 'scale' parameter
 
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
 #       The problem only occurs __just_ below -1 or +1 - there should be no zero in
 #       before the binary point
-# TODO: csd2dec doesn't respect wordlength specifications
 # TODO: Vecorization for hex / csd functions (frmt2float)
-
 
 __version__ = 0.5
 
@@ -84,7 +83,7 @@ def bin2hex(bin_str, WI=0):
     hex_str = "0" if len(hex_str) == 0 else hex_str
     return hex_str
 
-bin2hex_vec =np.vectorize(bin2hex) # safer than frompyfunction()
+bin2hex_vec = np.vectorize(bin2hex) # safer than frompyfunction()
 
 def dec2hex(val, nbits, WF=0):
     """
@@ -132,9 +131,6 @@ def dec2csd(dec_val, WF=0):
     License: GPL2
 
     """
-
-    logger.debug("Converting {0:f}:".format(dec_val))
-
     # figure out binary range, special case for 0
     if dec_val == 0 :
         return '0'
@@ -143,7 +139,7 @@ def dec2csd(dec_val, WF=0):
     else:
         k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
 
-    logger.debug("to {0:d}.{1:d} format".format(k, WF))
+    logger.debug("CSD: Converting {0:f} to {1:d}.{2:d} format".format(dec_val, k, WF))
 
     # Initialize CSD calculation
     csd_digits = []
@@ -194,8 +190,6 @@ def dec2csd(dec_val, WF=0):
             prev_non_zero = False
 
         k -= 1
-
-        logger.debug(csd_digits)
 
     # Always have something before the point
 #    if np.abs(dec_val) < 1.0:
@@ -409,11 +403,6 @@ class Fixed(object):
                 'dec' : r'[^0-9|.|,|\-]',
                 'hex' : r'[^0-9A-Fa-f|.|,|\-]'
                         }
-#        self.frmt_scale = {'bin' : 2,
-#              'csd' : 2,
-#              'dec' : 1,
-#              'hex' : 16}
-
 
     def setQobj(self, q_obj):
         """
@@ -728,12 +717,9 @@ class Fixed(object):
          # remove illegal characters and trailing zeros
             val_str = re.sub(self.FRMT_REGEX[frmt],r'', qstr(y)).lstrip('0')
             if len(val_str) > 0:
-
                 val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
-
                 if val_str[0] == '.': # prepend '0' when the number starts with '.'
                     val_str = '0' + val_str
-# TODO: This does not work with csd?!
 
                 # count number of fractional places in string
                 try:
@@ -750,7 +736,8 @@ class Fixed(object):
 
         # (1) calculate the decimal value of the input string using np.float64()
         #     which takes the number of decimal places into account.
-        # (2) divide by scale
+        # (2) quantize and saturate
+        # (3) divide by scale
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
@@ -776,11 +763,12 @@ class Fixed(object):
                 if int_bits > self.WI + 1:
                     if frmt == 'hex':
                         raw_str = np.binary_repr(int(raw_str, 16))
-                    raw_str = raw_str[int_bits - self.WI - 1:] # discard the upper bits
+                    # discard the upper bits outside the valid range
+                    raw_str = raw_str[int_bits - self.WI - 1:] 
 
                     y_dec = int(raw_str, 2) / self.base**frc_places # recalculate y_dec
 
-                    if y_dec == 0: # avoid log2(0)
+                    if y_dec == 0: # avoid log2(0) error in code below
                         return 0
 
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0) # ... and int_bits
@@ -798,10 +786,12 @@ class Fixed(object):
 
             logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
             logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
+        # ----
 
         elif frmt == 'csd':
             # - Glue integer and fractional part to a string without radix point
             # - Divide by 2 ** <number of fractional places> for correct scaling
+            # - Calculate fixpoint representation for saturation / overflow effects
 
             y_float = csd2dec(raw_str)
             if y_float is not None:
@@ -811,8 +801,11 @@ class Fixed(object):
             logger.error('Unknown output format "%s"!'.format(frmt))
             y_float = None
 
-        if frmt != "float": logger.debug("MSB={0:g} |  scale={1:g} | "
-              "y={2} | y_float={3}".format(self.MSB, self.scale, y, y_float))
+        if frmt != "float": 
+            logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
+                         .format(self.MSB, self.scale, raw_str, val_str))
+            logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
+
 
         if y_float is not None:
             return y_float

@@ -36,7 +36,6 @@ from .filter_coeffs_ui import FilterCoeffs_UI
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
-# TODO: Quantizing coefficients with setting "integer" produces zero values
 
 # TODO: convert to a proper Model-View-Architecture using QTableView?
 
