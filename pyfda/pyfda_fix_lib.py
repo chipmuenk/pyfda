@@ -487,9 +487,11 @@ class Fixed(object):
             in floating point format to be quantized
 
         scaling: String
-            When `scaling='mult'` (default), `y` is multiplied by `self.scale` 
-            *before* quantizing and saturating, when `scaling='div'`,
-            `y` is divided by `self.scale` *after* quantizing / saturating.
+            When `scaling=='mult'` or `'multdiv'` (default), `y` is multiplied
+             by `self.scale` *before* quantizing and saturating.
+             When `scaling='div'` or `'multdiv'`,`y` is divided by `self.scale`
+             *after* quantizing / saturating.
+             
             For all other settings, `y` is transformed unscaled.
 
         Returns
@@ -580,10 +582,10 @@ class Fixed(object):
         y_in = y # y before scaling / quantizing
         #======================================================================
         # (2) : Multiply by `scale` factor before requantization and saturation
-        #       when `scaling='mult'`
+        #       when `scaling=='mult'`or 'multdiv'
         #======================================================================
         y = y / self.LSB
-        if scaling == 'mult':
+        if scaling in {'mult', 'multdiv'}:
             y = y * self.scale
 
         #======================================================================
@@ -638,13 +640,13 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
         #======================================================================
-        # (5) : Divide result by `scale` factor when `scaling='div'`
+        # (5) : Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
         #       - frmt2float()
         #       - filter_coeffs when quantizing the coefficients
         #       float2frmt passes on the scaling argument
         #======================================================================
 
-        if scaling == 'div':
+        if scaling in {'div', 'multdiv'}:
             yq = yq / self.scale
 
         if SCALAR and isinstance(yq, np.ndarray):
@@ -793,10 +795,10 @@ class Fixed(object):
             # - Divide by 2 ** <number of fractional places> for correct scaling
             # - Calculate fixpoint representation for saturation / overflow effects
 
-            y_float = csd2dec(raw_str)
-            if y_float is not None:
-                y_float = y_float / 2**frc_places
-
+            y_dec = csd2dec(raw_str) # csd -> integer
+            if y_dec is not None:
+                y_float = self.fixp(y_dec / 2**frc_places, scaling='multdiv')
+        # ----
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
             y_float = None
@@ -859,7 +861,7 @@ class Fixed(object):
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # return a quantized & saturated / wrapped fixpoint (type float) for y
-            y_fix = self.fixp(y)
+            y_fix = self.fixp(y, scaling='mult')
 
             if self.frmt == 'dec':
                 if self.WF == 0:
@@ -913,7 +915,7 @@ if __name__=='__main__':
 
     print("\nTesting float2frmt()\n====================\n")
     for y in y_list:
-        print("y -> y_fix", y, "->", myQ.fixp(y))
+        print("y -> y_fix", y, "->", myQ.fixp(y, scaling='mult'))
         print(myQ.frmt, myQ.float2frmt(y))
 
     print("\nTesting frmt2float()\n====================\n")

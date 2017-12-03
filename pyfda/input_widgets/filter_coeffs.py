@@ -837,10 +837,10 @@ class FilterCoeffs(QWidget):
         """
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
-            self.ba = self.myQ.fixp(self.ba, scaling='mult') / self.myQ.scale #scaling='div')
+            self.ba = self.myQ.fixp(self.ba, scaling='multdiv')
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'mult') / self.myQ.scale
+                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'multdiv')
 
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()
