@@ -22,6 +22,7 @@ from pyfda.pyfda_qt_lib import qstr
 # TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
 #       The problem only occurs __just_ below -1 or +1 - there should be no zero in
 #       before the binary point
+# TODO: CSD frmt2float fails for scale <> 1 
 # TODO: Vecorization for hex / csd functions (frmt2float)
 
 __version__ = 0.5
@@ -476,13 +477,17 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or array-like object
-            in floating point format to be quantized
+            input value (floating point format) to be quantized
 
         scaling: String
-            When `scaling=='mult'` or `'multdiv'` (default), `y` is multiplied
-             by `self.scale` *before* quantizing and saturating.
-             When `scaling='div'` or `'multdiv'`,`y` is divided by `self.scale`
-             *after* quantizing / saturating.
+            Determine the scaling before and after quantizing / saturation
+            
+            *'mult'* float in, int out: 
+                `y` is multiplied by `self.scale` *before* quantizing / saturating
+            **'div'**: int in, float out:
+                `y` is divided by `self.scale` *after* quantizing / saturating.                
+            **'multdiv'**: float in, float out (default):
+                both of the above
              
             For all other settings, `y` is transformed unscaled.
 
@@ -786,9 +791,13 @@ class Fixed(object):
             # - Divide by 2 ** <number of fractional places> for correct scaling
             # - Calculate fixpoint representation for saturation / overflow effects
 
-            y_dec = csd2dec(raw_str) # csd -> integer
+            y_dec = csd2dec_vec(raw_str) # csd -> integer
             if y_dec is not None:
-                y_float = self.fixp(y_dec / 2**frc_places, scaling='multdiv')
+                y_float = y_dec / 2**frc_places
+                print("csd: float = {0}".format(y_float))
+                y_float = self.fixp(y_float, scaling='mult')
+                print("csd: fix = {0}".format(y_float))
+
         # ----
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
