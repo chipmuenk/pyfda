@@ -820,7 +820,7 @@ class Fixed(object):
             return 0.0
 
 #------------------------------------------------------------------------------
-    def float2frmt(self, y, scaling='mult'):
+    def float2frmt(self, y):
         """
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number
         conversion. Returns fixpoint representation for `y` (scalar or array-like)
@@ -833,12 +833,9 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or array-like decimal number (numeric or string) to be transformed
-
-        scaling: string
-            determines whether the float is multiplied (`mult`), divided (`div`)
-            or not scaled (`none`) before fixpoint conversion. This argument is
-            passed to the actual `fixp()` method
+        y: scalar or array-like 
+            y has to be an integer or float decimal number either numeric or in
+            string format.
 
         Returns
         -------
@@ -869,7 +866,7 @@ class Fixed(object):
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # return a quantized & saturated / wrapped fixpoint (type float) for y
-            y_fix = self.fixp(y, scaling=scaling)
+            y_fix = self.fixp(y)
 
             if self.frmt == 'dec':
                 if self.WF == 0:
@@ -923,7 +920,7 @@ if __name__=='__main__':
 
     print("\nTesting float2frmt()\n====================\n")
     for y in y_list:
-        print("y -> y_fix", y, "->", myQ.fixp(y, scaling='mult'))
+        print("y -> y_fix", y, "->", myQ.fixp(y))
         print(myQ.frmt, myQ.float2frmt(y))
 
     print("\nTesting frmt2float()\n====================\n")

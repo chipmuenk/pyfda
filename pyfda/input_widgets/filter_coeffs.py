@@ -652,7 +652,7 @@ class FilterCoeffs(QWidget):
         self.ui.ledW.setText(str(self.myQ.W))
         self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
+        self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
