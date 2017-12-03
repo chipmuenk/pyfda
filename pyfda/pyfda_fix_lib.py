@@ -268,7 +268,8 @@ def csd2dec(csd_str):
 
     return dec_val
 
-csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+#csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+csd2dec_vec = np.vectorize(csd2dec) # safer than np.frompyfunc()
 
 #------------------------------------------------------------------------
 class Fixed(object):
@@ -581,6 +582,7 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
+        scaling = scaling.lower()
         y_in = y # y before scaling / quantizing
         #======================================================================
         # (2) : Multiply by `scale` factor before requantization and saturation
@@ -700,6 +702,7 @@ class Fixed(object):
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
+        y_float = y_dec = None
 
         if frmt == 'float':
             # this handles floats, np scalars + arrays and strings / string arrays
@@ -745,10 +748,9 @@ class Fixed(object):
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
-                y_float = self.fixp(val_str, scaling='div')
+                y_dec = y_float = self.fixp(val_str, scaling='div')
             except Exception as e:
                 logger.warning(e)
-                y_float = None
 
         elif frmt in {'hex', 'bin'}:
             # - Glue integer and fractional part to a string without radix point
@@ -785,13 +787,11 @@ class Fixed(object):
                 y_float = self.fixp(y_dec, scaling='div')
             except Exception as e:
                 logger.warning(e)
-                y_dec = None
-                y_float = None
+                y_dec = y_float = None
 
             logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
             logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
         # ----
-
         elif frmt == 'csd':
             # - Glue integer and fractional part to a string without radix point
             # - Divide by 2 ** <number of fractional places> for correct scaling
@@ -803,7 +803,6 @@ class Fixed(object):
         # ----
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
-            y_float = None
 
         if frmt != "float": 
             logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
