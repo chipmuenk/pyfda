@@ -83,7 +83,7 @@ def get_log_dir():
 
 LOG_DIR  = get_log_dir()
 if LOG_DIR:
-    LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%b%d-%H%M%S"))
+    LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     # the name of the file can be changed in pyfdax.py
     USER_LOG_FILE = os.path.join(LOG_DIR, LOG_FILE) 
 else:
