@@ -453,7 +453,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_obj = {'WI':4, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 2}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [-16, -16, -4, -2, 0, 0, 0, 1, 2, 4, 15, 15, 15, 15, 0]
+        yq_list_goal = [-8, -8, -1, -0.5, 0, 0, 0, 0, 0.5, 1, 5, 5, 7.5, 7.5, 0]
         self.assertEqual(yq_list, yq_list_goal)
 
         # same with Q5.2 quantization        
@@ -467,7 +467,7 @@ class TestSequenceFunctions(unittest.TestCase):
         q_obj = {'WI':5, 'WF':2, 'ovfl':'sat', 'quant':'round', 'frmt': 'csd', 'scale': 0.25}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [-15.75, -4, -0.5, -0.25, 0, 0, 0, 0.0, 0.25, 0.5, 2.5, 2.5, 3.75, 4, 0]
+        yq_list_goal = [-128, -64, -9, -4, 0, 0, 0, 2, 4, 8, 40, 39, 60, 64, 0]
         self.assertEqual(yq_list, yq_list_goal)
 
         # same but vectorized
