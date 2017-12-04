@@ -225,7 +225,7 @@ def csd2dec(csd_str):
 
     Returns:
     --------
-    Real value of the CSD string
+    decimal (integer) value of the CSD string
 
     Examples:
     ---------
