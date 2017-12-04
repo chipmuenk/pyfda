@@ -3,6 +3,7 @@ pyFDA
 ## Python Filter Design Analysis Tool
 
 [![PyPI version](https://badge.fury.io/py/pyfda.svg)](https://badge.fury.io/py/pyfda)
+[![Anaconda-Server Badge](https://anaconda.org/chipmuenk/pyfda/badges/installer/conda.svg)](https://conda.anaconda.org/chipmuenk)
 [![Join the chat at https://gitter.im/chipmuenk/pyFDA](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/chipmuenk/pyFDA?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Google Group](https://img.shields.io/badge/Google%20Group-pyFDA-red.svg)](https://groups.google.com/forum/#!forum/pyfda)
