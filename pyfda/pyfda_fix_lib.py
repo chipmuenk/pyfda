@@ -15,15 +15,8 @@ logger = logging.getLogger(__name__)
 import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 
-# TODO: Entering a negative sign with a hex or bin number always yields zero
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
-
-# TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
-#       The problem only occurs __just_ below -1 or +1 - there should be no zero in
-#       before the binary point
-# TODO: csd2dec doesn't respect wordlength specifications
 # TODO: Vecorization for hex / csd functions (frmt2float)
-
 
 __version__ = 0.5
 
@@ -84,7 +77,7 @@ def bin2hex(bin_str, WI=0):
     hex_str = "0" if len(hex_str) == 0 else hex_str
     return hex_str
 
-bin2hex_vec =np.vectorize(bin2hex) # safer than frompyfunction()
+bin2hex_vec = np.vectorize(bin2hex) # safer than frompyfunction()
 
 def dec2hex(val, nbits, WF=0):
     """
@@ -132,9 +125,6 @@ def dec2csd(dec_val, WF=0):
     License: GPL2
 
     """
-
-    logger.debug("Converting {0:f}:".format(dec_val))
-
     # figure out binary range, special case for 0
     if dec_val == 0 :
         return '0'
@@ -143,7 +133,7 @@ def dec2csd(dec_val, WF=0):
     else:
         k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
 
-    logger.debug("to {0:d}.{1:d} format".format(k, WF))
+    logger.debug("CSD: Converting {0:f} to {1:d}.{2:d} format".format(dec_val, k, WF))
 
     # Initialize CSD calculation
     csd_digits = []
@@ -156,7 +146,7 @@ def dec2csd(dec_val, WF=0):
 
         limit = pow(2.0, k+1) / 3.0
 
-        logger.debug("\t{0} - {1}".format(remainder, limit))
+        # logger.debug("\t{0} - {1}".format(remainder, limit))
 
         # decimal point?
         if k == -1 :
@@ -195,13 +185,13 @@ def dec2csd(dec_val, WF=0):
 
         k -= 1
 
-        logger.debug(csd_digits)
-
     # Always have something before the point
 #    if np.abs(dec_val) < 1.0:
 #        csd_digits.insert(0, '0')
 
     csd_str = "".join(csd_digits)
+    
+    logger.debug("CSD result = {0}".format(csd_str))
 
 #    if WF > 0:
 #        csd_str = csd_str[:-WF] + "." + csd_str[-WF:]
@@ -216,7 +206,7 @@ def csd2dec(csd_str):
     '-', indicating whether the current bit is meant to positive or negative.
     All other characters are simply ignored (= replaced by zero).
 
-    `csd_str` may be an integer or fractional CSD number.
+    `csd_str` has to be an integer CSD number.
 
     Parameters:
     -----------
@@ -228,7 +218,7 @@ def csd2dec(csd_str):
 
     Returns:
     --------
-    Real value of the CSD string
+    decimal (integer) value of the CSD string
 
     Examples:
     ---------
@@ -237,22 +227,11 @@ def csd2dec(csd_str):
 
     -0+0 = -2³ + 2¹ = -6
 
-    +0.-0- = 2¹ - 1/2¹ - 1/2³ = 1.375
-
     """
     logger.debug("Converting: {0}".format(csd_str))
 
-    #  Find out what the MSB power of two should be, keeping in
-    #  mind we may have a fractional CSD number:
-    try:
-        (int_str, _) = csd_str.split('.') # split into integer and fractional bits
-        csd_str = csd_str.replace('.','') # join integer and fractional bits to one csd string
-    except ValueError: # no fractional part
-        int_str = csd_str
-        _ = ""
-
     # Intialize calculation, start with the MSB (integer)
-    msb_power = len(int_str)-1 #
+    msb_power = len(csd_str)-1 #
     dec_val = 0.0
 
     # start from the MSB and work all the way down to the last digit
@@ -267,12 +246,13 @@ def csd2dec(csd_str):
         # else
         #    ... all other values are ignored
 
-        logger.debug('  "{0:s}" ({1:d}.{2:d}); 2**{3:d} = {4}; Num={5:f}'.format(
-                csd_str[ii], len(int_str), len(_), msb_power-ii, power_of_two, dec_val))
+        logger.debug('  "{0:s}" (QI = {1:d}); 2**{2:d} = {3}; Num={4:f}'.format(
+                csd_str[ii], len(csd_str), msb_power-ii, power_of_two, dec_val))
 
     return dec_val
 
-csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+#csd2dec_vec = np.frompyfunc(csd2dec, 1, 1)
+csd2dec_vec = np.vectorize(csd2dec) # safer than np.frompyfunc()
 
 #------------------------------------------------------------------------
 class Fixed(object):
@@ -409,11 +389,6 @@ class Fixed(object):
                 'dec' : r'[^0-9|.|,|\-]',
                 'hex' : r'[^0-9A-Fa-f|.|,|\-]'
                         }
-#        self.frmt_scale = {'bin' : 2,
-#              'csd' : 2,
-#              'dec' : 1,
-#              'hex' : 16}
-
 
     def setQobj(self, q_obj):
         """
@@ -495,12 +470,18 @@ class Fixed(object):
         Parameters
         ----------
         y: scalar or array-like object
-            in floating point format to be quantized
+            input value (floating point format) to be quantized
 
         scaling: String
-            When `scaling='mult'` (default), `y` is multiplied by `self.scale` 
-            *before* quantizing and saturating, when `scaling='div'`,
-            `y` is divided by `self.scale` *after* quantizing / saturating.
+            Determine the scaling before and after quantizing / saturation
+            
+            *'mult'* float in, int out: 
+                `y` is multiplied by `self.scale` *before* quantizing / saturating
+            **'div'**: int in, float out:
+                `y` is divided by `self.scale` *after* quantizing / saturating.                
+            **'multdiv'**: float in, float out (default):
+                both of the above
+             
             For all other settings, `y` is transformed unscaled.
 
         Returns
@@ -588,13 +569,14 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
+        scaling = scaling.lower()
         y_in = y # y before scaling / quantizing
         #======================================================================
         # (2) : Multiply by `scale` factor before requantization and saturation
-        #       when `scaling='mult'`
+        #       when `scaling=='mult'`or 'multdiv'
         #======================================================================
         y = y / self.LSB
-        if scaling == 'mult':
+        if scaling in {'mult', 'multdiv'}:
             y = y * self.scale
 
         #======================================================================
@@ -649,13 +631,13 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
         #======================================================================
-        # (5) : Divide result by `scale` factor when `scaling='div'`
+        # (5) : Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
         #       - frmt2float()
         #       - filter_coeffs when quantizing the coefficients
         #       float2frmt passes on the scaling argument
         #======================================================================
 
-        if scaling == 'div':
+        if scaling in {'div', 'multdiv'}:
             yq = yq / self.scale
 
         if SCALAR and isinstance(yq, np.ndarray):
@@ -707,6 +689,7 @@ class Fixed(object):
         if frmt is None:
             frmt = self.frmt
         frmt = frmt.lower()
+        y_float = y_dec = None
 
         if frmt == 'float':
             # this handles floats, np scalars + arrays and strings / string arrays
@@ -728,12 +711,9 @@ class Fixed(object):
          # remove illegal characters and trailing zeros
             val_str = re.sub(self.FRMT_REGEX[frmt],r'', qstr(y)).lstrip('0')
             if len(val_str) > 0:
-
                 val_str = val_str.replace(',','.') # ',' -> '.' for German-style numbers
-
                 if val_str[0] == '.': # prepend '0' when the number starts with '.'
                     val_str = '0' + val_str
-# TODO: This does not work with csd?!
 
                 # count number of fractional places in string
                 try:
@@ -750,23 +730,29 @@ class Fixed(object):
 
         # (1) calculate the decimal value of the input string using np.float64()
         #     which takes the number of decimal places into account.
-        # (2) divide by scale
+        # (2) quantize and saturate
+        # (3) divide by scale
         if frmt == 'dec':
             # try to convert string -> float directly with decimal point position
             try:
-                y_float = self.fixp(val_str, scaling='div')
+                y_dec = y_float = self.fixp(val_str, scaling='div')
             except Exception as e:
                 logger.warning(e)
-                y_float = None
 
         elif frmt in {'hex', 'bin'}:
             # - Glue integer and fractional part to a string without radix point
+            # - Check for a negative sign, use this information only in the end
             # - Divide by <base> ** <number of fractional places> for correct scaling
             # - Strip MSBs outside fixpoint range
             # - Transform numbers in negative 2's complement to negative floats.
             # - Calculate the fixpoint representation for correct saturation / quantization
+            neg_sign = False
             try:
-                y_dec = int(raw_str, self.base) / self.base**frc_places
+                if raw_str[0] == '-':
+                    neg_sign = True
+                    raw_str = raw_str.lstrip('-')
+
+                y_dec = abs(int(raw_str, self.base) / self.base**frc_places)
 
                 if y_dec == 0:  # avoid log2(0)
                     return 0
@@ -776,11 +762,13 @@ class Fixed(object):
                 if int_bits > self.WI + 1:
                     if frmt == 'hex':
                         raw_str = np.binary_repr(int(raw_str, 16))
-                    raw_str = raw_str[int_bits - self.WI - 1:] # discard the upper bits
+                    # discard the upper bits outside the valid range
+                    raw_str = raw_str[int_bits - self.WI - 1:] 
 
-                    y_dec = int(raw_str, 2) / self.base**frc_places # recalculate y_dec
+                    # recalculate y_dec for truncated string
+                    y_dec = int(raw_str, 2) / self.base**frc_places 
 
-                    if y_dec == 0: # avoid log2(0)
+                    if y_dec == 0: # avoid log2(0) error in code below
                         return 0
 
                     int_bits = max(int(np.floor(np.log2(y_dec))) + 1, 0) # ... and int_bits
@@ -790,29 +778,33 @@ class Fixed(object):
                 elif int_bits == self.WI + 1: # negative, calculate 2's complemente
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
+                if neg_sign:
+                    y_dec = -y_dec
                 y_float = self.fixp(y_dec, scaling='div')
             except Exception as e:
                 logger.warning(e)
-                y_dec = None
-                y_float = None
+                y_dec = y_float = None
 
             logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
             logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
-
+        # ----
         elif frmt == 'csd':
             # - Glue integer and fractional part to a string without radix point
             # - Divide by 2 ** <number of fractional places> for correct scaling
+            # - Calculate fixpoint representation for saturation / overflow effects
 
-            y_float = csd2dec(raw_str)
-            if y_float is not None:
-                y_float = y_float / 2**frc_places
-
+            y_dec = csd2dec_vec(raw_str) # csd -> integer
+            if y_dec is not None:
+                y_float = self.fixp(y_dec / 2**frc_places, scaling='div')
+        # ----
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
-            y_float = None
 
-        if frmt != "float": logger.debug("MSB={0:g} |  scale={1:g} | "
-              "y={2} | y_float={3}".format(self.MSB, self.scale, y, y_float))
+        if frmt != "float": 
+            logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
+                         .format(self.MSB, self.scale, raw_str, val_str))
+            logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
+
 
         if y_float is not None:
             return y_float
@@ -820,7 +812,7 @@ class Fixed(object):
             return 0.0
 
 #------------------------------------------------------------------------------
-    def float2frmt(self, y, scaling='mult'):
+    def float2frmt(self, y):
         """
         Called a.o. by `itemDelegate.displayText()` for on-the-fly number
         conversion. Returns fixpoint representation for `y` (scalar or array-like)
@@ -833,12 +825,9 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or array-like decimal number (numeric or string) to be transformed
-
-        scaling: string
-            determines whether the float is multiplied (`mult`), divided (`div`)
-            or not scaled (`none`) before fixpoint conversion. This argument is
-            passed to the actual `fixp()` method
+        y: scalar or array-like 
+            y has to be an integer or float decimal number either numeric or in
+            string format.
 
         Returns
         -------
@@ -869,7 +858,7 @@ class Fixed(object):
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # return a quantized & saturated / wrapped fixpoint (type float) for y
-            y_fix = self.fixp(y, scaling=scaling)
+            y_fix = self.fixp(y, scaling='mult')
 
             if self.frmt == 'dec':
                 if self.WF == 0:
@@ -908,28 +897,29 @@ class Fixed(object):
             return None
 
 ########################################
-# If called directly, do some examples #
-########################################
 if __name__=='__main__':
+    """
+    Run a simple test with python -m pyfda.pyfda_fix_lib
+    or a more elaborate one with
+    python -m pyfda.tests.test_pyfda_fix_lib
+    """
     import pprint
 
     q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
     myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
-
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
-    print("W = ", myQ.W, myQ.LSB, myQ.MSB)
 
     myQ.setQobj(q_obj)
 
-    print("\nTesting float2frmt()\n====================\n")
+    print("\nTesting float2frmt()\n====================")
+    pprint.pprint(q_obj)
     for y in y_list:
-        print("y -> y_fix", y, "->", myQ.fixp(y, scaling='mult'))
-        print(myQ.frmt, myQ.float2frmt(y))
+        print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
 
-    print("\nTesting frmt2float()\n====================\n")
-    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec'}
+    print("\nTesting frmt2float()\n====================")
+    q_obj = {'WI':3, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 2}
     pprint.pprint(q_obj)
     myQ.setQobj(q_obj)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
-        print("{0} -> {1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
+        print("y={0}\t->\ty_fix={1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))

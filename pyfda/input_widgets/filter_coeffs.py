@@ -36,7 +36,6 @@ from .filter_coeffs_ui import FilterCoeffs_UI
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
-# TODO: Quantizing coefficients with setting "integer" produces zero values
 
 # TODO: convert to a proper Model-View-Architecture using QTableView?
 
@@ -652,7 +651,7 @@ class FilterCoeffs(QWidget):
         self.ui.ledW.setText(str(self.myQ.W))
         self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
-        self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX, scaling='none')))
+        self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
 
 #------------------------------------------------------------------------------
     def _store_q_settings(self):
@@ -838,10 +837,10 @@ class FilterCoeffs(QWidget):
         """
         idx = qget_selected(self.tblCoeff)['idx'] # get all selected indices
         if not idx: # nothing selected, quantize all elements
-            self.ba = self.myQ.fixp(self.ba, scaling='mult') / self.myQ.scale #scaling='div')
+            self.ba = self.myQ.fixp(self.ba, scaling='multdiv')
         else:
             for i in idx:
-                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'mult') / self.myQ.scale
+                self.ba[i[0]][i[1]] = self.myQ.fixp(self.ba[i[0]][i[1]], scaling = 'multdiv')
 
         qstyle_widget(self.ui.butSave, 'changed')
         self._refresh_table()

@@ -58,8 +58,8 @@ class FilterCoeffs_UI(QWidget):
         self.butEnable.setIconSize(q_icon_size)
         self.butEnable.setCheckable(True)
         self.butEnable.setChecked(True)
-        self.butEnable.setToolTip("<span>Show / hide filter coefficients as an editable table."
-                "For high order systems, table display might be slow.</span>")
+        self.butEnable.setToolTip("<span>Show / hide filter coefficients in an editable table."
+                " For high order systems, table display might be slow.</span>")
 
         fix_formats = ['Dec', 'Hex', 'Bin', 'CSD']
         self.cmbFormat = QComboBox(self)
