@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 import numpy as np
 from pyfda.pyfda_qt_lib import qstr
 
-# TODO: Entering a negative sign with a hex or bin number always yields zero
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
-
 # TODO: Vecorization for hex / csd functions (frmt2float)
 
 __version__ = 0.5
@@ -743,12 +741,18 @@ class Fixed(object):
 
         elif frmt in {'hex', 'bin'}:
             # - Glue integer and fractional part to a string without radix point
+            # - Check for a negative sign, use this information only in the end
             # - Divide by <base> ** <number of fractional places> for correct scaling
             # - Strip MSBs outside fixpoint range
             # - Transform numbers in negative 2's complement to negative floats.
             # - Calculate the fixpoint representation for correct saturation / quantization
+            neg_sign = False
             try:
-                y_dec = int(raw_str, self.base) / self.base**frc_places
+                if raw_str[0] == '-':
+                    neg_sign = True
+                    raw_str = raw_str.lstrip('-')
+
+                y_dec = abs(int(raw_str, self.base) / self.base**frc_places)
 
                 if y_dec == 0:  # avoid log2(0)
                     return 0
@@ -761,7 +765,8 @@ class Fixed(object):
                     # discard the upper bits outside the valid range
                     raw_str = raw_str[int_bits - self.WI - 1:] 
 
-                    y_dec = int(raw_str, 2) / self.base**frc_places # recalculate y_dec
+                    # recalculate y_dec for truncated string
+                    y_dec = int(raw_str, 2) / self.base**frc_places 
 
                     if y_dec == 0: # avoid log2(0) error in code below
                         return 0
@@ -773,6 +778,8 @@ class Fixed(object):
                 elif int_bits == self.WI + 1: # negative, calculate 2's complemente
                     y_dec = y_dec - (1 << int_bits)
                 # quantize / saturate / wrap & scale the integer value:
+                if neg_sign:
+                    y_dec = -y_dec
                 y_float = self.fixp(y_dec, scaling='div')
             except Exception as e:
                 logger.warning(e)
