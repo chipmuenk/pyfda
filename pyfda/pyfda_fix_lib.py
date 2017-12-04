@@ -894,28 +894,25 @@ class Fixed(object):
             return None
 
 ########################################
-# If called directly, do some examples #
-########################################
 if __name__=='__main__':
+    """ Test with python -m pyfda.pyfda_fix_lib """
     import pprint
 
     q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
     myQ = Fixed(q_obj) # instantiate fixpoint object with settings above
-
     y_list = [-1.1, -1.0, -0.5, 0, 0.5, 0.99, 1.0]
-    print("W = ", myQ.W, myQ.LSB, myQ.MSB)
 
     myQ.setQobj(q_obj)
 
-    print("\nTesting float2frmt()\n====================\n")
+    print("\nTesting float2frmt()\n====================")
+    pprint.pprint(q_obj)
     for y in y_list:
-        print("y -> y_fix", y, "->", myQ.fixp(y, scaling='mult'))
-        print(myQ.frmt, myQ.float2frmt(y))
+        print("y = {0}\t->\ty_fix = {1}".format(y, myQ.float2frmt(y)))
 
-    print("\nTesting frmt2float()\n====================\n")
-    q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec'}
+    print("\nTesting frmt2float()\n====================")
+    q_obj = {'WI':3, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 2}
     pprint.pprint(q_obj)
     myQ.setQobj(q_obj)
     dec_list = [-9, -8, -7, -4.0, -3.578, 0, 0.5, 4, 7, 8]
     for dec in dec_list:
-        print("{0} -> {1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
+        print("y={0}\t->\ty_fix={1} ({2})".format(dec, myQ.frmt2float(dec), myQ.frmt))
