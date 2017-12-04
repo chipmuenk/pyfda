@@ -145,18 +145,17 @@ class FilterPZ_UI(QWidget):
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
-        self.butSave.setToolTip("<span>Save coefficients and update all plots. "
-                                "No modifications are saved before!</span>")
+        self.butSave.setToolTip("<span>Copy P/Z table to filter dict and update all plots and widgets.</span>")
 
         self.butLoad = QPushButton(self)
         self.butLoad.setIcon(QIcon(':/download.svg'))
         self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip("Reload coefficients.")
+        self.butLoad.setToolTip("Reload P/Z table from filter dict.")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
         self.butClear.setIconSize(q_icon_size)
-        self.butClear.setToolTip("Clear all entries.")
+        self.butClear.setToolTip("Clear all table entries.")
 
 
         self.butFromTable = QPushButton(self)
@@ -175,7 +174,7 @@ class FilterPZ_UI(QWidget):
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
         butSettingsClipboard.setIconSize(q_icon_size)
-        butSettingsClipboard.setToolTip("<span>Adjust settings for CSV format and whether "
+        butSettingsClipboard.setToolTip("<span>Select CSV format and whether "
                                 "to copy to/from clipboard or file.</span>")
 
         layHButtonsCoeffs1 = QHBoxLayout()

@@ -146,18 +146,17 @@ class FilterCoeffs_UI(QWidget):
         self.butSave = QPushButton(self)
         self.butSave.setIcon(QIcon(':/upload.svg'))
         self.butSave.setIconSize(q_icon_size)
-        self.butSave.setToolTip("<span>Save coefficients and update all plots. "
-                                "No modifications are saved before!</span>")
+        self.butSave.setToolTip("<span>Copy coefficient table to filter dict and update all plots and widgets.</span>")
 
         self.butLoad = QPushButton(self)
         self.butLoad.setIcon(QIcon(':/download.svg'))
         self.butLoad.setIconSize(q_icon_size)
-        self.butLoad.setToolTip("Reload coefficients.")
+        self.butLoad.setToolTip("Reload coefficient table from filter dict.")
 
         self.butClear = QPushButton(self)
         self.butClear.setIcon(QIcon(':/trash.svg'))
         self.butClear.setIconSize(q_icon_size)
-        self.butClear.setToolTip("Clear all entries.")
+        self.butClear.setToolTip("Clear all table entries.")
 
         self.butFromTable = QPushButton(self)
         self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
@@ -165,7 +164,7 @@ class FilterCoeffs_UI(QWidget):
         self.butFromTable.setToolTip("<span>"
                             "Copy table to clipboard / file, SELECTED items are copied as "
                             "displayed. When nothing is selected, the whole table "
-                            "is copied with full precision in decimal format. </span>")
+                            "is copied with full precision in decimal format.</span>")
 
         self.butToTable = QPushButton(self)
         self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
@@ -175,7 +174,7 @@ class FilterCoeffs_UI(QWidget):
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
         butSettingsClipboard.setIconSize(q_icon_size)
-        butSettingsClipboard.setToolTip("<span>Adjust settings for CSV format and whether "
+        butSettingsClipboard.setToolTip("<span>Select CSV format and whether "
                                 "to copy to/from clipboard or file.</span>")
 
         layHButtonsCoeffs1 = QHBoxLayout()
