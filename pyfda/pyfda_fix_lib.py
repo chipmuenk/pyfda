@@ -17,12 +17,7 @@ from pyfda.pyfda_qt_lib import qstr
 
 # TODO: Entering a negative sign with a hex or bin number always yields zero
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
-# TODO: Simplify handling of 'scale' parameter
 
-# TODO: Max. value in CSD normalized frac format is 0.+0+0+ ... instead of 0.+00000-
-#       The problem only occurs __just_ below -1 or +1 - there should be no zero in
-#       before the binary point
-# TODO: CSD frmt2float fails for scale <> 1 
 # TODO: Vecorization for hex / csd functions (frmt2float)
 
 __version__ = 0.5
@@ -795,7 +790,7 @@ class Fixed(object):
             if y_dec is not None:
                 y_float = y_dec / 2**frc_places
                 print("csd: float = {0}".format(y_float))
-                y_float = self.fixp(y_float, scaling='mult')
+                y_float = self.fixp(y_float, scaling='div')
                 print("csd: fix = {0}".format(y_float))
 
         # ----
