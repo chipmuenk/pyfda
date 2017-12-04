@@ -795,11 +795,7 @@ class Fixed(object):
 
             y_dec = csd2dec_vec(raw_str) # csd -> integer
             if y_dec is not None:
-                y_float = y_dec / 2**frc_places
-                print("csd: float = {0}".format(y_float))
-                y_float = self.fixp(y_float, scaling='div')
-                print("csd: fix = {0}".format(y_float))
-
+                y_float = self.fixp(y_dec / 2**frc_places, scaling='div')
         # ----
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
@@ -902,7 +898,11 @@ class Fixed(object):
 
 ########################################
 if __name__=='__main__':
-    """ Test with python -m pyfda.pyfda_fix_lib """
+    """
+    Run a simple test with python -m pyfda.pyfda_fix_lib
+    or a more elaborate one with
+    python -m pyfda.tests.test_pyfda_fix_lib
+    """
     import pprint
 
     q_obj = {'WI':0, 'WF':3, 'ovfl':'sat', 'quant':'round', 'frmt': 'dec', 'scale': 1}
