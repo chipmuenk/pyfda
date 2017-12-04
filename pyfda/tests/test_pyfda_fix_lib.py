@@ -375,21 +375,20 @@ class TestSequenceFunctions(unittest.TestCase):
         #yq_list = self.myQ.frmt2float(y_list)
         #print("### :{1} - {0}".format(yq_list, type(yq_list)))
         #self.assertEqual(yq_list, yq_list_goal)
-
-
+        
         # same for integer case
-        y_list = ['11000', '1000', '1001', '1100', '1111', '0000', '0100', '0111', '01000']
+        y_list = ['11000', '1000', '-0111', '1001', '1100', '1111', '0000', '0100', '0111', '01000']
         q_obj = {'WI':3, 'WF':0, 'scale': 8}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [-1, -1, -0.875, -0.5, -0.125,  0, 0.5, 0.875, -1]
+        yq_list_goal = [-1, -1, -0.875, -0.875, -0.5, -0.125,  0, 0.5, 0.875, -1]
         self.assertEqual(yq_list, yq_list_goal)
 
         # same for integer case without scaling
         q_obj = {'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [-8, -8, -7, -4, -1,  0, 4, 7, -8]  
+        yq_list_goal = [-8, -8, -7, -7, -4, -1,  0, 4, 7, -8]  
         self.assertEqual(yq_list, yq_list_goal)
         # same but vectorized     
         #yq_list = list(self.myQ.frmt2float(y_list)) 
@@ -400,11 +399,11 @@ class TestSequenceFunctions(unittest.TestCase):
         Test conversion from hex format to float
         """
         # saturation behaviour with 'round' quantization for integer case
-        y_list = ['100', '10', '3F', '1E', '1F', '0', '00', '', '1', '2', 'A', 'A.0', 'F', '020.01']
+        y_list = ['100', '-F', '10', '3F', '1E', '1F', '0', '00', '', '-1F', '1', '2', 'A', 'A.0', 'F', '020.01']
         q_obj = {'WI':4, 'WF':0, 'ovfl':'sat', 'quant':'round', 'frmt': 'hex', 'scale': 1}
         self.myQ.setQobj(q_obj)
         yq_list = list(map(self.myQ.frmt2float, y_list))
-        yq_list_goal = [0, -16, -1, -2, -1, 0, 0, 0, 1, 2, 10, 10, 15, 0]
+        yq_list_goal = [0, -15, -16, -1, -2, -1, 0, 0, 0, 1, 1, 2, 10, 10, 15, 0]
         self.assertEqual(yq_list, yq_list_goal)
 
         # same for Q5.0 quantization
