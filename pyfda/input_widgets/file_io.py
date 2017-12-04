@@ -382,7 +382,7 @@ class File_IO(QWidget):
          dir_string = ("<br><b>User Directories</b><br>Install : {0}<br>Temp :   {1}<br>Home : {2}<br>"\
                        .format(dirs.INSTALL_DIR, dirs.TEMP_DIR, dirs.HOME_DIR))
          dir_string += ("<br><b>User Files</b><br>Log. Config: {0}<br>Log. File:  {1}"\
-                       .format(dirs.USER_LOG_CONF_FILE, dirs.USER_LOG_FILE))
+                       .format(dirs.USER_LOG_CONF_FILE, dirs.LOG_DIR_FILE))
 
          about_string = info_string + versions_string + dir_string
 

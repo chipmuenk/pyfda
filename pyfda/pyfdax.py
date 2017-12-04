@@ -40,8 +40,8 @@ class DynFileHandler(logging.FileHandler):
         if filename == '':
             filename = dirs.LOG_FILE # use name including data and time
         if not os.path.isabs(filename): # path to logging file given in config_file?
-            dirs.USER_LOG_FILE = os.path.join(dirs.LOG_DIR, filename) # no, use default dir
-        logging.FileHandler.__init__(self, dirs.USER_LOG_FILE, mode, encoding)
+            dirs.LOG_DIR_FILE = os.path.join(dirs.LOG_DIR, filename) # no, use default dir
+        logging.FileHandler.__init__(self, dirs.LOG_DIR_FILE, mode, encoding)
 
 class XStream(QtCore.QObject):
     """
