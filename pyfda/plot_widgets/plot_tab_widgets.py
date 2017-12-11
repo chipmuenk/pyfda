@@ -21,7 +21,7 @@ class PlotTabWidgets(QTabWidget):
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
-        self.pltHf = plot_hf.PlotHf(self)
+        self.pltHf = plot_hf.PlotHf(self, )
         self.pltPhi = plot_phi.PlotPhi(self)
         self.pltPZ = plot_pz.PlotPZ(self)
         self.pltTauG = plot_tau_g.PlotTauG(self)
@@ -45,7 +45,7 @@ class PlotTabWidgets(QTabWidget):
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tabWidget)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
-#
+
         self.setLayout(layVMain)
         self.timer_id = QtCore.QTimer()
         self.timer_id.setSingleShot(True)
@@ -58,6 +58,36 @@ class PlotTabWidgets(QTabWidget):
         # self.tabWidget.currentChanged.connect(self.tabWidget.currentWidget().redraw) # 
 
         self.tabWidget.installEventFilter(self)
+        
+        """
+        https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
+
+        The QTabWidget won't select the biggest widget's height as its own height
+        unless you use layout on the QTabWidget. Therefore, if you want to change
+        the size of QTabWidget manually, remove the layout and call QTabWidget::resize
+        according to the currentChanged signal.
+
+        You can set the size policy of the widget that is displayed to QSizePolicy::Preferred
+        and the other ones to QSizePolicy::Ignored. After that call adjustSize to update the sizes.
+        
+        void MainWindow::updateSizes(int index)
+        {
+        for(int i=0;i<ui->tabWidget->count();i++)
+            if(i!=index)
+                ui->tabWidget->widget(i)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
+        ui->tabWidget->widget(index)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        ui->tabWidget->widget(index)->resize(ui->tabWidget->widget(index)->minimumSizeHint());
+        ui->tabWidget->widget(index)->adjustSize();
+        resize(minimumSizeHint());
+        adjustSize();
+        }
+        
+        adjustSize(): The last two lines resize the main window itself. You might want to avoid it, 
+        depending on your application. For example, if you set the rest of the widgets 
+        to expand into the space just made available, it's not so nice if the window 
+        resizes itself instead. 
+        """
 
 #------------------------------------------------------------------------------
         

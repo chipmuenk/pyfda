@@ -26,7 +26,7 @@ try:
 except ImportError:
     matplotlib.use("Qt4Agg")
 
-from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics,
+from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics, QSizePolicy,
                      QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
 
 #========================= Setup the loggers ==================================
@@ -131,47 +131,37 @@ class pyFDA(QMainWindow):
         """
 
         # ============== UI Layout =====================================
-        self.main_widget = QWidget(self) # this widget contains all subwidget groups
 
-        layHMain = QHBoxLayout(self.main_widget) # horizontal layout of all groups
-        laySubWin  = QSplitter(QtCore.Qt.Horizontal)
-        laySubRight  = QSplitter(QtCore.Qt.Vertical)
 
         # Instantiate subwidget groups
-        self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
-        self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-        self.statusWin     = QPlainTextEdit(self)  # status window
-        logger.error('size_status: {0}'.format(self.statusWin.sizeHint()))
-        logger.error('size_tab: {0}'.format(self.pltTabWidgets.sizeHint()))
-        mSize = QFontMetrics(self.statusWin.font())
+        inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
+        pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
+        statusWin     = QPlainTextEdit(self)  # status window
+        statusWin.setReadOnly(True)
+
+        logger.error('size_status: {0}'.format(statusWin.sizeHint()))
+        logger.error('size_tab: {0}'.format(pltTabWidgets.sizeHint()))
+        mSize = QFontMetrics(statusWin.font())
         rowHt = mSize.lineSpacing()
-        #self.statusWin.setFixedHeight(4*rowHt+4)
-        self.statusWin.setBaseSize(self.statusWin.sizeHint().width(), 4*rowHt+4)
+        statusWin.setFixedHeight(4*rowHt+4)
+        #statusWin.setBaseSize(statusWin.sizeHint().width(), 4*rowHt+4)
 
-        self.statusWin.setReadOnly(True)
+        # add status window underneath plot Tab Widgets
+        spltVPltStatus = QSplitter(QtCore.Qt.Vertical)
+        spltVPltStatus.addWidget(pltTabWidgets)
+        spltVPltStatus.addWidget(statusWin)
+        spltVPltStatus.setStretchFactor(0,0) # relative initial sizes of subwidgets
 
-        #self._title = QtGui.QLabel('Status Log')
-        #self._title.setAlignment(QtCore.Qt.AlignCenter)
-
-        # Add status window underneath plot Tab Widgets
-        laySubRight.addWidget(self.pltTabWidgets)
-        #laySub.addWidget(self._title)
-        laySubRight.addWidget(self.statusWin)
-        laySubRight.setStretchFactor(0,0) # relative initial sizes of subwidgets
-
-        laySubWin.addWidget(self.inputTabWidgets)
-        laySubWin.addWidget(laySubRight)
-        laySubWin.setStretchFactor(1,4) # relative initial sizes of subwidgets
-
-        layHMain.addWidget(laySubWin)
-        layHMain.setContentsMargins(*rc.params['wdg_margins'])
-
+        # create splitter that contains all subwidget groups
+        spltHMain = QSplitter(QtCore.Qt.Horizontal)
+        spltHMain.addWidget(inputTabWidgets)
+        spltHMain.addWidget(spltVPltStatus)
+        spltHMain.setStretchFactor(1,4) # relative initial sizes of subwidgets
+        spltHMain.setContentsMargins(*rc.params['wdg_margins'])
+        spltHMain.setFocus()
+        # make spltHMain occupy the main area of QMainWindow and make QMainWindow its parent !!!
+        self.setCentralWidget(spltHMain)   
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
-    
-        self.main_widget.setFocus()
-        # make main_widget occupy the main area of QMainWidget 
-        #   and make QMainWindow its parent !!!
-        self.setCentralWidget(self.main_widget)
 
         #=============== Menubar =======================================
 
@@ -185,7 +175,6 @@ class pyFDA(QMainWindow):
 
 #        self.statusMessage("Application is initialized.")
 
-
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -195,24 +184,24 @@ class pyFDA(QMainWindow):
         #
         # sigViewChanged: signal indicating that filter VIEW has changed,
         # requiring partial update of some plot widgets:
-        self.inputTabWidgets.sigViewChanged.connect(self.pltTabWidgets.update_view)
+        inputTabWidgets.sigViewChanged.connect(pltTabWidgets.update_view)
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed,
         # requiring partial update of some plot widgets:
-        self.inputTabWidgets.sigSpecsChanged.connect(self.pltTabWidgets.update_view)
+        inputTabWidgets.sigSpecsChanged.connect(pltTabWidgets.update_view)
 
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
-        self.inputTabWidgets.sigFilterDesigned.connect(self.pltTabWidgets.update_data)
+        inputTabWidgets.sigFilterDesigned.connect(pltTabWidgets.update_data)
 
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 
 
         # trigger the close event in response to sigQuit generated in another subwidget:
-        self.inputTabWidgets.filter_specs.sigQuit.connect(self.close)
+        inputTabWidgets.filter_specs.sigQuit.connect(self.close)
 
-        XStream.stdout().messageWritten.connect (self.statusWin.appendPlainText)
+        XStream.stdout().messageWritten.connect (statusWin.appendPlainText)
 
 #==============================================================================
 #     def statusMessage(self, message):
