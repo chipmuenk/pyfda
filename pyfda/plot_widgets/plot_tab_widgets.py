@@ -21,7 +21,7 @@ class PlotTabWidgets(QTabWidget):
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
-        self.pltHf = plot_hf.PlotHf(self, )
+        self.pltHf = plot_hf.PlotHf(self)
         self.pltPhi = plot_phi.PlotPhi(self)
         self.pltPZ = plot_pz.PlotPZ(self)
         self.pltTauG = plot_tau_g.PlotTauG(self)
