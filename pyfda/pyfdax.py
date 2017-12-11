@@ -141,9 +141,13 @@ class pyFDA(QMainWindow):
         self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
         self.statusWin     = QPlainTextEdit(self)  # status window
+        logger.error('size_status: {0}'.format(self.statusWin.sizeHint()))
+        logger.error('size_tab: {0}'.format(self.pltTabWidgets.sizeHint()))
         mSize = QFontMetrics(self.statusWin.font())
         rowHt = mSize.lineSpacing()
-        self.statusWin.setFixedHeight(4*rowHt+4)
+        #self.statusWin.setFixedHeight(4*rowHt+4)
+        self.statusWin.setBaseSize(self.statusWin.sizeHint().width(), 4*rowHt+4)
+
         self.statusWin.setReadOnly(True)
 
         #self._title = QtGui.QLabel('Status Log')
@@ -154,7 +158,6 @@ class pyFDA(QMainWindow):
         #laySub.addWidget(self._title)
         laySubRight.addWidget(self.statusWin)
         laySubRight.setStretchFactor(0,0) # relative initial sizes of subwidgets
-        #laySubRight.setStretchFactor(1,1) # relative initial sizes of subwidgets
 
         laySubWin.addWidget(self.inputTabWidgets)
         laySubWin.addWidget(laySubRight)
