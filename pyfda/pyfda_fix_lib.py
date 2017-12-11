@@ -682,7 +682,6 @@ class Fixed(object):
         -------
         quantized floating point (`dtype=np.float64`) representation of input string
         """
-
         if y == "":
             return 0
 
@@ -691,6 +690,11 @@ class Fixed(object):
         frmt = frmt.lower()
         y_float = y_dec = None
 
+        if frmt == 'float32':
+            float_frmt = np.float32
+        elif frmt == 'float16':
+            float_frmt = np.float16
+            
         if frmt == 'float':
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
@@ -855,6 +859,10 @@ class Fixed(object):
 
         if self.frmt == 'float': # return float input value unchanged (no string)
             return y
+        elif self.frmt == 'float32':
+            return np.float32(y)
+        elif self.frmt == 'float16':
+            return np.float16(y)
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # return a quantized & saturated / wrapped fixpoint (type float) for y
