@@ -136,26 +136,29 @@ class pyFDA(QMainWindow):
         # Instantiate subwidget groups
         inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-        statusWin     = QPlainTextEdit(self)  # status window
-        statusWin.setReadOnly(True)
+        loggerWin     = QPlainTextEdit(self)  # status window
+        loggerWin.setReadOnly(True)
+        #statusWin.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
 
-        logger.error('size_status: {0}'.format(statusWin.sizeHint()))
-        logger.error('size_tab: {0}'.format(pltTabWidgets.sizeHint()))
-        mSize = QFontMetrics(statusWin.font())
-        rowHt = mSize.lineSpacing()
-        statusWin.setFixedHeight(4*rowHt+4)
+        loggerWinH = loggerWin.sizeHint().height()
+        #logger.error('size_tab: {0}'.format(pltTabWidgets.sizeHint()))
+        mSize = QFontMetrics(loggerWin.font())
+        row4_height = mSize.lineSpacing() * 4
+        #statusWin.setFixedHeight(4*rowHt+4)
         #statusWin.setBaseSize(statusWin.sizeHint().width(), 4*rowHt+4)
 
-        # add status window underneath plot Tab Widgets
-        spltVPltStatus = QSplitter(QtCore.Qt.Vertical)
-        spltVPltStatus.addWidget(pltTabWidgets)
-        spltVPltStatus.addWidget(statusWin)
-        spltVPltStatus.setStretchFactor(0,0) # relative initial sizes of subwidgets
+        # add logger window underneath plot Tab Widgets
+        spltVPltLogger = QSplitter(QtCore.Qt.Vertical)
+        spltVPltLogger.addWidget(pltTabWidgets)
+        spltVPltLogger.addWidget(loggerWin)
+        spltVPltLogger.setSizes([spltVPltLogger.size().height(), 20])
+#                                 row4_height])# statusWinH*0.1])
+        #spltVPltStatus.size().height() * 0.9
 
         # create splitter that contains all subwidget groups
         spltHMain = QSplitter(QtCore.Qt.Horizontal)
         spltHMain.addWidget(inputTabWidgets)
-        spltHMain.addWidget(spltVPltStatus)
+        spltHMain.addWidget(spltVPltLogger)
         spltHMain.setStretchFactor(1,4) # relative initial sizes of subwidgets
         spltHMain.setContentsMargins(*rc.params['wdg_margins'])
         spltHMain.setFocus()
@@ -201,7 +204,7 @@ class pyFDA(QMainWindow):
         # trigger the close event in response to sigQuit generated in another subwidget:
         inputTabWidgets.filter_specs.sigQuit.connect(self.close)
 
-        XStream.stdout().messageWritten.connect (statusWin.appendPlainText)
+        XStream.stdout().messageWritten.connect(loggerWin.appendPlainText)
 
 #==============================================================================
 #     def statusMessage(self, message):
