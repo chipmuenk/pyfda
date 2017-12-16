@@ -15,6 +15,7 @@ from ..compat import (QtCore, QWidget, QLabel, pyqtSignal,
 
 import sys
 import six
+import numpy as np
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 #from matplotlib.backend_bases import cursors as mplCursors
@@ -116,10 +117,11 @@ class MplWidget(QWidget):
                     ax.axis(self.limits) # restore old limits
                 else:
                     self.limits = ax.axis() # save old limits
-
-            self.fig.tight_layout(pad = 0.2)
-#        self.pltCanv.updateGeometry()
-#        self.pltCanv.adjustSize() #  resize the parent widget to fit its content
+            try:
+                # only call tight_layout() crashes with small figure sizes
+               self.fig.tight_layout(pad = 0)# .2)
+            except(ValueError, np.linalg.linalg.LinAlgError):
+                pass
         self.pltCanv.draw() # now (re-)draw the figure
 
 #------------------------------------------------------------------------------
