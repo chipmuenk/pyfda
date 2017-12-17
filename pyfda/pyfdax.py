@@ -137,25 +137,19 @@ class pyFDA(QMainWindow):
         inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
         loggerWin     = QPlainTextEdit(self)  # status window
-        loggerWin.setReadOnly(True)
-        #statusWin.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-
-        loggerWinH = loggerWin.sizeHint().height()
-        #logger.error('size_tab: {0}'.format(pltTabWidgets.sizeHint()))
-        mSize = QFontMetrics(loggerWin.font())
-        row4_height = mSize.lineSpacing() * 4
-        #statusWin.setFixedHeight(4*rowHt+4)
-        #statusWin.setBaseSize(statusWin.sizeHint().width(), 4*rowHt+4)
+        loggerWin.setReadOnly(True)        
+        # only needed for logging window height measured in lines
+        # mSize = QFontMetrics(loggerWin.font())
+        # row4_height = mSize.lineSpacing() * 4
 
         # add logger window underneath plot Tab Widgets
         spltVPltLogger = QSplitter(QtCore.Qt.Vertical)
         spltVPltLogger.addWidget(pltTabWidgets)
         spltVPltLogger.addWidget(loggerWin)
-        spltVPltLogger.setSizes([spltVPltLogger.size().height(), 20])
-#                                 row4_height])# statusWinH*0.1])
-        #spltVPltStatus.size().height() * 0.9
+#        spltVPltLogger.setSizes([spltVPltLogger.size().height()*0.95, 20])
+#                                 spltVPltLogger.size().height()* 0.05])
 
-        # create splitter that contains all subwidget groups
+        # create horizontal splitter that contains all subwidget groups
         spltHMain = QSplitter(QtCore.Qt.Horizontal)
         spltHMain.addWidget(inputTabWidgets)
         spltHMain.addWidget(spltVPltLogger)
@@ -163,7 +157,13 @@ class pyFDA(QMainWindow):
         spltHMain.setContentsMargins(*rc.params['wdg_margins'])
         spltHMain.setFocus()
         # make spltHMain occupy the main area of QMainWindow and make QMainWindow its parent !!!
-        self.setCentralWidget(spltHMain)   
+        self.setCentralWidget(spltHMain)
+        spltVPltLoggerH = spltVPltLogger.size().height()
+        spltVPltLogger.setSizes([spltVPltLoggerH*0.9, spltVPltLoggerH*0.1 - 8])
+        logger.error('plot tabs: {0}'.format(pltTabWidgets.size()))
+        logger.error('log windw: {0}'.format(loggerWin.size().height()))
+        logger.error('splitter : {0}'.format(spltHMain.size().height()))
+
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
 
         #=============== Menubar =======================================
