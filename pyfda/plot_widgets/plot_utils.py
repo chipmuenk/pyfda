@@ -453,6 +453,4 @@ class MyMplToolbar(NavigationToolbar):
             img = QImage(self.canvas.grab())
             self.cb.setImage(img)
         except:
-            print('Error copying figure to clipboard')
-            errorMsg = "Sorry: {0}".format(sys.exc_info())
-            print(errorMsg)
+            logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))

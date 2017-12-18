@@ -177,7 +177,6 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         These subwidgets are instantiated dynamically when needed in 
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """
-#        print("Constructing Equiripple UI")
         self.lbl_remez_1 = QLabel("Grid Density", self)
         self.lbl_remez_1.setObjectName('wdg_lbl_remez_1')
         self.led_remez_1 = QLineEdit(self)

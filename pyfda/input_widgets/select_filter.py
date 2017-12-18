@@ -435,7 +435,7 @@ class SelectFilter(QWidget):
                 self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
 
             except AttributeError as e:
-                print("Could not destruct_UI!\n", e)
+                logger.error("Could not destruct_UI!\n{0}".format(e))
 
             ff.fil_inst.deleteLater() # delete QWidget when scope has been left
 

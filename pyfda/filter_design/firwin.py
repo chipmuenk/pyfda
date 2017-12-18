@@ -310,8 +310,6 @@ class Firwin(QWidget):
 
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.cmb_firwin_alg.currentText()
-#        print("===== firwin ====\n", self.alg)
-#        print(self.firWindow)
 
     def _save(self, fil_dict, arg):
         """

@@ -929,7 +929,7 @@ Examples
     singular = np.absolute(den) < 10 * minmag
     if np.any(singular) and verbose:
         singularity_list = ", ".join("{0:.3f}".format(ws/(2*pi)) for ws in w[singular])
-        print("pyfda_lib.py:grpdelay:\n"
+        logger.warning("pyfda_lib.py:grpdelay:\n"
             "The group delay is singular at F = [{0:s}], setting to 0".format(singularity_list)
         )
 
@@ -1208,7 +1208,7 @@ def fil_convert(fil_dict, format_in):
 #                fil_dict['sos'] = sig.zpk2sos(zpk[0], zpk[1], zpk[2])
 #            except ValueError:
 #                fil_dict['sos'] = []
-#                print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
+#                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     elif 'ba' in format_in: # arg = [b,a]
         b, a = fil_dict['ba'][0], fil_dict['ba'][1]
@@ -1223,7 +1223,7 @@ def fil_convert(fil_dict, format_in):
 #                fil_dict['sos'] = sig.tf2sos(b,a)
 #            except ValueError:
 #                fil_dict['sos'] = []
-#                print("WARN (pyfda_lib): Complex-valued coefficients, could not convert to SOS.")
+#                logger.warning("Complex-valued coefficients, could not convert to SOS.")
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
@@ -1261,7 +1261,7 @@ def sos2zpk(sos):
     p = np.empty(n_sections*2, np.complex128)
     k = 1.
     for section in range(n_sections):
-        print(sos[section])
+        logger.info(sos[section])
         zpk = sig.tf2zpk(sos[section, :3], sos[section, 3:])
 #        if sos[section, 3] == 0: # first order section
         z[2*section:2*(section+1)] = zpk[0]

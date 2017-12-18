@@ -29,7 +29,7 @@ from .pyfda_lib import cmp_version, CRLF
 # #############################################################################
 # Get all available system styles:
 #from PyQt5.QtWidgets import QStyleFactory
-#fróm PyQt4.QtGui import QStyleFactory
+#from PyQt4.QtGui import QStyleFactory
 #print(QStyleFactory.keys())
 
 THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the

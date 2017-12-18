@@ -10,7 +10,7 @@
 Library with classes and functions for file and text IO
 """
 # TODO: import data from files doesn't update FIR / IIR and data changed
-# TODO: export COE, Actel
+
 from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
