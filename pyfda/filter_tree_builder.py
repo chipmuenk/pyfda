@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Nov 24 10:00:14 2014
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
+"""
+Create the filter tree dictionary that contains all filter types in a well
+structured form.
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys, six

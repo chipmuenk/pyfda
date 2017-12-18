@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Created 2012 - 2017
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-@author: Christian Muenker
-
-Library with common routines for Qt widgets
 """
-# TODO: import data from files doesn't update FIR / IIR and data changed
-# TODO: export COE, Actel
+Library with various helper functions for Qt widgets
+"""
+
 from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)

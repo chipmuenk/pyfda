@@ -1,40 +1,23 @@
 # -*- coding: utf-8 -*-
-"""
-Created 2012 - 2017
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-@author: Christian Muenker
 """
-#
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-
+Library with various general functions and variables needed by the pyfda routines
+"""
 
 from __future__ import division, print_function
-import os, platform
-import sys, re, time
+import os
+import sys, time
 import struct
-import codecs
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
 from numpy import pi, log10, arctan
-
-# Specify the backend of matplotlib to use pyQT4 to avoid conflicts on systems
-# that default to pyQT5 (but have pyQt4 installed as well)
-#import matplotlib
-#matplotlib.use("Qt4Agg")
 
 import scipy.signal as sig
 

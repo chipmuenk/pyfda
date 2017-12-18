@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
-# (see LICENSE in root directory for details)
+# (see file LICENSE in root directory for details)
 
 """
-
+Handle directories in an OS-independent way
 """
+
 from __future__ import print_function
 import os
 import shutil

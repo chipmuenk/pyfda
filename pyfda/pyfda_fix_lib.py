@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Fixpoint library for converting numpy scalars and arrays to quantized
-numpy values
+numpy values and formatting reals in various formats
 """
-#
-# (c) 2015 - 2017 Christian Münker
 #===========================================================================
 from __future__ import division, print_function, unicode_literals
 

@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-filter_factory.py
-
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
-Importing filterbroker.py runs the module once, defining all module variables.
-Module variables are global like class variables. 
-
-
-Author: Christian Muenker
+Importing filterbroker.py runs the module once, defining all module variables
+which have a global scope like class variables. 
 """
 
 from __future__ import division, unicode_literals, print_function, absolute_import

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Common plotting utilities
-
-Author: Christian Muenker 2015
-http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
-
-http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-runs-slow-after-several-loads-or-looks-messy
 """
 from __future__ import print_function, division, unicode_literals
 import logging

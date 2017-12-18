@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-filterbroker.py
-
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
-Importing filterbroker.py runs the module once, defining all module variables.
-Module variables are global like class variables.
-
-
-Author: Christian Muenker
+Importing filterbroker.py runs the module once, defining all module variables
+having a global scope like class variables.
 """
 
 from __future__ import division, unicode_literals, print_function, absolute_import
@@ -49,8 +51,7 @@ fil_classes = {# IIR:
             }
 
 # Dictionary describing the available combinations of response types (rt),
-# filter types (ft), design methods (dm) and filter order (fo).
-
+# filter types (ft), design methods (dm) and filter order (fo):
 fil_tree = freeze_hierarchical({
     'LP':{
         'FIR':{
@@ -169,12 +170,9 @@ fil_tree = freeze_hierarchical({
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
-# auxiliary information, it is automatically overwritten by input widgets
-# and design routines
+# auxiliary information, the initial definition here is overwritten by 
+# input widgets and design routines:
 #------------------------------------------------------------------------------
-
-
-# Initial filter dictionary
 fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'N':10, 'f_S':1,
             'A_PB':0.02, 'A_PB2': 0.01, 'F_PB':0.1, 'F_PB2':0.4, 'F_C': 0.2, 'F_N': 0.2,

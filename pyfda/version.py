@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-Created on Mon Apr 18 10:21:33 2016
-
 Store the version number here for setup.py and pyfdax.py
-
-@author: Christian Muenker
 """
 
 __version__ = '0.1rc7'
