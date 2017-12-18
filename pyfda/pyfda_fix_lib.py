@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Fixpoint library for converting numpy scalars and arrays to quantized
-numpy values
+numpy values and formatting reals in various formats
 """
-#
-# (c) 2015 - 2017 Christian Münker
 #===========================================================================
 from __future__ import division, print_function, unicode_literals
 
@@ -682,7 +687,6 @@ class Fixed(object):
         -------
         quantized floating point (`dtype=np.float64`) representation of input string
         """
-
         if y == "":
             return 0
 
@@ -691,6 +695,11 @@ class Fixed(object):
         frmt = frmt.lower()
         y_float = y_dec = None
 
+        if frmt == 'float32':
+            float_frmt = np.float32
+        elif frmt == 'float16':
+            float_frmt = np.float16
+            
         if frmt == 'float':
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
@@ -855,6 +864,10 @@ class Fixed(object):
 
         if self.frmt == 'float': # return float input value unchanged (no string)
             return y
+        elif self.frmt == 'float32':
+            return np.float32(y)
+        elif self.frmt == 'float16':
+            return np.float16(y)
 
         elif self.frmt in {'hex', 'bin', 'dec', 'csd'}:
             # return a quantized & saturated / wrapped fixpoint (type float) for y

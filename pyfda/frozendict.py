@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-Created on Thu Dec  1 07:26:11 2016
+Create an immutable dictionary for the filter tree. The eliminates the risk
+that a filter design routine inadvertedly modifies the dict e.g. via
+a shallow copy. Used by filterbroker.py and filter_tree_builder.py
 
-http://stackoverflow.com/questions/2703599/what-would-a-frozen-dict-be
-
+Taken from http://stackoverflow.com/questions/2703599/what-would-a-frozen-dict-be
 """
 if 3 / 2 == 1:
     version = 2

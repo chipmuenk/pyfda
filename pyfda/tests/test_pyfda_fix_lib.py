@@ -373,7 +373,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(yq_list, yq_list_goal)
         # same but vectorized
         #yq_list = self.myQ.frmt2float(y_list)
-        #print("### :{1} - {0}".format(yq_list, type(yq_list)))
         #self.assertEqual(yq_list, yq_list_goal)
         
         # same for integer case
@@ -424,7 +423,6 @@ class TestSequenceFunctions(unittest.TestCase):
         
         # same but vectorized
         # yq_list = self.myQ.frmt2float(y_list)
-        #print("### :{1} - {0}".format(yq_list, type(yq_list)))
         # self.assertEqual(yq_list, yq_list_goal)
 
         # same for integer case
@@ -495,7 +493,6 @@ class TestSequenceFunctions(unittest.TestCase):
 #         
 #         # same but vectorized
 #         #yq_list = self.myQ.frmt2float(y_list)
-#         #print("### :{1} - {0}".format(yq_list, type(yq_list)))
 #         #self.assertEqual(yq_list, yq_list_goal)
 # 
 #         # same for integer case

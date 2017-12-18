@@ -76,7 +76,6 @@ class ItemDelegate(QStyledItemDelegate):
 #         index_role = index.data(Qt.AccessibleDescriptionRole).toString()
 #
 #         if index_role == QtCore.QLatin1String("separator"):
-#             print("separator!")
 #             y = (option.rect.top() + option.rect.bottom()) / 2
 #             #        painter.setPen(option.palette.color( QPalette.Active, QPalette.Dark ) )
 #             painter.drawLine(option.rect.left(), y, option.rect.right(), y )
@@ -125,7 +124,6 @@ class ItemDelegate(QStyledItemDelegate):
 #         index:   instance of QModelIndex
 #         """
 #         logger.debug("Ovr_flag:".format(self.parent.myQ.ovr_flag))
-#         print("paint_ovr:{0}.{1}:{2}".format(index.row(), index.column(), self.parent.myQ.ovr_flag))
 #         #option.backgroundBrush = QBrush(QColor(000, 100, 100, 200)) # lightGray
 #             #option.backgroundBrush.setColor(QColor(000, 100, 100, 200))
 #         # continue with the original `paint()` method

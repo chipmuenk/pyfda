@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Common plotting utilities
-
-Author: Christian Muenker 2015
-http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
-
-http://stackoverflow.com/questions/17973177/matplotlib-and-pyqt-dynamic-figure-runs-slow-after-several-loads-or-looks-messy
 """
 from __future__ import print_function, division, unicode_literals
+import logging
+logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QWidget, QLabel, pyqtSignal,
                       QSizePolicy, QIcon, QImage, QVBoxLayout,
@@ -15,6 +19,7 @@ from ..compat import (QtCore, QWidget, QLabel, pyqtSignal,
 
 import sys
 import six
+import numpy as np
 
 # do not import matplotlib.pyplot - pyplot brings its own GUI, event loop etc!!!
 #from matplotlib.backend_bases import cursors as mplCursors
@@ -45,12 +50,9 @@ class MplWidget(QWidget):
     def __init__(self, parent):
         super(MplWidget, self).__init__(parent)
         # Create the mpl figure and subplot (white bg, 100 dots-per-inch).
-        # Construct the canvas with the figure
-        #
-        self.plt_lim = [] # x,y plot limits
+        # Construct the canvas with the figure:
+        self.plt_lim = [] # define variable for x,y plot limits
         self.fig = Figure()
-#        self.mpl = self.fig.add_subplot(111) # self.fig.add_axes([.1,.1,.9,.9])#
-#        self.mpl21 = self.fig.add_subplot(211)
 
         self.pltCanv = FigureCanvas(self.fig)
         self.pltCanv.setSizePolicy(QSizePolicy.Expanding,
@@ -76,18 +78,9 @@ class MplWidget(QWidget):
         self.mplToolbar.sigEnabled.connect(self.clear_disabled_figure)
 
         #=============================================
-        # Widget layout with QHBox / QVBox
+        # Main plot widget layout
         #=============================================
-
-#        self.hbox = QHBoxLayout()
-#
-#        for w in [self.mpl_toolbar, self.butDraw, self.cboxGrid]:
-#            self.hbox.addWidget(w)
-#            self.hbox.setAlignment(w, QtCore.Qt.AlignVCenter)
-#        self.hbox.setSizeConstraint(QLayout.SetFixedSize)
-
         self.layVMainMpl = QVBoxLayout()
-#        self.layVMainMpl.addLayout(self.hbox)
         self.layVMainMpl.addWidget(self.mplToolbar)
         self.layVMainMpl.addWidget(self.pltCanv)
 
@@ -111,15 +104,16 @@ class MplWidget(QWidget):
         if self.fig.axes:
             for ax in self.fig.axes:
                 ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
-    #        plt.artist.setp(self.pltPlt, linewidth = self.sldLw.value()/5.)
+
                 if self.mplToolbar.lock_zoom:
                     ax.axis(self.limits) # restore old limits
                 else:
                     self.limits = ax.axis() # save old limits
-
-            self.fig.tight_layout(pad = 0.2)
-#        self.pltCanv.updateGeometry()
-#        self.pltCanv.adjustSize() #  resize the parent widget to fit its content
+            try:
+                # only call tight_layout() crashes with small figure sizes
+               self.fig.tight_layout(pad = 0)# .2)
+            except(ValueError, np.linalg.linalg.LinAlgError):
+                pass
         self.pltCanv.draw() # now (re-)draw the figure
 
 #------------------------------------------------------------------------------
@@ -149,8 +143,8 @@ class MplWidget(QWidget):
 #------------------------------------------------------------------------------
     def get_full_extent(self, ax, pad=0.0):
         """
-        Get the full extent of an axes, including axes labels, tick labels, and
-        titles.
+        Get the full extent of axes system `ax`, including axes labels, tick labels
+        and titles.
         """
         #http://stackoverflow.com/questions/14712665/matplotlib-subplot-background-axes-face-labels-colour-or-figure-axes-coor
         # For text objects, we need to draw the figure first, otherwise the extents
@@ -158,7 +152,6 @@ class MplWidget(QWidget):
         self.pltCanv.draw()
         items = ax.get_xticklabels() + ax.get_yticklabels()
         items += [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
-#        items += [ax, ax.title]
         bbox = Bbox.union([item.get_window_extent() for item in items])
         return bbox.expanded(1.0 + pad, 1.0 + pad)
 #------------------------------------------------------------------------------
@@ -213,15 +206,8 @@ class MyMplToolbar(NavigationToolbar):
 #
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
-#       Using the following path to the icons seems to fail in some cases, we
-#       rather rely on qrc files containing all icons
-#        iconDir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-#           '..','images','icons', '')
-#        self.basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-#           '..','images', 'icons', '')
 
-#---------------- Construct Toolbar using QRC icons ---------------------------
-
+        #---------------- Construct Toolbar using QRC icons -------------------
         # ENABLE:
         self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_update)
         self.a_en.setToolTip('Enable / disable plot update')
@@ -467,6 +453,4 @@ class MyMplToolbar(NavigationToolbar):
             img = QImage(self.canvas.grab())
             self.cb.setImage(img)
         except:
-            print('Error copying figure to clipboard')
-            errorMsg = "Sorry: {0}".format(sys.exc_info())
-            print(errorMsg)
+            logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))

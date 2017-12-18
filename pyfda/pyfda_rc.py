@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-pyfda_rc.py
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
+"""
 This file contains layout definitions for Qt and matplotlib widgets
 A dark and a light theme can be selected via a constant but this more a demonstration
 on how to set things than a finished layout yet.
@@ -10,18 +15,6 @@ Default parameters, paths etc. are also defined at the end of the file.
 
 Importing pyfda_rc runs the module once, defining all module variables
 which are global (similar to class variables).
-
-See
-http://stackoverflow.com/questions/13034496/using-global-variables-between-files-in-python
-http://pymotw.com/2/articles/data_persistence.html
-for information on passing/storing data between files
-
-See
-http://doc.qt.io/qt-4.8/stylesheet-examples.html
-http://www.informit.com/articles/article.aspx?p=1405556
-for qss styling
-
-Author: Christian Muenker
 """
 
 from __future__ import division, unicode_literals, absolute_import
@@ -36,7 +29,7 @@ from .pyfda_lib import cmp_version, CRLF
 # #############################################################################
 # Get all available system styles:
 #from PyQt5.QtWidgets import QStyleFactory
-#fróm PyQt4.QtGui import QStyleFactory
+#from PyQt4.QtGui import QStyleFactory
 #print(QStyleFactory.keys())
 
 THEME = 'light' # select 'dark' or 'light' theme or 'none' or use one of the

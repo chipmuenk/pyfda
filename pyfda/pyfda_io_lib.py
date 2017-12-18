@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-Created 2012 - 2017
-
-@author: Christian Muenker
-
 Library with classes and functions for file and text IO
 """
 # TODO: import data from files doesn't update FIR / IIR and data changed
-# TODO: export COE, Actel
+
 from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)

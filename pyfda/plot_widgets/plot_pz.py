@@ -112,7 +112,7 @@ class PlotPZ(QWidget):
 
         self.ax.clear()
 
-        [z,p,k] = self.zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax, verbose = False,
+        [z,p,k] = self.zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax,
             mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
 
         self.ax.set_title(r'Pole / Zero Plot')
@@ -130,8 +130,8 @@ class PlotPZ(QWidget):
         
         
 #------------------------------------------------------------------------------
-    def zplane(self, b=None, a=1, z=None, p=None, k =1,  pn_eps=1e-3, analog=False, plt_ax = None,
-              verbose=False, style='square', anaCircleRad=0, lw=2,
+    def zplane(self, b=None, a=1, z=None, p=None, k =1,  pn_eps=1e-3, analog=False,
+              plt_ax = None, style='square', anaCircleRad=0, lw=2,
               mps = 10, mzs = 10, mpc = 'r', mzc = 'b', plabel = '', zlabel = ''):
         """
         Plot the poles and zeros in the complex z-plane either from the
@@ -172,9 +172,6 @@ class PlotPZ(QWidget):
              Library for plotting the P/Z plane. Currently, only matplotlib is
              implemented. When pltLib = 'none' or when matplotlib is not
              available, only pass the poles / zeros and their multiplicity
-    
-        verbose : boolean (default: False)
-            When verbose == True, print poles / zeros and their multiplicity.
     
         style : string (default: 'square')
             Style of the plot, for style == 'square' make scale of x- and y-
@@ -302,12 +299,12 @@ class PlotPZ(QWidget):
     
          # Print multiplicity of poles / zeros
         for i in range(len(z)):
-            if verbose == True: print('z', i, z[i], num_z[i])
+            logger.debug('z: {0} | {1} | {2}'.format(i, z[i], num_z[i]))
             if num_z[i] > 1:
                 ax.text(np.real(z[i]), np.imag(z[i]),'  (' + str(num_z[i]) +')',va = 'bottom')
     
         for i in range(len(p)):
-            if verbose == True: print('p', i, p[i], num_p[i])
+            logger.debug('p:{0} | {1} | {2}'.format(i, p[i], num_p[i]))
             if num_p[i] > 1:
                 ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',va = 'bottom')
     
@@ -324,7 +321,6 @@ class PlotPZ(QWidget):
         yl = ax.get_ylim(); Dy = max(abs(yl[1]-yl[0]), 0.05)
         ax.set_xlim((xl[0]-Dx*0.05, max(xl[1]+Dx*0.05,0)))
         ax.set_ylim((yl[0]-Dy*0.05, yl[1] + Dy*0.05))
-    #    print(ax.get_xlim(),ax.get_ylim())
     
         return z, p, k
 

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
-# (see LICENSE in root directory for details)
+# (see file LICENSE in root directory for details)
 
 """
 Mainwindow for the pyFDA app
@@ -26,7 +29,7 @@ try:
 except ImportError:
     matplotlib.use("Qt4Agg")
 
-from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics,
+from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics, QSizePolicy,
                      QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
 
 #========================= Setup the loggers ==================================
@@ -45,17 +48,28 @@ class DynFileHandler(logging.FileHandler):
 
 class XStream(QtCore.QObject):
     """
-    subclass for log messages on main display
+    subclass for log messages on logger window
     Overrides stdout to print messages to textWidget 
     """
     _stdout = None
-    messageWritten = QtCore.pyqtSignal(str)
+    messageWritten = QtCore.pyqtSignal(str) # pass str to slot
+    # mappings text -> HTML formatted logging messages
+    mapping = [ ('[  DEBUG]','<b>[  DEBUG]</b>'),
+                ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
+                ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
+                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')]
+
     def flush( self ):
         pass
+
     def fileno( self ):
         return -1
+
     def write( self, msg ):
         if ( not self.signalsBlocked() ):
+            for k, v in XStream.mapping:
+                msg = msg.replace(k, v)
+
             self.messageWritten.emit(msg)
 
     @staticmethod
@@ -75,7 +89,8 @@ class QEditHandler(logging.Handler):
 
     def emit(self, record):
         msg = self.format(record)
-        if msg: XStream.stdout().write('%s'%msg)
+        if msg: 
+            XStream.stdout().write('%s'%msg)
 
 # "register" custom class DynFileHandler as an attribute for the logging module
 # to use it inside the logging config file and pass file name / path and mode
@@ -130,45 +145,34 @@ class pyFDA(QMainWindow):
         - Plot Window [-> plotAll.plotAll()]
         """
 
-        # ============== UI Layout =====================================
-        self.main_widget = QWidget(self) # this widget contains all subwidget groups
+        # ============== UI Layout with H and V-Splitter =====================
 
-        layHMain = QHBoxLayout(self.main_widget) # horizontal layout of all groups
-        laySubWin  = QSplitter(QtCore.Qt.Horizontal)
-        laySubRight  = QSplitter(QtCore.Qt.Vertical)
+        inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
+        pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
+        loggerWin     = QPlainTextEdit(self)  # status window
+        loggerWin.setReadOnly(True)        
+        # only needed for logging window height measured in lines
+        # mSize = QFontMetrics(loggerWin.font())
+        # row4_height = mSize.lineSpacing() * 4
 
-        # Instantiate subwidget groups
-        self.inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
-        self.pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-        self.statusWin     = QPlainTextEdit(self)  # status window
-        mSize = QFontMetrics(self.statusWin.font())
-        rowHt = mSize.lineSpacing()
-        self.statusWin.setFixedHeight(4*rowHt+4)
-        self.statusWin.setReadOnly(True)
+        # add logger window underneath plot Tab Widgets
+        spltVPltLogger = QSplitter(QtCore.Qt.Vertical)
+        spltVPltLogger.addWidget(pltTabWidgets)
+        spltVPltLogger.addWidget(loggerWin)
 
-        #self._title = QtGui.QLabel('Status Log')
-        #self._title.setAlignment(QtCore.Qt.AlignCenter)
-
-        # Add status window underneath plot Tab Widgets
-        laySubRight.addWidget(self.pltTabWidgets)
-        #laySub.addWidget(self._title)
-        laySubRight.addWidget(self.statusWin)
-        laySubRight.setStretchFactor(0,0) # relative initial sizes of subwidgets
-        #laySubRight.setStretchFactor(1,1) # relative initial sizes of subwidgets
-
-        laySubWin.addWidget(self.inputTabWidgets)
-        laySubWin.addWidget(laySubRight)
-        laySubWin.setStretchFactor(1,4) # relative initial sizes of subwidgets
-
-        layHMain.addWidget(laySubWin)
-        layHMain.setContentsMargins(*rc.params['wdg_margins'])
+        # create horizontal splitter that contains all subwidget groups
+        spltHMain = QSplitter(QtCore.Qt.Horizontal)
+        spltHMain.addWidget(inputTabWidgets)
+        spltHMain.addWidget(spltVPltLogger)
+        spltHMain.setStretchFactor(1,4) # relative initial sizes of subwidgets
+        spltHMain.setContentsMargins(*rc.params['wdg_margins'])
+        spltHMain.setFocus()
+        # make spltHMain occupy the main area of QMainWindow and make QMainWindow its parent !!!
+        self.setCentralWidget(spltHMain)
+        spltVPltLoggerH = spltVPltLogger.size().height()
+        spltVPltLogger.setSizes([spltVPltLoggerH*0.95, spltVPltLoggerH*0.05 - 8])
 
         self.setWindowTitle('pyFDA - Python Filter Design and Analysis')
-    
-        self.main_widget.setFocus()
-        # make main_widget occupy the main area of QMainWidget 
-        #   and make QMainWindow its parent !!!
-        self.setCentralWidget(self.main_widget)
 
         #=============== Menubar =======================================
 
@@ -182,7 +186,6 @@ class pyFDA(QMainWindow):
 
 #        self.statusMessage("Application is initialized.")
 
-
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -192,24 +195,26 @@ class pyFDA(QMainWindow):
         #
         # sigViewChanged: signal indicating that filter VIEW has changed,
         # requiring partial update of some plot widgets:
-        self.inputTabWidgets.sigViewChanged.connect(self.pltTabWidgets.update_view)
+        inputTabWidgets.sigViewChanged.connect(pltTabWidgets.update_view)
         #
         # sigSpecsChanged: signal indicating that filter SPECS have changed,
         # requiring partial update of some plot widgets:
-        self.inputTabWidgets.sigSpecsChanged.connect(self.pltTabWidgets.update_view)
+        inputTabWidgets.sigSpecsChanged.connect(pltTabWidgets.update_view)
 
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #  requiring full update of all plot widgets:
-        self.inputTabWidgets.sigFilterDesigned.connect(self.pltTabWidgets.update_data)
+        inputTabWidgets.sigFilterDesigned.connect(pltTabWidgets.update_data)
 
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 
 
         # trigger the close event in response to sigQuit generated in another subwidget:
-        self.inputTabWidgets.filter_specs.sigQuit.connect(self.close)
+        inputTabWidgets.filter_specs.sigQuit.connect(self.close)
 
-        XStream.stdout().messageWritten.connect (self.statusWin.appendPlainText)
+        # when a message has been written, pass it via signal-slot mechanism and
+        # print it to logger window
+        XStream.stdout().messageWritten.connect(loggerWin.appendHtml)
 
 #==============================================================================
 #     def statusMessage(self, message):
