@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Widget stacking all subwidgets for filter specification and design
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-Author: Christian Muenker
 """
+Widget stacking all subwidgets for filter specification and design. The actual
+filter design is started here as well.
+"""
+
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 from pprint import pformat
@@ -12,8 +19,8 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 
-from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal, QtGui,
-                      QVBoxLayout, QHBoxLayout, QSizePolicy)
+from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
+                      QVBoxLayout, QHBoxLayout)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -243,13 +250,8 @@ class FilterSpecs(QWidget):
           have been changed by the filter design method
         - the plots are updated via signal-slot connection
         """
-        logger.debug("start_design_filt - Specs:\n"
-            "fb.fil[0]: %s\n"
-            "fb.fil[0]['fc'] %s.%s%s",
-            pformat(fb.fil[0]), str(fb.fil[0]['fc']), str(fb.fil[0]['rt']),
-                         str(fb.fil[0]['fo']))
-
-        logger.info("start_design_filt using method: %s", str(fb.fil[0]['fc']))
+        logger.info("Start filter design using method '{0}.{1}{2}'"\
+                        .format(str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo'])))
 
         try:
             #----------------------------------------------------------------------
@@ -274,7 +276,7 @@ class FilterSpecs(QWidget):
                 if (err == 18):
                     raise AttributeError("Filter cannot be designed, please relax specifications.")
                 else:
-                    raise AttributeError("Unknown design method.")
+                    raise AttributeError("Unknown error during filter design.")
                 self.color_design_button("error")
 
             # Update filter order. weights and freq display in case they
@@ -286,7 +288,8 @@ class FilterSpecs(QWidget):
             self.color_design_button("ok")
 
             self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
-            logger.debug("start_design_filt - Results:\n"
+            logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
+            logger.debug("Results:\n"
                 "F_PB = %s, F_SB = %s "
                 "Filter order N = %s\n"
                 "NDim fil[0]['ba'] = %s\n\n"
@@ -296,13 +299,11 @@ class FilterSpecs(QWidget):
                 str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
                 pformat(fb.fil[0]['zpk']))
 
-            logger.info ('Filter designed, order ' + str(fb.fil[0]['N']))
-
         except Exception as e:
             if ('__doc__' in str(e)):
-                logger.warning("start_design_filt:\n %s\n %s\n", e.__doc__, e)
+                logger.warning("Filter design:\n %s\n %s\n", e.__doc__, e)
             else:
-                logger.warning("%s", e)
+                logger.warning("{0}".format(e))
             self.color_design_button("error")
 
     def color_design_button(self, state):
