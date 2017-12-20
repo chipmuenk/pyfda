@@ -17,15 +17,14 @@
     <file alias="fullscreen-enter.svg">images/icons/dark/fullscreen-enter.svg</file>
     <file alias="grid.svg">images/icons/dark/grid-four-up.svg</file>
     <file alias="home.svg">images/icons/dark/home.svg</file>
-    <file alias="load.svg">images/icons/dark/appbar.disk.download.svg</file>
     <file alias="lock-locked.svg">images/icons/dark/lock-locked.svg</file>
     <file alias="lock-unlocked.svg">images/icons/dark/lock-unlocked.svg</file>    
     <file alias="magnifying-glass.svg">images/icons/dark/magnifying-glass.svg</file>
     <file alias="move.svg">images/icons/dark/move.svg</file>
     <file alias="quantize.svg">images/icons/dark/quantize.svg</file>
-    <file alias="row_delete.svg">images/icons/dark/appbar.cell.row.delete.svg</file>
-    <file alias="row_insert_above.svg">images/icons/dark/appbar.cell.insert.above.svg</file>
-    <file alias="save.svg">images/icons/dark/appbar.disk.upload.svg</file>
+    <file alias="row_delete.svg">images/icons/dark/appbar.list.delete.svg</file>
+    <file alias="row_insert_above.svg">images/icons/dark/appbar.list.add.above.svg</file>
+    <file alias="save.svg">images/icons/dark/appbar.disk.svg</file>
     <file alias="to_clipboard.svg">images/icons/dark/appbar.to_clipboard.svg</file>
     <file alias="trash.svg">images/icons/dark/trash.svg</file>
     <file alias="upload.svg">images/icons/dark/data-transfer-upload.svg</file>
@@ -37,10 +36,10 @@
 </RCC>
 
 
-
 <!-- QtPy4: pyrcc4 pyfda.qrc -o qrc_resources.py -py3
      QtPy5: pyrcc5 pyfda.qrc -o qrc_resources.py
 
      manual edit in qrc_resources.py : 
-        from PyQtX import QtCore -> from .compat import QtCore  -->
+        from PyQtX import QtCore -> from .compat import QtCore  
+-->
 
