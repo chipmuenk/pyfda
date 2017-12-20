@@ -270,7 +270,7 @@ class MyMplToolbar(NavigationToolbar):
         self.a_rd.setToolTip('Redraw Plot')
 
         # SAVE:
-        self.a_sv = self.addAction(QIcon(':/file.svg'), 'Save', self.save_figure)
+        self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self.save_figure)
         self.a_sv.setToolTip('Save the figure')
 
         self.cb = fb.clipboard
