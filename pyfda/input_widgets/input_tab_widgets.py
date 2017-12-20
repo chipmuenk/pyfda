@@ -39,6 +39,8 @@ class InputTabWidgets(QWidget):
     sigViewChanged = pyqtSignal() # emitted when view (e.g. single / double sided f) has changed
     sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
+    sig_changed_rx = pyqtSignal(dict)
+    sig_changed_tx = pyqtSignal(dict)
 
 
     def __init__(self, parent):
@@ -125,6 +127,8 @@ class InputTabWidgets(QWidget):
         # The following three widgets require a reloading of the select_filter
         # widget to update the filter selection:
         self.filter_coeffs.sigFilterDesigned.connect(self.load_all)
+        self.filter_coeffs.ui.sig_tx.connect(self.filter_pz.ui.sig_rx)
+        self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
         self.filter_pz.sigFilterDesigned.connect(self.load_all)
         self.file_io.sigFilterLoaded.connect(self.load_all)
         #----------------------------------------------------------------------

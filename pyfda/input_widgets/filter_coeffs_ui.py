@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-Created on Tue Nov 26 10:57:30 2013
-
-@author: Christian Muenker
-
 Create the UI for the FilterCoeffs class
 """
 
@@ -11,7 +14,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox,
+from ..compat import (pyqtSignal, Qt, QtGui, QWidget, QLabel, QLineEdit, QComboBox,
                       QPushButton, QFrame, QSpinBox, QFont, QIcon,
                       QVBoxLayout, QHBoxLayout, QGridLayout, QSizePolicy)
 
@@ -20,11 +23,12 @@ from pyfda.pyfda_io_lib import CSV_option_box
  
 from pyfda.pyfda_rc import params
 
-
 class FilterCoeffs_UI(QWidget):
     """
     Create the UI for the FilterCoeffs class
     """
+    sig_rx = pyqtSignal(dict) # incoming
+    sig_tx = pyqtSignal(dict) # outgoing
 
     def __init__(self, parent):
         super(FilterCoeffs_UI, self).__init__(parent)
@@ -159,17 +163,11 @@ class FilterCoeffs_UI(QWidget):
         self.butClear.setToolTip("Clear all table entries.")
 
         self.butFromTable = QPushButton(self)
-        self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
         self.butFromTable.setIconSize(q_icon_size)
-        self.butFromTable.setToolTip("<span>"
-                            "Copy table to clipboard / file, SELECTED items are copied as "
-                            "displayed. When nothing is selected, the whole table "
-                            "is copied with full precision in decimal format.</span>")
 
         self.butToTable = QPushButton(self)
-        self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
         self.butToTable.setIconSize(q_icon_size)
-        self.butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
+        self._set_load_save_icons()
 
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
@@ -371,7 +369,9 @@ class FilterCoeffs_UI(QWidget):
         #--- set initial values from dict / signal slot connections------------
         self.spnDigits.setValue(params['FMT_ba'])
         self.ledEps.setText(str(self.eps))
+        
         butSettingsClipboard.clicked.connect(self._copy_options)
+        self.sig_rx.connect(self._set_load_save_icons)
         
     #------------------------------------------------------------------------------
     def _copy_options(self):
@@ -382,6 +382,34 @@ class FilterCoeffs_UI(QWidget):
         self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
         #self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.opt_widget.exec_() # modal dialog (blocking)
+
+        self._set_load_save_icons()
+        self.sig_tx.emit({'sender':__name__, 'changed': 'csv'})
+
+    #------------------------------------------------------------------------------
+    def _set_load_save_icons(self):
+        """
+        Set icons / tooltipps for loading and saving data to / from file or
+        clipboard depending on selected options.
+        """
+        if params['CSV']['clipboard']:
+            self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
+            self.butFromTable.setToolTip("<span>"
+                    "Copy table to clipboard, SELECTED items are copied as "
+                    "displayed. When nothing is selected, the whole table "
+                    "is copied with full precision in decimal format.</span>")
+
+            self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
+            self.butToTable.setToolTip("<span>Copy clipboard to table.</span>")
+        else:
+            self.butFromTable.setIcon(QIcon(':/save.svg'))
+            self.butFromTable.setToolTip("<span>"
+                    "Save table to file, SELECTED items are copied as "
+                    "displayed. When nothing is selected, the whole table "
+                    "is copied with full precision in decimal format.</span>")
+
+            self.butToTable.setIcon(QIcon(':/file.svg'))
+            self.butToTable.setToolTip("<span>Load table from file.</span>")
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':

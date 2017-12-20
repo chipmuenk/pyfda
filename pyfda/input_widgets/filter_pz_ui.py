@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Oct  8 16:13:50 2017
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-@author: muenker
+
+"""
+Create the UI for the FilterPZ class
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
+from ..compat import (pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPushButton,
                       QFrame, QSpinBox, QFont, QIcon, QVBoxLayout, QHBoxLayout)
 
 from pyfda.pyfda_qt_lib import qset_cmb_box
@@ -21,6 +27,8 @@ class FilterPZ_UI(QWidget):
     Create the UI for the FilterPZ class
     """
 
+    sig_rx = pyqtSignal(dict) # incoming
+    sig_tx = pyqtSignal(dict) # outgoing
 
     def __init__(self, parent):
         """
@@ -159,17 +167,12 @@ class FilterPZ_UI(QWidget):
 
 
         self.butFromTable = QPushButton(self)
-        self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
         self.butFromTable.setIconSize(q_icon_size)
-        self.butFromTable.setToolTip("<span>"
-                            "Copy table to clipboard / file, SELECTED items are copied as "
-                            "displayed. When nothing is selected, the whole table "
-                            "is copied with full precision in decimal format.</span>")
         
         self.butToTable = QPushButton(self)
-        self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
         self.butToTable.setIconSize(q_icon_size)
-        self.butToTable.setToolTip("<span>Copy clipboard / file to table.</span>")
+
+        self._set_load_save_icons()
 
         butSettingsClipboard = QPushButton(self)
         butSettingsClipboard.setIcon(QIcon(':/settings.svg'))
@@ -230,6 +233,7 @@ class FilterPZ_UI(QWidget):
         self.spnDigits.setValue(params['FMT_pz'])
         self.ledEps.setText(str(self.eps))
         butSettingsClipboard.clicked.connect(self._copy_options)
+        self.sig_rx.connect(self._set_load_save_icons)
         
     #------------------------------------------------------------------------------
     def _copy_options(self):
@@ -240,6 +244,35 @@ class FilterPZ_UI(QWidget):
         self.opt_widget = CSV_option_box(self) # important: Handle must be class attribute
         #self.opt_widget.show() # modeless dialog, i.e. non-blocking
         self.opt_widget.exec_() # modal dialog (blocking)
+
+        self._set_load_save_icons()
+        self.sig_tx.emit({'sender':__name__, 'changed': 'csv'})
+        
+    #------------------------------------------------------------------------------
+    def _set_load_save_icons(self):
+        """
+        Set icons / tooltipps for loading and saving data to / from file or
+        clipboard depending on selected options.
+        """
+        if params['CSV']['clipboard']:
+            self.butFromTable.setIcon(QIcon(':/to_clipboard.svg'))
+            self.butFromTable.setToolTip("<span>"
+                    "Copy table to clipboard, SELECTED items are copied as "
+                    "displayed. When nothing is selected, the whole table "
+                    "is copied with full precision in decimal format.</span>")
+
+            self.butToTable.setIcon(QIcon(':/from_clipboard.svg'))
+            self.butToTable.setToolTip("<span>Copy clipboard to table.</span>")
+        else:
+            self.butFromTable.setIcon(QIcon(':/save.svg'))
+            self.butFromTable.setToolTip("<span>"
+                    "Save table to file, SELECTED items are copied as "
+                    "displayed. When nothing is selected, the whole table "
+                    "is copied with full precision in decimal format.</span>")
+
+            self.butToTable.setIcon(QIcon(':/file.svg'))
+            self.butToTable.setToolTip("<span>Load table from file.</span>")            
+
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
