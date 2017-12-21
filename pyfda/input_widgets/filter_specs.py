@@ -180,14 +180,17 @@ class FilterSpecs(QWidget):
 
         # self.sel_fil.load_filter_order() # update filter order subwidget, called by select_filter
 
+        # TARGET SPECS: is widget in the dict and is it visible (marker != 'i')?
         if ('tspecs' in all_widgets and len(all_widgets['tspecs']) > 1 and
                                               all_widgets['tspecs'][0] != 'i'):
             self.t_specs.setVisible(True)
+            # disable all subwidgets with marker 'd':
             self.t_specs.setEnabled(all_widgets['tspecs'][0] != 'd')
             self.t_specs.update_UI(new_labels=all_widgets['tspecs'][1])
         else:
             self.t_specs.hide()
 
+        # FREQUENCY SPECS
         if ('fspecs' in all_widgets and len(all_widgets['fspecs']) > 1 and
                                               all_widgets['fspecs'][0] != 'i'):
             self.f_specs.setVisible(True)
@@ -196,6 +199,7 @@ class FilterSpecs(QWidget):
         else:
             self.f_specs.hide()
 
+        # AMPLITUDE SPECS
         if ('aspecs' in all_widgets and len(all_widgets['aspecs']) > 1 and
                                               all_widgets['aspecs'][0] != 'i'):
             self.a_specs.setVisible(True)
@@ -204,6 +208,7 @@ class FilterSpecs(QWidget):
         else:
             self.a_specs.hide()
 
+        # WEIGHT SPECS
         if ('wspecs' in all_widgets and len(all_widgets['wspecs']) > 1 and
                                               all_widgets['wspecs'][0] != 'i'):
             self.w_specs.setVisible(True)
@@ -273,31 +278,26 @@ class FilterSpecs(QWidget):
             #-----------------------------------------------------------------------
 
             if err > 0:
-                if (err == 18):
-                    raise AttributeError("Filter cannot be designed, please relax specifications.")
-                else:
-                    raise AttributeError("Unknown error during filter design.")
                 self.color_design_button("error")
+            else:
+                # Update filter order. weights and freq display in case they
+                # have been changed by the design algorithm
+                self.sel_fil.load_filter_order()
+                self.w_specs.load_dict()
+                self.f_specs.load_dict()
+                self.color_design_button("ok")
 
-            # Update filter order. weights and freq display in case they
-            # have been changed by the design algorithm
-
-            self.sel_fil.load_filter_order()
-            self.w_specs.load_dict()
-            self.f_specs.load_dict()
-            self.color_design_button("ok")
-
-            self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
-            logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
-            logger.debug("Results:\n"
-                "F_PB = %s, F_SB = %s "
-                "Filter order N = %s\n"
-                "NDim fil[0]['ba'] = %s\n\n"
-                "b,a = %s\n\n"
-                "zpk = %s\n",
-                str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
-                str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
-                pformat(fb.fil[0]['zpk']))
+                self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
+                logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
+                logger.debug("Results:\n"
+                    "F_PB = %s, F_SB = %s "
+                    "Filter order N = %s\n"
+                    "NDim fil[0]['ba'] = %s\n\n"
+                    "b,a = %s\n\n"
+                    "zpk = %s\n",
+                    str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
+                    str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
+                    pformat(fb.fil[0]['zpk']))
 
         except Exception as e:
             if ('__doc__' in str(e)):
@@ -309,7 +309,6 @@ class FilterSpecs(QWidget):
     def color_design_button(self, state):
         fb.design_filt_state = state
         qstyle_widget(self.butDesignFilt, state)
-
 
 #------------------------------------------------------------------------------
 

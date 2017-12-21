@@ -122,14 +122,14 @@ class FilterFactory(object):
 
             if fil_class is None: # fc is not a class of fc_module
                 err_string = ("\nERROR in 'FilterFactory.create_fil_inst()':\n"
-                        "Unknown design class '%s', could not be created." %fc)
+                        "Unknown design class '{0}', could not be created.".format(fc))
                 logger.warning(err_string)
                 self.err_code = 3
             else:
                 try:
                     fil_inst = fil_class() # instantiate an object         
                     self.err_code = 0 # filter instance has been created / changed successfully
-                    logger.debug("FilterFactory.create_fil_inst(): successfully created %s", fc)
+                    logger.debug("FilterFactory.create_fil_inst(): successfully created {0}".format(fc))
                 except Exception as e:
                     self.err_code = 4
                     logger.warning("Error during instantiation of filter class {0}:\n{1}".format(fc,e))                    
@@ -210,20 +210,22 @@ class FilterFactory(object):
                 getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
-                err_string = "Error calling method '{0}' of class '{1}':\n{2}"\
+                err_string = "Method '{0}' of class '{1}':\n{2}"\
                                     .format(method, type(fil_inst).__name__, e)
                 if "order n is too high" in str(e).lower():
                     self.err_code = 18
+                    err_string += "\nTry relaxing the specifications."
+                elif "failure to converge" in str(e).lower():
+                    self.err_code = 19
+                    err_string += "\nTry relaxing the specifications."
                 else: 
-                    self.err_code = 30
-                
+                    self.err_code = 99
+
         if self.err_code > 0:
                 logger.error("ErrCode {0}: {1}".format(self.err_code, err_string))
-            
+
         return self.err_code
-        
-# TODO:      Generate Signal in filter_design: finished, error, ...
-                    
+
 #------------------------------------------------------------------------------
 fil_factory = FilterFactory()       
 # This *class instance* of FilterFactory can be accessed in other modules using
