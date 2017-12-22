@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Design equiripple-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in coefficients format ('ba')
@@ -7,7 +14,7 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling the __init__ method.
 
-Version info:   
+API version info:   
     1.0: initial working release
     1.1: mark private methods as private
     1.2: new API using fil_save
@@ -19,9 +26,6 @@ Version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-
-    
-Author: Christian Muenker 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 

@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-Created on Tue Nov 26 10:57:30 2013
-
-@author: Christian Muenker
-
 Widget for displaying and modifying filter coefficients
 """
 

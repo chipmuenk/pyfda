@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+# -*- coding: utf-8 -*-
+
 """
-Design equiripple-Filters (LP, HP, BP, BS) with fixed or minimum order, return
-the filter design in coefficients format ('ba')
-   
-Author: Christian Muenker 2014 - 2016
+Common settings for some IIR filter types (Cheby1, Cheby2, Ellip, EllipZero, MA)
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
