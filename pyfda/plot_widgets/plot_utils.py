@@ -111,7 +111,7 @@ class MplWidget(QWidget):
                     self.limits = ax.axis() # save old limits
             try:
                 # only call tight_layout() crashes with small figure sizes
-               self.fig.tight_layout(pad = 0)# .2)
+               self.fig.tight_layout(pad = 0.1)
             except(ValueError, np.linalg.linalg.LinAlgError):
                 pass
         self.pltCanv.draw() # now (re-)draw the figure
