@@ -33,6 +33,7 @@ import scipy.signal as sig
 from scipy.signal import cheb1ord
     
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.pyfda_qt_lib import qfilter_warning
 from .common import Common
 
 __version__ = "2.0"
@@ -151,6 +152,16 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+    def _test_N(self):
+        """
+        Warn the user if the calculated order is too high for a reasonable filter
+        design.
+        """
+        if self.N > 30:
+            return qfilter_warning(None, self.N, "Chebychev 1")
+        else:
+            return True
+
 
     def _save(self, fil_dict, arg):
         """
@@ -184,11 +195,15 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                               analog=self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                             btype='low', analog=self.analog, output=self.FRMT))
  
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
                             btype='low', analog=self.analog, output=self.FRMT))
 
@@ -197,11 +212,15 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                           analog=self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_C,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
@@ -212,11 +231,15 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog=self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                         btype='bandpass', analog=self.analog, output=self.FRMT))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB,[self.F_C,self.F_C2],
                         btype='bandpass', analog=self.analog, output=self.FRMT))
 
@@ -226,11 +249,15 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = cheb1ord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, self.F_PBC,
                         btype='bandstop', analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.cheby1(self.N, self.A_PB, [self.F_C,self.F_C2],
                         btype='bandstop', analog=self.analog, output=self.FRMT))
 

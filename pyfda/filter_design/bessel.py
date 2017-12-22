@@ -163,12 +163,7 @@ For scipy 0.18 and higher, more design options have been implemented
         Translate parameters from the passed dictionary to instance
         parameters, scaling / transforming them if needed.
         """
-
-        #in scipy, Bessel filter order is limited to 25
-        self.N = fil_dict['N'] if fil_dict['N'] < 26 else 25
-        if (fil_dict['N'] != self.N):
-            logger.warn("Bessel orders limited to 25 in scipy")
-            fil_dict['N'] = self.N
+        self.N = fil_dict['N']
 
         self.F_PB  = fil_dict['F_PB'] * 2 # Frequencies are normalized to f_Nyq
         self.F_SB  = fil_dict['F_SB'] * 2
@@ -188,6 +183,17 @@ For scipy 0.18 and higher, more design options have been implemented
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+    def _test_N(self):
+        """
+        Warn the user if the calculated order is too high for a reasonable filter
+        design.
+        """
+        if self.N > 25:
+            #in scipy, Bessel filter order is limited to 25
+            logger.warn("Order N = {0} is too high for Bessel filters, limiting to 25.".format(self.N))
+            self.N = 25
+        return True
+
 
     def _save(self, fil_dict, arg):
         """
@@ -201,9 +207,8 @@ For scipy 0.18 and higher, more design options have been implemented
 
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC
+        fil_dict['N'] = self.N # always save, might have been limited by _test_N
         if str(fil_dict['fo']) == 'min':
-            fil_dict['N'] = self.N
-
             if str(fil_dict['rt']) == 'LP' or str(fil_dict['rt']) == 'HP':
                 fil_dict['F_C'] = self.F_PBC / 2. # HP or LP - single  corner frequency
             else: # BP or BS - two corner frequencies
@@ -213,6 +218,8 @@ For scipy 0.18 and higher, more design options have been implemented
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, self.F_C,
                             btype='low', analog=False, output=self.FRMT))
 
@@ -220,6 +227,8 @@ For scipy 0.18 and higher, more design options have been implemented
     def LPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='low', analog=False, output=self.FRMT))
 
@@ -228,6 +237,8 @@ For scipy 0.18 and higher, more design options have been implemented
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, self.F_C,
                             btype='highpass', analog=False, output=self.FRMT))
 
@@ -235,6 +246,8 @@ For scipy 0.18 and higher, more design options have been implemented
     def HPmin(self, fil_dict):
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='highpass', analog=False, output=self.FRMT))
 
@@ -243,6 +256,8 @@ For scipy 0.18 and higher, more design options have been implemented
     # BP: F_SB[0] < F_PB[0], F_SB[1] > F_PB[1]
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
                             btype='bandpass', analog=False, output=self.FRMT))
 
@@ -251,6 +266,8 @@ For scipy 0.18 and higher, more design options have been implemented
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB, self.A_SB)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='bandpass', analog=False, output=self.FRMT))
 
@@ -260,6 +277,8 @@ For scipy 0.18 and higher, more design options have been implemented
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, [self.F_C,self.F_C2],
                             btype='bandstop', analog=False, output=self.FRMT))
 
@@ -268,6 +287,8 @@ For scipy 0.18 and higher, more design options have been implemented
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.bessel(self.N, self.F_PBC,
                             btype='bandstop', analog=False, output=self.FRMT))
 #------------------------------------------------------------------------------

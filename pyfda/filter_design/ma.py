@@ -41,6 +41,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
+from pyfda.pyfda_qt_lib import qfilter_warning
 
 __version__ = "2.0"
 
@@ -340,6 +341,11 @@ near ``f_S/2`` (highpass).
 
             norm = np.sum(b0)
 
+        if self.delays > 1000:
+            if not qfilter_warning(None, self.delays*self.stages, "Moving Average"):
+                return -1
+
+        
         z0 = np.exp(-2j*np.pi*i/L)            
         # calculate filter for multiple cascaded stages    
         for i in range(self.stages):
