@@ -574,8 +574,8 @@ class FilterCoeffs(QWidget):
     #------------------------------------------------------------------------------
     def _copy_from_table(self):
         """
-        Copy data from coefficient table `self.tblCoeff` to clipboard in CSV format
-        or to file.
+        Copy data from coefficient table `self.tblCoeff` to clipboard / file in
+        CSV format.
         """
         qtable2text(self.tblCoeff, self.ba, self, 'ba', self.myQ.frmt)
 
@@ -586,6 +586,9 @@ class FilterCoeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, 'ba', comment="filter coefficients ")
+        if data_str == -1: # file operation has been aborted
+            return
+
         logger.debug("importing data: dim - shape = {0} - {1} - {2}\n{3}"\
                        .format(type(data_str), np.ndim(data_str), np.shape(data_str), data_str))
 

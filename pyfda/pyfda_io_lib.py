@@ -598,6 +598,8 @@ def import_data(parent, fkey, comment):
         except IOError as e:
             logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             return None
+    else:
+        return -1 # operation cancelled
 #------------------------------------------------------------------------------
 def export_data(parent, data, fkey, comment=""):
     """

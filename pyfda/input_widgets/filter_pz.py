@@ -740,6 +740,8 @@ class FilterPZ(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, 'zpk', comment="poles / zeros ")
+        if data_str == -1: # file operation has been aborted
+            return
         
         conv = self.frmt2cmplx # routine for converting to cartesian coordinates
 
@@ -751,7 +753,7 @@ class FilterPZ(QWidget):
             num_cols = 1
             orientation_horiz = False
         else:
-            logger.error("Data from clipboard is a single value or None.")
+            logger.error("Imported data is a single value or None.")
             return None
         logger.debug("_copy_to_table: c x r:", num_cols, num_rows)
         if orientation_horiz:
