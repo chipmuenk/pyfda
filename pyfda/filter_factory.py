@@ -214,10 +214,10 @@ class FilterFactory(object):
                                     .format(method, type(fil_inst).__name__, e)
                 if "order n is too high" in str(e).lower():
                     self.err_code = 18
-                    err_string += "\nTry relaxing the specifications."
+                    err_string += "Try relaxing the specifications."
                 elif "failure to converge" in str(e).lower():
                     self.err_code = 19
-                    err_string += "\nTry relaxing the specifications."
+                    err_string += "Try relaxing the specifications."
                 else: 
                     self.err_code = 99
 
