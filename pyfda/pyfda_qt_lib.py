@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 from .pyfda_lib import PY3
 
-from .compat import QFrame
+from .compat import QFrame, QMessageBox
 
 #------------------------------------------------------------------------------
 def qstr(text):
@@ -178,7 +178,6 @@ def qhline(widget):
     return line
     
 #------------------------------------------------------------------------------
-
 def qget_selected(table, select_all=False, reverse=True):
     """
     Get selected cells in `table`and return a dictionary with the following keys:
@@ -215,6 +214,23 @@ def qget_selected(table, select_all=False, reverse=True):
     cur = (table.currentColumn(), table.currentRow())
     # cur_idx_row = table.currentIndex().row()
     return {'idx':idx, 'sel':sel, 'cur':cur}# 'rows':rows 'cols':cols, }
+
+#------------------------------------------------------------------------------
+def qfilter_warning(self, N, fil_class):
+    """
+    Pop-up a warning box for very large filter orders
+    """
+    reply = QMessageBox.warning(self, 'Warning',
+        ("<span><i><b>N = {0}</b></i> &nbsp; is a rather high order for<br />"
+         "an {1} filter and may cause large <br />"
+         "numerical errors and compute times.<br />"
+         "Continue?</span>".format(N, fil_class)),
+         QMessageBox.Yes, QMessageBox.No)
+    if reply == QMessageBox.Yes:
+        return True
+    else:
+        return False
+
     
 #==============================================================================
 
