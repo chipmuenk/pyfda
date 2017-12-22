@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 import numpy as np
 
 from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
-                      QVBoxLayout, QHBoxLayout)
+                      QVBoxLayout, QHBoxLayout, QMessageBox)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
@@ -255,10 +255,21 @@ class FilterSpecs(QWidget):
           have been changed by the filter design method
         - the plots are updated via signal-slot connection
         """
-        logger.info("Start filter design using method '{0}.{1}{2}'"\
-                        .format(str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo'])))
+        # issue a user warning when the filter order is high
+        cont = True
+        if fb.fil[0]['ft'] == 'IIR':
+            if fb.fil[0]['N'] > 19 and fb.fil[0]['fo'] == 'man':
+                cont = self.pop_up_warning()
+        elif fb.fil[0]['ft'] == 'FIR' and fb.fil[0]['fo'] == 'man':
+            if fb.fil[0]['N'] > 1000:
+                cont = self.pop_up_warning()
+        if not cont:
+            return
 
         try:
+            logger.info("Start filter design using method '{0}.{1}{2}'"\
+                .format(str(fb.fil[0]['fc']), str(fb.fil[0]['rt']), str(fb.fil[0]['fo'])))
+
             #----------------------------------------------------------------------
             # A globally accessible instance fb.fil_inst of selected filter class fc
             # has been instantiated in InputFilter.set_design_method, now
@@ -306,9 +317,26 @@ class FilterSpecs(QWidget):
                 logger.warning("{0}".format(e))
             self.color_design_button("error")
 
+
     def color_design_button(self, state):
         fb.design_filt_state = state
         qstyle_widget(self.butDesignFilt, state)
+
+
+    def pop_up_warning(self):
+        """
+        Pop-up a warning box for very large filter orders
+        """
+        reply = QMessageBox.warning(self, 'Warning',
+            ("<span><i><b>N = {0}</b></i> is a rather high order for<br />"
+             "an {1} filter and may cause large <br />"
+             "numerical errors and compute times.<br />"
+             "Continue?</span>".format(fb.fil[0]['N'], fb.fil[0]['ft'])),
+             QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            return True
+        else:
+            return False
 
 #------------------------------------------------------------------------------
 
