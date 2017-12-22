@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-Plotting widget |H(f)|
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-Author: Christian Muenker 2015
+"""
+Widget for plotting |H(f)|, frequency specs and the phase
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame
 
 import numpy as np
-import scipy.signal as sig
 from matplotlib.patches import Rectangle
 from matplotlib import rcParams
 #import matplotlib.ticker
@@ -25,7 +29,6 @@ class PlotHf(QWidget):
 #       stop band or pass band should be selectable as well as lin / log scale
 # TODO: position and size of inset plot should be selectable
 # TODO: ax.clear() should not be neccessary for each replot?
-# TODO: Canvas should be grey when disabled
 
     def __init__(self, parent): 
         super(PlotHf, self).__init__(parent)
