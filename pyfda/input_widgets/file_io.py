@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Widget for exporting / importing and saving / loading filter data
-
-Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os, io
@@ -387,13 +392,14 @@ class File_IO(QWidget):
          about_string = info_string + versions_string + dir_string
 
          #msg = QMessageBox.about(self, "About pyFDA", info_string)
-         butClipboard = QPushButton("To Clipboard")
+         butClipboard = QPushButton("To Clipboard", self)
          msg = QMessageBox(self)
          msg.setIconPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(32, Qt.SmoothTransformation))
          msg.addButton(butClipboard, QMessageBox.ActionRole)
          msg.setText(about_string)
          # msg.setInformativeText("This is additional information")
          #msg.setDetailedText(versions_string) # adds a button that opens another textwindow
+         
          msg.setWindowTitle("About pyFDA")
          msg.setStandardButtons(QMessageBox.Ok) # | QMessageBox.Cancel
 
