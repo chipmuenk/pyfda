@@ -5,7 +5,7 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
-# -*- coding: utf-8 -*-
+
 """
 Design Moving-Average-Filters (LP, HP) with fixed order, return
 the filter design in coefficients format ('ba') or as poles/zeros ('zpk')
@@ -14,7 +14,7 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
-Version info:   
+API version info:   
     1.0: initial working release
     1.1: mark private methods as private
     1.2: - new API using fil_save & fil_convert (allow multiple formats, 

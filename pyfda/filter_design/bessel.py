@@ -14,7 +14,7 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling its __init__ method.
 
-Version info:
+API version info:
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
