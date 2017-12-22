@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Widget for displaying infos about filter and filter design method
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-Author: Christian Muenker
+"""
+Widget for displaying infos about filter and filter design method and debugging infos as well
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
@@ -11,7 +16,7 @@ import textwrap
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtGui, QWidget, QLabel, QFont, QCheckBox, QFrame,
+from ..compat import (QtGui, QWidget, QFont, QCheckBox, QFrame,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
                       QVBoxLayout, QHBoxLayout, QSplitter, Qt)
 
