@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Design elliptic Filters (LP, HP, BP, BS) with zero phase in fixed or minimum order,
 return the filter design in zeros, poles, gain (zpk) format
@@ -7,10 +14,8 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling its __init__ method.
 
-Version info:
+API version info:
     2.0: initial working release
-
-Author: Christian Muenker/Nelson
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig

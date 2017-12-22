@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Design ellip-Filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
@@ -7,7 +14,7 @@ Attention:
 This class is re-instantiated dynamically every time the filter design method
 is selected, calling its __init__ method.
 
-Version info:   
+API version info:
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
@@ -20,13 +27,13 @@ Version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-
-Author: Christian Muenker
 """
+
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import ellipord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+
 from .common import Common
 
 __version__ = "2.0"

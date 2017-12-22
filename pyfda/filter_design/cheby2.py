@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Design Chebychev 2 filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) or second-order sections (sos) format.
@@ -7,7 +14,7 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
-Version info:   
+API version info:
     1.0: initial working release
     1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
          - mark private methods as private
@@ -20,8 +27,6 @@ Version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-
-Author: Christian Muenker
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -29,6 +34,7 @@ from scipy.signal import cheb2ord
 from .common import Common 
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.pyfda_qt_lib import qfilter_warning
 
 __version__ = "2.0"
 

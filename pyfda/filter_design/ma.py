@@ -14,7 +14,7 @@ Attention:
 This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
-API version info:   
+API version info:
     1.0: initial working release
     1.1: mark private methods as private
     1.2: - new API using fil_save & fil_convert (allow multiple formats, 
