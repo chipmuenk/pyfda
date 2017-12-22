@@ -33,6 +33,7 @@ from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import ellipord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.pyfda_qt_lib import qfilter_warning
 
 from .common import Common
 
@@ -146,6 +147,16 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+    def _test_N(self):
+        """
+        Warn the user if the calculated order is too high for a reasonable filter
+        design.
+        """
+        if self.N > 25:
+            return qfilter_warning(None, self.N, "Elliptic")
+        else:
+            return True
+
 
     def _save(self, fil_dict, arg):
         """
@@ -180,12 +191,16 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                           analog=self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                             btype='low', analog=self.analog, output=self.FRMT))
                             
     def LPman(self, fil_dict):
         """Elliptic LP filter, manual order"""
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                             btype='low', analog=self.analog, output=self.FRMT))
 
@@ -195,12 +210,16 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                           analog=self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         """Elliptic HP filter, manual order"""
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PB,
                         btype='highpass', analog=self.analog, output=self.FRMT))
 
@@ -212,12 +231,16 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self._get_params(fil_dict)
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog=self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='bandpass', analog=self.analog, output=self.FRMT))
                             
     def BPman(self, fil_dict):
         """Elliptic BP filter, manual order"""
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, 
             [self.F_PB,self.F_PB2], btype='bandpass', analog=self.analog, 
                                                                 output=self.FRMT))
@@ -229,12 +252,16 @@ critical passband frequency :math:`F_C` from pass and stop band specifications.
         self.N, self.F_PBC = ellipord([self.F_PB, self.F_PB2],
                                 [self.F_SB, self.F_SB2], self.A_PB,self.A_SB,
                                                         analog=self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, self.F_PBC,
                         btype='bandstop', analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         """Elliptic BS filter, manual order"""
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.ellip(self.N, self.A_PB, self.A_SB, 
             [self.F_PB,self.F_PB2], btype='bandstop', analog=self.analog, 
                                                                 output=self.FRMT))
