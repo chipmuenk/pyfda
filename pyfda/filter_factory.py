@@ -141,16 +141,16 @@ class FilterFactory(object):
         Instantiate the filter design class passed  as string `fc` with the 
         globally accessible handle `fil_inst`. If `fc = None`, use the previously
         instantiated filter design class. 
-        
+
         Next, call the method passed as string `method` of the instantiated
         filter design class.
-    
+
         Parameters
         ----------
-        
+
         method : string
             The name of the design method to be called (e.g. 'LPmin')
-            
+
         fil_dict : dictionary
             A dictionary with all the filter specs that is passed to the actual
             filter design routine. This is usually a copy of fb.fil[0]
@@ -159,31 +159,35 @@ class FilterFactory(object):
         fc : string (optional, default: None)
             The name of the filter design class to be instantiated. When nothing
             is specified, the last filter selection is used.
-    
+
         Returns
         -------
         
         err_code : integer
+             :-1: filter design operation has been cancelled by user
+
              :00: filter design method exists and is callable
-             
+
              :16: passed method name is not a string
-             
+
              :17: filter design method does not exist in class
-             
-             :18: filter design method is not callable
-             
-        
+
+             :18: filter design error containing "order is too high"
+
+             :19: filter design error containing "failure to converge"
+
+             :99: unknown error
+
         Example
         -------
-            
+
         >>> call_fil_method("LPmin", fc = "cheby1")(fil[0])
-        
+
         The example first creates an instance of the filter class 'cheby1' and 
         then performs the actual filter design by calling the method 'LPmin',
         passing the global filter dictionary fil[0] as the parameter.
-    
         """                
-        if self.err_code >= 16:
+        if self.err_code >= 16 or self.err_code < 0:
             self.err_code = 0 #  # clear previous method call error
             err_string = ""
 
@@ -205,13 +209,16 @@ class FilterFactory(object):
             self.err_code = 17
  
         else: # everything ok so far, try calling method with the filter dict as argument
+              # err_code = -1 means "operation cancelled"
             try:
                 #------------------------------------------------------------------
-                getattr(fil_inst, method)(fil_dict)
+                self.err_code = getattr(fil_inst, method)(fil_dict)
                 #------------------------------------------------------------------
             except Exception as e:
                 err_string = "Method '{0}' of class '{1}':\n{2}"\
                                     .format(method, type(fil_inst).__name__, e)
+                if e:
+                    err_string += "\n" # add line break to error message
                 if "order n is too high" in str(e).lower():
                     self.err_code = 18
                     err_string += "Try relaxing the specifications."
@@ -221,7 +228,9 @@ class FilterFactory(object):
                 else: 
                     self.err_code = 99
 
-        if self.err_code > 0:
+        if self.err_code is None:
+            self.err_code = 0
+        elif self.err_code > 0:
                 logger.error("ErrCode {0}: {1}".format(self.err_code, err_string))
 
         return self.err_code
