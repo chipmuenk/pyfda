@@ -57,7 +57,8 @@ class XStream(QtCore.QObject):
     mapping = [ ('[  DEBUG]','<b>[  DEBUG]</b>'),
                 ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
                 ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
-                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')]
+                ('[  ERROR]','<b style="color:red">[  ERROR]</b>'),
+                ('\n','<br />')]
 
     def flush( self ):
         pass
