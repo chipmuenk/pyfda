@@ -34,6 +34,7 @@ import scipy.signal as sig
 from scipy.signal import buttord
 
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.pyfda_qt_lib import qfilter_warning
 
 __version__ = "2.0"
 
@@ -178,6 +179,16 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+    def _test_N(self):
+        """
+        Warn the user if the calculated order is too high for a reasonable filter
+        design.
+        """
+        if self.N > 25:
+            return qfilter_warning(None, self.N, "Butterworth")
+        else:
+            return True
+
 
     def _save(self, fil_dict, arg):
         """
@@ -214,11 +225,15 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                      analog = self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='low',
                                        analog=self.analog, output=self.FRMT))
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, self.F_C,
                             btype='low', analog=self.analog, output=self.FRMT))
 
@@ -227,11 +242,15 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord(self.F_PB,self.F_SB, self.A_PB,self.A_SB,
                                                          analog = self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='highpass',
                                       analog=self.analog, output=self.FRMT))
 
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, self.F_PB, btype='highpass',
                                       analog=self.analog, output=self.FRMT))
 
@@ -243,11 +262,15 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB, self.A_SB, analog = self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='bandpass',
                                        analog=self.analog, output=self.FRMT))
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, [self.F_C,self.F_C2],
                     btype='bandpass', analog=self.analog, output=self.FRMT))
 
@@ -256,11 +279,15 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         self._get_params(fil_dict)
         self.N, self.F_PBC = buttord([self.F_PB, self.F_PB2],
             [self.F_SB, self.F_SB2], self.A_PB,self.A_SB, analog = self.analog)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, self.F_PBC, btype='bandstop',
                                        analog=self.analog, output=self.FRMT))
 
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.butter(self.N, [self.F_C,self.F_C2],
                         btype='bandstop', analog=self.analog, output=self.FRMT))
 
