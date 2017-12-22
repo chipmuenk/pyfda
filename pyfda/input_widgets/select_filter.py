@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-select_filter.py
----------------
 Subwidget for selecting the filter, consisting of combo boxes for:
 - Response Type (LP, HP, Hilbert, ...)
 - Filter Type (IIR, FIR, CIC ...)
 - Filter Class (Butterworth, ...)
-
-@author: Julia Beike, Christian Münker, Michael Winkler 2014 - 2016
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
