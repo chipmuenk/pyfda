@@ -39,6 +39,7 @@ import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 from pyfda.pyfda_lib import fil_save, remezord, round_odd, safe_eval
+from pyfda.pyfda_qt_lib import qfilter_warning
 from .common import Common
 
 
@@ -316,6 +317,17 @@ class Firwin(QWidget):
 #        self.alg = 'ichige' # algorithm for determining the minimum order
 #        self.alg = self.cmb_firwin_alg.currentText()
 
+    def _test_N(self):
+        """
+        Warn the user if the calculated order is too high for a reasonable filter
+        design.
+        """
+        if self.N > 1000:
+            return qfilter_warning(self, self.N, "FirWin")
+        else:
+            return True
+
+
     def _save(self, fil_dict, arg):
         """
         Convert between poles / zeros / gain, filter coefficients (polynomes)
@@ -361,12 +373,16 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         self.N = self._firwin_ord([self.F_PB, self.F_SB], [1, 0],
                                  [self.A_PB, self.A_SB], alg = self.alg)
+        if not self._test_N():
+            return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                                        window = self.firWindow, nyq = 0.5))
 
     def LPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'],
                                        window = self.firWindow, nyq = 0.5))
 
@@ -375,6 +391,8 @@ class Firwin(QWidget):
         N = self._firwin_ord([self.F_SB, self.F_PB], [0, 1],
                             [self.A_SB, self.A_PB], alg = self.alg)
         self.N = round_odd(N)  # enforce odd order
+        if not self._test_N():
+            return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
                     window = self.firWindow, pass_zero=False, nyq = 0.5))
@@ -382,6 +400,8 @@ class Firwin(QWidget):
     def HPman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.firwin(self.N, fil_dict['F_C'], 
             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
@@ -391,6 +411,8 @@ class Firwin(QWidget):
         self._get_params(fil_dict)
         self.N = remezord([self.F_SB, self.F_PB, self.F_PB2, self.F_SB2], [0, 1, 0],
             [self.A_SB, self.A_PB, self.A_SB2], Hz = 1, alg = self.alg)[0]
+        if not self._test_N():
+            return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
@@ -398,6 +420,8 @@ class Firwin(QWidget):
 
     def BPman(self, fil_dict):
         self._get_params(fil_dict)
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=False, nyq = 0.5))
 
@@ -406,6 +430,8 @@ class Firwin(QWidget):
         N = remezord([self.F_PB, self.F_SB, self.F_SB2, self.F_PB2], [1, 0, 1],
             [self.A_PB, self.A_SB, self.A_PB2], Hz = 1, alg = self.alg)[0]
         self.N = round_odd(N)  # enforce odd order
+        if not self._test_N():
+            return -1
         fil_dict['F_C'] = (self.F_SB + self.F_PB)/2 # use average of calculated F_PB and F_SB
         fil_dict['F_C2'] = (self.F_SB2 + self.F_PB2)/2 # use average of calculated F_PB and F_SB
         self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
@@ -414,6 +440,8 @@ class Firwin(QWidget):
     def BSman(self, fil_dict):
         self._get_params(fil_dict)
         self.N = round_odd(self.N)  # enforce odd order
+        if not self._test_N():
+            return -1
         self._save(fil_dict, sig.firwin(self.N, [fil_dict['F_C'], fil_dict['F_C2']],
                             window = self.firWindow, pass_zero=True, nyq = 0.5))
 
