@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
 Widget for plotting poles and zeros
-
-Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout
+from ..compat import QWidget, QHBoxLayout
 
 
 import numpy as np
@@ -18,9 +23,9 @@ from pyfda.pyfda_rc import params
 
 from pyfda.pyfda_lib import unique_roots
 
-from pyfda.plot_widgets.plot_utils import MplWidget#, MplCanvas
+from pyfda.plot_widgets.plot_utils import MplWidget
 
-from  matplotlib import patches # TODO: should not be imported here?!
+from  matplotlib import patches
 
 
 class PlotPZ(QWidget):
@@ -208,7 +213,7 @@ class PlotPZ(QWidget):
         """
         # TODO:
         # - polar option
-        # - add keywords for size, color etc. of markers and circle -> **kwargs
+        # - add keywords for color of circle -> **kwargs
         # - add option for multi-dimensional arrays and zpk data
     
         # make sure that all inputs are arrays
@@ -290,9 +295,6 @@ class PlotPZ(QWidget):
         # Plot the zeros
         ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker = 'o',
                    facecolor = 'none', edgecolor = mzc, lw = lw, label=zlabel)
-    #        t1 = plt.plot(z.real, z.imag, 'go', ms=10, label=label)
-    #        plt.setp( t1, markersize=mzs, markeredgewidth=2.0,
-    #                  markeredgecolor=mzc, markerfacecolor='none')
         # Plot the poles
         ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker='x',
                    color=mpc, lw=lw, label=plabel)
