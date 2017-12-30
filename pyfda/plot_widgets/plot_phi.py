@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 """
 Widget for plotting phase frequency response phi(f)
-
-Author: Christian Muenker 2015
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame
-
 
 import numpy as np
 
