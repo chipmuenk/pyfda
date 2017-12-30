@@ -41,15 +41,6 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_qt_lib import qfilter_warning
 from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even, safe_eval
 
-
-# TODO: min order for Hilbert & Differentiator
-# TODO: implement check-box for auto grid_density, using (lgrid*N)/(2*bw)
-# TODO: fails (just as Matlab does) when manual order is too LARGE, remez would
-#       need an update, see: Emmanouil Z. Psarakis and George V. Moustakides,
-#         "A Robust Initialization Scheme for the Remez Exchange Algorithm",
-#           IEEE SIGNAL PROCESSING LETTERS, VOL. 10, NO. 1, JANUARY 2003  
-
-
 __version__ = "2.0"
 
 filter_classes = {'Equiripple':'Equiripple'}
