@@ -20,7 +20,6 @@ import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-
 from pyfda.pyfda_lib import unique_roots
 
 from pyfda.plot_widgets.plot_utils import MplWidget
@@ -303,12 +302,14 @@ class PlotPZ(QWidget):
         for i in range(len(z)):
             logger.debug('z: {0} | {1} | {2}'.format(i, z[i], num_z[i]))
             if num_z[i] > 1:
-                ax.text(np.real(z[i]), np.imag(z[i]),'  (' + str(num_z[i]) +')',va = 'bottom')
+                ax.text(np.real(z[i]), np.imag(z[i]),'  (' + str(num_z[i]) +')',
+                                va = 'top', color=mzc)
     
         for i in range(len(p)):
             logger.debug('p:{0} | {1} | {2}'.format(i, p[i], num_p[i]))
             if num_p[i] > 1:
-                ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',va = 'bottom')
+                ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',
+                                va = 'bottom', color=mpc)
     
             # increase distance between ticks and labels
             # to give some room for poles and zeros
