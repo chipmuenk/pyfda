@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Widget for entering frequency specifications
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-Author: Christian Münker
+"""
+Subwidget for entering frequency specifications
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
