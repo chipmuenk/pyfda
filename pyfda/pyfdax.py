@@ -54,11 +54,12 @@ class XStream(QtCore.QObject):
     _stdout = None
     messageWritten = QtCore.pyqtSignal(str) # pass str to slot
     # mappings text -> HTML formatted logging messages
-    mapping = [ ('[  DEBUG]','<b>[  DEBUG]</b>'),
+    mapping = [ ('<','&lt;'), ('>','&gt;'), ('\n','<br />'),
+                ('[  DEBUG]','<b>[  DEBUG]</b>'),
                 ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
                 ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
-                ('[  ERROR]','<b style="color:red">[  ERROR]</b>'),
-                ('\n','<br />')]
+                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
+              ]
 
     def flush( self ):
         pass
