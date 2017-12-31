@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+
 """
-Created on Tue Nov 26 10:57:30 2013
-
-@author: Christian Muenker
-
-Tab-Widget for displaying and modifying filter Poles and Zeros
+Widget for displaying and modifying filter Poles and Zeros
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
@@ -31,12 +34,6 @@ from pyfda.pyfda_rc import params
 
 from .filter_pz_ui import FilterPZ_UI
 
-# TODO: sort P/Z depending on frequency, magnitude, real or imag. part
-# TODO: store / load gain (k) from / to clipboard
-
-# TODO: Option for mirroring P/Z (w/ and without copying) at the UC or the x-axis
-# TODO: Option for limiting P/Z to a selectable magnitude
-# TODO: display SOS graphically
 
 class ItemDelegate(QStyledItemDelegate):
     """
