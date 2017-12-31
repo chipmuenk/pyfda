@@ -199,7 +199,11 @@ class WeightSpecs(QWidget):
         """
         if self.spec_edited:
             w_label = str(widget.objectName())
-            w_value = safe_eval(widget.text(), fb.data_old)
+            w_value = safe_eval(widget.text(), fb.data_old, sign='pos')
+            if w_value < 1:
+                w_value = 1
+            if w_value > 1.e6:
+                w_value = 1.e6
             fb.fil[0].update({w_label:w_value})
             self.sigSpecsChanged.emit() # -> filter_specs
             self.spec_edited = False # reset flag
