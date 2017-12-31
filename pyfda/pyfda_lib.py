@@ -318,7 +318,6 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
 
     # check limits to avoid errors during filter design
     if "PB" in amp_label: # passband
-        print("pb")
         if lin_value < MIN_PB_AMP:
             lin_value = MIN_PB_AMP
             msg += "too small, "
