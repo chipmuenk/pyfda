@@ -20,7 +20,7 @@ from ..compat import (QtCore, Qt,
                       pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, safe_eval
+from pyfda.pyfda_lib import rt_label, safe_eval, unique_roots
 from pyfda.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -286,22 +286,28 @@ class FreqSpecs(QWidget):
         if fb.fil[0]['freq_specs_sort']:
             f_specs.sort()
 
-        # Make sure freqs are in range and self correct
-        # cannot design filters with negative freqs, so Zero is minFreq
-        # f_specs have been converted to Fs freqs [0:0.5], so test against that
-        val_changed = False
+        # Make sure normalized freqs are in the range ]0, 0.5[ and are different
+        # by at least MIN_FREQ_STEP
         for i in range(self.n_cur_labels):
-            # test against dict range values
             if f_specs[i] <= MIN_FREQ:
+                logger.warning("Frequencies must be > 0, changed {0} from {1:.4g} to {2:.4g}."\
+                               .format(str(self.qlineedit[i].objectName()),f_specs[i]*fb.fil[0]['f_S'],
+                                       (MIN_FREQ + MIN_FREQ_STEP)*fb.fil[0]['f_S']))
                 f_specs[i] = MIN_FREQ + MIN_FREQ_STEP
-                val_changed = True
             if f_specs[i] >= MAX_FREQ:
+                logger.warning("Frequencies must be < f_S/2, changed {0} from {1:.4g} to {2:.4g}."\
+                               .format(str(self.qlineedit[i].objectName()),f_specs[i]*fb.fil[0]['f_S'],
+                                       (MAX_FREQ - MIN_FREQ_STEP)*fb.fil[0]['f_S']))
                 f_specs[i] = MAX_FREQ - MIN_FREQ_STEP
-                val_changed = True
 
             fb.fil[0][str(self.qlineedit[i].objectName())] = f_specs[i]
-
-        if val_changed: logger.warning("We changed a Frequency Spec to be reasonable")
+            
+        # check for (nearly) identical elements:
+        _, mult = unique_roots(f_specs, tol = MIN_FREQ_STEP)
+        ident = [x for x in mult if x > 1]
+        if ident:
+            logger.warning("Frequencies must differ by at least {0:.4g}"\
+                           .format(MIN_FREQ_STEP * fb.fil[0]['f_S']))
 
         self.load_dict()
 
