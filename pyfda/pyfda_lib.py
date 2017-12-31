@@ -123,7 +123,7 @@ SOS_AVAIL = cmp_version("scipy", "0.16") >= 0 # True when installed version = 0.
 # (Linear values)
 MIN_PB_AMP  = 1e-5  # min pass band ripple
 MAX_IPB_AMP = 0.85  # max pass band ripple IIR
-MAX_FPB_AMP = 0.65  # max pass band ripple FIR
+MAX_FPB_AMP = 0.5  # max pass band ripple FIR
 MIN_SB_AMP  = 1e-6  # max stop band attenuation
 MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
 MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
@@ -292,52 +292,63 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
 
     Returns the result as a float.
     """
-    val_changed = False # flag for changed values
+    msg = "" # string for error message
     if np.iscomplex(unit_value) or unit_value < 0:
         unit_value = abs(unit_value)
-        val_changed = True
+        msg = "negative or complex, "
 
     if unit == 'dB':
-        if "PB" in amp_label: # passband
-            if filt_type == 'IIR':
-                lin_value = 1. - 10.**(-unit_value / 20.)
-            else:
-                lin_value = (10.**(unit_value / 20.) - 1) / (10.**(unit_value / 20.) + 1)
+        try:
+            if "PB" in amp_label: # passband
+                if filt_type == 'IIR':
+                    lin_value = 1. - 10.**(-unit_value / 20.)
+                else:
+                    lin_value = (10.**(unit_value / 20.) - 1) / (10.**(unit_value / 20.) + 1)
+            else: # stopband
+                lin_value = 10.**(-unit_value / 20)
 
-        else: # stopband
-            lin_value = 10.**(-unit_value / 20)
+        except OverflowError as e:
+            logger.warning(e)
+            lin_value = 10 # definitely too large, will be limited in next section
+
     elif unit == 'W':
         lin_value = np.sqrt(unit_value)
     else:
         lin_value = unit_value
 
-    # Add limits to avoid errors
+    # check limits to avoid errors during filter design
     if "PB" in amp_label: # passband
+        print("pb")
         if lin_value < MIN_PB_AMP:
             lin_value = MIN_PB_AMP
-            val_changed = True
+            msg += "too small, "
         if filt_type == 'IIR':
             if lin_value > MAX_IPB_AMP:
                 lin_value = MAX_IPB_AMP
-                val_changed = True
+                msg += "too large, "
         elif filt_type == 'FIR':
             if lin_value > MAX_FPB_AMP:
                 lin_value = MAX_FPB_AMP
-                val_changed = True
+                msg += "too large, "
+
     else: # stopband
         if lin_value < MIN_SB_AMP:
             lin_value = MIN_SB_AMP
-            val_changed = True
+            msg += "too small, "
         if filt_type == 'IIR':
             if lin_value > MAX_ISB_AMP:
                 lin_value = MAX_ISB_AMP
-                val_changed = True
+                msg += "too large, "
         elif filt_type == 'FIR':
             if lin_value > MAX_FSB_AMP:
                 lin_value = MAX_FSB_AMP
-                val_changed = True
+                msg += "too large, "
 
-    if val_changed: logger.warning("We changed an Amplitude Spec to be reasonable")
+    if msg:
+        logger.warning("Amplitude spec for {0} is ".format(amp_label) + msg + "using {0:.4g} {1} instead."\
+                       .format(lin2unit(lin_value, filt_type=filt_type, amp_label=amp_label,unit=unit),
+                               unit))
+
     return lin_value
 
 
