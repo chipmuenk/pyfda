@@ -92,7 +92,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                 "<span>Enter desired filter order <b><i>N</i></b>, corner "
                                 "frequencies of pass and stop band(s), <b><i>F<sub>PB</sub></i></b>"
                                 "&nbsp; and <b><i>F<sub>SB</sub></i></b>&nbsp;, and relative weight "
-                                "values <b><i>W&nbsp; </i></b> (1 ... 10<sup>6</sup>) to specifiy how well "
+                                "values <b><i>W&nbsp; </i></b> (1 ... 10<sup>6</sup>) to specify how well "
                                 "the bands are approximated.</span>")
                             },
                     'min': {'fo':('d', 'N'),
