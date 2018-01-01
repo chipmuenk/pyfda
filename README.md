@@ -12,10 +12,9 @@ pyFDA
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.
 
-**Screenshot from the current version:**
 ![Screenshot](images/pyFDA_screenshot_3.PNG)
 
-### Prerequisites
+## Prerequisites
 * Python versions: **2.7** or **3.3 ... 3.6**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
@@ -39,7 +38,9 @@ Optional libraries:
         <td><img src = "images/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
     </tr>
 </table>
+
 ## Release History / Roadmap
+
 ### Release 0.1 (Jan. 1st 2017)
 
 Initial release 
