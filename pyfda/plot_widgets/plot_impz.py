@@ -276,7 +276,7 @@ class PlotImpz(QWidget):
         self.ledFreq.setVisible(periodic_sig)
         self.lblFreqUnit.setVisible(periodic_sig)
 
-        self.lblFreqUnit.setText(to_html(fb.fil[0]['freq_specs_unit'], frmt='b'))
+        self.lblFreqUnit.setText(to_html(fb.fil[0]['freq_specs_unit']))
         self.load_dict()
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
