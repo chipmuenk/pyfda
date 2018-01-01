@@ -26,7 +26,9 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
         <td><img src = "images/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
     </tr>
 </table>
+
 ## Prerequisites
+
 * Python versions: **2.7** or **3.3 ... 3.6**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
