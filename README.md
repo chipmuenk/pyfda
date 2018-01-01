@@ -119,7 +119,7 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 **More screenshots from the current version:**
 <table>
     <tr>
-        <td><img src = "images/pyFDA_screenshot_3d_2.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyFDA_screenshot_3d_4.PNG" alt="Screenshot" width=300px></td>
         <td><img src = "images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>        
    </tr>
     <tr>
@@ -128,11 +128,10 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
     </tr>
 </table>
 
-### Release 0.1
+## Release History / Roadmap
+### Release 0.1 (Jan. 1st 2017)
 
-The following features are still missing for the first release. 
-* Fixpoint representations with radix point are not always scaled correctly
-* log and configuration files are installed in read-only directories on non-Windows systems
+Initial release 
 
 ### Release 0.2
 * **HDL synthesis**
