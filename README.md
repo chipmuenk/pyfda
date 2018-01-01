@@ -43,23 +43,30 @@ Optional libraries:
 
 ## Release History / Roadmap
 
-### Release 0.1 (Jan. 1st 2017)
+### Release 0.1 (Jan. 1st 2018)
 
 Initial release 
 
-### Release 0.2
+### Release 0.2 (planned for Aug. 2018)
+
+* **Rework of signal-slot connections**
+    * Clearer structure: only one RX / TX signal connection per widget
+    * More flexibility: transport dicts or lists via the signals
 * **HDL synthesis**
     * Use a templating engine or myHDL to generate synthesizable VHDL / Verilog netlists for basic filter topologies
     * Fixpoint simulation results in pyFDA widgets
-* **Filter coefficients and poles / zeros**
-  * Display and edit second-order sections (SOS) in PZ editor
 * **Didactic improvements**
   * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
   * Apply filter on audio files (in the h[n] widget) to hear the filtering effect
+* **Documentation using Sphinx / ReadTheDocs**
+
+### Release 0.3 (planned for end of 2018)
+
 * **Filter Manager**
   * Store multiple designs in one filter dict
   * Compare multiple designs in plots
-* **Documentation using Sphinx / ReadTheDocs**
+* **Filter coefficients and poles / zeros**
+  * Display and edit second-order sections (SOS) in PZ editor
 
 ### Following releases
 * Add a tracking cursor
