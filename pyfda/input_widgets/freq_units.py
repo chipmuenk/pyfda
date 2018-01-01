@@ -21,7 +21,7 @@ from ..compat import (QtCore,
 
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, safe_eval
+from pyfda.pyfda_lib import to_html, safe_eval
 from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -67,7 +67,7 @@ class FreqUnits(QWidget):
         self.ledF_S.installEventFilter(self)  # filter events
 
         self.lblF_S = QLabel(self)
-        self.lblF_S.setText(rt_label("f_S"))
+        self.lblF_S.setText(to_html("f_S", frmt='b'))
 
         self.cmbUnits = QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")

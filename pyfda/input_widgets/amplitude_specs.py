@@ -15,7 +15,7 @@ from ..compat import (QtCore, Qt, QEvent, pyqtSignal,
                       QVBoxLayout, QHBoxLayout, QGridLayout)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, lin2unit, unit2lin, safe_eval
+from pyfda.pyfda_lib import to_html, lin2unit, unit2lin, safe_eval
 from pyfda.pyfda_qt_lib import qstyle_widget, qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -179,7 +179,7 @@ class AmplitudeSpecs(QWidget):
         tool_tipp_sb = "Min. attenuation resp. maximum level in (this) stop band"
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
-            self.qlabels[i].setText(rt_label(new_labels[i]))
+            self.qlabels[i].setText(to_html(new_labels[i], frmt='b'))
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
@@ -278,7 +278,7 @@ class AmplitudeSpecs(QWidget):
         if num_tot_labels < num_new_labels: # new widgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
                 self.qlabels.append(QLabel(self))
-                self.qlabels[i].setText(rt_label("dummy"))
+                self.qlabels[i].setText(to_html("dummy", frmt='b'))
     
                 self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")

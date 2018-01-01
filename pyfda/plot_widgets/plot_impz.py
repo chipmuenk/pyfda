@@ -20,7 +20,7 @@ import numpy as np
 import scipy.signal as sig
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import expand_lim, rt_label, safe_eval
+from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.plot_utils import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -276,7 +276,7 @@ class PlotImpz(QWidget):
         self.ledFreq.setVisible(periodic_sig)
         self.lblFreqUnit.setVisible(periodic_sig)
 
-        self.lblFreqUnit.setText(rt_label(fb.fil[0]['freq_specs_unit']))
+        self.lblFreqUnit.setText(to_html(fb.fil[0]['freq_specs_unit'], frmt='b'))
         self.load_dict()
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])

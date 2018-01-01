@@ -11,6 +11,7 @@ Library with various general functions and variables needed by the pyfda routine
 """
 
 from __future__ import division, print_function
+import os, re
 import os
 import sys, time
 import struct
@@ -1499,39 +1500,70 @@ def remlplen_ichige(fp,fs,dp,ds):
 
     return int(N4)
 
-#-------------------------------------------------------------
-def rt_label(label, it = True):
+
+#------------------------------------------------------------------------------
+def to_html(text, frmt=None):
     """
-    Rich text label: Format label with italic + bold HTML tags and
+    Convert text to HTML format
+    Format label with italic + bold HTML tags and
      replace '_' by HTML subscript tags
 
-     Parameters
-     ----------
+    Parameters
+    ----------
 
-    label : string
-        Name for the label to be converted, containing '_' for subscripts
+    text : string
+        Text to be converted
+
+    frmt: string
+        'b' : bold text
+        'i' : italic text
+        'bi' or 'ib' : bold and italic text
 
     Returns
     -------
 
-    html_label : string
-        HTML - formatted label
+    html : string
+        HTML - formatted text
 
     Examples
     --------
 
-        >>> rt_label("F_SB")
+        >>> to_html("F_SB", frmt='b')
         <b><i>F<sub>SB</sub></i></b>
-
     """
-    if "_" in label:
-        label = label.replace('_', '<sub>')
-        label += "</sub>"
-    if it:
-        html_label = "<b><i>"+label+"</i></b>"
-    else:
-        html_label = "<b>"+label+"</b>"
-    return html_label
+    # see https://danielfett.de/de/tutorials/tutorial-regulare-ausdrucke/
+    # arguments for regex replacement with illegal characters
+    # [a-dA-D] list of characters
+    # [123][abc] test for e.g. '2c'
+    # ^ means "not", | means "or" and \ escapes
+    #   '.' means any character, 
+    # '+' means once or more, '?' means zero or once, '*' means zero or more
+    #   '[^a]' means except for 'a'
+    # () defines a group that can be referenced by \1, \2, ...
+    #
+    # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
+    # '(' must be escaped as '\('
+    
+    # mappings text -> HTML formatted logging messages
+    mapping = [ ('<','&lt;'), ('>','&gt;'), ('\n','<br />'),
+                ('[  DEBUG]','<b>[  DEBUG]</b>'),
+                ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
+                ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
+                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
+              ]
+
+    for k, v in mapping:
+         text = text.replace(k, v)
+
+    if frmt in {'i', 'bi', 'ib'}:
+        text = "<i>" + text + "</i>"
+    if frmt in {'b', 'bi', 'ib'}:
+        text = "<b>" + text + "</b>"
+
+    # replace e.g. A_SB by <i>A<sub>SB</sub></i>:
+    html = re.sub(r'([fAFW])_([a-zA-Z0-9]+)', r'<i>\1<sub>\2</sub></i>', text)  
+
+    return html
 
 #------------------------------------------------------------------------------
 

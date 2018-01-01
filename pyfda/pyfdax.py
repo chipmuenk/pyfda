@@ -32,6 +32,8 @@ except ImportError:
 from .compat import (QtCore, QMainWindow, QApplication, QFontMetrics, QSizePolicy,
                      QSplitter, QIcon, QMessageBox, QWidget, QHBoxLayout, QPlainTextEdit)
 
+from pyfda.pyfda_lib import to_html
+
 #========================= Setup the loggers ==================================
 class DynFileHandler(logging.FileHandler):
     """
@@ -53,13 +55,6 @@ class XStream(QtCore.QObject):
     """
     _stdout = None
     messageWritten = QtCore.pyqtSignal(str) # pass str to slot
-    # mappings text -> HTML formatted logging messages
-    mapping = [ ('<','&lt;'), ('>','&gt;'), ('\n','<br />'),
-                ('[  DEBUG]','<b>[  DEBUG]</b>'),
-                ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
-                ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
-                ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
-              ]
 
     def flush( self ):
         pass
@@ -67,16 +62,15 @@ class XStream(QtCore.QObject):
     def fileno( self ):
         return -1
 
-    def write( self, msg ):
-        if ( not self.signalsBlocked() ):
-            for k, v in XStream.mapping:
-                msg = msg.replace(k, v)
+    def write(self, msg):
+        if not self.signalsBlocked():
+            msg = to_html(msg)
 
             self.messageWritten.emit(msg)
 
     @staticmethod
     def stdout():
-        if ( not XStream._stdout ):
+        if not XStream._stdout:
             XStream._stdout = XStream()
             sys.stdout = XStream._stdout
         return XStream._stdout

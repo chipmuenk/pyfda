@@ -20,7 +20,7 @@ from ..compat import (QtCore, Qt,
                       pyqtSignal, QEvent)
 
 import pyfda.filterbroker as fb
-from pyfda.pyfda_lib import rt_label, safe_eval, unique_roots
+from pyfda.pyfda_lib import to_html, safe_eval, unique_roots
 from pyfda.pyfda_qt_lib import qstyle_widget
 from pyfda.pyfda_rc import params  # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -62,7 +62,7 @@ class FreqSpecs(QWidget):
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
         self.lblUnit = QLabel(self)
-        self.lblUnit.setText("in " + rt_label(fb.fil[0]['freq_specs_unit']))
+        self.lblUnit.setText("in " + to_html(fb.fil[0]['freq_specs_unit'], frmt='b'))
 
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
@@ -166,7 +166,7 @@ class FreqSpecs(QWidget):
         state = new_labels[0]
         new_labels = new_labels[1:]
             
-        self.lblUnit.setText(" in " + rt_label(fb.fil[0]['freq_specs_unit']))
+        self.lblUnit.setText(" in " + to_html(fb.fil[0]['freq_specs_unit'], frmt='b'))
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
@@ -180,7 +180,7 @@ class FreqSpecs(QWidget):
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
-            self.qlabels[i].setText(rt_label(new_labels[i]))
+            self.qlabels[i].setText(to_html(new_labels[i], frmt='b'))
             
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
@@ -257,7 +257,7 @@ class FreqSpecs(QWidget):
         else: # new subwidgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
                 self.qlabels.append(QLabel(self))
-                self.qlabels[i].setText(rt_label("dummy"))
+                self.qlabels[i].setText(to_html("dummy", frmt='b'))
     
                 self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")
@@ -295,7 +295,7 @@ class FreqSpecs(QWidget):
                                        (MIN_FREQ + MIN_FREQ_STEP)*fb.fil[0]['f_S']))
                 f_specs[i] = MIN_FREQ + MIN_FREQ_STEP
             if f_specs[i] >= MAX_FREQ:
-                logger.warning("Frequencies must be < f_S/2, changed {0} from {1:.4g} to {2:.4g}."\
+                logger.warning("Frequencies must be < f_S /2, changed {0} from {1:.4g} to {2:.4g}."\
                                .format(str(self.qlineedit[i].objectName()),f_specs[i]*fb.fil[0]['f_S'],
                                        (MAX_FREQ - MIN_FREQ_STEP)*fb.fil[0]['f_S']))
                 f_specs[i] = MAX_FREQ - MIN_FREQ_STEP

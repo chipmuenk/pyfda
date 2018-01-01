@@ -19,7 +19,7 @@ from ..compat import (pyqtSignal, Qt, QWidget, QLabel, QLineEdit, QComboBox, QPu
 
 from pyfda.pyfda_qt_lib import qset_cmb_box
 from pyfda.pyfda_io_lib import CSV_option_box
-from pyfda.pyfda_lib import rt_label
+from pyfda.pyfda_lib import to_html
 from pyfda.pyfda_rc import params
 
 class FilterPZ_UI(QWidget):
@@ -105,13 +105,13 @@ class FilterPZ_UI(QWidget):
         # ---------------------------------------------
         # UI Elements for setting the gain
         # ---------------------------------------------
-        self.lblNorm = QLabel(rt_label("Normalize"), self)
+        self.lblNorm = QLabel(to_html("Normalize:", frmt='bi'), self)
         self.cmbNorm = QComboBox(self)
         self.cmbNorm.addItems(["None", "1", "Max"])
         self.cmbNorm.setToolTip("<span>Set the gain <i>k</i> so that H(f)<sub>max</sub> is "
                                 "either 1 or the max. of the previous system.</span>")
 
-        self.lblGain = QLabel(rt_label("k = "), self)
+        self.lblGain = QLabel(to_html("k =", frmt='bi'), self)
         self.ledGain = QLineEdit(self)
         self.ledGain.setToolTip("<span>Specify gain factor <i>k</i>"
                                 " (only possible for Normalize = 'None').</span>")
