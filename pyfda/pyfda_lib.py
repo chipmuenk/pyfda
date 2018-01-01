@@ -12,7 +12,6 @@ Library with various general functions and variables needed by the pyfda routine
 
 from __future__ import division, print_function
 import os, re
-import os
 import sys, time
 import struct
 import logging
@@ -309,7 +308,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
                 lin_value = 10.**(-unit_value / 20)
 
         except OverflowError as e:
-            logger.warning(e)
+            msg += "way "
             lin_value = 10 # definitely too large, will be limited in next section
 
     elif unit == 'W':
