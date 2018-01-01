@@ -216,7 +216,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
             except (se.InvalidExpression, se.FunctionNotDefined, Exception, 
                     SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
 
-                    logger.error(fallback + 'save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
+                    logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
 
         if result is not None:
             break # break out of for loop when evaluation has succeeded
