@@ -20,7 +20,7 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
     <tr>
         <td><img src = "images/pyFDA_screenshot_3d_4.PNG" alt="Screenshot" width=300px></td>
         <td><img src = "images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "images/pyfda_scr_shot_baq_impz.png" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyfda_scr_shot_baq_impz.PNG" alt="Screenshot" width=300px></td>
    </tr>
     <tr>
         <td><img src = "images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
@@ -28,7 +28,7 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
     </tr>
       <tr>
         <td><img src = "images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "images/pyfda_scr_shot_baq_impz.png" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyfda_scr_shot_baq_impz.PNG" alt="Screenshot" width=300px></td>
     </tr>
 </table>
 
