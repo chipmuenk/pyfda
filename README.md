@@ -19,11 +19,16 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 <table>
     <tr>
         <td><img src = "images/pyFDA_screenshot_3d_4.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>        
+        <td><img src = "images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyfda_scr_shot_baq_impz.png" alt="Screenshot" width=300px></td>
    </tr>
     <tr>
         <td><img src = "images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
         <td><img src = "images/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
+    </tr>
+      <tr>
+        <td><img src = "images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "images/pyfda_scr_shot_baq_impz.png" alt="Screenshot" width=300px></td>
     </tr>
 </table>
 
@@ -155,7 +160,7 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
     * Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program
 * **Saving and loading**
     * Save and load filter designs in pickled and in numpy's NPZ-format
-    * Export coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R) or in Matlab (R) workspace format
+    * Export and import coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R) or in Matlab (R) workspace format
     * Export coefficients in FPGA vendor specific formats like Xilinx (R) COE-format
 
 ## Why yet another filter design tool?
