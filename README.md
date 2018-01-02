@@ -83,7 +83,7 @@ Initial release
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
 
 ### conda
-If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel `Chipmuenk` using
+If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel ![`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda) using
 
     conda install -c Chipmuenk pyfda
 resp.
