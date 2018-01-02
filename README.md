@@ -83,7 +83,7 @@ Initial release
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
 
 ### conda
-If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel ![`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda) using
+If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda) using
 
     conda install -c Chipmuenk pyfda
 resp.
@@ -95,9 +95,9 @@ Otherwise, you can install from PyPI using
 
     pip install pyfda
 
-or update using
+or upgrade using
 
-    pip install pyfda --upgrade
+    pip install pyfda -U
 
 ### setup.py   
 You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
