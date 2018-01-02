@@ -11,8 +11,7 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 
 Prerequisites
 -------------
-
-Besides standard python libraries, the project requires the following libraries:
+The software runs under Python 2.7 and 3.3 ... 3.6. The following additional libraries are required:
 
 * numpy
 * scipy
@@ -24,13 +23,13 @@ Besides standard python libraries, the project requires the following libraries:
     * xlwt and / or XlsxWriter for exporting filter coefficients as \*.xls(x) files
 
 
-
 Installing and starting pyFDA
 -----------------------------
 
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
 
-*conda*
+**conda**
+
 If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel `Chipmuenk` (https://anaconda.org/Chipmuenk/pyfda) using
 
     ``>> conda install -c Chipmuenk pyfda``
@@ -39,6 +38,7 @@ resp.
     ``>> conda update  -c Chipmuenk pyfda``
 
 **pip**
+
 Otherwise, you can install from PyPI using
 
     ``>> pip install pyfda``
@@ -48,7 +48,8 @@ or upgrade using
     ``>> pip install pyfda -U``
 
 **from setup.py**
-or download the zip file and extract it to a directory of your choice. Install it either to your ``<python>/Lib/site-packages`` subdirectory using
+
+Download the zip file and extract it to a directory of your choice. Install it either to your ``<python>/Lib/site-packages`` subdirectory using
 
     ``>> python setup.py install``
 
@@ -92,7 +93,7 @@ Features
 * **Common interface for all filter design methods:**
     * specify frequencies as absolute values or normalized to sampling or Nyquist frequency
     * specify ripple and attenuations in dB, as voltage or as power ratios
-    * enter expressions like exp(-pi/4 * 1j) with the help of the library [simpleeval](https://pypi.python.org/pypi/simpleeval) (included in source files)
+    * enter expressions like exp(-pi/4 * 1j) with the help of the library simpleeval (https://pypi.python.org/pypi/simpleeval) (included in source files)
 * **Graphical Analyses**
     * Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot
     * Phase response (wrapped / unwrapped)
