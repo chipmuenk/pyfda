@@ -232,14 +232,14 @@ class MyMplToolbar(NavigationToolbar):
         # PAN:
         self.a_pa = self.addAction(QIcon(':/move.svg'), 'Pan', self.pan)
         self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
-        "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
+        "pressing x / y / CTRL keys yields horizontal / vertical / diagonal constraints.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
 
         # ZOOM RECTANGLE:
         self.a_zo = self.addAction(QIcon(':/magnifying-glass.svg'), 'Zoom', self.zoom)
         self.a_zo.setToolTip("Zoom in / out to rectangle with left / right mouse button,\n"
-        "pressing x / y / CTRL yields horizontal / vertical / diagonal constraints.")
+        "pressing x / y keys constrains zoom to horizontal / vertical direction.")
         self._actions['zoom'] = self.a_zo
         self.a_zo.setCheckable(True)
 
