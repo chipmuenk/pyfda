@@ -195,6 +195,7 @@ class MyMplToolbar(NavigationToolbar):
     #def __init__(self, canvas, parent, coordinates=True):
 
     sigEnabled = pyqtSignal() # emitted when toolbar has been enabled / disabled
+    sig_tx = pyqtSignal(object) # general signal, containing a dict 
 
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
@@ -370,6 +371,14 @@ class MyMplToolbar(NavigationToolbar):
 #                else:
 #                    self.set_message(s)
 #        else: self.set_message(self.mode)
+    
+    def home(self):
+        """
+        Reset zoom to default settings (defined by plotting widget).
+        This method shadows `home()` inherited from NavigationToolbar.
+        """
+        self.sig_tx.emit({'home':'home'}) # only the key is used by the slot
+        # self.parent.pltCanv.draw() # don't use self.parent.redraw()
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):

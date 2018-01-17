@@ -11,7 +11,7 @@ Widget for plotting |H(f)|, frequency specs and the phase
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame
+from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, pyqtSlot
 
 import numpy as np
 from matplotlib.patches import Rectangle
@@ -68,7 +68,11 @@ class PlotHf(QWidget):
         self.chkPhase = QCheckBox("Phase", self)
         self.chkPhase.setToolTip("Overlay phase")
 
-
+        #----------------------------------------------------------------------
+        #               ### frmControls ###
+        #
+        # This widget encompasses all control subwidgets
+        #----------------------------------------------------------------------
         layHControls = QHBoxLayout()
         layHControls.addStretch(10)
         layHControls.addWidget(self.cmbShowH)
@@ -84,16 +88,16 @@ class PlotHf(QWidget):
         layHControls.addStretch(1)
         layHControls.addWidget(self.chkPhase)
         layHControls.addStretch(10)
-        
-        # This widget encompasses all control subwidgets:
+
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
 
         #----------------------------------------------------------------------
-        # mplwidget
-        #----------------------------------------------------------------------
-        # This is the plot pane widget, encompassing the other widgets        
+        #               ### mplwidget ###
+        #
+        # main widget, encompassing the other widgets 
+        #----------------------------------------------------------------------  
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -114,8 +118,22 @@ class PlotHf(QWidget):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)        
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
         
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process rx and tx signals
+        """
+        if 'home' in sig_dict:
+            self.update_view()
+        elif 'enable' in sig_dict:
+            self.enable_ui()
+        else:
+            pass
+
 #------------------------------------------------------------------------------
     def init_axes(self):
         """

@@ -10,7 +10,7 @@ Widget for plotting phase frequency response phi(f)
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame
+from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSlot
 
 import numpy as np
 
@@ -24,6 +24,14 @@ class PlotPhi(QWidget):
 
     def __init__(self, parent):
         super(PlotPhi, self).__init__(parent)
+        self._construct_UI()
+
+    def _construct_UI(self):
+        """
+        Intitialize the widget, consisting of:
+        - Matplotlib widget with NavigationToolbar
+        - Frame with control elements
+        """
 
         self.cmbUnitsPhi = QComboBox(self)
         units = ["rad", "rad/pi",  "deg"]
@@ -45,15 +53,20 @@ class PlotPhi(QWidget):
         layHControls.addWidget(self.chkWrap)
         layHControls.addStretch(10)
         
-        # This widget encompasses all control subwidgets:
+        #----------------------------------------------------------------------
+        #               ### frmControls ###
+        #
+        # This widget encompasses all control subwidgets
+        #----------------------------------------------------------------------
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
 
-
         #----------------------------------------------------------------------
-        # mplwidget
-        #----------------------------------------------------------------------
+        #               ### mplwidget ###
+        #
+        # main widget, encompassing the other widgets 
+        #----------------------------------------------------------------------  
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -68,8 +81,21 @@ class PlotPhi(QWidget):
 #        #=============================================
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)        
+        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)   
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process sig
+        """
+        if 'home' in sig_dict or 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enable' in sig_dict:
+            self.enable_ui()
+        else:
+            pass 
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
