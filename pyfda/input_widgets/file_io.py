@@ -376,17 +376,24 @@ class File_IO(QWidget):
                  my_string = my_string.replace(k, v)
              fb.clipboard.setText(my_string)
 
-         info_string = ("<b>pyfda</b> Version {0} (c) 2013 - 17 Christian Münker<br>"
+         info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a></b> "
+         "Version {0} (c) 2013 - 18 Christian Münker<br>"
          "Design, analyze and synthesize digital filters<hr>".format(version.__version__))
 
-         versions_string =("<b>Operating System:</b> {0} {1}<br><br>"
-         "<b>Imported Modules</b><br>{2}"
-           .format(dirs.OS, dirs.OS_VER,
+         versions_string =("<b>Operating System:</b> {0} {1}<br>User Name : {2}<br><br>"
+         "<b>Imported Modules</b><br>{3}"
+           .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME, 
                  pyfda_lib.mod_version().replace("\n", "<br>")))
 
-         dir_string = ("<br><b>User Directories</b><br>Install : {0}<br>Temp :   {1}<br>Home : {2}<br>"\
-                       .format(dirs.INSTALL_DIR, dirs.TEMP_DIR, dirs.HOME_DIR))
-         dir_string += ("<br><b>User Files</b><br>Log. Config: {0}<br>Log. File:  {1}"\
+         dir_string = ("<table><th>Directories</th>"
+                           "<tr><td>Home:</td><td>{0}</td></tr>"
+                           "<tr><td>Install:</td><td>{1}</td></tr>"
+                           "<tr><td>Temp:</td><td>{2}</td></tr>"\
+                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.TEMP_DIR))
+         dir_string += ("<th>Logging Files</th>"
+                        "<tr><td>Config:</td><td>{0}</td></tr>"
+                        "<tr><td>Output:</td><td>{1}</td></tr>"
+                        "</table>"\
                        .format(dirs.USER_LOG_CONF_FILE, dirs.LOG_DIR_FILE))
 
          about_string = info_string + versions_string + dir_string
