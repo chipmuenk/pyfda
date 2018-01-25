@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QWidget, QLabel, pyqtSignal,
+from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
                       QSizePolicy, QIcon, QImage, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
@@ -75,7 +75,7 @@ class MplWidget(QWidget):
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_plot(state = True)
-        self.mplToolbar.sigEnabled.connect(self.clear_disabled_figure)
+        self.mplToolbar.sig_tx.connect(self.process_signals)
 
         #=============================================
         # Main plot widget layout
@@ -85,6 +85,18 @@ class MplWidget(QWidget):
         self.layVMainMpl.addWidget(self.pltCanv)
 
         self.setLayout(self.layVMainMpl)
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process sig
+        """
+        if 'plot' in sig_dict:
+            if 'enabled' in sig_dict['plot']:
+                self.clear_disabled_figure(sig_dict['plot']['enabled'])
+        else:
+            pass
 
 #------------------------------------------------------------------------------
     def save_limits(self):
@@ -117,11 +129,11 @@ class MplWidget(QWidget):
         self.pltCanv.draw() # now (re-)draw the figure
 
 #------------------------------------------------------------------------------
-    def clear_disabled_figure(self):
+    def clear_disabled_figure(self, enabled):
         """
         Clear the figure when it is disabled in the mplToolbar
         """
-        if not self.mplToolbar.enabled:
+        if not enabled:
             self.fig.clf()
             self.pltCanv.draw()
         else:
@@ -194,7 +206,6 @@ class MyMplToolbar(NavigationToolbar):
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
 
-    sigEnabled = pyqtSignal() # emitted when toolbar has been enabled / disabled
     sig_tx = pyqtSignal(object) # general signal, containing a dict 
 
     def __init__(self, *args, **kwargs):
@@ -377,7 +388,7 @@ class MyMplToolbar(NavigationToolbar):
         Reset zoom to default settings (defined by plotting widget).
         This method shadows `home()` inherited from NavigationToolbar.
         """
-        self.sig_tx.emit({'home':'home'}) # only the key is used by the slot
+        self.sig_tx.emit({'plot':'home'}) # only the key is used by the slot
         # self.parent.pltCanv.draw() # don't use self.parent.redraw()
 
 #------------------------------------------------------------------------------
@@ -407,6 +418,8 @@ class MyMplToolbar(NavigationToolbar):
             self.a_zo.setEnabled(True)
             self.a_pa.setEnabled(True)
             self.a_fv.setEnabled(True)
+            
+        self.sig_tx.emit({'plot':{'lock_zoom':self.lock_zoom}})
 
 #------------------------------------------------------------------------------
     def enable_plot(self, state = None):
@@ -436,7 +449,7 @@ class MyMplToolbar(NavigationToolbar):
         self.a_cb.setEnabled(self.enabled)
         self.a_op.setEnabled(self.enabled)
 
-        self.sigEnabled.emit()
+        self.sig_tx.emit({'plot':{'enabled':self.enabled}})
 
 #------------------------------------------------------------------------------
     def mpl2Clip(self):

@@ -81,7 +81,6 @@ class PlotPhi(QWidget):
 #        #=============================================
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)   
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
 #------------------------------------------------------------------------------
@@ -90,12 +89,26 @@ class PlotPhi(QWidget):
         """
         Process sig
         """
-        if 'home' in sig_dict or 'update_view' in sig_dict:
-            self.update_view()
-        elif 'enable' in sig_dict:
-            self.enable_ui()
+        if 'plot' in sig_dict:
+            if 'update_view' in sig_dict['plot']:
+                self.update_view()
+            elif 'enabled' in sig_dict['plot']:
+                self.enable_ui(sig_dict['plot']['enabled'])
+            elif 'home' in sig_dict['plot']:
+                self.draw()
         else:
-            pass 
+            pass
+
+#------------------------------------------------------------------------------
+    def enable_ui(self, enabled):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        self.frmControls.setEnabled(enabled)
+        if enabled:
+            self.init_axes()
+            self.draw()
+
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
@@ -117,16 +130,6 @@ class PlotPhi(QWidget):
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
         self.H_cmplx = np.nan_to_num(self.H_cmplx) 
-
-#------------------------------------------------------------------------------
-    def enable_ui(self):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def draw(self):

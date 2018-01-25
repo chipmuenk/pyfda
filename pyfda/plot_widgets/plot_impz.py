@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QEvent,
-                      Qt, QHBoxLayout, QFrame)
+                      Qt, QHBoxLayout, QFrame, pyqtSlot)
 
 import numpy as np
 import scipy.signal as sig
@@ -133,9 +133,39 @@ class PlotImpz(QWidget):
         self.cmbStimulus.activated.connect(self.draw)
         self.ledAmp.editingFinished.connect(self.draw)
         self.ledFreq.installEventFilter(self) 
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
 
         self.draw() # initial calculation and drawing
+        
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process sig
+        """
+        if 'plot' in sig_dict:
+            if 'update_view' in sig_dict['plot']:
+                self.update_view()
+            elif 'enabled' in sig_dict['plot']:
+                self.enable_ui(sig_dict['plot']['enabled'])
+            elif 'home' in sig_dict['plot']:
+                self.draw()
+        else:
+            pass 
+
+#------------------------------------------------------------------------------
+    def enable_ui(self, enabled):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        self.frmControls.setEnabled(enabled)
+        if enabled:
+            # self.init_axes() # called by self.draw
+            self.draw()
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -246,15 +276,6 @@ class PlotImpz(QWidget):
         """
         self.draw()
 
-#------------------------------------------------------------------------------
-    def enable_ui(self):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
-            # self.init_axes() # called by self.draw
-            self.draw()
 #------------------------------------------------------------------------------
     def draw(self):
         if self.mplwidget.mplToolbar.enabled:

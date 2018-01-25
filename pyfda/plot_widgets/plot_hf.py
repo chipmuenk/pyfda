@@ -118,21 +118,24 @@ class PlotHf(QWidget):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
+
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
         
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
-        Process rx and tx signals
+        Process sig
         """
-        if 'home' in sig_dict:
-            self.update_view()
-        elif 'enable' in sig_dict:
-            self.enable_ui()
+        if 'plot' in sig_dict:
+            if 'update_view' in sig_dict['plot']:
+                self.update_view()
+            elif 'enabled' in sig_dict['plot']:
+                self.enable_ui(sig_dict['plot']['enabled'])
+            elif 'home' in sig_dict['plot']:
+                self.draw()
         else:
-            pass
+            pass 
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -438,12 +441,12 @@ class PlotHf(QWidget):
         self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], True)
 
 #------------------------------------------------------------------------------
-    def enable_ui(self):
+    def enable_ui(self, enabled):
         """
         Triggered when the toolbar is enabled or disabled
         """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
+        self.frmControls.setEnabled(enabled)
+        if enabled:
             self.init_axes()
             self.draw()
 
