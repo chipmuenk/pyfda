@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QtCore, QFD, Qt, QWidget, QPushButton, QFont, QFrame,
-                      QVBoxLayout, QMessageBox, QPixmap)
+                      QVBoxLayout, QMessageBox, QPixmap, QIcon)
 
 import pyfda.version as version
 import pyfda.pyfda_lib as pyfda_lib
@@ -376,30 +376,34 @@ class File_IO(QWidget):
                  my_string = my_string.replace(k, v)
              fb.clipboard.setText(my_string)
 
-         info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a></b> "
-         "Version {0} (c) 2013 - 18 Christian Münker<br>"
+         info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
+         "Version {0} (c) 2013 - 2018 Christian Münker</b><br>"
          "Design, analyze and synthesize digital filters<hr>".format(version.__version__))
 
-         versions_string =("<b>Operating System:</b> {0} {1}<br>User Name : {2}<br><br>"
-         "<b>Imported Modules</b><br>{3}"
+         versions_string =("<b>Operating System:</b> {0} {1}<br><b>User Name:</b> {2}<br><br>"
+         "<b style='font-size:large;'>Imported Modules</b><br>&nbsp;&emsp;{3}"
            .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME, 
-                 pyfda_lib.mod_version().replace("\n", "<br>")))
+                 pyfda_lib.mod_version().replace("\n", "<br>&nbsp;&emsp;")))
 
-         dir_string = ("<table><th>Directories</th>"
-                           "<tr><td>Home:</td><td>{0}</td></tr>"
-                           "<tr><td>Install:</td><td>{1}</td></tr>"
-                           "<tr><td>Temp:</td><td>{2}</td></tr>"\
+         dir_string = ("<table><th style='font-size:large;'>Directories</th>"
+                           "<tr><td><b>Home:</b></td><td>{0}</td></tr>"
+                           "<tr><td><b>Install:&emsp;</b></td><td>{1}</td></tr>"
+                           "<tr><td><b>Temp:</b></td><td>{2}</td></tr>"\
                         .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.TEMP_DIR))
-         dir_string += ("<th>Logging Files</th>"
-                        "<tr><td>Config:</td><td>{0}</td></tr>"
-                        "<tr><td>Output:</td><td>{1}</td></tr>"
+         dir_string += ("<br /><th style='font-size:large;'>Logging Files</th>"
+                        "<tr><td><b>Config:</b></td><td>{0}</td></tr>"
+                        "<tr><td><b>Output:&emsp;</b></td><td>{1}</td></tr>"
                         "</table>"\
                        .format(dirs.USER_LOG_CONF_FILE, dirs.LOG_DIR_FILE))
 
          about_string = info_string + versions_string + dir_string
 
          #msg = QMessageBox.about(self, "About pyFDA", info_string)
-         butClipboard = QPushButton("To Clipboard", self)
+         butClipboard = QPushButton(self)
+         butClipboard.setIcon(QIcon(':/clipboard.svg'))
+         butClipboard.setToolTip("Copy text to clipboard.")
+         # butClipboard.adjustSize()
+         # butClipboard.setFixedSize(self.checkLayout.sizeHint())
          msg = QMessageBox(self)
          msg.setIconPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(32, Qt.SmoothTransformation))
          msg.addButton(butClipboard, QMessageBox.ActionRole)
