@@ -74,7 +74,7 @@ class MplWidget(QWidget):
         self.mplToolbar = MyMplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
-        self.mplToolbar.enable_update(state = True)
+        self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sigEnabled.connect(self.clear_disabled_figure)
 
         #=============================================
@@ -210,8 +210,8 @@ class MyMplToolbar(NavigationToolbar):
 
         #---------------- Construct Toolbar using QRC icons -------------------
         # ENABLE:
-        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_update)
-        self.a_en.setToolTip('Enable / disable plot update')
+        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_plot)
+        self.a_en.setToolTip('Enable / disable plot')
         self.a_en.setCheckable(True)
         self.a_en.setChecked(True)
 #        a.setEnabled(False)
@@ -409,7 +409,7 @@ class MyMplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
 
 #------------------------------------------------------------------------------
-    def enable_update(self, state = None):
+    def enable_plot(self, state = None):
         """
         Toggle the enable button and setting and enable / disable all
         buttons accordingly.

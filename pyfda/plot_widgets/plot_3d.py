@@ -217,7 +217,7 @@ class Plot3D(QWidget):
         self.chkContour2D.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
-        self.mplwidget.mplToolbar.enable_update(state = False) # disable initially
+        self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
 
 
 #------------------------------------------------------------------------------
