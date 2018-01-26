@@ -19,7 +19,7 @@ import numpy as np
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import grpdelay
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # TODO: Anticausal filter have no group delay. But is a filter with
 #       'baA' always anticausal or maybe just acausal?

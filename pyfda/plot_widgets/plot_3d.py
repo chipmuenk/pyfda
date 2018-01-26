@@ -25,7 +25,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import H_mag, mod_version, safe_eval
 from pyfda.pyfda_qt_lib import qget_cmb_box
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap

@@ -22,7 +22,7 @@ import scipy.signal as sig
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 

@@ -16,7 +16,7 @@ import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
 
 
