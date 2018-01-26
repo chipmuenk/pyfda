@@ -13,10 +13,6 @@ from __future__ import print_function, division, unicode_literals
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
-                      QSizePolicy, QIcon, QImage, QVBoxLayout,
-                      QInputDialog, FigureCanvas, NavigationToolbar)
-
 import sys
 import six
 import numpy as np
@@ -31,6 +27,10 @@ try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
     figureoptions = None
+    
+from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
+                      QSizePolicy, QIcon, QImage, QVBoxLayout,
+                      QInputDialog, FigureCanvas, NavigationToolbar)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
@@ -40,11 +40,11 @@ from pyfda import qrc_resources # contains all icons
 for key in pyfda_rc.mpl_rc:
     rcParams[key] = pyfda_rc.mpl_rc[key]
 
-
 #------------------------------------------------------------------------------
 class MplWidget(QWidget):
     """
-    Construct a subwidget with Matplotlib canvas and NavigationToolbar
+    Construct a subwidget, instantiating a Matplotlib canvas and a modified
+    NavigationToolbar.
     """
 
     def __init__(self, parent):
@@ -71,7 +71,7 @@ class MplWidget(QWidget):
         # initialize toolbar settings
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
-        self.mplToolbar = MyMplToolbar(self.pltCanv, self)
+        self.mplToolbar = MplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_plot(state = True)
@@ -166,16 +166,19 @@ class MplWidget(QWidget):
         items += [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
         bbox = Bbox.union([item.get_window_extent() for item in items])
         return bbox.expanded(1.0 + pad, 1.0 + pad)
-#------------------------------------------------------------------------------
 
-class MyMplToolbar(NavigationToolbar):
+###############################################################################
+
+class MplToolbar(NavigationToolbar):
     """
-    Custom Matplotlib Navigationtoolbar, derived (sublassed) from
-    Navigationtoolbar with the following changes:
+    Custom Matplotlib Navigationtoolbar, derived (subclassed) from Qt's
+    NavigationToolbar with the following changes:
     - new icon set
-    - new functions and icons grid, full view
+    - new functions and icons for grid toggle, full view, screenshot
     - removed buttons for configuring subplots and editing curves
     - added an x,y location widget and icon
+    
+    Signalling / communication works via the signal `sig_tx'
 
 
     derived from http://www.python-forum.de/viewtopic.php?f=24&t=26437
@@ -213,9 +216,6 @@ class MyMplToolbar(NavigationToolbar):
 
 #        QtWidgets.QToolBar.__init__(self, parent)
 
-#    def _icon(self, name):
-#        return QIcon(os.path.join(self.basedir, name))
-#
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
 
@@ -225,13 +225,13 @@ class MyMplToolbar(NavigationToolbar):
         self.a_en.setToolTip('Enable / disable plot')
         self.a_en.setCheckable(True)
         self.a_en.setChecked(True)
-#        a.setEnabled(False)
+#        self.a.setEnabled(False)
 
         self.addSeparator() #---------------------------------------------
 
         # HOME:
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
-        self.a_ho.setToolTip('Reset original zoom')
+        self.a_ho.setToolTip('Reset zoom')
         # BACK:
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
         self.a_ba.setToolTip('Back to previous zoom')
@@ -244,7 +244,7 @@ class MyMplToolbar(NavigationToolbar):
         # PAN:
         self.a_pa = self.addAction(QIcon(':/move.svg'), 'Pan', self.pan)
         self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
-        "pressing x / y / CTRL keys yields horizontal / vertical / diagonal constraints.")
+        "pressing x / y / CTRL keys constrains to horizontal / vertical / diagonal movements.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
 
@@ -287,7 +287,7 @@ class MyMplToolbar(NavigationToolbar):
 
         self.cb = fb.clipboard
 
-        self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'Save', self.mpl2Clip)
+        self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip('Copy to clipboard in png format.')
         self.a_cb.setShortcut("Ctrl+C")
 
