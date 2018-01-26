@@ -25,6 +25,9 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 #       'baA' always anticausal or maybe just acausal?
 
 class PlotTauG(QWidget):
+    """
+    Widget for plotting the group delay
+    """
 
     def __init__(self, parent):
         super(PlotTauG, self).__init__(parent)
@@ -63,15 +66,14 @@ class PlotTauG(QWidget):
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
-        Process signals, call corresponding routines
+        Process signals coming from the navigation toolbar
         """
-        if 'plot' in sig_dict:
-            if 'update_view' in sig_dict['plot']:
-                self.update_view()
-            elif 'enabled' in sig_dict['plot']:
-                self.enable_ui(sig_dict['plot']['enabled'])
-            elif 'home' in sig_dict['plot']:
-                self.draw()
+        if 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        elif 'home' in sig_dict:
+            self.draw()
         else:
             pass
 

@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for plotting impulse response
+Widget for plotting impulse and general transient responses
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
@@ -27,7 +27,9 @@ from pyfda.plot_widgets.plot_utils import MplWidget
 
 
 class PlotImpz(QWidget):
-
+    """
+    Construct a widget for plotting impulse and general transient responses
+    """
     def __init__(self, parent):
         super(PlotImpz, self).__init__(parent)
 
@@ -145,17 +147,16 @@ class PlotImpz(QWidget):
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
-        Process sig
+        Process signals coming from the navigation toolbar
         """
-        if 'plot' in sig_dict:
-            if 'update_view' in sig_dict['plot']:
-                self.update_view()
-            elif 'enabled' in sig_dict['plot']:
-                self.enable_ui(sig_dict['plot']['enabled'])
-            elif 'home' in sig_dict['plot']:
-                self.draw()
+        if 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        elif 'home' in sig_dict:
+            self.draw()
         else:
-            pass 
+            pass
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):

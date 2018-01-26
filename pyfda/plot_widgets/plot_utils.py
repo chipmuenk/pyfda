@@ -7,7 +7,8 @@
 # (see file LICENSE in root directory for details)
 
 """
-Common plotting utilities
+Construct a widget consisting of a matplotlib canvas and an improved Navigation
+toolbar.
 """
 from __future__ import print_function, division, unicode_literals
 import logging
@@ -92,9 +93,8 @@ class MplWidget(QWidget):
         """
         Process sig
         """
-        if 'plot' in sig_dict:
-            if 'enabled' in sig_dict['plot']:
-                self.clear_disabled_figure(sig_dict['plot']['enabled'])
+        if 'enabled' in sig_dict:
+            self.clear_disabled_figure(sig_dict['enabled'])
         else:
             pass
 
@@ -388,7 +388,7 @@ class MplToolbar(NavigationToolbar):
         Reset zoom to default settings (defined by plotting widget).
         This method shadows `home()` inherited from NavigationToolbar.
         """
-        self.sig_tx.emit({'plot':'home'}) # only the key is used by the slot
+        self.sig_tx.emit({'home':''}) # only the key is used by the slot
         # self.parent.pltCanv.draw() # don't use self.parent.redraw()
 
 #------------------------------------------------------------------------------
@@ -419,7 +419,7 @@ class MplToolbar(NavigationToolbar):
             self.a_pa.setEnabled(True)
             self.a_fv.setEnabled(True)
             
-        self.sig_tx.emit({'plot':{'lock_zoom':self.lock_zoom}})
+        self.sig_tx.emit({'lock_zoom':self.lock_zoom})
 
 #------------------------------------------------------------------------------
     def enable_plot(self, state = None):
@@ -449,7 +449,7 @@ class MplToolbar(NavigationToolbar):
         self.a_cb.setEnabled(self.enabled)
         self.a_op.setEnabled(self.enabled)
 
-        self.sig_tx.emit({'plot':{'enabled':self.enabled}})
+        self.sig_tx.emit({'enabled':self.enabled})
 
 #------------------------------------------------------------------------------
     def mpl2Clip(self):
