@@ -458,21 +458,6 @@ class MplToolbar(NavigationToolbar):
         Save current figure to temporary file and copy it to the clipboard.
         """
         try:
-            #---- Copy to temporary file ---------------
-            #self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
-            #temp_img = QImage(self.temp_file)
-            #self.cb = fb.clipboard# 
-            #self.cb.setImage(temp_img)
-            
-            # ---- Construct image from raw rgba data, this changes the colormap -----
-            #size = self.canvas.size()
-            #width, height = size.width(), size.height()
-            #im = QImage(self.canvas.buffer_rgba(), width, height, QImage.Format_ARGB32)
-            #self.cb.setImage(im)
-
-            #---- Grab canvas directly as a pixmap resp as QImage:
-            #im = QPixmap(self.canvas.grab())
-            #self.cb.setPixmap(im)
             if HAS_QT5:
                 img = QImage(self.canvas.grab())
                 self.cb.setImage(img)
