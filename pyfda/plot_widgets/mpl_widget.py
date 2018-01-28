@@ -29,8 +29,8 @@ try:
 except ImportError:
     figureoptions = None
     
-from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot,
-                      QSizePolicy, QIcon, QImage, QVBoxLayout,
+from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot, HAS_QT5,
+                      QSizePolicy, QIcon, QImage, QPixmap, QVBoxLayout,
                       QInputDialog, FigureCanvas, NavigationToolbar)
 
 from pyfda import pyfda_rc
@@ -113,7 +113,7 @@ class MplWidget(QWidget):
         Redraw the figure with new properties (grid, linewidth)
         """
         # only execute when at least one axis exists -> tight_layout crashes otherwise
-        logger.debug("redraw ax of {0}\n:{1}".format(self.parent.__class__.__name__, self.fig.axes))
+        logger.debug("redraw ax of {0}\n:{1}".format(self.parent.__name__, self.fig.axes))
         if self.fig.axes:
             for ax in self.fig.axes:
                 ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
@@ -473,7 +473,11 @@ class MplToolbar(NavigationToolbar):
             #---- Grab canvas directly as a pixmap resp as QImage:
             #im = QPixmap(self.canvas.grab())
             #self.cb.setPixmap(im)
-            img = QImage(self.canvas.grab())
-            self.cb.setImage(img)
+            if HAS_QT5:
+                img = QImage(self.canvas.grab())
+                self.cb.setImage(img)
+            else:
+                pixmap = QPixmap.grabWidget(self.canvas)
+                self.cb.setPixmap(pixmap)
         except:
             logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))
