@@ -10,13 +10,13 @@ Widget for plotting phase frequency response phi(f)
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame
+from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSlot
 
 import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
 
 
@@ -24,6 +24,14 @@ class PlotPhi(QWidget):
 
     def __init__(self, parent):
         super(PlotPhi, self).__init__(parent)
+        self._construct_UI()
+
+    def _construct_UI(self):
+        """
+        Intitialize the widget, consisting of:
+        - Matplotlib widget with NavigationToolbar
+        - Frame with control elements
+        """
 
         self.cmbUnitsPhi = QComboBox(self)
         units = ["rad", "rad/pi",  "deg"]
@@ -45,15 +53,20 @@ class PlotPhi(QWidget):
         layHControls.addWidget(self.chkWrap)
         layHControls.addStretch(10)
         
-        # This widget encompasses all control subwidgets:
+        #----------------------------------------------------------------------
+        #               ### frmControls ###
+        #
+        # This widget encompasses all control subwidgets
+        #----------------------------------------------------------------------
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
 
-
         #----------------------------------------------------------------------
-        # mplwidget
-        #----------------------------------------------------------------------
+        #               ### mplwidget ###
+        #
+        # main widget, encompassing the other widgets 
+        #----------------------------------------------------------------------  
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -68,7 +81,32 @@ class PlotPhi(QWidget):
 #        #=============================================
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)        
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from the navigation toolbar
+        """
+        if 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        elif 'home' in sig_dict:
+            self.draw()
+        else:
+            pass
+
+#------------------------------------------------------------------------------
+    def enable_ui(self, enabled):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        self.frmControls.setEnabled(enabled)
+        if enabled:
+            self.init_axes()
+            self.draw()
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -91,16 +129,6 @@ class PlotPhi(QWidget):
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
         self.H_cmplx = np.nan_to_num(self.H_cmplx) 
-
-#------------------------------------------------------------------------------
-    def enable_ui(self):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def draw(self):

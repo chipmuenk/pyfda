@@ -7,15 +7,12 @@
 # (see file LICENSE in root directory for details)
 
 """
-Common plotting utilities
+Construct a widget consisting of a matplotlib canvas and an improved Navigation
+toolbar.
 """
 from __future__ import print_function, division, unicode_literals
 import logging
 logger = logging.getLogger(__name__)
-
-from ..compat import (QtCore, QWidget, QLabel, pyqtSignal,
-                      QSizePolicy, QIcon, QImage, QVBoxLayout,
-                      QInputDialog, FigureCanvas, NavigationToolbar)
 
 import sys
 import six
@@ -31,6 +28,10 @@ try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions
 except ImportError:
     figureoptions = None
+    
+from ..compat import (QtCore, QWidget, QLabel, pyqtSignal, pyqtSlot, HAS_QT5,
+                      QSizePolicy, QIcon, QImage, QPixmap, QVBoxLayout,
+                      QInputDialog, FigureCanvas, NavigationToolbar)
 
 from pyfda import pyfda_rc
 import pyfda.filterbroker as fb
@@ -40,11 +41,11 @@ from pyfda import qrc_resources # contains all icons
 for key in pyfda_rc.mpl_rc:
     rcParams[key] = pyfda_rc.mpl_rc[key]
 
-
 #------------------------------------------------------------------------------
 class MplWidget(QWidget):
     """
-    Construct a subwidget with Matplotlib canvas and NavigationToolbar
+    Construct a subwidget, instantiating a Matplotlib canvas and a modified
+    NavigationToolbar.
     """
 
     def __init__(self, parent):
@@ -71,11 +72,11 @@ class MplWidget(QWidget):
         # initialize toolbar settings
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
-        self.mplToolbar = MyMplToolbar(self.pltCanv, self)
+        self.mplToolbar = MplToolbar(self.pltCanv, self)
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
-        self.mplToolbar.enable_update(state = True)
-        self.mplToolbar.sigEnabled.connect(self.clear_disabled_figure)
+        self.mplToolbar.enable_plot(state = True)
+        self.mplToolbar.sig_tx.connect(self.process_signals)
 
         #=============================================
         # Main plot widget layout
@@ -85,6 +86,17 @@ class MplWidget(QWidget):
         self.layVMainMpl.addWidget(self.pltCanv)
 
         self.setLayout(self.layVMainMpl)
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process sig
+        """
+        if 'enabled' in sig_dict:
+            self.clear_disabled_figure(sig_dict['enabled'])
+        else:
+            pass
 
 #------------------------------------------------------------------------------
     def save_limits(self):
@@ -101,6 +113,7 @@ class MplWidget(QWidget):
         Redraw the figure with new properties (grid, linewidth)
         """
         # only execute when at least one axis exists -> tight_layout crashes otherwise
+        logger.debug("redraw ax of {0}\n:{1}".format(self.parent.__name__, self.fig.axes))
         if self.fig.axes:
             for ax in self.fig.axes:
                 ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
@@ -113,15 +126,15 @@ class MplWidget(QWidget):
                 # only call tight_layout() crashes with small figure sizes
                self.fig.tight_layout(pad = 0.1)
             except(ValueError, np.linalg.linalg.LinAlgError):
-                pass
+                logger.debug("error in tight_layout")
         self.pltCanv.draw() # now (re-)draw the figure
 
 #------------------------------------------------------------------------------
-    def clear_disabled_figure(self):
+    def clear_disabled_figure(self, enabled):
         """
         Clear the figure when it is disabled in the mplToolbar
         """
-        if not self.mplToolbar.enabled:
+        if not enabled:
             self.fig.clf()
             self.pltCanv.draw()
         else:
@@ -154,16 +167,19 @@ class MplWidget(QWidget):
         items += [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
         bbox = Bbox.union([item.get_window_extent() for item in items])
         return bbox.expanded(1.0 + pad, 1.0 + pad)
-#------------------------------------------------------------------------------
 
-class MyMplToolbar(NavigationToolbar):
+###############################################################################
+
+class MplToolbar(NavigationToolbar):
     """
-    Custom Matplotlib Navigationtoolbar, derived (sublassed) from
-    Navigationtoolbar with the following changes:
+    Custom Matplotlib Navigationtoolbar, derived (subclassed) from Qt's
+    NavigationToolbar with the following changes:
     - new icon set
-    - new functions and icons grid, full view
+    - new functions and icons for grid toggle, full view, screenshot
     - removed buttons for configuring subplots and editing curves
     - added an x,y location widget and icon
+    
+    Signalling / communication works via the signal `sig_tx'
 
 
     derived from http://www.python-forum.de/viewtopic.php?f=24&t=26437
@@ -194,32 +210,29 @@ class MyMplToolbar(NavigationToolbar):
 # subclass NavigationToolbar, passing through arguments:
     #def __init__(self, canvas, parent, coordinates=True):
 
-    sigEnabled = pyqtSignal() # emitted when toolbar has been enabled / disabled
+    sig_tx = pyqtSignal(object) # general signal, containing a dict 
 
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
 
 #        QtWidgets.QToolBar.__init__(self, parent)
 
-#    def _icon(self, name):
-#        return QIcon(os.path.join(self.basedir, name))
-#
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
 
         #---------------- Construct Toolbar using QRC icons -------------------
         # ENABLE:
-        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_update)
-        self.a_en.setToolTip('Enable / disable plot update')
+        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_plot)
+        self.a_en.setToolTip('Enable / disable plot')
         self.a_en.setCheckable(True)
         self.a_en.setChecked(True)
-#        a.setEnabled(False)
+#        self.a.setEnabled(False)
 
         self.addSeparator() #---------------------------------------------
 
         # HOME:
         self.a_ho = self.addAction(QIcon(':/home.svg'), 'Home', self.home)
-        self.a_ho.setToolTip('Reset original zoom')
+        self.a_ho.setToolTip('Reset zoom')
         # BACK:
         self.a_ba = self.addAction(QIcon(':/action-undo.svg'), 'Back', self.back)
         self.a_ba.setToolTip('Back to previous zoom')
@@ -232,7 +245,7 @@ class MyMplToolbar(NavigationToolbar):
         # PAN:
         self.a_pa = self.addAction(QIcon(':/move.svg'), 'Pan', self.pan)
         self.a_pa.setToolTip("Pan axes with left mouse button, zoom with right,\n"
-        "pressing x / y / CTRL keys yields horizontal / vertical / diagonal constraints.")
+        "pressing x / y / CTRL keys constrains to horizontal / vertical / diagonal movements.")
         self._actions['pan'] = self.a_pa
         self.a_pa.setCheckable(True)
 
@@ -275,7 +288,7 @@ class MyMplToolbar(NavigationToolbar):
 
         self.cb = fb.clipboard
 
-        self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'Save', self.mpl2Clip)
+        self.a_cb = self.addAction(QIcon(':/clipboard.svg'), 'To Clipboard', self.mpl2Clip)
         self.a_cb.setToolTip('Copy to clipboard in png format.')
         self.a_cb.setShortcut("Ctrl+C")
 
@@ -370,6 +383,14 @@ class MyMplToolbar(NavigationToolbar):
 #                else:
 #                    self.set_message(s)
 #        else: self.set_message(self.mode)
+    
+    def home(self):
+        """
+        Reset zoom to default settings (defined by plotting widget).
+        This method shadows `home()` inherited from NavigationToolbar.
+        """
+        self.sig_tx.emit({'home':''}) # only the key is used by the slot
+        # self.parent.pltCanv.draw() # don't use self.parent.redraw()
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):
@@ -398,9 +419,11 @@ class MyMplToolbar(NavigationToolbar):
             self.a_zo.setEnabled(True)
             self.a_pa.setEnabled(True)
             self.a_fv.setEnabled(True)
+            
+        self.sig_tx.emit({'lock_zoom':self.lock_zoom})
 
 #------------------------------------------------------------------------------
-    def enable_update(self, state = None):
+    def enable_plot(self, state = None):
         """
         Toggle the enable button and setting and enable / disable all
         buttons accordingly.
@@ -427,7 +450,7 @@ class MyMplToolbar(NavigationToolbar):
         self.a_cb.setEnabled(self.enabled)
         self.a_op.setEnabled(self.enabled)
 
-        self.sigEnabled.emit()
+        self.sig_tx.emit({'enabled':self.enabled})
 
 #------------------------------------------------------------------------------
     def mpl2Clip(self):
@@ -435,22 +458,11 @@ class MyMplToolbar(NavigationToolbar):
         Save current figure to temporary file and copy it to the clipboard.
         """
         try:
-            #---- Copy to temporary file ---------------
-            #self.canvas.figure.savefig(self.temp_file, dpi = 300, type = 'png')
-            #temp_img = QImage(self.temp_file)
-            #self.cb = fb.clipboard# 
-            #self.cb.setImage(temp_img)
-            
-            # ---- Construct image from raw rgba data, this changes the colormap -----
-            #size = self.canvas.size()
-            #width, height = size.width(), size.height()
-            #im = QImage(self.canvas.buffer_rgba(), width, height, QImage.Format_ARGB32)
-            #self.cb.setImage(im)
-
-            #---- Grab canvas directly as a pixmap resp as QImage:
-            #im = QPixmap(self.canvas.grab())
-            #self.cb.setPixmap(im)
-            img = QImage(self.canvas.grab())
-            self.cb.setImage(img)
+            if HAS_QT5:
+                img = QImage(self.canvas.grab())
+                self.cb.setImage(img)
+            else:
+                pixmap = QPixmap.grabWidget(self.canvas)
+                self.cb.setPixmap(pixmap)
         except:
             logger.error('Error copying figure to clipboard:\n{0}'.format(sys.exc_info()))

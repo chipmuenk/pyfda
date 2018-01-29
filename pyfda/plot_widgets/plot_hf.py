@@ -11,7 +11,7 @@ Widget for plotting |H(f)|, frequency specs and the phase
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame
+from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, pyqtSlot
 
 import numpy as np
 from matplotlib.patches import Rectangle
@@ -20,11 +20,13 @@ from matplotlib import rcParams
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
 
 class PlotHf(QWidget):
-
+    """
+    Widget for plotting |H(f)|, frequency specs and the phase
+    """
     def __init__(self, parent): 
         super(PlotHf, self).__init__(parent)
 
@@ -68,7 +70,11 @@ class PlotHf(QWidget):
         self.chkPhase = QCheckBox("Phase", self)
         self.chkPhase.setToolTip("Overlay phase")
 
-
+        #----------------------------------------------------------------------
+        #               ### frmControls ###
+        #
+        # This widget encompasses all control subwidgets
+        #----------------------------------------------------------------------
         layHControls = QHBoxLayout()
         layHControls.addStretch(10)
         layHControls.addWidget(self.cmbShowH)
@@ -84,16 +90,16 @@ class PlotHf(QWidget):
         layHControls.addStretch(1)
         layHControls.addWidget(self.chkPhase)
         layHControls.addStretch(10)
-        
-        # This widget encompasses all control subwidgets:
+
         self.frmControls = QFrame(self)
         self.frmControls.setObjectName("frmControls")
         self.frmControls.setLayout(layHControls)
 
         #----------------------------------------------------------------------
-        # mplwidget
-        #----------------------------------------------------------------------
-        # This is the plot pane widget, encompassing the other widgets        
+        #               ### mplwidget ###
+        #
+        # main widget, encompassing the other widgets 
+        #----------------------------------------------------------------------  
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -114,8 +120,24 @@ class PlotHf(QWidget):
 
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)        
+
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
         
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from the navigation toolbar
+        """
+        if 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        elif 'home' in sig_dict:
+            self.draw()
+        else:
+            pass
+
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
@@ -420,12 +442,12 @@ class PlotHf(QWidget):
         self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], True)
 
 #------------------------------------------------------------------------------
-    def enable_ui(self):
+    def enable_ui(self, enabled):
         """
         Triggered when the toolbar is enabled or disabled
         """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
+        self.frmControls.setEnabled(enabled)
+        if enabled:
             self.init_axes()
             self.draw()
 

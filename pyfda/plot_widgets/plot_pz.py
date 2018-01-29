@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QHBoxLayout
+from ..compat import QWidget, QHBoxLayout, pyqtSlot
 
 
 import numpy as np
@@ -22,7 +22,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import unique_roots
 
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from  matplotlib import patches
 
@@ -58,7 +58,32 @@ class PlotPZ(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from the navigation toolbar
+        """
+        if 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        elif 'home' in sig_dict:
+            self.draw()
+        else:
+            pass
+
+#------------------------------------------------------------------------------
+    def enable_ui(self, enabled):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        # self.frmControls.setEnabled(enabled) # no control widgets yet
+        if enabled:
+            self.init_axes()
+            self.draw()
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -71,22 +96,12 @@ class PlotPZ(QWidget):
         self.ax.get_yaxis().tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
-    def update_specs(self):
+    def update_view(self):
         """
         Draw the figure with new limits, scale etcs without recalculating H(f)
         -- not yet implemented, just use draw() for the moment
         """
         self.draw()
-
-#------------------------------------------------------------------------------
-    def enable_ui(self):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        # self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled) # no control widgets
-        if self.mplwidget.mplToolbar.enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def draw(self):
