@@ -35,15 +35,17 @@ def env(name):
     return os.environ.get( name, '' )
 
 def get_home_dir():
-    """Return the user's home directory"""
+    """Return the user's home directory and name"""
     if OS != "Windows":
     # set home directory from user name for Mac and Linux when started as user or
     # sudo user
-        USERNAME = os.getenv('SUDO_USER') or os.getenv('USER') 
-        home_dir = os.path.expanduser('~'+USERNAME)
+        user_name = os.getenv('SUDO_USER') or os.getenv('USER')
+        if user_name is None:
+            user_name = ""
+        home_dir = os.path.expanduser('~'+user_name)
     else:
         # same for windows
-        USERNAME = os.getenv('USER')
+        user_name = os.getenv('USER')
         # home_dir = os.path.expanduser(os.getenv('USERPROFILE'))
         home_dir = env( 'USERPROFILE' )
         if not valid(home_dir):
@@ -56,9 +58,9 @@ def get_home_dir():
                         home_dir += '\\'
                     if not valid(home_dir) :
                         home_dir = 'C:\\'
-    return home_dir
+    return home_dir, user_name
 
-HOME_DIR = get_home_dir()        
+HOME_DIR, USER_NAME = get_home_dir()        
 #------------------------------------------------------------------------------ 
 
 TEMP_DIR = tempfile.gettempdir()
