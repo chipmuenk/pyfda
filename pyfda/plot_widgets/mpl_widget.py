@@ -113,7 +113,6 @@ class MplWidget(QWidget):
         Redraw the figure with new properties (grid, linewidth)
         """
         # only execute when at least one axis exists -> tight_layout crashes otherwise
-        logger.debug("redraw ax of {0}\n:{1}".format(self.parent.__name__, self.fig.axes))
         if self.fig.axes:
             for ax in self.fig.axes:
                 ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
@@ -123,7 +122,7 @@ class MplWidget(QWidget):
                 else:
                     self.limits = ax.axis() # save old limits
             try:
-                # only call tight_layout() crashes with small figure sizes
+                # tight_layout() crashes with small figure sizes
                self.fig.tight_layout(pad = 0.1)
             except(ValueError, np.linalg.linalg.LinAlgError):
                 logger.debug("error in tight_layout")
@@ -390,7 +389,6 @@ class MplToolbar(NavigationToolbar):
         This method shadows `home()` inherited from NavigationToolbar.
         """
         self.sig_tx.emit({'home':''}) # only the key is used by the slot
-        # self.parent.pltCanv.draw() # don't use self.parent.redraw()
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):
