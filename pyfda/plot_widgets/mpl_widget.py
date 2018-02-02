@@ -72,7 +72,7 @@ class MplWidget(QWidget):
         # initialize toolbar settings
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
-        self.mplToolbar = MplToolbar(self.pltCanv, self)
+        self.mplToolbar = MplToolbar(self.pltCanv, self) # inherits all methods
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_plot(state = True)
@@ -214,8 +214,6 @@ class MplToolbar(NavigationToolbar):
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
 
-#        QtWidgets.QToolBar.__init__(self, parent)
-
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
 
@@ -257,7 +255,7 @@ class MplToolbar(NavigationToolbar):
 
         # FULL VIEW:
         self.a_fv = self.addAction(QIcon(':/fullscreen-enter.svg'), \
-            'Zoom full extent', self.parent.plt_full_view)
+            'Zoom full extent', self.plt_full_view)
         self.a_fv.setToolTip('Zoom to full extent')
 
         # LOCK ZOOM:
@@ -278,7 +276,7 @@ class MplToolbar(NavigationToolbar):
         self.a_gr.setChecked(True)
 
         # REDRAW:
-        self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.parent.redraw)
+        self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.redraw)
         self.a_rd.setToolTip('Redraw Plot')
 
         # SAVE:
@@ -343,7 +341,7 @@ class MplToolbar(NavigationToolbar):
                                          ylabel=ylabel, label=label,
                                          axes_repr=repr(axes)))
                 item, ok = QInputDialog.getItem(
-                    self.parent, 'Customize', 'Select axes:', titles, 0, False)
+                    self, 'Customize', 'Select axes:', titles, 0, False)
                 if ok:
                     axes = allaxes[titles.index(six.text_type(item))]
                 else:
@@ -388,15 +386,16 @@ class MplToolbar(NavigationToolbar):
         Reset zoom to default settings (defined by plotting widget).
         This method shadows `home()` inherited from NavigationToolbar.
         """
+        self.save_limits()
         self.sig_tx.emit({'home':''}) # only the key is used by the slot
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):
         """Toggle the grid and redraw the figure."""
         self.grid = not self.grid
-        for ax in self.parent.fig.axes:
+        for ax in self.fig.axes:
             ax.grid(self.grid)
-        self.parent.pltCanv.draw() # don't use self.parent.redraw()
+        self.pltCanv.draw() # don't use self.redraw()
 
 #------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
@@ -405,7 +404,7 @@ class MplToolbar(NavigationToolbar):
             when previously unlocked, settings need to be saved
             when previously locked, current settings can be saved without effect
         """
-        self.parent.save_limits() # save limits in any case: when previously unlocked
+        self.save_limits() # save limits in any case: when previously unlocked
         self.lock_zoom = not self.lock_zoom
         if self.lock_zoom:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
