@@ -412,11 +412,13 @@ class MplToolbar(NavigationToolbar):
             self.a_zo.setEnabled(False)
             self.a_pa.setEnabled(False)
             self.a_fv.setEnabled(False)
+            self.a_ho.setEnabled(False)
         else:
             self.a_lk.setIcon(QIcon(':/lock-unlocked.svg'))
             self.a_zo.setEnabled(True)
             self.a_pa.setEnabled(True)
             self.a_fv.setEnabled(True)
+            self.a_ho.setEnabled(True)
             
         self.sig_tx.emit({'lock_zoom':self.lock_zoom})
 
