@@ -12,19 +12,22 @@ Widget for plotting the group delay
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-from ..compat import QCheckBox, QWidget, QFrame, QHBoxLayout
+from ..compat import QCheckBox, QWidget, QFrame, QHBoxLayout, pyqtSlot
 
 import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import grpdelay
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # TODO: Anticausal filter have no group delay. But is a filter with
 #       'baA' always anticausal or maybe just acausal?
 
 class PlotTauG(QWidget):
+    """
+    Widget for plotting the group delay
+    """
 
     def __init__(self, parent):
         super(PlotTauG, self).__init__(parent)
@@ -57,7 +60,32 @@ class PlotTauG(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from the navigation toolbar
+        """
+        if 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        elif 'home' in sig_dict:
+            self.draw()
+        else:
+            pass
+
+#------------------------------------------------------------------------------
+    def enable_ui(self, enabled):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+#        self.frmControls.setEnabled(enabled)
+        if enabled:
+            self.init_axes()
+            self.draw()
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -85,15 +113,6 @@ class PlotTauG(QWidget):
         if 'baA' in fb.fil[0]:
            self.tau_g = np.zeros(self.tau_g.size)
 
-#------------------------------------------------------------------------------
-    def enable_ui(self):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-#        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def draw(self):

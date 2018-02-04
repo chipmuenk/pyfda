@@ -47,6 +47,11 @@ VERSION.update({'scipy': VERSION_SCI})
 
 # ================ Optional Modules ============================
 try:
+    from cycler import __version__ as VERSION_CYCLER
+    VERSION.update({'cycler': VERSION_CYCLER})
+except ImportError:
+    VERSION.update({'cycler': None})
+try:
     from mayavi import __version__ as VERSION_MAYAVI
     VERSION.update({'mayavi': VERSION_MAYAVI})
 except ImportError:

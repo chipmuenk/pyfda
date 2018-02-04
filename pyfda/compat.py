@@ -13,8 +13,8 @@ Compatibility wrapper to obtain same syntax for both Qt4 and 5
 try:
     import PyQt5
     from PyQt5 import QtGui, QtCore, QtTest
-    from PyQt5.QtCore import (pyqtSignal, Qt, QEvent, QT_VERSION_STR, QSize, QSysInfo, 
-                              QObject, QVariant)
+    from PyQt5.QtCore import (Qt, QEvent, QT_VERSION_STR, QSize, QSysInfo, 
+                              QObject, QVariant, pyqtSignal, pyqtSlot)
     from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QImage, QTextCursor, QColor, 
                                 QBrush, QPalette, QPixmap)
     from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QApplication, QRadioButton,
@@ -34,8 +34,8 @@ except ImportError:
     import PyQt4
 
     from PyQt4 import QtGui, QtCore, QtTest
-    from PyQt4.QtCore import (pyqtSignal, Qt, QEvent, QT_VERSION_STR, QSize, QSysInfo,
-                              QObject, QVariant)
+    from PyQt4.QtCore import (Qt, QEvent, QT_VERSION_STR, QSize, QSysInfo,
+                              QObject, QVariant, pyqtSignal, pyqtSlot)
     from PyQt4.QtGui import (QFont, QFontMetrics, QIcon, QImage, QColor, QBrush, QStyle,
                              QPalette, QPixmap, 
                              QMainWindow, QTabWidget, QApplication, QRadioButton,

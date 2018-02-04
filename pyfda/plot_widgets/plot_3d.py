@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QDial,
-                      QGridLayout, QFrame)
+                      QGridLayout, QFrame, pyqtSlot)
 
 import numpy as np
 from numpy import pi, ones, sin, cos, log10
@@ -25,7 +25,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import H_mag, mod_version, safe_eval
 from pyfda.pyfda_qt_lib import qget_cmb_box
-from pyfda.plot_widgets.plot_utils import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap
@@ -216,9 +216,33 @@ class Plot3D(QWidget):
         self.diaHatch.valueChanged.connect(self.draw)
         self.chkContour2D.clicked.connect(self.draw)
 
-        self.mplwidget.mplToolbar.sigEnabled.connect(self.enable_ui)
-        self.mplwidget.mplToolbar.enable_update(state = False) # disable initially
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+        self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
 
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from the navigation toolbar
+        """
+        if 'update_view' in sig_dict:
+            self.update_view()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        elif 'home' in sig_dict:
+            self.draw()
+        else:
+            pass
+
+#------------------------------------------------------------------------------
+    def enable_ui(self, enabled):
+        """
+        Triggered when the toolbar is enabled or disabled
+        """
+        self.frmControls.setEnabled(enabled)
+        if enabled:
+            self.init_axes()
+            self.draw()
 
 #------------------------------------------------------------------------------
     def _init_cmb_colormap(self):
@@ -353,17 +377,6 @@ class Plot3D(QWidget):
                 self.ledTop.setText(str(self.zmax))
 
         self.draw()
-
-
-#------------------------------------------------------------------------------
-    def enable_ui(self):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.frmControls.setEnabled(self.mplwidget.mplToolbar.enabled)
-        if self.mplwidget.mplToolbar.enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def draw(self):
