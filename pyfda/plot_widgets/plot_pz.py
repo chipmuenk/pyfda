@@ -382,7 +382,7 @@ class PlotPZ(QWidget):
         y = h * np.sin(w)
         x = h * np.cos(w)
 
-        self.ax.plot(x,y)
+        self.ax.plot(x,y, label="|H(f)|")
         uc = patches.Circle((0,0), radius=r, fill=False,
                                     color='grey', ls='dashed', zorder=1)
         self.ax.add_patch(uc)
