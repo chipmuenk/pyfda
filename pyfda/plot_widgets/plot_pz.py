@@ -13,14 +13,16 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QHBoxLayout, pyqtSlot
+from ..compat import QWidget, QHBoxLayout, QCheckBox, QFrame, pyqtSlot
 
 
 import numpy as np
+import scipy.signal as sig
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import unique_roots
+from pyfda.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -31,22 +33,42 @@ class PlotPZ(QWidget):
 
     def __init__(self, parent): 
         super(PlotPZ, self).__init__(parent)
+        self._construct_UI()
+        
+    def _construct_UI(self):
+        """
+        Intitialize the widget, consisting of:
+        - Matplotlib widget with NavigationToolbar
+        - Frame with control elements
+        """
+        self.chkHf = QCheckBox("Show |H(f)|", self)
+        self.chkHf.setToolTip("<span>Enable display of |H(f)|.</span>")
+        self.chkHf.setEnabled(True)
+
 
         layHControls = QHBoxLayout()
+        layHControls.addWidget(self.chkHf)
         layHControls.addStretch(10)
         
-        # This widget encompasses all control subwidgets:
-#        self.frmControls = QFrame(self)
-#        self.frmControls.setLayout(layHControls)
-
+        #----------------------------------------------------------------------
+        #               ### frmControls ###
+        #
+        # This widget encompasses all control subwidgets
+        #----------------------------------------------------------------------
+        self.frmControls = QFrame(self)
+        self.frmControls.setObjectName("frmControls")
+        self.frmControls.setLayout(layHControls)
 
         #----------------------------------------------------------------------
-        # mplwidget
-        #----------------------------------------------------------------------
+        #               ### mplwidget ###
+        #
+        # main widget, encompassing the other widgets 
+        #----------------------------------------------------------------------  
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addLayout(layHControls)
+        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
+
 
         # make this the central widget, taking all available space:
  #       self.setCentralWidget(self.mplwidget)
@@ -59,7 +81,7 @@ class PlotPZ(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
-
+        self.chkHf.clicked.connect(self.draw)
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
@@ -82,15 +104,17 @@ class PlotPZ(QWidget):
         """
         # self.frmControls.setEnabled(enabled) # no control widgets yet
         if enabled:
-            self.init_axes()
             self.draw()
 
 #------------------------------------------------------------------------------
     def init_axes(self):
-        """Initialize and clear the axes
         """
-#        self.ax = self.mplwidget.ax
-        self.ax = self.mplwidget.fig.add_subplot(111)
+        Initialize and clear the axes
+        """
+        if self.chkHf.isChecked():
+            self.ax = self.mplwidget.fig.add_subplot(111)
+        else:
+            self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.clear()
         self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
         self.ax.get_yaxis().tick_left() # remove axis ticks right
@@ -106,6 +130,7 @@ class PlotPZ(QWidget):
 #------------------------------------------------------------------------------
     def draw(self):
         if self.mplwidget.mplToolbar.enabled:
+            self.init_axes()
             self.draw_pz()
             
 #------------------------------------------------------------------------------
@@ -138,16 +163,18 @@ class PlotPZ(QWidget):
         self.ax.set_xlabel('Real axis')
         self.ax.set_ylabel('Imaginary axis')
 
+        if self.chkHf.isChecked():
+            self.draw_Hf()
+
         self.redraw()
-        
+
 #------------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
-        
-        
+
 #------------------------------------------------------------------------------
     def zplane(self, b=None, a=1, z=None, p=None, k =1,  pn_eps=1e-3, analog=False,
               plt_ax = None, style='square', anaCircleRad=0, lw=2,
@@ -342,7 +369,31 @@ class PlotPZ(QWidget):
     
         return z, p, k
 
-#
+#------------------------------------------------------------------------------
+
+    def draw_Hf(self, r=2):
+        """
+        Draw the magnitude frequency response around the UC
+        """
+        ba = fb.fil[0]['ba']
+        w, h = sig.freqz(ba[0], ba[1], whole=True)
+        h = np.abs(h)
+        h = h / np.max(h) +1 #  map |H(f)| to a range 1 ... 2
+        y = h * np.sin(w)
+        x = h * np.cos(w)
+
+        self.ax.plot(x,y, label="|H(f)|")
+        uc = patches.Circle((0,0), radius=r, fill=False,
+                                    color='grey', ls='dashed', zorder=1)
+        self.ax.add_patch(uc)
+
+        xl = self.ax.get_xlim()
+        xmax = max(abs(xl[0]), abs(xl[1]), r*1.05)
+        yl = self.ax.get_ylim()
+        ymax = max(abs(yl[0]), abs(yl[1]), r*1.05)
+        self.ax.set_xlim((-xmax, xmax))
+        self.ax.set_ylim((-ymax, ymax))
+
 #------------------------------------------------------------------------------
 
 def main():

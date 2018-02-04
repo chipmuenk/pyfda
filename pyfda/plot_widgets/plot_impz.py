@@ -38,9 +38,9 @@ class PlotImpz(QWidget):
         self.stim_freq = 0.02
         self.A = 1.0
         self.bottom = -80
-        self._init_UI()
+        self._construct_UI()
 
-    def _init_UI(self):
+    def _construct_UI(self):
         self.chkLog = QCheckBox(self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
@@ -131,17 +131,13 @@ class PlotImpz(QWidget):
         self.ledNPoints.editingFinished.connect(self.draw)
         self.ledLogBottom.editingFinished.connect(self.draw)
         self.chkPltStim.clicked.connect(self.draw)
-#        self.cmbStimulus.currentIndexChanged.connect(self.draw)
         self.cmbStimulus.activated.connect(self.draw)
         self.ledAmp.editingFinished.connect(self.draw)
-        self.ledFreq.installEventFilter(self) 
+        self.ledFreq.installEventFilter(self)
+        
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
         self.draw() # initial calculation and drawing
-        
-        #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)

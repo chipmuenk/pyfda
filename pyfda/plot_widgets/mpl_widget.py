@@ -72,7 +72,7 @@ class MplWidget(QWidget):
         # initialize toolbar settings
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
-        self.mplToolbar = MplToolbar(self.pltCanv, self)
+        self.mplToolbar = MplToolbar(self.pltCanv, self) # inherits all methods
         self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_plot(state = True)
@@ -214,8 +214,6 @@ class MplToolbar(NavigationToolbar):
     def __init__(self, *args, **kwargs):
         NavigationToolbar.__init__(self, *args, **kwargs)
 
-#        QtWidgets.QToolBar.__init__(self, parent)
-
 #------------------------------------------------------------------------------
     def _init_toolbar(self):
 
@@ -343,7 +341,7 @@ class MplToolbar(NavigationToolbar):
                                          ylabel=ylabel, label=label,
                                          axes_repr=repr(axes)))
                 item, ok = QInputDialog.getItem(
-                    self.parent, 'Customize', 'Select axes:', titles, 0, False)
+                    self, 'Customize', 'Select axes:', titles, 0, False)
                 if ok:
                     axes = allaxes[titles.index(six.text_type(item))]
                 else:
@@ -388,7 +386,9 @@ class MplToolbar(NavigationToolbar):
         Reset zoom to default settings (defined by plotting widget).
         This method shadows `home()` inherited from NavigationToolbar.
         """
+        self.push_current()
         self.sig_tx.emit({'home':''}) # only the key is used by the slot
+        self.parent.redraw()
 
 #------------------------------------------------------------------------------
     def toggle_grid(self):
@@ -396,7 +396,7 @@ class MplToolbar(NavigationToolbar):
         self.grid = not self.grid
         for ax in self.parent.fig.axes:
             ax.grid(self.grid)
-        self.parent.pltCanv.draw() # don't use self.parent.redraw()
+        self.parent.pltCanv.draw() # don't use self.redraw()
 
 #------------------------------------------------------------------------------
     def toggle_lock_zoom(self):
@@ -412,11 +412,13 @@ class MplToolbar(NavigationToolbar):
             self.a_zo.setEnabled(False)
             self.a_pa.setEnabled(False)
             self.a_fv.setEnabled(False)
+            self.a_ho.setEnabled(False)
         else:
             self.a_lk.setIcon(QIcon(':/lock-unlocked.svg'))
             self.a_zo.setEnabled(True)
             self.a_pa.setEnabled(True)
             self.a_fv.setEnabled(True)
+            self.a_ho.setEnabled(True)
             
         self.sig_tx.emit({'lock_zoom':self.lock_zoom})
 
