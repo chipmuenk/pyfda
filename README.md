@@ -62,7 +62,7 @@ Initial release
   * Apply filter on audio files (in the h[n] widget) to hear the filtering effect
 * **Documentation using Sphinx / ReadTheDocs**
 
-### Release 0.3 (planned for end of 2018)
+### Release 1.0 (planned for end of 2018)
 
 * **Filter Manager**
   * Store multiple designs in one filter dict
