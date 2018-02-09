@@ -758,8 +758,9 @@ class FilterCoeffs(QWidget):
 
         # test and equalize if b and a array have different lengths:
         self._equalize_ba_length()
+        # if length is less than 2, clear the table: this ain't no filter!
         if len(self.ba[0]) < 2:
-            self._clear_table()
+            self._clear_table() # sets 'changed' attribute
         else:
             self._refresh_table()
             qstyle_widget(self.ui.butSave, 'changed')
@@ -774,18 +775,21 @@ class FilterCoeffs(QWidget):
         # get indices of all selected cells
         sel = qget_selected(self.tblCoeff)['sel']
 
-        if not np.any(sel):
-            sel[0] = [len(self.ba[0])]
-            sel[1] = [len(self.ba[1])]
-
-        self.ba[0] = np.insert(self.ba[0], sel[0], 0)
-        self.ba[1] = np.insert(self.ba[1], sel[1], 0)
+        if not np.any(sel): # nothing selected, append zeros to table
+            np.append(self.ba[0], 0)
+            np.append(self.ba[1], 0)
+        else:
+            self.ba[0] = np.insert(self.ba[0], sel[0], 0)
+            self.ba[1] = np.insert(self.ba[1], sel[1], 0)
 
         # insert 'sel' contiguous rows  before 'row':
         # self.ba[0] = np.insert(self.ba[0], row, np.zeros(sel))
 
         self._equalize_ba_length()
         self._refresh_table()
+        # don't tag as 'changed' when only zeros have been added at the end
+        if np.any(sel):
+            qstyle_widget(self.ui.butSave, 'changed')
 
 #------------------------------------------------------------------------------
     def _set_eps(self):
