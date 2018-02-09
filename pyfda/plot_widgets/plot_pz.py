@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QHBoxLayout, QCheckBox, QFrame, pyqtSlot
+from ..compat import QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout, pyqtSlot
 
 
 import numpy as np
@@ -22,7 +22,6 @@ import scipy.signal as sig
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import unique_roots
-from pyfda.pyfda_qt_lib import qget_cmb_box
 
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
@@ -42,14 +41,31 @@ class PlotPZ(QWidget):
         - Frame with control elements
         """
         self.chkHf = QCheckBox("Show |H(f)|", self)
-        self.chkHf.setToolTip("<span>Enable display of |H(f)|.</span>")
+        self.chkHf.setToolTip("<span>Display |H(f)| around unit circle.</span>")
         self.chkHf.setEnabled(True)
 
+        self.chkHfLog = QCheckBox("Log. Scale", self)
+        self.chkHfLog.setToolTip("<span>Log. scale for |H(f)|.</span>")
+        self.chkHfLog.setEnabled(True)
+
+        self.diaRad_Hf = QDial(self)
+        self.diaRad_Hf.setRange(2., 10.)
+        self.diaRad_Hf.setValue(2)
+        self.diaRad_Hf.setTracking(False) # produce less events when turning
+        self.diaRad_Hf.setFixedHeight(30)
+        self.diaRad_Hf.setFixedWidth(30)
+        self.diaRad_Hf.setWrapping(False)
+        self.diaRad_Hf.setToolTip("<span>Set max. radius for |H(f)| plot.</span>")
+
+        self.lblRad_Hf = QLabel("Radius", self)
 
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.chkHf)
+        layHControls.addWidget(self.chkHfLog)
+        layHControls.addWidget(self.diaRad_Hf)
+        layHControls.addWidget(self.lblRad_Hf)
         layHControls.addStretch(10)
-        
+
         #----------------------------------------------------------------------
         #               ### frmControls ###
         #
@@ -68,10 +84,6 @@ class PlotPZ(QWidget):
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
-
-
-        # make this the central widget, taking all available space:
- #       self.setCentralWidget(self.mplwidget)
         
         self.init_axes()
 
@@ -82,6 +94,8 @@ class PlotPZ(QWidget):
         #----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
         self.chkHf.clicked.connect(self.draw)
+        self.chkHfLog.clicked.connect(self.draw)
+        self.diaRad_Hf.valueChanged.connect(self.draw)
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
@@ -163,8 +177,7 @@ class PlotPZ(QWidget):
         self.ax.set_xlabel('Real axis')
         self.ax.set_ylabel('Imaginary axis')
 
-        if self.chkHf.isChecked():
-            self.draw_Hf()
+        self.draw_Hf(r = self.diaRad_Hf.value())
 
         self.redraw()
 
@@ -375,12 +388,22 @@ class PlotPZ(QWidget):
         """
         Draw the magnitude frequency response around the UC
         """
+        self.chkHfLog.setVisible(self.chkHf.isChecked())
+        self.diaRad_Hf.setVisible(self.chkHf.isChecked())
+        self.lblRad_Hf.setVisible(self.chkHf.isChecked())
+        if not self.chkHf.isChecked():
+            return
         ba = fb.fil[0]['ba']
-        w, h = sig.freqz(ba[0], ba[1], whole=True)
-        h = np.abs(h)
-        h = h / np.max(h) +1 #  map |H(f)| to a range 1 ... 2
-        y = h * np.sin(w)
-        x = h * np.cos(w)
+        w, H = sig.freqz(ba[0], ba[1], whole=True)
+        H = np.abs(H)
+        if self.chkHfLog.isChecked():
+            H = np.clip(np.log10(H), -4, None) # clip to -80 dB
+            H = H - np.max(H) # shift scale to H_min ... 0
+            H = 1 + (r-1) * (1 + H / abs(np.min(H))) # scale to 1 ... r 
+        else:
+            H = 1 + (r-1) * H / np.max(H)  #  map |H(f)| to a range 1 ... r
+        y = H * np.sin(w)
+        x = H * np.cos(w)
 
         self.ax.plot(x,y, label="|H(f)|")
         uc = patches.Circle((0,0), radius=r, fill=False,
