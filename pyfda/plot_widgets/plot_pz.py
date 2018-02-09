@@ -58,6 +58,11 @@ class PlotPZ(QWidget):
         self.diaRad_Hf.setToolTip("<span>Set max. radius for |H(f)| plot.</span>")
 
         self.lblRad_Hf = QLabel("Radius", self)
+        
+        self.chkFIR_P = QCheckBox("Plot FIR Poles", self)
+        self.chkFIR_P.setToolTip("<span>Show FIR poles at the origin.</span>")
+        self.chkFIR_P.setChecked(True)
+
 
         layHControls = QHBoxLayout()
         layHControls.addWidget(self.chkHf)
@@ -65,6 +70,7 @@ class PlotPZ(QWidget):
         layHControls.addWidget(self.diaRad_Hf)
         layHControls.addWidget(self.lblRad_Hf)
         layHControls.addStretch(10)
+        layHControls.addWidget(self.chkFIR_P)
 
         #----------------------------------------------------------------------
         #               ### frmControls ###
@@ -96,6 +102,7 @@ class PlotPZ(QWidget):
         self.chkHf.clicked.connect(self.draw)
         self.chkHfLog.clicked.connect(self.draw)
         self.diaRad_Hf.valueChanged.connect(self.draw)
+        self.chkFIR_P.clicked.connect(self.draw)
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
@@ -144,6 +151,7 @@ class PlotPZ(QWidget):
 #------------------------------------------------------------------------------
     def draw(self):
         if self.mplwidget.mplToolbar.enabled:
+            self.chkFIR_P.setVisible(fb.fil[0]['ft']=='FIR')
             self.init_axes()
             self.draw_pz()
             
@@ -171,6 +179,7 @@ class PlotPZ(QWidget):
         self.ax.clear()
 
         [z,p,k] = self.zplane(z = zpk[0], p = zpk[1], k = zpk[2], plt_ax = self.ax,
+            plt_poles=self.chkFIR_P.isChecked() or fb.fil[0]['ft'] == 'IIR',
             mps = p_marker[0], mpc = p_marker[1], mzs = z_marker[0], mzc = z_marker[1])
 
         self.ax.set_title(r'Pole / Zero Plot')
@@ -189,8 +198,8 @@ class PlotPZ(QWidget):
         self.mplwidget.redraw()
 
 #------------------------------------------------------------------------------
-    def zplane(self, b=None, a=1, z=None, p=None, k =1,  pn_eps=1e-3, analog=False,
-              plt_ax = None, style='square', anaCircleRad=0, lw=2,
+    def zplane(self, b=None, a=1, z=None, p=None, k=1,  pn_eps=1e-3, analog=False,
+              plt_ax = None, plt_poles=True, style='square', anaCircleRad=0, lw=2,
               mps = 10, mzs = 10, mpc = 'r', mzc = 'b', plabel = '', zlabel = ''):
         """
         Plot the poles and zeros in the complex z-plane either from the
@@ -205,95 +214,93 @@ class PlotPZ(QWidget):
              Numerator coefficients (transversal part of filter)
              When b is not None, poles and zeros are determined from the coefficients
              b and a
-    
+
         a :  array_like (optional, default = 1 for FIR-filter)
              Denominator coefficients (recursive part of filter)
-             
+
         z :  array_like, default = None
              Zeros
              When b is None, poles and zeros are taken directly from z and p
-    
+
         p :  array_like, default = None
              Poles
-    
+
         analog : boolean (default: False)
             When True, create a P/Z plot suitable for the s-plane, i.e. suppress
             the unit circle (unless anaCircleRad > 0) and scale the plot for
             a good display of all poles and zeros.
-    
+
         pn_eps : float (default : 1e-2)
              Tolerance for separating close poles or zeros
-             
+
         plt_ax : handle to axes for plotting (default: None)
             When no axes is specified, the current axes is determined via plt.gca()
-    
-        pltLib :  string (default: 'matplotlib')
-             Library for plotting the P/Z plane. Currently, only matplotlib is
-             implemented. When pltLib = 'none' or when matplotlib is not
-             available, only pass the poles / zeros and their multiplicity
-    
+
+        plt_poles : Boolean (default : True)
+            Plot poles. This can be used to suppress poles for FIR systems
+            where all poles are at the origin.
+
         style : string (default: 'square')
             Style of the plot, for style == 'square' make scale of x- and y-
             axis equal.
-    
+
         mps : integer  (default: 10)
             Size for pole marker
-            
+
         mzs : integer (default: 10)
             Size for zero marker
-            
+
         mpc : char (default: 'r')
             Pole marker colour
-            
+
         mzc : char (default: 'b')
             Zero marker colour
-            
+
         lw : integer (default:  2)
             Linewidth for unit circle
-    
+
         plabel, zlabel : string (default: '')
             This string is passed to the plot command for poles and zeros and
             can be displayed by legend()
-    
-    
+
+
         Returns
         -------
         z, p, k : ndarray
-    
-    
+
+
         Notes
         -----
-    
         """
         # TODO:
         # - polar option
         # - add keywords for color of circle -> **kwargs
         # - add option for multi-dimensional arrays and zpk data
-    
+
         # make sure that all inputs are arrays
         b = np.atleast_1d(b) 
         a = np.atleast_1d(a)
         z = np.atleast_1d(z) # make sure that p, z  are arrays
         p = np.atleast_1d(p)
-    
+
         if b.any(): # coefficients were specified
             if len(b) < 2 and len(a) < 2:
                 logger.error('No proper filter coefficients: both b and a are scalars!')
                 return z, p, k
-            
+
             # The coefficients are less than 1, normalize the coefficients
             if np.max(b) > 1:
                 kn = np.max(b)
                 b = b / float(kn) 
             else:
                 kn = 1.
-    
+
             if np.max(a) > 1:
                 kd = np.max(a)
                 a = a / abs(kd)
             else:
                 kd = 1.
-    
+
             # Calculate the poles, zeros and scaling factor
             p = np.roots(a)
             z = np.roots(b)
@@ -301,7 +308,7 @@ class PlotPZ(QWidget):
         elif not (len(p) or len(z)): # P/Z were specified
             logger.error('Either b,a or z,p must be specified!')
             return z, p, k
-  
+
         # find multiple poles and zeros and their multiplicities
         if len(p) < 2: # single pole, [None] or [0]
             if not p or p == 0: # only zeros, create equal number of poles at origin
@@ -319,8 +326,7 @@ class PlotPZ(QWidget):
             #z, num_z = sig.signaltools.unique_roots(z, tol = pn_eps, rtype='avg')
         else:
             num_z = []
-    
-    
+
         ax = plt_ax#.subplot(111)
         if analog == False:
             # create the unit circle for the z-plane
@@ -335,7 +341,7 @@ class PlotPZ(QWidget):
         #    ax.spines['bottom'].set_position('center')
         #    ax.spines['right'].set_visible(True)
         #    ax.spines['top'].set_visible(True)
-    
+
         else: # s-plane
             if anaCircleRad > 0:
                 # plot a circle with radius = anaCircleRad
@@ -345,26 +351,26 @@ class PlotPZ(QWidget):
             # plot real and imaginary axis
             ax.axhline(lw=2, color = 'k', zorder=1)
             ax.axvline(lw=2, color = 'k', zorder=1)
-    
+
         # Plot the zeros
         ax.scatter(z.real, z.imag, s=mzs*mzs, zorder=2, marker = 'o',
                    facecolor = 'none', edgecolor = mzc, lw = lw, label=zlabel)
-        # Plot the poles
-        ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker='x',
-                   color=mpc, lw=lw, label=plabel)
-    
-         # Print multiplicity of poles / zeros
+        # and print their multiplicity
         for i in range(len(z)):
             logger.debug('z: {0} | {1} | {2}'.format(i, z[i], num_z[i]))
             if num_z[i] > 1:
                 ax.text(np.real(z[i]), np.imag(z[i]),'  (' + str(num_z[i]) +')',
                                 va = 'top', color=mzc)
-    
-        for i in range(len(p)):
-            logger.debug('p:{0} | {1} | {2}'.format(i, p[i], num_p[i]))
-            if num_p[i] > 1:
-                ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',
-                                va = 'bottom', color=mpc)
+        if plt_poles:
+            # Plot the poles
+            ax.scatter(p.real, p.imag, s=mps*mps, zorder=2, marker='x',
+                       color=mpc, lw=lw, label=plabel)
+            # and print their multiplicity
+            for i in range(len(p)):
+                logger.debug('p:{0} | {1} | {2}'.format(i, p[i], num_p[i]))
+                if num_p[i] > 1:
+                    ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',
+                                    va = 'bottom', color=mpc)
     
             # increase distance between ticks and labels
             # to give some room for poles and zeros
@@ -374,12 +380,12 @@ class PlotPZ(QWidget):
         for tick in ax.get_yaxis().get_major_ticks():
             tick.set_pad(12.)
             tick.label1 = tick._get_text1()
-    
+
         xl = ax.get_xlim(); Dx = max(abs(xl[1]-xl[0]), 0.05)
         yl = ax.get_ylim(); Dy = max(abs(yl[1]-yl[0]), 0.05)
         ax.set_xlim((xl[0]-Dx*0.05, max(xl[1]+Dx*0.05,0)))
         ax.set_ylim((yl[0]-Dy*0.05, yl[1] + Dy*0.05))
-    
+
         return z, p, k
 
 #------------------------------------------------------------------------------
@@ -397,7 +403,7 @@ class PlotPZ(QWidget):
         w, H = sig.freqz(ba[0], ba[1], whole=True)
         H = np.abs(H)
         if self.chkHfLog.isChecked():
-            H = np.clip(np.log10(H), -4, None) # clip to -80 dB
+            H = np.clip(np.log10(H), -6, None) # clip to -120 dB
             H = H - np.max(H) # shift scale to H_min ... 0
             H = 1 + (r-1) * (1 + H / abs(np.min(H))) # scale to 1 ... r 
         else:
