@@ -400,7 +400,7 @@ class PlotPZ(QWidget):
         if not self.chkHf.isChecked():
             return
         ba = fb.fil[0]['ba']
-        w, H = sig.freqz(ba[0], ba[1], whole=True)
+        w, H = sig.freqz(ba[0], ba[1], worN=params['N_FFT'], whole=True)
         H = np.abs(H)
         if self.chkHfLog.isChecked():
             H = np.clip(np.log10(H), -6, None) # clip to -120 dB
