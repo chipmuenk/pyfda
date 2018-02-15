@@ -122,10 +122,10 @@ class PlotTabWidgets(QTabWidget):
 #            logger.debug("process_signals called by {0}".format(sender_name))
 
         if 'specs_changed' in sig_dict:
-            self.update_view()
+               self.update_view()
             
-        elif 'view_changed' in sig_dict:
-            self.update_view()
+        elif 'view_changed' in sig_dict.keys():
+               self.update_view()
             
         elif 'filter_designed' in sig_dict:
                self.update_data()
