@@ -184,7 +184,6 @@ class InputTabWidgets(QWidget):
         if HAS_MYHDL:
             self.hdlSpecs.update_UI()
         logger.debug("Emit sig_tx = 'specs_changed'")
-        print("Emit sig_tx = 'specs_changed'")
         self.sig_tx.emit({'sender':'InputTabWidgets','specs_changed':True})
 
     def load_all(self):

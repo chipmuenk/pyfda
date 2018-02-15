@@ -113,7 +113,7 @@ class PlotTabWidgets(QTabWidget):
         """
         Process signals coming in
         """
-        print("plt_tab_widget: signal received!", sig_dict)
+        logger.debug("sig_rx = {0}".format(sig_dict))
         if self.sender(): # origin of signal that triggered the slot
             sender_name = self.sender().objectName()
             sender_text = self.sender().text()
