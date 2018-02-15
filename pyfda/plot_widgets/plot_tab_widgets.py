@@ -114,12 +114,12 @@ class PlotTabWidgets(QTabWidget):
         Process signals coming in
         """
         logger.debug("sig_rx = {0}".format(sig_dict))
-        if self.sender(): # origin of signal that triggered the slot
-            sender_name = self.sender().objectName()
-            sender_text = self.sender().text()
-            sender_class = self.sender().__class__.__name__
-            print("sender = ", sender_text, sender_class, sender_name, self.__class__.__name__)
-            logger.debug("process_signals called by {0}".format(sender_name))
+#        if self.sender(): # origin of signal that triggered the slot
+#            sender_name = self.sender().objectName()
+#            sender_text = self.sender().text()
+#            sender_class = self.sender().__class__.__name__
+#            print("sender = ", sender_text, sender_class, sender_name, self.__class__.__name__)
+#            logger.debug("process_signals called by {0}".format(sender_name))
 
         if 'specs_changed' in sig_dict:
             self.update_view()
