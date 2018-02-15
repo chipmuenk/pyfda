@@ -163,7 +163,7 @@ class InputTabWidgets(QWidget):
         """
         self.filter_info.load_dict() # update frequency unit of info widget
         logger.debug("Emit sig_tx = 'specs_changed'")
-        self.sig_tx.emit({'sender':'InputTabWidgets',' view_changed':True})
+        self.sig_tx.emit({'sender':'InputTabWidgets','view_changed':True})
 
 
     def update_specs(self):
