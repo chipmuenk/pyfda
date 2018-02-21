@@ -13,8 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QEvent,
-                      Qt, QHBoxLayout, QFrame, pyqtSlot)
+from ..compat import QWidget, QLineEdit, QEvent, Qt, pyqtSlot
 
 import numpy as np
 import scipy.signal as sig
@@ -24,6 +23,7 @@ from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
+from .plot_impz_ui import PlotImpz_UI
 
 
 class PlotImpz(QWidget):
@@ -34,107 +34,45 @@ class PlotImpz(QWidget):
         super(PlotImpz, self).__init__(parent)
 
         self.ACTIVE_3D = False
+        self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
+
         # initial settings for line edit widgets
-        self.stim_freq = 0.02
-        self.A = 1.0
-        self.bottom = -80
+        self.f1 = self.ui.f1
+        self.f2 = self.ui.f2
+        self.A = self.ui.A
+        self.A2 = self.ui.A2
+        self.bottom = self.ui.bottom
+
         self._construct_UI()
 
     def _construct_UI(self):
-        self.chkLog = QCheckBox(self)
-        self.chkLog.setObjectName("chkLog")
-        self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chkLog.setChecked(False)
-        self.lblLog = QLabel("Log. y-axis", self)
-
-        self.lblLogBottom = QLabel("Bottom = ", self)
-        self.ledLogBottom = QLineEdit(self)
-        self.ledLogBottom.setText(str(self.bottom))
-        self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbldB = QLabel("dB")
+        """
+        Create the top level UI of the widget, consisting of matplotlib widget
+        and control frame.
+        """
         
-        self.lblPltStim = QLabel(self)
-        self.lblPltStim.setText("Stimulus:")
-        self.chkPltStim = QCheckBox("Show", self)
-        self.chkPltStim.setChecked(False)
-        self.chkPltStim.setToolTip("Show stimulus signal.")
-        
-        self.lblStimulus = QLabel("Type = ", self)
-        self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw", "RandN", "RandU"])
-        self.cmbStimulus.setToolTip("Select stimulus type.")
-
-        self.lblAmp = QLabel("<i>A</i>&nbsp; =", self)
-        self.ledAmp = QLineEdit(self)
-        self.ledAmp.setText(str(self.A))
-        self.ledAmp.setToolTip("Stimulus amplitude.")
-        self.ledAmp.setObjectName("stimAmp")
-
-        self.lblFreq = QLabel("<i>f</i>&nbsp; =", self)
-        self.ledFreq = QLineEdit(self)
-        self.ledFreq.setText(str(self.stim_freq))
-        self.ledFreq.setToolTip("Stimulus frequency.")
-        self.ledFreq.setObjectName("stimFreq")
-
-        self.lblFreqUnit = QLabel("f_S", self)
-
-        self.lblNPoints = QLabel("<i>N</i>&nbsp; =", self)
-
-        self.ledNPoints = QLineEdit(self)
-        self.ledNPoints.setText("0")
-        self.ledNPoints.setToolTip("<span>Number of points to calculate and display. "
-                                   "N = 0 selects automatically.</span>")
-
-        layHControls = QHBoxLayout()
-        
-        layHControls.addWidget(self.lblNPoints)
-        layHControls.addWidget(self.ledNPoints)
-        layHControls.addStretch(2)
-        layHControls.addWidget(self.chkLog)
-        layHControls.addWidget(self.lblLog)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.lblLogBottom)
-        layHControls.addWidget(self.ledLogBottom)
-        layHControls.addWidget(self.lbldB)
-        layHControls.addStretch(2)
-        layHControls.addWidget(self.lblPltStim)
-        layHControls.addWidget(self.chkPltStim)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.lblStimulus)
-        layHControls.addWidget(self.cmbStimulus)
-        layHControls.addStretch(2)
-        layHControls.addWidget(self.lblAmp)
-        layHControls.addWidget(self.ledAmp)
-        layHControls.addWidget(self.lblFreq)
-        layHControls.addWidget(self.ledFreq)
-        layHControls.addWidget(self.lblFreqUnit)
-
-        layHControls.addStretch(10)
-        
-        # This widget encompasses all control subwidgets:
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
-        self.frmControls.setLayout(layHControls)
-
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.addWidget(self.ui)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.chkLog.clicked.connect(self.draw)
-        self.ledNPoints.editingFinished.connect(self.draw)
-        self.ledLogBottom.editingFinished.connect(self.draw)
-        self.chkPltStim.clicked.connect(self.draw)
-        self.cmbStimulus.activated.connect(self.draw)
-        self.ledAmp.editingFinished.connect(self.draw)
-        self.ledFreq.installEventFilter(self)
-        
+        self.ui.chkLog.clicked.connect(self.draw)
+        self.ui.chkMarker.clicked.connect(self.draw)
+        self.ui.ledNPoints.editingFinished.connect(self.draw)
+        self.ui.ledLogBottom.editingFinished.connect(self.draw)
+        self.ui.chkPltStim.clicked.connect(self.draw)
+        self.ui.cmbStimulus.activated.connect(self.draw)
+        self.ui.ledAmp1.editingFinished.connect(self.draw)
+        self.ui.ledAmp2.editingFinished.connect(self.draw)
+        self.ui.ledFreq1.installEventFilter(self)
+        self.ui.ledFreq2.installEventFilter(self)
+
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
         self.draw() # initial calculation and drawing
@@ -159,7 +97,7 @@ class PlotImpz(QWidget):
         """
         Triggered when the toolbar is enabled or disabled
         """
-        self.frmControls.setEnabled(enabled)
+        self.ui.frmControls.setEnabled(enabled)
         if enabled:
             # self.init_axes() # called by self.draw
             self.draw()
@@ -182,8 +120,14 @@ class PlotImpz(QWidget):
 
         def _store_entry(source):
             if self.spec_edited:
-                self.stim_freq = safe_eval(source.text(), self.stim_freq * fb.fil[0]['f_S'],
+                if source.objectName() == "stimFreq1":
+                   self.f1 = safe_eval(source.text(), self.f1 * fb.fil[0]['f_S'],
                                             return_type='float') / fb.fil[0]['f_S']
+
+                elif source.objectName() == "stimFreq2":
+                   self.f2 = safe_eval(source.text(), self.f2 * fb.fil[0]['f_S'],
+                                            return_type='float') / fb.fil[0]['f_S']
+
                 self.spec_edited = False # reset flag
                 self.draw()
                 
@@ -197,12 +141,19 @@ class PlotImpz(QWidget):
                 if key in {Qt.Key_Return, Qt.Key_Enter}:
                     _store_entry(source)
                 elif key == Qt.Key_Escape: # revert changes
-                    self.spec_edited = False                    
-                    source.setText(str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+                    self.spec_edited = False
+                    if source.objectName() == "stimFreq1":                    
+                        source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                    elif source.objectName() == "stimFreq2":                    
+                        source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
                 
             elif event.type() == QEvent.FocusOut:
                 _store_entry(source)
-                source.setText(str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+                if source.objectName() == "stimFreq1":
+                    source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                elif source.objectName() == "stimFreq2":
+                    source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+
         # Call base class method to continue normal event processing:
         return super(PlotImpz, self).eventFilter(source, event)
 
@@ -224,13 +175,13 @@ class PlotImpz(QWidget):
 
         # recalculate displayed freq spec values for (maybe) changed f_S
         logger.debug("exec load_dict")
-        if not self.ledFreq.hasFocus():
+        if not self.ui.ledFreq1.hasFocus():
             # widget has no focus, round the display
-            self.ledFreq.setText(
-                str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+            self.ui.ledFreq1.setText(
+                str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
         else:
             # widget has focus, show full precision
-            self.ledFreq.setText(str(self.stim_freq * fb.fil[0]['f_S']))
+            self.ui.ledFreq1.setText(str(self.f1 * fb.fil[0]['f_S']))
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -283,18 +234,18 @@ class PlotImpz(QWidget):
         """
         (Re-)calculate h[n] and draw the figure
         """
-        log = self.chkLog.isChecked()
-        stim = str(self.cmbStimulus.currentText())
+        log = self.ui.chkLog.isChecked()
+        stim = str(self.ui.cmbStimulus.currentText())
         periodic_sig = stim in {"Cos", "Sine","Rect", "Saw"}
-        self.lblLogBottom.setVisible(log)
-        self.ledLogBottom.setVisible(log)
-        self.lbldB.setVisible(log)
+        self.ui.lblLogBottom.setVisible(log)
+        self.ui.ledLogBottom.setVisible(log)
+        self.ui.lbldB.setVisible(log)
         
-        self.lblFreq.setVisible(periodic_sig)
-        self.ledFreq.setVisible(periodic_sig)
-        self.lblFreqUnit.setVisible(periodic_sig)
+        self.ui.lblFreq1.setVisible(periodic_sig)
+        self.ui.ledFreq1.setVisible(periodic_sig)
+        self.ui.lblFreqUnit1.setVisible(periodic_sig)
 
-        self.lblFreqUnit.setText(to_html(fb.fil[0]['freq_specs_unit']))
+        self.ui.lblFreqUnit1.setText(to_html(fb.fil[0]['freq_specs_unit']))
         self.load_dict()
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -309,18 +260,23 @@ class PlotImpz(QWidget):
 
         self.f_S  = fb.fil[0]['f_S']
         
-        N_entry = safe_eval(self.ledNPoints.text(), 0, return_type='int', sign='pos')
+        N_entry = safe_eval(self.ui.ledNPoints.text(), 0, return_type='int', sign='pos')
         N = self.calc_n_points(N_entry)
         if N_entry != 0: # automatic calculation
-            self.ledNPoints.setText(str(N))
+            self.ui.ledNPoints.setText(str(N))
 
-        self.A = safe_eval(self.ledAmp.text(), self.A, return_type='float')
-        self.ledAmp.setText(str(self.A))
+        self.A = safe_eval(self.ui.ledAmp1.text(), self.A, return_type='float')
+        self.ui.ledAmp1.setText(str(self.A))
+        
+        self.A2 = safe_eval(self.ui.ledAmp2.text(), self.A2, return_type='float')
+        self.ui.ledAmp2.setText(str(self.A2))
+
 
         t = np.linspace(0, N/self.f_S, N, endpoint=False)
 
         title_str = r'Impulse Response' # default
         H_str = r'$h[n]$' # default
+        self.wdg = ['A1']
 
         # calculate h[n]
         if stim == "Pulse":
@@ -330,19 +286,21 @@ class PlotImpz(QWidget):
             x = self.A * np.ones(N) # create step function
             title_str = r'Step Response'
             H_str = r'$h_{\epsilon}[n]$'
+            
         elif stim == "StepErr":
             x = self.A * np.ones(N) # create step function
             title_str = r'Settling Error'
             H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif stim in {"Cos"}:
-            x = self.A * np.cos(2 * np.pi * t * float(self.ledFreq.text()))
+            x = self.A * np.cos(2 * np.pi * t * float(self.ui.ledFreq1.text()))
             if stim == "Cos":
                 title_str = r'Transient Response to Cosine Signal'
                 H_str = r'$y_{\cos}[n]$'
-
+                self.wdg = ['A1', 'f1', 'A2', 'f2']
+                
         elif stim in {"Sine", "Rect"}:
-            x = self.A * np.sin(2 * np.pi * t * float(self.ledFreq.text()))
+            x = self.A * np.sin(2 * np.pi * t * float(self.ui.ledFreq1.text()))
             if stim == "Sine":
                 title_str = r'Transient Response to Sine Signal'
                 H_str = r'$y_{\sin}[n]$'
@@ -352,7 +310,7 @@ class PlotImpz(QWidget):
                 H_str = r'$y_{rect}[n]$'
 
         elif stim == "Saw":
-            x = self.A * sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
+            x = self.A * sig.sawtooth(t * (float(self.ui.ledFreq1.text())* 2*np.pi))
             title_str = r'Transient Response to Sawtooth Signal'
             H_str = r'$y_{saw}[n]$'
 
@@ -390,8 +348,8 @@ class PlotImpz(QWidget):
             H_i_str = r'$\Im\{$' + H_str + '$\}$'
             H_str = r'$\Re\{$' + H_str + '$\}$'
         if log:
-            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom, return_type='float')
-            self.ledLogBottom.setText(str(self.bottom))
+            self.bottom = safe_eval(self.ui.ledLogBottom.text(), self.bottom, return_type='float')
+            self.ui.ledLogBottom.setText(str(self.bottom))
             H_str = r'$|$ ' + H_str + '$|$ in dB'
             h = np.maximum(20 * np.log10(abs(h)), self.bottom)
             if self.cmplx:
@@ -403,9 +361,15 @@ class PlotImpz(QWidget):
         self.init_axes()
 
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt='o', label = '$h[n]$')
+        if self.ui.chkMarker.isChecked():
+            mkfmt_r = 'o'
+            mkfmt_i = 'd'
+        else:
+            mkfmt_r = mkfmt_i = ' '
+
+        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt=mkfmt_r, label = '$h[n]$')
         stem_fmt = params['mpl_stimuli']
-        if self.chkPltStim.isChecked():
+        if self.ui.chkPltStim.isChecked():
             [ms, ss, bs] = self.ax_r.stem(t, x, bottom=self.bottom, label = 'Stim.', **stem_fmt)
             ms.set_mfc(stem_fmt['mfc'])
             ms.set_mec(stem_fmt['mec'])
@@ -421,7 +385,7 @@ class PlotImpz(QWidget):
 
         if self.cmplx:
             [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=self.bottom,
-                                                markerfmt='d', label = '$h_i[n]$')
+                                                markerfmt=mkfmt_i, label = '$h_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
