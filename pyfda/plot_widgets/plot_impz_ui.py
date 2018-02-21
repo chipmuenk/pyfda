@@ -168,11 +168,11 @@ class PlotImpz_UI(QWidget):
         layVMainF.addLayout(layHControls)
 
         # This frame encompasses all UI elements
-        frmMain = QFrame(self)
-        frmMain.setLayout(layVMainF)
+        self.frmControls = QFrame(self)
+        self.frmControls.setLayout(layVMainF)
 
         layVMain = QVBoxLayout()
-        layVMain.addWidget(frmMain)
+        layVMain.addWidget(self.frmControls)
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         
