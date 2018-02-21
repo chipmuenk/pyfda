@@ -67,6 +67,7 @@ class PlotImpz(QWidget):
         self.ui.ledNPoints.editingFinished.connect(self.draw)
         self.ui.ledLogBottom.editingFinished.connect(self.draw)
         self.ui.chkPltStim.clicked.connect(self.draw)
+        self.ui.chkPltResp.clicked.connect(self.draw)
         self.ui.cmbStimulus.activated.connect(self.draw)
         self.ui.ledAmp1.editingFinished.connect(self.draw)
         self.ui.ledAmp2.editingFinished.connect(self.draw)
@@ -193,7 +194,7 @@ class PlotImpz(QWidget):
         except (KeyError, AttributeError, UnboundLocalError):
             pass
 
-        if self.cmplx:
+        if self.cmplx and self.ui.chkPltResp.isChecked():
             self.ax_r = self.mplwidget.fig.add_subplot(211)
             self.ax_r.clear()
             self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
@@ -367,9 +368,11 @@ class PlotImpz(QWidget):
         else:
             mkfmt_r = mkfmt_i = ' '
 
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt=mkfmt_r, label = '$h[n]$')
-        stem_fmt = params['mpl_stimuli']
+        if self.ui.chkPltResp.isChecked():
+            [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt=mkfmt_r, label = '$h[n]$')
+
         if self.ui.chkPltStim.isChecked():
+            stem_fmt = params['mpl_stimuli']
             [ms, ss, bs] = self.ax_r.stem(t, x, bottom=self.bottom, label = 'Stim.', **stem_fmt)
             ms.set_mfc(stem_fmt['mfc'])
             ms.set_mec(stem_fmt['mec'])
@@ -380,10 +383,11 @@ class PlotImpz(QWidget):
                 stem.set_color(stem_fmt['mec'])
                 stem.set_alpha(stem_fmt['alpha'])
             bs.set_visible(False) # invisible bottomline
+
         expand_lim(self.ax_r, 0.02)
         self.ax_r.set_title(title_str)
 
-        if self.cmplx:
+        if self.cmplx and self.ui.chkPltResp.isChecked():
             [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=self.bottom,
                                                 markerfmt=mkfmt_i, label = '$h_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
