@@ -118,6 +118,14 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.setToolTip("Stimulus amplitude 2.")
         self.ledAmp2.setObjectName("stimAmp2")
 
+        layVlblAmp = QVBoxLayout()
+        layVlblAmp.addWidget(self.lblAmp1)
+        layVlblAmp.addWidget(self.lblAmp2)
+
+        layVledAmp = QVBoxLayout()
+        layVledAmp.addWidget(self.ledAmp1)
+        layVledAmp.addWidget(self.ledAmp2)
+
         self.lblFreq1 = QLabel("<i>f</i><sub>1</sub>&nbsp; =", self)
         self.ledFreq1 = QLineEdit(self)
         self.ledFreq1.setText(str(self.f1))
@@ -141,7 +149,6 @@ class PlotImpz_UI(QWidget):
         layHControls.addLayout(layVledNPoints)
         layHControls.addStretch(2)
         layHControls.addLayout(layVchkLogMark)
-        
         layHControls.addStretch(1)
         layHControls.addWidget(self.lblLogBottom)
         layHControls.addWidget(self.ledLogBottom)
@@ -152,8 +159,8 @@ class PlotImpz_UI(QWidget):
         layHControls.addWidget(self.lblStimulus)
         layHControls.addWidget(self.cmbStimulus)
         layHControls.addStretch(2)
-        layHControls.addWidget(self.lblAmp1)
-        layHControls.addWidget(self.ledAmp1)
+        layHControls.addLayout(layVlblAmp)
+        layHControls.addLayout(layVledAmp)
         layHControls.addWidget(self.lblFreq1)
         layHControls.addWidget(self.ledFreq1)
         layHControls.addWidget(self.lblFreqUnit1)
