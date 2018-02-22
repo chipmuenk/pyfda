@@ -184,8 +184,18 @@ class PlotImpz_UI(QWidget):
         self.setLayout(layVMain)
         
     def enableControls(self):
-        stim = str(self.cmbStimulus.currentText()) 
-        
+        stim = str(self.cmbStimulus.currentText())
+        f1_en = stim in {"Cos", "Sine", "Rect", "Saw"}
+        f2_en = stim in {"Cos", "Sine", "Rect", "Saw"}
+        a2_en = stim in {"Cos", "Sine"}
+        self.lblFreq1.setVisible(f1_en)
+        self.ledFreq1.setVisible(f1_en)
+        self.lblFreqUnit1.setVisible(f1_en)
+        self.lblFreq2.setVisible(f2_en)
+        self.ledFreq2.setVisible(f2_en)
+        self.lblFreqUnit2.setVisible(f2_en)
+        self.lblAmp2.setVisible(a2_en)
+        self.ledAmp2.setVisible(a2_en)        
 #------------------------------------------------------------------------------
 
 def main():

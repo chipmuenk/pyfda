@@ -237,14 +237,9 @@ class PlotImpz(QWidget):
         """
         log = self.ui.chkLog.isChecked()
         stim = str(self.ui.cmbStimulus.currentText())
-        periodic_sig = stim in {"Cos", "Sine","Rect", "Saw"}
         self.ui.lblLogBottom.setVisible(log)
         self.ui.ledLogBottom.setVisible(log)
         self.ui.lbldB.setVisible(log)
-        
-        self.ui.lblFreq1.setVisible(periodic_sig)
-        self.ui.ledFreq1.setVisible(periodic_sig)
-        self.ui.lblFreqUnit1.setVisible(periodic_sig)
 
         self.ui.lblFreqUnit1.setText(to_html(fb.fil[0]['freq_specs_unit']))
         self.load_dict()
