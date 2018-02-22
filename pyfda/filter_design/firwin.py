@@ -345,14 +345,14 @@ class Firwin(QWidget):
         
     def _firwin_ord(self, F, W, A, alg):
         #http://www.mikroe.com/chapters/view/72/chapter-2-fir-filters/
-        delta_f = abs(F[1] - F[0])
+        delta_f = abs(F[1] - F[0]) * 2 # referred to f_Ny
         delta_A = np.sqrt(A[0] * A[1])
         if self.fir_window_name == 'kaiser':
-            N, beta = sig.kaiserord(fb.fil[0]['A_SB'], delta_f)
+            N, beta = sig.kaiserord(20 * np.log10(np.abs(fb.fil[0]['A_SB'])), delta_f)
             self.led_firwin_1.setText(str(beta))
             fb.fil[0]['wdg_fil'][1] = beta
-            self.firWindow[1] = beta
-            self._load_dict()
+            self._update_UI()
+            #self._load_dict()
             return N
         
         if self.firWindow == 'hann':
