@@ -186,7 +186,9 @@ class PlotImpz_UI(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         
+
     def enable_controls(self):
+
         stim = str(self.cmbStimulus.currentText())
         f1_en = stim in {"Cos", "Sine", "Rect", "Saw"}
         f2_en = stim in {"Cos", "Sine", "Rect", "Saw"}
