@@ -235,16 +235,7 @@ class PlotImpz(QWidget):
         """
         (Re-)calculate h[n] and draw the figure
         """
-        log = self.ui.chkLog.isChecked()
         stim = str(self.ui.cmbStimulus.currentText())
-        periodic_sig = stim in {"Cos", "Sine","Rect", "Saw"}
-        self.ui.lblLogBottom.setVisible(log)
-        self.ui.ledLogBottom.setVisible(log)
-        self.ui.lbldB.setVisible(log)
-        
-        self.ui.lblFreq1.setVisible(periodic_sig)
-        self.ui.ledFreq1.setVisible(periodic_sig)
-        self.ui.lblFreqUnit1.setVisible(periodic_sig)
 
         self.ui.lblFreqUnit1.setText(to_html(fb.fil[0]['freq_specs_unit']))
         self.load_dict()
@@ -348,7 +339,7 @@ class PlotImpz(QWidget):
             h = h.real
             H_i_str = r'$\Im\{$' + H_str + '$\}$'
             H_str = r'$\Re\{$' + H_str + '$\}$'
-        if log:
+        if self.ui.chkLog.isChecked():
             self.bottom = safe_eval(self.ui.ledLogBottom.text(), self.bottom, return_type='float')
             self.ui.ledLogBottom.setText(str(self.bottom))
             H_str = r'$|$ ' + H_str + '$|$ in dB'

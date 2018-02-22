@@ -47,6 +47,8 @@ class PlotImpz_UI(QWidget):
         self.A2 = 0.0
         self.bottom = -80
         self._construct_UI()
+        self.enable_controls()
+        self.enable_log_mode()
 
     def _construct_UI(self):
         self.lblNPoints = QLabel("<i>N</i>&nbsp; =", self)
@@ -167,7 +169,8 @@ class PlotImpz_UI(QWidget):
 
         layHControls.addStretch(10)
         
-        self.cmbStimulus.activated.connect(self.enableControls)
+        self.cmbStimulus.activated.connect(self.enable_controls)
+        self.chkLog.clicked.connect(self.enable_log_mode)
         
         # ########################  Main UI Layout ############################
         # layout for frame (UI widget)
@@ -183,9 +186,26 @@ class PlotImpz_UI(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         
-    def enableControls(self):
-        stim = str(self.cmbStimulus.currentText()) 
+    def enable_controls(self):
+        stim = str(self.cmbStimulus.currentText())
+        f1_en = stim in {"Cos", "Sine", "Rect", "Saw"}
+        f2_en = stim in {"Cos", "Sine", "Rect", "Saw"}
+        a2_en = stim in {"Cos", "Sine"}
+        self.lblFreq1.setVisible(f1_en)
+        self.ledFreq1.setVisible(f1_en)
+        self.lblFreqUnit1.setVisible(f1_en)
+        self.lblFreq2.setVisible(f2_en)
+        self.ledFreq2.setVisible(f2_en)
+        self.lblFreqUnit2.setVisible(f2_en)
+        self.lblAmp2.setVisible(a2_en)
+        self.ledAmp2.setVisible(a2_en)
         
+    def enable_log_mode(self):
+        log = self.chkLog.isChecked()
+        self.lblLogBottom.setVisible(log)
+        self.ledLogBottom.setVisible(log)
+        self.lbldB.setVisible(log)
+
 #------------------------------------------------------------------------------
 
 def main():
