@@ -39,8 +39,7 @@ class PlotImpz(QWidget):
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
-        self.A = self.ui.A
-        self.A2 = self.ui.A2
+
         self.bottom = self.ui.bottom
 
         self._construct_UI()
@@ -65,12 +64,17 @@ class PlotImpz(QWidget):
         self.ui.chkLog.clicked.connect(self.draw)
         self.ui.chkMarker.clicked.connect(self.draw)
         self.ui.ledNPoints.editingFinished.connect(self.draw)
+        self.ui.ledN_start.editingFinished.connect(self.draw)
         self.ui.ledLogBottom.editingFinished.connect(self.draw)
         self.ui.chkPltStim.clicked.connect(self.draw)
         self.ui.chkPltResp.clicked.connect(self.draw)
         self.ui.cmbStimulus.activated.connect(self.draw)
+        self.ui.cmbNoise.activated.connect(self.draw)
         self.ui.ledAmp1.editingFinished.connect(self.draw)
         self.ui.ledAmp2.editingFinished.connect(self.draw)
+        self.ui.ledDC.editingFinished.connect(self.draw)
+        self.ui.ledNoi.editingFinished.connect(self.draw)
+        # frequency widgets require special handling as they are scaled with f_s
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
 
@@ -152,8 +156,13 @@ class PlotImpz(QWidget):
                 _store_entry(source)
                 if source.objectName() == "stimFreq1":
                     source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                    self.f1 = safe_eval(self.ui.ledFreq1.text(), self.f1, return_type='float')
+                    self.ui.ledFreq1.setText(str(self.f1))
                 elif source.objectName() == "stimFreq2":
                     source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+                    self.f2 = safe_eval(self.ui.ledFreq2.text(), self.f2, return_type='float')
+                    self.ui.ledFreq2.setText(str(self.f2))
+
 
         # Call base class method to continue normal event processing:
         return super(PlotImpz, self).eventFilter(source, event)
@@ -238,6 +247,9 @@ class PlotImpz(QWidget):
         stim = str(self.ui.cmbStimulus.currentText())
 
         self.ui.lblFreqUnit1.setText(to_html(fb.fil[0]['freq_specs_unit']))
+        self.ui.lblFreqUnit2.setText(to_html(fb.fil[0]['freq_specs_unit']))
+        self.phi1 = self.phi2 = 0
+        N_start = self.ui.N_start
         self.load_dict()
         
         self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -256,69 +268,60 @@ class PlotImpz(QWidget):
         N = self.calc_n_points(N_entry)
         if N_entry != 0: # automatic calculation
             self.ui.ledNPoints.setText(str(N))
-
-        self.A = safe_eval(self.ui.ledAmp1.text(), self.A, return_type='float')
-        self.ui.ledAmp1.setText(str(self.A))
         
-        self.A2 = safe_eval(self.ui.ledAmp2.text(), self.A2, return_type='float')
-        self.ui.ledAmp2.setText(str(self.A2))
-
-
+        N += self.ui.N_start # total number of points to be calculated: N + N_start
         t = np.linspace(0, N/self.f_S, N, endpoint=False)
 
         title_str = r'Impulse Response' # default
         H_str = r'$h[n]$' # default
-        self.wdg = ['A1']
 
         # calculate h[n]
         if stim == "Pulse":
             x = np.zeros(N)
-            x[0] = self.A # create dirac impulse as input signal
+            x[0] = self.ui.A1 # create dirac impulse as input signal
         elif stim == "Step":
-            x = self.A * np.ones(N) # create step function
+            x = self.ui.A1 * np.ones(N) # create step function
             title_str = r'Step Response'
             H_str = r'$h_{\epsilon}[n]$'
             
         elif stim == "StepErr":
-            x = self.A * np.ones(N) # create step function
+            x = self.ui.A1 * np.ones(N) # create step function
             title_str = r'Settling Error'
             H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif stim in {"Cos"}:
-            x = self.A * np.cos(2 * np.pi * t * float(self.ui.ledFreq1.text()))
+            x = self.ui.A1 * np.cos(2 * np.pi * t * float(self.ui.ledFreq1.text()))
             if stim == "Cos":
                 title_str = r'Transient Response to Cosine Signal'
                 H_str = r'$y_{\cos}[n]$'
-                self.wdg = ['A1', 'f1', 'A2', 'f2']
                 
-        elif stim in {"Sine", "Rect"}:
-            x = self.A * np.sin(2 * np.pi * t * float(self.ui.ledFreq1.text()))
-            if stim == "Sine":
-                title_str = r'Transient Response to Sine Signal'
-                H_str = r'$y_{\sin}[n]$'
-            else:
-                x = self.A * np.sign(x)
-                title_str = r'Transient Response to Rect. Signal'
-                H_str = r'$y_{rect}[n]$'
+        elif stim == "Sine":
+            x = self.ui.A1 * np.sin(2 * np.pi * t * self.f1 + self.phi1) +\
+                self.ui.A2 * np.sin(2 * np.pi * t * self.f2 + self.phi2)
+            title_str = r'Transient Response to Sinusoidal Signal'
+            H_str = r'$y_{\sin}[n]$'
+            
+        elif stim == "Rect":
+            x = self.ui.A1 * np.sign(np.sin(2 * np.pi * t * self.f1))
+            title_str = r'Transient Response to Rect. Signal'
+            H_str = r'$y_{rect}[n]$'
 
         elif stim == "Saw":
-            x = self.A * sig.sawtooth(t * (float(self.ui.ledFreq1.text())* 2*np.pi))
+            x = self.ui.A1 * sig.sawtooth(t * self.f1 * 2*np.pi)
             title_str = r'Transient Response to Sawtooth Signal'
             H_str = r'$y_{saw}[n]$'
-
-        elif stim == "RandN":
-            x = self.A * np.random.randn(N)
-            title_str = r'Transient Response to Gaussian Noise'
-            H_str = r'$y_{gauss}[n]$'
-
-        elif stim == "RandU":
-            x = self.A * (np.random.rand(N)-0.5)
-            title_str = r'Transient Response to Uniform Noise'
-            H_str = r'$y_{uni}[n]$'
 
         else:
             logger.error('Unknown stimulus "{0}"'.format(stim))
             return
+        
+        # Add noise to stimulus
+        if self.ui.noise == "gauss":
+            x[N_start:] += self.ui.noi * np.random.randn(N - N_start)
+        elif self.ui.noise == "uniform":
+            x[N_start:] += self.ui.noi * (np.random.rand(N - N_start)-0.5)
+        # Add DC to stimulus 
+        x += self.ui.DC
 
         if len(sos) > 0 and (causal): # has second order sections and is causal
             h = sig.sosfilt(sos, x)
@@ -360,11 +363,13 @@ class PlotImpz(QWidget):
             mkfmt_r = mkfmt_i = ' '
 
         if self.ui.chkPltResp.isChecked():
-            [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt=mkfmt_r, label = '$h[n]$')
+            [ml, sl, bl] = self.ax_r.stem(t[N_start:], h[N_start:], 
+                bottom=self.bottom, markerfmt=mkfmt_r, label = '$h[n]$')
 
         if self.ui.chkPltStim.isChecked():
             stem_fmt = params['mpl_stimuli']
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=self.bottom, label = 'Stim.', **stem_fmt)
+            [ms, ss, bs] = self.ax_r.stem(t[N_start:], x[N_start:], 
+                bottom=self.bottom, label = 'Stim.', **stem_fmt)
             ms.set_mfc(stem_fmt['mfc'])
             ms.set_mec(stem_fmt['mec'])
             ms.set_ms(stem_fmt['ms'])
@@ -379,8 +384,8 @@ class PlotImpz(QWidget):
         self.ax_r.set_title(title_str)
 
         if self.cmplx and self.ui.chkPltResp.isChecked():
-            [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=self.bottom,
-                                                markerfmt=mkfmt_i, label = '$h_i[n]$')
+            [ml_i, sl_i, bl_i] = self.ax_i.stem(t[N_start:], h_i[N_start:],
+                bottom=self.bottom, markerfmt=mkfmt_i, label = '$h_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
@@ -396,12 +401,12 @@ class PlotImpz(QWidget):
         if self.ACTIVE_3D: # not implemented / tested yet
 
             # plotting the stems
-            for i in range(len(t)):
+            for i in range(N_start, N):
               self.ax3d.plot([t[i], t[i]], [h[i], h[i]], [0, h_i[i]],
                              '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
-            self.ax3d.plot(t, h, h_i, 'o', markersize=8,
+            self.ax3d.plot(t[N_start:], h[N_start:], h_i[N_start:], 'o', markersize=8,
                            markerfacecolor='none', label='$h[n]$')
 
             self.ax3d.set_xlabel('x')
