@@ -1567,7 +1567,7 @@ def to_html(text, frmt=None):
         text = "<span>" + text + "</span>"
 
     # replace e.g. A_SB by A<sub>SB</sub>:
-    html = re.sub(r'([fAFW])_([a-zA-Z0-9]+)', r'\1<sub>\2</sub>', text)  
+    html = re.sub(r'([a-zA-Z])_([a-zA-Z0-9]+)', r'\1<sub>\2</sub>', text)
 
     return html
 
