@@ -42,40 +42,40 @@ class PlotImpz_UI(QWidget):
 
         # initial settings for line edit widgets
         self.N_start = 0
+        self.N_points = 0
         self.bottom = -80
         self.f1 = 0.02
         self.f2 = 0.03
         self.A1 = 1.0
         self.A2 = 0.0
-        self.noi = 0.0
+        self.phi1 = self.phi2 = 0 # not used yet
+        self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
         self._construct_UI()
         self.enable_controls()
-        self.enable_log_mode()
+        self._log_mode()
         self.update_noi()
 
     def _construct_UI(self):
-        self.lblNPoints = QLabel(to_html("N =", frmt='bi'), self)
-
-        self.ledNPoints = QLineEdit(self)
-        self.ledNPoints.setText("0")
-        self.ledNPoints.setToolTip("<span>Number of points to calculate and display. "
+        self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
+        self.ledN_points = QLineEdit(self)
+        self.ledN_points.setText(str(self.N_points))
+        self.ledN_points.setToolTip("<span>Number of points to calculate and display. "
                                    "N = 0 tries to choose for you.</span>")
         
         self.lblN_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.ledN_start = QLineEdit(self)
-        self.ledN_start.setText("0")
+        self.ledN_start.setText(str(self.N_start))
         self.ledN_start.setToolTip("<span>First point to plot.</span>")
         
-        layVlblNPoints = QVBoxLayout()
-        layVlblNPoints.addWidget(self.lblN_start)
-        layVlblNPoints.addWidget(self.lblNPoints)
+        layVlblN = QVBoxLayout()
+        layVlblN.addWidget(self.lblN_start)
+        layVlblN.addWidget(self.lblN_points)
         
-        layVledNPoints = QVBoxLayout()
-        layVledNPoints.addWidget(self.ledN_start)
-        layVledNPoints.addWidget(self.ledNPoints)
-
+        layVledN = QVBoxLayout()
+        layVledN.addWidget(self.ledN_start)
+        layVledN.addWidget(self.ledN_points)
         
         self.chkLog = QCheckBox("Log. y-axis", self)
         self.chkLog.setObjectName("chkLog")
@@ -172,7 +172,7 @@ class PlotImpz_UI(QWidget):
         
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
-        self.ledNoi.setText(str(self.f1))
+        self.ledNoi.setText(str(self.noi))
         self.ledNoi.setToolTip("Noise Level")
         self.ledNoi.setObjectName("stimNoi")
 
@@ -190,8 +190,8 @@ class PlotImpz_UI(QWidget):
 
         layHControls = QHBoxLayout()
         
-        layHControls.addLayout(layVlblNPoints)
-        layHControls.addLayout(layVledNPoints)
+        layHControls.addLayout(layVlblN)
+        layHControls.addLayout(layVledN)
         layHControls.addStretch(2)
         layHControls.addLayout(layVchkLogMark)
         layHControls.addStretch(1)
@@ -215,13 +215,20 @@ class PlotImpz_UI(QWidget):
 
         layHControls.addStretch(10)
         
-        self.ledN_start.editingFinished.connect(self.update_N_start)
+        self.ledN_start.editingFinished.connect(self.update_N)
+        self.chkLog.clicked.connect(self._log_mode)
+        self.ledLogBottom.editingFinished.connect(self._log_mode)
+
+        self.chkPltStim.clicked.connect(self.update_chk_boxes)
+        self.chkPltResp.clicked.connect(self.update_chk_boxes)
+        self.chkMarker.clicked.connect(self.update_chk_boxes)
+
         self.cmbStimulus.activated.connect(self.enable_controls)
         self.cmbNoise.activated.connect(self.update_noi)
-        self.chkLog.clicked.connect(self.enable_log_mode)
+        self.ledNoi.editingFinished.connect(self.update_noi)
         self.ledAmp1.editingFinished.connect(self.update_amp1)
         self.ledAmp2.editingFinished.connect(self.update_amp2)
-        self.ledNoi.editingFinished.connect(self.update_noi)
+
         self.ledDC.editingFinished.connect(self.update_DC)
         
         # ########################  Main UI Layout ############################
@@ -238,13 +245,39 @@ class PlotImpz_UI(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
         
+        
+    def update_N(self):
+        """ Update value for self.N_start from the QLineEditWidget"""
+        self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
+        self.ledN_start.setText(str(self.N_start))
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
 
+    def update_chk_boxes(self):
+        """ 
+        Trigger update view when one of "show stimulus", "show response" or 
+        "show markers" checkboxes is clicked
+        """
+        self.sig_tx.emit({'sender':__name__, 'update_view':''})
+
+    def _log_mode(self):
+        """ Select / deselect logarithmic mode and update self.bottom """
+        log = self.chkLog.isChecked()
+        self.lblLogBottom.setVisible(log)
+        self.ledLogBottom.setVisible(log)
+        self.lbldB.setVisible(log)
+        if log:
+            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom, 
+                                    return_type='float', sign='neg')
+            self.ledLogBottom.setText(str(self.bottom))
+        self.sig_tx.emit({'sender':__name__, 'update_view':''})
+        
     def enable_controls(self):
         """ Enable / disable widget depending on the selected stimulus"""
         stim = str(self.cmbStimulus.currentText())
         f1_en = stim in {"Cos", "Sine", "Rect", "Saw"}
         f2_en = stim in {"Cos", "Sine", "Rect", "Saw"}
         a2_en = stim in {"Cos", "Sine"}
+        dc_en = stim not in {"Step", "StepErr"}
         self.lblFreq1.setVisible(f1_en)
         self.ledFreq1.setVisible(f1_en)
         self.lblFreqUnit1.setVisible(f1_en)
@@ -253,32 +286,26 @@ class PlotImpz_UI(QWidget):
         self.lblFreqUnit2.setVisible(f2_en)
         self.lblAmp2.setVisible(a2_en)
         self.ledAmp2.setVisible(a2_en)
-        
-    def enable_log_mode(self):
-        log = self.chkLog.isChecked()
-        self.lblLogBottom.setVisible(log)
-        self.ledLogBottom.setVisible(log)
-        self.lbldB.setVisible(log)
-        
+        self.lblDC.setVisible(dc_en)
+        self.ledDC.setVisible(dc_en)
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
+
     def update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""        
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='float')
         self.ledAmp1.setText(str(self.A1))
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
         
     def update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='float')
         self.ledAmp2.setText(str(self.A2))
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
 
-    def update_N_start(self):
-        """ Update value for self.N_start from the QLineEditWidget"""
-        self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
-        self.ledN_start.setText(str(self.N_start))
         
     def update_noi(self):
-        """ Update value for self.noi from the QLineEditWidget"""
+        """ Update type + value + label for self.noi for noise"""
         self.noise = self.cmbNoise.currentText().lower()
-        print(self.noise)
         self.lblNoi.setVisible(self.noise!='none')
         self.ledNoi.setVisible(self.noise!='none')
         if self.noise!='none':
@@ -288,12 +315,13 @@ class PlotImpz_UI(QWidget):
                 self.lblNoi.setText(to_html("&sigma; =", frmt='b'))
             elif self.noise == 'uniform':
                 self.lblNoi.setText(to_html("&Delta; =", frmt='b'))
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
 
     def update_DC(self):
         """ Update value for self.DC from the QLineEditWidget"""
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
-
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
         
 
 #------------------------------------------------------------------------------

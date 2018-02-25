@@ -40,8 +40,6 @@ class PlotImpz(QWidget):
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
 
-        self.bottom = self.ui.bottom
-
         self._construct_UI()
 
     def _construct_UI(self):
@@ -61,24 +59,13 @@ class PlotImpz(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ui.chkLog.clicked.connect(self.draw)
-        self.ui.chkMarker.clicked.connect(self.draw)
-        self.ui.ledNPoints.editingFinished.connect(self.draw)
-        self.ui.ledN_start.editingFinished.connect(self.draw)
-        self.ui.ledLogBottom.editingFinished.connect(self.draw)
-        self.ui.chkPltStim.clicked.connect(self.draw)
-        self.ui.chkPltResp.clicked.connect(self.draw)
-        self.ui.cmbStimulus.activated.connect(self.draw)
-        self.ui.cmbNoise.activated.connect(self.draw)
-        self.ui.ledAmp1.editingFinished.connect(self.draw)
-        self.ui.ledAmp2.editingFinished.connect(self.draw)
-        self.ui.ledDC.editingFinished.connect(self.draw)
-        self.ui.ledNoi.editingFinished.connect(self.draw)
+        self.ui.ledN_points.editingFinished.connect(self.draw)
         # frequency widgets require special handling as they are scaled with f_s
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+        self.ui.sig_tx.connect(self.process_signals)
 
         self.draw() # initial calculation and drawing
 
@@ -88,14 +75,14 @@ class PlotImpz(QWidget):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict:
+        if 'update_view' in sig_dict or 'home' in sig_dict:
             self.update_view()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'home' in sig_dict:
+        elif 'draw' in sig_dict:
             self.draw()
         else:
-            pass
+            logger.error("Dict not understood: {0}".format(sig_dict))
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):
@@ -139,7 +126,7 @@ class PlotImpz(QWidget):
         if isinstance(source, QLineEdit): # could be extended for other widgets
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_dict()
+                self.load_fs()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
@@ -168,15 +155,15 @@ class PlotImpz(QWidget):
         return super(PlotImpz, self).eventFilter(source, event)
 
 #-------------------------------------------------------------        
-    def load_dict(self):
+    def load_fs(self):
         """
-        Reload textfields from filter dictionary 
-        Transform the displayed frequency spec input fields according to the units
+        Reload sampling frequency from filter dictionary and transform
+        the displayed frequency spec input fields according to the units
         setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
-        load_dict() is called during init and when the frequency unit or the
+        load_fs() is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
@@ -184,7 +171,7 @@ class PlotImpz(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.debug("exec load_dict")
+        logger.debug("exec load_fs")
         if not self.ui.ledFreq1.hasFocus():
             # widget has no focus, round the display
             self.ui.ledFreq1.setText(
@@ -220,38 +207,81 @@ class PlotImpz(QWidget):
             self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
-
         self.mplwidget.fig.subplots_adjust(hspace = 0.5)  
 
         if self.ACTIVE_3D: # not implemented / tested yet
             self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
 
 #------------------------------------------------------------------------------
-    def update_view(self):
+    def calc(self):
         """
-        place holder; should update only the limits without recalculating
-        the impulse respons
+        (Re-)calculate stimulus x[n] and filter response y[n]
         """
-        self.draw()
-
-#------------------------------------------------------------------------------
-    def draw(self):
-        if self.mplwidget.mplToolbar.enabled:
-            self.draw_impz()
-
-#------------------------------------------------------------------------------
-    def draw_impz(self):
-        """
-        (Re-)calculate h[n] and draw the figure
-        """
-        stim = str(self.ui.cmbStimulus.currentText())
-
-        self.ui.lblFreqUnit1.setText(to_html(fb.fil[0]['freq_specs_unit']))
-        self.ui.lblFreqUnit2.setText(to_html(fb.fil[0]['freq_specs_unit']))
-        self.phi1 = self.phi2 = 0
-        N_start = self.ui.N_start
-        self.load_dict()
+        # calculate time vector self.t[n] with n = 0 ... N_points + N_start ===
+        N_user = safe_eval(self.ui.ledN_points.text(), 0, return_type='int', sign='pos')
+        if N_user == 0: # automatic calculation
+            self.N = self.calc_n_points(N_user)
+            self.ui.ledN_points.setText(str(self.N))
+        else:
+            self.N = N_user
         
+        self.N += self.ui.N_start # total number of points to be calculated: N + N_start
+        self.t = np.linspace(0, self.N/fb.fil[0]['f_S'], self.N, endpoint=False)
+
+        # calculate stimuli x[n] ==============================================
+        stim = str(self.ui.cmbStimulus.currentText())
+        if stim == "Pulse":
+            self.x = np.zeros(self.N)
+            self.x[0] = self.ui.A1 # create dirac impulse as input signal
+            self.title_str = r'Impulse Response'
+            self.H_str = r'$h[n]$' # default
+
+        elif stim == "Step":
+            self.x = self.ui.A1 * np.ones(self.N) # create step function
+            self.title_str = r'Step Response'
+            self.H_str = r'$h_{\epsilon}[n]$'
+            
+        elif stim == "StepErr":
+            self.x = self.ui.A1 * np.ones(self.N) # create step function
+            self.title_str = r'Settling Error'
+            self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
+            
+        elif stim == "Cos":
+            self.x = self.ui.A1 * np.cos(2 * np.pi * self.t * self.f1)
+            self.title_str = r'Transient Response to Cosine Signal'
+            self.H_str = r'$y_{\cos}[n]$'
+                
+        elif stim == "Sine":
+            self.x = self.ui.A1 * np.sin(2 * np.pi * self.t * self.f1 + self.ui.phi1) +\
+                self.ui.A2 * np.sin(2 * np.pi * self.t * self.f2 + self.ui.phi2)
+            self.title_str = r'Transient Response to Sinusoidal Signal'
+            self.H_str = r'$y_{\sin}[n]$'
+            
+        elif stim == "Rect":
+            self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.t * self.f1))
+            self.title_str = r'Transient Response to Rect. Signal'
+            self.H_str = r'$y_{rect}[n]$'
+
+        elif stim == "Saw":
+            self.x = self.ui.A1 * sig.sawtooth(self.t * self.f1 * 2*np.pi)
+            self.title_str = r'Transient Response to Sawtooth Signal'
+            self.H_str = r'$y_{saw}[n]$'
+
+        else:
+            logger.error('Unknown stimulus "{0}"'.format(stim))
+            return
+        
+        # Add noise to stimulus
+        if self.ui.noise == "gauss":
+            self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.N - self.ui.N_start)
+        elif self.ui.noise == "uniform":
+            self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.N - self.ui.N_start)-0.5)
+
+        # Add DC to stimulus when visible / enabled
+        if self.ui.ledDC.isVisible:
+            self.x += self.ui.DC
+        
+        # calculate response self.y[n] and self.y_i[n] (for complex case) =====   
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
         if min(len(self.aa), len(self.bb)) < 2:
@@ -262,114 +292,90 @@ class PlotImpz(QWidget):
         antiCausal = 'zpkA' in fb.fil[0]
         causal     = not (antiCausal)
 
-        self.f_S  = fb.fil[0]['f_S']
-        
-        N_entry = safe_eval(self.ui.ledNPoints.text(), 0, return_type='int', sign='pos')
-        N = self.calc_n_points(N_entry)
-        if N_entry != 0: # automatic calculation
-            self.ui.ledNPoints.setText(str(N))
-        
-        N += self.ui.N_start # total number of points to be calculated: N + N_start
-        t = np.linspace(0, N/self.f_S, N, endpoint=False)
-
-        title_str = r'Impulse Response' # default
-        H_str = r'$h[n]$' # default
-
-        # calculate h[n]
-        if stim == "Pulse":
-            x = np.zeros(N)
-            x[0] = self.ui.A1 # create dirac impulse as input signal
-        elif stim == "Step":
-            x = self.ui.A1 * np.ones(N) # create step function
-            title_str = r'Step Response'
-            H_str = r'$h_{\epsilon}[n]$'
-            
-        elif stim == "StepErr":
-            x = self.ui.A1 * np.ones(N) # create step function
-            title_str = r'Settling Error'
-            H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
-            
-        elif stim in {"Cos"}:
-            x = self.ui.A1 * np.cos(2 * np.pi * t * float(self.ui.ledFreq1.text()))
-            if stim == "Cos":
-                title_str = r'Transient Response to Cosine Signal'
-                H_str = r'$y_{\cos}[n]$'
-                
-        elif stim == "Sine":
-            x = self.ui.A1 * np.sin(2 * np.pi * t * self.f1 + self.phi1) +\
-                self.ui.A2 * np.sin(2 * np.pi * t * self.f2 + self.phi2)
-            title_str = r'Transient Response to Sinusoidal Signal'
-            H_str = r'$y_{\sin}[n]$'
-            
-        elif stim == "Rect":
-            x = self.ui.A1 * np.sign(np.sin(2 * np.pi * t * self.f1))
-            title_str = r'Transient Response to Rect. Signal'
-            H_str = r'$y_{rect}[n]$'
-
-        elif stim == "Saw":
-            x = self.ui.A1 * sig.sawtooth(t * self.f1 * 2*np.pi)
-            title_str = r'Transient Response to Sawtooth Signal'
-            H_str = r'$y_{saw}[n]$'
-
-        else:
-            logger.error('Unknown stimulus "{0}"'.format(stim))
-            return
-        
-        # Add noise to stimulus
-        if self.ui.noise == "gauss":
-            x[N_start:] += self.ui.noi * np.random.randn(N - N_start)
-        elif self.ui.noise == "uniform":
-            x[N_start:] += self.ui.noi * (np.random.rand(N - N_start)-0.5)
-        # Add DC to stimulus 
-        x += self.ui.DC
-
         if len(sos) > 0 and (causal): # has second order sections and is causal
-            h = sig.sosfilt(sos, x)
+            y = sig.sosfilt(sos, self.x)
         elif (antiCausal):
-            h = sig.filtfilt(self.bb, self.aa, x, -1, None)
+            y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
         else: # no second order sections or antiCausals for current filter
-            h = sig.lfilter(self.bb, self.aa, x)
+            y = sig.lfilter(self.bb, self.aa, self.x)
 
-        dc = sig.freqz(self.bb, self.aa, [0])
+
 
         if stim == "StepErr":
-            h = h - abs(dc[1]) # subtract DC value from response
+            dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
+            y = y - abs(dc[1]) # subtract DC (final) value from response
 
-        h = np.real_if_close(h, tol = 1e3)  # tol specified in multiples of machine eps
-        self.cmplx = np.any(np.iscomplex(h))
+        y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
+        self.cmplx = np.any(np.iscomplex(y))
         if self.cmplx:
-            h_i = h.imag
-            h = h.real
-            H_i_str = r'$\Im\{$' + H_str + '$\}$'
-            H_str = r'$\Re\{$' + H_str + '$\}$'
-        if self.ui.chkLog.isChecked():
-            self.bottom = safe_eval(self.ui.ledLogBottom.text(), self.bottom, return_type='float')
-            self.ui.ledLogBottom.setText(str(self.bottom))
-            H_str = r'$|$ ' + H_str + '$|$ in dB'
-            h = np.maximum(20 * np.log10(abs(h)), self.bottom)
-            if self.cmplx:
-                h_i = np.maximum(20 * np.log10(abs(h_i)), self.bottom)
-                H_i_str = r'$\log$ ' + H_i_str + ' in dB'
+            self.y_i = y.imag
+            self.y = y.real
         else:
-            self.bottom = 0
+            self.y = y
+            self.y_i = None
 
+#------------------------------------------------------------------------------
+    def update_view(self):
+        """
+        place holder; should update only the limits without recalculating
+        the impulse respons
+        """
+        self.draw_impz()
+
+#------------------------------------------------------------------------------
+    def draw(self):
+        """
+        Recalculate response and redraw it
+        """
+        if self.mplwidget.mplToolbar.enabled:
+            self.calc()
+            self.draw_impz()
+
+#------------------------------------------------------------------------------
+    def draw_impz(self):
+        """
+        (Re-)draw the figure
+        """
+        self.ui.lblFreqUnit1.setText(to_html(fb.fil[0]['freq_specs_unit']))
+        self.ui.lblFreqUnit2.setText(to_html(fb.fil[0]['freq_specs_unit']))
+        N_start = self.ui.N_start
+        self.load_fs()
         self.init_axes()
-
+        
         #================ Main Plotting Routine =========================
         if self.ui.chkMarker.isChecked():
             mkfmt_r = 'o'
             mkfmt_i = 'd'
         else:
             mkfmt_r = mkfmt_i = ' '
+        if self.cmplx:           
+            H_i_str = r'$\Im\{$' + self.H_str + '$\}$'
+            H_str = r'$\Re\{$' + self.H_str + '$\}$'
+        else:
+            H_str = self.H_str
+
+        if self.ui.chkLog.isChecked():
+            #self.bottom = safe_eval(self.ui.ledLogBottom.text(), self.bottom, return_type='float')
+            self.ui.ledLogBottom.setText(str(self.ui.bottom))
+            H_str = r'$|$ ' + H_str + '$|$ in dB'
+            y = np.maximum(20 * np.log10(abs(self.y)), self.ui.bottom)
+            if self.cmplx:
+                y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom)
+                H_i_str = r'$\log$ ' + H_i_str + ' in dB'
+        else:
+            self.ui.bottom = 0
+            y = self.y
+            y_i = self.y_i
+
 
         if self.ui.chkPltResp.isChecked():
-            [ml, sl, bl] = self.ax_r.stem(t[N_start:], h[N_start:], 
-                bottom=self.bottom, markerfmt=mkfmt_r, label = '$h[n]$')
+            [ml, sl, bl] = self.ax_r.stem(self.t[N_start:], y[N_start:], 
+                bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
 
         if self.ui.chkPltStim.isChecked():
             stem_fmt = params['mpl_stimuli']
-            [ms, ss, bs] = self.ax_r.stem(t[N_start:], x[N_start:], 
-                bottom=self.bottom, label = 'Stim.', **stem_fmt)
+            [ms, ss, bs] = self.ax_r.stem(self.t[N_start:], self.x[N_start:], 
+                bottom=self.ui.bottom, label = 'Stim.', **stem_fmt)
             ms.set_mfc(stem_fmt['mfc'])
             ms.set_mec(stem_fmt['mec'])
             ms.set_ms(stem_fmt['ms'])
@@ -381,11 +387,11 @@ class PlotImpz(QWidget):
             bs.set_visible(False) # invisible bottomline
 
         expand_lim(self.ax_r, 0.02)
-        self.ax_r.set_title(title_str)
+        self.ax_r.set_title(self.title_str)
 
         if self.cmplx and self.ui.chkPltResp.isChecked():
-            [ml_i, sl_i, bl_i] = self.ax_i.stem(t[N_start:], h_i[N_start:],
-                bottom=self.bottom, markerfmt=mkfmt_i, label = '$h_i[n]$')
+            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[N_start:], y_i[N_start:],
+                bottom=self.ui.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
@@ -399,15 +405,14 @@ class PlotImpz(QWidget):
 
 
         if self.ACTIVE_3D: # not implemented / tested yet
-
             # plotting the stems
-            for i in range(N_start, N):
-              self.ax3d.plot([t[i], t[i]], [h[i], h[i]], [0, h_i[i]],
+            for i in range(N_start, self.self.N):
+              self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
                              '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
-            self.ax3d.plot(t[N_start:], h[N_start:], h_i[N_start:], 'o', markersize=8,
-                           markerfacecolor='none', label='$h[n]$')
+            self.ax3d.plot(self.t[N_start:], y[N_start:], y_i[N_start:], 'o', markersize=8,
+                           markerfacecolor='none', label='$y[n]$')
 
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')
@@ -437,7 +442,7 @@ class PlotImpz(QWidget):
             if fb.fil[0]['ft'] == 'IIR':
                 N = 100
             else:
-                N = min(len(self.bb),  100) # FIR: N = number of coefficients (max. 100)
+                N = min(len(fb.fil[0]['ba'][0]),  100) # FIR: N = number of coefficients (max. 100)
         else:
             N = N_user
 
