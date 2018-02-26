@@ -188,6 +188,9 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledNoi)
         layVledNoiDC.addWidget(self.ledDC)
 
+        self.chkFFTPlt = QCheckBox("FFT", self)
+        self.chkFFTPlt.setToolTip("<span>Show FFT of stimulus / response.</span>")
+
         layHControls = QHBoxLayout()
         
         layHControls.addLayout(layVlblN)
@@ -212,6 +215,8 @@ class PlotImpz_UI(QWidget):
         layHControls.addStretch(1)
         layHControls.addLayout(layVlblNoiDC)
         layHControls.addLayout(layVledNoiDC)
+        layHControls.addStretch(1)
+        layHControls.addWidget(self.chkFFTPlt)
 
         layHControls.addStretch(10)
         
@@ -222,6 +227,7 @@ class PlotImpz_UI(QWidget):
         self.chkPltStim.clicked.connect(self.update_chk_boxes)
         self.chkPltResp.clicked.connect(self.update_chk_boxes)
         self.chkMarker.clicked.connect(self.update_chk_boxes)
+        self.chkFFTPlt.clicked.connect(self.update_chk_boxes)
 
         self.cmbStimulus.activated.connect(self.enable_controls)
         self.cmbNoise.activated.connect(self.update_noi)
@@ -275,7 +281,7 @@ class PlotImpz_UI(QWidget):
         """ Enable / disable widget depending on the selected stimulus"""
         stim = str(self.cmbStimulus.currentText())
         f1_en = stim in {"Cos", "Sine", "Rect", "Saw"}
-        f2_en = stim in {"Cos", "Sine", "Rect", "Saw"}
+        f2_en = stim in {"Cos", "Sine"}
         a2_en = stim in {"Cos", "Sine"}
         dc_en = stim not in {"Step", "StepErr"}
         self.lblFreq1.setVisible(f1_en)
