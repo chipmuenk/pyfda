@@ -123,7 +123,10 @@ class PlotImpz(QWidget):
                 self.spec_edited = False # reset flag
                 self.draw()
                 
-        if isinstance(source, QLineEdit): # could be extended for other widgets
+#        if isinstance(source, QLineEdit): # could be extended for other widgets
+#        if source.objectName() in {"stimFreq1","stimFreq2"}:
+        if event.type() in {QEvent.FocusIn,QEvent.KeyPress, QEvent.FocusOut}:
+            logger.error("filter:{0}-{1}".format(source.objectName(), event.type()))
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_fs()
@@ -171,14 +174,18 @@ class PlotImpz(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.debug("exec load_fs")
-        if not self.ui.ledFreq1.hasFocus():
-            # widget has no focus, round the display
-            self.ui.ledFreq1.setText(
-                str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
-        else:
+        if self.ui.ledFreq1.hasFocus():
             # widget has focus, show full precision
             self.ui.ledFreq1.setText(str(self.f1 * fb.fil[0]['f_S']))
+        elif self.ui.ledFreq2.hasFocus():
+            # widget has focus, show full precision
+            self.ui.ledFreq2.setText(str(self.f2 * fb.fil[0]['f_S']))
+        else:
+            # widgets have no focus, round the display
+            self.ui.ledFreq1.setText(
+                str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+            self.ui.ledFreq2.setText(
+                str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
 #------------------------------------------------------------------------------
     def init_axes(self):
