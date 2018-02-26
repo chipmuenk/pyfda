@@ -239,7 +239,11 @@ class ItemDelegate(QStyledItemDelegate):
                                     self.parent.myQ.frmt) # transform back to float
 
         model.setData(index, data)                          # store in QTableWidget
-        self.parent.ba[index.column()][index.row()] = data  # and in self.ba
+        # if the entry is complex, convert ba (list of arrays) to complex type
+        if isinstance(data, complex):
+            self.parent.ba[0] = self.parent.ba[0].astype(complex)
+            self.parent.ba[1] = self.parent.ba[1].astype(complex)
+        self.parent.ba[index.column()][index.row()] = data  # store in self.ba
         qstyle_widget(self.parent.ui.butSave, 'changed')
         self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
 
