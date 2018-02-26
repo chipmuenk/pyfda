@@ -126,7 +126,7 @@ class ItemDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
-        convert it to floating point format and store it in both the model
+        convert it to complex format and store it in both the model
         (= QTableWidget) and in `zpk`. Finally, refresh the table item to
         display it in the selected format (via `to be defined`) and normalize
         the gain.
