@@ -115,18 +115,19 @@ class PlotImpz(QWidget):
                 if source.objectName() == "stimFreq1":
                    self.f1 = safe_eval(source.text(), self.f1 * fb.fil[0]['f_S'],
                                             return_type='float') / fb.fil[0]['f_S']
+                   source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
 
                 elif source.objectName() == "stimFreq2":
                    self.f2 = safe_eval(source.text(), self.f2 * fb.fil[0]['f_S'],
                                             return_type='float') / fb.fil[0]['f_S']
+                   source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
                 self.spec_edited = False # reset flag
                 self.draw()
-                
-#        if isinstance(source, QLineEdit): # could be extended for other widgets
+
+#        if isinstance(source, QLineEdit): 
 #        if source.objectName() in {"stimFreq1","stimFreq2"}:
         if event.type() in {QEvent.FocusIn,QEvent.KeyPress, QEvent.FocusOut}:
-            logger.error("filter:{0}-{1}".format(source.objectName(), event.type()))
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
                 self.load_fs()
@@ -141,18 +142,9 @@ class PlotImpz(QWidget):
                         source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
                     elif source.objectName() == "stimFreq2":                    
                         source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
-                
+
             elif event.type() == QEvent.FocusOut:
                 _store_entry(source)
-                if source.objectName() == "stimFreq1":
-                    source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
-                    self.f1 = safe_eval(self.ui.ledFreq1.text(), self.f1, return_type='float')
-                    self.ui.ledFreq1.setText(str(self.f1))
-                elif source.objectName() == "stimFreq2":
-                    source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
-                    self.f2 = safe_eval(self.ui.ledFreq2.text(), self.f2, return_type='float')
-                    self.ui.ledFreq2.setText(str(self.f2))
-
 
         # Call base class method to continue normal event processing:
         return super(PlotImpz, self).eventFilter(source, event)
@@ -425,7 +417,7 @@ class PlotImpz(QWidget):
             self.ax3d.set_zlabel('z')
 
         self.redraw()
-        
+
 #------------------------------------------------------------------------------
     def redraw(self):
         """
