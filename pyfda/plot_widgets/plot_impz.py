@@ -228,7 +228,6 @@ class PlotImpz(QWidget):
         N_user = safe_eval(self.ui.ledN_points.text(), 0, return_type='int', sign='pos')
         if N_user == 0: # automatic calculation
             self.N = self.calc_n_points(N_user)
-            self.ui.ledN_points.setText(str(self.N))
         else:
             self.N = N_user
         
