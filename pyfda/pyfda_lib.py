@@ -1563,9 +1563,11 @@ def to_html(text, frmt=None):
         text = "<i>" + text + "</i>"
     if frmt in {'b', 'bi', 'ib'}:
         text = "<b>" + text + "</b>"
+    if frmt == None:
+        text = "<span>" + text + "</span>"
 
-    # replace e.g. A_SB by <i>A<sub>SB</sub></i>:
-    html = re.sub(r'([fAFW])_([a-zA-Z0-9]+)', r'<i>\1<sub>\2</sub></i>', text)  
+    # replace e.g. A_SB by A<sub>SB</sub>:
+    html = re.sub(r'([a-zA-Z])_([a-zA-Z0-9]+)', r'\1<sub>\2</sub>', text)
 
     return html
 
