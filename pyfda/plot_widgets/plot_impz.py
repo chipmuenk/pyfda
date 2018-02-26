@@ -183,30 +183,33 @@ class PlotImpz(QWidget):
     def init_axes(self):
         # clear the axes and (re)draw the plot
         #
-        try:
-            self.mplwidget.fig.delaxes(self.ax_r)
-            self.mplwidget.fig.delaxes(self.ax_i)
-        except (KeyError, AttributeError, UnboundLocalError):
-            pass
+        for ax in self.mplwidget.fig.get_axes():
+            self.mplwidget.fig.delaxes(ax)
 
-        if self.cmplx and self.ui.chkPltResp.isChecked():
-            self.ax_r = self.mplwidget.fig.add_subplot(211)
+        num_subplots = 0 + (self.ui.chkPltResp.isChecked() or self.ui.chkPltStim.isChecked())\
+                        + (self.cmplx and self.ui.chkPltResp.isChecked())\
+                        + self.ui.chkFFTPlt.isChecked()
+
+        if num_subplots > 0:
+            self.mplwidget.fig.subplots_adjust(hspace = 0.5)
+
+        if (self.ui.chkPltResp.isChecked() or self.ui.chkPltStim.isChecked()):
+            self.ax_r = self.mplwidget.fig.add_subplot(num_subplots,1 ,1)
             self.ax_r.clear()
             self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_r.get_yaxis().tick_left() # remove axis ticks right
 
-            self.ax_i = self.mplwidget.fig.add_subplot(212, sharex = self.ax_r)
+        if self.cmplx and self.ui.chkPltResp.isChecked():
+            self.ax_i = self.mplwidget.fig.add_subplot(num_subplots, 1, 2, sharex = self.ax_r)
             self.ax_i.clear()
             self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_i.get_yaxis().tick_left() # remove axis ticks right
 
-        else:
-            self.ax_r = self.mplwidget.fig.add_subplot(111)
-            self.ax_r.clear()
-            self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_r.get_yaxis().tick_left() # remove axis ticks right
-
-        self.mplwidget.fig.subplots_adjust(hspace = 0.5)  
+        if self.ui.chkFFTPlt.isChecked():
+            self.ax_fft = self.mplwidget.fig.add_subplot(num_subplots, 1, num_subplots)    
+            self.ax_fft.clear()
+            self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
 
         if self.ACTIVE_3D: # not implemented / tested yet
             self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
@@ -219,11 +222,11 @@ class PlotImpz(QWidget):
         # calculate time vector self.t[n] with n = 0 ... N_points + N_start ===
         N_user = safe_eval(self.ui.ledN_points.text(), 0, return_type='int', sign='pos')
         if N_user == 0: # automatic calculation
-            self.N = self.calc_n_points(N_user)
+            self.N_show = self.calc_n_points(N_user)
         else:
-            self.N = N_user
+            self.N_show = N_user
         
-        self.N += self.ui.N_start # total number of points to be calculated: N + N_start
+        self.N = self.N_show + self.ui.N_start # total number of points to be calculated: N + N_start
         self.t = np.linspace(0, self.N/fb.fil[0]['f_S'], self.N, endpoint=False)
 
         # calculate stimuli x[n] ==============================================
@@ -297,8 +300,6 @@ class PlotImpz(QWidget):
         else: # no second order sections or antiCausals for current filter
             y = sig.lfilter(self.bb, self.aa, self.x)
 
-
-
         if stim == "StepErr":
             dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
             y = y - abs(dc[1]) # subtract DC (final) value from response
@@ -311,6 +312,9 @@ class PlotImpz(QWidget):
         else:
             self.y = y
             self.y_i = None
+            
+        if self.ui.chkFFTPlt.isChecked:
+            self.Y = np.abs(np.fft.fft(y[self.ui.N_start:self.N])) / self.N_show
 
 #------------------------------------------------------------------------------
     def update_view(self):
@@ -354,7 +358,7 @@ class PlotImpz(QWidget):
 
         if self.ui.chkLog.isChecked():
             #self.bottom = safe_eval(self.ui.ledLogBottom.text(), self.bottom, return_type='float')
-            self.ui.ledLogBottom.setText(str(self.ui.bottom))
+            #self.ui.ledLogBottom.setText(str(self.ui.bottom))
             H_str = r'$|$ ' + H_str + '$|$ in dB'
             y = np.maximum(20 * np.log10(abs(self.y)), self.ui.bottom)
             if self.cmplx:
@@ -400,7 +404,29 @@ class PlotImpz(QWidget):
         else:
             self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+        self.ax_r.set_xlim([N_start,self.N])
 
+        if self.ui.chkFFTPlt.isChecked():
+            F = np.fft.fftfreq(self.N_show, d = 1. / fb.fil[0]['f_S'])
+
+            if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+            # shift tau_g and F by f_S/2
+                Y = np.fft.fftshift(self.Y)
+                F = np.fft.fftshift(F)
+            elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+                # only use the first half of H and F
+                Y = 2 * self.Y[0:self.N_show//2]
+                F = F[0:self.N_show//2]
+            else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+                # plot for F = 0 ... 1
+                Y = self.Y
+                F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
+
+            self.ax_fft.plot(F, Y)
+
+            self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
+            self.ax_fft.set_ylabel(r'$Y(\mathrm{e}^{\mathrm{j} \Omega})$')
+            self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
