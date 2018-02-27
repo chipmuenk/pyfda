@@ -181,7 +181,7 @@ class PlotTabWidgets(QTabWidget):
         self.pltHf.update_view()
         self.pltPhi.update_view()
         self.pltTauG.update_view()
-        self.pltImpz.update_view()
+        self.pltImpz.draw() # changing of f_s has to update the plot - more differentiation needed
 #        self.pltPZ.draw()
 #        self.plt3D.draw()
         
