@@ -17,6 +17,7 @@ from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
                       QHBoxLayout, QVBoxLayout, QFrame, pyqtSlot, pyqtSignal)
 
 from pyfda.pyfda_lib import to_html, safe_eval
+from pyfda.pyfda_qt_lib import qset_cmb_box, qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
 class PlotImpz_UI(QWidget):
@@ -52,6 +53,10 @@ class PlotImpz_UI(QWidget):
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
+        
+        self.plt_time = "Response"
+        self.plt_freq = "None"
+        
         self._construct_UI()
         self.enable_controls()
         self._log_mode()
@@ -97,18 +102,27 @@ class PlotImpz_UI(QWidget):
         self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbldB = QLabel("dB", self)
         
-        self.chkPltStim = QCheckBox("Show Stimulus", self)
-        self.chkPltStim.setChecked(False)
-        self.chkPltStim.setToolTip("Show stimulus signal.")
+        self.lblPltTime = QLabel("Time: ", self)
+        self.cmbPltTime = QComboBox(self)
+        self.cmbPltTime.addItems(["None","Stimulus","Response", "Both"])
+        qset_cmb_box(self.cmbPltTime, self.plt_time)
+        self.cmbPltTime.setToolTip("<span>Choose which signals to show in the time domain: "
+                                 "The stimulus, the filter response or both.</span>")
+
+        self.lblPltFreq = QLabel("Freq.: ", self)
+        self.cmbPltFreq = QComboBox(self)
+        self.cmbPltFreq.addItems(["None","Stimulus","Response", "Both"])
+        qset_cmb_box(self.cmbPltFreq, self.plt_freq)
+        self.cmbPltFreq.setToolTip("<span>Choose which signals to show in the frequency domain: "
+                                 "The stimulus, the filter response or both.</span>")
+        layVlblPlt = QVBoxLayout()
+        layVlblPlt.addWidget(self.lblPltTime)
+        layVlblPlt.addWidget(self.lblPltFreq)
+        layVcmbPlt = QVBoxLayout()
+        layVcmbPlt.addWidget(self.cmbPltTime)
+        layVcmbPlt.addWidget(self.cmbPltFreq)
         
-        self.chkPltResp = QCheckBox("Show Response", self)
-        self.chkPltResp.setChecked(True)
-        self.chkPltResp.setToolTip("Show filter response.")
-        layVchkPlt = QVBoxLayout()
-        layVchkPlt.addWidget(self.chkPltStim)
-        layVchkPlt.addWidget(self.chkPltResp)
-        
-        self.lblStimulus = QLabel("Type: ", self)
+        self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
@@ -188,9 +202,6 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledNoi)
         layVledNoiDC.addWidget(self.ledDC)
 
-        self.chkFFTPlt = QCheckBox("FFT", self)
-        self.chkFFTPlt.setToolTip("<span>Show FFT of stimulus / response.</span>")
-
         layHControls = QHBoxLayout()
         
         layHControls.addLayout(layVlblN)
@@ -202,7 +213,8 @@ class PlotImpz_UI(QWidget):
         layHControls.addWidget(self.ledLogBottom)
         layHControls.addWidget(self.lbldB)
         layHControls.addStretch(2)
-        layHControls.addLayout(layVchkPlt)
+        layHControls.addLayout(layVlblPlt)
+        layHControls.addLayout(layVcmbPlt)        
         layHControls.addStretch(1)
         layHControls.addLayout(layVlblCmb)
         layHControls.addLayout(layVCmb)
@@ -215,8 +227,6 @@ class PlotImpz_UI(QWidget):
         layHControls.addStretch(1)
         layHControls.addLayout(layVlblNoiDC)
         layHControls.addLayout(layVledNoiDC)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.chkFFTPlt)
 
         layHControls.addStretch(10)
         
@@ -224,10 +234,10 @@ class PlotImpz_UI(QWidget):
         self.chkLog.clicked.connect(self._log_mode)
         self.ledLogBottom.editingFinished.connect(self._log_mode)
 
-        self.chkPltStim.clicked.connect(self.update_chk_boxes)
-        self.chkPltResp.clicked.connect(self.update_chk_boxes)
+        self.cmbPltTime.activated.connect(self.update_time_freq)
+        self.cmbPltFreq.activated.connect(self.update_time_freq)
+
         self.chkMarker.clicked.connect(self.update_chk_boxes)
-        self.chkFFTPlt.clicked.connect(self.update_chk_boxes)
 
         self.cmbStimulus.activated.connect(self.enable_controls)
         self.cmbNoise.activated.connect(self.update_noi)
@@ -264,6 +274,16 @@ class PlotImpz_UI(QWidget):
         "show markers" checkboxes is clicked
         """
         self.sig_tx.emit({'sender':__name__, 'update_view':''})
+        
+    def update_time_freq(self):
+        """ 
+        Trigger draw when one of the comboboxes PltTime or PltFreq is modified
+        "show markers" checkboxes is clicked
+        """
+        self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
+        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
+
 
     def _log_mode(self):
         """ Select / deselect logarithmic mode and update self.bottom """
