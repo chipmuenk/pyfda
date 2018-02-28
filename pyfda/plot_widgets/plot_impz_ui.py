@@ -41,7 +41,7 @@ class PlotImpz_UI(QWidget):
         - two bottom rows with action buttons
         """
 
-        # initial settings for line edit widgets
+        # initial settings for lineedit widgets
         self.N_start = 0
         self.N_points = 0
         self.bottom = -80
@@ -54,8 +54,14 @@ class PlotImpz_UI(QWidget):
         self.noise = 'none'
         self.DC = 0.0
         
+        self.bottom_f = -80
+
+        # initial settings for comboboxes        
         self.plt_time = "Response"
         self.plt_freq = "None"
+        self.stim = "Pulse"
+        self.noise = "None"
+        self.window = "Hann"
         
         self._construct_UI()
         self.enable_controls()
@@ -126,11 +132,13 @@ class PlotImpz_UI(QWidget):
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
+        qset_cmb_box(self.cmbStimulus, self.stim)
 
         self.lblNoise = QLabel("Noise: ", self)
         self.cmbNoise = QComboBox(self)
         self.cmbNoise.addItems(["None","Gauss","Uniform"])
         self.cmbNoise.setToolTip("Select added noise type.")
+        qset_cmb_box(self.cmbNoise, self.noise)
         
         layVlblCmb = QVBoxLayout()
         layVlblCmb.addWidget(self.lblStimulus)
@@ -203,7 +211,6 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledDC)
 
         layHControls = QHBoxLayout()
-        
         layHControls.addLayout(layVlblN)
         layHControls.addLayout(layVledN)
         layHControls.addStretch(2)
@@ -227,9 +234,41 @@ class PlotImpz_UI(QWidget):
         layHControls.addStretch(1)
         layHControls.addLayout(layVlblNoiDC)
         layHControls.addLayout(layVledNoiDC)
-
         layHControls.addStretch(10)
         
+        layHControlsF = QHBoxLayout()
+        self.chkLogF = QCheckBox("Log. scale", self)
+        self.chkLogF.setObjectName("chkLogF")
+        self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chkLogF.setChecked(True)
+
+        self.lblLogBottomF = QLabel("Bottom = ", self)
+        self.ledLogBottomF = QLineEdit(self)
+        self.ledLogBottomF.setText(str(self.bottom_f))
+        self.ledLogBottomF.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.lbldBF = QLabel("dB", self)
+        
+        self.lblWindow = QLabel("Window: ", self)
+        self.cmbWindow = QComboBox(self)
+        self.cmbWindow.addItems(["Boxcar","Hamming","Hann"])
+        self.cmbWindow.setToolTip("Select window type.")
+        qset_cmb_box(self.cmbWindow, self.window)
+
+        layHControlsF.addWidget(self.chkLogF)
+        layHControlsF.addWidget(self.lblLogBottomF)
+        layHControlsF.addWidget(self.ledLogBottomF)
+        layHControlsF.addWidget(self.lbldBF)
+        layHControls.addStretch(1)       
+        layHControlsF.addWidget(self.lblWindow)  
+        layHControlsF.addWidget(self.cmbWindow)
+        layHControlsF.addStretch(10)
+        
+        self.wdgHControlsF = QWidget(self)
+        self.wdgHControlsF.setLayout(layHControlsF)
+
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.ledN_start.editingFinished.connect(self.update_N)
         self.chkLog.clicked.connect(self._log_mode)
         self.ledLogBottom.editingFinished.connect(self._log_mode)
@@ -247,10 +286,15 @@ class PlotImpz_UI(QWidget):
 
         self.ledDC.editingFinished.connect(self.update_DC)
         
+        self.chkLogF.clicked.connect(self._log_mode)
+        self.ledLogBottomF.editingFinished.connect(self._log_mode)
+       
+        
         # ########################  Main UI Layout ############################
         # layout for frame (UI widget)
         layVMainF = QVBoxLayout()
         layVMainF.addLayout(layHControls)
+        layVMainF.addWidget(self.wdgHControlsF)
 
         # This frame encompasses all UI elements
         self.frmControls = QFrame(self)
@@ -295,15 +339,21 @@ class PlotImpz_UI(QWidget):
             self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom, 
                                     return_type='float', sign='neg')
             self.ledLogBottom.setText(str(self.bottom))
+            
+        log_f = self.chkLogF.isChecked()
+        self.lblLogBottomF.setVisible(log_f)
+        self.ledLogBottomF.setVisible(log_f)
+        self.lbldBF.setVisible(log_f)
+
         self.sig_tx.emit({'sender':__name__, 'update_view':''})
         
     def enable_controls(self):
         """ Enable / disable widget depending on the selected stimulus"""
-        stim = str(self.cmbStimulus.currentText())
-        f1_en = stim in {"Cos", "Sine", "Rect", "Saw"}
-        f2_en = stim in {"Cos", "Sine"}
-        a2_en = stim in {"Cos", "Sine"}
-        dc_en = stim not in {"Step", "StepErr"}
+        self.stim = str(self.cmbStimulus.currentText())
+        f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw"}
+        f2_en = self.stim in {"Cos", "Sine"}
+        a2_en = self.stim in {"Cos", "Sine"}
+        dc_en = self.stim not in {"Step", "StepErr"}
         self.lblFreq1.setVisible(f1_en)
         self.ledFreq1.setVisible(f1_en)
         self.lblFreqUnit1.setVisible(f1_en)
