@@ -64,9 +64,10 @@ class PlotImpz_UI(QWidget):
         self.window = "Hann"
         
         self._construct_UI()
-        self.enable_controls()
+        self._enable_stim_widgets()
+        self._update_time_freq()
         self._log_mode()
-        self.update_noi()
+        self._update_noi()
 
     def _construct_UI(self):
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
@@ -225,7 +226,7 @@ class PlotImpz_UI(QWidget):
         layHControls.addStretch(1)
         layHControls.addLayout(layVlblCmb)
         layHControls.addLayout(layVCmb)
-        layHControls.addStretch(2)
+        layHControls.addStretch(1)
         layHControls.addLayout(layVlblAmp)
         layHControls.addLayout(layVledAmp)
         layHControls.addLayout(layVlblfreq)
@@ -269,25 +270,26 @@ class PlotImpz_UI(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ledN_start.editingFinished.connect(self.update_N)
+        self.ledN_start.editingFinished.connect(self._update_N)
         self.chkLog.clicked.connect(self._log_mode)
         self.ledLogBottom.editingFinished.connect(self._log_mode)
 
-        self.cmbPltTime.activated.connect(self.update_time_freq)
-        self.cmbPltFreq.activated.connect(self.update_time_freq)
+        self.cmbPltTime.activated.connect(self._update_time_freq)
+        self.cmbPltFreq.activated.connect(self._update_time_freq)
 
-        self.chkMarker.clicked.connect(self.update_chk_boxes)
+        self.chkMarker.clicked.connect(self._update_chk_boxes)
 
-        self.cmbStimulus.activated.connect(self.enable_controls)
-        self.cmbNoise.activated.connect(self.update_noi)
-        self.ledNoi.editingFinished.connect(self.update_noi)
-        self.ledAmp1.editingFinished.connect(self.update_amp1)
-        self.ledAmp2.editingFinished.connect(self.update_amp2)
+        self.cmbStimulus.activated.connect(self._enable_stim_widgets)
+        self.cmbNoise.activated.connect(self._update_noi)
+        self.ledNoi.editingFinished.connect(self._update_noi)
+        self.ledAmp1.editingFinished.connect(self._update_amp1)
+        self.ledAmp2.editingFinished.connect(self._update_amp2)
 
-        self.ledDC.editingFinished.connect(self.update_DC)
+        self.ledDC.editingFinished.connect(self._update_DC)
         
         self.chkLogF.clicked.connect(self._log_mode)
         self.ledLogBottomF.editingFinished.connect(self._log_mode)
+        self.cmbWindow.activated.connect(self._update_window)
        
         
         # ########################  Main UI Layout ############################
@@ -306,31 +308,35 @@ class PlotImpz_UI(QWidget):
         self.setLayout(layVMain)
         
         
-    def update_N(self):
+    def _update_N(self):
         """ Update value for self.N_start from the QLineEditWidget"""
         self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
         self.ledN_start.setText(str(self.N_start))
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
-    def update_chk_boxes(self):
+    def _update_chk_boxes(self):
         """ 
         Trigger update view when one of "show stimulus", "show response" or 
         "show markers" checkboxes is clicked
         """
         self.sig_tx.emit({'sender':__name__, 'update_view':''})
         
-    def update_time_freq(self):
+    def _update_time_freq(self):
         """ 
-        Trigger draw when one of the comboboxes PltTime or PltFreq is modified
-        "show markers" checkboxes is clicked
+        Trigger 'draw' when one of the comboboxes PltTime or PltFreq is modified,
+        enable frequency domain controls only when needed
         """
         self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
         self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
+        self.wdgHControlsF.setVisible(self.plt_freq != "None")
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
 
     def _log_mode(self):
-        """ Select / deselect logarithmic mode and update self.bottom """
+        """
+        Select / deselect logarithmic mode for both time and frequency
+        domain and update self.bottom / self.bottom_f
+        """
         log = self.chkLog.isChecked()
         self.lblLogBottom.setVisible(log)
         self.ledLogBottom.setVisible(log)
@@ -344,12 +350,16 @@ class PlotImpz_UI(QWidget):
         self.lblLogBottomF.setVisible(log_f)
         self.ledLogBottomF.setVisible(log_f)
         self.lbldBF.setVisible(log_f)
+        if log_f:
+            self.bottom_f = safe_eval(self.ledLogBottomF.text(), self.bottom_f, 
+                                    return_type='float', sign='neg')
+            self.ledLogBottomF.setText(str(self.bottom_f))
 
         self.sig_tx.emit({'sender':__name__, 'update_view':''})
         
-    def enable_controls(self):
-        """ Enable / disable widget depending on the selected stimulus"""
-        self.stim = str(self.cmbStimulus.currentText())
+    def _enable_stim_widgets(self):
+        """ Enable / disable widgets depending on the selected stimulus"""
+        self.stim = qget_cmb_box(self.cmbStimulus, data=False)
         f1_en = self.stim in {"Cos", "Sine", "Rect", "Saw"}
         f2_en = self.stim in {"Cos", "Sine"}
         a2_en = self.stim in {"Cos", "Sine"}
@@ -364,22 +374,23 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.setVisible(a2_en)
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
+        
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
-    def update_amp1(self):
+    def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""        
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='float')
         self.ledAmp1.setText(str(self.A1))
         self.sig_tx.emit({'sender':__name__, 'draw':''})
         
-    def update_amp2(self):
+    def _update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='float')
         self.ledAmp2.setText(str(self.A2))
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
         
-    def update_noi(self):
+    def _update_noi(self):
         """ Update type + value + label for self.noi for noise"""
         self.noise = self.cmbNoise.currentText().lower()
         self.lblNoi.setVisible(self.noise!='none')
@@ -393,10 +404,21 @@ class PlotImpz_UI(QWidget):
                 self.lblNoi.setText(to_html("&Delta; =", frmt='b'))
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
-    def update_DC(self):
+    def _update_DC(self):
         """ Update value for self.DC from the QLineEditWidget"""
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        
+    def _update_window(self):
+        """ Update window type for FFT """
+        self.window_type = qget_cmb_box(self.cmbWindow)
+        if self.window_type == "Kaiser":
+            self.ledWinParam1.setVisible()
+            self.lblWinParam1.setText(to_html('&beta;'))
+            self.param1 = safe_eval(self.ledWinParam1.text(), self.param1, return_type='float', sign='pos')
+            self.ledWinParam1.setText(self.param1)
+
         self.sig_tx.emit({'sender':__name__, 'draw':''})
         
 
