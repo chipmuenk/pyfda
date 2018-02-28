@@ -230,46 +230,46 @@ class PlotImpz(QWidget):
         self.t = np.linspace(0, self.N/fb.fil[0]['f_S'], self.N, endpoint=False)
 
         # calculate stimuli x[n] ==============================================
-        stim = str(self.ui.cmbStimulus.currentText())
-        if stim == "Pulse":
+
+        if self.ui.stim == "Pulse":
             self.x = np.zeros(self.N)
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
 
-        elif stim == "Step":
+        elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.N) # create step function
             self.title_str = r'Step Response'
             self.H_str = r'$h_{\epsilon}[n]$'
             
-        elif stim == "StepErr":
+        elif self.ui.stim == "StepErr":
             self.x = self.ui.A1 * np.ones(self.N) # create step function
             self.title_str = r'Settling Error'
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
-        elif stim == "Cos":
+        elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2 * np.pi * self.t * self.f1)
             self.title_str = r'Transient Response to Cosine Signal'
             self.H_str = r'$y_{\cos}[n]$'
                 
-        elif stim == "Sine":
+        elif self.ui.stim == "Sine":
             self.x = self.ui.A1 * np.sin(2 * np.pi * self.t * self.f1 + self.ui.phi1) +\
                 self.ui.A2 * np.sin(2 * np.pi * self.t * self.f2 + self.ui.phi2)
             self.title_str = r'Transient Response to Sinusoidal Signal'
             self.H_str = r'$y_{\sin}[n]$'
             
-        elif stim == "Rect":
+        elif self.ui.stim == "Rect":
             self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.t * self.f1))
             self.title_str = r'Transient Response to Rect. Signal'
             self.H_str = r'$y_{rect}[n]$'
 
-        elif stim == "Saw":
+        elif self.ui.stim == "Saw":
             self.x = self.ui.A1 * sig.sawtooth(self.t * self.f1 * 2*np.pi)
             self.title_str = r'Transient Response to Sawtooth Signal'
             self.H_str = r'$y_{saw}[n]$'
 
         else:
-            logger.error('Unknown stimulus "{0}"'.format(stim))
+            logger.error('Unknown stimulus "{0}"'.format(self.ui.stim))
             return
         
         # Add noise to stimulus
@@ -300,7 +300,7 @@ class PlotImpz(QWidget):
         else: # no second order sections or antiCausals for current filter
             y = sig.lfilter(self.bb, self.aa, self.x)
 
-        if stim == "StepErr":
+        if self.ui.stim == "StepErr":
             dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
             y = y - abs(dc[1]) # subtract DC (final) value from response
 
