@@ -314,13 +314,13 @@ class PlotImpz(QWidget):
             self.y_i = None
             
         if self.ui.plt_freq in {"Response", "Both"}:
-            self.Y = np.abs(np.fft.fft(y[self.ui.N_start:self.N])) / self.N_show
+            self.Y = np.abs(np.fft.fft(y[self.ui.N_start:self.N])) / self.N_show / np.sqrt(2.)
             if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                self.Y *= 2. # correct for single-sided spectrum
+                self.Y[1:] *= 2. # correct for single-sided spectrum (except DC)
         if self.ui.plt_freq in {"Stimulus", "Both"}:
-            self.X = np.abs(np.fft.fft(self.x[self.ui.N_start:self.N])) / self.N_show
+            self.X = np.abs(np.fft.fft(self.x[self.ui.N_start:self.N])) / self.N_show / np.sqrt(2.)
             if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                self.X *= 2. # correct for single-sided spectrum
+                self.X[1:] *= 2. # correct for single-sided spectrum (except DC)
 
 #------------------------------------------------------------------------------
     def update_view(self):
