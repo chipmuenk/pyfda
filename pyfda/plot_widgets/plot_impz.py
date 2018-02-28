@@ -406,11 +406,24 @@ class PlotImpz(QWidget):
         self.ax_r.set_xlim([self.t[N_start],self.t[self.N-1]])
         expand_lim(self.ax_r, 0.02)
 
-        # plot frequency domain ###
+        # plot frequency domain =========================================
         if self.ui.plt_freq != "None":
             plt_response = self.ui.plt_freq in {"Response","Both"}
             plt_stimulus = self.ui.plt_freq in {"Stimulus","Both"}
+            if plt_response and not plt_stimulus:
+                XY_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
+            elif not plt_response and plt_stimulus:
+                XY_str = r'$|X(\mathrm{e}^{\mathrm{j} \Omega})|$'
+            else:
+                XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             F = np.fft.fftfreq(self.N_show, d = 1. / fb.fil[0]['f_S'])
+            
+            if self.ui.chkLogF.isChecked():
+                XY_str = XY_str + ' in dB'
+                if plt_response:
+                    self.Y = np.maximum(20 * np.log10(abs(self.Y)), self.ui.bottom_f)
+                if plt_stimulus:
+                    self.X = np.maximum(20 * np.log10(abs(self.X)), self.ui.bottom_f)
 
             if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift X, Y and F by f_S/2
@@ -440,7 +453,7 @@ class PlotImpz(QWidget):
                 self.ax_fft.plot(F, X, color =(0.5,0.5,0.5,0.5), lw=2)               
 
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
-            self.ax_fft.set_ylabel(r'$Y(\mathrm{e}^{\mathrm{j} \Omega})$')
+            self.ax_fft.set_ylabel(XY_str)
             self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         if self.ACTIVE_3D: # not implemented / tested yet
