@@ -35,7 +35,7 @@ class PlotImpz(QWidget):
 
         self.ACTIVE_3D = False
         self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
-
+        
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
@@ -315,9 +315,12 @@ class PlotImpz(QWidget):
             
         if self.ui.plt_freq in {"Response", "Both"}:
             self.Y = np.abs(np.fft.fft(y[self.ui.N_start:self.N])) / self.N_show
+            if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                self.Y *= 2. # correct for single-sided spectrum
         if self.ui.plt_freq in {"Stimulus", "Both"}:
             self.X = np.abs(np.fft.fft(self.x[self.ui.N_start:self.N])) / self.N_show
-
+            if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                self.X *= 2. # correct for single-sided spectrum
 
 #------------------------------------------------------------------------------
     def update_view(self):
@@ -421,30 +424,29 @@ class PlotImpz(QWidget):
             if self.ui.chkLogF.isChecked():
                 XY_str = XY_str + ' in dB'
                 if plt_response:
-                    self.Y = np.maximum(20 * np.log10(abs(self.Y)), self.ui.bottom_f)
+                    Y = np.maximum(20 * np.log10(abs(self.Y)), self.ui.bottom_f)
                 if plt_stimulus:
-                    self.X = np.maximum(20 * np.log10(abs(self.X)), self.ui.bottom_f)
+                    X = np.maximum(20 * np.log10(abs(self.X)), self.ui.bottom_f)
+            else:
+                Y = self.Y
+                X = self.X
 
             if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift X, Y and F by f_S/2
                 if plt_response:
-                    Y = np.fft.fftshift(self.Y)
+                    Y = np.fft.fftshift(Y)
                 if plt_stimulus:
-                    X = np.fft.fftshift(self.X)
+                    X = np.fft.fftshift(X)
                 F = np.fft.fftshift(F)
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
                 # only use the first half of X, Y and F
                 if plt_response:
-                    Y = 2 * self.Y[0:self.N_show//2]
+                    Y = Y[0:self.N_show//2]
                 if plt_stimulus:
-                    X = 2 * self.X[0:self.N_show//2]
+                    X = X[0:self.N_show//2]
                 F = F[0:self.N_show//2]
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # plot for F = 0 ... 1
-                if plt_response:
-                    Y = self.Y
-                if plt_stimulus:
-                    X = self.X
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
             if plt_response:
