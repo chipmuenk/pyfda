@@ -54,7 +54,7 @@ class PlotImpz_UI(QWidget):
         self.noise = 'none'
         self.DC = 0.0
         
-        self.bottom_f = -80
+        self.bottom_f = -120
 
         # initial settings for comboboxes        
         self.plt_time = "Response"
@@ -68,6 +68,7 @@ class PlotImpz_UI(QWidget):
         self._update_time_freq()
         self._log_mode()
         self._update_noi()
+        self._update_window()
 
     def _construct_UI(self):
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
@@ -94,7 +95,7 @@ class PlotImpz_UI(QWidget):
         self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLog.setChecked(False)
         
-        self.chkMarker = QCheckBox("Show markers", self)
+        self.chkMarker = QCheckBox("Markers", self)
         self.chkMarker.setObjectName("chkMarker")
         self.chkMarker.setToolTip("<span>Show plot markers.</span>")
         self.chkMarker.setChecked(True)
@@ -251,9 +252,14 @@ class PlotImpz_UI(QWidget):
         
         self.lblWindow = QLabel("Window: ", self)
         self.cmbWindow = QComboBox(self)
-        self.cmbWindow.addItems(["Boxcar","Hamming","Hann"])
+        self.cmbWindow.addItems(["Rect","Hamming","Hann","Kaiser", "Flattop", "Chebwin"])
         self.cmbWindow.setToolTip("Select window type.")
         qset_cmb_box(self.cmbWindow, self.window)
+        
+        self.lblWinPar1 = QLabel("Param1")
+        self.ledWinPar1 = QLineEdit(self)
+        self.ledWinPar1.setText("1")
+        self.ledWinPar1.setObjectName("ledWinPar1")
 
         layHControlsF.addWidget(self.chkLogF)
         layHControlsF.addWidget(self.lblLogBottomF)
@@ -262,6 +268,8 @@ class PlotImpz_UI(QWidget):
         layHControls.addStretch(1)       
         layHControlsF.addWidget(self.lblWindow)  
         layHControlsF.addWidget(self.cmbWindow)
+        layHControlsF.addWidget(self.lblWinPar1)
+        layHControlsF.addWidget(self.ledWinPar1)
         layHControlsF.addStretch(10)
         
         self.wdgHControlsF = QWidget(self)
@@ -290,6 +298,7 @@ class PlotImpz_UI(QWidget):
         self.chkLogF.clicked.connect(self._log_mode)
         self.ledLogBottomF.editingFinished.connect(self._log_mode)
         self.cmbWindow.activated.connect(self._update_window)
+        self.ledWinPar1.editingFinished.connect(self._update_window)
        
         
         # ########################  Main UI Layout ############################
@@ -392,7 +401,7 @@ class PlotImpz_UI(QWidget):
         
     def _update_noi(self):
         """ Update type + value + label for self.noi for noise"""
-        self.noise = self.cmbNoise.currentText().lower()
+        self.noise = qget_cmb_box(self.cmbNoise, data=False).lower()
         self.lblNoi.setVisible(self.noise!='none')
         self.ledNoi.setVisible(self.noise!='none')
         if self.noise!='none':
@@ -412,13 +421,54 @@ class PlotImpz_UI(QWidget):
         
     def _update_window(self):
         """ Update window type for FFT """
-        self.window_type = qget_cmb_box(self.cmbWindow)
-        if self.window_type == "Kaiser":
-            self.ledWinParam1.setVisible()
-            self.lblWinParam1.setText(to_html('&beta;'))
-            self.param1 = safe_eval(self.ledWinParam1.text(), self.param1, return_type='float', sign='pos')
-            self.ledWinParam1.setText(self.param1)
+        self.window_type = qget_cmb_box(self.cmbWindow, data=False)
+        self.param1 = None
+        has_par1 = False
+        txt_par1 = ""
+        self.nenbw = None
+        
+        if self.window_type in {"Bartlett", "Triangular"}:
+            self.window_fnct = "bartlett"
+            self.nenbw = 4./3
+            
+        if self.window_type == "Flattop":
+            self.window_fnct = "flattop"
+        elif self.window_type == "Hamming":
+            self.window_fnct = "hamming"
+            self.nenbw = 1.36 # update this
+        elif self.window_type == "Hann":
+            self.window_fnct = "hann"
+            self.nenbw = 1.5
+        elif self.window_type == "Rect":
+            self.window_fnct = "boxcar"
+            self.nenbw = 1.
+            self.cgain = 1.
+        elif self.window_type == "Kaiser":
+            self.window_fnct = "kaiser"
+            has_par1 = True
+            txt_par1 = '&beta; ='
+            self.param1 = 5
+            tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
+                       "higher values reduce side lobe level.</span>")
+        elif self.window_type == "Chebwin":
+            self.window_fnct = "chebwin"
+            has_par1 = True
+            txt_par1 = 'Attn ='
+            self.enbw = 1 # not true!
+            self.param1 = 80
+            tooltip = ("<span>Side lobe attenuation in dB.</span>")
 
+        else:
+            logger.error("Unknown window type {0}".format(self.window_type))
+
+        self.lblWinPar1.setVisible(has_par1)
+        self.ledWinPar1.setVisible(has_par1)
+        if has_par1:
+            self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
+            self.ledWinPar1.setText(str(self.param1))
+            self.ledWinPar1.setToolTip(tooltip)
+            self.lblWinPar1.setText(to_html(txt_par1))
+        
         self.sig_tx.emit({'sender':__name__, 'draw':''})
         
 

@@ -222,50 +222,50 @@ class PlotImpz(QWidget):
         # calculate time vector self.t[n] with n = 0 ... N_points + N_start ===
         N_user = safe_eval(self.ui.ledN_points.text(), 0, return_type='int', sign='pos')
         if N_user == 0: # automatic calculation
-            self.N_show = self.calc_n_points(N_user)
+            self.N = self.calc_n_points(N_user)
         else:
-            self.N_show = N_user
+            self.N = N_user
         
-        self.N = self.N_show + self.ui.N_start # total number of points to be calculated: N + N_start
-        self.t = np.linspace(0, self.N/fb.fil[0]['f_S'], self.N, endpoint=False)
+        self.N_end = self.N + self.ui.N_start # total number of points to be calculated: N + N_start
+        self.t = np.linspace(0, self.N_end/fb.fil[0]['f_S'], self.N_end, endpoint=False)
 
         # calculate stimuli x[n] ==============================================
 
         if self.ui.stim == "Pulse":
-            self.x = np.zeros(self.N)
+            self.x = np.zeros(self.N_end)
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
 
         elif self.ui.stim == "Step":
-            self.x = self.ui.A1 * np.ones(self.N) # create step function
-            self.title_str = r'Step Response'
+            self.x = self.ui.A1 * np.ones(self.N_end) # create step function
+            self.title_str = r'Filter Step Response'
             self.H_str = r'$h_{\epsilon}[n]$'
             
         elif self.ui.stim == "StepErr":
-            self.x = self.ui.A1 * np.ones(self.N) # create step function
+            self.x = self.ui.A1 * np.ones(self.N_end) # create step function
             self.title_str = r'Settling Error'
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2 * np.pi * self.t * self.f1)
-            self.title_str = r'Transient Response to Cosine Signal'
+            self.title_str = r'Filter Response to Cosine Signal'
             self.H_str = r'$y_{\cos}[n]$'
                 
         elif self.ui.stim == "Sine":
             self.x = self.ui.A1 * np.sin(2 * np.pi * self.t * self.f1 + self.ui.phi1) +\
                 self.ui.A2 * np.sin(2 * np.pi * self.t * self.f2 + self.ui.phi2)
-            self.title_str = r'Transient Response to Sinusoidal Signal'
+            self.title_str = r'Filter Response to Sinusoidal Signal'
             self.H_str = r'$y_{\sin}[n]$'
             
         elif self.ui.stim == "Rect":
             self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.t * self.f1))
-            self.title_str = r'Transient Response to Rect. Signal'
+            self.title_str = r'Filter Response to Rect. Signal'
             self.H_str = r'$y_{rect}[n]$'
 
         elif self.ui.stim == "Saw":
             self.x = self.ui.A1 * sig.sawtooth(self.t * self.f1 * 2*np.pi)
-            self.title_str = r'Transient Response to Sawtooth Signal'
+            self.title_str = r'Filter Response to Sawtooth Signal'
             self.H_str = r'$y_{saw}[n]$'
 
         else:
@@ -274,9 +274,9 @@ class PlotImpz(QWidget):
         
         # Add noise to stimulus
         if self.ui.noise == "gauss":
-            self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.N - self.ui.N_start)
+            self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.N_end - self.ui.N_start)
         elif self.ui.noise == "uniform":
-            self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.N - self.ui.N_start)-0.5)
+            self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.N_end - self.ui.N_start)-0.5)
 
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
@@ -312,13 +312,30 @@ class PlotImpz(QWidget):
         else:
             self.y = y
             self.y_i = None
-            
+
+        # calculate FFT of stimulus / response
+        # get attribute window_fnct from submodule sig.windows, here, 
+        # returning the desired window function
+        win_fnct = getattr(sig.windows, self.ui.window_fnct, None) # or None if not in fc_module 
+        if not win_fnct:
+            logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
+                         .format(self.ui.window_fnct))
+            win_fnct = sig.windows.boxcar
+            self.ui.param1 = None
+
+        if self.ui.param1:
+            win_fnct_arg = win_fnct(self.N, self.ui.param1) # use additional parameter
+        else:
+            win_fnct_arg = win_fnct(self.N)
+
         if self.ui.plt_freq in {"Response", "Both"}:
-            self.Y = np.abs(np.fft.fft(y[self.ui.N_start:self.N])) / self.N_show / np.sqrt(2.)
+            y_win = y[self.ui.N_start:self.N_end] * win_fnct_arg
+            self.Y = np.abs(np.fft.fft(y_win)) / self.N / np.sqrt(2.)
             if fb.fil[0]['freqSpecsRangeType'] == 'half':
                 self.Y[1:] *= 2. # correct for single-sided spectrum (except DC)
         if self.ui.plt_freq in {"Stimulus", "Both"}:
-            self.X = np.abs(np.fft.fft(self.x[self.ui.N_start:self.N])) / self.N_show / np.sqrt(2.)
+            x_win = self.x[self.ui.N_start:self.N_end] * win_fnct_arg
+            self.X = np.abs(np.fft.fft(x_win)) / self.N / np.sqrt(2.) 
             if fb.fil[0]['freqSpecsRangeType'] == 'half':
                 self.X[1:] *= 2. # correct for single-sided spectrum (except DC)
 
@@ -406,7 +423,7 @@ class PlotImpz(QWidget):
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
         
         self.ax_r.set_title(self.title_str)
-        self.ax_r.set_xlim([self.t[N_start],self.t[self.N-1]])
+        self.ax_r.set_xlim([self.t[N_start],self.t[self.N_end-1]])
         expand_lim(self.ax_r, 0.02)
 
         # plot frequency domain =========================================
@@ -419,7 +436,7 @@ class PlotImpz(QWidget):
                 XY_str = r'$|X(\mathrm{e}^{\mathrm{j} \Omega})|$'
             else:
                 XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
-            F = np.fft.fftfreq(self.N_show, d = 1. / fb.fil[0]['f_S'])
+            F = np.fft.fftfreq(self.N, d = 1. / fb.fil[0]['f_S'])
             
             if self.ui.chkLogF.isChecked():
                 XY_str = XY_str + ' in dB'
@@ -441,10 +458,10 @@ class PlotImpz(QWidget):
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
                 # only use the first half of X, Y and F
                 if plt_response:
-                    Y = Y[0:self.N_show//2]
+                    Y = Y[0:self.N//2]
                 if plt_stimulus:
-                    X = X[0:self.N_show//2]
-                F = F[0:self.N_show//2]
+                    X = X[0:self.N//2]
+                F = F[0:self.N//2]
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # plot for F = 0 ... 1
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
@@ -457,10 +474,12 @@ class PlotImpz(QWidget):
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
             self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
+            if self.ui.plt_time == "None":
+                self.ax_fft.set_title(self.title_str) # no time window, print title here
 
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
-            for i in range(N_start, self.self.N):
+            for i in range(N_start, self.N_end):
               self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
                              '-', linewidth=2, alpha=.5)
 
