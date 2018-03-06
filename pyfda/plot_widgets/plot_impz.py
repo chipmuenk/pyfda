@@ -361,8 +361,13 @@ class PlotImpz(QWidget):
         """
         (Re-)draw the figure
         """
-        self.ui.lblFreqUnit1.setText(to_html(fb.fil[0]['freq_specs_unit']))
-        self.ui.lblFreqUnit2.setText(to_html(fb.fil[0]['freq_specs_unit']))
+        f_unit = fb.fil[0]['freq_specs_unit']
+        if f_unit in {"f_S", "f_Ny"}:
+            unit_frmt = "i"
+        else:
+            unit_frmt = None
+        self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
+        self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         N_start = self.ui.N_start
         self.load_fs()
         self.init_axes()

@@ -149,13 +149,13 @@ class PlotImpz_UI(QWidget):
         layVCmb.addWidget(self.cmbStimulus)
         layVCmb.addWidget(self.cmbNoise)
 
-        self.lblAmp1 = QLabel(to_html("A_1", frmt='b') + " =", self)
+        self.lblAmp1 = QLabel(to_html("A_1", frmt='bi') + " =", self)
         self.ledAmp1 = QLineEdit(self)
         self.ledAmp1.setText(str(self.A1))
         self.ledAmp1.setToolTip("Stimulus amplitude.")
         self.ledAmp1.setObjectName("stimAmp1")
         
-        self.lblAmp2 = QLabel(to_html("A_2", frmt='b') + " =", self)
+        self.lblAmp2 = QLabel(to_html("A_2", frmt='bi') + " =", self)
         self.ledAmp2 = QLineEdit(self)
         self.ledAmp2.setText(str(self.A2))
         self.ledAmp2.setToolTip("Stimulus amplitude 2.")
@@ -200,7 +200,7 @@ class PlotImpz_UI(QWidget):
         self.ledNoi.setToolTip("Noise Level")
         self.ledNoi.setObjectName("stimNoi")
 
-        self.lblDC = QLabel(to_html("DC =", frmt='b'), self)
+        self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
         self.ledDC = QLineEdit(self)
         self.ledDC.setText(str(self.DC))
         self.ledDC.setToolTip("DC Level")
@@ -408,9 +408,9 @@ class PlotImpz_UI(QWidget):
             self.noi = safe_eval(self.ledNoi.text(), 0, return_type='float', sign='pos')
             self.ledNoi.setText(str(self.noi))
             if self.noise == 'gauss':
-                self.lblNoi.setText(to_html("&sigma; =", frmt='b'))
+                self.lblNoi.setText(to_html("&sigma; =", frmt='bi'))
             elif self.noise == 'uniform':
-                self.lblNoi.setText(to_html("&Delta; =", frmt='b'))
+                self.lblNoi.setText(to_html("&Delta; =", frmt='bi'))
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
     def _update_DC(self):
@@ -426,6 +426,7 @@ class PlotImpz_UI(QWidget):
         has_par1 = False
         txt_par1 = ""
         self.nenbw = None
+        self.cgain = 1
         
         if self.window_type in {"Bartlett", "Triangular"}:
             self.window_fnct = "bartlett"
@@ -442,7 +443,6 @@ class PlotImpz_UI(QWidget):
         elif self.window_type == "Rect":
             self.window_fnct = "boxcar"
             self.nenbw = 1.
-            self.cgain = 1.
         elif self.window_type == "Kaiser":
             self.window_fnct = "kaiser"
             has_par1 = True
@@ -457,7 +457,6 @@ class PlotImpz_UI(QWidget):
             self.enbw = 1 # not true!
             self.param1 = 80
             tooltip = ("<span>Side lobe attenuation in dB.</span>")
-
         else:
             logger.error("Unknown window type {0}".format(self.window_type))
 
@@ -467,7 +466,7 @@ class PlotImpz_UI(QWidget):
             self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
             self.ledWinPar1.setText(str(self.param1))
             self.ledWinPar1.setToolTip(tooltip)
-            self.lblWinPar1.setText(to_html(txt_par1))
+            self.lblWinPar1.setText(to_html(txt_par1, frmt='bi'))
         
         self.sig_tx.emit({'sender':__name__, 'draw':''})
         
