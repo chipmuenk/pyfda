@@ -62,7 +62,7 @@ class FreqSpecs(QWidget):
         lblTitle.setFont(bfont)
         lblTitle.setWordWrap(True)
         self.lblUnit = QLabel(self)
-        self.lblUnit.setText("in " + to_html(fb.fil[0]['freq_specs_unit'], frmt='b'))
+        self.lblUnit.setText("in " + to_html(fb.fil[0]['freq_specs_unit'], frmt='bi'))
 
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(lblTitle)
@@ -165,8 +165,13 @@ class FreqSpecs(QWidget):
         """
         state = new_labels[0]
         new_labels = new_labels[1:]
+        unit = fb.fil[0]['freq_specs_unit']
+        if unit in {"f_S", "f_Ny"}:
+            unit_frmt = 'bi'
+        else:
+            unit_frmt = 'b'
             
-        self.lblUnit.setText(" in " + to_html(fb.fil[0]['freq_specs_unit'], frmt='b'))
+        self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
@@ -180,7 +185,7 @@ class FreqSpecs(QWidget):
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
-            self.qlabels[i].setText(to_html(new_labels[i], frmt='b'))
+            self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
             
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
@@ -257,7 +262,7 @@ class FreqSpecs(QWidget):
         else: # new subwidgets need to be generated
             for i in range(num_tot_labels, num_new_labels):                   
                 self.qlabels.append(QLabel(self))
-                self.qlabels[i].setText(to_html("dummy", frmt='b'))
+                self.qlabels[i].setText(to_html("dummy", frmt='bi'))
     
                 self.qlineedit.append(QLineEdit(""))
                 self.qlineedit[i].setObjectName("dummy")

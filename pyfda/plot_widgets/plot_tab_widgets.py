@@ -14,7 +14,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore
+from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSlot, pyqtSignal
 
 from pyfda.pyfda_rc import params
 
@@ -23,6 +23,10 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
+       
+    sig_rx = pyqtSignal(dict)
+    sig_tx = pyqtSignal(dict) # not used yet
+    
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
@@ -52,17 +56,26 @@ class PlotTabWidgets(QTabWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
         self.setLayout(layVMain)
+        
+        #----------------------------------------------------------------------
+        # SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        # local signals:
+        
         self.timer_id = QtCore.QTimer()
         self.timer_id.setSingleShot(True)
         # redraw current widget at timeout (timer was triggered by resize event):
         self.timer_id.timeout.connect(self.current_tab_redraw)
 
-        # When user has selected a different tab, call self.tab_changed for a redraw
+        # When user has selected a different tab, trigger a redraw of current tab
         self.tabWidget.currentChanged.connect(self.current_tab_redraw)
         # The following does not work: maybe current scope must be left?
         # self.tabWidget.currentChanged.connect(self.tabWidget.currentWidget().redraw) # 
 
         self.tabWidget.installEventFilter(self)
+        
+        # global signals
+        self.sig_rx.connect(self.process_signals)
         
         """
         https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
@@ -95,6 +108,32 @@ class PlotTabWidgets(QTabWidget):
         """
 
 #------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming in
+        """
+        logger.debug("sig_rx = {0}".format(sig_dict))
+#        if self.sender(): # origin of signal that triggered the slot
+#            sender_name = self.sender().objectName()
+#            sender_text = self.sender().text()
+#            sender_class = self.sender().__class__.__name__
+#            print("sender = ", sender_text, sender_class, sender_name, self.__class__.__name__)
+#            logger.debug("process_signals called by {0}".format(sender_name))
+
+        if 'specs_changed' in sig_dict:
+               self.update_view()
+            
+        elif 'view_changed' in sig_dict.keys():
+               self.update_view()
+            
+        elif 'filter_designed' in sig_dict:
+               self.update_data()
+
+        else:
+            pass
+
+#------------------------------------------------------------------------------
         
 #    @QtCore.pyqtSlot(int)
 #    def tab_changed(self,argTabIndex):
@@ -123,8 +162,7 @@ class PlotTabWidgets(QTabWidget):
 #------------------------------------------------------------------------------
     def update_data(self):
         """
-        Calculate subplots with new filter DATA and redraw them,
-        triggered by self.inputTabWidgets.sigFilterDesigned.
+        Calculate subplots with new filter DATA and redraw them
         """
         logger.debug("update_data (filter designed)")
         self.pltHf.draw()
@@ -137,14 +175,13 @@ class PlotTabWidgets(QTabWidget):
 #------------------------------------------------------------------------------
     def update_view(self):
         """
-        Update plot limits with new filter SPECS and redraw all subplots,
-        triggered by self.inputTabWidgets.sigSpecsChanged.
+        Update plot limits with new filter SPECS and redraw all subplots
         """
         logger.debug("update_view (specs changed)")
         self.pltHf.update_view()
         self.pltPhi.update_view()
         self.pltTauG.update_view()
-        self.pltImpz.update_view()
+        self.pltImpz.draw() # changing of f_s has to update the plot - more differentiation needed
 #        self.pltPZ.draw()
 #        self.plt3D.draw()
         

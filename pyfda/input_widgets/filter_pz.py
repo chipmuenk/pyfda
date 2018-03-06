@@ -17,7 +17,7 @@ import sys
 import re
 from pprint import pformat
 
-from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, QEvent, QIcon,
+from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, pyqtSlot, QEvent, QIcon,
                       QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
@@ -126,7 +126,7 @@ class ItemDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         """
         When editor has finished, read the updated data from the editor,
-        convert it to floating point format and store it in both the model
+        convert it to complex format and store it in both the model
         (= QTableWidget) and in `zpk`. Finally, refresh the table item to
         display it in the selected format (via `to be defined`) and normalize
         the gain.
@@ -231,7 +231,7 @@ class FilterPZ(QWidget):
 
     def setup_signal_slot(self):
         """
-        Setup signal-slot connections
+        Setup local signal-slot connections
         """
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
@@ -308,8 +308,21 @@ class FilterPZ(QWidget):
                 return True
 
         return super(FilterPZ, self).eventFilter(source, event)
-#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from input_tab_widgets
+        """
+        if 'load_dict' in sig_dict:
+            self.load_dict()
+        elif 'enabled' in sig_dict:
+            self.enable_ui(sig_dict['enabled'])
+        else:
+            pass
+
+#------------------------------------------------------------------------------
     def _store_gain(self, source):
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),

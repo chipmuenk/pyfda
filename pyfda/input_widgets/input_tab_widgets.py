@@ -14,7 +14,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
+from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal, pyqtSlot
 
 SCROLL = True
 
@@ -35,12 +35,9 @@ class InputTabWidgets(QWidget):
     """
     Create a tabbed widget for various input subwidgets
     """
-    # class variables (shared between instances if more than one exists)
-    sigViewChanged = pyqtSignal() # emitted when view (e.g. single / double sided f) has changed
-    sigSpecsChanged = pyqtSignal()  # emitted when specs have been changed
-    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
-    sig_changed_rx = pyqtSignal(dict)
-    sig_changed_tx = pyqtSignal(dict)
+    # signals as class variables (shared between instances if more than one exists)
+    sig_rx = pyqtSignal(dict)
+    sig_tx = pyqtSignal(dict)
 
 
     def __init__(self, parent):
@@ -131,20 +128,42 @@ class InputTabWidgets(QWidget):
         self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
         self.filter_pz.sigFilterDesigned.connect(self.load_all)
         self.file_io.sigFilterLoaded.connect(self.load_all)
+        
+        self.sig_rx.connect(self.process_signals)
         #----------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from sig_rx
+        """
+        if self.sender(): # origin of signal that triggered the slot
+            sender_name = self.sender().objectName()
+            sender_text = self.sender().text()
+            sender_class = self.sender().__class__.__name__
+            print("sender = ", sender_text, sender_class, sender_name, self.__class__.__name__)
+            logger.debug("process_signals called by {0}".format(sender_name))
+
+        if 'load_dict' in sig_dict:
+            self.load_dict()
+        else:
+            pass
+
 
     def update_view(self):
         """
         Slot for InputSpecs.sigViewChanged
 
-        Propagate new PLOT VIEW (e.g. log scale) to plot widgets via pyfda.py
+        Propagate new PLOT VIEW (e.g. log scale, single/double sided) to
+        plot widgets via pyfda.py
 
         Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
         self.filter_info.load_dict() # update frequency unit of info widget
-        logger.debug("Emit sigViewChanged!")
-        self.sigViewChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
+        logger.debug("Emit sig_tx = 'specs_changed'")
+        self.sig_tx.emit({'sender':'InputTabWidgets','view_changed':True})
 
 
     def update_specs(self):
@@ -164,8 +183,8 @@ class InputTabWidgets(QWidget):
         self.filter_info.load_dict()
         if HAS_MYHDL:
             self.hdlSpecs.update_UI()
-        logger.debug("Emit sigSpecsChanged!")
-        self.sigSpecsChanged.emit() # pyFDA -> PlotTabWidgets.update_specs
+        logger.debug("Emit sig_tx = 'specs_changed'")
+        self.sig_tx.emit({'sender':'InputTabWidgets','specs_changed':True})
 
     def load_all(self):
         """
@@ -173,7 +192,7 @@ class InputTabWidgets(QWidget):
         Pass new filter data from the global filter dict
         - Specifically call SelectFilter.load_dict
         - Update the input widgets that can / need to display filter data
-        - Update all plot widgets via the signal sigFilterDesigned
+        - Update all plot widgets via sig_tx = 'filter_designed'
         """
         self.filter_specs.color_design_button("ok")
         self.filter_specs.sel_fil.load_dict() # update select_filter widget
@@ -187,7 +206,7 @@ class InputTabWidgets(QWidget):
         Called when a new filter has been DESIGNED:
         - Pass new filter data from the global filter dict
         - Update the input widgets that can / need to display filter data
-        - Update all plot widgets via the signal sigFilterDesigned
+        - Update all plot widgets via the sig_tx = 'filter_designed'
 
         """
         sender_name = ""
@@ -200,9 +219,8 @@ class InputTabWidgets(QWidget):
         self.filter_coeffs.load_dict()
         self.filter_pz.load_dict()
 
-        logger.debug("Emit sigFilterDesigned!")
-        self.sigFilterDesigned.emit() # pyFDA -> PlotTabWidgets.update_data
-
+        logger.debug("Emit sig_tx = 'filter_designed'")
+        self.sig_tx.emit({'sender':'InputTabWidgets','filter_designed':True})
 
 #------------------------------------------------------------------------
 

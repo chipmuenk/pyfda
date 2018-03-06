@@ -188,20 +188,8 @@ class pyFDA(QMainWindow):
         # Here, signals about spec and design changes from lower hierarchies
         # are distributed. At the moment, only changes in the input widgets are
         # routed to the plot widgets:
-        #
-        # sigViewChanged: signal indicating that filter VIEW has changed,
-        # requiring partial update of some plot widgets:
-        inputTabWidgets.sigViewChanged.connect(pltTabWidgets.update_view)
-        #
-        # sigSpecsChanged: signal indicating that filter SPECS have changed,
-        # requiring partial update of some plot widgets:
-        inputTabWidgets.sigSpecsChanged.connect(pltTabWidgets.update_view)
-
-        #
-        # sigFilterDesigned: signal indicating that filter has been DESIGNED,
-        #  requiring full update of all plot widgets:
-        inputTabWidgets.sigFilterDesigned.connect(pltTabWidgets.update_data)
-
+        inputTabWidgets.sig_tx.connect(pltTabWidgets.sig_rx)
+        
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 
 
