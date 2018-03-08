@@ -1548,9 +1548,10 @@ def to_html(text, frmt=None):
     # see https://danielfett.de/de/tutorials/tutorial-regulare-ausdrucke/
     # arguments for regex replacement with illegal characters
     # [a-dA-D] list of characters
+    # \w : meta character for [a-zA-Z0-9_]
+    # \s : meta character for all sorts of whitespace
     # [123][abc] test for e.g. '2c'
-    # ^ means "not", | means "or" and \ escapes
-    #   '.' means any character, 
+    # '^' means "not", '|' means "or" and '\' escapes, '.' means any character, 
     # '+' means once or more, '?' means zero or once, '*' means zero or more
     #   '[^a]' means except for 'a'
     # () defines a group that can be referenced by \1, \2, ...
@@ -1576,7 +1577,11 @@ def to_html(text, frmt=None):
     if frmt == None:
         text = "<span>" + text + "</span>"
 
-    html = re.sub(r'([a-zA-Z])_([a-zA-Z0-9]+)', r'\1<sub>\2</sub>', text)
+    html = re.sub(r'([a-zA-Z])_(\w+)', r'\1<sub>\2</sub>', text)
+    
+    #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
+
+    # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
 
     return html
 
