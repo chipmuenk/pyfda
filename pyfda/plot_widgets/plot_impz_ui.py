@@ -426,23 +426,28 @@ class PlotImpz_UI(QWidget):
         has_par1 = False
         txt_par1 = ""
         self.nenbw = None
-        self.cgain = 1
+        self.scale = None
         
         if self.window_type in {"Bartlett", "Triangular"}:
             self.window_fnct = "bartlett"
             self.nenbw = 4./3
+            self.scale = 2.
             
         if self.window_type == "Flattop":
             self.window_fnct = "flattop"
+            self.scale = 1./0.2155
         elif self.window_type == "Hamming":
             self.window_fnct = "hamming"
             self.nenbw = 1.36 # update this
+            self.scale = 1./0.54
         elif self.window_type == "Hann":
             self.window_fnct = "hann"
             self.nenbw = 1.5
+            self.scale = 2
         elif self.window_type == "Rect":
             self.window_fnct = "boxcar"
             self.nenbw = 1.
+            self.scale = 1.
         elif self.window_type == "Kaiser":
             self.window_fnct = "kaiser"
             has_par1 = True
