@@ -265,7 +265,7 @@ class PlotImpz_UI(QWidget):
         layHControlsF.addWidget(self.lblLogBottomF)
         layHControlsF.addWidget(self.ledLogBottomF)
         layHControlsF.addWidget(self.lbldBF)
-        layHControls.addStretch(1)       
+        layHControls.addStretch(2)       
         layHControlsF.addWidget(self.lblWindow)  
         layHControlsF.addWidget(self.cmbWindow)
         layHControlsF.addWidget(self.lblWinPar1)
