@@ -197,7 +197,7 @@ class PlotImpz_UI(QWidget):
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
         self.ledNoi.setText(str(self.noi))
-        self.ledNoi.setToolTip("Noise Level")
+        self.ledNoi.setToolTip("not initialized")
         self.ledNoi.setObjectName("stimNoi")
 
         self.lblDC = QLabel(to_html("DC =", frmt='bi'), self)
@@ -298,7 +298,7 @@ class PlotImpz_UI(QWidget):
         self.chkLogF.clicked.connect(self._log_mode)
         self.ledLogBottomF.editingFinished.connect(self._log_mode)
         self.cmbWindow.activated.connect(self._update_window)
-        self.ledWinPar1.editingFinished.connect(self._update_window)
+        self.ledWinPar1.editingFinished.connect(self._update_param)
        
         
         # ########################  Main UI Layout ############################
@@ -409,8 +409,12 @@ class PlotImpz_UI(QWidget):
             self.ledNoi.setText(str(self.noi))
             if self.noise == 'gauss':
                 self.lblNoi.setText(to_html("&sigma; =", frmt='bi'))
+                self.ledNoi.setToolTip("<span>Standard deviation of statistical process.</span>")
             elif self.noise == 'uniform':
                 self.lblNoi.setText(to_html("&Delta; =", frmt='bi'))
+                self.ledNoi.setToolTip("<span>Interval size for uniformly distributed process "
+                                       "(e.g. quantization step size for quantization noise), "
+                                       "centered around 0.</span>")
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
     def _update_DC(self):
@@ -426,7 +430,7 @@ class PlotImpz_UI(QWidget):
         has_par1 = False
         txt_par1 = ""
         self.nenbw = None
-        self.cgain = 1
+        self.scale = None
         
         if self.window_type in {"Bartlett", "Triangular"}:
             self.window_fnct = "bartlett"
@@ -437,9 +441,11 @@ class PlotImpz_UI(QWidget):
         elif self.window_type == "Hamming":
             self.window_fnct = "hamming"
             self.nenbw = 1.36 # update this
+            self.scale = 1./0.54
         elif self.window_type == "Hann":
             self.window_fnct = "hann"
             self.nenbw = 1.5
+            self.scale = 2.
         elif self.window_type == "Rect":
             self.window_fnct = "boxcar"
             self.nenbw = 1.
@@ -454,7 +460,6 @@ class PlotImpz_UI(QWidget):
             self.window_fnct = "chebwin"
             has_par1 = True
             txt_par1 = 'Attn ='
-            self.enbw = 1 # not true!
             self.param1 = 80
             tooltip = ("<span>Side lobe attenuation in dB.</span>")
         else:
@@ -463,14 +468,18 @@ class PlotImpz_UI(QWidget):
         self.lblWinPar1.setVisible(has_par1)
         self.ledWinPar1.setVisible(has_par1)
         if has_par1:
-            self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
-            self.ledWinPar1.setText(str(self.param1))
             self.ledWinPar1.setToolTip(tooltip)
             self.lblWinPar1.setText(to_html(txt_par1, frmt='bi'))
+            self.ledWinPar1.setText(str(self.param1))
         
         self.sig_tx.emit({'sender':__name__, 'draw':''})
-        
 
+    def _update_param(self):
+        """ Update param when edited """
+        self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
+        self.ledWinPar1.setText(str(self.param1))
+    
+        self.sig_tx.emit({'sender':__name__, 'draw':''})
 #------------------------------------------------------------------------------
 
 def main():
