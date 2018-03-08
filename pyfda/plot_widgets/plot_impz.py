@@ -82,7 +82,7 @@ class PlotImpz(QWidget):
         elif 'draw' in sig_dict:
             self.draw()
         else:
-            logger.error("Dict not understood: {0}".format(sig_dict))
+            logger.debug("{0}: dict {1} passed thru".format(__name__, sig_dict))
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):
@@ -327,6 +327,9 @@ class PlotImpz(QWidget):
             win_fnct_arg = win_fnct(self.N, self.ui.param1) # use additional parameter
         else:
             win_fnct_arg = win_fnct(self.N)
+
+        if self.ui.scale: 
+            win_fnct_arg = win_fnct_arg * self.ui.scale
 
         if self.ui.plt_freq in {"Response", "Both"}:
             y_win = y[self.ui.N_start:self.N_end] * win_fnct_arg
