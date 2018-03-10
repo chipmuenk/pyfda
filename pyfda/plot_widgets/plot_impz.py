@@ -485,6 +485,16 @@ class PlotImpz(QWidget):
             self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
             if self.ui.plt_time == "None":
                 self.ax_fft.set_title(self.title_str) # no time window, print title here
+                
+            if self.ui.chkLogF.isChecked():
+                # create second axis scaled for noise power scale
+                self.ax_fft_noise = self.ax_fft.twinx()
+                self.ax_fft_noise.is_twin = True
+
+                corr = 10*np.log10(self.N)
+                mn, mx = self.ax_fft.get_ylim()
+                self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
+                self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
 
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
