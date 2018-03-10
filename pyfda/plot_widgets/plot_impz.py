@@ -507,6 +507,8 @@ class PlotImpz(QWidget):
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
+        if hasattr(self, "ax2_fft"):
+            self.ax2_fft.grid(False)
 
 #------------------------------------------------------------------------------        
     def calc_n_points(self, N_user = 0):
