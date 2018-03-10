@@ -248,7 +248,8 @@ class PlotImpz(QWidget):
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif self.ui.stim == "Cos":
-            self.x = self.ui.A1 * np.cos(2 * np.pi * self.t * self.f1)
+            self.x = self.ui.A1 * np.cos(2 * np.pi * self.t * self.f1) +\
+                self.ui.A2 * np.cos(2 * np.pi * self.t * self.f2 + self.ui.phi2)
             self.title_str = r'Filter Response to Cosine Signal'
             self.H_str = r'$y_{\cos}[n]$'
                 
