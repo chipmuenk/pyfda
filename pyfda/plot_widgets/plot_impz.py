@@ -208,6 +208,7 @@ class PlotImpz(QWidget):
             if self.ui.plt_freq != "None":
                 self.ax_fft = self.mplwidget.fig.add_subplot(num_subplots, 1, num_subplots)    
                 self.ax_fft.clear()
+
                 self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
     
@@ -454,8 +455,10 @@ class PlotImpz(QWidget):
                 if plt_stimulus:
                     X = np.maximum(20 * np.log10(abs(self.X)), self.ui.bottom_f)
             else:
-                Y = self.Y
-                X = self.X
+                if plt_response:
+                    Y = self.Y
+                if plt_stimulus:
+                    X = self.X
 
             if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift X, Y and F by f_S/2
