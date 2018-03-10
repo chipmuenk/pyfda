@@ -339,7 +339,7 @@ class Plot3D(QWidget):
         """
         Restore x/y/z - limits and camera position
         """
-        if self.mplwidget.mplToolbar.lock_zoom:
+        if self.mplwidget.mplToolbar.a_lk.isChecked():
             self.ax3d.set_xlim3d(self.xlim)
             self.ax3d.set_ylim3d(self.ylim)
             self.ax3d.set_zlim3d(self.zlim)
@@ -604,7 +604,7 @@ class Plot3D(QWidget):
         #----------------------------------------------------------------------
         ## Set view limits and labels
         #----------------------------------------------------------------------
-        if not self.mplwidget.mplToolbar.lock_zoom:
+        if not self.mplwidget.mplToolbar.a_lk.isChecked():
             self.ax3d.set_xlim3d(self.xmin, self.xmax)
             self.ax3d.set_ylim3d(self.ymin, self.ymax)
             self.ax3d.set_zlim3d(bottom, top)
