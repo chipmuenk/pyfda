@@ -409,12 +409,14 @@ class PlotImpz_UI(QWidget):
             self.ledNoi.setText(str(self.noi))
             if self.noise == 'gauss':
                 self.lblNoi.setText(to_html("&sigma; =", frmt='bi'))
-                self.ledNoi.setToolTip("<span>Standard deviation of statistical process.</span>")
+                self.ledNoi.setToolTip("<span>Standard deviation of statistical process,"
+                                       "noise power is <i>P</i> = &sigma;<sup>2</sup></span>")
             elif self.noise == 'uniform':
                 self.lblNoi.setText(to_html("&Delta; =", frmt='bi'))
                 self.ledNoi.setToolTip("<span>Interval size for uniformly distributed process "
                                        "(e.g. quantization step size for quantization noise), "
-                                       "centered around 0.</span>")
+                                       "centered around 0. Noise power is "
+                                       "<i>P</i> = &Delta;<sup>2</sup>/12.</span>")
         self.sig_tx.emit({'sender':__name__, 'draw':''})
 
     def _update_DC(self):
@@ -447,11 +449,7 @@ class PlotImpz_UI(QWidget):
         elif self.window_type == "Hann":
             self.window_fnct = "hann"
             self.nenbw = 1.5
-<<<<<<< HEAD
             self.scale = 2.
-=======
-            self.scale = 2
->>>>>>> d9ffec89847546c5c74dab13f8ad43938a4b28ff
         elif self.window_type == "Rect":
             self.window_fnct = "boxcar"
             self.nenbw = 1.
