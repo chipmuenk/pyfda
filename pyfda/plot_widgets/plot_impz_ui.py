@@ -16,7 +16,10 @@ logger = logging.getLogger(__name__)
 from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
                       QHBoxLayout, QVBoxLayout, QFrame, pyqtSlot, pyqtSignal)
 
+import numpy as np
+import scipy.signal as sig
 from pyfda.pyfda_lib import to_html, safe_eval
+import pyfda.filterbroker as fb
 from pyfda.pyfda_qt_lib import qset_cmb_box, qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 
@@ -67,8 +70,9 @@ class PlotImpz_UI(QWidget):
         self._enable_stim_widgets()
         self._update_time_freq()
         self._log_mode()
+        self._update_N() # slso updates window
         self._update_noi()
-        self._update_window()
+        #self._update_window()
 
     def _construct_UI(self):
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
@@ -252,7 +256,7 @@ class PlotImpz_UI(QWidget):
         
         self.lblWindow = QLabel("Window: ", self)
         self.cmbWindow = QComboBox(self)
-        self.cmbWindow.addItems(["Rect","Hamming","Hann","Kaiser", "Flattop", "Chebwin"])
+        self.cmbWindow.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
         self.cmbWindow.setToolTip("Select window type.")
         qset_cmb_box(self.cmbWindow, self.window)
         
@@ -279,6 +283,7 @@ class PlotImpz_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.ledN_start.editingFinished.connect(self._update_N)
+        self.ledN_points.editingFinished.connect(self._update_N)
         self.chkLog.clicked.connect(self._log_mode)
         self.ledLogBottom.editingFinished.connect(self._log_mode)
 
@@ -321,7 +326,15 @@ class PlotImpz_UI(QWidget):
         """ Update value for self.N_start from the QLineEditWidget"""
         self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
         self.ledN_start.setText(str(self.N_start))
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        N_user = safe_eval(self.ledN_points.text(), 0, return_type='int', sign='pos')
+        if N_user == 0: # automatic calculation
+            self.N = self.calc_n_points(N_user)
+        else:
+            self.N = N_user
+        
+        self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
+        
+        self._update_window()
 
     def _update_chk_boxes(self):
         """ 
@@ -431,38 +444,31 @@ class PlotImpz_UI(QWidget):
         self.param1 = None
         has_par1 = False
         txt_par1 = ""
-        self.nenbw = None
-        self.scale = None
+        self.nenbw = None # normalized equivalent noise bandwidth
         
         if self.window_type in {"Bartlett", "Triangular"}:
-            self.window_fnct = "bartlett"
+            window_name = "bartlett"
             self.nenbw = 4./3
-            self.scale = 2.
-            
         if self.window_type == "Flattop":
-            self.window_fnct = "flattop"
-            self.scale = 1./0.2155
+            window_name = "flattop"
         elif self.window_type == "Hamming":
-            self.window_fnct = "hamming"
+            window_name = "hamming"
             self.nenbw = 1.36 # update this
-            self.scale = 1./0.54
         elif self.window_type == "Hann":
-            self.window_fnct = "hann"
+            window_name = "hann"
             self.nenbw = 1.5
-            self.scale = 2.
         elif self.window_type == "Rect":
-            self.window_fnct = "boxcar"
+            window_name = "boxcar"
             self.nenbw = 1.
-            self.scale = 1.
         elif self.window_type == "Kaiser":
-            self.window_fnct = "kaiser"
+            window_name = "kaiser"
             has_par1 = True
             txt_par1 = '&beta; ='
             self.param1 = 5
             tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
                        "higher values reduce side lobe level.</span>")
         elif self.window_type == "Chebwin":
-            self.window_fnct = "chebwin"
+            window_name = "chebwin"
             has_par1 = True
             txt_par1 = 'Attn ='
             self.param1 = 80
@@ -470,6 +476,28 @@ class PlotImpz_UI(QWidget):
         else:
             logger.error("Unknown window type {0}".format(self.window_type))
 
+
+        # get attribute window_name from submodule sig.windows and
+        # returning the desired window function:
+        win_fnct = getattr(sig.windows, window_name, None)
+        if not win_fnct:
+            logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
+                         .format(window_name))
+            win_fnct = sig.windows.boxcar
+            self.param1 = None
+
+        if self.param1:
+            self.win = win_fnct(self.N, self.param1) # use additional parameter
+        else:
+            self.win = win_fnct(self.N)
+
+        logger.error("def:{0}".format(self.nenbw))
+        self.nenbw = np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
+        logger.error("calc:{0}".format(self.nenbw))
+        
+        self.scale = self.N / np.sum(self.win)
+        self.win *= self.scale # correct gain for periodic signals (coherent gain)
+         
         self.lblWinPar1.setVisible(has_par1)
         self.ledWinPar1.setVisible(has_par1)
         if has_par1:
@@ -485,6 +513,28 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.setText(str(self.param1))
     
         self.sig_tx.emit({'sender':__name__, 'draw':''})
+        
+#------------------------------------------------------------------------------        
+    def calc_n_points(self, N_user = 0):
+        """
+        Calculate number of points to be displayed, depending on type of filter 
+        (FIR, IIR) and user input. If the user selects 0 points, the number is
+        calculated automatically.
+        
+        An improvement would be to calculate the dominant pole and the corresponding
+        settling time.
+        """
+
+        if N_user == 0: # set number of data points automatically
+            if fb.fil[0]['ft'] == 'IIR':
+                N = 100
+            else:
+                N = min(len(fb.fil[0]['ba'][0]),  100) # FIR: N = number of coefficients (max. 100)
+        else:
+            N = N_user
+
+        return N
+
 #------------------------------------------------------------------------------
 
 def main():

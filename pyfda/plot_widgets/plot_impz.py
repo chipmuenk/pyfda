@@ -59,7 +59,6 @@ class PlotImpz(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ui.ledN_points.editingFinished.connect(self.draw)
         # frequency widgets require special handling as they are scaled with f_s
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
@@ -220,31 +219,22 @@ class PlotImpz(QWidget):
         """
         (Re-)calculate stimulus x[n] and filter response y[n]
         """
-        # calculate time vector self.t[n] with n = 0 ... N_points + N_start ===
-        N_user = safe_eval(self.ui.ledN_points.text(), 0, return_type='int', sign='pos')
-        if N_user == 0: # automatic calculation
-            self.N = self.calc_n_points(N_user)
-        else:
-            self.N = N_user
-        
-        self.N_end = self.N + self.ui.N_start # total number of points to be calculated: N + N_start
-        self.t = np.linspace(0, self.N_end/fb.fil[0]['f_S'], self.N_end, endpoint=False)
+        self.t = np.linspace(0, self.ui.N_end/fb.fil[0]['f_S'], self.ui.N_end, endpoint=False)
 
         # calculate stimuli x[n] ==============================================
-
         if self.ui.stim == "Pulse":
-            self.x = np.zeros(self.N_end)
+            self.x = np.zeros(self.ui.N_end)
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
 
         elif self.ui.stim == "Step":
-            self.x = self.ui.A1 * np.ones(self.N_end) # create step function
+            self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
             self.title_str = r'Filter Step Response'
             self.H_str = r'$h_{\epsilon}[n]$'
             
         elif self.ui.stim == "StepErr":
-            self.x = self.ui.A1 * np.ones(self.N_end) # create step function
+            self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
             self.title_str = r'Settling Error'
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
@@ -276,9 +266,9 @@ class PlotImpz(QWidget):
         
         # Add noise to stimulus
         if self.ui.noise == "gauss":
-            self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.N_end - self.ui.N_start)
+            self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.ui.N)
         elif self.ui.noise == "uniform":
-            self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.N_end - self.ui.N_start)-0.5)
+            self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.ui.N)-0.5)
 
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
@@ -316,33 +306,17 @@ class PlotImpz(QWidget):
             self.y_i = None
 
         # calculate FFT of stimulus / response
-        # get attribute window_fnct from submodule sig.windows, here, 
-        # returning the desired window function
-        win_fnct = getattr(sig.windows, self.ui.window_fnct, None) # or None if not in fc_module 
-        if not win_fnct:
-            logger.error("No window function {0} in scipy.signal.windows, using rectangular window instead!"\
-                         .format(self.ui.window_fnct))
-            win_fnct = sig.windows.boxcar
-            self.ui.param1 = None
-
-        if self.ui.param1:
-            win_fnct_arg = win_fnct(self.N, self.ui.param1) # use additional parameter
-        else:
-            win_fnct_arg = win_fnct(self.N)
-
-        if self.ui.scale: 
-            win_fnct_arg = win_fnct_arg * self.ui.scale
-
-        if self.ui.plt_freq in {"Response", "Both"}:
-            y_win = y[self.ui.N_start:self.N_end] * win_fnct_arg
-            self.Y = np.abs(np.fft.fft(y_win)) / self.N / np.sqrt(2.)
-            if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                self.Y[1:] *= 2. # correct for single-sided spectrum (except DC)
         if self.ui.plt_freq in {"Stimulus", "Both"}:
-            x_win = self.x[self.ui.N_start:self.N_end] * win_fnct_arg
-            self.X = np.abs(np.fft.fft(x_win)) / self.N / np.sqrt(2.) 
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N / np.sqrt(2.) 
             if fb.fil[0]['freqSpecsRangeType'] == 'half':
                 self.X[1:] *= 2. # correct for single-sided spectrum (except DC)
+
+        if self.ui.plt_freq in {"Response", "Both"}:
+            y_win = y[self.ui.N_start:self.ui.N_end] * self.ui.win
+            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N / np.sqrt(2.)
+            if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                self.Y[1:] *= 2. # correct for single-sided spectrum (except DC)
 
 #------------------------------------------------------------------------------
     def update_view(self):
@@ -433,7 +407,7 @@ class PlotImpz(QWidget):
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
         
         self.ax_r.set_title(self.title_str)
-        self.ax_r.set_xlim([self.t[N_start],self.t[self.N_end-1]])
+        self.ax_r.set_xlim([self.t[N_start],self.t[self.ui.N_end-1]])
         expand_lim(self.ax_r, 0.02)
 
         # plot frequency domain =========================================
@@ -446,7 +420,7 @@ class PlotImpz(QWidget):
                 XY_str = r'$|X(\mathrm{e}^{\mathrm{j} \Omega})|$'
             else:
                 XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
-            F = np.fft.fftfreq(self.N, d = 1. / fb.fil[0]['f_S'])
+            F = np.fft.fftfreq(self.ui.N, d = 1. / fb.fil[0]['f_S'])
             
             if self.ui.chkLogF.isChecked():
                 XY_str = XY_str + ' in dB'
@@ -470,10 +444,10 @@ class PlotImpz(QWidget):
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
                 # only use the first half of X, Y and F
                 if plt_response:
-                    Y = Y[0:self.N//2]
+                    Y = Y[0:self.ui.N//2]
                 if plt_stimulus:
-                    X = X[0:self.N//2]
-                F = F[0:self.N//2]
+                    X = X[0:self.ui.N//2]
+                F = F[0:self.ui.N//2]
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # plot for F = 0 ... 1
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
@@ -494,14 +468,14 @@ class PlotImpz(QWidget):
                 self.ax_fft_noise = self.ax_fft.twinx()
                 self.ax_fft_noise.is_twin = True
 
-                corr = 10*np.log10(self.N)
+                corr = 10*np.log10(self.ui.N / self.ui.nenbw) 
                 mn, mx = self.ax_fft.get_ylim()
                 self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
 
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
-            for i in range(N_start, self.N_end):
+            for i in range(N_start, self.ui.N_end):
               self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
                              '-', linewidth=2, alpha=.5)
 
@@ -523,27 +497,6 @@ class PlotImpz(QWidget):
         self.mplwidget.redraw()
         if hasattr(self, "ax2_fft"):
             self.ax2_fft.grid(False)
-
-#------------------------------------------------------------------------------        
-    def calc_n_points(self, N_user = 0):
-        """
-        Calculate number of points to be displayed, depending on type of filter 
-        (FIR, IIR) and user input. If the user selects 0 points, the number is
-        calculated automatically.
-        
-        An improvement would be to calculate the dominant pole and the corresponding
-        settling time.
-        """
-
-        if N_user == 0: # set number of data points automatically
-            if fb.fil[0]['ft'] == 'IIR':
-                N = 100
-            else:
-                N = min(len(fb.fil[0]['ba'][0]),  100) # FIR: N = number of coefficients (max. 100)
-        else:
-            N = N_user
-
-        return N
 
 #------------------------------------------------------------------------------
 
