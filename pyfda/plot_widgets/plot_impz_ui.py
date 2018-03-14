@@ -287,13 +287,13 @@ class PlotImpz_UI(QWidget):
         self.chkLog.clicked.connect(self._log_mode)
         self.ledLogBottom.editingFinished.connect(self._log_mode)
 
-        self.cmbPltTime.activated.connect(self._update_time_freq)
-        self.cmbPltFreq.activated.connect(self._update_time_freq)
+        self.cmbPltTime.currentIndexChanged.connect(self._update_time_freq)
+        self.cmbPltFreq.currentIndexChanged.connect(self._update_time_freq)
 
         self.chkMarker.clicked.connect(self._update_chk_boxes)
 
-        self.cmbStimulus.activated.connect(self._enable_stim_widgets)
-        self.cmbNoise.activated.connect(self._update_noi)
+        self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
+        self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
         self.ledAmp2.editingFinished.connect(self._update_amp2)
@@ -302,7 +302,7 @@ class PlotImpz_UI(QWidget):
         
         self.chkLogF.clicked.connect(self._log_mode)
         self.ledLogBottomF.editingFinished.connect(self._log_mode)
-        self.cmbWindow.activated.connect(self._update_window)
+        self.cmbWindow.currentIndexChanged.connect(self._update_window)
         self.ledWinPar1.editingFinished.connect(self._update_param)
        
         
@@ -444,22 +444,17 @@ class PlotImpz_UI(QWidget):
         self.param1 = None
         has_par1 = False
         txt_par1 = ""
-        self.nenbw = None # normalized equivalent noise bandwidth
         
         if self.window_type in {"Bartlett", "Triangular"}:
             window_name = "bartlett"
-            self.nenbw = 4./3
-        if self.window_type == "Flattop":
+        elif self.window_type == "Flattop":
             window_name = "flattop"
         elif self.window_type == "Hamming":
             window_name = "hamming"
-            self.nenbw = 1.36 # update this
         elif self.window_type == "Hann":
             window_name = "hann"
-            self.nenbw = 1.5
         elif self.window_type == "Rect":
             window_name = "boxcar"
-            self.nenbw = 1.
         elif self.window_type == "Kaiser":
             window_name = "kaiser"
             has_par1 = True
@@ -476,7 +471,6 @@ class PlotImpz_UI(QWidget):
         else:
             logger.error("Unknown window type {0}".format(self.window_type))
 
-
         # get attribute window_name from submodule sig.windows and
         # returning the desired window function:
         win_fnct = getattr(sig.windows, window_name, None)
@@ -491,9 +485,7 @@ class PlotImpz_UI(QWidget):
         else:
             self.win = win_fnct(self.N)
 
-        logger.error("def:{0}".format(self.nenbw))
-        self.nenbw = np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
-        logger.error("calc:{0}".format(self.nenbw))
+        self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
         
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)

@@ -17,6 +17,7 @@ from ..compat import QWidget, QEvent, Qt, pyqtSlot
 
 import numpy as np
 import scipy.signal as sig
+import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
@@ -308,15 +309,11 @@ class PlotImpz(QWidget):
         # calculate FFT of stimulus / response
         if self.ui.plt_freq in {"Stimulus", "Both"}:
             x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N / np.sqrt(2.) 
-            if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                self.X[1:] *= 2. # correct for single-sided spectrum (except DC)
+            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
 
         if self.ui.plt_freq in {"Response", "Both"}:
             y_win = y[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N / np.sqrt(2.)
-            if fb.fil[0]['freqSpecsRangeType'] == 'half':
-                self.Y[1:] *= 2. # correct for single-sided spectrum (except DC)
+            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
 
 #------------------------------------------------------------------------------
     def update_view(self):
@@ -342,7 +339,7 @@ class PlotImpz(QWidget):
         """
         f_unit = fb.fil[0]['freq_specs_unit']
         if f_unit in {"f_S", "f_Ny"}:
-            unit_frmt = "i"
+            unit_frmt = "i" # italic
         else:
             unit_frmt = None
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
@@ -358,17 +355,17 @@ class PlotImpz(QWidget):
         else:
             mkfmt_r = mkfmt_i = ' '
         if self.cmplx:           
-            H_i_str = r'$\Im\{$' + self.H_str + '$\}$'
-            H_str = r'$\Re\{$' + self.H_str + '$\}$'
+            H_i_str = r'$\Im\{$' + self.H_str + '$\}$ in V'
+            H_str = r'$\Re\{$' + self.H_str + '$\}$ in V'
         else:
-            H_str = self.H_str
+            H_str = self.H_str + 'in V'
 
         if self.ui.chkLog.isChecked():
-            H_str = r'$|$ ' + H_str + '$|$ in dB'
+            H_str = r'$|$ ' + H_str + '$|$ in dBV'
             y = np.maximum(20 * np.log10(abs(self.y)), self.ui.bottom)
             if self.cmplx:
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom)
-                H_i_str = r'$\log$ ' + H_i_str + ' in dB'
+                H_i_str = r'$\log$ ' + H_i_str + ' in dBV'
         else:
             self.ui.bottom = 0
             y = self.y
@@ -421,18 +418,31 @@ class PlotImpz(QWidget):
             else:
                 XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             F = np.fft.fftfreq(self.ui.N, d = 1. / fb.fil[0]['f_S'])
-            
+
+            if plt_stimulus:
+                X = self.X.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                self.Px = np.sum(np.square(self.X))
+                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                    X[1:] = 2 * X[1:] # correct for single-sided spectrum (except DC)
+            if plt_response:
+                Y = self.Y.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                self.Py = np.sum(np.square(self.Y))
+                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                    Y[1:] = 2 * Y[1:] # correct for single-sided spectrum (except DC)
+
             if self.ui.chkLogF.isChecked():
-                XY_str = XY_str + ' in dB'
-                if plt_response:
-                    Y = np.maximum(20 * np.log10(abs(self.Y)), self.ui.bottom_f)
+                unit = unit_P = "dBW"
                 if plt_stimulus:
-                    X = np.maximum(20 * np.log10(abs(self.X)), self.ui.bottom_f)
+                    X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
+                    self.Px = 10*np.log10(self.Px)
+                if plt_response:
+                    Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
+                    self.Py = 10*np.log10(self.Py)
             else:
-                if plt_response:
-                    Y = self.Y
-                if plt_stimulus:
-                    X = self.X
+                unit = "Vrms"
+                unit_P = "W"
+
+            XY_str = XY_str + ' in ' + unit
 
             if fb.fil[0]['freqSpecsRangeType'] == 'sym':
             # shift X, Y and F by f_S/2
@@ -452,10 +462,18 @@ class PlotImpz(QWidget):
                 # plot for F = 0 ... 1
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
-            if plt_response:
-                self.ax_fft.plot(F, Y)
+            handle = []
+            label = []
             if plt_stimulus:
-                self.ax_fft.plot(F, X, color =(0.5,0.5,0.5,0.5), lw=2)               
+                h, = self.ax_fft.plot(F, X, color =(0.5,0.5,0.5,0.5), lw=2)
+                handle.append(h)
+                label.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
+            if plt_response:
+                h, = self.ax_fft.plot(F, Y)
+                handle.append(h)
+                label.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
+
+            self.ax_fft.legend(handle, label, loc='best')
 
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
