@@ -58,6 +58,7 @@ class PlotImpz_UI(QWidget):
         self.DC = 0.0
         
         self.bottom_f = -120
+        self.param1 = None
 
         # initial settings for comboboxes        
         self.plt_time = "Response"
@@ -303,7 +304,7 @@ class PlotImpz_UI(QWidget):
         self.chkLogF.clicked.connect(self._log_mode)
         self.ledLogBottomF.editingFinished.connect(self._log_mode)
         self.cmbWindow.currentIndexChanged.connect(self._update_window)
-        self.ledWinPar1.editingFinished.connect(self._update_param)
+        self.ledWinPar1.editingFinished.connect(self._update_window)
        
         
         # ########################  Main UI Layout ############################
@@ -440,8 +441,16 @@ class PlotImpz_UI(QWidget):
         
     def _update_window(self):
         """ Update window type for FFT """
+
+        def _update_param1():
+            self.ledWinPar1.setToolTip(tooltip)
+            self.lblWinPar1.setText(to_html(txt_par1, frmt='bi'))
+
+            self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
+            self.ledWinPar1.setText(str(self.param1))   
+        #----------------------------------------------------------------------            
         self.window_type = qget_cmb_box(self.cmbWindow, data=False)
-        self.param1 = None
+#        self.param1 = None
         has_par1 = False
         txt_par1 = ""
         
@@ -459,18 +468,27 @@ class PlotImpz_UI(QWidget):
             window_name = "kaiser"
             has_par1 = True
             txt_par1 = '&beta; ='
-            self.param1 = 5
+
             tooltip = ("<span>Shape parameter; lower values reduce  main lobe width, "
-                       "higher values reduce side lobe level.</span>")
+                       "higher values reduce side lobe level, typ. value is 5.</span>")
+            _update_param1()
+            if not self.param1:
+                self.param1 = 5
+                
         elif self.window_type == "Chebwin":
             window_name = "chebwin"
             has_par1 = True
             txt_par1 = 'Attn ='
-            self.param1 = 80
-            tooltip = ("<span>Side lobe attenuation in dB.</span>")
+            tooltip = ("<span>Side lobe attenuation in dB (typ. 80 dB).</span>")
+            _update_param1()
+            if not self.param1:
+                self.param1 = 80
+            if self.param1 < 45:
+                logger.warning("Attenuation needs to be larger than 45 dB!")
+
         else:
             logger.error("Unknown window type {0}".format(self.window_type))
-
+            
         # get attribute window_name from submodule sig.windows and
         # returning the desired window function:
         win_fnct = getattr(sig.windows, window_name, None)
@@ -480,7 +498,9 @@ class PlotImpz_UI(QWidget):
             win_fnct = sig.windows.boxcar
             self.param1 = None
 
-        if self.param1:
+        self.lblWinPar1.setVisible(has_par1)
+        self.ledWinPar1.setVisible(has_par1)
+        if has_par1:
             self.win = win_fnct(self.N, self.param1) # use additional parameter
         else:
             self.win = win_fnct(self.N)
@@ -490,20 +510,6 @@ class PlotImpz_UI(QWidget):
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
          
-        self.lblWinPar1.setVisible(has_par1)
-        self.ledWinPar1.setVisible(has_par1)
-        if has_par1:
-            self.ledWinPar1.setToolTip(tooltip)
-            self.lblWinPar1.setText(to_html(txt_par1, frmt='bi'))
-            self.ledWinPar1.setText(str(self.param1))
-        
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
-
-    def _update_param(self):
-        """ Update param when edited """
-        self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
-        self.ledWinPar1.setText(str(self.param1))
-    
         self.sig_tx.emit({'sender':__name__, 'draw':''})
         
 #------------------------------------------------------------------------------        

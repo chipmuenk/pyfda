@@ -432,6 +432,8 @@ class PlotImpz(QWidget):
 
             if self.ui.chkLogF.isChecked():
                 unit = unit_P = "dBW"
+                unit_nenbw = "dB"
+                nenbw = 10 * np.log10(self.ui.nenbw)
                 if plt_stimulus:
                     X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
                     self.Px = 10*np.log10(self.Px)
@@ -441,6 +443,8 @@ class PlotImpz(QWidget):
             else:
                 unit = "Vrms"
                 unit_P = "W"
+                unit_nenbw = "bins"
+                nenbw = self.ui.nenbw
 
             XY_str = XY_str + ' in ' + unit
 
@@ -462,18 +466,24 @@ class PlotImpz(QWidget):
                 # plot for F = 0 ... 1
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
-            handle = []
-            label = []
+            handles = []
+            labels = []
             if plt_stimulus:
                 h, = self.ax_fft.plot(F, X, color =(0.5,0.5,0.5,0.5), lw=2)
-                handle.append(h)
-                label.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
+                handles.append(h)
+                labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
             if plt_response:
                 h, = self.ax_fft.plot(F, Y)
-                handle.append(h)
-                label.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
-
-            self.ax_fft.legend(handle, label, loc='best')
+                handles.append(h)
+                labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
+                
+            labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
+            labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
+            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
+            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
+            self.ax_fft.legend(handles, labels, loc='best', fontsize = 'small',
+                               fancybox=True, framealpha=0.5)
+            
 
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
