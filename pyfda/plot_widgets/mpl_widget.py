@@ -73,7 +73,7 @@ class MplWidget(QWidget):
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MplToolbar(self.pltCanv, self) # inherits all methods
-        #self.mplToolbar.lock_zoom = False
+        self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
 
@@ -102,7 +102,7 @@ class MplWidget(QWidget):
         """
         Save x- and y-limits of all axes in self.limits when zoom is unlocked
         """
-        if not self.mplToolbar.a_lk.isChecked():
+        if not self.mplToolbar.lock_zoom:
             for ax in self.fig.axes:
                 self.limits = ax.axis() # save old limits
 
@@ -119,7 +119,7 @@ class MplWidget(QWidget):
                 else:
                     ax.grid(self.mplToolbar.a_gr.isChecked())  # collect axes objects and apply grid settings
 
-                if self.mplToolbar.a_lk.isChecked():
+                if self.mplToolbar.lock_zoom:
                     ax.axis(self.limits) # restore old limits
                 else:
                     self.limits = ax.axis() # save old limits
@@ -410,8 +410,9 @@ class MplToolbar(NavigationToolbar):
             when previously unlocked, settings need to be saved
             when previously locked, current settings can be saved without effect
         """
-        self.parent.save_limits() # save limits in any case: when previously unlocked
-        if self.a_lk.isChecked():
+        self.parent.save_limits() # save limits in any case:
+        self.lock_zoom = not self.lock_zoom
+        if self.lock_zoom:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))
             self.a_zo.setEnabled(False)
             self.a_pa.setEnabled(False)
@@ -424,7 +425,7 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
             
-        self.sig_tx.emit({'lock_zoom':self.a_lk.isChecked()})
+        self.sig_tx.emit({'lock_zoom':self.lock_zoom})
 
 #------------------------------------------------------------------------------
     def enable_plot(self, state = None):
