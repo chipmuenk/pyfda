@@ -283,6 +283,7 @@ class PlotImpz_UI(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        self.sig_rx.connect(self.sig_tx)
         self.ledN_start.editingFinished.connect(self._update_N)
         self.ledN_points.editingFinished.connect(self._update_N)
         self.chkLog.clicked.connect(self._log_mode)

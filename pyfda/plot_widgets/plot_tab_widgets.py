@@ -35,6 +35,7 @@ class PlotTabWidgets(QTabWidget):
         self.pltPZ = plot_pz.PlotPZ(self)
         self.pltTauG = plot_tau_g.PlotTauG(self)
         self.pltImpz = plot_impz.PlotImpz(self)
+        #self.sig_tx.connect(self.pltImpz.sig_rx)
         self.plt3D = plot_3d.Plot3D(self)
 
         self._construct_UI()
