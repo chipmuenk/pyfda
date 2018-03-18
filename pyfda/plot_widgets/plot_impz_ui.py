@@ -71,9 +71,8 @@ class PlotImpz_UI(QWidget):
         self._enable_stim_widgets()
         self._update_time_freq()
         self._log_mode()
-        self._update_N() # slso updates window
+        self.update_N() # slso updates window
         self._update_noi()
-        #self._update_window()
 
     def _construct_UI(self):
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
@@ -284,8 +283,8 @@ class PlotImpz_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.sig_rx.connect(self.sig_tx)
-        self.ledN_start.editingFinished.connect(self._update_N)
-        self.ledN_points.editingFinished.connect(self._update_N)
+        self.ledN_start.editingFinished.connect(self.update_N)
+        self.ledN_points.editingFinished.connect(self.update_N)
         self.chkLog.clicked.connect(self._log_mode)
         self.ledLogBottom.editingFinished.connect(self._log_mode)
 
@@ -324,8 +323,11 @@ class PlotImpz_UI(QWidget):
         self.setLayout(layVMain)
         
         
-    def _update_N(self):
-        """ Update value for self.N_start from the QLineEditWidget"""
+    def update_N(self, emit=True):
+        """
+        Update values for self.N and self.N_start from the QLineEditWidget
+        When emit=False, block emitting a signal in _update_window()
+        """
         self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
         self.ledN_start.setText(str(self.N_start))
         N_user = safe_eval(self.ledN_points.text(), 0, return_type='int', sign='pos')
@@ -333,10 +335,11 @@ class PlotImpz_UI(QWidget):
             self.N = self.calc_n_points(N_user)
         else:
             self.N = N_user
+            self.ledN_points.setText(str(self.N))
         
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
         
-        self._update_window()
+        self._update_window(emit=emit)
 
     def _update_chk_boxes(self):
         """ 
@@ -440,7 +443,7 @@ class PlotImpz_UI(QWidget):
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'draw':''})
         
-    def _update_window(self):
+    def _update_window(self, emit=True):
         """ Update window type for FFT """
 
         def _update_param1():
@@ -510,9 +513,10 @@ class PlotImpz_UI(QWidget):
         
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
-         
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
-        
+
+        if emit:
+            self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+
 #------------------------------------------------------------------------------        
     def calc_n_points(self, N_user = 0):
         """

@@ -220,6 +220,7 @@ class PlotImpz(QWidget):
         """
         (Re-)calculate stimulus x[n] and filter response y[n]
         """
+        self.ui.update_N(emit=False) # for a new filter, N and win need to be updated
         self.t = np.linspace(0, self.ui.N_end/fb.fil[0]['f_S'], self.ui.N_end, endpoint=False)
 
         # calculate stimuli x[n] ==============================================
