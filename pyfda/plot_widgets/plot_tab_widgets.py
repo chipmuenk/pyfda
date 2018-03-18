@@ -35,7 +35,7 @@ class PlotTabWidgets(QTabWidget):
         self.pltPZ = plot_pz.PlotPZ(self)
         self.pltTauG = plot_tau_g.PlotTauG(self)
         self.pltImpz = plot_impz.PlotImpz(self)
-        #self.sig_tx.connect(self.pltImpz.sig_rx)
+        self.sig_tx.connect(self.pltImpz.ui.sig_rx)
         self.plt3D = plot_3d.Plot3D(self)
 
         self._construct_UI()
@@ -112,7 +112,7 @@ class PlotTabWidgets(QTabWidget):
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
-        Process signals coming in
+        Process signals coming in via sig_rx
         """
         logger.debug("sig_rx = {0}".format(sig_dict))
 #        if self.sender(): # origin of signal that triggered the slot
@@ -122,14 +122,14 @@ class PlotTabWidgets(QTabWidget):
 #            print("sender = ", sender_text, sender_class, sender_name, self.__class__.__name__)
 #            logger.debug("process_signals called by {0}".format(sender_name))
 
-        if 'specs_changed' in sig_dict:
-               self.update_view()
+        if 'specs_changed' in sig_dict.keys():
+               self.update_view(sig_dict)
             
         elif 'view_changed' in sig_dict.keys():
-               self.update_view()
+               self.update_view(sig_dict)
             
-        elif 'filter_designed' in sig_dict:
-               self.update_data()
+        elif 'data_changed' in sig_dict.keys():
+               self.update_data(sig_dict)
 
         else:
             pass
@@ -161,28 +161,34 @@ class PlotTabWidgets(QTabWidget):
         return super(PlotTabWidgets, self).eventFilter(source, event)
 
 #------------------------------------------------------------------------------
-    def update_data(self):
+    def update_data(self, sig_dict):
         """
         Calculate subplots with new filter DATA and redraw them
         """
         logger.debug("update_data (filter designed)")
+        if sig_dict:
+            self.sig_tx.emit(sig_dict)
+        else:
+            self.sig_tx.emit({'sender':__name__, 'draw':''})
         self.pltHf.draw()
         self.pltPhi.draw()
-        self.pltPZ.draw()
         self.pltTauG.draw()
-        self.pltImpz.draw()
+        self.pltPZ.draw()
         self.plt3D.draw()
 
 #------------------------------------------------------------------------------
-    def update_view(self):
+    def update_view(self, sig_dict):
         """
         Update plot limits with new filter SPECS and redraw all subplots
         """
         logger.debug("update_view (specs changed)")
+        if sig_dict:
+            self.sig_tx.emit(sig_dict)
+        else:
+            self.sig_tx.emit({'sender':__name__, 'specs':'fS'})
         self.pltHf.update_view()
         self.pltPhi.update_view()
         self.pltTauG.update_view()
-        self.pltImpz.draw() # changing of f_s has to update the plot - more differentiation needed
 #        self.pltPZ.draw()
 #        self.plt3D.draw()
         
