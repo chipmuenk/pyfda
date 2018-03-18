@@ -223,7 +223,8 @@ class PlotImpz(QWidget):
         (Re-)calculate stimulus x[n] and filter response y[n]
         """
         self.ui.update_N(emit=False) # for a new filter, N and win need to be updated
-        self.t = np.linspace(0, self.ui.N_end/fb.fil[0]['f_S'], self.ui.N_end, endpoint=False)
+        self.n = np.arange(self.ui.N_end)
+        self.t = self.n / fb.fil[0]['f_S']
 
         # calculate stimuli x[n] ==============================================
         if self.ui.stim == "Pulse":
@@ -243,24 +244,24 @@ class PlotImpz(QWidget):
             self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
             
         elif self.ui.stim == "Cos":
-            self.x = self.ui.A1 * np.cos(2 * np.pi * self.t * self.f1) +\
-                self.ui.A2 * np.cos(2 * np.pi * self.t * self.f2 + self.ui.phi2)
+            self.x = self.ui.A1 * np.cos(2 * np.pi * self.n * self.f1) +\
+                self.ui.A2 * np.cos(2 * np.pi * self.n * self.f2 + self.ui.phi2)
             self.title_str = r'Filter Response to Cosine Signal'
             self.H_str = r'$y_{\cos}[n]$'
                 
         elif self.ui.stim == "Sine":
-            self.x = self.ui.A1 * np.sin(2 * np.pi * self.t * self.f1 + self.ui.phi1) +\
-                self.ui.A2 * np.sin(2 * np.pi * self.t * self.f2 + self.ui.phi2)
+            self.x = self.ui.A1 * np.sin(2 * np.pi * self.n * self.f1 + self.ui.phi1) +\
+                self.ui.A2 * np.sin(2 * np.pi * self.n * self.f2 + self.ui.phi2)
             self.title_str = r'Filter Response to Sinusoidal Signal'
             self.H_str = r'$y_{\sin}[n]$'
             
         elif self.ui.stim == "Rect":
-            self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.t * self.f1))
+            self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.n * self.f1))
             self.title_str = r'Filter Response to Rect. Signal'
             self.H_str = r'$y_{rect}[n]$'
 
         elif self.ui.stim == "Saw":
-            self.x = self.ui.A1 * sig.sawtooth(self.t * self.f1 * 2*np.pi)
+            self.x = self.ui.A1 * sig.sawtooth(self.n * self.f1 * 2*np.pi)
             self.title_str = r'Filter Response to Sawtooth Signal'
             self.H_str = r'$y_{saw}[n]$'
 
