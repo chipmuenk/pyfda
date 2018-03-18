@@ -341,13 +341,14 @@ class PlotImpz_UI(QWidget):
         
         self._update_window(emit=emit)
 
+
     def _update_chk_boxes(self):
         """ 
-        Trigger update view when one of "show stimulus", "show response" or 
-        "show markers" checkboxes is clicked
+        Trigger update view when "show markers" checkbox is clicked
         """
-        self.sig_tx.emit({'sender':__name__, 'update_view':''})
-        
+        self.sig_tx.emit({'sender':__name__, 'view_changed':''})
+
+
     def _update_time_freq(self):
         """ 
         Trigger 'draw' when one of the comboboxes PltTime or PltFreq is modified,
@@ -356,7 +357,7 @@ class PlotImpz_UI(QWidget):
         self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
         self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
         self.wdgHControlsF.setVisible(self.plt_freq != "None")
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        self.sig_tx.emit({'sender':__name__, 'view_changed':''})
 
 
     def _log_mode(self):
@@ -382,7 +383,7 @@ class PlotImpz_UI(QWidget):
                                     return_type='float', sign='neg')
             self.ledLogBottomF.setText(str(self.bottom_f))
 
-        self.sig_tx.emit({'sender':__name__, 'update_view':''})
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'log'})
         
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
@@ -402,19 +403,19 @@ class PlotImpz_UI(QWidget):
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
         
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'stim'})
 
     def _update_amp1(self):
         """ Update value for self.A1 from QLineEditWidget"""        
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='float')
         self.ledAmp1.setText(str(self.A1))
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'a1'})
         
     def _update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='float')
         self.ledAmp2.setText(str(self.A2))
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'a2'})
 
         
     def _update_noi(self):
@@ -435,13 +436,13 @@ class PlotImpz_UI(QWidget):
                                        "(e.g. quantization step size for quantization noise), "
                                        "centered around 0. Noise power is "
                                        "<i>P</i> = &Delta;<sup>2</sup>/12.</span>")
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'noi'})
 
     def _update_DC(self):
         """ Update value for self.DC from the QLineEditWidget"""
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
-        self.sig_tx.emit({'sender':__name__, 'draw':''})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'dc'})
         
     def _update_window(self, emit=True):
         """ Update window type for FFT """
@@ -532,7 +533,7 @@ class PlotImpz_UI(QWidget):
             if fb.fil[0]['ft'] == 'IIR':
                 N = 100
             else:
-                N = min(len(fb.fil[0]['ba'][0]),  100) # FIR: N = number of coefficients (max. 100)
+                N = min(len(fb.fil[0]['ba'][0]),100) # FIR: N = number of coefficients (max. 100)
         else:
             N = N_user
 

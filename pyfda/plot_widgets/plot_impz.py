@@ -75,11 +75,13 @@ class PlotImpz(QWidget):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict or 'home' in sig_dict:
+        logger.debug("processing {0}".format(sig_dict))
+        if 'home' in sig_dict:
             self.update_view()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'draw' in sig_dict:
+        elif 'data_changed' in sig_dict or 'specs_changed' in sig_dict\
+                or 'view_changed' in sig_dict: # changing of f_s has to update the plot - more differentiation needed
             self.draw()
         else:
             logger.debug("{0}: dict {1} passed thru".format(__name__, sig_dict))

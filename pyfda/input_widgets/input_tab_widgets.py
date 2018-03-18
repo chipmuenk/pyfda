@@ -163,7 +163,7 @@ class InputTabWidgets(QWidget):
         """
         self.filter_info.load_dict() # update frequency unit of info widget
         logger.debug("Emit sig_tx = 'specs_changed'")
-        self.sig_tx.emit({'sender':'InputTabWidgets','view_changed':True})
+        self.sig_tx.emit({'sender':__name__,'view_changed':True})
 
 
     def update_specs(self):
@@ -184,7 +184,7 @@ class InputTabWidgets(QWidget):
         if HAS_MYHDL:
             self.hdlSpecs.update_UI()
         logger.debug("Emit sig_tx = 'specs_changed'")
-        self.sig_tx.emit({'sender':'InputTabWidgets','specs_changed':True})
+        self.sig_tx.emit({'sender':__name__,'specs_changed':True})
 
     def load_all(self):
         """
@@ -220,7 +220,7 @@ class InputTabWidgets(QWidget):
         self.filter_pz.load_dict()
 
         logger.debug("Emit sig_tx = 'filter_designed'")
-        self.sig_tx.emit({'sender':'InputTabWidgets','filter_designed':True})
+        self.sig_tx.emit({'sender':__name__,'data_changed':True})
 
 #------------------------------------------------------------------------
 
