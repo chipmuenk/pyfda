@@ -117,9 +117,9 @@ class InputTabWidgets(QWidget):
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:
-        self.filter_specs.sigFilterDesigned.connect(self.update_all)
-        self.filter_coeffs.sigFilterDesigned.connect(self.update_all)
-        self.filter_pz.sigFilterDesigned.connect(self.update_all)
+        self.filter_specs.sigFilterDesigned.connect(self.update_data)
+        self.filter_coeffs.sigFilterDesigned.connect(self.update_data)
+        self.filter_pz.sigFilterDesigned.connect(self.update_data)
 
         # The following three widgets require a reloading of the select_filter
         # widget to update the filter selection:
@@ -196,10 +196,10 @@ class InputTabWidgets(QWidget):
         """
         self.filter_specs.color_design_button("ok")
         self.filter_specs.sel_fil.load_dict() # update select_filter widget
-        self.update_all()
+        self.update_data()
 
 
-    def update_all(self):
+    def update_data(self):
         """
         Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
 
