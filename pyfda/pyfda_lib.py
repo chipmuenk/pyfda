@@ -1577,7 +1577,7 @@ def to_html(text, frmt=None):
     if frmt == None:
         text = "<span>" + text + "</span>"
 
-    html = re.sub(r'([a-zA-Z])_(\w+)', r'\1<sub>\2</sub>', text)
+    html = re.sub(r'([a-zA-Z])_(\w{1,3})', r'\1<sub>\2</sub>', text)
     
     #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
 
