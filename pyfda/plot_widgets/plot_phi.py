@@ -21,11 +21,9 @@ from pyfda.pyfda_lib import calc_Hcomplex
 
 
 class PlotPhi(QWidget):
-    
     # incoming, connected in sender widget (locally connected to self.process_signals() )
     sig_rx = pyqtSignal(dict)
 #    sig_tx = pyqtSignal(dict) # outgoing from process_signals
-
 
     def __init__(self, parent):
         super(PlotPhi, self).__init__(parent)
@@ -51,13 +49,13 @@ class PlotPhi(QWidget):
         self.chkWrap = QCheckBox("Wrapped Phase", self)
         self.chkWrap.setChecked(False)
         self.chkWrap.setToolTip("Plot phase wrapped to +/- pi")
-        
+
         layHControls = QHBoxLayout()
 #        layHControls.addStretch(10)
         layHControls.addWidget(self.cmbUnitsPhi)
         layHControls.addWidget(self.chkWrap)
         layHControls.addStretch(10)
-        
+
         #----------------------------------------------------------------------
         #               ### frmControls ###
         #
@@ -70,8 +68,8 @@ class PlotPhi(QWidget):
         #----------------------------------------------------------------------
         #               ### mplwidget ###
         #
-        # main widget, encompassing the other widgets 
-        #----------------------------------------------------------------------  
+        # main widget, encompassing the other widgets
+        #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
@@ -93,7 +91,7 @@ class PlotPhi(QWidget):
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
-        
+
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
@@ -139,12 +137,12 @@ class PlotPhi(QWidget):
         self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], wholeF=True)
         # replace nan and inf by finite values, otherwise np.unwrap yields
         # an array full of nans
-        self.H_cmplx = np.nan_to_num(self.H_cmplx) 
+        self.H_cmplx = np.nan_to_num(self.H_cmplx)
 
 #------------------------------------------------------------------------------
     def draw(self):
         """
-        Main entry point: 
+        Main entry point:
         Re-calculate |H(f)| and draw the figure if enabled
         """
         if self.mplwidget.mplToolbar.enabled:
@@ -189,14 +187,14 @@ class PlotPhi(QWidget):
             scale = 180./np.pi
         fb.fil[0]['plt_phiLabel'] = y_str
         fb.fil[0]['plt_phiUnit'] = self.unitPhi
-        
+
         if self.chkWrap.isChecked():
             phi_plt = np.angle(H) * scale
         else:
             phi_plt = np.unwrap(np.angle(H)) * scale
 
         #---------------------------------------------------------
-        self.ax.clear() # need to clear, doesn't overwrite 
+        self.ax.clear() # need to clear, doesn't overwrite
         line_phi, = self.ax.plot(F, phi_plt)
         #---------------------------------------------------------
 
@@ -206,7 +204,7 @@ class PlotPhi(QWidget):
         self.ax.set_xlim(fb.fil[0]['freqSpecsRange'])
 
         self.redraw()
-        
+
 #------------------------------------------------------------------------------
     def redraw(self):
         """
@@ -219,10 +217,10 @@ class PlotPhi(QWidget):
 def main():
     import sys
     from ..compat import QApplication
-    
+
     app = QApplication(sys.argv)
     mainw = PlotPhi(None)
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
 
