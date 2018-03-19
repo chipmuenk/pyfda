@@ -13,8 +13,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout, pyqtSlot
-
+from ..compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout, 
+                      pyqtSlot, pyqtSignal)
 
 import numpy as np
 import scipy.signal as sig
@@ -29,6 +29,10 @@ from  matplotlib import patches
 
 
 class PlotPZ(QWidget):
+    
+    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    sig_rx = pyqtSignal(dict)
+#    sig_tx = pyqtSignal(dict) # outgoing from process_signals
 
     def __init__(self, parent): 
         super(PlotPZ, self).__init__(parent)
@@ -96,25 +100,30 @@ class PlotPZ(QWidget):
         self.draw() # calculate and draw poles and zeros
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
         self.chkHf.clicked.connect(self.draw)
         self.chkHfLog.clicked.connect(self.draw)
         self.diaRad_Hf.valueChanged.connect(self.draw)
         self.chkFIR_P.clicked.connect(self.draw)
+
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict:
+        if 'view_changed' in sig_dict:
             self.update_view()
+        elif 'data_changed' in sig_dict or 'home' in sig_dict:
+            self.draw()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'home' in sig_dict:
-            self.draw()
         else:
             pass
 
