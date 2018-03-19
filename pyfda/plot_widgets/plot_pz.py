@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout, 
+from ..compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout,
                       pyqtSlot, pyqtSignal)
 
 import numpy as np
@@ -29,15 +29,15 @@ from  matplotlib import patches
 
 
 class PlotPZ(QWidget):
-    
+
     # incoming, connected in sender widget (locally connected to self.process_signals() )
     sig_rx = pyqtSignal(dict)
 #    sig_tx = pyqtSignal(dict) # outgoing from process_signals
 
-    def __init__(self, parent): 
+    def __init__(self, parent):
         super(PlotPZ, self).__init__(parent)
         self._construct_UI()
-        
+
     def _construct_UI(self):
         """
         Intitialize the widget, consisting of:
@@ -62,7 +62,7 @@ class PlotPZ(QWidget):
         self.diaRad_Hf.setToolTip("<span>Set max. radius for |H(f)| plot.</span>")
 
         self.lblRad_Hf = QLabel("Radius", self)
-        
+
         self.chkFIR_P = QCheckBox("Plot FIR Poles", self)
         self.chkFIR_P.setToolTip("<span>Show FIR poles at the origin.</span>")
         self.chkFIR_P.setChecked(True)
@@ -88,13 +88,13 @@ class PlotPZ(QWidget):
         #----------------------------------------------------------------------
         #               ### mplwidget ###
         #
-        # main widget, encompassing the other widgets 
-        #----------------------------------------------------------------------  
+        # main widget, encompassing the other widgets
+        #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
         self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
-        
+
         self.init_axes()
 
         self.draw() # calculate and draw poles and zeros
@@ -163,7 +163,7 @@ class PlotPZ(QWidget):
             self.chkFIR_P.setVisible(fb.fil[0]['ft']=='FIR')
             self.init_axes()
             self.draw_pz()
-            
+
 #------------------------------------------------------------------------------
     def draw_pz(self):
         """
@@ -171,7 +171,7 @@ class PlotPZ(QWidget):
         """
         p_marker = params['P_Marker']
         z_marker = params['Z_Marker']
-        
+
         zpk = fb.fil[0]['zpk']
 
         # add antiCausals if they exist (must take reciprocal to plot)
@@ -214,9 +214,9 @@ class PlotPZ(QWidget):
         Plot the poles and zeros in the complex z-plane either from the
         coefficients (`b,`a) of a discrete transfer function `H`(`z`) (zpk = False)
         or directly from the zeros and poles (z,p) (zpk = True).
-    
+
         When only b is given, an FIR filter with all poles at the origin is assumed.
-    
+
         Parameters
         ----------
         b :  array_like
@@ -287,7 +287,7 @@ class PlotPZ(QWidget):
         # - add option for multi-dimensional arrays and zpk data
 
         # make sure that all inputs are arrays
-        b = np.atleast_1d(b) 
+        b = np.atleast_1d(b)
         a = np.atleast_1d(a)
         z = np.atleast_1d(z) # make sure that p, z  are arrays
         p = np.atleast_1d(p)
@@ -300,7 +300,7 @@ class PlotPZ(QWidget):
             # The coefficients are less than 1, normalize the coefficients
             if np.max(b) > 1:
                 kn = np.max(b)
-                b = b / float(kn) 
+                b = b / float(kn)
             else:
                 kn = 1.
 
@@ -321,7 +321,7 @@ class PlotPZ(QWidget):
         # find multiple poles and zeros and their multiplicities
         if len(p) < 2: # single pole, [None] or [0]
             if not p or p == 0: # only zeros, create equal number of poles at origin
-                p = np.array(0,ndmin=1) # 
+                p = np.array(0,ndmin=1) #
                 num_p = np.atleast_1d(len(z))
             else:
                 num_p = [1.] # single pole != 0
@@ -380,7 +380,7 @@ class PlotPZ(QWidget):
                 if num_p[i] > 1:
                     ax.text(np.real(p[i]), np.imag(p[i]), '  (' + str(num_p[i]) +')',
                                     va = 'bottom', color=mpc)
-    
+
             # increase distance between ticks and labels
             # to give some room for poles and zeros
         for tick in ax.get_xaxis().get_major_ticks():
@@ -414,7 +414,7 @@ class PlotPZ(QWidget):
         if self.chkHfLog.isChecked():
             H = np.clip(np.log10(H), -6, None) # clip to -120 dB
             H = H - np.max(H) # shift scale to H_min ... 0
-            H = 1 + (r-1) * (1 + H / abs(np.min(H))) # scale to 1 ... r 
+            H = 1 + (r-1) * (1 + H / abs(np.min(H))) # scale to 1 ... r
         else:
             H = 1 + (r-1) * H / np.max(H)  #  map |H(f)| to a range 1 ... r
         y = H * np.sin(w)
@@ -440,7 +440,7 @@ def main():
 
     app = QApplication(sys.argv)
     mainw = PlotPZ(None)
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
 
