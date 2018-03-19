@@ -12,7 +12,7 @@ Widget for plotting the group delay
 from __future__ import print_function, division, unicode_literals, absolute_import
 
 
-from ..compat import QCheckBox, QWidget, QFrame, QHBoxLayout, pyqtSlot
+from ..compat import QCheckBox, QWidget, QFrame, QHBoxLayout, pyqtSignal, pyqtSlot
 
 import numpy as np
 
@@ -28,6 +28,9 @@ class PlotTauG(QWidget):
     """
     Widget for plotting the group delay
     """
+    sig_rx = pyqtSignal(dict) # incoming, connected in sender widget
+    sig_tx = pyqtSignal(dict) # outgoing, connected to process_signals
+
 
     def __init__(self, parent):
         super(PlotTauG, self).__init__(parent)
@@ -38,27 +41,31 @@ class PlotTauG(QWidget):
 #         self.chkWarnings = QCheckBox("Enable Warnings", self)
 #         self.chkWarnings.setChecked(False)
 #         self.chkWarnings.setToolTip("Print warnings about singular group delay")
-# 
+#
 #         layHControls = QHBoxLayout()
 #         layHControls.addStretch(10)
 #         layHControls.addWidget(self.chkWarnings)
-#         
+#
 #         # This widget encompasses all control subwidgets:
 #         self.frmControls = QFrame(self)
 #         self.frmControls.setObjectName("frmControls")
 #         self.frmControls.setLayout(layHControls)
-# 
+#
 # =============================================================================
         self.mplwidget = MplWidget(self)
 #        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
-        self.init_axes()        
+        self.init_axes()
         self.draw() # initial drawing of tau_g
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
@@ -68,12 +75,12 @@ class PlotTauG(QWidget):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict:
+        if 'view_changed' in sig_dict:
             self.update_view()
+        elif 'data_changed' in sig_dict or 'home' in sig_dict:
+            self.draw()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'home' in sig_dict:
-            self.draw()
         else:
             pass
 
@@ -144,7 +151,7 @@ class PlotTauG(QWidget):
 
         #================ Main Plotting Routine =========================
         #===  clear the axes and (re)draw the plot
-            
+
         if fb.fil[0]['freq_specs_unit'] in {'f_S', 'f_Ny'}:
             tau_str = r'$ \tau_g(\mathrm{e}^{\mathrm{j} \Omega}) / T_S \; \rightarrow $'
         else:
@@ -172,7 +179,7 @@ class PlotTauG(QWidget):
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
-        
+
 #------------------------------------------------------------------------------
 
 def main():
@@ -180,7 +187,7 @@ def main():
     from ..compat import QApplication
     app = QApplication(sys.argv)
     mainw = PlotTauG(None)
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
 

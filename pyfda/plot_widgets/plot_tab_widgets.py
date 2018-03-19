@@ -33,7 +33,9 @@ class PlotTabWidgets(QTabWidget):
         self.pltHf = plot_hf.PlotHf(self)
         self.pltPhi = plot_phi.PlotPhi(self)
         self.pltPZ = plot_pz.PlotPZ(self)
+
         self.pltTauG = plot_tau_g.PlotTauG(self)
+        self.sig_tx.connect(self.pltTauG.sig_rx)
         
         self.pltImpz = plot_impz.PlotImpz(self)
         self.sig_tx.connect(self.pltImpz.ui.sig_rx)
@@ -117,19 +119,11 @@ class PlotTabWidgets(QTabWidget):
         Process signals coming in via sig_rx
         """
         logger.debug("sig_rx = {0}".format(sig_dict))
-#        if self.sender(): # origin of signal that triggered the slot
-#            sender_name = self.sender().objectName()
-#            sender_text = self.sender().text()
-#            sender_class = self.sender().__class__.__name__
-#            print("sender = ", sender_text, sender_class, sender_name, self.__class__.__name__)
-#            logger.debug("process_signals called by {0}".format(sender_name))
 
         if 'specs_changed' in sig_dict.keys():
-               self.update_view(sig_dict)
-            
+               self.update_view(sig_dict) 
         elif 'view_changed' in sig_dict.keys():
                self.update_view(sig_dict)
-            
         elif 'data_changed' in sig_dict.keys():
                self.update_data(sig_dict)
         else:
@@ -173,7 +167,6 @@ class PlotTabWidgets(QTabWidget):
             self.sig_tx.emit({'sender':__name__, 'data_changed':''})
         self.pltHf.draw()
         self.pltPhi.draw()
-        self.pltTauG.draw()
         self.pltPZ.draw()
         self.plt3D.draw()
 
@@ -189,7 +182,6 @@ class PlotTabWidgets(QTabWidget):
             self.sig_tx.emit({'sender':__name__, 'view_changed':''})
         self.pltHf.update_view()
         self.pltPhi.update_view()
-        self.pltTauG.update_view()
         
 #------------------------------------------------------------------------
 
