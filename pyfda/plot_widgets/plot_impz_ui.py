@@ -27,15 +27,15 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    sig_rx = pyqtSignal(dict) # incoming
-    sig_tx = pyqtSignal(dict) # outgoing
+    sig_rx = pyqtSignal(dict) # incoming, connected in sender widget
+    sig_tx = pyqtSignal(dict) # outgoing, connected to PlotImpz via process_signals
 
     def __init__(self, parent):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
         """
         super(PlotImpz_UI, self).__init__(parent)
-        
+
         """
         Intitialize the widget, consisting of:
         - top chkbox row
@@ -55,17 +55,17 @@ class PlotImpz_UI(QWidget):
         self.noi = 0.1
         self.noise = 'none'
         self.DC = 0.0
-        
+
         self.bottom_f = -120
         self.param1 = None
 
-        # initial settings for comboboxes        
+        # initial settings for comboboxes
         self.plt_time = "Response"
         self.plt_freq = "None"
         self.stim = "Pulse"
         self.noise = "None"
         self.window = "Hann"
-        
+
         self._construct_UI()
         self._enable_stim_widgets()
         self._update_time_freq()
@@ -84,7 +84,7 @@ class PlotImpz_UI(QWidget):
             self.update_N(sig_dict) # this passes sig_dict on to sig_tx as well
         else:
             self.sig_tx.emit(sig_dict)
-            
+
 
     def _construct_UI(self):
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
@@ -92,30 +92,30 @@ class PlotImpz_UI(QWidget):
         self.ledN_points.setText(str(self.N_points))
         self.ledN_points.setToolTip("<span>Number of points to calculate and display. "
                                    "N = 0 tries to choose for you.</span>")
-        
+
         self.lblN_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.ledN_start = QLineEdit(self)
         self.ledN_start.setText(str(self.N_start))
         self.ledN_start.setToolTip("<span>First point to plot.</span>")
-        
+
         layVlblN = QVBoxLayout()
         layVlblN.addWidget(self.lblN_start)
         layVlblN.addWidget(self.lblN_points)
-        
+
         layVledN = QVBoxLayout()
         layVledN.addWidget(self.ledN_start)
         layVledN.addWidget(self.ledN_points)
-        
+
         self.chkLog = QCheckBox("Log. y-axis", self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLog.setChecked(False)
-        
+
         self.chkMarker = QCheckBox("Markers", self)
         self.chkMarker.setObjectName("chkMarker")
         self.chkMarker.setToolTip("<span>Show plot markers.</span>")
         self.chkMarker.setChecked(True)
-        
+
         layVchkLogMark = QVBoxLayout()
         layVchkLogMark.addWidget(self.chkLog)
         layVchkLogMark.addWidget(self.chkMarker)
@@ -125,7 +125,7 @@ class PlotImpz_UI(QWidget):
         self.ledLogBottom.setText(str(self.bottom))
         self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbldB = QLabel("dB", self)
-        
+
         self.lblPltTime = QLabel("Time: ", self)
         self.cmbPltTime = QComboBox(self)
         self.cmbPltTime.addItems(["None","Stimulus","Response", "Both"])
@@ -145,7 +145,7 @@ class PlotImpz_UI(QWidget):
         layVcmbPlt = QVBoxLayout()
         layVcmbPlt.addWidget(self.cmbPltTime)
         layVcmbPlt.addWidget(self.cmbPltFreq)
-        
+
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
@@ -157,7 +157,7 @@ class PlotImpz_UI(QWidget):
         self.cmbNoise.addItems(["None","Gauss","Uniform"])
         self.cmbNoise.setToolTip("Select added noise type.")
         qset_cmb_box(self.cmbNoise, self.noise)
-        
+
         layVlblCmb = QVBoxLayout()
         layVlblCmb.addWidget(self.lblStimulus)
         layVlblCmb.addWidget(self.lblNoise)
@@ -170,7 +170,7 @@ class PlotImpz_UI(QWidget):
         self.ledAmp1.setText(str(self.A1))
         self.ledAmp1.setToolTip("Stimulus amplitude.")
         self.ledAmp1.setObjectName("stimAmp1")
-        
+
         self.lblAmp2 = QLabel(to_html("A_2", frmt='bi') + " =", self)
         self.ledAmp2 = QLineEdit(self)
         self.ledAmp2.setText(str(self.A2))
@@ -209,7 +209,7 @@ class PlotImpz_UI(QWidget):
         layVlblfreqU = QVBoxLayout()
         layVlblfreqU.addWidget(self.lblFreqUnit1)
         layVlblfreqU.addWidget(self.lblFreqUnit2)
-        
+
         self.lblNoi = QLabel("not initialized", self)
         self.ledNoi = QLineEdit(self)
         self.ledNoi.setText(str(self.noi))
@@ -239,7 +239,7 @@ class PlotImpz_UI(QWidget):
         layHControls.addWidget(self.lbldB)
         layHControls.addStretch(2)
         layHControls.addLayout(layVlblPlt)
-        layHControls.addLayout(layVcmbPlt)        
+        layHControls.addLayout(layVcmbPlt)
         layHControls.addStretch(1)
         layHControls.addLayout(layVlblCmb)
         layHControls.addLayout(layVCmb)
@@ -253,7 +253,7 @@ class PlotImpz_UI(QWidget):
         layHControls.addLayout(layVlblNoiDC)
         layHControls.addLayout(layVledNoiDC)
         layHControls.addStretch(10)
-        
+
         layHControlsF = QHBoxLayout()
         self.chkLogF = QCheckBox("Log. scale", self)
         self.chkLogF.setObjectName("chkLogF")
@@ -265,13 +265,13 @@ class PlotImpz_UI(QWidget):
         self.ledLogBottomF.setText(str(self.bottom_f))
         self.ledLogBottomF.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbldBF = QLabel("dB", self)
-        
+
         self.lblWindow = QLabel("Window: ", self)
         self.cmbWindow = QComboBox(self)
         self.cmbWindow.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
         self.cmbWindow.setToolTip("Select window type.")
         qset_cmb_box(self.cmbWindow, self.window)
-        
+
         self.lblWinPar1 = QLabel("Param1")
         self.ledWinPar1 = QLineEdit(self)
         self.ledWinPar1.setText("1")
@@ -281,13 +281,13 @@ class PlotImpz_UI(QWidget):
         layHControlsF.addWidget(self.lblLogBottomF)
         layHControlsF.addWidget(self.ledLogBottomF)
         layHControlsF.addWidget(self.lbldBF)
-        layHControls.addStretch(2)       
-        layHControlsF.addWidget(self.lblWindow)  
+        layHControls.addStretch(2)
+        layHControlsF.addWidget(self.lblWindow)
         layHControlsF.addWidget(self.cmbWindow)
         layHControlsF.addWidget(self.lblWinPar1)
         layHControlsF.addWidget(self.ledWinPar1)
         layHControlsF.addStretch(10)
-        
+
         self.wdgHControlsF = QWidget(self)
         self.wdgHControlsF.setLayout(layHControlsF)
 
@@ -315,14 +315,14 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.editingFinished.connect(self._update_amp2)
 
         self.ledDC.editingFinished.connect(self._update_DC)
-        
+
         self.chkLogF.clicked.connect(self._log_mode)
         self.ledLogBottomF.editingFinished.connect(self._log_mode)
         # careful! currentIndexChanged passes the current index to _update_window
         self.cmbWindow.currentIndexChanged.connect(self._update_window)
         self.ledWinPar1.editingFinished.connect(self._update_window)
-       
-        
+
+
         # ########################  Main UI Layout ############################
         # layout for frame (UI widget)
         layVMainF = QVBoxLayout()
@@ -337,8 +337,8 @@ class PlotImpz_UI(QWidget):
         layVMain.addWidget(self.frmControls)
         layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(layVMain)
-        
-        
+
+
     def update_N(self, sig_dict=None):
         """
         Update values for self.N and self.N_start from the QLineEditWidget
@@ -352,21 +352,21 @@ class PlotImpz_UI(QWidget):
         else:
             self.N = N_user
             self.ledN_points.setText(str(self.N))
-        
+
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
-        
+
         self._update_window(sig_dict)
 
 
     def _update_chk_boxes(self):
-        """ 
+        """
         Trigger update view when "show markers" checkbox is clicked
         """
         self.sig_tx.emit({'sender':__name__, 'view_changed':''})
 
 
     def _update_time_freq(self):
-        """ 
+        """
         Trigger 'draw' when one of the comboboxes PltTime or PltFreq is modified,
         enable frequency domain controls only when needed
         """
@@ -386,21 +386,21 @@ class PlotImpz_UI(QWidget):
         self.ledLogBottom.setVisible(log)
         self.lbldB.setVisible(log)
         if log:
-            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom, 
+            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom,
                                     return_type='float', sign='neg')
             self.ledLogBottom.setText(str(self.bottom))
-            
+
         log_f = self.chkLogF.isChecked()
         self.lblLogBottomF.setVisible(log_f)
         self.ledLogBottomF.setVisible(log_f)
         self.lbldBF.setVisible(log_f)
         if log_f:
-            self.bottom_f = safe_eval(self.ledLogBottomF.text(), self.bottom_f, 
+            self.bottom_f = safe_eval(self.ledLogBottomF.text(), self.bottom_f,
                                     return_type='float', sign='neg')
             self.ledLogBottomF.setText(str(self.bottom_f))
 
         self.sig_tx.emit({'sender':__name__, 'view_changed':'log'})
-        
+
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
         self.stim = qget_cmb_box(self.cmbStimulus, data=False)
@@ -418,22 +418,22 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.setVisible(a2_en)
         self.lblDC.setVisible(dc_en)
         self.ledDC.setVisible(dc_en)
-        
+
         self.sig_tx.emit({'sender':__name__, 'data_changed':'stim'})
 
     def _update_amp1(self):
-        """ Update value for self.A1 from QLineEditWidget"""        
+        """ Update value for self.A1 from QLineEditWidget"""
         self.A1 = safe_eval(self.ledAmp1.text(), self.A1, return_type='float')
         self.ledAmp1.setText(str(self.A1))
         self.sig_tx.emit({'sender':__name__, 'data_changed':'a1'})
-        
+
     def _update_amp2(self):
         """ Update value for self.A2 from the QLineEditWidget"""
         self.A2 = safe_eval(self.ledAmp2.text(), self.A2, return_type='float')
         self.ledAmp2.setText(str(self.A2))
         self.sig_tx.emit({'sender':__name__, 'data_changed':'a2'})
 
-        
+
     def _update_noi(self):
         """ Update type + value + label for self.noi for noise"""
         self.noise = qget_cmb_box(self.cmbNoise, data=False).lower()
@@ -459,7 +459,7 @@ class PlotImpz_UI(QWidget):
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'data_changed':'dc'})
-        
+
     def _update_window(self, sig_dict=None):
         """ Update window type for FFT """
 
@@ -468,13 +468,13 @@ class PlotImpz_UI(QWidget):
             self.lblWinPar1.setText(to_html(txt_par1, frmt='bi'))
 
             self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
-            self.ledWinPar1.setText(str(self.param1))   
-        #----------------------------------------------------------------------            
+            self.ledWinPar1.setText(str(self.param1))
+        #----------------------------------------------------------------------
         self.window_type = qget_cmb_box(self.cmbWindow, data=False)
 #        self.param1 = None
         has_par1 = False
         txt_par1 = ""
-        
+
         if self.window_type in {"Bartlett", "Triangular"}:
             window_name = "bartlett"
         elif self.window_type == "Flattop":
@@ -495,7 +495,7 @@ class PlotImpz_UI(QWidget):
             _update_param1()
             if not self.param1:
                 self.param1 = 5
-                
+
         elif self.window_type == "Chebwin":
             window_name = "chebwin"
             has_par1 = True
@@ -509,7 +509,7 @@ class PlotImpz_UI(QWidget):
 
         else:
             logger.error("Unknown window type {0}".format(self.window_type))
-            
+
         # get attribute window_name from submodule sig.windows and
         # returning the desired window function:
         win_fnct = getattr(sig.windows, window_name, None)
@@ -527,7 +527,7 @@ class PlotImpz_UI(QWidget):
             self.win = win_fnct(self.N)
 
         self.nenbw = self.N * np.sum(np.square(self.win)) / (np.square(np.sum(self.win)))
-        
+
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
 
@@ -536,13 +536,13 @@ class PlotImpz_UI(QWidget):
         else:
             self.sig_tx.emit(sig_dict)
 
-#------------------------------------------------------------------------------        
+#------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):
         """
-        Calculate number of points to be displayed, depending on type of filter 
+        Calculate number of points to be displayed, depending on type of filter
         (FIR, IIR) and user input. If the user selects 0 points, the number is
         calculated automatically.
-        
+
         An improvement would be to calculate the dominant pole and the corresponding
         settling time.
         """
@@ -565,7 +565,7 @@ def main():
 
     app = QApplication(sys.argv)
     mainw = PlotImpz_UI(None)
-    app.setActiveWindow(mainw) 
+    app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
 
