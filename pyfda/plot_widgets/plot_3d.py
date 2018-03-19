@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QLineEdit, QDial,
-                      QGridLayout, QFrame, pyqtSlot)
+                      QGridLayout, QFrame, pyqtSlot, pyqtSignal)
 
 import numpy as np
 from numpy import pi, ones, sin, cos, log10
@@ -49,6 +49,10 @@ class Plot3D(QWidget):
     - lin / log surf plot of H(z)
     - optional display of poles / zeros
     """
+
+    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    sig_rx = pyqtSignal(dict)
+#    sig_tx = pyqtSignal(dict) # outgoing from process_signals
 
     def __init__(self, parent):
         super(Plot3D, self).__init__(parent)
@@ -195,7 +199,11 @@ class Plot3D(QWidget):
         self._init_grid() # initialize grid and do initial plot
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.chkLog.clicked.connect(self._log_clicked)
         self.ledBottom.editingFinished.connect(self._log_clicked)
@@ -225,12 +233,12 @@ class Plot3D(QWidget):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict:
+        if 'view_changed' in sig_dict:
             self.update_view()
+        elif 'data_changed' in sig_dict or 'home' in sig_dict:
+            self.draw()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'home' in sig_dict:
-            self.draw()
         else:
             pass
 

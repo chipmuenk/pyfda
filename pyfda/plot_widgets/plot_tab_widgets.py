@@ -45,6 +45,7 @@ class PlotTabWidgets(QTabWidget):
         self.sig_tx.connect(self.pltImpz.ui.sig_rx)
         
         self.plt3D = plot_3d.Plot3D(self)
+        self.sig_tx.connect(self.plt3D.sig_rx)
 
         self._construct_UI()
 
@@ -170,7 +171,6 @@ class PlotTabWidgets(QTabWidget):
         else:
             self.sig_tx.emit({'sender':__name__, 'data_changed':''})
         self.pltHf.draw()
-        self.plt3D.draw()
 
 #------------------------------------------------------------------------------
     def update_view(self, sig_dict):
