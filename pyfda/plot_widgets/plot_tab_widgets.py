@@ -34,8 +34,10 @@ class PlotTabWidgets(QTabWidget):
         self.pltPhi = plot_phi.PlotPhi(self)
         self.pltPZ = plot_pz.PlotPZ(self)
         self.pltTauG = plot_tau_g.PlotTauG(self)
+        
         self.pltImpz = plot_impz.PlotImpz(self)
         self.sig_tx.connect(self.pltImpz.ui.sig_rx)
+        
         self.plt3D = plot_3d.Plot3D(self)
 
         self._construct_UI()
@@ -130,9 +132,8 @@ class PlotTabWidgets(QTabWidget):
             
         elif 'data_changed' in sig_dict.keys():
                self.update_data(sig_dict)
-
         else:
-            pass
+            logger.warning("Dict not understood: {0}".format(sig_dict))
 
 #------------------------------------------------------------------------------
         
@@ -169,7 +170,7 @@ class PlotTabWidgets(QTabWidget):
         if sig_dict:
             self.sig_tx.emit(sig_dict)
         else:
-            self.sig_tx.emit({'sender':__name__, 'draw':''})
+            self.sig_tx.emit({'sender':__name__, 'data_changed':''})
         self.pltHf.draw()
         self.pltPhi.draw()
         self.pltTauG.draw()
@@ -185,12 +186,10 @@ class PlotTabWidgets(QTabWidget):
         if sig_dict:
             self.sig_tx.emit(sig_dict)
         else:
-            self.sig_tx.emit({'sender':__name__, 'specs':'fS'})
+            self.sig_tx.emit({'sender':__name__, 'view_changed':''})
         self.pltHf.update_view()
         self.pltPhi.update_view()
         self.pltTauG.update_view()
-#        self.pltPZ.draw()
-#        self.plt3D.draw()
         
 #------------------------------------------------------------------------
 
