@@ -28,8 +28,9 @@ class PlotTauG(QWidget):
     """
     Widget for plotting the group delay
     """
-    sig_rx = pyqtSignal(dict) # incoming, connected in sender widget
-    sig_tx = pyqtSignal(dict) # outgoing, connected to process_signals
+    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    sig_rx = pyqtSignal(dict)
+#    sig_tx = pyqtSignal(dict) # outgoing from process_signals
 
 
     def __init__(self, parent):
