@@ -377,6 +377,7 @@ class PlotHf(QWidget):
 
         if self.chkPhase.isChecked():
             self.ax_p = ax.twinx() # second axes system with same x-axis for phase
+            self.ax_p.is_twin = True # mark this as 'twin' to suppress second grid in mpl_widget
 #
             phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
             if fb.fil[0]['plt_phiUnit'] == 'rad':
