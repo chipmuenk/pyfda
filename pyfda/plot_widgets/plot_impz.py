@@ -13,17 +13,18 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QEvent,
-                      Qt, QHBoxLayout, QFrame, pyqtSlot)
+from ..compat import QWidget, QEvent, Qt, pyqtSlot
 
 import numpy as np
 import scipy.signal as sig
+import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
+from .plot_impz_ui import PlotImpz_UI
 
 
 class PlotImpz(QWidget):
@@ -34,108 +35,37 @@ class PlotImpz(QWidget):
         super(PlotImpz, self).__init__(parent)
 
         self.ACTIVE_3D = False
+        self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
+        
         # initial settings for line edit widgets
-        self.stim_freq = 0.02
-        self.A = 1.0
-        self.bottom = -80
+        self.f1 = self.ui.f1
+        self.f2 = self.ui.f2
+
         self._construct_UI()
 
     def _construct_UI(self):
-        self.chkLog = QCheckBox(self)
-        self.chkLog.setObjectName("chkLog")
-        self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chkLog.setChecked(False)
-        self.lblLog = QLabel("Log. y-axis", self)
-
-        self.lblLogBottom = QLabel("Bottom = ", self)
-        self.ledLogBottom = QLineEdit(self)
-        self.ledLogBottom.setText(str(self.bottom))
-        self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbldB = QLabel("dB")
+        """
+        Create the top level UI of the widget, consisting of matplotlib widget
+        and control frame.
+        """
         
-        self.lblPltStim = QLabel(self)
-        self.lblPltStim.setText("Stimulus:")
-        self.chkPltStim = QCheckBox("Show", self)
-        self.chkPltStim.setChecked(False)
-        self.chkPltStim.setToolTip("Show stimulus signal.")
-        
-        self.lblStimulus = QLabel("Type = ", self)
-        self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw", "RandN", "RandU"])
-        self.cmbStimulus.setToolTip("Select stimulus type.")
-
-        self.lblAmp = QLabel("<i>A</i>&nbsp; =", self)
-        self.ledAmp = QLineEdit(self)
-        self.ledAmp.setText(str(self.A))
-        self.ledAmp.setToolTip("Stimulus amplitude.")
-        self.ledAmp.setObjectName("stimAmp")
-
-        self.lblFreq = QLabel("<i>f</i>&nbsp; =", self)
-        self.ledFreq = QLineEdit(self)
-        self.ledFreq.setText(str(self.stim_freq))
-        self.ledFreq.setToolTip("Stimulus frequency.")
-        self.ledFreq.setObjectName("stimFreq")
-
-        self.lblFreqUnit = QLabel("f_S", self)
-
-        self.lblNPoints = QLabel("<i>N</i>&nbsp; =", self)
-
-        self.ledNPoints = QLineEdit(self)
-        self.ledNPoints.setText("0")
-        self.ledNPoints.setToolTip("<span>Number of points to calculate and display. "
-                                   "N = 0 selects automatically.</span>")
-
-        layHControls = QHBoxLayout()
-        
-        layHControls.addWidget(self.lblNPoints)
-        layHControls.addWidget(self.ledNPoints)
-        layHControls.addStretch(2)
-        layHControls.addWidget(self.chkLog)
-        layHControls.addWidget(self.lblLog)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.lblLogBottom)
-        layHControls.addWidget(self.ledLogBottom)
-        layHControls.addWidget(self.lbldB)
-        layHControls.addStretch(2)
-        layHControls.addWidget(self.lblPltStim)
-        layHControls.addWidget(self.chkPltStim)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.lblStimulus)
-        layHControls.addWidget(self.cmbStimulus)
-        layHControls.addStretch(2)
-        layHControls.addWidget(self.lblAmp)
-        layHControls.addWidget(self.ledAmp)
-        layHControls.addWidget(self.lblFreq)
-        layHControls.addWidget(self.ledFreq)
-        layHControls.addWidget(self.lblFreqUnit)
-
-        layHControls.addStretch(10)
-        
-        # This widget encompasses all control subwidgets:
-        self.frmControls = QFrame(self)
-        self.frmControls.setObjectName("frmControls")
-        self.frmControls.setLayout(layHControls)
-
         #----------------------------------------------------------------------
         # mplwidget
         #----------------------------------------------------------------------
         self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        self.mplwidget.layVMainMpl.addWidget(self.ui)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.chkLog.clicked.connect(self.draw)
-        self.ledNPoints.editingFinished.connect(self.draw)
-        self.ledLogBottom.editingFinished.connect(self.draw)
-        self.chkPltStim.clicked.connect(self.draw)
-        self.cmbStimulus.activated.connect(self.draw)
-        self.ledAmp.editingFinished.connect(self.draw)
-        self.ledFreq.installEventFilter(self)
-        
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+        # frequency widgets require special handling as they are scaled with f_s
+        self.ui.ledFreq1.installEventFilter(self)
+        self.ui.ledFreq2.installEventFilter(self)
+
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals) # connect to toolbar
+        self.ui.sig_tx.connect(self.process_signals) # connect to widgets and signals upstream
 
         self.draw() # initial calculation and drawing
 
@@ -145,21 +75,23 @@ class PlotImpz(QWidget):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict:
+        logger.debug("processing {0}".format(sig_dict))
+        if 'home' in sig_dict  or 'view_changed' in sig_dict:
             self.update_view()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'home' in sig_dict:
+        elif 'data_changed' in sig_dict or 'specs_changed' in sig_dict:
+                # changing of f_s has to update the plot - more differentiation needed
             self.draw()
         else:
-            pass
+            logger.debug("{0}: dict {1} passed thru".format(__name__, sig_dict))
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):
         """
         Triggered when the toolbar is enabled or disabled
         """
-        self.frmControls.setEnabled(enabled)
+        self.ui.frmControls.setEnabled(enabled)
         if enabled:
             # self.init_axes() # called by self.draw
             self.draw()
@@ -167,55 +99,68 @@ class PlotImpz(QWidget):
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
-        Filter all events generated by the QLineEdit widgets. Source and type
+        Filter all events generated by the monitored widgets. Source and type
         of all events generated by monitored objects are passed to this eventFilter,
         evaluated and passed on to the next hierarchy level.
 
-        - When a QLineEdit widget gains input focus (QEvent.FocusIn`), display
+        - When a QLineEdit widget gains input focus (`QEvent.FocusIn`), display
           the stored value from filter dict with full precision
         - When a key is pressed inside the text field, set the `spec_edited` flag
           to True.
-        - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
+        - When a QLineEdit widget loses input focus (`QEvent.FocusOut`), store
           current value normalized to f_S with full precision (only if
           `spec_edited`== True) and display the stored value in selected format
         """
 
         def _store_entry(source):
             if self.spec_edited:
-                self.stim_freq = safe_eval(source.text(), self.stim_freq * fb.fil[0]['f_S'],
+                if source.objectName() == "stimFreq1":
+                   self.f1 = safe_eval(source.text(), self.f1 * fb.fil[0]['f_S'],
                                             return_type='float') / fb.fil[0]['f_S']
+                   source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+
+                elif source.objectName() == "stimFreq2":
+                   self.f2 = safe_eval(source.text(), self.f2 * fb.fil[0]['f_S'],
+                                            return_type='float') / fb.fil[0]['f_S']
+                   source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+
                 self.spec_edited = False # reset flag
                 self.draw()
-                
-        if isinstance(source, QLineEdit): # could be extended for other widgets
+
+#        if isinstance(source, QLineEdit): 
+#        if source.objectName() in {"stimFreq1","stimFreq2"}:
+        if event.type() in {QEvent.FocusIn,QEvent.KeyPress, QEvent.FocusOut}:
             if event.type() == QEvent.FocusIn:
                 self.spec_edited = False
-                self.load_dict()
+                self.load_fs()
             elif event.type() == QEvent.KeyPress:
                 self.spec_edited = True # entry has been changed
                 key = event.key()
                 if key in {Qt.Key_Return, Qt.Key_Enter}:
                     _store_entry(source)
                 elif key == Qt.Key_Escape: # revert changes
-                    self.spec_edited = False                    
-                    source.setText(str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
-                
+                    self.spec_edited = False
+                    if source.objectName() == "stimFreq1":                    
+                        source.setText(str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+                    elif source.objectName() == "stimFreq2":                    
+                        source.setText(str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+
             elif event.type() == QEvent.FocusOut:
                 _store_entry(source)
-                source.setText(str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
+
         # Call base class method to continue normal event processing:
         return super(PlotImpz, self).eventFilter(source, event)
 
 #-------------------------------------------------------------        
-    def load_dict(self):
+    def load_fs(self):
         """
-        Reload textfields from filter dictionary 
-        Transform the displayed frequency spec input fields according to the units
+        Reload sampling frequency from filter dictionary and transform
+        the displayed frequency spec input fields according to the units
         setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
 
-        load_dict() is called during init and when the frequency unit or the
+        load_fs() is called during init and when the frequency unit or the
         sampling frequency have been changed.
 
         It should be called when sigSpecsChanged or sigFilterDesigned is emitted
@@ -223,80 +168,117 @@ class PlotImpz(QWidget):
         """
 
         # recalculate displayed freq spec values for (maybe) changed f_S
-        logger.debug("exec load_dict")
-        if not self.ledFreq.hasFocus():
-            # widget has no focus, round the display
-            self.ledFreq.setText(
-                str(params['FMT'].format(self.stim_freq * fb.fil[0]['f_S'])))
-        else:
+        if self.ui.ledFreq1.hasFocus():
             # widget has focus, show full precision
-            self.ledFreq.setText(str(self.stim_freq * fb.fil[0]['f_S']))
+            self.ui.ledFreq1.setText(str(self.f1 * fb.fil[0]['f_S']))
+        elif self.ui.ledFreq2.hasFocus():
+            # widget has focus, show full precision
+            self.ui.ledFreq2.setText(str(self.f2 * fb.fil[0]['f_S']))
+        else:
+            # widgets have no focus, round the display
+            self.ui.ledFreq1.setText(
+                str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
+            self.ui.ledFreq2.setText(
+                str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
 #------------------------------------------------------------------------------
     def init_axes(self):
         # clear the axes and (re)draw the plot
         #
-        try:
-            self.mplwidget.fig.delaxes(self.ax_r)
-            self.mplwidget.fig.delaxes(self.ax_i)
-        except (KeyError, AttributeError, UnboundLocalError):
-            pass
+        for ax in self.mplwidget.fig.get_axes():
+            self.mplwidget.fig.delaxes(ax)
 
-        if self.cmplx:
-            self.ax_r = self.mplwidget.fig.add_subplot(211)
-            self.ax_r.clear()
-            self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_r.get_yaxis().tick_left() # remove axis ticks right
+        num_subplots = 0 + (self.ui.plt_time != "None")\
+                        + (self.cmplx and self.ui.plt_time in {"Response", "Both"})\
+                        + (self.ui.plt_freq != "None")
 
-            self.ax_i = self.mplwidget.fig.add_subplot(212, sharex = self.ax_r)
-            self.ax_i.clear()
-            self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_i.get_yaxis().tick_left() # remove axis ticks right
+        if num_subplots > 0:
+            self.mplwidget.fig.subplots_adjust(hspace = 0.5)
+    
+            if self.ui.plt_time != "None":
+                self.ax_r = self.mplwidget.fig.add_subplot(num_subplots,1 ,1)
+                self.ax_r.clear()
+                self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
+                self.ax_r.get_yaxis().tick_left() # remove axis ticks right
+    
+            if self.cmplx and self.ui.plt_time in {"Response", "Both"}:
+                self.ax_i = self.mplwidget.fig.add_subplot(num_subplots, 1, 2, sharex = self.ax_r)
+                self.ax_i.clear()
+                self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
+                self.ax_i.get_yaxis().tick_left() # remove axis ticks right
+    
+            if self.ui.plt_freq != "None":
+                self.ax_fft = self.mplwidget.fig.add_subplot(num_subplots, 1, num_subplots)    
+                self.ax_fft.clear()
+
+                self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
+                self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
+    
+            if self.ACTIVE_3D: # not implemented / tested yet
+                self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
+
+#------------------------------------------------------------------------------
+    def calc(self):
+        """
+        (Re-)calculate stimulus x[n] and filter response y[n]
+        """
+        self.n = np.arange(self.ui.N_end)
+        self.t = self.n / fb.fil[0]['f_S']
+
+        # calculate stimuli x[n] ==============================================
+        if self.ui.stim == "Pulse":
+            self.x = np.zeros(self.ui.N_end)
+            self.x[0] = self.ui.A1 # create dirac impulse as input signal
+            self.title_str = r'Impulse Response'
+            self.H_str = r'$h[n]$' # default
+
+        elif self.ui.stim == "Step":
+            self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
+            self.title_str = r'Filter Step Response'
+            self.H_str = r'$h_{\epsilon}[n]$'
+            
+        elif self.ui.stim == "StepErr":
+            self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
+            self.title_str = r'Settling Error'
+            self.H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
+            
+        elif self.ui.stim == "Cos":
+            self.x = self.ui.A1 * np.cos(2 * np.pi * self.n * self.f1) +\
+                self.ui.A2 * np.cos(2 * np.pi * self.n * self.f2 + self.ui.phi2)
+            self.title_str = r'Filter Response to Cosine Signal'
+            self.H_str = r'$y_{\cos}[n]$'
+                
+        elif self.ui.stim == "Sine":
+            self.x = self.ui.A1 * np.sin(2 * np.pi * self.n * self.f1 + self.ui.phi1) +\
+                self.ui.A2 * np.sin(2 * np.pi * self.n * self.f2 + self.ui.phi2)
+            self.title_str = r'Filter Response to Sinusoidal Signal'
+            self.H_str = r'$y_{\sin}[n]$'
+            
+        elif self.ui.stim == "Rect":
+            self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.n * self.f1))
+            self.title_str = r'Filter Response to Rect. Signal'
+            self.H_str = r'$y_{rect}[n]$'
+
+        elif self.ui.stim == "Saw":
+            self.x = self.ui.A1 * sig.sawtooth(self.n * self.f1 * 2*np.pi)
+            self.title_str = r'Filter Response to Sawtooth Signal'
+            self.H_str = r'$y_{saw}[n]$'
 
         else:
-            self.ax_r = self.mplwidget.fig.add_subplot(111)
-            self.ax_r.clear()
-            self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_r.get_yaxis().tick_left() # remove axis ticks right
-
-
-        self.mplwidget.fig.subplots_adjust(hspace = 0.5)  
-
-        if self.ACTIVE_3D: # not implemented / tested yet
-            self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
-
-#------------------------------------------------------------------------------
-    def update_view(self):
-        """
-        place holder; should update only the limits without recalculating
-        the impulse respons
-        """
-        self.draw()
-
-#------------------------------------------------------------------------------
-    def draw(self):
-        if self.mplwidget.mplToolbar.enabled:
-            self.draw_impz()
-
-#------------------------------------------------------------------------------
-    def draw_impz(self):
-        """
-        (Re-)calculate h[n] and draw the figure
-        """
-        log = self.chkLog.isChecked()
-        stim = str(self.cmbStimulus.currentText())
-        periodic_sig = stim in {"Cos", "Sine","Rect", "Saw"}
-        self.lblLogBottom.setVisible(log)
-        self.ledLogBottom.setVisible(log)
-        self.lbldB.setVisible(log)
+            logger.error('Unknown stimulus "{0}"'.format(self.ui.stim))
+            return
         
-        self.lblFreq.setVisible(periodic_sig)
-        self.ledFreq.setVisible(periodic_sig)
-        self.lblFreqUnit.setVisible(periodic_sig)
+        # Add noise to stimulus
+        if self.ui.noise == "gauss":
+            self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.ui.N)
+        elif self.ui.noise == "uniform":
+            self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.ui.N)-0.5)
 
-        self.lblFreqUnit.setText(to_html(fb.fil[0]['freq_specs_unit']))
-        self.load_dict()
+        # Add DC to stimulus when visible / enabled
+        if self.ui.ledDC.isVisible:
+            self.x += self.ui.DC
         
+        # calculate response self.y[n] and self.y_i[n] (for complex case) =====   
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
         if min(len(self.aa), len(self.bb)) < 2:
@@ -307,106 +289,99 @@ class PlotImpz(QWidget):
         antiCausal = 'zpkA' in fb.fil[0]
         causal     = not (antiCausal)
 
-        self.f_S  = fb.fil[0]['f_S']
-        
-        N_entry = safe_eval(self.ledNPoints.text(), 0, return_type='int', sign='pos')
-        N = self.calc_n_points(N_entry)
-        if N_entry != 0: # automatic calculation
-            self.ledNPoints.setText(str(N))
-
-        self.A = safe_eval(self.ledAmp.text(), self.A, return_type='float')
-        self.ledAmp.setText(str(self.A))
-
-        t = np.linspace(0, N/self.f_S, N, endpoint=False)
-
-        title_str = r'Impulse Response' # default
-        H_str = r'$h[n]$' # default
-
-        # calculate h[n]
-        if stim == "Pulse":
-            x = np.zeros(N)
-            x[0] = self.A # create dirac impulse as input signal
-        elif stim == "Step":
-            x = self.A * np.ones(N) # create step function
-            title_str = r'Step Response'
-            H_str = r'$h_{\epsilon}[n]$'
-        elif stim == "StepErr":
-            x = self.A * np.ones(N) # create step function
-            title_str = r'Settling Error'
-            H_str = r'$h_{\epsilon, \infty} - h_{\epsilon}[n]$'
-            
-        elif stim in {"Cos"}:
-            x = self.A * np.cos(2 * np.pi * t * float(self.ledFreq.text()))
-            if stim == "Cos":
-                title_str = r'Transient Response to Cosine Signal'
-                H_str = r'$y_{\cos}[n]$'
-
-        elif stim in {"Sine", "Rect"}:
-            x = self.A * np.sin(2 * np.pi * t * float(self.ledFreq.text()))
-            if stim == "Sine":
-                title_str = r'Transient Response to Sine Signal'
-                H_str = r'$y_{\sin}[n]$'
-            else:
-                x = self.A * np.sign(x)
-                title_str = r'Transient Response to Rect. Signal'
-                H_str = r'$y_{rect}[n]$'
-
-        elif stim == "Saw":
-            x = self.A * sig.sawtooth(t * (float(self.ledFreq.text())* 2*np.pi))
-            title_str = r'Transient Response to Sawtooth Signal'
-            H_str = r'$y_{saw}[n]$'
-
-        elif stim == "RandN":
-            x = self.A * np.random.randn(N)
-            title_str = r'Transient Response to Gaussian Noise'
-            H_str = r'$y_{gauss}[n]$'
-
-        elif stim == "RandU":
-            x = self.A * (np.random.rand(N)-0.5)
-            title_str = r'Transient Response to Uniform Noise'
-            H_str = r'$y_{uni}[n]$'
-
-        else:
-            logger.error('Unknown stimulus "{0}"'.format(stim))
-            return
-
         if len(sos) > 0 and (causal): # has second order sections and is causal
-            h = sig.sosfilt(sos, x)
+            y = sig.sosfilt(sos, self.x)
         elif (antiCausal):
-            h = sig.filtfilt(self.bb, self.aa, x, -1, None)
+            y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
         else: # no second order sections or antiCausals for current filter
-            h = sig.lfilter(self.bb, self.aa, x)
+            y = sig.lfilter(self.bb, self.aa, self.x)
 
-        dc = sig.freqz(self.bb, self.aa, [0])
+        if self.ui.stim == "StepErr":
+            dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
+            y = y - abs(dc[1]) # subtract DC (final) value from response
 
-        if stim == "StepErr":
-            h = h - abs(dc[1]) # subtract DC value from response
-
-        h = np.real_if_close(h, tol = 1e3)  # tol specified in multiples of machine eps
-        self.cmplx = np.any(np.iscomplex(h))
+        y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
+        self.cmplx = np.any(np.iscomplex(y))
         if self.cmplx:
-            h_i = h.imag
-            h = h.real
-            H_i_str = r'$\Im\{$' + H_str + '$\}$'
-            H_str = r'$\Re\{$' + H_str + '$\}$'
-        if log:
-            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom, return_type='float')
-            self.ledLogBottom.setText(str(self.bottom))
-            H_str = r'$|$ ' + H_str + '$|$ in dB'
-            h = np.maximum(20 * np.log10(abs(h)), self.bottom)
-            if self.cmplx:
-                h_i = np.maximum(20 * np.log10(abs(h_i)), self.bottom)
-                H_i_str = r'$\log$ ' + H_i_str + ' in dB'
+            self.y_i = y.imag
+            self.y = y.real
         else:
-            self.bottom = 0
+            self.y = y
+            self.y_i = None
 
+        # calculate FFT of stimulus / response
+#        if self.ui.plt_freq in {"Stimulus", "Both"}:
+        x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+        self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+
+#        if self.ui.plt_freq in {"Response", "Both"}:
+        y_win = y[self.ui.N_start:self.ui.N_end] * self.ui.win
+        self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
+
+#------------------------------------------------------------------------------
+    def update_view(self):
+        """
+        place holder; should update only the limits without recalculating
+        the impulse respons
+        """
+        self.draw_impz()
+
+#------------------------------------------------------------------------------
+    def draw(self):
+        """
+        Recalculate response and redraw it
+        """
+        if self.mplwidget.mplToolbar.enabled:
+            self.calc()
+            self.draw_impz()
+
+#------------------------------------------------------------------------------
+    def draw_impz(self):
+        """
+        (Re-)draw the figure
+        """
+        f_unit = fb.fil[0]['freq_specs_unit']
+        if f_unit in {"f_S", "f_Ny"}:
+            unit_frmt = "i" # italic
+        else:
+            unit_frmt = None
+        self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
+        self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
+        N_start = self.ui.N_start
+        self.load_fs()
         self.init_axes()
-
+        
         #================ Main Plotting Routine =========================
-        [ml, sl, bl] = self.ax_r.stem(t, h, bottom=self.bottom, markerfmt='o', label = '$h[n]$')
-        stem_fmt = params['mpl_stimuli']
-        if self.chkPltStim.isChecked():
-            [ms, ss, bs] = self.ax_r.stem(t, x, bottom=self.bottom, label = 'Stim.', **stem_fmt)
+        if self.ui.chkMarker.isChecked():
+            mkfmt_r = 'o'
+            mkfmt_i = 'd'
+        else:
+            mkfmt_r = mkfmt_i = ' '
+        if self.cmplx:           
+            H_i_str = r'$\Im\{$' + self.H_str + '$\}$ in V'
+            H_str = r'$\Re\{$' + self.H_str + '$\}$ in V'
+        else:
+            H_str = self.H_str + 'in V'
+
+        if self.ui.chkLog.isChecked():
+            H_str = r'$|$ ' + H_str + '$|$ in dBV'
+            y = np.maximum(20 * np.log10(abs(self.y)), self.ui.bottom)
+            if self.cmplx:
+                y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom)
+                H_i_str = r'$\log$ ' + H_i_str + ' in dBV'
+        else:
+            self.ui.bottom = 0
+            y = self.y
+            y_i = self.y_i
+
+        if self.ui.plt_time in {"Response", "Both"}:
+            [ml, sl, bl] = self.ax_r.stem(self.t[N_start:], y[N_start:], 
+                bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
+
+        if self.ui.plt_time in {"Stimulus", "Both"}:
+            stem_fmt = params['mpl_stimuli']
+            [ms, ss, bs] = self.ax_r.stem(self.t[N_start:], self.x[N_start:], 
+                bottom=self.ui.bottom, label = 'Stim.', **stem_fmt)
             ms.set_mfc(stem_fmt['mfc'])
             ms.set_mec(stem_fmt['mec'])
             ms.set_ms(stem_fmt['ms'])
@@ -416,12 +391,10 @@ class PlotImpz(QWidget):
                 stem.set_color(stem_fmt['mec'])
                 stem.set_alpha(stem_fmt['alpha'])
             bs.set_visible(False) # invisible bottomline
-        expand_lim(self.ax_r, 0.02)
-        self.ax_r.set_title(title_str)
 
-        if self.cmplx:
-            [ml_i, sl_i, bl_i] = self.ax_i.stem(t, h_i, bottom=self.bottom,
-                                                markerfmt='d', label = '$h_i[n]$')
+        if self.cmplx and self.ui.plt_time in {"Response", "Both"}:
+            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[N_start:], y_i[N_start:],
+                bottom=self.ui.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
@@ -432,52 +405,129 @@ class PlotImpz(QWidget):
         else:
             self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+        
+        self.ax_r.set_title(self.title_str)
+        self.ax_r.set_xlim([self.t[N_start],self.t[self.ui.N_end-1]])
+        expand_lim(self.ax_r, 0.02)
 
+        # plot frequency domain =========================================
+        if self.ui.plt_freq != "None":
+            plt_response = self.ui.plt_freq in {"Response","Both"}
+            plt_stimulus = self.ui.plt_freq in {"Stimulus","Both"}
+            if plt_response and not plt_stimulus:
+                XY_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
+            elif not plt_response and plt_stimulus:
+                XY_str = r'$|X(\mathrm{e}^{\mathrm{j} \Omega})|$'
+            else:
+                XY_str = r'$|X,Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
+            F = np.fft.fftfreq(self.ui.N, d = 1. / fb.fil[0]['f_S'])
+
+            if plt_stimulus:
+                X = self.X.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                self.Px = np.sum(np.square(self.X))
+                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                    X[1:] = 2 * X[1:] # correct for single-sided spectrum (except DC)
+            if plt_response:
+                Y = self.Y.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                self.Py = np.sum(np.square(self.Y))
+                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                    Y[1:] = 2 * Y[1:] # correct for single-sided spectrum (except DC)
+
+            if self.ui.chkLogF.isChecked():
+                unit = unit_P = "dBW"
+                unit_nenbw = "dB"
+                nenbw = 10 * np.log10(self.ui.nenbw)
+                if plt_stimulus:
+                    X = np.maximum(20 * np.log10(X), self.ui.bottom_f)
+                    self.Px = 10*np.log10(self.Px)
+                if plt_response:
+                    Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
+                    self.Py = 10*np.log10(self.Py)
+            else:
+                unit = "Vrms"
+                unit_P = "W"
+                unit_nenbw = "bins"
+                nenbw = self.ui.nenbw
+
+            XY_str = XY_str + ' in ' + unit
+
+            if fb.fil[0]['freqSpecsRangeType'] == 'sym':
+            # shift X, Y and F by f_S/2
+                if plt_response:
+                    Y = np.fft.fftshift(Y)
+                if plt_stimulus:
+                    X = np.fft.fftshift(X)
+                F = np.fft.fftshift(F)
+            elif fb.fil[0]['freqSpecsRangeType'] == 'half':
+                # only use the first half of X, Y and F
+                if plt_response:
+                    Y = Y[0:self.ui.N//2]
+                if plt_stimulus:
+                    X = X[0:self.ui.N//2]
+                F = F[0:self.ui.N//2]
+            else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
+                # plot for F = 0 ... 1
+                F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
+
+            handles = []
+            labels = []
+            if plt_stimulus:
+                h, = self.ax_fft.plot(F, X, color =(0.5,0.5,0.5,0.5), lw=2)
+                handles.append(h)
+                labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
+            if plt_response:
+                h, = self.ax_fft.plot(F, Y)
+                handles.append(h)
+                labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
+                
+            labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
+            labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
+            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
+            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
+            self.ax_fft.legend(handles, labels, loc='best', fontsize = 'small',
+                               fancybox=True, framealpha=0.5)
+            
+
+            self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
+            self.ax_fft.set_ylabel(XY_str)
+            self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
+            if self.ui.plt_time == "None":
+                self.ax_fft.set_title(self.title_str) # no time window, print title here
+                
+            if self.ui.chkLogF.isChecked():
+                # create second axis scaled for noise power scale
+                self.ax_fft_noise = self.ax_fft.twinx()
+                self.ax_fft_noise.is_twin = True
+
+                corr = 10*np.log10(self.ui.N / self.ui.nenbw) 
+                mn, mx = self.ax_fft.get_ylim()
+                self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
+                self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
 
         if self.ACTIVE_3D: # not implemented / tested yet
-
             # plotting the stems
-            for i in range(len(t)):
-              self.ax3d.plot([t[i], t[i]], [h[i], h[i]], [0, h_i[i]],
+            for i in range(N_start, self.ui.N_end):
+              self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
                              '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
-            self.ax3d.plot(t, h, h_i, 'o', markersize=8,
-                           markerfacecolor='none', label='$h[n]$')
+            self.ax3d.plot(self.t[N_start:], y[N_start:], y_i[N_start:], 'o', markersize=8,
+                           markerfacecolor='none', label='$y[n]$')
 
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
 
         self.redraw()
-        
+
 #------------------------------------------------------------------------------
     def redraw(self):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget.redraw()
-
-#------------------------------------------------------------------------------        
-    def calc_n_points(self, N_user = 0):
-        """
-        Calculate number of points to be displayed, depending on type of filter 
-        (FIR, IIR) and user input. If the user selects 0 points, the number is
-        calculated automatically.
-        
-        An improvement would be to calculate the dominant pole and the corresponding
-        settling time.
-        """
-
-        if N_user == 0: # set number of data points automatically
-            if fb.fil[0]['ft'] == 'IIR':
-                N = 100
-            else:
-                N = min(len(self.bb),  100) # FIR: N = number of coefficients (max. 100)
-        else:
-            N = N_user
-
-        return N
+        if hasattr(self, "ax2_fft"):
+            self.ax2_fft.grid(False)
 
 #------------------------------------------------------------------------------
 

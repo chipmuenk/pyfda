@@ -11,7 +11,8 @@ Widget for plotting |H(f)|, frequency specs and the phase
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, pyqtSlot
+from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, 
+                      pyqtSlot, pyqtSignal)
 
 import numpy as np
 from matplotlib.patches import Rectangle
@@ -27,6 +28,10 @@ class PlotHf(QWidget):
     """
     Widget for plotting |H(f)|, frequency specs and the phase
     """
+    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    sig_rx = pyqtSignal(dict)
+#    sig_tx = pyqtSignal(dict) # outgoing from process_signals
+
     def __init__(self, parent): 
         super(PlotHf, self).__init__(parent)
 
@@ -110,7 +115,11 @@ class PlotHf(QWidget):
         self.draw() # calculate and draw |H(f)|
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self.draw)
         self.cmbShowH.currentIndexChanged.connect(self.draw)
@@ -129,12 +138,12 @@ class PlotHf(QWidget):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict:
+        if 'view_changed' in sig_dict:
             self.update_view()
+        elif 'data_changed' in sig_dict or 'specs_changed' in sig_dict or 'home' in sig_dict:
+            self.draw()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'home' in sig_dict:
-            self.draw()
         else:
             pass
 
@@ -377,6 +386,7 @@ class PlotHf(QWidget):
 
         if self.chkPhase.isChecked():
             self.ax_p = ax.twinx() # second axes system with same x-axis for phase
+            self.ax_p.is_twin = True # mark this as 'twin' to suppress second grid in mpl_widget
 #
             phi_str = r'$\angle H(\mathrm{e}^{\mathrm{j} \Omega})$'
             if fb.fil[0]['plt_phiUnit'] == 'rad':

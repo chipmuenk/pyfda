@@ -1508,39 +1508,50 @@ def remlplen_ichige(fp,fs,dp,ds):
 #------------------------------------------------------------------------------
 def to_html(text, frmt=None):
     """
-    Convert text to HTML format
-    Format label with italic + bold HTML tags and
-     replace '_' by HTML subscript tags
+    Convert text to HTML format:
+        - pretty-print logger messages
+        - convert "\\n" to "<br />
+        - convert "< " and "> " to "&lt;" and "&gt;"
+        - format strings with italic and / or bold HTML tags, depending on 
+          parameter `frmt`. When `frmt=None`, put the returned string between
+          <span> tags to enforce HTML rendering downstream
+        - replace '_' by HTML subscript tags. Numbers 0 ... 9 are never set to
+          italic format
 
     Parameters
     ----------
 
-    text : string
+    text: string
         Text to be converted
 
     frmt: string
-        'b' : bold text
-        'i' : italic text
-        'bi' or 'ib' : bold and italic text
+        define text style
+        
+        - 'b' : bold text
+        - 'i' : italic text
+        - 'bi' or 'ib' : bold and italic text
 
     Returns
     -------
 
-    html : string
+    string
         HTML - formatted text
 
     Examples
     --------
 
-        >>> to_html("F_SB", frmt='b')
-        <b><i>F<sub>SB</sub></i></b>
+        >>> to_html("F_SB", frmt='bi')
+        "<b><i>F<sub>SB</sub></i></b>"
+        >>> to_html("F_1", frmt='i')
+        "<i>F</i><sub>1</sub>"
     """
     # see https://danielfett.de/de/tutorials/tutorial-regulare-ausdrucke/
     # arguments for regex replacement with illegal characters
     # [a-dA-D] list of characters
+    # \w : meta character for [a-zA-Z0-9_]
+    # \s : meta character for all sorts of whitespace
     # [123][abc] test for e.g. '2c'
-    # ^ means "not", | means "or" and \ escapes
-    #   '.' means any character, 
+    # '^' means "not", '|' means "or" and '\' escapes, '.' means any character, 
     # '+' means once or more, '?' means zero or once, '*' means zero or more
     #   '[^a]' means except for 'a'
     # () defines a group that can be referenced by \1, \2, ...
@@ -1549,7 +1560,7 @@ def to_html(text, frmt=None):
     # '(' must be escaped as '\('
     
     # mappings text -> HTML formatted logging messages
-    mapping = [ ('<','&lt;'), ('>','&gt;'), ('\n','<br />'),
+    mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
                 ('[  DEBUG]','<b>[  DEBUG]</b>'),
                 ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
                 ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
@@ -1563,9 +1574,14 @@ def to_html(text, frmt=None):
         text = "<i>" + text + "</i>"
     if frmt in {'b', 'bi', 'ib'}:
         text = "<b>" + text + "</b>"
+    if frmt == None:
+        text = "<span>" + text + "</span>"
 
-    # replace e.g. A_SB by <i>A<sub>SB</sub></i>:
-    html = re.sub(r'([fAFW])_([a-zA-Z0-9]+)', r'<i>\1<sub>\2</sub></i>', text)  
+    html = re.sub(r'([a-zA-Z])_(\w{1,3})', r'\1<sub>\2</sub>', text)
+    
+    #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
+
+    # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
 
     return html
 

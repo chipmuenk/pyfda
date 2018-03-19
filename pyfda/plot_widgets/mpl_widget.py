@@ -73,7 +73,6 @@ class MplWidget(QWidget):
         #
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MplToolbar(self.pltCanv, self) # inherits all methods
-        self.mplToolbar.grid = True
         self.mplToolbar.lock_zoom = False
         self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
@@ -115,12 +114,16 @@ class MplWidget(QWidget):
         # only execute when at least one axis exists -> tight_layout crashes otherwise
         if self.fig.axes:
             for ax in self.fig.axes:
-                ax.grid(self.mplToolbar.grid) # collect axes objects and toggle grid
+                if hasattr(ax, "is_twin"):
+                    ax.grid(False)  # the axis is a twinx() system, suppress the gridlines
+                else:
+                    ax.grid(self.mplToolbar.a_gr.isChecked())  # collect axes objects and apply grid settings
 
                 if self.mplToolbar.lock_zoom:
                     ax.axis(self.limits) # restore old limits
                 else:
                     self.limits = ax.axis() # save old limits
+
             try:
                 # tight_layout() crashes with small figure sizes
                self.fig.tight_layout(pad = 0.1)
@@ -393,9 +396,11 @@ class MplToolbar(NavigationToolbar):
 #------------------------------------------------------------------------------
     def toggle_grid(self):
         """Toggle the grid and redraw the figure."""
-        self.grid = not self.grid
         for ax in self.parent.fig.axes:
-            ax.grid(self.grid)
+            if hasattr(ax, "is_twin"): # the axis is a twinx() system, suppress the gridlines
+                ax.grid(False)
+            else:
+                ax.grid(self.a_gr.isChecked())#(self.grid)
         self.parent.pltCanv.draw() # don't use self.redraw()
 
 #------------------------------------------------------------------------------
@@ -405,7 +410,7 @@ class MplToolbar(NavigationToolbar):
             when previously unlocked, settings need to be saved
             when previously locked, current settings can be saved without effect
         """
-        self.parent.save_limits() # save limits in any case: when previously unlocked
+        self.parent.save_limits() # save limits in any case:
         self.lock_zoom = not self.lock_zoom
         if self.lock_zoom:
             self.a_lk.setIcon(QIcon(':/lock-locked.svg'))

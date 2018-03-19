@@ -165,7 +165,7 @@ class WeightSpecs(QWidget):
 
         for i in range(num_new_labels):
             # Update ALL labels and corresponding values 
-            self.qlabels[i].setText(to_html(new_labels[i], frmt='b'))
+            self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
 
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID

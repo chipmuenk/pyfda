@@ -14,7 +14,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore
+from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSlot, pyqtSignal
 
 from pyfda.pyfda_rc import params
 
@@ -23,15 +23,30 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
+       
+    sig_rx = pyqtSignal(dict)
+#    sig_tx = pyqtSignal(dict) # not used yet
+    
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
         self.pltHf = plot_hf.PlotHf(self)
+        self.sig_rx.connect(self.pltHf.sig_rx)
+        
         self.pltPhi = plot_phi.PlotPhi(self)
+        self.sig_rx.connect(self.pltPhi.sig_rx)
+        
         self.pltPZ = plot_pz.PlotPZ(self)
+        self.sig_rx.connect(self.pltPZ.sig_rx)
+        
         self.pltTauG = plot_tau_g.PlotTauG(self)
+        self.sig_rx.connect(self.pltTauG.sig_rx)
+        
         self.pltImpz = plot_impz.PlotImpz(self)
+        self.sig_rx.connect(self.pltImpz.ui.sig_rx)
+        
         self.plt3D = plot_3d.Plot3D(self)
+        self.sig_rx.connect(self.plt3D.sig_rx)
 
         self._construct_UI()
 
@@ -52,17 +67,35 @@ class PlotTabWidgets(QTabWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
         self.setLayout(layVMain)
+        
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------        
         self.timer_id = QtCore.QTimer()
         self.timer_id.setSingleShot(True)
         # redraw current widget at timeout (timer was triggered by resize event):
         self.timer_id.timeout.connect(self.current_tab_redraw)
 
-        # When user has selected a different tab, call self.tab_changed for a redraw
+        # When user has selected a different tab, trigger a redraw of current tab
         self.tabWidget.currentChanged.connect(self.current_tab_redraw)
         # The following does not work: maybe current scope must be left?
         # self.tabWidget.currentChanged.connect(self.tabWidget.currentWidget().redraw) # 
 
         self.tabWidget.installEventFilter(self)
+        
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+#        self.sig_rx.connect(self.process_signals)
+#        #------------------------------------------------------------------------------
+#    @pyqtSlot(object)
+#    def process_signals(self, sig_dict):
+#        """
+#        Process signals coming in via sig_rx
+#        """
+#        logger.debug("sig_rx = {0}".format(sig_dict))
+#        self.sig_tx.emit(sig_dict)
+
         
         """
         https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
@@ -119,35 +152,7 @@ class PlotTabWidgets(QTabWidget):
 
         # Call base class method to continue normal event processing:
         return super(PlotTabWidgets, self).eventFilter(source, event)
-
-#------------------------------------------------------------------------------
-    def update_data(self):
-        """
-        Calculate subplots with new filter DATA and redraw them,
-        triggered by self.inputTabWidgets.sigFilterDesigned.
-        """
-        logger.debug("update_data (filter designed)")
-        self.pltHf.draw()
-        self.pltPhi.draw()
-        self.pltPZ.draw()
-        self.pltTauG.draw()
-        self.pltImpz.draw()
-        self.plt3D.draw()
-
-#------------------------------------------------------------------------------
-    def update_view(self):
-        """
-        Update plot limits with new filter SPECS and redraw all subplots,
-        triggered by self.inputTabWidgets.sigSpecsChanged.
-        """
-        logger.debug("update_view (specs changed)")
-        self.pltHf.update_view()
-        self.pltPhi.update_view()
-        self.pltTauG.update_view()
-        self.pltImpz.update_view()
-#        self.pltPZ.draw()
-#        self.plt3D.draw()
-        
+       
 #------------------------------------------------------------------------
 
 def main():
