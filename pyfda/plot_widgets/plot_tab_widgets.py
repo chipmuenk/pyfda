@@ -25,27 +25,28 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
 class PlotTabWidgets(QTabWidget):
        
     sig_rx = pyqtSignal(dict)
-    sig_tx = pyqtSignal(dict) # not used yet
+#    sig_tx = pyqtSignal(dict) # not used yet
     
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
         self.pltHf = plot_hf.PlotHf(self)
+        self.sig_rx.connect(self.pltHf.sig_rx)
         
         self.pltPhi = plot_phi.PlotPhi(self)
-        self.sig_tx.connect(self.pltPhi.sig_rx)
+        self.sig_rx.connect(self.pltPhi.sig_rx)
         
         self.pltPZ = plot_pz.PlotPZ(self)
-        self.sig_tx.connect(self.pltPZ.sig_rx)
+        self.sig_rx.connect(self.pltPZ.sig_rx)
         
         self.pltTauG = plot_tau_g.PlotTauG(self)
-        self.sig_tx.connect(self.pltTauG.sig_rx)
+        self.sig_rx.connect(self.pltTauG.sig_rx)
         
         self.pltImpz = plot_impz.PlotImpz(self)
-        self.sig_tx.connect(self.pltImpz.ui.sig_rx)
+        self.sig_rx.connect(self.pltImpz.ui.sig_rx)
         
         self.plt3D = plot_3d.Plot3D(self)
-        self.sig_tx.connect(self.plt3D.sig_rx)
+        self.sig_rx.connect(self.plt3D.sig_rx)
 
         self._construct_UI()
 
@@ -68,10 +69,8 @@ class PlotTabWidgets(QTabWidget):
         self.setLayout(layVMain)
         
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-        # local signals:
-        
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------        
         self.timer_id = QtCore.QTimer()
         self.timer_id.setSingleShot(True)
         # redraw current widget at timeout (timer was triggered by resize event):
@@ -84,8 +83,19 @@ class PlotTabWidgets(QTabWidget):
 
         self.tabWidget.installEventFilter(self)
         
-        # global signals
-        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+#        self.sig_rx.connect(self.process_signals)
+#        #------------------------------------------------------------------------------
+#    @pyqtSlot(object)
+#    def process_signals(self, sig_dict):
+#        """
+#        Process signals coming in via sig_rx
+#        """
+#        logger.debug("sig_rx = {0}".format(sig_dict))
+#        self.sig_tx.emit(sig_dict)
+
         
         """
         https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
@@ -118,23 +128,6 @@ class PlotTabWidgets(QTabWidget):
         """
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
-    def process_signals(self, sig_dict):
-        """
-        Process signals coming in via sig_rx
-        """
-        logger.debug("sig_rx = {0}".format(sig_dict))
-
-        if 'specs_changed' in sig_dict.keys():
-               self.update_view(sig_dict) 
-        elif 'view_changed' in sig_dict.keys():
-               self.update_view(sig_dict)
-        elif 'data_changed' in sig_dict.keys():
-               self.update_data(sig_dict)
-        else:
-            logger.warning("Dict not understood: {0}".format(sig_dict))
-
-#------------------------------------------------------------------------------
         
 #    @QtCore.pyqtSlot(int)
 #    def tab_changed(self,argTabIndex):
@@ -159,31 +152,7 @@ class PlotTabWidgets(QTabWidget):
 
         # Call base class method to continue normal event processing:
         return super(PlotTabWidgets, self).eventFilter(source, event)
-
-#------------------------------------------------------------------------------
-    def update_data(self, sig_dict):
-        """
-        Calculate subplots with new filter DATA and redraw them
-        """
-        logger.debug("update_data (filter designed)")
-        if sig_dict:
-            self.sig_tx.emit(sig_dict)
-        else:
-            self.sig_tx.emit({'sender':__name__, 'data_changed':''})
-        self.pltHf.draw()
-
-#------------------------------------------------------------------------------
-    def update_view(self, sig_dict):
-        """
-        Update plot limits with new filter SPECS and redraw all subplots
-        """
-        logger.debug("update_view (specs changed)")
-        if sig_dict:
-            self.sig_tx.emit(sig_dict)
-        else:
-            self.sig_tx.emit({'sender':__name__, 'view_changed':''})
-        self.pltHf.update_view()
-        
+       
 #------------------------------------------------------------------------
 
 def main():
