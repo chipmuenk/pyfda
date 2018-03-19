@@ -31,7 +31,10 @@ class PlotTabWidgets(QTabWidget):
         super(PlotTabWidgets, self).__init__(parent)
 
         self.pltHf = plot_hf.PlotHf(self)
+        
         self.pltPhi = plot_phi.PlotPhi(self)
+        self.sig_tx.connect(self.pltPhi.sig_rx)
+        
         self.pltPZ = plot_pz.PlotPZ(self)
 
         self.pltTauG = plot_tau_g.PlotTauG(self)
@@ -166,7 +169,6 @@ class PlotTabWidgets(QTabWidget):
         else:
             self.sig_tx.emit({'sender':__name__, 'data_changed':''})
         self.pltHf.draw()
-        self.pltPhi.draw()
         self.pltPZ.draw()
         self.plt3D.draw()
 
@@ -181,7 +183,6 @@ class PlotTabWidgets(QTabWidget):
         else:
             self.sig_tx.emit({'sender':__name__, 'view_changed':''})
         self.pltHf.update_view()
-        self.pltPhi.update_view()
         
 #------------------------------------------------------------------------
 

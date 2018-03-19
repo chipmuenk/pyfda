@@ -10,7 +10,7 @@ Widget for plotting phase frequency response phi(f)
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
-from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSlot
+from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSlot, pyqtSignal
 
 import numpy as np
 
@@ -21,6 +21,11 @@ from pyfda.pyfda_lib import calc_Hcomplex
 
 
 class PlotPhi(QWidget):
+    
+    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    sig_rx = pyqtSignal(dict)
+#    sig_tx = pyqtSignal(dict) # outgoing from process_signals
+
 
     def __init__(self, parent):
         super(PlotPhi, self).__init__(parent)
@@ -76,25 +81,31 @@ class PlotPhi(QWidget):
 
         self.draw() # initial drawing
 
-#        #=============================================
-#        # Signals & Slots
-#        #=============================================
+
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
-
+        
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
         Process signals coming from the navigation toolbar
         """
-        if 'update_view' in sig_dict:
+        if 'view_changed' in sig_dict:
             self.update_view()
+        elif 'data_changed' in sig_dict or 'home' in sig_dict:
+            self.draw()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'home' in sig_dict:
-            self.draw()
         else:
             pass
 
