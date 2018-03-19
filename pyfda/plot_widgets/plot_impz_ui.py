@@ -27,7 +27,6 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-
     sig_rx = pyqtSignal(dict) # incoming
     sig_tx = pyqtSignal(dict) # outgoing
 
@@ -73,6 +72,19 @@ class PlotImpz_UI(QWidget):
         self._log_mode()
         self.update_N() # slso updates window
         self._update_noi()
+
+#------------------------------------------------------------------------------
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming from the navigation toolbar
+        """
+        logger.debug("Processing {0}".format(sig_dict))
+        if 'data_changed' in sig_dict:
+            self.update_N(sig_dict) # this passes sig_dict on to sig_tx as well
+        else:
+            self.sig_tx.emit(sig_dict)
+            
 
     def _construct_UI(self):
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
@@ -280,9 +292,12 @@ class PlotImpz_UI(QWidget):
         self.wdgHControlsF.setLayout(layHControlsF)
 
         #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.sig_tx)
         self.ledN_start.editingFinished.connect(self.update_N)
         self.ledN_points.editingFinished.connect(self.update_N)
         self.chkLog.clicked.connect(self._log_mode)
@@ -303,6 +318,7 @@ class PlotImpz_UI(QWidget):
         
         self.chkLogF.clicked.connect(self._log_mode)
         self.ledLogBottomF.editingFinished.connect(self._log_mode)
+        # careful! currentIndexChanged passes the current index to _update_window
         self.cmbWindow.currentIndexChanged.connect(self._update_window)
         self.ledWinPar1.editingFinished.connect(self._update_window)
        
@@ -323,7 +339,7 @@ class PlotImpz_UI(QWidget):
         self.setLayout(layVMain)
         
         
-    def update_N(self, emit=True):
+    def update_N(self, sig_dict=None):
         """
         Update values for self.N and self.N_start from the QLineEditWidget
         When emit=False, block emitting a signal in _update_window()
@@ -339,7 +355,7 @@ class PlotImpz_UI(QWidget):
         
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
         
-        self._update_window(emit=emit)
+        self._update_window(sig_dict)
 
 
     def _update_chk_boxes(self):
@@ -444,7 +460,7 @@ class PlotImpz_UI(QWidget):
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'data_changed':'dc'})
         
-    def _update_window(self, emit=True):
+    def _update_window(self, sig_dict=None):
         """ Update window type for FFT """
 
         def _update_param1():
@@ -515,8 +531,10 @@ class PlotImpz_UI(QWidget):
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
 
-        if emit:
+        if not sig_dict or type(sig_dict) != 'dict':
             self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
+        else:
+            self.sig_tx.emit(sig_dict)
 
 #------------------------------------------------------------------------------        
     def calc_n_points(self, N_user = 0):

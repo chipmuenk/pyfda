@@ -64,8 +64,8 @@ class PlotImpz(QWidget):
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
-        self.ui.sig_tx.connect(self.process_signals)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals) # connect to toolbar
+        self.ui.sig_tx.connect(self.process_signals) # connect to widgets and signals upstream
 
         self.draw() # initial calculation and drawing
 
@@ -76,12 +76,12 @@ class PlotImpz(QWidget):
         Process signals coming from the navigation toolbar
         """
         logger.debug("processing {0}".format(sig_dict))
-        if 'home' in sig_dict:
+        if 'home' in sig_dict  or 'view_changed' in sig_dict:
             self.update_view()
         elif 'enabled' in sig_dict:
             self.enable_ui(sig_dict['enabled'])
-        elif 'data_changed' in sig_dict or 'specs_changed' in sig_dict\
-                or 'view_changed' in sig_dict: # changing of f_s has to update the plot - more differentiation needed
+        elif 'data_changed' in sig_dict or 'specs_changed' in sig_dict:
+                # changing of f_s has to update the plot - more differentiation needed
             self.draw()
         else:
             logger.debug("{0}: dict {1} passed thru".format(__name__, sig_dict))
@@ -222,7 +222,6 @@ class PlotImpz(QWidget):
         """
         (Re-)calculate stimulus x[n] and filter response y[n]
         """
-        self.ui.update_N(emit=False) # for a new filter, N and win need to be updated
         self.n = np.arange(self.ui.N_end)
         self.t = self.n / fb.fil[0]['f_S']
 
@@ -311,13 +310,13 @@ class PlotImpz(QWidget):
             self.y_i = None
 
         # calculate FFT of stimulus / response
-        if self.ui.plt_freq in {"Stimulus", "Both"}:
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+#        if self.ui.plt_freq in {"Stimulus", "Both"}:
+        x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+        self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
 
-        if self.ui.plt_freq in {"Response", "Both"}:
-            y_win = y[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
+#        if self.ui.plt_freq in {"Response", "Both"}:
+        y_win = y[self.ui.N_start:self.ui.N_end] * self.ui.win
+        self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
 
 #------------------------------------------------------------------------------
     def update_view(self):
