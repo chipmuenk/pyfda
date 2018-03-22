@@ -23,7 +23,8 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
-       
+
+    # incoming, connected in sender widget (pyfdax)       
     sig_rx = pyqtSignal(dict)
 #    sig_tx = pyqtSignal(dict) # not used yet
     
