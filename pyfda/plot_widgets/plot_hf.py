@@ -10,6 +10,8 @@
 Widget for plotting |H(f)|, frequency specs and the phase
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+import logging
+logger = logging.getLogger(__name__)
 
 from ..compat import (QCheckBox, QWidget, QComboBox, QLabel, QHBoxLayout, QFrame, 
                       pyqtSlot, pyqtSignal)
@@ -34,7 +36,13 @@ class PlotHf(QWidget):
 
     def __init__(self, parent): 
         super(PlotHf, self).__init__(parent)
+        self.dirty = True # flag whether plot needs to be updated
+        self._construct_ui()
 
+    def _construct_ui(self):
+        """
+        Define and construct the subwidgets
+        """
         modes = ['| H |', 're{H}', 'im{H}']
         self.cmbShowH = QComboBox(self)
         self.cmbShowH.addItems(modes)
@@ -131,21 +139,26 @@ class PlotHf(QWidget):
         self.chkPhase.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
-        
+                
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
-        Process signals coming from the navigation toolbar
+        Process signals coming from the navigation toolbar and from sig_rx
         """
-        if 'view_changed' in sig_dict:
-            self.update_view()
-        elif 'data_changed' in sig_dict or 'specs_changed' in sig_dict or 'home' in sig_dict:
-            self.draw()
-        elif 'enabled' in sig_dict:
-            self.enable_ui(sig_dict['enabled'])
+        logger.debug("Processing {0}\ndirty = {1}, visible = {2}".format(sig_dict, self.dirty, self.isVisible()))
+        if self.isVisible():
+            if 'data_changed' in sig_dict or 'specs_changed' in sig_dict or 'home' in sig_dict or self.dirty:
+                self.draw()
+                self.dirty = False
+            elif 'enabled' in sig_dict:
+                self.enable_ui(sig_dict['enabled']) 
         else:
-            pass
+            if 'data_changed' in sig_dict or 'specs_changed' in sig_dict:
+                self.dirty = True
+            else:
+                pass
+
 
 #------------------------------------------------------------------------------
     def init_axes(self):

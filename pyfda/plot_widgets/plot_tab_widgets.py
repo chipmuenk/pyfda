@@ -136,10 +136,9 @@ class PlotTabWidgets(QTabWidget):
 
 #------------------------------------------------------------------------------
         
-#    @QtCore.pyqtSlot(int)
-#    def tab_changed(self,argTabIndex):
     def current_tab_redraw(self):
-        self.tabWidget.currentWidget().redraw()
+        #self.tabWidget.currentWidget().redraw()
+        self.sig_tx.emit({'sender':__name__, 'tab_changed':True})
             
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
