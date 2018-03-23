@@ -45,7 +45,7 @@ class PlotTabWidgets(QTabWidget):
         self.sig_tx.connect(self.pltTauG.sig_rx)
         
         self.pltImpz = plot_impz.PlotImpz(self)
-        self.sig_tx.connect(self.pltImpz.ui.sig_rx)
+        self.sig_rx.connect(self.pltImpz.ui.sig_rx)
         
         self.plt3D = plot_3d.Plot3D(self)
         self.sig_tx.connect(self.plt3D.sig_rx)
@@ -93,7 +93,7 @@ class PlotTabWidgets(QTabWidget):
         
         
     @pyqtSlot(object)
-    def process_signals(self, sig_dict=None):
+    def process_signals(self, sig_dict):
         """
         Process signals coming in via sig_rx
         """
