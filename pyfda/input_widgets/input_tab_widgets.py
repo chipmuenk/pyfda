@@ -38,7 +38,8 @@ class InputTabWidgets(QWidget):
     # signals as class variables (shared between instances if more than one exists)
     # incoming, connected here to individual senders, passed on to process sigmals
     sig_rx = pyqtSignal(dict)
-    sig_tx = pyqtSignal(dict) # connected in receiver (pyfdax -> plot_tab_widgets)
+    # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
+    sig_tx = pyqtSignal(dict)
 
 
     def __init__(self, parent):
