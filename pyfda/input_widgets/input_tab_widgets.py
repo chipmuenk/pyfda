@@ -121,16 +121,14 @@ class InputTabWidgets(QWidget):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:
         self.filter_specs.sigFilterDesigned.connect(self.update_data)
-        self.filter_coeffs.sigFilterDesigned.connect(self.update_data)
-        self.filter_pz.sigFilterDesigned.connect(self.update_data)
 
-        # The following three widgets require a reloading of the select_filter
+        # The following widgets require a reloading of the select_filter
         # widget to update the filter selection:
         self.filter_coeffs.sigFilterDesigned.connect(self.update_filter_data) #??
         self.filter_coeffs.ui.sig_tx.connect(self.filter_pz.ui.sig_rx)
         self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
         self.filter_pz.sigFilterDesigned.connect(self.update_filter_data)
-#        self.file_io.sigFilterLoaded.connect(self.load_all)
+#        self.file_io.sigFilterLoaded.connect(self.load_all) # converted to rx-tx
         
         self.sig_rx.connect(self.process_signals)
         #----------------------------------------------------------------------
