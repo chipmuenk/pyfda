@@ -97,7 +97,7 @@ class PlotTabWidgets(QTabWidget):
         """
         Process signals coming in via sig_rx
         """
-        logger.debug("Processing {0}".format(sig_dict))
+        logger.error("Processing {0}{1}".format(type(sig_dict), sig_dict))
         if type(sig_dict) != 'dict':
             sig_dict = {'sender':__name__}
 

@@ -140,7 +140,7 @@ class InputTabWidgets(QWidget):
         """
         Process signals coming from sig_rx
         """
-        logger.error("processing {0}".format(sig_dict))
+        logger.error("Processing {0}".format(sig_dict))
         if 'load_dict' in sig_dict:
             self.load_dict()
             logger.error("loaded dict")
