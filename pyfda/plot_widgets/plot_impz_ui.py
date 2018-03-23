@@ -27,9 +27,10 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    # incoming: from connector widget plot_tab_widgets to self.process_signals() 
     sig_rx = pyqtSignal(dict)
-    sig_tx = pyqtSignal(dict) # outgoing from process_signals, connected to PlotImpz
+    # outgoing: from process_signals() to PlotImpz
+    sig_tx = pyqtSignal(dict) 
 
     def __init__(self, parent):
         """

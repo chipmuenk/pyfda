@@ -31,6 +31,7 @@ class PlotImpz(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
+    # no global signals, PlotImpzUI.sig_tx connects directly to process_signals()
     def __init__(self, parent):
         super(PlotImpz, self).__init__(parent)
 
