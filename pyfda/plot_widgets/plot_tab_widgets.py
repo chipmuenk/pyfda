@@ -33,22 +33,23 @@ class PlotTabWidgets(QTabWidget):
         super(PlotTabWidgets, self).__init__(parent)
 
         self.pltHf = plot_hf.PlotHf(self)
-        self.sig_tx.connect(self.pltHf.sig_rx)
-        
+        # self.sig_tx.connect(self.pltHf.sig_rx) # why doesn't this work?
+        self.sig_rx.connect(self.pltHf.sig_rx)
+
         self.pltPhi = plot_phi.PlotPhi(self)
-        self.sig_tx.connect(self.pltPhi.sig_rx)
+        self.sig_rx.connect(self.pltPhi.sig_rx)
         
         self.pltPZ = plot_pz.PlotPZ(self)
-        self.sig_tx.connect(self.pltPZ.sig_rx)
+        self.sig_rx.connect(self.pltPZ.sig_rx)
         
         self.pltTauG = plot_tau_g.PlotTauG(self)
-        self.sig_tx.connect(self.pltTauG.sig_rx)
+        self.sig_rx.connect(self.pltTauG.sig_rx)
         
         self.pltImpz = plot_impz.PlotImpz(self)
         self.sig_rx.connect(self.pltImpz.ui.sig_rx)
         
         self.plt3D = plot_3d.Plot3D(self)
-        self.sig_tx.connect(self.plt3D.sig_rx)
+        self.sig_rx.connect(self.plt3D.sig_rx)
 
         self._construct_UI()
 
@@ -97,7 +98,7 @@ class PlotTabWidgets(QTabWidget):
         """
         Process signals coming in via sig_rx
         """
-        logger.error("Processing {0}{1}".format(type(sig_dict), sig_dict))
+        logger.debug("Processing {0}{1}".format(type(sig_dict), sig_dict))
         if type(sig_dict) != 'dict':
             sig_dict = {'sender':__name__}
 
