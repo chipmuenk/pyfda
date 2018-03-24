@@ -64,7 +64,7 @@ class XStream(QtCore.QObject):
 
     def write(self, msg):
         if not self.signalsBlocked():
-            msg = to_html(msg)
+            msg = to_html(msg,frmt='log')
 
             self.messageWritten.emit(msg)
 
