@@ -1562,14 +1562,14 @@ def to_html(text, frmt=None):
     # mappings text -> HTML formatted logging messages
     mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
                 ('[  DEBUG]','<b>[  DEBUG]</b>'),
-                ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
-                ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
+                ('[   INFO]','<b style="color:darkgreen;">[   INFO]</b>'),
+                ('[WARNING]','<b style="color:orange;">[WARNING]</b>'),
                 ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
               ]
 
     for k, v in mapping:
-         html = text.replace(k, v)
-
+         text = text.replace(k, v)
+    html = text
     if frmt in {'i', 'bi', 'ib'}:
         html = "<i>" + html + "</i>"
     if frmt in {'b', 'bi', 'ib'}:

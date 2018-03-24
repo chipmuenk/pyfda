@@ -146,7 +146,7 @@ class PlotHf(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0}\ndirty = {1}, visible = {2}".format(sig_dict, self.dirty, self.isVisible()))
+        logger.debug("Processing {0} | dirty = {1}, visible = {2}".format(sig_dict, self.dirty, self.isVisible()))
         if self.isVisible():
             if 'data_changed' in sig_dict or 'specs_changed' in sig_dict or 'home' in sig_dict or self.dirty:
                 self.draw()

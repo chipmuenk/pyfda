@@ -240,22 +240,23 @@ def main():
     *before* any other objects related to the user interface are created."     
     """
      # instantiate QApplication object, passing command line arguments
-
     if len(rc.qss_rc) > 20:
         app = QApplication(sys.argv)
         app.setStyleSheet(rc.qss_rc) # this is a proper style sheet
+        style = "Using 'pyfda' style sheet."
     else:
         qstyle = QApplication.setStyle(rc.qss_rc) # no, this is just a name for a system stylesheet
-        if qstyle:
-            logger.info('Using system style "{0}".'.format(rc.qss_rc))
-            print(qstyle, "found")
-        else:
-            logger.warning('Style "{0}" not found, falling back to default style.'.format(rc.qss_rc))
-            print("not found")
         app = QApplication(sys.argv)
+        if qstyle:
+            style = 'Using system style "{0}".'.format(rc.qss_rc)
+        else:
+            style = 'Style "{0}" not found, falling back to default style.'.format(rc.qss_rc)
+        
     app.setWindowIcon(QIcon(':/pyfda_icon.svg'))
 
     mainw = pyFDA()
+    logger.info("Logging to {0}".format(dirs.LOG_DIR_FILE))
+    logger.info(style)
 
     # Sets the active window to the active widget in response to a system event.
     app.setActiveWindow(mainw) 
