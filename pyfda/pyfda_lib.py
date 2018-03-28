@@ -114,7 +114,10 @@ def mod_version(mod = None):
         v = ""
         keys = sorted(list(VERSION.keys()))
         for k in keys:
-            v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
+            if VERSION[k]:
+                v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
+            else:
+                v += "\t{0: <11} : missing\n".format(k)
         return v
 
 
