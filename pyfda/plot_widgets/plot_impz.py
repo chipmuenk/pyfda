@@ -31,6 +31,7 @@ class PlotImpz(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
+    # no global signals, PlotImpzUI.sig_tx connects directly to process_signals()
     def __init__(self, parent):
         super(PlotImpz, self).__init__(parent)
 
@@ -75,7 +76,7 @@ class PlotImpz(QWidget):
         """
         Process signals coming from the navigation toolbar
         """
-        logger.debug("processing {0}".format(sig_dict))
+        logger.debug("Processing {0}".format(sig_dict))
         if 'home' in sig_dict  or 'view_changed' in sig_dict:
             self.update_view()
         elif 'enabled' in sig_dict:

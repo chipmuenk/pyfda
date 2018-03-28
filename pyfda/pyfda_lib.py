@@ -38,7 +38,7 @@ PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit 
 
 VERSION = {}
 # VERSION.update({'python_long': sys.version})
-VERSION.update({'python': ".".join(map(str, sys.version_info[:3])) 
+VERSION.update({'python': ".".join(map(str, sys.version_info[:3]))
                             + " (" + str(PY32_64) + " Bit)"})
 VERSION.update({'matplotlib': VERSION_MPL})
 VERSION.update({'pyqt': QT_VERSION_STR})
@@ -82,7 +82,7 @@ except ImportError:
     pass
 
 PY3 = sys.version_info > (3,) # True for Python 3
-CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n" 
+CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
 def cmp_version(mod, version):
     """
@@ -119,7 +119,7 @@ def mod_version(mod = None):
             else:
                 v += "\t{0: <11} : missing\n".format(k)
         return v
-    
+
 
 #------------------------------------------------------------------------------
 
@@ -136,7 +136,7 @@ MIN_SB_AMP  = 1e-6  # max stop band attenuation
 MAX_ISB_AMP = 0.65  # min stop band attenuation IIR
 MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 
-    
+
 # https://stackoverflow.com/questions/847850/cross-platform-way-of-getting-temp-directory-in-python
 
 ###############################################################################
@@ -199,7 +199,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     -------
     float (default) / complex / int : the evaluated result or 0 when both arguments fail.
 
-    function attribute `err` contains number of errors that have occurred during 
+    function attribute `err` contains number of errors that have occurred during
     evaluation (0 / 1 / 2)
     """
     result = None
@@ -221,7 +221,7 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = ex_num.real
                 elif return_type == 'int':
                     result = np.int64(ex_num)
-            except (se.InvalidExpression, se.FunctionNotDefined, Exception, 
+            except (se.InvalidExpression, se.FunctionNotDefined, Exception,
                     SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
 
                     logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
@@ -1149,7 +1149,7 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
     if 'baA' in fil_dict: fil_dict.pop('baA')
     if 'rpk' in fil_dict: fil_dict.pop('rpk')
 
-    if convert:    
+    if convert:
         fil_convert(fil_dict, format_in)
 
 #==============================================================================
@@ -1245,7 +1245,7 @@ def fil_convert(fil_dict, format_in):
 
     else:
         raise ValueError("Unknown input format {0:s}".format(format_in))
-        
+
     # eliminate complex coefficients created by numerical inaccuracies
     fil_dict['ba'] = np.real_if_close(fil_dict['ba'], tol=100) # tol specified in multiples of machine eps
 
@@ -1515,7 +1515,7 @@ def to_html(text, frmt=None):
         - pretty-print logger messages
         - convert "\\n" to "<br />
         - convert "< " and "> " to "&lt;" and "&gt;"
-        - format strings with italic and / or bold HTML tags, depending on 
+        - format strings with italic and / or bold HTML tags, depending on
           parameter `frmt`. When `frmt=None`, put the returned string between
           <span> tags to enforce HTML rendering downstream
         - replace '_' by HTML subscript tags. Numbers 0 ... 9 are never set to
@@ -1529,7 +1529,7 @@ def to_html(text, frmt=None):
 
     frmt: string
         define text style
-        
+
         - 'b' : bold text
         - 'i' : italic text
         - 'bi' or 'ib' : bold and italic text
@@ -1554,36 +1554,36 @@ def to_html(text, frmt=None):
     # \w : meta character for [a-zA-Z0-9_]
     # \s : meta character for all sorts of whitespace
     # [123][abc] test for e.g. '2c'
-    # '^' means "not", '|' means "or" and '\' escapes, '.' means any character, 
+    # '^' means "not", '|' means "or" and '\' escapes, '.' means any character,
     # '+' means once or more, '?' means zero or once, '*' means zero or more
     #   '[^a]' means except for 'a'
     # () defines a group that can be referenced by \1, \2, ...
     #
     # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
     # '(' must be escaped as '\('
-    
+
     # mappings text -> HTML formatted logging messages
     mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
                 ('[  DEBUG]','<b>[  DEBUG]</b>'),
-                ('[   INFO]','<b style="color:darkgreen">[   INFO]</b>'),
-                ('[WARNING]','<b style="color:orange">[WARNING]</b>'),
+                ('[   INFO]','<b style="color:darkgreen;">[   INFO]</b>'),
+                ('[WARNING]','<b style="color:orange;">[WARNING]</b>'),
                 ('[  ERROR]','<b style="color:red">[  ERROR]</b>')
               ]
 
     for k, v in mapping:
          text = text.replace(k, v)
-
+    html = text
     if frmt in {'i', 'bi', 'ib'}:
-        text = "<i>" + text + "</i>"
+        html = "<i>" + html + "</i>"
     if frmt in {'b', 'bi', 'ib'}:
-        text = "<b>" + text + "</b>"
+        html = "<b>" + html + "</b>"
     if frmt == None:
-        text = "<span>" + text + "</span>"
+        html = "<span>" + html + "</span>"
 
-    html = re.sub(r'([a-zA-Z])_(\w{1,3})', r'\1<sub>\2</sub>', text)
-    
+    if frmt != 'log': # this is a label, not a logger message
+        html = re.sub(r'([a-zA-Z])_(\w+)', r'\1<sub>\2</sub>', html)
+
     #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
-
     # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
 
     return html
@@ -1602,7 +1602,7 @@ def calc_Hcomplex(fil_dict, param, wholeF):
     ac  = fil_dict['ba'][1]
 
     # standard call to signal freqz
-    W, H = sig.freqz(bc, ac, worN = param, whole = wholeF) 
+    W, H = sig.freqz(bc, ac, worN = param, whole = wholeF)
 
     # test for NonCausal filter
     if ('rpk' in fil_dict):
@@ -1626,7 +1626,7 @@ def calc_Hcomplex(fil_dict, param, wholeF):
        H = H*ha
 
     return (W, H)
-    
+
 #------------------------------------------------------------------------------
 
 if __name__=='__main__':

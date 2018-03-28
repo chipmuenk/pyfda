@@ -36,7 +36,9 @@ class InputTabWidgets(QWidget):
     Create a tabbed widget for various input subwidgets
     """
     # signals as class variables (shared between instances if more than one exists)
+    # incoming, connected here to individual senders, passed on to process sigmals
     sig_rx = pyqtSignal(dict)
+    # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
     sig_tx = pyqtSignal(dict)
 
 
@@ -49,6 +51,8 @@ class InputTabWidgets(QWidget):
 
         self.file_io = file_io.File_IO(self)
         self.file_io.setObjectName("inputFiles")
+        self.file_io.sig_tx.connect(self.sig_rx)
+        
         self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
         self.filter_coeffs.setObjectName("filter_coeffs")
         self.filter_pz = filter_pz.FilterPZ(self)
@@ -118,16 +122,14 @@ class InputTabWidgets(QWidget):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:
         self.filter_specs.sigFilterDesigned.connect(self.update_data)
-        self.filter_coeffs.sigFilterDesigned.connect(self.update_data)
-        self.filter_pz.sigFilterDesigned.connect(self.update_data)
 
-        # The following three widgets require a reloading of the select_filter
+        # The following widgets require a reloading of the select_filter
         # widget to update the filter selection:
-        self.filter_coeffs.sigFilterDesigned.connect(self.load_all)
+        self.filter_coeffs.sigFilterDesigned.connect(self.update_filter_data) #??
         self.filter_coeffs.ui.sig_tx.connect(self.filter_pz.ui.sig_rx)
         self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
-        self.filter_pz.sigFilterDesigned.connect(self.load_all)
-        self.file_io.sigFilterLoaded.connect(self.load_all)
+        self.filter_pz.sigFilterDesigned.connect(self.update_filter_data)
+#        self.file_io.sigFilterLoaded.connect(self.load_all) # converted to rx-tx
         
         self.sig_rx.connect(self.process_signals)
         #----------------------------------------------------------------------
@@ -138,17 +140,22 @@ class InputTabWidgets(QWidget):
         """
         Process signals coming from sig_rx
         """
-        if self.sender(): # origin of signal that triggered the slot
-            sender_name = self.sender().objectName()
-            sender_text = self.sender().text()
-            sender_class = self.sender().__class__.__name__
-            print("sender = ", sender_text, sender_class, sender_name, self.__class__.__name__)
-            logger.debug("process_signals called by {0}".format(sender_name))
-
+        logger.error("Processing {0}".format(sig_dict))
         if 'load_dict' in sig_dict:
             self.load_dict()
+            logger.error("loaded dict")
+        elif 'view_changed' in sig_dict:
+            self.update_view()
+        elif 'specs_changed' in sig_dict:
+            self.update_specs()
+        elif 'data_changed' in sig_dict:
+            if sig_dict['data_changed'] == 'filter_loaded':
+                self.update_filter_data()
+            else:
+                self.update_data()
         else:
-            pass
+            logger.debug("{0}: dict {1} passed thru".format(__name__, sig_dict))
+
 
 
     def update_view(self):
@@ -186,18 +193,16 @@ class InputTabWidgets(QWidget):
         logger.debug("Emit sig_tx = 'specs_changed'")
         self.sig_tx.emit({'sender':__name__,'specs_changed':True})
 
-    def load_all(self):
+    def update_filter_data(self):
         """
         Called when a new filter has been LOADED:
         Pass new filter data from the global filter dict
         - Specifically call SelectFilter.load_dict
         - Update the input widgets that can / need to display filter data
-        - Update all plot widgets via sig_tx = 'filter_designed'
+          and all plot widgets via `update_data()`.
         """
-        self.filter_specs.color_design_button("ok")
         self.filter_specs.sel_fil.load_dict() # update select_filter widget
         self.update_data()
-
 
     def update_data(self):
         """
@@ -206,9 +211,10 @@ class InputTabWidgets(QWidget):
         Called when a new filter has been DESIGNED:
         - Pass new filter data from the global filter dict
         - Update the input widgets that can / need to display filter data
-        - Update all plot widgets via the sig_tx = 'filter_designed'
+        - Update all plot widgets by emitting sig_tx = 'data_changed':True
 
         """
+        self.filter_specs.color_design_button("ok")
         sender_name = ""
         if self.sender(): # origin of signal that triggered the slot
             sender_name = self.sender().objectName()

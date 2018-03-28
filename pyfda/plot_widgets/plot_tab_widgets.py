@@ -23,16 +23,19 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
-       
+
+    # incoming, connected to input_tab_widget.sig_tx in pyfdax    
     sig_rx = pyqtSignal(dict)
-#    sig_tx = pyqtSignal(dict) # not used yet
+    # outgoing: emitted by process_signals  
+    sig_tx = pyqtSignal(dict)
     
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
 
         self.pltHf = plot_hf.PlotHf(self)
+        # self.sig_tx.connect(self.pltHf.sig_rx) # why doesn't this work?
         self.sig_rx.connect(self.pltHf.sig_rx)
-        
+
         self.pltPhi = plot_phi.PlotPhi(self)
         self.sig_rx.connect(self.pltPhi.sig_rx)
         
@@ -69,6 +72,12 @@ class PlotTabWidgets(QTabWidget):
         self.setLayout(layVMain)
         
         #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+
+        #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
         self.timer_id = QtCore.QTimer()
@@ -83,18 +92,17 @@ class PlotTabWidgets(QTabWidget):
 
         self.tabWidget.installEventFilter(self)
         
-        #----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-#        self.sig_rx.connect(self.process_signals)
-#        #------------------------------------------------------------------------------
-#    @pyqtSlot(object)
-#    def process_signals(self, sig_dict):
-#        """
-#        Process signals coming in via sig_rx
-#        """
-#        logger.debug("sig_rx = {0}".format(sig_dict))
-#        self.sig_tx.emit(sig_dict)
+        
+    @pyqtSlot(object)
+    def process_signals(self, sig_dict):
+        """
+        Process signals coming in via sig_rx
+        """
+        logger.debug("Processing {0}{1}".format(type(sig_dict), sig_dict))
+        if type(sig_dict) != 'dict':
+            sig_dict = {'sender':__name__}
+
+        self.sig_tx.emit(sig_dict)
 
         
         """
@@ -129,10 +137,9 @@ class PlotTabWidgets(QTabWidget):
 
 #------------------------------------------------------------------------------
         
-#    @QtCore.pyqtSlot(int)
-#    def tab_changed(self,argTabIndex):
     def current_tab_redraw(self):
-        self.tabWidget.currentWidget().redraw()
+        #self.tabWidget.currentWidget().redraw()
+        self.sig_tx.emit({'sender':__name__, 'tab_changed':True})
             
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):

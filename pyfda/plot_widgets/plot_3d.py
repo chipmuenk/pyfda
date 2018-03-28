@@ -60,6 +60,7 @@ class Plot3D(QWidget):
         self.zmax = 4
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu_r'
+        self.dirty = True # flag whether plot is up-to-date
         self._construct_UI()
 
     def _construct_UI(self):
@@ -225,22 +226,27 @@ class Plot3D(QWidget):
         self.chkContour2D.clicked.connect(self.draw)
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
-        self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
+        #self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
     def process_signals(self, sig_dict):
         """
-        Process signals coming from the navigation toolbar
+        Process signals coming from the navigation toolbar and from sig_rx
         """
-        if 'view_changed' in sig_dict:
-            self.update_view()
-        elif 'data_changed' in sig_dict or 'home' in sig_dict:
-            self.draw()
-        elif 'enabled' in sig_dict:
-            self.enable_ui(sig_dict['enabled'])
+        logger.debug("Processing {0} | dirty = {1}, visible = {2}"\
+                     .format(sig_dict, self.dirty, self.isVisible()))
+        if self.isVisible():
+            if 'data_changed' in sig_dict or 'home' in sig_dict or self.dirty:
+                self.draw()
+                self.dirty = False
+            elif 'enabled' in sig_dict:
+                self.enable_ui(sig_dict['enabled']) 
         else:
-            pass
+            if 'data_changed' in sig_dict:
+                self.dirty = True
+            else:
+                pass
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):

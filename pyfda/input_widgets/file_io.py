@@ -58,8 +58,9 @@ class File_IO(QWidget):
     """
     Create the widget for saving / loading data
     """
-
-    sigFilterLoaded = QtCore.pyqtSignal() # emitted when filter has been loaded successfully
+    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    #sig_rx = QtCore.pyqtSignal(dict)
+    sig_tx = QtCore.pyqtSignal(dict) # outgoing from process_signals, connected to PlotImpz
 
     def __init__(self, parent):
         super(File_IO, self).__init__(parent)
@@ -160,7 +161,7 @@ class File_IO(QWidget):
                     if not file_type_err:
                         logger.info('Loaded filter "%s"', file_name)
                          # emit signal -> InputTabWidgets.load_all:
-                        self.sigFilterLoaded.emit()
+                        self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
                         dirs.save_dir = os.path.dirname(file_name)
             except IOError as e:
                 logger.error("Failed loading %s!\n%s", file_name, e)
