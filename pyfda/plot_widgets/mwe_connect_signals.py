@@ -10,8 +10,8 @@ from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, QAppl
 #------------------------------------------------------------------------------
 class TabWidgets(QTabWidget):
  
-    sig_rx = pyqtSignal(dict) # incoming signals
-    sig_tx = pyqtSignal(dict) # outgoing: emitted by process_signals  
+    sig_rx = pyqtSignal(object) # incoming signals
+    sig_tx = pyqtSignal(object) # outgoing: emitted by process_signals  
 
     def __init__(self, parent):
         super(TabWidgets, self).__init__(parent)
@@ -53,8 +53,8 @@ class Button1(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
-    sig_rx = pyqtSignal(dict) # incoming signals
-    sig_tx = pyqtSignal(dict) # outgoing signals
+    sig_rx = pyqtSignal(object) # incoming signals
+    sig_tx = pyqtSignal(object) # outgoing signals
 
     def __init__(self, parent):
         super(Button1, self).__init__(parent)
@@ -82,8 +82,8 @@ class Button2(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
-    sig_rx = pyqtSignal(dict) # incoming signals
-    sig_tx = pyqtSignal(dict) # outgoing: emitted by process_signals  
+    sig_rx = pyqtSignal(object) # incoming signals
+    sig_tx = pyqtSignal(object) # outgoing: emitted by process_signals  
 
     def __init__(self, parent):
         super(Button2, self).__init__(parent)
