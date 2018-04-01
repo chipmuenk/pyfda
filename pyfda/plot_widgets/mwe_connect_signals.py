@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Tabbed container with all plot widgets
+MWE for
 """
 from __future__ import print_function, division
 
-from PyQt5.QtCore import Qt, QEvent, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QTabWidget, QPushButton, QVBoxLayout, QApplication
-#from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QEvent, QtCore, pyqtSlot, pyqtSignal
 
 #------------------------------------------------------------------------------
 class TabWidgets(QTabWidget):
@@ -16,31 +15,25 @@ class TabWidgets(QTabWidget):
 
     def __init__(self, parent):
         super(TabWidgets, self).__init__(parent)
-
-        self.btn1 = Button1(self)
+        # instantiate all subwidgets and connect their tx signals to self.sig_rx:
+        self.wdg1 = Button1(self)
         # self.sig_tx.connect(self.pltHf.sig_rx) # why doesn't this work?
-        self.sig_rx.connect(self.btn1.sig_rx)
-        self.btn2 = Button2(self)
-        # self.sig_tx.connect(self.pltHf.sig_rx) # why doesn't this work?
-        self.sig_rx.connect(self.btn2.sig_rx)
+        self.wdg1.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.wdg1.sig_rx)
+        
+        self.wdg2 = Button2(self)
+        self.wdg2.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.wdg2.sig_rx)
+        # now connect self.sig_rx to the slot self.process_signals:
+        self.sig_rx.connect(self.process_signals)
 
-        self._construct_UI()
-
-#------------------------------------------------------------------------------
-    def _construct_UI(self):
-        """ Initialize UI with tabbed subplots """
         self.tabWidget = QTabWidget(self)
-        self.tabWidget.addTab(self.btn1, 'Btn 1')
-        self.tabWidget.addTab(self.btn2, 'Btn 2')
+        self.tabWidget.addTab(self.wdg1, 'Btn 1')
+        self.tabWidget.addTab(self.wdg2, 'Btn 2')
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tabWidget)
-
         self.setLayout(layVMain)
-        
-        #----------------------------------------------------------------------
-        # GLOBAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+
         #----------------------------------------------------------------------
 
     @pyqtSlot(object)
@@ -48,34 +41,41 @@ class TabWidgets(QTabWidget):
         """
         Process signals coming in via sig_rx
         """
-        if type(sig_dict) != 'dict':
-            sig_dict = {'sender':__name__}
-
+        print("TAB.process_signals(): received dict {0}".format(sig_dict))
+        if sig_dict['info'] == 'btn1':
+            print("TAB: btn1")
+        elif sig_dict['info'] == 'btn2':
+            print("TAB: btn2")
         self.sig_tx.emit(sig_dict)
 
-#------------------------------------------------------------------------------
-        
-    def current_tab_redraw(self):
-        #self.tabWidget.currentWidget().redraw()
-        self.sig_tx.emit({'sender':__name__, 'tab_changed':True})
-            
 #------------------------------------------------------------------------------   
 class Button1(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
     sig_rx = pyqtSignal(dict) # incoming signals
-    sig_tx = pyqtSignal(dict) # outgoing: emitted by process_signals  
+    sig_tx = pyqtSignal(dict) # outgoing signals
 
     def __init__(self, parent):
         super(Button1, self).__init__(parent)
-        self.button = QPushButton('Test', self)
+        self.button = QPushButton('Button 1', self)
         self.button.clicked.connect(self.handleButton)
+        self.sig_rx.connect(self.process_signals)
+
         layout = QVBoxLayout(self)
         layout.addWidget(self.button)
 
     def handleButton(self):
-        print ('Button 1 pressed')
+        self.sig_tx.emit({'sender':type(self).__name__, 'info':'btn1'})
+        
+    @pyqtSlot(object)        
+    def process_signals(self, sig_dict):
+        print("BTN1: Signal received.")
+        if sig_dict['sender'] == type(self).__name__:
+            print("BTN1: generated here!")
+            return
+        if sig_dict['info'] == 'btn2':
+            print("BTN1: btn2 pressed")
         
 #------------------------------------------------------------------------------   
 class Button2(QWidget):
@@ -87,13 +87,24 @@ class Button2(QWidget):
 
     def __init__(self, parent):
         super(Button2, self).__init__(parent)
-        self.button = QPushButton('Test 2', self)
+        self.button = QPushButton('Button 2', self)
         self.button.clicked.connect(self.handleButton)
+        self.sig_rx.connect(self.process_signals)
+
         layout = QVBoxLayout(self)
         layout.addWidget(self.button)
 
     def handleButton(self):
-        print ('Button 2 pressed')
+        self.sig_tx.emit({'sender':type(self).__name__, 'info':'btn2'})
+
+    @pyqtSlot(object)        
+    def process_signals(self, sig_dict):
+        print("BTN2: Signal received.")
+        if sig_dict['sender'] == type(self).__name__:
+            print("BTN2: generated here!")
+            return
+        if sig_dict['info'] == 'btn1':
+            print("BTN2: btn1 pressed")
 
        
 #------------------------------------------------------------------------
