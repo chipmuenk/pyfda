@@ -31,40 +31,42 @@ class PlotTabWidgets(QTabWidget):
     
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
-
-        self.pltHf = plot_hf.PlotHf(self)
-        # self.sig_tx.connect(self.pltHf.sig_rx) # why doesn't this work?
-        self.sig_rx.connect(self.pltHf.sig_rx)
-
-        self.pltPhi = plot_phi.PlotPhi(self)
-        self.sig_rx.connect(self.pltPhi.sig_rx)
-        
-        self.pltPZ = plot_pz.PlotPZ(self)
-        self.sig_rx.connect(self.pltPZ.sig_rx)
-        
-        self.pltTauG = plot_tau_g.PlotTauG(self)
-        self.sig_rx.connect(self.pltTauG.sig_rx)
-        
-        self.pltImpz = plot_impz.PlotImpz(self)
-        self.sig_rx.connect(self.pltImpz.ui.sig_rx)
-        
-        self.plt3D = plot_3d.Plot3D(self)
-        self.sig_rx.connect(self.plt3D.sig_rx)
-
         self._construct_UI()
 
 #------------------------------------------------------------------------------
     def _construct_UI(self):
-        """ Initialize UI with tabbed subplots """
+        """ 
+        Initialize UI with tabbed subplots and connect the signals of all
+        subwidgets.
+        """
+        # self.sig_tx.connect(self.pltHf.sig_rx) # why doesn't this work?
         self.tabWidget = QTabWidget(self)
         self.tabWidget.setObjectName("plot_tabs")
+        #
+        self.pltHf = plot_hf.PlotHf(self)
         self.tabWidget.addTab(self.pltHf, '|H(f)|')
+        self.sig_rx.connect(self.pltHf.sig_rx)
+        #
+        self.pltPhi = plot_phi.PlotPhi(self)
         self.tabWidget.addTab(self.pltPhi, 'phi(f)')
+        self.sig_rx.connect(self.pltPhi.sig_rx)
+        #
+        self.pltPZ = plot_pz.PlotPZ(self)
         self.tabWidget.addTab(self.pltPZ, 'P/Z')
+        self.sig_rx.connect(self.pltPZ.sig_rx)
+        #
+        self.pltTauG = plot_tau_g.PlotTauG(self)
         self.tabWidget.addTab(self.pltTauG, 'tau_g')
+        self.sig_rx.connect(self.pltTauG.sig_rx)
+        #
+        self.pltImpz = plot_impz.PlotImpz(self)
         self.tabWidget.addTab(self.pltImpz, 'h[n]')
+        self.sig_rx.connect(self.pltImpz.ui.sig_rx)
+        #
+        self.plt3D = plot_3d.Plot3D(self)
         self.tabWidget.addTab(self.plt3D, '3D')
-
+        self.sig_rx.connect(self.plt3D.sig_rx)
+        #
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tabWidget)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
@@ -104,7 +106,6 @@ class PlotTabWidgets(QTabWidget):
 
         self.sig_tx.emit(sig_dict)
 
-        
         """
         https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
 
