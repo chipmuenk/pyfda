@@ -22,8 +22,8 @@ from pyfda.pyfda_lib import calc_Hcomplex
 
 class PlotPhi(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_signals() )
-    sig_rx = pyqtSignal(dict)
-#    sig_tx = pyqtSignal(dict) # outgoing from process_signals
+    sig_rx = pyqtSignal(object)
+#    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
         super(PlotPhi, self).__init__(parent)
@@ -93,8 +93,8 @@ class PlotPhi(QWidget):
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    #@pyqtSlot(object)
+    def process_signals(self, sig_dict=None):
         """
         Process signals coming from the navigation toolbar
         """

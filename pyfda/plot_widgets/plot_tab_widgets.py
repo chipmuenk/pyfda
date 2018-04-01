@@ -25,9 +25,9 @@ from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_imp
 class PlotTabWidgets(QTabWidget):
 
     # incoming, connected to input_tab_widget.sig_tx in pyfdax    
-    sig_rx = pyqtSignal(dict)
+    sig_rx = pyqtSignal(object)
     # outgoing: emitted by process_signals  
-    sig_tx = pyqtSignal(dict)
+    sig_tx = pyqtSignal(object)
     
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
@@ -37,35 +37,35 @@ class PlotTabWidgets(QTabWidget):
     def _construct_UI(self):
         """ 
         Initialize UI with tabbed subplots and connect the signals of all
-        subwidgets.
+        subwidgets. Plot widgets are not sending back anything (yet), hence no
+        need to connect self.sig_rx to the subwidgets
         """
-        # self.sig_tx.connect(self.pltHf.sig_rx) # why doesn't this work?
         self.tabWidget = QTabWidget(self)
         self.tabWidget.setObjectName("plot_tabs")
         #
         self.pltHf = plot_hf.PlotHf(self)
         self.tabWidget.addTab(self.pltHf, '|H(f)|')
-        self.sig_rx.connect(self.pltHf.sig_rx)
+        self.sig_tx.connect(self.pltHf.sig_rx)
         #
         self.pltPhi = plot_phi.PlotPhi(self)
         self.tabWidget.addTab(self.pltPhi, 'phi(f)')
-        self.sig_rx.connect(self.pltPhi.sig_rx)
+        self.sig_tx.connect(self.pltPhi.sig_rx)
         #
         self.pltPZ = plot_pz.PlotPZ(self)
         self.tabWidget.addTab(self.pltPZ, 'P/Z')
-        self.sig_rx.connect(self.pltPZ.sig_rx)
+        self.sig_tx.connect(self.pltPZ.sig_rx)
         #
         self.pltTauG = plot_tau_g.PlotTauG(self)
         self.tabWidget.addTab(self.pltTauG, 'tau_g')
-        self.sig_rx.connect(self.pltTauG.sig_rx)
+        self.sig_tx.connect(self.pltTauG.sig_rx)
         #
         self.pltImpz = plot_impz.PlotImpz(self)
         self.tabWidget.addTab(self.pltImpz, 'h[n]')
-        self.sig_rx.connect(self.pltImpz.ui.sig_rx)
+        self.sig_tx.connect(self.pltImpz.ui.sig_rx)
         #
         self.plt3D = plot_3d.Plot3D(self)
         self.tabWidget.addTab(self.plt3D, '3D')
-        self.sig_rx.connect(self.plt3D.sig_rx)
+        self.sig_tx.connect(self.plt3D.sig_rx)
         #
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tabWidget)
@@ -78,8 +78,6 @@ class PlotTabWidgets(QTabWidget):
         #----------------------------------------------------------------------
         self.sig_rx.connect(self.process_signals)
         #----------------------------------------------------------------------
-
-        #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
         self.timer_id = QtCore.QTimer()
@@ -90,20 +88,19 @@ class PlotTabWidgets(QTabWidget):
         # When user has selected a different tab, trigger a redraw of current tab
         self.tabWidget.currentChanged.connect(self.current_tab_redraw)
         # The following does not work: maybe current scope must be left?
-        # self.tabWidget.currentChanged.connect(self.tabWidget.currentWidget().redraw) # 
+        # self.tabWidget.currentChanged.connect(self.tabWidget.currentWidget().redraw)
 
         self.tabWidget.installEventFilter(self)
         
         
-    @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+#    @pyqtSlot(object)
+    def process_signals(self, sig_dict=None):
         """
         Process signals coming in via sig_rx
         """
-        logger.debug("Processing {0}{1}".format(type(sig_dict), sig_dict))
-        if type(sig_dict) != 'dict':
+        logger.debug("Processing {0}: {1}".format(type(sig_dict).__name__, sig_dict))
+        if type(sig_dict) != dict:
             sig_dict = {'sender':__name__}
-
         self.sig_tx.emit(sig_dict)
 
         """
@@ -169,7 +166,7 @@ def main():
     from ..compat import QApplication
     
     app = QApplication(sys.argv)
-    app.setStyleSheet(rc.css_rc)
+    app.setStyleSheet(rc.qss_rc)
 
     mainw = PlotTabWidgets(None)
     mainw.resize(300,400)
@@ -181,3 +178,4 @@ def main():
     
 if __name__ == "__main__":
     main()
+# test with: python -m  pyfda.plot_widgets.plot_tab_widgets

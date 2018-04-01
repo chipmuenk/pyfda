@@ -28,9 +28,9 @@ class PlotImpz_UI(QWidget):
     Create the UI for the PlotImpz class
     """
     # incoming: from connector widget plot_tab_widgets to self.process_signals() 
-    sig_rx = pyqtSignal(dict)
+    sig_rx = pyqtSignal(object)
     # outgoing: from process_signals() to PlotImpz
-    sig_tx = pyqtSignal(dict) 
+    sig_tx = pyqtSignal(object) 
 
     def __init__(self, parent):
         """
@@ -76,8 +76,8 @@ class PlotImpz_UI(QWidget):
         self._update_noi()
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    #@pyqtSlot(object)
+    def process_signals(self, sig_dict=None):
         """
         Process signals coming from the navigation toolbar
         """
@@ -533,7 +533,7 @@ class PlotImpz_UI(QWidget):
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
 
-        if not sig_dict or type(sig_dict) != 'dict':
+        if not sig_dict or type(sig_dict) != dict:
             self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
         else:
             self.sig_tx.emit(sig_dict)

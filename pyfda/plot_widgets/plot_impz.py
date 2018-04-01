@@ -41,6 +41,7 @@ class PlotImpz(QWidget):
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
+        self.dirty = True # flag whether plot needs to be updated
 
         self._construct_UI()
 
@@ -72,20 +73,23 @@ class PlotImpz(QWidget):
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    def process_signals(self, sig_dict=None):
         """
         Process signals coming from the navigation toolbar
         """
-        logger.debug("Processing {0}".format(sig_dict))
-        if 'home' in sig_dict  or 'view_changed' in sig_dict:
-            self.update_view()
+        logger.debug("Processing {0} | dirty = {1}, visible = {2}".format(sig_dict, self.dirty, self.isVisible()))
+        if self.isVisible():
+            if 'data_changed' in sig_dict or 'specs_changed' in sig_dict\
+                or 'view_changed' in sig_dict or 'home' in sig_dict or self.dirty:
+                self.draw()
+                self.dirty = False
         elif 'enabled' in sig_dict:
-            self.enable_ui(sig_dict['enabled'])
-        elif 'data_changed' in sig_dict or 'specs_changed' in sig_dict:
-                # changing of f_s has to update the plot - more differentiation needed
-            self.draw()
+                self.enable_ui(sig_dict['enabled']) 
         else:
-            logger.debug("{0}: dict {1} passed thru".format(__name__, sig_dict))
+            if 'data_changed' in sig_dict or 'specs_changed' in sig_dict:
+                self.dirty = True
+            else:
+                pass
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):

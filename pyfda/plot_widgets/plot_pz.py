@@ -31,8 +31,8 @@ from  matplotlib import patches
 class PlotPZ(QWidget):
 
     # incoming, connected in sender widget (locally connected to self.process_signals() )
-    sig_rx = pyqtSignal(dict)
-#    sig_tx = pyqtSignal(dict) # outgoing from process_signals
+    sig_rx = pyqtSignal(object)
+#    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
         super(PlotPZ, self).__init__(parent)
@@ -113,8 +113,8 @@ class PlotPZ(QWidget):
         self.chkFIR_P.clicked.connect(self.draw)
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    #@pyqtSlot(object)
+    def process_signals(self, sig_dict=None):
         """
         Process signals coming from the navigation toolbar
         """

@@ -37,9 +37,9 @@ class InputTabWidgets(QWidget):
     """
     # signals as class variables (shared between instances if more than one exists)
     # incoming, connected here to individual senders, passed on to process sigmals
-    sig_rx = pyqtSignal(dict)
+    sig_rx = pyqtSignal(object)
     # outgoing, connected in receiver (pyfdax -> plot_tab_widgets)
-    sig_tx = pyqtSignal(dict)
+    sig_tx = pyqtSignal(object)
 
 
     def __init__(self, parent):
@@ -136,14 +136,13 @@ class InputTabWidgets(QWidget):
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    def process_signals(self, sig_dict=None):
         """
         Process signals coming from sig_rx
         """
-        logger.error("Processing {0}".format(sig_dict))
+        logger.debug("Processing {0}: {1}".format(type(sig_dict).__name__, sig_dict))
         if 'load_dict' in sig_dict:
             self.load_dict()
-            logger.error("loaded dict")
         elif 'view_changed' in sig_dict:
             self.update_view()
         elif 'specs_changed' in sig_dict:
@@ -154,8 +153,7 @@ class InputTabWidgets(QWidget):
             else:
                 self.update_data()
         else:
-            logger.debug("{0}: dict {1} passed thru".format(__name__, sig_dict))
-
+            logger.debug("Dict {0} passed thru".format(sig_dict))
 
 
     def update_view(self):
