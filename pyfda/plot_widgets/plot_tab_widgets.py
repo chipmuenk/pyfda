@@ -94,14 +94,14 @@ class PlotTabWidgets(QTabWidget):
         
         
 #    @pyqtSlot(object)
-    def process_signals(self, sig_dict=None):
+    def process_signals(self, dict_sig=None):
         """
         Process signals coming in via sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(sig_dict).__name__, sig_dict))
-        if type(sig_dict) != dict:
-            sig_dict = {'sender':__name__}
-        self.sig_tx.emit(sig_dict)
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__}
+        self.sig_tx.emit(dict_sig)
 
         """
         https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab

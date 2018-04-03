@@ -37,16 +37,16 @@ class TabWidgets(QTabWidget):
         #----------------------------------------------------------------------
 
     @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    def process_signals(self, dict_sig):
         """
         Process signals coming in via sig_rx
         """
-        print("TAB.process_signals(): received dict {0}".format(sig_dict))
-        if sig_dict['info'] == 'btn1':
+        print("TAB.process_signals(): received dict {0}".format(dict_sig))
+        if dict_sig['info'] == 'btn1':
             print("TAB: btn1")
-        elif sig_dict['info'] == 'btn2':
+        elif dict_sig['info'] == 'btn2':
             print("TAB: btn2")
-        self.sig_tx.emit(sig_dict)
+        self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------   
 class Button1(QWidget):
@@ -69,12 +69,12 @@ class Button1(QWidget):
         self.sig_tx.emit({'sender':type(self).__name__, 'info':'btn1'})
         
     @pyqtSlot(object)        
-    def process_signals(self, sig_dict):
+    def process_signals(self, dict_sig):
         print("BTN1: Signal received.")
-        if sig_dict['sender'] == type(self).__name__:
+        if dict_sig['sender'] == type(self).__name__:
             print("BTN1: generated here!")
             return
-        if sig_dict['info'] == 'btn2':
+        if dict_sig['info'] == 'btn2':
             print("BTN1: btn2 pressed")
         
 #------------------------------------------------------------------------------   
@@ -98,12 +98,12 @@ class Button2(QWidget):
         self.sig_tx.emit({'sender':type(self).__name__, 'info':'btn2'})
 
     @pyqtSlot(object)        
-    def process_signals(self, sig_dict):
+    def process_signals(self, dict_sig):
         print("BTN2: Signal received.")
-        if sig_dict['sender'] == type(self).__name__:
+        if dict_sig['sender'] == type(self).__name__:
             print("BTN2: generated here!")
             return
-        if sig_dict['info'] == 'btn1':
+        if dict_sig['info'] == 'btn1':
             print("BTN2: btn1 pressed")
 
        

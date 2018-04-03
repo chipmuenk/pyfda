@@ -136,24 +136,24 @@ class InputTabWidgets(QWidget):
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
-    def process_signals(self, sig_dict=None):
+    def process_signals(self, dict_sig=None):
         """
         Process signals coming from sig_rx
         """
-        logger.debug("Processing {0}: {1}".format(type(sig_dict).__name__, sig_dict))
-        if 'load_dict' in sig_dict:
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if 'load_dict' in dict_sig:
             self.load_dict()
-        elif 'view_changed' in sig_dict:
+        elif 'view_changed' in dict_sig:
             self.update_view()
-        elif 'specs_changed' in sig_dict:
+        elif 'specs_changed' in dict_sig:
             self.update_specs()
-        elif 'data_changed' in sig_dict:
-            if sig_dict['data_changed'] == 'filter_loaded':
+        elif 'data_changed' in dict_sig:
+            if dict_sig['data_changed'] == 'filter_loaded':
                 self.update_filter_data()
             else:
                 self.update_data()
         else:
-            logger.debug("Dict {0} passed thru".format(sig_dict))
+            logger.debug("Dict {0} passed thru".format(dict_sig))
 
 
     def update_view(self):

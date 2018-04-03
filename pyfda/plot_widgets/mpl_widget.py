@@ -88,12 +88,12 @@ class MplWidget(QWidget):
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    def process_signals(self, dict_sig):
         """
         Process sig
         """
-        if 'enabled' in sig_dict:
-            self.clear_disabled_figure(sig_dict['enabled'])
+        if 'enabled' in dict_sig:
+            self.clear_disabled_figure(dict_sig['enabled'])
         else:
             pass
 

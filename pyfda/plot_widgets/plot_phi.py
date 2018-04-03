@@ -9,6 +9,8 @@
 Widget for plotting phase frequency response phi(f)
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
+import logging
+logger = logging.getLogger(__name__)
 
 from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSlot, pyqtSignal
 
@@ -27,6 +29,7 @@ class PlotPhi(QWidget):
 
     def __init__(self, parent):
         super(PlotPhi, self).__init__(parent)
+        self.needs_redraw = True
         self._construct_UI()
 
     def _construct_UI(self):
@@ -94,18 +97,25 @@ class PlotPhi(QWidget):
 
 #------------------------------------------------------------------------------
     #@pyqtSlot(object)
-    def process_signals(self, sig_dict=None):
+    def process_signals(self, dict_sig=None):
         """
-        Process signals coming from the navigation toolbar
+        Process signals coming from the navigation toolbar and from sig_rx
         """
-        if 'view_changed' in sig_dict:
-            self.update_view()
-        elif 'data_changed' in sig_dict or 'home' in sig_dict:
-            self.draw()
-        elif 'enabled' in sig_dict:
-            self.enable_ui(sig_dict['enabled'])
+        logger.debug("Processing {0} | needs_redraw = {1}, visible = {2}"\
+                     .format(dict_sig, self.needs_redraw, self.isVisible()))
+        if self.isVisible():
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
+                self.draw()
+                self.needs_redraw = False
+            elif 'view_changed' in dict_sig:
+                self.update_view()
+            elif 'enabled' in dict_sig:
+                self.enable_ui(dict_sig['enabled']) 
         else:
-            pass
+            if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
+                self.needs_redraw = True
+            else:
+                pass
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):

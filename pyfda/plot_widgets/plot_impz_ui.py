@@ -77,15 +77,15 @@ class PlotImpz_UI(QWidget):
 
 #------------------------------------------------------------------------------
     #@pyqtSlot(object)
-    def process_signals(self, sig_dict=None):
+    def process_signals(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar
         """
-        logger.debug("Processing {0}".format(sig_dict))
-        if 'data_changed' in sig_dict:
-            self.update_N(sig_dict) # this passes sig_dict on to sig_tx as well
+        logger.debug("Processing {0}".format(dict_sig))
+        if 'data_changed' in dict_sig:
+            self.update_N(dict_sig) # this passes dict_sig on to sig_tx as well
         else:
-            self.sig_tx.emit(sig_dict)
+            self.sig_tx.emit(dict_sig)
 
 
     def _construct_UI(self):
@@ -341,7 +341,7 @@ class PlotImpz_UI(QWidget):
         self.setLayout(layVMain)
 
 
-    def update_N(self, sig_dict=None):
+    def update_N(self, dict_sig=None):
         """
         Update values for self.N and self.N_start from the QLineEditWidget
         When emit=False, block emitting a signal in _update_window()
@@ -357,7 +357,7 @@ class PlotImpz_UI(QWidget):
 
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
 
-        self._update_window(sig_dict)
+        self._update_window(dict_sig)
 
 
     def _update_chk_boxes(self):
@@ -462,7 +462,7 @@ class PlotImpz_UI(QWidget):
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'data_changed':'dc'})
 
-    def _update_window(self, sig_dict=None):
+    def _update_window(self, dict_sig=None):
         """ Update window type for FFT """
 
         def _update_param1():
@@ -533,10 +533,10 @@ class PlotImpz_UI(QWidget):
         self.scale = self.N / np.sum(self.win)
         self.win *= self.scale # correct gain for periodic signals (coherent gain)
 
-        if not sig_dict or type(sig_dict) != dict:
+        if not dict_sig or type(dict_sig) != dict:
             self.sig_tx.emit({'sender':__name__, 'data_changed':'win'})
         else:
-            self.sig_tx.emit(sig_dict)
+            self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------
     def calc_n_points(self, N_user = 0):

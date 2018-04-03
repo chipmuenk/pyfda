@@ -311,14 +311,14 @@ class FilterPZ(QWidget):
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
-    def process_signals(self, sig_dict):
+    def process_signals(self, dict_sig):
         """
         Process signals coming from input_tab_widgets
         """
-        if 'load_dict' in sig_dict:
+        if 'load_dict' in dict_sig:
             self.load_dict()
-        elif 'enabled' in sig_dict:
-            self.enable_ui(sig_dict['enabled'])
+        elif 'enabled' in dict_sig:
+            self.enable_ui(dict_sig['enabled'])
         else:
             pass
 

@@ -60,7 +60,7 @@ class Plot3D(QWidget):
         self.zmax = 4
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu_r'
-        self.dirty = True # flag whether plot is up-to-date
+        self.needs_redraw = True # flag whether plot is up-to-date
         self._construct_UI()
 
     def _construct_UI(self):
@@ -230,21 +230,21 @@ class Plot3D(QWidget):
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
-    def process_signals(self, sig_dict=None):
+    def process_signals(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | dirty = {1}, visible = {2}"\
-                     .format(sig_dict, self.dirty, self.isVisible()))
+        logger.debug("Processing {0} | needs_redraw = {1}, visible = {2}"\
+                     .format(dict_sig, self.needs_redraw, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in sig_dict or 'home' in sig_dict or self.dirty:
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
                 self.draw()
-                self.dirty = False
-            elif 'enabled' in sig_dict:
-                self.enable_ui(sig_dict['enabled']) 
+                self.needs_redraw = False
+            elif 'enabled' in dict_sig:
+                self.enable_ui(dict_sig['enabled']) 
         else:
-            if 'data_changed' in sig_dict:
-                self.dirty = True
+            if 'data_changed' in dict_sig:
+                self.needs_redraw = True
             else:
                 pass
 
