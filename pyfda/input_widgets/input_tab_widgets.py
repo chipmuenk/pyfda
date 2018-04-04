@@ -60,7 +60,7 @@ class InputTabWidgets(QWidget):
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
         self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
-        self.filter_coeffs.sigFilterDesigned.connect(self.update_filter_data) #??
+        self.filter_coeffs.sig_tx.connect(self.sig_rx)
         tabWidget.addTab(self.filter_coeffs, 'b,a')
         tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
         #

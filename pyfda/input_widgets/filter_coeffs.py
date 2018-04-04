@@ -264,6 +264,8 @@ class FilterCoeffs(QWidget):
 
     Views / formats are handled by the ItemDelegate() class.
     """
+    sig_tx = pyqtSignal(object) # emitted when filter has been saved
+
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
 
     def __init__(self, parent):
@@ -683,7 +685,7 @@ class FilterCoeffs(QWidget):
         Save the coefficient register `self.ba` to the filter dict `fb.fil[0]['ba']`.
         """
 
-        logger.debug("_save_entries called")
+        logger.debug("_save_dict called")
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
@@ -700,8 +702,8 @@ class FilterCoeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sigFilterDesigned.emit() # -> filter_specs
-        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_coeffs'})
+        # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
 
