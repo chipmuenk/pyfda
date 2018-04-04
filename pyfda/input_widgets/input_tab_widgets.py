@@ -45,44 +45,41 @@ class InputTabWidgets(QWidget):
     def __init__(self, parent):
         
         super(InputTabWidgets, self).__init__(parent)
-
-        self.filter_specs = filter_specs.FilterSpecs(self)
-        self.filter_specs.setObjectName("filter_specs")
-
-        self.file_io = file_io.File_IO(self)
-        self.file_io.setObjectName("inputFiles")
-        self.file_io.sig_tx.connect(self.sig_rx)
-        
-        self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
-        self.filter_coeffs.setObjectName("filter_coeffs")
-        self.filter_pz = filter_pz.FilterPZ(self)
-        self.filter_pz.setObjectName("filter_pz")
-        self.filter_info = filter_info.FilterInfo(self)
-        self.filter_info.setObjectName("filter_info")
-
-        if HAS_MYHDL:
-            self.hdlSpecs = hdl_specs.HDLSpecs(self)
-
         self._construct_UI()
 
-
     def _construct_UI(self):
-        """ Initialize UI with tabbed input widgets """
+        """
+        Initialize UI with tabbed subwidgets and connect the signals of all
+        subwidgets.
+        """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("input_tabs")
-
+        #
+        self.filter_specs = filter_specs.FilterSpecs(self)
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
+        #
+        self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
+        self.filter_coeffs.sigFilterDesigned.connect(self.update_filter_data) #??
         tabWidget.addTab(self.filter_coeffs, 'b,a')
         tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
+        #
+        self.filter_pz = filter_pz.FilterPZ(self)
+        self.filter_pz.sig_tx.connect(self.sig_rx)
         tabWidget.addTab(self.filter_pz, 'P/Z')
         tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
+        #
+        self.file_io = file_io.File_IO(self)
+        self.file_io.sig_tx.connect(self.sig_rx)
         tabWidget.addTab(self.file_io, 'Files')
         tabWidget.setTabToolTip(3, "Import and export filter designs and coefficients.")
+        #
+        self.filter_info = filter_info.FilterInfo(self)
         tabWidget.addTab(self.filter_info, 'Info')
         tabWidget.setTabToolTip(4, "<span>Display the achieved filter specifications"
                                    " and more info about the filter design algorithm.</span>")        
         if HAS_MYHDL:
+            self.hdlSpecs = hdl_specs.HDLSpecs(self)
             tabWidget.addTab(self.hdlSpecs, 'HDL')
 
         layVMain = QVBoxLayout()
@@ -125,11 +122,8 @@ class InputTabWidgets(QWidget):
 
         # The following widgets require a reloading of the select_filter
         # widget to update the filter selection:
-        self.filter_coeffs.sigFilterDesigned.connect(self.update_filter_data) #??
         self.filter_coeffs.ui.sig_tx.connect(self.filter_pz.ui.sig_rx)
         self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
-        self.filter_pz.sigFilterDesigned.connect(self.update_filter_data)
-#        self.file_io.sigFilterLoaded.connect(self.load_all) # converted to rx-tx
         
         self.sig_rx.connect(self.process_signals)
         #----------------------------------------------------------------------
@@ -142,21 +136,21 @@ class InputTabWidgets(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if 'load_dict' in dict_sig:
-            self.load_dict()
+            self.load_dict(dict_sig)
         elif 'view_changed' in dict_sig:
-            self.update_view()
+            self.update_view(dict_sig)
         elif 'specs_changed' in dict_sig:
-            self.update_specs()
+            self.update_specs(dict_sig)
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
-                self.update_filter_data()
+                self.update_filter_data(dict_sig)
             else:
-                self.update_data()
+                self.update_data(dict_sig)
         else:
             logger.debug("Dict {0} passed thru".format(dict_sig))
 
 
-    def update_view(self):
+    def update_view(self, dict_sig=None):
         """
         Slot for InputSpecs.sigViewChanged
 
@@ -166,12 +160,14 @@ class InputTabWidgets(QWidget):
         Update plot widgets via sigSpecsChanged signal that need new
             specs, e.g. plotHf widget for the filter regions
         """
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__,'view_changed':True}
         self.filter_info.load_dict() # update frequency unit of info widget
-        logger.debug("Emit sig_tx = 'specs_changed'")
-        self.sig_tx.emit({'sender':__name__,'view_changed':True})
+
+        self.sig_tx.emit(dict_sig)
 
 
-    def update_specs(self):
+    def update_specs(self, dict_sig=None):
         """
         Slot for FilterSpecs.sigSpecsChanged
 
@@ -185,13 +181,16 @@ class InputTabWidgets(QWidget):
         """
 
         self.filter_specs.color_design_button("changed")
+
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__,'specs_changed':True}
         self.filter_info.load_dict()
         if HAS_MYHDL:
             self.hdlSpecs.update_UI()
-        logger.debug("Emit sig_tx = 'specs_changed'")
-        self.sig_tx.emit({'sender':__name__,'specs_changed':True})
 
-    def update_filter_data(self):
+        self.sig_tx.emit(dict_sig)
+
+    def update_filter_data(self, dict_sig=None):
         """
         Called when a new filter has been LOADED:
         Pass new filter data from the global filter dict
@@ -199,10 +198,12 @@ class InputTabWidgets(QWidget):
         - Update the input widgets that can / need to display filter data
           and all plot widgets via `update_data()`.
         """
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__,'data_changed':True}
         self.filter_specs.sel_fil.load_dict() # update select_filter widget
-        self.update_data()
+        self.update_data(dict_sig)
 
-    def update_data(self):
+    def update_data(self, dict_sig=None):
         """
         Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
 
@@ -213,10 +214,8 @@ class InputTabWidgets(QWidget):
 
         """
         self.filter_specs.color_design_button("ok")
-        sender_name = ""
-        if self.sender(): # origin of signal that triggered the slot
-            sender_name = self.sender().objectName()
-        logger.debug("updateAll called by %s", sender_name)
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__,'data_changed':True}
 
         self.filter_specs.load_dict()
         self.filter_info.load_dict()
@@ -224,7 +223,7 @@ class InputTabWidgets(QWidget):
         self.filter_pz.load_dict()
 
         logger.debug("Emit sig_tx = 'filter_designed'")
-        self.sig_tx.emit({'sender':__name__,'data_changed':True})
+        self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------
 

@@ -178,9 +178,7 @@ class FilterPZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-
-    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
-    sigSpecsChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object) # emitted when filter has been saved
 
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
@@ -483,8 +481,8 @@ class FilterPZ(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sigFilterDesigned.emit() # -> filter_specs
-        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_pz'})
+        # -> input_tab_widgets
 
         logger.debug("b,a = %s\n\n"
             "zpk = %s\n"
