@@ -75,6 +75,7 @@ class InputTabWidgets(QWidget):
         tabWidget.setTabToolTip(3, "Import and export filter designs and coefficients.")
         #
         self.filter_info = filter_info.FilterInfo(self)
+        self.sig_tx.connect(self.filter_info.sig_rx)
         tabWidget.addTab(self.filter_info, 'Info')
         tabWidget.setTabToolTip(4, "<span>Display the achieved filter specifications"
                                    " and more info about the filter design algorithm.</span>")        
@@ -126,7 +127,6 @@ class InputTabWidgets(QWidget):
         self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
         
         self.sig_rx.connect(self.process_signals)
-        #----------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
@@ -136,7 +136,7 @@ class InputTabWidgets(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if 'load_dict' in dict_sig:
-            self.load_dict(dict_sig)
+            self.go_bananas(dict_sig) # this is never called?!
         elif 'view_changed' in dict_sig:
             self.update_view(dict_sig)
         elif 'specs_changed' in dict_sig:
@@ -162,7 +162,6 @@ class InputTabWidgets(QWidget):
         """
         if type(dict_sig) != dict:
             dict_sig = {'sender':__name__,'view_changed':True}
-        self.filter_info.load_dict() # update frequency unit of info widget
 
         self.sig_tx.emit(dict_sig)
 
@@ -184,7 +183,7 @@ class InputTabWidgets(QWidget):
 
         if type(dict_sig) != dict:
             dict_sig = {'sender':__name__,'specs_changed':True}
-        self.filter_info.load_dict()
+
         if HAS_MYHDL:
             self.hdlSpecs.update_UI()
 
@@ -218,7 +217,6 @@ class InputTabWidgets(QWidget):
             dict_sig = {'sender':__name__,'data_changed':True}
 
         self.filter_specs.load_dict()
-        self.filter_info.load_dict()
         self.filter_coeffs.load_dict()
         self.filter_pz.load_dict()
 
