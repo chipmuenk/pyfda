@@ -120,11 +120,6 @@ class InputTabWidgets(QWidget):
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:
         self.filter_specs.sigFilterDesigned.connect(self.update_data)
-
-        # The following widgets require a reloading of the select_filter
-        # widget to update the filter selection:
-        self.filter_coeffs.ui.sig_tx.connect(self.filter_pz.ui.sig_rx)
-        self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
         
         self.sig_rx.connect(self.process_signals)
 
@@ -135,9 +130,7 @@ class InputTabWidgets(QWidget):
         Process signals coming from sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if 'load_dict' in dict_sig:
-            self.go_bananas(dict_sig) # this is never called?!
-        elif 'view_changed' in dict_sig:
+        if 'view_changed' in dict_sig:
             self.update_view(dict_sig)
         elif 'specs_changed' in dict_sig:
             self.update_specs(dict_sig)
