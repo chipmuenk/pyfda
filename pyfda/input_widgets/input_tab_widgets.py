@@ -61,11 +61,13 @@ class InputTabWidgets(QWidget):
         #
         self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
         self.filter_coeffs.sig_tx.connect(self.sig_rx)
+        self.filter_coeffs.ui.sig_tx.connect(self.filter_pz.ui.sig_rx)
         tabWidget.addTab(self.filter_coeffs, 'b,a')
         tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
         #
         self.filter_pz = filter_pz.FilterPZ(self)
         self.filter_pz.sig_tx.connect(self.sig_rx)
+        self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
         tabWidget.addTab(self.filter_pz, 'P/Z')
         tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
         #
