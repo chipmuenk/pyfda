@@ -366,10 +366,13 @@ class FilterCoeffs_UI(QWidget):
         self.setLayout(layVMain)
         #######################################################################
 
-        #--- set initial values from dict / signal slot connections------------
+        #--- set initial values from dict ------------
         self.spnDigits.setValue(params['FMT_ba'])
         self.ledEps.setText(str(self.eps))
-        
+
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------                
         butSettingsClipboard.clicked.connect(self._copy_options)
         self.sig_rx.connect(self._set_load_save_icons)
         
@@ -384,7 +387,7 @@ class FilterCoeffs_UI(QWidget):
         self.opt_widget.exec_() # modal dialog (blocking)
 
         self._set_load_save_icons()
-        self.sig_tx.emit({'sender':__name__, 'changed': 'csv'})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed': 'csv'})
 
     #------------------------------------------------------------------------------
     def _set_load_save_icons(self):

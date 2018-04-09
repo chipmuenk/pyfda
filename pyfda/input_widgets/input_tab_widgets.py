@@ -61,13 +61,13 @@ class InputTabWidgets(QWidget):
         #
         self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
         self.filter_coeffs.sig_tx.connect(self.sig_rx)
-        self.filter_coeffs.ui.sig_tx.connect(self.filter_pz.ui.sig_rx)
+        self.sig_tx.connect(self.filter_coeffs.sig_rx)
         tabWidget.addTab(self.filter_coeffs, 'b,a')
         tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
         #
         self.filter_pz = filter_pz.FilterPZ(self)
         self.filter_pz.sig_tx.connect(self.sig_rx)
-        self.filter_pz.ui.sig_tx.connect(self.filter_coeffs.ui.sig_rx)
+        self.sig_tx.connect(self.filter_pz.sig_rx)
         tabWidget.addTab(self.filter_pz, 'P/Z')
         tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
         #
@@ -132,6 +132,8 @@ class InputTabWidgets(QWidget):
         Process signals coming from sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            return
         if 'view_changed' in dict_sig:
             self.update_view(dict_sig)
         elif 'specs_changed' in dict_sig:
@@ -143,7 +145,8 @@ class InputTabWidgets(QWidget):
                 self.update_data(dict_sig)
         else:
             logger.debug("Dict {0} passed thru".format(dict_sig))
-
+            
+        self.sig_tx.emit(dict_sig)
 
     def update_view(self, dict_sig=None):
         """
@@ -212,8 +215,6 @@ class InputTabWidgets(QWidget):
             dict_sig = {'sender':__name__,'data_changed':True}
 
         self.filter_specs.load_dict()
-        self.filter_coeffs.load_dict()
-        self.filter_pz.load_dict()
 
         logger.debug("Emit sig_tx = 'filter_designed'")
         self.sig_tx.emit(dict_sig)

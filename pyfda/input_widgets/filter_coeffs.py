@@ -265,6 +265,7 @@ class FilterCoeffs(QWidget):
     Views / formats are handled by the ItemDelegate() class.
     """
     sig_tx = pyqtSignal(object) # emitted when filter has been saved
+    sig_rx = pyqtSignal(object)
 
     sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
 
@@ -274,6 +275,21 @@ class FilterCoeffs(QWidget):
         self.opt_widget = None # handle for pop-up options widget
         self.ui = FilterCoeffs_UI(self) # create the UI part with buttons etc.
         self._construct_UI()
+        
+#------------------------------------------------------------------------------
+    def process_signals(self, dict_sig=None):
+        """
+        Process signals coming from sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if type(dict_sig) != dict or ('sender' in dict_sig and dict_sig['sender'] == __name__):
+            return
+        if 'data_changed' in dict_sig:
+            self.load_dict()
+        elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+            self.ui._set_load_save_icons()
+        
+
 
     def _construct_UI(self):
         """
@@ -313,8 +329,14 @@ class FilterCoeffs(QWidget):
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()
-
-        # ============== Signals & Slots ================================
+        
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+        # LOCAL (UI) SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         # wdg.textChanged() is emitted when contents of widget changes
         # wdg.textEdited() is only emitted for user changes
         # wdg.editingFinished() is only emitted for user changes
@@ -346,6 +368,8 @@ class FilterCoeffs(QWidget):
         self.ui.ledScale.editingFinished.connect(self._set_scale)
 
         self.ui.butQuant.clicked.connect(self.quant_coeffs)
+        
+        self.ui.sig_tx.connect(self.sig_tx)
         # =====================================================================
 
 #------------------------------------------------------------------------------
