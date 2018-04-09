@@ -780,8 +780,8 @@ class FilterCoeffs(QWidget):
         sel = qget_selected(self.tblCoeff)['sel']
 
         if not np.any(sel): # nothing selected, append zeros to table
-            np.append(self.ba[0], 0)
-            np.append(self.ba[1], 0)
+            self.ba[0] = np.append(self.ba[0], 0)
+            self.ba[1] = np.append(self.ba[1], 0)
         else:
             self.ba[0] = np.insert(self.ba[0], sel[0], 0)
             self.ba[1] = np.insert(self.ba[1], sel[1], 0)
