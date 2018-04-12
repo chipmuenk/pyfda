@@ -27,6 +27,8 @@ class AmplitudeSpecs(QWidget):
     """
 
     sigUnitChanged = pyqtSignal() # emitted when amplitude unit has been changed
+    sig_tx = pyqtSignal(object)  # emitted when amplitude unit has been changed
+    
     sigSpecsChanged = pyqtSignal()
 
     def __init__(self, parent, title = "Amplitude Specs"):
@@ -229,6 +231,7 @@ class AmplitudeSpecs(QWidget):
         self.load_dict()
 
         self.sigUnitChanged.emit() # -> input_widgets
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'a_unit'})
 
 #------------------------------------------------------------------------------
     def _store_entry(self, source):
