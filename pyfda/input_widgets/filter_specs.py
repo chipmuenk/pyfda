@@ -31,7 +31,6 @@ from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
 
-
 class FilterSpecs(QWidget):
     """
     Build widget for entering all filter specs
@@ -39,13 +38,79 @@ class FilterSpecs(QWidget):
     # class variables (shared between instances if more than one exists)
     sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
     sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
-    sigViewChanged = pyqtSignal() # emitted when view has changed
     sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
+
+    sig_rx = pyqtSignal(object)
+    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
         super(FilterSpecs, self).__init__(parent)
 
         self._construct_UI()
+
+    def process_signals(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__}
+        #self.sig_tx.emit(dict_sig)
+
+    def update_view(self, dict_sig=None):
+        """
+        Slot for InputSpecs.sigViewChanged
+
+        Propagate new PLOT VIEW (e.g. log scale, single/double sided) to
+        plot widgets via pyfda.py
+
+        Update plot widgets via sigSpecsChanged signal that need new
+            specs, e.g. plotHf widget for the filter regions
+        """
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__,'view_changed':True}
+
+        self.sig_tx.emit(dict_sig)
+
+
+    def update_specs(self, dict_sig=None):
+        """
+        Slot for FilterSpecs.sigSpecsChanged
+
+        Propagate new filter SPECS from filter dict to other input widgets and
+        to plot widgets via pyfda.py
+
+        - Update input widgets that can / need to display specs (except inputSpecs
+             - the origin of the signal !!)
+        - Update plot widgets via sigSpecsChanged signal that need new
+            specs, e.g. plotHf widget for the filter regions
+        """
+
+        self.filter_specs.color_design_button("changed")
+
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__,'specs_changed':True}
+
+        self.sig_tx.emit(dict_sig)
+
+    def update_data(self, dict_sig=None):
+        """
+        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
+
+        Called when a new filter has been DESIGNED:
+        - Pass new filter data from the global filter dict
+        - Update the input widgets that can / need to display filter data
+        - Update all plot widgets by emitting sig_tx = 'data_changed':True
+
+        """
+        self.filter_specs.color_design_button("ok")
+        if type(dict_sig) != dict:
+            dict_sig = {'sender':__name__,'data_changed':True}
+
+        self.filter_specs.load_dict()
+
+        logger.debug("Emit sig_tx = 'filter_designed'")
+        self.sig_tx.emit(dict_sig)
 
     def _construct_UI(self):
         """
@@ -111,8 +176,16 @@ class FilterSpecs(QWidget):
         self.setLayout(layVMain) # main layout of widget
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTS
-        #
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------        
+        # NEW
+        self.a_specs.sigUnitChanged.connect(self.update_view)
+        self.f_units.sigUnitChanged.connect(self.update_view)
+
         # Changing the filter design requires updating UI because number or
         # kind of input fields changes -> Call update_all_UIs, emitting
         # sigFilterChanged when it's finished
@@ -122,7 +195,6 @@ class FilterSpecs(QWidget):
         # but it does not influence the actual specs (no specsChanged )
         self.f_units.sigUnitChanged.connect(self.f_specs.load_dict)
         self.f_units.sigUnitChanged.connect(self.t_specs.load_dict)
-        self.f_units.sigUnitChanged.connect(self.sigViewChanged)
         # Activating the "Sort" button triggers sigSpecsChanged, requiring
         # sorting and storing the frequency entries
         self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
@@ -136,7 +208,7 @@ class FilterSpecs(QWidget):
         self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
         self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
         self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.a_specs.sigUnitChanged.connect(self.sigViewChanged)
+        #
         self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
 
         # Other signal-slot connections

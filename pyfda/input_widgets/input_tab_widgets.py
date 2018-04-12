@@ -56,6 +56,8 @@ class InputTabWidgets(QWidget):
         tabWidget.setObjectName("input_tabs")
         #
         self.filter_specs = filter_specs.FilterSpecs(self)
+        self.filter_specs.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.filter_specs.sig_rx)      
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
@@ -115,9 +117,6 @@ class InputTabWidgets(QWidget):
         # sigSpecsChanged: signal indicating that filter SPECS have changed,
         #       requiring update of some plot widgets and input widgets:
         self.filter_specs.sigSpecsChanged.connect(self.update_specs)
-        # sigViewChanged: signal indicating that PLOT VIEW has changed,
-        #       requiring update of some plot widgets only:
-        self.filter_specs.sigViewChanged.connect(self.update_view)
         #
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:
@@ -134,9 +133,7 @@ class InputTabWidgets(QWidget):
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
             return
-        if 'view_changed' in dict_sig:
-            self.update_view(dict_sig)
-        elif 'specs_changed' in dict_sig:
+        if 'specs_changed' in dict_sig:
             self.update_specs(dict_sig)
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
@@ -146,21 +143,6 @@ class InputTabWidgets(QWidget):
         else:
             logger.debug("Dict {0} passed thru".format(dict_sig))
             
-        self.sig_tx.emit(dict_sig)
-
-    def update_view(self, dict_sig=None):
-        """
-        Slot for InputSpecs.sigViewChanged
-
-        Propagate new PLOT VIEW (e.g. log scale, single/double sided) to
-        plot widgets via pyfda.py
-
-        Update plot widgets via sigSpecsChanged signal that need new
-            specs, e.g. plotHf widget for the filter regions
-        """
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__,'view_changed':True}
-
         self.sig_tx.emit(dict_sig)
 
 
