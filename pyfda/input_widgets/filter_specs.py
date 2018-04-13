@@ -40,7 +40,7 @@ class FilterSpecs(QWidget):
     sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
     sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
 
-    sig_rx = pyqtSignal(object)
+    sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sigmals
     sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
@@ -53,9 +53,13 @@ class FilterSpecs(QWidget):
         Process signals coming in via subwidgets and sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if type(dict_sig) != dict:
+        if type(dict_sig) == dict:
+            if dict_sig['sender'] == __name__:
+                logger.warning("Infinite Loop!")
+        else:
             dict_sig = {'sender':__name__}
-        #self.sig_tx.emit(dict_sig)
+
+        self.sig_tx.emit(dict_sig) # causes infinite loop
 
     def update_view(self, dict_sig=None):
         """
@@ -126,15 +130,18 @@ class FilterSpecs(QWidget):
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
+        self.f_specs.sig_tx.connect(self.sig_rx)
         # Subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
+        self.a_specs.sig_tx.connect(self.sig_rx)
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
+        self.t_specs.sig_tx.connect(self.sig_rx)
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -183,7 +190,6 @@ class FilterSpecs(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
         # NEW
-        self.a_specs.sigUnitChanged.connect(self.update_view)
         self.f_units.sigUnitChanged.connect(self.update_view)
 
         # Changing the filter design requires updating UI because number or
@@ -200,14 +206,10 @@ class FilterSpecs(QWidget):
         self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
         self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
 
-
         # Changing filter parameters / specs requires reloading of parameters
         # in other hierarchy levels, e.g. in the plot tabs
         # bundle sigSpecsChanged signals and propagate to next hierarchy level
 #        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
         #
         self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
 

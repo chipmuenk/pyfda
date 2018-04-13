@@ -30,8 +30,8 @@ class TargetSpecs(QWidget):
     """
 
     # class variables (shared between instances if more than one exists)
-    sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
-
+    sig_rx = pyqtSignal(object)
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, title = "Target Specs"):
         super(TargetSpecs, self).__init__(parent)
@@ -41,16 +41,32 @@ class TargetSpecs(QWidget):
         self._construct_UI()
 
 #------------------------------------------------------------------------------
+    def process_signals(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if type(dict_sig) != dict or ('sender' in dict_sig and dict_sig['sender'] == __name__):
+            if type(dict_sig) == dict:
+                logger.warning("Signal-slot connection would create infinite loop!")
+                return
+            else:
+                dict_sig= {'sender':__name__, 'type':'unknown'}
+
+        self.sig_tx.emit(dict_sig) #causes infinite loop
+
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Construct user interface
         """
-
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
+        self.f_specs.sig_tx.connect(self.sig_rx)
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
         self.a_specs.setVisible(True)
+        self.a_specs.sig_tx.connect(self.sig_rx)
         """
         LAYOUT
         """
@@ -85,12 +101,11 @@ class TargetSpecs(QWidget):
         self.setLayout(self.layVMain)
         
         #----------------------------------------------------------------------
-        #  SIGNALS & SLOTS
-        self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
-        self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged.emit)
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_signals)
         
         self.update_UI() # first time initialization
-        
 
 #------------------------------------------------------------------------------
     def update_UI(self, new_labels = ()):
@@ -120,7 +135,8 @@ class TargetSpecs(QWidget):
         else:
             self.a_specs.hide()
 #
-        self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
+        #self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
+        self.process_signals({'sender':__name__, 'changed_specs':'target'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):

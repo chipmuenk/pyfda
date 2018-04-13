@@ -36,7 +36,7 @@ class FreqSpecs(QWidget):
     """
 
     # class variables (shared between instances if more than one exists)
-    sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
+    sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent, title = "Frequency Specs"):
 
@@ -146,7 +146,7 @@ class FreqSpecs(QWidget):
             f_value = safe_eval(event_source.text(), fb.data_old) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
-            self.sigSpecsChanged.emit() # -> filter_specs
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_specs'})
             self.spec_edited = False # reset flag
 
 #-------------------------------------------------------------

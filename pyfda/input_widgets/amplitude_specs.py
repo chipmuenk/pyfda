@@ -26,10 +26,7 @@ class AmplitudeSpecs(QWidget):
     specifications like A_SB, A_PB etc.
     """
 
-    sigUnitChanged = pyqtSignal() # emitted when amplitude unit has been changed
-    sig_tx = pyqtSignal(object)  # emitted when amplitude unit has been changed
-    
-    sigSpecsChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
 
     def __init__(self, parent, title = "Amplitude Specs"):
         """
@@ -105,7 +102,7 @@ class AmplitudeSpecs(QWidget):
         self.update_UI(new_labels = new_labels)
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs / EVENT MONITORING
+        # LOCAL SIGNALS & SLOTs / EVENT MONITORING
         #----------------------------------------------------------------------
         self.cmbUnitsA.currentIndexChanged.connect(self._set_amp_unit)
         #       ^ this also triggers the initial load_dict
@@ -230,7 +227,6 @@ class AmplitudeSpecs(QWidget):
         fb.fil[0]['amp_specs_unit'] = qget_cmb_box(self.cmbUnitsA, data=False)
         self.load_dict()
 
-        self.sigUnitChanged.emit() # -> input_widgets
         self.sig_tx.emit({'sender':__name__, 'view_changed':'a_unit'})
 
 #------------------------------------------------------------------------------
@@ -250,7 +246,7 @@ class AmplitudeSpecs(QWidget):
             amp_label = str(source.objectName())
             amp_value = safe_eval(source.text(), fb.data_old)
             fb.fil[0].update({amp_label:unit2lin(amp_value, filt_type, amp_label, unit)})
-            self.sigSpecsChanged.emit() # -> filter_specs
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'a_specs'})
             self.spec_edited = False # reset flag
         self.load_dict()
 
