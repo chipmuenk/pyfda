@@ -27,8 +27,8 @@ class FilterPZ_UI(QWidget):
     Create the UI for the FilterPZ class
     """
 
-    sig_rx = pyqtSignal(dict) # incoming
-    sig_tx = pyqtSignal(dict) # outgoing
+    sig_rx = pyqtSignal(object) # incoming
+    sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent):
         """
