@@ -28,7 +28,6 @@ class TargetSpecs(QWidget):
     Build and update widget for entering the target specifications (frequencies
     and amplitudes) like F_SB, F_PB, A_SB, etc.
     """
-
     # class variables (shared between instances if more than one exists)
     sig_rx = pyqtSignal(object)
     sig_tx = pyqtSignal(object)
@@ -53,8 +52,7 @@ class TargetSpecs(QWidget):
             else:
                 dict_sig= {'sender':__name__, 'type':'unknown'}
 
-        self.sig_tx.emit(dict_sig) #causes infinite loop
-
+        self.sig_tx.emit(dict_sig)
 #------------------------------------------------------------------------------
     def _construct_UI(self):
         """
