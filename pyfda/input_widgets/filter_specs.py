@@ -138,6 +138,7 @@ class FilterSpecs(QWidget):
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
+        self.w_specs.sig_tx.connect(self.sig_rx)
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
@@ -210,8 +211,6 @@ class FilterSpecs(QWidget):
         # in other hierarchy levels, e.g. in the plot tabs
         # bundle sigSpecsChanged signals and propagate to next hierarchy level
 #        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged)
-        #
-        self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
 
         # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.start_design_filt)
