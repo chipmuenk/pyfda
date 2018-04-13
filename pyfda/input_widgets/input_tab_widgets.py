@@ -57,7 +57,7 @@ class InputTabWidgets(QWidget):
         #
         self.filter_specs = filter_specs.FilterSpecs(self)
         self.filter_specs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.filter_specs.sig_rx)      
+        #self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)   
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
@@ -131,8 +131,9 @@ class InputTabWidgets(QWidget):
         Process signals coming from sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if dict_sig['sender'] == __name__:
-            return
+#        if dict_sig['sender'] == __name__:
+#            logger.warning("Infinite Loop!")
+#            return
         if 'specs_changed' in dict_sig:
             self.update_specs(dict_sig)
         elif 'data_changed' in dict_sig:
@@ -143,7 +144,7 @@ class InputTabWidgets(QWidget):
         else:
             logger.debug("Dict {0} passed thru".format(dict_sig))
             
-        self.sig_tx.emit(dict_sig)
+            self.sig_tx.emit(dict_sig)
 
 
     def update_specs(self, dict_sig=None):
