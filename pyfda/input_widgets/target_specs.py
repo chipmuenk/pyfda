@@ -61,6 +61,7 @@ class TargetSpecs(QWidget):
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
         self.f_specs.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.f_specs.sig_rx)
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
         self.a_specs.setVisible(True)
