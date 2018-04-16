@@ -29,8 +29,8 @@ class TargetSpecs(QWidget):
     and amplitudes) like F_SB, F_PB, A_SB, etc.
     """
     # class variables (shared between instances if more than one exists)
-    sig_rx = pyqtSignal(object)
-    sig_tx = pyqtSignal(object)
+    sig_rx = pyqtSignal(object) # incoming
+    sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent, title = "Target Specs"):
         super(TargetSpecs, self).__init__(parent)
