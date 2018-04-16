@@ -377,6 +377,7 @@ class SelectFilter(QWidget):
         if enb_signal:
             logger.debug("Emit sigFiltChanged")
             self.sigFiltChanged.emit() # -> filter_specs
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter_order_auto'})
 
 #------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
@@ -412,6 +413,7 @@ class SelectFilter(QWidget):
         if enb_signal:
             logger.debug("Emit sigFiltChanged") 
             self.sigFiltChanged.emit() # -> filter_specs
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter_order_widget'})
 
 #------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
