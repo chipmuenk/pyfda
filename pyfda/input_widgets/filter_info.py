@@ -40,7 +40,7 @@ class FilterInfo(QWidget):
     """
     Create widget for displaying infos about filter and filter design method
     """
-    sig_rx = pyqtSignal(dict) # incoming signals, connected in input_tab_widgets
+    sig_rx = pyqtSignal(object) # incoming signals from input_tab_widgets
 
     def __init__(self, parent):
         super(FilterInfo, self).__init__(parent)
@@ -48,7 +48,7 @@ class FilterInfo(QWidget):
         self._construct_UI()
         self.load_dict()
 
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
         """

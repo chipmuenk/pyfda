@@ -58,13 +58,11 @@ class FreqSpecs(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.warning("Signal-slot connection would create infinite loop!")
+            logger.warning("Infinite loop detected (and interrupted)!")
         elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
             self.sort_dict_freqs()
         elif 'view_changed' in dict_sig:
             self.load_dict()
-        #else:
-            #self.sig_tx.emit(dict_sig)
 
 #-------------------------------------------------------------
     def _construct_UI(self):

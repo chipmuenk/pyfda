@@ -178,7 +178,7 @@ class FilterPZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-    sig_rx = pyqtSignal(object)
+    sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
     sig_tx = pyqtSignal(object) # emitted when filter has been saved
 
     def __init__(self, parent):
@@ -198,19 +198,19 @@ class FilterPZ(QWidget):
         self.setup_signal_slot() # setup signal-slot connections and eventFilters
 
 #------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if type(dict_sig) != dict or ('sender' in dict_sig and dict_sig['sender'] == __name__):
-            return
-        if 'data_changed' in dict_sig:
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite loop detected (and interrupted)!")
+        elif 'data_changed' in dict_sig:
             self.load_dict()
         elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
 
-
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget
@@ -248,7 +248,9 @@ class FilterPZ(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
+        self.ui.sig_tx.connect(self.sig_tx)
+
         #----------------------------------------------------------------------
         # LOCAL (UI) SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -272,7 +274,6 @@ class FilterPZ(QWidget):
         self.ui.ledGain.installEventFilter(self)
         self.ui.ledEps.editingFinished.connect(self._set_eps)
         
-        self.ui.sig_tx.connect(self.sig_tx)
 
         #----------------------------------------------------------------------
         # self.tblPZ.itemSelectionChanged.connect(self._copy_item)

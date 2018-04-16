@@ -26,8 +26,8 @@ class AmplitudeSpecs(QWidget):
     specifications like A_SB, A_PB etc.
     """
 
-    sig_rx = pyqtSignal(object)
-    sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
+    sig_rx = pyqtSignal(object) # from input_tab_widgets / target_specs
+    sig_tx = pyqtSignal(object) # emitted when amplitude unit or spec has been changed
 
     def __init__(self, parent, title = "Amplitude Specs"):
         """
@@ -48,7 +48,7 @@ class AmplitudeSpecs(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-                logger.warning("Infinite Loop!")
+            logger.warning("Infinite Loop detected (and interrupted)!")
         elif 'specs_changed' in dict_sig:
             self.update_UI()
 

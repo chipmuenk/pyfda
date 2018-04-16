@@ -265,9 +265,7 @@ class FilterCoeffs(QWidget):
     Views / formats are handled by the ItemDelegate() class.
     """
     sig_tx = pyqtSignal(object) # emitted when filter has been saved
-    sig_rx = pyqtSignal(object)
-
-    sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
+    sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
 
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
@@ -277,15 +275,14 @@ class FilterCoeffs(QWidget):
         self._construct_UI()
         
 #------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
             logger.warning("Infinite Loop!")
-            return
-        if 'data_changed' in dict_sig:
+        elif 'data_changed' in dict_sig:
             self.load_dict()
         elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
@@ -333,7 +330,7 @@ class FilterCoeffs(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL (UI) SIGNALS & SLOTs
         #----------------------------------------------------------------------

@@ -264,8 +264,7 @@ class WeightSpecs(QWidget):
             fb.fil[0].update({w_label:1})
 
         self.load_dict()
-        self.sigSpecsChanged.emit() # -> filter_specs
-
+        self.sig_tx.emit({'sender':__name__, 'specs_changed':'w_specs'})
 
 #------------------------------------------------------------------------------
 
