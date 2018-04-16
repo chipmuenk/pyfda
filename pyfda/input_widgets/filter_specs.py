@@ -53,12 +53,17 @@ class FilterSpecs(QWidget):
         Process signals coming in via subwidgets and sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if type(dict_sig) == dict:
-            if dict_sig['sender'] == __name__:
-                logger.warning("Infinite Loop!")
-        else:
-            dict_sig = {'sender':__name__}
-
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite Loop!")
+            return
+        elif 'view_changed' in dict_sig:
+            self.f_specs.load_dict()
+            self.t_specs.load_dict()
+        elif 'specs_changed' in dict_sig:
+            self.f_specs.sort_dict_freqs()
+            self.t_specs.f_specs.sort_dict_freqs()         
+#        else:
+#            dict_sig = {'sender':__name__}
         self.sig_tx.emit(dict_sig) # causes infinite loop
 
     def update_view(self, dict_sig=None):
@@ -77,45 +82,49 @@ class FilterSpecs(QWidget):
         self.sig_tx.emit(dict_sig)
 
 
-    def update_specs(self, dict_sig=None):
-        """
-        Slot for FilterSpecs.sigSpecsChanged
-
-        Propagate new filter SPECS from filter dict to other input widgets and
-        to plot widgets via pyfda.py
-
-        - Update input widgets that can / need to display specs (except inputSpecs
-             - the origin of the signal !!)
-        - Update plot widgets via sigSpecsChanged signal that need new
-            specs, e.g. plotHf widget for the filter regions
-        """
-
-        self.filter_specs.color_design_button("changed")
-
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__,'specs_changed':True}
-
-        self.sig_tx.emit(dict_sig)
-
-    def update_data(self, dict_sig=None):
-        """
-        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
-
-        Called when a new filter has been DESIGNED:
-        - Pass new filter data from the global filter dict
-        - Update the input widgets that can / need to display filter data
-        - Update all plot widgets by emitting sig_tx = 'data_changed':True
-
-        """
-        self.filter_specs.color_design_button("ok")
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__,'data_changed':True}
-
-        self.filter_specs.load_dict()
-
-        logger.debug("Emit sig_tx = 'filter_designed'")
-        self.sig_tx.emit(dict_sig)
-
+# =============================================================================
+#     def update_specs(self, dict_sig=None):
+#         """
+#         Slot for FilterSpecs.sigSpecsChanged
+# 
+#         Propagate new filter SPECS from filter dict to other input widgets and
+#         to plot widgets via pyfda.py
+# 
+#         - Update input widgets that can / need to display specs (except inputSpecs
+#              - the origin of the signal !!)
+#         - Update plot widgets via sigSpecsChanged signal that need new
+#             specs, e.g. plotHf widget for the filter regions
+#         """
+# 
+#         self.filter_specs.color_design_button("changed")
+# 
+#         if type(dict_sig) != dict:
+#             dict_sig = {'sender':__name__,'specs_changed':True}
+# 
+#         self.sig_tx.emit(dict_sig)
+# 
+# =============================================================================
+# =============================================================================
+#     def update_data(self, dict_sig=None):
+#         """
+#         Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
+# 
+#         Called when a new filter has been DESIGNED:
+#         - Pass new filter data from the global filter dict
+#         - Update the input widgets that can / need to display filter data
+#         - Update all plot widgets by emitting sig_tx = 'data_changed':True
+# 
+#         """
+#         self.filter_specs.color_design_button("ok")
+#         if type(dict_sig) != dict:
+#             dict_sig = {'sender':__name__,'data_changed':True}
+# 
+#         self.filter_specs.load_dict()
+# 
+#         logger.debug("Emit sig_tx = 'filter_designed'")
+#         self.sig_tx.emit(dict_sig)
+# 
+# =============================================================================
     def _construct_UI(self):
         """
         Construct User Interface from all input subwidgets
@@ -127,6 +136,17 @@ class FilterSpecs(QWidget):
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
+        
+        # Changing the frequency unit requires re-display of frequency specs
+        # but it does not influence the actual specs (no specsChanged )
+        # self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
+        ## self.f_units.sigUnitChanged.connect(self.f_specs.load_dict)
+        ## self.f_units.sigUnitChanged.connect(self.t_specs.load_dict)
+        # Activating the "Sort" button triggers sigSpecsChanged, requiring
+        # sorting and storing the frequency entries
+        ## self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
+        ## self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
+
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
@@ -135,6 +155,7 @@ class FilterSpecs(QWidget):
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
         self.a_specs.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.a_specs.sig_rx)
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
@@ -143,6 +164,7 @@ class FilterSpecs(QWidget):
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
         self.t_specs.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.t_specs.sig_rx)
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -190,7 +212,6 @@ class FilterSpecs(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
-        # NEW
         self.f_units.sigUnitChanged.connect(self.update_view)
 
         # Changing the filter design requires updating UI because number or
@@ -198,14 +219,6 @@ class FilterSpecs(QWidget):
         # sigFilterChanged when it's finished
         self.sel_fil.sigFiltChanged.connect(self.update_UI)
 
-        # Changing the frequency unit requires re-display of frequency specs
-        # but it does not influence the actual specs (no specsChanged )
-        self.f_units.sigUnitChanged.connect(self.f_specs.load_dict)
-        self.f_units.sigUnitChanged.connect(self.t_specs.load_dict)
-        # Activating the "Sort" button triggers sigSpecsChanged, requiring
-        # sorting and storing the frequency entries
-        self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
-        self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
 
         # Changing filter parameters / specs requires reloading of parameters
         # in other hierarchy levels, e.g. in the plot tabs
