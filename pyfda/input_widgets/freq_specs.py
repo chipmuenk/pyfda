@@ -37,6 +37,7 @@ class FreqSpecs(QWidget):
 
     # class variables (shared between instances if more than one exists)
     sig_tx = pyqtSignal(object) # outgoing
+    sig_rx = pyqtSignal(object) # incoming
 
     def __init__(self, parent, title = "Frequency Specs"):
 
@@ -49,6 +50,21 @@ class FreqSpecs(QWidget):
         self.spec_edited = False # flag whether QLineEdit field has been edited
 
         self._construct_UI()
+
+#-------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Signal-slot connection would create infinite loop!")
+        elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
+            self.sort_dict_freqs()
+        elif 'view_changed' in dict_sig:
+            self.load_dict()
+        #else:
+            #self.sig_tx.emit(dict_sig)
 
 #-------------------------------------------------------------
     def _construct_UI(self):
@@ -85,7 +101,12 @@ class FreqSpecs(QWidget):
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
 
-        self.n_cur_labels = 0 # number of currently visible labels / qlineedits        
+        self.n_cur_labels = 0 # number of currently visible labels / qlineedits
+
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
 
         #----------------------------------------------------------------------
         # EVENT FILTER

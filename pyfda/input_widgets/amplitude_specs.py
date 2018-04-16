@@ -26,6 +26,7 @@ class AmplitudeSpecs(QWidget):
     specifications like A_SB, A_PB etc.
     """
 
+    sig_rx = pyqtSignal(object)
     sig_tx = pyqtSignal(object)  # emitted when amplitude unit or spec has been changed
 
     def __init__(self, parent, title = "Amplitude Specs"):
@@ -40,6 +41,16 @@ class AmplitudeSpecs(QWidget):
 
         self.spec_edited = False # flag whether QLineEdit field has been edited
         self._construct_UI()
+
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+                logger.warning("Infinite Loop!")
+        elif 'specs_changed' in dict_sig:
+            self.update_UI()
 
     def _construct_UI(self):
         """
@@ -100,6 +111,11 @@ class AmplitudeSpecs(QWidget):
         # ATTENTION: Entries need to be converted from QString to str for Py 2
         new_labels = [str(l) for l in fb.fil[0] if l[0] == 'A']
         self.update_UI(new_labels = new_labels)
+
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs / EVENT MONITORING
