@@ -136,6 +136,8 @@ class FilterSpecs(QWidget):
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
+        self.f_units.sig_tx.connect(self.sig_rx)
+        #self.f_units.sigUnitChanged.connect(self.update_view)
         
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -212,7 +214,7 @@ class FilterSpecs(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
-        self.f_units.sigUnitChanged.connect(self.update_view)
+
 
         # Changing the filter design requires updating UI because number or
         # kind of input fields changes -> Call update_all_UIs, emitting
