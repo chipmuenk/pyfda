@@ -131,11 +131,13 @@ class InputTabWidgets(QWidget):
         Process signals coming from sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-#        if dict_sig['sender'] == __name__:
-#            logger.warning("Infinite Loop!")
-#            return
+        if dict_sig['sender'] == __name__:
+            logger.warning("Prevented Infinite Loop!")
+            return
         if 'specs_changed' in dict_sig:
+            self.filter_specs.color_design_button("changed")
             self.update_specs(dict_sig)
+
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
                 self.update_filter_data(dict_sig)
@@ -199,8 +201,8 @@ class InputTabWidgets(QWidget):
 
         self.filter_specs.load_dict()
 
-        logger.debug("Emit sig_tx = 'filter_designed'")
-        self.sig_tx.emit(dict_sig)
+        #logger.debug("Emit sig_tx = 'filter_designed'")
+        #self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------
 
