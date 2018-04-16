@@ -35,6 +35,7 @@ class FreqUnits(QWidget):
     sigUnitChanged = pyqtSignal() # emitted when frequency unit has been changed
     sigSpecsChanged = pyqtSignal() # emitted when frequency specs have been changed
                                   # (e.g. when the sort button has been pushed)
+    sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent, title = "Frequency Units"):
 
@@ -207,6 +208,7 @@ class FreqUnits(QWidget):
                 fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'])})
                 self._freq_range(emit_sig_range = False) # update plotting range
                 self.sigSpecsChanged.emit() # -> input_widgets
+                self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_unit'})
                 self.spec_edited = False # reset flag, changed entry has been saved
 
         if source.objectName() == 'f_S':
@@ -250,6 +252,7 @@ class FreqUnits(QWidget):
         fb.fil[0]['freqSpecsRange'] = f_lim # store settings in dict
 
         self.sigUnitChanged.emit() # -> input_widgets
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
 
 
     #-------------------------------------------------------------
@@ -284,6 +287,7 @@ class FreqUnits(QWidget):
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
         if self.butSort.isChecked():
             self.sigSpecsChanged.emit() # -> input_widgets
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_unit'})
 
 
 #------------------------------------------------------------------------------
