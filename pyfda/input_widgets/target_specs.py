@@ -40,18 +40,14 @@ class TargetSpecs(QWidget):
         self._construct_UI()
 
 #------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if type(dict_sig) != dict or ('sender' in dict_sig and dict_sig['sender'] == __name__):
-            if type(dict_sig) == dict:
-                logger.warning("Signal-slot connection would create infinite loop!")
-                return
-            else:
-                dict_sig= {'sender':__name__, 'type':'unknown'}
-
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite loop detected")
+            return
         self.sig_tx.emit(dict_sig)
 #------------------------------------------------------------------------------
     def _construct_UI(self):
@@ -102,7 +98,7 @@ class TargetSpecs(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         
         self.update_UI() # first time initialization
 
@@ -135,7 +131,7 @@ class TargetSpecs(QWidget):
             self.a_specs.hide()
 #
         #self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
-        self.process_signals({'sender':__name__, 'changed_specs':'target'})
+        self.sig_tx.emit({'sender':__name__, 'changed_specs':'target'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):
