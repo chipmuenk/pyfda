@@ -282,13 +282,13 @@ class FilterCoeffs(QWidget):
         Process signals coming from sig_rx
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if type(dict_sig) != dict or ('sender' in dict_sig and dict_sig['sender'] == __name__):
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite Loop!")
             return
         if 'data_changed' in dict_sig:
             self.load_dict()
         elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
             self.ui._set_load_save_icons()
-        
 
 
     def _construct_UI(self):
