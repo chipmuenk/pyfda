@@ -36,8 +36,6 @@ class FilterSpecs(QWidget):
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
-    sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
     sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
 
     sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sigmals
@@ -62,9 +60,7 @@ class FilterSpecs(QWidget):
         elif 'specs_changed' in dict_sig:
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()         
-#        else:
-#            dict_sig = {'sender':__name__}
-        self.sig_tx.emit(dict_sig) # causes infinite loop
+        self.sig_tx.emit(dict_sig)
 
     def update_view(self, dict_sig=None):
         """
@@ -263,8 +259,8 @@ class FilterSpecs(QWidget):
         # the values are a tuple with the corresponding parameters
         all_widgets = fb.fil_tree[rt][ft][fc][fo]
 
-        logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
-        logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
+        # logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
+        # logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
 
         # self.sel_fil.load_filter_order() # update filter order subwidget, called by select_filter
 
@@ -314,7 +310,8 @@ class FilterSpecs(QWidget):
             self.frmMsg.hide()
 
         logger.debug("emit sigSpecsChanged")
-        self.sigSpecsChanged.emit()
+        #self.sigSpecsChanged.emit()
+        self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):
@@ -378,18 +375,21 @@ class FilterSpecs(QWidget):
                 self.f_specs.load_dict()
                 self.color_design_button("ok")
 
-                self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
+                #self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
+                self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_designed'})
                 logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
-                logger.debug("Results:\n"
-                    "F_PB = %s, F_SB = %s "
-                    "Filter order N = %s\n"
-                    "NDim fil[0]['ba'] = %s\n\n"
-                    "b,a = %s\n\n"
-                    "zpk = %s\n",
-                    str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
-                    str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
-                    pformat(fb.fil[0]['zpk']))
-
+# =============================================================================
+#                 logger.debug("Results:\n"
+#                     "F_PB = %s, F_SB = %s "
+#                     "Filter order N = %s\n"
+#                     "NDim fil[0]['ba'] = %s\n\n"
+#                     "b,a = %s\n\n"
+#                     "zpk = %s\n",
+#                     str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
+#                     str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
+#                     pformat(fb.fil[0]['zpk']))
+# 
+# =============================================================================
         except Exception as e:
             if ('__doc__' in str(e)):
                 logger.warning("Filter design:\n %s\n %s\n", e.__doc__, e)
