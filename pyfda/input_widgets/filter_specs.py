@@ -61,6 +61,9 @@ class FilterSpecs(QWidget):
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()
         elif 'filt_changed' in dict_sig:
+            # Changing the filter design requires updating UI because number or
+            # kind of input fields changes -> call update_UI, emitting
+            # 'specs_changed' when finished
             self.update_UI()
         self.sig_tx.emit(dict_sig)
 
@@ -88,10 +91,6 @@ class FilterSpecs(QWidget):
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
         self.sel_fil.sig_tx.connect(self.sig_rx)
-        # Changing the filter design requires updating UI because number or
-        # kind of input fields changes -> Call update_all_UIs, emitting
-        # sigFilterChanged when it's finished
-#        self.sel_fil.sigFiltChanged.connect(self.update_UI)
         
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)

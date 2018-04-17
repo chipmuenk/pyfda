@@ -76,7 +76,6 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
     """
 
     sig_tx = pyqtSignal(object)
-    sigFiltChanged = pyqtSignal()
 
     def __init__(self):
         QWidget.__init__(self)
@@ -218,7 +217,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                         {'grid_density':self.grid_density}
                                     })
         
-        self.sigFiltChanged.emit() # -> select_filter -> filter_specs
+        # sig_tx -> select_filter -> filter_specs   
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'equiripple'})
 
     def destruct_UI(self):
