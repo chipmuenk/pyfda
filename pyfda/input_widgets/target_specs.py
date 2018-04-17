@@ -48,7 +48,6 @@ class TargetSpecs(QWidget):
         if dict_sig['sender'] == __name__:
             logger.warning("Infinite loop detected")
             return
-        self.sig_tx.emit(dict_sig)
 #------------------------------------------------------------------------------
     def _construct_UI(self):
         """
@@ -56,12 +55,12 @@ class TargetSpecs(QWidget):
         """
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
-        self.f_specs.sig_tx.connect(self.sig_rx)
+        self.f_specs.sig_tx.connect(self.sig_tx)
         self.sig_tx.connect(self.f_specs.sig_rx)
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
         self.a_specs.setVisible(True)
-        self.a_specs.sig_tx.connect(self.sig_rx)
+        self.a_specs.sig_tx.connect(self.sig_tx)
         """
         LAYOUT
         """
