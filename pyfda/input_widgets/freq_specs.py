@@ -151,7 +151,6 @@ class FreqSpecs(QWidget):
         # Call base class method to continue normal event processing:
         return super(FreqSpecs, self).eventFilter(source, event)
 
-
 #------------------------------------------------------------------------------
     def _store_entry(self, event_source):
         """
@@ -182,15 +181,9 @@ class FreqSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
+        self.update_f_unit()
         state = new_labels[0]
         new_labels = new_labels[1:]
-        unit = fb.fil[0]['freq_specs_unit']
-        if unit in {"f_S", "f_Ny"}:
-            unit_frmt = 'bi'
-        else:
-            unit_frmt = 'b'
-            
-        self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
@@ -220,6 +213,18 @@ class FreqSpecs(QWidget):
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
 
+#-------------------------------------------------------------
+    def update_f_unit(self):
+        """
+        Set label for frequency unit according to selected unit.
+        """
+        unit = fb.fil[0]['freq_specs_unit']
+        if unit in {"f_S", "f_Ny"}:
+            unit_frmt = 'bi'
+        else:
+            unit_frmt = 'b'
+        self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
+
 #-------------------------------------------------------------        
     def load_dict(self):
         """
@@ -228,6 +233,8 @@ class FreqSpecs(QWidget):
         setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
+        
+        Update the displayed frequency unit
 
         load_dict is called during init and when the frequency unit or the
         sampling frequency have been changed.
@@ -238,6 +245,8 @@ class FreqSpecs(QWidget):
 
         # recalculate displayed freq spec values for (maybe) changed f_S
         logger.debug("exec load_dict")
+        self.update_f_unit()
+        
         for i in range(len(self.qlineedit)):
             f_name = str(self.qlineedit[i].objectName()).split(":",1)
             f_label = f_name[0]
