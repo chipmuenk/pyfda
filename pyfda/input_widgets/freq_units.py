@@ -32,9 +32,6 @@ class FreqUnits(QWidget):
     """
 
     # class variables (shared between instances if more than one exists)
-    #sigUnitChanged = pyqtSignal() # emitted when frequency unit has been changed
-    #sigSpecsChanged = pyqtSignal() # emitted when frequency specs have been changed
-                                  # (e.g. when the sort button has been pushed)
     sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent, title = "Frequency Units"):
@@ -122,7 +119,7 @@ class FreqUnits(QWidget):
         self.setLayout(self.layVMain)
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.cmbUnits.currentIndexChanged.connect(self.update_UI)
         self.cmbFRange.currentIndexChanged.connect(self._freq_range)
@@ -196,7 +193,7 @@ class FreqUnits(QWidget):
           to True.
         - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
           current value with full precision (only if `spec_edited`== True) and
-          display the stored value in selected format. Emit sigSpecsChanged
+          display the stored value in selected format. Emit 'specs_changed':'f_unit'
           signal and a sigUnitsChanged signals
         """
         def _store_entry():
@@ -206,8 +203,8 @@ class FreqUnits(QWidget):
             """
             if self.spec_edited:
                 fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'])})
-                self._freq_range(emit_sig_range = False) # update plotting range
-                #self.sigSpecsChanged.emit() # -> input_widgets
+                # TODO: ?!
+                self._freq_range(emit_sig_range = False) # update plotting range 
                 self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_unit'})
                 self.spec_edited = False # reset flag, changed entry has been saved
 
@@ -230,15 +227,13 @@ class FreqUnits(QWidget):
         # Call base class method to continue normal event processing:
         return super(FreqUnits, self).eventFilter(source, event)
 
-
     #-------------------------------------------------------------
     def _freq_range(self, emit_sig_range = True):
         """
         Set frequency plotting range for single-sided spectrum up to f_S/2 or f_S
         or for double-sided spectrum between -f_S/2 and f_S/2 and emit
-        sigUnitChanged signal
+        'view_changed':'f_range'.
         """
-
         rangeType = qget_cmb_box(self.cmbFRange)
 
         fb.fil[0].update({'freqSpecsRangeType':rangeType})
@@ -251,9 +246,7 @@ class FreqUnits(QWidget):
 
         fb.fil[0]['freqSpecsRange'] = f_lim # store settings in dict
 
-        #self.sigUnitChanged.emit() # -> input_widgets
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
-
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'f_range'})
 
     #-------------------------------------------------------------
     def load_dict(self):
@@ -277,18 +270,15 @@ class FreqUnits(QWidget):
         self.butSort.setChecked(fb.fil[0]['freq_specs_sort'])
         self.butSort.blockSignals(False)
 
-
 #-------------------------------------------------------------
     def _store_sort_flag(self):
         """
-        Store sort flag in filter dict and emit sigSpecsChanged
+        Store sort flag in filter dict and emit 'specs_changed':'f_sort'
         when sort button is checked.
         """
         fb.fil[0]['freq_specs_sort'] = self.butSort.isChecked()
         if self.butSort.isChecked():
-            #self.sigSpecsChanged.emit() # -> input_widgets
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_unit'})
-
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_sort'})
 
 #------------------------------------------------------------------------------
 
