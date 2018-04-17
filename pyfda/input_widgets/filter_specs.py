@@ -129,6 +129,7 @@ class FilterSpecs(QWidget):
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
+        self.sel_fil.sig_tx.connect(self.sig_rx)
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
@@ -137,13 +138,8 @@ class FilterSpecs(QWidget):
         
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
-        # self.sig_tx.emit({'sender':__name__, 'view_changed':'f_unit'})
-        ## self.f_units.sigUnitChanged.connect(self.f_specs.load_dict)
-        ## self.f_units.sigUnitChanged.connect(self.t_specs.load_dict)
         # Activating the "Sort" button triggers sigSpecsChanged, requiring
         # sorting and storing the frequency entries
-        ## self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
-        ## self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
 
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
@@ -309,8 +305,6 @@ class FilterSpecs(QWidget):
         else:
             self.frmMsg.hide()
 
-        logger.debug("emit sigSpecsChanged")
-        #self.sigSpecsChanged.emit()
         self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter'})
 
 #------------------------------------------------------------------------------
@@ -375,7 +369,6 @@ class FilterSpecs(QWidget):
                 self.f_specs.load_dict()
                 self.color_design_button("ok")
 
-                #self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
                 self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_designed'})
                 logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
 # =============================================================================
