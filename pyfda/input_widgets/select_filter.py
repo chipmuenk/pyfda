@@ -42,8 +42,9 @@ class SelectFilter(QWidget):
       The signal sigFiltChanged is triggered and propagated to filter_specs.py
       where it triggers the recreation of all subwidgets.
     """
-
+    # TODO:
     sigFiltChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent):
         super(SelectFilter, self).__init__(parent)
@@ -412,7 +413,6 @@ class SelectFilter(QWidget):
 
         if enb_signal:
             logger.debug("Emit sigFiltChanged") 
-            self.sigFiltChanged.emit() # -> filter_specs
             self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter_order_widget'})
 
 #------------------------------------------------------------------------------
@@ -459,7 +459,7 @@ class SelectFilter(QWidget):
             if ff.fil_inst.wdg:
                 self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
-
+# TODO:
                 ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
 
         except AttributeError as e:
