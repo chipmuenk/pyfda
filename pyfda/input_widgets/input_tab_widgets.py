@@ -57,7 +57,15 @@ class InputTabWidgets(QWidget):
         #
         self.filter_specs = filter_specs.FilterSpecs(self)
         self.filter_specs.sig_tx.connect(self.sig_rx)
-        #self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)   
+        #self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)
+        # sigSpecsChanged: signal indicating that filter SPECS have changed,
+        #       requiring update of some plot widgets and input widgets:
+        # self.filter_specs.sigSpecsChanged.connect(self.update_specs)
+        #
+        # sigFilterDesigned: signal indicating that filter has been DESIGNED,
+        #       requiring update of all plot and some input widgets:
+        # self.filter_specs.sigFilterDesigned.connect(self.update_data)
+
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
@@ -86,6 +94,12 @@ class InputTabWidgets(QWidget):
         if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDLSpecs(self)
             tabWidget.addTab(self.hdlSpecs, 'HDL')
+  
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------       
+        self.sig_rx.connect(self.process_sig_rx)
+
 
         layVMain = QVBoxLayout()
 
@@ -104,29 +118,9 @@ class InputTabWidgets(QWidget):
 
         self.setLayout(layVMain) # set the main layout of the window
 
-
-        #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
-        #----------------------------------------------------------------------
-        # Collect "specs changed" / "filter designed" signals from all input
-        # widgets and route them to plot / input widgets that need to be updated
-        #
-        # Check:
-        #http://www.pythoncentral.io/pysidepyqt-tutorial-creating-your-own-signals-and-slots/#custom-tab-2-pyqt
-        #
-        # sigSpecsChanged: signal indicating that filter SPECS have changed,
-        #       requiring update of some plot widgets and input widgets:
-        self.filter_specs.sigSpecsChanged.connect(self.update_specs)
-        #
-        # sigFilterDesigned: signal indicating that filter has been DESIGNED,
-        #       requiring update of all plot and some input widgets:
-        self.filter_specs.sigFilterDesigned.connect(self.update_data)
-        
-        self.sig_rx.connect(self.process_signals)
-
 #------------------------------------------------------------------------------
     @pyqtSlot(object)
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
         """
@@ -134,75 +128,25 @@ class InputTabWidgets(QWidget):
         if dict_sig['sender'] == __name__:
             logger.warning("Prevented Infinite Loop!")
             return
-        if 'specs_changed' in dict_sig:
+        elif 'specs_changed' in dict_sig:
             self.filter_specs.color_design_button("changed")
-            self.update_specs(dict_sig)
+            if HAS_MYHDL:
+                self.hdlSpecs.update_UI()
 
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
-                self.update_filter_data(dict_sig)
-            else:
-                self.update_data(dict_sig)
+                self.filter_specs.color_design_button("ok")
+                """
+                Called when a new filter has been LOADED:
+                Pass new filter data from the global filter dict by
+                specifically calling SelectFilter.load_dict()
+                """
+                self.filter_specs.sel_fil.load_dict() # update select_filter widget
+            self.filter_specs.load_dict() # Pass new filter data from the global filter dict
         else:
             logger.debug("Dict {0} passed thru".format(dict_sig))
-            
-            self.sig_tx.emit(dict_sig)
-
-
-    def update_specs(self, dict_sig=None):
-        """
-        Slot for FilterSpecs.sigSpecsChanged
-
-        Propagate new filter SPECS from filter dict to other input widgets and
-        to plot widgets via pyfda.py
-
-        - Update input widgets that can / need to display specs (except inputSpecs
-             - the origin of the signal !!)
-        - Update plot widgets via sigSpecsChanged signal that need new
-            specs, e.g. plotHf widget for the filter regions
-        """
-
-        self.filter_specs.color_design_button("changed")
-
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__,'specs_changed':True}
-
-        if HAS_MYHDL:
-            self.hdlSpecs.update_UI()
 
         self.sig_tx.emit(dict_sig)
-
-    def update_filter_data(self, dict_sig=None):
-        """
-        Called when a new filter has been LOADED:
-        Pass new filter data from the global filter dict
-        - Specifically call SelectFilter.load_dict
-        - Update the input widgets that can / need to display filter data
-          and all plot widgets via `update_data()`.
-        """
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__,'data_changed':True}
-        self.filter_specs.sel_fil.load_dict() # update select_filter widget
-        self.update_data(dict_sig)
-
-    def update_data(self, dict_sig=None):
-        """
-        Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
-
-        Called when a new filter has been DESIGNED:
-        - Pass new filter data from the global filter dict
-        - Update the input widgets that can / need to display filter data
-        - Update all plot widgets by emitting sig_tx = 'data_changed':True
-
-        """
-        self.filter_specs.color_design_button("ok")
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__,'data_changed':True}
-
-        self.filter_specs.load_dict()
-
-        #logger.debug("Emit sig_tx = 'filter_designed'")
-        #self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------
 
