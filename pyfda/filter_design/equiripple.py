@@ -75,6 +75,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
 ``scipy.signal.remez()``, ``pyfda_lib.remezord()``
     """
 
+    sig_tx = pyqtSignal(object)
     sigFiltChanged = pyqtSignal()
 
     def __init__(self):
@@ -218,6 +219,7 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
                                     })
         
         self.sigFiltChanged.emit() # -> select_filter -> filter_specs
+        self.sig_tx.emit({'sender':__name__, 'filt_changed':'equiripple'})
 
     def destruct_UI(self):
         """

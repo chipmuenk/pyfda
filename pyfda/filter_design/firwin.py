@@ -61,6 +61,7 @@ class Firwin(QWidget):
                 # currently, only 'ba' is supported for firwin routines
     
     sigFiltChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object)
 
     def __init__(self):
         QWidget.__init__(self)
@@ -236,6 +237,7 @@ class Firwin(QWidget):
             self.firWindow = self.fir_window_name
 
         self.sigFiltChanged.emit() # -> select_filter -> filter_specs
+        self.sig_tx.emit({'sender':__name__, 'filt_changed':'firwin'})
             
     def destruct_UI(self):
         """

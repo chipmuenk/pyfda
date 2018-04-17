@@ -46,7 +46,7 @@ class FilterSpecs(QWidget):
 
         self._construct_UI()
 
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
         """
@@ -59,7 +59,9 @@ class FilterSpecs(QWidget):
             self.t_specs.load_dict()
         elif 'specs_changed' in dict_sig:
             self.f_specs.sort_dict_freqs()
-            self.t_specs.f_specs.sort_dict_freqs()         
+            self.t_specs.f_specs.sort_dict_freqs()
+        elif 'filt_changed' in dict_sig:
+            self.update_UI()
         self.sig_tx.emit(dict_sig)
 
     def update_view(self, dict_sig=None):
@@ -77,50 +79,6 @@ class FilterSpecs(QWidget):
 
         self.sig_tx.emit(dict_sig)
 
-
-# =============================================================================
-#     def update_specs(self, dict_sig=None):
-#         """
-#         Slot for FilterSpecs.sigSpecsChanged
-# 
-#         Propagate new filter SPECS from filter dict to other input widgets and
-#         to plot widgets via pyfda.py
-# 
-#         - Update input widgets that can / need to display specs (except inputSpecs
-#              - the origin of the signal !!)
-#         - Update plot widgets via sigSpecsChanged signal that need new
-#             specs, e.g. plotHf widget for the filter regions
-#         """
-# 
-#         self.filter_specs.color_design_button("changed")
-# 
-#         if type(dict_sig) != dict:
-#             dict_sig = {'sender':__name__,'specs_changed':True}
-# 
-#         self.sig_tx.emit(dict_sig)
-# 
-# =============================================================================
-# =============================================================================
-#     def update_data(self, dict_sig=None):
-#         """
-#         Slot for sigFilterDesigned from InputSpecs, FilterCoeffs, FilterPZ
-# 
-#         Called when a new filter has been DESIGNED:
-#         - Pass new filter data from the global filter dict
-#         - Update the input widgets that can / need to display filter data
-#         - Update all plot widgets by emitting sig_tx = 'data_changed':True
-# 
-#         """
-#         self.filter_specs.color_design_button("ok")
-#         if type(dict_sig) != dict:
-#             dict_sig = {'sender':__name__,'data_changed':True}
-# 
-#         self.filter_specs.load_dict()
-# 
-#         logger.debug("Emit sig_tx = 'filter_designed'")
-#         self.sig_tx.emit(dict_sig)
-# 
-# =============================================================================
     def _construct_UI(self):
         """
         Construct User Interface from all input subwidgets
@@ -130,6 +88,11 @@ class FilterSpecs(QWidget):
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
         self.sel_fil.sig_tx.connect(self.sig_rx)
+        # Changing the filter design requires updating UI because number or
+        # kind of input fields changes -> Call update_all_UIs, emitting
+        # sigFilterChanged when it's finished
+#        self.sel_fil.sigFiltChanged.connect(self.update_UI)
+        
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
@@ -140,6 +103,11 @@ class FilterSpecs(QWidget):
         # but it does not influence the actual specs (no specsChanged )
         # Activating the "Sort" button triggers sigSpecsChanged, requiring
         # sorting and storing the frequency entries
+
+        # Changing filter parameters / specs requires reloading of parameters
+        # in other hierarchy levels, e.g. in the plot tabs
+        # bundle sigSpecsChanged signals and propagate to next hierarchy level
+#        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged)
 
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
@@ -202,24 +170,10 @@ class FilterSpecs(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
-
-
-        # Changing the filter design requires updating UI because number or
-        # kind of input fields changes -> Call update_all_UIs, emitting
-        # sigFilterChanged when it's finished
-        self.sel_fil.sigFiltChanged.connect(self.update_UI)
-
-
-        # Changing filter parameters / specs requires reloading of parameters
-        # in other hierarchy levels, e.g. in the plot tabs
-        # bundle sigSpecsChanged signals and propagate to next hierarchy level
-#        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged)
-
-        # Other signal-slot connections
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.sigQuit) # pass on to main application
         #----------------------------------------------------------------------

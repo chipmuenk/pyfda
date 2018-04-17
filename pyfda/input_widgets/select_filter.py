@@ -378,7 +378,7 @@ class SelectFilter(QWidget):
         if enb_signal:
             logger.debug("Emit sigFiltChanged")
             self.sigFiltChanged.emit() # -> filter_specs
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter_order_auto'})
+            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_auto'})
 
 #------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
@@ -413,7 +413,7 @@ class SelectFilter(QWidget):
 
         if enb_signal:
             logger.debug("Emit sigFiltChanged") 
-            self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter_order_widget'})
+            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_widget'})
 
 #------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
@@ -431,6 +431,7 @@ class SelectFilter(QWidget):
         if hasattr(ff.fil_inst, 'wdg') and ff.fil_inst.wdg:
             try:
                 ff.fil_inst.sigFiltChanged.disconnect() # disconnect signal
+                ff.fil_inst.sig_tx.disconnect()
             except (TypeError, AttributeError) as e:
                 logger.warning("Could not disconnect signal!\n", e)
 
@@ -461,6 +462,7 @@ class SelectFilter(QWidget):
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
 # TODO:
                 ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
+                ff.fil_inst.sig_tx.connect(self.sig_tx)
 
         except AttributeError as e:
             logger.warning(e)

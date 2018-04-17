@@ -71,6 +71,7 @@ near ``f_S/2`` (highpass).
 ``ma.calc_ma()``
     """
 
+    sig_tx = pyqtSignal(object)
     sigFiltChanged = pyqtSignal()
 
     def __init__(self):
@@ -245,6 +246,7 @@ near ``f_S/2`` (highpass).
                                          'normalize':self.chk_norm.isChecked()}
                                     })
                                     
+        self.sig_tx.emit({'sender':__name__, 'filt_changed':'ma'})
         self.sigFiltChanged.emit() # -> select_filter -> filter_specs
 
 
