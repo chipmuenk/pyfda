@@ -58,13 +58,9 @@ class InputTabWidgets(QWidget):
         self.filter_specs = filter_specs.FilterSpecs(self)
         self.filter_specs.sig_tx.connect(self.sig_rx)
         #self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)
-        # sigSpecsChanged: signal indicating that filter SPECS have changed,
-        #       requiring update of some plot widgets and input widgets:
-        # self.filter_specs.sigSpecsChanged.connect(self.update_specs)
-        #
+
         # sigFilterDesigned: signal indicating that filter has been DESIGNED,
         #       requiring update of all plot and some input widgets:
-        # self.filter_specs.sigFilterDesigned.connect(self.update_data)
 
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
@@ -119,7 +115,7 @@ class InputTabWidgets(QWidget):
         self.setLayout(layVMain) # set the main layout of the window
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
+#    @pyqtSlot(object)
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
