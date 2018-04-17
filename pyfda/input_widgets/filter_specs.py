@@ -13,11 +13,9 @@ filter design is started here as well.
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
-from pprint import pformat
+#from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
-
-import numpy as np
 
 from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
                       QVBoxLayout, QHBoxLayout)
@@ -67,21 +65,6 @@ class FilterSpecs(QWidget):
             self.update_UI()
         self.sig_tx.emit(dict_sig)
 
-    def update_view(self, dict_sig=None):
-        """
-        Slot for InputSpecs.sigViewChanged
-
-        Propagate new PLOT VIEW (e.g. log scale, single/double sided) to
-        plot widgets via pyfda.py
-
-        Update plot widgets via sigSpecsChanged signal that need new
-            specs, e.g. plotHf widget for the filter regions
-        """
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__,'view_changed':True}
-
-        self.sig_tx.emit(dict_sig)
-
     def _construct_UI(self):
         """
         Construct User Interface from all input subwidgets
@@ -96,17 +79,14 @@ class FilterSpecs(QWidget):
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
         self.f_units.sig_tx.connect(self.sig_rx)
-        #self.f_units.sigUnitChanged.connect(self.update_view)
         
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
-        # Activating the "Sort" button triggers sigSpecsChanged, requiring
+        # Activating the "Sort" button emits 'view_changed'?specs_changed'?, requiring
         # sorting and storing the frequency entries
 
         # Changing filter parameters / specs requires reloading of parameters
         # in other hierarchy levels, e.g. in the plot tabs
-        # bundle sigSpecsChanged signals and propagate to next hierarchy level
-#        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged)
 
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
