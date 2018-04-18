@@ -142,7 +142,7 @@ class FreqUnits(QWidget):
         - during init
         - when the unit combobox is changed
 
-        Finally, store freqSpecsRange and emit sigUnitChanged signal via _freq_range
+        Finally, store freqSpecsRange and emit 'view_changed' signal via _freq_range
         """
         idx = self.cmbUnits.currentIndex() # read index of units combobox
         f_unit = str(self.cmbUnits.currentText()) # and the label
@@ -193,8 +193,7 @@ class FreqUnits(QWidget):
           to True.
         - When a QLineEdit widget loses input focus (QEvent.FocusOut`), store
           current value with full precision (only if `spec_edited`== True) and
-          display the stored value in selected format. Emit 'specs_changed':'f_unit'
-          signal and a sigUnitsChanged signals
+          display the stored value in selected format. Emit 'view_changed':'f_S'
         """
         def _store_entry():
             """
@@ -205,7 +204,7 @@ class FreqUnits(QWidget):
                 fb.fil[0].update({'f_S':safe_eval(source.text(), fb.fil[0]['f_S'])})
                 # TODO: ?!
                 self._freq_range(emit_sig_range = False) # update plotting range 
-                self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_unit'})
+                self.sig_tx.emit({'sender':__name__, 'view_changed':'f_S'})
                 self.spec_edited = False # reset flag, changed entry has been saved
 
         if source.objectName() == 'f_S':
