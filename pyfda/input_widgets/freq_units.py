@@ -65,7 +65,7 @@ class FreqUnits(QWidget):
         self.ledF_S.installEventFilter(self)  # filter events
 
         self.lblF_S = QLabel(self)
-        self.lblF_S.setText(to_html("f_S", frmt='b'))
+        self.lblF_S.setText(to_html("f_S", frmt='bi'))
 
         self.cmbUnits = QComboBox(self)
         self.cmbUnits.setObjectName("cmbUnits")
