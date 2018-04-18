@@ -177,7 +177,7 @@ class FilterSpecs(QWidget):
         widgets are visible and which message shall be displayed.
 
         Then, the UIs of all subwidgets are updated using their "update_UI" method,
-        finally the signal 'sigSpecsChanged' is emitted.
+        finally sig_tx({'specs_changed':'filter'}) is emitted.
         """
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
