@@ -137,24 +137,27 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False):
 def qstyle_widget(widget, state):
     """
     Apply the "state" defined in pyfda_rc.py to the widget, e.g.:  
-    Color the >> DESIGN FILTER << button according to the filter design state:
+    Color the >> DESIGN FILTER << button according to the filter design state.
     
     - "normal": default, no color styling
     - "ok":  green, filter has been designed, everything ok
     - "changed": yellow, filter specs have been changed
     - "error" : red, an error has occurred during filter design
     - "failed" : orange, filter fails to meet target specs
-    - "unused": grey
+    - "u" or "unused": grey text color
+    - "d" or "disabled": background color darkgrey
+    - "a" or "active": no special style defined
     """
     state = str(state)
     if state == 'u':
         state = "unused"
+        # *[state="unused"], *[state="u"]{background-color:white; color:darkgrey}
     elif state == 'a':
         state = "active"
     elif state == 'd':
         state = "disabled"
+        # QLineEdit:disabled{background-color:darkgrey;}
     widget.setProperty("state", state)
-    #fb.design_filt_state = state
     widget.style().unpolish(widget)
     widget.style().polish(widget)
     widget.update()

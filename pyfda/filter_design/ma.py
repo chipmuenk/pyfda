@@ -70,8 +70,7 @@ near ``f_S/2`` (highpass).
 
 ``ma.calc_ma()``
     """
-
-    sigFiltChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object)
 
     def __init__(self):
         QWidget.__init__(self)       
@@ -244,8 +243,8 @@ near ``f_S/2`` (highpass).
                                          'stages':self.stages,
                                          'normalize':self.chk_norm.isChecked()}
                                     })
-                                    
-        self.sigFiltChanged.emit() # -> select_filter -> filter_specs
+        # sig_tx -> select_filter -> filter_specs                                   
+        self.sig_tx.emit({'sender':__name__, 'filt_changed':'ma'})
 
 
     def destruct_UI(self):

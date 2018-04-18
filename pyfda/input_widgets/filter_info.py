@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 from ..compat import (QtGui, QWidget, QFont, QCheckBox, QFrame,
                       QTableWidget, QTableWidgetItem, QTextBrowser, QTextCursor,
-                      QVBoxLayout, QHBoxLayout, QSplitter, Qt)
+                      QVBoxLayout, QHBoxLayout, QSplitter, Qt, pyqtSignal)
 
 import numpy as np
 from numpy import pi, log10
@@ -40,11 +40,21 @@ class FilterInfo(QWidget):
     """
     Create widget for displaying infos about filter and filter design method
     """
+    sig_rx = pyqtSignal(object) # incoming signals from input_tab_widgets
+
     def __init__(self, parent):
         super(FilterInfo, self).__init__(parent)
         
         self._construct_UI()
         self.load_dict()
+
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if 'data_changed' in dict_sig or 'view_changed' in dict_sig or 'specs_changed' in dict_sig:
+            self.load_dict()
 
     def _construct_UI(self):
         """
@@ -123,7 +133,13 @@ class FilterInfo(QWidget):
 
         self.setLayout(layVMain)
 
-        # ============== Signals & Slots ================================
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         self.chkFiltPerf.clicked.connect(self._show_filt_perf)
         self.chkFiltDict.clicked.connect(self._show_filt_dict)
         self.chkFiltTree.clicked.connect(self._show_filt_tree)

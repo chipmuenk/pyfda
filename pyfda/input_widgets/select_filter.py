@@ -39,11 +39,10 @@ class SelectFilter(QWidget):
       response resp. filter type is read and the combo box(es) further down in
       the hierarchy are populated according to the available combinations.
 
-      The signal sigFiltChanged is triggered and propagated to filter_specs.py
+      sig_tx({ 'filt_changed'}) is emitted and propagated to filter_specs.py
       where it triggers the recreation of all subwidgets.
     """
-
-    sigFiltChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent):
         super(SelectFilter, self).__init__(parent)
@@ -180,8 +179,7 @@ class SelectFilter(QWidget):
         # SIGNALS & SLOTS
         #------------------------------------------------------------
         # Connect comboBoxes and setters, propgate change events hierarchically
-        #  through all widget methods and generate the signal sigFiltChanged
-        #  in the end.
+        #  through all widget methods and emit 'filt_changed' in the end.
         self.cmbResponseType.currentIndexChanged.connect(
                 lambda: self._set_response_type(enb_signal=True))# 'LP'
         self.cmbFilterType.currentIndexChanged.connect(
@@ -375,15 +373,15 @@ class SelectFilter(QWidget):
         self.lblOrderN.setEnabled(not self.chkMinOrder.isChecked() and status == 'a')
 
         if enb_signal:
-            logger.debug("Emit sigFiltChanged")
-            self.sigFiltChanged.emit() # -> filter_specs
+            logger.debug("Emit 'filt_changed'")
+            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_auto'})
 
 #------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
         """
         Triggered when either ledOrderN or chkMinOrder are edited:
         - copy settings to fb.fil[0]
-        - emit sigFiltChanged if enb_signal is True
+        - emit 'filt_changed' if enb_signal is True
         """
         # Determine which subwidgets are _enabled_
         if self.chkMinOrder.isVisible():
@@ -410,8 +408,8 @@ class SelectFilter(QWidget):
         fb.fil[0].update({'N' : ordn})
 
         if enb_signal:
-            logger.debug("Emit sigFiltChanged") 
-            self.sigFiltChanged.emit() # -> filter_specs
+            logger.debug("Emit 'filt_changed'") 
+            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_widget'})
 
 #------------------------------------------------------------------------------
     def _destruct_dyn_widgets(self):
@@ -428,9 +426,9 @@ class SelectFilter(QWidget):
 
         if hasattr(ff.fil_inst, 'wdg') and ff.fil_inst.wdg:
             try:
-                ff.fil_inst.sigFiltChanged.disconnect() # disconnect signal
+                ff.fil_inst.sig_tx.disconnect()
             except (TypeError, AttributeError) as e:
-                logger.warning("Could not disconnect signal!\n", e)
+                logger.warning("Could not disconnect signal!\n{0}".format(e))
 
             try:
                 ff.fil_inst.destruct_UI() # local operations like disconnecting signals
@@ -447,8 +445,7 @@ class SelectFilter(QWidget):
     def _construct_dyn_widgets(self):
         """
         Create filter widget UI dynamically (if the filter routine has one) and
-        connect its sigFiltChanged signal to the signal with the same name
-        in this scope.
+        connect its sig_tx signal to sig_tx in this scope.
         """
 
         ff.fil_inst.construct_UI()
@@ -458,7 +455,7 @@ class SelectFilter(QWidget):
                 self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
 
-                ff.fil_inst.sigFiltChanged.connect(self.sigFiltChanged)
+                ff.fil_inst.sig_tx.connect(self.sig_tx)
 
         except AttributeError as e:
             logger.warning(e)

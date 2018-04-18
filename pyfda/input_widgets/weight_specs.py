@@ -29,8 +29,7 @@ class WeightSpecs(QWidget):
     Build and update widget for entering the weight
     specifications like W_SB, W_PB etc.
     """
-
-    sigSpecsChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent):
 
@@ -92,7 +91,7 @@ class WeightSpecs(QWidget):
 
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs / EVENT FILTER
+        # LOCAL SIGNALS & SLOTs / EVENT FILTER
         #----------------------------------------------------------------------
         self.butReset.clicked.connect(self._reset_weights)
         #       ^ this also initializes the weight text fields
@@ -142,6 +141,7 @@ class WeightSpecs(QWidget):
 #-------------------------------------------------------------
     def update_UI(self, new_labels = []):
         """
+        Called from filter_specs.update_UI()
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
         using
@@ -205,7 +205,7 @@ class WeightSpecs(QWidget):
             if w_value > 1.e6:
                 w_value = 1.e6
             fb.fil[0].update({w_label:w_value})
-            self.sigSpecsChanged.emit() # -> filter_specs
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'w_specs'})
             self.spec_edited = False # reset flag
         self.load_dict()
         
@@ -265,8 +265,7 @@ class WeightSpecs(QWidget):
             fb.fil[0].update({w_label:1})
 
         self.load_dict()
-        self.sigSpecsChanged.emit() # -> filter_specs
-
+        self.sig_tx.emit({'sender':__name__, 'specs_changed':'w_specs'})
 
 #------------------------------------------------------------------------------
 

@@ -264,7 +264,8 @@ class FilterCoeffs(QWidget):
 
     Views / formats are handled by the ItemDelegate() class.
     """
-    sigFilterDesigned = pyqtSignal()  # emitted when coeffs have been changed
+    sig_tx = pyqtSignal(object) # emitted when filter has been saved
+    sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
 
     def __init__(self, parent):
         super(FilterCoeffs, self).__init__(parent)
@@ -272,6 +273,20 @@ class FilterCoeffs(QWidget):
         self.opt_widget = None # handle for pop-up options widget
         self.ui = FilterCoeffs_UI(self) # create the UI part with buttons etc.
         self._construct_UI()
+        
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite Loop!")
+        elif 'data_changed' in dict_sig:
+            self.load_dict()
+        elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+            self.ui._set_load_save_icons()
+
 
     def _construct_UI(self):
         """
@@ -311,8 +326,14 @@ class FilterCoeffs(QWidget):
         self.load_dict() # initialize + refresh table with default values from filter dict
         # TODO: this needs to be optimized - self._refresh is being called in both routines
         self._set_number_format()
-
-        # ============== Signals & Slots ================================
+        
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+        #----------------------------------------------------------------------
+        # LOCAL (UI) SIGNALS & SLOTs
+        #----------------------------------------------------------------------
         # wdg.textChanged() is emitted when contents of widget changes
         # wdg.textEdited() is only emitted for user changes
         # wdg.editingFinished() is only emitted for user changes
@@ -344,6 +365,8 @@ class FilterCoeffs(QWidget):
         self.ui.ledScale.editingFinished.connect(self._set_scale)
 
         self.ui.butQuant.clicked.connect(self.quant_coeffs)
+        
+        self.ui.sig_tx.connect(self.sig_tx)
         # =====================================================================
 
 #------------------------------------------------------------------------------
@@ -683,7 +706,7 @@ class FilterCoeffs(QWidget):
         Save the coefficient register `self.ba` to the filter dict `fb.fil[0]['ba']`.
         """
 
-        logger.debug("_save_entries called")
+        logger.debug("_save_dict called")
 
         fb.fil[0]['N'] = max(len(self.ba[0]), len(self.ba[1])) - 1
 
@@ -700,8 +723,8 @@ class FilterCoeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sigFilterDesigned.emit() # -> filter_specs
-        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_coeffs'})
+        # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
 

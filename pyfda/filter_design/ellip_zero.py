@@ -81,8 +81,7 @@ to be complex (no real values).
 ``scipy.signal.ellip()``, ``scipy.signal.ellipord()``
 
         """
-
-    sigFiltChanged = pyqtSignal()
+    sig_tx = pyqtSignal(object)
 
     def __init__(self):
         QWidget.__init__(self)
@@ -337,8 +336,8 @@ to be complex (no real values).
 
 #       'rpk' is our signal that this is a non-Causal filter with zero phase
 #       inserted into fil dictionary after fil_save and convert
-
-        self.sigFiltChanged.emit()
+        # sig_tx -> select_filter -> filter_specs   
+        self.sig_tx.emit({'sender':__name__, 'filt_changed':'ellip_zero'})
 
 #------------------------------------------------------------------------------
 #

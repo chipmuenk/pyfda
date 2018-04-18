@@ -178,9 +178,8 @@ class FilterPZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
-
-    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
-    sigSpecsChanged = pyqtSignal()
+    sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
+    sig_tx = pyqtSignal(object) # emitted when filter has been saved
 
     def __init__(self, parent):
         super(FilterPZ, self).__init__(parent)
@@ -198,7 +197,20 @@ class FilterPZ(QWidget):
 
         self.setup_signal_slot() # setup signal-slot connections and eventFilters
 
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite loop detected (and interrupted)!")
+        elif 'data_changed' in dict_sig:
+            self.load_dict()
+        elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
+            self.ui._set_load_save_icons()
 
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         """
         Intitialize the widget
@@ -231,10 +243,16 @@ class FilterPZ(QWidget):
 
     def setup_signal_slot(self):
         """
-        Setup local signal-slot connections
+        Setup setup signal-slot connections
         """
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+        self.ui.sig_tx.connect(self.sig_tx)
+
+        #----------------------------------------------------------------------
+        # LOCAL (UI) SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.ui.cmbPZFrmt.activated.connect(self._refresh_table)
         self.ui.spnDigits.editingFinished.connect(self._refresh_table)
@@ -255,6 +273,7 @@ class FilterPZ(QWidget):
 
         self.ui.ledGain.installEventFilter(self)
         self.ui.ledEps.editingFinished.connect(self._set_eps)
+        
 
         #----------------------------------------------------------------------
         # self.tblPZ.itemSelectionChanged.connect(self._copy_item)
@@ -483,8 +502,8 @@ class FilterPZ(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sigFilterDesigned.emit() # -> filter_specs
-        # -> input_tab_widgets -> pyfdax -> plt_tab_widgets.updateAll()
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_pz'})
+        # -> input_tab_widgets
 
         logger.debug("b,a = %s\n\n"
             "zpk = %s\n"

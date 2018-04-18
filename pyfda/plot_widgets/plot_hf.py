@@ -152,10 +152,13 @@ class PlotHf(QWidget):
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
                 self.draw()
                 self.needs_redraw = False
+            elif 'view_changed' in dict_sig:
+                self.update_view()
             elif 'enabled' in dict_sig:
                 self.enable_ui(dict_sig['enabled']) 
         else:
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
+            # TODO: redraw wouldn't be necessary for 'view_changed', only update view 
+            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or 'view_changed' in dict_sig:
                 self.needs_redraw = True
             else:
                 pass
@@ -586,6 +589,7 @@ class PlotHf(QWidget):
             #-----------------------------------------------------------
             self.ax.clear()
             self.ax.plot(self.F, self.H_plt, label = 'H(f)')
+            # TODO: self.draw_inset() # this gives an infinite recursion
             self.draw_phase(self.ax)
             #-----------------------------------------------------------
             

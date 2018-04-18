@@ -36,7 +36,8 @@ class FreqSpecs(QWidget):
     """
 
     # class variables (shared between instances if more than one exists)
-    sigSpecsChanged = pyqtSignal() # emitted when filter has been changed
+    sig_tx = pyqtSignal(object) # outgoing
+    sig_rx = pyqtSignal(object) # incoming
 
     def __init__(self, parent, title = "Frequency Specs"):
 
@@ -49,6 +50,19 @@ class FreqSpecs(QWidget):
         self.spec_edited = False # flag whether QLineEdit field has been edited
 
         self._construct_UI()
+
+#-------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite loop detected (and interrupted)!")
+        elif 'specs_changed' in dict_sig and dict_sig['specs_changed'] == 'f_specs':
+            self.sort_dict_freqs()
+        elif 'view_changed' in dict_sig:
+            self.load_dict()
 
 #-------------------------------------------------------------
     def _construct_UI(self):
@@ -85,7 +99,12 @@ class FreqSpecs(QWidget):
         self.layVMain.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.layVMain)
 
-        self.n_cur_labels = 0 # number of currently visible labels / qlineedits        
+        self.n_cur_labels = 0 # number of currently visible labels / qlineedits
+
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
 
         #----------------------------------------------------------------------
         # EVENT FILTER
@@ -132,7 +151,6 @@ class FreqSpecs(QWidget):
         # Call base class method to continue normal event processing:
         return super(FreqSpecs, self).eventFilter(source, event)
 
-
 #------------------------------------------------------------------------------
     def _store_entry(self, event_source):
         """
@@ -146,12 +164,13 @@ class FreqSpecs(QWidget):
             f_value = safe_eval(event_source.text(), fb.data_old) / fb.fil[0]['f_S']
             fb.fil[0].update({f_label:f_value})
             self.sort_dict_freqs()
-            self.sigSpecsChanged.emit() # -> filter_specs
+            self.sig_tx.emit({'sender':__name__, 'specs_changed':'f_specs'})
             self.spec_edited = False # reset flag
 
 #-------------------------------------------------------------
     def update_UI(self, new_labels = ()):
         """
+        Called from filter_specs.update_UI() and target_specs.update_UI()
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
         using
@@ -163,15 +182,9 @@ class FreqSpecs(QWidget):
         - `self.n_cur_labels`, the number of currently visible labels / qlineedit
           fields
         """
+        self.update_f_unit()
         state = new_labels[0]
         new_labels = new_labels[1:]
-        unit = fb.fil[0]['freq_specs_unit']
-        if unit in {"f_S", "f_Ny"}:
-            unit_frmt = 'bi'
-        else:
-            unit_frmt = 'b'
-            
-        self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
         num_new_labels = len(new_labels)
         # hide / show labels / create new subwidgets if neccessary:
         self._show_entries(num_new_labels)
@@ -201,6 +214,18 @@ class FreqSpecs(QWidget):
         self.n_cur_labels = num_new_labels # update number of currently visible labels
         self.sort_dict_freqs() # sort frequency entries in dictionary and update display
 
+#-------------------------------------------------------------
+    def update_f_unit(self):
+        """
+        Set label for frequency unit according to selected unit.
+        """
+        unit = fb.fil[0]['freq_specs_unit']
+        if unit in {"f_S", "f_Ny"}:
+            unit_frmt = 'bi'
+        else:
+            unit_frmt = 'b'
+        self.lblUnit.setText(" in " + to_html(unit, frmt=unit_frmt))
+
 #-------------------------------------------------------------        
     def load_dict(self):
         """
@@ -209,6 +234,8 @@ class FreqSpecs(QWidget):
         setting (i.e. f_S). Spec entries are always stored normalized w.r.t. f_S 
         in the dictionary; when f_S or the unit are changed, only the displayed values
         of the frequency entries are updated, not the dictionary!
+        
+        Update the displayed frequency unit
 
         load_dict is called during init and when the frequency unit or the
         sampling frequency have been changed.
@@ -219,6 +246,8 @@ class FreqSpecs(QWidget):
 
         # recalculate displayed freq spec values for (maybe) changed f_S
         logger.debug("exec load_dict")
+        self.update_f_unit()
+        
         for i in range(len(self.qlineedit)):
             f_name = str(self.qlineedit[i].objectName()).split(":",1)
             f_label = f_name[0]

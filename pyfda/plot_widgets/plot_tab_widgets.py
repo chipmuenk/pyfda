@@ -36,39 +36,45 @@ class PlotTabWidgets(QTabWidget):
 #------------------------------------------------------------------------------
     def _construct_UI(self):
         """ 
-        Initialize UI with tabbed subplots and connect the signals of all
+        Initialize UI with tabbed subwidgets and connect the signals of all
         subwidgets. Plot widgets are not sending back anything (yet), hence no
         need to connect self.sig_rx to the subwidgets
         """
-        self.tabWidget = QTabWidget(self)
-        self.tabWidget.setObjectName("plot_tabs")
+        tabWidget = QTabWidget(self)
+        tabWidget.setObjectName("plot_tabs")
         #
         self.pltHf = plot_hf.PlotHf(self)
-        self.tabWidget.addTab(self.pltHf, '|H(f)|')
         self.sig_tx.connect(self.pltHf.sig_rx)
+        tabWidget.addTab(self.pltHf, '|H(f)|')
+        tabWidget.setTabToolTip(0, "Magnitude and phase frequency response")
         #
         self.pltPhi = plot_phi.PlotPhi(self)
-        self.tabWidget.addTab(self.pltPhi, 'phi(f)')
         self.sig_tx.connect(self.pltPhi.sig_rx)
+        tabWidget.addTab(self.pltPhi, 'phi(f)')
+        tabWidget.setTabToolTip(1, "Phase frequency response")
         #
         self.pltPZ = plot_pz.PlotPZ(self)
-        self.tabWidget.addTab(self.pltPZ, 'P/Z')
         self.sig_tx.connect(self.pltPZ.sig_rx)
+        tabWidget.addTab(self.pltPZ, 'P/Z')
+        tabWidget.setTabToolTip(2, "Pole / zero plan")
         #
         self.pltTauG = plot_tau_g.PlotTauG(self)
-        self.tabWidget.addTab(self.pltTauG, 'tau_g')
         self.sig_tx.connect(self.pltTauG.sig_rx)
+        tabWidget.addTab(self.pltTauG, 'tau_g')
+        tabWidget.setTabToolTip(3, "Group delay")
         #
         self.pltImpz = plot_impz.PlotImpz(self)
-        self.tabWidget.addTab(self.pltImpz, 'h[n]')
         self.sig_tx.connect(self.pltImpz.ui.sig_rx)
+        tabWidget.addTab(self.pltImpz, 'h[n]')
+        tabWidget.setTabToolTip(4, "Impulse and transient response")
         #
         self.plt3D = plot_3d.Plot3D(self)
-        self.tabWidget.addTab(self.plt3D, '3D')
         self.sig_tx.connect(self.plt3D.sig_rx)
+        tabWidget.addTab(self.plt3D, '3D')
+        tabWidget.setTabToolTip(5, "3D magnitude response |H(z)|")
         #
         layVMain = QVBoxLayout()
-        layVMain.addWidget(self.tabWidget)
+        layVMain.addWidget(tabWidget)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
         self.setLayout(layVMain)
@@ -86,11 +92,11 @@ class PlotTabWidgets(QTabWidget):
         self.timer_id.timeout.connect(self.current_tab_redraw)
 
         # When user has selected a different tab, trigger a redraw of current tab
-        self.tabWidget.currentChanged.connect(self.current_tab_redraw)
+        tabWidget.currentChanged.connect(self.current_tab_redraw)
         # The following does not work: maybe current scope must be left?
-        # self.tabWidget.currentChanged.connect(self.tabWidget.currentWidget().redraw)
+        # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
 
-        self.tabWidget.installEventFilter(self)
+        tabWidget.installEventFilter(self)
         
         
 #    @pyqtSlot(object)
@@ -136,7 +142,6 @@ class PlotTabWidgets(QTabWidget):
 #------------------------------------------------------------------------------
         
     def current_tab_redraw(self):
-        #self.tabWidget.currentWidget().redraw()
         self.sig_tx.emit({'sender':__name__, 'tab_changed':True})
             
 #------------------------------------------------------------------------------

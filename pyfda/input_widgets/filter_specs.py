@@ -13,11 +13,9 @@ filter design is started here as well.
 
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
-from pprint import pformat
+#from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
-
-import numpy as np
 
 from ..compat import (QWidget, QLabel, QFrame, QPushButton, pyqtSignal,
                       QVBoxLayout, QHBoxLayout)
@@ -31,21 +29,41 @@ from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
 
-
 class FilterSpecs(QWidget):
     """
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    sigFilterDesigned = pyqtSignal()  # emitted when filter has been designed
-    sigSpecsChanged = pyqtSignal() # emitted when specs have been changed
-    sigViewChanged = pyqtSignal() # emitted when view has changed
     sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
+
+    sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sigmals
+    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
         super(FilterSpecs, self).__init__(parent)
 
         self._construct_UI()
+
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite Loop!")
+            return
+        elif 'view_changed' in dict_sig:
+            self.f_specs.load_dict()
+            self.t_specs.load_dict()
+        elif 'specs_changed' in dict_sig:
+            self.f_specs.sort_dict_freqs()
+            self.t_specs.f_specs.sort_dict_freqs()
+        elif 'filt_changed' in dict_sig:
+            # Changing the filter design requires updating UI because number or
+            # kind of input fields changes -> call update_UI, emitting
+            # 'specs_changed' when finished
+            self.update_UI()
+        self.sig_tx.emit(dict_sig)
 
     def _construct_UI(self):
         """
@@ -55,21 +73,38 @@ class FilterSpecs(QWidget):
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
+        self.sel_fil.sig_tx.connect(self.sig_rx)
+        
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
+        self.f_units.sig_tx.connect(self.sig_rx)
+        
+        # Changing the frequency unit requires re-display of frequency specs
+        # but it does not influence the actual specs (no specsChanged )
+        # Activating the "Sort" button emits 'view_changed'?specs_changed'?, requiring
+        # sorting and storing the frequency entries
+
+        # Changing filter parameters / specs requires reloading of parameters
+        # in other hierarchy levels, e.g. in the plot tabs
+
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
+        self.f_specs.sig_tx.connect(self.sig_rx)
         # Subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
+        self.a_specs.sig_tx.connect(self.sig_rx)
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
+        self.w_specs.sig_tx.connect(self.sig_rx)
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
+        self.t_specs.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.t_specs.sig_rx)
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
         self.lblMsg.setWordWrap(True)
@@ -111,35 +146,12 @@ class FilterSpecs(QWidget):
         self.setLayout(layVMain) # main layout of widget
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTS
-        #
-        # Changing the filter design requires updating UI because number or
-        # kind of input fields changes -> Call update_all_UIs, emitting
-        # sigFilterChanged when it's finished
-        self.sel_fil.sigFiltChanged.connect(self.update_UI)
-
-        # Changing the frequency unit requires re-display of frequency specs
-        # but it does not influence the actual specs (no specsChanged )
-        self.f_units.sigUnitChanged.connect(self.f_specs.load_dict)
-        self.f_units.sigUnitChanged.connect(self.t_specs.load_dict)
-        self.f_units.sigUnitChanged.connect(self.sigViewChanged)
-        # Activating the "Sort" button triggers sigSpecsChanged, requiring
-        # sorting and storing the frequency entries
-        self.f_units.sigSpecsChanged.connect(self.f_specs.sort_dict_freqs)
-        self.f_units.sigSpecsChanged.connect(self.t_specs.f_specs.sort_dict_freqs)
-
-
-        # Changing filter parameters / specs requires reloading of parameters
-        # in other hierarchy levels, e.g. in the plot tabs
-        # bundle sigSpecsChanged signals and propagate to next hierarchy level
-#        self.f_units.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.f_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.t_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.a_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
-        self.a_specs.sigUnitChanged.connect(self.sigViewChanged)
-        self.w_specs.sigSpecsChanged.connect(self.sigSpecsChanged)
-
-        # Other signal-slot connections
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------        
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.sigQuit) # pass on to main application
         #----------------------------------------------------------------------
@@ -164,7 +176,7 @@ class FilterSpecs(QWidget):
         widgets are visible and which message shall be displayed.
 
         Then, the UIs of all subwidgets are updated using their "update_UI" method,
-        finally the signal 'sigSpecsChanged' is emitted.
+        finally sig_tx({'specs_changed':'filter'}) is emitted.
         """
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
@@ -175,8 +187,8 @@ class FilterSpecs(QWidget):
         # the values are a tuple with the corresponding parameters
         all_widgets = fb.fil_tree[rt][ft][fc][fo]
 
-        logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
-        logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
+        # logger.debug("rt: {0} - ft: {1} - fc: {2} - fo: {3}".format(rt, ft, fc, fo))
+        # logger.debug("fb.fil_tree[rt][ft][fc][fo]:\n{0}".format(fb.fil_tree[rt][ft][fc][fo]))
 
         # self.sel_fil.load_filter_order() # update filter order subwidget, called by select_filter
 
@@ -225,8 +237,7 @@ class FilterSpecs(QWidget):
         else:
             self.frmMsg.hide()
 
-        logger.debug("emit sigSpecsChanged")
-        self.sigSpecsChanged.emit()
+        self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):
@@ -290,18 +301,20 @@ class FilterSpecs(QWidget):
                 self.f_specs.load_dict()
                 self.color_design_button("ok")
 
-                self.sigFilterDesigned.emit() # emit signal -> InputTabWidgets.update_all
+                self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_designed'})
                 logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
-                logger.debug("Results:\n"
-                    "F_PB = %s, F_SB = %s "
-                    "Filter order N = %s\n"
-                    "NDim fil[0]['ba'] = %s\n\n"
-                    "b,a = %s\n\n"
-                    "zpk = %s\n",
-                    str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
-                    str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
-                    pformat(fb.fil[0]['zpk']))
-
+# =============================================================================
+#                 logger.debug("Results:\n"
+#                     "F_PB = %s, F_SB = %s "
+#                     "Filter order N = %s\n"
+#                     "NDim fil[0]['ba'] = %s\n\n"
+#                     "b,a = %s\n\n"
+#                     "zpk = %s\n",
+#                     str(fb.fil[0]['F_PB']), str(fb.fil[0]['F_SB']), str(fb.fil[0]['N']),
+#                     str(np.ndim(fb.fil[0]['ba'])), pformat(fb.fil[0]['ba']),
+#                     pformat(fb.fil[0]['zpk']))
+# 
+# =============================================================================
         except Exception as e:
             if ('__doc__' in str(e)):
                 logger.warning("Filter design:\n %s\n %s\n", e.__doc__, e)

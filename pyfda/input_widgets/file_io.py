@@ -58,9 +58,7 @@ class File_IO(QWidget):
     """
     Create the widget for saving / loading data
     """
-    # incoming, connected in sender widget (locally connected to self.process_signals() )
-    #sig_rx = QtCore.pyqtSignal(dict)
-    sig_tx = QtCore.pyqtSignal(dict) # outgoing from process_signals, connected to PlotImpz
+    sig_tx = QtCore.pyqtSignal(object) # sent when loading filter ('data_changed')
 
     def __init__(self, parent):
         super(File_IO, self).__init__(parent)
@@ -107,7 +105,7 @@ class File_IO(QWidget):
         self.setLayout(layVMain)
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.butSave.clicked.connect(self.save_filter)
         self.butLoad.clicked.connect(self.load_filter)
