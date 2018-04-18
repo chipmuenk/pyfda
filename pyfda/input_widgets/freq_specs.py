@@ -170,6 +170,7 @@ class FreqSpecs(QWidget):
 #-------------------------------------------------------------
     def update_UI(self, new_labels = ()):
         """
+        Called from filter_specs.update_UI() and target_specs.update_UI()
         Set labels and get corresponding values from filter dictionary.
         When number of entries has changed, the layout of subwidget is rebuilt,
         using

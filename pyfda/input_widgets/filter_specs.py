@@ -96,7 +96,6 @@ class FilterSpecs(QWidget):
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
         self.a_specs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.a_specs.sig_rx)
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
@@ -177,7 +176,7 @@ class FilterSpecs(QWidget):
         widgets are visible and which message shall be displayed.
 
         Then, the UIs of all subwidgets are updated using their "update_UI" method,
-        finally the signal 'sigSpecsChanged' is emitted.
+        finally sig_tx({'specs_changed':'filter'}) is emitted.
         """
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'

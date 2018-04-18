@@ -128,8 +128,7 @@ class TargetSpecs(QWidget):
             self.a_specs.update_UI(new_labels=new_labels['amp'])
         else:
             self.a_specs.hide()
-#
-        #self.sigSpecsChanged.emit() # ->pyFDA -> pltWidgets.updateAll()
+
         self.sig_tx.emit({'sender':__name__, 'changed_specs':'target'})
 
 #------------------------------------------------------------------------------
