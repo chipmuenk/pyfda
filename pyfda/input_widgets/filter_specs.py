@@ -96,7 +96,6 @@ class FilterSpecs(QWidget):
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
         self.a_specs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.a_specs.sig_rx)
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
