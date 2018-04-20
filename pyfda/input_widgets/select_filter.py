@@ -425,11 +425,8 @@ class SelectFilter(QWidget):
         """
 
         if hasattr(ff.fil_inst, 'wdg') and ff.fil_inst.wdg:
-            try:
-                ff.fil_inst.sig_tx.disconnect()
-            except (TypeError, AttributeError) as e:
-                logger.warning("Could not disconnect signal!\n{0}".format(e))
-
+            # not needed, connection is destroyed automatically
+            # ff.fil_inst.sig_tx.disconnect()
             try:
                 self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
                 self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
