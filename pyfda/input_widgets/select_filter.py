@@ -453,11 +453,11 @@ class SelectFilter(QWidget):
             if ff.fil_inst.wdg:
                 self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
-
-                ff.fil_inst.sig_tx.connect(self.sig_tx)
-
         except AttributeError as e:
             logger.warning(e)
+
+        if hasattr(ff.fil_inst, 'sig_tx'):
+            ff.fil_inst.sig_tx.connect(self.sig_tx)
 
 #------------------------------------------------------------------------------
 
