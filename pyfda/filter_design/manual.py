@@ -102,14 +102,6 @@ class Manual_FIR(object):
         pass
 
 
-            
-    def destruct_UI(self):
-        """
-        No UI, nothing to destruct here
-        """
-        pass
-
-
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
@@ -197,13 +189,6 @@ class Manual_IIR(object):
         pass
 
             
-    def destruct_UI(self):
-        """
-        No UI, nothing to destruct here
-        """
-        pass
-
-
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance

@@ -113,14 +113,6 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         pass
         
 
-    def destruct_UI(self):
-        """
-        Disconnect all signal-slot connections to avoid crashes upon exit
-        (empty method, nothing to do in this filter)
-        """
-        pass
-
-
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance

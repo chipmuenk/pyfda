@@ -220,12 +220,6 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         # sig_tx -> select_filter -> filter_specs   
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'equiripple'})
 
-    def destruct_UI(self):
-        """
-        Disconnect all signal-slot connections to avoid crashes upon exit
-        """
-        self.led_remez_1.editingFinished.disconnect()
-
 
     def _load_dict(self):
         """

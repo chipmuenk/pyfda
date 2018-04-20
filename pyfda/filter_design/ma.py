@@ -247,15 +247,6 @@ near ``f_S/2`` (highpass).
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'ma'})
 
 
-    def destruct_UI(self):
-        """
-        Disconnect all signal-slot connections to avoid crashes upon exit
-        """
-        self.led_delays.editingFinished.disconnect()
-        self.led_stages.editingFinished.disconnect()
-        self.chk_norm.clicked.disconnect()
-
-
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance

@@ -431,7 +431,6 @@ class SelectFilter(QWidget):
                 logger.warning("Could not disconnect signal!\n{0}".format(e))
 
             try:
-                ff.fil_inst.destruct_UI() # local operations like disconnecting signals
                 self.layHDynWdg.removeWidget(self.dyn_wdg_fil) # remove widget from layout
                 self.dyn_wdg_fil.deleteLater() # delete UI widget when scope has been left
 

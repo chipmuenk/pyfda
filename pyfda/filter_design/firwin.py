@@ -238,16 +238,6 @@ class Firwin(QWidget):
         # sig_tx -> select_filter -> filter_specs
         self.sig_tx.emit({'sender':__name__, 'filt_changed':'firwin'})
             
-    def destruct_UI(self):
-        """
-        Disconnect all signal-slot connections to avoid crashes upon exit
-        """
-        self.cmb_firwin_win.activated.disconnect()
-        self.led_firwin_1.editingFinished.disconnect()
-        self.led_firwin_2.editingFinished.disconnect()
-        self.cmb_firwin_alg.activated.disconnect()
-
-
     def _load_dict(self):
         """
         Reload window selection and parameters from filter dictionary
