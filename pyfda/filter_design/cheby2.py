@@ -27,6 +27,7 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
+    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -65,10 +66,7 @@ class Cheby2(object):
             'HP': {'man':{}, 'min':{}},
             'BS': {'man':{}, 'min':{}},
             'BP': {'man':{}, 'min':{}},
-            }
-        self.wdg = False  # has no additional dynamic widgets
-        
-        self.hdl = ('iir_sos', 'df') # filter topologies        
+            }    
 
         self.info = """
 **Chebyshev Type 2 filters**
@@ -101,18 +99,17 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         self.info_doc.append('cheb2ord()\n==========')
         self.info_doc.append(sig.cheb2ord.__doc__)
 
-
+    #--------------------------------------------------------------------------
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the 
-        names given in self.wdg :
+        Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in 
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         (empty method, nothing to do in this filter)
         """
         pass
         
-
+    #--------------------------------------------------------------------------
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
@@ -141,6 +138,7 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+    #--------------------------------------------------------------------------
     def _test_N(self):
         """
         Warn the user if the calculated order is too high for a reasonable filter
@@ -151,6 +149,7 @@ critical stop band frequency :math:`F_C` from pass and stop band specifications.
         else:
             return True
 
+    #--------------------------------------------------------------------------
     def _save(self, fil_dict, arg):
         """
         Convert results of filter design to all available formats (pz, ba, sos)

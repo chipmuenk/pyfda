@@ -26,6 +26,7 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
+    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 
@@ -160,16 +161,10 @@ is estimated from frequency and amplitude specifications using Ichige's algorith
         self.info_doc.append('remezord()\n==========')
         self.info_doc.append(remezord.__doc__)
 
-        self.wdg = True  # has additional dynamic widget 'wdg_fil'
-        
-        self.hdl = ('df') # filter topologies
-
-        #----------------------------------------------------------------------
-
+    #--------------------------------------------------------------------------
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the 
-        names given in self.wdg :
+        Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in 
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """

@@ -28,6 +28,7 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
+    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
@@ -101,11 +102,7 @@ class Butter(object):
                         }
                 }
             }
-
-        self.wdg = False  # has no additional dynamic widgets
-        
-        self.hdl = ('iir_sos', 'df') # filter topologies
-            
+          
         self.info = """
 **Butterworth filters**
 
@@ -134,10 +131,10 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         self.info_doc.append('buttord()\n==========')
         self.info_doc.append(buttord.__doc__)
 
+    #--------------------------------------------------------------------------
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the
-        names given in self.wdg :
+        Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         (empty method, nothing to do in this filter)
@@ -145,6 +142,7 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         pass
 
 
+    #--------------------------------------------------------------------------
     def _get_params(self,fil_dict):
         """
         Translate parameters from the passed dictionary to instance
@@ -171,6 +169,7 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+    #--------------------------------------------------------------------------
     def _test_N(self):
         """
         Warn the user if the calculated order is too high for a reasonable filter
@@ -181,7 +180,7 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         else:
             return True
 
-
+    #--------------------------------------------------------------------------
     def _save(self, fil_dict, arg):
         """
         Convert results of filter design to all available formats (pz, ba, sos)
@@ -192,7 +191,6 @@ are calculated using the ``buttord()``  helper routine to meet pass and stop ban
         """
 
         fil_save(fil_dict, arg, self.FRMT, __name__) # save & convert
-
 
         # For min. filter order algorithms, update filter dictionary with calculated
         # new values for filter order N and corner frequency(s) F_PBC

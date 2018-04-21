@@ -16,6 +16,7 @@ is selected, calling its __init__ method.
 
 API version info:
     2.0: initial working release
+    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -103,21 +104,16 @@ to be complex (no real values).
             'BP': {'man':{}, 'min':{}},
             }
 
-#       has additional dynamic widgets (for non-causal and Complex BP/BS)
-        self.wdg = True
-
-        self.hdl = ('iir_sos', 'df') # filter topologies
-
         self.info_doc = []
         self.info_doc.append('ellip()\n========')
         self.info_doc.append(sig.ellip.__doc__)
         self.info_doc.append('ellipord()\n==========')
         self.info_doc.append(ellipord.__doc__)
 
+    #--------------------------------------------------------------------------
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the
-        names given in self.wdg :
+        Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in
         select_filter.py using the handle to the filter instance, fb.fil_inst.
         """

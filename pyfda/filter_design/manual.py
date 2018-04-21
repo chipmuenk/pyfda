@@ -26,6 +26,7 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
+    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
 """
 
 from __future__ import print_function, division, unicode_literals
@@ -83,11 +84,6 @@ class Manual_FIR(object):
                         }}
                    }
 
-        self.wdg = False  # has no additional dynamic widgets
-        
-        self.hdl = ('df') # filter topologies
-
-        
         self.info = info_str
         self.info_doc = []
         self.info_doc.append('manual FIR\n==========')
@@ -172,9 +168,6 @@ class Manual_IIR(object):
                                            'amp':('u','A_SB','A_PB','A_SB2')})
                         }}
                    }
-        self.wdg = False  # has no additional dynamic widgets
-        
-        self.hdl = ('df') # filter topologies
         
         self.info = info_str
         self.info_doc = []

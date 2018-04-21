@@ -27,6 +27,7 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
+    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -101,10 +102,6 @@ class Bessel(object):
                 }
             }
 
-        self.wdg = False  # has no additional dynamic widgets
-        
-        self.hdl = ('iir_sos', 'df') # filter topologies
-
         self.info = """
 **Bessel filters**
 
@@ -133,31 +130,24 @@ For scipy 0.18 and higher, more design options have been implemented
 **Design routines:**
 
 ``scipy.signal.bessel()``, ``scipy.signal.buttord()``
-"""
-
-    def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the
-        names given in self.wdg :
-        These subwidgets are instantiated dynamically when needed in
-        select_filter.py using the handle to the filter instance, fb.fil_inst.
-        (empty method, nothing to do in this filter)
-        """
-        pass
-
-    def destruct_UI(self):
-        """
-        Disconnect all signal-slot connections to avoid crashes upon exit
-        (empty method, nothing to do in this filter)
-        """
-        pass
-
         self.info_doc = []
         self.info_doc.append('bessel()\n========')
         self.info_doc.append(sig.bessel.__doc__)
         self.info_doc.append('buttord()\n==========')
         self.info_doc.append(buttord.__doc__)
 
+#    #--------------------------------------------------------------------------
+#    def construct_UI(self):
+#        """
+#        Create additional subwidget(s) needed for filter design:
+#        These subwidgets are instantiated dynamically when needed in
+#        select_filter.py using the handle to the filter instance, fb.fil_inst.
+#        (empty method, nothing to do in this filter)
+#        """
+#        pass
+
+    #--------------------------------------------------------------------------
     def _get_params(self, fil_dict):
         """
         Translate parameters from the passed dictionary to instance
@@ -183,6 +173,7 @@ For scipy 0.18 and higher, more design options have been implemented
         elif str(fil_dict['rt']) == 'BP':
             fil_dict['A_SB2'] = fil_dict['A_SB']
 
+    #--------------------------------------------------------------------------
     def _test_N(self):
         """
         Warn the user if the calculated order is too high for a reasonable filter

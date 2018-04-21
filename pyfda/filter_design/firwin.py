@@ -103,15 +103,11 @@ class Firwin(QWidget):
         
         #------------------- end of static info for filter tree ---------------
 
-        self.wdg = True  # has additional dynamic widget 'wdg_fil'
-        
-        self.hdl = ('df') # filter topologies
         
         #----------------------------------------------------------------------        
     def construct_UI(self):
         """
-        Create additional subwidget(s) needed for filter design with the 
-        names given in self.wdg :
+        Create additional subwidget(s) needed for filter design:
         These subwidgets are instantiated dynamically when needed in 
         select_filter.py using the handle to the filter object, fb.filObj .
         """

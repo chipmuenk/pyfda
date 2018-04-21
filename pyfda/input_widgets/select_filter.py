@@ -326,10 +326,8 @@ class SelectFilter(QWidget):
                     fb.fil_tree[self.rt][self.ft][fc].keys()
                     ))
 
-            if hasattr(ff.fil_inst, 'wdg'): # construct dyn. subwidgets if available
+            if hasattr(ff.fil_inst, 'construct_UI'): # construct dyn. subwidgets if available
                 self._construct_dyn_widgets()
-            else:
-                self.frmDynWdg.setVisible(False) # no subwidget, hide empty frame
 
             self.fc_last = fb.fil[0]['fc']
 
@@ -424,7 +422,7 @@ class SelectFilter(QWidget):
         design method is the same as the old one.
         """
 
-        if hasattr(ff.fil_inst, 'wdg') and ff.fil_inst.wdg:
+        if hasattr(ff.fil_inst, 'wdg_fil'):
             # not needed, connection is destroyed automatically
             # ff.fil_inst.sig_tx.disconnect()
             try:
@@ -443,15 +441,13 @@ class SelectFilter(QWidget):
         Create filter widget UI dynamically (if the filter routine has one) and
         connect its sig_tx signal to sig_tx in this scope.
         """
-
         ff.fil_inst.construct_UI()
-
-        try:
-            if ff.fil_inst.wdg:
+        if hasattr(ff.fil_inst, 'wdg_fil'):
+            try:
                 self.dyn_wdg_fil = getattr(ff.fil_inst, 'wdg_fil')
                 self.layHDynWdg.addWidget(self.dyn_wdg_fil, stretch=1)
-        except AttributeError as e:
-            logger.warning(e)
+            except AttributeError as e:
+                logger.warning(e)
 
         if hasattr(ff.fil_inst, 'sig_tx'):
             ff.fil_inst.sig_tx.connect(self.sig_tx)
