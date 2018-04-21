@@ -26,7 +26,8 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+    2.1: Remove empty methods construct_UI and destruct_UI and attributes 
+         self.wdg and self.hdl
 """
 
 from __future__ import print_function, division, unicode_literals
@@ -88,15 +89,7 @@ class Manual_FIR(object):
         self.info_doc = []
         self.info_doc.append('manual FIR\n==========')
         
-        #------------------- end of static info for filter tree ---------------
-        
-        
-    def construct_UI(self):
-        """
-        No UI, nothing to construct here
-        """
-        pass
-
+    #------------------- end of static info for filter tree -------------------
 
     def _get_params(self, fil_dict):
         """
@@ -174,13 +167,6 @@ class Manual_IIR(object):
         self.info_doc.append('manual IIR\n==========')
         
         #------------------- end of static info for filter tree ---------------       
-        
-    def construct_UI(self):
-        """
-        No UI, nothing to construct here
-        """
-        pass
-
             
     def _get_params(self, fil_dict):
         """

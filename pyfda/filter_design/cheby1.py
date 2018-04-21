@@ -27,7 +27,8 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+    2.1: Remove empty methods construct_UI and destruct_UI and attributes 
+         self.wdg and self.hdl
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import scipy.signal as sig
@@ -100,16 +101,6 @@ critical passband frequency :math:`F_C` from passband / stopband specifications.
         self.info_doc.append(sig.cheby1.__doc__)
         self.info_doc.append('cheb1ord()\n==========')
         self.info_doc.append(sig.cheb1ord.__doc__)
-
-    #--------------------------------------------------------------------------
-    def construct_UI(self):
-        """
-        Create additional subwidget(s) needed for filter design:
-        These subwidgets are instantiated dynamically when needed in 
-        select_filter.py using the handle to the filter instance, fb.fil_inst.
-        (empty method, nothing to do in this filter)
-        """
-        pass
       
     #--------------------------------------------------------------------------
     def _get_params(self, fil_dict):
