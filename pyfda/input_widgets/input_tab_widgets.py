@@ -80,7 +80,7 @@ class InputTabWidgets(QWidget):
         self.file_io = file_io.File_IO(self)
         self.file_io.sig_tx.connect(self.sig_rx)
         tabWidget.addTab(self.file_io, 'Files')
-        tabWidget.setTabToolTip(3, "Import and export filter designs and coefficients.")
+        tabWidget.setTabToolTip(3, "Load and save filter designs.")
         #
         self.filter_info = filter_info.FilterInfo(self)
         self.sig_tx.connect(self.filter_info.sig_rx)
@@ -115,7 +115,6 @@ class InputTabWidgets(QWidget):
         self.setLayout(layVMain) # set the main layout of the window
 
 #------------------------------------------------------------------------------
-#    @pyqtSlot(object)
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from sig_rx
