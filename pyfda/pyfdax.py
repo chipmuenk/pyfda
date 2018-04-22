@@ -29,8 +29,8 @@ try:
 except ImportError:
     matplotlib.use("Qt4Agg")
 
-from .compat import (QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
-                     QMessageBox, QPlainTextEdit)
+from .compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
+                     QMessageBox, QPlainTextEdit, QAction, QMenu)
 
 from pyfda.pyfda_lib import to_html
 
@@ -136,17 +136,28 @@ class pyFDA(QMainWindow):
     def _construct_UI(self):
         """
         Construct the main GUI, consisting of:
-        - Subwindow for parameter selection [-> ChooseParams.ChooseParams()]
-        - Filter Design button [-> self.startDesignFilt()]
-        - Plot Window [-> plotAll.plotAll()]
+            - Tabbed input widgets (left side)
+            - Tabbed plot widgets (right side)
+            - Logger window (right side, below plot tab)
         """
 
         # ============== UI Layout with H and V-Splitter =====================
 
         inputTabWidgets = input_tab_widgets.InputTabWidgets(self) # input widgets
         pltTabWidgets = plot_tab_widgets.PlotTabWidgets(self) # plot widgets
-        loggerWin     = QPlainTextEdit(self)  # status window
-        loggerWin.setReadOnly(True)        
+        self.loggerWin     = QPlainTextEdit(self)  # logger window
+        self.loggerWin.setReadOnly(True)
+        # set custom right-button context menu policy
+        self.loggerWin.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.loggerWin.customContextMenuRequested.connect(self.logger_win_context_menu)
+        # create context menu and define actions and shortcuts
+        self.popMenu = QMenu(self)
+        self.popMenu.addAction('Select &All', self.loggerWin.selectAll, "Ctrl+A")
+        self.popMenu.addAction('&Copy Selected', self.loggerWin.copy, "Ctrl+C")
+        self.popMenu.addSeparator()
+        self.popMenu.addAction('Clear &Window', self.loggerWin.clear, "Ctrl+X")       
+
+# =============================================================================
         # only needed for logging window height measured in lines
         # mSize = QFontMetrics(loggerWin.font())
         # row4_height = mSize.lineSpacing() * 4
@@ -154,7 +165,7 @@ class pyFDA(QMainWindow):
         # add logger window underneath plot Tab Widgets
         spltVPltLogger = QSplitter(QtCore.Qt.Vertical)
         spltVPltLogger.addWidget(pltTabWidgets)
-        spltVPltLogger.addWidget(loggerWin)
+        spltVPltLogger.addWidget(self.loggerWin)
 
         # create horizontal splitter that contains all subwidget groups
         spltHMain = QSplitter(QtCore.Qt.Horizontal)
@@ -198,7 +209,7 @@ class pyFDA(QMainWindow):
 
         # when a message has been written, pass it via signal-slot mechanism and
         # print it to logger window
-        XStream.stdout().messageWritten.connect(loggerWin.appendHtml)
+        XStream.stdout().messageWritten.connect(self.loggerWin.appendHtml)
 
 #==============================================================================
 #     def statusMessage(self, message):
@@ -210,6 +221,11 @@ class pyFDA(QMainWindow):
 # #------------------------------------------------------------------------------       
 #==============================================================================
     
+    def logger_win_context_menu(self, point):
+        """ Show right mouse button context  menu """
+        self.popMenu.exec_(self.loggerWin.mapToGlobal(point))
+
+# =============================================================================
     def closeEvent(self, event): 
         """
         reimplement QMainWindow.closeEvent() to prompt the user
