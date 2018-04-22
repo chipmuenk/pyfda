@@ -153,9 +153,9 @@ class pyFDA(QMainWindow):
         # create context menu and define actions and shortcuts
         self.popMenu = QMenu(self)
         self.popMenu.addAction('Select &All', self.loggerWin.selectAll, "Ctrl+A")
-        self.popMenu.addAction('&Copy Selected', self.loggerWin.copy, "Ctrl+C")
+        self.popMenu.addAction('&Copy Selected', self.loggerWin.copy)
         self.popMenu.addSeparator()
-        self.popMenu.addAction('Clear &Window', self.loggerWin.clear, "Ctrl+X")       
+        self.popMenu.addAction('Clear &Window', self.loggerWin.clear)       
 
 # =============================================================================
         # only needed for logging window height measured in lines
