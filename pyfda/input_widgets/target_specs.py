@@ -29,7 +29,7 @@ class TargetSpecs(QWidget):
     and amplitudes) like F_SB, F_PB, A_SB, etc.
     """
     # class variables (shared between instances if more than one exists)
-    sig_rx = pyqtSignal(object) # incoming
+    # sig_rx = pyqtSignal(object) # incoming
     sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent, title = "Target Specs"):
@@ -39,28 +39,30 @@ class TargetSpecs(QWidget):
         
         self._construct_UI()
 
-#------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
-        """
-        Process signals coming in via subwidgets and sig_rx
-        """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if dict_sig['sender'] == __name__:
-            logger.warning("Infinite loop detected")
-            return
-#------------------------------------------------------------------------------
+# =============================================================================
+# #------------------------------------------------------------------------------
+#     def process_sig_rx(self, dict_sig=None):
+#         """
+#         Process signals coming in via subwidgets and sig_rx
+#         """
+#         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+#         if dict_sig['sender'] == __name__:
+#             logger.warning("Infinite loop detected")
+#             return
+# #------------------------------------------------------------------------------
+# =============================================================================
     def _construct_UI(self):
         """
         Construct user interface
         """
         # subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self, title = "Frequency")
-        self.f_specs.sig_tx.connect(self.sig_tx)
-        self.sig_tx.connect(self.f_specs.sig_rx)
+        self.f_specs.sig_tx.connect(self.sig_tx) # pass signal upwards
+        #self.sig_tx.connect(self.f_specs.sig_rx)
         # subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self, title = "Amplitude")
         self.a_specs.setVisible(True)
-        self.a_specs.sig_tx.connect(self.sig_tx)
+        self.a_specs.sig_tx.connect(self.sig_tx) # pass signal upwards
         """
         LAYOUT
         """
@@ -97,7 +99,7 @@ class TargetSpecs(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_sig_rx)
+        # self.sig_rx.connect(self.process_sig_rx)
         
         self.update_UI() # first time initialization
 
@@ -129,7 +131,7 @@ class TargetSpecs(QWidget):
         else:
             self.a_specs.hide()
 
-        self.sig_tx.emit({'sender':__name__, 'changed_specs':'target'})
+        # self.sig_tx.emit({'sender':__name__, 'changed_specs':'target'})
 
 #------------------------------------------------------------------------------
     def load_dict(self):
