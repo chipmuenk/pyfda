@@ -42,7 +42,7 @@ else:
     MLAB = False
 
 
-class Plot3D(QWidget):
+class Plot_3D(QWidget):
     """
     Class for various 3D-plots:
     - lin / log line plot of H(f)
@@ -55,12 +55,15 @@ class Plot3D(QWidget):
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
-        super(Plot3D, self).__init__(parent)
+        super(Plot_3D, self).__init__(parent)
         self.zmin = 0
         self.zmax = 4
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu_r'
         self.needs_redraw = True # flag whether plot is up-to-date
+        self.tool_tip = "3D magnitude response |H(z)|"
+        self.tab_label = "3D"
+
         self._construct_UI()
 
     def _construct_UI(self):
@@ -645,7 +648,7 @@ def main():
     import sys
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = Plot3D(None)
+    mainw = Plot_3D(None)
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

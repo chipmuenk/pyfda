@@ -28,15 +28,18 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from  matplotlib import patches
 
 
-class PlotPZ(QWidget):
+class Plot_PZ(QWidget):
 
     # incoming, connected in sender widget (locally connected to self.process_signals() )
     sig_rx = pyqtSignal(object)
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
-        super(PlotPZ, self).__init__(parent)
+        super(Plot_PZ, self).__init__(parent)
         self.needs_redraw = True # flag whether plot needs to be updated        
+        self.tool_tip = "Pole / zero plan"
+        self.tab_label = "P / Z"
+
         self._construct_UI()
 
     def _construct_UI(self):
@@ -447,7 +450,7 @@ def main():
     from ..compat import QApplication
 
     app = QApplication(sys.argv)
-    mainw = PlotPZ(None)
+    mainw = Plot_PZ(None)
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())

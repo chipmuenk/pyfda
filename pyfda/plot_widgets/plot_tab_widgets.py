@@ -19,9 +19,8 @@ from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSlot, pyqtSign
 
 from pyfda.pyfda_rc import params
 
-plot_wdg_lst = ['Plot_Hf', 'Plot_Phi']#[ 'Plot_Phi', 'Plot_PZ', 'Plot_Tau_G', 'Plot_Impz', 'Plot_3D']
+plot_wdg_lst = ['Plot_Hf', 'Plot_Phi', 'Plot_Tau_G', 'Plot_PZ', 'Plot_Impz', 'Plot_3D']
 plot_wdg_dir = 'plot_widgets'
-from pyfda.plot_widgets import (plot_pz, plot_tau_g, plot_impz, plot_3d)
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
@@ -39,8 +38,7 @@ class PlotTabWidgets(QTabWidget):
     def _construct_UI(self):
         """ 
         Initialize UI with tabbed subwidgets and connect the signals of all
-        subwidgets. Plot widgets are not sending back anything (yet), hence no
-        need to connect self.sig_rx to the subwidgets
+        subwidgets. 
         """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
@@ -69,41 +67,7 @@ class PlotTabWidgets(QTabWidget):
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
-
-# =============================================================================
-#         self.pltHf = plot_hf.PlotHf(self)
-#         self.sig_tx.connect(self.pltHf.sig_rx)
-#         tabWidget.addTab(self.pltHf, '|H(f)|')
-#         tabWidget.setTabToolTip(0, "Magnitude and phase frequency response")
-#         #
-# =============================================================================
-# =============================================================================
-#         self.pltPhi = plot_phi.PlotPhi(self)
-#         self.sig_tx.connect(self.pltPhi.sig_rx)
-#         tabWidget.addTab(self.pltPhi, 'phi(f)')
-#         tabWidget.setTabToolTip(1, "Phase frequency response")
-#         #
-# =============================================================================
-        self.pltPZ = plot_pz.PlotPZ(self)
-        self.sig_tx.connect(self.pltPZ.sig_rx)
-        tabWidget.addTab(self.pltPZ, 'P/Z')
-        tabWidget.setTabToolTip(2, "Pole / zero plan")
-        #
-        self.pltTauG = plot_tau_g.PlotTauG(self)
-        self.sig_tx.connect(self.pltTauG.sig_rx)
-        tabWidget.addTab(self.pltTauG, 'tau_g')
-        tabWidget.setTabToolTip(3, "Group delay")
-        #
-        self.pltImpz = plot_impz.PlotImpz(self)
-        self.sig_tx.connect(self.pltImpz.ui.sig_rx)
-        tabWidget.addTab(self.pltImpz, 'h[n]')
-        tabWidget.setTabToolTip(4, "Impulse and transient response")
-        #
-        self.plt3D = plot_3d.Plot3D(self)
-        self.sig_tx.connect(self.plt3D.sig_rx)
-        tabWidget.addTab(self.plt3D, '3D')
-        tabWidget.setTabToolTip(5, "3D magnitude response |H(z)|")
-        #
+        #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)

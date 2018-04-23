@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QEvent, Qt, pyqtSlot
+from ..compat import QWidget, QEvent, Qt, pyqtSignal
 
 import numpy as np
 import scipy.signal as sig
@@ -27,13 +27,14 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from .plot_impz_ui import PlotImpz_UI
 
 
-class PlotImpz(QWidget):
+class Plot_Impz(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
-    # no global signals, PlotImpzUI.sig_tx connects directly to process_signals()
+    sig_rx = pyqtSignal(object)
+
     def __init__(self, parent):
-        super(PlotImpz, self).__init__(parent)
+        super(Plot_Impz, self).__init__(parent)
 
         self.ACTIVE_3D = False
         self.ui = PlotImpz_UI(self) # create the UI part with buttons etc.
@@ -42,6 +43,8 @@ class PlotImpz(QWidget):
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
         self.needs_redraw = True # flag whether plot needs to be updated
+        self.tool_tip = "Impulse and transient response"
+        self.tab_label = "h[n]"
 
         self._construct_UI()
 
@@ -66,18 +69,20 @@ class PlotImpz(QWidget):
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals) # connect to toolbar
-        self.ui.sig_tx.connect(self.process_signals) # connect to widgets and signals upstream
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
+        self.sig_rx.connect(self.ui.sig_rx)
+        self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
 
         self.draw() # initial calculation and drawing
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
-        Process signals coming from the navigation toolbar
+        Process signals coming from the navigation toolbar and input_tab_widgets
         """
         logger.debug("Processing {0} | needs_redraw = {1}, visible = {2}".format(dict_sig, self.needs_redraw, self.isVisible()))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Stopped infinite loop.")
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                 or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
@@ -154,7 +159,7 @@ class PlotImpz(QWidget):
                 _store_entry(source)
 
         # Call base class method to continue normal event processing:
-        return super(PlotImpz, self).eventFilter(source, event)
+        return super(Plot_Impz, self).eventFilter(source, event)
 
 #-------------------------------------------------------------        
     def load_fs(self):
@@ -541,7 +546,7 @@ def main():
     from ..compat import QApplication
 
     app = QApplication(sys.argv)
-    mainw = PlotImpz(None)
+    mainw = Plot_Impz(None)
     app.setActiveWindow(mainw) 
     mainw.show()
     sys.exit(app.exec_())
