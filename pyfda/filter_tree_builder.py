@@ -310,7 +310,7 @@ class FilterTreeBuilder(object):
                 logger.warning('Filter module "{0}" could not be imported.\n{1}'.format(filt_mod, e))
                 continue
             except Exception as e:
-                logger.warning("Unexpected error during module import:\n%s", e)
+                logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
             # Now, try to instantiate an instance ff.fil_inst() of filter class fc
             for fc in fdict:
