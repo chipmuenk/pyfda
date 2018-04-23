@@ -83,7 +83,7 @@ class PlotImpz(QWidget):
                 or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
                 self.draw()
                 self.needs_redraw = False
-        elif 'enabled' in dict_sig:
+            elif 'enabled' in dict_sig:
                 self.enable_ui(dict_sig['enabled']) 
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
