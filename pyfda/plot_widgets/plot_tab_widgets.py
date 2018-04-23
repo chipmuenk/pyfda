@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import importlib
-from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSlot, pyqtSignal
+from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
 from pyfda.pyfda_rc import params
 
@@ -38,7 +38,13 @@ class PlotTabWidgets(QTabWidget):
     def _construct_UI(self):
         """ 
         Initialize UI with tabbed subwidgets and connect the signals of all
-        subwidgets. 
+        subwidgets.
+        This is done by dynamically instantiating each widget from the list
+        `plot_wdg_lst` in the directory `plot_wdg_dir`. Try to:
+        - connect `sig_tx` and `sig_rx`
+        - set the TabToolTip from the instance attribute `tool_tip`
+        - set the tab label from the instance attribute `tab_label`
+        for each widget.
         """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
