@@ -14,12 +14,13 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSlot, pyqtSignal
+import importlib
+from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
 from pyfda.pyfda_rc import params
 
-from pyfda.plot_widgets import (plot_hf, plot_phi, plot_pz, plot_tau_g, plot_impz,
-                          plot_3d)
+plot_wdg_lst = ['Plot_Hf', 'Plot_Phi', 'Plot_Tau_G', 'Plot_PZ', 'Plot_Impz', 'Plot_3D']
+plot_wdg_dir = 'plot_widgets'
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
@@ -37,42 +38,42 @@ class PlotTabWidgets(QTabWidget):
     def _construct_UI(self):
         """ 
         Initialize UI with tabbed subwidgets and connect the signals of all
-        subwidgets. Plot widgets are not sending back anything (yet), hence no
-        need to connect self.sig_rx to the subwidgets
+        subwidgets.
+        This is done by dynamically instantiating each widget from the list
+        `plot_wdg_lst` in the directory `plot_wdg_dir`. Try to:
+        - connect `sig_tx` and `sig_rx`
+        - set the TabToolTip from the instance attribute `tool_tip`
+        - set the tab label from the instance attribute `tab_label`
+        for each widget.
         """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
         #
-        self.pltHf = plot_hf.PlotHf(self)
-        self.sig_tx.connect(self.pltHf.sig_rx)
-        tabWidget.addTab(self.pltHf, '|H(f)|')
-        tabWidget.setTabToolTip(0, "Magnitude and phase frequency response")
-        #
-        self.pltPhi = plot_phi.PlotPhi(self)
-        self.sig_tx.connect(self.pltPhi.sig_rx)
-        tabWidget.addTab(self.pltPhi, 'phi(f)')
-        tabWidget.setTabToolTip(1, "Phase frequency response")
-        #
-        self.pltPZ = plot_pz.PlotPZ(self)
-        self.sig_tx.connect(self.pltPZ.sig_rx)
-        tabWidget.addTab(self.pltPZ, 'P/Z')
-        tabWidget.setTabToolTip(2, "Pole / zero plan")
-        #
-        self.pltTauG = plot_tau_g.PlotTauG(self)
-        self.sig_tx.connect(self.pltTauG.sig_rx)
-        tabWidget.addTab(self.pltTauG, 'tau_g')
-        tabWidget.setTabToolTip(3, "Group delay")
-        #
-        self.pltImpz = plot_impz.PlotImpz(self)
-        self.sig_tx.connect(self.pltImpz.ui.sig_rx)
-        tabWidget.addTab(self.pltImpz, 'h[n]')
-        tabWidget.setTabToolTip(4, "Impulse and transient response")
-        #
-        self.plt3D = plot_3d.Plot3D(self)
-        self.sig_tx.connect(self.plt3D.sig_rx)
-        tabWidget.addTab(self.plt3D, '3D')
-        tabWidget.setTabToolTip(5, "3D magnitude response |H(z)|")
-        #
+        for i, plot_wdg in enumerate(plot_wdg_lst):
+            plot_mod_name = 'pyfda.' + plot_wdg_dir + '.' + plot_wdg.lower()
+            try:  # Try to import the module from the  package and get a handle:
+                plot_mod = importlib.import_module(plot_mod_name)
+                plot_class = getattr(plot_mod, plot_wdg, None)
+                plot_inst = plot_class(self)
+                if hasattr(plot_inst, 'tab_label'):
+                    tabWidget.addTab(plot_inst, plot_inst.tab_label)
+                else:
+                    tabWidget.addTab(plot_inst, str(i))
+                if hasattr(plot_inst, 'tool_tip'):
+                    tabWidget.setTabToolTip(i, plot_inst.tool_tip)
+                if hasattr(plot_inst, 'sig_tx'):
+                    plot_inst.sig_tx.connect(self.sig_rx)
+                if hasattr(plot_inst, 'sig_rx'):
+                    self.sig_tx.connect(plot_inst.sig_rx)
+
+            except ImportError as e:
+                logger.warning('Plotting module "{0}" could not be imported.\n{1}'\
+                               .format(plot_mod_name, e))
+                continue
+            except Exception as e:
+                logger.warning("Unexpected error during module import:\n{0}".format(e))
+                continue
+        #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)

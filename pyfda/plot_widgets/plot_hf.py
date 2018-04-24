@@ -26,7 +26,7 @@ from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
 
-class PlotHf(QWidget):
+class Plot_Hf(QWidget):
     """
     Widget for plotting |H(f)|, frequency specs and the phase
     """
@@ -35,8 +35,10 @@ class PlotHf(QWidget):
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent): 
-        super(PlotHf, self).__init__(parent)
+        super(Plot_Hf, self).__init__(parent)
         self.needs_redraw = True # flag whether plot needs to be updated
+        self.tool_tip = "Magnitude and phase frequency response"
+        self.tab_label = "|H(f)|"
         self._construct_ui()
 
     def _construct_ui(self):
@@ -141,7 +143,6 @@ class PlotHf(QWidget):
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
                 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
     def process_signals(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -162,7 +163,6 @@ class PlotHf(QWidget):
                 self.needs_redraw = True
             else:
                 pass
-
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -621,7 +621,7 @@ def main():
     from ..compat import QApplication
     
     app = QApplication(sys.argv)
-    mainw = PlotHf(None)
+    mainw = Plot_Hf(None)
     app.setActiveWindow(mainw) 
     mainw.show()
     sys.exit(app.exec_())
