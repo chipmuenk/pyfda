@@ -390,7 +390,7 @@ class MplToolbar(NavigationToolbar):
         This method shadows `home()` inherited from NavigationToolbar.
         """
         self.push_current()
-        self.sig_tx.emit({'home':''}) # only the key is used by the slot
+        self.sig_tx.emit({'sender':__name__, 'home':''}) # only the key is used by the slot
         self.parent.redraw()
 
 #------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ class MplToolbar(NavigationToolbar):
             self.a_fv.setEnabled(True)
             self.a_ho.setEnabled(True)
             
-        self.sig_tx.emit({'lock_zoom':self.lock_zoom})
+        self.sig_tx.emit({'sender':__name__, 'lock_zoom':self.lock_zoom})
 
 #------------------------------------------------------------------------------
     def enable_plot(self, state = None):
@@ -455,7 +455,7 @@ class MplToolbar(NavigationToolbar):
         self.a_cb.setEnabled(self.enabled)
         self.a_op.setEnabled(self.enabled)
 
-        self.sig_tx.emit({'enabled':self.enabled})
+        self.sig_tx.emit({'sender':__name__, 'enabled':self.enabled})
 
 #------------------------------------------------------------------------------
     def mpl2Clip(self):

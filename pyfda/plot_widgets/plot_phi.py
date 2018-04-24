@@ -22,14 +22,16 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
 
 
-class PlotPhi(QWidget):
+class Plot_Phi(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_signals() )
     sig_rx = pyqtSignal(object)
 #    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
-        super(PlotPhi, self).__init__(parent)
+        super(Plot_Phi, self).__init__(parent)
         self.needs_redraw = True
+        self.tool_tip = "Phase frequency response"
+        self.tab_label = "phi(f)"
         self._construct_UI()
 
     def _construct_UI(self):
@@ -229,7 +231,7 @@ def main():
     from ..compat import QApplication
 
     app = QApplication(sys.argv)
-    mainw = PlotPhi(None)
+    mainw = Plot_Phi(None)
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
