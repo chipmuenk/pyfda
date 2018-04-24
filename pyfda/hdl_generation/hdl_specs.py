@@ -15,8 +15,8 @@ import sys, os
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
-                      QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
+from ..compat import (QtWidget, QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
+                      QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QImage)
 import numpy as np
 
 #from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
@@ -47,8 +47,6 @@ class HDLSpecs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
-    
-    sigFilterDesigned = pyqtSignal()
 
     def __init__(self, parent):
         super(HDLSpecs, self).__init__(parent)
@@ -58,8 +56,7 @@ class HDLSpecs(QWidget):
     def initUI(self):
         """
         Intitialize the main GUI, consisting of:
-        """
-        
+        """  
         # ============== UI Layout =====================================
         bfont = QFont()
 #        font.setPointSize(11)
@@ -82,6 +79,13 @@ class HDLSpecs(QWidget):
         self.frmMsg = QFrame(self)
         self.frmMsg.setLayout(layHMsg)
         self.frmMsg.setContentsMargins(*params['wdg_margins'])
+
+        imgFixp = QImage(fixp_IIR.png)
+        layHImg = QHBoxLayout()
+        layHImg.addWidget()
+        self.frmImg = QFrame(self)
+        self.frmImg.setLayout(layHImg)
+        self.frmImg.setContentsMargins(*params['wdg_margins'])        
 
 # =============================================================================
 # UI for quantization
@@ -296,6 +300,7 @@ class HDLSpecs(QWidget):
         self.layHButtonsHDL_oc.addWidget(self.lblQuant_o)
         self.layHButtonsHDL_oc.addWidget(self.cmbQuant_o)
 
+#------------------------------------------------------------------------------
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
         self.butExportHDL.setText("Create HDL")
@@ -337,6 +342,7 @@ class HDLSpecs(QWidget):
     # -------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmMsg)
+        layVMain.addWidget(self.imgFilt)
 #        layVMain.addWidget(self.frmFixpoint)
         layVMain.addWidget(frmBtns)
         layVMain.setContentsMargins(*params['wdg_margins'])
