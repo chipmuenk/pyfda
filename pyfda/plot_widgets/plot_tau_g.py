@@ -25,7 +25,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 # TODO: Anticausal filter have no group delay. But is a filter with
 #       'baA' always anticausal or maybe just acausal?
 
-class PlotTauG(QWidget):
+class Plot_Tau_G(QWidget):
     """
     Widget for plotting the group delay
     """
@@ -35,9 +35,19 @@ class PlotTauG(QWidget):
 
 
     def __init__(self, parent):
-        super(PlotTauG, self).__init__(parent)
+        super(Plot_Tau_G, self).__init__(parent)
         self.verbose = False # suppress warnings
         self.needs_redraw = True # flag whether plot needs to be updated        
+        self.tool_tip = "Group delay"
+        self.tab_label = "tau_g"
+        self._construct_UI()
+
+    def _construct_UI(self):
+        """
+        Intitialize the widget, consisting of:
+        - Matplotlib widget with NavigationToolbar
+        - Frame with control elements (currently commented out)
+        """
 
 # =============================================================================
 # #### not needed at the moment ###
@@ -73,7 +83,6 @@ class PlotTauG(QWidget):
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
 #------------------------------------------------------------------------------
-    #@pyqtSlot(object)
     def process_signals(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -196,7 +205,7 @@ def main():
     import sys
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = PlotTauG(None)
+    mainw = Plot_Tau_G(None)
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
