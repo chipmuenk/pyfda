@@ -14,17 +14,17 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal, pyqtSlot
+from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
 
 SCROLL = True
 
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import mod_version
+from pyfda.pyfda_lib import cmp_version
 
 from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
                                 filter_info, filter_pz)
 
-if mod_version("myhdl"):
+if cmp_version("myhdl", "0.9") >= 0:
     from pyfda.hdl_generation import hdl_specs
     HAS_MYHDL = True
 else:
