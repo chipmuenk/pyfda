@@ -15,7 +15,8 @@ import sys, os
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFont, 
+                      QPushButton, QFD, QSplitter,
                       QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QPixmap)
 import numpy as np
 
@@ -32,7 +33,7 @@ import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qstr
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import safe_eval
+from pyfda.pyfda_lib import safe_eval, to_html
 
 from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
 
@@ -43,23 +44,164 @@ from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
 
 #------------------------------------------------------------------------------
 
+class UI_WI_WF(QWidget):
+    """ 
+    Widget for entering integer and fractional bits. The result can be read out
+    via the attributes `self.WI` and `self.WF`.
+    """
+
+    def __init__(self, parent, **kwargs):
+        super(UI_WI_WF, self).__init__(parent)
+        self._construct_UI(**kwargs)
+
+    def _construct_UI(self, **kwargs):
+        """ Construct widget """
+
+        dict_ui = {'label':'WI.WF', 'max_led_width':30,
+                   'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
+                   'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits'
+                   }
+        for key, val in kwargs.items():
+            dict_ui.update({key:val})
+        # dict_ui.update(map(kwargs)) # same as above?
+        self.WI = dict_ui['WI']
+        self.WF = dict_ui['WF']
+            
+        lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
+        self.ledWI = QLineEdit(self)
+        self.ledWI.setToolTip(dict_ui['tip_WI'])
+        self.ledWI.setText(qstr(dict_ui['WI']))
+        self.ledWI.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
+        self.ledWI.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
+
+        lblDot = QLabel(".", self)
+        
+        self.ledWF = QLineEdit(self)
+        self.ledWF.setToolTip(dict_ui['tip_WF'])
+        self.ledWF.setText(qstr(dict_ui['WF']))
+        self.ledWF.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
+        self.ledWF.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
+
+        layH = QHBoxLayout()
+        layH.addWidget(lblW)
+        layH.addStretch()
+        layH.addWidget(self.ledWI)
+        layH.addWidget(lblDot)
+        layH.addWidget(self.ledWF)
+        layH.setContentsMargins(0,0,0,0)
+        
+        frmMain = QFrame(self)
+        frmMain.setLayout(layH)
+
+        layVMain = QVBoxLayout() # Widget main layout
+        layVMain.addWidget(frmMain)
+        layVMain.setContentsMargins(0,5,0,0)#*params['wdg_margins'])
+
+        self.setLayout(layVMain)
+
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------       
+        self.ledWI.editingFinished.connect(self._update_ui)
+        self.ledWF.editingFinished.connect(self._update_ui)
+
+    #--------------------------------------------------------------------------              
+    def _update_ui(self):
+        """ Update the attributes `self.WI` and `self.WF` """
+        self.WI = safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos')
+        self.ledWI.setText(qstr(self.WI))
+        self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
+        self.ledWF.setText(qstr(self.WF))
+
+#==============================================================================
+
+class UI_Q_Ovfl(QWidget):
+    """ 
+    Widget for selecting quantization / overflow options. The result can be read out
+    via the attributes `self.x` and `self.y`.
+    """
+
+    def __init__(self, parent, **kwargs):
+        super(UI_Q_Ovfl, self).__init__(parent)
+        self._construct_UI(**kwargs)
+
+    def _construct_UI(self, **kwargs):
+        """ Construct widget """
+
+        dict_ui = {'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
+                   'cmb_q':['none', 'round', 'fix', 'floor'],
+                   'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
+                   'cmb_ov': ['none', 'wrap', 'sat']
+                   }
+        for key, val in kwargs.items():
+            dict_ui.update({key:val})
+        # dict_ui.update(map(kwargs)) # same as above?
+
+        lblQuant = QLabel(dict_ui['label_q'], self)
+        self.cmbQuant = QComboBox(self)
+        self.cmbQuant.addItems(dict_ui['cmb_q'])
+        self.cmbQuant.setToolTip(dict_ui['tip_q'])
+        
+        lblOvfl = QLabel(dict_ui['label_ov'], self) 
+        self.cmbOvfl = QComboBox(self)
+        self.cmbOvfl.addItems(dict_ui['cmb_ov'])
+        self.cmbOvfl.setToolTip(dict_ui['tip_ov'])
+
+        # ComboBox size is adjusted automatically to fit the longest element
+        self.cmbQuant.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
+        layH = QHBoxLayout()
+        layH.addWidget(lblOvfl)            
+        layH.addWidget(self.cmbOvfl)
+        layH.addStretch()
+        layH.addWidget(lblQuant)
+        layH.addWidget(self.cmbQuant)
+        layH.setContentsMargins(0,0,0,0)
+
+        frmMain = QFrame(self)
+        frmMain.setLayout(layH)
+
+        layVMain = QVBoxLayout() # Widget main layout
+        layVMain.addWidget(frmMain)
+        layVMain.setContentsMargins(5,0,0,0)#*params['wdg_margins'])
+
+        self.setLayout(layVMain)
+        
+        # initial settings:
+        self.ovfl = self.cmbOvfl.currentText()
+        self.quant = self.cmbQuant.currentText()
+        
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------       
+        self.cmbOvfl.currentIndexChanged.connect(self._update_ui)
+        self.cmbQuant.currentIndexChanged.connect(self._update_ui)
+
+    #--------------------------------------------------------------------------              
+    def _update_ui(self):
+        """ Update the attributes `self.ovfl` and `self.quant` """
+        self.ovfl = self.cmbOvfl.currentText()
+        self.quant = self.cmbQuant.currentText()
+
+#==============================================================================
+ 
+
 class HDLSpecs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
-
     def __init__(self, parent):
         super(HDLSpecs, self).__init__(parent)
 
-        self.initUI()
+        self._construct_UI()
 
-    def initUI(self):
+    def _construct_UI(self):
         """
         Intitialize the main GUI, consisting of:
         """  
         # ============== UI Layout =====================================
         bfont = QFont()
-#        font.setPointSize(11)
         bfont.setBold(True)
         
         bifont = QFont()
@@ -84,7 +226,8 @@ class HDLSpecs(QWidget):
         img_file = os.path.join(file_path, "hdl-df1.png") 
         img_hdl = QPixmap(img_file)
         img_hdl_scaled = img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio)
-        self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
+        # self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
+        self.lbl_img_hdl.setPixmap(QPixmap(img_hdl)) # fixed size
 
         layHImg = QHBoxLayout()
         layHImg.addWidget(self.lbl_img_hdl)
@@ -101,210 +244,14 @@ class HDLSpecs(QWidget):
         self.layHBtnsMsg = QHBoxLayout()
         self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
-        ledMaxWid = 30 # Max. Width of QLineEdit fields
-        qQuant = ['none', 'round', 'fix', 'floor']
-        qOvfl = ['none', 'wrap', 'sat']
-        tipOvfl = "Select overflow behaviour."
-        tipQuant = "Select the kind of quantization."
-        tipWI = "Specify number of integer bits."
-        tipWF = "Specify number of fractional bits."
-        lblQ = "Quant.:"
-        lblOv = "Ovfl.:"
-
-# -------------------------------------------------------------------
-# subUI -- self.layHButtonsHDL_i -- for input format 
-# -------------------------------------------------------------------
-        self.lblWInput = QLabel("Input Format:", self)
-        self.lblWInput.setFont(bifont)
-        self.ledWIInput = QLineEdit(self)
-        self.ledWIInput.setToolTip(tipWI)
-        self.ledWIInput.setText("0")
-        self.ledWIInput.setMaxLength(2) # maximum of 2 digits
-        self.ledWIInput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
-
-        self.lblDotInput = QLabel(".", self)
-        
-        self.ledWFInput = QLineEdit(self)
-        self.ledWFInput.setToolTip(tipWF)
-        self.ledWFInput.setText("15")
-        self.ledWFInput.setMaxLength(2) # maximum of 2 digits
-        self.ledWFInput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
-
-        self.layHButtonsHDL_i = QHBoxLayout()
-        self.layHButtonsHDL_i.addWidget(self.lblWInput)
-        self.layHButtonsHDL_i.addStretch()
-        self.layHButtonsHDL_i.addWidget(self.ledWIInput)
-        self.layHButtonsHDL_i.addWidget(self.lblDotInput)
-        self.layHButtonsHDL_i.addWidget(self.ledWFInput)
-        
-# -----------------------------------------------------------------------------
-# subUI -- self.layHButtonsHDL_cc -- for coefficient format 
-# -----------------------------------------------------------------------------
-        enb_coeff = False
-        self.lblQCoeff = QLabel("Coeff. Format:", self)
-        self.lblQCoeff.setFont(bifont)
-        self.lblQCoeff.setEnabled(enb_coeff)
-        self.ledWICoeff = QLineEdit(self)
-        self.ledWICoeff.setToolTip(tipWI)
-        self.ledWICoeff.setText("0")
-        self.ledWICoeff.setMaxLength(2) # maximum of 2 digits
-        self.ledWICoeff.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
-        self.ledWICoeff.setEnabled(enb_coeff)
-
-        self.lblDotCoeff = QLabel(".", self)
-        
-        self.ledWFCoeff = QLineEdit(self)
-        self.ledWFCoeff.setToolTip(tipWF)
-        self.ledWFCoeff.setText("15")
-        self.ledWFCoeff.setMaxLength(2) # maximum of 2 digits
-#        self.ledWFCoeff.setFixedWidth(30) # width of lineedit in points(?)
-        self.ledWFCoeff.setMaximumWidth(ledMaxWid)
-        self.ledWFCoeff.setEnabled(enb_coeff)
-
-        self.layHButtonsHDL_c = QHBoxLayout()
-        self.layHButtonsHDL_c.addWidget(self.lblQCoeff)
-        self.layHButtonsHDL_c.addStretch()
-        self.layHButtonsHDL_c.addWidget(self.ledWICoeff)
-        self.layHButtonsHDL_c.addWidget(self.lblDotCoeff)
-        self.layHButtonsHDL_c.addWidget(self.ledWFCoeff)
- 
-
-        self.lblQuant_c = QLabel(lblQ, self)
-        self.lblQuant_c.setEnabled(enb_coeff)
-        self.cmbQuant_c = QComboBox(self)
-        self.cmbQuant_c.addItems(qQuant)
-        self.cmbQuant_c.setToolTip(tipQuant)
-        self.cmbQuant_c.setEnabled(enb_coeff)
-        
-        self.lblQOvfl_c = QLabel(lblOv, self)
-        self.lblQOvfl_c.setEnabled(enb_coeff)   
-        self.cmbOvfl_c = QComboBox(self)
-        self.cmbOvfl_c.addItems(qOvfl)
-        self.cmbOvfl_c.setToolTip(tipOvfl)
-        self.cmbOvfl_c.setEnabled(enb_coeff)   
-
-        # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant_c.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbOvfl_c.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.layHButtonsHDL_cc = QHBoxLayout()
-        self.layHButtonsHDL_cc.addWidget(self.lblQOvfl_c)            
-        self.layHButtonsHDL_cc.addWidget(self.cmbOvfl_c)
-        self.layHButtonsHDL_cc.addStretch()
-        self.layHButtonsHDL_cc.addWidget(self.lblQuant_c)
-        self.layHButtonsHDL_cc.addWidget(self.cmbQuant_c)
-        self.layHButtonsHDL_cc.setEnabled(False)
-        
-# -----------------------------------------------------------------------------
-# subUI -- self.layHButtonsHDL_ac -- for accumulator format / overflow behaviour
-# -----------------------------------------------------------------------------
-        # ---------- Accumulator format --------------
-        self.lblQAccu = QLabel("Accumulator Format:", self)
-        self.lblQAccu.setFont(bifont)
-        self.ledWIAccu = QLineEdit(self)
-        self.ledWIAccu.setToolTip(tipWI)
-        self.ledWIAccu.setText("0")
-        self.ledWIAccu.setMaxLength(2) # maximum of 2 digits
-        self.ledWIAccu.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
-
-        self.lblDotAccu = QLabel(".", self)
-        
-        self.ledWFAccu = QLineEdit(self)
-        self.ledWFAccu.setToolTip(tipWF)
-        self.ledWFAccu.setText("15")
-        self.ledWFAccu.setMaxLength(2) # maximum of 2 digits
-        self.ledWFAccu.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
-
-        self.layHButtonsHDL_a = QHBoxLayout()
-        self.layHButtonsHDL_a.addWidget(self.lblQAccu)
-        self.layHButtonsHDL_a.addStretch()
-        self.layHButtonsHDL_a.addWidget(self.ledWIAccu)
-        self.layHButtonsHDL_a.addWidget(self.lblDotAccu)
-        self.layHButtonsHDL_a.addWidget(self.ledWFAccu)
-
-        # ---------- Accumulator overflow --------------
-        self.lblOvfl_a = QLabel(lblOv, self)
-        self.cmbOvfl_a = QComboBox(self)
-        self.cmbOvfl_a.addItems(qOvfl)
-        self.cmbOvfl_a.setToolTip(tipOvfl)
-        
-        self.lblQuant_a = QLabel(lblQ, self)
-        self.cmbQuant_a = QComboBox(self)
-        self.cmbQuant_a.addItems(qQuant)
-        self.cmbQuant_a.setToolTip(tipQuant)
-
-        # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbOvfl_a.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.layHButtonsHDL_ac = QHBoxLayout()
-        self.layHButtonsHDL_ac.addWidget(self.lblOvfl_a)            
-        self.layHButtonsHDL_ac.addWidget(self.cmbOvfl_a)
-        self.layHButtonsHDL_ac.addStretch()
-        self.layHButtonsHDL_ac.addWidget(self.lblQuant_a)
-        self.layHButtonsHDL_ac.addWidget(self.cmbQuant_a)
-
-# -----------------------------------------------------------------------------
-# subUI -- self.layHButtonsHDL_o -- for output format and overflow behaviour
-# -----------------------------------------------------------------------------
-
-        enb_o_ui = False
-        self.lblQOutput = QLabel("Output Format:", self)
-        self.lblQOutput.setFont(bifont)
-#        self.lblQOutput.setEnabled(enb_o_ui)
-        self.ledWIOutput = QLineEdit(self)
-        self.ledWIOutput.setToolTip(tipWI)
-        self.ledWIOutput.setText("0")
-        self.ledWIOutput.setMaxLength(2) # maximum of 2 digits
-        self.ledWIOutput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
-#        self.ledWIOutput.setEnabled(enb_o_ui)
-        
-        self.lblDot_o = QLabel(".", self)
-#        self.lblDot_o.setEnabled(enb_o_ui)
-
-        self.ledWFOutput = QLineEdit(self)
-        self.ledWFOutput.setToolTip(tipWF)
-        self.ledWFOutput.setText("15")
-        self.ledWFOutput.setMaxLength(2) # maximum of 2 digits
-        self.ledWFOutput.setFixedWidth(ledMaxWid) # width of lineedit in points(?)
-#        self.ledWFOutput.setEnabled(enb_o_ui)
-
-        self.layHButtonsHDL_o = QHBoxLayout()
-        self.layHButtonsHDL_o.addWidget(self.lblQOutput)
-        self.layHButtonsHDL_o.addStretch()
-        self.layHButtonsHDL_o.addWidget(self.ledWIOutput)
-        self.layHButtonsHDL_o.addWidget(self.lblDot_o)
-        self.layHButtonsHDL_o.addWidget(self.ledWFOutput)
-        # This doesn't work - need to set a parent widget like WFrame
-        self.layHButtonsHDL_o.setEnabled(False)
-        
-        # ---------- Accumulator overflow --------------
-        self.lblQOvfl_o = QLabel(lblOv, self)
-        self.lblQOvfl_o.setEnabled(enb_o_ui)
-        self.lblQuant_o = QLabel(lblQ, self)
-        self.lblQuant_o.setEnabled(enb_o_ui)
-        
-        self.cmbQuant_o = QComboBox(self)
-        self.cmbQuant_o.addItems(qQuant)
-        self.cmbQuant_o.setToolTip(tipQuant)
-        self.cmbQuant_o.setEnabled(enb_o_ui)
-        
-        self.cmbOvfl_o = QComboBox(self)
-        self.cmbOvfl_o.addItems(qOvfl)
-        self.cmbOvfl_o.setToolTip(tipOvfl)
-        self.cmbOvfl_o.setEnabled(enb_o_ui)
-
-        # ComboBox size is adjusted automatically to fit the longest element
-        self.cmbQuant_o.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.cmbOvfl_o.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-        self.layHButtonsHDL_oc = QHBoxLayout()
-        self.layHButtonsHDL_oc.addWidget(self.lblQOvfl_o)            
-        self.layHButtonsHDL_oc.addWidget(self.cmbOvfl_o)
-        self.layHButtonsHDL_oc.addStretch()
-        self.layHButtonsHDL_oc.addWidget(self.lblQuant_o)
-        self.layHButtonsHDL_oc.addWidget(self.cmbQuant_o)
-
+        self.wdg_wi_wf_input = UI_WI_WF(self, label='Input Format x[n]:')
+        self.wdg_wi_wf_coeffs = UI_WI_WF(self, label='Coefficient Format:')
+        self.wdg_q_ovfl_coeffs = UI_Q_Ovfl(self)
+        self.wdg_wi_wf_accu = UI_WI_WF(self, label='Accumulator Format:', WF=30)
+        self.wdg_q_ovfl_accu = UI_Q_Ovfl(self)
+        self.wdg_wi_wf_output = UI_WI_WF(self, label='Output Format y[n]:')
+        self.wdg_q_ovfl_output = UI_Q_Ovfl(self)
+         
 #------------------------------------------------------------------------------
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
@@ -323,18 +270,21 @@ class HDLSpecs(QWidget):
 
         layVBtns = QVBoxLayout()
         layVBtns.addLayout(self.layHBtnsMsg)
-        layVBtns.addLayout(self.layHButtonsHDL_i)
+        layVBtns.addWidget(self.wdg_wi_wf_input)
+        layVBtns.addWidget(self.wdg_wi_wf_coeffs)
+        self.wdg_wi_wf_coeffs.setEnabled(False)
+        layVBtns.addWidget(self.wdg_q_ovfl_coeffs)
+        self.wdg_q_ovfl_coeffs.setEnabled(False)
         
-        layVBtns.addLayout(self.layHButtonsHDL_c)
-        layVBtns.addLayout(self.layHButtonsHDL_cc)
-        
-        layVBtns.addLayout(self.layHButtonsHDL_a)
-        layVBtns.addLayout(self.layHButtonsHDL_ac)
+        layVBtns.addWidget(self.wdg_wi_wf_accu)
+        layVBtns.addWidget(self.wdg_q_ovfl_accu)
 
-        layVBtns.addLayout(self.layHButtonsHDL_o)
-        layVBtns.addLayout(self.layHButtonsHDL_oc)
+        layVBtns.addWidget(self.wdg_wi_wf_output)
+        layVBtns.addWidget(self.wdg_q_ovfl_output)
         
         layVBtns.addLayout(self.layHButtonsHDL_h)
+        
+        layVBtns.addStretch()
 
         # -------------------------------------------------------------------
         # This frame encompasses all the buttons            
@@ -345,54 +295,64 @@ class HDLSpecs(QWidget):
     # -------------------------------------------------------------------
     # Top level layout
     # -------------------------------------------------------------------
+        splitter = QSplitter(self)
+        splitter.setOrientation(Qt.Vertical)
+        splitter.addWidget(self.frmMsg)
+        splitter.addWidget(self.frmImg)
+        splitter.addWidget(frmBtns)
+        # setSizes uses absolute pixel values, but can be "misused" by specifying values
+        # that are way too large: in this case, the space is distributed according
+        # to the _ratio_ of the values:
+        splitter.setSizes([1000,3000,10000])
+
+
         layVMain = QVBoxLayout()
-        layVMain.addWidget(self.frmMsg)
-        layVMain.addWidget(self.frmImg)
-#        layVMain.addWidget(self.frmFixpoint)
-        layVMain.addWidget(frmBtns)
+        layVMain.addWidget(splitter)
+        #layVMain.addWidget(self.frmMsg)
+        #layVMain.addWidget(self.frmImg)
+        #layVMain.addWidget(frmBtns)
+        #layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
         
-        layVMain.addStretch()
             
         self.setLayout(layVMain)
 
         #----------------------------------------------------------------------
-        # SIGNALS & SLOTs
+        # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
         self.update_UI()
-        
+
 #------------------------------------------------------------------------------
     def update_UI(self):
         """
         Update the UI after changing the filter class
         """
-        if hasattr(ff.fil_inst, 'hdl'):
-            self.butExportHDL.setEnabled('iir_sos' in ff.fil_inst.hdl)
-            self.butSimFixPoint.setEnabled('iir_sos' in ff.fil_inst.hdl)
-        else:
-            self.butExportHDL.setEnabled(False)
-            self.butSimFixPoint.setEnabled(False)
-            
+        pass
+# =============================================================================
+#         if hasattr(ff.fil_inst, 'hdl'):
+#             self.butExportHDL.setEnabled('iir_sos' in ff.fil_inst.hdl)
+#             self.butSimFixPoint.setEnabled('iir_sos' in ff.fil_inst.hdl)
+#         else:
+#             self.butExportHDL.setEnabled(False)
+#             self.butSimFixPoint.setEnabled(False)
+#             
+# =============================================================================
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
-        self.qI_i = safe_eval(self.ledWIInput.text(), return_type='int', sign='pos')
-        self.qF_i = safe_eval(self.ledWFInput.text(), return_type='int', sign='pos')
-        self.ledWIInput.setText(qstr(self.qI_i))
-        self.ledWFInput.setText(qstr(self.qF_i))
+        self.qI_i = self.wdg_wi_wf_input.WI
+        self.qF_i = self.wdg_wi_wf_input.WF
 
-        self.qI_o = safe_eval(self.ledWIOutput.text(), return_type='int', sign='pos')
-        self.qF_o = safe_eval(self.ledWFOutput.text(), return_type='int', sign='pos')
-        self.ledWIOutput.setText(qstr(self.qI_o))
-        self.ledWFOutput.setText(qstr(self.qF_o))
+        self.qI_o = self.wdg_wi_wf_output.WI
+        self.qF_o = self.wdg_wi_wf_output.WF
 
-        qQuant_o = self.cmbQuant_o.currentText()
-        qOvfl_o = self.cmbOvfl_o.currentText()
+        qQuant_o = self.wdg_q_ovfl_output.quant
+        qOvfl_o = self.wdg_q_ovfl_output.ovfl
         
         q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
         myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
@@ -432,11 +392,11 @@ class HDLSpecs(QWidget):
         hdl_file, hdl_filter = dlg.getSaveFileName_(
                 caption="Save HDL as", directory=dirs.save_dir,
                 filter=file_types)
-        hdl_file = str(hdl_file)
+        hdl_file = qstr(hdl_file)
 
         if hdl_file != "": # "operation cancelled" gives back an empty string
             hdl_file = os.path.normpath(hdl_file)
-            hdl_type = extract_file_ext(hdl_filter)[0] # return '.v' or '.vhd'
+            hdl_type = extract_file_ext(qstr(hdl_filter))[0] # return '.v' or '.vhd'
     
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
@@ -445,6 +405,8 @@ class HDLSpecs(QWidget):
     
             # return the filename without suffix
             hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
+
+            self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
 
             if str(hdl_type) == '.vhd':
                 self.flt.hdl_target = 'vhdl'
@@ -456,8 +418,6 @@ class HDLSpecs(QWidget):
                 
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + suffix)))
-
-            self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
 
             self.flt.convert()
             logger.info("HDL conversion finished!")
