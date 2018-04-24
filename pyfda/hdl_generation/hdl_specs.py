@@ -7,23 +7,23 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for simulating fixpoint filters and 
-generating VHDL and Verilog Code 
+Widget for simulating fixpoint filters and
+generating VHDL and Verilog Code
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFont, 
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFont,
                       QPushButton, QFD, QSplitter,
                       QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QPixmap)
 import numpy as np
 
 #from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
-#               instance, instances, intbv, traceSignals, 
+#               instance, instances, intbv, traceSignals,
 #               Simulation, StopSimulation)
-import myhdl  
+import myhdl
 
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -45,7 +45,7 @@ from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
 #------------------------------------------------------------------------------
 
 class UI_WI_WF(QWidget):
-    """ 
+    """
     Widget for entering integer and fractional bits. The result can be read out
     via the attributes `self.WI` and `self.WF`.
     """
@@ -66,7 +66,7 @@ class UI_WI_WF(QWidget):
         # dict_ui.update(map(kwargs)) # same as above?
         self.WI = dict_ui['WI']
         self.WF = dict_ui['WF']
-            
+
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
@@ -75,7 +75,7 @@ class UI_WI_WF(QWidget):
         self.ledWI.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
 
         lblDot = QLabel(".", self)
-        
+
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(dict_ui['tip_WF'])
         self.ledWF.setText(qstr(dict_ui['WF']))
@@ -89,7 +89,7 @@ class UI_WI_WF(QWidget):
         layH.addWidget(lblDot)
         layH.addWidget(self.ledWF)
         layH.setContentsMargins(0,0,0,0)
-        
+
         frmMain = QFrame(self)
         frmMain.setLayout(layH)
 
@@ -101,11 +101,11 @@ class UI_WI_WF(QWidget):
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------       
+        #----------------------------------------------------------------------
         self.ledWI.editingFinished.connect(self._update_ui)
         self.ledWF.editingFinished.connect(self._update_ui)
 
-    #--------------------------------------------------------------------------              
+    #--------------------------------------------------------------------------
     def _update_ui(self):
         """ Update the attributes `self.WI` and `self.WF` """
         self.WI = safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos')
@@ -116,7 +116,7 @@ class UI_WI_WF(QWidget):
 #==============================================================================
 
 class UI_Q_Ovfl(QWidget):
-    """ 
+    """
     Widget for selecting quantization / overflow options. The result can be read out
     via the attributes `self.x` and `self.y`.
     """
@@ -141,8 +141,8 @@ class UI_Q_Ovfl(QWidget):
         self.cmbQuant = QComboBox(self)
         self.cmbQuant.addItems(dict_ui['cmb_q'])
         self.cmbQuant.setToolTip(dict_ui['tip_q'])
-        
-        lblOvfl = QLabel(dict_ui['label_ov'], self) 
+
+        lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
         self.cmbOvfl.addItems(dict_ui['cmb_ov'])
         self.cmbOvfl.setToolTip(dict_ui['tip_ov'])
@@ -152,7 +152,7 @@ class UI_Q_Ovfl(QWidget):
         self.cmbOvfl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
         layH = QHBoxLayout()
-        layH.addWidget(lblOvfl)            
+        layH.addWidget(lblOvfl)
         layH.addWidget(self.cmbOvfl)
         layH.addStretch()
         layH.addWidget(lblQuant)
@@ -167,25 +167,25 @@ class UI_Q_Ovfl(QWidget):
         layVMain.setContentsMargins(5,0,0,0)#*params['wdg_margins'])
 
         self.setLayout(layVMain)
-        
+
         # initial settings:
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
-        
+
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------       
+        #----------------------------------------------------------------------
         self.cmbOvfl.currentIndexChanged.connect(self._update_ui)
         self.cmbQuant.currentIndexChanged.connect(self._update_ui)
 
-    #--------------------------------------------------------------------------              
+    #--------------------------------------------------------------------------
     def _update_ui(self):
         """ Update the attributes `self.ovfl` and `self.quant` """
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
 
 #==============================================================================
- 
+
 
 class HDLSpecs(QWidget):
     """
@@ -199,11 +199,11 @@ class HDLSpecs(QWidget):
     def _construct_UI(self):
         """
         Intitialize the main GUI, consisting of:
-        """  
+        """
         # ============== UI Layout =====================================
         bfont = QFont()
         bfont.setBold(True)
-        
+
         bifont = QFont()
         bifont.setBold(True)
         bifont.setItalic(True)
@@ -215,7 +215,7 @@ class HDLSpecs(QWidget):
                         "Simple filters", self)
         lblMsg.setWordWrap(True)
         layHMsg = QHBoxLayout()
-        layHMsg.addWidget(lblMsg)   
+        layHMsg.addWidget(lblMsg)
 
         self.frmMsg = QFrame(self)
         self.frmMsg.setLayout(layHMsg)
@@ -223,7 +223,7 @@ class HDLSpecs(QWidget):
 
         self.lbl_img_hdl = QLabel(self)
         file_path = os.path.dirname(os.path.realpath(__file__))
-        img_file = os.path.join(file_path, "hdl-df1.png") 
+        img_file = os.path.join(file_path, "hdl-df1.png")
         img_hdl = QPixmap(img_file)
         img_hdl_scaled = img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio)
         # self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
@@ -233,12 +233,12 @@ class HDLSpecs(QWidget):
         layHImg.addWidget(self.lbl_img_hdl)
         self.frmImg = QFrame(self)
         self.frmImg.setLayout(layHImg)
-        self.frmImg.setContentsMargins(*params['wdg_margins'])        
+        self.frmImg.setContentsMargins(*params['wdg_margins'])
 
 # =============================================================================
 # UI for quantization
 # =============================================================================
-        
+
         lblHBtnsMsg = QLabel("Fixpoint signal / coeff. formats as WI.WF:", self)
         lblHBtnsMsg.setFont(bfont)
         self.layHBtnsMsg = QHBoxLayout()
@@ -251,22 +251,22 @@ class HDLSpecs(QWidget):
         self.wdg_q_ovfl_accu = UI_Q_Ovfl(self)
         self.wdg_wi_wf_output = UI_WI_WF(self, label='Output Format y[n]:')
         self.wdg_q_ovfl_output = UI_Q_Ovfl(self)
-         
+
 #------------------------------------------------------------------------------
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
         self.butExportHDL.setText("Create HDL")
-        
+
         self.butSimFixPoint = QPushButton(self)
         self.butSimFixPoint.setToolTip("Simulate filter with fixpoint effects.")
         self.butSimFixPoint.setText("Simulate")
 
-        
+
         self.layHButtonsHDL_h = QHBoxLayout()
-        self.layHButtonsHDL_h.addWidget(self.butSimFixPoint)            
+        self.layHButtonsHDL_h.addWidget(self.butSimFixPoint)
         self.layHButtonsHDL_h.addWidget(self.butExportHDL)
 
-# -------------------------------------------------------------------        
+# -------------------------------------------------------------------
 
         layVBtns = QVBoxLayout()
         layVBtns.addLayout(self.layHBtnsMsg)
@@ -275,19 +275,19 @@ class HDLSpecs(QWidget):
         self.wdg_wi_wf_coeffs.setEnabled(False)
         layVBtns.addWidget(self.wdg_q_ovfl_coeffs)
         self.wdg_q_ovfl_coeffs.setEnabled(False)
-        
+
         layVBtns.addWidget(self.wdg_wi_wf_accu)
         layVBtns.addWidget(self.wdg_q_ovfl_accu)
 
         layVBtns.addWidget(self.wdg_wi_wf_output)
         layVBtns.addWidget(self.wdg_q_ovfl_output)
-        
+
         layVBtns.addLayout(self.layHButtonsHDL_h)
-        
+
         layVBtns.addStretch()
 
         # -------------------------------------------------------------------
-        # This frame encompasses all the buttons            
+        # This frame encompasses all the buttons
         frmBtns = QFrame(self)
         frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmBtns.setLayout(layVBtns)
@@ -313,8 +313,8 @@ class HDLSpecs(QWidget):
         #layVMain.addWidget(frmBtns)
         #layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
-        
-            
+
+
         self.setLayout(layVMain)
 
         #----------------------------------------------------------------------
@@ -338,7 +338,7 @@ class HDLSpecs(QWidget):
 #         else:
 #             self.butExportHDL.setEnabled(False)
 #             self.butSimFixPoint.setEnabled(False)
-#             
+#
 # =============================================================================
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
@@ -353,7 +353,7 @@ class HDLSpecs(QWidget):
 
         qQuant_o = self.wdg_q_ovfl_output.quant
         qOvfl_o = self.wdg_q_ovfl_output.ovfl
-        
+
         q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
         myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
 
@@ -379,14 +379,14 @@ class HDLSpecs(QWidget):
 
         self.flt.hdl_name = file_name
         self.flt.hdl_directory = dir_name
-        
+
 #------------------------------------------------------------------------------
     def exportHDL(self):
         """
         Synthesize HDL description of filter using myHDL module
         """
         dlg = QFD(self) # instantiate file dialog object
-        
+
         file_types = "Verilog (*.v);;VHDL (*.vhd)"
 
         hdl_file, hdl_filter = dlg.getSaveFileName_(
@@ -397,12 +397,12 @@ class HDLSpecs(QWidget):
         if hdl_file != "": # "operation cancelled" gives back an empty string
             hdl_file = os.path.normpath(hdl_file)
             hdl_type = extract_file_ext(qstr(hdl_filter))[0] # return '.v' or '.vhd'
-    
+
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
             dirs.save_dir = hdl_dir_name # make this directory the new default / base dir
-    
+
             # return the filename without suffix
             hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
 
@@ -415,7 +415,7 @@ class HDLSpecs(QWidget):
                 self.flt.hdl_target = 'verilog'
                 suffix = '.v'
 
-                
+
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + suffix)))
 
@@ -430,7 +430,7 @@ class HDLSpecs(QWidget):
         # Setup the Testbench and run
 
         dlg = QFD(self)  # instantiate file dialog object
-        
+
         plt_types = "png (*.png);;svg (*.svg)"
 
         plt_file, plt_type = dlg.getSaveFileName_(
@@ -441,9 +441,9 @@ class HDLSpecs(QWidget):
         if plt_file != "":
             plt_file = os.path.normpath(plt_file)
             plt_type = str(plt_type)
-            
+
             logger.info('Using plot filename "%s"', plt_file)
-            
+
             plt_dir_name = os.path.dirname(plt_file)  # extract the directory path
             if not os.path.isdir(plt_dir_name): # create directory if it doesn't exist
                 os.mkdir(plt_dir_name)
@@ -451,7 +451,7 @@ class HDLSpecs(QWidget):
 
 #            plt_file_name = os.path.splitext(os.path.basename(plt_file))[0] # filename without suffix
             plt_file_name = os.path.basename(plt_file)
-            
+
             logger.info('Creating plot file "{0}"'.format(
                         os.path.join(plt_dir_name, plt_file_name)))
 
@@ -463,7 +463,7 @@ class HDLSpecs(QWidget):
             ts  = myhdl.Signal(False)
             x   = myhdl.Signal(myhdl.intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
             y   = myhdl.Signal(myhdl.intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
-            
+
             try:
                 sim = myhdl.Simulation(tb)
                 logger.info("Fixpoint simulation started")
