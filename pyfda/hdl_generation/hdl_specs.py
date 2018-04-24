@@ -15,8 +15,8 @@ import sys, os
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QtWidget, QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
-                      QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QImage)
+from ..compat import (Qt, QWidget, QLabel, QLineEdit, QComboBox, QFont, QPushButton, QFD,
+                      QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QPixmap)
 import numpy as np
 
 #from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
@@ -69,9 +69,8 @@ class HDLSpecs(QWidget):
         ifont = QFont()
         ifont.setItalic(True)
 
-        lblMsg = QLabel("Warning! This feature is only experimental, "
-        "only HDL code for second order IIR filters can be created at the moment. "
-        "The quantization settings are not used for code generation and simulation.", self)
+        lblMsg = QLabel("<b>Direct-Form 1 (DF1) Filters</b><br />"
+                        "Simple filters", self)
         lblMsg.setWordWrap(True)
         layHMsg = QHBoxLayout()
         layHMsg.addWidget(lblMsg)   
@@ -80,9 +79,15 @@ class HDLSpecs(QWidget):
         self.frmMsg.setLayout(layHMsg)
         self.frmMsg.setContentsMargins(*params['wdg_margins'])
 
-        imgFixp = QImage(fixp_IIR.png)
+        self.lbl_img_hdl = QLabel(self)
+        file_path = os.path.dirname(os.path.realpath(__file__))
+        img_file = os.path.join(file_path, "hdl-df1.png") 
+        img_hdl = QPixmap(img_file)
+        img_hdl_scaled = img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio)
+        self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
+
         layHImg = QHBoxLayout()
-        layHImg.addWidget()
+        layHImg.addWidget(self.lbl_img_hdl)
         self.frmImg = QFrame(self)
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])        
@@ -342,7 +347,7 @@ class HDLSpecs(QWidget):
     # -------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmMsg)
-        layVMain.addWidget(self.imgFilt)
+        layVMain.addWidget(self.frmImg)
 #        layVMain.addWidget(self.frmFixpoint)
         layVMain.addWidget(frmBtns)
         layVMain.setContentsMargins(*params['wdg_margins'])
