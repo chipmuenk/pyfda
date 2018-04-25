@@ -329,7 +329,6 @@ class FilterPZ(QWidget):
         return super(FilterPZ, self).eventFilter(source, event)
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
     def process_signals(self, dict_sig):
         """
         Process signals coming from input_tab_widgets
