@@ -12,7 +12,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSlot, pyqtSignal
+from ..compat import QCheckBox, QWidget, QComboBox, QHBoxLayout, QFrame, pyqtSignal
 
 import numpy as np
 
@@ -29,6 +29,7 @@ class Plot_Phi(QWidget):
 
     def __init__(self, parent):
         super(Plot_Phi, self).__init__(parent)
+        self.needs_draw = True
         self.needs_redraw = True
         self.tool_tip = "Phase frequency response"
         self.tab_label = "phi(f)"
@@ -56,7 +57,6 @@ class Plot_Phi(QWidget):
         self.chkWrap.setToolTip("Plot phase wrapped to +/- pi")
 
         layHControls = QHBoxLayout()
-#        layHControls.addStretch(10)
         layHControls.addWidget(self.cmbUnitsPhi)
         layHControls.addWidget(self.chkWrap)
         layHControls.addStretch(10)
@@ -84,7 +84,6 @@ class Plot_Phi(QWidget):
 
         self.draw() # initial drawing
 
-
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -98,26 +97,30 @@ class Plot_Phi(QWidget):
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
 
 #------------------------------------------------------------------------------
-    #@pyqtSlot(object)
     def process_signals(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_redraw = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_redraw, self.isVisible()))
+        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
+                     .format(dict_sig, self.needs_draw, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
                 self.draw()
+                self.needs_draw = False
+                self.needs_redraw = False
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+                or self.needs_redraw:
+                self.redraw()
                 self.needs_redraw = False
             elif 'view_changed' in dict_sig:
                 self.update_view()
             elif 'enabled' in dict_sig:
-                self.enable_ui(dict_sig['enabled']) 
+                self.enable_ui(dict_sig['enabled'])
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
+                self.needs_draw = True
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
-            else:
-                pass
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):

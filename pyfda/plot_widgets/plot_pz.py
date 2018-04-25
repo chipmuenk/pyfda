@@ -34,7 +34,8 @@ class Plot_PZ(QWidget):
 
     def __init__(self, parent):
         super(Plot_PZ, self).__init__(parent)
-        self.needs_redraw = True # flag whether plot needs to be updated        
+        self.needs_draw = True   # flag whether plot needs to be updated  
+        self.needs_redraw = True # flag whether plot needs to be redrawn 
         self.tool_tip = "Pole / zero plan"
         self.tab_label = "P / Z"
 
@@ -119,11 +120,16 @@ class Plot_PZ(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_redraw = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_redraw, self.isVisible()))
+        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
+                     .format(dict_sig, self.needs_draw, self.isVisible()))
         if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
                 self.draw()
+                self.needs_draw = False
+                self.needs_redraw = False
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+                    or self.needs_redraw:
+                self.redraw()
                 self.needs_redraw = False
             elif 'view_changed' in dict_sig:
                 self.update_view()
@@ -131,9 +137,9 @@ class Plot_PZ(QWidget):
                 self.enable_ui(dict_sig['enabled'])
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
+                self.needs_draw = True
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
-            else:
-                pass
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):

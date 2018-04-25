@@ -42,7 +42,8 @@ class Plot_Impz(QWidget):
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
-        self.needs_redraw = True # flag whether plot needs to be updated
+        self.needs_draw = True   # flag whether plot needs to be updated 
+        self.needs_redraw = True # flag whether plot needs to be redrawn
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
 
@@ -80,21 +81,27 @@ class Plot_Impz(QWidget):
         """
         Process signals coming from the navigation toolbar and input_tab_widgets
         """
-        logger.debug("Processing {0} | needs_redraw = {1}, visible = {2}".format(dict_sig, self.needs_redraw, self.isVisible()))
+        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
+                     .format(dict_sig, self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop.")
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_redraw:
+                or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
                 self.draw()
+                self.needs_draw = False
+                self.needs_redraw = False                
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+                    or self.needs_redraw:
+                self.redraw()
                 self.needs_redraw = False
             elif 'enabled' in dict_sig:
                 self.enable_ui(dict_sig['enabled']) 
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
+                self.needs_draw = True
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
-            else:
-                pass
 
 #------------------------------------------------------------------------------
     def enable_ui(self, enabled):
