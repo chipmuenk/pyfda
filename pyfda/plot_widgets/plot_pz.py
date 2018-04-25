@@ -114,7 +114,6 @@ class PlotPZ(QWidget):
         self.chkFIR_P.clicked.connect(self.draw)
 
 #------------------------------------------------------------------------------
-    #@pyqtSlot(object)
     def process_signals(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
@@ -129,6 +128,8 @@ class PlotPZ(QWidget):
                 self.update_view()
             elif 'enabled' in dict_sig:
                 self.enable_ui(dict_sig['enabled'])
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+                self.redraw()
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
                 self.needs_redraw = True
