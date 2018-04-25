@@ -27,7 +27,7 @@ class PlotTabWidgets(QTabWidget):
 
     # incoming, connected to input_tab_widget.sig_tx in pyfdax    
     sig_rx = pyqtSignal(object)
-    # outgoing: emitted by process_signals  
+    # outgoing: emitted by process_sig_rx  
     sig_tx = pyqtSignal(object)
     
     def __init__(self, parent):
@@ -83,7 +83,7 @@ class PlotTabWidgets(QTabWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
@@ -93,15 +93,14 @@ class PlotTabWidgets(QTabWidget):
         self.timer_id.timeout.connect(self.current_tab_redraw)
 
         # When user has selected a different tab, trigger a redraw of current tab
-        tabWidget.currentChanged.connect(self.current_tab_redraw)
+        tabWidget.currentChanged.connect(self.current_tab_changed)
         # The following does not work: maybe current scope must be left?
         # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
 
         tabWidget.installEventFilter(self)
         
         
-#    @pyqtSlot(object)
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via sig_rx
         """
@@ -140,10 +139,13 @@ class PlotTabWidgets(QTabWidget):
         resizes itself instead. 
         """
 
-#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------       
+    def current_tab_changed(self):
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'changed'})
         
+#------------------------------------------------------------------------------       
     def current_tab_redraw(self):
-        self.sig_tx.emit({'sender':__name__, 'tab_changed':True})
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'resized'})
             
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):

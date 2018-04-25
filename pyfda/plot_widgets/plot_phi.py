@@ -107,13 +107,15 @@ class Plot_Phi(QWidget):
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
                 self.draw()
                 self.needs_draw = False
+                self.needs_redraw = False
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+                or self.needs_redraw:
+                self.redraw()
+                self.needs_redraw = False
             elif 'view_changed' in dict_sig:
                 self.update_view()
             elif 'enabled' in dict_sig:
                 self.enable_ui(dict_sig['enabled'])
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                or self.needs_redraw:
-                self.redraw()
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
                 self.needs_draw = True
