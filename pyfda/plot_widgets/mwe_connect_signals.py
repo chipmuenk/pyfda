@@ -34,9 +34,7 @@ class TabWidgets(QTabWidget):
         layVMain.addWidget(self.tabWidget)
         self.setLayout(layVMain)
 
-        #----------------------------------------------------------------------
-
-    @pyqtSlot(object)
+    #--------------------------------------------------------------------------
     def process_signals(self, dict_sig):
         """
         Process signals coming in via sig_rx
