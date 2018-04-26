@@ -329,19 +329,6 @@ class FilterPZ(QWidget):
         return super(FilterPZ, self).eventFilter(source, event)
 
 #------------------------------------------------------------------------------
-    @pyqtSlot(object)
-    def process_signals(self, dict_sig):
-        """
-        Process signals coming from input_tab_widgets
-        """
-        if 'load_dict' in dict_sig:
-            self.load_dict()
-        elif 'enabled' in dict_sig:
-            self.enable_ui(dict_sig['enabled'])
-        else:
-            pass
-
-#------------------------------------------------------------------------------
     def _store_gain(self, source):
         """
         When the textfield of `source` has been edited (flag `self.spec_edited` =  True),
