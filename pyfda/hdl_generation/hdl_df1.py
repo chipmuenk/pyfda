@@ -11,12 +11,11 @@ Widget for simulating fixpoint filters and
 generating VHDL and Verilog Code
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QLabel, QSplitter,
-                      QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QPixmap)
+from ..compat import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
 
 from pyfda.hdl_generation.hdl_helpers import UI_WI_WF, UI_Q_Ovfl
 
@@ -32,38 +31,14 @@ class HDL_DF1(QWidget):
     def __init__(self, parent):
         super(HDL_DF1, self).__init__(parent)
 
+        self.title = ("<b>Direct-Form 1 (DF1) Filters</b><br />"
+                 "Simple topology, only suitable for low-order filters.")
         self._construct_UI()
 
     def _construct_UI(self):
         """
-        Intitialize the main GUI, consisting of:
+        Intitialize the UI
         """
-        lblMsg = QLabel("<b>Direct-Form 1 (DF1) Filters</b><br />"
-                        "Simple filters", self)
-        lblMsg.setWordWrap(True)
-        layHMsg = QHBoxLayout()
-        layHMsg.addWidget(lblMsg)
-
-        self.frmMsg = QFrame(self)
-        self.frmMsg.setLayout(layHMsg)
-        self.frmMsg.setContentsMargins(*params['wdg_margins'])
-
-#------------------------------------------------------------------------------
-
-        self.lbl_img_hdl = QLabel(self)
-        file_path = os.path.dirname(os.path.realpath(__file__))
-        img_file = os.path.join(file_path, "hdl-df1.png")
-        img_hdl = QPixmap(img_file)
-        img_hdl_scaled = img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio)
-        # self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
-        self.lbl_img_hdl.setPixmap(QPixmap(img_hdl)) # fixed size
-
-        layHImg = QHBoxLayout()
-        layHImg.addWidget(self.lbl_img_hdl)
-        self.frmImg = QFrame(self)
-        self.frmImg.setLayout(layHImg)
-        self.frmImg.setContentsMargins(*params['wdg_margins'])
-
 #------------------------------------------------------------------------------
 
         lblHBtnsMsg = QLabel("<b>Fixpoint signal / coeff. formats as WI.WF:</b>", self)
@@ -106,22 +81,9 @@ class HDL_DF1(QWidget):
     # Top level layout
     # -------------------------------------------------------------------
        
-        splitter = QSplitter(self)
-        splitter.setOrientation(Qt.Vertical)
-        splitter.addWidget(self.frmMsg)
-        splitter.addWidget(self.frmImg)
-        splitter.addWidget(frmWdg)
-        # setSizes uses absolute pixel values, but can be "misused" by specifying values
-        # that are way too large: in this case, the space is distributed according
-        # to the _ratio_ of the values:
-        splitter.setSizes([1000,3000,10000])
-
         layVMain = QVBoxLayout()
-        layVMain.addWidget(splitter)
-        #layVMain.addWidget(self.frmMsg)
-        #layVMain.addWidget(self.frmImg)
-        #layVMain.addWidget(frmBtns)
-        #layVMain.addStretch()
+        layVMain.addWidget(frmWdg)
+
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)
