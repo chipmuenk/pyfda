@@ -11,29 +11,32 @@ Widget for simulating fixpoint filters and
 generating VHDL and Verilog Code
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os
+import sys, os, importlib
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QtCore, QWidget, QPushButton, QFD, QSplitter, QPixmap, QLabel,
-                      QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QEvent)
+from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel,
+                      QPixmap, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, 
+                      QEvent, QSizePolicy)
 import numpy as np
 
+import myhdl
 #from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
 #               instance, instances, intbv, traceSignals,
 #               Simulation, StopSimulation)
-import myhdl
+hdl_wdg_list = ["HDL_DF1", "HDL_DF2"]
+hdl_wdg_dir = "hdl_generation"
+
 from pyfda.hdl_generation.hdl_df1 import HDL_DF1
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_fix_lib as fix
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_io_lib import extract_file_ext
-from pyfda.pyfda_qt_lib import qstr
+from pyfda.pyfda_qt_lib import qstr, qget_cmb_box
 from pyfda.pyfda_rc import params
 
-from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
-
+from pyfda.hdl_generation.filter_iir import FilterIIR 
 
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
 #                 @ http://www.dsprelated.com/showcode/211.php
@@ -44,6 +47,7 @@ class HDL_Specs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
+    sig_resize = pyqtSignal()
     def __init__(self, parent):
         super(HDL_Specs, self).__init__(parent)
 
@@ -56,35 +60,47 @@ class HDL_Specs(QWidget):
         - the UI for the HDL filter settings
         - and the myHDL interface:
         """
+        self.cmb_wdg_hdl = QComboBox(self)
+        self.cmb_wdg_hdl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
 
+        for hdl_wdg in hdl_wdg_list:
+            hdl_mod_name = 'pyfda.' + hdl_wdg_dir + '.' + hdl_wdg.lower()
+            try:  # Try to import the module from the  package and get a handle:
+                hdl_mod = importlib.import_module(hdl_mod_name)
+                hdl_wdg_class = getattr(hdl_mod, hdl_wdg) # try to resolve the class       
+                self.cmb_wdg_hdl.addItem(hdl_wdg, hdl_mod_name)
+            except ImportError:
+                logger.warning("Could not import {0}!".format(hdl_mod_name))
+                continue
+            except Exception as e:
+                logger.warning("Unexpected error during module import:\n{0}".format(e))
+                continue
+        self.update_filt_wdg()
 #------------------------------------------------------------------------------        
-        self.frmHDL = HDL_DF1(self)
+        # import and set self.hdl_wdg_inst
 #------------------------------------------------------------------------------
-        lblTitle = QLabel(self.frmHDL.title, self)
-        lblTitle.setWordWrap(True)
+        self.lblTitle = QLabel(self.hdl_wdg_inst.title, self)
+        self.lblTitle.setWordWrap(True)
+        self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layHTitle = QHBoxLayout()
-        layHTitle.addWidget(lblTitle)
+        layHTitle.addWidget(self.cmb_wdg_hdl)
+        layHTitle.addWidget(self.lblTitle)
 
         self.frmTitle = QFrame(self)
         self.frmTitle.setLayout(layHTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
+        self.frmImg = QFrame(self)
         self.lbl_img_hdl = QLabel(self)
-        file_path = os.path.dirname(os.path.realpath(__file__))
-        img_file = os.path.join(file_path, self.frmHDL.img_name)
-        self.img_hdl = QPixmap(img_file)
-        #img_hdl_scaled = img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio)
-        # self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
-        
-        self.lbl_img_hdl.setPixmap(QPixmap(self.img_hdl)) # fixed size
-
+        self.img_dir = os.path.dirname(os.path.realpath(__file__))  
+        self.img_file = os.path.join(self.img_dir, 'hdl_dummy.png')
+        self.img_hdl = QPixmap(self.img_file)
+        self.resize_img()
         layHImg = QHBoxLayout()
         layHImg.addWidget(self.lbl_img_hdl)
-        self.frmImg = QFrame(self)
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
-        
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
         self.butExportHDL.setText("Create HDL")
@@ -92,7 +108,6 @@ class HDL_Specs(QWidget):
         self.butSimFixPoint = QPushButton(self)
         self.butSimFixPoint.setToolTip("Simulate filter with fixpoint effects.")
         self.butSimFixPoint.setText("Simulate")
-
 
         self.layHBtns = QHBoxLayout()
         self.layHBtns.addWidget(self.butSimFixPoint)
@@ -110,34 +125,29 @@ class HDL_Specs(QWidget):
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.frmTitle)
         splitter.addWidget(self.frmImg)
-        splitter.addWidget(self.frmHDL)
+        splitter.addWidget(self.hdl_wdg_inst)
         splitter.addWidget(frmBtns)
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
         # that are way too large: in this case, the space is distributed according
         # to the _ratio_ of the values:
-        splitter.setSizes([1000,1000, 3000,10000])
-
+        splitter.setSizes([1000,3000, 5000,1000])
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(splitter)
-        #layVMain.addWidget(self.frmMsg)
-        #layVMain.addWidget(self.frmImg)
-        #layVMain.addWidget(frmBtns)
-        #layVMain.addStretch()
+        layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)
 
         #----------------------------------------------------------------------
-        # LOCAL SIGNALS & SLOTs
+        # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         #----------------------------------------------------------------------
-        self.timer_id = QtCore.QTimer()
-        self.timer_id.setSingleShot(True)
-        # redraw current widget at timeout (timer was triggered by resize event):
-        self.timer_id.timeout.connect(self.resize_img)
+        # monitor events and generate sig_resize event when resized
+        self.lbl_img_hdl.installEventFilter(self)
+        # ... then redraw image when resized
+        self.sig_resize.connect(self.resize_img)
 
-        splitter.installEventFilter(self)
-
+        self.cmb_wdg_hdl.currentIndexChanged.connect(self.update_all)
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
@@ -147,34 +157,76 @@ class HDL_Specs(QWidget):
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
-        Filter all events generated by QSplitter. Source and type of all
-         events generated by monitored objects are passed to this eventFilter,
-        evaluated and passed on to the next hierarchy level.
-        
-        This filter stops and restarts a one-shot timer for every resize event.
-        When the timer generates a timeout after 500 ms, current_tab_redraw is 
-        called by the timer.
+        Filter all events generated by monitored QLabel, only resize events are
+        processed here, generating a `sig_resize` signal. Alll other events
+        are passed on to the next hierarchy level.
         """
-        if isinstance(source, QSplitter):
-            if event.type() == QEvent.Resize:
-                self.timer_id.stop()
-                self.timer_id.start(500)
+        if event.type() == QEvent.Resize:
+            self.sig_resize.emit()
 
         # Call base class method to continue normal event processing:
         return super(HDL_Specs, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
-
     def resize_img(self):
+            """ 
+            Resize the image inside QLabel to completely fill the label while
+            keeping the aspect ratio.
+            """
             img_scaled = self.img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self.lbl_img_hdl.setPixmap(QPixmap(img_scaled))
 
+#------------------------------------------------------------------------------
+    def update_all(self):
+        """
+        Import new module and update UI after changing the filter topology
+        """
+        self.update_filt_wdg()
+        self.update_UI()
 
+#------------------------------------------------------------------------------
+    def update_filt_wdg(self):
+        """
+        Import new module after changing the filter topology
+        """
+        cmb_wdg_hdl_cur = qstr(self.cmb_wdg_hdl.currentText())
+
+        if cmb_wdg_hdl_cur: # at least one valid hdl widget found
+            self.hdl_wdg_found = True
+            hdl_mod_name = qget_cmb_box(self.cmb_wdg_hdl, data=True)
+            hdl_mod = importlib.import_module(hdl_mod_name)
+            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_hdl_cur)
+            self.hdl_wdg_inst = hdl_wdg_class(self)
+        else:
+            self.hdl_wdg_found = False
+ 
 #------------------------------------------------------------------------------
     def update_UI(self):
         """
         Update the UI after changing the filter class
         """
-        pass
+        if self.hdl_wdg_inst.img_name: # is filename defined?
+            # check whether file exists
+            file_path = os.path.dirname(os.path.realpath(__file__))  
+            img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name)
+            if os.path.exists(img_file):
+                self.img_hdl = QPixmap(img_file)
+            else:
+                logger.warning("Image file {0} doesn't exist.".format(img_file))
+                img_file = os.path.join(file_path, "hdl_dummy.png")                
+                self.img_hdl = QPixmap(img_file)
+                
+                #self.lbl_img_hdl.setPixmap(QPixmap(self.img_hdl)) # fixed size
+            self.resize_img()
+            
+        self.lblTitle.setText(self.hdl_wdg_inst.title)
+# =============================================================================
+#             layHImg = QHBoxLayout()
+#             layHImg.addWidget(self.lbl_img_hdl)
+#             self.frmImg.setLayout(layHImg)
+#             self.frmImg.setContentsMargins(*params['wdg_margins'])
+# 
+# =============================================================================
+
 # =============================================================================
 #         if hasattr(ff.fil_inst, 'hdl'):
 #             self.butExportHDL.setEnabled('iir_sos' in ff.fil_inst.hdl)
