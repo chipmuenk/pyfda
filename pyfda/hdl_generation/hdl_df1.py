@@ -33,6 +33,7 @@ class HDL_DF1(QWidget):
 
         self.title = ("<b>Direct-Form 1 (DF1) Filters</b><br />"
                  "Simple topology, only suitable for low-order filters.")
+        self.img_name = "hdl-df1.png"
         self._construct_UI()
 
     def _construct_UI(self):

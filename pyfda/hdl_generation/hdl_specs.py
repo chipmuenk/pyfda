@@ -15,7 +15,7 @@ import sys, os
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (Qt, QWidget, QPushButton, QFD, QSplitter, QPixmap, QLabel,
+from ..compat import (Qt, QtCore, QWidget, QPushButton, QFD, QSplitter, QPixmap, QLabel,
                       QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, QEvent)
 import numpy as np
 
@@ -40,12 +40,12 @@ from pyfda.hdl_generation.filter_iir import FilterIIR # IIR filter object
 
 #------------------------------------------------------------------------------
 
-class HDLSpecs(QWidget):
+class HDL_Specs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
     def __init__(self, parent):
-        super(HDLSpecs, self).__init__(parent)
+        super(HDL_Specs, self).__init__(parent)
 
         self._construct_UI()
 
@@ -56,20 +56,6 @@ class HDLSpecs(QWidget):
         - the UI for the HDL filter settings
         - and the myHDL interface:
         """
-        self.lbl_img_hdl = QLabel(self)
-        file_path = os.path.dirname(os.path.realpath(__file__))
-        img_file = os.path.join(file_path, "hdl-df1.png")
-        self.img_hdl = QPixmap(img_file)
-        #img_hdl_scaled = img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio)
-        # self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
-        
-        self.lbl_img_hdl.setPixmap(QPixmap(self.img_hdl)) # fixed size
-
-        layHImg = QHBoxLayout()
-        layHImg.addWidget(self.lbl_img_hdl)
-        self.frmImg = QFrame(self)
-        self.frmImg.setLayout(layHImg)
-        self.frmImg.setContentsMargins(*params['wdg_margins'])
 
 #------------------------------------------------------------------------------        
         self.frmHDL = HDL_DF1(self)
@@ -82,6 +68,21 @@ class HDLSpecs(QWidget):
         self.frmTitle = QFrame(self)
         self.frmTitle.setLayout(layHTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
+#------------------------------------------------------------------------------        
+        self.lbl_img_hdl = QLabel(self)
+        file_path = os.path.dirname(os.path.realpath(__file__))
+        img_file = os.path.join(file_path, self.frmHDL.img_name)
+        self.img_hdl = QPixmap(img_file)
+        #img_hdl_scaled = img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio)
+        # self.lbl_img_hdl.setPixmap(QPixmap(img_hdl_scaled))
+        
+        self.lbl_img_hdl.setPixmap(QPixmap(self.img_hdl)) # fixed size
+
+        layHImg = QHBoxLayout()
+        layHImg.addWidget(self.lbl_img_hdl)
+        self.frmImg = QFrame(self)
+        self.frmImg.setLayout(layHImg)
+        self.frmImg.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
         
         self.butExportHDL = QPushButton(self)
@@ -130,9 +131,17 @@ class HDLSpecs(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        self.timer_id = QtCore.QTimer()
+        self.timer_id.setSingleShot(True)
+        # redraw current widget at timeout (timer was triggered by resize event):
+        self.timer_id.timeout.connect(self.resize_img)
+
+        splitter.installEventFilter(self)
+
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
+
         self.update_UI()
         
 #------------------------------------------------------------------------------
@@ -152,7 +161,8 @@ class HDLSpecs(QWidget):
                 self.timer_id.start(500)
 
         # Call base class method to continue normal event processing:
-        return super(HDL_DF1, self).eventFilter(source, event)
+        return super(HDL_Specs, self).eventFilter(source, event)
+#------------------------------------------------------------------------------
 
     def resize_img(self):
             img_scaled = self.img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -314,7 +324,7 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = HDLSpecs(None)
+    mainw = HDL_Specs(None)
     mainw.show()
 
     app.exec_()
