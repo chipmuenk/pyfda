@@ -380,14 +380,16 @@ class Plot_Impz(QWidget):
         else:
             H_str = self.H_str + 'in V'
 
-        if self.ui.chkLog.isChecked():
+        if self.ui.chkLog.isChecked(): # log. scale for stimulus / response time domain
             H_str = r'$|$ ' + H_str + '$|$ in dBV'
+            x = np.maximum(20 * np.log10(abs(self.x)), self.ui.bottom)
             y = np.maximum(20 * np.log10(abs(self.y)), self.ui.bottom)
             if self.cmplx:
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom)
                 H_i_str = r'$\log$ ' + H_i_str + ' in dBV'
         else:
             self.ui.bottom = 0
+            x = self.x
             y = self.y
             y_i = self.y_i
 
@@ -397,7 +399,7 @@ class Plot_Impz(QWidget):
 
         if self.ui.plt_time in {"Stimulus", "Both"}:
             stem_fmt = params['mpl_stimuli']
-            [ms, ss, bs] = self.ax_r.stem(self.t[N_start:], self.x[N_start:], 
+            [ms, ss, bs] = self.ax_r.stem(self.t[N_start:], x[N_start:], 
                 bottom=self.ui.bottom, label = 'Stim.', **stem_fmt)
             ms.set_mfc(stem_fmt['mfc'])
             ms.set_mec(stem_fmt['mec'])
