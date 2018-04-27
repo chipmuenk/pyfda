@@ -55,15 +55,17 @@ class FilterSpecs(QWidget):
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()
             self.t_specs.load_dict()
+            self.sig_tx.emit(dict_sig)
         elif 'specs_changed' in dict_sig:
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()
+            self.sig_tx.emit(dict_sig)
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> call update_UI, emitting
             # 'specs_changed' when finished
-            self.update_UI()
-        self.sig_tx.emit(dict_sig)
+            self.update_UI(dict_sig)
+        
 
     def _construct_UI(self):
         """
@@ -160,7 +162,7 @@ class FilterSpecs(QWidget):
         self.start_design_filt() # design first filter using default values
 
 #------------------------------------------------------------------------------
-    def update_UI(self):
+    def update_UI(self, dict_sig={}):
         """
         update_UI is called every time the filter design method or order
         (min / man) has been changed as this usually requires a different set of
@@ -237,7 +239,8 @@ class FilterSpecs(QWidget):
         else:
             self.frmMsg.hide()
 
-        self.sig_tx.emit({'sender':__name__, 'specs_changed':'filter'})
+        dict_sig.update({'sender':__name__, 'specs_changed':'filter'})
+        self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------
     def load_dict(self):
