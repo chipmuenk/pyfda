@@ -36,8 +36,6 @@ from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qstr, qget_cmb_box
 from pyfda.pyfda_rc import params
 
-from pyfda.hdl_generation.filter_iir import FilterIIR 
-
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
 #                 @ http://www.dsprelated.com/showcode/211.php
 
@@ -75,13 +73,20 @@ class HDL_Specs(QWidget):
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
+
         self.update_filt_wdg()
 #------------------------------------------------------------------------------        
-        # import and set self.hdl_wdg_inst
+        # Define frame and layout for the dynamically updated filter widget
+        # The actual filter widget is instantiated in self.update_UI() later on
+        self.layHWdg = QHBoxLayout()
+        #self.layHWdg.setContentsMargins(*params['wdg_margins'])
+        frmHDL_wdg = QFrame(self)
+        frmHDL_wdg.setLayout(self.layHWdg)
+
 #------------------------------------------------------------------------------
         self.lblTitle = QLabel(self.hdl_wdg_inst.title, self)
         self.lblTitle.setWordWrap(True)
-        self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layHTitle = QHBoxLayout()
         layHTitle.addWidget(self.cmb_wdg_hdl)
         layHTitle.addWidget(self.lblTitle)
@@ -90,14 +95,15 @@ class HDL_Specs(QWidget):
         self.frmTitle.setLayout(layHTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
-        self.frmImg = QFrame(self)
         self.lbl_img_hdl = QLabel(self)
         self.img_dir = os.path.dirname(os.path.realpath(__file__))  
         self.img_file = os.path.join(self.img_dir, 'hdl_dummy.png')
         self.img_hdl = QPixmap(self.img_file)
         self.resize_img()
         layHImg = QHBoxLayout()
-        layHImg.addWidget(self.lbl_img_hdl)
+        layHImg.setContentsMargins(0,0,0,0)
+        layHImg.addWidget(self.lbl_img_hdl)#, Qt.AlignCenter)
+        self.frmImg = QFrame(self)
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
@@ -123,17 +129,17 @@ class HDL_Specs(QWidget):
     # -------------------------------------------------------------------
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
-        splitter.addWidget(self.frmTitle)
         splitter.addWidget(self.frmImg)
-        splitter.addWidget(self.hdl_wdg_inst)
-        splitter.addWidget(frmBtns)
+        splitter.addWidget(frmHDL_wdg)
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
         # that are way too large: in this case, the space is distributed according
         # to the _ratio_ of the values:
-        splitter.setSizes([1000,3000, 5000,1000])
+        splitter.setSizes([3000, 5000])
 
         layVMain = QVBoxLayout()
+        layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(splitter)
+        layVMain.addWidget(frmBtns)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
 
@@ -151,7 +157,7 @@ class HDL_Specs(QWidget):
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
-
+        self.update_filt_wdg()
         self.update_UI()
         
 #------------------------------------------------------------------------------
@@ -180,6 +186,11 @@ class HDL_Specs(QWidget):
         """
         Import new module and update UI after changing the filter topology
         """
+        try:
+            self.hdl_wdg_inst.deleteLater() # delete QWidget when scope has been left
+        except AttributeError as e:
+            logger.error("Could not destruct_UI!\n{0}".format(e))
+
         self.update_filt_wdg()
         self.update_UI()
 
@@ -192,9 +203,9 @@ class HDL_Specs(QWidget):
 
         if cmb_wdg_hdl_cur: # at least one valid hdl widget found
             self.hdl_wdg_found = True
-            hdl_mod_name = qget_cmb_box(self.cmb_wdg_hdl, data=True)
+            hdl_mod_name = qget_cmb_box(self.cmb_wdg_hdl, data=True) # module name and path
             hdl_mod = importlib.import_module(hdl_mod_name)
-            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_hdl_cur)
+            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_hdl_cur) # class name
             self.hdl_wdg_inst = hdl_wdg_class(self)
         else:
             self.hdl_wdg_found = False
@@ -204,7 +215,7 @@ class HDL_Specs(QWidget):
         """
         Update the UI after changing the filter class
         """
-        if self.hdl_wdg_inst.img_name: # is filename defined?
+        if hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name: # is an image name defined?
             # check whether file exists
             file_path = os.path.dirname(os.path.realpath(__file__))  
             img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name)
@@ -214,11 +225,11 @@ class HDL_Specs(QWidget):
                 logger.warning("Image file {0} doesn't exist.".format(img_file))
                 img_file = os.path.join(file_path, "hdl_dummy.png")                
                 self.img_hdl = QPixmap(img_file)
-                
                 #self.lbl_img_hdl.setPixmap(QPixmap(self.img_hdl)) # fixed size
             self.resize_img()
             
         self.lblTitle.setText(self.hdl_wdg_inst.title)
+        self.layHWdg.addWidget(self.hdl_wdg_inst)
 # =============================================================================
 #             layHImg = QHBoxLayout()
 #             layHImg.addWidget(self.lbl_img_hdl)
@@ -241,20 +252,6 @@ class HDL_Specs(QWidget):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
-        self.qI_i = self.wdg_wi_wf_input.WI
-        self.qF_i = self.wdg_wi_wf_input.WF
-
-        self.qI_o = self.wdg_wi_wf_output.WI
-        self.qF_o = self.wdg_wi_wf_output.WF
-
-        qQuant_o = self.wdg_q_ovfl_output.quant
-        qOvfl_o = self.wdg_q_ovfl_output.ovfl
-
-        q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
-        myQ_o = fix.Fixed(q_obj_o) # instantiate fixed-point object
-
-
-        self.W = (self.qI_i + self.qF_i + 1, self.qF_i) # Matlab format: (W,WF)
 
         # @todo: always use sos?  The filter object is setup to always
         # @todo: generate a second order filter
@@ -263,18 +260,11 @@ class HDL_Specs(QWidget):
         zpk =  fb.fil[0]['zpk']
         sos = fb.fil[0]['sos']
 
-        logger.info("W = {0}".format(self.W))
-        logger.info('b = {0}'.format(coeffs[0][0:3]))
-        logger.info('a = {0}'.format(coeffs[1][0:3]))
-
         # =============== adapted from C. Felton's SIIR example =============
-        self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
-                             a=np.array(coeffs[1][0:3]),
-                             #sos = sos, doesn't work yet
-                             word_format=(self.W[0], 0, self.W[1]))
+        self.hdl_wdg_inst.setup_HDL(coeffs)
 
-        self.flt.hdl_name = file_name
-        self.flt.hdl_directory = dir_name
+        self.hdl_wdg_inst.flt.hdl_name = file_name
+        self.hdl_wdg_inst.flt.hdl_directory = dir_name
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
@@ -305,17 +295,17 @@ class HDL_Specs(QWidget):
             self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
 
             if str(hdl_type) == '.vhd':
-                self.flt.hdl_target = 'vhdl'
+                self.hdl_wdg_inst.flt.hdl_target = 'vhdl'
                 suffix = '.vhd'
             else:
-                self.flt.hdl_target = 'verilog'
+                self.hdl_wdg_inst.flt.hdl_target = 'verilog'
                 suffix = '.v'
 
 
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + suffix)))
 
-            self.flt.convert()
+            self.hdl_wdg_inst.flt.convert()
             logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
@@ -354,7 +344,7 @@ class HDL_Specs(QWidget):
             self.setupHDL(file_name = plt_file_name, dir_name = plt_dir_name)
 
             logger.info("Fixpoint simulation setup")
-            tb = self.flt.simulate_freqz(num_loops=3, Nfft=1024)
+            tb = self.hdl_wdg_inst.flt.simulate_freqz(num_loops=3, Nfft=1024)
             clk = myhdl.Signal(False)
             ts  = myhdl.Signal(False)
             x   = myhdl.Signal(myhdl.intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
@@ -365,7 +355,7 @@ class HDL_Specs(QWidget):
                 logger.info("Fixpoint simulation started")
                 sim.run()
                 logger.info("Fixpoint plotting started")
-                self.flt.plot_response()
+                self.hdl_wdg_inst.flt.plot_response()
                 logger.info("Fixpoint plotting finished")
             except myhdl.SimulationError as e:
                 logger.warning("Simulation failed:\n{0}".format(e))

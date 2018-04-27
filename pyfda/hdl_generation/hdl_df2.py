@@ -14,11 +14,12 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
+import numpy as np
+
+from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame
 
 from pyfda.hdl_generation.hdl_helpers import UI_WI_WF, UI_Q_Ovfl
-
-from pyfda.pyfda_rc import params
+from pyfda.hdl_generation.filter_iir import FilterIIR 
 #==============================================================================
 
 class HDL_DF2(QWidget):
@@ -56,6 +57,7 @@ class HDL_DF2(QWidget):
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
+        layVWdg.setContentsMargins(0,0,0,0)
         layVWdg.addLayout(self.layHBtnsMsg)
         layVWdg.addWidget(self.wdg_wi_wf_input)
         layVWdg.addWidget(self.wdg_wi_wf_coeffs)
@@ -71,22 +73,37 @@ class HDL_DF2(QWidget):
 
         layVWdg.addStretch()
 
-        # -------------------------------------------------------------------
-        # This frame encompasses all the subwidgets
-        frmWdg = QFrame(self)
-        frmWdg.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmWdg.setLayout(layVWdg)
+        self.setLayout(layVWdg)
+        
+#==============================================================================
+    def setup_HDL(self, coeffs):
+        """
+        Instantiate the myHDL description and pass quantization parameters and
+        coefficients.
+        """
+        self.qI_i = self.wdg_wi_wf_input.WI
+        self.qF_i = self.wdg_wi_wf_input.WF
 
-    # -------------------------------------------------------------------
-    # Top level layout
-    # -------------------------------------------------------------------
-       
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(frmWdg)
+        self.qI_o = self.wdg_wi_wf_output.WI
+        self.qF_o = self.wdg_wi_wf_output.WF
 
-        layVMain.setContentsMargins(*params['wdg_margins'])
+        qQuant_o = self.wdg_q_ovfl_output.quant
+        qOvfl_o = self.wdg_q_ovfl_output.ovfl
 
-        self.setLayout(layVMain)
+        # a dict like this could be passed to the HDL description
+        q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
+
+        self.W = (self.qI_i + self.qF_i + 1, self.qF_i) # Matlab format: (W,WF)
+        
+        logger.info("W = {0}".format(self.W))
+        logger.info('b = {0}'.format(coeffs[0][0:3]))
+        logger.info('a = {0}'.format(coeffs[1][0:3]))
+
+        
+        self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
+                a=np.array(coeffs[1][0:3]),
+                #sos = sos, doesn't work yet
+                word_format=(self.W[0], 0, self.W[1]))
 
 #------------------------------------------------------------------------------
 
