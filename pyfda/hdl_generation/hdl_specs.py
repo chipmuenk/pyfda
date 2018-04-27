@@ -18,19 +18,17 @@ logger = logging.getLogger(__name__)
 from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabel,
                       QPixmap, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, 
                       QEvent, QSizePolicy)
-import numpy as np
 
 import myhdl
 #from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
 #               instance, instances, intbv, traceSignals,
 #               Simulation, StopSimulation)
+
+# The following modules are imported dynamically
 hdl_wdg_list = ["HDL_DF1", "HDL_DF2"]
 hdl_wdg_dir = "hdl_generation"
 
-from pyfda.hdl_generation.hdl_df1 import HDL_DF1
-
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-import pyfda.pyfda_fix_lib as fix
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qstr, qget_cmb_box
@@ -230,23 +228,7 @@ class HDL_Specs(QWidget):
             
         self.lblTitle.setText(self.hdl_wdg_inst.title)
         self.layHWdg.addWidget(self.hdl_wdg_inst)
-# =============================================================================
-#             layHImg = QHBoxLayout()
-#             layHImg.addWidget(self.lbl_img_hdl)
-#             self.frmImg.setLayout(layHImg)
-#             self.frmImg.setContentsMargins(*params['wdg_margins'])
-# 
-# =============================================================================
 
-# =============================================================================
-#         if hasattr(ff.fil_inst, 'hdl'):
-#             self.butExportHDL.setEnabled('iir_sos' in ff.fil_inst.hdl)
-#             self.butSimFixPoint.setEnabled('iir_sos' in ff.fil_inst.hdl)
-#         else:
-#             self.butExportHDL.setEnabled(False)
-#             self.butSimFixPoint.setEnabled(False)
-#
-# =============================================================================
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
         """
@@ -257,12 +239,10 @@ class HDL_Specs(QWidget):
         # @todo: generate a second order filter
         # get filter coefficients etc. from filter dict
         coeffs = fb.fil[0]['ba']
-        zpk =  fb.fil[0]['zpk']
-        sos = fb.fil[0]['sos']
+        # zpk =  fb.fil[0]['zpk'] # not implemented yet
+        # sos = fb.fil[0]['sos']  # not implemented yet
 
-        # =============== adapted from C. Felton's SIIR example =============
-        self.hdl_wdg_inst.setup_HDL(coeffs)
-
+        self.hdl_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
         self.hdl_wdg_inst.flt.hdl_name = file_name
         self.hdl_wdg_inst.flt.hdl_directory = dir_name
 
@@ -319,36 +299,35 @@ class HDL_Specs(QWidget):
 
         plt_types = "png (*.png);;svg (*.svg)"
 
-        plt_file, plt_type = dlg.getSaveFileName_(
+        plt_dir_file, plt_type = dlg.getSaveFileName_(
                 caption = "Save plots as", directory=dirs.save_dir,
                 filter = plt_types)
-        plt_file = str(plt_file)
+        plt_dir_file = qstr(plt_dir_file) # dir + file name without suffix
 
-        if plt_file != "":
-            plt_file = os.path.normpath(plt_file)
-            plt_type = str(plt_type)
+        if plt_dir_file != "":
+            plt_type = extract_file_ext(qstr(plt_type)) # suffix
+            plt_dir_file += plt_type[0] # file name with suffix
+            plt_dir_file = os.path.normpath(plt_dir_file) # "sanitize" path
 
-            logger.info('Using plot filename "%s"', plt_file)
+            plt_dir = os.path.dirname(plt_dir_file)  # extract the directory path
+            if not os.path.isdir(plt_dir): # create directory if it doesn't exist
+                os.mkdir(plt_dir)
+            dirs.save_dir = plt_dir # make this directory the new default / base dir
 
-            plt_dir_name = os.path.dirname(plt_file)  # extract the directory path
-            if not os.path.isdir(plt_dir_name): # create directory if it doesn't exist
-                os.mkdir(plt_dir_name)
-            dirs.save_dir = plt_dir_name # make this directory the new default / base dir
-
-#            plt_file_name = os.path.splitext(os.path.basename(plt_file))[0] # filename without suffix
-            plt_file_name = os.path.basename(plt_file)
+            plt_file = os.path.basename(plt_dir_file)
 
             logger.info('Creating plot file "{0}"'.format(
-                        os.path.join(plt_dir_name, plt_file_name)))
+                        os.path.join(plt_dir, plt_file)))
 
-            self.setupHDL(file_name = plt_file_name, dir_name = plt_dir_name)
+            self.setupHDL(file_name = plt_file, dir_name = plt_dir)
 
             logger.info("Fixpoint simulation setup")
+            W = self.hdl_wdg_inst.W # Matlab format : W = (W_len,WF)
             tb = self.hdl_wdg_inst.flt.simulate_freqz(num_loops=3, Nfft=1024)
             clk = myhdl.Signal(False)
             ts  = myhdl.Signal(False)
-            x   = myhdl.Signal(myhdl.intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
-            y   = myhdl.Signal(myhdl.intbv(0,min=-2**(self.W[0]-1), max=2**(self.W[0]-1)))
+            x   = myhdl.Signal(myhdl.intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
+            y   = myhdl.Signal(myhdl.intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
 
             try:
                 sim = myhdl.Simulation(tb)
