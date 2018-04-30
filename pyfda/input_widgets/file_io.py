@@ -154,17 +154,17 @@ class File_IO(QWidget):
                         # this only works for python >= 3.3
                             fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
                     else:
-                        logger.error('Unknown file type "%s"', file_type)
+                        logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
                     if not file_type_err:
-                        logger.info('Loaded filter "%s"', file_name)
+                        logger.info('Loaded filter "{0}"'.format(file_name))
                          # emit signal -> InputTabWidgets.load_all:
                         self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
                         dirs.save_dir = os.path.dirname(file_name)
             except IOError as e:
-                logger.error("Failed loading %s!\n%s", file_name, e)
+                logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             except Exception as e:
-                logger.error("Unexpected error:", e)
+                logger.error("Unexpected error:\n{0}".format(e))
 
 #------------------------------------------------------------------------------
     def file_dump (self, fOut):
@@ -352,14 +352,14 @@ class File_IO(QWidget):
                             pickle.dump(fb.fil, f, protocol = 2)
                         else:
                             file_type_err = True
-                            logger.error('Unknown file type "%s"', file_type)
+                            logger.error('Unknown file type "{0}"'.format(file_type))
 
                 if not file_type_err:
-                    logger.info('Filter saved as "%s"', file_name)
+                    logger.info('Filter saved as "{0}"'.format(file_name))
                     dirs.save_dir = os.path.dirname(file_name) # save new dir
 
             except IOError as e:
-                logger.error('Failed saving "%s"!\n%s\n', file_name, e)
+                logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
                 
 #------------------------------------------------------------------------------
     def about_window(self):
