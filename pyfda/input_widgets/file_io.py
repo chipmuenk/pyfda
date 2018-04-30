@@ -138,7 +138,14 @@ class File_IO(QWidget):
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.npz':
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
-                        a = np.load(f) # array containing dict, dtype 'object'
+                        if sys.version_info[0] < 3:
+                            a = np.load(f) # array containing dict, dtype 'object'
+                        else:
+                            # What encoding to use when reading Py2 strings. Only 
+                            # needed for loading py2 generated pickled files on py3.
+                            # fix_imports will try to map old py2 names to new py3
+                            # names when unpickling.
+                            a = np.load(f, fix_imports=True, encoding='bytes') # array containing dict, dtype 'object'
 
                         for key in a:
                             if np.ndim(a[key]) == 0:
@@ -152,7 +159,7 @@ class File_IO(QWidget):
                             fb.fil = pickle.load(f)
                         else:
                         # this only works for python >= 3.3
-                            fb.fil = pickle.load(f, fix_imports = True, encoding = 'bytes')
+                            fb.fil = pickle.load(f, fix_imports=True, encoding='bytes')
                     else:
                         logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
