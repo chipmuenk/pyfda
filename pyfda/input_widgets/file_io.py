@@ -129,6 +129,10 @@ class File_IO(QWidget):
                 file_type = t
 
         if file_name != "": # cancelled file operation returns empty string
+            if os.stat(file_name).st_size == 0:
+                dirs.save_dir = os.path.dirname(file_name)
+                logger.error('"{0}" has size zero, aborting.'.format(file_name))
+                return
 
             # strip extension from returned file name (if any) + append file type:
             file_name = os.path.splitext(file_name)[0] + file_type
