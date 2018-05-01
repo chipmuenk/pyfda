@@ -492,9 +492,11 @@ class FilterPZ(QWidget):
         self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_pz'})
         # -> input_tab_widgets
 
-        logger.debug("b,a = %s\n\n"
-            "zpk = %s\n"
-            %(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
+        qstyle_widget(self.ui.butSave, 'normal')
+
+        logger.debug("b,a = {0}\n\n"
+            "zpk = {1}\n"
+            .format(pformat(fb.fil[0]['ba']), pformat(fb.fil[0]['zpk'])
               ))
 
 #------------------------------------------------------------------------------
