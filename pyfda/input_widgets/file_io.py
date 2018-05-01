@@ -10,7 +10,7 @@
 Widget for exporting / importing and saving / loading filter data
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os, io
+import os, io
 import logging
 logger = logging.getLogger(__name__)
 
@@ -142,7 +142,7 @@ class File_IO(QWidget):
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.npz':
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
-                        if sys.version_info[0] < 3:
+                        if not pyfda_lib.PY3:
                             a = np.load(f) # array containing dict, dtype 'object'
                         else:
                             # What encoding to use when reading Py2 strings. Only 
@@ -159,7 +159,7 @@ class File_IO(QWidget):
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
                     elif file_type == '.pkl':
-                        if sys.version_info[0] < 3:
+                        if not pyfda_lib.PY3:
                             fb.fil = pickle.load(f)
                         else:
                         # this only works for python >= 3.3
@@ -434,6 +434,7 @@ class File_IO(QWidget):
 if __name__ == '__main__':
 
     from ..compat import QApplication
+    import sys
     app = QApplication(sys.argv)
     mainw = File_IO(None)
 
