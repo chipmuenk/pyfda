@@ -153,6 +153,10 @@ class File_IO(QWidget):
                             a = np.load(f, fix_imports=True, encoding='bytes') # array containing dict, dtype 'object'
 
                         for key in a:
+                            logger.error("key: {0}-{1}".format(key, type(key)))
+                            if pyfda_lib.PY3:
+                                #key = str(key)#.encode('utf-8')
+                                logger.error("key: {0}-{1}".format(key, type(key)))
                             if np.ndim(a[key]) == 0:
                                 # scalar objects may be extracted with the item() method
                                 fb.fil[0][key] = a[key].item()
