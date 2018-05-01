@@ -138,6 +138,7 @@ class File_IO(QWidget):
             file_name = os.path.splitext(file_name)[0] + file_type
 
             file_type_err = False
+            fb.fil[1] = fb.fil[0].copy() # backup filter dict 
             try:
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.npz':
@@ -176,6 +177,7 @@ class File_IO(QWidget):
                 logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             except Exception as e:
                 logger.error("Unexpected error:\n{0}".format(e))
+                fb.fil[0] = fb.fil[1] # restore backup
 
 #------------------------------------------------------------------------------
     def file_dump (self, fOut):
