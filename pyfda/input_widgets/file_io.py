@@ -144,16 +144,17 @@ class File_IO(QWidget):
                     if file_type == '.npz':
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
                         if not pyfda_lib.PY3:
-                            a = np.load(f) # array containing dict, dtype 'object'
+                            a = np.load(f) # returns an instance of class NpzFile
                         else:
                             # What encoding to use when reading Py2 strings. Only 
                             # needed for loading py2 generated pickled files on py3.
                             # fix_imports will try to map old py2 names to new py3
                             # names when unpickling.
                             a = np.load(f, fix_imports=True, encoding='bytes') # array containing dict, dtype 'object'
+                        logger.debug("Entries in {0}:\n{1}".format(file_name, a.files))
+                        for key in sorted(a):
+                            logger.debug("key: {0}|{1}|{2}|{3}".format(key, type(key).__name__, type(a[key]).__name__, a[key]))
 
-                        for key in a:
-                            logger.error("key: {0}-{1}".format(key, type(key)))
                             if pyfda_lib.PY3:
                                 #key = str(key)#.encode('utf-8')
                                 logger.error("key: {0}-{1}".format(key, type(key)))
