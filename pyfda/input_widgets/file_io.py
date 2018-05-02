@@ -366,7 +366,7 @@ class File_IO(QWidget):
                             np.savez(f, **fb.fil[0])
                         elif file_type == '.pkl':
                             # save as a pickle version compatible with Python 2.x
-                            pickle.dump(fb.fil, f, protocol = 2)
+                            pickle.dump(fb.fil[0], f, protocol = 2)
                         else:
                             file_type_err = True
                             logger.error('Unknown file type "{0}"'.format(file_type))
