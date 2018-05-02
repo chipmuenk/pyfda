@@ -165,10 +165,10 @@ class File_IO(QWidget):
                                 fb.fil[0][key] = a[key].tolist()
                     elif file_type == '.pkl':
                         if not pyfda_lib.PY3:
-                            fb.fil = pickle.load(f)
+                            fb.fil[0] = pickle.load(f)
                         else:
                         # this only works for python >= 3.3
-                            fb.fil = pickle.load(f, fix_imports=True, encoding='bytes')
+                            fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
                     else:
                         logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
