@@ -20,6 +20,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
 from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
+from pyfda.pyfda_qt_lib import qget_cmb_box
 
 
 class Plot_Phi(QWidget):
@@ -170,7 +171,7 @@ class Plot_Phi(QWidget):
         Draw the figure with new limits, scale etc without recalculating H(f)
         """
 
-        self.unitPhi = self.cmbUnitsPhi.currentText()
+        self.unitPhi = qget_cmb_box(self.cmbUnitsPhi, data=False)
 
         f_S2 = fb.fil[0]['f_S'] / 2.
 
