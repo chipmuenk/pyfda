@@ -209,8 +209,8 @@ fil = [None] * 10 # create empty list with length 10 for multiple filter designs
 # define fil[0] as a dict with "built-in" default. The argument defines the default
 # factory that is called when a key is missing. Here, lambda simply returns a float.
 # When e.g. list is given as the default_factory, an empty list is returned.
-fil[0] = defaultdict(lambda: 0.123)
-
+#fil[0] = defaultdict(lambda: 0.123)
+fil[0] = {}
 # Now, copy each key-value pair into the defaultdict
 for k in fil_init:
     fil[0].update({k:fil_init[k]})
