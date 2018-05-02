@@ -157,7 +157,12 @@ class File_IO(QWidget):
 
                             if np.ndim(a[key]) == 0:
                                 # scalar objects may be extracted with the item() method
-                                fb.fil[0][key] = a[key].item()
+                                val = a[key].item()
+                                logger.debug(type(val).__name__)
+                                # Bytes need to be decoded to be used as keys later on
+                                if type(val) == bytes: # and pyfda_lib.PY3:
+                                    val = val.decode('utf-8')
+                                fb.fil[0][key] = val
                             else:
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
