@@ -155,9 +155,6 @@ class File_IO(QWidget):
                         for key in sorted(a):
                             logger.debug("key: {0}|{1}|{2}|{3}".format(key, type(key).__name__, type(a[key]).__name__, a[key]))
 
-                            if pyfda_lib.PY3:
-                                #key = str(key)#.encode('utf-8')
-                                logger.error("key: {0}-{1}".format(key, type(key)))
                             if np.ndim(a[key]) == 0:
                                 # scalar objects may be extracted with the item() method
                                 fb.fil[0][key] = a[key].item()
