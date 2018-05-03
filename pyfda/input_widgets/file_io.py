@@ -10,7 +10,7 @@
 Widget for exporting / importing and saving / loading filter data
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys, os, io
+import os, io
 import logging
 logger = logging.getLogger(__name__)
 
@@ -129,25 +129,32 @@ class File_IO(QWidget):
                 file_type = t
 
         if file_name != "": # cancelled file operation returns empty string
+            if os.stat(file_name).st_size == 0:
+                dirs.save_dir = os.path.dirname(file_name)
+                logger.error('"{0}" has size zero, aborting.'.format(file_name))
+                return
 
             # strip extension from returned file name (if any) + append file type:
             file_name = os.path.splitext(file_name)[0] + file_type
 
             file_type_err = False
+            fb.fil[1] = fb.fil[0].copy() # backup filter dict 
             try:
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.npz':
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
-                        if sys.version_info[0] < 3:
-                            a = np.load(f) # array containing dict, dtype 'object'
+                        if not pyfda_lib.PY3:
+                            a = np.load(f) # returns an instance of class NpzFile
                         else:
                             # What encoding to use when reading Py2 strings. Only 
                             # needed for loading py2 generated pickled files on py3.
                             # fix_imports will try to map old py2 names to new py3
                             # names when unpickling.
                             a = np.load(f, fix_imports=True, encoding='bytes') # array containing dict, dtype 'object'
+                        logger.debug("Entries in {0}:\n{1}".format(file_name, a.files))
+                        for key in sorted(a):
+                            logger.debug("key: {0}|{1}|{2}|{3}".format(key, type(key).__name__, type(a[key]).__name__, a[key]))
 
-                        for key in a:
                             if np.ndim(a[key]) == 0:
                                 # scalar objects may be extracted with the item() method
                                 fb.fil[0][key] = a[key].item()
@@ -155,23 +162,32 @@ class File_IO(QWidget):
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
                     elif file_type == '.pkl':
-                        if sys.version_info[0] < 3:
-                            fb.fil = pickle.load(f)
+                        if not pyfda_lib.PY3:
+                            fb.fil[0] = pickle.load(f)
                         else:
                         # this only works for python >= 3.3
-                            fb.fil = pickle.load(f, fix_imports=True, encoding='bytes')
+                            fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
                     else:
                         logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
                     if not file_type_err:
+                        # sanitize values in filter dictionary, keys are ok by now
+                        for k in fb.fil[0]:
+                             # Bytes need to be decoded for py3 to be used as keys later on
+                            if pyfda_lib.PY3 and type(fb.fil[0][k]) == bytes:
+                                fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
+                            if fb.fil[0][k] == None:
+                                logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
+                            
                         logger.info('Loaded filter "{0}"'.format(file_name))
                          # emit signal -> InputTabWidgets.load_all:
                         self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
-                        dirs.save_dir = os.path.dirname(file_name)
+                        dirs.save_dir = os.path.dirname(file_name) # update working dir
             except IOError as e:
                 logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             except Exception as e:
                 logger.error("Unexpected error:\n{0}".format(e))
+                fb.fil[0] = fb.fil[1] # restore backup
 
 #------------------------------------------------------------------------------
     def file_dump (self, fOut):
@@ -356,7 +372,7 @@ class File_IO(QWidget):
                             np.savez(f, **fb.fil[0])
                         elif file_type == '.pkl':
                             # save as a pickle version compatible with Python 2.x
-                            pickle.dump(fb.fil, f, protocol = 2)
+                            pickle.dump(fb.fil[0], f, protocol = 2)
                         else:
                             file_type_err = True
                             logger.error('Unknown file type "{0}"'.format(file_type))
@@ -430,6 +446,7 @@ class File_IO(QWidget):
 if __name__ == '__main__':
 
     from ..compat import QApplication
+    import sys
     app = QApplication(sys.argv)
     mainw = File_IO(None)
 
