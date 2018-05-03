@@ -509,7 +509,7 @@ class FilterCoeffs(QWidget):
             self.num_rows = max(len(self.ba[1]), len(self.ba[0]))
         except IndexError:
             self.num_rows = len(self.ba[0])
-        logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
+        # logger.debug("np.shape(ba) = {0}".format(np.shape(self.ba)))
 
         params['FMT_ba'] = int(self.ui.spnDigits.text())
 

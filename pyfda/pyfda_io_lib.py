@@ -322,7 +322,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
                 for c in sel_c:
                     if r in sel[c]: # selected item?
                         item = table.item(r,c)
-                        print(c,r)
+                        # print(c,r)
                         if item and item.text() != "":
                             text += table.itemDelegate().text(item).lstrip(" ") + delim
                 text = text.rstrip(delim) + cr
@@ -719,15 +719,15 @@ def export_data(parent, data, fkey, comment=""):
                         workbook.close()
 
                     else:
-                        logger.error('Unknown file type "%s"', file_type)
+                        logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
 
                     if not file_type_err:
-                        logger.info('Filter saved as "%s"', file_name)
+                        logger.info('Filter saved as "{0}"'.format(file_name))
                         dirs.save_dir = os.path.dirname(file_name) # save new dir
 
         except IOError as e:
-            logger.error('Failed saving "%s"!\n%s\n', file_name, e)
+            logger.error('Failed saving "{0}"!\n{1}\n'.format(file_name, e))
 
 
         # Download the Simple ods py module:
