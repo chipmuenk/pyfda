@@ -157,12 +157,7 @@ class File_IO(QWidget):
 
                             if np.ndim(a[key]) == 0:
                                 # scalar objects may be extracted with the item() method
-                                val = a[key].item()
-                                logger.debug(type(val).__name__)
-                                # Bytes need to be decoded to be used as keys later on
-                                if type(val) == bytes: # and pyfda_lib.PY3:
-                                    val = val.decode('utf-8')
-                                fb.fil[0][key] = val
+                                fb.fil[0][key] = a[key].item()
                             else:
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
@@ -176,10 +171,18 @@ class File_IO(QWidget):
                         logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
                     if not file_type_err:
+                        # sanitize values in filter dictionary, keys are ok by now
+                        for k in fb.fil[0]:
+                             # Bytes need to be decoded for py3 to be used as keys later on
+                            if pyfda_lib.PY3 and type(fb.fil[0][k]) == bytes:
+                                fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
+                            if fb.fil[0][k] == None:
+                                logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
+                            
                         logger.info('Loaded filter "{0}"'.format(file_name))
                          # emit signal -> InputTabWidgets.load_all:
                         self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
-                        dirs.save_dir = os.path.dirname(file_name)
+                        dirs.save_dir = os.path.dirname(file_name) # update working dir
             except IOError as e:
                 logger.error("Failed loading {0}!\n{1}".format(file_name, e))
             except Exception as e:
