@@ -16,9 +16,13 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 
+import pyfda.filterbroker as fb
+import pyfda.pyfda_fix_lib as fix
+import pprint
+
 from ..compat import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
 
-from pyfda.hdl_generation.hdl_helpers import UI_WI_WF, UI_Q_Ovfl
+from pyfda.hdl_generation.hdl_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
 from pyfda.hdl_generation.filter_iir import FilterIIR 
 
 #==============================================================================
@@ -35,6 +39,8 @@ class HDL_DF1(QWidget):
         self.title = ("<b>Direct-Form 1 (DF1) Filters</b><br />"
                  "Simple topology, only suitable for low-order filters.")
         self.img_name = "hdl_df1.png"
+        # construct coefficient fixpoint object with initial settings
+        self.Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
         self._construct_UI()
 
     def _construct_UI(self):
@@ -77,6 +83,30 @@ class HDL_DF1(QWidget):
         self.setLayout(layVWdg)
 
 #==============================================================================
+    def build_hdl_dict(self):
+        """
+        Build the dictionary for constructing the filter
+        """
+        hdl_dict = {'QC':build_coeff_dict()} # coefficients
+        # parameters for input format
+        hdl_dict.update({'QI':{'WI':self.wdg_wi_wf_input.WI,
+                               'WF':self.wdg_wi_wf_input.WF
+                               }
+                        })
+        # parameters for output format
+        hdl_dict.update({'QO':{'WI':self.wdg_wi_wf_output.WI,
+                               'WF':self.wdg_wi_wf_output.WF
+                               }
+                        })
+  
+        hdl_dict_sorted = [str(k) +' : '+ str(hdl_dict[k]) for k in sorted(hdl_dict.keys())]
+        hdl_dict_str = pprint.pformat(hdl_dict_sorted)
+        logger.info("exporting hdl_dict:\n{0:s}".format(hdl_dict_str))   
+
+        return hdl_dict
+
+
+#==============================================================================
     def setup_HDL(self, coeffs):
         """
         Instantiate the myHDL description and pass quantization parameters and
@@ -90,6 +120,8 @@ class HDL_DF1(QWidget):
 
         qQuant_o = self.wdg_q_ovfl_output.quant
         qOvfl_o = self.wdg_q_ovfl_output.ovfl
+        
+        self.build_hdl_dict()
 
         # a dict like this could be passed to the HDL description
         q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
