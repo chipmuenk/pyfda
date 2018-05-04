@@ -14,6 +14,9 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
+import filterbroker as fb
+import pyfda.pyfda_fix_lib as fix
+
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, 
                       QVBoxLayout, QHBoxLayout, QFrame)
 
@@ -21,8 +24,52 @@ from pyfda.pyfda_qt_lib import qstr
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import safe_eval, to_html
 
-#------------------------------------------------------------------------------
 
+def build_coeff_dict(frmt=None):
+    """
+    Read and quantize the coefficients and return them as a dictionary
+    
+    Parameters:
+    -----------
+    frmt: string
+    
+    One of the following options: 'hex' (default), 'bin', 'dec', 'csd'
+    
+    Returns:
+    --------
+    A dictionary with the followig keys and values:
+        
+        - WI: integer
+            
+        - WF: integer
+            
+        - f_fix: np.array
+            
+        - a_fix: np.array
+        
+    """
+    b = fb.fil[0]['ba'][0]
+    a = fb.fil[0]['ba'][1]
+    # update the coefficient quantizer object
+    Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
+    Q_coeff.setQobj(fb.fil[0]['q_coeff'])
+    if not frmt:
+        Q_coeff.frmt = 'hex' # use hex format for coefficients by default
+    else:
+        Q_coeff.frmt = frmt
+
+    # this quantizes floating point coefficients and converts them to the
+    # selected numeric format (hex, bin, dec ...)
+    b_fix = Q_coeff.float2frmt(b)
+    a_fix = Q_coeff.float2frmt(a)
+    q_dict = {}
+    q_dict.update(Q_coeff.q_obj)
+    q_dict.update({'b':b_fix})
+    q_dict.update({'a':a_fix})
+    return q_dict
+
+
+#------------------------------------------------------------------------------
 class UI_WI_WF(QWidget):
     """
     Widget for entering integer and fractional bits. The result can be read out

@@ -39,6 +39,9 @@ from .filter_coeffs_ui import FilterCoeffs_UI
 # TODO: This ItemDelegate method displayText is called again and again when an
 #        item is selected?!
 # TODO: negative values for WI don't work correctly
+#
+# TODO: Filters need to be scaled properly, see e.g. http://radio.feld.cvut.cz/matlab/toolbox/filterdesign/normalize.html
+#       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
 
 # TODO: convert to a proper Model-View-Architecture using QTableView?
 
