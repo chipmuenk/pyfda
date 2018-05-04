@@ -14,10 +14,10 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-import filterbroker as fb
+import pyfda.filterbroker as fb
 import pyfda.pyfda_fix_lib as fix
 
-from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, 
+from ..compat import (QWidget, QLabel, QLineEdit, QComboBox,
                       QVBoxLayout, QHBoxLayout, QFrame)
 
 from pyfda.pyfda_qt_lib import qstr
@@ -28,25 +28,29 @@ from pyfda.pyfda_lib import safe_eval, to_html
 def build_coeff_dict(frmt=None):
     """
     Read and quantize the coefficients and return them as a dictionary
-    
+
     Parameters:
     -----------
     frmt: string
-    
+
     One of the following options: 'hex' (default), 'bin', 'dec', 'csd'
-    
+
     Returns:
     --------
     A dictionary with the followig keys and values:
-        
+
         - WI: integer
-            
+
         - WF: integer
-            
+
+        - scale:
+
+        - frmt:
+
         - f_fix: np.array
-            
+
         - a_fix: np.array
-        
+
     """
     b = fb.fil[0]['ba'][0]
     a = fb.fil[0]['ba'][1]
@@ -56,18 +60,19 @@ def build_coeff_dict(frmt=None):
     if not frmt:
         Q_coeff.frmt = 'hex' # use hex format for coefficients by default
     else:
-        Q_coeff.frmt = frmt
+        Q_coeff.frmt = frmt # use the function argument
 
-    # this quantizes floating point coefficients and converts them to the
+    # quantize floating point coefficients and converts them to the
     # selected numeric format (hex, bin, dec ...)
-    b_fix = Q_coeff.float2frmt(b)
-    a_fix = Q_coeff.float2frmt(a)
-    q_dict = {}
-    q_dict.update(Q_coeff.q_obj)
-    q_dict.update({'b':b_fix})
-    q_dict.update({'a':a_fix})
-    return q_dict
+    c_dict = {}
+    c_dict.update({'b':list(Q_coeff.float2frmt(b))})
+    c_dict.update({'a':list(Q_coeff.float2frmt(a))})
+    c_dict.update({'WF':Q_coeff.WF})
+    c_dict.update({'WI':Q_coeff.WI})
+    c_dict.update({'scale':Q_coeff.scale})
+    c_dict.update({'frmt':Q_coeff.frmt})
 
+    return c_dict
 
 #------------------------------------------------------------------------------
 class UI_WI_WF(QWidget):
