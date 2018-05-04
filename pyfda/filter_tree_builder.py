@@ -15,6 +15,7 @@ import os, sys, six
 from pprint import pformat
 import codecs
 import importlib
+import configparser
 
 import logging
 logger = logging.getLogger(__name__)
@@ -234,6 +235,13 @@ class FilterTreeBuilder(object):
 
             logger.info("%d entries found in filter list!\n", num_filters)
             fp.close()
+            
+            # setup an instance of config parser, allow  keys without value
+            conf = configparser.ConfigParser(allow_no_value=True)
+            conf.read(self.filt_dir_file)
+            logger.info("Found sections: {0}".format(str(conf.sections())))
+            
+            # conf.sections()
 
             return filt_list_names
 
@@ -244,8 +252,8 @@ class FilterTreeBuilder(object):
                 I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
 
         except Exception as e:
-            logger.error( "Unexpected error: %s", e)
-            sys.exit( "Unexpected error: %s", e)
+            logger.error("Unexpected error: {0}".format(e))
+            sys.exit("Unexpected error: {0}".format(e))
 
 #==============================================================================
     def dyn_filt_import(self, filt_list_names):
