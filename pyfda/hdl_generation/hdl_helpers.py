@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox, 
                       QVBoxLayout, QHBoxLayout, QFrame)
 
-from pyfda.pyfda_qt_lib import qstr
+from pyfda.pyfda_qt_lib import qstr, qget_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import safe_eval, to_html
 
@@ -38,7 +38,8 @@ class UI_WI_WF(QWidget):
 
         dict_ui = {'label':'WI.WF', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
-                   'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits'
+                   'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
+                   'enabled':True, 'visible':True
                    }
         for key, val in kwargs.items():
             dict_ui.update({key:val})
@@ -49,7 +50,6 @@ class UI_WI_WF(QWidget):
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
         self.ledWI = QLineEdit(self)
         self.ledWI.setToolTip(dict_ui['tip_WI'])
-        self.ledWI.setText(qstr(dict_ui['WI']))
         self.ledWI.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
         self.ledWI.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
 
@@ -57,7 +57,6 @@ class UI_WI_WF(QWidget):
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(dict_ui['tip_WF'])
-        self.ledWF.setText(qstr(dict_ui['WF']))
         self.ledWF.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
         self.ledWF.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
 
@@ -77,6 +76,15 @@ class UI_WI_WF(QWidget):
         layVMain.setContentsMargins(0,5,0,0)#*params['wdg_margins'])
 
         self.setLayout(layVMain)
+        
+        #----------------------------------------------------------------------
+        # INITIAL SETTINGS
+        #----------------------------------------------------------------------
+        self.ledWI.setText(qstr(dict_ui['WI']))
+        self.ledWF.setText(qstr(dict_ui['WF']))
+
+        frmMain.setEnabled(dict_ui['enabled'])
+        frmMain.setVisible(dict_ui['visible'])
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
@@ -110,7 +118,8 @@ class UI_Q_Ovfl(QWidget):
         dict_ui = {'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
                    'cmb_q':['round', 'fix', 'floor'],
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
-                   'cmb_ov': ['wrap', 'sat']
+                   'cmb_ov':['wrap', 'sat'],
+                   'enabled':True, 'visible':True
                    }
         for key, val in kwargs.items():
             dict_ui.update({key:val})
@@ -147,9 +156,14 @@ class UI_Q_Ovfl(QWidget):
 
         self.setLayout(layVMain)
 
-        # initial settings:
-        self.ovfl = self.cmbOvfl.currentText()
-        self.quant = self.cmbQuant.currentText()
+        #----------------------------------------------------------------------
+        # INITIAL SETTINGS
+        #----------------------------------------------------------------------
+        self.ovfl = qget_cmb_box(self.cmbOvfl, data=False)
+        self.quant = qget_cmb_box(self.cmbQuant, data=False)
+        
+        frmMain.setEnabled(dict_ui['enabled'])
+        frmMain.setVisible(dict_ui['visible'])
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
