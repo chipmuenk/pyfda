@@ -87,13 +87,15 @@ class HDL_DF1(QWidget):
         """
         hdl_dict = {'QC':build_coeff_dict()} # coefficients
         # parameters for input format
-        hdl_dict.update({'QI':{'WI':self.wdg_wi_wf_input.WI,
-                               'WF':self.wdg_wi_wf_input.WF
+        hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
+                               'WF':self.wdg_w_input.WF
                                }
                         })
         # parameters for output format
-        hdl_dict.update({'QO':{'WI':self.wdg_wi_wf_output.WI,
-                               'WF':self.wdg_wi_wf_output.WF
+        hdl_dict.update({'QO':{'WI':self.wdg_w_output.WI,
+                               'WF':self.wdg_w_output.WF,
+                               'OVFL': self.wdg_q_output.ovfl,
+                               'QUANT': self.wdg_q_output.quant
                                }
                         })
   
