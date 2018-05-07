@@ -25,6 +25,12 @@ manual.py
 
 [Plotting Widgets]
 # ----------------
+Plot_Hf
+Plot_Phi
+Plot_Tau_G
+Plot_PZ
+Plot_Impz
+Plot_3D
 
 # ======== Testing ==========
 .py
