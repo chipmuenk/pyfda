@@ -53,30 +53,28 @@ class HDL_DF1(QWidget):
         self.layHBtnsMsg = QHBoxLayout()
         self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
-        self.wdg_wi_wf_input = UI_WI_WF(self, label='Input Format x[n]:')
-        self.wdg_wi_wf_coeffs = UI_WI_WF(self, label='Coefficient Format:')
-        self.wdg_q_ovfl_coeffs = UI_Q_Ovfl(self)
-        self.wdg_wi_wf_accu = UI_WI_WF(self, label='Accumulator Format:', WF=30)
-        self.wdg_q_ovfl_accu = UI_Q_Ovfl(self)
-        self.wdg_wi_wf_output = UI_WI_WF(self, label='Output Format y[n]:')
-        self.wdg_q_ovfl_output = UI_Q_Ovfl(self)        
+        self.wdg_w_input = UI_WI_WF(self, label='Input Format x[n]:')
+        self.wdg_w_coeffs = UI_WI_WF(self, label='Coefficient Format:', enabled=False)
+        self.wdg_q_coeffs = UI_Q_Ovfl(self, enabled=False)
+        self.wdg_w_accu = UI_WI_WF(self, label='Accumulator Format:', WF=30)
+        self.wdg_q_accu = UI_Q_Ovfl(self)
+        self.wdg_w_output = UI_WI_WF(self, label='Output Format y[n]:')
+        self.wdg_q_output = UI_Q_Ovfl(self)        
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0,0,0,0)
 
         layVWdg.addLayout(self.layHBtnsMsg)
-        layVWdg.addWidget(self.wdg_wi_wf_input)
-        layVWdg.addWidget(self.wdg_wi_wf_coeffs)
-        self.wdg_wi_wf_coeffs.setEnabled(False)
-        layVWdg.addWidget(self.wdg_q_ovfl_coeffs)
-        self.wdg_q_ovfl_coeffs.setEnabled(False)
+        layVWdg.addWidget(self.wdg_w_input)
+        layVWdg.addWidget(self.wdg_w_coeffs)
+        layVWdg.addWidget(self.wdg_q_coeffs)
 
-        layVWdg.addWidget(self.wdg_wi_wf_accu)
-        layVWdg.addWidget(self.wdg_q_ovfl_accu)
+        layVWdg.addWidget(self.wdg_w_accu)
+        layVWdg.addWidget(self.wdg_q_accu)
 
-        layVWdg.addWidget(self.wdg_wi_wf_output)
-        layVWdg.addWidget(self.wdg_q_ovfl_output)
+        layVWdg.addWidget(self.wdg_w_output)
+        layVWdg.addWidget(self.wdg_q_output)
 
         layVWdg.addStretch()
 
@@ -112,11 +110,11 @@ class HDL_DF1(QWidget):
         Instantiate the myHDL description and pass quantization parameters and
         coefficients.
         """
-        self.qI_i = self.wdg_wi_wf_input.WI
-        self.qF_i = self.wdg_wi_wf_input.WF
+        self.qI_i = self.wdg_w_input.WI
+        self.qF_i = self.wdg_w_input.WF
 
-        self.qI_o = self.wdg_wi_wf_output.WI
-        self.qF_o = self.wdg_wi_wf_output.WF
+        self.qI_o = self.wdg_w_output.WI
+        self.qF_o = self.wdg_w_output.WF
 
         qQuant_o = self.wdg_q_ovfl_output.quant
         qOvfl_o = self.wdg_q_ovfl_output.ovfl
