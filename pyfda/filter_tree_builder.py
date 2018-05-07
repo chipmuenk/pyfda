@@ -240,8 +240,7 @@ class FilterTreeBuilder(object):
             conf = configparser.ConfigParser(allow_no_value=True)
             conf.read(self.filt_dir_file)
             logger.info("Found sections: {0}".format(str(conf.sections())))
-            
-            # conf.sections()
+            logger.info("Section 1 :{0}".format(str(conf.items("Filter Designs"))))
 
             return filt_list_names
 
