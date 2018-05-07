@@ -216,7 +216,7 @@ class HDL_Specs(QWidget):
         """
         Import new module after changing the filter topology
         """
-        cmb_wdg_hdl_cur = qget_cmb_box(self.cmb_wdg_hdl)#qstr(self.cmb_wdg_hdl.currentText())
+        cmb_wdg_hdl_cur = qget_cmb_box(self.cmb_wdg_hdl, data=False)
 
         if cmb_wdg_hdl_cur: # at least one valid hdl widget found
             self.hdl_wdg_found = True
