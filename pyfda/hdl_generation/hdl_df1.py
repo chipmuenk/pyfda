@@ -112,21 +112,21 @@ class HDL_DF1(QWidget):
         Instantiate the myHDL description and pass quantization parameters and
         coefficients.
         """
-        self.qI_i = self.wdg_w_input.WI
-        self.qF_i = self.wdg_w_input.WF
+        WI_i = self.wdg_w_input.WI
+        WF_i = self.wdg_w_input.WF
 
-        self.qI_o = self.wdg_w_output.WI
-        self.qF_o = self.wdg_w_output.WF
+        WI_o = self.wdg_w_output.WI
+        WF_o = self.wdg_w_output.WF
 
-        qQuant_o = self.wdg_q_ovfl_output.quant
-        qOvfl_o = self.wdg_q_ovfl_output.ovfl
+        quant_o = self.wdg_q_output.quant
+        ovfl_o = self.wdg_q_output.ovfl
         
         self.build_hdl_dict()
 
         # a dict like this could be passed to the HDL description
-        q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
+        q_dict =  {'WI':WI_o, 'WF': WF_o, 'quant': quant_o, 'ovfl': ovfl_o}
 
-        self.W = (self.qI_i + self.qF_i + 1, self.qF_i) # Matlab format: (W,WF)
+        self.W = (WI_i + WF_i + 1, WF_i) # Matlab format: (W,WF)
         
         logger.info("W = {0}".format(self.W))
         logger.info('b = {0}'.format(coeffs[0][0:3]))
