@@ -206,43 +206,48 @@ class FilterTreeBuilder(object):
         num_filters = 0           # number of filter design files found
 
         try:
-            # Try to open filt_dir_file in read mode:
+            # Try to open filt_dir_file in read mode, this is necessary as 
+            # configParser quietly fails when the file doesn't exist
             fp = codecs.open(self.filt_dir_file, 'rU', encoding='utf-8')
             cur_line = fp.readline()
 
-            while cur_line: # read until currentLine is empty (EOF reached)
-#                cur_line = cur_line.encode('UTF-8') # enforce utf-8
-                # remove white space and Newline characters at beginning and end:
-                cur_line = cur_line.strip(' \n')
-                # Only process line if it is longer than 1 character
-                if len(cur_line) > 1:
-                    # Does current line begin with the comment character?
-                    if cur_line[0] == self.comment_char:
-                        # yes, append line to list filt_list_comments :
-                        filt_list_comments.append((cur_line[1:]))
-                    # No, this is not a comment line
-                    else:
-                        # Is '.py' contained in cur_line? Starting at which pos?
-                        suffix_pos = cur_line.find(".py")
-                        if suffix_pos > 0:
-                            # Yes, strip '.py' and all characters after,
-                            # append the file name to the lines list,
-                            # otherwise discard the line
-                            filt_list_names.append(cur_line[0:suffix_pos])
-                            num_filters += 1
+# =============================================================================
+#             while cur_line: # read until currentLine is empty (EOF reached)
+# #                cur_line = cur_line.encode('UTF-8') # enforce utf-8
+#                 # remove white space and Newline characters at beginning and end:
+#                 cur_line = cur_line.strip(' \n')
+#                 # Only process line if it is longer than 1 character
+#                 if len(cur_line) > 1:
+#                     # Does current line begin with the comment character?
+#                     if cur_line[0] == self.comment_char:
+#                         # yes, append line to list filt_list_comments :
+#                         filt_list_comments.append((cur_line[1:]))
+#                     # No, this is not a comment line
+#                     else:
+#                         # Is '.py' contained in cur_line? Starting at which pos?
+#                         suffix_pos = cur_line.find(".py")
+#                         if suffix_pos > 0:
+#                             # Yes, strip '.py' and all characters after,
+#                             # append the file name to the lines list,
+#                             # otherwise discard the line
+#                             filt_list_names.append(cur_line[0:suffix_pos])
+#                             num_filters += 1
+# 
+#                 cur_line = fp.readline() # read next line
+# =============================================================================
 
-                cur_line = fp.readline() # read next line
-
-            logger.info("%d entries found in filter list!\n", num_filters)
             fp.close()
             
             # setup an instance of config parser, allow  keys without value
             conf = configparser.ConfigParser(allow_no_value=True)
             conf.read(self.filt_dir_file)
             logger.info("Found sections: {0}".format(str(conf.sections())))
-            logger.info("Section 1 :{0}".format(str(conf.items("Filter Designs"))))
+            filt_dict = conf.items("Filter Designs")
 
-            return filt_list_names
+            filt_list = [k[0].replace(".py","") for k in filt_dict]
+            logger.info("{0:d} entries found in filter list!\n".format(len(filt_list)))
+
+            return filt_list# _names
 
         except IOError as e:
             logger.critical( 'Filter list file "%s" could not be found.\n\
