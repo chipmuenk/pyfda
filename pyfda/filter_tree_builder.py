@@ -113,9 +113,9 @@ class FilterTreeBuilder(object):
 
     def __init__(self, filt_dir, filt_list_file, comment_char='#'):
         cwd = os.path.dirname(os.path.abspath(__file__))
-        self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list_file)
+        self.conf_dir_file = os.path.join(cwd, filt_dir, filt_list_file)
 
-        logger.debug("Filter file list: %s\n", self.filt_dir_file)
+        logger.debug("Filter file list: %s\n", self.conf_dir_file)
         self.comment_char = comment_char
         self.filt_dir = filt_dir
 
@@ -125,7 +125,7 @@ class FilterTreeBuilder(object):
     def init_filters(self):
         """
         - Extract the names of all Python files in the file specified during
-          instantiation (self.filt_dir_file) and write them to a list
+          instantiation (self.conf_dir_file) and write them to a list
         - Try to import all python files and return a dict with all file names
           and corresponding objects (the class needs to have the same name as
           the file)
@@ -134,8 +134,8 @@ class FilterTreeBuilder(object):
         This method can also be called when the main app runs to re-read the
         filter directory
         """
-        # Scan filter_list.txt for python file names and extract them
-        filt_list_names = self.read_filt_file()
+        # Scan filter_list.txt for class names / python file names and extract them
+        filt_list_names = self.read_conf_file()
 
         # Try to import all filter modules and classes found in filter_list,
         # store names and modules in the dict fb.fil_classes as {filterName:filterModule}:
@@ -180,16 +180,13 @@ class FilterTreeBuilder(object):
 
 
 #==============================================================================
-    def read_filt_file(self):
+    def read_conf_file(self):
         """
-        Extract all file names = class names from self.filt_dir_file:
+        Extract all file names = class names from self.conf_dir_file, section:
 
-        - Lines that don't begin with commentCh are stripped from Newline
-          character, whitespace, '.py' and everything after it and returned as
-          a list.
-        - Lines starting with self.comment_char are stripped of newline,
-          whitespace and comment chars and written to list 'filt_list_comments'
-        - All other lines are discarded (for now)
+        - Lines that don't begin with '#' are stripped from newline, whitespace
+          and everything after it and returned as a list.
+        - All other lines are discarded
         - Collect and return valid file names (without .py) as `filt_list_names`.
 
         Parameters
@@ -201,84 +198,66 @@ class FilterTreeBuilder(object):
         List `filt_list_names` with the names of all design files
         """
 
-        filt_list_comments = []     # comment lines from filt_list_file (not used yet)
-        # List with filter design file names in filt_list_file without .py suffix:
-        filt_list_names = []
-
-        num_filters = 0           # number of filter design files found
-
         try:
-            # Try to open filt_dir_file in read mode, this is necessary as 
+            # Try to open conf_dir_file in read mode, this is necessary as 
             # configParser quietly fails when the file doesn't exist
-            fp = codecs.open(self.filt_dir_file, 'rU', encoding='utf-8')
-            cur_line = fp.readline()
-
-# =============================================================================
-#             while cur_line: # read until currentLine is empty (EOF reached)
-# #                cur_line = cur_line.encode('UTF-8') # enforce utf-8
-#                 # remove white space and Newline characters at beginning and end:
-#                 cur_line = cur_line.strip(' \n')
-#                 # Only process line if it is longer than 1 character
-#                 if len(cur_line) > 1:
-#                     # Does current line begin with the comment character?
-#                     if cur_line[0] == self.comment_char:
-#                         # yes, append line to list filt_list_comments :
-#                         filt_list_comments.append((cur_line[1:]))
-#                     # No, this is not a comment line
-#                     else:
-#                         # Is '.py' contained in cur_line? Starting at which pos?
-#                         suffix_pos = cur_line.find(".py")
-#                         if suffix_pos > 0:
-#                             # Yes, strip '.py' and all characters after,
-#                             # append the file name to the lines list,
-#                             # otherwise discard the line
-#                             filt_list_names.append(cur_line[0:suffix_pos])
-#                             num_filters += 1
-# 
-#                 cur_line = fp.readline() # read next line
-# =============================================================================
-
-            fp.close()
+            #fp = codecs.open(self.conf_dir_file, 'rU', encoding='utf-8')
+            #fp.close()
+            if not os.path.isfile(self.conf_dir_file):
+                raise IOError('Config file "{0}" could not be found.'.format(self.conf_dir_file))
             
             # setup an instance of config parser, allow  keys without value
             conf = configparser.ConfigParser(allow_no_value=True)
-            conf.read(self.filt_dir_file)
-            logger.info("Found sections: {0}".format(str(conf.sections())))
+            # preserve case of parsed options by overriding optionxform():
+            # Set it to function str()
+            conf.optionxform = str 
+            conf.read(self.conf_dir_file)
+            logger.info('Parsing config file\n\t"{0}"'.format(self.conf_dir_file))
+            logger.info("with sections:\n\t{0}".format(str(conf.sections())))
+
+            # returns a list with ("option","argument") items, "argument" is always empty here       
+            plot_widgets = conf.items("Plot Widgets") 
+            fb.plot_widget_list = [p[0] for p in plot_widgets]
+            logger.info('Found {0:d} entries under [Plot Widgets].'\
+                        .format(len(fb.plot_widget_list)))
+            
             filt_dict = conf.items("Filter Designs")
 
-            filt_list = [k[0].replace(".py","") for k in filt_dict]
-            logger.info("{0:d} entries found in filter list!\n".format(len(filt_list)))
+            filt_list = [k[0] for k in filt_dict]
             if len(filt_list) == 0:
-                raise configparser.NoOptionError("No filters defined under section [Filter Designs]." )
+                raise configparser.NoOptionError('No filters defined under section [Filter Designs].' )
+            else:
+                logger.info('Found {0:d} entries under [Filter Designs].\n'.format(len(filt_list)))
 
             return filt_list
 
         except configparser.ParsingError as e:
-            logger.error('Parsing Error in config file "{0}".\n{1}'\
-                         .format(self.filt_dir_file, e)) 
+            logger.critical('Parsing Error in config file "{0}".\n{1}'\
+                         .format(self.conf_dir_file, e)) 
             sys.exit('Parsing Error in config file "{0}".\n{1}'\
-                         .format(self.filt_dir_file, e))
+                         .format(self.conf_dir_file, e))
 
         except configparser.NoSectionError as e:
-            logger.error('No section ([ ... ]) found in config file "{0}".\n{1}'\
-                         .format(self.filt_dir_file, e))
-            sys.exit('No section ([ ... ]) found in config file "{0}".\n{1}'\
-                         .format(self.filt_dir_file, e))
+            logger.critical('{0} found in config file "{1}".'\
+                         .format(e, self.conf_dir_file))
+            sys.exit('{0} found in config file "{1}".'\
+                         .format(e, self.conf_dir_file))
         except configparser.NoOptionError as e:
-            logger.error('No entries found in config file "{0}".\n{1}'\
-                         .format(self.filt_dir_file, e))
+            logger.critical('No entries found in config file "{0}".\n{1}'\
+                         .format(self.conf_dir_file, e))
             sys.exit('No section ([ ... ]) found in config file "{0}".\n{1}'\
-                         .format(self.filt_dir_file, e))
-
+                         .format(self.conf_dir_file, e))
 
         except IOError as e:
-            logger.critical( 'Filter list file "%s" could not be found.\n\
-                I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
-            sys.exit( 'Filter list file "%s" could not be found.\n\
-                I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
+            logger.critical('{0}'.format(e))
+            sys.exit('{0}'.format(e))
+#            logger.critical( 'Config file "%s" could not be found.\n\
+#                I/O Error(%d): %s' %(self.conf_dir_file, e.errno, e.strerror))
+#            sys.exit( 'Config file "%s" could not be found.\n\
+#                I/O Error(%d): %s' %(self.conf_dir_file, e.errno, e.strerror))
 
         except Exception as e:
-            logger.error("Unexpected error: {0}".format(e))
+            logger.critical("Unexpected error: {0}".format(e))
             sys.exit("Unexpected error: {0}".format(e))
 
 #==============================================================================
@@ -364,10 +343,9 @@ class FilterTreeBuilder(object):
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
             sys.exit("No filter class could be imported - shutting down.")
-
         else:
-            logger.info("Imported successfully the following %d filter classes:\n%s",
-                    num_imports, imported_fil_classes)
+            logger.info("Imported the following {0:d} filter classes:\n{1:s}"\
+                    .format(num_imports, imported_fil_classes))
 
 #==============================================================================
     def build_fil_tree(self, fc, rt_dict, fil_tree = None):

@@ -202,7 +202,6 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             'wdg_dyn':{'win':'hann'}
             }
 
-
 fil = [None] * 10 # create empty list with length 10 for multiple filter designs
 # This functionality is not implemented yet, currently only fil[0] is used
 
@@ -215,3 +214,8 @@ fil[0] = {}
 for k in fil_init:
     fil[0].update({k:fil_init[k]})
 
+# -----------------------------------------------------------------------------
+# List with plot widget class names found in the main configuration file, 
+# parsed in filter_tree_builder.
+#------------------------------------------------------------------------------
+plot_widget_list = []

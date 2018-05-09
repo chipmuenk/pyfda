@@ -1,39 +1,40 @@
 # This file configures filters and plotting routines for pyFDA
 # ------------------------------------------------------------------
 # - Encoding should be either UTF-8 without BOM or standard ASCII
-# - All lines starting with # are regarded as comment lines
-# - [Label] is the beginning of a new section
+# - All lines starting with # are regarded as comments
+# - [Section] starts a new section
 
+###################
 [Filter Designs]
-# --------------
-# This section is used for initializing filters: 
-# - Only the files listed here are imported into pyFDA
-# - The class name in a filter file has to be identical to its file name 
-#     (without the .py suffix)
+###################
+# This section defines which filter designs are imported: 
+# File names have to be identical to the class names.
 
-cheby1.py
-equiripple.py
-firwin.py
-cheby2.py
-ellip.py
-ellip_zero.py
-butter.py
-bessel.py
-ma.py
+# --- IIR ---
+bessel
+butter
+cheby1
+cheby2
+ellip
+ellip_zero
 
-manual.py
+# --- FIR ---
+equiripple
+firwin
+ma
 
-[Plotting Widgets]
-# ----------------
+# --- Manual ---
+manual
+
+###################
+[Plot Widgets]
+###################
+# ------------
+# This section defines which plot widget classes are imported.
+# File names are derived by lower-casing the class names.
 Plot_Hf
 Plot_Phi
 Plot_Tau_G
 Plot_PZ
 Plot_Impz
 Plot_3D
-
-# ======== Testing ==========
-.py
-#a.py
-bla bla blubb without py
-#

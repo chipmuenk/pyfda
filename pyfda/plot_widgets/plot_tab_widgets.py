@@ -18,8 +18,8 @@ import importlib
 from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
 from pyfda.pyfda_rc import params
+import pyfda.filterbroker as fb
 
-plot_wdg_lst = ['Plot_Hf', 'Plot_Phi', 'Plot_Tau_G', 'Plot_PZ', 'Plot_Impz', 'Plot_3D']
 plot_wdg_dir = 'plot_widgets'
 
 #------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class PlotTabWidgets(QTabWidget):
         Initialize UI with tabbed subwidgets and connect the signals of all
         subwidgets.
         This is done by dynamically instantiating each widget from the list
-        `plot_wdg_lst` in the directory `plot_wdg_dir`. Try to:
+        `fb.plot_widget_list` in the module `plot_wdg_dir`. Try to:
         - connect `sig_tx` and `sig_rx`
         - set the TabToolTip from the instance attribute `tool_tip`
         - set the tab label from the instance attribute `tab_label`
@@ -48,10 +48,11 @@ class PlotTabWidgets(QTabWidget):
         """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
+        inst_wdg_list = "" # successfully instantiated plot widgets
         #
-        for i, plot_wdg in enumerate(plot_wdg_lst):
+        for i, plot_wdg in enumerate(fb.plot_widget_list):
             plot_mod_name = 'pyfda.' + plot_wdg_dir + '.' + plot_wdg.lower()
-            try:  # Try to import the module from the  package and get a handle:
+            try:  # Try to import the module from the package and get a handle:
                 plot_mod = importlib.import_module(plot_mod_name)
                 plot_class = getattr(plot_mod, plot_wdg, None)
                 plot_inst = plot_class(self)
@@ -65,6 +66,8 @@ class PlotTabWidgets(QTabWidget):
                     plot_inst.sig_tx.connect(self.sig_rx)
                 if hasattr(plot_inst, 'sig_rx'):
                     self.sig_tx.connect(plot_inst.sig_rx)
+       
+                inst_wdg_list += '\t' + 'pyfda.' + plot_wdg_dir + '.' + plot_wdg + '\n'
 
             except ImportError as e:
                 logger.warning('Plotting module "{0}" could not be imported.\n{1}'\
@@ -73,6 +76,11 @@ class PlotTabWidgets(QTabWidget):
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
+
+        if len(inst_wdg_list) == 0:
+            logger.warning("No plotting widgets found!")
+        else:
+            logger.info("Imported the following plotting classes:\n{0}".format(inst_wdg_list))
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
