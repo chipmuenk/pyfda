@@ -162,8 +162,6 @@ class Plot_Hf(QWidget):
                 self.needs_redraw = False
             elif 'view_changed' in dict_sig:
                 self.update_view()
-            elif 'enabled' in dict_sig:
-                self.enable_ui(dict_sig['enabled'])
         else:
             # TODO: draw wouldn't be necessary for 'view_changed', only update view 
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or 'view_changed' in dict_sig:
@@ -476,23 +474,12 @@ class Plot_Hf(QWidget):
         self.W, self.H_cmplx = calc_Hcomplex(fb.fil[0], params['N_FFT'], True)
 
 #------------------------------------------------------------------------------
-    def enable_ui(self, enabled):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.frmControls.setEnabled(enabled)
-        if enabled:
-            self.init_axes()
-            self.draw()
-
-#------------------------------------------------------------------------------
     def draw(self):
         """
-        Re-calculate |H(f)| and draw the figure if enabled
+        Re-calculate |H(f)| and draw the figure
         """
-        if self.mplwidget.mplToolbar.enabled:
-            self.calc_hf()
-            self.update_view()
+        self.calc_hf()
+        self.update_view()
 
 #------------------------------------------------------------------------------
     def update_view(self):

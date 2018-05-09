@@ -95,23 +95,11 @@ class Plot_Impz(QWidget):
                     or self.needs_redraw:
                 self.redraw()
                 self.needs_redraw = False
-            elif 'enabled' in dict_sig:
-                self.enable_ui(dict_sig['enabled']) 
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
-
-#------------------------------------------------------------------------------
-    def enable_ui(self, enabled):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.ui.frmControls.setEnabled(enabled)
-        if enabled:
-            # self.init_axes() # called by self.draw
-            self.draw()
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -348,9 +336,8 @@ class Plot_Impz(QWidget):
         """
         Recalculate response and redraw it
         """
-        if self.mplwidget.mplToolbar.enabled:
-            self.calc()
-            self.draw_impz()
+        self.calc()
+        self.draw_impz()
 
 #------------------------------------------------------------------------------
     def draw_impz(self):

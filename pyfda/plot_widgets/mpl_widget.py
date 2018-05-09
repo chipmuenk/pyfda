@@ -74,7 +74,7 @@ class MplWidget(QWidget):
         #self.mplToolbar = NavigationToolbar(self.pltCanv, self) # original
         self.mplToolbar = MplToolbar(self.pltCanv, self) # inherits all methods
         self.mplToolbar.lock_zoom = False
-        self.mplToolbar.enable_plot(state = True)
+        #self.mplToolbar.enable_plot(state = True)
         self.mplToolbar.sig_tx.connect(self.process_signals)
 
         #=============================================
@@ -92,10 +92,10 @@ class MplWidget(QWidget):
         """
         Process sig
         """
-        if 'enabled' in dict_sig:
-            self.clear_disabled_figure(dict_sig['enabled'])
-        else:
-            pass
+#        if 'enabled' in dict_sig:
+#            self.clear_disabled_figure(dict_sig['enabled'])
+#        else:
+        pass
 
 #------------------------------------------------------------------------------
     def save_limits(self):
@@ -132,15 +132,15 @@ class MplWidget(QWidget):
         self.pltCanv.draw() # now (re-)draw the figure
 
 #------------------------------------------------------------------------------
-    def clear_disabled_figure(self, enabled):
-        """
-        Clear the figure when it is disabled in the mplToolbar
-        """
-        if not enabled:
-            self.fig.clf()
-            self.pltCanv.draw()
-        else:
-            self.redraw()
+#    def clear_disabled_figure(self, enabled):
+#        """
+#        Clear the figure when it is disabled in the mplToolbar
+#        """
+#        if not enabled:
+#            self.fig.clf()
+#            self.pltCanv.draw()
+#        else:
+#            self.redraw()
 
 #------------------------------------------------------------------------------
     def plt_full_view(self):
@@ -222,11 +222,11 @@ class MplToolbar(NavigationToolbar):
 
         #---------------- Construct Toolbar using QRC icons -------------------
         # ENABLE:
-        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_plot)
-        self.a_en.setToolTip('Enable / disable plot')
-        self.a_en.setCheckable(True)
-        self.a_en.setChecked(True)
-#        self.a.setEnabled(False)
+#        self.a_en = self.addAction(QIcon(':/circle-x.svg'), 'Enable Update', self.enable_plot)
+#        self.a_en.setToolTip('Enable / disable plot')
+#        self.a_en.setCheckable(True)
+#        self.a_en.setChecked(True)
+##        self.a.setEnabled(False)
 
         self.addSeparator() #---------------------------------------------
 
@@ -428,35 +428,37 @@ class MplToolbar(NavigationToolbar):
         self.sig_tx.emit({'sender':__name__, 'lock_zoom':self.lock_zoom})
 
 #------------------------------------------------------------------------------
-    def enable_plot(self, state = None):
-        """
-        Toggle the enable button and setting and enable / disable all
-        buttons accordingly.
-        """
-        if state is not None:
-            self.enabled = state
-        else:
-            self.enabled = not self.enabled
-        if self.enabled:
-            self.a_en.setIcon(QIcon(':/circle-x.svg'))
-        else:
-            self.a_en.setIcon(QIcon(':/circle-check.svg'))
-
-        self.a_ho.setEnabled(self.enabled)
-        self.a_ba.setEnabled(self.enabled)
-        self.a_fw.setEnabled(self.enabled)
-        self.a_pa.setEnabled(self.enabled)
-        self.a_zo.setEnabled(self.enabled)
-        self.a_fv.setEnabled(self.enabled)
-        self.a_lk.setEnabled(self.enabled)
-        self.a_gr.setEnabled(self.enabled)
-        #self.a_rd.setEnabled(self.enabled)
-        self.a_sv.setEnabled(self.enabled)
-        self.a_cb.setEnabled(self.enabled)
-        self.a_op.setEnabled(self.enabled)
-
-        self.sig_tx.emit({'sender':__name__, 'enabled':self.enabled})
-
+# =============================================================================
+#     def enable_plot(self, state = None):
+#         """
+#         Toggle the enable button and setting and enable / disable all
+#         buttons accordingly.
+#         """
+#         if state is not None:
+#             self.enabled = state
+#         else:
+#             self.enabled = not self.enabled
+#         if self.enabled:
+#             self.a_en.setIcon(QIcon(':/circle-x.svg'))
+#         else:
+#             self.a_en.setIcon(QIcon(':/circle-check.svg'))
+# 
+#         self.a_ho.setEnabled(self.enabled)
+#         self.a_ba.setEnabled(self.enabled)
+#         self.a_fw.setEnabled(self.enabled)
+#         self.a_pa.setEnabled(self.enabled)
+#         self.a_zo.setEnabled(self.enabled)
+#         self.a_fv.setEnabled(self.enabled)
+#         self.a_lk.setEnabled(self.enabled)
+#         self.a_gr.setEnabled(self.enabled)
+#         #self.a_rd.setEnabled(self.enabled)
+#         self.a_sv.setEnabled(self.enabled)
+#         self.a_cb.setEnabled(self.enabled)
+#         self.a_op.setEnabled(self.enabled)
+# 
+#         self.sig_tx.emit({'sender':__name__, 'enabled':self.enabled})
+# 
+# =============================================================================
 #------------------------------------------------------------------------------
     def mpl2Clip(self):
         """
