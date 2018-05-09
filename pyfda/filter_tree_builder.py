@@ -89,6 +89,8 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
             d1[key] = d2[key] # add new entry to dict1
     return d1
 
+class ParseError(Exception):
+    pass
 
 class FilterTreeBuilder(object):
     """
@@ -246,8 +248,28 @@ class FilterTreeBuilder(object):
 
             filt_list = [k[0].replace(".py","") for k in filt_dict]
             logger.info("{0:d} entries found in filter list!\n".format(len(filt_list)))
+            if len(filt_list) == 0:
+                raise configparser.NoOptionError("No filters defined under section [Filter Designs]." )
 
-            return filt_list# _names
+            return filt_list
+
+        except configparser.ParsingError as e:
+            logger.error('Parsing Error in config file "{0}".\n{1}'\
+                         .format(self.filt_dir_file, e)) 
+            sys.exit('Parsing Error in config file "{0}".\n{1}'\
+                         .format(self.filt_dir_file, e))
+
+        except configparser.NoSectionError as e:
+            logger.error('No section ([ ... ]) found in config file "{0}".\n{1}'\
+                         .format(self.filt_dir_file, e))
+            sys.exit('No section ([ ... ]) found in config file "{0}".\n{1}'\
+                         .format(self.filt_dir_file, e))
+        except configparser.NoOptionError as e:
+            logger.error('No entries found in config file "{0}".\n{1}'\
+                         .format(self.filt_dir_file, e))
+            sys.exit('No section ([ ... ]) found in config file "{0}".\n{1}'\
+                         .format(self.filt_dir_file, e))
+
 
         except IOError as e:
             logger.critical( 'Filter list file "%s" could not be found.\n\
