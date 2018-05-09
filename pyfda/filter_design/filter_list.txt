@@ -7,7 +7,7 @@
 ###################
 [Filter Designs]
 ###################
-# This section defines which filter designs are imported: 
+# This section defines which filter designs are imported:
 # File names have to be identical to the class names.
 
 # --- IIR ---

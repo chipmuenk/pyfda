@@ -199,28 +199,28 @@ class FilterTreeBuilder(object):
         """
 
         try:
-            # Try to open conf_dir_file in read mode, this is necessary as 
+            # Try to open conf_dir_file in read mode, this is necessary as
             # configParser quietly fails when the file doesn't exist
             #fp = codecs.open(self.conf_dir_file, 'rU', encoding='utf-8')
             #fp.close()
             if not os.path.isfile(self.conf_dir_file):
                 raise IOError('Config file "{0}" could not be found.'.format(self.conf_dir_file))
-            
+
             # setup an instance of config parser, allow  keys without value
             conf = configparser.ConfigParser(allow_no_value=True)
             # preserve case of parsed options by overriding optionxform():
             # Set it to function str()
-            conf.optionxform = str 
+            conf.optionxform = str
             conf.read(self.conf_dir_file)
             logger.info('Parsing config file\n\t"{0}"'.format(self.conf_dir_file))
             logger.info("with sections:\n\t{0}".format(str(conf.sections())))
 
-            # returns a list with ("option","argument") items, "argument" is always empty here       
-            plot_widgets = conf.items("Plot Widgets") 
+            # returns a list with ("option","argument") items, "argument" is always empty here
+            plot_widgets = conf.items("Plot Widgets")
             fb.plot_widget_list = [p[0] for p in plot_widgets]
             logger.info('Found {0:d} entries under [Plot Widgets].'\
                         .format(len(fb.plot_widget_list)))
-            
+
             filt_dict = conf.items("Filter Designs")
 
             filt_list = [k[0] for k in filt_dict]
@@ -233,7 +233,7 @@ class FilterTreeBuilder(object):
 
         except configparser.ParsingError as e:
             logger.critical('Parsing Error in config file "{0}".\n{1}'\
-                         .format(self.conf_dir_file, e)) 
+                         .format(self.conf_dir_file, e))
             sys.exit('Parsing Error in config file "{0}".\n{1}'\
                          .format(self.conf_dir_file, e))
 

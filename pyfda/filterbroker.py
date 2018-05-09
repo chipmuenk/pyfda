@@ -59,7 +59,7 @@ fil_tree = freeze_hierarchical({
                  'man':{'fo':     ('a','N'),
                         'fspecs': ('a','F_C'),
                         'wspecs': ('a','W_PB','W_SB'),
-                        'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                        'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
                                          'amp':('u','A_PB','A_SB')}),
                         'msg':    ('a',
                                      "Enter desired filter order <b><i>N</i></b>, corner "
@@ -87,16 +87,16 @@ fil_tree = freeze_hierarchical({
              'Cheby1':{
                  'man':{'fo':     ('a','N'),
                         'fspecs': ('a','F_C'),
-                        'tspecs': ('u', {'frq':('u','F_PB','F_SB'), 
+                        'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
                                          'amp':('u','A_PB','A_SB')})
                         },
                  'min':{'fo':     ('d','N'),
                         'fspecs': ('d','F_C'),
-                        'tspecs': ('a', {'frq':('a','F_PB','F_SB'), 
+                        'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
                                          'amp':('a','A_PB','A_SB')})
                         }
                 }
-            }  
+            }
         },
     'HP':{
         'FIR':{
@@ -104,13 +104,13 @@ fil_tree = freeze_hierarchical({
                  'man':{'fo':     ('a','N'),
                         'fspecs': ('a','F_C'),
                         'wspecs': ('a','W_SB','W_PB'),
-                        'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                        'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
                                          'amp':('u','A_SB','A_PB')})
                             },
                  'min':{'fo':     ('d','N'),
                         'wspecs': ('d','W_SB','W_PB'),
                         'fspecs': ('d','F_C'),
-                        'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                        'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
                                          'amp':('a','A_SB','A_PB')})
                         }
                     }
@@ -119,15 +119,15 @@ fil_tree = freeze_hierarchical({
             'Cheby1':{
                  'man':{'fo':     ('a','N'),
                         'fspecs': ('a','F_C'),
-                        'tspecs': ('u', {'frq':('u','F_SB','F_PB'), 
+                        'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
                                          'amp':('u','A_SB','A_PB')})
                         },
                  'min':{'fo':     ('d','N'),
                         'fspecs': ('d','F_C'),
-                        'tspecs': ('a', {'frq':('a','F_SB','F_PB'), 
+                        'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
                                          'amp':('a','A_SB','A_PB')})
                         }
-                    }  
+                    }
                 }
         },
     'BP':{
@@ -136,13 +136,13 @@ fil_tree = freeze_hierarchical({
                  'man':{'fo':     ('a','N'),
                         'wspecs': ('a','W_SB','W_PB','W_SB2'),
                         'fspecs': ('a','F_C','F_C2'),
-                        'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'), 
+                        'tspecs': ('u', {'frq':('u','F_SB','F_PB','F_PB2','F_SB2'),
                                          'amp':('u','A_SB','A_PB','A_SB2')})
                             },
                  'min':{'fo':     ('d','N'),
                         'fspecs': ('d','F_C','F_C2'),
                         'wspecs': ('d','W_SB','W_PB','W_SB2'),
-                        'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'), 
+                        'tspecs': ('a', {'frq':('a','F_SB','F_PB','F_PB2','F_SB2'),
                                          'amp':('a','A_SB','A_PB','A_SB2')})
                         }
                     }
@@ -154,13 +154,13 @@ fil_tree = freeze_hierarchical({
                 'man':{ 'fo':     ('a','N'),
                         'wspecs': ('a','W_PB','W_SB','W_PB2'),
                         'fspecs': ('a','F_C','F_C2'),
-                        'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'), 
+                        'tspecs': ('u', {'frq':('u','F_PB','F_SB','F_SB2','F_PB2'),
                                          'amp':('u','A_PB','A_SB','A_PB2')})
                     },
                 'min':{ 'fo':     ('d','N'),
                         'wspecs': ('d','W_PB','W_SB','W_PB2'),
                         'fspecs': ('d','F_C','F_C2'),
-                        'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'), 
+                        'tspecs': ('a', {'frq':('a','F_PB','F_SB','F_SB2','F_PB2'),
                                          'amp':('a','A_PB','A_SB','A_PB2')})
                       }
                 }
@@ -170,7 +170,7 @@ fil_tree = freeze_hierarchical({
 
 # -----------------------------------------------------------------------------
 # Dictionary containing current filter type, specifications, design and some
-# auxiliary information, the initial definition here is overwritten by 
+# auxiliary information, the initial definition here is overwritten by
 # input widgets and design routines:
 #------------------------------------------------------------------------------
 fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
@@ -215,7 +215,7 @@ for k in fil_init:
     fil[0].update({k:fil_init[k]})
 
 # -----------------------------------------------------------------------------
-# List with plot widget class names found in the main configuration file, 
+# List with plot widget class names found in the main configuration file,
 # parsed in filter_tree_builder.
 #------------------------------------------------------------------------------
 plot_widget_list = []
