@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Handle directories in an OS-independent way
+Handle directories in an OS-independent way, create logging directory etc.
 """
 
 from __future__ import print_function
@@ -20,9 +20,11 @@ import datetime
 OS     = platform.system()
 OS_VER = platform.release()
 
+CONF_FILE = 'pyfda.conf'            # general configuration file
+LOG_CONF_FILE = 'pyfda_log.conf'    # logging configuration file
+
 INSTALL_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
 #------------------------------------------------------------------------------
-# taken from http://matplotlib.1069221.n5.nabble.com/Figure-with-pyQt-td19095.html
 
 def valid(path):
     """ Check whether path exists and is valid"""
@@ -95,6 +97,7 @@ if LOG_DIR:
 else:
     LOG_FILE = None
     LOG_DIR_FILE = None
+
 #------------------------------------------------------------------------------
 def get_conf_dir():
     """Return the user's configuration directory"""
@@ -108,24 +111,33 @@ def get_conf_dir():
             print("Creating config directory \n'{0}'".format(conf_dir))
             return conf_dir
         except (IOError, OSError) as e:
-            print("Error creating {0}:\n{1}".format(conf_dir, e))
+            print("Error creating config directory {0}:\n{1}".format(conf_dir, e))
             return HOME_DIR
 
 CONF_DIR = get_conf_dir()
-LOG_CONF_FILE = 'pyfda_log.conf'
+
 #------------------------------------------------------------------------------
+USER_CONF_DIR_FILE     = os.path.join(CONF_DIR, CONF_FILE)
+USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
 
-USER_LOG_CONF_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
-
-if not os.path.isfile(USER_LOG_CONF_FILE):
-    # copy default logging configuration file to user directory if it doesn't exist
+if not os.path.isfile(USER_CONF_DIR_FILE):
+    # Copy default configuration file to user directory if it doesn't exist
     # This file can be easily edited by the user without admin access rights
     try:
-        shutil.copyfile(os.path.join(INSTALL_DIR, LOG_CONF_FILE), USER_LOG_CONF_FILE)
+        shutil.copyfile(os.path.join(INSTALL_DIR, CONF_FILE), USER_CONF_DIR_FILE)
+        print('Config file "{0}" doesn\'t exist yet, creating it.'.format(USER_CONF_DIR_FILE))
     except IOError as e:
         print(e)
+        
+if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
+    # Copy default logging configuration file to user directory if it doesn't exist
+    # This file can be easily edited by the user without admin access rights
+    try:
+        shutil.copyfile(os.path.join(INSTALL_DIR, LOG_CONF_FILE), USER_LOG_CONF_DIR_FILE)
+        print("Logging config file {0} doesn't exist yet, creating it.".format(USER_LOG_CONF_DIR_FILE))
+    except IOError as e:
+        print(e)
+
 #------------------------------------------------------------------------------
 # This is the place holder for storing where the last file was saved
 save_dir = HOME_DIR
-
-print("Operating System: {0} {1}".format(OS, OS_VER)) # logger.info?

@@ -93,7 +93,7 @@ class QEditHandler(logging.Handler):
 # as parameters:
 logging.DynFileHandler = DynFileHandler
 logging.QEditHandler = QEditHandler
-logging.config.fileConfig(dirs.USER_LOG_CONF_FILE)#, disable_existing_loggers=True)
+logging.config.fileConfig(dirs.USER_LOG_CONF_DIR_FILE)#, disable_existing_loggers=True)
 #==============================================================================
 
 from pyfda import pyfda_rc as rc
@@ -127,10 +127,9 @@ class pyFDA(QMainWindow):
         # create clipboard instance that can be accessed from other modules
         fb.clipboard = QApplication.clipboard()
 
-        # initialize the FilterTreeBuilder class with the filter directory and
-        # the filter file as parameters:         
-        # read directory with filterDesigns and construct filter tree from it
-        self.ftb = FilterTreeBuilder('filter_design', 'filter_list.txt', comment_char='#')
+        # initialize the FilterTreeBuilder class: 
+        # read config file and construct filter tree from it
+        self.ftb = FilterTreeBuilder()
         self._construct_UI()
 
     def _construct_UI(self):

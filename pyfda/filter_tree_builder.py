@@ -13,7 +13,6 @@ structured form.
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys, six
 from pprint import pformat
-import codecs
 import importlib
 import configparser
 
@@ -22,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
+import pyfda.pyfda_dirs as dirs
 
 from .frozendict import freeze_hierarchical
 
@@ -98,26 +98,12 @@ class FilterTreeBuilder(object):
 
     Parameters
     ----------
-
-    filt_dir: string
-        Name of the subdirectory containing the init-file and the
-        Python files to be read, needs to have __init__.py)
-
-    filt_list_file: string
-        Name of the init file
-
-    comment_char: char
-        comment character at the beginning of a comment line
-
     """
 
-    def __init__(self, filt_dir, filt_list_file, comment_char='#'):
-        cwd = os.path.dirname(os.path.abspath(__file__))
-        self.conf_dir_file = os.path.join(cwd, filt_dir, filt_list_file)
+    def __init__(self):# conf_dir, conf_file):
 
-        logger.debug("Filter file list: %s\n", self.conf_dir_file)
-        self.comment_char = comment_char
-        self.filt_dir = filt_dir
+        logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
+        self.conf_dir = "filter_design" # TODO: This should be read from config file
 
         self.init_filters()
 
@@ -155,7 +141,7 @@ class FilterTreeBuilder(object):
             # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
-                logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
+                logger.warning('Skipping filter class "{0:s}" due to import error {1:d}'.format(fc, err_code))
                 continue # continue with next entry in fb.fil_classes
 
             # add attributes from dict to fil_tree for filter class fc
@@ -182,12 +168,13 @@ class FilterTreeBuilder(object):
 #==============================================================================
     def read_conf_file(self):
         """
-        Extract all file names = class names from self.conf_dir_file, section:
+        Extract all file names = class names from `self.conf_dir_file` in 
+        section "[Filter Designs}":
 
         - Lines that don't begin with '#' are stripped from newline, whitespace
           and everything after it and returned as a list.
         - All other lines are discarded
-        - Collect and return valid file names (without .py) as `filt_list_names`.
+        - Collect and return valid class / file names as `filt_list_names`.
 
         Parameters
         ----------
@@ -195,24 +182,22 @@ class FilterTreeBuilder(object):
 
         Returns
         -------
-        List `filt_list_names` with the names of all design files
+        List `filt_list_names` with the names of all filter design classes / files
         """
 
         try:
-            # Try to open conf_dir_file in read mode, this is necessary as
+            # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
-            #fp = codecs.open(self.conf_dir_file, 'rU', encoding='utf-8')
-            #fp.close()
-            if not os.path.isfile(self.conf_dir_file):
-                raise IOError('Config file "{0}" could not be found.'.format(self.conf_dir_file))
+            if not os.access(dirs.USER_CONF_DIR_FILE, os.R_OK):
+                raise IOError('Config file "{0}" cannot be read.'.format(dirs.USER_CONF_DIR_FILE))
 
             # setup an instance of config parser, allow  keys without value
             conf = configparser.ConfigParser(allow_no_value=True)
             # preserve case of parsed options by overriding optionxform():
             # Set it to function str()
             conf.optionxform = str
-            conf.read(self.conf_dir_file)
-            logger.info('Parsing config file\n\t"{0}"'.format(self.conf_dir_file))
+            conf.read(dirs.USER_CONF_DIR_FILE)
+            logger.info('Parsing config file\n\t"{0}"'.format(dirs.USER_CONF_DIR_FILE))
             logger.info("with sections:\n\t{0}".format(str(conf.sections())))
 
             # returns a list with ("option","argument") items, "argument" is always empty here
@@ -251,10 +236,6 @@ class FilterTreeBuilder(object):
         except IOError as e:
             logger.critical('{0}'.format(e))
             sys.exit('{0}'.format(e))
-#            logger.critical( 'Config file "%s" could not be found.\n\
-#                I/O Error(%d): %s' %(self.conf_dir_file, e.errno, e.strerror))
-#            sys.exit( 'Config file "%s" could not be found.\n\
-#                I/O Error(%d): %s' %(self.conf_dir_file, e.errno, e.strerror))
 
         except Exception as e:
             logger.critical("Unexpected error: {0}".format(e))
@@ -263,7 +244,7 @@ class FilterTreeBuilder(object):
 #==============================================================================
     def dyn_filt_import(self, filt_list_names):
         """
-        Try to import from all filter files found by ``read_filt_file()``,
+        Try to import from all filter files found by `read_conf_file()`,
         auto-detecting available modules / classes:
 
         - The design classes in a module are specified in the module attribute
@@ -282,7 +263,7 @@ class FilterTreeBuilder(object):
 
         filt_list_names
             List with the classes to be imported, contained in the
-            Python files (ending with .py !!) in the file filt_list_file
+            Python files (ending with .py !!) in the file conf_file
 
         Returns
         -------
@@ -299,7 +280,7 @@ class FilterTreeBuilder(object):
         imported_fil_classes = "" # names of successful filter module imports
 
         for filt_mod in filt_list_names:
-            module_name = 'pyfda.' + self.filt_dir + '.' + filt_mod
+            module_name = 'pyfda.' + self.conf_dir + '.' + filt_mod
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
                 mod = importlib.import_module(module_name)
@@ -461,17 +442,16 @@ if __name__ == "__main__":
     # Need to start a QApplication to avoid the error
     #  "QWidget: Must construct a QApplication before a QPaintDevice"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
-    from .compat import QtGui
-    app = QtGui.QApplication(sys.argv)
+    from .compat import QApplication
+    app = QApplication(sys.argv)
 
     print("===== Initialize FilterReader ====")
 
     filt_file_name = "filter_list.txt"
-    filt_dir = "filter_design"
-    comment_char = '#'
+    conf_dir = "filter_design"
 
     # Create a new FilterFileReader instance & initialize it
-    myTreeBuilder = FilterTreeBuilder(filt_dir, filt_file_name, comment_char)
+    myTreeBuilder = FilterTreeBuilder(conf_dir, filt_file_name)
 
     print("\n===== Start Test ====")
     filterTree = myTreeBuilder.build_fil_tree()
