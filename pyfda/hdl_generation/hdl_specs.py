@@ -247,6 +247,7 @@ class HDL_Specs(QWidget):
             
         self.lblTitle.setText(self.hdl_wdg_inst.title)
         self.layHWdg.addWidget(self.hdl_wdg_inst)
+        self.layHWdg.addStretch()
 
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
