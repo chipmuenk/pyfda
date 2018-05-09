@@ -279,8 +279,8 @@ class MplToolbar(NavigationToolbar):
         self.a_gr.setChecked(True)
 
         # REDRAW:
-        self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.parent.redraw)
-        self.a_rd.setToolTip('Redraw Plot')
+        #self.a_rd = self.addAction(QIcon(':/brush.svg'), 'Redraw', self.parent.redraw)
+        #self.a_rd.setToolTip('Redraw Plot')
 
         # SAVE:
         self.a_sv = self.addAction(QIcon(':/save.svg'), 'Save', self.save_figure)
@@ -450,7 +450,7 @@ class MplToolbar(NavigationToolbar):
         self.a_fv.setEnabled(self.enabled)
         self.a_lk.setEnabled(self.enabled)
         self.a_gr.setEnabled(self.enabled)
-        self.a_rd.setEnabled(self.enabled)
+        #self.a_rd.setEnabled(self.enabled)
         self.a_sv.setEnabled(self.enabled)
         self.a_cb.setEnabled(self.enabled)
         self.a_op.setEnabled(self.enabled)
