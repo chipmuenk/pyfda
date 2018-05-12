@@ -218,4 +218,8 @@ for k in fil_init:
 # List with plot widget class names found in the main configuration file,
 # parsed in filter_tree_builder.
 #------------------------------------------------------------------------------
-plot_widget_list = []
+plot_widgets_list = []
+plot_widgets_mod_std = ""
+
+filter_designs_list = []
+filter_designs_mod_std = ""
