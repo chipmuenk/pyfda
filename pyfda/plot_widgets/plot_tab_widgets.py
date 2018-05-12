@@ -50,11 +50,15 @@ class PlotTabWidgets(QTabWidget):
         tabWidget.setObjectName("plot_tabs")
         inst_wdg_list = "" # successfully instantiated plot widgets
         #
-        for i, plot_wdg in enumerate(fb.plot_widget_list):
-            plot_mod_name = 'pyfda.' + plot_wdg_dir + '.' + plot_wdg.lower()
+        for i, plot_wdg in enumerate(fb.plot_widgets_list):
+            if not plot_wdg[1]:
+                plot_mod_name = fb.plot_widgets_mod_std + '.' + plot_wdg[0].lower()
+                plot_class_name = fb.plot_widgets_mod_std + '.' + plot_wdg[0]
+            else:
+                plot_mod_name = plot_wdg[1] + '.' + plot_wdg[0].lower()
             try:  # Try to import the module from the package and get a handle:
                 plot_mod = importlib.import_module(plot_mod_name)
-                plot_class = getattr(plot_mod, plot_wdg, None)
+                plot_class = getattr(plot_mod, plot_wdg[0], None)
                 plot_inst = plot_class(self)
                 if hasattr(plot_inst, 'tab_label'):
                     tabWidget.addTab(plot_inst, plot_inst.tab_label)
@@ -67,7 +71,7 @@ class PlotTabWidgets(QTabWidget):
                 if hasattr(plot_inst, 'sig_rx'):
                     self.sig_tx.connect(plot_inst.sig_rx)
 
-                inst_wdg_list += '\t' + 'pyfda.' + plot_wdg_dir + '.' + plot_wdg + '\n'
+                inst_wdg_list += '\t' + plot_class_name + '\n'
 
             except ImportError as e:
                 logger.warning('Plotting module "{0}" could not be imported.\n{1}'\

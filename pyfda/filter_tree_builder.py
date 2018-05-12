@@ -98,9 +98,10 @@ class FilterTreeBuilder(object):
 
     Parameters
     ----------
+    None
     """
 
-    def __init__(self):# conf_dir, conf_file):
+    def __init__(self):
 
         logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
         self.conf_dir = "filter_design" # TODO: This should be read from config file
@@ -118,14 +119,17 @@ class FilterTreeBuilder(object):
         - Construct a tree with all the filter combinations
 
         This method can also be called when the main app runs to re-read the
-        filter directory
+        filter directory (?)
         """
-        # Scan filter_list.txt for class names / python file names and extract them
-        filt_list_names = self.read_conf_file()
+        self.filter_list_std = []
+        self.filter_list_usr = []
+        
+        # Scan pyfda.conf for class names / python file names and extract them
+        self.parse_conf_file()
 
         # Try to import all filter modules and classes found in filter_list,
         # store names and modules in the dict fb.fil_classes as {filterName:filterModule}:
-        self.dyn_filt_import(filt_list_names)
+        self.dyn_filt_import()
 
         """
         Read attributes (ft, rt, fo) from all valid filter classes (fc)
@@ -166,7 +170,7 @@ class FilterTreeBuilder(object):
 
 
 #==============================================================================
-    def read_conf_file(self):
+    def parse_conf_file(self):
         """
         Extract all file names = class names from `self.conf_dir_file` in 
         section "[Filter Designs}":
@@ -184,7 +188,6 @@ class FilterTreeBuilder(object):
         -------
         List `filt_list_names` with the names of all filter design classes / files
         """
-
         try:
             # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
@@ -196,26 +199,36 @@ class FilterTreeBuilder(object):
             # preserve case of parsed options by overriding optionxform():
             # Set it to function str()
             conf.optionxform = str
+            # conf._interpolation = configparser.ExtendedInterpolation()
             conf.read(dirs.USER_CONF_DIR_FILE)
             logger.info('Parsing config file\n\t"{0}"'.format(dirs.USER_CONF_DIR_FILE))
             logger.info("with sections:\n\t{0}".format(str(conf.sections())))
-
-            # returns a list with ("option","argument") items, "argument" is always empty here
-            plot_widgets = conf.items("Plot Widgets")
-            fb.plot_widget_list = [p[0] for p in plot_widgets]
+            # -----------------------------------------------------------------
+            # Parsing directories and modules [Dirs]
+            #------------------------------------------------------------------
+            dirs_dict = {i[0]:i[1] for i in conf.items('Dirs')} # convert list to dict
+            fb.filter_designs_mod_std = dirs_dict['filter_designs']
+            fb.plot_widgets_mod_std = dirs_dict['plot_widgets']
+            # -----------------------------------------------------------------
+            # Parsing section [Plot Widgets]
+            #------------------------------------------------------------------
+            fb.plot_widgets_list = conf.items("Plot Widgets")
+            # returns a list with ("option","value") items where value is None
+            # for standard plot widgets
             logger.info('Found {0:d} entries under [Plot Widgets].'\
-                        .format(len(fb.plot_widget_list)))
+                        .format(len(fb.plot_widgets_list)))
 
-            filt_dict = conf.items("Filter Designs")
-
-            filt_list = [k[0] for k in filt_dict]
-            if len(filt_list) == 0:
+            # -----------------------------------------------------------------
+            # Parsing section [Filter Designs]
+            #------------------------------------------------------------------
+            fb.filter_designs_list = conf.items("Filter Designs")
+            if len(fb.filter_designs_list) == 0:
                 raise configparser.NoOptionError('No filters defined under section [Filter Designs].' )
             else:
-                logger.info('Found {0:d} entries under [Filter Designs].\n'.format(len(filt_list)))
+                logger.info('Found {0:d} entries under [Filter Designs].\n'\
+                            .format(len(fb.filter_designs_list)))
 
-            return filt_list
-
+        # ----- Exceptions ----------------------
         except configparser.ParsingError as e:
             logger.critical('Parsing Error in config file "{0}".\n{1}'\
                          .format(self.conf_dir_file, e))
@@ -242,7 +255,7 @@ class FilterTreeBuilder(object):
             sys.exit("Unexpected error: {0}".format(e))
 
 #==============================================================================
-    def dyn_filt_import(self, filt_list_names):
+    def dyn_filt_import(self):
         """
         Try to import from all filter files found by `read_conf_file()`,
         auto-detecting available modules / classes:
@@ -279,8 +292,9 @@ class FilterTreeBuilder(object):
         num_imports = 0           # number of successful filter module imports
         imported_fil_classes = "" # names of successful filter module imports
 
-        for filt_mod in filt_list_names:
-            module_name = 'pyfda.' + self.conf_dir + '.' + filt_mod
+        for filt_mod in fb.filter_designs_list:
+            if not filt_mod[1]: # standard filter directory / module
+                module_name = fb.filter_designs_mod_std + '.' + filt_mod[0]
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
                 mod = importlib.import_module(module_name)
@@ -319,7 +333,7 @@ class FilterTreeBuilder(object):
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
 
                     num_imports += 1
-                    imported_fil_classes += "\t" + filt_mod + "."+ fc + "\n"
+                    imported_fil_classes += "\t" + filt_mod[0] + "."+ fc + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
