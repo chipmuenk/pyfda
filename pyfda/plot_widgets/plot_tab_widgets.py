@@ -14,6 +14,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
+import os, sys
 import importlib
 from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
@@ -34,7 +35,7 @@ class PlotTabWidgets(QTabWidget):
         super(PlotTabWidgets, self).__init__(parent)
         self._construct_UI()
 
-#------------------------------------------------------------------------------
+#---------------------------------------------- --------------------------------
     def _construct_UI(self):
         """
         Initialize UI with tabbed subwidgets and connect the signals of all
@@ -52,10 +53,23 @@ class PlotTabWidgets(QTabWidget):
         #
         for i, plot_wdg in enumerate(fb.plot_widgets_list):
             if not plot_wdg[1]:
-                plot_mod_name = fb.plot_widgets_mod_std + '.' + plot_wdg[0].lower()
-                plot_class_name = fb.plot_widgets_mod_std + '.' + plot_wdg[0]
+                # use standard plot module
+                mod_name = fb.plot_widgets_mod_std
             else:
-                plot_mod_name = plot_wdg[1] + '.' + plot_wdg[0].lower()
+                # check and extract user directory
+                if os.path.isdir(plot_wdg[1]):
+                    mod_path = os.path.normpath(plot_wdg[1])
+                    # split the path into the dir containing the module and its name
+                    mod_dir_name, mod_name = os.path.split(mod_path)
+
+                    if mod_dir_name not in sys.path:
+                        sys.path.append(mod_dir_name)
+                else:
+                    logger.warning("Path {0:s} doesn't exist!".format(plot_wdg[1]))
+                    continue
+            plot_mod_name = mod_name + '.' + plot_wdg[0].lower()
+            plot_class_name = mod_name + '.' + plot_wdg[0]
+
             try:  # Try to import the module from the package and get a handle:
                 plot_mod = importlib.import_module(plot_mod_name)
                 plot_class = getattr(plot_mod, plot_wdg[0], None)
