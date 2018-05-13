@@ -199,7 +199,8 @@ class FilterTreeBuilder(object):
             # preserve case of parsed options by overriding optionxform():
             # Set it to function str()
             conf.optionxform = str
-            # conf._interpolation = configparser.ExtendedInterpolation()
+            # Allow interpolation across sections, ${Dirs:dir1}
+            conf._interpolation = configparser.ExtendedInterpolation()
             conf.read(dirs.USER_CONF_DIR_FILE)
             logger.info('Parsing config file\n\t"{0}"'.format(dirs.USER_CONF_DIR_FILE))
             logger.info("with sections:\n\t{0}".format(str(conf.sections())))
@@ -235,16 +236,13 @@ class FilterTreeBuilder(object):
             sys.exit('Parsing Error in config file "{0}".\n{1}'\
                          .format(self.conf_dir_file, e))
 
-        except configparser.NoSectionError as e:
+        except (configparser.NoSectionError, configparser.NoOptionError) as e:
             logger.critical('{0} found in config file "{1}".'\
                          .format(e, self.conf_dir_file))
             sys.exit('{0} found in config file "{1}".'\
                          .format(e, self.conf_dir_file))
-        except configparser.NoOptionError as e:
-            logger.critical('No entries found in config file "{0}".\n{1}'\
-                         .format(self.conf_dir_file, e))
-            sys.exit('No section ([ ... ]) found in config file "{0}".\n{1}'\
-                         .format(self.conf_dir_file, e))
+        except (configparser.DuplicateOptionError, configparser.DuplicateOptionError) as e:
+            logger.warning('{0} in config file "{1}".'.format(e, self.conf_dir_file))
 
         except IOError as e:
             logger.critical('{0}'.format(e))
