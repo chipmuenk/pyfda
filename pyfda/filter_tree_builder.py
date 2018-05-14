@@ -112,7 +112,7 @@ class FilterTreeBuilder(object):
     def init_filters(self):
         """
         - Extract the names of all Python files in the file specified during
-          instantiation (self.conf_dir_file) and write them to a list
+          instantiation (dirs.USER_CONF_DIR_FILE) and write them to a list
         - Try to import all python files and return a dict with all file names
           and corresponding objects (the class needs to have the same name as
           the file)
@@ -172,7 +172,7 @@ class FilterTreeBuilder(object):
 #==============================================================================
     def parse_conf_file(self):
         """
-        Extract all file names = class names from `self.conf_dir_file` in 
+        Extract all file names = class names from `dirs.USER_CONF_DIR_FILE` in 
         section "[Filter Designs}":
 
         - Lines that don't begin with '#' are stripped from newline, whitespace
@@ -244,17 +244,18 @@ class FilterTreeBuilder(object):
         # ----- Exceptions ----------------------
         except configparser.ParsingError as e:
             logger.critical('Parsing Error in config file "{0}".\n{1}'\
-                         .format(self.conf_dir_file, e))
+                         .format(dirs.USER_CONF_DIR_FILE, e))
             sys.exit('Parsing Error in config file "{0}".\n{1}'\
-                         .format(self.conf_dir_file, e))
+                         .format(dirs.USER_CONF_DIR_FILE, e))
 
-        except (configparser.NoSectionError, configparser.NoOptionError) as e:
+        except (configparser.NoSectionError) as e:
             logger.critical('{0} found in config file "{1}".'\
-                         .format(e, self.conf_dir_file))
+                         .format(e, dirs.USER_CONF_DIR_FILE))
             sys.exit('{0} found in config file "{1}".'\
-                         .format(e, self.conf_dir_file))
-        except (configparser.DuplicateOptionError, configparser.DuplicateOptionError) as e:
-            logger.warning('{0} in config file "{1}".'.format(e, self.conf_dir_file))
+                         .format(e, dirs.USER_CONF_DIR_FILE))
+        except (configparser.DuplicateOptionError, configparser.DuplicateSectionError,
+                configparser.NoOptionError) as e:
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
 
         except IOError as e:
             logger.critical('{0}'.format(e))
