@@ -22,19 +22,19 @@ import pprint
 
 from ..compat import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
 
-from pyfda.hdl_generation.hdl_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
-from pyfda.hdl_generation.filter_iir import FilterIIR 
+from pyfda.fixpoint_filters.hdl_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
+from pyfda.fixpoint_filters.filter_iir import FilterIIR 
 
 #==============================================================================
 
-class HDL_DF1(QWidget):
+class DF1(QWidget):
     """
     Create the widget for quantizing data and coef
     """
     sig_rx = pyqtSignal(object)
     
     def __init__(self, parent):
-        super(HDL_DF1, self).__init__(parent)
+        super(DF1, self).__init__(parent)
 
         self.title = ("<b>Direct-Form 1 (DF1) Filters</b><br />"
                  "Simple topology, only suitable for low-order filters.")
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = HDL_DF1(None)
+    mainw = DF1(None)
     mainw.show()
 
     app.exec_()

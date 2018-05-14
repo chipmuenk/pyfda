@@ -25,7 +25,7 @@ from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
                                 filter_info, filter_pz)
 
 if cmp_version("myhdl", "0.10") >= 0:
-    from pyfda.hdl_generation import hdl_specs
+    from pyfda.fixpoint_filters import hdl_specs
     HAS_MYHDL = True
 else:
     HAS_MYHDL = False

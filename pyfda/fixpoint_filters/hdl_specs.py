@@ -25,8 +25,8 @@ import myhdl
 #               Simulation, StopSimulation)
 
 # The following modules are imported dynamically
-hdl_wdg_list = ["HDL_DF1", "HDL_DF2"]
-hdl_wdg_dir = "hdl_generation"
+#hdl_wdg_list = ["HDL_DF1", "HDL_DF2"]
+#hdl_wdg_dir = "hdl_generation"
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
@@ -77,19 +77,49 @@ class HDL_Specs(QWidget):
         """
         self.cmb_wdg_hdl = QComboBox(self)
         self.cmb_wdg_hdl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        
+        inst_wdg_list = "" # successfully instantiated widgets
+        #
+        for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
+            if not fx_fil_wdg[1]:
+                # use standard module
+                mod_name = fb.fixpoint_filters_mod_std
+            else:
+                # check and extract user directory
+                if os.path.isdir(fx_fil_wdg[1]):
+                    mod_path = os.path.normpath(fx_fil_wdg[1])
+                    # split the path into the dir containing the module and its name
+                    mod_dir_name, mod_name = os.path.split(mod_path)
 
-        for hdl_wdg in hdl_wdg_list:
-            hdl_mod_name = 'pyfda.' + hdl_wdg_dir + '.' + hdl_wdg.lower()
+                    if mod_dir_name not in sys.path:
+                        sys.path.append(mod_dir_name)
+                else:
+                    logger.warning("Path {0:s} doesn't exist!".format(fx_fil_wdg[1]))
+                    continue
+            fx_fil_mod_name = mod_name + '.' + fx_fil_wdg[0].lower()
+            fx_fil_class_name = mod_name + '.' + fx_fil_wdg[0]
+
+#        for hdl_wdg in fb.filter_implementations_list:
+#            hdl_mod_name = 'pyfda.' + hdl_wdg_dir + '.' + hdl_wdg.lower()
             try:  # Try to import the module from the  package and get a handle:
-                hdl_mod = importlib.import_module(hdl_mod_name)
-                hdl_wdg_class = getattr(hdl_mod, hdl_wdg) # try to resolve the class       
-                self.cmb_wdg_hdl.addItem(hdl_wdg, hdl_mod_name)
+                fx_fil_mod = importlib.import_module(fx_fil_mod_name)
+                fx_fil_class = getattr(fx_fil_mod, fx_fil_wdg[0]) # try to resolve the class       
+                self.cmb_wdg_hdl.addItem(fx_fil_wdg[0], fx_fil_mod_name)
+                
+                inst_wdg_list += '\t' + fx_fil_class_name + '\n'
+
             except ImportError:
-                logger.warning("Could not import {0}!".format(hdl_mod_name))
+                logger.warning("Could not import {0}!".format(fx_fil_mod_name))
                 continue
-            except Exception as e:
-                logger.warning("Unexpected error during module import:\n{0}".format(e))
-                continue
+#            except Exception as e:
+#                logger.warning("Unexpected error during module import:\n{0}".format(e))
+#                continue
+
+        if len(inst_wdg_list) == 0:
+            logger.warning("No fixpoint filters found!")
+        else:
+            logger.info("Imported the following fixpoint filters:\n{0}".format(inst_wdg_list))
+
 
         self.update_filt_wdg()
 #------------------------------------------------------------------------------        
