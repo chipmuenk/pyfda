@@ -208,10 +208,12 @@ class FilterTreeBuilder(object):
             # Parsing directories and modules [Dirs]
             #------------------------------------------------------------------
             dirs_dict = {i[0]:i[1] for i in conf.items('Dirs')} # convert list to dict
-            fb.filter_designs_mod_std = dirs_dict['filter_designs']
             fb.plot_widgets_mod_std = dirs_dict['plot_widgets']
+            fb.filter_designs_mod_std = dirs_dict['filter_designs']
+            fb.fixpoint_filters_mod_std = dirs_dict['fixpoint_filters']
+
             # -----------------------------------------------------------------
-            # Parsing section [Plot Widgets]
+            # Parsing [Plot Widgets]
             #------------------------------------------------------------------
             fb.plot_widgets_list = conf.items("Plot Widgets")
             # returns a list with ("option","value") items where value is None
@@ -220,14 +222,24 @@ class FilterTreeBuilder(object):
                         .format(len(fb.plot_widgets_list)))
 
             # -----------------------------------------------------------------
-            # Parsing section [Filter Designs]
+            # Parsing [Filter Designs]
             #------------------------------------------------------------------
             fb.filter_designs_list = conf.items("Filter Designs")
             if len(fb.filter_designs_list) == 0:
-                raise configparser.NoOptionError('No filters defined under section [Filter Designs].' )
+                raise configparser.NoOptionError('No entries in [Filter Designs].' )
             else:
                 logger.info('Found {0:d} entries under [Filter Designs].\n'\
                             .format(len(fb.filter_designs_list)))
+                
+            # -----------------------------------------------------------------
+            # Parsing [Fixpoint Filters]
+            #------------------------------------------------------------------
+            fb.fixpoint_filters_list = conf.items("Fixpoint Filters")
+            if len(fb.fixpoint_filters_list) == 0:
+                logger.warning('No entries in [Fixpoint Filters].' )
+            else:
+                logger.info('Found {0:d} entries under [Fixpoint Filters].\n'\
+                            .format(len(fb.fixpoint_filters_list)))
 
         # ----- Exceptions ----------------------
         except configparser.ParsingError as e:

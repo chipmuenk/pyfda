@@ -223,3 +223,6 @@ plot_widgets_mod_std = ""
 
 filter_designs_list = []
 filter_designs_mod_std = ""
+
+fixpoint_filters_list = []
+fixpoint_filters_mod_std = ""
