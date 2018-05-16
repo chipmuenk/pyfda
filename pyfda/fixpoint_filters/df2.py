@@ -18,18 +18,18 @@ import numpy as np
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame
 
-from pyfda.hdl_generation.hdl_helpers import UI_WI_WF, UI_Q_Ovfl
-from pyfda.hdl_generation.filter_iir import FilterIIR 
+from .hdl_helpers import UI_WI_WF, UI_Q_Ovfl
+from .filter_iir import FilterIIR 
 #==============================================================================
 
-class HDL_DF2(QWidget):
+class DF2(QWidget):
     """
     Create the widget for quantizing data and coef
     """
     sig_rx = pyqtSignal(object)
     
     def __init__(self, parent):
-        super(HDL_DF2, self).__init__(parent)
+        super(DF2, self).__init__(parent)
 
         self.title = ("<b>Direct-Form 2 (DF2) Filters</b><br />"
                  "Simple topology, only suitable for low-order filters.")
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = HDL_DF2(None)
+    mainw = DF2(None)
     mainw.show()
 
     app.exec_()

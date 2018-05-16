@@ -24,10 +24,6 @@ import myhdl
 #               instance, instances, intbv, traceSignals,
 #               Simulation, StopSimulation)
 
-# The following modules are imported dynamically
-#hdl_wdg_list = ["HDL_DF1", "HDL_DF2"]
-#hdl_wdg_dir = "hdl_generation"
-
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_io_lib import extract_file_ext

@@ -20,10 +20,10 @@ import pyfda.filterbroker as fb
 import pyfda.pyfda_fix_lib as fix
 import pprint
 
-from ..compat import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
+from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal
 
-from pyfda.fixpoint_filters.hdl_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
-from pyfda.fixpoint_filters.filter_iir import FilterIIR 
+from .hdl_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
+from .filter_iir import FilterIIR 
 
 #==============================================================================
 
