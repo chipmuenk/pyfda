@@ -75,6 +75,7 @@ class HDL_Specs(QWidget):
         self.cmb_wdg_hdl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         
         inst_wdg_list = "" # successfully instantiated widgets
+        n_wdg = 0 # number of successfully instantiated widgets
         #
         for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
             if not fx_fil_wdg[1]:
@@ -103,6 +104,7 @@ class HDL_Specs(QWidget):
                 self.cmb_wdg_hdl.addItem(fx_fil_wdg[0], fx_fil_mod_name)
                 
                 inst_wdg_list += '\t' + fx_fil_class_name + '\n'
+                n_wdg += 1
 
             except ImportError:
                 logger.warning("Could not import {0}!".format(fx_fil_mod_name))
@@ -114,7 +116,7 @@ class HDL_Specs(QWidget):
         if len(inst_wdg_list) == 0:
             logger.warning("No fixpoint filters found!")
         else:
-            logger.info("Imported the following fixpoint filters:\n{0}".format(inst_wdg_list))
+            logger.info("Imported {0:d} fixpoint filters:\n{1}".format(n_wdg, inst_wdg_list))
 
 
         self.update_filt_wdg()

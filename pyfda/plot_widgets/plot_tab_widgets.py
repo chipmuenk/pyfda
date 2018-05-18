@@ -50,6 +50,7 @@ class PlotTabWidgets(QTabWidget):
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
         inst_wdg_list = "" # successfully instantiated plot widgets
+        n_wdg = 0 # number of successfully instantiated plot widgets
         #
         for i, plot_wdg in enumerate(fb.plot_widgets_list):
             if not plot_wdg[1]:
@@ -86,6 +87,7 @@ class PlotTabWidgets(QTabWidget):
                     self.sig_tx.connect(plot_inst.sig_rx)
 
                 inst_wdg_list += '\t' + plot_class_name + '\n'
+                n_wdg += 1
 
             except ImportError as e:
                 logger.warning('Plotting module "{0}" could not be imported.\n{1}'\
@@ -98,7 +100,7 @@ class PlotTabWidgets(QTabWidget):
         if len(inst_wdg_list) == 0:
             logger.warning("No plotting widgets found!")
         else:
-            logger.info("Imported the following plotting classes:\n{0}".format(inst_wdg_list))
+            logger.info("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_list))
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)

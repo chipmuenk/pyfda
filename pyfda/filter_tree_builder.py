@@ -205,8 +205,9 @@ class FilterTreeBuilder(object):
             # Allow interpolation across sections, ${Dirs:dir1}
             # conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
             conf.read(dirs.USER_CONF_DIR_FILE)
-            logger.info('Parsing config file\n\t"{0}"'.format(dirs.USER_CONF_DIR_FILE))
-            logger.info("with sections:\n\t{0}".format(str(conf.sections())))
+            logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
+                        .format(dirs.USER_CONF_DIR_FILE, str(conf.sections())))
+            #logger.info("with sections:\n\t{0}".format(str(conf.sections())))
             # -----------------------------------------------------------------
             # Parsing directories and modules [Dirs]
             #------------------------------------------------------------------
@@ -221,7 +222,7 @@ class FilterTreeBuilder(object):
             fb.plot_widgets_list = conf.items("Plot Widgets")
             # returns a list with ("option","value") items where value is None
             # for standard plot widgets
-            logger.info('Found {0:2d} entries under [Plot Widgets].'\
+            logger.info('Found {0:2d} entries in [Plot Widgets].'\
                         .format(len(fb.plot_widgets_list)))
 
             # -----------------------------------------------------------------
@@ -231,7 +232,7 @@ class FilterTreeBuilder(object):
             if len(fb.filter_designs_list) == 0:
                 raise configparser.NoOptionError('No entries in [Filter Designs].' )
             else:
-                logger.info('Found {0:2d} entries under [Filter Designs].'\
+                logger.info('Found {0:2d} entries in [Filter Designs].'\
                             .format(len(fb.filter_designs_list)))
                 
             # -----------------------------------------------------------------
@@ -241,7 +242,7 @@ class FilterTreeBuilder(object):
             if len(fb.fixpoint_filters_list) == 0:
                 logger.warning('No entries in [Fixpoint Filters].' )
             else:
-                logger.info('Found {0:2d} entries under [Fixpoint Filters].'\
+                logger.info('Found {0:2d} entries in [Fixpoint Filters].'\
                             .format(len(fb.fixpoint_filters_list)))
 
         # ----- Exceptions ----------------------
@@ -259,7 +260,7 @@ class FilterTreeBuilder(object):
             sys.exit()
 
 # Py3 only?
-#        except (configparser.DuplicateSectionError, configparser.DuplicateOptionError) as e:
+#        except configparser.DuplicateOptionError as e:
 #            logger.warning('{0} in config file "{1}".'.format(e, self.conf_dir_file))
 
         except IOError as e:
@@ -354,7 +355,7 @@ class FilterTreeBuilder(object):
             logger.critical("No filter class could be imported - shutting down.")
             sys.exit("No filter class could be imported - shutting down.")
         else:
-            logger.info("Imported the following {0:d} filter classes:\n{1:s}"\
+            logger.info("Imported {0:d} filter classes:\n{1:s}"\
                     .format(num_imports, imported_fil_classes))
 
 #==============================================================================
