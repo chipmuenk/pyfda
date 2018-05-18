@@ -14,7 +14,10 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os, sys, six
 from pprint import pformat
 import importlib
-import configparser
+if sys.version_info > (3,): # True for Python 3
+    import configparser
+else:
+    import ConfigParser as configparser
 
 import logging
 logger = logging.getLogger(__name__)
@@ -200,7 +203,7 @@ class FilterTreeBuilder(object):
             # Set it to function str()
             conf.optionxform = str
             # Allow interpolation across sections, ${Dirs:dir1}
-            conf._interpolation = configparser.ExtendedInterpolation()
+            # conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
             conf.read(dirs.USER_CONF_DIR_FILE)
             logger.info('Parsing config file\n\t"{0}"'.format(dirs.USER_CONF_DIR_FILE))
             logger.info("with sections:\n\t{0}".format(str(conf.sections())))
@@ -218,7 +221,7 @@ class FilterTreeBuilder(object):
             fb.plot_widgets_list = conf.items("Plot Widgets")
             # returns a list with ("option","value") items where value is None
             # for standard plot widgets
-            logger.info('Found {0:d} entries under [Plot Widgets].'\
+            logger.info('Found {0:2d} entries under [Plot Widgets].'\
                         .format(len(fb.plot_widgets_list)))
 
             # -----------------------------------------------------------------
@@ -228,7 +231,7 @@ class FilterTreeBuilder(object):
             if len(fb.filter_designs_list) == 0:
                 raise configparser.NoOptionError('No entries in [Filter Designs].' )
             else:
-                logger.info('Found {0:d} entries under [Filter Designs].\n'\
+                logger.info('Found {0:2d} entries under [Filter Designs].'\
                             .format(len(fb.filter_designs_list)))
                 
             # -----------------------------------------------------------------
@@ -238,32 +241,33 @@ class FilterTreeBuilder(object):
             if len(fb.fixpoint_filters_list) == 0:
                 logger.warning('No entries in [Fixpoint Filters].' )
             else:
-                logger.info('Found {0:d} entries under [Fixpoint Filters].\n'\
+                logger.info('Found {0:2d} entries under [Fixpoint Filters].'\
                             .format(len(fb.fixpoint_filters_list)))
 
         # ----- Exceptions ----------------------
         except configparser.ParsingError as e:
-            logger.critical('Parsing Error in config file "{0}".\n{1}'\
-                         .format(dirs.USER_CONF_DIR_FILE, e))
-            sys.exit('Parsing Error in config file "{0}".\n{1}'\
-                         .format(dirs.USER_CONF_DIR_FILE, e))
+            logger.critical('Parsing Error in config file "{0}:\n{1}".'.format(self.conf_dir_file,e))
+            sys.exit()
+        except configparser.NoSectionError as e:
+            logger.critical('{0} in config file "{1}".'.format(e, self.conf_dir_file))
+            sys.exit()
+            # configparser.NoOptionError
+        except configparser.DuplicateSectionError as e:
+            logger.warning('{0} in config file "{1}".'.format(e, self.conf_dir_file))
+        except configparser.Error as e:
+            logger.critical('{0} in config file "{1}".'.format(e, self.conf_dir_file))
+            sys.exit()
 
-        except (configparser.NoSectionError) as e:
-            logger.critical('{0} found in config file "{1}".'\
-                         .format(e, dirs.USER_CONF_DIR_FILE))
-            sys.exit('{0} found in config file "{1}".'\
-                         .format(e, dirs.USER_CONF_DIR_FILE))
-        except (configparser.DuplicateOptionError, configparser.DuplicateSectionError,
-                configparser.NoOptionError) as e:
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+# Py3 only?
+#        except (configparser.DuplicateSectionError, configparser.DuplicateOptionError) as e:
+#            logger.warning('{0} in config file "{1}".'.format(e, self.conf_dir_file))
 
         except IOError as e:
             logger.critical('{0}'.format(e))
-            sys.exit('{0}'.format(e))
-
+            sys.exit()
         except Exception as e:
             logger.critical("Unexpected error: {0}".format(e))
-            sys.exit("Unexpected error: {0}".format(e))
+            sys.exit()
 
 #==============================================================================
     def dyn_filt_import(self):
