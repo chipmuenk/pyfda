@@ -305,7 +305,7 @@ class FilterSpecs(QWidget):
                 self.color_design_button("ok")
 
                 self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_designed'})
-                logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
+                logger.info ('Designed filter with order = {0}'.format(str(fb.fil[0]['N'])))
 # =============================================================================
 #                 logger.debug("Results:\n"
 #                     "F_PB = %s, F_SB = %s "
