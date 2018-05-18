@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Helper classes and functions for generating and simulating hdl-files
+Helper classes and functions for generating and simulating fixpoint filters
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys

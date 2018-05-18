@@ -22,7 +22,7 @@ import pprint
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal
 
-from .hdl_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
+from .fixpoint_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
 from .filter_iir import FilterIIR 
 
 #==============================================================================

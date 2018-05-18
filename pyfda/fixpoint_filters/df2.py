@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 
-from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame
+from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal
 
-from .hdl_helpers import UI_WI_WF, UI_Q_Ovfl
+from .fixpoint_helpers import UI_WI_WF, UI_Q_Ovfl
 from .filter_iir import FilterIIR 
 #==============================================================================
 
