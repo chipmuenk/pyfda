@@ -207,14 +207,14 @@ class FilterTreeBuilder(object):
             conf.read(dirs.USER_CONF_DIR_FILE)
             logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
                         .format(dirs.USER_CONF_DIR_FILE, str(conf.sections())))
-            #logger.info("with sections:\n\t{0}".format(str(conf.sections())))
             # -----------------------------------------------------------------
             # Parsing directories and modules [Dirs]
             #------------------------------------------------------------------
             dirs_dict = {i[0]:i[1] for i in conf.items('Dirs')} # convert list to dict
-            fb.plot_widgets_mod_std = dirs_dict['plot_widgets']
-            fb.filter_designs_mod_std = dirs_dict['filter_designs']
-            fb.fixpoint_filters_mod_std = dirs_dict['fixpoint_filters']
+            try:
+                fb.user_wdg_dir = dirs_dict['user_dir']
+            except (AttributeError, KeyError):
+                logger.info("No user directory specified.")
 
             # -----------------------------------------------------------------
             # Parsing [Plot Widgets]
@@ -266,9 +266,6 @@ class FilterTreeBuilder(object):
         except IOError as e:
             logger.critical('{0}'.format(e))
             sys.exit()
-        except Exception as e:
-            logger.critical("Unexpected error: {0}".format(e))
-            sys.exit()
 
 #==============================================================================
     def dyn_filt_import(self):
@@ -310,7 +307,7 @@ class FilterTreeBuilder(object):
 
         for filt_mod in fb.filter_designs_list:
             if not filt_mod[1]: # standard filter directory / module
-                module_name = fb.filter_designs_mod_std + '.' + filt_mod[0]
+                module_name = 'pyfda.filter_designs' + '.' + filt_mod[0]
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
                 mod = importlib.import_module(module_name)

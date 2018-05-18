@@ -218,11 +218,13 @@ for k in fil_init:
 # List with plot widget class names found in the main configuration file,
 # parsed in filter_tree_builder.
 #------------------------------------------------------------------------------
+user_wdg_dir = ""
+
+# input_widgets_list = [] # not yet implemented
+
 plot_widgets_list = []
-plot_widgets_mod_std = ""
 
 filter_designs_list = []
-filter_designs_mod_std = ""
 
 fixpoint_filters_list = []
-fixpoint_filters_mod_std = ""
+

@@ -21,8 +21,6 @@ from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 from pyfda.pyfda_rc import params
 import pyfda.filterbroker as fb
 
-plot_wdg_dir = 'plot_widgets'
-
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
 
@@ -55,7 +53,7 @@ class PlotTabWidgets(QTabWidget):
         for i, plot_wdg in enumerate(fb.plot_widgets_list):
             if not plot_wdg[1]:
                 # use standard plot module
-                mod_name = fb.plot_widgets_mod_std
+                mod_name = 'pyfda.plot_widgets'
             else:
                 # check and extract user directory
                 if os.path.isdir(plot_wdg[1]):

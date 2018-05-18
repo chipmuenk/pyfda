@@ -63,7 +63,6 @@ class HDL_Specs(QWidget):
             pass
 #------------------------------------------------------------------------------
 
-
     def _construct_UI(self):
         """
         Intitialize the main GUI, consisting of:
@@ -74,13 +73,17 @@ class HDL_Specs(QWidget):
         self.cmb_wdg_hdl = QComboBox(self)
         self.cmb_wdg_hdl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         
-        inst_wdg_list = "" # successfully instantiated widgets
+        user_dir = os.path.normpath(fb.user_wdg_dir) # root directory for user widgets
+        if os.path.isdir(user_dir) and user_dir not in sys.path:
+                sys.path.append(user_dir)            
+        
+        inst_wdg_list = "" # list of successfully instantiated widgets
         n_wdg = 0 # number of successfully instantiated widgets
         #
         for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
             if not fx_fil_wdg[1]:
                 # use standard module
-                mod_name = fb.fixpoint_filters_mod_std
+                mod_name = 'pyfda'
             else:
                 # check and extract user directory
                 if os.path.isdir(fx_fil_wdg[1]):
@@ -93,11 +96,9 @@ class HDL_Specs(QWidget):
                 else:
                     logger.warning("Path {0:s} doesn't exist!".format(fx_fil_wdg[1]))
                     continue
-            fx_fil_mod_name = mod_name + '.' + fx_fil_wdg[0].lower()
-            fx_fil_class_name = mod_name + '.' + fx_fil_wdg[0]
+            fx_fil_mod_name = mod_name + '.fixpoint_filters.' + fx_fil_wdg[0].lower()
+            fx_fil_class_name = mod_name + '.fixpoint_filters.' + fx_fil_wdg[0]
 
-#        for hdl_wdg in fb.filter_implementations_list:
-#            hdl_mod_name = 'pyfda.' + hdl_wdg_dir + '.' + hdl_wdg.lower()
             try:  # Try to import the module from the  package and get a handle:
                 fx_fil_mod = importlib.import_module(fx_fil_mod_name)
                 fx_fil_class = getattr(fx_fil_mod, fx_fil_wdg[0]) # try to resolve the class       
@@ -244,16 +245,16 @@ class HDL_Specs(QWidget):
         """
         Import new module after changing the filter topology
         """
-        cmb_wdg_hdl_cur = qget_cmb_box(self.cmb_wdg_hdl, data=False)
+        cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_hdl, data=False)
 
-        if cmb_wdg_hdl_cur: # at least one valid hdl widget found
-            self.hdl_wdg_found = True
+        if cmb_wdg_fx_cur: # at least one valid hdl widget found
+            self.fx_wdg_found = True
             hdl_mod_name = qget_cmb_box(self.cmb_wdg_hdl, data=True) # module name and path
             hdl_mod = importlib.import_module(hdl_mod_name) # get module 
-            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_hdl_cur) # get class
+            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_fx_cur) # get class
             self.hdl_wdg_inst = hdl_wdg_class(self)
         else:
-            self.hdl_wdg_found = False
+            self.fx_wdg_found = False
  
 #------------------------------------------------------------------------------
     def update_UI(self):
