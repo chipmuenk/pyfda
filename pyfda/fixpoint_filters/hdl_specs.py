@@ -73,9 +73,8 @@ class HDL_Specs(QWidget):
         self.cmb_wdg_hdl = QComboBox(self)
         self.cmb_wdg_hdl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         
-        user_dir = os.path.normpath(fb.user_wdg_dir) # root directory for user widgets
-        if os.path.isdir(user_dir) and user_dir not in sys.path:
-                sys.path.append(user_dir)            
+#        if fb.user_dir and os.path.isdir(fb.user_dir) and fb.user_dir not in sys.path:
+#                sys.path.append(fb.user_dir)            
         
         inst_wdg_list = "" # list of successfully instantiated widgets
         n_wdg = 0 # number of successfully instantiated widgets
