@@ -58,10 +58,6 @@ class InputTabWidgets(QWidget):
         self.filter_specs = filter_specs.FilterSpecs(self)
         self.filter_specs.sig_tx.connect(self.sig_rx)
         #self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)
-
-        # sigFilterDesigned: signal indicating that filter has been DESIGNED,
-        #       requiring update of all plot and some input widgets:
-
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
