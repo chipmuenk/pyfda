@@ -29,7 +29,7 @@ from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
 
-class FilterSpecs(QWidget):
+class Input_Filter_Specs(QWidget):
     """
     Build widget for entering all filter specs
     """
@@ -40,7 +40,9 @@ class FilterSpecs(QWidget):
     sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
-        super(FilterSpecs, self).__init__(parent)
+        super(Input_Filter_Specs, self).__init__(parent)
+        self.tab_label =  "Specs"
+        self.tool_tip = "Enter and view filter specifications."
 
         self._construct_UI()
 
@@ -60,11 +62,15 @@ class FilterSpecs(QWidget):
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()
             self.sig_tx.emit(dict_sig)
+            self.color_design_button("changed")
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
             # kind of input fields changes -> call update_UI, emitting
             # 'specs_changed' when finished
             self.update_UI(dict_sig)
+            self.color_design_button("changed")
+        elif 'data_changed' in dict_sig:
+            self.color_design_button("ok")
         
 
     def _construct_UI(self):
@@ -335,7 +341,7 @@ class FilterSpecs(QWidget):
 if __name__ == '__main__':
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = FilterSpecs(None)
+    mainw = Input_Filter_Specs(None)
     app.setActiveWindow(mainw)
     mainw.show()
 

@@ -21,8 +21,8 @@ SCROLL = True
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import cmp_version
 
-from pyfda.input_widgets import (filter_specs, file_io, input_coeffs,
-                                filter_info, input_pz)
+from pyfda.input_widgets import (input_filter_specs, file_io, input_coeffs,
+                                 filter_info, input_pz)
 
 if cmp_version("myhdl", "0.10") >= 0:
     from pyfda.fixpoint_filters import hdl_specs
@@ -55,10 +55,13 @@ class InputTabWidgets(QWidget):
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("input_tabs")
         #
-        self.filter_specs = filter_specs.FilterSpecs(self)
-        self.filter_specs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)
-        tabWidget.addTab(self.filter_specs, 'Specs')
+        # TODO: remove hardcoded references to input_filter_specs in process_sig_rx
+        # TODO: input_filter_specs creates infinite loop
+        # TODO: remove hardcoded references in pyfdax.py to input_filter_specs
+        self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
+        self.input_filter_specs.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.input_filter_specs.sig_rx)   # comment out (infinite loop)
+        tabWidget.addTab(self.input_filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
         self.input_coeffs = input_coeffs.Input_Coeffs(self)
@@ -120,20 +123,20 @@ class InputTabWidgets(QWidget):
             logger.warning("Prevented Infinite Loop!")
             return
         elif 'specs_changed' in dict_sig:
-            self.filter_specs.color_design_button("changed")
+            #self.input_filter_specs.color_design_button("changed")
             if HAS_MYHDL:
                 self.hdlSpecs.update_UI()
 
         elif 'data_changed' in dict_sig:
             if dict_sig['data_changed'] == 'filter_loaded':
-                self.filter_specs.color_design_button("ok")
+                #self.input_filter_specs.color_design_button("ok")
                 """
                 Called when a new filter has been LOADED:
                 Pass new filter data from the global filter dict by
                 specifically calling SelectFilter.load_dict()
                 """
-                self.filter_specs.sel_fil.load_dict() # update select_filter widget
-            self.filter_specs.load_dict() # Pass new filter data from the global filter dict
+                self.input_filter_specs.sel_fil.load_dict() # update select_filter widget
+            self.input_filter_specs.load_dict() # Pass new filter data from the global filter dict
         else:
             logger.debug("Dict {0} passed thru".format(dict_sig))
 

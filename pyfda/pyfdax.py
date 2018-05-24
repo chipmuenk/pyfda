@@ -204,7 +204,7 @@ class pyFDA(QMainWindow):
         #aboutAction.triggered.connect(self.aboutWindow) 
 
         # trigger the close event in response to sigQuit generated in another subwidget:
-        inputTabWidgets.filter_specs.sigQuit.connect(self.close)
+        inputTabWidgets.input_filter_specs.sigQuit.connect(self.close)
 
         # when a message has been written, pass it via signal-slot mechanism and
         # print it to logger window
