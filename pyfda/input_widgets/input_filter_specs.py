@@ -70,6 +70,14 @@ class Input_Filter_Specs(QWidget):
             self.update_UI(dict_sig)
             self.color_design_button("changed")
         elif 'data_changed' in dict_sig:
+            if dict_sig['data_changed'] == 'filter_loaded':
+                """
+                Called when a new filter has been LOADED:
+                Pass new filter data from the global filter dict by
+                specifically calling SelectFilter.load_dict()
+                """
+                self.sel_fil.load_dict() # update select_filter widget
+            self.load_dict() # Pass new filter data from the global filter dict
             self.color_design_button("ok")
         
 

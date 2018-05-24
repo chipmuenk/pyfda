@@ -55,7 +55,6 @@ class InputTabWidgets(QWidget):
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("input_tabs")
         #
-        # TODO: remove hardcoded references to input_filter_specs in process_sig_rx
         # TODO: input_filter_specs creates infinite loop
         # TODO: remove hardcoded references in pyfdax.py to input_filter_specs
         self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
@@ -89,6 +88,7 @@ class InputTabWidgets(QWidget):
         if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDL_Specs(self)
             tabWidget.addTab(self.hdlSpecs, 'HDL')
+            #self.sig_tx.connect(self.hdlSpecs.sig_rx)
   
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -123,20 +123,8 @@ class InputTabWidgets(QWidget):
             logger.warning("Prevented Infinite Loop!")
             return
         elif 'specs_changed' in dict_sig:
-            #self.input_filter_specs.color_design_button("changed")
             if HAS_MYHDL:
                 self.hdlSpecs.update_UI()
-
-        elif 'data_changed' in dict_sig:
-            if dict_sig['data_changed'] == 'filter_loaded':
-                #self.input_filter_specs.color_design_button("ok")
-                """
-                Called when a new filter has been LOADED:
-                Pass new filter data from the global filter dict by
-                specifically calling SelectFilter.load_dict()
-                """
-                self.input_filter_specs.sel_fil.load_dict() # update select_filter widget
-            self.input_filter_specs.load_dict() # Pass new filter data from the global filter dict
         else:
             logger.debug("Dict {0} passed thru".format(dict_sig))
 
