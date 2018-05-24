@@ -22,7 +22,7 @@ from pyfda.pyfda_io_lib import CSV_option_box
 from pyfda.pyfda_lib import to_html
 from pyfda.pyfda_rc import params
 
-class FilterPZ_UI(QWidget):
+class Input_PZ_UI(QWidget):
     """
     Create the UI for the FilterPZ class
     """
@@ -34,7 +34,7 @@ class FilterPZ_UI(QWidget):
         """
         Pass instance `parent` of parent class (FilterCoeffs)
         """
-        super(FilterPZ_UI, self).__init__(parent)
+        super(Input_PZ_UI, self).__init__(parent)
 #        self.parent = parent # instance of the parent (not the base) class
         self.eps = 1.e-4 # # tolerance value for e.g. setting P/Z to zero
         
@@ -284,7 +284,7 @@ if __name__ == '__main__':
     from ..compat import QApplication
 
     app = QApplication(sys.argv)
-    mainw = FilterPZ_UI(None)
+    mainw = Input_PZ_UI(None)
 
     app.setActiveWindow(mainw)
     mainw.show()

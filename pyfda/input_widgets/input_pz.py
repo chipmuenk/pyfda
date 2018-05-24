@@ -32,7 +32,7 @@ from pyfda.pyfda_lib import fil_save, safe_eval, unichr_23
 
 from pyfda.pyfda_rc import params
 
-from .filter_pz_ui import FilterPZ_UI
+from .input_pz_ui import Input_PZ_UI
 
 
 class ItemDelegate(QStyledItemDelegate):
@@ -50,7 +50,7 @@ class ItemDelegate(QStyledItemDelegate):
     """
     def __init__(self, parent):
         """
-        Pass instance `parent` of parent class (FilterPZ)
+        Pass instance `parent` of parent class (Input_PZ)
         """
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
@@ -165,7 +165,7 @@ class ItemDelegateAnti(QStyledItemDelegate):
     """
     def __init__(self, parent):
         """
-        Pass instance `parent` of parent class (FilterPZ)
+        Pass instance `parent` of parent class (Input_PZ)
         """
         super(ItemDelegateAnti, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
@@ -174,7 +174,7 @@ class ItemDelegateAnti(QStyledItemDelegate):
         return "{:.{n_digits}g}".format(safe_eval(qstr(text), return_type='cmplx'), 
                 n_digits = params['FMT_pz'])
 
-class FilterPZ(QWidget):
+class Input_PZ(QWidget):
     """
     Create the window for entering exporting / importing and saving / loading data
     """
@@ -182,13 +182,16 @@ class FilterPZ(QWidget):
     sig_tx = pyqtSignal(object) # emitted when filter has been saved
 
     def __init__(self, parent):
-        super(FilterPZ, self).__init__(parent)
+        super(Input_PZ, self).__init__(parent)
 
         self.Hmax_last = 1  # initial setting for maximum gain
         self.angle_char = "<" # "∠" may give problems with some encodings
         self.angle_char = unichr_23(int('2220', 16))
+        
+        self.tab_label = "P/Z"
+        self.tool_tip = "Display and edit filter poles and zeros."
 
-        self.ui = FilterPZ_UI(self) # create the UI part with buttons etc.
+        self.ui = Input_PZ_UI(self) # create the UI part with buttons etc.
         self.norm_last = qget_cmb_box(self.ui.cmbNorm, data=False) # initial setting of cmbNorm
         self._construct_UI() # construct the rest of the UI
 
@@ -326,7 +329,7 @@ class FilterPZ(QWidget):
                 self._restore_gain(source) # display in desired format
                 return True
 
-        return super(FilterPZ, self).eventFilter(source, event)
+        return super(Input_PZ, self).eventFilter(source, event)
 
 #------------------------------------------------------------------------------
     def _store_gain(self, source):
@@ -489,7 +492,7 @@ class FilterPZ(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_pz'})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'input_pz'})
         # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
@@ -822,9 +825,9 @@ class FilterPZ(QWidget):
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-
+    """ Test with python -m pyfda.input_widgets.input_pz"""
     app = QApplication(sys.argv)
-    mainw = FilterPZ(None)
+    mainw = Input_PZ(None)
 
     app.setActiveWindow(mainw)
     mainw.show()

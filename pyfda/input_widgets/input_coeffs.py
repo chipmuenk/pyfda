@@ -62,7 +62,7 @@ class ItemDelegate(QStyledItemDelegate):
     """
     def __init__(self, parent):
         """
-        Pass instance `parent` of parent class (FilterCoeffs)
+        Pass instance `parent` of parent class (Input_Coeffs)
         """
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
@@ -271,7 +271,7 @@ class Input_Coeffs(QWidget):
     sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
 
     def __init__(self, parent):
-        super(Filter_Coeffs, self).__init__(parent)
+        super(Input_Coeffs, self).__init__(parent)
 
         self.opt_widget = None # handle for pop-up options widget
         self.tool_tip = "Display and edit filter coefficients."
@@ -729,7 +729,7 @@ class Input_Coeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_coeffs'})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'input_coeffs'})
         # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
@@ -889,7 +889,7 @@ class Input_Coeffs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    """ Test with python -m pyfda.input_widgets.filter_coeffs """
+    """ Test with python -m pyfda.input_widgets.input_coeffs """
     app = QApplication(sys.argv)
     mainw = Input_Coeffs(None)
 

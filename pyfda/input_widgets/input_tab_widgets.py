@@ -22,7 +22,7 @@ from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import cmp_version
 
 from pyfda.input_widgets import (filter_specs, file_io, input_coeffs,
-                                filter_info, filter_pz)
+                                filter_info, input_pz)
 
 if cmp_version("myhdl", "0.10") >= 0:
     from pyfda.fixpoint_filters import hdl_specs
@@ -61,16 +61,16 @@ class InputTabWidgets(QWidget):
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
-        self.filter_coeffs = filter_coeffs.Filter_Coeffs(self)
-        self.filter_coeffs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.filter_coeffs.sig_rx)
-        tabWidget.addTab(self.filter_coeffs, 'b,a')
+        self.input_coeffs = input_coeffs.Input_Coeffs(self)
+        self.input_coeffs.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.input_coeffs.sig_rx)
+        tabWidget.addTab(self.input_coeffs, 'b,a')
         tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
         #
-        self.filter_pz = filter_pz.FilterPZ(self)
-        self.filter_pz.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.filter_pz.sig_rx)
-        tabWidget.addTab(self.filter_pz, 'P/Z')
+        self.input_pz = input_pz.Input_PZ(self)
+        self.input_pz.sig_tx.connect(self.sig_rx)
+        self.sig_tx.connect(self.input_pz.sig_rx)
+        tabWidget.addTab(self.input_pz, 'P/Z')
         tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
         #
         self.file_io = file_io.File_IO(self)
