@@ -21,7 +21,7 @@ SCROLL = True
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import cmp_version
 
-from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
+from pyfda.input_widgets import (filter_specs, file_io, input_coeffs,
                                 filter_info, filter_pz)
 
 if cmp_version("myhdl", "0.10") >= 0:
@@ -57,11 +57,11 @@ class InputTabWidgets(QWidget):
         #
         self.filter_specs = filter_specs.FilterSpecs(self)
         self.filter_specs.sig_tx.connect(self.sig_rx)
-        #self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)
+        self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)
         tabWidget.addTab(self.filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #
-        self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
+        self.filter_coeffs = filter_coeffs.Filter_Coeffs(self)
         self.filter_coeffs.sig_tx.connect(self.sig_rx)
         self.sig_tx.connect(self.filter_coeffs.sig_rx)
         tabWidget.addTab(self.filter_coeffs, 'b,a')

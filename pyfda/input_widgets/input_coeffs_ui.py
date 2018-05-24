@@ -23,7 +23,7 @@ from pyfda.pyfda_io_lib import CSV_option_box
  
 from pyfda.pyfda_rc import params
 
-class FilterCoeffs_UI(QWidget):
+class Input_Coeffs_UI(QWidget):
     """
     Create the UI for the FilterCoeffs class
     """
@@ -31,7 +31,7 @@ class FilterCoeffs_UI(QWidget):
     sig_tx = pyqtSignal(dict) # outgoing
 
     def __init__(self, parent):
-        super(FilterCoeffs_UI, self).__init__(parent)
+        super(Input_Coeffs_UI, self).__init__(parent)
         self.eps = 1.e-6 # initialize tolerance value
         """
         Intitialize the widget, consisting of:
@@ -421,7 +421,7 @@ if __name__ == '__main__':
     from ..compat import QApplication
 
     app = QApplication(sys.argv)
-    mainw = FilterCoeffs_UI(None)
+    mainw = Input_Coeffs_UI(None)
 
     app.setActiveWindow(mainw)
     mainw.show()

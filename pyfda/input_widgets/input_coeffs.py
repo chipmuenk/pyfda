@@ -30,7 +30,7 @@ from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-from .filter_coeffs_ui import FilterCoeffs_UI
+from .input_coeffs_ui import Input_Coeffs_UI
 
 # TODO: implement checking for complex-valued filters somewhere (pyfda_lib?),
 #       h[n] detects complex data (although it isn't)
@@ -251,7 +251,7 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
 
 
-class FilterCoeffs(QWidget):
+class Input_Coeffs(QWidget):
     """
     Create widget with a (sort of) model-view architecture for viewing /
     editing / entering data contained in `self.ba` which is a list of two numpy
@@ -271,10 +271,13 @@ class FilterCoeffs(QWidget):
     sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
 
     def __init__(self, parent):
-        super(FilterCoeffs, self).__init__(parent)
+        super(Filter_Coeffs, self).__init__(parent)
 
         self.opt_widget = None # handle for pop-up options widget
-        self.ui = FilterCoeffs_UI(self) # create the UI part with buttons etc.
+        self.tool_tip = "Display and edit filter coefficients."
+        self.tab_label = "b,a"
+
+        self.ui = Input_Coeffs_UI(self) # create the UI part with buttons etc.
         self._construct_UI()
         
 #------------------------------------------------------------------------------
@@ -888,7 +891,7 @@ class FilterCoeffs(QWidget):
 if __name__ == '__main__':
     """ Test with python -m pyfda.input_widgets.filter_coeffs """
     app = QApplication(sys.argv)
-    mainw = FilterCoeffs(None)
+    mainw = Input_Coeffs(None)
 
     app.setActiveWindow(mainw)
     mainw.show()
