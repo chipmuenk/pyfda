@@ -39,7 +39,13 @@ class HDL_Specs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
+    # emit a signal when the image has been resized
     sig_resize = pyqtSignal()
+    # incoming, connected to input_tab_widget.sig_tx in pyfdax
+    sig_rx = pyqtSignal(object)
+    # outgoing: emitted by process_sig_rx
+    # sig_tx = pyqtSignal(object)
+
     def __init__(self, parent):
         super(HDL_Specs, self).__init__(parent)
 
@@ -60,7 +66,8 @@ class HDL_Specs(QWidget):
         if 'specs_changed' in dict_sig:
             # update fields in the filter topology widget - wordlength may have
             # been changed
-            pass
+            self.update_UI()
+
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -189,6 +196,11 @@ class HDL_Specs(QWidget):
         layVMain.setContentsMargins(*params['wdg_margins'])
 
         self.setLayout(layVMain)
+
+        #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS

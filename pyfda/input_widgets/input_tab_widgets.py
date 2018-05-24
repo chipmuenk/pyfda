@@ -56,6 +56,7 @@ class InputTabWidgets(QWidget):
         tabWidget.setObjectName("input_tabs")
         #
         # TODO: input_filter_specs creates infinite loop
+        # TODO: infinite loop in input_coeffs / input_pz
         # TODO: remove hardcoded references in pyfdax.py to input_filter_specs
         self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
         self.input_filter_specs.sig_tx.connect(self.sig_rx)
@@ -122,11 +123,6 @@ class InputTabWidgets(QWidget):
         if dict_sig['sender'] == __name__:
             logger.warning("Prevented Infinite Loop!")
             return
-        elif 'specs_changed' in dict_sig:
-            if HAS_MYHDL:
-                self.hdlSpecs.update_UI()
-        else:
-            logger.debug("Dict {0} passed thru".format(dict_sig))
 
         self.sig_tx.emit(dict_sig)
 
