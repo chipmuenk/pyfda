@@ -55,9 +55,7 @@ class InputTabWidgets(QWidget):
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("input_tabs")
         #
-        # TODO: input_filter_specs creates infinite loop
-        # TODO: infinite loop in input_coeffs / input_pz
-        # TODO: input_coeffs / input_pz no longer trigger "manual filter"
+        # TODO: document signal options
         # TODO: remove hardcoded references in pyfdax.py to input_filter_specs
         self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
         self.input_filter_specs.sig_tx.connect(self.sig_rx)
