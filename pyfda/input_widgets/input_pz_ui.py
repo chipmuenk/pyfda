@@ -279,7 +279,7 @@ class Input_PZ_UI(QWidget):
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Test with python -m pyfda.input_widgets.filter_pz_ui """
+    """ Test with python -m pyfda.input_widgets.input_pz_ui """
     import sys
     from ..compat import QApplication
 

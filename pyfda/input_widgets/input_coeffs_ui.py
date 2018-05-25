@@ -416,7 +416,7 @@ class Input_Coeffs_UI(QWidget):
 
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """ Test with python -m pyfda.input_widgets.filter_coeffs_ui """
+    """ Test with python -m pyfda.input_widgets.input_coeffs_ui """
     import sys
     from ..compat import QApplication
 
