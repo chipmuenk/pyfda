@@ -59,7 +59,7 @@ class InputTabWidgets(QWidget):
         # TODO: remove hardcoded references in pyfdax.py to input_filter_specs
         self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
         self.input_filter_specs.sig_tx.connect(self.sig_rx)
-        #self.sig_tx.connect(self.input_filter_specs.sig_rx)   # comment out (infinite loop)
+        self.sig_tx.connect(self.input_filter_specs.sig_rx)   # comment out (infinite loop)
         tabWidget.addTab(self.input_filter_specs, 'Specs')
         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
         #

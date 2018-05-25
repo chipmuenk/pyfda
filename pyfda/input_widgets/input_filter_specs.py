@@ -191,8 +191,7 @@ class Input_Filter_Specs(QWidget):
         the filter tree [fb.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
-        Then, the UIs of all subwidgets are updated using their "update_UI" method,
-        finally sig_tx({'specs_changed':'filter'}) is emitted.
+        Then, the UIs of all subwidgets are updated using their "update_UI" method.
         """
         logger.debug("updating ui")
         rt = fb.fil[0]['rt'] # e.g. 'LP'
@@ -253,9 +252,6 @@ class Input_Filter_Specs(QWidget):
             self.lblMsg.setText(all_widgets['msg'][1:][0])
         else:
             self.frmMsg.hide()
-
-        dict_sig.update({'sender':__name__, 'specs_changed':'filter'})
-        self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------
     def load_dict(self):

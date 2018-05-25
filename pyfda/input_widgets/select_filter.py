@@ -39,7 +39,7 @@ class SelectFilter(QWidget):
       response resp. filter type is read and the combo box(es) further down in
       the hierarchy are populated according to the available combinations.
 
-      sig_tx({ 'filt_changed'}) is emitted and propagated to filter_specs.py
+      sig_tx({'filt_changed'}) is emitted and propagated to input_filter_specs.py
       where it triggers the recreation of all subwidgets.
     """
     sig_tx = pyqtSignal(object) # outgoing
