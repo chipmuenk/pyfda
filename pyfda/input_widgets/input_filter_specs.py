@@ -77,8 +77,8 @@ class Input_Filter_Specs(QWidget):
                 specifically calling SelectFilter.load_dict()
                 """
                 self.sel_fil.load_dict() # update select_filter widget
-            self.load_dict() # Pass new filter data from the global filter dict
-            self.color_design_button("ok")
+            # Pass new filter data from the global filter dict & set button = "ok"
+            self.load_dict() 
         
 
     def _construct_UI(self):
