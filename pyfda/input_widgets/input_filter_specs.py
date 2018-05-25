@@ -194,6 +194,7 @@ class Input_Filter_Specs(QWidget):
         Then, the UIs of all subwidgets are updated using their "update_UI" method,
         finally sig_tx({'specs_changed':'filter'}) is emitted.
         """
+        logger.debug("updating ui")
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
