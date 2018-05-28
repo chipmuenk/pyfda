@@ -30,7 +30,7 @@ except ImportError:
     matplotlib.use("Qt4Agg")
 
 from .compat import (Qt, QtCore, QMainWindow, QApplication, QSplitter, QIcon, 
-                     QMessageBox, QPlainTextEdit, QAction, QMenu)
+                     QMessageBox, QPlainTextEdit, QAction, QMenu, pyqtSignal)
 
 from pyfda.pyfda_lib import to_html
 
@@ -54,7 +54,7 @@ class XStream(QtCore.QObject):
     Overrides stdout to print messages to textWidget 
     """
     _stdout = None
-    messageWritten = QtCore.pyqtSignal(str) # pass str to slot
+    messageWritten = pyqtSignal(str) # pass str to slot
 
     def flush( self ):
         pass
@@ -119,6 +119,8 @@ class pyFDA(QMainWindow):
     QMainWindow is used here as it is a class that understands GUI elements like
     toolbar, statusbar, central widget, docking areas etc.
     """
+    sig_rx = pyqtSignal(object) # incoming 
+    # sig_tx = pyqtSignal(object) # outgoing
 
     def __init__(self, parent=None):
         super(QMainWindow,self).__init__()
@@ -193,6 +195,11 @@ class pyFDA(QMainWindow):
 #        self.statusMessage("Application is initialized.")
 
         #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+
+        #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # Here, signals about spec and design changes from lower hierarchies
@@ -204,12 +211,23 @@ class pyFDA(QMainWindow):
         #aboutAction.triggered.connect(self.aboutWindow) 
 
         # trigger the close event in response to sigQuit generated in another subwidget:
-        inputTabWidgets.input_filter_specs.sigQuit.connect(self.close)
+        # inputTabWidgets.input_filter_specs.sigQuit.connect(self.close)
 
         # when a message has been written, pass it via signal-slot mechanism and
         # print it to logger window
         XStream.stdout().messageWritten.connect(self.loggerWin.appendHtml)
 
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from sig_rx:
+        - trigger close event in response to 'quit_program' emitted in another subwidget:
+
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if 'quit_program' in dict_sig:
+            self.closeEvent()
+   
 #==============================================================================
 #     def statusMessage(self, message):
 #         """
