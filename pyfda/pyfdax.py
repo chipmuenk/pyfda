@@ -206,6 +206,7 @@ class pyFDA(QMainWindow):
         # are distributed. At the moment, only changes in the input widgets are
         # routed to the plot widgets:
         inputTabWidgets.sig_tx.connect(pltTabWidgets.sig_rx)
+        inputTabWidgets.sig_tx.connect(self.process_sig_rx)
         
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 
@@ -226,8 +227,8 @@ class pyFDA(QMainWindow):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if 'quit_program' in dict_sig:
-            self.closeEvent()
-   
+            self.close()
+
 #==============================================================================
 #     def statusMessage(self, message):
 #         """
