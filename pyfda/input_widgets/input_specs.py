@@ -29,7 +29,7 @@ from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
 
-class Input_Filter_Specs(QWidget):
+class Input_Specs(QWidget):
     """
     Build widget for entering all filter specs
     """
@@ -38,7 +38,7 @@ class Input_Filter_Specs(QWidget):
     sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
-        super(Input_Filter_Specs, self).__init__(parent)
+        super(Input_Specs, self).__init__(parent)
         self.tab_label =  "Specs"
         self.tool_tip = "Enter and view filter specifications."
 
@@ -191,7 +191,6 @@ class Input_Filter_Specs(QWidget):
 
         Then, the UIs of all subwidgets are updated using their "update_UI" method.
         """
-        logger.debug("updating ui")
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
         fc = fb.fil[0]['fc'] # e.g. 'equiripple'
@@ -351,7 +350,7 @@ class Input_Filter_Specs(QWidget):
 if __name__ == '__main__':
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = Input_Filter_Specs(None)
+    mainw = Input_Specs(None)
     app.setActiveWindow(mainw)
     mainw.show()
 
