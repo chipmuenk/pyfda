@@ -55,8 +55,8 @@ class InputTabWidgets(QWidget):
         """
         tabWidget = QTabWidget(self)
 
-        inst_wdg_list = "" # successfully instantiated plot widgets
-        n_wdg = 0 # number of successfully instantiated plot widgets
+        n_wdg = 0 # number of ... 
+        inst_wdg_list = "" # ... successfully instantiated widgets
         #
         for i, wdg in enumerate(fb.input_widgets_list):
             if not wdg[1]:
@@ -77,20 +77,22 @@ class InputTabWidgets(QWidget):
             mod_name = pckg_name + '.' + wdg[0].lower()
             class_name = pckg_name + '.' + wdg[0]
 
-            try:  # Try to import the module from the package and get a handle:
-                input_mod = importlib.import_module(mod_name)
-                input_class = getattr(input_mod, wdg[0])
-                input_inst = input_class(self)
-                if hasattr(input_inst, 'tab_label'):
-                    tabWidget.addTab(input_inst, input_inst.tab_label)
+            try:  # Try to import the module from the package ...
+                mod = importlib.import_module(mod_name)
+                # get the class belonging to wdg[0] ...
+                wdg_class = getattr(mod, wdg[0])
+                # and instantiate it
+                inst = wdg_class(self)
+                if hasattr(inst, 'tab_label'):
+                    tabWidget.addTab(inst, inst.tab_label)
                 else:
-                    tabWidget.addTab(input_inst, str(i))
-                if hasattr(input_inst, 'tool_tip'):
-                    tabWidget.setTabToolTip(i, input_inst.tool_tip)
-                if hasattr(input_inst, 'sig_tx'):
-                    input_inst.sig_tx.connect(self.sig_rx)
-                if hasattr(input_inst, 'sig_rx'):
-                    self.sig_tx.connect(input_inst.sig_rx)
+                    tabWidget.addTab(inst, str(i))
+                if hasattr(inst, 'tool_tip'):
+                    tabWidget.setTabToolTip(i, inst.tool_tip)
+                if hasattr(inst, 'sig_tx'):
+                    inst.sig_tx.connect(self.sig_rx)
+                if hasattr(inst, 'sig_rx'):
+                    self.sig_tx.connect(inst.sig_rx)
 
                 inst_wdg_list += '\t' + class_name + '\n'
                 n_wdg += 1
@@ -103,10 +105,6 @@ class InputTabWidgets(QWidget):
                 logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
                                .format(wdg[0], mod_name, e))
                 continue
-
-            #except Exception as e:
-             #   logger.warning("Unexpected error during module import:\n{0}".format(e))
-              #  continue
 
         if len(inst_wdg_list) == 0:
             logger.warning("No input widgets found!")
