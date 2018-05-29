@@ -10,7 +10,8 @@
 Tabbed container for all input widgets
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
+import sys, os
+import importlib
 import logging
 logger = logging.getLogger(__name__)
 
@@ -20,9 +21,9 @@ SCROLL = True
 
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import cmp_version
+import pyfda.filterbroker as fb
 
-from pyfda.input_widgets import (input_filter_specs, file_io, input_coeffs,
-                                 filter_info, input_pz)
+from pyfda.input_widgets import (file_io, filter_info)
 
 if cmp_version("myhdl", "0.10") >= 0:
     from pyfda.fixpoint_filters import hdl_specs
@@ -53,28 +54,91 @@ class InputTabWidgets(QWidget):
         subwidgets.
         """
         tabWidget = QTabWidget(self)
-        tabWidget.setObjectName("input_tabs")
+
+        inst_wdg_list = "" # successfully instantiated plot widgets
+        n_wdg = 0 # number of successfully instantiated plot widgets
+        #
+        for i, wdg in enumerate(fb.input_widgets_list):
+            if not wdg[1]:
+                # use standard input widgets package
+                pckg_name = 'pyfda.input_widgets'
+            else:
+                # check and extract user directory
+                if os.path.isdir(wdg[1]):
+                    pckg_path = os.path.normpath(wdg[1])
+                    # split the path into the dir containing the module and its name
+                    user_dir_name, pckg_name = os.path.split(pckg_path)
+
+                    if user_dir_name not in sys.path:
+                        sys.path.append(user_dir_name)
+                else:
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
+                    continue
+            mod_name = pckg_name + '.' + wdg[0].lower()
+            class_name = pckg_name + '.' + wdg[0]
+
+            try:  # Try to import the module from the package and get a handle:
+                input_mod = importlib.import_module(mod_name)
+                input_class = getattr(input_mod, wdg[0])
+                input_inst = input_class(self)
+                if hasattr(input_inst, 'tab_label'):
+                    tabWidget.addTab(input_inst, input_inst.tab_label)
+                else:
+                    tabWidget.addTab(input_inst, str(i))
+                if hasattr(input_inst, 'tool_tip'):
+                    tabWidget.setTabToolTip(i, input_inst.tool_tip)
+                if hasattr(input_inst, 'sig_tx'):
+                    input_inst.sig_tx.connect(self.sig_rx)
+                if hasattr(input_inst, 'sig_rx'):
+                    self.sig_tx.connect(input_inst.sig_rx)
+
+                inst_wdg_list += '\t' + class_name + '\n'
+                n_wdg += 1
+
+            except ImportError as e:
+                logger.warning('Module "{0}" could not be imported.\n{1}'\
+                               .format(mod_name, e))
+                continue
+            except AttributeError as e:
+                logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
+                               .format(wdg[0], mod_name, e))
+                continue
+
+            #except Exception as e:
+             #   logger.warning("Unexpected error during module import:\n{0}".format(e))
+              #  continue
+
+        if len(inst_wdg_list) == 0:
+            logger.warning("No input widgets found!")
+        else:
+            logger.info("Imported {0:d} input classes:\n{1}".format(n_wdg, inst_wdg_list))
+
+
+
+
         #
         # TODO: document signal options
         # TODO: remove hardcoded references in pyfdax.py to input_filter_specs
-        self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
-        self.input_filter_specs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.input_filter_specs.sig_rx)   # comment out (infinite loop)
-        tabWidget.addTab(self.input_filter_specs, 'Specs')
-        tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
-        #
-        self.input_coeffs = input_coeffs.Input_Coeffs(self)
-        self.input_coeffs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.input_coeffs.sig_rx)
-        tabWidget.addTab(self.input_coeffs, 'b,a')
-        tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
-        #
-        self.input_pz = input_pz.Input_PZ(self)
-        self.input_pz.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.input_pz.sig_rx)
-        tabWidget.addTab(self.input_pz, 'P/Z')
-        tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
-        #
+# =============================================================================
+#         self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
+#         self.input_filter_specs.sig_tx.connect(self.sig_rx)
+#         self.sig_tx.connect(self.input_filter_specs.sig_rx)   # comment out (infinite loop)
+#         tabWidget.addTab(self.input_filter_specs, 'Specs')
+#         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
+#         #
+#         self.input_coeffs = input_coeffs.Input_Coeffs(self)
+#         self.input_coeffs.sig_tx.connect(self.sig_rx)
+#         self.sig_tx.connect(self.input_coeffs.sig_rx)
+#         tabWidget.addTab(self.input_coeffs, 'b,a')
+#         tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
+#         #
+#         self.input_pz = input_pz.Input_PZ(self)
+#         self.input_pz.sig_tx.connect(self.sig_rx)
+#         self.sig_tx.connect(self.input_pz.sig_rx)
+#         tabWidget.addTab(self.input_pz, 'P/Z')
+#         tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
+#         #
+# =============================================================================
         self.file_io = file_io.File_IO(self)
         self.file_io.sig_tx.connect(self.sig_rx)
         tabWidget.addTab(self.file_io, 'Files')
