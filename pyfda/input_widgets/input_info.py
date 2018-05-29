@@ -36,14 +36,18 @@ if mod_version('docutils') is not None:
 else:
     HAS_DOCUTILS = False
 
-class FilterInfo(QWidget):
+class Input_Info(QWidget):
     """
-    Create widget for displaying infos about filter and filter design method
+    Create widget for displaying infos about filter specs and filter design method
     """
     sig_rx = pyqtSignal(object) # incoming signals from input_tab_widgets
 
     def __init__(self, parent):
-        super(FilterInfo, self).__init__(parent)
+        super(Input_Info, self).__init__(parent)
+        
+        self.tab_label = 'Info'
+        self.tool_tip = ("<span>Display the achieved filter specifications"
+                " and more info about the filter design algorithm.</span>")       
         
         self._construct_UI()
         self.load_dict()
@@ -427,7 +431,7 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = FilterInfo(None)
+    mainw = Input_Info(None)
 
     app.setActiveWindow(mainw) 
     mainw.show()
