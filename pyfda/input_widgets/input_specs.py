@@ -50,15 +50,17 @@ class Input_Specs(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.warning("Infinite Loop!")
+            logger.debug("Infinite Loop!")
             return
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()
             self.t_specs.load_dict()
+            dict_sig.update({'sender':__name__})
             self.sig_tx.emit(dict_sig)
         elif 'specs_changed' in dict_sig:
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()
+            dict_sig.update({'sender':__name__})
             self.sig_tx.emit(dict_sig)
             self.color_design_button("changed")
         elif 'filt_changed' in dict_sig:
