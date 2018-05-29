@@ -116,9 +116,6 @@ class HDL_Specs(QWidget):
             except ImportError:
                 logger.warning("Could not import {0}!".format(fx_fil_mod_name))
                 continue
-#            except Exception as e:
-#                logger.warning("Unexpected error during module import:\n{0}".format(e))
-#                continue
 
         if len(inst_wdg_list) == 0:
             logger.warning("No fixpoint filters found!")
@@ -267,7 +264,7 @@ class HDL_Specs(QWidget):
         else:
             self.fx_wdg_found = False
  
-#------------------------------------------------------------------------------
+##------------------------------------------------------------------------------
     def update_UI(self):
         """
         Update the UI after changing the filter class
