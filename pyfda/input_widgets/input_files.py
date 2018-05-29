@@ -54,14 +54,16 @@ else:
 #    XLRD = True
 
 
-class File_IO(QWidget):
+class Input_Files(QWidget):
     """
     Create the widget for saving / loading data
     """
     sig_tx = QtCore.pyqtSignal(object) # sent when loading filter ('data_changed')
 
     def __init__(self, parent):
-        super(File_IO, self).__init__(parent)
+        super(Input_Files, self).__init__(parent)
+        self.tab_label = 'Files'
+        self.tool_tip = "Load and save filter designs."
 
         self._construct_UI()
 
@@ -449,7 +451,7 @@ if __name__ == '__main__':
     from ..compat import QApplication
     import sys
     app = QApplication(sys.argv)
-    mainw = File_IO(None)
+    mainw = Input_Files(None)
 
     app.setActiveWindow(mainw)
     mainw.show()

@@ -23,8 +23,6 @@ from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import cmp_version
 import pyfda.filterbroker as fb
 
-from pyfda.input_widgets import file_io
-
 if cmp_version("myhdl", "0.10") >= 0:
     from pyfda.fixpoint_filters import hdl_specs
     HAS_MYHDL = True
@@ -113,11 +111,6 @@ class InputTabWidgets(QWidget):
 
         #
         # TODO: document signal options
-        self.file_io = file_io.File_IO(self)
-        self.file_io.sig_tx.connect(self.sig_rx)
-        tabWidget.addTab(self.file_io, 'Files')
-        tabWidget.setTabToolTip(3, "Load and save filter designs.")
-        #
         if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDL_Specs(self)
             tabWidget.addTab(self.hdlSpecs, 'HDL')
