@@ -113,32 +113,8 @@ class InputTabWidgets(QWidget):
         else:
             logger.info("Imported {0:d} input classes:\n{1}".format(n_wdg, inst_wdg_list))
 
-
-
-
         #
         # TODO: document signal options
-        # TODO: remove hardcoded references in pyfdax.py to input_filter_specs
-# =============================================================================
-#         self.input_filter_specs = input_filter_specs.Input_Filter_Specs(self)
-#         self.input_filter_specs.sig_tx.connect(self.sig_rx)
-#         self.sig_tx.connect(self.input_filter_specs.sig_rx)   # comment out (infinite loop)
-#         tabWidget.addTab(self.input_filter_specs, 'Specs')
-#         tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
-#         #
-#         self.input_coeffs = input_coeffs.Input_Coeffs(self)
-#         self.input_coeffs.sig_tx.connect(self.sig_rx)
-#         self.sig_tx.connect(self.input_coeffs.sig_rx)
-#         tabWidget.addTab(self.input_coeffs, 'b,a')
-#         tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
-#         #
-#         self.input_pz = input_pz.Input_PZ(self)
-#         self.input_pz.sig_tx.connect(self.sig_rx)
-#         self.sig_tx.connect(self.input_pz.sig_rx)
-#         tabWidget.addTab(self.input_pz, 'P/Z')
-#         tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
-#         #
-# =============================================================================
         self.file_io = file_io.File_IO(self)
         self.file_io.sig_tx.connect(self.sig_rx)
         tabWidget.addTab(self.file_io, 'Files')
