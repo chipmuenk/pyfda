@@ -66,7 +66,7 @@ class HDL_Specs(QWidget):
         if 'specs_changed' in dict_sig:
             # update fields in the filter topology widget - wordlength may have
             # been changed
-            self.update_UI()
+            self.update_wdg_UI()
 
 #------------------------------------------------------------------------------
 
@@ -121,7 +121,6 @@ class HDL_Specs(QWidget):
             logger.warning("No fixpoint filters found!")
         else:
             logger.info("Imported {0:d} fixpoint filters:\n{1}".format(n_wdg, inst_wdg_list))
-
 
         self.update_filt_wdg()
 #------------------------------------------------------------------------------        
@@ -285,6 +284,18 @@ class HDL_Specs(QWidget):
         self.lblTitle.setText(self.hdl_wdg_inst.title)
         self.layHWdg.addWidget(self.hdl_wdg_inst)
         self.layHWdg.addStretch()
+ 
+#------------------------------------------------------------------------------
+    def update_wdg_UI(self):
+        """
+        Update the fixpoint UI when specs have been changed outside this class
+        """
+        if hasattr(self.hdl_wdg_inst, "update_UI"): 
+            pass
+        else:
+            pass
+       
+
 
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
