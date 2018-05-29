@@ -319,13 +319,15 @@ class SelectFilter(QWidget):
                 # explicit list(dict.keys()) needed for Python 3
                 fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][fc].keys())[0]
 
-            logger.debug("selFilter = %s"
-                   "filterTree[fc] = %s"
-                   "filterTree[fc].keys() = %s"
-                  %(fb.fil[0], fb.fil_tree[self.rt][self.ft][fc],\
-                    fb.fil_tree[self.rt][self.ft][fc].keys()
-                    ))
-
+# =============================================================================
+#             logger.debug("selFilter = %s"
+#                    "filterTree[fc] = %s"
+#                    "filterTree[fc].keys() = %s"
+#                   %(fb.fil[0], fb.fil_tree[self.rt][self.ft][fc],\
+#                     fb.fil_tree[self.rt][self.ft][fc].keys()
+#                     ))
+# 
+# =============================================================================
             if hasattr(ff.fil_inst, 'construct_UI'): # construct dyn. subwidgets if available
                 self._construct_dyn_widgets()
 
