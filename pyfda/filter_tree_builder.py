@@ -213,12 +213,13 @@ class FilterTreeBuilder(object):
             dirs_dict = {i[0]:i[1] for i in conf.items('Dirs')} # convert list to dict
             dirs.USER_DIR = None
             try:
-                user_dir = os.path.normpath(dirs_dict['user_dir'])
+                user_dir = os.path.abspath(os.path.normpath(dirs_dict['user_dir']))
                 if os.path.exists(user_dir):
                     dirs.USER_DIR = user_dir
                     logger.info("User directory: {0}".format(user_dir))
                 else:
-                    logger.warning("User directory:\n\t'{0}' doesn't exist.".format(user_dir))
+                    logger.warning("User directory:\n\t'{0}' doesn't exist."\
+                                   .format(user_dir))
             except (AttributeError, KeyError):
                 logger.info("No user directory specified.")
                 
