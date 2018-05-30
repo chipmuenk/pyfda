@@ -31,7 +31,7 @@ class DF1(QWidget):
     """
     Create the widget for quantizing data and coef
     """
-    sig_rx = pyqtSignal(object)
+    #sig_rx = pyqtSignal(object)
     
     def __init__(self, parent):
         super(DF1, self).__init__(parent)
@@ -83,7 +83,8 @@ class DF1(QWidget):
     def update_UI(self):
         """
         Update all parts of the UI that need to be updated when specs have been
-        changed outside this class (e.g. coefficient wordlength)
+        changed outside this class (e.g. coefficient wordlength).
+        This is called from one level above.
         """
         self.wdg_w_coeffs.update()
 
