@@ -218,7 +218,6 @@ for k in fil_init:
 # List with plot widget class names found in the main configuration file,
 # parsed in filter_tree_builder.
 #------------------------------------------------------------------------------
-user_dir = None # Directory for user widgets
 
 input_widgets_list = [] 
 
