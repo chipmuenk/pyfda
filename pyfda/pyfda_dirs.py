@@ -141,3 +141,5 @@ if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
 #------------------------------------------------------------------------------
 # This is the place holder for storing where the last file was saved
 save_dir = HOME_DIR
+
+USER_DIR = None # Directory for user widgets

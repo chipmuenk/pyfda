@@ -211,16 +211,17 @@ class FilterTreeBuilder(object):
             # Parsing directories and modules [Dirs]
             #------------------------------------------------------------------
             dirs_dict = {i[0]:i[1] for i in conf.items('Dirs')} # convert list to dict
+            dirs.USER_DIR = None
             try:
                 user_dir = os.path.normpath(dirs_dict['user_dir'])
                 if os.path.exists(user_dir):
-                    fb.user_dir = user_dir
+                    dirs.USER_DIR = user_dir
                     logger.info("User directory: {0}".format(user_dir))
                 else:
                     logger.warning("User directory:\n\t'{0}' doesn't exist.".format(user_dir))
             except (AttributeError, KeyError):
                 logger.info("No user directory specified.")
-                fb.user_wdg_dir = None
+                
 
             # -----------------------------------------------------------------
             # Parsing [Input Widgets] and [User Input Widgets]
@@ -232,8 +233,8 @@ class FilterTreeBuilder(object):
                 raise configparser.NoOptionError('No entries in [Input Widgets].' )
             # Append a list of tuples ("user_class","user_dir") where "user_class"
             # is the class name of a user input widget and "user_dir" is its dir: 
-            if fb.user_dir:
-                user_widgets_dir = os.path.join(fb.user_dir,'input_widgets')
+            if dirs.USER_DIR:
+                user_widgets_dir = os.path.join(dirs.USER_DIR,'input_widgets')
                 if os.path.exists(user_widgets_dir):
                     try:
                         user_widgets_list = conf.items("User Input Widgets")
@@ -257,8 +258,8 @@ class FilterTreeBuilder(object):
             fb.plot_widgets_list = conf.items("Plot Widgets")
             # Append a list of tuples ("user_class","user_dir") where "user_class"
             # is the class name of a user plotting widget and "user_dir" is its dir: 
-            if fb.user_dir:
-                user_widgets_dir = os.path.join(fb.user_dir,'plot_widgets')
+            if dirs.USER_DIR:
+                user_widgets_dir = os.path.join(dirs.USER_DIR,'plot_widgets')
                 if os.path.exists(user_widgets_dir):
                     try:
                         user_widgets_list = conf.items("User Plot Widgets")
@@ -284,8 +285,8 @@ class FilterTreeBuilder(object):
                 raise configparser.NoOptionError('No entries in [Filter Designs].')
             # Append a list of tuples ("user_class","user_dir") where "user_class"
             # is the class name of a user filter design and "user_dir" is its dir: 
-            if fb.user_dir:
-                user_widgets_dir = os.path.join(fb.user_dir, 'filter_designs')
+            if dirs.USER_DIR:
+                user_widgets_dir = os.path.join(dirs.USER_DIR, 'filter_designs')
                 if os.path.exists(user_widgets_dir):
                     try:
                         user_widgets_list = conf.items("User Input Widgets")
