@@ -33,7 +33,7 @@ def build_coeff_dict(frmt=None):
     -----------
     frmt: string
 
-    One of the following options: 'hex' (default), 'bin', 'dec', 'csd'
+    One of the following options: 'dec' (default), 'hex', 'bin', 'csd'
 
     Returns:
     --------
@@ -58,7 +58,7 @@ def build_coeff_dict(frmt=None):
     Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
     Q_coeff.setQobj(fb.fil[0]['q_coeff'])
     if not frmt:
-        Q_coeff.frmt = 'hex' # use hex format for coefficients by default
+        Q_coeff.frmt = 'dec' # use decimal format for coefficients by default
     else:
         Q_coeff.frmt = frmt # use the function argument
 
@@ -152,6 +152,20 @@ class UI_WI_WF(QWidget):
         self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
         self.ledWF.setText(qstr(self.WF))
 
+#------------------------------------------------------------------------------
+class UI_WI_WF_coeffs(UI_WI_WF):
+    """
+    Widget for entering word format (integer and fractional bits) for the 
+    oefficients. The result can be read out via the attributes `self.WI` and 
+    `self.WF`.
+    """
+    def __init__(self, parent, **kwargs):
+        super(UI_WI_WF_coeffs, self).__init__(parent)
+        self._construct_UI(**kwargs)
+        
+    def update(self):
+        self.c_dict = build_coeff_dict()
+        
 #==============================================================================
 
 class UI_Q_Ovfl(QWidget):
