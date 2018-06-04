@@ -146,7 +146,10 @@ class UI_WI_WF(QWidget):
 
     #--------------------------------------------------------------------------
     def _update_ui(self):
-        """ Update the attributes `self.WI` and `self.WF` """
+        """ 
+        Update the attributes `self.WI` and `self.WF` when one of the QLineEdit
+        widgets has been edited.
+        """
         self.WI = safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos')
         self.ledWI.setText(qstr(self.WI))
         self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
@@ -160,8 +163,8 @@ class UI_WI_WF_coeffs(UI_WI_WF):
     `self.WF`.
     """
     def __init__(self, parent, **kwargs):
-        super(UI_WI_WF_coeffs, self).__init__(parent)
-        self._construct_UI(**kwargs)
+        super(UI_WI_WF_coeffs, self).__init__(parent, **kwargs)
+        # parent's __init__ method is used
         
     def update(self):
         self.c_dict = build_coeff_dict()
