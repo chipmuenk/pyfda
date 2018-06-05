@@ -194,8 +194,8 @@ class UI_W_coeffs(UI_WI_WF):
         format has been changed outside the class, e.g. by a new filter design or
         by changing the coefficient format in `input_coeffs.py`.
         """
-        self.WI = fb.fil[0]['coeffs']['WI']
-        self.WF = fb.fil[0]['coeffs']['WF']
+        self.WI = fb.fil[0]['q_coeff']['WI']
+        self.WF = fb.fil[0]['q_coeff']['WF']
         self.ledWI.setText(qstr(self.WI))
         self.ledWF.setText(qstr(self.WF))
 
