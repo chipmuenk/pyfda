@@ -678,14 +678,14 @@ class Input_Coeffs(QWidget):
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
         q_coeff = self.myQ.q_obj
 
-        self.ui.ledWI.setText(str(q_coeff['WI']))
-        self.ui.ledWF.setText(str(q_coeff['WF']))
+        self.ui.ledWI.setText(qstr(q_coeff['WI']))
+        self.ui.ledWF.setText(qstr(q_coeff['WF']))
         qset_cmb_box(self.ui.cmbQuant, q_coeff['quant'])
         qset_cmb_box(self.ui.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.ui.cmbFormat, q_coeff['frmt'])
-        self.ui.ledScale.setText(str(q_coeff['scale']))
+        self.ui.ledScale.setText(qstr(q_coeff['scale']))
 
-        self.ui.ledW.setText(str(self.myQ.W))
+        self.ui.ledW.setText(qstr(self.myQ.W))
         self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
