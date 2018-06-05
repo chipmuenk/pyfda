@@ -207,7 +207,7 @@ class Input_PZ(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.warning("Infinite loop detected (and interrupted)!")
+            logger.debug("Infinite loop detected (and interrupted)!")
         elif 'data_changed' in dict_sig:
             self.load_dict()
         elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
