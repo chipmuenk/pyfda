@@ -55,18 +55,13 @@ class Input_Specs(QWidget):
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()
             self.t_specs.load_dict()
-            dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
         elif 'specs_changed' in dict_sig:
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()
-            dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
             self.color_design_button("changed")
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
-            # kind of input fields changes -> call update_UI, emitting
-            # 'specs_changed' when finished
+            # kind of input fields changes -> call update_UI
             self.update_UI(dict_sig)
             self.color_design_button("changed")
         elif 'data_changed' in dict_sig:
@@ -79,6 +74,9 @@ class Input_Specs(QWidget):
                 self.sel_fil.load_dict() # update select_filter widget
             # Pass new filter data from the global filter dict & set button = "ok"
             self.load_dict() 
+
+        dict_sig.update({'sender':__name__})
+        self.sig_tx.emit(dict_sig)
         
 
     def _construct_UI(self):
