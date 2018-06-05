@@ -18,7 +18,7 @@ import numpy as np
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal
 
-from .fixpoint_helpers import UI_WI_WF, UI_Q_Ovfl
+from .fixpoint_helpers import UI_WI_WF, UI_Q
 from .filter_iir import FilterIIR 
 #==============================================================================
 
@@ -48,11 +48,11 @@ class DF2(QWidget):
 
         self.wdg_wi_wf_input = UI_WI_WF(self, label='Input Format x[n]:')
         self.wdg_wi_wf_coeffs = UI_WI_WF(self, label='Coefficient Format:')
-        self.wdg_q_ovfl_coeffs = UI_Q_Ovfl(self)
+        self.wdg_q_ovfl_coeffs = UI_Q(self)
         #self.wdg_wi_wf_accu = UI_WI_WF(self, label='Accumulator Format:', WF=30)
         #self.wdg_q_ovfl_accu = UI_Q_Ovfl(self)
         self.wdg_wi_wf_output = UI_WI_WF(self, label='Output Format y[n]:')
-        self.wdg_q_ovfl_output = UI_Q_Ovfl(self)
+        self.wdg_q_ovfl_output = UI_Q(self)
 
 #------------------------------------------------------------------------------
 

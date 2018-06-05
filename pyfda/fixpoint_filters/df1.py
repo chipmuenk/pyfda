@@ -22,7 +22,7 @@ import pprint
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal
 
-from .fixpoint_helpers import UI_WI_WF, UI_W_coeffs, UI_Q_Ovfl, build_coeff_dict
+from .fixpoint_helpers import UI_WI_WF, UI_W_coeffs, UI_Q, build_coeff_dict
 from .filter_iir import FilterIIR 
 
 #==============================================================================
@@ -53,12 +53,14 @@ class DF1(QWidget):
         self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
         self.wdg_w_input = UI_WI_WF(self, label='Input Format x[n]:')
-        self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=True)
-        self.wdg_q_coeffs = UI_Q_Ovfl(self, enabled=False)
+        self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
+                                        tip_WI='Number of integer bits - edit in the "b,a" tab',
+                                        tip_WF='Number of fractional bits - edit in the "b,a" tab')
+        self.wdg_q_coeffs = UI_Q(self, enabled=False)
         self.wdg_w_accu = UI_WI_WF(self, label='Accumulator Format:', WF=30)
-        self.wdg_q_accu = UI_Q_Ovfl(self)
+        self.wdg_q_accu = UI_Q(self)
         self.wdg_w_output = UI_WI_WF(self, label='Output Format y[n]:')
-        self.wdg_q_output = UI_Q_Ovfl(self)        
+        self.wdg_q_output = UI_Q(self)
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()

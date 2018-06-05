@@ -203,14 +203,14 @@ class UI_W_coeffs(UI_WI_WF):
         
 #==============================================================================
 
-class UI_Q_Ovfl(QWidget):
+class UI_Q(QWidget):
     """
     Widget for selecting quantization / overflow options. The result can be read out
-    via the attributes `self.x` and `self.y`.
+    via the attributes `self.ovfl` and `self.quant`.
     """
 
     def __init__(self, parent, **kwargs):
-        super(UI_Q_Ovfl, self).__init__(parent)
+        super(UI_Q, self).__init__(parent)
         self._construct_UI(**kwargs)
 
     def _construct_UI(self, **kwargs):
