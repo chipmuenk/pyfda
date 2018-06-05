@@ -56,7 +56,7 @@ def build_coeff_dict(frmt=None):
     a = fb.fil[0]['ba'][1]
     # update the coefficient quantizer object
     Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
-    Q_coeff.setQobj(fb.fil[0]['q_coeff'])
+    #Q_coeff.setQobj(fb.fil[0]['q_coeff'])
     if not frmt:
         Q_coeff.frmt = 'dec' # use decimal format for coefficients by default
     else:
@@ -141,11 +141,11 @@ class UI_WI_WF(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ledWI.editingFinished.connect(self._update_ui)
-        self.ledWF.editingFinished.connect(self._update_ui)
+        self.ledWI.editingFinished.connect(self.save_ui)
+        self.ledWF.editingFinished.connect(self.save_ui)
 
     #--------------------------------------------------------------------------
-    def _update_ui(self):
+    def save_ui(self):
         """ 
         Update the attributes `self.WI` and `self.WF` when one of the QLineEdit
         widgets has been edited.
@@ -154,19 +154,51 @@ class UI_WI_WF(QWidget):
         self.ledWI.setText(qstr(self.WI))
         self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
         self.ledWF.setText(qstr(self.WF))
+        
+    #--------------------------------------------------------------------------
+    def load_ui(self):
+        """ 
+        Update the widgets `WI` and `WF` when specs have been changed outside
+        this class.
+        """
+        pass
 
 #------------------------------------------------------------------------------
-class UI_WI_WF_coeffs(UI_WI_WF):
+class UI_W_coeffs(UI_WI_WF):
     """
     Widget for entering word format (integer and fractional bits) for the 
     oefficients. The result can be read out via the attributes `self.WI` and 
-    `self.WF`.
+    `self.WF`. This class inherits from `UI_WI_WF`, adding the method `load_ui()`
+    for updating the UI from the filter dict.
     """
     def __init__(self, parent, **kwargs):
-        super(UI_WI_WF_coeffs, self).__init__(parent, **kwargs)
+        super(UI_W_coeffs, self).__init__(parent, **kwargs)
         # parent's __init__ method is used
         
-    def update(self):
+    #--------------------------------------------------------------------------
+    def save_ui(self):
+        """ 
+        Update the attributes `self.WI` and `self.WF` and the filter dict 
+        when one of the QLineEdit widgets has been edited.
+        """
+        self.WI = safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos')
+        self.ledWI.setText(qstr(self.WI))
+        self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
+        self.ledWF.setText(qstr(self.WF))
+        fb.fil[0]["q_coeff"].update({'WI':self.WI, 'WF':self.WF})
+
+    def load_ui(self):
+        """ 
+        Update the ui and the attributes `self.WI` and `self.WF` from the filter
+        dict. `load_ui()` has to be called when the coefficients or the word
+        format has been changed outside the class, e.g. by a new filter design or
+        by changing the coefficient format in `input_coeffs.py`.
+        """
+        self.WI = fb.fil[0]['coeffs']['WI']
+        self.WF = fb.fil[0]['coeffs']['WF']
+        self.ledWI.setText(qstr(self.WI))
+        self.ledWF.setText(qstr(self.WF))
+
         self.c_dict = build_coeff_dict()
         
 #==============================================================================

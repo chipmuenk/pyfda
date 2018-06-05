@@ -22,7 +22,7 @@ import pprint
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal
 
-from .fixpoint_helpers import UI_WI_WF, UI_WI_WF_coeffs, UI_Q_Ovfl, build_coeff_dict
+from .fixpoint_helpers import UI_WI_WF, UI_W_coeffs, UI_Q_Ovfl, build_coeff_dict
 from .filter_iir import FilterIIR 
 
 #==============================================================================
@@ -64,7 +64,7 @@ class DF1(QWidget):
         self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
         self.wdg_w_input = UI_WI_WF(self, label='Input Format x[n]:')
-        self.wdg_w_coeffs = UI_WI_WF_coeffs(self, label='Coefficient Format:', enabled=False)
+        self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=True)
         self.wdg_q_coeffs = UI_Q_Ovfl(self, enabled=False)
         self.wdg_w_accu = UI_WI_WF(self, label='Accumulator Format:', WF=30)
         self.wdg_q_accu = UI_Q_Ovfl(self)
