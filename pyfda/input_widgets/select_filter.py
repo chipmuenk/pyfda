@@ -374,7 +374,7 @@ class SelectFilter(QWidget):
 
         if enb_signal:
             logger.debug("Emit 'filt_changed'")
-            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_auto'})
+            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_type'})
 
 #------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):
