@@ -278,6 +278,11 @@ class UI_Q(QWidget):
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
 
+    #--------------------------------------------------------------------------
+    def load_ui(self):
+        """ Update UI from somewhere """
+        pass
+
 #==============================================================================
 
 if __name__ == '__main__':

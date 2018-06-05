@@ -80,7 +80,8 @@ class DF1(QWidget):
         layVWdg.addStretch()
 
         self.setLayout(layVWdg)
-        
+
+#------------------------------------------------------------------------------
     def update_UI(self):
         """
         Update all parts of the UI that need to be updated when specs have been
@@ -88,7 +89,7 @@ class DF1(QWidget):
         This is called from one level above.
         """
         self.wdg_w_coeffs.load_ui()
-
+        self.wdg_q_coeffs.load_ui()
 
 #==============================================================================
     def build_hdl_dict(self):
