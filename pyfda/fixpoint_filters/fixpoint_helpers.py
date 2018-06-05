@@ -75,14 +75,14 @@ def build_coeff_dict(frmt=None):
     return c_dict
 
 #------------------------------------------------------------------------------
-class UI_WI_WF(QWidget):
+class UI_W(QWidget):
     """
     Widget for entering integer and fractional bits. The result can be read out
     via the attributes `self.WI` and `self.WF`.
     """
 
     def __init__(self, parent, **kwargs):
-        super(UI_WI_WF, self).__init__(parent)
+        super(UI_W, self).__init__(parent)
         self._construct_UI(**kwargs)
 
     def _construct_UI(self, **kwargs):
@@ -164,7 +164,7 @@ class UI_WI_WF(QWidget):
         pass
 
 #------------------------------------------------------------------------------
-class UI_W_coeffs(UI_WI_WF):
+class UI_W_coeffs(UI_W):
     """
     Widget for entering word format (integer and fractional bits) for the 
     oefficients. The result can be read out via the attributes `self.WI` and 
