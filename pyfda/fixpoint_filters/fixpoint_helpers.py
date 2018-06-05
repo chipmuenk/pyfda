@@ -269,12 +269,12 @@ class UI_Q(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.cmbOvfl.currentIndexChanged.connect(self._update_ui)
-        self.cmbQuant.currentIndexChanged.connect(self._update_ui)
+        self.cmbOvfl.currentIndexChanged.connect(self.save_ui)
+        self.cmbQuant.currentIndexChanged.connect(self.save_ui)
 
     #--------------------------------------------------------------------------
-    def _update_ui(self):
-        """ Update the attributes `self.ovfl` and `self.quant` """
+    def save_ui(self):
+        """ Update the attributes `self.ovfl` and `self.quant` from the UI"""
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
 
