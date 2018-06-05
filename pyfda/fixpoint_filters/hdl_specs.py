@@ -63,7 +63,7 @@ class HDL_Specs(QWidget):
         if 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             pass
-        if 'specs_changed' in dict_sig:
+        if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeffs':
             # update fields in the filter topology widget - wordlength may have
             # been changed
             self.update_wdg_UI()
@@ -259,6 +259,8 @@ class HDL_Specs(QWidget):
             self.hdl_wdg_inst = hdl_wdg_class(self)
             if hasattr(self.hdl_wdg_inst, "sig_rx"):
                 self.sig_rx.connect(self.hdl_wdg_inst.sig_rx)
+            #if hasattr(self.hdl_wdg_inst, "sig_tx"):
+                #self.hdl_wdg_inst.sig_tx.connect(self.sig_rx)
         else:
             self.fx_wdg_found = False
  
@@ -287,14 +289,11 @@ class HDL_Specs(QWidget):
 #------------------------------------------------------------------------------
     def update_wdg_UI(self):
         """
-        Update the fixpoint UI when specs have been changed outside this class
+        Update the fixpoint UI when view (i.e. fixpoint coefficient format) 
+        has been changed outside this class
         """
-        if hasattr(self.hdl_wdg_inst, "update_UI"): 
-            pass
-        else:
-            pass
-       
-
+        if hasattr(self.hdl_wdg_inst, "update_UI"):
+            self.hdl_wdg_inst.update_UI()
 
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):

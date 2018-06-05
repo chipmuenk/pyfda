@@ -31,7 +31,6 @@ class DF1(QWidget):
     """
     Create the widget for quantizing data and coef
     """
-    sig_rx = pyqtSignal(object)
     
     def __init__(self, parent):
         super(DF1, self).__init__(parent)
@@ -43,16 +42,6 @@ class DF1(QWidget):
         self.Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
         self._construct_UI()
 
-    def process_sig_rx(self, dict_sig=None):
-        """
-        Process signals coming in via subwidgets and sig_rx
-        """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if dict_sig['sender'] == __name__:
-            return
-        elif 'specs_changed' in dict_sig:
-            self.update_UI()
-    
     def _construct_UI(self):
         """
         Intitialize the UI and instantiate hdl_filter class

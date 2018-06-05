@@ -114,7 +114,7 @@ class InputTabWidgets(QWidget):
         if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDL_Specs(self)
             tabWidget.addTab(self.hdlSpecs, 'HDL')
-            #self.sig_tx.connect(self.hdlSpecs.sig_rx)
+            self.sig_tx.connect(self.hdlSpecs.sig_rx)
   
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
