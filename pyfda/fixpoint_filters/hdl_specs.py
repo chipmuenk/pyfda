@@ -168,12 +168,12 @@ class HDL_Specs(QWidget):
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
-        inst_wdg_list = self._update_filter_cmb()
-        if len(inst_wdg_list) == 0:
+        inst_wdg_list, n_wdg = self._update_filter_cmb()
+        if n_wdg == 0:
             logger.warning("No fixpoint filters found!")
         else:
             logger.info("Imported {0:d} fixpoint filters:\n{1}"
-                        .format(len(inst_wdg_list), inst_wdg_list))
+                        .format(n_wdg, inst_wdg_list))
 
         self._update_fixp_widget()
 
@@ -185,6 +185,7 @@ class HDL_Specs(QWidget):
         filter design type is selected.
         """
         inst_wdg_list = "" # list of successfully instantiated widgets
+        n_wdg = 0
 
         for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
             if not fx_fil_wdg[1]:
@@ -211,12 +212,13 @@ class HDL_Specs(QWidget):
                 self.cmb_wdg_hdl.addItem(fx_fil_wdg[0], fx_fil_mod_name)
                 
                 inst_wdg_list += '\t' + fx_fil_class_name + '\n'
+                n_wdg += 1
 
             except ImportError:
                 logger.warning("Could not import {0}!".format(fx_fil_mod_name))
                 continue
             
-        return inst_wdg_list
+        return inst_wdg_list, n_wdg
 
 #        self.update_filt_wdg()
         
