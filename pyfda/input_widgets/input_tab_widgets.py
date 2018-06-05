@@ -111,6 +111,9 @@ class InputTabWidgets(QWidget):
 
         #
         # TODO: document signal options
+        # TODO: changing view in input_coeffs (wordformat) triggers 6 times "view changed"
+        # TODO: combo boxes trigger "view changed" twice
+        # TODO: except combo box "integer / float / ..." triggering 4 times
         if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDL_Specs(self)
             tabWidget.addTab(self.hdlSpecs, 'HDL')
