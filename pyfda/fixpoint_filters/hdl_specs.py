@@ -186,6 +186,7 @@ class HDL_Specs(QWidget):
         """
         inst_wdg_list = "" # list of successfully instantiated widgets
         n_wdg = 0
+        self.cmb_wdg_hdl.clear()
 
         for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
             if not fx_fil_wdg[1]:
