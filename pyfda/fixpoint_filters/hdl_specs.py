@@ -257,6 +257,8 @@ class HDL_Specs(QWidget):
             hdl_mod = importlib.import_module(hdl_mod_name) # get module 
             hdl_wdg_class = getattr(hdl_mod, cmb_wdg_fx_cur) # get class
             self.hdl_wdg_inst = hdl_wdg_class(self)
+            if hasattr(self.hdl_wdg_inst, "sig_rx"):
+                self.sig_rx.connect(self.hdl_wdg_inst.sig_rx)
         else:
             self.fx_wdg_found = False
  
