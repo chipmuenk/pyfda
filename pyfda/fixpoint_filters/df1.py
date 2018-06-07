@@ -17,12 +17,11 @@ logger = logging.getLogger(__name__)
 import numpy as np
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_fix_lib as fix
 import pprint
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
-from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, build_coeff_dict
+from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q
 from .filter_iir import FilterIIR 
 #==============================================================================
 

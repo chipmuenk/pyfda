@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 import numpy as np
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_fix_lib as fix
 import pprint
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
