@@ -173,7 +173,8 @@ class UI_W_coeffs(UI_W):
     """
     def __init__(self, parent, **kwargs):
         super(UI_W_coeffs, self).__init__(parent, **kwargs)
-        # parent's __init__ method is used
+        # __init__ method of parent is used, additionally initialize coefficient dict
+        self.c_dict = build_coeff_dict()
         
     #--------------------------------------------------------------------------
     def save_ui(self):
@@ -194,6 +195,7 @@ class UI_W_coeffs(UI_W):
         format has been changed outside the class, e.g. by a new filter design or
         by changing the coefficient format in `input_coeffs.py`.
         """
+        logger.warning("load_ui")
         self.WI = fb.fil[0]['q_coeff']['WI']
         self.WF = fb.fil[0]['q_coeff']['WF']
         self.ledWI.setText(qstr(self.WI))
