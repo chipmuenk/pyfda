@@ -77,8 +77,8 @@ class HDL_Specs(QWidget):
         - the UI for the HDL filter settings
         - and the myHDL interface:
         """
-        self.cmb_wdg_hdl = QComboBox(self)
-        self.cmb_wdg_hdl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_wdg_fixp = QComboBox(self)
+        self.cmb_wdg_fixp.setSizeAdjustPolicy(QComboBox.AdjustToContents)
                 
 
 #------------------------------------------------------------------------------        
@@ -94,7 +94,7 @@ class HDL_Specs(QWidget):
         self.lblTitle.setWordWrap(True)
         self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layHTitle = QHBoxLayout()
-        layHTitle.addWidget(self.cmb_wdg_hdl)
+        layHTitle.addWidget(self.cmb_wdg_fixp)
         layHTitle.addWidget(self.lblTitle)
 
         self.frmTitle = QFrame(self)
@@ -164,7 +164,7 @@ class HDL_Specs(QWidget):
         # ... then redraw image when resized
         self.sig_resize.connect(self.resize_img)
 
-        self.cmb_wdg_hdl.currentIndexChanged.connect(self._update_fixp_widget)
+        self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
@@ -186,7 +186,7 @@ class HDL_Specs(QWidget):
         """
         inst_wdg_list = "" # list of successfully instantiated widgets
         n_wdg = 0
-        self.cmb_wdg_hdl.clear()
+        self.cmb_wdg_fixp.clear()
 
         for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
             if not fx_fil_wdg[1]:
@@ -210,7 +210,7 @@ class HDL_Specs(QWidget):
             try:  # Try to import the module from the  package and get a handle:
                 fx_fil_mod = importlib.import_module(fx_fil_mod_name)
                 fx_fil_class = getattr(fx_fil_mod, fx_fil_wdg[0]) # try to resolve the class       
-                self.cmb_wdg_hdl.addItem(fx_fil_wdg[0], fx_fil_mod_name)
+                self.cmb_wdg_fixp.addItem(fx_fil_wdg[0], fx_fil_mod_name)
                 
                 inst_wdg_list += '\t' + fx_fil_class_name + '\n'
                 n_wdg += 1
@@ -273,11 +273,11 @@ class HDL_Specs(QWidget):
             except AttributeError as e:
                 logger.error("Could not destruct_UI!\n{0}".format(e))
 
-        cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_hdl, data=False)
+        cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
 
         if cmb_wdg_fx_cur: # at least one valid hdl widget found
             self.fx_wdg_found = True
-            hdl_mod_name = qget_cmb_box(self.cmb_wdg_hdl, data=True) # module name and path
+            hdl_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
             hdl_mod = importlib.import_module(hdl_mod_name) # get module 
             hdl_wdg_class = getattr(hdl_mod, cmb_wdg_fx_cur) # get class
             self.hdl_wdg_inst = hdl_wdg_class(self)
