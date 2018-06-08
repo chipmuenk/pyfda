@@ -293,7 +293,8 @@ class UI_Q_coeffs(UI_Q):
     overloading the method `load_ui()` for updating the UI from the filter dict.
     """
     def __init__(self, parent, **kwargs):
-        super(UI_Q_coeffs, self).__init__(parent)
+        super(UI_Q_coeffs, self).__init__(parent, **kwargs)
+
         # __init__ method of parent is used, additionally initialize coefficient dict
         self.c_dict = build_coeff_dict()
                
