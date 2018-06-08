@@ -34,8 +34,10 @@ class Input_Specs(QWidget):
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sigmals
-    sig_tx = pyqtSignal(object) # outgoing from process_signals
+    sig_rx_local = pyqtSignal(object) # incoming from subwidgets -> process_sig_rx_local
+
+    sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sig_rx
+    sig_tx = pyqtSignal(object) # from process_sig_rx: propagate local signals
 
     def __init__(self, parent):
         super(Input_Specs, self).__init__(parent)
@@ -44,9 +46,18 @@ class Input_Specs(QWidget):
 
         self._construct_UI()
 
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx_local(self, dict_sig=None):
+        """
+        Flag signals coming in from local subwidgets as "local" before proceeding
+        with processing in `process_sig_rx`.
+        """
+        self.process_sig_rx(dict_sig, local=True)
+
+    def process_sig_rx(self, dict_sig=None, local=False):
         """
         Process signals coming in via subwidgets and sig_rx
+        The sender name of signals coming in from local subwidgets is changed to
+        its parent widget (`input_specs`) to prevent infinite loops.
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
@@ -75,8 +86,11 @@ class Input_Specs(QWidget):
             # Pass new filter data from the global filter dict & set button = "ok"
             self.load_dict() 
 
-        dict_sig.update({'sender':__name__})
-        self.sig_tx.emit(dict_sig)
+        if local:
+            # local signals are propagated with the name of this widget,
+            # global signals terminate here
+            dict_sig.update({'sender':__name__})
+            self.sig_tx.emit(dict_sig)
         
 
     def _construct_UI(self):
@@ -87,12 +101,12 @@ class Input_Specs(QWidget):
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
-        self.sel_fil.sig_tx.connect(self.sig_rx)
+        self.sel_fil.sig_tx.connect(self.sig_rx_local)
         
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
-        self.f_units.sig_tx.connect(self.sig_rx)
+        self.f_units.sig_tx.connect(self.sig_rx_local)
         
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -105,19 +119,19 @@ class Input_Specs(QWidget):
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
-        self.f_specs.sig_tx.connect(self.sig_rx)
+        self.f_specs.sig_tx.connect(self.sig_rx_local)
         # Subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
-        self.a_specs.sig_tx.connect(self.sig_rx)
+        self.a_specs.sig_tx.connect(self.sig_rx_local)
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
-        self.w_specs.sig_tx.connect(self.sig_rx)
+        self.w_specs.sig_tx.connect(self.sig_rx_local)
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
-        self.t_specs.sig_tx.connect(self.sig_rx)
+        self.t_specs.sig_tx.connect(self.sig_rx_local)
         # self.sig_tx.connect(self.t_specs.sig_rx)
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
@@ -166,6 +180,7 @@ class Input_Specs(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
+        self.sig_rx_local.connect(self.process_sig_rx_local)  
         self.butDesignFilt.clicked.connect(self.start_design_filt)
         self.butQuit.clicked.connect(self.quit_program) # emit 'quit_program'
         #----------------------------------------------------------------------
