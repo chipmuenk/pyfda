@@ -704,7 +704,7 @@ class Input_Coeffs(QWidget):
                 'frmt':qstr(self.ui.cmbFormat.currentText()),
                 'scale':qstr(self.ui.ledScale.text())
                 }
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeffs'})
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
 
         self._load_q_settings() # update widgets and the fixpoint object self.myQ
 

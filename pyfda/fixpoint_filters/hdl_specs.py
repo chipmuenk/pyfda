@@ -63,7 +63,7 @@ class HDL_Specs(QWidget):
         if 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
-        if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeffs':
+        if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff':
             # update fields in the filter topology widget - wordlength may have
             # been changed
             self.update_wdg_UI()
