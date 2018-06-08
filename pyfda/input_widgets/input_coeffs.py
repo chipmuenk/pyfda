@@ -360,12 +360,12 @@ class Input_Coeffs(QWidget):
         self.ui.ledEps.editingFinished.connect(self._set_eps)
         self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
 
-        # refresh table after storing new settings
-        self.ui.cmbFormat.currentIndexChanged.connect(self._refresh_table)
-        self.ui.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
-        self.ui.cmbQuant.currentIndexChanged.connect(self._refresh_table)
-        self.ui.ledWF.editingFinished.connect(self._WIWF_changed)
-        self.ui.ledWI.editingFinished.connect(self._WIWF_changed)
+        # store new settings and refresh table
+        self.ui.cmbFormat.currentIndexChanged.connect(self._store_q_settings)
+        self.ui.cmbQOvfl.currentIndexChanged.connect(self._store_q_settings)
+        self.ui.cmbQuant.currentIndexChanged.connect(self._store_q_settings)
+        self.ui.ledWF.editingFinished.connect(self._store_q_settings)
+        self.ui.ledWI.editingFinished.connect(self._store_q_settings)
         self.ui.ledW.editingFinished.connect(self._W_changed)
 
         self.ui.ledScale.editingFinished.connect(self._set_scale)
@@ -403,16 +403,6 @@ class Input_Coeffs(QWidget):
 
         if not ftype:
             self._refresh_table()
-            # self.load_dict() overwrites current info - is this ok?
-
-#------------------------------------------------------------------------------
-    def _WIWF_changed(self):
-        """
-        Store values for 'WI' and 'WF' when either has been changed, 
-        update wordlength `W` accordingly and update table
-        """
-        self._store_q_settings()
-        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _W_changed(self):
@@ -421,8 +411,6 @@ class Input_Coeffs(QWidget):
         been changed. Try to preserve `WI` or `WF` settings depending on the
         number format (integer or fractional).
         """
-        
-        # if self.ui.ledW.isModified() ... self.ui.ledW.setModified(False)
         W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
 
         if W < 2:
@@ -442,7 +430,6 @@ class Input_Coeffs(QWidget):
             self.ui.ledWF.setText(str(WF))
 
         self._store_q_settings()
-        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _set_number_format(self):
@@ -471,7 +458,6 @@ class Input_Coeffs(QWidget):
         self.ui.ledScale.setEnabled(is_qfrac)
 
         self._store_q_settings()
-        self._refresh_table()
 
         #------------------------------------------------------------------------------
     def _set_scale(self):
@@ -483,7 +469,6 @@ class Input_Coeffs(QWidget):
         scale = safe_eval(self.ui.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
         self.ui.ledScale.setText(str(scale))
         self._store_q_settings()
-        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -532,8 +517,6 @@ class Input_Coeffs(QWidget):
             self.ui.frmQSettings.setVisible(not is_float) # hide all q-settings for float
             self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(True)
-
-            self._store_q_settings() # store updated quantization / format settings
 
             # check whether filter is FIR and only needs one column
             if fb.fil[0]['ft'] == 'FIR':
@@ -694,7 +677,7 @@ class Input_Coeffs(QWidget):
     def _store_q_settings(self):
         """
         Read out the settings of the quantization comboboxes and store them in
-        the filter dict. Update the fixpoint object.
+        the filter dict. Update the fixpoint object and refresh table
         """
         fb.fil[0]['q_coeff'] = {
                 'WI':safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
@@ -707,6 +690,7 @@ class Input_Coeffs(QWidget):
         self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
 
         self._load_q_settings() # update widgets and the fixpoint object self.myQ
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _save_dict(self):
