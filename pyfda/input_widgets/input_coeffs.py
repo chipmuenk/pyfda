@@ -30,7 +30,7 @@ from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
 from pyfda.pyfda_rc import params
 import pyfda.pyfda_fix_lib as fix
 
-from .filter_coeffs_ui import FilterCoeffs_UI
+from .input_coeffs_ui import Input_Coeffs_UI
 
 # TODO: implement checking for complex-valued filters somewhere (pyfda_lib?),
 #       h[n] detects complex data (although it isn't)
@@ -62,7 +62,7 @@ class ItemDelegate(QStyledItemDelegate):
     """
     def __init__(self, parent):
         """
-        Pass instance `parent` of parent class (FilterCoeffs)
+        Pass instance `parent` of parent class (Input_Coeffs)
         """
         super(ItemDelegate, self).__init__(parent)
         self.parent = parent # instance of the parent (not the base) class
@@ -251,7 +251,7 @@ class ItemDelegate(QStyledItemDelegate):
         self.parent._refresh_table_item(index.row(), index.column()) # refresh table entry
 
 
-class FilterCoeffs(QWidget):
+class Input_Coeffs(QWidget):
     """
     Create widget with a (sort of) model-view architecture for viewing /
     editing / entering data contained in `self.ba` which is a list of two numpy
@@ -271,10 +271,13 @@ class FilterCoeffs(QWidget):
     sig_rx = pyqtSignal(object) # incoming from input_tab_widgets
 
     def __init__(self, parent):
-        super(FilterCoeffs, self).__init__(parent)
+        super(Input_Coeffs, self).__init__(parent)
 
         self.opt_widget = None # handle for pop-up options widget
-        self.ui = FilterCoeffs_UI(self) # create the UI part with buttons etc.
+        self.tool_tip = "Display and edit filter coefficients."
+        self.tab_label = "b,a"
+
+        self.ui = Input_Coeffs_UI(self) # create the UI part with buttons etc.
         self._construct_UI()
         
 #------------------------------------------------------------------------------
@@ -284,7 +287,7 @@ class FilterCoeffs(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.warning("Infinite Loop!")
+            logger.debug("Infinite Loop!")
         elif 'data_changed' in dict_sig:
             self.load_dict()
         elif  'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'csv':
@@ -357,12 +360,12 @@ class FilterCoeffs(QWidget):
         self.ui.ledEps.editingFinished.connect(self._set_eps)
         self.ui.butSetZero.clicked.connect(self._set_coeffs_zero)
 
-        # refresh table after storing new settings
-        self.ui.cmbFormat.currentIndexChanged.connect(self._refresh_table)
-        self.ui.cmbQOvfl.currentIndexChanged.connect(self._refresh_table)
-        self.ui.cmbQuant.currentIndexChanged.connect(self._refresh_table)
-        self.ui.ledWF.editingFinished.connect(self._WIWF_changed)
-        self.ui.ledWI.editingFinished.connect(self._WIWF_changed)
+        # store new settings and refresh table
+        self.ui.cmbFormat.currentIndexChanged.connect(self._store_q_settings)
+        self.ui.cmbQOvfl.currentIndexChanged.connect(self._store_q_settings)
+        self.ui.cmbQuant.currentIndexChanged.connect(self._store_q_settings)
+        self.ui.ledWF.editingFinished.connect(self._store_q_settings)
+        self.ui.ledWI.editingFinished.connect(self._store_q_settings)
         self.ui.ledW.editingFinished.connect(self._W_changed)
 
         self.ui.ledScale.editingFinished.connect(self._set_scale)
@@ -400,16 +403,6 @@ class FilterCoeffs(QWidget):
 
         if not ftype:
             self._refresh_table()
-            # self.load_dict() overwrites current info - is this ok?
-
-#------------------------------------------------------------------------------
-    def _WIWF_changed(self):
-        """
-        Store values for 'WI' and 'WF' when either has been changed, 
-        update wordlength `W` accordingly and update table
-        """
-        self._store_q_settings()
-        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _W_changed(self):
@@ -418,8 +411,6 @@ class FilterCoeffs(QWidget):
         been changed. Try to preserve `WI` or `WF` settings depending on the
         number format (integer or fractional).
         """
-        
-        # if self.ui.ledW.isModified() ... self.ui.ledW.setModified(False)
         W = safe_eval(self.ui.ledW.text(), self.myQ.W, return_type='int', sign='pos')
 
         if W < 2:
@@ -439,7 +430,6 @@ class FilterCoeffs(QWidget):
             self.ui.ledWF.setText(str(WF))
 
         self._store_q_settings()
-        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _set_number_format(self):
@@ -468,7 +458,6 @@ class FilterCoeffs(QWidget):
         self.ui.ledScale.setEnabled(is_qfrac)
 
         self._store_q_settings()
-        self._refresh_table()
 
         #------------------------------------------------------------------------------
     def _set_scale(self):
@@ -480,7 +469,6 @@ class FilterCoeffs(QWidget):
         scale = safe_eval(self.ui.ledScale.text(), self.myQ.scale, return_type='float', sign='pos')
         self.ui.ledScale.setText(str(scale))
         self._store_q_settings()
-        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _refresh_table_item(self, row, col):
@@ -529,8 +517,6 @@ class FilterCoeffs(QWidget):
             self.ui.frmQSettings.setVisible(not is_float) # hide all q-settings for float
             self.ui.butEnable.setIcon(QIcon(':/circle-x.svg'))
             self.tblCoeff.setVisible(True)
-
-            self._store_q_settings() # store updated quantization / format settings
 
             # check whether filter is FIR and only needs one column
             if fb.fil[0]['ft'] == 'FIR':
@@ -675,14 +661,14 @@ class FilterCoeffs(QWidget):
         self.myQ.setQobj(fb.fil[0]['q_coeff'])
         q_coeff = self.myQ.q_obj
 
-        self.ui.ledWI.setText(str(q_coeff['WI']))
-        self.ui.ledWF.setText(str(q_coeff['WF']))
+        self.ui.ledWI.setText(qstr(q_coeff['WI']))
+        self.ui.ledWF.setText(qstr(q_coeff['WF']))
         qset_cmb_box(self.ui.cmbQuant, q_coeff['quant'])
         qset_cmb_box(self.ui.cmbQOvfl,  q_coeff['ovfl'])
         qset_cmb_box(self.ui.cmbFormat, q_coeff['frmt'])
-        self.ui.ledScale.setText(str(q_coeff['scale']))
+        self.ui.ledScale.setText(qstr(q_coeff['scale']))
 
-        self.ui.ledW.setText(str(self.myQ.W))
+        self.ui.ledW.setText(qstr(self.myQ.W))
         self.ui.lblLSB.setText("{0:.{1}g}".format(self.myQ.LSB, params['FMT_ba']))
         self.ui.lblMSB.setText("{0:.{1}g}".format(self.myQ.MSB, params['FMT_ba']))
         self.ui.lblMAX.setText("{0}".format(self.myQ.float2frmt(self.myQ.MAX/self.myQ.scale)))
@@ -691,7 +677,7 @@ class FilterCoeffs(QWidget):
     def _store_q_settings(self):
         """
         Read out the settings of the quantization comboboxes and store them in
-        the filter dict. Update the fixpoint object.
+        the filter dict. Update the fixpoint object and refresh table
         """
         fb.fil[0]['q_coeff'] = {
                 'WI':safe_eval(self.ui.ledWI.text(), self.myQ.WI, return_type='int'),
@@ -701,7 +687,10 @@ class FilterCoeffs(QWidget):
                 'frmt':qstr(self.ui.cmbFormat.currentText()),
                 'scale':qstr(self.ui.ledScale.text())
                 }
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'q_coeff'})
+
         self._load_q_settings() # update widgets and the fixpoint object self.myQ
+        self._refresh_table()
 
 #------------------------------------------------------------------------------
     def _save_dict(self):
@@ -726,7 +715,7 @@ class FilterCoeffs(QWidget):
         if __name__ == '__main__':
             self.load_dict() # only needed for stand-alone test
 
-        self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_coeffs'})
+        self.sig_tx.emit({'sender':__name__, 'data_changed':'input_coeffs'})
         # -> input_tab_widgets
 
         qstyle_widget(self.ui.butSave, 'normal')
@@ -886,9 +875,9 @@ class FilterCoeffs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    """ Test with python -m pyfda.input_widgets.filter_coeffs """
+    """ Test with python -m pyfda.input_widgets.input_coeffs """
     app = QApplication(sys.argv)
-    mainw = FilterCoeffs(None)
+    mainw = Input_Coeffs(None)
 
     app.setActiveWindow(mainw)
     mainw.show()

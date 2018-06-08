@@ -248,23 +248,11 @@ class Plot_3D(QWidget):
                     or self.needs_redraw:
                 self.redraw()
                 self.needs_redraw = False                
-            elif 'enabled' in dict_sig:
-                self.enable_ui(dict_sig['enabled']) 
         else:
             if 'data_changed' in dict_sig:
                 self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
-
-#------------------------------------------------------------------------------
-    def enable_ui(self, enabled):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.frmControls.setEnabled(enabled)
-        if enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def _init_cmb_colormap(self):
@@ -403,11 +391,9 @@ class Plot_3D(QWidget):
 #------------------------------------------------------------------------------
     def draw(self):
         """
-        Main drawing entry point: Check whether updating is enabled in the
-        toolbar and then perform the actual plot
+        Main drawing entry point: perform the actual plot
         """
-        if self.mplwidget.mplToolbar.enabled:
-            self.draw_3d()
+        self.draw_3d()
 
 #------------------------------------------------------------------------------
     def draw_3d(self):

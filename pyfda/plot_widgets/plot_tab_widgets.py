@@ -14,33 +14,32 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
+import os, sys
 import importlib
 from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
 from pyfda.pyfda_rc import params
-
-plot_wdg_lst = ['Plot_Hf', 'Plot_Phi', 'Plot_Tau_G', 'Plot_PZ', 'Plot_Impz', 'Plot_3D']
-plot_wdg_dir = 'plot_widgets'
+import pyfda.filterbroker as fb
 
 #------------------------------------------------------------------------------
 class PlotTabWidgets(QTabWidget):
 
-    # incoming, connected to input_tab_widget.sig_tx in pyfdax    
+    # incoming, connected to input_tab_widget.sig_tx in pyfdax
     sig_rx = pyqtSignal(object)
-    # outgoing: emitted by process_sig_rx  
+    # outgoing: emitted by process_sig_rx
     sig_tx = pyqtSignal(object)
-    
+
     def __init__(self, parent):
         super(PlotTabWidgets, self).__init__(parent)
         self._construct_UI()
 
-#------------------------------------------------------------------------------
+#---------------------------------------------- --------------------------------
     def _construct_UI(self):
-        """ 
+        """
         Initialize UI with tabbed subwidgets and connect the signals of all
         subwidgets.
         This is done by dynamically instantiating each widget from the list
-        `plot_wdg_lst` in the directory `plot_wdg_dir`. Try to:
+        `fb.plot_widget_list` in the module `plot_wdg_dir`. Try to:
         - connect `sig_tx` and `sig_rx`
         - set the TabToolTip from the instance attribute `tool_tip`
         - set the tab label from the instance attribute `tab_label`
@@ -48,12 +47,31 @@ class PlotTabWidgets(QTabWidget):
         """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
+        inst_wdg_list = "" # successfully instantiated plot widgets
+        n_wdg = 0 # number of successfully instantiated plot widgets
         #
-        for i, plot_wdg in enumerate(plot_wdg_lst):
-            plot_mod_name = 'pyfda.' + plot_wdg_dir + '.' + plot_wdg.lower()
-            try:  # Try to import the module from the  package and get a handle:
+        for i, plot_wdg in enumerate(fb.plot_widgets_list):
+            if not plot_wdg[1]:
+                # use standard plot module
+                mod_name = 'pyfda.plot_widgets'
+            else:
+                # check and extract user directory
+                if os.path.isdir(plot_wdg[1]):
+                    mod_path = os.path.normpath(plot_wdg[1])
+                    # split the path into the dir containing the module and its name
+                    mod_dir_name, mod_name = os.path.split(mod_path)
+
+                    if mod_dir_name not in sys.path:
+                        sys.path.append(mod_dir_name)
+                else:
+                    logger.warning("Path {0:s} doesn't exist!".format(plot_wdg[1]))
+                    continue
+            plot_mod_name = mod_name + '.' + plot_wdg[0].lower()
+            plot_class_name = mod_name + '.' + plot_wdg[0]
+
+            try:  # Try to import the module from the package and get a handle:
                 plot_mod = importlib.import_module(plot_mod_name)
-                plot_class = getattr(plot_mod, plot_wdg, None)
+                plot_class = getattr(plot_mod, plot_wdg[0], None)
                 plot_inst = plot_class(self)
                 if hasattr(plot_inst, 'tab_label'):
                     tabWidget.addTab(plot_inst, plot_inst.tab_label)
@@ -66,6 +84,9 @@ class PlotTabWidgets(QTabWidget):
                 if hasattr(plot_inst, 'sig_rx'):
                     self.sig_tx.connect(plot_inst.sig_rx)
 
+                inst_wdg_list += '\t' + plot_class_name + '\n'
+                n_wdg += 1
+
             except ImportError as e:
                 logger.warning('Plotting module "{0}" could not be imported.\n{1}'\
                                .format(plot_mod_name, e))
@@ -73,20 +94,25 @@ class PlotTabWidgets(QTabWidget):
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
+
+        if len(inst_wdg_list) == 0:
+            logger.warning("No plotting widgets found!")
+        else:
+            logger.info("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_list))
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
         self.setLayout(layVMain)
-        
+
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
-        #----------------------------------------------------------------------        
+        #----------------------------------------------------------------------
         self.timer_id = QtCore.QTimer()
         self.timer_id.setSingleShot(True)
         # redraw current widget at timeout (timer was triggered by resize event):
@@ -98,8 +124,8 @@ class PlotTabWidgets(QTabWidget):
         # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
 
         tabWidget.installEventFilter(self)
-        
-        
+
+
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via sig_rx
@@ -119,7 +145,7 @@ class PlotTabWidgets(QTabWidget):
 
         You can set the size policy of the widget that is displayed to QSizePolicy::Preferred
         and the other ones to QSizePolicy::Ignored. After that call adjustSize to update the sizes.
-        
+
         void MainWindow::updateSizes(int index)
         {
         for(int i=0;i<ui->tabWidget->count();i++)
@@ -132,30 +158,30 @@ class PlotTabWidgets(QTabWidget):
         resize(minimumSizeHint());
         adjustSize();
         }
-        
-        adjustSize(): The last two lines resize the main window itself. You might want to avoid it, 
-        depending on your application. For example, if you set the rest of the widgets 
-        to expand into the space just made available, it's not so nice if the window 
-        resizes itself instead. 
+
+        adjustSize(): The last two lines resize the main window itself. You might want to avoid it,
+        depending on your application. For example, if you set the rest of the widgets
+        to expand into the space just made available, it's not so nice if the window
+        resizes itself instead.
         """
 
-#------------------------------------------------------------------------------       
+#------------------------------------------------------------------------------
     def current_tab_changed(self):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'changed'})
-        
-#------------------------------------------------------------------------------       
+
+#------------------------------------------------------------------------------
     def current_tab_redraw(self):
         self.sig_tx.emit({'sender':__name__, 'ui_changed':'resized'})
-            
+
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
         Filter all events generated by the QTabWidget. Source and type of all
          events generated by monitored objects are passed to this eventFilter,
         evaluated and passed on to the next hierarchy level.
-        
+
         This filter stops and restarts a one-shot timer for every resize event.
-        When the timer generates a timeout after 500 ms, current_tab_redraw is 
+        When the timer generates a timeout after 500 ms, current_tab_redraw is
         called by the timer.
         """
         if isinstance(source, QTabWidget):
@@ -165,25 +191,25 @@ class PlotTabWidgets(QTabWidget):
 
         # Call base class method to continue normal event processing:
         return super(PlotTabWidgets, self).eventFilter(source, event)
-       
+
 #------------------------------------------------------------------------
 
 def main():
     import sys
     from pyfda import pyfda_rc as rc
     from ..compat import QApplication
-    
+
     app = QApplication(sys.argv)
     app.setStyleSheet(rc.qss_rc)
 
     mainw = PlotTabWidgets(None)
     mainw.resize(300,400)
-    
-    app.setActiveWindow(mainw) 
+
+    app.setActiveWindow(mainw)
     mainw.show()
-    
+
     sys.exit(app.exec_())
-    
+
 if __name__ == "__main__":
     main()
 # test with: python -m  pyfda.plot_widgets.plot_tab_widgets

@@ -17,30 +17,25 @@ logger = logging.getLogger(__name__)
 import numpy as np
 
 import pyfda.filterbroker as fb
-import pyfda.pyfda_fix_lib as fix
 import pprint
 
-from ..compat import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame)
+from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
-from pyfda.hdl_generation.hdl_helpers import UI_WI_WF, UI_Q_Ovfl, build_coeff_dict
-from pyfda.hdl_generation.filter_iir import FilterIIR 
-
+from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
+from .filter_iir import FilterIIR 
 #==============================================================================
 
-class HDL_DF1(QWidget):
+class DF1(QWidget):
     """
     Create the widget for quantizing data and coef
     """
-    sig_rx = pyqtSignal(object)
-    
     def __init__(self, parent):
-        super(HDL_DF1, self).__init__(parent)
+        super(DF1, self).__init__(parent)
 
         self.title = ("<b>Direct-Form 1 (DF1) Filters</b><br />"
                  "Simple topology, only suitable for low-order filters.")
         self.img_name = "hdl_df1.png"
-        # construct coefficient fixpoint object with initial settings
-        self.Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
+
         self._construct_UI()
 
     def _construct_UI(self):
@@ -53,49 +48,66 @@ class HDL_DF1(QWidget):
         self.layHBtnsMsg = QHBoxLayout()
         self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
-        self.wdg_wi_wf_input = UI_WI_WF(self, label='Input Format x[n]:')
-        self.wdg_wi_wf_coeffs = UI_WI_WF(self, label='Coefficient Format:')
-        self.wdg_q_ovfl_coeffs = UI_Q_Ovfl(self)
-        self.wdg_wi_wf_accu = UI_WI_WF(self, label='Accumulator Format:', WF=30)
-        self.wdg_q_ovfl_accu = UI_Q_Ovfl(self)
-        self.wdg_wi_wf_output = UI_WI_WF(self, label='Output Format y[n]:')
-        self.wdg_q_ovfl_output = UI_Q_Ovfl(self)        
+        self.wdg_w_input = UI_W(self, label='Input Format x[n]:')
+        self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
+                                        tip_WI='Number of integer bits - edit in the "b,a" tab',
+                                        tip_WF='Number of fractional bits - edit in the "b,a" tab',
+                                        WI = fb.fil[0]['q_coeff']['WI'],
+                                        WF = fb.fil[0]['q_coeff']['WF'])
+        self.wdg_q_coeffs = UI_Q_coeffs(self, enabled=False,
+                                        cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
+                                        cur_q=fb.fil[0]['q_coeff']['quant'])
+        self.wdg_w_accu = UI_W(self, label='Accumulator Format:', WF=30)
+        self.wdg_q_accu = UI_Q(self)
+        self.wdg_w_output = UI_W(self, label='Output Format y[n]:')
+        self.wdg_q_output = UI_Q(self)
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0,0,0,0)
 
         layVWdg.addLayout(self.layHBtnsMsg)
-        layVWdg.addWidget(self.wdg_wi_wf_input)
-        layVWdg.addWidget(self.wdg_wi_wf_coeffs)
-        self.wdg_wi_wf_coeffs.setEnabled(False)
-        layVWdg.addWidget(self.wdg_q_ovfl_coeffs)
-        self.wdg_q_ovfl_coeffs.setEnabled(False)
 
-        layVWdg.addWidget(self.wdg_wi_wf_accu)
-        layVWdg.addWidget(self.wdg_q_ovfl_accu)
+        layVWdg.addWidget(self.wdg_w_input)
+        layVWdg.addWidget(self.wdg_w_coeffs)
+        layVWdg.addWidget(self.wdg_q_coeffs)
 
-        layVWdg.addWidget(self.wdg_wi_wf_output)
-        layVWdg.addWidget(self.wdg_q_ovfl_output)
+        layVWdg.addWidget(self.wdg_w_accu)
+        layVWdg.addWidget(self.wdg_q_accu)
+
+        layVWdg.addWidget(self.wdg_w_output)
+        layVWdg.addWidget(self.wdg_q_output)
 
         layVWdg.addStretch()
 
         self.setLayout(layVWdg)
 
+#------------------------------------------------------------------------------
+    def update_UI(self):
+        """
+        Update all parts of the UI that need to be updated when specs have been
+        changed outside this class (e.g. coefficient wordlength).
+        This is called from one level above.
+        """
+        self.wdg_w_coeffs.load_ui()
+        self.wdg_q_coeffs.load_ui()
+
 #==============================================================================
     def build_hdl_dict(self):
         """
-        Build the dictionary for constructing the filter
+        Build the dictionary for passing infos to the filter implementation
         """
-        hdl_dict = {'QC':build_coeff_dict()} # coefficients
+        hdl_dict = {'QC':self.wdg_w_coeffs.c_dict} # coefficients
         # parameters for input format
-        hdl_dict.update({'QI':{'WI':self.wdg_wi_wf_input.WI,
-                               'WF':self.wdg_wi_wf_input.WF
+        hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
+                               'WF':self.wdg_w_input.WF
                                }
                         })
         # parameters for output format
-        hdl_dict.update({'QO':{'WI':self.wdg_wi_wf_output.WI,
-                               'WF':self.wdg_wi_wf_output.WF
+        hdl_dict.update({'QO':{'WI':self.wdg_w_output.WI,
+                               'WF':self.wdg_w_output.WF,
+                               'OVFL': self.wdg_q_output.ovfl,
+                               'QUANT': self.wdg_q_output.quant
                                }
                         })
   
@@ -105,28 +117,16 @@ class HDL_DF1(QWidget):
 
         return hdl_dict
 
-
 #==============================================================================
     def setup_HDL(self, coeffs):
         """
         Instantiate the myHDL description and pass quantization parameters and
         coefficients.
         """
-        self.qI_i = self.wdg_wi_wf_input.WI
-        self.qF_i = self.wdg_wi_wf_input.WF
-
-        self.qI_o = self.wdg_wi_wf_output.WI
-        self.qF_o = self.wdg_wi_wf_output.WF
-
-        qQuant_o = self.wdg_q_ovfl_output.quant
-        qOvfl_o = self.wdg_q_ovfl_output.ovfl
-        
+        # a dict like this could be passed to myHDL
         self.build_hdl_dict()
 
-        # a dict like this could be passed to the HDL description
-        q_obj_o =  {'WI':self.qI_o, 'WF': self.qF_o, 'quant': qQuant_o, 'ovfl': qOvfl_o}
-
-        self.W = (self.qI_i + self.qF_i + 1, self.qF_i) # Matlab format: (W,WF)
+        self.W = (self.wdg_w_input.WI + self.wdg_w_input.WF, self.wdg_w_input.WF) # Matlab format: (W,WF)        
         
         logger.info("W = {0}".format(self.W))
         logger.info('b = {0}'.format(coeffs[0][0:3]))
@@ -144,9 +144,9 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = HDL_DF1(None)
+    mainw = DF1(None)
     mainw.show()
 
     app.exec_()
     
-    # test using "python -m pyfda.hdl_generation.hdl_df1"
+    # test using "python -m pyfda.fixpoint_filters.df1"

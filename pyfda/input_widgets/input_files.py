@@ -54,14 +54,16 @@ else:
 #    XLRD = True
 
 
-class File_IO(QWidget):
+class Input_Files(QWidget):
     """
     Create the widget for saving / loading data
     """
     sig_tx = QtCore.pyqtSignal(object) # sent when loading filter ('data_changed')
 
     def __init__(self, parent):
-        super(File_IO, self).__init__(parent)
+        super(Input_Files, self).__init__(parent)
+        self.tab_label = 'Files'
+        self.tool_tip = "Load and save filter designs."
 
         self._construct_UI()
 
@@ -410,13 +412,14 @@ class File_IO(QWidget):
          dir_string = ("<table><th style='font-size:large;'>Directories</th>"
                            "<tr><td><b>Home:</b></td><td>{0}</td></tr>"
                            "<tr><td><b>Install:&emsp;</b></td><td>{1}</td></tr>"
-                           "<tr><td><b>Temp:</b></td><td>{2}</td></tr>"\
-                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.TEMP_DIR))
+                           "<tr><td><b>Config:&emsp;</b></td><td>{2}</td></tr>"
+                           "<tr><td><b>Temp:</b></td><td>{3}</td></tr>"\
+                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR, dirs.TEMP_DIR))
          dir_string += ("<br /><th style='font-size:large;'>Logging Files</th>"
                         "<tr><td><b>Config:</b></td><td>{0}</td></tr>"
                         "<tr><td><b>Output:&emsp;</b></td><td>{1}</td></tr>"
                         "</table>"\
-                       .format(dirs.USER_LOG_CONF_FILE, dirs.LOG_DIR_FILE))
+                       .format(dirs.USER_LOG_CONF_DIR_FILE, dirs.LOG_DIR_FILE))
 
          about_string = info_string + versions_string + dir_string
 
@@ -448,7 +451,7 @@ if __name__ == '__main__':
     from ..compat import QApplication
     import sys
     app = QApplication(sys.argv)
-    mainw = File_IO(None)
+    mainw = Input_Files(None)
 
     app.setActiveWindow(mainw)
     mainw.show()

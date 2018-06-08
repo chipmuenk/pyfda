@@ -101,23 +101,11 @@ class Plot_Tau_G(QWidget):
                 self.needs_redraw = False
             elif 'view_changed' in dict_sig:
                 self.update_view()
-            elif 'enabled' in dict_sig:
-                self.enable_ui(dict_sig['enabled']) 
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
                 self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
-
-#------------------------------------------------------------------------------
-    def enable_ui(self, enabled):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-#        self.frmControls.setEnabled(enabled)
-        if enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -148,9 +136,8 @@ class Plot_Tau_G(QWidget):
 
 #------------------------------------------------------------------------------
     def draw(self):
-        if self.mplwidget.mplToolbar.enabled:
-            self.calc_tau_g()
-            self.update_view()
+        self.calc_tau_g()
+        self.update_view()
 
 #------------------------------------------------------------------------------
     def update_view(self):

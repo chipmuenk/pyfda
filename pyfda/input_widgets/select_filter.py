@@ -39,7 +39,7 @@ class SelectFilter(QWidget):
       response resp. filter type is read and the combo box(es) further down in
       the hierarchy are populated according to the available combinations.
 
-      sig_tx({ 'filt_changed'}) is emitted and propagated to filter_specs.py
+      sig_tx({'filt_changed'}) is emitted and propagated to input_filter_specs.py
       where it triggers the recreation of all subwidgets.
     """
     sig_tx = pyqtSignal(object) # outgoing
@@ -319,13 +319,15 @@ class SelectFilter(QWidget):
                 # explicit list(dict.keys()) needed for Python 3
                 fb.fil[0]['fo'] = list(fb.fil_tree[self.rt][self.ft][fc].keys())[0]
 
-            logger.debug("selFilter = %s"
-                   "filterTree[fc] = %s"
-                   "filterTree[fc].keys() = %s"
-                  %(fb.fil[0], fb.fil_tree[self.rt][self.ft][fc],\
-                    fb.fil_tree[self.rt][self.ft][fc].keys()
-                    ))
-
+# =============================================================================
+#             logger.debug("selFilter = %s"
+#                    "filterTree[fc] = %s"
+#                    "filterTree[fc].keys() = %s"
+#                   %(fb.fil[0], fb.fil_tree[self.rt][self.ft][fc],\
+#                     fb.fil_tree[self.rt][self.ft][fc].keys()
+#                     ))
+# 
+# =============================================================================
             if hasattr(ff.fil_inst, 'construct_UI'): # construct dyn. subwidgets if available
                 self._construct_dyn_widgets()
 
@@ -372,7 +374,7 @@ class SelectFilter(QWidget):
 
         if enb_signal:
             logger.debug("Emit 'filt_changed'")
-            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_order_auto'})
+            self.sig_tx.emit({'sender':__name__, 'filt_changed':'filter_type'})
 
 #------------------------------------------------------------------------------
     def _set_filter_order(self, enb_signal=False):

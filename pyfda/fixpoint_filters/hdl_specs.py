@@ -24,10 +24,6 @@ import myhdl
 #               instance, instances, intbv, traceSignals,
 #               Simulation, StopSimulation)
 
-# The following modules are imported dynamically
-hdl_wdg_list = ["HDL_DF1", "HDL_DF2"]
-hdl_wdg_dir = "hdl_generation"
-
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_io_lib import extract_file_ext
@@ -43,11 +39,36 @@ class HDL_Specs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
+    # emit a signal when the image has been resized
     sig_resize = pyqtSignal()
+    # incoming, connected to input_tab_widget.sig_tx in pyfdax
+    sig_rx = pyqtSignal(object)
+    # outgoing: emitted by process_sig_rx
+    # sig_tx = pyqtSignal(object)
+
     def __init__(self, parent):
         super(HDL_Specs, self).__init__(parent)
 
         self._construct_UI()
+
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming in via subwidgets and sig_rx
+        """
+        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
+        if dict_sig['sender'] == __name__:
+            logger.warning("Infinite loop detected")
+            return
+        if 'filt_changed' in dict_sig:
+            # update list of available filter topologies here
+            self._update_filter_cmb()
+        if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff':
+            # update fields in the filter topology widget - wordlength may have
+            # been changed
+            self.update_wdg_UI()
+
+#------------------------------------------------------------------------------
 
     def _construct_UI(self):
         """
@@ -56,37 +77,24 @@ class HDL_Specs(QWidget):
         - the UI for the HDL filter settings
         - and the myHDL interface:
         """
-        self.cmb_wdg_hdl = QComboBox(self)
-        self.cmb_wdg_hdl.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.cmb_wdg_fixp = QComboBox(self)
+        self.cmb_wdg_fixp.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+                
 
-        for hdl_wdg in hdl_wdg_list:
-            hdl_mod_name = 'pyfda.' + hdl_wdg_dir + '.' + hdl_wdg.lower()
-            try:  # Try to import the module from the  package and get a handle:
-                hdl_mod = importlib.import_module(hdl_mod_name)
-                hdl_wdg_class = getattr(hdl_mod, hdl_wdg) # try to resolve the class       
-                self.cmb_wdg_hdl.addItem(hdl_wdg, hdl_mod_name)
-            except ImportError:
-                logger.warning("Could not import {0}!".format(hdl_mod_name))
-                continue
-            except Exception as e:
-                logger.warning("Unexpected error during module import:\n{0}".format(e))
-                continue
-
-        self.update_filt_wdg()
 #------------------------------------------------------------------------------        
         # Define frame and layout for the dynamically updated filter widget
-        # The actual filter widget is instantiated in self.update_UI() later on
+        # The actual filter widget is instantiated in self.set_fixp_widget() later on
         self.layHWdg = QHBoxLayout()
         #self.layHWdg.setContentsMargins(*params['wdg_margins'])
         frmHDL_wdg = QFrame(self)
         frmHDL_wdg.setLayout(self.layHWdg)
 
 #------------------------------------------------------------------------------
-        self.lblTitle = QLabel(self.hdl_wdg_inst.title, self)
+        self.lblTitle = QLabel("not set", self)
         self.lblTitle.setWordWrap(True)
         self.lblTitle.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layHTitle = QHBoxLayout()
-        layHTitle.addWidget(self.cmb_wdg_hdl)
+        layHTitle.addWidget(self.cmb_wdg_fixp)
         layHTitle.addWidget(self.lblTitle)
 
         self.frmTitle = QFrame(self)
@@ -96,7 +104,7 @@ class HDL_Specs(QWidget):
         self.lbl_img_hdl = QLabel(self)
         self.img_dir = os.path.dirname(os.path.realpath(__file__))  
         self.img_file = os.path.join(self.img_dir, 'hdl_dummy.png')
-        self.img_hdl = QPixmap(self.img_file)
+        self.img_fixp = QPixmap(self.img_file)
         self.resize_img()
         layHImg = QHBoxLayout()
         layHImg.setContentsMargins(0,0,0,0)
@@ -144,6 +152,11 @@ class HDL_Specs(QWidget):
         self.setLayout(layVMain)
 
         #----------------------------------------------------------------------
+        # GLOBAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------
+        self.sig_rx.connect(self.process_sig_rx)
+
+        #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         #----------------------------------------------------------------------
         # monitor events and generate sig_resize event when resized
@@ -151,18 +164,70 @@ class HDL_Specs(QWidget):
         # ... then redraw image when resized
         self.sig_resize.connect(self.resize_img)
 
-        self.cmb_wdg_hdl.currentIndexChanged.connect(self.update_all)
+        self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
-        self.update_filt_wdg()
-        self.update_UI()
+        inst_wdg_list, n_wdg = self._update_filter_cmb()
+        if n_wdg == 0:
+            logger.warning("No fixpoint filters found!")
+        else:
+            logger.info("Imported {0:d} fixpoint filters:\n{1}"
+                        .format(n_wdg, inst_wdg_list))
+
+        self._update_fixp_widget()
+
+#------------------------------------------------------------------------------
+    def _update_filter_cmb(self):
+        """
+        (Re-)Read list of fixpoint filters, try to import them and populate the 
+        corresponding combo box. The list should be updated everytime a new
+        filter design type is selected.
+        """
+        inst_wdg_list = "" # list of successfully instantiated widgets
+        n_wdg = 0
+        self.cmb_wdg_fixp.clear()
+
+        for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
+            if not fx_fil_wdg[1]:
+                # use standard module
+                mod_name = 'pyfda'
+            else:
+                # check and extract user directory
+                if os.path.isdir(fx_fil_wdg[1]):
+                    mod_path = os.path.normpath(fx_fil_wdg[1])
+                    # split the path into the dir containing the module and its name
+                    mod_dir_name, mod_name = os.path.split(mod_path)
+
+                    if mod_dir_name not in sys.path:
+                        sys.path.append(mod_dir_name)
+                else:
+                    logger.warning("Path {0:s} doesn't exist!".format(fx_fil_wdg[1]))
+                    continue
+            fx_fil_mod_name = mod_name + '.fixpoint_filters.' + fx_fil_wdg[0].lower()
+            fx_fil_class_name = mod_name + '.fixpoint_filters.' + fx_fil_wdg[0]
+
+            try:  # Try to import the module from the  package and get a handle:
+                fx_fil_mod = importlib.import_module(fx_fil_mod_name)
+                fx_fil_class = getattr(fx_fil_mod, fx_fil_wdg[0]) # try to resolve the class       
+                self.cmb_wdg_fixp.addItem(fx_fil_wdg[0], fx_fil_mod_name)
+                
+                inst_wdg_list += '\t' + fx_fil_class_name + '\n'
+                n_wdg += 1
+
+            except ImportError:
+                logger.warning("Could not import {0}!".format(fx_fil_mod_name))
+                continue
+            
+        return inst_wdg_list, n_wdg
+
+#        self.update_filt_wdg()
         
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
         """
         Filter all events generated by monitored QLabel, only resize events are
-        processed here, generating a `sig_resize` signal. Alll other events
+        processed here, generating a `sig_resize` signal. All other events
         are passed on to the next hierarchy level.
         """
         if event.type() == QEvent.Resize:
@@ -172,62 +237,89 @@ class HDL_Specs(QWidget):
         return super(HDL_Specs, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
     def resize_img(self):
-            """ 
-            Resize the image inside QLabel to completely fill the label while
-            keeping the aspect ratio.
-            """
-            img_scaled = self.img_hdl.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            self.lbl_img_hdl.setPixmap(QPixmap(img_scaled))
+        """ 
+        Resize the image inside QLabel to completely fill the label while
+        keeping the aspect ratio.
+        """
+        img_scaled = self.img_fixp.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.lbl_img_hdl.setPixmap(QPixmap(img_scaled))
 
 #------------------------------------------------------------------------------
     def update_all(self):
         """
         Import new module and update UI after changing the filter topology
         """
-        try:
-            self.hdl_wdg_inst.deleteLater() # delete QWidget when scope has been left
-        except AttributeError as e:
-            logger.error("Could not destruct_UI!\n{0}".format(e))
-
-        self.update_filt_wdg()
+        self._construct_dyn_widget()
         self.update_UI()
 
 #------------------------------------------------------------------------------
-    def update_filt_wdg(self):
+    def _update_fixp_widget(self):
         """
-        Import new module after changing the filter topology
-        """
-        cmb_wdg_hdl_cur = qstr(self.cmb_wdg_hdl.currentText())
+        This method is called at the initialization of this widget.
 
-        if cmb_wdg_hdl_cur: # at least one valid hdl widget found
-            self.hdl_wdg_found = True
-            hdl_mod_name = qget_cmb_box(self.cmb_wdg_hdl, data=True) # module name and path
-            hdl_mod = importlib.import_module(hdl_mod_name)
-            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_hdl_cur) # class name
+        It will also be called in the future every time a new filter design is
+        selected, bringing a new selection of available fixpoint filter
+        implementations (not implemented yet).
+        
+        - Destruct old fixpoint filter widget and instance
+        - Import and instantiate new fixpoint filter widget e.g. after changing the 
+          filter topology
+        - Update the UI of the widget
+        """
+        if hasattr(self, "hdl_wdg_inst"): # is a fixpoint widget loaded?
+            try:
+                self.layHWdg.removeWidget(self.hdl_wdg_inst) # remove widget from layout
+                self.hdl_wdg_inst.deleteLater() # delete QWidget when scope has been left
+            except AttributeError as e:
+                logger.error("Could not destruct_UI!\n{0}".format(e))
+
+        cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
+
+        if cmb_wdg_fx_cur: # at least one valid hdl widget found
+            self.fx_wdg_found = True
+            hdl_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
+            hdl_mod = importlib.import_module(hdl_mod_name) # get module 
+            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_fx_cur) # get class
             self.hdl_wdg_inst = hdl_wdg_class(self)
+            self.layHWdg.addWidget(self.hdl_wdg_inst, stretch=1)
+           
+            if hasattr(self.hdl_wdg_inst, "sig_rx"):
+                self.sig_rx.connect(self.hdl_wdg_inst.sig_rx)
+            #if hasattr(self.hdl_wdg_inst, "sig_tx"):
+                #self.hdl_wdg_inst.sig_tx.connect(self.sig_rx)
         else:
-            self.hdl_wdg_found = False
+            self.fx_wdg_found = False
+        
+        self.update_UI()
  
-#------------------------------------------------------------------------------
+##------------------------------------------------------------------------------
     def update_UI(self):
         """
-        Update the UI after changing the filter class
+        Update the UI after changing the fixpoint filter class
         """
         if hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name: # is an image name defined?
             # check whether file exists
             file_path = os.path.dirname(os.path.realpath(__file__))  
             img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name)
             if os.path.exists(img_file):
-                self.img_hdl = QPixmap(img_file)
+                self.img_fixp = QPixmap(img_file)
             else:
                 logger.warning("Image file {0} doesn't exist.".format(img_file))
                 img_file = os.path.join(file_path, "hdl_dummy.png")                
-                self.img_hdl = QPixmap(img_file)
-                #self.lbl_img_hdl.setPixmap(QPixmap(self.img_hdl)) # fixed size
+                self.img_fixp = QPixmap(img_file)
+                #self.lbl_img_hdl.setPixmap(QPixmap(self.img_fixp)) # fixed size
             self.resize_img()
             
         self.lblTitle.setText(self.hdl_wdg_inst.title)
-        self.layHWdg.addWidget(self.hdl_wdg_inst)
+ 
+#------------------------------------------------------------------------------
+    def update_wdg_UI(self):
+        """
+        Update the fixpoint widget UI when view (i.e. fixpoint coefficient format) 
+        has been changed outside this class
+        """
+        if hasattr(self.hdl_wdg_inst, "update_UI"):
+            self.hdl_wdg_inst.update_UI()
 
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):

@@ -29,42 +29,68 @@ from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
 
-class FilterSpecs(QWidget):
+class Input_Specs(QWidget):
     """
     Build widget for entering all filter specs
     """
     # class variables (shared between instances if more than one exists)
-    sigQuit = pyqtSignal() # emitted when >QUIT< button is clicked
+    sig_rx_local = pyqtSignal(object) # incoming from subwidgets -> process_sig_rx_local
 
-    sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sigmals
-    sig_tx = pyqtSignal(object) # outgoing from process_signals
+    sig_rx = pyqtSignal(object) # incoming from subwidgets -> process_sig_rx
+    sig_tx = pyqtSignal(object) # from process_sig_rx: propagate local signals
 
     def __init__(self, parent):
-        super(FilterSpecs, self).__init__(parent)
+        super(Input_Specs, self).__init__(parent)
+        self.tab_label =  "Specs"
+        self.tool_tip = "Enter and view filter specifications."
 
         self._construct_UI()
 
-    def process_sig_rx(self, dict_sig=None):
+    def process_sig_rx_local(self, dict_sig=None):
+        """
+        Flag signals coming in from local subwidgets as "local" before proceeding
+        with processing in `process_sig_rx`.
+        """
+        self.process_sig_rx(dict_sig, local=True)
+
+    def process_sig_rx(self, dict_sig=None, local=False):
         """
         Process signals coming in via subwidgets and sig_rx
+        The sender name of signals coming in from local subwidgets is changed to
+        its parent widget (`input_specs`) to prevent infinite loops.
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.warning("Infinite Loop!")
+            logger.debug("Infinite Loop!")
             return
         elif 'view_changed' in dict_sig:
             self.f_specs.load_dict()
             self.t_specs.load_dict()
-            self.sig_tx.emit(dict_sig)
         elif 'specs_changed' in dict_sig:
             self.f_specs.sort_dict_freqs()
             self.t_specs.f_specs.sort_dict_freqs()
-            self.sig_tx.emit(dict_sig)
+            self.color_design_button("changed")
         elif 'filt_changed' in dict_sig:
             # Changing the filter design requires updating UI because number or
-            # kind of input fields changes -> call update_UI, emitting
-            # 'specs_changed' when finished
+            # kind of input fields changes -> call update_UI
             self.update_UI(dict_sig)
+            self.color_design_button("changed")
+        elif 'data_changed' in dict_sig:
+            if dict_sig['data_changed'] == 'filter_loaded':
+                """
+                Called when a new filter has been LOADED:
+                Pass new filter data from the global filter dict by
+                specifically calling SelectFilter.load_dict()
+                """
+                self.sel_fil.load_dict() # update select_filter widget
+            # Pass new filter data from the global filter dict & set button = "ok"
+            self.load_dict() 
+
+        if local:
+            # local signals are propagated with the name of this widget,
+            # global signals terminate here
+            dict_sig.update({'sender':__name__})
+            self.sig_tx.emit(dict_sig)
         
 
     def _construct_UI(self):
@@ -75,12 +101,12 @@ class FilterSpecs(QWidget):
         #    filter type ft (IIR, ...) and filter class fc (cheby1, ...)
         self.sel_fil = select_filter.SelectFilter(self)
         self.sel_fil.setObjectName("select_filter")
-        self.sel_fil.sig_tx.connect(self.sig_rx)
+        self.sel_fil.sig_tx.connect(self.sig_rx_local)
         
         # Subwidget for selecting the frequency unit and range
         self.f_units = freq_units.FreqUnits(self)
         self.f_units.setObjectName("freq_units")
-        self.f_units.sig_tx.connect(self.sig_rx)
+        self.f_units.sig_tx.connect(self.sig_rx_local)
         
         # Changing the frequency unit requires re-display of frequency specs
         # but it does not influence the actual specs (no specsChanged )
@@ -93,19 +119,19 @@ class FilterSpecs(QWidget):
         # Subwidget for Frequency Specs
         self.f_specs = freq_specs.FreqSpecs(self)
         self.f_specs.setObjectName("freq_specs")
-        self.f_specs.sig_tx.connect(self.sig_rx)
+        self.f_specs.sig_tx.connect(self.sig_rx_local)
         # Subwidget for Amplitude Specs
         self.a_specs = amplitude_specs.AmplitudeSpecs(self)
         self.a_specs.setObjectName("amplitude_specs")
-        self.a_specs.sig_tx.connect(self.sig_rx)
+        self.a_specs.sig_tx.connect(self.sig_rx_local)
         # Subwidget for Weight Specs
         self.w_specs = weight_specs.WeightSpecs(self)
         self.w_specs.setObjectName("weight_specs")
-        self.w_specs.sig_tx.connect(self.sig_rx)
+        self.w_specs.sig_tx.connect(self.sig_rx_local)
         # Subwidget for target specs (frequency and amplitude)
         self.t_specs = target_specs.TargetSpecs(self, title="Target Specifications")
         self.t_specs.setObjectName("target_specs")
-        self.t_specs.sig_tx.connect(self.sig_rx)
+        self.t_specs.sig_tx.connect(self.sig_rx_local)
         # self.sig_tx.connect(self.t_specs.sig_rx)
         # Subwidget for displaying infos on the design method
         self.lblMsg = QLabel(self)
@@ -154,8 +180,9 @@ class FilterSpecs(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------        
+        self.sig_rx_local.connect(self.process_sig_rx_local)  
         self.butDesignFilt.clicked.connect(self.start_design_filt)
-        self.butQuit.clicked.connect(self.sigQuit) # pass on to main application
+        self.butQuit.clicked.connect(self.quit_program) # emit 'quit_program'
         #----------------------------------------------------------------------
 
         self.update_UI() # first time initialization
@@ -177,8 +204,7 @@ class FilterSpecs(QWidget):
         the filter tree [fb.fil_tree], i.e. which parameters are needed, which
         widgets are visible and which message shall be displayed.
 
-        Then, the UIs of all subwidgets are updated using their "update_UI" method,
-        finally sig_tx({'specs_changed':'filter'}) is emitted.
+        Then, the UIs of all subwidgets are updated using their "update_UI" method.
         """
         rt = fb.fil[0]['rt'] # e.g. 'LP'
         ft = fb.fil[0]['ft'] # e.g. 'FIR'
@@ -238,9 +264,6 @@ class FilterSpecs(QWidget):
             self.lblMsg.setText(all_widgets['msg'][1:][0])
         else:
             self.frmMsg.hide()
-
-        dict_sig.update({'sender':__name__, 'specs_changed':'filter'})
-        self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------------
     def load_dict(self):
@@ -305,7 +328,7 @@ class FilterSpecs(QWidget):
                 self.color_design_button("ok")
 
                 self.sig_tx.emit({'sender':__name__, 'data_changed':'filter_designed'})
-                logger.info ('Filter designed with order = {0}'.format(str(fb.fil[0]['N'])))
+                logger.info ('Designed filter with order = {0}'.format(str(fb.fil[0]['N'])))
 # =============================================================================
 #                 logger.debug("Results:\n"
 #                     "F_PB = %s, F_SB = %s "
@@ -331,11 +354,18 @@ class FilterSpecs(QWidget):
         qstyle_widget(self.butDesignFilt, state)
 
 #------------------------------------------------------------------------------
+    def quit_program(self):
+        """
+        When <QUIT> button is pressed, send 'quit_program'
+        """
+        self.sig_tx.emit({'sender':__name__, 'quit_program':''})
+
+#------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = FilterSpecs(None)
+    mainw = Input_Specs(None)
     app.setActiveWindow(mainw)
     mainw.show()
 

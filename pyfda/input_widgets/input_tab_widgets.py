@@ -10,7 +10,8 @@
 Tabbed container for all input widgets
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import sys
+import sys, os
+import importlib
 import logging
 logger = logging.getLogger(__name__)
 
@@ -20,12 +21,10 @@ SCROLL = True
 
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import cmp_version
-
-from pyfda.input_widgets import (filter_specs, file_io, filter_coeffs,
-                                filter_info, filter_pz)
+import pyfda.filterbroker as fb
 
 if cmp_version("myhdl", "0.10") >= 0:
-    from pyfda.hdl_generation import hdl_specs
+    from pyfda.fixpoint_filters import hdl_specs
     HAS_MYHDL = True
 else:
     HAS_MYHDL = False
@@ -53,43 +52,72 @@ class InputTabWidgets(QWidget):
         subwidgets.
         """
         tabWidget = QTabWidget(self)
-        tabWidget.setObjectName("input_tabs")
-        #
-        self.filter_specs = filter_specs.FilterSpecs(self)
-        self.filter_specs.sig_tx.connect(self.sig_rx)
-        #self.sig_tx.connect(self.filter_specs.sig_rx)   # comment out (infinite loop)
 
-        # sigFilterDesigned: signal indicating that filter has been DESIGNED,
-        #       requiring update of all plot and some input widgets:
+        n_wdg = 0 # number of ... 
+        inst_wdg_list = "" # ... successfully instantiated widgets
+        #
+        for i, wdg in enumerate(fb.input_widgets_list):
+            if not wdg[1]:
+                # use standard input widgets package
+                pckg_name = 'pyfda.input_widgets'
+            else:
+                # check and extract user directory
+                if os.path.isdir(wdg[1]):
+                    pckg_path = os.path.normpath(wdg[1])
+                    # split the path into the dir containing the module and its name
+                    user_dir_name, pckg_name = os.path.split(pckg_path)
 
-        tabWidget.addTab(self.filter_specs, 'Specs')
-        tabWidget.setTabToolTip(0, "Enter and view filter specifications.")
+                    if user_dir_name not in sys.path:
+                        sys.path.append(user_dir_name)
+                else:
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
+                    continue
+            mod_name = pckg_name + '.' + wdg[0].lower()
+            class_name = pckg_name + '.' + wdg[0]
+
+            try:  # Try to import the module from the package ...
+                mod = importlib.import_module(mod_name)
+                # get the class belonging to wdg[0] ...
+                wdg_class = getattr(mod, wdg[0])
+                # and instantiate it
+                inst = wdg_class(self)
+                if hasattr(inst, 'tab_label'):
+                    tabWidget.addTab(inst, inst.tab_label)
+                else:
+                    tabWidget.addTab(inst, str(i))
+                if hasattr(inst, 'tool_tip'):
+                    tabWidget.setTabToolTip(i, inst.tool_tip)
+                if hasattr(inst, 'sig_tx'):
+                    inst.sig_tx.connect(self.sig_rx)
+                if hasattr(inst, 'sig_rx'):
+                    self.sig_tx.connect(inst.sig_rx)
+
+                inst_wdg_list += '\t' + class_name + '\n'
+                n_wdg += 1
+
+            except ImportError as e:
+                logger.warning('Module "{0}" could not be imported.\n{1}'\
+                               .format(mod_name, e))
+                continue
+            except AttributeError as e:
+                logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
+                               .format(wdg[0], mod_name, e))
+                continue
+
+        if len(inst_wdg_list) == 0:
+            logger.warning("No input widgets found!")
+        else:
+            logger.info("Imported {0:d} input classes:\n{1}".format(n_wdg, inst_wdg_list))
+
         #
-        self.filter_coeffs = filter_coeffs.FilterCoeffs(self)
-        self.filter_coeffs.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.filter_coeffs.sig_rx)
-        tabWidget.addTab(self.filter_coeffs, 'b,a')
-        tabWidget.setTabToolTip(1, "Display and edit filter coefficients.")
-        #
-        self.filter_pz = filter_pz.FilterPZ(self)
-        self.filter_pz.sig_tx.connect(self.sig_rx)
-        self.sig_tx.connect(self.filter_pz.sig_rx)
-        tabWidget.addTab(self.filter_pz, 'P/Z')
-        tabWidget.setTabToolTip(2, "Display and edit filter poles and zeros.")
-        #
-        self.file_io = file_io.File_IO(self)
-        self.file_io.sig_tx.connect(self.sig_rx)
-        tabWidget.addTab(self.file_io, 'Files')
-        tabWidget.setTabToolTip(3, "Load and save filter designs.")
-        #
-        self.filter_info = filter_info.FilterInfo(self)
-        self.sig_tx.connect(self.filter_info.sig_rx)
-        tabWidget.addTab(self.filter_info, 'Info')
-        tabWidget.setTabToolTip(4, "<span>Display the achieved filter specifications"
-                                   " and more info about the filter design algorithm.</span>")        
+        # TODO: document signal options
+        # TODO: changing view in input_coeffs (wordformat) triggers 6 times "view changed"
+        # TODO: combo boxes trigger "view changed" twice
+        # TODO: except combo box "integer / float / ..." triggering 4 times
         if HAS_MYHDL:
             self.hdlSpecs = hdl_specs.HDL_Specs(self)
             tabWidget.addTab(self.hdlSpecs, 'HDL')
+            self.sig_tx.connect(self.hdlSpecs.sig_rx)
   
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -123,23 +151,6 @@ class InputTabWidgets(QWidget):
         if dict_sig['sender'] == __name__:
             logger.warning("Prevented Infinite Loop!")
             return
-        elif 'specs_changed' in dict_sig:
-            self.filter_specs.color_design_button("changed")
-            if HAS_MYHDL:
-                self.hdlSpecs.update_UI()
-
-        elif 'data_changed' in dict_sig:
-            if dict_sig['data_changed'] == 'filter_loaded':
-                self.filter_specs.color_design_button("ok")
-                """
-                Called when a new filter has been LOADED:
-                Pass new filter data from the global filter dict by
-                specifically calling SelectFilter.load_dict()
-                """
-                self.filter_specs.sel_fil.load_dict() # update select_filter widget
-            self.filter_specs.load_dict() # Pass new filter data from the global filter dict
-        else:
-            logger.debug("Dict {0} passed thru".format(dict_sig))
 
         self.sig_tx.emit(dict_sig)
 

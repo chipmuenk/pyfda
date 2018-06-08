@@ -13,14 +13,18 @@ structured form.
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys, six
 from pprint import pformat
-import codecs
 import importlib
+if sys.version_info > (3,): # True for Python 3
+    import configparser
+else:
+    import ConfigParser as configparser
 
 import logging
 logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
 import pyfda.filter_factory as ff
+import pyfda.pyfda_dirs as dirs
 
 from .frozendict import freeze_hierarchical
 
@@ -88,6 +92,8 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
             d1[key] = d2[key] # add new entry to dict1
     return d1
 
+class ParseError(Exception):
+    pass
 
 class FilterTreeBuilder(object):
     """
@@ -95,26 +101,13 @@ class FilterTreeBuilder(object):
 
     Parameters
     ----------
-
-    filt_dir: string
-        Name of the subdirectory containing the init-file and the
-        Python files to be read, needs to have __init__.py)
-
-    filt_list_file: string
-        Name of the init file
-
-    comment_char: char
-        comment character at the beginning of a comment line
-
+    None
     """
 
-    def __init__(self, filt_dir, filt_list_file, comment_char='#'):
-        cwd = os.path.dirname(os.path.abspath(__file__))
-        self.filt_dir_file = os.path.join(cwd, filt_dir, filt_list_file)
+    def __init__(self):
 
-        logger.debug("Filter file list: %s\n", self.filt_dir_file)
-        self.comment_char = comment_char
-        self.filt_dir = filt_dir
+        logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
+        self.conf_dir = "filter_design" # TODO: This should be read from config file
 
         self.init_filters()
 
@@ -122,21 +115,24 @@ class FilterTreeBuilder(object):
     def init_filters(self):
         """
         - Extract the names of all Python files in the file specified during
-          instantiation (self.filt_dir_file) and write them to a list
+          instantiation (dirs.USER_CONF_DIR_FILE) and write them to a list
         - Try to import all python files and return a dict with all file names
           and corresponding objects (the class needs to have the same name as
           the file)
         - Construct a tree with all the filter combinations
 
         This method can also be called when the main app runs to re-read the
-        filter directory
+        filter directory (?)
         """
-        # Scan filter_list.txt for python file names and extract them
-        filt_list_names = self.read_filt_file()
+        self.filter_list_std = []
+        self.filter_list_usr = []
+        
+        # Scan pyfda.conf for class names / python file names and extract them
+        self.parse_conf_file()
 
         # Try to import all filter modules and classes found in filter_list,
         # store names and modules in the dict fb.fil_classes as {filterName:filterModule}:
-        self.dyn_filt_import(filt_list_names)
+        self.dyn_filt_import()
 
         """
         Read attributes (ft, rt, fo) from all valid filter classes (fc)
@@ -152,7 +148,7 @@ class FilterTreeBuilder(object):
             # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
-                logger.warning('Skipping filter class "%s" due to import error %d', fc, err_code)
+                logger.warning('Skipping filter class "{0:s}" due to import error {1:d}'.format(fc, err_code))
                 continue # continue with next entry in fb.fil_classes
 
             # add attributes from dict to fil_tree for filter class fc
@@ -177,17 +173,15 @@ class FilterTreeBuilder(object):
 
 
 #==============================================================================
-    def read_filt_file(self):
+    def parse_conf_file(self):
         """
-        Extract all file names = class names from self.filt_dir_file:
+        Extract all file names = class names from `dirs.USER_CONF_DIR_FILE` in 
+        section "[Filter Designs}":
 
-        - Lines that don't begin with commentCh are stripped from Newline
-          character, whitespace, '.py' and everything after it and returned as
-          a list.
-        - Lines starting with self.comment_char are stripped of newline,
-          whitespace and comment chars and written to list 'filt_list_comments'
-        - All other lines are discarded (for now)
-        - Collect and return valid file names (without .py) as `filt_list_names`.
+        - Lines that don't begin with '#' are stripped from newline, whitespace
+          and everything after it and returned as a list.
+        - All other lines are discarded
+        - Collect and return valid class / file names as `filt_list_names`.
 
         Parameters
         ----------
@@ -195,62 +189,157 @@ class FilterTreeBuilder(object):
 
         Returns
         -------
-        List `filt_list_names` with the names of all design files
+        List `filt_list_names` with the names of all filter design classes / files
         """
-
-        filt_list_comments = []     # comment lines from filt_list_file (not used yet)
-        # List with filter design file names in filt_list_file without .py suffix:
-        filt_list_names = []
-
-        num_filters = 0           # number of filter design files found
-
         try:
-            # Try to open filt_dir_file in read mode:
-            fp = codecs.open(self.filt_dir_file, 'rU', encoding='utf-8')
-            cur_line = fp.readline()
+            # Test whether user config file is readable, this is necessary as
+            # configParser quietly fails when the file doesn't exist
+            if not os.access(dirs.USER_CONF_DIR_FILE, os.R_OK):
+                raise IOError('Config file "{0}" cannot be read.'.format(dirs.USER_CONF_DIR_FILE))
 
-            while cur_line: # read until currentLine is empty (EOF reached)
-#                cur_line = cur_line.encode('UTF-8') # enforce utf-8
-                # remove white space and Newline characters at beginning and end:
-                cur_line = cur_line.strip(' \n')
-                # Only process line if it is longer than 1 character
-                if len(cur_line) > 1:
-                    # Does current line begin with the comment character?
-                    if cur_line[0] == self.comment_char:
-                        # yes, append line to list filt_list_comments :
-                        filt_list_comments.append((cur_line[1:]))
-                    # No, this is not a comment line
-                    else:
-                        # Is '.py' contained in cur_line? Starting at which pos?
-                        suffix_pos = cur_line.find(".py")
-                        if suffix_pos > 0:
-                            # Yes, strip '.py' and all characters after,
-                            # append the file name to the lines list,
-                            # otherwise discard the line
-                            filt_list_names.append(cur_line[0:suffix_pos])
-                            num_filters += 1
+            # setup an instance of config parser, allow  keys without value
+            conf = configparser.ConfigParser(allow_no_value=True)
+            # preserve case of parsed options by overriding optionxform():
+            # Set it to function str()
+            conf.optionxform = str
+            # Allow interpolation across sections, ${Dirs:dir1}
+            # conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
+            conf.read(dirs.USER_CONF_DIR_FILE)
+            logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
+                        .format(dirs.USER_CONF_DIR_FILE, str(conf.sections())))
+            # -----------------------------------------------------------------
+            # Parsing directories and modules [Dirs]
+            #------------------------------------------------------------------
+            dirs_dict = {i[0]:i[1] for i in conf.items('Dirs')} # convert list to dict
+            dirs.USER_DIR = None
+            try:
+                user_dir = os.path.abspath(os.path.normpath(dirs_dict['user_dir']))
+                if os.path.exists(user_dir):
+                    dirs.USER_DIR = user_dir
+                    logger.info("User directory: {0}".format(user_dir))
+                else:
+                    logger.warning("User directory:\n\t'{0}' doesn't exist."\
+                                   .format(user_dir))
+            except (AttributeError, KeyError):
+                logger.info("No user directory specified.")
+                
 
-                cur_line = fp.readline() # read next line
+            # -----------------------------------------------------------------
+            # Parsing [Input Widgets] and [User Input Widgets]
+            #------------------------------------------------------------------
+            # Return a list of tuples ("class",None) where "class" is the 
+            # class name of a standard input widget:
+            fb.input_widgets_list = conf.items("Input Widgets")
+            if len(fb.input_widgets_list) == 0:
+                raise configparser.NoOptionError('No entries in [Input Widgets].' )
+            # Append a list of tuples ("user_class","user_dir") where "user_class"
+            # is the class name of a user input widget and "user_dir" is its dir: 
+            if dirs.USER_DIR:
+                user_widgets_dir = os.path.join(dirs.USER_DIR,'input_widgets')
+                if os.path.exists(user_widgets_dir):
+                    try:
+                        user_widgets_list = conf.items("User Input Widgets")
+                        if len(user_widgets_list) > 0:
+                            user_widgets_list =\
+                                [(w[0], user_widgets_dir) for w in user_widgets_list]
+                            fb.input_widgets_list += user_widgets_list # append user input widgets
+                    except configparser.NoSectionError:
+                        pass
+                else:
+                    logger.warning("User input widget directory:\n\t'{0}' doesn't exist."
+                                   .format(user_widgets_dir))
+            logger.info('Found {0:2d} entries in [(User) Input Widgets].'
+                        .format(len(fb.input_widgets_list)))
 
-            logger.info("%d entries found in filter list!\n", num_filters)
-            fp.close()
+            # -----------------------------------------------------------------
+            # Parsing [Plot Widgets] and [User Plot Widgets]
+            #------------------------------------------------------------------
+            # Return a list of tuples ("class",None) where "class" is the 
+            # class name of a standard plotting widget:
+            fb.plot_widgets_list = conf.items("Plot Widgets")
+            # Append a list of tuples ("user_class","user_dir") where "user_class"
+            # is the class name of a user plotting widget and "user_dir" is its dir: 
+            if dirs.USER_DIR:
+                user_widgets_dir = os.path.join(dirs.USER_DIR,'plot_widgets')
+                if os.path.exists(user_widgets_dir):
+                    try:
+                        user_widgets_list = conf.items("User Plot Widgets")
+                        if len(user_widgets_list) > 0:
+                            user_widgets_list =\
+                                [(w[0], user_widgets_dir) for w in user_widgets_list]
+                            fb.plot_widgets_list += user_widgets_list # append user plot widgets
+                    except configparser.NoSectionError:
+                        pass
+                else:
+                    logger.warning("User plot widget directory:\n\t'{0}' doesn't exist."
+                                   .format(user_widgets_dir))
+            logger.info('Found {0:2d} entries in [(User) Plot Widgets].'
+                        .format(len(fb.plot_widgets_list)))
 
-            return filt_list_names
+            # -----------------------------------------------------------------
+            # Parsing [Filter Designs] and [User Filter Designs]
+            #------------------------------------------------------------------
+            # Return a list of tuples ("class",None) where "class" is the 
+            # class name of a standard filter design:
+            fb.filter_designs_list = conf.items("Filter Designs")
+            if len(fb.filter_designs_list) == 0:
+                raise configparser.NoOptionError('No entries in [Filter Designs].')
+            # Append a list of tuples ("user_class","user_dir") where "user_class"
+            # is the class name of a user filter design and "user_dir" is its dir: 
+            if dirs.USER_DIR:
+                user_widgets_dir = os.path.join(dirs.USER_DIR, 'filter_designs')
+                if os.path.exists(user_widgets_dir):
+                    try:
+                        user_widgets_list = conf.items("User Input Widgets")
+                        if len(user_widgets_list) > 0:
+                            user_widgets_list =\
+                                [(w[0], user_widgets_dir) for w in user_widgets_list]
+                            fb.input_widgets_list += user_widgets_list # append user input widgets
+                    except configparser.NoSectionError:
+                        pass
+                else:
+                    logger.warning("User filter design directory:\n\t'{0}' doesn't exist."
+                                   .format(user_widgets_dir))
+            logger.info('Found {0:2d} entries in [(User) Filter Designs].'
+                        .format(len(fb.filter_designs_list)))
+
+            # -----------------------------------------------------------------
+            # Parsing [Fixpoint Filters]
+            #------------------------------------------------------------------
+            fb.fixpoint_filters_list = conf.items("Fixpoint Filters")
+            if len(fb.fixpoint_filters_list) == 0:
+                logger.warning('No entries in [Fixpoint Filters].' )
+            else:
+                logger.info('Found {0:2d} entries in [Fixpoint Filters].'\
+                            .format(len(fb.fixpoint_filters_list)))
+
+        # ----- Exceptions ----------------------
+        except configparser.ParsingError as e:
+            logger.critical('Parsing Error in config file "{0}:\n{1}".'
+                            .format(dirs.USER_CONF_DIR_FILE,e))
+            sys.exit()
+        except configparser.NoSectionError as e:
+            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            sys.exit()
+            # configparser.NoOptionError
+        except configparser.DuplicateSectionError as e:
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+        except configparser.Error as e:
+            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            sys.exit()
+
+# Py3 only?
+#        except configparser.DuplicateOptionError as e:
+#            logger.warning('{0} in config file "{1}".'.format(e, self.conf_dir_file))
 
         except IOError as e:
-            logger.critical( 'Filter list file "%s" could not be found.\n\
-                I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
-            sys.exit( 'Filter list file "%s" could not be found.\n\
-                I/O Error(%d): %s' %(self.filt_dir_file, e.errno, e.strerror))
-
-        except Exception as e:
-            logger.error( "Unexpected error: %s", e)
-            sys.exit( "Unexpected error: %s", e)
+            logger.critical('{0}'.format(e))
+            sys.exit()
 
 #==============================================================================
-    def dyn_filt_import(self, filt_list_names):
+    def dyn_filt_import(self):
         """
-        Try to import from all filter files found by ``read_filt_file()``,
+        Try to import from all filter files found by `read_conf_file()`,
         auto-detecting available modules / classes:
 
         - The design classes in a module are specified in the module attribute
@@ -269,7 +358,7 @@ class FilterTreeBuilder(object):
 
         filt_list_names
             List with the classes to be imported, contained in the
-            Python files (ending with .py !!) in the file filt_list_file
+            Python files (ending with .py !!) in the file conf_file
 
         Returns
         -------
@@ -285,8 +374,9 @@ class FilterTreeBuilder(object):
         num_imports = 0           # number of successful filter module imports
         imported_fil_classes = "" # names of successful filter module imports
 
-        for filt_mod in filt_list_names:
-            module_name = 'pyfda.' + self.filt_dir + '.' + filt_mod
+        for filt_mod in fb.filter_designs_list:
+            if not filt_mod[1]: # standard filter directory / module
+                module_name = 'pyfda.filter_designs' + '.' + filt_mod[0]
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
                 mod = importlib.import_module(module_name)
@@ -325,15 +415,14 @@ class FilterTreeBuilder(object):
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
 
                     num_imports += 1
-                    imported_fil_classes += "\t" + filt_mod + "."+ fc + "\n"
+                    imported_fil_classes += "\t" + filt_mod[0] + "."+ fc + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
             sys.exit("No filter class could be imported - shutting down.")
-
         else:
-            logger.info("Imported successfully the following %d filter classes:\n%s",
-                    num_imports, imported_fil_classes)
+            logger.info("Imported {0:d} filter classes:\n{1:s}"\
+                    .format(num_imports, imported_fil_classes))
 
 #==============================================================================
     def build_fil_tree(self, fc, rt_dict, fil_tree = None):
@@ -449,17 +538,16 @@ if __name__ == "__main__":
     # Need to start a QApplication to avoid the error
     #  "QWidget: Must construct a QApplication before a QPaintDevice"
     # when instantiating filters with dynamic widgets (equiripple, firwin)
-    from .compat import QtGui
-    app = QtGui.QApplication(sys.argv)
+    from .compat import QApplication
+    app = QApplication(sys.argv)
 
     print("===== Initialize FilterReader ====")
 
     filt_file_name = "filter_list.txt"
-    filt_dir = "filter_design"
-    comment_char = '#'
+    conf_dir = "filter_design"
 
     # Create a new FilterFileReader instance & initialize it
-    myTreeBuilder = FilterTreeBuilder(filt_dir, filt_file_name, comment_char)
+    myTreeBuilder = FilterTreeBuilder(conf_dir, filt_file_name)
 
     print("\n===== Start Test ====")
     filterTree = myTreeBuilder.build_fil_tree()

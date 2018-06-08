@@ -115,23 +115,11 @@ class Plot_Phi(QWidget):
                 self.needs_redraw = False
             elif 'view_changed' in dict_sig:
                 self.update_view()
-            elif 'enabled' in dict_sig:
-                self.enable_ui(dict_sig['enabled'])
         else:
             if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
                 self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw = True
-
-#------------------------------------------------------------------------------
-    def enable_ui(self, enabled):
-        """
-        Triggered when the toolbar is enabled or disabled
-        """
-        self.frmControls.setEnabled(enabled)
-        if enabled:
-            self.init_axes()
-            self.draw()
 
 #------------------------------------------------------------------------------
     def init_axes(self):
@@ -159,11 +147,10 @@ class Plot_Phi(QWidget):
     def draw(self):
         """
         Main entry point:
-        Re-calculate |H(f)| and draw the figure if enabled
+        Re-calculate |H(f)| and draw the figure
         """
-        if self.mplwidget.mplToolbar.enabled:
-            self.calc_hf()
-            self.update_view()
+        self.calc_hf()
+        self.update_view()
 
 #------------------------------------------------------------------------------
     def update_view(self):

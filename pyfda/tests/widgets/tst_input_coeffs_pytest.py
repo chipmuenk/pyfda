@@ -14,16 +14,16 @@ from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 
 from ...compat import Qt, QtTest, QApplication, QTableWidgetItem
 
-from pyfda.input_widgets.filter_coeffs import FilterCoeffs
+from pyfda.input_widgets.input_coeffs import Input_Coeffs
 
 app = QApplication(sys.argv)
 
-class FilterCoeffsTest(unittest.TestCase):
-    '''Test the FilterCoeffs GUI'''
+class InputCoeffsTest(unittest.TestCase):
+    '''Test the InputCoeffs GUI'''
 
     def setUp(self):
         '''Create the GUI'''
-        self.form = FilterCoeffs(None)
+        self.form = Input_Coeffs(None)
 
     def set_cmb_box(self, cmb_wdg, arg):
         """
@@ -161,5 +161,5 @@ class FilterCoeffsTest(unittest.TestCase):
 if __name__=='__main__':
     unittest.main()
 
-# run tests with python -m pyfda.tests.widgets.test_filter_coeffs
+# run tests with python -m pyfda.tests.widgets.tst_input_coeffs
 # or, using pytest: python -m pytest tests/

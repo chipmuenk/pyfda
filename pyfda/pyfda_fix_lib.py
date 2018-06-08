@@ -638,7 +638,7 @@ class Fixed(object):
         #======================================================================
         # (5) : Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
         #       - frmt2float()
-        #       - filter_coeffs when quantizing the coefficients
+        #       - input_coeffs when quantizing the coefficients
         #       float2frmt passes on the scaling argument
         #======================================================================
 
