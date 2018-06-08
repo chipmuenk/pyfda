@@ -21,7 +21,7 @@ import pprint
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
-from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q
+from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
 from .filter_iir import FilterIIR 
 #==============================================================================
 
@@ -54,7 +54,9 @@ class DF2(QWidget):
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
                                         WI = fb.fil[0]["q_coeff"]['WI'],
                                         WF = fb.fil[0]["q_coeff"]['WF'])
-        self.wdg_q_coeffs = UI_Q(self, enabled=False)
+        self.wdg_q_coeffs = UI_Q_coeffs(self, enabled=False,
+                                        cur_ov=fb.fil[0]["q_coeff"]['ovfl'], 
+                                        cur_q=fb.fil[0]['q_coeff']['quant'])
         #self.wdg_w_accu = UI_W(self, label='Accumulator Format:', WF=30)
         #self.wdg_q_accu = UI_Q_Ovfl(self)
         self.wdg_w_output = UI_W(self, label='Output Format y[n]:')

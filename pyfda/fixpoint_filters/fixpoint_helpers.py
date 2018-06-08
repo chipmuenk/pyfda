@@ -20,7 +20,7 @@ import pyfda.pyfda_fix_lib as fix
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox,
                       QVBoxLayout, QHBoxLayout, QFrame)
 
-from pyfda.pyfda_qt_lib import qstr, qget_cmb_box
+from pyfda.pyfda_qt_lib import qstr, qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import safe_eval, to_html
 
@@ -168,8 +168,8 @@ class UI_W_coeffs(UI_W):
     """
     Widget for entering word format (integer and fractional bits) for the 
     oefficients. The result can be read out via the attributes `self.WI` and 
-    `self.WF`. This class inherits from `UI_WI_WF`, adding the method `load_ui()`
-    for updating the UI from the filter dict.
+    `self.WF`. This class inherits from `UI_WI_WF`, overloading the methods `load_ui()`
+    and `save_ui()` for loading / saving the UI from / to the filter dict.
     """
     def __init__(self, parent, **kwargs):
         super(UI_W_coeffs, self).__init__(parent, **kwargs)
@@ -195,7 +195,6 @@ class UI_W_coeffs(UI_W):
         format has been changed outside the class, e.g. by a new filter design or
         by changing the coefficient format in `input_coeffs.py`.
         """
-        logger.warning("load_ui")
         self.WI = fb.fil[0]['q_coeff']['WI']
         self.WF = fb.fil[0]['q_coeff']['WF']
         self.ledWI.setText(qstr(self.WI))
@@ -204,7 +203,6 @@ class UI_W_coeffs(UI_W):
         self.c_dict = build_coeff_dict()
         
 #==============================================================================
-
 class UI_Q(QWidget):
     """
     Widget for selecting quantization / overflow options. The result can be read out
@@ -219,9 +217,9 @@ class UI_Q(QWidget):
         """ Construct widget """
 
         dict_ui = {'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
-                   'cmb_q':['round', 'fix', 'floor'],
+                   'cmb_q':['round', 'fix', 'floor'], 'cur_q':'round',
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
-                   'cmb_ov':['wrap', 'sat'],
+                   'cmb_ov':['wrap', 'sat'], 'cur_ov':'wrap',
                    'enabled':True, 'visible':True
                    }
         for key, val in kwargs.items():
@@ -231,11 +229,13 @@ class UI_Q(QWidget):
         lblQuant = QLabel(dict_ui['label_q'], self)
         self.cmbQuant = QComboBox(self)
         self.cmbQuant.addItems(dict_ui['cmb_q'])
+        qset_cmb_box(self.cmbQuant, dict_ui['cur_q'])
         self.cmbQuant.setToolTip(dict_ui['tip_q'])
 
         lblOvfl = QLabel(dict_ui['label_ov'], self)
         self.cmbOvfl = QComboBox(self)
         self.cmbOvfl.addItems(dict_ui['cmb_ov'])
+        qset_cmb_box(self.cmbOvfl, dict_ui['cur_ov'])
         self.cmbOvfl.setToolTip(dict_ui['tip_ov'])
 
         # ComboBox size is adjusted automatically to fit the longest element
@@ -286,12 +286,34 @@ class UI_Q(QWidget):
         pass
 
 #==============================================================================
+class UI_Q_coeffs(UI_Q):
+    """
+    Widget for selecting quantization / overflow options. The result can be read out
+    via the attributes `self.ovfl` and `self.quant`. This class inherits from `UI_Q`,
+    overloading the method `load_ui()` for updating the UI from the filter dict.
+    """
+    def __init__(self, parent, **kwargs):
+        super(UI_Q_coeffs, self).__init__(parent)
+        # __init__ method of parent is used, additionally initialize coefficient dict
+        self.c_dict = build_coeff_dict()
+               
+    #--------------------------------------------------------------------------
+    def load_ui(self):
+        """ Update UI from filter dict """
+        self.ovfl = fb.fil[0]['q_coeff']['ovfl']
+        self.quant = fb.fil[0]['q_coeff']['quant']
+        qset_cmb_box(self.cmbOvfl,self.ovfl)
+        qset_cmb_box(self.cmbQuant,self.quant)
+
+        self.c_dict = build_coeff_dict()
+
+#==============================================================================
 
 if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = UI_WI_WF(None)
+    mainw = UI_W(None)
     mainw.show()
 
     app.exec_()
