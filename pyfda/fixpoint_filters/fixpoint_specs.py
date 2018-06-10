@@ -35,7 +35,7 @@ from pyfda.pyfda_rc import params
 
 #------------------------------------------------------------------------------
 
-class HDL_Specs(QWidget):
+class Fixpoint_Specs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
@@ -47,7 +47,7 @@ class HDL_Specs(QWidget):
     # sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
-        super(HDL_Specs, self).__init__(parent)
+        super(Fixpoint_Specs, self).__init__(parent)
 
         self._construct_UI()
 
@@ -234,7 +234,7 @@ class HDL_Specs(QWidget):
             self.sig_resize.emit()
 
         # Call base class method to continue normal event processing:
-        return super(HDL_Specs, self).eventFilter(source, event)
+        return super(Fixpoint_Specs, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
     def resize_img(self):
         """ 
@@ -437,9 +437,9 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = HDL_Specs(None)
+    mainw = Fixpoint_Specs(None)
     mainw.show()
 
     app.exec_()
     
-# test using "python -m pyfda.hdl_generation.hdl_specs"
+# test using "python -m pyfda.fixpoint_filters.fixpoint_specs"

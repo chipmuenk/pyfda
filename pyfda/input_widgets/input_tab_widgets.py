@@ -24,7 +24,7 @@ from pyfda.pyfda_lib import cmp_version
 import pyfda.filterbroker as fb
 
 if cmp_version("myhdl", "0.10") >= 0:
-    from pyfda.fixpoint_filters import hdl_specs
+    from pyfda.fixpoint_filters import fixpoint_specs
     HAS_MYHDL = True
 else:
     HAS_MYHDL = False
@@ -115,9 +115,9 @@ class InputTabWidgets(QWidget):
         # TODO: combo boxes trigger "view changed" twice
         # TODO: except combo box "integer / float / ..." triggering 4 times
         if HAS_MYHDL:
-            self.hdlSpecs = hdl_specs.HDL_Specs(self)
-            tabWidget.addTab(self.hdlSpecs, 'HDL')
-            self.sig_tx.connect(self.hdlSpecs.sig_rx)
+            fxp_specs = fixpoint_specs.Fixpoint_Specs(self)
+            tabWidget.addTab(fxp_specs, 'HDL')
+            self.sig_tx.connect(fxp_specs.sig_rx)
   
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
