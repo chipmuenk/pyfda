@@ -168,12 +168,12 @@ class Fixpoint_Specs(QWidget):
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.simFixPoint)
         #----------------------------------------------------------------------
-        inst_wdg_list, n_wdg = self._update_filter_cmb()
-        if n_wdg == 0:
+        inst_wdg_list = self._update_filter_cmb()
+        if len(inst_wdg_list) == 0:
             logger.warning("No fixpoint filters found!")
         else:
             logger.info("Imported {0:d} fixpoint filters:\n{1}"
-                        .format(n_wdg, inst_wdg_list))
+                        .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
 
         self._update_fixp_widget()
 
@@ -184,44 +184,42 @@ class Fixpoint_Specs(QWidget):
         corresponding combo box. The list should be updated everytime a new
         filter design type is selected.
         """
-        inst_wdg_list = "" # list of successfully instantiated widgets
-        n_wdg = 0
+        inst_wdg_str = "" # full names of successfully instantiated widgets
+
         self.cmb_wdg_fixp.clear()
 
-        for i, fx_fil_wdg in enumerate(fb.fixpoint_filters_list):
-            if not fx_fil_wdg[1]:
+        for wdg in fb.fixpoint_filters_list:
+            if not wdg[1]:
                 # use standard module
-                mod_name = 'pyfda'
+                pckg_name = 'pyfda'
             else:
                 # check and extract user directory
-                if os.path.isdir(fx_fil_wdg[1]):
-                    mod_path = os.path.normpath(fx_fil_wdg[1])
+                if os.path.isdir(wdg[1]):
+                    pckg_path = os.path.normpath(wdg[1])
                     # split the path into the dir containing the module and its name
-                    mod_dir_name, mod_name = os.path.split(mod_path)
+                    mod_dir_name, pckg_name = os.path.split(pckg_path)
 
                     if mod_dir_name not in sys.path:
                         sys.path.append(mod_dir_name)
                 else:
-                    logger.warning("Path {0:s} doesn't exist!".format(fx_fil_wdg[1]))
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
                     continue
-            fx_fil_mod_name = mod_name + '.fixpoint_filters.' + fx_fil_wdg[0].lower()
-            fx_fil_class_name = mod_name + '.fixpoint_filters.' + fx_fil_wdg[0]
+            mod_name = pckg_name + '.fixpoint_filters.' + wdg[0].lower()
+            class_name = pckg_name + '.fixpoint_filters.' + wdg[0]
 
-            try:  # Try to import the module from the  package and get a handle:
-                fx_fil_mod = importlib.import_module(fx_fil_mod_name)
-                fx_fil_class = getattr(fx_fil_mod, fx_fil_wdg[0]) # try to resolve the class       
-                self.cmb_wdg_fixp.addItem(fx_fil_wdg[0], fx_fil_mod_name)
+            try:  # Try to import the module from the  package ...
+                mod = importlib.import_module(mod_name)
+                # get the class belonging to wdg[0] ...
+                _ = getattr(mod, wdg[0]) # try to resolve the class       
+                # everything worked fine, add it to the combo box:
+                self.cmb_wdg_fixp.addItem(wdg[0], mod_name)
                 
-                inst_wdg_list += '\t' + fx_fil_class_name + '\n'
-                n_wdg += 1
+                inst_wdg_str += '\t' + class_name + '\n'
 
             except ImportError:
-                logger.warning("Could not import {0}!".format(fx_fil_mod_name))
+                logger.warning("Could not import {0}!".format(mod_name))
                 continue
-            
-        return inst_wdg_list, n_wdg
-
-#        self.update_filt_wdg()
+        return inst_wdg_str
         
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
