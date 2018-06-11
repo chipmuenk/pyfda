@@ -34,7 +34,7 @@ class DF2(QWidget):
 
         self.title = ("<b>Direct-Form 2 (DF2) Filters</b><br />"
                  "Simple topology, only suitable for low-order filters.")
-        self.img_name = "hdl_df2.png"
+        self.img_name = "df2.png"
 
         self._construct_UI()
 
