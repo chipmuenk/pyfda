@@ -27,7 +27,7 @@ from .filter_iir import FilterIIR
 
 class DF1(QWidget):
     """
-    Create the widget for quantizing data and coef
+    Widget for entering word formats & quantization
     """
     def __init__(self, parent):
         super(DF1, self).__init__(parent)
