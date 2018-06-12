@@ -20,15 +20,7 @@ from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
 SCROLL = True
 
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import cmp_version
 import pyfda.filterbroker as fb
-
-if cmp_version("myhdl", "0.10") >= 0:
-    from pyfda.fixpoint_filters import hdl_specs
-    HAS_MYHDL = True
-else:
-    HAS_MYHDL = False
-
 
 class InputTabWidgets(QWidget):
     """
@@ -53,10 +45,10 @@ class InputTabWidgets(QWidget):
         """
         tabWidget = QTabWidget(self)
 
-        n_wdg = 0 # number of ... 
-        inst_wdg_list = "" # ... successfully instantiated widgets
+        n_wdg = 0 # number and ... 
+        inst_wdg_str = "" # ... full names of successfully instantiated widgets
         #
-        for i, wdg in enumerate(fb.input_widgets_list):
+        for wdg in fb.input_widgets_list:
             if not wdg[1]:
                 # use standard input widgets package
                 pckg_name = 'pyfda.input_widgets'
@@ -81,19 +73,22 @@ class InputTabWidgets(QWidget):
                 wdg_class = getattr(mod, wdg[0])
                 # and instantiate it
                 inst = wdg_class(self)
-                if hasattr(inst, 'tab_label'):
+
+                if hasattr(inst, "state") and inst.state == "deactivated":
+                    continue # with next widget
+                elif hasattr(inst, 'tab_label'):
                     tabWidget.addTab(inst, inst.tab_label)
                 else:
-                    tabWidget.addTab(inst, str(i))
+                    tabWidget.addTab(inst, "not set")
                 if hasattr(inst, 'tool_tip'):
-                    tabWidget.setTabToolTip(i, inst.tool_tip)
+                    tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
                 if hasattr(inst, 'sig_tx'):
                     inst.sig_tx.connect(self.sig_rx)
                 if hasattr(inst, 'sig_rx'):
                     self.sig_tx.connect(inst.sig_rx)
 
-                inst_wdg_list += '\t' + class_name + '\n'
-                n_wdg += 1
+                n_wdg += 1 # successfully instantiated one more widget
+                inst_wdg_str += '\t' + class_name + '\n'
 
             except ImportError as e:
                 logger.warning('Module "{0}" could not be imported.\n{1}'\
@@ -101,24 +96,18 @@ class InputTabWidgets(QWidget):
                 continue
             except AttributeError as e:
                 logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
-                               .format(wdg[0], mod_name, e))
+                               .format(wdg[0], pckg_name, e))
                 continue
 
-        if len(inst_wdg_list) == 0:
+        if len(inst_wdg_str) == 0:
             logger.warning("No input widgets found!")
         else:
-            logger.info("Imported {0:d} input classes:\n{1}".format(n_wdg, inst_wdg_list))
+            logger.info("Imported {0:d} input classes:\n{1}"
+                        .format(n_wdg, inst_wdg_str))
 
         #
         # TODO: document signal options
-        # TODO: changing view in input_coeffs (wordformat) triggers 6 times "view changed"
-        # TODO: combo boxes trigger "view changed" twice
-        # TODO: except combo box "integer / float / ..." triggering 4 times
-        if HAS_MYHDL:
-            self.hdlSpecs = hdl_specs.HDL_Specs(self)
-            tabWidget.addTab(self.hdlSpecs, 'HDL')
-            self.sig_tx.connect(self.hdlSpecs.sig_rx)
-  
+
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------       

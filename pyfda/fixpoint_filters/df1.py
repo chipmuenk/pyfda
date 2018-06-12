@@ -27,14 +27,14 @@ from .filter_iir import FilterIIR
 
 class DF1(QWidget):
     """
-    Create the widget for quantizing data and coef
+    Widget for entering word formats & quantization
     """
     def __init__(self, parent):
         super(DF1, self).__init__(parent)
 
         self.title = ("<b>Direct-Form 1 (DF1) Filters</b><br />"
                  "Simple topology, only suitable for low-order filters.")
-        self.img_name = "hdl_df1.png"
+        self.img_name = "df1.png"
 
         self._construct_UI()
 
@@ -48,7 +48,7 @@ class DF1(QWidget):
         self.layHBtnsMsg = QHBoxLayout()
         self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
-        self.wdg_w_input = UI_W(self, label='Input Format x[n]:')
+        self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X</sub></i>:')
         self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
@@ -57,9 +57,9 @@ class DF1(QWidget):
         self.wdg_q_coeffs = UI_Q_coeffs(self, enabled=False,
                                         cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
-        self.wdg_w_accu = UI_W(self, label='Accumulator Format:', WF=30)
+        self.wdg_w_accu = UI_W(self, label='Accumulator Format <i>Q<sub>A</sub></i>:', WF=30)
         self.wdg_q_accu = UI_Q(self)
-        self.wdg_w_output = UI_W(self, label='Output Format y[n]:')
+        self.wdg_w_output = UI_W(self, label='Output Format <i>Q<sub>Y</sub></i>:')
         self.wdg_q_output = UI_Q(self)
 #------------------------------------------------------------------------------
 

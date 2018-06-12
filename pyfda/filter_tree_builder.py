@@ -189,7 +189,7 @@ class FilterTreeBuilder(object):
 
         Returns
         -------
-        List `filt_list_names` with the names of all filter design classes / files
+ 
         """
         try:
             # Test whether user config file is readable, this is necessary as
@@ -210,16 +210,17 @@ class FilterTreeBuilder(object):
             # -----------------------------------------------------------------
             # Parsing directories and modules [Dirs]
             #------------------------------------------------------------------
-            dirs_dict = {i[0]:i[1] for i in conf.items('Dirs')} # convert list to dict
             dirs.USER_DIR = None
             try:
-                user_dir = os.path.abspath(os.path.normpath(dirs_dict['user_dir']))
-                if os.path.exists(user_dir):
-                    dirs.USER_DIR = user_dir
-                    logger.info("User directory: {0}".format(user_dir))
-                else:
-                    logger.warning("User directory:\n\t'{0}' doesn't exist."\
-                                   .format(user_dir))
+                for d in conf.items('Dirs'):
+                    user_dir = os.path.normpath(d[1])
+                    if os.path.exists(user_dir):
+                        dirs.USER_DIR = user_dir
+                        dirs.USER_DIR_LABEL = d[0]
+                        logger.info("User directory: {0}".format(user_dir))
+                        break
+                    else:
+                        logger.warning("Invalid user directory:\n\t'{0}'.".format(user_dir))
             except (AttributeError, KeyError):
                 logger.info("No user directory specified.")
                 
@@ -246,7 +247,7 @@ class FilterTreeBuilder(object):
                     except configparser.NoSectionError:
                         pass
                 else:
-                    logger.warning("User input widget directory:\n\t'{0}' doesn't exist."
+                    logger.warning("No user input widget directory:\n\t'{0}'."
                                    .format(user_widgets_dir))
             logger.info('Found {0:2d} entries in [(User) Input Widgets].'
                         .format(len(fb.input_widgets_list)))
@@ -271,7 +272,7 @@ class FilterTreeBuilder(object):
                     except configparser.NoSectionError:
                         pass
                 else:
-                    logger.warning("User plot widget directory:\n\t'{0}' doesn't exist."
+                    logger.warning("No user plot widget directory:\n\t'{0}'."
                                    .format(user_widgets_dir))
             logger.info('Found {0:2d} entries in [(User) Plot Widgets].'
                         .format(len(fb.plot_widgets_list)))
@@ -298,7 +299,7 @@ class FilterTreeBuilder(object):
                     except configparser.NoSectionError:
                         pass
                 else:
-                    logger.warning("User filter design directory:\n\t'{0}' doesn't exist."
+                    logger.warning("No user filter design directory:\n\t'{0}'."
                                    .format(user_widgets_dir))
             logger.info('Found {0:2d} entries in [(User) Filter Designs].'
                         .format(len(fb.filter_designs_list)))

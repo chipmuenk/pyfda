@@ -39,7 +39,7 @@ class PlotTabWidgets(QTabWidget):
         Initialize UI with tabbed subwidgets and connect the signals of all
         subwidgets.
         This is done by dynamically instantiating each widget from the list
-        `fb.plot_widget_list` in the module `plot_wdg_dir`. Try to:
+        `fb.plot_widget_list` in the module `wdg_dir`. Try to:
         - connect `sig_tx` and `sig_rx`
         - set the TabToolTip from the instance attribute `tool_tip`
         - set the tab label from the instance attribute `tab_label`
@@ -47,49 +47,50 @@ class PlotTabWidgets(QTabWidget):
         """
         tabWidget = QTabWidget(self)
         tabWidget.setObjectName("plot_tabs")
-        inst_wdg_list = "" # successfully instantiated plot widgets
-        n_wdg = 0 # number of successfully instantiated plot widgets
+
+        n_wdg = 0 # number and ...
+        inst_wdg_list = "" # full names of successfully instantiated plot widgets
         #
-        for i, plot_wdg in enumerate(fb.plot_widgets_list):
-            if not plot_wdg[1]:
+        for wdg in fb.plot_widgets_list:
+            if not wdg[1]:
                 # use standard plot module
-                mod_name = 'pyfda.plot_widgets'
+                pckg_name = 'pyfda.plot_widgets'
             else:
                 # check and extract user directory
-                if os.path.isdir(plot_wdg[1]):
-                    mod_path = os.path.normpath(plot_wdg[1])
+                if os.path.isdir(wdg[1]):
+                    pckg_path = os.path.normpath(wdg[1])
                     # split the path into the dir containing the module and its name
-                    mod_dir_name, mod_name = os.path.split(mod_path)
+                    mod_dir_name, pckg_name = os.path.split(pckg_path)
 
                     if mod_dir_name not in sys.path:
                         sys.path.append(mod_dir_name)
                 else:
-                    logger.warning("Path {0:s} doesn't exist!".format(plot_wdg[1]))
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
                     continue
-            plot_mod_name = mod_name + '.' + plot_wdg[0].lower()
-            plot_class_name = mod_name + '.' + plot_wdg[0]
+            mod_name = pckg_name + '.' + wdg[0].lower()
+            class_name = pckg_name + '.' + wdg[0]
 
             try:  # Try to import the module from the package and get a handle:
-                plot_mod = importlib.import_module(plot_mod_name)
-                plot_class = getattr(plot_mod, plot_wdg[0], None)
-                plot_inst = plot_class(self)
-                if hasattr(plot_inst, 'tab_label'):
-                    tabWidget.addTab(plot_inst, plot_inst.tab_label)
+                mod = importlib.import_module(mod_name)
+                wdg_class = getattr(mod, wdg[0], None)
+                inst = wdg_class(self)
+                if hasattr(inst, 'tab_label'):
+                    tabWidget.addTab(inst, inst.tab_label)
                 else:
-                    tabWidget.addTab(plot_inst, str(i))
-                if hasattr(plot_inst, 'tool_tip'):
-                    tabWidget.setTabToolTip(i, plot_inst.tool_tip)
-                if hasattr(plot_inst, 'sig_tx'):
-                    plot_inst.sig_tx.connect(self.sig_rx)
-                if hasattr(plot_inst, 'sig_rx'):
-                    self.sig_tx.connect(plot_inst.sig_rx)
+                    tabWidget.addTab(inst, "not set")
+                if hasattr(inst, 'tool_tip'):
+                    tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
+                if hasattr(inst, 'sig_tx'):
+                    inst.sig_tx.connect(self.sig_rx)
+                if hasattr(inst, 'sig_rx'):
+                    self.sig_tx.connect(inst.sig_rx)
 
-                inst_wdg_list += '\t' + plot_class_name + '\n'
+                inst_wdg_list += '\t' + class_name + '\n'
                 n_wdg += 1
 
             except ImportError as e:
                 logger.warning('Plotting module "{0}" could not be imported.\n{1}'\
-                               .format(plot_mod_name, e))
+                               .format(mod_name, e))
                 continue
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
