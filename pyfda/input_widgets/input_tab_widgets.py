@@ -24,7 +24,7 @@ from pyfda.pyfda_lib import cmp_version
 import pyfda.filterbroker as fb
 
 if cmp_version("myhdl", "0.10") >= 0:
-    from pyfda.fixpoint_filters import fixpoint_specs
+    from pyfda.input_widgets import fixpoint_specs
     HAS_MYHDL = True
 else:
     HAS_MYHDL = False

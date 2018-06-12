@@ -214,6 +214,7 @@ class Fixpoint_Specs(QWidget):
 
             try:  # Try to import the module from the  package ...
                 mod = importlib.import_module(mod_name)
+                mpath = os.path.dirname(mod.__file__) # get path of fixpoint file
                 # get the class belonging to wdg[0] ...
                 _ = getattr(mod, wdg[0]) # try to resolve the class       
                 # everything worked fine, add it to the combo box:
@@ -267,6 +268,7 @@ class Fixpoint_Specs(QWidget):
         - Destruct old fixpoint filter widget and instance
         - Import and instantiate new fixpoint filter widget e.g. after changing the 
           filter topology
+        - Try to load image for filter topology
         - Update the UI of the widget
         """
         if hasattr(self, "hdl_wdg_inst"): # is a fixpoint widget loaded?
@@ -280,9 +282,9 @@ class Fixpoint_Specs(QWidget):
 
         if cmb_wdg_fx_cur: # at least one valid hdl widget found
             self.fx_wdg_found = True
-            hdl_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
-            hdl_mod = importlib.import_module(hdl_mod_name) # get module 
-            hdl_wdg_class = getattr(hdl_mod, cmb_wdg_fx_cur) # get class
+            fx_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
+            fx_mod = importlib.import_module(fx_mod_name) # get module 
+            hdl_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
             self.hdl_wdg_inst = hdl_wdg_class(self)
             self.layHWdg.addWidget(self.hdl_wdg_inst, stretch=1)
            
@@ -293,16 +295,10 @@ class Fixpoint_Specs(QWidget):
         else:
             self.fx_wdg_found = False
         
-        self.update_UI()
- 
-##------------------------------------------------------------------------------
-    def update_UI(self):
-        """
-        Update the UI after changing the fixpoint filter class
-        """
         if hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name: # is an image name defined?
             # check whether file exists
-            file_path = os.path.dirname(os.path.realpath(__file__))  
+            file_path = os.path.dirname(fx_mod.__file__)
+            #file_path = os.path.dirname(os.path.realpath(__file__))  
             img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name)
             if os.path.exists(img_file):
                 self.img_fixp = QPixmap(img_file)
