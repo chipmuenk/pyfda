@@ -20,15 +20,7 @@ from ..compat import QTabWidget, QWidget, QVBoxLayout, QScrollArea, pyqtSignal
 SCROLL = True
 
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import cmp_version
 import pyfda.filterbroker as fb
-
-if cmp_version("myhdl", "0.10") >= 0:
-    from pyfda.input_widgets import fixpoint_specs
-    HAS_MYHDL = True
-else:
-    HAS_MYHDL = False
-
 
 class InputTabWidgets(QWidget):
     """
@@ -81,8 +73,10 @@ class InputTabWidgets(QWidget):
                 wdg_class = getattr(mod, wdg[0])
                 # and instantiate it
                 inst = wdg_class(self)
-                
-                if hasattr(inst, 'tab_label'):
+
+                if hasattr(inst, "state") and inst.state == "deactivated":
+                    continue # with next widget
+                elif hasattr(inst, 'tab_label'):
                     tabWidget.addTab(inst, inst.tab_label)
                 else:
                     tabWidget.addTab(inst, "not set")
@@ -114,12 +108,6 @@ class InputTabWidgets(QWidget):
         #
         # TODO: document signal options
 
-        if HAS_MYHDL:
-            fxp_specs = fixpoint_specs.Fixpoint_Specs(self)
-            tabWidget.addTab(fxp_specs, fxp_specs.tab_label)
-            tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
-            self.sig_tx.connect(fxp_specs.sig_rx)
-  
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------       

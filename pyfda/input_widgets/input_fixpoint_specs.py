@@ -19,23 +19,30 @@ from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabe
                       QPixmap, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, 
                       QEvent, QSizePolicy)
 
-import myhdl
 #from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
 #               instance, instances, intbv, traceSignals,
 #               Simulation, StopSimulation)
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
+from pyfda.pyfda_lib import cmp_version
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qstr, qget_cmb_box
 from pyfda.pyfda_rc import params
+
+if cmp_version("myhdl", "0.10") >= 0:
+    import myhdl
+    HAS_MYHDL = True
+else:
+    HAS_MYHDL = False
+
 
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
 #                 @ http://www.dsprelated.com/showcode/211.php
 
 #------------------------------------------------------------------------------
 
-class Fixpoint_Specs(QWidget):
+class Input_Fixpoint_Specs(QWidget):
     """
     Create the widget for entering exporting / importing / saving / loading data
     """
@@ -47,14 +54,17 @@ class Fixpoint_Specs(QWidget):
     # sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
-        super(Fixpoint_Specs, self).__init__(parent)
+        super(Input_Fixpoint_Specs, self).__init__(parent)
 
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
-                " simulate it and generate a Verilog / VHDL netlist.</span>")       
+                " simulate it and generate a Verilog / VHDL netlist.</span>")
 
-        if True:
+        if HAS_MYHDL:
             self._construct_UI()
+        else:
+            self.state = "deactivated" # "invisible", "disabled"
+
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -214,7 +224,6 @@ class Fixpoint_Specs(QWidget):
 
             try:  # Try to import the module from the  package ...
                 mod = importlib.import_module(mod_name)
-                mpath = os.path.dirname(mod.__file__) # get path of fixpoint file
                 # get the class belonging to wdg[0] ...
                 _ = getattr(mod, wdg[0]) # try to resolve the class       
                 # everything worked fine, add it to the combo box:
@@ -238,7 +247,7 @@ class Fixpoint_Specs(QWidget):
             self.sig_resize.emit()
 
         # Call base class method to continue normal event processing:
-        return super(Fixpoint_Specs, self).eventFilter(source, event)
+        return super(Input_Fixpoint_Specs, self).eventFilter(source, event)
 #------------------------------------------------------------------------------
     def resize_img(self):
         """ 
@@ -284,8 +293,8 @@ class Fixpoint_Specs(QWidget):
             self.fx_wdg_found = True
             fx_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
             fx_mod = importlib.import_module(fx_mod_name) # get module 
-            hdl_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
-            self.hdl_wdg_inst = hdl_wdg_class(self)
+            fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
+            self.hdl_wdg_inst = fx_wdg_class(self)
             self.layHWdg.addWidget(self.hdl_wdg_inst, stretch=1)
            
             if hasattr(self.hdl_wdg_inst, "sig_rx"):
@@ -297,9 +306,8 @@ class Fixpoint_Specs(QWidget):
         
         if hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name: # is an image name defined?
             # check whether file exists
-            file_path = os.path.dirname(fx_mod.__file__)
-            #file_path = os.path.dirname(os.path.realpath(__file__))  
-            img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name)
+            file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
+            img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name) # construct full image name from it
             if os.path.exists(img_file):
                 self.img_fixp = QPixmap(img_file)
             else:
@@ -436,7 +444,7 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = Fixpoint_Specs(None)
+    mainw = Input_Fixpoint_Specs(None)
     mainw.show()
 
     app.exec_()
