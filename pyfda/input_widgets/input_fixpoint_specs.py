@@ -308,8 +308,14 @@ class Input_Fixpoint_Specs(QWidget):
             # check whether file exists
             file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
             img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name) # construct full image name from it
+            # _, file_extension = os.path.splitext(self.hdl_wdg_inst.img_name)
+
             if os.path.exists(img_file):
                 self.img_fixp = QPixmap(img_file)
+#                if file_extension == '.png':
+#                    self.img_fixp = QPixmap(img_file)
+#                elif file_extension == '.svg':
+#                    self.img_fixp = QtSvg.QSvgWidget(img_file)
             else:
                 logger.warning("Image file {0} doesn't exist.".format(img_file))
                 img_file = os.path.join(file_path, "hdl_dummy.png")                
