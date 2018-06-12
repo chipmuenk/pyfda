@@ -309,7 +309,7 @@
        <g class="com.sun.star.drawing.CustomShape">
         <g id="id30">
          <rect class="BoundingBox" stroke="none" fill="none" x="3244" y="2844" width="3875" height="761"/>
-         <path fill="rgb(153,204,255)" stroke="none" d="M 5181,3586 L 3262,3586 3262,2862 7100,2862 7100,3586 5181,3586 Z"/>
+         <path fill="rgb(173,216,230)" stroke="none" d="M 5181,3586 L 3262,3586 3262,2862 7100,2862 7100,3586 5181,3586 Z"/>
          <path fill="none" stroke="rgb(0,0,0)" stroke-width="35" stroke-linejoin="round" d="M 5181,3586 L 3262,3586 3262,2862 7100,2862 7100,3586 5181,3586 Z"/>
          <text class="TextShape"><tspan class="TextParagraph" font-family="Noto Sans, sans-serif" font-size="423px" font-weight="400"><tspan class="TextPosition" x="4557" y="3214"><tspan font-size="245px" fill="rgb(0,0,0)" stroke="none"> </tspan></tspan><tspan class="TextPosition" y="3354"><tspan fill="rgb(0,0,0)" stroke="none">   </tspan><tspan font-size="388px" fill="rgb(0,0,0)" stroke="none">&lt;</tspan><tspan font-size="388px" font-style="italic" fill="rgb(0,0,0)" stroke="none">Q</tspan></tspan><tspan class="TextPosition" y="3482"><tspan font-size="225px" font-style="italic" fill="rgb(0,0,0)" stroke="none">A</tspan></tspan><tspan class="TextPosition" y="3354"><tspan font-size="388px" fill="rgb(0,0,0)" stroke="none">&gt;</tspan></tspan></tspan></text>
         </g>
@@ -334,7 +334,7 @@
        <g class="com.sun.star.drawing.CustomShape">
         <g id="id33">
          <rect class="BoundingBox" stroke="none" fill="none" x="7392" y="2887" width="828" height="675"/>
-         <path fill="rgb(153,204,255)" stroke="none" d="M 7805,2905 L 8201,3224 7805,3543 7410,3224 7805,2905 7805,2905 Z M 7410,2905 L 7410,2905 Z M 8201,3543 L 8201,3543 Z"/>
+         <path fill="rgb(173,216,230)" stroke="none" d="M 7805,2905 L 8201,3224 7805,3543 7410,3224 7805,2905 7805,2905 Z M 7410,2905 L 7410,2905 Z M 8201,3543 L 8201,3543 Z"/>
          <path fill="none" stroke="rgb(0,0,0)" stroke-width="35" stroke-linejoin="round" d="M 7805,2905 L 8201,3224 7805,3543 7410,3224 7805,2905 7805,2905 Z"/>
          <text class="TextShape"><tspan class="TextParagraph" font-family="Noto Sans, sans-serif" font-size="205px" font-style="italic" font-weight="400"><tspan class="TextPosition" x="7602" y="3300"><tspan font-size="353px" fill="rgb(0,0,0)" stroke="none">Q</tspan></tspan><tspan class="TextPosition" y="3416"><tspan fill="rgb(0,0,0)" stroke="none">Y </tspan></tspan></tspan></text>
         </g>
@@ -381,7 +381,7 @@
        <g class="com.sun.star.drawing.CustomShape">
         <g id="id39">
          <rect class="BoundingBox" stroke="none" fill="none" x="2471" y="1384" width="828" height="675"/>
-         <path fill="rgb(153,204,255)" stroke="none" d="M 2884,1402 L 3280,1721 2884,2040 2489,1721 2884,1402 2884,1402 Z M 2489,1402 L 2489,1402 Z M 3280,2040 L 3280,2040 Z"/>
+         <path fill="rgb(173,216,230)" stroke="none" d="M 2884,1402 L 3280,1721 2884,2040 2489,1721 2884,1402 2884,1402 Z M 2489,1402 L 2489,1402 Z M 3280,2040 L 3280,2040 Z"/>
          <path fill="none" stroke="rgb(0,0,0)" stroke-width="35" stroke-linejoin="round" d="M 2884,1402 L 3280,1721 2884,2040 2489,1721 2884,1402 2884,1402 Z"/>
          <text class="TextShape"><tspan class="TextParagraph" font-family="Noto Sans, sans-serif" font-size="205px" font-style="italic" font-weight="400"><tspan class="TextPosition" x="2678" y="1797"><tspan font-size="353px" fill="rgb(0,0,0)" stroke="none">Q</tspan></tspan><tspan class="TextPosition" y="1913"><tspan fill="rgb(0,0,0)" stroke="none">X </tspan></tspan></tspan></text>
         </g>
