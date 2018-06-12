@@ -113,12 +113,11 @@ class InputTabWidgets(QWidget):
 
         #
         # TODO: document signal options
-        # TODO: changing view in input_coeffs (wordformat) triggers 6 times "view changed"
-        # TODO: combo boxes trigger "view changed" twice
-        # TODO: except combo box "integer / float / ..." triggering 4 times
+
         if HAS_MYHDL:
             fxp_specs = fixpoint_specs.Fixpoint_Specs(self)
-            tabWidget.addTab(fxp_specs, 'HDL')
+            tabWidget.addTab(fxp_specs, fxp_specs.tab_label)
+            tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
             self.sig_tx.connect(fxp_specs.sig_rx)
   
         #----------------------------------------------------------------------

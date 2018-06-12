@@ -49,7 +49,12 @@ class Fixpoint_Specs(QWidget):
     def __init__(self, parent):
         super(Fixpoint_Specs, self).__init__(parent)
 
-        self._construct_UI()
+        self.tab_label = 'Fixpoint'
+        self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
+                " simulate it and generate a Verilog / VHDL netlist.</span>")       
+
+        if True:
+            self._construct_UI()
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
