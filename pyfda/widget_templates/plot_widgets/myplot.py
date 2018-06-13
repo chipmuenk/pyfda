@@ -21,13 +21,26 @@ from pyfda.pyfda_lib import unique_roots
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 
-class myplot(QWidget):
+class Myplot(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
 
     def __init__(self, parent):
-        super(myplot, self).__init__(parent)
+        super(Myplot, self).__init__(parent)
         self.needs_draw = True   # flag whether plot needs to be updated  
         self.needs_redraw = True # flag whether plot needs to be redrawn 
         self.tool_tip = "My first pyfda plot widget"
         self.tab_label = "xxx"
+
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+
+    from ..compat import QApplication
+    app = QApplication(sys.argv)
+    mainw = Myplot(None)
+
+    app.setActiveWindow(mainw) 
+    mainw.show()
+
+    sys.exit(app.exec_())
