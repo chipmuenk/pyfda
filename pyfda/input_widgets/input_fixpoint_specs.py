@@ -142,8 +142,9 @@ class Input_Fixpoint_Specs(QWidget):
 
         # This frame encompasses all the buttons
         frmBtns = QFrame(self)
-        frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmBtns.setLayout(self.layHBtns)
+        frmBtns.setContentsMargins(*params['wdg_margins'])
 
     # -------------------------------------------------------------------
     # Top level layout
