@@ -225,5 +225,5 @@ plot_widgets_list = []
 
 filter_designs_list = []
 
-fixpoint_filters_list = []
+fixpoint_widgets_list = []
 

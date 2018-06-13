@@ -48,21 +48,22 @@ class InputTabWidgets(QWidget):
         n_wdg = 0 # number and ... 
         inst_wdg_str = "" # ... full names of successfully instantiated widgets
         #
+        # wdg = (class_name, args, dir)
         for wdg in fb.input_widgets_list:
-            if not wdg[1]:
-                # use standard input widgets package
+            if not wdg[2]:
+                # dir is empty, use standard input widgets package
                 pckg_name = 'pyfda.input_widgets'
             else:
                 # check and extract user directory
-                if os.path.isdir(wdg[1]):
-                    pckg_path = os.path.normpath(wdg[1])
+                if os.path.isdir(wdg[2]):
+                    pckg_path = os.path.normpath(wdg[2])
                     # split the path into the dir containing the module and its name
                     user_dir_name, pckg_name = os.path.split(pckg_path)
 
                     if user_dir_name not in sys.path:
                         sys.path.append(user_dir_name)
                 else:
-                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[2]))
                     continue
             mod_name = pckg_name + '.' + wdg[0].lower()
             class_name = pckg_name + '.' + wdg[0]

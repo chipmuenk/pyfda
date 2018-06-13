@@ -49,30 +49,33 @@ class PlotTabWidgets(QTabWidget):
         tabWidget.setObjectName("plot_tabs")
 
         n_wdg = 0 # number and ...
-        inst_wdg_list = "" # full names of successfully instantiated plot widgets
+        inst_wdg_str = "" # ... full names of successfully instantiated plot widgets
         #
+        # wdg = (class_name, args, dir)
         for wdg in fb.plot_widgets_list:
-            if not wdg[1]:
+            if not wdg[2]:
                 # use standard plot module
                 pckg_name = 'pyfda.plot_widgets'
             else:
                 # check and extract user directory
-                if os.path.isdir(wdg[1]):
-                    pckg_path = os.path.normpath(wdg[1])
+                if os.path.isdir(wdg[2]):
+                    pckg_path = os.path.normpath(wdg[2])
                     # split the path into the dir containing the module and its name
-                    mod_dir_name, pckg_name = os.path.split(pckg_path)
+                    user_dir_name, pckg_name = os.path.split(pckg_path)
 
-                    if mod_dir_name not in sys.path:
-                        sys.path.append(mod_dir_name)
+                    if user_dir_name not in sys.path:
+                        sys.path.append(user_dir_name)
                 else:
-                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[2]))
                     continue
             mod_name = pckg_name + '.' + wdg[0].lower()
             class_name = pckg_name + '.' + wdg[0]
 
-            try:  # Try to import the module from the package and get a handle:
+            try:  # Try to import the module from the package ...
                 mod = importlib.import_module(mod_name)
-                wdg_class = getattr(mod, wdg[0], None)
+                # get the class belonging to wdg[0] ...       
+                wdg_class = getattr(mod, wdg[0])
+                # and instantiate it
                 inst = wdg_class(self)
                 if hasattr(inst, 'tab_label'):
                     tabWidget.addTab(inst, inst.tab_label)
@@ -85,21 +88,23 @@ class PlotTabWidgets(QTabWidget):
                 if hasattr(inst, 'sig_rx'):
                     self.sig_tx.connect(inst.sig_rx)
 
-                inst_wdg_list += '\t' + class_name + '\n'
-                n_wdg += 1
+                n_wdg += 1 # successfully instantiated one more widget
+                inst_wdg_str += '\t' + class_name + '\n'
 
             except ImportError as e:
-                logger.warning('Plotting module "{0}" could not be imported.\n{1}'\
+                logger.warning('Module "{0}" could not be imported.\n{1}'\
                                .format(mod_name, e))
                 continue
-            except Exception as e:
-                logger.warning("Unexpected error during module import:\n{0}".format(e))
+            
+            except AttributeError as e:
+                logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
+                               .format(wdg[0], pckg_name, e))
                 continue
 
-        if len(inst_wdg_list) == 0:
+        if len(inst_wdg_str) == 0:
             logger.warning("No plotting widgets found!")
         else:
-            logger.info("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_list))
+            logger.info("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
