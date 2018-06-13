@@ -221,8 +221,8 @@ class Input_Fixpoint_Specs(QWidget):
                 else:
                     logger.warning("Path {0:s} doesn't exist!".format(wdg[2]))
                     continue
-            mod_name = pckg_name + '.fixpoint_filters.' + wdg[0].lower()
-            class_name = pckg_name + '.fixpoint_filters.' + wdg[0]
+            mod_name = pckg_name + '.fixpoint_widgets.' + wdg[0].lower()
+            class_name = pckg_name + '.fixpoint_widgets.' + wdg[0]
 
             try:  # Try to import the module from the  package ...
                 mod = importlib.import_module(mod_name)
@@ -303,29 +303,31 @@ class Input_Fixpoint_Specs(QWidget):
                 self.sig_rx.connect(self.hdl_wdg_inst.sig_rx)
             #if hasattr(self.hdl_wdg_inst, "sig_tx"):
                 #self.hdl_wdg_inst.sig_tx.connect(self.sig_rx)
+        
+            if hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name: # is an image name defined?
+                # check whether file exists
+                file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
+                img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name) # construct full image name from it
+                # _, file_extension = os.path.splitext(self.hdl_wdg_inst.img_name)
+    
+                if os.path.exists(img_file):
+                    self.img_fixp = QPixmap(img_file)
+    #                if file_extension == '.png':
+    #                    self.img_fixp = QPixmap(img_file)
+    #                elif file_extension == '.svg':
+    #                    self.img_fixp = QtSvg.QSvgWidget(img_file)
+                else:
+                    logger.warning("Image file {0} doesn't exist.".format(img_file))
+                    img_file = os.path.join(file_path, "hdl_dummy.png")                
+                    self.img_fixp = QPixmap(img_file)
+                    #self.lbl_img_hdl.setPixmap(QPixmap(self.img_fixp)) # fixed size
+                self.resize_img()
+                
+            self.lblTitle.setText(self.hdl_wdg_inst.title)
+
         else:
             self.fx_wdg_found = False
-        
-        if hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name: # is an image name defined?
-            # check whether file exists
-            file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
-            img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name) # construct full image name from it
-            # _, file_extension = os.path.splitext(self.hdl_wdg_inst.img_name)
 
-            if os.path.exists(img_file):
-                self.img_fixp = QPixmap(img_file)
-#                if file_extension == '.png':
-#                    self.img_fixp = QPixmap(img_file)
-#                elif file_extension == '.svg':
-#                    self.img_fixp = QtSvg.QSvgWidget(img_file)
-            else:
-                logger.warning("Image file {0} doesn't exist.".format(img_file))
-                img_file = os.path.join(file_path, "hdl_dummy.png")                
-                self.img_fixp = QPixmap(img_file)
-                #self.lbl_img_hdl.setPixmap(QPixmap(self.img_fixp)) # fixed size
-            self.resize_img()
-            
-        self.lblTitle.setText(self.hdl_wdg_inst.title)
  
 #------------------------------------------------------------------------------
     def update_wdg_UI(self):
