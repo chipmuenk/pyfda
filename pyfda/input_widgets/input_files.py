@@ -405,11 +405,13 @@ class Input_Files(QWidget):
          "Design, analyze and synthesize digital filters<hr>".format(version.__version__))
 
          versions_string =("<b>Operating System:</b> {0} {1}<br><b>User Name:</b> {2}<br><br>"
-         "<b style='font-size:large;'>Imported Modules</b><br>&nbsp;&emsp;{3}"
-           .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME, 
-                 pyfda_lib.mod_version().replace("\n", "<br>&nbsp;&emsp;")))
+                    .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME))
 
-         dir_string = ("<table><th style='font-size:large;'>Directories</th>"
+         dir_string = ("<table><th style='font-size:large;'>Imported Modules</th>"
+                           "<tr><td>&nbsp;&emsp;{0}</td></tr>"\
+                           .format( pyfda_lib.mod_version().replace("\n", "<br>&nbsp;&emsp;")))
+
+         dir_string += ("<table><th style='font-size:large;'>Directories</th>"
                            "<tr><td><b>Home:</b></td><td>{0}</td></tr>"
                            "<tr><td><b>Install:&emsp;</b></td><td>{1}</td></tr>"
                            "<tr><td><b>Config:&emsp;</b></td><td>{2}</td></tr>"
