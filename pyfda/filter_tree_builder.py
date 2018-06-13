@@ -317,12 +317,18 @@ class FilterTreeBuilder(object):
             # Return a list of tuples ("class",args, dir=None) where "class" is the 
             # class name of a standard widget, args are optional arguments
             # from the config file for the widget and dir=None for non-user widgets:
-            wdg_list = conf.items("Fixpoint Widgets")
-            # Add a third empty entry to each tuple
-            if len(wdg_list) > 0:
-                fb.fixpoint_widgets_list = [(w[0], w[1], None) for w in wdg_list]
-            else:
+            try:
+                wdg_list = conf.items("Fixpoint Widgets")
+            
+                # Add a third empty entry to each tuple
+                if len(wdg_list) > 0:
+                    fb.fixpoint_widgets_list = [(w[0], w[1], None) for w in wdg_list]
+                else:
+                    fb.fixpoint_widgets_list = []
+            except configparser.NoSectionError:
                 fb.fixpoint_widgets_list = []
+                logger.warning("No fixpoint widget section in config file.")
+
             # Append a list of tuples ("user_class", "args", "user_dir") where 
             # "user_class" is the class name of a user fixpoint widget, 
             # args are optional arguments and "user_dir" is the widget dir: 
