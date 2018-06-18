@@ -59,6 +59,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                 " simulate it and generate a Verilog / VHDL netlist.</span>")
+        self.parent = parent
 
         if HAS_MYHDL:
             self._construct_UI()
@@ -116,17 +117,18 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle.setLayout(layHTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
-        self.lbl_img_hdl = QLabel(self)
+        self.lbl_img_fixp = QLabel(self)
         self.img_dir = os.path.dirname(os.path.realpath(__file__))  
         self.img_file = os.path.join(self.img_dir, 'hdl_dummy.png')
         self.img_fixp = QPixmap(self.img_file)
-        self.resize_img()
+
         layHImg = QHBoxLayout()
         layHImg.setContentsMargins(0,0,0,0)
-        layHImg.addWidget(self.lbl_img_hdl)#, Qt.AlignCenter)
+        layHImg.addWidget(self.lbl_img_fixp)#, Qt.AlignCenter)
         self.frmImg = QFrame(self)
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
+        self.resize_img()
 #------------------------------------------------------------------------------        
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
@@ -176,7 +178,7 @@ class Input_Fixpoint_Specs(QWidget):
         # LOCAL SIGNALS & SLOTs & EVENTFILTERS
         #----------------------------------------------------------------------
         # monitor events and generate sig_resize event when resized
-        self.lbl_img_hdl.installEventFilter(self)
+        self.lbl_img_fixp.installEventFilter(self)
         # ... then redraw image when resized
         self.sig_resize.connect(self.resize_img)
 
@@ -256,8 +258,15 @@ class Input_Fixpoint_Specs(QWidget):
         Resize the image inside QLabel to completely fill the label while
         keeping the aspect ratio.
         """
-        img_scaled = self.img_fixp.scaled(self.lbl_img_hdl.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.lbl_img_hdl.setPixmap(QPixmap(img_scaled))
+        fx, fy = self.parent.width(), self.parent.height()
+        img_w, img_h = self.lbl_img_fixp.width(), self.lbl_img_fixp.height() 
+        max_h = int(img_h * fx/img_w) - 5
+
+#        img_scaled = self.img_fixp.scaled(self.lbl_img_fixp.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
+
+        logger.warning("img size: {0},{1}, frm size:  {2},{3}, {4}".format(img_w, img_h, fx, fy, max_h))
+        self.lbl_img_fixp.setPixmap(QPixmap(img_scaled))
 
 #------------------------------------------------------------------------------
     def update_all(self):
@@ -304,24 +313,26 @@ class Input_Fixpoint_Specs(QWidget):
             #if hasattr(self.hdl_wdg_inst, "sig_tx"):
                 #self.hdl_wdg_inst.sig_tx.connect(self.sig_rx)
         
-            if hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name: # is an image name defined?
+            if not (hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name): # is an image name defined?
+                self.hdl_wdg_inst.img_name = "no_img.png"
                 # check whether file exists
-                file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
-                img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name) # construct full image name from it
-                # _, file_extension = os.path.splitext(self.hdl_wdg_inst.img_name)
-    
-                if os.path.exists(img_file):
-                    self.img_fixp = QPixmap(img_file)
-    #                if file_extension == '.png':
-    #                    self.img_fixp = QPixmap(img_file)
-    #                elif file_extension == '.svg':
-    #                    self.img_fixp = QtSvg.QSvgWidget(img_file)
-                else:
-                    logger.warning("Image file {0} doesn't exist.".format(img_file))
-                    img_file = os.path.join(file_path, "hdl_dummy.png")                
-                    self.img_fixp = QPixmap(img_file)
-                    #self.lbl_img_hdl.setPixmap(QPixmap(self.img_fixp)) # fixed size
-                self.resize_img()
+            file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
+            img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name) # construct full image name from it
+            # _, file_extension = os.path.splitext(self.hdl_wdg_inst.img_name)
+
+            if os.path.exists(img_file):
+                self.img_fixp = QPixmap(img_file)
+#                if file_extension == '.png':
+#                    self.img_fixp = QPixmap(img_file)
+#                elif file_extension == '.svg':
+#                    self.img_fixp = QtSvg.QSvgWidget(img_file)
+            else:
+                logger.warning("Image file {0} doesn't exist.".format(img_file))
+                img_file = os.path.join(file_path, "hdl_dummy.png")                
+                self.img_fixp = QPixmap(img_file)
+                #self.lbl_img_fixp.setPixmap(QPixmap(self.img_fixp)) # fixed size
+
+            self.resize_img()
                 
             self.lblTitle.setText(self.hdl_wdg_inst.title)
 
