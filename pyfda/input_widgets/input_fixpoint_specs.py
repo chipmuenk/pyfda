@@ -33,6 +33,15 @@ from pyfda.pyfda_rc import params
 if cmp_version("myhdl", "0.10") >= 0:
     import myhdl
     HAS_MYHDL = True
+
+    fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
+    if not os.path.exists(fil_blocks_path):
+        logger.error("Invalid path {0}".format(fil_blocks_path))
+    else:
+        if fil_blocks_path not in sys.path:
+            sys.path.append(fil_blocks_path)
+        import filter_blocks
+    
 else:
     HAS_MYHDL = False
 
@@ -365,6 +374,15 @@ class Input_Fixpoint_Specs(QWidget):
         self.hdl_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
         self.hdl_wdg_inst.flt.hdl_name = file_name
         self.hdl_wdg_inst.flt.hdl_directory = dir_name
+        
+        # NEW
+        from filter_blocks.fda import FilterFIR
+        
+        hdlfilter = FilterFIR(file_name, dir_name) # Standard DF1 filter 
+        hdlfilter.set_coefficients(coeffs[0])      # Coefficients for the filter
+        hdlfilter.set_stimulation(np.ones(100))    # Set the simulation input
+        hdlfilter.run_sim()                # Run the simulation
+        y = hdlfilter.get_response()       # Get the response from the simulation
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
