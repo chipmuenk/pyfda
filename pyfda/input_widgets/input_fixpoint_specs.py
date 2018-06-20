@@ -22,6 +22,7 @@ from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabe
 #from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
 #               instance, instances, intbv, traceSignals,
 #               Simulation, StopSimulation)
+import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
@@ -270,16 +271,28 @@ class Input_Fixpoint_Specs(QWidget):
         Resize the image inside QLabel to completely fill the label while
         keeping the aspect ratio.
         """
-        fx, fy = self.parent.width(), self.parent.height()
-        img_w, img_h = self.lbl_img_fixp.width(), self.lbl_img_fixp.height() 
-        max_h = int(img_h * fx/img_w) - 5
 
-#        img_scaled = self.img_fixp.scaled(self.lbl_img_fixp.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        #self.lbl_img_fixp.blockSignals(True)
+        if hasattr(self.parent, "width"): # needed for module test
+            par_w, par_h = self.parent.width(), self.parent.height()
+        else:
+            par_w, par_h = 300, 700
+        lbl_w, lbl_h = self.lbl_img_fixp.width(), self.lbl_img_fixp.height()
+        img_w, img_h = self.img_fixp.width(), self.img_fixp.height()
+
+        if img_w > 10:        
+            max_h = int(max(np.floor(img_h * par_w/img_w) - 15, 20))
+        else:
+            max_h = 200
+        logger.warning("img size: {0},{1}, frm size: {2},{3}, max_h: {4}".format(img_w, img_h, par_w, par_h, max_h))        
+        #return
+        #img_scaled = self.img_fixp.scaled(self.lbl_img_fixp.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        #img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
         img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
 
-        logger.warning("img size: {0},{1}, frm size:  {2},{3}, {4}".format(img_w, img_h, fx, fy, max_h))
-        self.lbl_img_fixp.setPixmap(QPixmap(img_scaled))
 
+        self.lbl_img_fixp.setPixmap(QPixmap(img_scaled))
+        #self.lbl_img_fixp.blockSignals(False)
 #------------------------------------------------------------------------------
     def update_all(self):
         """
