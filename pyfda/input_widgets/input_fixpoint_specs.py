@@ -45,7 +45,6 @@ if cmp_version("myhdl", "0.10") >= 0:
 else:
     HAS_MYHDL = False
 
-
 # see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
 #                 @ http://www.dsprelated.com/showcode/211.php
 
@@ -74,7 +73,6 @@ class Input_Fixpoint_Specs(QWidget):
             self._construct_UI()
         else:
             self.state = "deactivated" # "invisible", "disabled"
-
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -105,14 +103,15 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_wdg_fixp = QComboBox(self)
         self.cmb_wdg_fixp.setSizeAdjustPolicy(QComboBox.AdjustToContents)
                 
-
 #------------------------------------------------------------------------------        
         # Define frame and layout for the dynamically updated filter widget
         # The actual filter widget is instantiated in self.set_fixp_widget() later on
+       
         self.layHWdg = QHBoxLayout()
         #self.layHWdg.setContentsMargins(*params['wdg_margins'])
         frmHDL_wdg = QFrame(self)
         frmHDL_wdg.setLayout(self.layHWdg)
+        #frmHDL_wdg.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
 #------------------------------------------------------------------------------
         self.lblTitle = QLabel("not set", self)
@@ -127,6 +126,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
         self.lbl_img_fixp = QLabel("a", self)
+        #self.lbl_img_fixp.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+
         self.img_dir = os.path.dirname(os.path.realpath(__file__))  
         self.img_file = os.path.join(self.img_dir, 'hdl_dummy.png')
         self.img_fixp = QPixmap(self.img_file)
