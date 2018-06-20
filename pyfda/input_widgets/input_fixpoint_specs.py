@@ -246,8 +246,10 @@ class Input_Fixpoint_Specs(QWidget):
                 inst_wdg_str += '\t' + class_name + '\n'
 
             except ImportError:
-                logger.warning("Could not import {0}!".format(mod_name))
+                logger.warning('Could not import module "{0}"!'.format(mod_name))
                 continue
+            except AttributeError:
+                logger.warning('No attribute / class "{0}" in"{1}"'.format(wdg[0], mod_name))
         return inst_wdg_str
         
 #------------------------------------------------------------------------------
