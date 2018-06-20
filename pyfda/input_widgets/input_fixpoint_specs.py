@@ -462,12 +462,13 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-
     from ..compat import QApplication
+    logging.basicConfig() # setup a basic logger
+    fb.fixpoint_widgets_list = [('DF1','',''), ('DF2','','')]
     app = QApplication(sys.argv)
     mainw = Input_Fixpoint_Specs(None)
     mainw.show()
 
     app.exec_()
     
-# test using "python -m pyfda.fixpoint_filters.fixpoint_specs"
+# test using "python -m pyfda.input_widgets.input_fixpoint_specs"
