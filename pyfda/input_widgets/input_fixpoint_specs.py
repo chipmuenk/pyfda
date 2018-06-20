@@ -126,7 +126,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle.setLayout(layHTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 #------------------------------------------------------------------------------        
-        self.lbl_img_fixp = QLabel(self)
+        self.lbl_img_fixp = QLabel("a", self)
         self.img_dir = os.path.dirname(os.path.realpath(__file__))  
         self.img_file = os.path.join(self.img_dir, 'hdl_dummy.png')
         self.img_fixp = QPixmap(self.img_file)
