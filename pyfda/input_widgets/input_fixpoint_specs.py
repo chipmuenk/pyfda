@@ -394,7 +394,8 @@ class Input_Fixpoint_Specs(QWidget):
         # NEW
         from filter_blocks.fda import FilterFIR
         
-        hdlfilter = FilterFIR(file_name, dir_name) # Standard DF1 filter 
+        # hdlfilter = FilterFIR(file_name, dir_name) # Standard DF1 filter 
+        hdlfilter = FilterFIR(0,0) # Standard DF1 filter 
         hdlfilter.set_coefficients(coeffs[0])      # Coefficients for the filter
         hdlfilter.set_stimulation(np.ones(100))    # Set the simulation input
         hdlfilter.run_sim()                # Run the simulation
