@@ -19,9 +19,6 @@ from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabe
                       QPixmap, QVBoxLayout, QHBoxLayout, pyqtSignal, QFrame, 
                       QEvent, QSizePolicy)
 
-#from myhdl import (toVerilog, toVHDL, Signal, always, always_comb, delay,
-#               instance, instances, intbv, traceSignals,
-#               Simulation, StopSimulation)
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -284,7 +281,7 @@ class Input_Fixpoint_Specs(QWidget):
             max_h = int(max(np.floor(img_h * par_w/img_w) - 15, 20))
         else:
             max_h = 200
-        logger.warning("img size: {0},{1}, frm size: {2},{3}, max_h: {4}".format(img_w, img_h, par_w, par_h, max_h))        
+        logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}".format(img_w, img_h, par_w, par_h, max_h))        
         #return
         #img_scaled = self.img_fixp.scaled(self.lbl_img_fixp.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         #img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
@@ -316,10 +313,10 @@ class Input_Fixpoint_Specs(QWidget):
         - Try to load image for filter topology
         - Update the UI of the widget
         """
-        if hasattr(self, "hdl_wdg_inst"): # is a fixpoint widget loaded?
+        if hasattr(self, "fx_wdg_inst"): # is a fixpoint widget loaded?
             try:
-                self.layHWdg.removeWidget(self.hdl_wdg_inst) # remove widget from layout
-                self.hdl_wdg_inst.deleteLater() # delete QWidget when scope has been left
+                self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
+                self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
             except AttributeError as e:
                 logger.error("Could not destruct_UI!\n{0}".format(e))
 
@@ -330,20 +327,20 @@ class Input_Fixpoint_Specs(QWidget):
             fx_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
             fx_mod = importlib.import_module(fx_mod_name) # get module 
             fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
-            self.hdl_wdg_inst = fx_wdg_class(self)
-            self.layHWdg.addWidget(self.hdl_wdg_inst, stretch=1)
+            self.fx_wdg_inst = fx_wdg_class(self)
+            self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1)
            
-            if hasattr(self.hdl_wdg_inst, "sig_rx"):
-                self.sig_rx.connect(self.hdl_wdg_inst.sig_rx)
-            #if hasattr(self.hdl_wdg_inst, "sig_tx"):
-                #self.hdl_wdg_inst.sig_tx.connect(self.sig_rx)
+            if hasattr(self.fx_wdg_inst, "sig_rx"):
+                self.sig_rx.connect(self.fx_wdg_inst.sig_rx)
+            #if hasattr(self.fx_wdg_inst, "sig_tx"):
+                #self.fx_wdg_inst.sig_tx.connect(self.sig_rx)
         
-            if not (hasattr(self.hdl_wdg_inst, "img_name") and self.hdl_wdg_inst.img_name): # is an image name defined?
-                self.hdl_wdg_inst.img_name = "no_img.png"
+            if not (hasattr(self.fx_wdg_inst, "img_name") and self.fx_wdg_inst.img_name): # is an image name defined?
+                self.fx_wdg_inst.img_name = "no_img.png"
                 # check whether file exists
             file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
-            img_file = os.path.join(file_path, self.hdl_wdg_inst.img_name) # construct full image name from it
-            # _, file_extension = os.path.splitext(self.hdl_wdg_inst.img_name)
+            img_file = os.path.join(file_path, self.fx_wdg_inst.img_name) # construct full image name from it
+            # _, file_extension = os.path.splitext(self.fx_wdg_inst.img_name)
 
             if os.path.exists(img_file):
                 self.img_fixp = QPixmap(img_file)
@@ -359,7 +356,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.resize_img()
                 
-            self.lblTitle.setText(self.hdl_wdg_inst.title)
+            self.lblTitle.setText(self.fx_wdg_inst.title)
 
         else:
             self.fx_wdg_found = False
@@ -371,8 +368,8 @@ class Input_Fixpoint_Specs(QWidget):
         Update the fixpoint widget UI when view (i.e. fixpoint coefficient format) 
         has been changed outside this class
         """
-        if hasattr(self.hdl_wdg_inst, "update_UI"):
-            self.hdl_wdg_inst.update_UI()
+        if hasattr(self.fx_wdg_inst, "update_UI"):
+            self.fx_wdg_inst.update_UI()
 
 #------------------------------------------------------------------------------
     def setupHDL(self, file_name = "", dir_name = ""):
@@ -387,9 +384,9 @@ class Input_Fixpoint_Specs(QWidget):
         # zpk =  fb.fil[0]['zpk'] # not implemented yet
         # sos = fb.fil[0]['sos']  # not implemented yet
 
-        self.hdl_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
-        self.hdl_wdg_inst.flt.hdl_name = file_name
-        self.hdl_wdg_inst.flt.hdl_directory = dir_name
+        self.fx_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
+        self.fx_wdg_inst.flt.hdl_name = file_name
+        self.fx_wdg_inst.flt.hdl_directory = dir_name
         
         # NEW
         from filter_blocks.fda import FilterFIR
@@ -430,17 +427,17 @@ class Input_Fixpoint_Specs(QWidget):
             self.setupHDL(file_name = hdl_file_name, dir_name = hdl_dir_name)
 
             if str(hdl_type) == '.vhd':
-                self.hdl_wdg_inst.flt.hdl_target = 'vhdl'
+                self.fx_wdg_inst.flt.hdl_target = 'vhdl'
                 suffix = '.vhd'
             else:
-                self.hdl_wdg_inst.flt.hdl_target = 'verilog'
+                self.fx_wdg_inst.flt.hdl_target = 'verilog'
                 suffix = '.v'
 
 
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + suffix)))
 
-            self.hdl_wdg_inst.flt.convert()
+            self.fx_wdg_inst.flt.convert()
             logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
@@ -477,8 +474,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.setupHDL(file_name = plt_file, dir_name = plt_dir)
 
             logger.info("Fixpoint simulation setup")
-            W = self.hdl_wdg_inst.W # Matlab format : W = (W_len,WF)
-            tb = self.hdl_wdg_inst.flt.simulate_freqz(num_loops=3, Nfft=1024)
+            W = self.fx_wdg_inst.W # Matlab format : W = (W_len,WF)
+            tb = self.fx_wdg_inst.flt.simulate_freqz(num_loops=3, Nfft=1024)
             clk = myhdl.Signal(False)
             ts  = myhdl.Signal(False)
             x   = myhdl.Signal(myhdl.intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
@@ -489,7 +486,7 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.info("Fixpoint simulation started")
                 sim.run()
                 logger.info("Fixpoint plotting started")
-                self.hdl_wdg_inst.flt.plot_response()
+                self.fx_wdg_inst.flt.plot_response()
                 logger.info("Fixpoint plotting finished")
             except myhdl.SimulationError as e:
                 logger.warning("Simulation failed:\n{0}".format(e))
