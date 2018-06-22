@@ -7,8 +7,8 @@
 # (see file LICENSE in root directory for details)
 
 """
-Create the filter tree dictionary that contains all filter types in a well
-structured form.
+Create the tree dictionaries containing information about filters, 
+filter implementations, widgets etc. in hierarchical form
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys, six
@@ -95,9 +95,11 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
 class ParseError(Exception):
     pass
 
-class FilterTreeBuilder(object):
+class Tree_Builder(object):
     """
-    Construct a tree with all the filter combinations
+    Read the config file and construct dictionary trees with
+    - all filter combinations
+    - valid combinations of filter designs and fixpoint implementations
 
     Parameters
     ----------
@@ -107,7 +109,6 @@ class FilterTreeBuilder(object):
     def __init__(self):
 
         logger.debug("Config file: {0:s}\n".format(dirs.USER_CONF_DIR_FILE))
-        self.conf_dir = "filter_design" # TODO: This should be read from config file
 
         self.init_filters()
 
@@ -123,10 +124,7 @@ class FilterTreeBuilder(object):
 
         This method can also be called when the main app runs to re-read the
         filter directory (?)
-        """
-        self.filter_list_std = []
-        self.filter_list_usr = []
-        
+        """       
         # Scan pyfda.conf for class names / python file names and extract them
         self.parse_conf_file()
 
@@ -365,7 +363,7 @@ class FilterTreeBuilder(object):
 
 # Py3 only?
 #        except configparser.DuplicateOptionError as e:
-#            logger.warning('{0} in config file "{1}".'.format(e, self.conf_dir_file))
+#            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
 
         except IOError as e:
             logger.critical('{0}'.format(e))
@@ -582,7 +580,7 @@ if __name__ == "__main__":
     conf_dir = "filter_design"
 
     # Create a new FilterFileReader instance & initialize it
-    myTreeBuilder = FilterTreeBuilder(conf_dir, filt_file_name)
+    myTreeBuilder = Tree_Builder(conf_dir, filt_file_name)
 
     print("\n===== Start Test ====")
     filterTree = myTreeBuilder.build_fil_tree()

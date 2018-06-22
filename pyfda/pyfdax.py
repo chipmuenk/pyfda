@@ -104,7 +104,7 @@ from pyfda import qrc_resources # contains all icons
 #   or          pyrcc5 pyfda.qrc -o qrc_resources.py
 # and manually replace "from from PyQt4/5 import QtCore"
 #   by "from .compat import QtCore" in qrc_resources.py
-from pyfda.filter_tree_builder import FilterTreeBuilder
+from pyfda.tree_builder import Tree_Builder
 from pyfda.input_widgets import input_tab_widgets
 from pyfda.plot_widgets import plot_tab_widgets
 
@@ -131,7 +131,7 @@ class pyFDA(QMainWindow):
 
         # initialize the FilterTreeBuilder class: 
         # read config file and construct filter tree from it
-        self.ftb = FilterTreeBuilder()
+        _ = Tree_Builder() # TODO_ couldn't this be a function?
         self._construct_UI()
 
     def _construct_UI(self):
