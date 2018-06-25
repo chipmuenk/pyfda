@@ -387,19 +387,55 @@ class Input_Fixpoint_Specs(QWidget):
         # zpk =  fb.fil[0]['zpk'] # not implemented yet
         # sos = fb.fil[0]['sos']  # not implemented yet
 
-        self.hdl_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
-        self.hdl_wdg_inst.flt.hdl_name = file_name
-        self.hdl_wdg_inst.flt.hdl_directory = dir_name
-        
+
+        hdl_d = self.hdl_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
+        b = [ int(x) for x in hdl_d['QC']['b']]
+
+        # self.hdl_wdg_inst.flt.hdl_name = file_name
+        # self.hdl_wdg_inst.flt.hdl_directory = dir_name
         # NEW
+
         from filter_blocks.fda import FilterFIR
+        import matplotlib.pyplot as pl
+        import pyfda.pyfda_fix_lib as fix
         
         # hdlfilter = FilterFIR(file_name, dir_name) # Standard DF1 filter 
         hdlfilter = FilterFIR(0,0) # Standard DF1 filter 
-        hdlfilter.set_coefficients(coeffs[0])      # Coefficients for the filter
+        hdlfilter.set_coefficients(b)      # Coefficients for the filter
         hdlfilter.set_stimulation(np.ones(100))    # Set the simulation input
-        hdlfilter.run_sim()                # Run the simulation
+        testfil = hdlfilter.filter_block()
+        testfil.run_sim()               # Run the simulation
         y = hdlfilter.get_response()       # Get the response from the simulation
+        #TODO: float to fixed point conversion
+
+        print(y)
+
+        # y = y.tolist()
+        # frmt = None
+        # # update the coefficient quantizer object
+        # Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
+        # #Q_coeff.setQobj(fb.fil[0]['q_coeff'])
+        # if not frmt:
+        #     Q_coeff.frmt = 'dec' # use decimal format for coefficients by default
+        # else:
+        #     Q_coeff.frmt = frmt # use the function argument
+
+        # # quantize floating point coefficients and converts them to the
+        # # selected numeric format (hex, bin, dec ...)
+        # c_dict = {}
+        # c_dict.update({'y':list(Q_coeff.frmt2float(y))})
+        # c_dict.update({'a':list(Q_coeff.float2frmt(a))})
+        # c_dict.update({'WF':Q_coeff.WF})
+        # c_dict.update({'WI':Q_coeff.WI})
+        # c_dict.update({'scale':Q_coeff.scale})
+        # c_dict.update({'frmt':Q_coeff.frmt})
+
+        # print(c_dict)
+
+
+
+        pl.plot(y) #plot in pop-up needs to be integrated in the UI
+        pl.show()
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
@@ -478,18 +514,18 @@ class Input_Fixpoint_Specs(QWidget):
 
             logger.info("Fixpoint simulation setup")
             W = self.hdl_wdg_inst.W # Matlab format : W = (W_len,WF)
-            tb = self.hdl_wdg_inst.flt.simulate_freqz(num_loops=3, Nfft=1024)
+            #tb = self.hdl_wdg_inst.flt.simulate_freqz(num_loops=3, Nfft=1024)
             clk = myhdl.Signal(False)
             ts  = myhdl.Signal(False)
             x   = myhdl.Signal(myhdl.intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
             y   = myhdl.Signal(myhdl.intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
 
             try:
-                sim = myhdl.Simulation(tb)
+                #sim = myhdl.Simulation(tb)
                 logger.info("Fixpoint simulation started")
-                sim.run()
+                #sim.run()
                 logger.info("Fixpoint plotting started")
-                self.hdl_wdg_inst.flt.plot_response()
+ #               self.hdl_wdg_inst.flt.plot_response()
                 logger.info("Fixpoint plotting finished")
             except myhdl.SimulationError as e:
                 logger.warning("Simulation failed:\n{0}".format(e))
