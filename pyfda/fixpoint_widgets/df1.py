@@ -111,9 +111,9 @@ class DF1(QWidget):
                                }
                         })
   
-        hdl_dict_sorted = [str(k) +' : '+ str(hdl_dict[k]) for k in sorted(hdl_dict.keys())]
-        hdl_dict_str = pprint.pformat(hdl_dict_sorted)
-        logger.info("exporting hdl_dict:\n{0:s}".format(hdl_dict_str))   
+        # hdl_dict_sorted = [str(k) +' : '+ str(hdl_dict[k]) for k in sorted(hdl_dict.keys())]
+        # hdl_dict_str = pprint.pformat(hdl_dict_sorted)
+        # logger.info("exporting hdl_dict:\n{0:s}".format(hdl_dict_str))   
 
         return hdl_dict
 
@@ -124,19 +124,24 @@ class DF1(QWidget):
         coefficients.
         """
         # a dict like this could be passed to myHDL
-        self.build_hdl_dict()
+        hdl_d = self.build_hdl_dict()
+
+        # for k, v in cf.items():
+        #     print(k, v)
+        # print("hellohello")
 
         self.W = (self.wdg_w_input.WI + self.wdg_w_input.WF, self.wdg_w_input.WF) # Matlab format: (W,WF)        
+        
         
         logger.info("W = {0}".format(self.W))
         logger.info('b = {0}'.format(coeffs[0][0:3]))
         logger.info('a = {0}'.format(coeffs[1][0:3]))
 
-        
-        self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
-                a=np.array(coeffs[1][0:3]),
-                #sos = sos, doesn't work yet
-                word_format=(self.W[0], 0, self.W[1]))
+        return hdl_d
+        # self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
+        #         a=np.array(coeffs[1][0:3]),
+        #         #sos = sos, doesn't work yet
+        #         word_format=(self.W[0], 0, self.W[1]))
 
 #------------------------------------------------------------------------------
 
