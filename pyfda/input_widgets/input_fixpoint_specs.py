@@ -461,7 +461,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.setupHDL()
         stim = np.zeros(100)
         stim[0] = 1
-        self.hdlfilter.set_stimulation(stim)    # Set the simulation input
+        self.hdlfilter.set_stimulus(stim)    # Set the simulation input
         testfil = self.hdlfilter.filter_block()
         testfil.run_sim()               # Run the simulation
         y = self.hdlfilter.get_response()       # Get the response from the simulation
