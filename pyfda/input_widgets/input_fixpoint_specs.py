@@ -84,6 +84,9 @@ class Input_Fixpoint_Specs(QWidget):
         if dict_sig['sender'] == __name__:
             logger.warning("Infinite loop detected")
             return
+        if 'data_changed' in dict_sig:
+            # update hdl_dict when filter has been designed
+            self.update_hdl_dict()
         if 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
@@ -371,7 +374,16 @@ class Input_Fixpoint_Specs(QWidget):
     def update_wdg_UI(self):
         """
         Update the fixpoint widget UI when view (i.e. fixpoint coefficient format) 
-        has been changed outside this class
+        has been changed outside this class and update coefficient dictionary
+        """
+        if hasattr(self.hdl_wdg_inst, "update_UI"):
+            self.hdl_wdg_inst.update_UI()
+#------------------------------------------------------------------------------
+    def update_hdl_dict(self):
+        """
+        Update the hdl dictionary when a filter has been designed
+        Currently, this also updates widget UI, should be separated ...
+        # TODO
         """
         if hasattr(self.hdl_wdg_inst, "update_UI"):
             self.hdl_wdg_inst.update_UI()
