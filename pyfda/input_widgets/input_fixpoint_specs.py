@@ -382,18 +382,9 @@ class Input_Fixpoint_Specs(QWidget):
         Setup instance of myHDL object with word lengths and coefficients
         """
 
-        # @todo: always use sos?  The filter object is setup to always
-        # @todo: generate a second order filter
-        
-        # get filter coefficients etc. from filter dict
-        coeffs = fb.fil[0]['ba']
-        # zpk =  fb.fil[0]['zpk'] # not implemented yet
-        # sos = fb.fil[0]['sos']  # not implemented yet
+        # get a dict with the coefficients and fixpoint settings from fixpoint widget
+        hdl_d = self.hdl_wdg_inst.get_hdl_dict()
 
-        # call setup method of filter widget returning a dict with the coefficients
-        # and fixpoint settings
-        hdl_d = self.hdl_wdg_inst.setup_HDL(coeffs)
-        b = [ int(x) for x in hdl_d['QC']['b']]
 
         # self.hdl_wdg_inst.flt.hdl_name = file_name
         # self.hdl_wdg_inst.flt.hdl_directory = dir_name

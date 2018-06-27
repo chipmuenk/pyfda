@@ -86,19 +86,23 @@ class DF1(QWidget):
 #------------------------------------------------------------------------------
     def update_UI(self):
         """
-        Update all parts of the UI that need to be updated when specs have been
-        changed outside this class (e.g. coefficient wordlength).
-        This is called from one level above.
+        Update:
+            - all parts of the UI that need to be updated when specs have been
+                changed outside this class (e.g. coefficient wordlength).
+            - coefficients
+        This is called from one level above by Input_Fixpoint_Specs().
         """
         self.wdg_w_coeffs.load_ui() # update coefficient wordlength
         self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
 
 #==============================================================================
-    def build_hdl_dict(self):
+    def get_hdl_dict(self):
         """
         Build the dictionary for passing infos to the filter implementation
         """
-        hdl_dict = {'QC':self.wdg_w_coeffs.c_dict} # coefficients
+        
+        # quantized coefficients in decimal format
+        hdl_dict = {'QC':self.wdg_w_coeffs.c_dict}
         # parameters for input format
         hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
                                'WF':self.wdg_w_input.WF
@@ -111,30 +115,17 @@ class DF1(QWidget):
                                'QUANT': self.wdg_q_output.quant
                                }
                         })
-  
-        # hdl_dict_sorted = [str(k) +' : '+ str(hdl_dict[k]) for k in sorted(hdl_dict.keys())]
-        # hdl_dict_str = pprint.pformat(hdl_dict_sorted)
-        # logger.info("exporting hdl_dict:\n{0:s}".format(hdl_dict_str))   
 
+        # TODO: remove this - a leftover from an earlier version, needed for old 
+        #       implementation of exportHDL
+        self.flt = FilterIIR(b=np.array(fb.fil[0]['ba'][0][0:3]),
+                a=np.array(fb.fil[0]['ba'][1][0:3]),
+                #sos = sos, doesn't work yet
+                word_format=(hdl_dict['QI']['WI'] + hdl_dict['QI']['WF'], 0,
+                             hdl_dict['QI']['WF']))
+        #-------------------------------------------------   
+    
         return hdl_dict
-
-#==============================================================================
-    def setup_HDL(self, coeffs):
-        """
-        Instantiate the myHDL description and pass quantization parameters and
-        coefficients.
-        """
-        # a dict like this could be passed to myHDL
-        hdl_d = self.build_hdl_dict()
-
-        self.W = (self.wdg_w_input.WI + self.wdg_w_input.WF, self.wdg_w_input.WF) # Matlab format: (W,WF)        
-        
-        
-        logger.info("W = {0}".format(self.W))
-        logger.info('b = {0}'.format(coeffs[0][0:3]))
-        logger.info('a = {0}'.format(coeffs[1][0:3]))
-
-        return hdl_d
 
 #------------------------------------------------------------------------------
 

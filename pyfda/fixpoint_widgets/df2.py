@@ -93,10 +93,12 @@ class DF2(QWidget):
         self.wdg_q_coeffs.load_ui()
 
 #==============================================================================
-    def build_hdl_dict(self):
+    def get_hdl_dict(self):
         """
         Build the dictionary for passing infos to the filter implementation
         """
+        
+
         hdl_dict = {'QC':self.wdg_w_coeffs.c_dict} # coefficients
         # parameters for input format
         hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
@@ -110,33 +112,17 @@ class DF2(QWidget):
                                'QUANT': self.wdg_q_output.quant
                                }
                         })
-  
-        hdl_dict_sorted = [str(k) +' : '+ str(hdl_dict[k]) for k in sorted(hdl_dict.keys())]
-        hdl_dict_str = pprint.pformat(hdl_dict_sorted)
-        logger.info("exporting hdl_dict:\n{0:s}".format(hdl_dict_str))   
+
+        # TODO: remove this - a leftover from an earlier version, needed for old 
+        #       implementation of exportHDL
+        self.flt = FilterIIR(b=np.array(fb.fil[0]['ba'][0][0:3]),
+                a=np.array(fb.fil[0]['ba'][1][0:3]),
+                #sos = sos, doesn't work yet
+                word_format=(hdl_dict['QI']['WI'] + hdl_dict['QI']['WF'], 0,
+                             hdl_dict['QI']['WF']))        
+        #-------------------------------------------------
 
         return hdl_dict
-
-#==============================================================================
-    def setup_HDL(self, coeffs):
-        """
-        Instantiate the myHDL description and pass quantization parameters and
-        coefficients.
-        """
-        # a dict like this could be passed to myHDL
-        self.build_hdl_dict()
-
-        self.W = (self.wdg_w_input.WI + self.wdg_w_input.WF, self.wdg_w_input.WF) # Matlab format: (W,WF)
-        
-        logger.info("W = {0}".format(self.W))
-        logger.info('b = {0}'.format(coeffs[0][0:3]))
-        logger.info('a = {0}'.format(coeffs[1][0:3]))
-
-        
-        self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
-                a=np.array(coeffs[1][0:3]),
-                #sos = sos, doesn't work yet
-                word_format=(self.W[0], 0, self.W[1]))
 
 #------------------------------------------------------------------------------
 
