@@ -38,11 +38,12 @@ class DF1(QWidget):
 
         self._construct_UI()
 
+#------------------------------------------------------------------------------
+
     def _construct_UI(self):
         """
         Intitialize the UI and instantiate hdl_filter class
         """
-#------------------------------------------------------------------------------
         
         lblHBtnsMsg = QLabel("<b>Fixpoint signal / coeff. formats as WI.WF:</b>", self)
         self.layHBtnsMsg = QHBoxLayout()
@@ -89,8 +90,8 @@ class DF1(QWidget):
         changed outside this class (e.g. coefficient wordlength).
         This is called from one level above.
         """
-        self.wdg_w_coeffs.load_ui()
-        self.wdg_q_coeffs.load_ui()
+        self.wdg_w_coeffs.load_ui() # update coefficient wordlength
+        self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
 
 #==============================================================================
     def build_hdl_dict(self):
@@ -126,10 +127,6 @@ class DF1(QWidget):
         # a dict like this could be passed to myHDL
         hdl_d = self.build_hdl_dict()
 
-        # for k, v in cf.items():
-        #     print(k, v)
-        # print("hellohello")
-
         self.W = (self.wdg_w_input.WI + self.wdg_w_input.WF, self.wdg_w_input.WF) # Matlab format: (W,WF)        
         
         
@@ -138,10 +135,6 @@ class DF1(QWidget):
         logger.info('a = {0}'.format(coeffs[1][0:3]))
 
         return hdl_d
-        # self.flt = FilterIIR(b=np.array(coeffs[0][0:3]),
-        #         a=np.array(coeffs[1][0:3]),
-        #         #sos = sos, doesn't work yet
-        #         word_format=(self.W[0], 0, self.W[1]))
 
 #------------------------------------------------------------------------------
 

@@ -268,11 +268,13 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def resize_img(self):
         """ 
-        Resize the image inside QLabel to completely fill the label while
-        keeping the aspect ratio.
+        Triggered when self (the widget) is resized, consequently the image
+        inside QLabel is resized to completely fill the label while keeping 
+        the aspect ratio.
+        
+        This doesn't really work at the moment.
         """
 
-        #self.lbl_img_fixp.blockSignals(True)
         if hasattr(self.parent, "width"): # needed for module test
             par_w, par_h = self.parent.width(), self.parent.height()
         else:
@@ -292,7 +294,7 @@ class Input_Fixpoint_Specs(QWidget):
 
 
         self.lbl_img_fixp.setPixmap(QPixmap(img_scaled))
-        #self.lbl_img_fixp.blockSignals(False)
+
 #------------------------------------------------------------------------------
     def update_all(self):
         """
@@ -382,13 +384,15 @@ class Input_Fixpoint_Specs(QWidget):
 
         # @todo: always use sos?  The filter object is setup to always
         # @todo: generate a second order filter
+        
         # get filter coefficients etc. from filter dict
         coeffs = fb.fil[0]['ba']
         # zpk =  fb.fil[0]['zpk'] # not implemented yet
         # sos = fb.fil[0]['sos']  # not implemented yet
 
-
-        hdl_d = self.hdl_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
+        # call setup method of filter widget returning a dict with the coefficients
+        # and fixpoint settings
+        hdl_d = self.hdl_wdg_inst.setup_HDL(coeffs)
         b = [ int(x) for x in hdl_d['QC']['b']]
 
         # self.hdl_wdg_inst.flt.hdl_name = file_name
