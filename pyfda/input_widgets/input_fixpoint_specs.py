@@ -24,6 +24,8 @@ from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabe
 #               Simulation, StopSimulation)
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_lib import cmp_version
@@ -42,7 +44,7 @@ if cmp_version("myhdl", "0.10") >= 0:
         if fil_blocks_path not in sys.path:
             sys.path.append(fil_blocks_path)
         import filter_blocks
-    
+        from filter_blocks.fda import FilterFIR    
 else:
     HAS_MYHDL = False
 
@@ -397,30 +399,16 @@ class Input_Fixpoint_Specs(QWidget):
         # get a dict with the coefficients and fixpoint settings from fixpoint widget
         hdl_d = self.hdl_wdg_inst.get_hdl_dict()
 
+        b = [ int(x) for x in hdl_d['QC']['b']] # convert np.int64 to python int
+        # b = hdl_d['QC']['b']
 
         # self.hdl_wdg_inst.flt.hdl_name = file_name
         # self.hdl_wdg_inst.flt.hdl_directory = dir_name
         # NEW
-
-        from filter_blocks.fda import FilterFIR
-        import matplotlib.pyplot as pl
-        import pyfda.pyfda_fix_lib as fix
         
-        # hdlfilter = FilterFIR(file_name, dir_name) # Standard DF1 filter 
-        hdlfilter = FilterFIR(0,0) # Standard DF1 filter 
-        hdlfilter.set_coefficients(b)      # Coefficients for the filter
-        hdlfilter.set_stimulation(np.ones(100))    # Set the simulation input
-        testfil = hdlfilter.filter_block()
-        testfil.run_sim()               # Run the simulation
-        y = hdlfilter.get_response()       # Get the response from the simulation
-        #TODO: float to fixed point conversion
-
-        print(y)
-
-
-
-        pl.plot(y) #plot in pop-up needs to be integrated in the UI
-        pl.show()
+        # self.hdlfilter = FilterFIR(file_name, dir_name) # Standard DF1 filter 
+        self.hdlfilter = FilterFIR(0,0) # Standard DF1 filter 
+        self.hdlfilter.set_coefficients(b)      # Coefficients for the filter
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
@@ -470,50 +458,31 @@ class Input_Fixpoint_Specs(QWidget):
         Simulate filter in fix-point description
         """
         # Setup the Testbench and run
+        self.setupHDL()
+        stim = np.zeros(100)
+        stim[0] = 1
+        self.hdlfilter.set_stimulation(stim)    # Set the simulation input
+        testfil = self.hdlfilter.filter_block()
+        testfil.run_sim()               # Run the simulation
+        y = self.hdlfilter.get_response()       # Get the response from the simulation
+        #TODO: fixed point / integer to float conversion?
 
-        dlg = QFD(self)  # instantiate file dialog object
+        #print(y)
 
-        plt_types = "png (*.png);;svg (*.svg)"
-
-        plt_dir_file, plt_type = dlg.getSaveFileName_(
-                caption = "Save plots as", directory=dirs.save_dir,
-                filter = plt_types)
-        plt_dir_file = qstr(plt_dir_file) # dir + file name without suffix
-
-        if plt_dir_file != "":
-            plt_type = extract_file_ext(qstr(plt_type)) # suffix
-            plt_dir_file += plt_type[0] # file name with suffix
-            plt_dir_file = os.path.normpath(plt_dir_file) # "sanitize" path
-
-            plt_dir = os.path.dirname(plt_dir_file)  # extract the directory path
-            if not os.path.isdir(plt_dir): # create directory if it doesn't exist
-                os.mkdir(plt_dir)
-            dirs.save_dir = plt_dir # make this directory the new default / base dir
-
-            plt_file = os.path.basename(plt_dir_file)
-
-            logger.info('Creating plot file "{0}"'.format(
-                        os.path.join(plt_dir, plt_file)))
-
-            self.setupHDL(file_name = plt_file, dir_name = plt_dir)
-
-            logger.info("Fixpoint simulation setup")
-            W = self.hdl_wdg_inst.W # Matlab format : W = (W_len,WF)
-            #tb = self.hdl_wdg_inst.flt.simulate_freqz(num_loops=3, Nfft=1024)
-            clk = myhdl.Signal(False)
-            ts  = myhdl.Signal(False)
-            x   = myhdl.Signal(myhdl.intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
-            y   = myhdl.Signal(myhdl.intbv(0,min=-2**(W[0]-1), max=2**(W[0]-1)))
-
-            try:
-                #sim = myhdl.Simulation(tb)
-                logger.info("Fixpoint simulation started")
-                #sim.run()
-                logger.info("Fixpoint plotting started")
+        plt.plot(y) #plot in pop-up needs to be integrated in the UI
+        plt.show()
+        
+        try:
+            #sim = myhdl.Simulation(tb)
+            logger.info("Fixpoint simulation started")
+            #sim.run()
+            logger.info("Fixpoint plotting started")
  #               self.hdl_wdg_inst.flt.plot_response()
-                logger.info("Fixpoint plotting finished")
-            except myhdl.SimulationError as e:
-                logger.warning("Simulation failed:\n{0}".format(e))
+            logger.info("Fixpoint plotting finished")
+        except myhdl.SimulationError as e:
+            logger.warning("Simulation failed:\n{0}".format(e))
+            
+        return
 
 #------------------------------------------------------------------------------
 
