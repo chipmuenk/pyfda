@@ -286,7 +286,7 @@ class Input_Fixpoint_Specs(QWidget):
             max_h = int(max(np.floor(img_h * par_w/img_w) - 15, 20))
         else:
             max_h = 200
-        logger.warning("img size: {0},{1}, frm size: {2},{3}, max_h: {4}".format(img_w, img_h, par_w, par_h, max_h))        
+        logger.debug("img size: {0},{1}, frm size: {2},{3}, max_h: {4}".format(img_w, img_h, par_w, par_h, max_h))        
         #return
         #img_scaled = self.img_fixp.scaled(self.lbl_img_fixp.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         #img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
@@ -404,28 +404,6 @@ class Input_Fixpoint_Specs(QWidget):
         #TODO: float to fixed point conversion
 
         print(y)
-
-        # y = y.tolist()
-        # frmt = None
-        # # update the coefficient quantizer object
-        # Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
-        # #Q_coeff.setQobj(fb.fil[0]['q_coeff'])
-        # if not frmt:
-        #     Q_coeff.frmt = 'dec' # use decimal format for coefficients by default
-        # else:
-        #     Q_coeff.frmt = frmt # use the function argument
-
-        # # quantize floating point coefficients and converts them to the
-        # # selected numeric format (hex, bin, dec ...)
-        # c_dict = {}
-        # c_dict.update({'y':list(Q_coeff.frmt2float(y))})
-        # c_dict.update({'a':list(Q_coeff.float2frmt(a))})
-        # c_dict.update({'WF':Q_coeff.WF})
-        # c_dict.update({'WI':Q_coeff.WI})
-        # c_dict.update({'scale':Q_coeff.scale})
-        # c_dict.update({'frmt':Q_coeff.frmt})
-
-        # print(c_dict)
 
 
 

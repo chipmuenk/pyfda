@@ -877,8 +877,8 @@ class Fixed(object):
                 if self.WF == 0:
                     y_str = np.int64(y_fix) # get rid of trailing zero
                     # y_str = np.char.mod('%d', y_fix)
-                # elementwise conversion from integer (%d) to string
-                # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
+                    # elementwise conversion from integer (%d) to string
+                    # see https://docs.scipy.org/doc/numpy/reference/routines.char.html
                 else:
                     # y_str = np.char.mod('%f',y_fix)
                     y_str = y_fix

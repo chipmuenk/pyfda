@@ -27,7 +27,9 @@ from pyfda.pyfda_lib import safe_eval, to_html
 
 def build_coeff_dict(frmt=None):
     """
-    Read and quantize the coefficients and return them as a dictionary
+    Read and quantize the coefficients and return them as a dictionary.
+    
+    This is called every time one of the coefficient subwidgets is edited or changed.
 
     Parameters:
     -----------
@@ -43,9 +45,9 @@ def build_coeff_dict(frmt=None):
 
         - WF: integer
 
-        - scale:
+        - scale: float
 
-        - frmt:
+        - frmt: string
 
         - f_fix: np.array
 
