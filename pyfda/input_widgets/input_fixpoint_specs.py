@@ -43,7 +43,6 @@ if cmp_version("myhdl", "0.10") >= 0:
     else:
         if fil_blocks_path not in sys.path:
             sys.path.append(fil_blocks_path)
-        import filter_blocks
         from filter_blocks.fda import FilterFIR    
 else:
     HAS_MYHDL = False
@@ -55,14 +54,12 @@ else:
 
 class Input_Fixpoint_Specs(QWidget):
     """
-    Create the widget for entering exporting / importing / saving / loading data
+    Create the widget that holds the dynamically loaded fixpoint filter ui 
     """
     # emit a signal when the image has been resized
     sig_resize = pyqtSignal()
-    # incoming, connected to input_tab_widget.sig_tx in pyfdax
+    # incoming, connected to input_tab_widget.sig_tx
     sig_rx = pyqtSignal(object)
-    # outgoing: emitted by process_sig_rx
-    # sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
         super(Input_Fixpoint_Specs, self).__init__(parent)
