@@ -131,8 +131,15 @@ class PlotTabWidgets(QTabWidget):
 
         tabWidget.installEventFilter(self)
 
+    def process_sig_rx_local(self, dict_sig=None):
+        """
+        Flag signals coming in from local subwidgets as "local" before proceeding
+        with processing in `process_sig_rx`.
+        """
+        self.process_sig_rx(dict_sig, local=True)
 
-    def process_sig_rx(self, dict_sig=None):
+
+    def process_sig_rx(self, dict_sig=None, local=False):
         """
         Process signals coming in via sig_rx
         """
@@ -140,6 +147,11 @@ class PlotTabWidgets(QTabWidget):
         if type(dict_sig) != dict:
             dict_sig = {'sender':__name__}
         self.sig_tx.emit(dict_sig)
+        if local:
+            # local signals are propagated with the name of this widget,
+            # global signals terminate here
+            #dict_sig.update({'sender':__name__})
+            self.sig_tx.emit(dict_sig)
 
         """
         https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab
