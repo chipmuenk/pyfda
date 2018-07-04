@@ -8,6 +8,8 @@
 
 """
 Handle directories in an OS-independent way, create logging directory etc.
+Upon import, all the variables are set.
+This is imported first by pyfdax.
 """
 
 from __future__ import print_function
@@ -17,14 +19,6 @@ import platform
 import tempfile
 import datetime
 
-OS     = platform.system()
-OS_VER = platform.release()
-
-CONF_FILE = 'pyfda.conf'            # general configuration file
-LOG_CONF_FILE = 'pyfda_log.conf'    # logging configuration file
-
-INSTALL_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
-#------------------------------------------------------------------------------
 
 def valid(path):
     """ Check whether path exists and is valid"""
@@ -62,11 +56,7 @@ def get_home_dir():
                         home_dir = 'C:\\'
     return home_dir, user_name
 
-HOME_DIR, USER_NAME = get_home_dir()        
 #------------------------------------------------------------------------------ 
-
-TEMP_DIR = tempfile.gettempdir()
-
 def get_log_dir():
     """Return the logging directory"""
 
@@ -89,15 +79,6 @@ def get_log_dir():
     print("ERROR: No suitable directory found for logging.")
     return None
 
-LOG_DIR  = get_log_dir()
-if LOG_DIR:
-    LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-    # the name of the file can be changed in pyfdax.py
-    LOG_DIR_FILE = os.path.join(LOG_DIR, LOG_FILE) 
-else:
-    LOG_FILE = None
-    LOG_DIR_FILE = None
-
 #------------------------------------------------------------------------------
 def get_conf_dir():
     """Return the user's configuration directory"""
@@ -114,9 +95,31 @@ def get_conf_dir():
             print("Error creating config directory {0}:\n{1}".format(conf_dir, e))
             return HOME_DIR
 
-CONF_DIR = get_conf_dir()
+#==============================================================================
 
-#------------------------------------------------------------------------------
+OS     = platform.system()
+OS_VER = platform.release()
+
+CONF_FILE = 'pyfda.conf'            # name for general configuration file
+LOG_CONF_FILE = 'pyfda_log.conf'    # name for logging configuration file
+
+INSTALL_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
+
+TEMP_DIR = tempfile.gettempdir() # Temp directory for constructing logging dir
+USER_DIR = None # Placeholder for user widgets directory, set by treebuilder
+
+HOME_DIR, USER_NAME = get_home_dir()
+
+LOG_DIR  = get_log_dir()
+if LOG_DIR:
+    LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    # the name of the file can be changed in pyfdax.py
+    LOG_DIR_FILE = os.path.join(LOG_DIR, LOG_FILE) 
+else:
+    LOG_FILE = None
+    LOG_DIR_FILE = None
+    
+CONF_DIR = get_conf_dir()
 USER_CONF_DIR_FILE     = os.path.join(CONF_DIR, CONF_FILE)
 USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
 
@@ -142,4 +145,4 @@ if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
 # This is the place holder for storing where the last file was saved
 save_dir = HOME_DIR
 
-USER_DIR = None # Directory for user widgets
+

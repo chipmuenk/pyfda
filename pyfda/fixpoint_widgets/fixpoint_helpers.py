@@ -54,24 +54,25 @@ def build_coeff_dict(frmt=None):
         - a_fix: np.array
 
     """
-    b = fb.fil[0]['ba'][0]
-    a = fb.fil[0]['ba'][1]
-    # update the coefficient quantizer object
+    b = fb.fil[0]['ba'][0] # get coefficients from 
+    a = fb.fil[0]['ba'][1] # filter dict in float form
+    # Create a coefficient quantizer instance using the quantization parameters dict
+    # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
     Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
-    #Q_coeff.setQobj(fb.fil[0]['q_coeff'])
+    #Q_coeff.setQobj(fb.fil[0]['q_coeff']) # alternative: explicitly call setter
     if not frmt:
         Q_coeff.frmt = 'dec' # use decimal format for coefficients by default
     else:
         Q_coeff.frmt = frmt # use the function argument
 
-    # quantize floating point coefficients and converts them to the
-    # selected numeric format (hex, bin, dec ...)
+    # quantize floating point coefficients and convert them to the
+    # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF)
     c_dict = {}
-    c_dict.update({'b':list(Q_coeff.float2frmt(b))})
-    c_dict.update({'a':list(Q_coeff.float2frmt(a))})
-    c_dict.update({'WF':Q_coeff.WF})
-    c_dict.update({'WI':Q_coeff.WI})
-    c_dict.update({'scale':Q_coeff.scale})
+    c_dict.update({'b':list(Q_coeff.float2frmt(b))}) # convert float -> fixp and
+    c_dict.update({'a':list(Q_coeff.float2frmt(a))}) # format it as bin, hex, ...
+    c_dict.update({'WF':Q_coeff.WF}) # read parameters from quantizer instance
+    c_dict.update({'WI':Q_coeff.WI}) # and pass them to the coefficient dict
+    c_dict.update({'scale':Q_coeff.scale}) # for later use 
     c_dict.update({'frmt':Q_coeff.frmt})
 
     return c_dict
