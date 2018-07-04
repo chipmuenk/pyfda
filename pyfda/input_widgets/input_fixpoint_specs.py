@@ -377,8 +377,8 @@ class Input_Fixpoint_Specs(QWidget):
         Update the fixpoint widget UI when view (i.e. fixpoint coefficient format) 
         has been changed outside this class and update coefficient dictionary
         """
-        if hasattr(self.hdl_wdg_inst, "update_UI"):
-            self.hdl_wdg_inst.update_UI()
+        if hasattr(self.fx_wdg_inst, "update_UI"):
+            self.fx_wdg_inst.update_UI()
 #------------------------------------------------------------------------------
     def update_hdl_dict(self):
         """
@@ -396,21 +396,14 @@ class Input_Fixpoint_Specs(QWidget):
         """
 
         # get a dict with the coefficients and fixpoint settings from fixpoint widget
-        hdl_d = self.hdl_wdg_inst.get_hdl_dict()
+        hdl_d = self.fx_wdg_inst.get_hdl_dict()
 
         b = [ int(x) for x in hdl_d['QC']['b']] # convert np.int64 to python int
-        # b = hdl_d['QC']['b']
 
-        # self.hdl_wdg_inst.flt.hdl_name = file_name
-        # self.hdl_wdg_inst.flt.hdl_directory = dir_name
-=======
-        self.fx_wdg_inst.setup_HDL(coeffs) # call setup method of filter widget
-        self.fx_wdg_inst.flt.hdl_name = file_name
-        self.fx_wdg_inst.flt.hdl_directory = dir_name
+        # self.fx_wdg_inst.setup_HDL(hdl_d) # call setup method of filter widget
+        # self.fx_wdg_inst.flt.hdl_name = file_name
+        # self.fx_wdg_inst.flt.hdl_directory = dir_name
         
-        # NEW
-        
-        # self.hdlfilter = FilterFIR(file_name, dir_name) # Standard DF1 filter 
         self.hdlfilter = FilterFIR(0,0) # Standard DF1 filter 
         self.hdlfilter.set_coefficients(b)      # Coefficients for the filter
 
@@ -485,7 +478,7 @@ class Input_Fixpoint_Specs(QWidget):
 
             #sim.run()
             logger.info("Fixpoint plotting started")
- #               self.hdl_wdg_inst.flt.plot_response()
+ #               self.fx_wdg_inst.flt.plot_response()
             logger.info("Fixpoint plotting finished")
         except myhdl.SimulationError as e:
             logger.warning("Simulation failed:\n{0}".format(e))
