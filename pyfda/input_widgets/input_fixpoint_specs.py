@@ -40,7 +40,6 @@ if cmp_version("myhdl", "0.10") >= 0:
     else:
         if fil_blocks_path not in sys.path:
             sys.path.append(fil_blocks_path)
-        import filter_blocks
         from filter_blocks.fda import FilterFIR    
 else:
     HAS_MYHDL = False
@@ -52,14 +51,14 @@ else:
 
 class Input_Fixpoint_Specs(QWidget):
     """
-    Create the widget for entering exporting / importing / saving / loading data
+    Create the widget that holds the dynamically loaded fixpoint filter ui 
     """
     # emit a signal when the image has been resized
     sig_resize = pyqtSignal()
-    # incoming, connected to input_tab_widget.sig_tx in pyfdax
+    # incoming, connected to input_tab_widget.sig_tx
     sig_rx = pyqtSignal(object)
-    # outgoing: emitted by process_sig_rx
-    # sig_tx = pyqtSignal(object)
+    # outcgoing
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
         super(Input_Fixpoint_Specs, self).__init__(parent)
@@ -81,7 +80,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.warning("Infinite loop detected")
+            logger.debug("Infinite loop detected")
             return
         if 'data_changed' in dict_sig:
             # update hdl_dict when filter has been designed
@@ -93,6 +92,9 @@ class Input_Fixpoint_Specs(QWidget):
             # update fields in the filter topology widget - wordlength may have
             # been changed
             self.update_wdg_UI()
+        if 'fx_sim' in dict_sig:
+            # receive stimulus from another widget
+            pass
 
 #------------------------------------------------------------------------------
 
@@ -461,8 +463,13 @@ class Input_Fixpoint_Specs(QWidget):
         """
         # Setup the Testbench and run
         self.setupHDL()
+        logger.info("Fixpoint simulation started")
         stim = np.zeros(100)
         stim[0] = 1
+        results = np.zeros(100)
+        dict_sig = {'sender':__name__, 'fx_sim':'init', 'fx_stimul':stim, 'fx_results':results}
+        self.sig_tx.emit(dict_sig)
+
         self.hdlfilter.set_stimulus(stim)    # Set the simulation input
         testfil = self.hdlfilter.filter_block()
         testfil.run_sim()               # Run the simulation
@@ -475,7 +482,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         try:
             #sim = myhdl.Simulation(tb)
-            logger.info("Fixpoint simulation started")
+
             #sim.run()
             logger.info("Fixpoint plotting started")
  #               self.hdl_wdg_inst.flt.plot_response()

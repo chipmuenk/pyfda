@@ -85,12 +85,24 @@ class Plot_Impz(QWidget):
                      .format(dict_sig, self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop.")
+        if 'fx_sim' in dict_sig:
+            try:
+                if dict_sig['fx_sim'] == 'init':
+                    # initialize handles to stimulus and results
+                    dict_sig['fx_stimulus'] = self.x
+                    self.fx_results = dict_sig['fx_results']
+                    self.calc_stimulus()
+                elif 'start' in dict_sig['fx_sim']:
+                    pass
+            except KeyError as e:
+                logger.error('Interface to fixpoint simulation is defect:\n{0}.'.format(e))
+                self.fx_sim = None                
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                 or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
                 self.draw()
                 self.needs_draw = False
-                self.needs_redraw = False                
+                self.needs_redraw = False
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
                     or self.needs_redraw:
                 self.redraw()
@@ -223,7 +235,7 @@ class Plot_Impz(QWidget):
                 self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
 
 #------------------------------------------------------------------------------
-    def calc(self):
+    def calc_stimulus(self):
         """
         (Re-)calculate stimulus x[n] and filter response y[n]
         """
@@ -282,7 +294,12 @@ class Plot_Impz(QWidget):
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
-        
+
+#------------------------------------------------------------------------------
+    def calc_response(self):
+        """
+        (Re-)calculate filter response y[n]
+        """
         # calculate response self.y[n] and self.y_i[n] (for complex case) =====   
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
@@ -294,9 +311,9 @@ class Plot_Impz(QWidget):
         antiCausal = 'zpkA' in fb.fil[0]
         causal     = not (antiCausal)
 
-        if len(sos) > 0 and (causal): # has second order sections and is causal
+        if len(sos) > 0 and causal: # has second order sections and is causal
             y = sig.sosfilt(sos, self.x)
-        elif (antiCausal):
+        elif antiCausal:
             y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
         else: # no second order sections or antiCausals for current filter
             y = sig.lfilter(self.bb, self.aa, self.x)
@@ -336,7 +353,8 @@ class Plot_Impz(QWidget):
         """
         Recalculate response and redraw it
         """
-        self.calc()
+        self.calc_stimulus()
+        self.calc_response()
         self.draw_impz()
 
 #------------------------------------------------------------------------------
