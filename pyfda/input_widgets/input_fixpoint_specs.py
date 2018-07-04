@@ -93,9 +93,10 @@ class Input_Fixpoint_Specs(QWidget):
             # been changed
             self.update_wdg_UI()
         if 'fx_sim' in dict_sig:
-            # receive stimulus from another widget
-            pass
-
+            # receive stimulus from another widget, pass it to HDL object
+            if dict_sig['fx_sim'] == 'initialized':
+                self.sim_fixpoint_stimulus()
+                
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -199,7 +200,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimFixPoint.clicked.connect(self.simFixPoint)
+        self.butSimFixPoint.clicked.connect(self.sim_fixpoint_setup)
         #----------------------------------------------------------------------
         inst_wdg_list = self._update_filter_cmb()
         if len(inst_wdg_list) == 0:
@@ -370,7 +371,6 @@ class Input_Fixpoint_Specs(QWidget):
         else:
             self.fx_wdg_found = False
 
- 
 #------------------------------------------------------------------------------
     def update_wdg_UI(self):
         """
@@ -404,8 +404,8 @@ class Input_Fixpoint_Specs(QWidget):
         # self.fx_wdg_inst.flt.hdl_name = file_name
         # self.fx_wdg_inst.flt.hdl_directory = dir_name
         
-        self.hdlfilter = FilterFIR(0,0) # Standard DF1 filter 
-        self.hdlfilter.set_coefficients(b)      # Coefficients for the filter
+        self.hdlfilter = FilterFIR(0,0)     # Standard DF1 filter - hdl_dict should be passed here
+        self.hdlfilter.set_coefficients(b)  # Coefficients for the filter
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
@@ -450,40 +450,55 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
-    def simFixPoint(self):
+    def sim_fixpoint_setup(self):
         """
-        Simulate filter in fix-point description
+        Setup fix-point simulation
         """
-        # Setup the Testbench and run
-        self.setupHDL()
-        logger.info("Fixpoint simulation started")
-        stim = np.zeros(100)
-        stim[0] = 1
-        results = np.zeros(100)
-        dict_sig = {'sender':__name__, 'fx_sim':'init', 'fx_stimul':stim, 'fx_results':results}
-        self.sig_tx.emit(dict_sig)
-
-        self.hdlfilter.set_stimulus(stim)    # Set the simulation input
-        testfil = self.hdlfilter.filter_block()
-        testfil.run_sim()               # Run the simulation
-        y = self.hdlfilter.get_response()       # Get the response from the simulation
-        #TODO: fixed point / integer to float conversion?
-
-
-        plt.plot(y) #plot in pop-up needs to be integrated in the UI
-        plt.show()
-        
         try:
-            #sim = myhdl.Simulation(tb)
+            self.setupHDL()
+            logger.info("Fixpoint simulation started")
+            self.stim = np.zeros(100)
+            self.stim[0] = 1
+            self.fx_results = np.zeros(100)
 
-            #sim.run()
-            logger.info("Fixpoint plotting started")
- #               self.fx_wdg_inst.flt.plot_response()
-            logger.info("Fixpoint plotting finished")
+            dict_sig = {'sender':__name__, 'fx_sim':'init',
+                        'fx_stimul':self.stim, 'fx_results':self.fx_results}
+            self.sig_tx.emit(dict_sig)
+                        
+        except myhdl.SimulationError as e:
+            logger.warning("Simulation setup failed:\n{0}".format(e))
+
+        return
+
+#------------------------------------------------------------------------------
+    def sim_fixpoint_stimulus(self):
+        """
+        Setup fix-point stimulus when stimulus has been calculated
+        """
+        try:
+            self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
+            testfil = self.hdlfilter.filter_block()
+            testfil.run_sim()               # Run the simulation
+            self.fx_results = self.hdlfilter.get_response()       # Get the response from the simulation
+            #TODO: fixed point / integer to float conversion?
+            #TODO: color push-button to show state of simulation
+            #TODO: add QTimer single shot
+#            self.timer_id = QtCore.QTimer()
+#            self.timer_id.setSingleShot(True)
+#            # kill simulation after some idle time, also add a button for this
+#            self.timer_id.timeout.connect(self.kill_sim)
+
+            
         except myhdl.SimulationError as e:
             logger.warning("Simulation failed:\n{0}".format(e))
+
+        logger.info("Fixpoint plotting started")
+        plt.plot(self.fx_results) #plot in pop-up needs to be integrated in the UI
+        plt.show()
+        logger.info("Fixpoint plotting finished")        
             
         return
+
 
 #------------------------------------------------------------------------------
 
