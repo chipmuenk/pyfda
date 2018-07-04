@@ -85,6 +85,18 @@ class Plot_Impz(QWidget):
                      .format(dict_sig, self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
             logger.warning("Stopped infinite loop.")
+        if 'fx_sim' in dict_sig:
+            try:
+                if dict_sig['fx_sim'] == 'init':
+                    # initialize handles to stimulus and results
+                    dict_sig['fx_stimulus'] = self.x
+                    self.fx_results = dict_sig['fx_results']
+                    self.calc_stimulus()
+                elif 'start' in dict_sig['fx_sim']:
+                    pass
+            except KeyError as e:
+                logger.error('Interface to fixpoint simulation is defect:\n{0}.'.format(e))
+                self.fx_sim = None                
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                 or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:

@@ -60,6 +60,8 @@ class Input_Fixpoint_Specs(QWidget):
     sig_resize = pyqtSignal()
     # incoming, connected to input_tab_widget.sig_tx
     sig_rx = pyqtSignal(object)
+    # outcgoing
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent):
         super(Input_Fixpoint_Specs, self).__init__(parent)
@@ -93,6 +95,9 @@ class Input_Fixpoint_Specs(QWidget):
             # update fields in the filter topology widget - wordlength may have
             # been changed
             self.update_wdg_UI()
+        if 'fx_sim' in dict_sig:
+            # receive stimulus from another widget
+            pass
 
 #------------------------------------------------------------------------------
 
@@ -459,6 +464,10 @@ class Input_Fixpoint_Specs(QWidget):
         logger.info("Fixpoint simulation started")
         stim = np.zeros(100)
         stim[0] = 1
+        results = np.zeros(100)
+        dict_sig = {'sender':__name__, 'fx_sim':'init', 'fx_stimul':stim, 'fx_results':results}
+        self.sig_tx.emit(dict_sig)
+
         self.hdlfilter.set_stimulus(stim)    # Set the simulation input
         testfil = self.hdlfilter.filter_block()
         testfil.run_sim()               # Run the simulation
