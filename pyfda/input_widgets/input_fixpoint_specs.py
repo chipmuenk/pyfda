@@ -81,7 +81,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
-            logger.warning("Infinite loop detected")
+            logger.debug("Infinite loop detected")
             return
         if 'data_changed' in dict_sig:
             # update hdl_dict when filter has been designed
@@ -456,6 +456,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         # Setup the Testbench and run
         self.setupHDL()
+        logger.info("Fixpoint simulation started")
         stim = np.zeros(100)
         stim[0] = 1
         self.hdlfilter.set_stimulus(stim)    # Set the simulation input
@@ -471,7 +472,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         try:
             #sim = myhdl.Simulation(tb)
-            logger.info("Fixpoint simulation started")
+
             #sim.run()
             logger.info("Fixpoint plotting started")
  #               self.hdl_wdg_inst.flt.plot_response()
