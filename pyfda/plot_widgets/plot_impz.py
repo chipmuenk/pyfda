@@ -90,7 +90,7 @@ class Plot_Impz(QWidget):
                 or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
                 self.draw()
                 self.needs_draw = False
-                self.needs_redraw = False                
+                self.needs_redraw = False
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
                     or self.needs_redraw:
                 self.redraw()
@@ -294,9 +294,9 @@ class Plot_Impz(QWidget):
         antiCausal = 'zpkA' in fb.fil[0]
         causal     = not (antiCausal)
 
-        if len(sos) > 0 and (causal): # has second order sections and is causal
+        if len(sos) > 0 and causal: # has second order sections and is causal
             y = sig.sosfilt(sos, self.x)
-        elif (antiCausal):
+        elif antiCausal:
             y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
         else: # no second order sections or antiCausals for current filter
             y = sig.lfilter(self.bb, self.aa, self.x)
