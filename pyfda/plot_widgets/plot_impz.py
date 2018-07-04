@@ -223,7 +223,7 @@ class Plot_Impz(QWidget):
                 self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
 
 #------------------------------------------------------------------------------
-    def calc(self):
+    def calc_stimulus(self):
         """
         (Re-)calculate stimulus x[n] and filter response y[n]
         """
@@ -282,7 +282,12 @@ class Plot_Impz(QWidget):
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
-        
+
+#------------------------------------------------------------------------------
+    def calc_response(self):
+        """
+        (Re-)calculate filter response y[n]
+        """
         # calculate response self.y[n] and self.y_i[n] (for complex case) =====   
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
@@ -336,7 +341,8 @@ class Plot_Impz(QWidget):
         """
         Recalculate response and redraw it
         """
-        self.calc()
+        self.calc_stimulus()
+        self.calc_response()
         self.draw_impz()
 
 #------------------------------------------------------------------------------
