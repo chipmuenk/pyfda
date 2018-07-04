@@ -31,8 +31,11 @@ class Plot_Impz(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
     """
+    # incoming
     sig_rx = pyqtSignal(object)
-
+    # outgoing, e.g. when stimulus has been calculated
+    sig_tx = pyqtSignal(object)
+    
     def __init__(self, parent):
         super(Plot_Impz, self).__init__(parent)
 
@@ -84,14 +87,15 @@ class Plot_Impz(QWidget):
         logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
                      .format(dict_sig, self.needs_draw, self.isVisible()))
         if dict_sig['sender'] == __name__:
-            logger.warning("Stopped infinite loop.")
+            logger.warning("Stopped infinite loop, {0}".format(dict_sig))
         if 'fx_sim' in dict_sig:
             try:
                 if dict_sig['fx_sim'] == 'init':
-                    # initialize handles to stimulus and results
+                    # initialize handles to stimulus and results and calculate stimulus
                     dict_sig['fx_stimulus'] = self.x
                     self.fx_results = dict_sig['fx_results']
                     self.calc_stimulus()
+                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'initialized'})
                 elif 'start' in dict_sig['fx_sim']:
                     pass
             except KeyError as e:
