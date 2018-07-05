@@ -266,23 +266,23 @@ class Plot_Impz(QWidget):
             self.x = self.ui.A1 * np.cos(2 * np.pi * self.n * self.f1) +\
                 self.ui.A2 * np.cos(2 * np.pi * self.n * self.f2 + self.ui.phi2)
             self.title_str = r'Filter Response to Cosine Signal'
-            self.H_str = r'$y_{\cos}[n]$'
+            self.H_str = r'$y[n]$'
                 
         elif self.ui.stim == "Sine":
             self.x = self.ui.A1 * np.sin(2 * np.pi * self.n * self.f1 + self.ui.phi1) +\
                 self.ui.A2 * np.sin(2 * np.pi * self.n * self.f2 + self.ui.phi2)
             self.title_str = r'Filter Response to Sinusoidal Signal'
-            self.H_str = r'$y_{\sin}[n]$'
+            self.H_str = r'$y[n]$'
             
         elif self.ui.stim == "Rect":
             self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.n * self.f1))
             self.title_str = r'Filter Response to Rect. Signal'
-            self.H_str = r'$y_{rect}[n]$'
+            self.H_str = r'$y[n]$'
 
         elif self.ui.stim == "Saw":
             self.x = self.ui.A1 * sig.sawtooth(self.n * self.f1 * 2*np.pi)
             self.title_str = r'Filter Response to Sawtooth Signal'
-            self.H_str = r'$y_{saw}[n]$'
+            self.H_str = r'$y[n]$'
 
         else:
             logger.error('Unknown stimulus "{0}"'.format(self.ui.stim))
@@ -389,24 +389,27 @@ class Plot_Impz(QWidget):
             mkfmt_i = 'd'
         else:
             mkfmt_r = mkfmt_i = ' '
-        if self.cmplx:           
-            H_i_str = r'$\Im\{$' + self.H_str + '$\}$ in V'
-            H_str = r'$\Re\{$' + self.H_str + '$\}$ in V'
-        else:
-            H_str = self.H_str + 'in V'
 
         if self.ui.chkLog.isChecked(): # log. scale for stimulus / response time domain
-            H_str = r'$|$ ' + H_str + '$|$ in dBV'
+            H_str = '$|$' + self.H_str + '$|$ in dBV'
             x = np.maximum(20 * np.log10(abs(self.x)), self.ui.bottom)
             y = np.maximum(20 * np.log10(abs(self.y_r)), self.ui.bottom)
             if self.cmplx:
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom)
-                H_i_str = r'$\log$ ' + H_i_str + ' in dBV'
+                H_i_str = r'$|\Im\{$' + self.H_str + '$\}|$' + ' in dBV'
+                H_str =   r'$|\Re\{$' + self.H_str + '$\}|$' + ' in dBV'
         else:
             self.ui.bottom = 0
             x = self.x
             y = self.y_r
             y_i = self.y_i
+            
+            if self.cmplx:           
+                H_i_str = r'$\Im\{$' + self.H_str + '$\}$ in V'
+                H_str = r'$\Re\{$' + self.H_str + '$\}$ in V'
+            else:
+                H_str = self.H_str + ' in V'
+
 
         if self.ui.plt_time in {"Response", "Both"}:
             [ml, sl, bl] = self.ax_r.stem(self.t[N_start:], y[N_start:], 
