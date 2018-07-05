@@ -115,7 +115,7 @@ class PlotTabWidgets(QTabWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        # self.sig_rx.connect(self.sig_rx) # this happens in _construct_UI()
+        # self.sig_rx.connect(inst.sig_rx) # this happens in _construct_UI()
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------

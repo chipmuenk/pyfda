@@ -84,9 +84,9 @@ class InputTabWidgets(QWidget):
                 if hasattr(inst, 'tool_tip'):
                     tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
                 if hasattr(inst, 'sig_tx'):
-                    inst.sig_tx.connect(self.sig_rx)
+                    inst.sig_tx.connect(self.sig_tx)
                 if hasattr(inst, 'sig_rx'):
-                    self.sig_tx.connect(inst.sig_rx)
+                    self.sig_rx.connect(inst.sig_rx)
 
                 n_wdg += 1 # successfully instantiated one more widget
                 inst_wdg_str += '\t' + class_name + '\n'
@@ -112,8 +112,11 @@ class InputTabWidgets(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------       
-        self.sig_rx.connect(self.process_sig_rx)
-
+        #self.sig_rx.connect(inst.sig_rx) # happens in _construct_UI()
+        #----------------------------------------------------------------------
+        # LOCAL SIGNALS & SLOTs
+        #----------------------------------------------------------------------       
+        self.sig_tx.connect(self.sig_rx) # loop back to local inputs
 
         layVMain = QVBoxLayout()
 
@@ -131,18 +134,6 @@ class InputTabWidgets(QWidget):
             layVMain.addWidget(tabWidget) # add the tabWidget directly
 
         self.setLayout(layVMain) # set the main layout of the window
-
-#------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
-        """
-        Process signals coming from sig_rx
-        """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if dict_sig['sender'] == __name__:
-            logger.warning("Prevented Infinite Loop!")
-            return
-
-        self.sig_tx.emit(dict_sig)
 
 #------------------------------------------------------------------------
 
