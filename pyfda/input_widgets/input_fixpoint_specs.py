@@ -94,8 +94,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.update_wdg_UI()
         if 'fx_sim' in dict_sig:
             # receive stimulus from another widget, pass it to HDL object
-            if dict_sig['fx_sim'] == 'initialized':
-                self.sim_fixpoint_stimulus()
+            if dict_sig['fx_sim'] == 'set_stimulus':
+                self.sim_fixpoint_stimulus(dict_sig)
                 
 #------------------------------------------------------------------------------
 
@@ -457,12 +457,8 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             self.setupHDL()
             logger.info("Fixpoint simulation started")
-            self.stim = np.zeros(100)
-            self.stim[0] = 1
-            self.fx_results = np.zeros(100)
 
-            dict_sig = {'sender':__name__, 'fx_sim':'init',
-                        'fx_stimul':self.stim, 'fx_results':self.fx_results}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:
@@ -471,11 +467,12 @@ class Input_Fixpoint_Specs(QWidget):
         return
 
 #------------------------------------------------------------------------------
-    def sim_fixpoint_stimulus(self):
+    def sim_fixpoint_stimulus(self, dict_sig):
         """
         Setup fix-point stimulus when stimulus has been calculated
         """
         try:
+            self.stim = dict_sig['fx_stimulus']
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             testfil = self.hdlfilter.filter_block()
             testfil.run_sim()               # Run the simulation

@@ -90,13 +90,12 @@ class Plot_Impz(QWidget):
             logger.warning("Stopped infinite loop, {0}".format(dict_sig))
         if 'fx_sim' in dict_sig:
             try:
-                if dict_sig['fx_sim'] == 'init':
-                    # initialize handles to stimulus and results and calculate stimulus
-                    dict_sig['fx_stimulus'] = self.x
-                    self.fx_results = dict_sig['fx_results']
+                if dict_sig['fx_sim'] == 'get_stimulus':
+                    # calculate stimulus and pass it via sig_dict
                     self.calc_stimulus()
-                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'initialized'})
-                elif 'start' in dict_sig['fx_sim']:
+                    self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
+                                      'fx_stimulus':self.x})
+                elif 'set_response' in dict_sig['fx_sim']:
                     pass
             except KeyError as e:
                 logger.error('Interface to fixpoint simulation is defect:\n{0}.'.format(e))
