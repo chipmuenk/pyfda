@@ -84,9 +84,9 @@ class PlotTabWidgets(QTabWidget):
                 if hasattr(inst, 'tool_tip'):
                     tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
                 if hasattr(inst, 'sig_tx'):
-                    inst.sig_tx.connect(self.sig_rx)
+                    inst.sig_tx.connect(self.sig_tx)
                 if hasattr(inst, 'sig_rx'):
-                    self.sig_tx.connect(inst.sig_rx)
+                    self.sig_rx.connect(inst.sig_rx)
 
                 n_wdg += 1 # successfully instantiated one more widget
                 inst_wdg_str += '\t' + class_name + '\n'
@@ -115,7 +115,7 @@ class PlotTabWidgets(QTabWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_sig_rx)
+        # self.sig_rx.connect(self.sig_rx) # this happens in _construct_UI()
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -123,6 +123,8 @@ class PlotTabWidgets(QTabWidget):
         self.timer_id.setSingleShot(True)
         # redraw current widget at timeout (timer was triggered by resize event):
         self.timer_id.timeout.connect(self.current_tab_redraw)
+        
+        self.sig_tx.connect(self.sig_rx) # loop back to local inputs
 
         # When user has selected a different tab, trigger a redraw of current tab
         tabWidget.currentChanged.connect(self.current_tab_changed)
@@ -130,28 +132,6 @@ class PlotTabWidgets(QTabWidget):
         # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
 
         tabWidget.installEventFilter(self)
-
-    def process_sig_rx_local(self, dict_sig=None):
-        """
-        Flag signals coming in from local subwidgets as "local" before proceeding
-        with processing in `process_sig_rx`.
-        """
-        self.process_sig_rx(dict_sig, local=True)
-
-
-    def process_sig_rx(self, dict_sig=None, local=False):
-        """
-        Process signals coming in via sig_rx
-        """
-        logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
-        if type(dict_sig) != dict:
-            dict_sig = {'sender':__name__}
-        self.sig_tx.emit(dict_sig)
-        if local:
-            # local signals are propagated with the name of this widget,
-            # global signals terminate here
-            #dict_sig.update({'sender':__name__})
-            self.sig_tx.emit(dict_sig)
 
         """
         https://stackoverflow.com/questions/29128936/qtabwidget-size-depending-on-current-tab

@@ -207,7 +207,7 @@ class pyFDA(QMainWindow):
         # routed to the plot widgets:
         inputTabWidgets.sig_tx.connect(pltTabWidgets.sig_rx)
         inputTabWidgets.sig_tx.connect(self.process_sig_rx)
-        
+        pltTabWidgets.sig_tx.connect(inputTabWidgets.sig_rx)
         # open pop-up "about" window
         #aboutAction.triggered.connect(self.aboutWindow) 
 
