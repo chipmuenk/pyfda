@@ -303,7 +303,7 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate filter response y[n]
         """
-        # calculate response self.y[n] and self.y_i[n] (for complex case) =====   
+        # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
         self.bb = np.asarray(fb.fil[0]['ba'][0])
         self.aa = np.asarray(fb.fil[0]['ba'][1])
         if min(len(self.aa), len(self.bb)) < 2:
@@ -325,14 +325,20 @@ class Plot_Impz(QWidget):
             dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
             y = y - abs(dc[1]) # subtract DC (final) value from response
 
-        y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
+        self.y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
         self.cmplx = np.any(np.iscomplex(y))
         if self.cmplx:
-            self.y_i = y.imag
-            self.y = y.real
+            self.y_i = self.y.imag
+            self.y_r = self.y.real
         else:
-            self.y = y
+            self.y_r = self.y
             self.y_i = None
+
+#------------------------------------------------------------------------------
+    def calc_fft(self):
+        """
+        (Re-)calculate ffts X(f) and Y(f) of stimulus and response
+        """
 
         # calculate FFT of stimulus / response
 #        if self.ui.plt_freq in {"Stimulus", "Both"}:
@@ -340,7 +346,7 @@ class Plot_Impz(QWidget):
         self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
 
 #        if self.ui.plt_freq in {"Response", "Both"}:
-        y_win = y[self.ui.N_start:self.ui.N_end] * self.ui.win
+        y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
         self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
 
 #------------------------------------------------------------------------------
@@ -358,6 +364,7 @@ class Plot_Impz(QWidget):
         """
         self.calc_stimulus()
         self.calc_response()
+        self.calc_fft()
         self.draw_impz()
 
 #------------------------------------------------------------------------------
@@ -391,14 +398,14 @@ class Plot_Impz(QWidget):
         if self.ui.chkLog.isChecked(): # log. scale for stimulus / response time domain
             H_str = r'$|$ ' + H_str + '$|$ in dBV'
             x = np.maximum(20 * np.log10(abs(self.x)), self.ui.bottom)
-            y = np.maximum(20 * np.log10(abs(self.y)), self.ui.bottom)
+            y = np.maximum(20 * np.log10(abs(self.y_r)), self.ui.bottom)
             if self.cmplx:
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom)
                 H_i_str = r'$\log$ ' + H_i_str + ' in dBV'
         else:
             self.ui.bottom = 0
             x = self.x
-            y = self.y
+            y = self.y_r
             y_i = self.y_i
 
         if self.ui.plt_time in {"Response", "Both"}:
