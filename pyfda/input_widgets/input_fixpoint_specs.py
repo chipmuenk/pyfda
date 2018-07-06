@@ -92,10 +92,9 @@ class Input_Fixpoint_Specs(QWidget):
             # update fields in the filter topology widget - wordlength may have
             # been changed
             self.update_wdg_UI()
-        if 'fx_sim' in dict_sig:
+        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
+                self.fx_sim_set_stimulus(dict_sig)
             # receive stimulus from another widget, pass it to HDL object
-            if dict_sig['fx_sim'] == 'set_stimulus':
-                self.sim_fixpoint_stimulus(dict_sig)
                 
 #------------------------------------------------------------------------------
 
@@ -200,7 +199,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimFixPoint.clicked.connect(self.sim_fixpoint_setup)
+        self.butSimFixPoint.clicked.connect(self.fx_sim_start)
         #----------------------------------------------------------------------
         inst_wdg_list = self._update_filter_cmb()
         if len(inst_wdg_list) == 0:
@@ -450,33 +449,34 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("HDL conversion finished!")
 
 #------------------------------------------------------------------------------
-    def sim_fixpoint_setup(self):
+    def fx_sim_start(self):
         """
-        Setup fix-point simulation
+        Setup and start fix-point simulation
         """
         try:
+            logger.info("Setup fixpoint simulation")
             self.setupHDL()
-            logger.info("Fixpoint simulation started")
-
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:
             logger.warning("Simulation setup failed:\n{0}".format(e))
-
         return
 
 #------------------------------------------------------------------------------
-    def sim_fixpoint_stimulus(self, dict_sig):
+    def fx_sim_set_stimulus(self, dict_sig):
         """
-        Setup fix-point stimulus when stimulus has been calculated
+        Get fix-point stimulus from cooperating widget
         """
         try:
+            W = self.hdl_dict['QO']['WI'] + self.hdl_dict['QO']['WF']+1
             self.stim = dict_sig['fx_stimulus']
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
+            logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
             testfil = self.hdlfilter.filter_block()
             testfil.run_sim()               # Run the simulation
-            self.fx_results = self.hdlfilter.get_response()       # Get the response from the simulation
+            # Get the response from the simulation and scale it to float
+            self.fx_results = self.hdlfilter.get_response() / (2<<(W-1)) 
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
@@ -485,19 +485,21 @@ class Input_Fixpoint_Specs(QWidget):
 #            # kill simulation after some idle time, also add a button for this
 #            self.timer_id.timeout.connect(self.kill_sim)
 
-            
         except myhdl.SimulationError as e:
             logger.warning("Simulation failed:\n{0}".format(e))
+            return
 
         logger.info("Fixpoint plotting started")
-        plt.plot(self.fx_results) #plot in pop-up needs to be integrated in the UI
-        plt.show()
+        dict_sig = {'sender':__name__, 'fx_sim':'set_results', 
+                    'fx_results':self.fx_results }            
+        self.sig_tx.emit(dict_sig)
         
         #plt.plot(self.fx_results) #plot in pop-up needs to be integrated in the UI
         #plt.show()
         logger.info("Fixpoint plotting finished")        
             
         return
+#------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
