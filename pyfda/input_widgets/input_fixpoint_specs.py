@@ -396,11 +396,11 @@ class Input_Fixpoint_Specs(QWidget):
         """
 
         # get a dict with the coefficients and fixpoint settings from fixpoint widget
-        hdl_d = self.fx_wdg_inst.get_hdl_dict()
+        self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
 
-        b = [ int(x) for x in hdl_d['QC']['b']] # convert np.int64 to python int
+        b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
 
-        # self.fx_wdg_inst.setup_HDL(hdl_d) # call setup method of filter widget
+        # self.fx_wdg_inst.setup_HDL(self.hdl_dict) # call setup method of filter widget
         # self.fx_wdg_inst.flt.hdl_name = file_name
         # self.fx_wdg_inst.flt.hdl_directory = dir_name
         
