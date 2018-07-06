@@ -21,7 +21,7 @@ from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabe
 
 import numpy as np
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
@@ -492,6 +492,9 @@ class Input_Fixpoint_Specs(QWidget):
         logger.info("Fixpoint plotting started")
         plt.plot(self.fx_results) #plot in pop-up needs to be integrated in the UI
         plt.show()
+        
+        #plt.plot(self.fx_results) #plot in pop-up needs to be integrated in the UI
+        #plt.show()
         logger.info("Fixpoint plotting finished")        
             
         return
