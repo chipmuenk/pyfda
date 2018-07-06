@@ -91,15 +91,16 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             try:
                 if dict_sig['fx_sim'] == 'get_stimulus':
-                    # calculate stimulus and pass it via sig_dict
-                    self.calc_stimulus()
+                    self.calc_stimulus() # calculate selected stimulus with selected length
+                    # pass stimulus in self.x back  via dict
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                                       'fx_stimulus':self.x})
-                elif 'set_response' in dict_sig['fx_sim']:
-                    pass
+                elif dict_sig['fx_sim'] == 'set_response':
+                    fx_result = dict_sig['fx_response']
             except KeyError as e:
                 logger.error('Interface to fixpoint simulation is defect:\n{0}.'.format(e))
-                self.fx_sim = None                
+                self.fx_sim = None
+
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                 or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
