@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
-                      QHBoxLayout, QVBoxLayout, QFrame, pyqtSlot, pyqtSignal)
+                      QHBoxLayout, QVBoxLayout, QFrame, pyqtSignal)
 
 import numpy as np
 import scipy.signal as sig
@@ -86,7 +86,6 @@ class PlotImpz_UI(QWidget):
             self.update_N(dict_sig) # this passes dict_sig on to sig_tx as well
         else:
             self.sig_tx.emit(dict_sig)
-
 
     def _construct_UI(self):
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
@@ -323,7 +322,6 @@ class PlotImpz_UI(QWidget):
         # careful! currentIndexChanged passes the current index to _update_window
         self.cmbWindow.currentIndexChanged.connect(self._update_window)
         self.ledWinPar1.editingFinished.connect(self._update_window)
-
 
         # ########################  Main UI Layout ############################
         # layout for frame (UI widget)
