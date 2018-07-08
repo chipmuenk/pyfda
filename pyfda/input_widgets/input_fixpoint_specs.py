@@ -93,19 +93,14 @@ class Input_Fixpoint_Specs(QWidget):
             # been changed
             self.update_wdg_UI()
 
-        if 'fx_sim' in dict_sig:
+        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
+                self.fx_sim_set_stimulus(dict_sig)
             # PingPong with a stimulus & plot widget:
             # 1. Request stimulus by sending 'fx_sim':'get_stimulus'
             # 2. Receive stimulus from another widget in 'fx_sim':'set_stimulus'
             #    pass it to HDL object
             # 3. Calculate  HDL response here
             # 4. Send back response by sending 'fx_sim':'set_response'
-            if dict_sig['fx_sim'] == 'set_stimulus':
-                self.sim_fixpoint_stimulus(dict_sig)
-
-        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
-                self.fx_sim_set_stimulus(dict_sig)
-            # receive stimulus from another widget, pass it to HDL object
 
                 
 #------------------------------------------------------------------------------
@@ -473,7 +468,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:
-            logger.warning("Fixpoint imulation failed:\n{0}".format(e))
+            logger.warning("Fixpoint simulation failed:\n{0}".format(e))
         return
 
 #------------------------------------------------------------------------------
