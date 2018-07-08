@@ -93,7 +93,12 @@ class Input_Fixpoint_Specs(QWidget):
             # been changed
             self.update_wdg_UI()
         if 'fx_sim' in dict_sig:
-            # receive stimulus from another widget, pass it to HDL object
+            # PingPong with a stimulus & plot widget:
+            # 1. Request stimulus by sending 'fx_sim':'get_stimulus'
+            # 2. Receive stimulus from another widget in 'fx_sim':'set_stimulus'
+            #    pass it to HDL object
+            # 3. Calculate  HDL response here
+            # 4. Send back response by sending 'fx_sim':'set_response'
             if dict_sig['fx_sim'] == 'set_stimulus':
                 self.sim_fixpoint_stimulus(dict_sig)
                 
@@ -452,12 +457,13 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def sim_fixpoint_setup(self):
         """
-        Setup fix-point simulation
+        Setup fix-point simulation: Request a stimulus signal
         """
         try:
             self.setupHDL()
             logger.info("Fixpoint simulation started")
 
+            # request stimulus
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
             self.sig_tx.emit(dict_sig)
                         
@@ -469,7 +475,9 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def sim_fixpoint_stimulus(self, dict_sig):
         """
-        Setup fix-point stimulus when stimulus has been calculated
+        - Pass fix-point stimulus from dict_sig to HDL filter, 
+        - Calculate the fixpoint response
+        - Send it to the plotting widget
         """
         try:
             self.stim = dict_sig['fx_stimulus']
