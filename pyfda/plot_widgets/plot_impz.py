@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QEvent, Qt, pyqtSignal
+from ..compat import QWidget, QEvent, Qt, pyqtSignal, QTabWidget
 
 import numpy as np
 import scipy.signal as sig
@@ -66,7 +66,16 @@ class Plot_Impz(QWidget):
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
-        #----------------------------------------------------------------------
+# =============================================================================
+#         # Tabbed layout, tabs to the left
+#         mylabel = QLabel("TestWest", self) 
+#         tabs = QTabWidget(self)
+#         tabs.addTab(mylabel, 'Time')
+#         tabs.setTabPosition(QTabWidget.West)
+#         
+#         layVMain.addWidget(tabs)
+#         #----------------------------------------------------------------------
+# =============================================================================
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # frequency widgets require special handling as they are scaled with f_s
