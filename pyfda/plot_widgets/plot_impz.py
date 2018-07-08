@@ -95,8 +95,13 @@ class Plot_Impz(QWidget):
                     # pass stimulus in self.x back  via dict
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                                       'fx_stimulus':self.x})
-                elif dict_sig['fx_sim'] == 'set_response':
-                    fx_result = dict_sig['fx_response']
+                elif dict_sig['fx_sim'] == 'set_results':
+                    self.y = dict_sig['fx_results']
+                    logger.info("Received fixpoint results.")
+                    self.calc_y_real_imag()
+                    self.calc_fft()
+                    self.draw_impz()
+                    
             except KeyError as e:
                 logger.error('Interface to fixpoint simulation is defect:\n{0}.'.format(e))
                 self.fx_sim = None
@@ -327,7 +332,13 @@ class Plot_Impz(QWidget):
             y = y - abs(dc[1]) # subtract DC (final) value from response
 
         self.y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
-        self.cmplx = np.any(np.iscomplex(y))
+
+#------------------------------------------------------------------------------
+    def calc_y_real_imag(self):
+        """
+        Check whether y is complex and calculate imag. / real components
+        """
+        self.cmplx = np.any(np.iscomplex(self.y))
         if self.cmplx:
             self.y_i = self.y.imag
             self.y_r = self.y.real
@@ -340,7 +351,6 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate ffts X(f) and Y(f) of stimulus and response
         """
-
         # calculate FFT of stimulus / response
 #        if self.ui.plt_freq in {"Stimulus", "Both"}:
         x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
@@ -365,6 +375,7 @@ class Plot_Impz(QWidget):
         """
         self.calc_stimulus()
         self.calc_response()
+        self.calc_y_real_imag()
         self.calc_fft()
         self.draw_impz()
 
