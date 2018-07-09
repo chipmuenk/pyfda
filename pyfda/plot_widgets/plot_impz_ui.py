@@ -88,6 +88,8 @@ class PlotImpz_UI(QWidget):
             self.sig_tx.emit(dict_sig)
 
     def _construct_UI(self):
+
+        # ----------------- run control --------------------------------
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
         self.ledN_points = QLineEdit(self)
         self.ledN_points.setText(str(self.N_points))
@@ -106,6 +108,19 @@ class PlotImpz_UI(QWidget):
         layVledN = QVBoxLayout()
         layVledN.addWidget(self.ledN_start)
         layVledN.addWidget(self.ledN_points)
+        
+        layHRunCtrl = QHBoxLayout()
+        layHRunCtrl.addWidget(self.lblN_start)
+        layHRunCtrl.addWidget(self.ledN_start)
+        layHRunCtrl.addStretch(1)
+        layHRunCtrl.addWidget(self.lblN_points)
+        layHRunCtrl.addWidget(self.ledN_points)
+        layHRunCtrl.addStretch(10)
+        
+        self.wdgRunCtrl = QWidget(self)
+        self.wdgRunCtrl.setLayout(layHRunCtrl)
+
+        # --- end of run control ----------------------------------------        
 
         self.chkLog = QCheckBox("Log. y-axis", self)
         self.chkLog.setObjectName("chkLog")
@@ -133,20 +148,17 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmbPltTime, self.plt_time)
         self.cmbPltTime.setToolTip("<span>Choose which signals to show in the time domain: "
                                  "The stimulus, the filter response or both.</span>")
-
-        self.lblPltFreq = QLabel("Freq.: ", self)
-        self.cmbPltFreq = QComboBox(self)
-        self.cmbPltFreq.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmbPltFreq, self.plt_freq)
-        self.cmbPltFreq.setToolTip("<span>Choose which signals to show in the frequency domain: "
-                                 "The stimulus, the filter response or both.</span>")
-        layVlblPlt = QVBoxLayout()
-        layVlblPlt.addWidget(self.lblPltTime)
-        layVlblPlt.addWidget(self.lblPltFreq)
-        layVcmbPlt = QVBoxLayout()
-        layVcmbPlt.addWidget(self.cmbPltTime)
-        layVcmbPlt.addWidget(self.cmbPltFreq)
-
+# =============================================================================
+# 
+#         layVlblPlt = QVBoxLayout()
+#         layVlblPlt.addWidget(self.lblPltTime)
+#         layVlblPlt.addWidget(self.lblPltFreq)
+#         layVcmbPlt = QVBoxLayout()
+#         layVcmbPlt.addWidget(self.cmbPltTime)
+#         layVcmbPlt.addWidget(self.cmbPltFreq)
+# 
+# =============================================================================
+        # ---------- Stimuli -----------------------------
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
@@ -228,10 +240,11 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC = QVBoxLayout()
         layVledNoiDC.addWidget(self.ledNoi)
         layVledNoiDC.addWidget(self.ledDC)
+        # --------- end stimuli ---------------------------------
 
         layHControls = QHBoxLayout()
-        layHControls.addLayout(layVlblN)
-        layHControls.addLayout(layVledN)
+#        layHControls.addLayout(layVlblN)
+#        layHControls.addLayout(layVledN)
         layHControls.addStretch(2)
         layHControls.addLayout(layVchkLogMark)
         layHControls.addStretch(1)
@@ -239,8 +252,11 @@ class PlotImpz_UI(QWidget):
         layHControls.addWidget(self.ledLogBottom)
         layHControls.addWidget(self.lbldB)
         layHControls.addStretch(2)
-        layHControls.addLayout(layVlblPlt)
-        layHControls.addLayout(layVcmbPlt)
+        layHControls.addWidget(self.lblPltTime)
+        layHControls.addWidget(self.cmbPltTime)
+
+#        layHControls.addLayout(layVlblPlt)
+#        layHControls.addLayout(layVcmbPlt)
         layHControls.addStretch(1)
         layHControls.addLayout(layVlblCmb)
         layHControls.addLayout(layVCmb)
@@ -255,7 +271,16 @@ class PlotImpz_UI(QWidget):
         layHControls.addLayout(layVledNoiDC)
         layHControls.addStretch(10)
 
+        # ------------ Frequency Domain --------------------------------
         layHControlsF = QHBoxLayout()
+        self.lblPltFreq = QLabel("Freq.: ", self)
+        self.cmbPltFreq = QComboBox(self)
+        self.cmbPltFreq.addItems(["None","Stimulus","Response", "Both"])
+        qset_cmb_box(self.cmbPltFreq, self.plt_freq)
+        self.cmbPltFreq.setToolTip("<span>Choose which signals to show in the frequency domain: "
+                                 "The stimulus, the filter response or both.</span>")
+
+
         self.chkLogF = QCheckBox("Log. scale", self)
         self.chkLogF.setObjectName("chkLogF")
         self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
@@ -278,11 +303,14 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.setText("1")
         self.ledWinPar1.setObjectName("ledWinPar1")
 
+        layHControlsF.addWidget(self.lblPltFreq)
+        layHControlsF.addWidget(self.cmbPltFreq)
+        layHControlsF.addStretch(2)
         layHControlsF.addWidget(self.chkLogF)
         layHControlsF.addWidget(self.lblLogBottomF)
         layHControlsF.addWidget(self.ledLogBottomF)
         layHControlsF.addWidget(self.lbldBF)
-        layHControls.addStretch(2)
+        layHControlsF.addStretch(2)
         layHControlsF.addWidget(self.lblWindow)
         layHControlsF.addWidget(self.cmbWindow)
         layHControlsF.addWidget(self.lblWinPar1)
@@ -291,7 +319,9 @@ class PlotImpz_UI(QWidget):
 
         self.wdgHControlsF = QWidget(self)
         self.wdgHControlsF.setLayout(layHControlsF)
-
+        
+        # ---- end Frequency Domain ------------------
+ 
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -327,7 +357,7 @@ class PlotImpz_UI(QWidget):
         # layout for frame (UI widget)
         layVMainF = QVBoxLayout()
         layVMainF.addLayout(layHControls)
-        layVMainF.addWidget(self.wdgHControlsF)
+        # layVMainF.addWidget(self.wdgHControlsF)
 
         # This frame encompasses all UI elements
         self.frmControls = QFrame(self)
@@ -372,7 +402,7 @@ class PlotImpz_UI(QWidget):
         """
         self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
         self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
-        self.wdgHControlsF.setVisible(self.plt_freq != "None")
+        # self.wdgHControlsF.setVisible(self.plt_freq != "None")
         self.sig_tx.emit({'sender':__name__, 'view_changed':''})
 
 

@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QEvent, Qt, pyqtSignal, QTabWidget
+from ..compat import QWidget, QEvent, Qt, pyqtSignal, QTabWidget, QVBoxLayout, QLabel
 
 import numpy as np
 import scipy.signal as sig
@@ -59,30 +59,40 @@ class Plot_Impz(QWidget):
         """
         
         #----------------------------------------------------------------------
-        # mplwidget
+        # MplWidget for time domain plots
         #----------------------------------------------------------------------
-        self.mplwidget = MplWidget(self)
-        self.mplwidget.layVMainMpl.addWidget(self.ui)
-        self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(self.mplwidget.layVMainMpl)
+        self.mplwidget_t = MplWidget(self)
+        self.mplwidget_t.layVMainMpl.addWidget(self.ui)
+        self.mplwidget_t.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+        
+        #----------------------------------------------------------------------
+        # MplWidget for frequency domain plots
+        #----------------------------------------------------------------------
+        self.mplwidget_f = MplWidget(self)
+        self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdgHControlsF)
+        self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
-# =============================================================================
-#         # Tabbed layout, tabs to the left
-#         mylabel = QLabel("TestWest", self) 
-#         tabs = QTabWidget(self)
-#         tabs.addTab(mylabel, 'Time')
-#         tabs.setTabPosition(QTabWidget.West)
-#         
-#         layVMain.addWidget(tabs)
-#         #----------------------------------------------------------------------
-# =============================================================================
+        # Tabbed layout, tabs to the left
+        tabWidget = QTabWidget(self)
+        tabWidget.addTab(self.mplwidget_t, "Time")
+        tabWidget.addTab(self.mplwidget_f, "Frequency")
+        tabWidget.setTabPosition(QTabWidget.West)
+        layVMain = QVBoxLayout()
+        layVMain.addWidget(tabWidget)
+        layVMain.addWidget(self.ui.wdgRunCtrl)
+        layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
+
+        self.setLayout(layVMain)
+        #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # frequency widgets require special handling as they are scaled with f_s
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
+        self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
+        self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
+
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
 
@@ -220,37 +230,37 @@ class Plot_Impz(QWidget):
     def init_axes(self):
         # clear the axes and (re)draw the plot
         #
-        for ax in self.mplwidget.fig.get_axes():
-            self.mplwidget.fig.delaxes(ax)
+        for ax in self.mplwidget_t.fig.get_axes():
+            self.mplwidget_t.fig.delaxes(ax)
 
         num_subplots = 0 + (self.ui.plt_time != "None")\
                         + (self.cmplx and self.ui.plt_time in {"Response", "Both"})\
                         + (self.ui.plt_freq != "None")
 
         if num_subplots > 0:
-            self.mplwidget.fig.subplots_adjust(hspace = 0.5)
+            self.mplwidget_t.fig.subplots_adjust(hspace = 0.5)
     
             if self.ui.plt_time != "None":
-                self.ax_r = self.mplwidget.fig.add_subplot(num_subplots,1 ,1)
+                self.ax_r = self.mplwidget_t.fig.add_subplot(num_subplots,1 ,1)
                 self.ax_r.clear()
                 self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_r.get_yaxis().tick_left() # remove axis ticks right
     
             if self.cmplx and self.ui.plt_time in {"Response", "Both"}:
-                self.ax_i = self.mplwidget.fig.add_subplot(num_subplots, 1, 2, sharex = self.ax_r)
+                self.ax_i = self.mplwidget_t.fig.add_subplot(num_subplots, 1, 2, sharex = self.ax_r)
                 self.ax_i.clear()
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_i.get_yaxis().tick_left() # remove axis ticks right
     
             if self.ui.plt_freq != "None":
-                self.ax_fft = self.mplwidget.fig.add_subplot(num_subplots, 1, num_subplots)    
+                self.ax_fft = self.mplwidget_t.fig.add_subplot(num_subplots, 1, num_subplots)    
                 self.ax_fft.clear()
 
                 self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
     
             if self.ACTIVE_3D: # not implemented / tested yet
-                self.ax3d = self.mplwidget.fig.add_subplot(111, projection='3d')
+                self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
@@ -583,7 +593,7 @@ class Plot_Impz(QWidget):
         """
         Redraw the canvas when e.g. the canvas size has changed
         """
-        self.mplwidget.redraw()
+        self.mplwidget_t.redraw()
         if hasattr(self, "ax2_fft"):
             self.ax2_fft.grid(False)
 
