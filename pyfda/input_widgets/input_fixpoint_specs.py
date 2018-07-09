@@ -405,13 +405,14 @@ class Input_Fixpoint_Specs(QWidget):
         self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
 
         b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
+        a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
 
         # self.fx_wdg_inst.setup_HDL(self.hdl_dict) # call setup method of filter widget
         # self.fx_wdg_inst.flt.hdl_name = file_name
         # self.fx_wdg_inst.flt.hdl_directory = dir_name
         
-        self.hdlfilter = FilterFIR(0,0)     # Standard DF1 filter - hdl_dict should be passed here
-        self.hdlfilter.set_coefficients(b)  # Coefficients for the filter
+        self.hdlfilter = FilterFIR(b, a)     # Standard DF1 filter - hdl_dict should be passed here
+        #self.hdlfilter.set_coefficients(b)  # Coefficients for the filter
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
