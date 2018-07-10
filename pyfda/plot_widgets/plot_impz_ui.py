@@ -89,7 +89,9 @@ class PlotImpz_UI(QWidget):
 
     def _construct_UI(self):
 
-        # ----------------- run control --------------------------------
+        # ----------- ---------------------------------------------------
+        # Run control widgets
+        # ---------------------------------------------------------------
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
         self.ledN_points = QLineEdit(self)
         self.ledN_points.setText(str(self.N_points))
@@ -109,20 +111,31 @@ class PlotImpz_UI(QWidget):
         layVledN.addWidget(self.ledN_start)
         layVledN.addWidget(self.ledN_points)
         
-        layHRunCtrl = QHBoxLayout()
-        layHRunCtrl.addWidget(self.lblN_start)
-        layHRunCtrl.addWidget(self.ledN_start)
-        layHRunCtrl.addStretch(1)
-        layHRunCtrl.addWidget(self.lblN_points)
-        layHRunCtrl.addWidget(self.ledN_points)
-        layHRunCtrl.addStretch(10)
-        
-        self.wdgRunCtrl = QWidget(self)
-        self.wdgRunCtrl.setLayout(layHRunCtrl)
+        layH_ctrl_run = QHBoxLayout()
+        layH_ctrl_run.addWidget(self.lblN_start)
+        layH_ctrl_run.addWidget(self.ledN_start)
+        layH_ctrl_run.addStretch(1)
+        layH_ctrl_run.addWidget(self.lblN_points)
+        layH_ctrl_run.addWidget(self.ledN_points)
+        layH_ctrl_run.addStretch(10)
 
+        #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
+
+        self.wdg_ctrl_run = QWidget(self)
+        self.wdg_ctrl_run.setLayout(layH_ctrl_run)
         # --- end of run control ----------------------------------------        
 
-        self.chkLog = QCheckBox("Log. y-axis", self)
+        # ----------- ---------------------------------------------------
+        # Controls for time domain
+        # ---------------------------------------------------------------
+        self.lblPltTime = QLabel("Show ", self)
+        self.cmbPltTime = QComboBox(self)
+        self.cmbPltTime.addItems(["None","Stimulus","Response", "Both"])
+        qset_cmb_box(self.cmbPltTime, self.plt_time)
+        self.cmbPltTime.setToolTip("<span>Choose which signals to show in the time domain: "
+                                 "The stimulus, the filter response or both.</span>")
+
+        self.chkLog = QCheckBox("Log. scale", self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLog.setChecked(False)
@@ -132,33 +145,87 @@ class PlotImpz_UI(QWidget):
         self.chkMarker.setToolTip("<span>Show plot markers.</span>")
         self.chkMarker.setChecked(True)
 
-        layVchkLogMark = QVBoxLayout()
-        layVchkLogMark.addWidget(self.chkLog)
-        layVchkLogMark.addWidget(self.chkMarker)
-
         self.lblLogBottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
         self.ledLogBottom.setText(str(self.bottom))
         self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbldB = QLabel("dB", self)
 
-        self.lblPltTime = QLabel("Time: ", self)
-        self.cmbPltTime = QComboBox(self)
-        self.cmbPltTime.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmbPltTime, self.plt_time)
-        self.cmbPltTime.setToolTip("<span>Choose which signals to show in the time domain: "
+        layH_ctrl_time = QHBoxLayout()
+        layH_ctrl_time.addWidget(self.lblPltTime)
+        layH_ctrl_time.addWidget(self.cmbPltTime)
+        layH_ctrl_time.addStretch(2)
+        layH_ctrl_time.addWidget(self.chkLog)
+        layH_ctrl_time.addStretch(1)
+        layH_ctrl_time.addWidget(self.lblLogBottom)
+        layH_ctrl_time.addWidget(self.ledLogBottom)
+        layH_ctrl_time.addWidget(self.lbldB)
+        layH_ctrl_time.addStretch(2)
+        layH_ctrl_time.addWidget(self.chkMarker)
+        layH_ctrl_time.addStretch(10)
+        
+        #layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
+        
+        self.wdg_ctrl_time = QWidget(self)
+        self.wdg_ctrl_time.setLayout(layH_ctrl_time)
+        # ---- end time domain ------------------
+
+        # ---------------------------------------------------------------
+        # Controls for frequency domain
+        # ---------------------------------------------------------------
+        self.lblPltFreq = QLabel("Show ", self)
+        self.cmbPltFreq = QComboBox(self)
+        self.cmbPltFreq.addItems(["None","Stimulus","Response", "Both"])
+        qset_cmb_box(self.cmbPltFreq, self.plt_freq)
+        self.cmbPltFreq.setToolTip("<span>Choose which signals to show in the frequency domain: "
                                  "The stimulus, the filter response or both.</span>")
-# =============================================================================
-# 
-#         layVlblPlt = QVBoxLayout()
-#         layVlblPlt.addWidget(self.lblPltTime)
-#         layVlblPlt.addWidget(self.lblPltFreq)
-#         layVcmbPlt = QVBoxLayout()
-#         layVcmbPlt.addWidget(self.cmbPltTime)
-#         layVcmbPlt.addWidget(self.cmbPltFreq)
-# 
-# =============================================================================
-        # ---------- Stimuli -----------------------------
+
+        self.chkLogF = QCheckBox("Log. scale", self)
+        self.chkLogF.setObjectName("chkLogF")
+        self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chkLogF.setChecked(True)
+
+        self.lblLogBottomF = QLabel("Bottom = ", self)
+        self.ledLogBottomF = QLineEdit(self)
+        self.ledLogBottomF.setText(str(self.bottom_f))
+        self.ledLogBottomF.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.lbldBF = QLabel("dB", self)
+
+        self.lblWindow = QLabel("Window: ", self)
+        self.cmbWindow = QComboBox(self)
+        self.cmbWindow.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
+        self.cmbWindow.setToolTip("Select window type.")
+        qset_cmb_box(self.cmbWindow, self.window)
+
+        self.lblWinPar1 = QLabel("Param1")
+        self.ledWinPar1 = QLineEdit(self)
+        self.ledWinPar1.setText("1")
+        self.ledWinPar1.setObjectName("ledWinPar1")
+
+        layH_ctrl_freq = QHBoxLayout()
+        layH_ctrl_freq.addWidget(self.lblPltFreq)
+        layH_ctrl_freq.addWidget(self.cmbPltFreq)
+        layH_ctrl_freq.addStretch(2)
+        layH_ctrl_freq.addWidget(self.chkLogF)
+        layH_ctrl_freq.addWidget(self.lblLogBottomF)
+        layH_ctrl_freq.addWidget(self.ledLogBottomF)
+        layH_ctrl_freq.addWidget(self.lbldBF)
+        layH_ctrl_freq.addStretch(2)
+        layH_ctrl_freq.addWidget(self.lblWindow)
+        layH_ctrl_freq.addWidget(self.cmbWindow)
+        layH_ctrl_freq.addWidget(self.lblWinPar1)
+        layH_ctrl_freq.addWidget(self.ledWinPar1)
+        layH_ctrl_freq.addStretch(10)
+
+        #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])
+
+        self.wdg_ctrl_freq = QWidget(self)
+        self.wdg_ctrl_freq.setLayout(layH_ctrl_freq)
+        # ---- end Frequency Domain ------------------
+
+        # ---------------------------------------------------------------
+        # Controls for stimuli
+        # ---------------------------------------------------------------
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
@@ -240,80 +307,25 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC = QVBoxLayout()
         layVledNoiDC.addWidget(self.ledNoi)
         layVledNoiDC.addWidget(self.ledDC)
+        
+        layH_ctrl_stim = QHBoxLayout()
+        layH_ctrl_stim.addLayout(layVlblCmb)
+        layH_ctrl_stim.addLayout(layVCmb)
+        layH_ctrl_stim.addStretch(1)
+        layH_ctrl_stim.addLayout(layVlblAmp)
+        layH_ctrl_stim.addLayout(layVledAmp)
+        layH_ctrl_stim.addLayout(layVlblfreq)
+        layH_ctrl_stim.addLayout(layVledfreq)
+        layH_ctrl_stim.addLayout(layVlblfreqU)
+        layH_ctrl_stim.addStretch(1)
+        layH_ctrl_stim.addLayout(layVlblNoiDC)
+        layH_ctrl_stim.addLayout(layVledNoiDC)
+        layH_ctrl_stim.addStretch(10)
+        
+        self.wdg_ctrl_stim = QWidget(self)
+        self.wdg_ctrl_stim.setLayout(layH_ctrl_stim)
         # --------- end stimuli ---------------------------------
 
-        layHControls = QHBoxLayout()
-        layHControls.addWidget(self.lblPltTime)
-        layHControls.addWidget(self.cmbPltTime)
-        layHControls.addStretch(2)
-        layHControls.addLayout(layVchkLogMark)
-        layHControls.addStretch(1)
-        layHControls.addWidget(self.lblLogBottom)
-        layHControls.addWidget(self.ledLogBottom)
-        layHControls.addWidget(self.lbldB)
-        layHControls.addStretch(2)
-
-        layHControls.addLayout(layVlblCmb)
-        layHControls.addLayout(layVCmb)
-        layHControls.addStretch(1)
-        layHControls.addLayout(layVlblAmp)
-        layHControls.addLayout(layVledAmp)
-        layHControls.addLayout(layVlblfreq)
-        layHControls.addLayout(layVledfreq)
-        layHControls.addLayout(layVlblfreqU)
-        layHControls.addStretch(1)
-        layHControls.addLayout(layVlblNoiDC)
-        layHControls.addLayout(layVledNoiDC)
-        layHControls.addStretch(10)
-
-        # ------------ Frequency Domain --------------------------------
-        layHControlsF = QHBoxLayout()
-        self.lblPltFreq = QLabel("Freq.: ", self)
-        self.cmbPltFreq = QComboBox(self)
-        self.cmbPltFreq.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmbPltFreq, self.plt_freq)
-        self.cmbPltFreq.setToolTip("<span>Choose which signals to show in the frequency domain: "
-                                 "The stimulus, the filter response or both.</span>")
-
-        self.chkLogF = QCheckBox("Log. scale", self)
-        self.chkLogF.setObjectName("chkLogF")
-        self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chkLogF.setChecked(True)
-
-        self.lblLogBottomF = QLabel("Bottom = ", self)
-        self.ledLogBottomF = QLineEdit(self)
-        self.ledLogBottomF.setText(str(self.bottom_f))
-        self.ledLogBottomF.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbldBF = QLabel("dB", self)
-
-        self.lblWindow = QLabel("Window: ", self)
-        self.cmbWindow = QComboBox(self)
-        self.cmbWindow.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
-        self.cmbWindow.setToolTip("Select window type.")
-        qset_cmb_box(self.cmbWindow, self.window)
-
-        self.lblWinPar1 = QLabel("Param1")
-        self.ledWinPar1 = QLineEdit(self)
-        self.ledWinPar1.setText("1")
-        self.ledWinPar1.setObjectName("ledWinPar1")
-
-        layHControlsF.addWidget(self.lblPltFreq)
-        layHControlsF.addWidget(self.cmbPltFreq)
-        layHControlsF.addStretch(2)
-        layHControlsF.addWidget(self.chkLogF)
-        layHControlsF.addWidget(self.lblLogBottomF)
-        layHControlsF.addWidget(self.ledLogBottomF)
-        layHControlsF.addWidget(self.lbldBF)
-        layHControlsF.addStretch(2)
-        layHControlsF.addWidget(self.lblWindow)
-        layHControlsF.addWidget(self.cmbWindow)
-        layHControlsF.addWidget(self.lblWinPar1)
-        layHControlsF.addWidget(self.ledWinPar1)
-        layHControlsF.addStretch(10)
-
-        self.wdgHControlsF = QWidget(self)
-        self.wdgHControlsF.setLayout(layHControlsF)
-        # ---- end Frequency Domain ------------------
  
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
@@ -346,21 +358,7 @@ class PlotImpz_UI(QWidget):
         self.cmbWindow.currentIndexChanged.connect(self._update_window)
         self.ledWinPar1.editingFinished.connect(self._update_window)
 
-        # ########################  Main UI Layout ############################
-        # layout for frame (UI widget)
-        layVMainF = QVBoxLayout()
-        layVMainF.addLayout(layHControls)
-        # layVMainF.addWidget(self.wdgHControlsF)
-
-        # This frame encompasses all UI elements
-        self.frmControls = QFrame(self)
-        self.frmControls.setLayout(layVMainF)
-
-        layVMain = QVBoxLayout()
-        layVMain.addWidget(self.frmControls)
-        layVMain.setContentsMargins(*params['wdg_margins'])
-        self.setLayout(layVMain)
-
+# =============================================================================
 
     def update_N(self, dict_sig=None):
         """

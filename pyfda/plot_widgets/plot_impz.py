@@ -62,24 +62,33 @@ class Plot_Impz(QWidget):
         # MplWidget for time domain plots
         #----------------------------------------------------------------------
         self.mplwidget_t = MplWidget(self)
-        self.mplwidget_t.layVMainMpl.addWidget(self.ui)
+        self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         
         #----------------------------------------------------------------------
         # MplWidget for frequency domain plots
         #----------------------------------------------------------------------
         self.mplwidget_f = MplWidget(self)
-        self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdgHControlsF)
+        self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+
+        #----------------------------------------------------------------------
+        # MplWidget for stimulus plots
+        #----------------------------------------------------------------------
+        self.mplwidget_s = MplWidget(self)
+        self.mplwidget_s.layVMainMpl.addWidget(self.ui.wdg_ctrl_stim)
+        self.mplwidget_s.layVMainMpl.setContentsMargins(*params['wdg_margins'])
+
 
         # Tabbed layout, tabs to the left
         tabWidget = QTabWidget(self)
         tabWidget.addTab(self.mplwidget_t, "Time")
         tabWidget.addTab(self.mplwidget_f, "Frequency")
+        tabWidget.addTab(self.mplwidget_s, "Stimuli")
         tabWidget.setTabPosition(QTabWidget.West)
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
-        layVMain.addWidget(self.ui.wdgRunCtrl)
+        layVMain.addWidget(self.ui.wdg_ctrl_run)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
         self.setLayout(layVMain)
