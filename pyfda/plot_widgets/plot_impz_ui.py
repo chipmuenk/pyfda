@@ -243,8 +243,8 @@ class PlotImpz_UI(QWidget):
         # --------- end stimuli ---------------------------------
 
         layHControls = QHBoxLayout()
-#        layHControls.addLayout(layVlblN)
-#        layHControls.addLayout(layVledN)
+        layHControls.addWidget(self.lblPltTime)
+        layHControls.addWidget(self.cmbPltTime)
         layHControls.addStretch(2)
         layHControls.addLayout(layVchkLogMark)
         layHControls.addStretch(1)
@@ -252,12 +252,7 @@ class PlotImpz_UI(QWidget):
         layHControls.addWidget(self.ledLogBottom)
         layHControls.addWidget(self.lbldB)
         layHControls.addStretch(2)
-        layHControls.addWidget(self.lblPltTime)
-        layHControls.addWidget(self.cmbPltTime)
 
-#        layHControls.addLayout(layVlblPlt)
-#        layHControls.addLayout(layVcmbPlt)
-        layHControls.addStretch(1)
         layHControls.addLayout(layVlblCmb)
         layHControls.addLayout(layVCmb)
         layHControls.addStretch(1)
@@ -279,7 +274,6 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmbPltFreq, self.plt_freq)
         self.cmbPltFreq.setToolTip("<span>Choose which signals to show in the frequency domain: "
                                  "The stimulus, the filter response or both.</span>")
-
 
         self.chkLogF = QCheckBox("Log. scale", self)
         self.chkLogF.setObjectName("chkLogF")
@@ -319,7 +313,6 @@ class PlotImpz_UI(QWidget):
 
         self.wdgHControlsF = QWidget(self)
         self.wdgHControlsF.setLayout(layHControlsF)
-        
         # ---- end Frequency Domain ------------------
  
         #----------------------------------------------------------------------
