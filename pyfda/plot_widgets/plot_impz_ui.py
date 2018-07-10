@@ -226,6 +226,11 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for stimuli
         # ---------------------------------------------------------------
+        self.chkStimPlot = QCheckBox("Plot", self)
+        self.chkStimPlot.setObjectName("chkStimPlot")
+        self.chkStimPlot.setToolTip("<span>Plot stimulus.</span>")
+        self.chkStimPlot.setChecked(True)
+
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
         self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
@@ -301,6 +306,7 @@ class PlotImpz_UI(QWidget):
         self.ledDC.setText(str(self.DC))
         self.ledDC.setToolTip("DC Level")
         self.ledDC.setObjectName("stimDC")
+
         layVlblNoiDC = QVBoxLayout()
         layVlblNoiDC.addWidget(self.lblNoi)
         layVlblNoiDC.addWidget(self.lblDC)
@@ -309,6 +315,7 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledDC)
         
         layH_ctrl_stim = QHBoxLayout()
+        layH_ctrl_stim.addWidget(self.chkStimPlot)
         layH_ctrl_stim.addLayout(layVlblCmb)
         layH_ctrl_stim.addLayout(layVCmb)
         layH_ctrl_stim.addStretch(1)

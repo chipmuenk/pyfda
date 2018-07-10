@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import QWidget, QEvent, Qt, pyqtSignal, QTabWidget, QVBoxLayout, QLabel
+from ..compat import QWidget, QEvent, Qt, pyqtSignal, QTabWidget, QVBoxLayout
 
 import numpy as np
 import scipy.signal as sig
@@ -26,6 +26,10 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 from .plot_impz_ui import PlotImpz_UI
 
+# TODO: "Home" calls redraw for all three mpl widgets
+# TODO: Stimulus uses the same x- and y-labels as time, incorporating e.g.
+#       log. labels
+# TODO: changing the view on some widgets redraws h[n] unncessarily
 
 class Plot_Impz(QWidget):
     """
@@ -101,6 +105,7 @@ class Plot_Impz(QWidget):
 
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
+        self.mplwidget_s.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
 
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
@@ -243,8 +248,7 @@ class Plot_Impz(QWidget):
             self.mplwidget_t.fig.delaxes(ax)
 
         num_subplots = 0 + (self.ui.plt_time != "None")\
-                        + (self.cmplx and self.ui.plt_time in {"Response", "Both"})\
-                        + (self.ui.plt_freq != "None")
+                        + (self.cmplx and self.ui.plt_time in {"Response", "Both"})
 
         if num_subplots > 0:
             self.mplwidget_t.fig.subplots_adjust(hspace = 0.5)
@@ -261,15 +265,24 @@ class Plot_Impz(QWidget):
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
                 self.ax_i.get_yaxis().tick_left() # remove axis ticks right
     
-            if self.ui.plt_freq != "None":
-                self.ax_fft = self.mplwidget_t.fig.add_subplot(num_subplots, 1, num_subplots)    
-                self.ax_fft.clear()
-
-                self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
-                self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
-    
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
+
+        if self.ui.plt_freq != "None":
+            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)    
+            self.ax_fft.clear()
+
+            self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
+    
+        if self.ui.chkStimPlot.isChecked():
+            self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
+            self.ax_stim.clear()
+
+            self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
+
+            
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
@@ -487,6 +500,21 @@ class Plot_Impz(QWidget):
         self.ax_r.set_xlim([self.t[N_start],self.t[self.ui.N_end-1]])
         expand_lim(self.ax_r, 0.02)
 
+        if self.ACTIVE_3D: # not implemented / tested yet
+            # plotting the stems
+            for i in range(N_start, self.ui.N_end):
+              self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
+                             '-', linewidth=2, alpha=.5)
+
+            # plotting a circle on the top of each stem
+            self.ax3d.plot(self.t[N_start:], y[N_start:], y_i[N_start:], 'o', markersize=8,
+                           markerfacecolor='none', label='$y[n]$')
+
+            self.ax3d.set_xlabel('x')
+            self.ax3d.set_ylabel('y')
+            self.ax3d.set_zlabel('z')
+
+
         # plot frequency domain =========================================
         if self.ui.plt_freq != "None":
             plt_response = self.ui.plt_freq in {"Response","Both"}
@@ -581,20 +609,28 @@ class Plot_Impz(QWidget):
                 self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
 
-        if self.ACTIVE_3D: # not implemented / tested yet
-            # plotting the stems
-            for i in range(N_start, self.ui.N_end):
-              self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
-                             '-', linewidth=2, alpha=.5)
-
-            # plotting a circle on the top of each stem
-            self.ax3d.plot(self.t[N_start:], y[N_start:], y_i[N_start:], 'o', markersize=8,
-                           markerfacecolor='none', label='$y[n]$')
-
-            self.ax3d.set_xlabel('x')
-            self.ax3d.set_ylabel('y')
-            self.ax3d.set_zlabel('z')
-
+        # plot stimulus =========================================
+        if self.ui.chkStimPlot.isChecked():
+            stem_fmt = params['mpl_stimuli']
+            [ms_s, ss_s, bs_s] = self.ax_stim.stem(self.t[N_start:], x[N_start:], 
+                bottom=self.ui.bottom, label = 'Stim.', **stem_fmt)
+            ms_s.set_mfc(stem_fmt['mfc'])
+            ms_s.set_mec(stem_fmt['mec'])
+            ms_s.set_ms(stem_fmt['ms'])
+            ms_s.set_alpha(stem_fmt['alpha'])
+            for stem in ss_s:
+                stem.set_linewidth(stem_fmt['lw'])
+                stem.set_color(stem_fmt['mec'])
+                stem.set_alpha(stem_fmt['alpha'])
+            bs_s.set_color(stem_fmt['mec']) # same format
+            bs_s.set_alpha(stem_fmt['alpha'])  # as stem for baseline       
+            
+            self.ax_stim.set_title("Stimulus")
+            self.ax_stim.set_xlim([self.t[N_start],self.t[self.ui.N_end-1]])
+            expand_lim(self.ax_stim, 0.02)
+            self.ax_stim.set_xlabel(fb.fil[0]['plt_tLabel'])
+            self.ax_stim.set_ylabel(H_str + r'$\rightarrow $')
+            
         self.redraw()
 
 #------------------------------------------------------------------------------
@@ -603,6 +639,9 @@ class Plot_Impz(QWidget):
         Redraw the canvas when e.g. the canvas size has changed
         """
         self.mplwidget_t.redraw()
+        self.mplwidget_f.redraw()
+        self.mplwidget_s.redraw()
+
         if hasattr(self, "ax2_fft"):
             self.ax2_fft.grid(False)
 
