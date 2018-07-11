@@ -27,8 +27,6 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from .plot_impz_ui import PlotImpz_UI
 
 # TODO: "Home" calls redraw for all three mpl widgets
-# TODO: Stimulus uses the same x- and y-labels as time, incorporating e.g.
-#       log. labels
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 
 class Plot_Impz(QWidget):
@@ -451,6 +449,10 @@ class Plot_Impz(QWidget):
         self.load_fs()
         self.init_axes()
         
+        self.fmt_plot_resp = {'color':'red', 'linewidth':2}
+        self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
+        self.fmt_stem_stim = params['mpl_stimuli']
+        
         self.draw_impz_time()
         self.draw_impz_freq()
         self.draw_impz_stim()
@@ -460,11 +462,9 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the time domain mplwidget
         """
-        if self.ui.chk_stems_time.isChecked():
-            mkfmt_r = 'o'
-            mkfmt_i = 'd'
-        else:
-            mkfmt_r = mkfmt_i = ' '
+        stem_plot = self.ui.chk_stems_time.isChecked()
+        mkfmt_r = 'o'
+        mkfmt_i = 'd'
 
         if self.ui.chkLog.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
@@ -487,22 +487,29 @@ class Plot_Impz(QWidget):
                 H_str = self.H_str + ' in V'
 
         if self.ui.plt_time in {"Response", "Both"}:
-            [ml, sl, bl] = self.ax_r.stem(self.t[self.ui.N_start:], y[self.ui.N_start:], 
-                bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
+            if stem_plot:
+                [ml, sl, bl] = self.ax_r.stem(self.t[self.ui.N_start:], y[self.ui.N_start:], 
+                    bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
+            else:
+                self.ax_r.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], 
+                    label = '$y[n]$', **self.fmt_plot_resp)                    
 
         if self.ui.plt_time in {"Stimulus", "Both"}:
-            stem_fmt = params['mpl_stimuli']
-            [ms, ss, bs] = self.ax_r.stem(self.t[self.ui.N_start:], x[self.ui.N_start:], 
-                bottom=self.ui.bottom, label = 'Stim.', **stem_fmt)
-            ms.set_mfc(stem_fmt['mfc'])
-            ms.set_mec(stem_fmt['mec'])
-            ms.set_ms(stem_fmt['ms'])
-            ms.set_alpha(stem_fmt['alpha'])
-            for stem in ss:
-                stem.set_linewidth(stem_fmt['lw'])
-                stem.set_color(stem_fmt['mec'])
-                stem.set_alpha(stem_fmt['alpha'])
-            bs.set_visible(False) # invisible bottomline
+            if stem_plot:
+                [ms, ss, bs] = self.ax_r.stem(self.t[self.ui.N_start:], x[self.ui.N_start:], 
+                    bottom=self.ui.bottom, label = 'Stim.', **self.fmt_stem_stim)
+                ms.set_mfc(self.fmt_stem_stim['mfc'])
+                ms.set_mec(self.fmt_stem_stim['mec'])
+                ms.set_ms(self.fmt_stem_stim['ms'])
+                ms.set_alpha(self.fmt_stem_stim['alpha'])
+                for stem in ss:
+                    stem.set_linewidth(self.fmt_stem_stim['lw'])
+                    stem.set_color(self.fmt_stem_stim['mec'])
+                    stem.set_alpha(self.fmt_stem_stim['alpha'])
+                bs.set_visible(False) # invisible bottomline
+            else:
+                self.ax_r.plot(self.t[self.ui.N_start:], x[self.ui.N_start:], 
+                    label = '$y[n]$', **self.fmt_plot_stim)                    
 
         if self.cmplx and self.ui.plt_time in {"Response", "Both"}:
             [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
@@ -603,11 +610,11 @@ class Plot_Impz(QWidget):
             handles = []
             labels = []
             if plt_stimulus:
-                h, = self.ax_fft.plot(F, X, color =(0.5,0.5,0.5,0.5), lw=2)
+                h, = self.ax_fft.plot(F, X, **self.fmt_plot_stim)
                 handles.append(h)
                 labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
             if plt_response:
-                h, = self.ax_fft.plot(F, Y)
+                h, = self.ax_fft.plot(F, Y, **self.fmt_plot_resp)
                 handles.append(h)
                 labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
                 
@@ -642,23 +649,22 @@ class Plot_Impz(QWidget):
         """
         if self.ui.chk_stim_plot.isChecked():
             H_str = self.H_str + ' in V'
-            stem_fmt = params['mpl_stimuli']
             if self.ui.chk_stems_stim.isChecked(): # stem plot
                 [ms_s, ss_s, bs_s] = self.ax_stim.stem(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
-                    label = 'Stim.', **stem_fmt)
-                ms_s.set_mfc(stem_fmt['mfc'])
-                ms_s.set_mec(stem_fmt['mec'])
-                ms_s.set_ms(stem_fmt['ms'])
-                ms_s.set_alpha(stem_fmt['alpha'])
+                    label = 'Stim.', **self.fmt_stem_stim)
+                ms_s.set_mfc(self.fmt_stem_stim['mfc'])
+                ms_s.set_mec(self.fmt_stem_stim['mec'])
+                ms_s.set_ms(self.fmt_stem_stim['ms'])
+                ms_s.set_alpha(self.fmt_stem_stim['alpha'])
                 for stem in ss_s:
-                    stem.set_linewidth(stem_fmt['lw'])
-                    stem.set_color(stem_fmt['mec'])
-                    stem.set_alpha(stem_fmt['alpha'])
-                bs_s.set_color(stem_fmt['mfc']) # same format
-                bs_s.set_alpha(stem_fmt['alpha'])  # as stem for baseline
+                    stem.set_linewidth(self.fmt_stem_stim['lw'])
+                    stem.set_color(self.fmt_stem_stim['mec'])
+                    stem.set_alpha(self.fmt_stem_stim['alpha'])
+                bs_s.set_color(self.fmt_stem_stim['mfc']) # same format
+                bs_s.set_alpha(self.fmt_stem_stim['alpha'])  # as stem for baseline
             else: # line plot
                 self.ax_stim.plot(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
-                    label='Stim.', color=stem_fmt['mfc'], alpha=stem_fmt['alpha'])                
+                    label='Stim.', **self.fmt_plot_stim)                
             
             self.ax_stim.set_title("Stimulus")
             self.ax_stim.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
