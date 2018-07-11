@@ -13,8 +13,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel,
-                      QHBoxLayout, QVBoxLayout, QFrame, pyqtSignal)
+from ..compat import (QCheckBox, QWidget, QComboBox, QLineEdit, QLabel, QPushButton,
+                      QHBoxLayout, QVBoxLayout, pyqtSignal)
 
 import numpy as np
 import scipy.signal as sig
@@ -27,9 +27,9 @@ class PlotImpz_UI(QWidget):
     """
     Create the UI for the PlotImpz class
     """
-    # incoming: from connector widget plot_tab_widgets to self.process_signals() 
+    # incoming: from connector widget plot_tab_widgets to self.process_sig_rx() 
     sig_rx = pyqtSignal(object)
-    # outgoing: from process_signals() to PlotImpz
+    # outgoing: from process_sig_rx() to PlotImpz
     sig_tx = pyqtSignal(object) 
 
     def __init__(self, parent):
@@ -70,14 +70,15 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self._update_time_freq()
-        self._log_mode()
-        self.update_N() # slso updates window
+        self._update_plot_time()
+        self._update_plot_freq()
+        self._log_mode_time()
+        self._log_mode_freq()
+        self.update_N() # also updates window function
         self._update_noi()
 
 #------------------------------------------------------------------------------
-    #@pyqtSlot(object)
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar
         """
@@ -88,10 +89,16 @@ class PlotImpz_UI(QWidget):
             self.sig_tx.emit(dict_sig)
 
     def _construct_UI(self):
-
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
+        self.lblSimSelect = QLabel("Simulate", self)
+        self.cmbSimSelect = QComboBox(self)
+        self.cmbSimSelect.addItems(["Float","Fixpoint"])
+        qset_cmb_box(self.cmbSimSelect, "Float")
+        self.cmbSimSelect.setToolTip("<span>Simulate floating-point or fixpoint response."
+                                 "</span>")
+
         self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
         self.ledN_points = QLineEdit(self)
         self.ledN_points.setText(str(self.N_points))
@@ -102,21 +109,21 @@ class PlotImpz_UI(QWidget):
         self.ledN_start = QLineEdit(self)
         self.ledN_start.setText(str(self.N_start))
         self.ledN_start.setToolTip("<span>First point to plot.</span>")
-
-        layVlblN = QVBoxLayout()
-        layVlblN.addWidget(self.lblN_start)
-        layVlblN.addWidget(self.lblN_points)
-
-        layVledN = QVBoxLayout()
-        layVledN.addWidget(self.ledN_start)
-        layVledN.addWidget(self.ledN_points)
         
+        self.butRun = QPushButton("RUN", self)
+        self.butRun.setToolTip("Run fixpoint simulation")
+
         layH_ctrl_run = QHBoxLayout()
+        layH_ctrl_run.addWidget(self.lblSimSelect)
+        layH_ctrl_run.addWidget(self.cmbSimSelect)
+        layH_ctrl_run.addStretch(1)        
         layH_ctrl_run.addWidget(self.lblN_start)
         layH_ctrl_run.addWidget(self.ledN_start)
         layH_ctrl_run.addStretch(1)
         layH_ctrl_run.addWidget(self.lblN_points)
         layH_ctrl_run.addWidget(self.ledN_points)
+        layH_ctrl_run.addStretch(1)
+        layH_ctrl_run.addWidget(self.butRun)
         layH_ctrl_run.addStretch(10)
 
         #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -140,10 +147,10 @@ class PlotImpz_UI(QWidget):
         self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLog.setChecked(False)
 
-        self.chkMarker = QCheckBox("Markers", self)
-        self.chkMarker.setObjectName("chkMarker")
-        self.chkMarker.setToolTip("<span>Show plot markers.</span>")
-        self.chkMarker.setChecked(True)
+        self.chk_stems_time = QCheckBox("Stems", self)
+        self.chk_stems_time.setObjectName("chkStems")
+        self.chk_stems_time.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
+        self.chk_stems_time.setChecked(True)
 
         self.lblLogBottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
@@ -161,7 +168,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.ledLogBottom)
         layH_ctrl_time.addWidget(self.lbldB)
         layH_ctrl_time.addStretch(2)
-        layH_ctrl_time.addWidget(self.chkMarker)
+        layH_ctrl_time.addWidget(self.chk_stems_time)
         layH_ctrl_time.addStretch(10)
         
         #layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
@@ -226,10 +233,18 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for stimuli
         # ---------------------------------------------------------------
-        self.chkStimPlot = QCheckBox("Plot", self)
-        self.chkStimPlot.setObjectName("chkStimPlot")
-        self.chkStimPlot.setToolTip("<span>Plot stimulus.</span>")
-        self.chkStimPlot.setChecked(True)
+        self.chk_stim_plot = QCheckBox("Plot", self)
+        self.chk_stim_plot.setObjectName("chkStimPlot")
+        self.chk_stim_plot.setToolTip("<span>Plot stimulus.</span>")
+        self.chk_stim_plot.setChecked(True)
+
+        self.chk_stems_stim = QCheckBox("Stems", self)
+        self.chk_stems_stim.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
+        self.chk_stems_stim.setChecked(True)
+
+        layV_stim_plot = QVBoxLayout()
+        layV_stim_plot.addWidget(self.chk_stim_plot)
+        layV_stim_plot.addWidget(self.chk_stems_stim)
 
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
@@ -315,7 +330,8 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledDC)
         
         layH_ctrl_stim = QHBoxLayout()
-        layH_ctrl_stim.addWidget(self.chkStimPlot)
+        #layH_ctrl_stim.addWidget(self.chkStimPlot)
+        layH_ctrl_stim.addLayout(layV_stim_plot)
         layH_ctrl_stim.addLayout(layVlblCmb)
         layH_ctrl_stim.addLayout(layVCmb)
         layH_ctrl_stim.addStretch(1)
@@ -337,33 +353,37 @@ class PlotImpz_UI(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        # --- run control ---
+        self.cmbSimSelect.currentIndexChanged.connect(self._update_sim_select)
         self.ledN_start.editingFinished.connect(self.update_N)
         self.ledN_points.editingFinished.connect(self.update_N)
-        self.chkLog.clicked.connect(self._log_mode)
-        self.ledLogBottom.editingFinished.connect(self._log_mode)
+        self.butRun.clicked.connect(self.run_fx_sim)
+        # --- time control ---
+        self.cmbPltTime.currentIndexChanged.connect(self._update_plot_time)
+        self.chkLog.clicked.connect(self._log_mode_time)
+        self.ledLogBottom.editingFinished.connect(self._log_mode_time)
+        self.chk_stems_time.clicked.connect(self._update_plot_time)
+        # --- frequency control ---
+        self.cmbPltFreq.currentIndexChanged.connect(self._update_plot_freq)
+        self.chkLogF.clicked.connect(self._log_mode_freq)
+        self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
+        # careful! currentIndexChanged passes the current index to _update_window
+        self.cmbWindow.currentIndexChanged.connect(self._update_window)
+        self.ledWinPar1.editingFinished.connect(self._update_window)
 
-        self.cmbPltTime.currentIndexChanged.connect(self._update_time_freq)
-        self.cmbPltFreq.currentIndexChanged.connect(self._update_time_freq)
-
-        self.chkMarker.clicked.connect(self._update_chk_boxes)
-
+        # --- stimulus control ---
+        self.chk_stim_plot.clicked.connect(self._update_plot_stim)
+        self.chk_stems_stim.clicked.connect(self._update_plot_stim)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
         self.ledAmp1.editingFinished.connect(self._update_amp1)
         self.ledAmp2.editingFinished.connect(self._update_amp2)
-
         self.ledDC.editingFinished.connect(self._update_DC)
-
-        self.chkLogF.clicked.connect(self._log_mode)
-        self.ledLogBottomF.editingFinished.connect(self._log_mode)
-        # careful! currentIndexChanged passes the current index to _update_window
-        self.cmbWindow.currentIndexChanged.connect(self._update_window)
-        self.ledWinPar1.editingFinished.connect(self._update_window)
 
 # =============================================================================
 
@@ -385,29 +405,48 @@ class PlotImpz_UI(QWidget):
 
         self._update_window(dict_sig)
 
-
-    def _update_chk_boxes(self):
+    def run_fx_sim(self):
         """
-        Trigger update view when "show markers" checkbox is clicked
+        Run fixpoint simulation
         """
-        self.sig_tx.emit({'sender':__name__, 'view_changed':''})
+        pass
 
+# TODO: add a function for run_fx_sim
+# TODO: add separate update function for time, freq, stim
 
-    def _update_time_freq(self):
+    def _update_plot_time(self):
         """
-        Trigger 'draw' when one of the comboboxes PltTime or PltFreq is modified,
-        enable frequency domain controls only when needed
+        Trigger 'draw' when the combobox PltTime has been modified
         """
         self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
-        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
-        # self.wdgHControlsF.setVisible(self.plt_freq != "None")
-        self.sig_tx.emit({'sender':__name__, 'view_changed':''})
-
-
-    def _log_mode(self):
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'time'})
+        
+    def _update_plot_freq(self):
         """
-        Select / deselect logarithmic mode for both time and frequency
-        domain and update self.bottom / self.bottom_f
+        Trigger 'draw' when the combobox PltFreq has been modified,
+        enable frequency domain controls only when needed
+        """
+        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'freq'})
+
+    def _update_plot_stim(self):
+        """
+        Trigger 'draw' when one of the stimulus checkboxes has been clicked
+        """
+        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'stim'})
+
+    def _update_sim_select(self):
+        """
+        Select between fixpoint and floating point simulation
+        """
+        self.sim_select = qget_cmb_box(self.cmbSimSelect, data=False)
+        self.sim_fxp = (self.sim_select == 'Fixpoint')
+        self.butRun.setEnabled(self.sim_fxp)
+        
+    def _log_mode_time(self):
+        """
+        Select / deselect log. mode for both time domain and update self.bottom
         """
         log = self.chkLog.isChecked()
         self.lblLogBottom.setVisible(log)
@@ -417,6 +456,13 @@ class PlotImpz_UI(QWidget):
             self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom,
                                     return_type='float', sign='neg')
             self.ledLogBottom.setText(str(self.bottom))
+            
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
+
+    def _log_mode_freq(self):
+        """
+        Select / deselect log. mode for frequency domain and update self.bottom_f
+        """
 
         log_f = self.chkLogF.isChecked()
         self.lblLogBottomF.setVisible(log_f)
@@ -427,7 +473,7 @@ class PlotImpz_UI(QWidget):
                                     return_type='float', sign='neg')
             self.ledLogBottomF.setText(str(self.bottom_f))
 
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'log'})
+        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_freq'})
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
