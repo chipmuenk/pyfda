@@ -20,9 +20,9 @@ import pyfda.pyfda_fix_lib as fix
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox,
                       QVBoxLayout, QHBoxLayout, QFrame)
 
-from pyfda.pyfda_qt_lib import qstr, qget_cmb_box, qset_cmb_box
+from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import safe_eval, to_html
+from pyfda.pyfda_lib import qstr, safe_eval, to_html
 
 
 def build_coeff_dict(frmt=None):

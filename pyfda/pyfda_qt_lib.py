@@ -14,56 +14,9 @@ from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
 
-from .pyfda_lib import PY3
+from .pyfda_lib import qstr
 
 from .compat import QFrame, QMessageBox
-
-#------------------------------------------------------------------------------
-def qstr(text):
-    """
-    Convert text (QVariant, QString, string) or numeric object to plain string.
-
-    In Python 3, python Qt objects are automatically converted to QVariant
-    when stored as "data" e.g. in a QComboBox and converted back when
-    retrieving. In Python 2, QVariant is returned when itemData is retrieved.
-    This is first converted from the QVariant container format to a
-    QString, next to a "normal" non-unicode string.
-
-    Parameter:
-    ----------
-    
-    text: QVariant, QString, string or numeric data type that can be converted
-      to string
-    
-    Returns:
-    --------
-    
-    The current `text` data as a unicode (utf8) string
-    """
-    text_type = str(type(text)).lower()
-
-    if "qstring" in text_type:
-        # Python 3: convert QString -> str
-        #string = str(text)
-        # Convert QString -> Utf8
-        string = text.toUtf8()
-#    elif not isinstance(text, six.text_type):
-    elif "qvariant" in text_type:
-        # Python 2: convert QVariant -> QString
-        string = text.toString()
-        #string = QVariant(text).toString()
-        #string = str(text.toString())
-    elif "unicode" in text_type:
-        return text
-    else:
-        # `text` is numeric or of type str
-        string = str(text)
-        
-    if not PY3:
-        return unicode(string, 'utf8')
-    else:
-        return str(string) # convert QString -> str
-
 
 #------------------------------------------------------------------------------
 def qget_cmb_box(cmb_box, data=True):

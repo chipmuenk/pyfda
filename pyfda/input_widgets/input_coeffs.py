@@ -23,8 +23,8 @@ from ..compat import (Qt, QtCore, QWidget, QLineEdit, QApplication,
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval
-from pyfda.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qstr, qget_selected
+from pyfda.pyfda_lib import qstr, fil_save, safe_eval
+from pyfda.pyfda_qt_lib import qstyle_widget, qset_cmb_box, qget_cmb_box, qget_selected
 from pyfda.pyfda_io_lib import CSV_option_box, qtable2text, qtext2table
  
 from pyfda.pyfda_rc import params

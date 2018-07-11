@@ -21,14 +21,14 @@ from ..compat import (QtCore, QWidget, QLineEdit, pyqtSignal, pyqtSlot, QEvent, 
                       QBrush, QColor, QSize, QStyledItemDelegate, QApplication,
                       QTableWidget, QTableWidgetItem, Qt, QVBoxLayout)
 
-from pyfda.pyfda_qt_lib import qstr, qget_cmb_box, qstyle_widget
+from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.pyfda_io_lib import qtable2text, qtext2table
 
 import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, safe_eval, unichr_23
+from pyfda.pyfda_lib import qstr, fil_save, safe_eval, unichr_23
 
 from pyfda.pyfda_rc import params
 
