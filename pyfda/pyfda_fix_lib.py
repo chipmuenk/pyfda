@@ -18,7 +18,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-from pyfda.pyfda_qt_lib import qstr
+from pyfda.pyfda_lib import qstr
 
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
 # TODO: Vecorization for hex / csd functions (frmt2float)

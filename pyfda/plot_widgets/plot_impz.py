@@ -27,8 +27,6 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from .plot_impz_ui import PlotImpz_UI
 
 # TODO: "Home" calls redraw for all three mpl widgets
-# TODO: Stimulus uses the same x- and y-labels as time, incorporating e.g.
-#       log. labels
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 
 class Plot_Impz(QWidget):
@@ -82,7 +80,6 @@ class Plot_Impz(QWidget):
         self.mplwidget_s = MplWidget(self)
         self.mplwidget_s.layVMainMpl.addWidget(self.ui.wdg_ctrl_stim)
         self.mplwidget_s.layVMainMpl.setContentsMargins(*params['wdg_margins'])
-
 
         # Tabbed layout, tabs to the left
         tabWidget = QTabWidget(self)
@@ -147,7 +144,7 @@ class Plot_Impz(QWidget):
                 self.needs_redraw = False
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
                     or self.needs_redraw:
-                self.redraw()
+                self.redraw() # redraw all widgets
                 self.needs_redraw = False
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
@@ -242,17 +239,26 @@ class Plot_Impz(QWidget):
 
 #------------------------------------------------------------------------------
     def init_axes(self):
-        # clear the axes and (re)draw the plot
-        #
-        for ax in self.mplwidget_t.fig.get_axes():
-            self.mplwidget_t.fig.delaxes(ax)
+        """
+        Clear the axes of all matplotlib widgets and (re)draw the plots.
+        """
+        self._init_axes_time()
+        self._init_axes_freq()
+        self._init_axes_stim()
 
-        num_subplots = 0 + (self.ui.plt_time != "None")\
-                        + (self.cmplx and self.ui.plt_time in {"Response", "Both"})
-
-        if num_subplots > 0:
-            self.mplwidget_t.fig.subplots_adjust(hspace = 0.5)
+    def _init_axes_time(self):
+        """
+        Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
+        """
+        if self.ui.plt_time != "None":
+            for ax in self.mplwidget_t.fig.get_axes():
+                self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
     
+            num_subplots = 0 + (self.ui.plt_time != "None")\
+                            + (self.cmplx and self.ui.plt_time in {"Response", "Both"})
+    
+            self.mplwidget_t.fig.subplots_adjust(hspace = 0.5)
+        
             if self.ui.plt_time != "None":
                 self.ax_r = self.mplwidget_t.fig.add_subplot(num_subplots,1 ,1)
                 self.ax_r.clear()
@@ -268,21 +274,31 @@ class Plot_Impz(QWidget):
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
 
+    def _init_axes_freq(self):
+        """
+        Clear the axes of the frequency domain matplotlib widgets and 
+        (re)draw the plots
+        """
         if self.ui.plt_freq != "None":
+            for ax in self.mplwidget_f.fig.get_axes():
+                self.mplwidget_f.fig.delaxes(ax) # clear twinned axes if present
+                
             self.ax_fft = self.mplwidget_f.fig.add_subplot(111)    
             self.ax_fft.clear()
 
             self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
     
-        if self.ui.chkStimPlot.isChecked():
+    def _init_axes_stim(self):
+        """
+        clear the axes of the stimulus matplotlib widgets and (re)draw the plots
+        """
+        if self.ui.chk_stim_plot.isChecked():
             self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
             self.ax_stim.clear()
 
             self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
-
-            
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
@@ -340,7 +356,6 @@ class Plot_Impz(QWidget):
             self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.ui.N)
         elif self.ui.noise == "uniform":
             self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.ui.N)-0.5)
-
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
@@ -404,8 +419,7 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def update_view(self):
         """
-        place holder; should update only the limits without recalculating
-        the impulse respons
+        only update only the limits without recalculating the impulse response
         """
         self.draw_impz()
 
@@ -432,16 +446,25 @@ class Plot_Impz(QWidget):
             unit_frmt = None
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
-        N_start = self.ui.N_start
         self.load_fs()
         self.init_axes()
         
-        #================ Main Plotting Routine =========================
-        if self.ui.chkMarker.isChecked():
-            mkfmt_r = 'o'
-            mkfmt_i = 'd'
-        else:
-            mkfmt_r = mkfmt_i = ' '
+        self.fmt_plot_resp = {'color':'red', 'linewidth':2}
+        self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
+        self.fmt_stem_stim = params['mpl_stimuli']
+        
+        self.draw_impz_time()
+        self.draw_impz_freq()
+        self.draw_impz_stim()
+        
+        #================ Plotting routine time domain =========================
+    def draw_impz_time(self):
+        """
+        (Re-)draw the time domain mplwidget
+        """
+        stem_plot = self.ui.chk_stems_time.isChecked()
+        mkfmt_r = 'o'
+        mkfmt_i = 'd'
 
         if self.ui.chkLog.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
@@ -463,27 +486,33 @@ class Plot_Impz(QWidget):
             else:
                 H_str = self.H_str + ' in V'
 
-
         if self.ui.plt_time in {"Response", "Both"}:
-            [ml, sl, bl] = self.ax_r.stem(self.t[N_start:], y[N_start:], 
-                bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
+            if stem_plot:
+                [ml, sl, bl] = self.ax_r.stem(self.t[self.ui.N_start:], y[self.ui.N_start:], 
+                    bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
+            else:
+                self.ax_r.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], 
+                    label = '$y[n]$', **self.fmt_plot_resp)                    
 
         if self.ui.plt_time in {"Stimulus", "Both"}:
-            stem_fmt = params['mpl_stimuli']
-            [ms, ss, bs] = self.ax_r.stem(self.t[N_start:], x[N_start:], 
-                bottom=self.ui.bottom, label = 'Stim.', **stem_fmt)
-            ms.set_mfc(stem_fmt['mfc'])
-            ms.set_mec(stem_fmt['mec'])
-            ms.set_ms(stem_fmt['ms'])
-            ms.set_alpha(stem_fmt['alpha'])
-            for stem in ss:
-                stem.set_linewidth(stem_fmt['lw'])
-                stem.set_color(stem_fmt['mec'])
-                stem.set_alpha(stem_fmt['alpha'])
-            bs.set_visible(False) # invisible bottomline
+            if stem_plot:
+                [ms, ss, bs] = self.ax_r.stem(self.t[self.ui.N_start:], x[self.ui.N_start:], 
+                    bottom=self.ui.bottom, label = 'Stim.', **self.fmt_stem_stim)
+                ms.set_mfc(self.fmt_stem_stim['mfc'])
+                ms.set_mec(self.fmt_stem_stim['mec'])
+                ms.set_ms(self.fmt_stem_stim['ms'])
+                ms.set_alpha(self.fmt_stem_stim['alpha'])
+                for stem in ss:
+                    stem.set_linewidth(self.fmt_stem_stim['lw'])
+                    stem.set_color(self.fmt_stem_stim['mec'])
+                    stem.set_alpha(self.fmt_stem_stim['alpha'])
+                bs.set_visible(False) # invisible bottomline
+            else:
+                self.ax_r.plot(self.t[self.ui.N_start:], x[self.ui.N_start:], 
+                    label = '$y[n]$', **self.fmt_plot_stim)                    
 
         if self.cmplx and self.ui.plt_time in {"Response", "Both"}:
-            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[N_start:], y_i[N_start:],
+            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
                 bottom=self.ui.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
@@ -497,25 +526,29 @@ class Plot_Impz(QWidget):
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
         
         self.ax_r.set_title(self.title_str)
-        self.ax_r.set_xlim([self.t[N_start],self.t[self.ui.N_end-1]])
+        self.ax_r.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
         expand_lim(self.ax_r, 0.02)
 
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
-            for i in range(N_start, self.ui.N_end):
+            for i in range(self.ui.N_start, self.ui.N_end):
               self.ax3d.plot([self.t[i], self.t[i]], [y[i], y[i]], [0, y_i[i]],
                              '-', linewidth=2, alpha=.5)
 
             # plotting a circle on the top of each stem
-            self.ax3d.plot(self.t[N_start:], y[N_start:], y_i[N_start:], 'o', markersize=8,
+            self.ax3d.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], y_i[self.ui.N_start:], 'o', markersize=8,
                            markerfacecolor='none', label='$y[n]$')
 
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
 
+        self.mplwidget_t.redraw()
 
-        # plot frequency domain =========================================
+    def draw_impz_freq(self):
+        """
+        (Re-)draw the frequency domain mplwidget
+        """
         if self.ui.plt_freq != "None":
             plt_response = self.ui.plt_freq in {"Response","Both"}
             plt_stimulus = self.ui.plt_freq in {"Stimulus","Both"}
@@ -577,11 +610,11 @@ class Plot_Impz(QWidget):
             handles = []
             labels = []
             if plt_stimulus:
-                h, = self.ax_fft.plot(F, X, color =(0.5,0.5,0.5,0.5), lw=2)
+                h, = self.ax_fft.plot(F, X, **self.fmt_plot_stim)
                 handles.append(h)
                 labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
             if plt_response:
-                h, = self.ax_fft.plot(F, Y)
+                h, = self.ax_fft.plot(F, Y, **self.fmt_plot_resp)
                 handles.append(h)
                 labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
                 
@@ -592,7 +625,6 @@ class Plot_Impz(QWidget):
             self.ax_fft.legend(handles, labels, loc='best', fontsize = 'small',
                                fancybox=True, framealpha=0.5)
             
-
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
             self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
@@ -609,29 +641,38 @@ class Plot_Impz(QWidget):
                 self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
 
-        # plot stimulus =========================================
-        if self.ui.chkStimPlot.isChecked():
-            stem_fmt = params['mpl_stimuli']
-            [ms_s, ss_s, bs_s] = self.ax_stim.stem(self.t[N_start:], x[N_start:], 
-                bottom=self.ui.bottom, label = 'Stim.', **stem_fmt)
-            ms_s.set_mfc(stem_fmt['mfc'])
-            ms_s.set_mec(stem_fmt['mec'])
-            ms_s.set_ms(stem_fmt['ms'])
-            ms_s.set_alpha(stem_fmt['alpha'])
-            for stem in ss_s:
-                stem.set_linewidth(stem_fmt['lw'])
-                stem.set_color(stem_fmt['mec'])
-                stem.set_alpha(stem_fmt['alpha'])
-            bs_s.set_color(stem_fmt['mec']) # same format
-            bs_s.set_alpha(stem_fmt['alpha'])  # as stem for baseline       
+            self.mplwidget_f.redraw()
+
+    def draw_impz_stim(self):
+        """
+        (Re-)draw the stimulus
+        """
+        if self.ui.chk_stim_plot.isChecked():
+            H_str = self.H_str + ' in V'
+            if self.ui.chk_stems_stim.isChecked(): # stem plot
+                [ms_s, ss_s, bs_s] = self.ax_stim.stem(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
+                    label = 'Stim.', **self.fmt_stem_stim)
+                ms_s.set_mfc(self.fmt_stem_stim['mfc'])
+                ms_s.set_mec(self.fmt_stem_stim['mec'])
+                ms_s.set_ms(self.fmt_stem_stim['ms'])
+                ms_s.set_alpha(self.fmt_stem_stim['alpha'])
+                for stem in ss_s:
+                    stem.set_linewidth(self.fmt_stem_stim['lw'])
+                    stem.set_color(self.fmt_stem_stim['mec'])
+                    stem.set_alpha(self.fmt_stem_stim['alpha'])
+                bs_s.set_color(self.fmt_stem_stim['mfc']) # same format
+                bs_s.set_alpha(self.fmt_stem_stim['alpha'])  # as stem for baseline
+            else: # line plot
+                self.ax_stim.plot(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
+                    label='Stim.', **self.fmt_plot_stim)                
             
             self.ax_stim.set_title("Stimulus")
-            self.ax_stim.set_xlim([self.t[N_start],self.t[self.ui.N_end-1]])
+            self.ax_stim.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
             expand_lim(self.ax_stim, 0.02)
             self.ax_stim.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_stim.set_ylabel(H_str + r'$\rightarrow $')
             
-        self.redraw()
+            self.mplwidget_s.redraw()
 
 #------------------------------------------------------------------------------
     def redraw(self):

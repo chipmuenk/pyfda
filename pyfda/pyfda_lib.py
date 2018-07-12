@@ -171,6 +171,68 @@ def unicode_23(string):
     else:
         return unicode(string)
 
+def ascii(string):
+    """
+    Remove non-ASCII-characters from string.
+    
+    Parameter
+    ---------
+    string: str
+        This is a unicode string under Python 3 and a "normal" string under Python 2.
+
+    Returns
+    -------
+    
+    A string (whatever that means in Py2 / Py3)
+    """
+    return re.sub(r'[^\x00-\x7f]',r'', string)
+
+#------------------------------------------------------------------------------
+def qstr(text):
+    """
+    Convert text (QVariant, QString, string) or numeric object to plain string.
+
+    In Python 3, python Qt objects are automatically converted to QVariant
+    when stored as "data" e.g. in a QComboBox and converted back when
+    retrieving. In Python 2, QVariant is returned when itemData is retrieved.
+    This is first converted from the QVariant container format to a
+    QString, next to a "normal" non-unicode string.
+
+    Parameter:
+    ----------
+    
+    text: QVariant, QString, string or numeric data type that can be converted
+      to string
+    
+    Returns:
+    --------
+    
+    The current `text` data as a unicode (utf8) string
+    """
+    text_type = str(type(text)).lower()
+
+    if "qstring" in text_type:
+        # Python 3: convert QString -> str
+        #string = str(text)
+        # Convert QString -> Utf8
+        string = text.toUtf8()
+#    elif not isinstance(text, six.text_type):
+    elif "qvariant" in text_type:
+        # Python 2: convert QVariant -> QString
+        string = text.toString()
+        #string = QVariant(text).toString()
+        #string = str(text.toString())
+    elif "unicode" in text_type:
+        return text
+    else:
+        # `text` is numeric or of type str
+        string = str(text)
+        
+    if not PY3:
+        return unicode(string, 'utf8')
+    else:
+        return str(string) # convert QString -> str
+
 
 ###############################################################################
 #### General functions ########################################################
@@ -202,6 +264,10 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     function attribute `err` contains number of errors that have occurred during
     evaluation (0 / 1 / 2)
     """
+    expr = qstr(expr) # convert to str (PY3) resp. unicode (PY2)
+    if type(expr) in {str, unicode}:
+        expr = ascii(expr) # remove non-ascii characters            
+
     result = None
     fallback = ""
     safe_eval.err = 0 # initialize function attribute

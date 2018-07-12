@@ -25,9 +25,9 @@ import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
-from pyfda.pyfda_lib import cmp_version
+from pyfda.pyfda_lib import qstr, cmp_version
 from pyfda.pyfda_io_lib import extract_file_ext
-from pyfda.pyfda_qt_lib import qstr, qget_cmb_box
+from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params
 
 if cmp_version("myhdl", "0.10") >= 0:
