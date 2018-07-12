@@ -291,9 +291,17 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                     result = ex_num.real
                 elif return_type == 'int':
                     result = np.int64(ex_num)
-            except (se.InvalidExpression, se.FunctionNotDefined, Exception,
-                    SyntaxError, ZeroDivisionError, IndexError, se.NameNotDefined) as e:
-
+            except SyntaxError:
+                logger.warning(fallback + ' Syntax error in expression "{0}".'.format(ex))
+            except ZeroDivisionError:
+                logger.warning(fallback + ' Division by 0 in expression "{0}".'.format(ex))
+            except OverflowError:
+                logger.warning(fallback + ' Overflow in expression "{0}".'.format(ex))
+            except KeyError:
+                logger.warning(fallback + ' Invalid expression "{0}".'.format(ex))
+            except (se.NameNotDefined, se.FunctionNotDefined) as e:
+                logger.warning(fallback + '{0}'.format(e))                
+            except (se.InvalidExpression, IndexError, TypeError) as e:
                     logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
 
         if result is not None:
