@@ -28,6 +28,7 @@ from .plot_impz_ui import PlotImpz_UI
 
 # TODO: "Home" calls redraw for all three mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
+# TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?
 
 class Plot_Impz(QWidget):
     """
@@ -448,7 +449,7 @@ class Plot_Impz(QWidget):
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         self.load_fs()
         self.init_axes()
-        
+
         self.fmt_plot_resp = {'color':'red', 'linewidth':2}
         self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
         self.fmt_stem_stim = params['mpl_stimuli']
