@@ -48,10 +48,11 @@ class Plot_Impz(QWidget):
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
-        self.needs_draw = True   # flag whether plot needs to be updated 
-        self.needs_redraw = True # flag whether plot needs to be redrawn
+        self.needs_draw = [True] * 3   # flag which plot needs to be updated 
+        self.needs_redraw = [True] * 3 # flag which plot needs to be redrawn
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
+        self.active_tab = 0 # index for active tab
 
         self._construct_UI()
 
@@ -65,6 +66,7 @@ class Plot_Impz(QWidget):
         # MplWidget for time domain plots
         #----------------------------------------------------------------------
         self.mplwidget_t = MplWidget(self)
+        self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         
@@ -72,6 +74,7 @@ class Plot_Impz(QWidget):
         # MplWidget for frequency domain plots
         #----------------------------------------------------------------------
         self.mplwidget_f = MplWidget(self)
+        self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
@@ -83,13 +86,14 @@ class Plot_Impz(QWidget):
         self.mplwidget_s.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
         # Tabbed layout, tabs to the left
-        tabWidget = QTabWidget(self)
-        tabWidget.addTab(self.mplwidget_t, "Time")
-        tabWidget.addTab(self.mplwidget_f, "Frequency")
-        tabWidget.addTab(self.mplwidget_s, "Stimuli")
-        tabWidget.setTabPosition(QTabWidget.West)
+        self.tabWidget = QTabWidget(self)
+        self.tabWidget.addTab(self.mplwidget_t, "Time")
+        self.tabWidget.addTab(self.mplwidget_f, "Frequency")
+        self.tabWidget.addTab(self.mplwidget_s, "Stimuli")
+        self.tabWidget.setTabPosition(QTabWidget.West)
+
         layVMain = QVBoxLayout()
-        layVMain.addWidget(tabWidget)
+        layVMain.addWidget(self.tabWidget)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
@@ -104,6 +108,9 @@ class Plot_Impz(QWidget):
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_s.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
+        
+        # When user has selected a different tab, trigger a redraw of current tab
+        self.tabWidget.currentChanged.connect(self._current_tab_changed) # passes number of active tab
 
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
@@ -139,19 +146,24 @@ class Plot_Impz(QWidget):
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                or 'view_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
+                or 'view_changed' in dict_sig or self.needs_draw[self.tabWidget.currentIndex()]:
+                # todo: after 'data_changed' all needs to be set to True except current widget
                 self.draw()
-                self.needs_draw = False
-                self.needs_redraw = False
+                self.needs_draw[self.tabWidget.currentIndex()] = False
+                self.needs_redraw[self.tabWidget.currentIndex()] = False
+            elif 'home' in dict_sig:
+                self.redraw()
+                # self.tabWidget.currentWidget().redraw() # redraw method of current mplwidget, always redraws tab 0
+                self.needs_redraw[self.tabWidget.currentIndex()] = False
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.needs_redraw:
+                    or self.needs_redraw[self.tabWidget.currentIndex()]:
                 self.redraw() # redraw all widgets
-                self.needs_redraw = False
+                self.needs_redraw[:] = [True] * 3
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
-                self.needs_draw = True
+                self.needs_draw[:] = [True] * 3
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw = True
+                self.needs_redraw[:] = [True] * 3
 
 #------------------------------------------------------------------------------
     def eventFilter(self, source, event):
@@ -208,6 +220,13 @@ class Plot_Impz(QWidget):
         # Call base class method to continue normal event processing:
         return super(Plot_Impz, self).eventFilter(source, event)
 
+#------------------------------------------------------------------------------
+    def _current_tab_changed(self, tab_num):
+        #self.sig_tx.emit({'sender':__name__, 'ui_changed':'changed'})
+        self.active_tab = tab_num# self.tabWidget.currentIndex()
+        #logger.warning("cur{0} int{1}".format(self.active_tab, tab_num))
+        self.active_wdg = self.tabWidget.currentWidget() # = self.mplwidget_t/f/s
+        
 #-------------------------------------------------------------        
     def load_fs(self):
         """
