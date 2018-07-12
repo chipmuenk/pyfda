@@ -150,7 +150,7 @@ class PlotImpz_UI(QWidget):
         self.chk_stems_time = QCheckBox("Stems", self)
         self.chk_stems_time.setObjectName("chkStems")
         self.chk_stems_time.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
-        self.chk_stems_time.setChecked(True)
+        self.chk_stems_time.setChecked(False)
 
         self.lblLogBottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
