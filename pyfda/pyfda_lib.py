@@ -13,6 +13,7 @@ Library with various general functions and variables needed by the pyfda routine
 from __future__ import division, print_function
 import os, re
 import sys, time
+import six
 import struct
 import logging
 logger = logging.getLogger(__name__)
@@ -171,7 +172,7 @@ def unicode_23(string):
     else:
         return unicode(string)
 
-def ascii(string):
+def clean_ascii(string):
     """
     Remove non-ASCII-characters from string.
     
@@ -185,7 +186,10 @@ def ascii(string):
     
     A string (whatever that means in Py2 / Py3)
     """
-    return re.sub(r'[^\x00-\x7f]',r'', string)
+    if type(string) in six.string_types:
+        return re.sub(r'[^\x00-\x7f]',r'', string)
+    else:
+        return string
 
 #------------------------------------------------------------------------------
 def qstr(text):
@@ -265,8 +269,8 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     evaluation (0 / 1 / 2)
     """
     expr = qstr(expr) # convert to str (PY3) resp. unicode (PY2)
-    if type(expr) in {str, unicode}:
-        expr = ascii(expr) # remove non-ascii characters            
+    if type(expr) in six.string_types:
+        expr = clean_ascii(expr) # remove non-ascii characters
 
     result = None
     fallback = ""
