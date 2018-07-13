@@ -250,15 +250,7 @@ class Plot_Impz(QWidget):
             self.ui.ledFreq2.setText(
                 str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
-#------------------------------------------------------------------------------
-    def init_axes(self):
-        """
-        Clear the axes of all matplotlib widgets and (re)draw the plots.
-        """
-        self._init_axes_time()
-        self._init_axes_freq()
-        self._init_axes_stim()
-
+# =============================================================================
     def _init_axes_time(self):
         """
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
@@ -454,7 +446,7 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def draw_impz(self):
         """
-        (Re-)draw the figure
+        (Re-)draw the figure without recalculation
         """
         f_unit = fb.fil[0]['freq_specs_unit']
         if f_unit in {"f_S", "f_Ny"}:
@@ -464,15 +456,22 @@ class Plot_Impz(QWidget):
         self.ui.lblFreqUnit1.setText(to_html(f_unit, frmt=unit_frmt))
         self.ui.lblFreqUnit2.setText(to_html(f_unit, frmt=unit_frmt))
         self.load_fs()
-        self.init_axes()
+        #self.init_axes()
 
         self.fmt_plot_resp = {'color':'red', 'linewidth':2}
         self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
         self.fmt_stem_stim = params['mpl_stimuli']
         
-        self.draw_impz_time()
-        self.draw_impz_freq()
-        self.draw_impz_stim()
+        idx = self.tabWidget.currentIndex()
+        if idx == 0:
+            self.draw_impz_time()
+        elif idx == 1:
+            self.draw_impz_freq()
+        elif idx == 2:
+            self.draw_impz_stim()
+        else:
+            logger.error("Index {0} out of range!".format(idx))
+        
         self.redraw() # redraw currently active mplwidget
         
         #================ Plotting routine time domain =========================
@@ -484,6 +483,8 @@ class Plot_Impz(QWidget):
         mkfmt_r = 'o'
         mkfmt_i = 'd'
 
+        self._init_axes_time()
+        
         if self.ui.chkLog.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
             x = np.maximum(20 * np.log10(abs(self.x)), self.ui.bottom)
@@ -565,6 +566,8 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the frequency domain mplwidget
         """
+        self._init_axes_freq()
+
         if self.ui.plt_freq != "None":
             plt_response = self.ui.plt_freq in {"Response","Both"}
             plt_stimulus = self.ui.plt_freq in {"Stimulus","Both"}
@@ -661,6 +664,8 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the stimulus
         """
+        self._init_axes_stim()
+
         if self.ui.chk_stim_plot.isChecked():
             H_str = self.H_str + ' in V'
             if self.ui.chk_stems_stim.isChecked(): # stem plot
