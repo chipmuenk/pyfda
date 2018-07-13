@@ -90,6 +90,8 @@ class Plot_Impz(QWidget):
         self.tabWidget.addTab(self.mplwidget_t, "Time")
         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
         self.tabWidget.addTab(self.mplwidget_s, "Stimuli")
+        # list with tabWidgets
+        self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f", "mplwidget_s"]
         self.tabWidget.setTabPosition(QTabWidget.West)
 
         layVMain = QVBoxLayout()
@@ -110,7 +112,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_s.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         
         # When user has selected a different tab, trigger a redraw of current tab
-        self.tabWidget.currentChanged.connect(self._current_tab_changed) # passes number of active tab
+        self.tabWidget.currentChanged.connect(self.redraw) # passes number of active tab
 
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
@@ -217,14 +219,7 @@ class Plot_Impz(QWidget):
 
         # Call base class method to continue normal event processing:
         return super(Plot_Impz, self).eventFilter(source, event)
-
-#------------------------------------------------------------------------------
-    def _current_tab_changed(self, tab_num):
-        #self.sig_tx.emit({'sender':__name__, 'ui_changed':'changed'})
-        self.active_tab = tab_num# self.tabWidget.currentIndex()
-        #logger.warning("cur{0} int{1}".format(self.active_tab, tab_num))
-        self.active_wdg = self.tabWidget.currentWidget() # = self.mplwidget_t/f/s
-        
+       
 #-------------------------------------------------------------        
     def load_fs(self):
         """
@@ -478,6 +473,7 @@ class Plot_Impz(QWidget):
         self.draw_impz_time()
         self.draw_impz_freq()
         self.draw_impz_stim()
+        self.redraw() # redraw currently active mplwidget
         
         #================ Plotting routine time domain =========================
     def draw_impz_time(self):
@@ -564,8 +560,6 @@ class Plot_Impz(QWidget):
             self.ax3d.set_xlabel('x')
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
-
-        self.mplwidget_t.redraw()
 
     def draw_impz_freq(self):
         """
@@ -663,8 +657,6 @@ class Plot_Impz(QWidget):
                 self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
 
-            self.mplwidget_f.redraw()
-
     def draw_impz_stim(self):
         """
         (Re-)draw the stimulus
@@ -693,20 +685,21 @@ class Plot_Impz(QWidget):
             expand_lim(self.ax_stim, 0.02)
             self.ax_stim.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_stim.set_ylabel(H_str + r'$\rightarrow $')
-            
-            self.mplwidget_s.redraw()
 
 #------------------------------------------------------------------------------
     def redraw(self):
         """
-        Redraw the canvas when e.g. the canvas size has changed
+        Redraw the currently visible canvas when e.g. the canvas size has changed
         """
-        self.mplwidget_t.redraw()
-        self.mplwidget_f.redraw()
-        self.mplwidget_s.redraw()
-
-        if hasattr(self, "ax2_fft"):
-            self.ax2_fft.grid(False)
+        idx = self.tabWidget.currentIndex()
+        self.tabWidget.currentWidget().redraw()
+        #wdg = getattr(self, self.tab_mplwidgets[idx])
+        logger.warning("redrawing {0}".format(idx))#, wdg == wdg_cur))
+        #wdg_cur.redraw()
+        self.needs_redraw[idx] = False
+#        self.mplwidget_t.redraw()
+#        self.mplwidget_f.redraw()
+#        self.mplwidget_s.redraw()
 
 #------------------------------------------------------------------------------
 
