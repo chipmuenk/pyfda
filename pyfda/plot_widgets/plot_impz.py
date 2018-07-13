@@ -270,10 +270,10 @@ class Plot_Impz(QWidget):
         """
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
         """
+        for ax in self.mplwidget_t.fig.get_axes():
+            self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
+
         if self.ui.plt_time != "None":
-            for ax in self.mplwidget_t.fig.get_axes():
-                self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
-    
             num_subplots = 0 + (self.ui.plt_time != "None")\
                             + (self.cmplx and self.ui.plt_time in {"Response", "Both"})
     
@@ -299,9 +299,10 @@ class Plot_Impz(QWidget):
         Clear the axes of the frequency domain matplotlib widgets and 
         (re)draw the plots
         """
+        for ax in self.mplwidget_f.fig.get_axes():
+            self.mplwidget_f.fig.delaxes(ax) # clear twinned axes if present
+
         if self.ui.plt_freq != "None":
-            for ax in self.mplwidget_f.fig.get_axes():
-                self.mplwidget_f.fig.delaxes(ax) # clear twinned axes if present
                 
             self.ax_fft = self.mplwidget_f.fig.add_subplot(111)    
             self.ax_fft.clear()
@@ -313,6 +314,9 @@ class Plot_Impz(QWidget):
         """
         clear the axes of the stimulus matplotlib widgets and (re)draw the plots
         """
+        for ax in self.mplwidget_s.fig.get_axes():
+            self.mplwidget_s.fig.delaxes(ax) # clear twinned axes if present
+
         if self.ui.chk_stim_plot.isChecked():
             self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
             self.ax_stim.clear()
