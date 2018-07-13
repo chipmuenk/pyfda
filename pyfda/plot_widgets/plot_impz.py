@@ -48,7 +48,7 @@ class Plot_Impz(QWidget):
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
-        self.needs_draw = [True] * 3   # flag which plot needs to be updated 
+        self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 3 # flag which plot needs to be redrawn
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
@@ -146,11 +146,9 @@ class Plot_Impz(QWidget):
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                or 'view_changed' in dict_sig or self.needs_draw[self.tabWidget.currentIndex()]:
-                # todo: after 'data_changed' all needs to be set to True except current widget
+                or 'view_changed' in dict_sig or self.needs_draw:
                 self.draw()
-                self.needs_draw[self.tabWidget.currentIndex()] = False
-                self.needs_redraw[self.tabWidget.currentIndex()] = False
+                self.needs_draw = False
             elif 'home' in dict_sig:
                 self.redraw()
                 # self.tabWidget.currentWidget().redraw() # redraw method of current mplwidget, always redraws tab 0
@@ -161,7 +159,7 @@ class Plot_Impz(QWidget):
                 self.needs_redraw[:] = [True] * 3
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
-                self.needs_draw[:] = [True] * 3
+                self.needs_draw = True
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
                 self.needs_redraw[:] = [True] * 3
 
