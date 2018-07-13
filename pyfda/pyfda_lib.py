@@ -82,7 +82,8 @@ try:
 except ImportError:
     pass
 
-PY3 = sys.version_info > (3,) # True for Python 3
+PY3 = six.PY3 # sys.version_info > (3,) # True for Python 3
+PY2 = six.PY2
 CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
 def cmp_version(mod, version):
@@ -148,10 +149,10 @@ def unichr_23(c):
     Convert code point value (integer between 1 ... 65536) to one-character unicode string.
     The reverse operation (`ord(u)`) works the same way in py2 and py3.
     """
-    if PY3:
-        return chr(c)
-    else:
+    if PY2:
         return unichr(c)
+    else:
+        return chr(c)
 
 def unicode_23(string):
     """
@@ -167,14 +168,15 @@ def unicode_23(string):
     Convert string to unicode string under Python 2.x. Python 3.x uses unicode
     strings anyway.
     """
-    if PY3:
-        return string
-    else:
+    if PY2:
         return unicode(string)
+    else:
+        return string
 
-def clean_ascii(string):
+def clean_ascii(arg):
     """
-    Remove non-ASCII-characters from string.
+    Remove non-ASCII-characters from `arg` when it is a text type (`six.string_types`).
+    Otherwise, return `arg` unchanged.
     
     Parameter
     ---------
@@ -186,10 +188,11 @@ def clean_ascii(string):
     
     A string (whatever that means in Py2 / Py3)
     """
-    if type(string) in six.string_types:
-        return re.sub(r'[^\x00-\x7f]',r'', string)
+    # remove all chars except when in the range 0 ... x7F
+    if isinstance(arg, six.string_types):
+        return re.sub(r'[^\x00-\x7f]',r'', arg)
     else:
-        return string
+        return arg
 
 #------------------------------------------------------------------------------
 def qstr(text):
@@ -197,8 +200,9 @@ def qstr(text):
     Convert text (QVariant, QString, string) or numeric object to plain string.
 
     In Python 3, python Qt objects are automatically converted to QVariant
-    when stored as "data" e.g. in a QComboBox and converted back when
-    retrieving. In Python 2, QVariant is returned when itemData is retrieved.
+    when stored as "data" (itemData) e.g. in a QComboBox and converted back when
+    retrieving to QString. 
+    In Python 2, QVariant is returned when itemData is retrieved.
     This is first converted from the QVariant container format to a
     QString, next to a "normal" non-unicode string.
 
@@ -232,7 +236,7 @@ def qstr(text):
         # `text` is numeric or of type str
         string = str(text)
         
-    if not PY3:
+    if PY2:
         return unicode(string, 'utf8')
     else:
         return str(string) # convert QString -> str
@@ -268,9 +272,8 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     function attribute `err` contains number of errors that have occurred during
     evaluation (0 / 1 / 2)
     """
-    expr = qstr(expr) # convert to str (PY3) resp. unicode (PY2)
-    if type(expr) in six.string_types:
-        expr = clean_ascii(expr) # remove non-ascii characters
+    # convert to str (PY3) resp. unicode (PY2) and remove non-ascii characters
+    expr = clean_ascii(qstr(expr)) 
 
     result = None
     fallback = ""
@@ -299,9 +302,12 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
                 logger.warning(fallback + ' Overflow in expression "{0}".'.format(ex))
             except KeyError:
                 logger.warning(fallback + ' Invalid expression "{0}".'.format(ex))
+            except TypeError as e:
+                logger.warning(fallback + ' Type error in "{0}", {1}.'.format(ex, e))
+
             except (se.NameNotDefined, se.FunctionNotDefined) as e:
                 logger.warning(fallback + '{0}'.format(e))                
-            except (se.InvalidExpression, IndexError, TypeError) as e:
+            except (se.InvalidExpression, IndexError) as e:
                     logger.error(fallback + 'in save_eval(): Expression "{0}" yields\n{1}'.format(ex, e))
 
         if result is not None:
