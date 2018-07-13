@@ -396,11 +396,10 @@ class PlotImpz_UI(QWidget):
         self.ledN_start.setText(str(self.N_start))
         N_user = safe_eval(self.ledN_points.text(), 0, return_type='int', sign='pos')
         if N_user == 0: # automatic calculation
-            self.N = self.calc_n_points(N_user)
+            self.N = self.calc_n_points(N_user) # widget remains set to 0
         else:
             self.N = N_user
-
-        self.ledN_points.setText(str(self.N))
+            self.ledN_points.setText(str(self.N)) # update widget
 
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
 
