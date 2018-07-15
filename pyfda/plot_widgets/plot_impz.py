@@ -21,6 +21,7 @@ import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
+from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -48,6 +49,10 @@ class Plot_Impz(QWidget):
         # initial settings for line edit widgets
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
+        
+        self.plt_freq = self.ui.plt_freq
+        self.plt_time = self.ui.plt_time
+        
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 3 # flag which plot needs to be redrawn
         self.tool_tip = "Impulse and transient response"
@@ -103,6 +108,11 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        self.ui.cmbPltFreq.currentIndexChanged.connect(self.draw_impz_freq)
+
+        self.ui.chk_stim_plot.clicked.connect(self.draw_impz_stim)
+        self.ui.chk_stems_stim.clicked.connect(self.draw_impz_stim)
+
         # frequency widgets require special handling as they are scaled with f_s
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
@@ -149,6 +159,7 @@ class Plot_Impz(QWidget):
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
                 or 'view_changed' in dict_sig or self.needs_draw:
+                # todo: after 'data_changed' all needs to be set to True except current widget
                 self.draw()
                 self.needs_draw = False
             elif 'home' in dict_sig:
@@ -278,37 +289,7 @@ class Plot_Impz(QWidget):
     
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
-
-    def _init_axes_freq(self):
-        """
-        Clear the axes of the frequency domain matplotlib widgets and 
-        (re)draw the plots
-        """
-        for ax in self.mplwidget_f.fig.get_axes():
-            self.mplwidget_f.fig.delaxes(ax) # clear twinned axes if present
-
-        if self.ui.plt_freq != "None":
-                
-            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)    
-            self.ax_fft.clear()
-
-            self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
     
-    def _init_axes_stim(self):
-        """
-        clear the axes of the stimulus matplotlib widgets and (re)draw the plots
-        """
-        for ax in self.mplwidget_s.fig.get_axes():
-            self.mplwidget_s.fig.delaxes(ax) # clear twinned axes if present
-
-        if self.ui.chk_stim_plot.isChecked():
-            self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
-            self.ax_stim.clear()
-
-            self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
-
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
         """
@@ -368,6 +349,7 @@ class Plot_Impz(QWidget):
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
+        self.needs_redraw[2] = True
 
 #------------------------------------------------------------------------------
     def calc_response(self):
@@ -398,6 +380,8 @@ class Plot_Impz(QWidget):
 
         self.y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
 
+        self.needs_redraw[0] = True
+
 #------------------------------------------------------------------------------
     def calc_y_real_imag(self):
         """
@@ -417,14 +401,15 @@ class Plot_Impz(QWidget):
         (Re-)calculate ffts X(f) and Y(f) of stimulus and response
         """
         # calculate FFT of stimulus / response
-#        if self.ui.plt_freq in {"Stimulus", "Both"}:
-        x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
-        self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+        if self.plt_freq in {"Stimulus", "Both"}:
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+            self.needs_redraw[1] = True
 
-#        if self.ui.plt_freq in {"Response", "Both"}:
-        y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
-        self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
-
+        if self.plt_freq in {"Response", "Both"}:
+            y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
+            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
+            self.needs_redraw[1] = True
 #------------------------------------------------------------------------------
     def update_view(self):
         """
@@ -440,7 +425,7 @@ class Plot_Impz(QWidget):
         self.calc_stimulus()
         self.calc_response()
         self.calc_y_real_imag()
-        self.calc_fft()
+        #self.calc_fft()
         self.draw_impz()
 
 #------------------------------------------------------------------------------
@@ -471,8 +456,7 @@ class Plot_Impz(QWidget):
             self.draw_impz_stim()
         else:
             logger.error("Index {0} out of range!".format(idx))
-        
-        self.redraw() # redraw currently active mplwidget
+
         
         #================ Plotting routine time domain =========================
     def draw_impz_time(self):
@@ -562,15 +546,35 @@ class Plot_Impz(QWidget):
             self.ax3d.set_ylabel('y')
             self.ax3d.set_zlabel('z')
 
+        self.redraw() # redraw currently active mplwidget
+
+    #--------------------------------------------------------------------------
+    def _init_axes_freq(self):
+        """
+        Clear the axes of the frequency domain matplotlib widgets and 
+        calculate the fft
+        """
+
+        self.plt_freq = qget_cmb_box(self.ui.cmbPltFreq, data=False)
+        
+        if self.plt_freq != "None":               
+            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)    
+            self.ax_fft.clear()
+
+            self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
+            
+            self.calc_fft()
+
     def draw_impz_freq(self):
         """
         (Re-)draw the frequency domain mplwidget
         """
         self._init_axes_freq()
 
-        if self.ui.plt_freq != "None":
-            plt_response = self.ui.plt_freq in {"Response","Both"}
-            plt_stimulus = self.ui.plt_freq in {"Stimulus","Both"}
+        if self.plt_freq != "None":
+            plt_response = self.plt_freq in {"Response","Both"}
+            plt_stimulus = self.plt_freq in {"Stimulus","Both"}
             if plt_response and not plt_stimulus:
                 XY_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             elif not plt_response and plt_stimulus:
@@ -659,6 +663,19 @@ class Plot_Impz(QWidget):
                 mn, mx = self.ax_fft.get_ylim()
                 self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
+        self.redraw() # redraw currently active mplwidget
+
+    #--------------------------------------------------------------------------      
+    def _init_axes_stim(self):
+        """
+        clear the axes of the stimulus matplotlib widgets and (re)draw the plots
+        """
+        if self.ui.chk_stim_plot.isChecked():
+            self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
+            self.ax_stim.clear()
+
+            self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
 
     def draw_impz_stim(self):
         """
@@ -690,6 +707,10 @@ class Plot_Impz(QWidget):
             expand_lim(self.ax_stim, 0.02)
             self.ax_stim.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_stim.set_ylabel(H_str + r'$\rightarrow $')
+        else:
+            self._init_axes_stim()
+
+        self.redraw() # redraw currently active mplwidget
 
 #------------------------------------------------------------------------------
     def redraw(self):

@@ -71,7 +71,6 @@ class PlotImpz_UI(QWidget):
         self._construct_UI()
         self._enable_stim_widgets()
         self._update_plot_time()
-        self._update_plot_freq()
         self._log_mode_time()
         self._log_mode_freq()
         self.update_N() # also updates window function
@@ -368,7 +367,6 @@ class PlotImpz_UI(QWidget):
         self.ledLogBottom.editingFinished.connect(self._log_mode_time)
         self.chk_stems_time.clicked.connect(self._update_plot_time)
         # --- frequency control ---
-        self.cmbPltFreq.currentIndexChanged.connect(self._update_plot_freq)
         self.chkLogF.clicked.connect(self._log_mode_freq)
         self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
         # careful! currentIndexChanged passes the current index to _update_window
@@ -376,8 +374,8 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.editingFinished.connect(self._update_window)
 
         # --- stimulus control ---
-        self.chk_stim_plot.clicked.connect(self._update_plot_stim)
-        self.chk_stems_stim.clicked.connect(self._update_plot_stim)
+#        self.chk_stim_plot.clicked.connect(self._update_plot_stim)
+#        self.chk_stems_stim.clicked.connect(self._update_plot_stim)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
@@ -412,7 +410,6 @@ class PlotImpz_UI(QWidget):
         pass
 
 # TODO: add a function for run_fx_sim
-# TODO: add separate update function for time, freq, stim
 
     def _update_plot_time(self):
         """
@@ -421,20 +418,13 @@ class PlotImpz_UI(QWidget):
         self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
         self.sig_tx.emit({'sender':__name__, 'view_changed':'time'})
         
-    def _update_plot_freq(self):
-        """
-        Trigger 'draw' when the combobox PltFreq has been modified,
-        enable frequency domain controls only when needed
-        """
-        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'freq'})
-
-    def _update_plot_stim(self):
-        """
-        Trigger 'draw' when one of the stimulus checkboxes has been clicked
-        """
-        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'stim'})
+#    def _update_plot_freq(self):
+#        """
+#        Trigger 'draw' when the combobox PltFreq has been modified,
+#        enable frequency domain controls only when needed
+#        """
+#        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
+#        self.sig_tx.emit({'sender':__name__, 'view_changed':'freq'})
 
     def _update_sim_select(self):
         """
