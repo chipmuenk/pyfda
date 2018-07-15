@@ -483,7 +483,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             W = self.hdl_dict['QO']['WI'] + self.hdl_dict['QO']['WF']
-            # TODO: Scale is wrong
+            # TODO: Scale is still wrong
             self.stim = self.q_i.float2frmt(dict_sig['fx_stimulus'])
 
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
