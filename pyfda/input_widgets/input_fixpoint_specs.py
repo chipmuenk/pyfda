@@ -26,6 +26,7 @@ import numpy as np
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_lib import qstr, cmp_version
+import pyfda.pyfda_fix_lib as fx
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params
@@ -403,6 +404,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         # get a dict with the coefficients and fixpoint settings from fixpoint widget
         self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
+        self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
 
         b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
         a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
@@ -481,7 +483,9 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             W = self.hdl_dict['QO']['WI'] + self.hdl_dict['QO']['WF']
-            self.stim = dict_sig['fx_stimulus']
+            # TODO: Scale is wrong
+            self.stim = self.q_i.float2frmt(dict_sig['fx_stimulus'])
+
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
             testfil = self.hdlfilter.filter_block()
