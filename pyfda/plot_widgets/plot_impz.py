@@ -108,7 +108,10 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ui.cmbPltFreq.currentIndexChanged.connect(self.draw_impz_freq)
+        self.ui.cmb_plt_time.currentIndexChanged.connect(self.draw_impz_time)
+        self.ui.chk_stems_time.clicked.connect(self.draw_impz_time)
+
+        self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
 
         self.ui.chk_stim_plot.clicked.connect(self.draw_impz_stim)
         self.ui.chk_stems_stim.clicked.connect(self.draw_impz_stim)
@@ -121,8 +124,8 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_s.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         
-        # When user has selected a different tab, trigger a redraw of current tab
-        self.tabWidget.currentChanged.connect(self.redraw) # passes number of active tab
+        # When user has selected a different tab, trigger a draw (incl. maybe recalc) of current tab
+        self.tabWidget.currentChanged.connect(self.draw) # passes number of active tab
 
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
@@ -168,8 +171,9 @@ class Plot_Impz(QWidget):
                 self.needs_redraw[self.tabWidget.currentIndex()] = False
             elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
                     or self.needs_redraw[self.tabWidget.currentIndex()]:
-                self.redraw() # redraw all widgets
                 self.needs_redraw[:] = [True] * 3
+                self.redraw() # redraw current widget
+
         else:
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
                 self.needs_draw = True
@@ -262,34 +266,6 @@ class Plot_Impz(QWidget):
                 str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
 # =============================================================================
-    def _init_axes_time(self):
-        """
-        Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
-        """
-        for ax in self.mplwidget_t.fig.get_axes():
-            self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
-
-        if self.ui.plt_time != "None":
-            num_subplots = 0 + (self.ui.plt_time != "None")\
-                            + (self.cmplx and self.ui.plt_time in {"Response", "Both"})
-    
-            self.mplwidget_t.fig.subplots_adjust(hspace = 0.5)
-        
-            if self.ui.plt_time != "None":
-                self.ax_r = self.mplwidget_t.fig.add_subplot(num_subplots,1 ,1)
-                self.ax_r.clear()
-                self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
-                self.ax_r.get_yaxis().tick_left() # remove axis ticks right
-    
-            if self.cmplx and self.ui.plt_time in {"Response", "Both"}:
-                self.ax_i = self.mplwidget_t.fig.add_subplot(num_subplots, 1, 2, sharex = self.ax_r)
-                self.ax_i.clear()
-                self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
-                self.ax_i.get_yaxis().tick_left() # remove axis ticks right
-    
-            if self.ACTIVE_3D: # not implemented / tested yet
-                self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
-    
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
         """
@@ -349,7 +325,7 @@ class Plot_Impz(QWidget):
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
-        self.needs_redraw[2] = True
+        self.needs_redraw[:] = [True] * 3
 
 #------------------------------------------------------------------------------
     def calc_response(self):
@@ -381,6 +357,7 @@ class Plot_Impz(QWidget):
         self.y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
 
         self.needs_redraw[0] = True
+        self.needs_redraw[1] = True
 
 #------------------------------------------------------------------------------
     def calc_y_real_imag(self):
@@ -422,10 +399,11 @@ class Plot_Impz(QWidget):
         """
         Recalculate response and redraw it
         """
-        self.calc_stimulus()
-        self.calc_response()
-        self.calc_y_real_imag()
-        #self.calc_fft()
+        if self.needs_draw:
+            self.calc_stimulus()
+            self.calc_response()
+            self.calc_y_real_imag()
+            self.needs_draw = False
         self.draw_impz()
 
 #------------------------------------------------------------------------------
@@ -459,6 +437,37 @@ class Plot_Impz(QWidget):
 
         
         #================ Plotting routine time domain =========================
+    def _init_axes_time(self):
+        """
+        Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
+        """
+        self.plt_time = qget_cmb_box(self.ui.cmb_plt_time, data=False)
+        
+        for ax in self.mplwidget_t.fig.get_axes():
+            self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
+
+        if self.plt_time != "None":
+            num_subplots = 0 + (self.plt_time != "None")\
+                            + (self.cmplx and self.plt_time in {"Response", "Both"})
+    
+            self.mplwidget_t.fig.subplots_adjust(hspace = 0.5)
+        
+            if self.plt_time != "None":
+                self.ax_r = self.mplwidget_t.fig.add_subplot(num_subplots,1 ,1)
+                self.ax_r.clear()
+                self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
+                self.ax_r.get_yaxis().tick_left() # remove axis ticks right
+    
+            if self.cmplx and self.plt_time in {"Response", "Both"}:
+                self.ax_i = self.mplwidget_t.fig.add_subplot(num_subplots, 1, 2, sharex = self.ax_r)
+                self.ax_i.clear()
+                self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
+                self.ax_i.get_yaxis().tick_left() # remove axis ticks right
+    
+            if self.ACTIVE_3D: # not implemented / tested yet
+                self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
+    
+
     def draw_impz_time(self):
         """
         (Re-)draw the time domain mplwidget
@@ -489,7 +498,7 @@ class Plot_Impz(QWidget):
             else:
                 H_str = self.H_str + ' in V'
 
-        if self.ui.plt_time in {"Response", "Both"}:
+        if self.plt_time in {"Response", "Both"}:
             if stem_plot:
                 [ml, sl, bl] = self.ax_r.stem(self.t[self.ui.N_start:], y[self.ui.N_start:], 
                     bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
@@ -497,7 +506,7 @@ class Plot_Impz(QWidget):
                 self.ax_r.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], 
                     label = '$y[n]$', **self.fmt_plot_resp)                    
 
-        if self.ui.plt_time in {"Stimulus", "Both"}:
+        if self.plt_time in {"Stimulus", "Both"}:
             if stem_plot:
                 [ms, ss, bs] = self.ax_r.stem(self.t[self.ui.N_start:], x[self.ui.N_start:], 
                     bottom=self.ui.bottom, label = 'Stim.', **self.fmt_stem_stim)
@@ -514,7 +523,7 @@ class Plot_Impz(QWidget):
                 self.ax_r.plot(self.t[self.ui.N_start:], x[self.ui.N_start:], 
                     label = '$y[n]$', **self.fmt_plot_stim)                    
 
-        if self.cmplx and self.ui.plt_time in {"Response", "Both"}:
+        if self.cmplx and self.plt_time in {"Response", "Both"}:
             [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
                 bottom=self.ui.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
@@ -555,7 +564,7 @@ class Plot_Impz(QWidget):
         calculate the fft
         """
 
-        self.plt_freq = qget_cmb_box(self.ui.cmbPltFreq, data=False)
+        self.plt_freq = qget_cmb_box(self.ui.cmb_plt_freq, data=False)
         
         if self.plt_freq != "None":               
             self.ax_fft = self.mplwidget_f.fig.add_subplot(111)    
@@ -651,7 +660,7 @@ class Plot_Impz(QWidget):
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
             self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
-            if self.ui.plt_time == "None":
+            if self.plt_time == "None":
                 self.ax_fft.set_title(self.title_str) # no time window, print title here
                 
             if self.ui.chkLogF.isChecked():

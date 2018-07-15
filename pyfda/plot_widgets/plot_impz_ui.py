@@ -70,7 +70,7 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self._update_plot_time()
+#        self._update_plot_time()
         self._log_mode_time()
         self._log_mode_freq()
         self.update_N() # also updates window function
@@ -134,11 +134,11 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
-        self.lblPltTime = QLabel("Show ", self)
-        self.cmbPltTime = QComboBox(self)
-        self.cmbPltTime.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmbPltTime, self.plt_time)
-        self.cmbPltTime.setToolTip("<span>Choose which signals to show in the time domain: "
+        self.lbl_plt_time = QLabel("Show ", self)
+        self.cmb_plt_time = QComboBox(self)
+        self.cmb_plt_time.addItems(["None","Stimulus","Response", "Both"])
+        qset_cmb_box(self.cmb_plt_time, self.plt_time)
+        self.cmb_plt_time.setToolTip("<span>Choose which signals to show in the time domain: "
                                  "The stimulus, the filter response or both.</span>")
 
         self.chkLog = QCheckBox("Log. scale", self)
@@ -158,8 +158,8 @@ class PlotImpz_UI(QWidget):
         self.lbldB = QLabel("dB", self)
 
         layH_ctrl_time = QHBoxLayout()
-        layH_ctrl_time.addWidget(self.lblPltTime)
-        layH_ctrl_time.addWidget(self.cmbPltTime)
+        layH_ctrl_time.addWidget(self.lbl_plt_time)
+        layH_ctrl_time.addWidget(self.cmb_plt_time)
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chkLog)
         layH_ctrl_time.addStretch(1)
@@ -179,11 +179,11 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        self.lblPltFreq = QLabel("Show ", self)
-        self.cmbPltFreq = QComboBox(self)
-        self.cmbPltFreq.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmbPltFreq, self.plt_freq)
-        self.cmbPltFreq.setToolTip("<span>Choose which signals to show in the frequency domain: "
+        self.lbl_plt_freq = QLabel("Show ", self)
+        self.cmb_plt_freq = QComboBox(self)
+        self.cmb_plt_freq.addItems(["None","Stimulus","Response", "Both"])
+        qset_cmb_box(self.cmb_plt_freq, self.plt_freq)
+        self.cmb_plt_freq.setToolTip("<span>Choose which signals to show in the frequency domain: "
                                  "The stimulus, the filter response or both.</span>")
 
         self.chkLogF = QCheckBox("Log. scale", self)
@@ -209,8 +209,8 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.setObjectName("ledWinPar1")
 
         layH_ctrl_freq = QHBoxLayout()
-        layH_ctrl_freq.addWidget(self.lblPltFreq)
-        layH_ctrl_freq.addWidget(self.cmbPltFreq)
+        layH_ctrl_freq.addWidget(self.lbl_plt_freq)
+        layH_ctrl_freq.addWidget(self.cmb_plt_freq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.chkLogF)
         layH_ctrl_freq.addWidget(self.lblLogBottomF)
@@ -362,10 +362,9 @@ class PlotImpz_UI(QWidget):
         self.ledN_points.editingFinished.connect(self.update_N)
         self.butRun.clicked.connect(self.run_fx_sim)
         # --- time control ---
-        self.cmbPltTime.currentIndexChanged.connect(self._update_plot_time)
         self.chkLog.clicked.connect(self._log_mode_time)
         self.ledLogBottom.editingFinished.connect(self._log_mode_time)
-        self.chk_stems_time.clicked.connect(self._update_plot_time)
+
         # --- frequency control ---
         self.chkLogF.clicked.connect(self._log_mode_freq)
         self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
@@ -374,8 +373,6 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.editingFinished.connect(self._update_window)
 
         # --- stimulus control ---
-#        self.chk_stim_plot.clicked.connect(self._update_plot_stim)
-#        self.chk_stems_stim.clicked.connect(self._update_plot_stim)
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
         self.cmbNoise.currentIndexChanged.connect(self._update_noi)
         self.ledNoi.editingFinished.connect(self._update_noi)
@@ -411,12 +408,12 @@ class PlotImpz_UI(QWidget):
 
 # TODO: add a function for run_fx_sim
 
-    def _update_plot_time(self):
-        """
-        Trigger 'draw' when the combobox PltTime has been modified
-        """
-        self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'time'})
+#    def _update_plot_time(self):
+#        """
+#        Trigger 'draw' when the combobox PltTime has been modified
+#        """
+#        self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
+#        self.sig_tx.emit({'sender':__name__, 'view_changed':'time'})
         
 #    def _update_plot_freq(self):
 #        """
