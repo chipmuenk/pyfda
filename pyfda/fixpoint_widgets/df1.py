@@ -111,8 +111,8 @@ class DF1(QWidget):
         # parameters for output format
         hdl_dict.update({'QO':{'WI':self.wdg_w_output.WI,
                                'WF':self.wdg_w_output.WF,
-                               'OVFL': self.wdg_q_output.ovfl,
-                               'QUANT': self.wdg_q_output.quant
+                               'ovfl': self.wdg_q_output.ovfl,
+                               'quant': self.wdg_q_output.quant
                                }
                         })
 
