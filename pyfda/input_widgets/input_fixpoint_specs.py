@@ -412,6 +412,15 @@ class Input_Fixpoint_Specs(QWidget):
         # self.fx_wdg_inst.setup_HDL(self.hdl_dict) # call setup method of filter widget
         
         self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
+
+        input_wi = self.hdl_dict['QI']['WI'] 
+        input_wf = self.hdl_dict['QI']['WF']
+        coeff_wi = self.hdl_dict['QC']['WI']
+        coeff_wf = self.hdl_dict['QC']['WF']
+
+        #self.hdlfilter.set_word_format = ((coeff_wi + coeff_wf + 1, coeff_wi, coeff_wf), 
+        #                                  (input_wi + input_wf + 1, input_wi, input_wf ))
+        self.hdlfilter.set_word_format = ((25,23,0), (27,23,0))
         self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
 
 #------------------------------------------------------------------------------
@@ -442,22 +451,20 @@ class Input_Fixpoint_Specs(QWidget):
 
             self.setupHDL()
 
+
             if str(hdl_type) == '.vhd':
-                hdl = self.fx_wdg_inst.flt.hdl_target = 'VHDL'
+                hdl = 'VHDL'
                 suffix = '.vhd'
             else:
-                hdl = self.fx_wdg_inst.flt.hdl_target = 'Verilog'
+                hdl = 'Verilog'
                 suffix = '.v'
-
-            self.fx_wdg_inst.flt.hdl_name = hdl_file_name
-            self.fx_wdg_inst.flt.hdl_directory = hdl_dir_name
 
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + suffix)))
 
             try:
-#                self.fx_wdg_inst.flt.convert(hdl=hdl, file_name=hdl_file_name, path=hdl_dir_name)
-                self.fx_wdg_inst.flt.convert()
+
+                self.hdlfilter.convert(hdl=hdl, file_name=hdl_file_name, path=hdl_dir_name)
 
                 logger.info("HDL conversion finished!")
             except (IOError, TypeError) as e:
