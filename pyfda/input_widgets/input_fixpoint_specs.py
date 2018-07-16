@@ -413,8 +413,8 @@ class Input_Fixpoint_Specs(QWidget):
         # self.fx_wdg_inst.flt.hdl_name = file_name
         # self.fx_wdg_inst.flt.hdl_directory = dir_name
         
-        self.hdlfilter = FilterFIR(b, a)     # Standard DF1 filter - hdl_dict should be passed here
-        #self.hdlfilter.set_coefficients(b)  # Coefficients for the filter
+        self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
+        self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
@@ -486,7 +486,7 @@ class Input_Fixpoint_Specs(QWidget):
             # TODO: Scale is still wrong
             self.stim = self.q_i.float2frmt(dict_sig['fx_stimulus'])
 
-            self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
+            self.hdlfilter.set_stimulus(self.stim, (24,23,0))    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
             testfil = self.hdlfilter.filter_block()
             testfil.run_sim()               # Run the simulation
