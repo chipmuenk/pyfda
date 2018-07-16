@@ -418,9 +418,9 @@ class Input_Fixpoint_Specs(QWidget):
         coeff_wi = self.hdl_dict['QC']['WI']
         coeff_wf = self.hdl_dict['QC']['WF']
 
-        #self.hdlfilter.set_word_format = ((coeff_wi + coeff_wf + 1, coeff_wi, coeff_wf), 
-        #                                  (input_wi + input_wf + 1, input_wi, input_wf ))
-        self.hdlfilter.set_word_format = ((25,23,0), (27,23,0))
+        self.hdlfilter.set_word_format((coeff_wi + coeff_wf + 1, coeff_wi, coeff_wf), 
+                                          (input_wi + input_wf + 1, input_wi, input_wf ))
+
         self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
 
 #------------------------------------------------------------------------------
@@ -463,8 +463,8 @@ class Input_Fixpoint_Specs(QWidget):
                         os.path.join(hdl_dir_name, hdl_file_name + suffix)))
 
             try:
-
-                self.hdlfilter.convert(hdl=hdl, file_name=hdl_file_name, path=hdl_dir_name)
+                
+                self.hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
 
                 logger.info("HDL conversion finished!")
             except (IOError, TypeError) as e:
@@ -494,14 +494,13 @@ class Input_Fixpoint_Specs(QWidget):
         - Send it to the plotting widget
         """
         try:
-            W = self.hdl_dict['QO']['WI'] + self.hdl_dict['QO']['WF']
+            W = self.hdl_dict['QC']['WI'] + self.hdl_dict['QC']['WF']
             # TODO: Scale is still wrong
             self.stim = self.q_i.float2frmt(dict_sig['fx_stimulus'])
 
-            self.hdlfilter.set_stimulus(self.stim, (24,23,0))    # Set the simulation input
+            self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
-            testfil = self.hdlfilter.filter_block()
-            testfil.run_sim()               # Run the simulation
+            self.hdlfilter.run_sim()         # Run the simulation
             # Get the response from the simulation and scale it to float
             self.fx_results = self.hdlfilter.get_response() / (2<<(W-1)) 
             #TODO: fixed point / integer to float conversion?

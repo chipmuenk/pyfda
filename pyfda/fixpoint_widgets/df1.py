@@ -124,11 +124,6 @@ class DF1(QWidget):
                 word_format=(hdl_dict['QI']['WI'] + hdl_dict['QI']['WF'], 0,
                              hdl_dict['QI']['WF']))
         #-------------------------------------------------
-        # 
-        
-        hdl_dict_sorted = [str(k) +' : '+ str(hdl_dict[k]) for k in sorted(hdl_dict.keys())]
-        hdl_dict_str = pprint.pformat(hdl_dict_sorted)
-        logger.info("exporting hdl_dict:\n{0:s}".format(hdl_dict_str))    
     
         return hdl_dict
 
