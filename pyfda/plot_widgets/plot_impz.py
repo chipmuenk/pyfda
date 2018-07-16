@@ -399,7 +399,7 @@ class Plot_Impz(QWidget):
         """
         Recalculate response and redraw it
         """
-        if self.needs_draw:
+        if True: # self.needs_draw:
             self.calc_stimulus()
             self.calc_response()
             self.calc_y_real_imag()
