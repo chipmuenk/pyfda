@@ -307,7 +307,7 @@ class Fixed(object):
     * **'frmt'** : Output format, optional; default = 'float'
 
       - 'float' : (default)
-      - 'int'  : decimal integer, scaled by :math:`2^{WF}`
+      - 'dec'  : decimal integer, scaled by :math:`2^{WF}`
       - 'bin'  : binary string, scaled by :math:`2^{WF}`
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
@@ -408,7 +408,7 @@ class Fixed(object):
                          'frmt':'float', 'scale':1}
 
         # missing key-value pairs are either taken from default dict or from
-        # class attributes
+        # instance attributes
         for k in q_obj_default.keys():
             if k not in q_obj.keys():
                 if not hasattr(self, k):
