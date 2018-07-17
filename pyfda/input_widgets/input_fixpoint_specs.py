@@ -405,12 +405,13 @@ class Input_Fixpoint_Specs(QWidget):
         # get a dict with the coefficients and fixpoint settings from fixpoint widget
         self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
         self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-        self.q_i.setQobj({'frmt':'dec', 'scale':'int'}) # use integer decimal format
+        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
 
         b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
         a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
 
-        # self.fx_wdg_inst.setup_HDL(self.hdl_dict) # call setup method of filter widget
+        # call setup method of filter widget - this is not implemented (yet)
+        # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
         
         self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
 
@@ -439,29 +440,29 @@ class Input_Fixpoint_Specs(QWidget):
         hdl_file = qstr(hdl_file)
 
         if hdl_file != "": # "operation cancelled" returns an empty string
-            # return '.v' or '.vhd' depending on filetype selection
+            # return '.v' or '.vhd' depending on filetype selection:
             hdl_type = extract_file_ext(qstr(hdl_filter))[0]
-            # sanitized dir + filename + suffix. The suffix here is discarded later.
+            # sanitized dir + filename + suffix. The filename suffix is replaced
+            # by `hdl_tyoe` later.
             hdl_file = os.path.normpath(hdl_file)
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
             dirs.save_dir = hdl_dir_name # make this directory the new default / base dir
 
-            # return the filename without suffix
+            # remove the suffix from the filename:
             hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
 
-            suffix = str(hdl_type)
-            if suffix == '.vhd':
+            if hdl_type == '.vhd':
                 hdl = 'VHDL'
-            elif str(hdl_type) == '.v':
+            elif hdl_type == '.v':
                 hdl = 'Verilog'
             else:
                 logger.error('Unknown file extension "{0}", cancelling.'.format(hdl_type))
                 return
 
             logger.info('Creating hdl_file "{0}"'.format(
-                        os.path.join(hdl_dir_name, hdl_file_name + suffix)))
+                        os.path.join(hdl_dir_name, hdl_file_name + hdl_type)))
             try:
                 self.setupHDL()
                 self.hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
@@ -494,16 +495,14 @@ class Input_Fixpoint_Specs(QWidget):
         - Send it to the plotting widget
         """
         try:
-            W = self.hdl_dict['QC']['WI'] + self.hdl_dict['QC']['WF']
-            # TODO: Scale is still wrong
-            self.stim = self.q_i.fixp(dict_sig['fx_stimulus'])
-            logger.warning("stim {0}\n{1}".format(self.q_i.q_obj, self.stim))
+            self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W)
+            logger.warning("stim {0}{1}\n{2}".format(type(self.q_i.W), self.q_i.q_obj, self.stim))
 
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
             self.hdlfilter.run_sim()         # Run the simulation
             # Get the response from the simulation and scale it to float
-            self.fx_results = self.hdlfilter.get_response() / (2<<(W-1)) 
+            self.fx_results = self.hdlfilter.get_response() / (1 << self.q_i.W) 
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
