@@ -197,11 +197,11 @@ class PlotImpz_UI(QWidget):
         self.ledLogBottomF.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbldBF = QLabel("dB", self)
 
-        self.lblWindow = QLabel("Window: ", self)
-        self.cmbWindow = QComboBox(self)
-        self.cmbWindow.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
-        self.cmbWindow.setToolTip("Select window type.")
-        qset_cmb_box(self.cmbWindow, self.window)
+        self.lbl_win_fft = QLabel("Window: ", self)
+        self.cmb_win_fft = QComboBox(self)
+        self.cmb_win_fft.addItems(["Rect","Triangular","Hann","Hamming","Kaiser", "Flattop", "Chebwin"])
+        self.cmb_win_fft.setToolTip("Select window type.")
+        qset_cmb_box(self.cmb_win_fft, self.window)
 
         self.lblWinPar1 = QLabel("Param1")
         self.ledWinPar1 = QLineEdit(self)
@@ -217,8 +217,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.ledLogBottomF)
         layH_ctrl_freq.addWidget(self.lbldBF)
         layH_ctrl_freq.addStretch(2)
-        layH_ctrl_freq.addWidget(self.lblWindow)
-        layH_ctrl_freq.addWidget(self.cmbWindow)
+        layH_ctrl_freq.addWidget(self.lbl_win_fft)
+        layH_ctrl_freq.addWidget(self.cmb_win_fft)
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
         layH_ctrl_freq.addStretch(10)
@@ -368,9 +368,9 @@ class PlotImpz_UI(QWidget):
         # --- frequency control ---
         self.chkLogF.clicked.connect(self._log_mode_freq)
         self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
-        # careful! currentIndexChanged passes the current index to _update_window
-        self.cmbWindow.currentIndexChanged.connect(self._update_window)
-        self.ledWinPar1.editingFinished.connect(self._update_window)
+        # careful! currentIndexChanged passes the current index to _update_win_fft
+        self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
+        self.ledWinPar1.editingFinished.connect(self._update_win_fft)
 
         # --- stimulus control ---
         self.cmbStimulus.currentIndexChanged.connect(self._enable_stim_widgets)
@@ -382,46 +382,12 @@ class PlotImpz_UI(QWidget):
 
 # =============================================================================
 
-    def update_N(self, dict_sig=None):
-        """
-        Update values for self.N and self.N_start from the QLineEditWidget
-        When emit=False, block emitting a signal in _update_window()
-        """
-        self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
-        self.ledN_start.setText(str(self.N_start))
-        N_user = safe_eval(self.ledN_points.text(), 0, return_type='int', sign='pos')
-        if N_user == 0: # automatic calculation
-            self.N = self.calc_n_points(N_user) # widget remains set to 0
-        else:
-            self.N = N_user
-            self.ledN_points.setText(str(self.N)) # update widget
-
-        self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
-
-        self._update_window(dict_sig)
-
     def run_fx_sim(self):
         """
         Run fixpoint simulation
         """
         pass
-
 # TODO: add a function for run_fx_sim
-
-#    def _update_plot_time(self):
-#        """
-#        Trigger 'draw' when the combobox PltTime has been modified
-#        """
-#        self.plt_time = qget_cmb_box(self.cmbPltTime, data=False)
-#        self.sig_tx.emit({'sender':__name__, 'view_changed':'time'})
-        
-#    def _update_plot_freq(self):
-#        """
-#        Trigger 'draw' when the combobox PltFreq has been modified,
-#        enable frequency domain controls only when needed
-#        """
-#        self.plt_freq = qget_cmb_box(self.cmbPltFreq, data=False)
-#        self.sig_tx.emit({'sender':__name__, 'view_changed':'freq'})
 
     def _update_sim_select(self):
         """
@@ -520,8 +486,26 @@ class PlotImpz_UI(QWidget):
         self.DC = safe_eval(self.ledDC.text(), 0, return_type='float')
         self.ledDC.setText(str(self.DC))
         self.sig_tx.emit({'sender':__name__, 'data_changed':'dc'})
+    # -------------------------------------------------------------------------
 
-    def _update_window(self, dict_sig=None):
+    def update_N(self, dict_sig=None):
+        """
+        Update values for self.N and self.N_start from the QLineEditWidget
+        """
+        self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
+        self.ledN_start.setText(str(self.N_start))
+        N_user = safe_eval(self.ledN_points.text(), 0, return_type='int', sign='pos')
+        if N_user == 0: # automatic calculation
+            self.N = self.calc_n_points(N_user) # widget remains set to 0
+        else:
+            self.N = N_user
+            self.ledN_points.setText(str(self.N)) # update widget
+
+        self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
+
+        self._update_win_fft(dict_sig)
+
+    def _update_win_fft(self, dict_sig=None):
         """ Update window type for FFT """
 
         def _update_param1():
@@ -531,7 +515,7 @@ class PlotImpz_UI(QWidget):
             self.param1 = safe_eval(self.ledWinPar1.text(), self.param1, return_type='float', sign='pos')
             self.ledWinPar1.setText(str(self.param1))
         #----------------------------------------------------------------------
-        self.window_type = qget_cmb_box(self.cmbWindow, data=False)
+        self.window_type = qget_cmb_box(self.cmb_win_fft, data=False)
 #        self.param1 = None
         has_par1 = False
         txt_par1 = ""
