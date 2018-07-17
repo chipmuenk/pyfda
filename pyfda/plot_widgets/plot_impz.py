@@ -677,11 +677,13 @@ class Plot_Impz(QWidget):
     #--------------------------------------------------------------------------      
     def _init_axes_stim(self):
         """
-        clear the axes of the stimulus matplotlib widgets and (re)draw the plots
+        clear the axes of the stimulus matplotlib widget and (re)draw the plots
         """
-        if self.ui.chk_stim_plot.isChecked():
+        if not self.ui.chk_stim_plot.isChecked():
+            self.mplwidget_s.fig.clf()
+        else:
             self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
-            self.ax_stim.clear()
+            self.ax_stim.clear() # same as cla()
 
             self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
