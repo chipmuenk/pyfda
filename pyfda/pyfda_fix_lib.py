@@ -263,18 +263,20 @@ csd2dec_vec = np.vectorize(csd2dec) # safer than np.frompyfunc()
 class Fixed(object):
     """
     Implement binary quantization of signed scalar or array-like objects
-    in the form yq = WI.WF where WI and WF are the wordlength of integer resp.
-    fractional part; total wordlength is W = WI + WF + 1 due to the sign bit.
+    in the form `Q = WI.WF` where WI and WF are the wordlength of integer resp.
+    fractional part; total wordlength is `W = WI + WF + 1` due to the sign bit.
 
     Examples:
-        
-    q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} or
+      
+        q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} 
+    
+    or
 
-    q_obj = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
+        q_obj = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
 
-    myQ = Fixed(q_obj) # instantiate fixed-point object, passing the format
+        myQ = Fixed(q_obj) # instantiate fixed-point object, passing the format
     dictionary to the constructor.
-
+    
     Parameters
     ----------
     q_obj : dict
