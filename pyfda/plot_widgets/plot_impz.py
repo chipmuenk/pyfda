@@ -399,7 +399,7 @@ class Plot_Impz(QWidget):
         """
         Recalculate response and redraw it
         """
-        if True: # self.needs_draw:
+        if True: # self.needs_draw: doesn't work yet - number of data points needs to updated
             self.calc_stimulus()
             self.calc_response()
             self.calc_y_real_imag()
@@ -563,16 +563,19 @@ class Plot_Impz(QWidget):
         Clear the axes of the frequency domain matplotlib widgets and 
         calculate the fft
         """
-
         self.plt_freq = qget_cmb_box(self.ui.cmb_plt_freq, data=False)
-        
-        if self.plt_freq != "None":               
-            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)    
-            self.ax_fft.clear()
 
+        if self.plt_freq == "None":
+            for ax in self.mplwidget_f.fig.get_axes(): # remove all axes
+                self.mplwidget_f.fig.delaxes(ax) 
+        else:
+            if not hasattr(self, 'ax_fft'):
+                self.ax_fft = self.mplwidget_f.fig.add_subplot(111)
+            else:
+                self.ax_fft.clear()
             self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
-            
+
             self.calc_fft()
 
     def draw_impz_freq(self):
@@ -653,7 +656,6 @@ class Plot_Impz(QWidget):
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
             handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
-            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
             self.ax_fft.legend(handles, labels, loc='best', fontsize = 'small',
                                fancybox=True, framealpha=0.5)
             
@@ -664,14 +666,20 @@ class Plot_Impz(QWidget):
                 self.ax_fft.set_title(self.title_str) # no time window, print title here
                 
             if self.ui.chkLogF.isChecked():
-                # create second axis scaled for noise power scale
-                self.ax_fft_noise = self.ax_fft.twinx()
-                self.ax_fft_noise.is_twin = True
+                # create second axis scaled for noise power scale if it doesn't exist
+                if not hasattr(self, 'ax_fft_noise'):
+                    self.ax_fft_noise = self.ax_fft.twinx()
+                    self.ax_fft_noise.is_twin = True
+                self.ax_fft_noise.clear()
 
                 corr = 10*np.log10(self.ui.N / self.ui.nenbw) 
                 mn, mx = self.ax_fft.get_ylim()
                 self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
+            else:
+                if hasattr(self, 'ax_fft_noise'): # remove twin axes
+                    self.mplwidget_f.fig.delaxes(self.ax_fft_noise)
+                    del self.ax_fft_noise
         self.redraw() # redraw currently active mplwidget
 
     #--------------------------------------------------------------------------      
