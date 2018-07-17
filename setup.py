@@ -62,19 +62,16 @@ setup(
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
-
+    # Read information from MANIFEST.in    
+    include_package_data = True,
     # add additional data files (= non *.py) for package / subpackages relative
     # to package directory, include 'qrc_resources.py' instead of 'images/icons/*',
     # ('qrc_resources.py','version.py' are automatically installed).
-    package_data={'pyfda': ['pyfda_log.conf', 'pyfda.conf'],
-                  'pyfda/fixpoint_widgets' : ['*.png', '*.svg']
-                  },
+    ## package_data={'pyfda': ['pyfda_log.conf', 'pyfda.conf']},
     # https://stackoverflow.com/questions/2026876/packaging-python-applications-with-configuration-files
     # include files that get installed OUTSIDE the package
-    data_files = [
-#        ('', ['README.rst']),
-#        ('', ['LICENSE'])
-        ],
+    ## data_files = [('', ['README.rst']), ('', ['LICENSE'])],
+    # Required modules
     install_requires = [
         'numpy', 'scipy', 'matplotlib', 'docutils'
         ],

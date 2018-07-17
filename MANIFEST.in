@@ -1,0 +1,4 @@
+include pyfda/fixpoint_widgets/*.png
+include pyfda/fixpoint_widgets/*.svg
+include pyfda/pyfda_log.conf
+include pyfda/pyfda.conf
