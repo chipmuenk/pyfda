@@ -496,7 +496,8 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             W = self.hdl_dict['QC']['WI'] + self.hdl_dict['QC']['WF']
             # TODO: Scale is still wrong
-            self.stim = self.q_i.float2frmt(dict_sig['fx_stimulus'])
+            self.stim = self.q_i.fixp(dict_sig['fx_stimulus'])
+            logger.warning("stim {0}\n{1}".format(self.q_i.q_obj, self.stim))
 
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
