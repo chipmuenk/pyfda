@@ -405,6 +405,7 @@ class Input_Fixpoint_Specs(QWidget):
         # get a dict with the coefficients and fixpoint settings from fixpoint widget
         self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
         self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
+        self.q_i.setQobj({'frmt':'dec', 'scale':'int'}) # use integer decimal format
 
         b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
         a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
