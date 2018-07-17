@@ -266,17 +266,19 @@ class Fixed(object):
     in the form yq = WI.WF where WI and WF are the wordlength of integer resp.
     fractional part; total wordlength is W = WI + WF + 1 due to the sign bit.
 
+    Examples:
+        
     q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} or
 
-    q_obj = {'Q':'1.14', 'ovfl':'sat', 'quant':'round'}
+    q_obj = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
 
-    myQ = Fixed(q_obj) # instantiate fixed-point object
-
+    myQ = Fixed(q_obj) # instantiate fixed-point object, passing the format
+    dictionary to the constructor.
 
     Parameters
     ----------
     q_obj : dict
-        defining quantization operation with the keys
+        define quantization options with the following keys
 
     * **'WI'** : integer word length, default: 0
 
@@ -327,7 +329,7 @@ class Fixed(object):
 
     WF : integer
         number of fractional bits
-
+        
     quant : string
         Quantization behaviour ('floor', 'round', ...)
 
@@ -340,6 +342,20 @@ class Fixed(object):
     scale : float
         The factor between integer fixpoint representation and the floating point
         value.
+        
+    Additionally, the following attributes can be read:
+
+    W : integer
+        total wordlength
+
+    LSB : float
+        value of LSB (smallest quantization step)
+
+    MSB : float
+        value of most significant bit (MSB)
+
+    digits : integer
+        number of digits required for selected number format and wordlength
 
     ovr_flag : integer or integer array (same shape as input argument)
         overflow flag   0 : no overflow
@@ -359,33 +375,28 @@ class Fixed(object):
     N_over_pos : integer
         number of positive overflows
 
-    LSB : float
-        value of LSB (smallest quantization step)
-
-    MSB : float
-        value of most significant bit (MSB)
-
-    digits : integer (read only)
-        number of digits required for selected number format and wordlength
 
     Notes
     -----
-    class Fixed() can be used like Matlabs quantizer object / function from the
+    class `Fixed()` can be used like Matlabs quantizer object / function from the
     fixpoint toolbox, see (Matlab) 'help round' and 'help quantizer/round' e.g.
 
     q_dsp = quantizer('fixed', 'round', [16 15], 'wrap'); % Matlab
+    yq = quantize(q_dsp, y)
 
     q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
-
+    my_q = Fixed(q_dsp)
+    yq = my_q.fixp(y)
     """
 
     def __init__(self, q_obj):
         """
         Initialize fixed object with dict q_obj
         """
-        # test if all passed keys of quantizer object are known
+        # test if all passed keys of quantizer object are defined
         self.setQobj(q_obj)
         self.resetN() # initialize overflow-counter
+        
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
         self.FRMT_REGEX = {
@@ -398,7 +409,9 @@ class Fixed(object):
     def setQobj(self, q_obj):
         """
         Analyze quantization dict, complete and transform it if needed and
-        store it as instance attribute
+        store it as instance attribute. 
+        
+        Check the docstring of class `Fixed()` for  details.
         """
         for key in q_obj.keys():
             if key not in ['Q','WF','WI','quant','ovfl','frmt','scale']:
@@ -431,7 +444,15 @@ class Fixed(object):
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt  = str(q_obj['frmt']).lower()
-        self.scale = np.float64(q_obj['scale'])
+        try:
+            self.scale = np.float64(q_obj['scale'])
+        except ValueError:
+            if q_obj['scale'] == 'int':
+                self.scale = 1 << self.WF
+            elif q_obj['scale'] == 'norm':
+                self.scale = 2.**(-self.WI)
+            else:
+                raise ValueError
 
         self.q_obj = q_obj # store quant. dict in instance
 
@@ -461,7 +482,7 @@ class Fixed(object):
         else:
             raise Exception(u'Unknown format "%s"!'%(self.frmt))
 
-        self.ovr_flag = 0
+        self.ovr_flag = 0 # initialize to allow reading when freshly initialized
 
 #------------------------------------------------------------------------------
     def fixp(self, y, scaling='mult'):
@@ -518,12 +539,15 @@ class Fixed(object):
         """
 
         #======================================================================
-        # (1) : Convert input argument into proper floating point scalars /
-        #        arrays and initialize flags
+        # (1) : INITIALIZATION
+        #       Convert input argument into proper floating point scalars /
+        #       arrays and initialize flags
         #======================================================================
+        scaling = scaling.lower()
         if np.shape(y):
-            # create empty arrays for result and overflows with same shape as y
-            # for speedup, test for invalid types
+            # Input is an array:
+            #   Create empty arrays for result and overflows with same shape as y
+            #   for speedup, test for invalid types
             SCALAR = False
             y = np.asarray(y) # convert lists / tuples / ... to numpy arrays
             yq = np.zeros(y.shape)
@@ -547,12 +571,13 @@ class Fixed(object):
                              "cannot convert to float.".format(y, y.dtype))
                 y = np.zeros(y.shape)
         else:
+            # Input is a scalar
             SCALAR = True
             # get rid of errors that have occurred upstream
             if y is None or str(y) == "":
                 y = 0
-            # If y is not a number, convert to string, remove whitespace and convert
-            # to complex format:
+            # If y is not a number, remove whitespace and try to convert to
+            # to float and or to complex format:
             elif not np.issubdtype(type(y), np.number):
                 y = qstr(y)
                 y = y.replace(' ','') # remove all whitespace
@@ -574,21 +599,25 @@ class Fixed(object):
             # quantizing complex objects is not supported yet
             y = y.real
 
-        scaling = scaling.lower()
         y_in = y # y before scaling / quantizing
         #======================================================================
-        # (2) : Multiply by `scale` factor before requantization and saturation
+        # (2) : INPUT SCALING
+        #       Multiply by `scale` factor before requantization and saturation
         #       when `scaling=='mult'`or 'multdiv'
         #======================================================================
-        y = y / self.LSB
         if scaling in {'mult', 'multdiv'}:
             y = y * self.scale
 
         #======================================================================
-        # (3) : Divide by LSB and apply selected quantization method to convert
-        #       floating point inputs to "fixpoint integers" arrays
-        #       Next, multiply by LSB to restore original scale
+        # (3) : QUANTIZATION
+        #       Divide by LSB to obtain an intermediate format where the 
+        #       quantization step size = 1.
+        #       Next, apply selected quantization method to convert
+        #       floating point inputs to "fixpoint integers".
+        #       Finally, multiply by LSB to restore original scale.
         #=====================================================================
+        y = y / self.LSB
+
         if   self.quant == 'floor':  yq = np.floor(y)
              # largest integer i, such that i <= x (= binary truncation)
         elif self.quant == 'round':  yq = np.round(y)
@@ -608,9 +637,9 @@ class Fixed(object):
         logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
         #======================================================================
-        # (4) : Handle Overflow / saturation in relation to MSB
+        # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a 
+        #       result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
         #=====================================================================
-
         if   self.ovfl == 'none':
             pass
         else:
@@ -636,8 +665,10 @@ class Fixed(object):
                 raise Exception('Unknown overflow type "%s"!'%(self.ovfl))
                 return None
         #======================================================================
-        # (5) : Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
-        #       - frmt2float()
+        # (5) : OUTPUT SCALING
+        #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
+        #       to obtain correct scaling for floats
+        #       - frmt2float() always returns float 
         #       - input_coeffs when quantizing the coefficients
         #       float2frmt passes on the scaling argument
         #======================================================================
@@ -653,6 +684,7 @@ class Fixed(object):
 #------------------------------------------------------------------------------
     def resetN(self):
         """ Reset overflow-counters of Fixed object"""
+        self.N_points = 0
         self.N_over = 0
         self.N_over_neg = 0
         self.N_over_pos = 0
