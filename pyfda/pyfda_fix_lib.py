@@ -442,7 +442,7 @@ class Fixed(object):
         # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
         self.WF    = int(abs(q_obj['WF']))
-        self.W     = self.WF + self.WI + 1
+        self.W     = int(self.WF + self.WI + 1)
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt  = str(q_obj['frmt']).lower()
