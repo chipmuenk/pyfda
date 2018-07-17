@@ -123,7 +123,7 @@ class DF1(QWidget):
                 #sos = sos, doesn't work yet
                 word_format=(hdl_dict['QI']['WI'] + hdl_dict['QI']['WF'], 0,
                              hdl_dict['QI']['WF']))
-        #-------------------------------------------------   
+        #-------------------------------------------------
     
         return hdl_dict
 
