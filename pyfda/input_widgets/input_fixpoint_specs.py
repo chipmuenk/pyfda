@@ -438,10 +438,11 @@ class Input_Fixpoint_Specs(QWidget):
                 filter=file_types)
         hdl_file = qstr(hdl_file)
 
-        if hdl_file != "": # "operation cancelled" gives back an empty string
+        if hdl_file != "": # "operation cancelled" returns an empty string
+            # return '.v' or '.vhd' depending on filetype selection
+            hdl_type = extract_file_ext(qstr(hdl_filter))[0]
+            # sanitized dir + filename + suffix. The suffix here is discarded later.
             hdl_file = os.path.normpath(hdl_file)
-            hdl_type = extract_file_ext(qstr(hdl_filter))[0] # return '.v' or '.vhd'
-
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
@@ -450,21 +451,19 @@ class Input_Fixpoint_Specs(QWidget):
             # return the filename without suffix
             hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
 
-            self.setupHDL()
-
-
-            if str(hdl_type) == '.vhd':
+            suffix = str(hdl_type)
+            if suffix == '.vhd':
                 hdl = 'VHDL'
-                suffix = '.vhd'
-            else:
+            elif str(hdl_type) == '.v':
                 hdl = 'Verilog'
-                suffix = '.v'
+            else:
+                logger.error('Unknown file extension "{0}", cancelling.'.format(hdl_type))
+                return
 
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + suffix)))
-
             try:
-                
+                self.setupHDL()
                 self.hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
 
                 logger.info("HDL conversion finished!")
