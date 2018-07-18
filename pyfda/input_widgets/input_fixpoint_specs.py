@@ -93,7 +93,6 @@ class Input_Fixpoint_Specs(QWidget):
             # update fields in the filter topology widget - wordlength may have
             # been changed
             self.update_wdg_UI()
-
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
             # PingPong with a stimulus & plot widget:
@@ -490,19 +489,20 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_set_stimulus(self, dict_sig):
         """
-        - Pass fix-point stimulus from dict_sig to HDL filter, 
+        - Get fix-point stimulus from dict_sig
+        - Scale fixpoint response with 2**W (input) and pass it to HDL filter
         - Calculate the fixpoint response
         - Send it to the plotting widget
         """
         try:
-            self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W)
+            self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)
             logger.warning("stim {0}{1}\n{2}".format(type(self.q_i.W), self.q_i.q_obj, self.stim))
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             self.hdlfilter.run_sim()         # Run the simulation
             # Get the response from the simulation and scale it to float
-            self.fx_results = self.hdlfilter.get_response() / (1 << self.q_i.W) 
+            self.fx_results = self.hdlfilter.get_response() / (1 << self.q_i.W-1) 
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
