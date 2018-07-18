@@ -497,9 +497,9 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W)
             logger.warning("stim {0}{1}\n{2}".format(type(self.q_i.W), self.q_i.q_obj, self.stim))
-
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
+
             self.hdlfilter.run_sim()         # Run the simulation
             # Get the response from the simulation and scale it to float
             self.fx_results = self.hdlfilter.get_response() / (1 << self.q_i.W) 
@@ -513,6 +513,9 @@ class Input_Fixpoint_Specs(QWidget):
 
         except myhdl.SimulationError as e:
             logger.warning("Simulation failed:\n{0}".format(e))
+            return
+        except ValueError as e:
+            logger.warning("Overflow error {0}".format(e))
             return
 
         logger.info("Fixpoint plotting started")
