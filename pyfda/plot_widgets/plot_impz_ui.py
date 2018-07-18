@@ -62,7 +62,8 @@ class PlotImpz_UI(QWidget):
         self.param1 = None
 
         # initial settings for comboboxes
-        self.plt_time = "Response"
+        self.plt_time_stim = "None"
+        self.plt_time_resp = "Stem"
         self.plt_freq = "None"
         self.stim = "Pulse"
         self.noise = "None"
@@ -70,7 +71,6 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-#        self._update_plot_time()
         self._log_mode_time()
         self._log_mode_freq()
         self.update_N() # also updates window function
@@ -91,38 +91,38 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Run control widgets
         # ---------------------------------------------------------------
-        self.lblSimSelect = QLabel("Simulate", self)
+        self.lbl_sim_select = QLabel("Simulate", self)
         self.cmbSimSelect = QComboBox(self)
         self.cmbSimSelect.addItems(["Float","Fixpoint"])
         qset_cmb_box(self.cmbSimSelect, "Float")
         self.cmbSimSelect.setToolTip("<span>Simulate floating-point or fixpoint response."
                                  "</span>")
 
-        self.lblN_points = QLabel(to_html("N", frmt='bi')  + " =", self)
+        self.lbl_N_points = QLabel(to_html("N", frmt='bi')  + " =", self)
         self.ledN_points = QLineEdit(self)
         self.ledN_points.setText(str(self.N_points))
         self.ledN_points.setToolTip("<span>Number of points to calculate and display. "
                                    "N = 0 tries to choose for you.</span>")
 
-        self.lblN_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
+        self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
         self.ledN_start = QLineEdit(self)
         self.ledN_start.setText(str(self.N_start))
         self.ledN_start.setToolTip("<span>First point to plot.</span>")
         
-        self.butRun = QPushButton("RUN", self)
-        self.butRun.setToolTip("Run fixpoint simulation")
+        self.but_run = QPushButton("RUN", self)
+        self.but_run.setToolTip("Run fixpoint simulation")
 
         layH_ctrl_run = QHBoxLayout()
-        layH_ctrl_run.addWidget(self.lblSimSelect)
+        layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmbSimSelect)
         layH_ctrl_run.addStretch(1)        
-        layH_ctrl_run.addWidget(self.lblN_start)
+        layH_ctrl_run.addWidget(self.lbl_N_start)
         layH_ctrl_run.addWidget(self.ledN_start)
         layH_ctrl_run.addStretch(1)
-        layH_ctrl_run.addWidget(self.lblN_points)
+        layH_ctrl_run.addWidget(self.lbl_N_points)
         layH_ctrl_run.addWidget(self.ledN_points)
         layH_ctrl_run.addStretch(1)
-        layH_ctrl_run.addWidget(self.butRun)
+        layH_ctrl_run.addWidget(self.but_run)
         layH_ctrl_run.addStretch(10)
 
         #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -134,40 +134,41 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
-        self.lbl_plt_time = QLabel("Show ", self)
-        self.cmb_plt_time = QComboBox(self)
-        self.cmb_plt_time.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmb_plt_time, self.plt_time)
-        self.cmb_plt_time.setToolTip("<span>Choose which signals to show in the time domain: "
-                                 "The stimulus, the filter response or both.</span>")
+        self.lbl_plt_time_stim = QLabel("Stimulus plot style", self)
+        self.cmb_plt_time_stim = QComboBox(self)
+        self.cmb_plt_time_stim.addItems(["None","Line","Stem", "Step", "Marker"])       
+        qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
+        self.cmb_plt_time_stim.setToolTip("<span>Choose plot style for stimulus.</span>")
+
+        self.lbl_plt_time_resp = QLabel("Response plot style", self)
+        self.cmb_plt_time_resp = QComboBox(self)
+        self.cmb_plt_time_resp.addItems(["None","Line","Stem", "Step", "Marker"])       
+        qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
+        self.cmb_plt_time_resp.setToolTip("<span>Choose plot style for response.</span>")
 
         self.chkLog = QCheckBox("Log. scale", self)
         self.chkLog.setObjectName("chkLog")
         self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLog.setChecked(False)
 
-        self.chk_stems_time = QCheckBox("Stems", self)
-        self.chk_stems_time.setObjectName("chkStems")
-        self.chk_stems_time.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
-        self.chk_stems_time.setChecked(False)
-
-        self.lblLogBottom = QLabel("Bottom = ", self)
+        self.lbl_log_bottom = QLabel("Bottom = ", self)
         self.ledLogBottom = QLineEdit(self)
         self.ledLogBottom.setText(str(self.bottom))
         self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbldB = QLabel("dB", self)
+        self.lbl_dB = QLabel("dB", self)
 
         layH_ctrl_time = QHBoxLayout()
-        layH_ctrl_time.addWidget(self.lbl_plt_time)
-        layH_ctrl_time.addWidget(self.cmb_plt_time)
+        layH_ctrl_time.addWidget(self.lbl_plt_time_resp)
+        layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
+        layH_ctrl_time.addStretch(2)
+        layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
+        layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
         layH_ctrl_time.addStretch(2)
         layH_ctrl_time.addWidget(self.chkLog)
         layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(self.lblLogBottom)
+        layH_ctrl_time.addWidget(self.lbl_log_bottom)
         layH_ctrl_time.addWidget(self.ledLogBottom)
-        layH_ctrl_time.addWidget(self.lbldB)
-        layH_ctrl_time.addStretch(2)
-        layH_ctrl_time.addWidget(self.chk_stems_time)
+        layH_ctrl_time.addWidget(self.lbl_dB)
         layH_ctrl_time.addStretch(10)
         
         #layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
@@ -360,7 +361,7 @@ class PlotImpz_UI(QWidget):
         self.cmbSimSelect.currentIndexChanged.connect(self._update_sim_select)
         self.ledN_start.editingFinished.connect(self.update_N)
         self.ledN_points.editingFinished.connect(self.update_N)
-        self.butRun.clicked.connect(self.run_fx_sim)
+        self.but_run.clicked.connect(self.run_fx_sim)
         # --- time control ---
         self.chkLog.clicked.connect(self._log_mode_time)
         self.ledLogBottom.editingFinished.connect(self._log_mode_time)
@@ -402,9 +403,9 @@ class PlotImpz_UI(QWidget):
         Select / deselect log. mode for both time domain and update self.bottom
         """
         log = self.chkLog.isChecked()
-        self.lblLogBottom.setVisible(log)
+        self.lbl_log_bottom.setVisible(log)
         self.ledLogBottom.setVisible(log)
-        self.lbldB.setVisible(log)
+        self.lbl_dB.setVisible(log)
         if log:
             self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom,
                                     return_type='float', sign='neg')

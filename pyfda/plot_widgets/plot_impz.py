@@ -23,7 +23,7 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
 from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
-from pyfda.plot_widgets.mpl_widget import MplWidget
+from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
 from .plot_impz_ui import PlotImpz_UI
 
@@ -51,8 +51,9 @@ class Plot_Impz(QWidget):
         self.f2 = self.ui.f2
         
         self.plt_freq = self.ui.plt_freq
-        self.plt_time = self.ui.plt_time
-        
+        self.plt_time_stim = self.ui.plt_time_stim
+        self.plt_time_resp = self.ui.plt_time_resp
+       
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 3 # flag which plot needs to be redrawn
         self.tool_tip = "Impulse and transient response"
@@ -108,8 +109,8 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ui.cmb_plt_time.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.chk_stems_time.clicked.connect(self.draw_impz_time)
+        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
+        self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
 
         self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
 
@@ -326,6 +327,7 @@ class Plot_Impz(QWidget):
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
         self.needs_redraw[:] = [True] * 3
+        
 
 #------------------------------------------------------------------------------
     def calc_response(self):
@@ -441,24 +443,24 @@ class Plot_Impz(QWidget):
         """
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
         """
-        self.plt_time = qget_cmb_box(self.ui.cmb_plt_time, data=False)
+        self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower()
+        self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower()
+        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"
         
         for ax in self.mplwidget_t.fig.get_axes():
             self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
 
-        if self.plt_time != "None":
-            num_subplots = 0 + (self.plt_time != "None")\
-                            + (self.cmplx and self.plt_time in {"Response", "Both"})
+        if plt_time:
+            num_subplots = 1 + (self.cmplx and self.plt_time_resp != "none")
     
             self.mplwidget_t.fig.subplots_adjust(hspace = 0.5)
         
-            if self.plt_time != "None":
-                self.ax_r = self.mplwidget_t.fig.add_subplot(num_subplots,1 ,1)
-                self.ax_r.clear()
-                self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
-                self.ax_r.get_yaxis().tick_left() # remove axis ticks right
+            self.ax_r = self.mplwidget_t.fig.add_subplot(num_subplots,1 ,1)
+            self.ax_r.clear()
+            self.ax_r.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_r.get_yaxis().tick_left() # remove axis ticks right
     
-            if self.cmplx and self.plt_time in {"Response", "Both"}:
+            if self.cmplx and self.plt_time_resp != "none":
                 self.ax_i = self.mplwidget_t.fig.add_subplot(num_subplots, 1, 2, sharex = self.ax_r)
                 self.ax_i.clear()
                 self.ax_i.get_xaxis().tick_bottom() # remove axis ticks on top
@@ -472,8 +474,6 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the time domain mplwidget
         """
-        stem_plot = self.ui.chk_stems_time.isChecked()
-        mkfmt_r = 'o'
         mkfmt_i = 'd'
 
         self._init_axes_time()
@@ -497,33 +497,43 @@ class Plot_Impz(QWidget):
                 H_str = r'$\Re\{$' + self.H_str + '$\}$ in V'
             else:
                 H_str = self.H_str + ' in V'
+        
+        plot_stim_dict = self.fmt_plot_stim.copy()
+        
+        if self.plt_time_stim == "line":
+            plot_stim_fnc = self.ax_r.plot
+        elif self.plt_time_stim == "stem":
+            plot_stim_fnc = stems
+            plot_stim_dict.update({'ax':self.ax_r, 'bottom':self.ui.bottom})
+        elif self.plt_time_stim == "step":
+            plot_stim_fnc = self.ax_r.plot
+            plot_stim_dict.update({'drawstyle':'steps-post'})
+        elif self.plt_time_stim == "marker":
+            plot_stim_fnc = self.ax_r.scatter
+        else:
+            plot_stim_fnc = no_plot
 
-        if self.plt_time in {"Response", "Both"}:
-            if stem_plot:
-                [ml, sl, bl] = self.ax_r.stem(self.t[self.ui.N_start:], y[self.ui.N_start:], 
-                    bottom=self.ui.bottom, markerfmt=mkfmt_r, label = '$y[n]$')
-            else:
-                self.ax_r.plot(self.t[self.ui.N_start:], y[self.ui.N_start:], 
-                    label = '$y[n]$', **self.fmt_plot_resp)                    
+        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$y[n]$',
+                 **plot_stim_dict)
 
-        if self.plt_time in {"Stimulus", "Both"}:
-            if stem_plot:
-                [ms, ss, bs] = self.ax_r.stem(self.t[self.ui.N_start:], x[self.ui.N_start:], 
-                    bottom=self.ui.bottom, label = 'Stim.', **self.fmt_stem_stim)
-                ms.set_mfc(self.fmt_stem_stim['mfc'])
-                ms.set_mec(self.fmt_stem_stim['mec'])
-                ms.set_ms(self.fmt_stem_stim['ms'])
-                ms.set_alpha(self.fmt_stem_stim['alpha'])
-                for stem in ss:
-                    stem.set_linewidth(self.fmt_stem_stim['lw'])
-                    stem.set_color(self.fmt_stem_stim['mec'])
-                    stem.set_alpha(self.fmt_stem_stim['alpha'])
-                bs.set_visible(False) # invisible bottomline
-            else:
-                self.ax_r.plot(self.t[self.ui.N_start:], x[self.ui.N_start:], 
-                    label = '$y[n]$', **self.fmt_plot_stim)                    
+        plot_resp_dict = self.fmt_plot_resp.copy()
+        if self.plt_time_resp == "line":
+            plot_resp_fnc = self.ax_r.plot
+        elif self.plt_time_resp == "stem":
+            plot_resp_fnc = stems
+            plot_resp_dict.update({'ax':self.ax_r, 'bottom':self.ui.bottom})
+        elif self.plt_time_resp == "step":
+            plot_resp_fnc = self.ax_r.plot
+            plot_resp_dict.update({'drawstyle':'steps-post'})
+        elif self.plt_time_resp == "marker":
+            plot_resp_fnc = self.ax_r.scatter
+        else:
+            plot_resp_fnc = no_plot
+            
+        plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
+                 **plot_resp_dict)
 
-        if self.cmplx and self.plt_time in {"Response", "Both"}:
+        if self.cmplx and self.plt_time_resp != "none":
             [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
                 bottom=self.ui.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
@@ -739,7 +749,7 @@ class Plot_Impz(QWidget):
         idx = self.tabWidget.currentIndex()
         self.tabWidget.currentWidget().redraw()
         #wdg = getattr(self, self.tab_mplwidgets[idx])
-        logger.warning("redrawing {0}".format(idx))#, wdg == wdg_cur))
+        logger.debug("Redrawing tab {0}".format(idx))
         #wdg_cur.redraw()
         self.needs_redraw[idx] = False
 #        self.mplwidget_t.redraw()
