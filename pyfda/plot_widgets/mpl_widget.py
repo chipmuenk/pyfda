@@ -42,6 +42,22 @@ for key in pyfda_rc.mpl_rc:
     rcParams[key] = pyfda_rc.mpl_rc[key]
 
 #------------------------------------------------------------------------------
+def stems(x, y, ax=None, label=None, **kwargs):
+    """ A faster replacement for stem plot
+    """
+    # pop the 'bottom' key-value pair from the dict, provide default value 0
+    bottom=kwargs.pop('bottom', 0) 
+    ax.axhline(bottom, x[0], x[-1], **kwargs)
+    ax.vlines(x, y, bottom, label=label, **kwargs)
+    # ax.set_ylim([1.05*y.min(), 1.05*y.max()])
+
+def no_plot(x, y, ax=None, bottom=0, label=None, **kwargs):
+    """
+    Don't plot anything - needed for plot factory
+    """
+    pass 
+    
+#------------------------------------------------------------------------------
 class MplWidget(QWidget):
     """
     Construct a subwidget, instantiating a Matplotlib canvas and a modified
@@ -154,7 +170,6 @@ class MplWidget(QWidget):
             if ax.get_navigate():
                 ax.autoscale()
         self.redraw()
-
 #------------------------------------------------------------------------------
     def get_full_extent(self, ax, pad=0.0):
         """
