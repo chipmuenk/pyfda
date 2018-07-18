@@ -93,6 +93,8 @@ class Input_Fixpoint_Specs(QWidget):
             # update fields in the filter topology widget - wordlength may have
             # been changed
             self.update_wdg_UI()
+        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
+                self.fx_sim_start()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
             # PingPong with a stimulus & plot widget:
@@ -479,7 +481,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Started fixpoint simulation")
             self.setupHDL()
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.hdl_dict}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:

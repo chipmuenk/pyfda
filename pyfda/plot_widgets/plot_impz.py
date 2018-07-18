@@ -68,7 +68,6 @@ class Plot_Impz(QWidget):
         Create the top level UI of the widget, consisting of matplotlib widget
         and control frame.
         """
-        
         #----------------------------------------------------------------------
         # MplWidget for time domain plots
         #----------------------------------------------------------------------
@@ -92,7 +91,7 @@ class Plot_Impz(QWidget):
         self.mplwidget_s.layVMainMpl.addWidget(self.ui.wdg_ctrl_stim)
         self.mplwidget_s.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
-        # Tabbed layout, tabs to the left
+        # Tabbed layout with vertical tabs
         self.tabWidget = QTabWidget(self)
         self.tabWidget.addTab(self.mplwidget_t, "Time")
         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
@@ -110,19 +109,18 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
+        # --- run control ---
         self.ui.cmbSimSelect.currentIndexChanged.connect(self.run_ctrl)
-        self.ui.but_run.clicked.connect(self.run_ctrl)
-        # --- time control ---
+        self.ui.but_run.clicked.connect(self.run_fxp)
+        self.ui.chk_fx_scale.clicked.connect(self.redraw)
+        # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
         self.ui.chk_marker_resp.clicked.connect(self.draw_impz_time)
         self.ui.chk_log.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom.editingFinished.connect(self._log_mode_time)
-
-        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.chk_marker_stim.clicked.connect(self.draw_impz_time)
-
+        # --- frequency domain plotting ---
         self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
-
+        # --- stimulus plotting ---
         self.ui.chk_stim_plot.clicked.connect(self.draw_impz_stim)
         self.ui.chk_stems_stim.clicked.connect(self.draw_impz_stim)
 
@@ -139,8 +137,10 @@ class Plot_Impz(QWidget):
 
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
-
+        #--------------------------------------------
+        # initialize routines and settings
         self._log_mode_time()
+        
         self.draw() # initial calculation and drawing
 
 #------------------------------------------------------------------------------
@@ -289,9 +289,9 @@ class Plot_Impz(QWidget):
     def run_fxp(self):
         """
         Run fixpoint simulation
-        """
-        self.draw()
-
+        """        
+        self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
+#        self.draw()
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
