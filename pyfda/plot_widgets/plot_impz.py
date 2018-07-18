@@ -53,6 +53,7 @@ class Plot_Impz(QWidget):
         self.plt_freq = self.ui.plt_freq
         self.plt_time_stim = self.ui.plt_time_stim
         self.plt_time_resp = self.ui.plt_time_resp
+        self.bottom = self.ui.bottom
        
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 3 # flag which plot needs to be redrawn
@@ -109,8 +110,16 @@ class Plot_Impz(QWidget):
         #----------------------------------------------------------------------
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
+        self.ui.cmbSimSelect.currentIndexChanged.connect(self.run_ctrl)
+        self.ui.but_run.clicked.connect(self.run_ctrl)
+        # --- time control ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
+        self.ui.chk_marker_resp.clicked.connect(self.draw_impz_time)
+        self.ui.chk_log.clicked.connect(self._log_mode_time)
+        self.ui.led_log_bottom.editingFinished.connect(self._log_mode_time)
+
+        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
+        self.ui.chk_marker_stim.clicked.connect(self.draw_impz_time)
 
         self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
 
@@ -131,6 +140,7 @@ class Plot_Impz(QWidget):
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
 
+        self._log_mode_time()
         self.draw() # initial calculation and drawing
 
 #------------------------------------------------------------------------------
@@ -165,7 +175,7 @@ class Plot_Impz(QWidget):
                 or 'view_changed' in dict_sig or self.needs_draw:
                 # todo: after 'data_changed' all needs to be set to True except current widget
                 self.draw()
-                self.needs_draw = False
+
             elif 'home' in dict_sig:
                 self.redraw()
                 # self.tabWidget.currentWidget().redraw() # redraw method of current mplwidget, always redraws tab 0
@@ -267,6 +277,22 @@ class Plot_Impz(QWidget):
                 str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
 # =============================================================================
+    def run_ctrl(self):
+        """
+        Select between fixpoint and floating point simulation
+        """
+        self.sim_select = qget_cmb_box(self.ui.cmbSimSelect, data=False)
+        self.sim_fxp = (self.sim_select == 'Fixpoint')
+        self.ui.but_run.setVisible(self.sim_fxp)
+        self.ui.chk_fx_scale.setVisible(self.sim_fxp)
+        
+    def run_fxp(self):
+        """
+        Run fixpoint simulation
+        """
+        self.draw()
+
+
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
         """
@@ -328,35 +354,37 @@ class Plot_Impz(QWidget):
             self.x += self.ui.DC
         self.needs_redraw[:] = [True] * 3
         
-
 #------------------------------------------------------------------------------
     def calc_response(self):
         """
         (Re-)calculate filter response y[n]
         """
-        # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
-        self.bb = np.asarray(fb.fil[0]['ba'][0])
-        self.aa = np.asarray(fb.fil[0]['ba'][1])
-        if min(len(self.aa), len(self.bb)) < 2:
-            logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
-            return
-
-        sos = np.asarray(fb.fil[0]['sos'])
-        antiCausal = 'zpkA' in fb.fil[0]
-        causal     = not (antiCausal)
-
-        if len(sos) > 0 and causal: # has second order sections and is causal
-            y = sig.sosfilt(sos, self.x)
-        elif antiCausal:
-            y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
-        else: # no second order sections or antiCausals for current filter
-            y = sig.lfilter(self.bb, self.aa, self.x)
-
-        if self.ui.stim == "StepErr":
-            dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
-            y = y - abs(dc[1]) # subtract DC (final) value from response
-
-        self.y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
+        if qget_cmb_box(self.ui.cmbSimSelect) == 'Fix':
+            pass
+        else:
+            # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
+            self.bb = np.asarray(fb.fil[0]['ba'][0])
+            self.aa = np.asarray(fb.fil[0]['ba'][1])
+            if min(len(self.aa), len(self.bb)) < 2:
+                logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
+                return
+    
+            sos = np.asarray(fb.fil[0]['sos'])
+            antiCausal = 'zpkA' in fb.fil[0]
+            causal     = not (antiCausal)
+    
+            if len(sos) > 0 and causal: # has second order sections and is causal
+                y = sig.sosfilt(sos, self.x)
+            elif antiCausal:
+                y = sig.filtfilt(self.bb, self.aa, self.x, -1, None)
+            else: # no second order sections or antiCausals for current filter
+                y = sig.lfilter(self.bb, self.aa, self.x)
+    
+            if self.ui.stim == "StepErr":
+                dc = sig.freqz(self.bb, self.aa, [0]) # DC response of the system
+                y = y - abs(dc[1]) # subtract DC (final) value from response
+    
+            self.y = np.real_if_close(y, tol = 1e3)  # tol specified in multiples of machine eps
 
         self.needs_redraw[0] = True
         self.needs_redraw[1] = True
@@ -425,6 +453,8 @@ class Plot_Impz(QWidget):
 
         self.fmt_plot_resp = {'color':'red', 'linewidth':2}
         self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
+        self.fmt_mkr_stim = {'color':'green', 'alpha':0.5}
+        self.fmt_mkr_resp = {'color':'blue'}
         self.fmt_stem_stim = params['mpl_stimuli']
         
         idx = self.tabWidget.currentIndex()
@@ -439,13 +469,31 @@ class Plot_Impz(QWidget):
 
         
         #================ Plotting routine time domain =========================
+    def _log_mode_time(self):
+        """
+        Select / deselect log. mode for time domain and update self.bottom
+        """
+        log = self.ui.chk_log.isChecked()
+        self.ui.lbl_log_bottom.setVisible(log)
+        self.ui.led_log_bottom.setVisible(log)
+        self.ui.lbl_dB.setVisible(log)
+        if log:
+            self.bottom = safe_eval(self.ui.led_log_bottom.text(), self.bottom,
+                                    return_type='float', sign='neg')
+            self.ui.led_log_bottom.setText(str(self.bottom))
+            
+        #self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
+        # TODO: draw() really needed?
+        self.draw()
+
     def _init_axes_time(self):
         """
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
         """
         self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower()
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower()
-        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"
+        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
+            or self.ui.chk_marker_resp.isChecked() or self.ui.chk_marker_stim.isChecked()
         
         for ax in self.mplwidget_t.fig.get_axes():
             self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
@@ -478,16 +526,16 @@ class Plot_Impz(QWidget):
 
         self._init_axes_time()
         
-        if self.ui.chkLog.isChecked(): # log. scale for stimulus / response time domain
+        if self.ui.chk_log.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
-            x = np.maximum(20 * np.log10(abs(self.x)), self.ui.bottom)
-            y = np.maximum(20 * np.log10(abs(self.y_r)), self.ui.bottom)
+            x = np.maximum(20 * np.log10(abs(self.x)), self.bottom)
+            y = np.maximum(20 * np.log10(abs(self.y_r)), self.bottom)
             if self.cmplx:
-                y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom)
+                y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.bottom)
                 H_i_str = r'$|\Im\{$' + self.H_str + '$\}|$' + ' in dBV'
                 H_str =   r'$|\Re\{$' + self.H_str + '$\}|$' + ' in dBV'
         else:
-            self.ui.bottom = 0
+            self.bottom = 0
             x = self.x
             y = self.y_r
             y_i = self.y_i
@@ -497,34 +545,35 @@ class Plot_Impz(QWidget):
                 H_str = r'$\Re\{$' + self.H_str + '$\}$ in V'
             else:
                 H_str = self.H_str + ' in V'
-        
+
         plot_stim_dict = self.fmt_plot_stim.copy()
-        
+
         if self.plt_time_stim == "line":
             plot_stim_fnc = self.ax_r.plot
         elif self.plt_time_stim == "stem":
             plot_stim_fnc = stems
-            plot_stim_dict.update({'ax':self.ax_r, 'bottom':self.ui.bottom})
+            plot_stim_dict.update({'ax':self.ax_r, 'bottom':self.bottom})
         elif self.plt_time_stim == "step":
             plot_stim_fnc = self.ax_r.plot
-            plot_stim_dict.update({'drawstyle':'steps-post'})
-        elif self.plt_time_stim == "marker":
-            plot_stim_fnc = self.ax_r.scatter
+            plot_stim_dict.update({'drawstyle':'steps-mid'})
         else:
             plot_stim_fnc = no_plot
 
-        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$y[n]$',
+        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
                  **plot_stim_dict)
+        if self.ui.chk_marker_stim.isChecked():
+            self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
+                 **self.fmt_mkr_stim)
 
         plot_resp_dict = self.fmt_plot_resp.copy()
         if self.plt_time_resp == "line":
             plot_resp_fnc = self.ax_r.plot
         elif self.plt_time_resp == "stem":
             plot_resp_fnc = stems
-            plot_resp_dict.update({'ax':self.ax_r, 'bottom':self.ui.bottom})
+            plot_resp_dict.update({'ax':self.ax_r, 'bottom':self.bottom})
         elif self.plt_time_resp == "step":
             plot_resp_fnc = self.ax_r.plot
-            plot_resp_dict.update({'drawstyle':'steps-post'})
+            plot_resp_dict.update({'drawstyle':'steps-mid'})
         elif self.plt_time_resp == "marker":
             plot_resp_fnc = self.ax_r.scatter
         else:
@@ -533,9 +582,13 @@ class Plot_Impz(QWidget):
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
 
+        if self.ui.chk_marker_resp.isChecked():
+            self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
+                 **self.fmt_mkr_resp)
+
         if self.cmplx and self.plt_time_resp != "none":
             [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
-                bottom=self.ui.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
+                bottom=self.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
             self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
@@ -585,6 +638,7 @@ class Plot_Impz(QWidget):
                 self.ax_fft.clear()
             self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
             self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
+            self.ax_fft.set_title("FFT of Transient Response")
 
             self.calc_fft()
 
@@ -672,9 +726,7 @@ class Plot_Impz(QWidget):
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
             self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
-            if self.plt_time == "None":
-                self.ax_fft.set_title(self.title_str) # no time window, print title here
-                
+
             if self.ui.chkLogF.isChecked():
                 # create second axis scaled for noise power scale if it doesn't exist
                 if not hasattr(self, 'ax_fft_noise'):

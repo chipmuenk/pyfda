@@ -71,7 +71,6 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self._log_mode_time()
         self._log_mode_freq()
         self.update_N() # also updates window function
         self._update_noi()
@@ -134,41 +133,58 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
-        self.lbl_plt_time_stim = QLabel("Stimulus plot style", self)
+        self.lbl_plt_time_stim = QLabel("Plot Style: Stimulus", self)
         self.cmb_plt_time_stim = QComboBox(self)
-        self.cmb_plt_time_stim.addItems(["None","Line","Stem", "Step", "Marker"])       
+        self.cmb_plt_time_stim.addItems(["None","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
         self.cmb_plt_time_stim.setToolTip("<span>Choose plot style for stimulus.</span>")
 
-        self.lbl_plt_time_resp = QLabel("Response plot style", self)
+        self.chk_marker_stim = QCheckBox("*", self)
+        self.chk_marker_stim.setChecked(False)
+        self.chk_marker_stim.setToolTip("Use plot markers")
+        
+        self.lbl_plt_time_resp = QLabel("Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
-        self.cmb_plt_time_resp.addItems(["None","Line","Stem", "Step", "Marker"])       
+        self.cmb_plt_time_resp.addItems(["None","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Choose plot style for response.</span>")
 
-        self.chkLog = QCheckBox("Log. scale", self)
-        self.chkLog.setObjectName("chkLog")
-        self.chkLog.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chkLog.setChecked(False)
+        self.chk_marker_resp = QCheckBox("*", self)
+        self.chk_marker_resp.setChecked(False)
+        self.chk_marker_resp.setToolTip("Use plot markers")
+
+        self.chk_log = QCheckBox("Log. scale", self)
+        self.chk_log.setObjectName("chkLog")
+        self.chk_log.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chk_log.setChecked(False)
 
         self.lbl_log_bottom = QLabel("Bottom = ", self)
-        self.ledLogBottom = QLineEdit(self)
-        self.ledLogBottom.setText(str(self.bottom))
-        self.ledLogBottom.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.led_log_bottom = QLineEdit(self)
+        self.led_log_bottom.setText(str(self.bottom))
+        self.led_log_bottom.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbl_dB = QLabel("dB", self)
-
+ 
+        self.chk_fx_scale = QCheckBox("Fixpoint scale", self)
+        self.chk_fx_scale.setObjectName("chk_fx_scale")
+        self.chk_fx_scale.setToolTip("<span>Display data with fixpoint (integer) scale.</span>")
+        self.chk_fx_scale.setChecked(False)
+       
         layH_ctrl_time = QHBoxLayout()
         layH_ctrl_time.addWidget(self.lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
-        layH_ctrl_time.addStretch(2)
+        layH_ctrl_time.addWidget(self.chk_marker_resp)        
+        layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.lbl_plt_time_stim)
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
+        layH_ctrl_time.addWidget(self.chk_marker_stim) 
         layH_ctrl_time.addStretch(2)
-        layH_ctrl_time.addWidget(self.chkLog)
+        layH_ctrl_time.addWidget(self.chk_log)
         layH_ctrl_time.addStretch(1)
         layH_ctrl_time.addWidget(self.lbl_log_bottom)
-        layH_ctrl_time.addWidget(self.ledLogBottom)
+        layH_ctrl_time.addWidget(self.led_log_bottom)
         layH_ctrl_time.addWidget(self.lbl_dB)
+        layH_ctrl_time.addStretch(2)        
+        layH_ctrl_time.addWidget(self.chk_fx_scale)
         layH_ctrl_time.addStretch(10)
         
         #layH_ctrl_time.setContentsMargins(*params['wdg_margins'])
@@ -358,13 +374,8 @@ class PlotImpz_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
-        self.cmbSimSelect.currentIndexChanged.connect(self._update_sim_select)
         self.ledN_start.editingFinished.connect(self.update_N)
         self.ledN_points.editingFinished.connect(self.update_N)
-        self.but_run.clicked.connect(self.run_fx_sim)
-        # --- time control ---
-        self.chkLog.clicked.connect(self._log_mode_time)
-        self.ledLogBottom.editingFinished.connect(self._log_mode_time)
 
         # --- frequency control ---
         self.chkLogF.clicked.connect(self._log_mode_freq)
@@ -382,36 +393,21 @@ class PlotImpz_UI(QWidget):
         self.ledDC.editingFinished.connect(self._update_DC)
 
 # =============================================================================
-
-    def run_fx_sim(self):
-        """
-        Run fixpoint simulation
-        """
-        pass
-# TODO: add a function for run_fx_sim
-
-    def _update_sim_select(self):
-        """
-        Select between fixpoint and floating point simulation
-        """
-        self.sim_select = qget_cmb_box(self.cmbSimSelect, data=False)
-        self.sim_fxp = (self.sim_select == 'Fixpoint')
-        self.butRun.setEnabled(self.sim_fxp)
         
-    def _log_mode_time(self):
-        """
-        Select / deselect log. mode for both time domain and update self.bottom
-        """
-        log = self.chkLog.isChecked()
-        self.lbl_log_bottom.setVisible(log)
-        self.ledLogBottom.setVisible(log)
-        self.lbl_dB.setVisible(log)
-        if log:
-            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom,
-                                    return_type='float', sign='neg')
-            self.ledLogBottom.setText(str(self.bottom))
-            
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
+#    def _log_mode_time(self):
+#        """
+#        Select / deselect log. mode for both time domain and update self.bottom
+#        """
+#        log = self.chkLog.isChecked()
+#        self.lbl_log_bottom.setVisible(log)
+#        self.ledLogBottom.setVisible(log)
+#        self.lbl_dB.setVisible(log)
+#        if log:
+#            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom,
+#                                    return_type='float', sign='neg')
+#            self.ledLogBottom.setText(str(self.bottom))
+#            
+#        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
 
     def _log_mode_freq(self):
         """
