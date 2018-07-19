@@ -91,35 +91,35 @@ class PlotImpz_UI(QWidget):
         # Run control widgets
         # ---------------------------------------------------------------
         self.lbl_sim_select = QLabel("Simulate", self)
-        self.cmbSimSelect = QComboBox(self)
-        self.cmbSimSelect.addItems(["Float","Fixpoint"])
-        qset_cmb_box(self.cmbSimSelect, "Float")
-        self.cmbSimSelect.setToolTip("<span>Simulate floating-point or fixpoint response."
+        self.cmb_sim_select = QComboBox(self)
+        self.cmb_sim_select.addItems(["Float","Fixpoint"])
+        qset_cmb_box(self.cmb_sim_select, "Float")
+        self.cmb_sim_select.setToolTip("<span>Simulate floating-point or fixpoint response."
                                  "</span>")
 
         self.lbl_N_points = QLabel(to_html("N", frmt='bi')  + " =", self)
-        self.ledN_points = QLineEdit(self)
-        self.ledN_points.setText(str(self.N_points))
-        self.ledN_points.setToolTip("<span>Number of points to calculate and display. "
+        self.led_N_points = QLineEdit(self)
+        self.led_N_points.setText(str(self.N_points))
+        self.led_N_points.setToolTip("<span>Number of points to calculate and display. "
                                    "N = 0 tries to choose for you.</span>")
 
         self.lbl_N_start = QLabel(to_html("N_0", frmt='bi') + " =", self)
-        self.ledN_start = QLineEdit(self)
-        self.ledN_start.setText(str(self.N_start))
-        self.ledN_start.setToolTip("<span>First point to plot.</span>")
+        self.led_N_start = QLineEdit(self)
+        self.led_N_start.setText(str(self.N_start))
+        self.led_N_start.setToolTip("<span>First point to plot.</span>")
         
         self.but_run = QPushButton("RUN", self)
         self.but_run.setToolTip("Run fixpoint simulation")
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.lbl_sim_select)
-        layH_ctrl_run.addWidget(self.cmbSimSelect)
+        layH_ctrl_run.addWidget(self.cmb_sim_select)
         layH_ctrl_run.addStretch(1)        
         layH_ctrl_run.addWidget(self.lbl_N_start)
-        layH_ctrl_run.addWidget(self.ledN_start)
+        layH_ctrl_run.addWidget(self.led_N_start)
         layH_ctrl_run.addStretch(1)
         layH_ctrl_run.addWidget(self.lbl_N_points)
-        layH_ctrl_run.addWidget(self.ledN_points)
+        layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addStretch(1)
         layH_ctrl_run.addWidget(self.but_run)
         layH_ctrl_run.addStretch(10)
@@ -133,7 +133,7 @@ class PlotImpz_UI(QWidget):
         # ----------- ---------------------------------------------------
         # Controls for time domain
         # ---------------------------------------------------------------
-        self.lbl_plt_time_stim = QLabel("Plot Style: Stimulus", self)
+        self.lbl_plt_time_stim = QLabel("Stimulus", self)
         self.cmb_plt_time_stim = QComboBox(self)
         self.cmb_plt_time_stim.addItems(["None","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
@@ -143,7 +143,7 @@ class PlotImpz_UI(QWidget):
         self.chk_marker_stim.setChecked(False)
         self.chk_marker_stim.setToolTip("Use plot markers")
         
-        self.lbl_plt_time_resp = QLabel("Response", self)
+        self.lbl_plt_time_resp = QLabel("Plot Style: Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(["None","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
@@ -153,7 +153,7 @@ class PlotImpz_UI(QWidget):
         self.chk_marker_resp.setChecked(False)
         self.chk_marker_resp.setToolTip("Use plot markers")
 
-        self.chk_log = QCheckBox("Log. scale", self)
+        self.chk_log = QCheckBox("dB", self)
         self.chk_log.setObjectName("chkLog")
         self.chk_log.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chk_log.setChecked(False)
@@ -203,7 +203,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_freq.setToolTip("<span>Choose which signals to show in the frequency domain: "
                                  "The stimulus, the filter response or both.</span>")
 
-        self.chkLogF = QCheckBox("Log. scale", self)
+        self.chkLogF = QCheckBox("dB", self)
         self.chkLogF.setObjectName("chkLogF")
         self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
         self.chkLogF.setChecked(True)
@@ -374,8 +374,8 @@ class PlotImpz_UI(QWidget):
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
-        self.ledN_start.editingFinished.connect(self.update_N)
-        self.ledN_points.editingFinished.connect(self.update_N)
+        self.led_N_start.editingFinished.connect(self.update_N)
+        self.led_N_points.editingFinished.connect(self.update_N)
 
         # --- frequency control ---
         self.chkLogF.clicked.connect(self._log_mode_freq)
@@ -489,14 +489,14 @@ class PlotImpz_UI(QWidget):
         """
         Update values for self.N and self.N_start from the QLineEditWidget
         """
-        self.N_start = safe_eval(self.ledN_start.text(), 0, return_type='int', sign='pos')
-        self.ledN_start.setText(str(self.N_start))
-        N_user = safe_eval(self.ledN_points.text(), 0, return_type='int', sign='pos')
+        self.N_start = safe_eval(self.led_N_start.text(), 0, return_type='int', sign='pos')
+        self.led_N_start.setText(str(self.N_start))
+        N_user = safe_eval(self.led_N_points.text(), 0, return_type='int', sign='pos')
         if N_user == 0: # automatic calculation
             self.N = self.calc_n_points(N_user) # widget remains set to 0
         else:
             self.N = N_user
-            self.ledN_points.setText(str(self.N)) # update widget
+            self.led_N_points.setText(str(self.N)) # update widget
 
         self.N_end = self.N + self.N_start # total number of points to be calculated: N + N_start
 

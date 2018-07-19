@@ -62,6 +62,13 @@ class Plot_Impz(QWidget):
         self.active_tab = 0 # index for active tab
 
         self._construct_UI()
+        
+        #--------------------------------------------
+        # initialize routines and settings
+        self._log_mode_time()
+        self.run_ctrl()        
+        self.draw() # initial calculation and drawing
+
 
     def _construct_UI(self):
         """
@@ -110,12 +117,14 @@ class Plot_Impz(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
-        self.ui.cmbSimSelect.currentIndexChanged.connect(self.run_ctrl)
+        self.ui.cmb_sim_select.currentIndexChanged.connect(self.run_ctrl)
         self.ui.but_run.clicked.connect(self.run_fxp)
         self.ui.chk_fx_scale.clicked.connect(self.redraw)
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
         self.ui.chk_marker_resp.clicked.connect(self.draw_impz_time)
+        self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
+        self.ui.chk_marker_stim.clicked.connect(self.draw_impz_time)
         self.ui.chk_log.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom.editingFinished.connect(self._log_mode_time)
         # --- frequency domain plotting ---
@@ -137,11 +146,6 @@ class Plot_Impz(QWidget):
 
         self.sig_rx.connect(self.ui.sig_rx)
         self.ui.sig_tx.connect(self.process_sig_rx) # connect to widgets and signals upstream
-        #--------------------------------------------
-        # initialize routines and settings
-        self._log_mode_time()
-        
-        self.draw() # initial calculation and drawing
 
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
@@ -281,7 +285,7 @@ class Plot_Impz(QWidget):
         """
         Select between fixpoint and floating point simulation
         """
-        self.sim_select = qget_cmb_box(self.ui.cmbSimSelect, data=False)
+        self.sim_select = qget_cmb_box(self.ui.cmb_sim_select, data=False)
         self.sim_fxp = (self.sim_select == 'Fixpoint')
         self.ui.but_run.setVisible(self.sim_fxp)
         self.ui.chk_fx_scale.setVisible(self.sim_fxp)
@@ -359,7 +363,7 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate filter response y[n]
         """
-        if qget_cmb_box(self.ui.cmbSimSelect) == 'Fix':
+        if qget_cmb_box(self.ui.cmb_sim_select) == 'Fix':
             pass
         else:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
