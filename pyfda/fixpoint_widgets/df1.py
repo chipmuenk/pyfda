@@ -50,6 +50,8 @@ class DF1(QWidget):
         self.layHBtnsMsg.addWidget(lblHBtnsMsg)
 
         self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X </sub></i>:')
+        self.wdg_q_input = UI_Q(self)
+        
         self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
@@ -70,6 +72,8 @@ class DF1(QWidget):
         layVWdg.addLayout(self.layHBtnsMsg)
 
         layVWdg.addWidget(self.wdg_w_input)
+        layVWdg.addWidget(self.wdg_q_input)
+        
         layVWdg.addWidget(self.wdg_w_coeffs)
         layVWdg.addWidget(self.wdg_q_coeffs)
 
@@ -106,7 +110,10 @@ class DF1(QWidget):
         # parameters for input format
         hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
                                'WF':self.wdg_w_input.WF,
-                               'W':self.wdg_w_input.W,}
+                               'W':self.wdg_w_input.W,
+                               'ovfl': self.wdg_q_input.ovfl,
+                               'quant': self.wdg_q_input.quant
+                               }
                         })
         # parameters for output format
         hdl_dict.update({'QO':{'WI':self.wdg_w_output.WI,
