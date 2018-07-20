@@ -409,6 +409,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
         self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
+        self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
+
 
         b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
         a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
@@ -418,14 +420,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
 
-#        input_wi = self.hdl_dict['QI']['WI'] 
-#        input_wf = self.hdl_dict['QI']['WF']
-#        coeff_wi = self.hdl_dict['QC']['WI']
-#        coeff_wf = self.hdl_dict['QC']['WF']
-#        output_wi = self.hdl_dict['QO']['WI'] 
-#        output_wf = self.hdl_dict['QO']['WF']
-#        w = self.hdl_dict['QO']['W']
-
+        # pass wordlength for input, coefficients, output
         self.hdlfilter.set_word_format(
                 (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
                 (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
@@ -523,13 +518,13 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)
-            logger.warning("stim {0}{1}\n{2}".format(type(self.q_i.W), self.q_i.q_obj, self.stim))
+            logger.info("stim {0}{1}\n{2}".format(type(self.q_i.W), self.q_i.q_obj, self.stim))
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             self.hdlfilter.run_sim()         # Run the simulation
             # Get the response from the simulation and scale it to float
-            self.fx_results = self.hdlfilter.get_response() / (1 << self.q_i.W-1) 
+            self.fx_results = self.hdlfilter.get_response() / (1 << self.q_o.W-1) 
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
