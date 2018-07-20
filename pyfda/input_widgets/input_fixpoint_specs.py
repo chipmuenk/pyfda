@@ -94,6 +94,8 @@ class Input_Fixpoint_Specs(QWidget):
             # been changed
             self.update_wdg_UI()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
+                self.fx_sim_init()
+        if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'start':
                 self.fx_sim_start()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
@@ -416,13 +418,19 @@ class Input_Fixpoint_Specs(QWidget):
         
         self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
 
-        input_wi = self.hdl_dict['QI']['WI'] 
-        input_wf = self.hdl_dict['QI']['WF']
-        coeff_wi = self.hdl_dict['QC']['WI']
-        coeff_wf = self.hdl_dict['QC']['WF']
+#        input_wi = self.hdl_dict['QI']['WI'] 
+#        input_wf = self.hdl_dict['QI']['WF']
+#        coeff_wi = self.hdl_dict['QC']['WI']
+#        coeff_wf = self.hdl_dict['QC']['WF']
+#        output_wi = self.hdl_dict['QO']['WI'] 
+#        output_wf = self.hdl_dict['QO']['WF']
+#        w = self.hdl_dict['QO']['W']
 
-        self.hdlfilter.set_word_format((coeff_wi + coeff_wf + 1, coeff_wi, coeff_wf), 
-                                          (input_wi + input_wf + 1, input_wi, input_wf ))
+        self.hdlfilter.set_word_format(
+                (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
+                (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
+                (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
+                )
 
         self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
 
@@ -472,6 +480,23 @@ class Input_Fixpoint_Specs(QWidget):
             except (IOError, TypeError) as e:
                 logger.warning(e)
 
+
+#------------------------------------------------------------------------------
+    def fx_sim_init(self):
+        """
+        Initialize fix-point simulation: Request the quantization dict including
+            the filter name
+        """
+        try:
+            logger.info("Initialize fixpoint simulation")
+            self.setupHDL()
+            dict_sig = {'sender':__name__, 'fx_sim':'set_hdl_dict', 'hdl_dict':self.hdl_dict}
+            self.sig_tx.emit(dict_sig)
+                        
+        except myhdl.SimulationError as e:
+            logger.warning("Fixpoint initialization failed:\n{0}".format(e))
+        return
+
 #------------------------------------------------------------------------------
     def fx_sim_start(self):
         """
@@ -481,7 +506,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Started fixpoint simulation")
             self.setupHDL()
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.hdl_dict}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:

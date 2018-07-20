@@ -72,6 +72,7 @@ def build_coeff_dict(frmt=None):
     c_dict.update({'a':list(Q_coeff.float2frmt(a))}) # format it as bin, hex, ...
     c_dict.update({'WF':Q_coeff.WF}) # read parameters from quantizer instance
     c_dict.update({'WI':Q_coeff.WI}) # and pass them to the coefficient dict
+    c_dict.update({'W':Q_coeff.W})
     c_dict.update({'scale':Q_coeff.scale}) # for later use 
     c_dict.update({'frmt':Q_coeff.frmt})
 
@@ -81,24 +82,48 @@ def build_coeff_dict(frmt=None):
 class UI_W(QWidget):
     """
     Widget for entering integer and fractional bits. The result can be read out
-    via the attributes `self.WI` and `self.WF`.
+    via the attributes `self.WI`, `self.WF` and `self.W`.
+    
+    The constructor accepts a dictionary as an argument. The following default
+    values are used for omitted keys:
+
+    'label'         : 'WI.WF'                   # widget label
+    'lbl_sep'       : '.'                       # label between WI and WF field
+    'max_led_width' : 30                        # max. length of lineedit field
+    'WI'            : 0                         # number of frac. *bits*                
+    'WI_len'        : 2                         # max. number of integer *digits*
+    'tip_WI'        : 'Number of integer bits'  # Mouse-over tooltip
+    'WF'            : 15                        # number of frac. *bits*
+    'WF_len'        : 2                         # max. number of frac. *digits*
+    'tip_WF'        : 'Number of frac. bits'    # Mouse-over tooltip
+    'enabled'       : True                      # Is widget enabled?
+    'visible'       : True                      # Is widget visible?
+    'fractional'    : True                      # Display WF, otherwise WF=0
     """
 
     def __init__(self, parent, **kwargs):
         super(UI_W, self).__init__(parent)
         self._construct_UI(**kwargs)
+        self.save_ui()
 
     def _construct_UI(self, **kwargs):
-        """ Construct widget """
+        """ Construct widget from default settings, """
 
-        dict_ui = {'label':'WI.WF', 'max_led_width':30,
+        # default settings
+        dict_ui = {'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
-                   'enabled':True, 'visible':True
+                   'enabled':True, 'visible':True, 'fractional':True
                    }
-        for key, val in kwargs.items():
-            dict_ui.update({key:val})
+        for k, v in kwargs.items():
+            if k not in dict_ui:
+                logger.warning("Unknown key {0}".format(k))
+            else:
+                dict_ui.update({k:v})
         # dict_ui.update(map(kwargs)) # same as above?
+
+        if not dict_ui['fractional']:
+            dict_ui['WF'] = 0
         self.WI = dict_ui['WI']
         self.WF = dict_ui['WF']
 
@@ -108,13 +133,15 @@ class UI_W(QWidget):
         self.ledWI.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
         self.ledWI.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
 
-        lblDot = QLabel(".", self)
+        lblDot = QLabel(dict_ui['lbl_sep'], self)
+        lblDot.setVisible(dict_ui['fractional'])
 
         self.ledWF = QLineEdit(self)
         self.ledWF.setToolTip(dict_ui['tip_WF'])
         self.ledWF.setMaxLength(dict_ui['WI_len']) # maximum of 2 digits
         self.ledWF.setFixedWidth(dict_ui['max_led_width']) # width of lineedit in points(?)
-
+        self.ledWF.setVisible(dict_ui['fractional'])
+        
         layH = QHBoxLayout()
         layH.addWidget(lblW)
         layH.addStretch()
@@ -157,6 +184,7 @@ class UI_W(QWidget):
         self.ledWI.setText(qstr(self.WI))
         self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
         self.ledWF.setText(qstr(self.WF))
+        self.W = self.WI + self.WF + 1
         
     #--------------------------------------------------------------------------
     def load_ui(self):
@@ -190,6 +218,7 @@ class UI_W_coeffs(UI_W):
         self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
         self.ledWF.setText(qstr(self.WF))
         fb.fil[0]["q_coeff"].update({'WI':self.WI, 'WF':self.WF})
+        self.W = self.WI + self.WF + 1
 
     def load_ui(self):
         """ 
@@ -202,6 +231,7 @@ class UI_W_coeffs(UI_W):
         self.WF = fb.fil[0]['q_coeff']['WF']
         self.ledWI.setText(qstr(self.WI))
         self.ledWF.setText(qstr(self.WF))
+        self.W = self.WI + self.WF + 1
 
         self.c_dict = build_coeff_dict()
         

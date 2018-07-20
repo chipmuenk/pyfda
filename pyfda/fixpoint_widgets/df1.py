@@ -105,12 +105,13 @@ class DF1(QWidget):
         hdl_dict = {'QC':self.wdg_w_coeffs.c_dict}
         # parameters for input format
         hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
-                               'WF':self.wdg_w_input.WF
-                               }
+                               'WF':self.wdg_w_input.WF,
+                               'W':self.wdg_w_input.W,}
                         })
         # parameters for output format
         hdl_dict.update({'QO':{'WI':self.wdg_w_output.WI,
                                'WF':self.wdg_w_output.WF,
+                               'W':self.wdg_w_output.W,
                                'ovfl': self.wdg_q_output.ovfl,
                                'quant': self.wdg_q_output.quant
                                }

@@ -66,7 +66,7 @@ class Plot_Impz(QWidget):
         #--------------------------------------------
         # initialize routines and settings
         self._log_mode_time()
-        self.run_ctrl()        
+        self.fx_sim_ctrl()        
         self.draw() # initial calculation and drawing
 
 
@@ -117,8 +117,8 @@ class Plot_Impz(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
-        self.ui.cmb_sim_select.currentIndexChanged.connect(self.run_ctrl)
-        self.ui.but_run.clicked.connect(self.run_fxp)
+        self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_sim_ctrl)
+        self.ui.but_run.clicked.connect(self.fx_sim_init)
         self.ui.chk_fx_scale.clicked.connect(self.redraw)
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
@@ -158,6 +158,9 @@ class Plot_Impz(QWidget):
             logger.warning("Stopped infinite loop, {0}".format(dict_sig))
         if 'fx_sim' in dict_sig:
             try:
+                if dict_sig['fx_sim'] == 'set_hdl_dict':
+                    self.fx_set_hdl_dict() # pass hdl dict
+
                 if dict_sig['fx_sim'] == 'get_stimulus':
                     self.calc_stimulus() # calculate selected stimulus with selected length
                     # pass stimulus in self.x back  via dict
@@ -281,7 +284,7 @@ class Plot_Impz(QWidget):
                 str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
 # =============================================================================
-    def run_ctrl(self):
+    def fx_sim_ctrl(self):
         """
         Select between fixpoint and floating point simulation
         """
@@ -290,12 +293,27 @@ class Plot_Impz(QWidget):
         self.ui.but_run.setVisible(self.sim_fxp)
         self.ui.chk_fx_scale.setVisible(self.sim_fxp)
         
-    def run_fxp(self):
+    def fx_sim_init(self):
         """
         Run fixpoint simulation
         """        
         self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
 #        self.draw()
+    def fx_set_hdl_dict(self):
+        """
+        Set quantization dict
+        """
+        try:
+            self.hdl_dict = dict_sig['hdl_dict']
+        except (KeyError, ValueError) as e:
+            logger.warning(e)
+                
+    def fx_sim_set_hdl_dict(self):
+        """
+        Set quantization dictionary
+        """        
+        self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
+
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
