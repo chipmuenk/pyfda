@@ -66,7 +66,7 @@ class Plot_Impz(QWidget):
         #--------------------------------------------
         # initialize routines and settings
         self._log_mode_time()
-        self.run_ctrl()        
+        self.fx_select()        
         self.draw() # initial calculation and drawing
 
 
@@ -117,8 +117,8 @@ class Plot_Impz(QWidget):
         # SIGNALS & SLOTs
         #----------------------------------------------------------------------
         # --- run control ---
-        self.ui.cmb_sim_select.currentIndexChanged.connect(self.run_ctrl)
-        self.ui.but_run.clicked.connect(self.run_fxp)
+        self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
+        self.ui.but_run.clicked.connect(self.fx_run)
         self.ui.chk_fx_scale.clicked.connect(self.redraw)
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
@@ -281,16 +281,20 @@ class Plot_Impz(QWidget):
                 str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
 
 # =============================================================================
-    def run_ctrl(self):
+    def fx_select(self):
         """
         Select between fixpoint and floating point simulation
         """
         self.sim_select = qget_cmb_box(self.ui.cmb_sim_select, data=False)
-        self.sim_fxp = (self.sim_select == 'Fixpoint')
-        self.ui.but_run.setVisible(self.sim_fxp)
-        self.ui.chk_fx_scale.setVisible(self.sim_fxp)
+        self.fx_sim = (self.sim_select == 'Fixpoint')
+        self.ui.but_run.setVisible(self.fx_sim)
+        self.ui.chk_fx_scale.setVisible(self.fx_sim)
+        self.hdl_dict = None
+
+        if self.fx_sim:
+            self.fx_run()
         
-    def run_fxp(self):
+    def fx_run(self):
         """
         Run fixpoint simulation
         """        
@@ -529,20 +533,31 @@ class Plot_Impz(QWidget):
         mkfmt_i = 'd'
 
         self._init_axes_time()
-        
+        scale_i = scale_o = 1
+        if qget_cmb_box(self.ui.cmb_sim_select) == 'Fix' and self.ui.chk_fx_scale.isChecked():
+            try:
+                WI = self.hdl_dict['QI']['W']
+                WO = self.hdl_dict['QO']['W']
+            except ValueError as e:
+                logger.warning("Value error: {0}".format(e))
+            
+            scale_i = 1 << WI-1
+            scale_o = 1 << WO-1
+
         if self.ui.chk_log.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
-            x = np.maximum(20 * np.log10(abs(self.x)), self.bottom)
-            y = np.maximum(20 * np.log10(abs(self.y_r)), self.bottom)
+            x = np.maximum(20 * np.log10(abs(self.x * scale_i)), self.bottom)
+            y = np.maximum(20 * np.log10(abs(self.y_r * scale_o)), self.bottom)
             if self.cmplx:
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.bottom)
                 H_i_str = r'$|\Im\{$' + self.H_str + '$\}|$' + ' in dBV'
                 H_str =   r'$|\Re\{$' + self.H_str + '$\}|$' + ' in dBV'
         else:
             self.bottom = 0
-            x = self.x
-            y = self.y_r
-            y_i = self.y_i
+            x = self.x * scale_i
+            y = self.y_r * scale_o
+            if self.cmplx:
+                y_i = self.y_i * scale_o
             
             if self.cmplx:           
                 H_i_str = r'$\Im\{$' + self.H_str + '$\}$ in V'
