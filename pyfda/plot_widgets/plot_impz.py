@@ -295,11 +295,12 @@ class Plot_Impz(QWidget):
         self.fx_sim = (self.sim_select == 'Fixpoint')
         self.ui.but_run.setVisible(self.fx_sim)
         self.ui.chk_fx_scale.setVisible(self.fx_sim)
+        self.ui.chk_fx_range.setVisible(self.fx_sim)
         self.hdl_dict = None
 
         if self.fx_sim:
             self.fx_run()
-        
+
     def fx_run(self):
         """
         Run fixpoint simulation
@@ -565,8 +566,13 @@ class Plot_Impz(QWidget):
 
             if self.ui.chk_fx_scale.isChecked():
                 scale_i = 1 << WI-1
+                fx_min = - (1 << WO-1)
+                fx_max = (1 << WO-1) - 1
             else:
                 scale_o = 1. / (1 << WO-1)
+                fx_min = -1
+                fx_max = 1 - scale_o
+                
                 
         logger.info("scale WI:{0} WO:{1}".format(scale_i, scale_o))
 
@@ -578,6 +584,9 @@ class Plot_Impz(QWidget):
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.bottom)
                 H_i_str = r'$|\Im\{$' + self.H_str + '$\}|$' + ' in dBV'
                 H_str =   r'$|\Re\{$' + self.H_str + '$\}|$' + ' in dBV'
+            fx_min = 20*np.log10(abs(fx_min))
+            fx_max = fx_min
+             
         else:
             self.bottom = 0
             x = self.x * scale_i
@@ -591,6 +600,10 @@ class Plot_Impz(QWidget):
             else:
                 H_str = self.H_str + ' in V'
 
+        if self.ui.chk_fx_range.isChecked():
+            self.ax_r.axhline(fx_max,0, 1, color='k', linestyle='--')
+            self.ax_r.axhline(fx_min,0, 1, color='k', linestyle='--')
+            
         plot_stim_dict = self.fmt_plot_stim.copy()
 
         if self.plt_time_stim == "line":
