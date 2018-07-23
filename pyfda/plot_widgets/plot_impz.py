@@ -159,6 +159,8 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             try:
                 if dict_sig['fx_sim'] == 'get_stimulus':
+                    # read hdl_dict and calculate stimulus
+                    self.hdl_dict = dict_sig['hdl_dict']
                     self.calc_stimulus() # calculate selected stimulus with selected length
                     # pass stimulus in self.x back  via dict
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
@@ -171,7 +173,7 @@ class Plot_Impz(QWidget):
                     self.draw_impz()
                     
             except KeyError as e:
-                logger.error('Interface to fixpoint simulation is defect:\n{0}.'.format(e))
+                logger.error('Key {0} missing in "hdl_dict".'.format(e))
                 self.fx_sim = None
 
         if self.isVisible():
@@ -534,15 +536,27 @@ class Plot_Impz(QWidget):
 
         self._init_axes_time()
         scale_i = scale_o = 1
-        if qget_cmb_box(self.ui.cmb_sim_select) == 'Fix' and self.ui.chk_fx_scale.isChecked():
+        if qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint':
             try:
+                logger.warning("hdl_dict {0}".format(self.hdl_dict))
                 WI = self.hdl_dict['QI']['W']
                 WO = self.hdl_dict['QO']['W']
+            except AttributeError as e:
+                logger.error("Attribute error: {0}".format(e))
+                WI = WO = 1
+            except TypeError as e:
+                logger.error("Type error: 'hdl_dict'={0},\n{1}".format(self.hdl_dict, e))
+                WI = WO = 1
             except ValueError as e:
-                logger.warning("Value error: {0}".format(e))
-            
-            scale_i = 1 << WI-1
-            scale_o = 1 << WO-1
+                logger.error("Value error: {0}".format(e))
+                WI = WO = 1
+
+            if self.ui.chk_fx_scale.isChecked():
+                scale_i = 1 << WI-1
+            else:
+                scale_o = 1. / (1 << WO-1)
+                
+        logger.info("scale WI:{0} WO:{1}".format(scale_i, scale_o))
 
         if self.ui.chk_log.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
