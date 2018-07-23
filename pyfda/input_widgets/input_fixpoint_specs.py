@@ -475,7 +475,8 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_start(self):
         """
-        Start fix-point simulation: Request a stimulus signal
+        Start fix-point simulation: Send the `hdl_dict` containing all quantization
+        information and request a stimulus signal
 
         """
         try:
@@ -503,8 +504,8 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             self.hdlfilter.run_sim()         # Run the simulation
-            # Get the response from the simulation and scale it to float
-            self.fx_results = self.hdlfilter.get_response() / (1 << self.q_i.W-1) 
+            # Get the response from the simulation in integer
+            self.fx_results = self.hdlfilter.get_response()
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
