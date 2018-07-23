@@ -158,6 +158,9 @@ class Plot_Impz(QWidget):
             logger.warning("Stopped infinite loop, {0}".format(dict_sig))
         if 'fx_sim' in dict_sig:
             try:
+                if dict_sig['fx_sim'] == 'set_hdl_dict':
+                    self.fx_set_hdl_dict() # pass hdl dict
+
                 if dict_sig['fx_sim'] == 'get_stimulus':
                     # read hdl_dict and calculate stimulus
                     self.hdl_dict = dict_sig['hdl_dict']
@@ -302,6 +305,21 @@ class Plot_Impz(QWidget):
         """        
         self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
 #        self.draw()
+    def fx_set_hdl_dict(self):
+        """
+        Set quantization dict
+        """
+        try:
+            self.hdl_dict = dict_sig['hdl_dict']
+        except (KeyError, ValueError) as e:
+            logger.warning(e)
+                
+    def fx_sim_set_hdl_dict(self):
+        """
+        Set quantization dictionary
+        """        
+        self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
+
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):

@@ -286,6 +286,9 @@ class Fixed(object):
 
     * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
 
+    * **'W'**  : total word length; WI + WF + 1 = W (1 sign bit). When W is given,
+                 WI = W - 1 and WF = 0, `Q` is overridden.
+
     * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated
                  to`WI` and `WF` and deleted afterwards. When both `Q` and `WI` / `WF`
                  are given, `Q` takes precedence
@@ -416,7 +419,7 @@ class Fixed(object):
         Check the docstring of class `Fixed()` for  details.
         """
         for key in q_obj.keys():
-            if key not in ['Q','WF','WI','quant','ovfl','frmt','scale']:
+            if key not in ['Q','WF','WI','W','quant','ovfl','frmt','scale']:
                 raise Exception(u'Unknown Key "%s"!'%(key))
 
         q_obj_default = {'WI':0, 'WF':15, 'quant':'round', 'ovfl':'sat',
@@ -432,12 +435,16 @@ class Fixed(object):
                     q_obj[k] = getattr(self, k)
 
         # set default values for parameters if undefined:
-        if 'Q' in q_obj:
+
+        if 'WI' in q_obj and 'WF' in q_obj:
+            pass # everything's defined already
+        elif 'W' in q_obj:
+            q_obj['WI'] = int(q_obj['W']) - 1
+            q_obj['WF'] = 0
+        elif 'Q' in q_obj:
             Q_str = str(q_obj['Q']).split('.',1)  # split 'Q':'1.4'
             q_obj['WI'] = int(Q_str[0])
             q_obj['WF'] = abs(int(Q_str[1]))
-            # remove 'Q' to avoid ambiguities in case 'WI' / 'WF' are set directly
-            del q_obj['Q']
 
         # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
@@ -455,7 +462,9 @@ class Fixed(object):
                 self.scale = 2.**(-self.WI)
             else:
                 raise ValueError
-
+                
+        q_obj['W'] = self.W
+        q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
         self.q_obj = q_obj # store quant. dict in instance
 
         self.LSB = 2. ** -self.WF  # value of LSB
