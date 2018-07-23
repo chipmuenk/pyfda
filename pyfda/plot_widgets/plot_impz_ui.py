@@ -111,6 +111,11 @@ class PlotImpz_UI(QWidget):
         self.but_run = QPushButton("RUN", self)
         self.but_run.setToolTip("Run fixpoint simulation")
 
+        self.chk_fx_scale = QCheckBox("Integer scale", self)
+        self.chk_fx_scale.setObjectName("chk_fx_scale")
+        self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
+        self.chk_fx_scale.setChecked(False)
+
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.lbl_sim_select)
         layH_ctrl_run.addWidget(self.cmb_sim_select)
@@ -122,6 +127,9 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.led_N_points)
         layH_ctrl_run.addStretch(1)
         layH_ctrl_run.addWidget(self.but_run)
+        layH_ctrl_run.addStretch(2)        
+        layH_ctrl_run.addWidget(self.chk_fx_scale)
+
         layH_ctrl_run.addStretch(10)
 
         #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -163,12 +171,12 @@ class PlotImpz_UI(QWidget):
         self.led_log_bottom.setText(str(self.bottom))
         self.led_log_bottom.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbl_dB = QLabel("dB", self)
- 
-        self.chk_fx_scale = QCheckBox("Fixpoint scale", self)
-        self.chk_fx_scale.setObjectName("chk_fx_scale")
-        self.chk_fx_scale.setToolTip("<span>Display data with fixpoint (integer) scale.</span>")
-        self.chk_fx_scale.setChecked(False)
-       
+
+        self.chk_fx_range = QCheckBox("Min/max.", self)
+        self.chk_fx_range.setObjectName("chk_fx_range")
+        self.chk_fx_range.setToolTip("<span>Display limits of fixpoint range.</span>")
+        self.chk_fx_range.setChecked(False)
+
         layH_ctrl_time = QHBoxLayout()
         layH_ctrl_time.addWidget(self.lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
@@ -184,7 +192,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.led_log_bottom)
         layH_ctrl_time.addWidget(self.lbl_dB)
         layH_ctrl_time.addStretch(2)        
-        layH_ctrl_time.addWidget(self.chk_fx_scale)
+        layH_ctrl_time.addWidget(self.chk_fx_range)
         layH_ctrl_time.addStretch(10)
         
         #layH_ctrl_time.setContentsMargins(*params['wdg_margins'])

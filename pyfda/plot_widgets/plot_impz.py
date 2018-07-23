@@ -119,7 +119,7 @@ class Plot_Impz(QWidget):
         # --- run control ---
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
         self.ui.but_run.clicked.connect(self.fx_run)
-        self.ui.chk_fx_scale.clicked.connect(self.redraw)
+        self.ui.chk_fx_scale.clicked.connect(self.draw_impz_time)
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
         self.ui.chk_marker_resp.clicked.connect(self.draw_impz_time)
@@ -127,6 +127,7 @@ class Plot_Impz(QWidget):
         self.ui.chk_marker_stim.clicked.connect(self.draw_impz_time)
         self.ui.chk_log.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom.editingFinished.connect(self._log_mode_time)
+        self.ui.chk_fx_range.clicked.connect(self.draw_impz_time)
         # --- frequency domain plotting ---
         self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
         # --- stimulus plotting ---
