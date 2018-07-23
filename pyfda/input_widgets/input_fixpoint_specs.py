@@ -479,9 +479,10 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_init(self):
         """
-        Initialize fix-point simulation: Request the quantization dict including
+        Initialize fix-point simulation: Send the quantization dict including
             the filter name
         """
+        # TODO: Filter name missing?
         try:
             logger.info("Initialize fixpoint simulation")
             self.setupHDL()
@@ -497,12 +498,11 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Start fix-point simulation: Send the `hdl_dict` containing all quantization
         information and request a stimulus signal
-
         """
         try:
             logger.info("Started fixpoint simulation")
             self.setupHDL()
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus'}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.hdl_dict}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:

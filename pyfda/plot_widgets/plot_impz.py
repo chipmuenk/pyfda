@@ -160,7 +160,7 @@ class Plot_Impz(QWidget):
         if 'fx_sim' in dict_sig:
             try:
                 if dict_sig['fx_sim'] == 'set_hdl_dict':
-                    self.fx_set_hdl_dict() # pass hdl dict
+                    self.fx_set_hdl_dict(dict_sig) # pass hdl dict
 
                 if dict_sig['fx_sim'] == 'get_stimulus':
                     # read hdl_dict and calculate stimulus
@@ -304,9 +304,9 @@ class Plot_Impz(QWidget):
         """
         Run fixpoint simulation
         """        
-        self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
-#        self.draw()
-    def fx_set_hdl_dict(self):
+        self.sig_tx.emit({'sender':__name__, 'fx_sim':'start'})
+
+    def fx_set_hdl_dict(self, dict_sig):
         """
         Set quantization dict
         """
@@ -314,13 +314,6 @@ class Plot_Impz(QWidget):
             self.hdl_dict = dict_sig['hdl_dict']
         except (KeyError, ValueError) as e:
             logger.warning(e)
-                
-    def fx_sim_set_hdl_dict(self):
-        """
-        Set quantization dictionary
-        """        
-        self.sig_tx.emit({'sender':__name__, 'fx_sim':'init'})
-
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
