@@ -391,6 +391,8 @@ class Plot_Impz(QWidget):
             if min(len(self.aa), len(self.bb)) < 2:
                 logger.error('No proper filter coefficients: len(a), len(b) < 2 !')
                 return
+
+            logger.info("Coefficient area = {0}".format(np.sum(np.abs(self.bb))))
     
             sos = np.asarray(fb.fil[0]['sos'])
             antiCausal = 'zpkA' in fb.fil[0]
