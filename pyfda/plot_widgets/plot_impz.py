@@ -300,6 +300,8 @@ class Plot_Impz(QWidget):
 
         if self.fx_sim:
             self.fx_run()
+        else:
+            self.draw()
 
     def fx_run(self):
         """
@@ -382,7 +384,7 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate filter response y[n]
         """
-        if qget_cmb_box(self.ui.cmb_sim_select) == 'Fix':
+        if qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint':
             pass
         else:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
@@ -551,6 +553,8 @@ class Plot_Impz(QWidget):
 
         self._init_axes_time()
         scale_i = scale_o = 1
+        fx_min = -1.
+        fx_max = 1.
         if qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint':
             try:
                 logger.warning("hdl_dict {0}".format(self.hdl_dict))
@@ -602,7 +606,7 @@ class Plot_Impz(QWidget):
             else:
                 H_str = self.H_str + ' in V'
 
-        if self.ui.chk_fx_range.isChecked():
+        if self.ui.chk_fx_range.isChecked() and self.fx_sim:
             self.ax_r.axhline(fx_max,0, 1, color='k', linestyle='--')
             self.ax_r.axhline(fx_min,0, 1, color='k', linestyle='--')
             
