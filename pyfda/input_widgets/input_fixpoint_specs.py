@@ -41,7 +41,7 @@ if cmp_version("myhdl", "0.10") >= 0:
     else:
         if fil_blocks_path not in sys.path:
             sys.path.append(fil_blocks_path)
-        from filter_blocks.fda import FilterFIR    
+        from filter_blocks.fda import FilterFIR, FilterIIR    
 else:
     HAS_MYHDL = False
 
@@ -418,7 +418,14 @@ class Input_Fixpoint_Specs(QWidget):
         # call setup method of filter widget - this is not implemented (yet)
         # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
         
-        self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
+        if fb.fil[0]['ft'] == 'FIR':
+            self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
+            self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
+        elif fb.fil[0]['ft'] == 'IIR':
+            self.hdlfilter = FilterIIR()     # Standard DF1 filter - hdl_dict should be passed here
+            self.hdlfilter.set_coefficients(coeff_b = b, coeff_a = a)  # Coefficients for the filter
+        else:
+            logger.error("Unknown filter type {0}".format(fb.fil[0]['ft']))            
 
         # pass wordlength for input, coefficients, output
         self.hdlfilter.set_word_format(
@@ -427,7 +434,6 @@ class Input_Fixpoint_Specs(QWidget):
                 (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
                 )
 
-        self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
