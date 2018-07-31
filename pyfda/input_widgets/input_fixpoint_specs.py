@@ -427,10 +427,10 @@ class Input_Fixpoint_Specs(QWidget):
         else:
             logger.error("Unknown filter type {0}".format(fb.fil[0]['ft']))            
 
-        # pass wordlength for input, coefficients, output
+        # pass wordlength for coeffs, input, output
         self.hdlfilter.set_word_format(
-                (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
                 (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
+                (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
                 (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
                 )
 
