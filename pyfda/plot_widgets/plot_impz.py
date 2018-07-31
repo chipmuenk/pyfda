@@ -30,6 +30,9 @@ from .plot_impz_ui import PlotImpz_UI
 # TODO: "Home" calls redraw for all three mpl widgets
 # TODO: changing the view on some widgets redraws h[n] unncessarily
 # TODO: keywords 'ms', 'alpha', 'lw' not defined for stems?
+# TODO: fixpoint scaling is applied in spite of cmbbox = float
+# TODO: fir fixpoint  scaling is off by 1 bit due to W_c + W_I without -1
+# TODO: Increasing number of data points repeats the previous ones in fixpoint mode
 
 class Plot_Impz(QWidget):
     """
