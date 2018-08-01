@@ -21,7 +21,7 @@ import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
-from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -57,9 +57,10 @@ class Plot_Impz(QWidget):
         self.plt_time_stim = self.ui.plt_time_stim
         self.plt_time_resp = self.ui.plt_time_resp
         self.bottom = self.ui.bottom
-       
+
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 3 # flag which plot needs to be redrawn
+        self.fx_sim = False # initial setting for fixpoint simulation
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
         self.active_tab = 0 # index for active tab
@@ -69,7 +70,7 @@ class Plot_Impz(QWidget):
         #--------------------------------------------
         # initialize routines and settings
         self._log_mode_time()
-        self.fx_select()        
+        self.fx_select()    # initialize fixpoint or float simulation    
         self.draw() # initial calculation and drawing
 
 
@@ -173,9 +174,8 @@ class Plot_Impz(QWidget):
                     self.sig_tx.emit({'sender':__name__, 'fx_sim':'set_stimulus',
                                       'fx_stimulus':self.x})
                 elif dict_sig['fx_sim'] == 'set_results':
-                    self.y = dict_sig['fx_results']
                     logger.info("Received fixpoint results.")
-                    self.calc_y_real_imag()
+                    self.calc_y_real_imag(dict_sig['fx_results'])
                     self.calc_fft()
                     self.draw_impz()
                     
@@ -302,6 +302,7 @@ class Plot_Impz(QWidget):
         self.hdl_dict = None
 
         if self.fx_sim:
+            qstyle_widget(self.ui.but_run, "changed")
             self.fx_run()
         else:
             self.draw()
@@ -387,7 +388,7 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate filter response y[n]
         """
-        if qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint':
+        if self.fx_sim: # fixpoint simulation selected, response is calculated elsewhere
             pass
         else:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
@@ -420,17 +421,21 @@ class Plot_Impz(QWidget):
         self.needs_redraw[1] = True
 
 #------------------------------------------------------------------------------
-    def calc_y_real_imag(self):
+    def calc_y_real_imag(self, y_fx = None):
         """
         Check whether y is complex and calculate imag. / real components
         """
-        self.cmplx = np.any(np.iscomplex(self.y))
-        if self.cmplx:
-            self.y_i = self.y.imag
-            self.y_r = self.y.real
+        if self.fx_sim and y_fx is not None:
+            self.y = y_fx
+            qstyle_widget(self.ui.but_run, "normal")
         else:
-            self.y_r = self.y
-            self.y_i = None
+            self.cmplx = np.any(np.iscomplex(self.y))
+            if self.cmplx:
+                self.y_i = self.y.imag
+                self.y_r = self.y.real
+            else:
+                self.y_r = self.y
+                self.y_i = None
 
 #------------------------------------------------------------------------------
     def calc_fft(self):
@@ -558,7 +563,7 @@ class Plot_Impz(QWidget):
         scale_i = scale_o = 1
         fx_min = -1.
         fx_max = 1.
-        if qget_cmb_box(self.ui.cmb_sim_select, data=False) == 'Fixpoint':
+        if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
             try:
                 logger.warning("hdl_dict {0}".format(self.hdl_dict))
                 WI = self.hdl_dict['QI']['W']
@@ -889,3 +894,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # module test using python -m pyfda.plot_widgets.plot_impz
