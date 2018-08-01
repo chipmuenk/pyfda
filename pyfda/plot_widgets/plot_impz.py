@@ -21,7 +21,7 @@ import matplotlib.patches as mpl_patches
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import expand_lim, to_html, safe_eval
-from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
+from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box, qstyle_widget
 from pyfda.pyfda_rc import params # FMT string for QLineEdit fields, e.g. '{:.3g}'
 from pyfda.plot_widgets.mpl_widget import MplWidget, stems, no_plot
 #from mpl_toolkits.mplot3d.axes3d import Axes3D
@@ -176,6 +176,7 @@ class Plot_Impz(QWidget):
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
                     self.calc_y_real_imag(dict_sig['fx_results'])
+                    qset_cmb_box(self.ui.cmb_sim_select, "Fixpoint", fireSignals=True)
                     self.calc_fft()
                     self.draw_impz()
                     
