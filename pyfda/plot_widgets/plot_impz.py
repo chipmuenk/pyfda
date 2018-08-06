@@ -321,11 +321,10 @@ class Plot_Impz(QWidget):
         Get simulation results from `dict_sig` and transfer them to plotting
         routine.
         """
-        self.calc_y_real_imag(dict_sig['fx_results'])
+        self.calc_response(dict_sig['fx_results'])
         qset_cmb_box(self.ui.cmb_sim_select, "Fixpoint", fireSignals=True)
         self.calc_fft()
         self.draw_impz()
-
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
@@ -389,15 +388,17 @@ class Plot_Impz(QWidget):
         self.needs_redraw[:] = [True] * 3
         
 #------------------------------------------------------------------------------
-    def calc_response(self):
+    def calc_response(self, y_fx = None):
         """
         (Re-)calculate filter response `self.y` from either stimulus `self.x`
         (float mode) or copy fixpoint response. 
         Split response into imag. and real components `self.y_i` and `self.y_r`
         and set the flag `self.cmplx`.
         """
-        if self.fx_sim: # fixpoint simulation selected, response is calculated elsewhere
-            pass
+        if self.fx_sim and y_fx is not None:
+        # use fixpoint simulation results instead of floating results
+            self.y = y_fx
+            qstyle_widget(self.ui.but_run, "normal")
         else:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
             self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -428,22 +429,14 @@ class Plot_Impz(QWidget):
         self.needs_redraw[0] = True
         self.needs_redraw[1] = True
 
-#------------------------------------------------------------------------------
-    def calc_y_real_imag(self, y_fx = None):
-        """
-        Check whether y is complex and calculate imag. / real components
-        """
-        if self.fx_sim and y_fx is not None:
-            self.y = y_fx
-            qstyle_widget(self.ui.but_run, "normal")
+        # Calculate imag. and real components from response
+        self.cmplx = np.any(np.iscomplex(self.y))
+        if self.cmplx:
+            self.y_i = self.y.imag
+            self.y_r = self.y.real
         else:
-            self.cmplx = np.any(np.iscomplex(self.y))
-            if self.cmplx:
-                self.y_i = self.y.imag
-                self.y_r = self.y.real
-            else:
-                self.y_r = self.y
-                self.y_i = None
+            self.y_r = self.y
+            self.y_i = None
 
 #------------------------------------------------------------------------------
     def calc_fft(self):
@@ -477,7 +470,6 @@ class Plot_Impz(QWidget):
         if True: # self.needs_draw: doesn't work yet - number of data points needs to updated
             self.calc_stimulus()
             self.calc_response()
-            self.calc_y_real_imag()
             self.needs_draw = False
         self.draw_impz()
 
@@ -486,6 +478,10 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the figure without recalculation
         """
+        if not hasattr(self, 'cmplx'): # has response been calculated yet?            logger.error("self.y {0}".format(self.y))
+            self.calc_stimulus()
+            self.calc_response()
+            
         f_unit = fb.fil[0]['freq_specs_unit']
         if f_unit in {"f_S", "f_Ny"}:
             unit_frmt = "i" # italic
@@ -529,7 +525,7 @@ class Plot_Impz(QWidget):
             
         #self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
         # TODO: draw() really needed?
-        self.draw()
+        self.draw_impz()
 
     def _init_axes_time(self):
         """
@@ -612,7 +608,6 @@ class Plot_Impz(QWidget):
                 H_str =   r'$|\Re\{$' + self.H_str + '$\}|$' + ' in dBV'
             fx_min = 20*np.log10(abs(fx_min))
             fx_max = fx_min
-             
         else:
             self.bottom = 0
             x = self.x * scale_i
