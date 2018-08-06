@@ -330,7 +330,7 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
         """
-        (Re-)calculate stimulus x[n] and filter response y[n]
+        (Re-)calculate stimulus `self.x`
         """
         self.n = np.arange(self.ui.N_end)
         self.t = self.n / fb.fil[0]['f_S']
@@ -391,7 +391,10 @@ class Plot_Impz(QWidget):
 #------------------------------------------------------------------------------
     def calc_response(self):
         """
-        (Re-)calculate filter response y[n]
+        (Re-)calculate filter response `self.y` from either stimulus `self.x`
+        (float mode) or copy fixpoint response. 
+        Split response into imag. and real components `self.y_i` and `self.y_r`
+        and set the flag `self.cmplx`.
         """
         if self.fx_sim: # fixpoint simulation selected, response is calculated elsewhere
             pass
@@ -464,7 +467,9 @@ class Plot_Impz(QWidget):
         """
         self.draw_impz()
 
-#------------------------------------------------------------------------------
+###############################################################################
+#        PLOTTING
+###############################################################################
     def draw(self):
         """
         Recalculate response and redraw it
