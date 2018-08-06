@@ -80,29 +80,25 @@ class Plot_Impz(QWidget):
         and control frame.
         """
         #----------------------------------------------------------------------
-        # MplWidget for time domain plots
+        # Define MplWidgets: Time domain plots
         #----------------------------------------------------------------------
         self.mplwidget_t = MplWidget(self)
         self.mplwidget_t.setObjectName("mplwidget_t1")
         self.mplwidget_t.layVMainMpl.addWidget(self.ui.wdg_ctrl_time)
         self.mplwidget_t.layVMainMpl.setContentsMargins(*params['wdg_margins'])
-        
-        #----------------------------------------------------------------------
         # MplWidget for frequency domain plots
-        #----------------------------------------------------------------------
         self.mplwidget_f = MplWidget(self)
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
-
-        #----------------------------------------------------------------------
         # MplWidget for stimulus plots
-        #----------------------------------------------------------------------
         self.mplwidget_s = MplWidget(self)
         self.mplwidget_s.layVMainMpl.addWidget(self.ui.wdg_ctrl_stim)
         self.mplwidget_s.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
+        #----------------------------------------------------------------------
         # Tabbed layout with vertical tabs
+        #----------------------------------------------------------------------
         self.tabWidget = QTabWidget(self)
         self.tabWidget.addTab(self.mplwidget_t, "Time")
         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
