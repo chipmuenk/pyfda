@@ -171,11 +171,8 @@ class Plot_Impz(QWidget):
                                       'fx_stimulus':self.x})
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
-                    self.calc_y_real_imag(dict_sig['fx_results'])
-                    qset_cmb_box(self.ui.cmb_sim_select, "Fixpoint", fireSignals=True)
-                    self.calc_fft()
-                    self.draw_impz()
-                    
+                    self.fx_set_results(dict_sig) # plot fx simulation results 
+
             except KeyError as e:
                 logger.error('Key {0} missing in "hdl_dict".'.format(e))
                 self.fx_sim = None
@@ -318,6 +315,17 @@ class Plot_Impz(QWidget):
             self.hdl_dict = dict_sig['hdl_dict']
         except (KeyError, ValueError) as e:
             logger.warning(e)
+            
+    def fx_set_results(self, dict_sig):
+        """
+        Get simulation results from `dict_sig` and transfer them to plotting
+        routine.
+        """
+        self.calc_y_real_imag(dict_sig['fx_results'])
+        qset_cmb_box(self.ui.cmb_sim_select, "Fixpoint", fireSignals=True)
+        self.calc_fft()
+        self.draw_impz()
+
 
 #------------------------------------------------------------------------------
     def calc_stimulus(self):
