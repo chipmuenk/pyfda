@@ -397,7 +397,7 @@ class Plot_Impz(QWidget):
         """
         if self.fx_sim and y_fx is not None:
         # use fixpoint simulation results instead of floating results
-            self.y = y_fx
+            self.y = np.array(y_fx)
             qstyle_widget(self.ui.but_run, "normal")
         else:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
