@@ -12,23 +12,23 @@ pyFDA
 
 pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.
 
-![Screenshot](images/pyFDA_screenshot_3.PNG)
+![Screenshot](img/pyFDA_screenshot_3.png)
 
 **More screenshots from the current version:**
 
 <table>
     <tr>
-        <td><img src = "images/pyFDA_screenshot_3d_4.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "images/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "images/pyfda_scr_shot_baq_impz.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyFDA_screenshot_3d_4.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyFDA_screenshot_hn.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyfda_scr_shot_baq_impz.PNG" alt="Screenshot" width=300px></td>
    </tr>
     <tr>
-        <td><img src = "images/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "images/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
-        <td><img src = "images/pyFDA_screenshot_spec_error.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyFDA_screenshot_3d_3.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyFDA_screenshot_PZ.PNG" alt="Screenshot" width=300px></td>
+        <td><img src = "img/pyFDA_screenshot_spec_error.PNG" alt="Screenshot" width=300px></td>
     </tr>
   <tr>
-        <td><img src = "images/pyfda_scr_shot_3d5_info.PNG" alt="Screenshot" width=300px></td> 
+        <td><img src = "img/pyfda_scr_shot_3d5_info.PNG" alt="Screenshot" width=300px></td> 
   <tr>
 </table>
 
