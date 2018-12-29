@@ -71,8 +71,8 @@ class FilterFactory(object):
 
             :4: unknown error during instantiation
         
-        Example
-        -------
+        Examples
+        --------
             
         >>> create_fil_instance('cheby1')
         >>> fil_inst.LPmin(fil[0])
@@ -178,8 +178,8 @@ class FilterFactory(object):
 
              :99: unknown error
 
-        Example
-        -------
+        Examples
+        --------
 
         >>> call_fil_method("LPmin", fc = "cheby1")(fil[0])
 
