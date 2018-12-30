@@ -98,12 +98,11 @@ class ParseError(Exception):
 class Tree_Builder(object):
     """
     Read the config file and construct dictionary trees with
+    
     - all filter combinations
     - valid combinations of filter designs and fixpoint implementations
 
-    Parameters
-    ----------
-    None
+    
     """
 
     def __init__(self):
@@ -124,6 +123,11 @@ class Tree_Builder(object):
 
         This method can also be called when the main app runs to re-read the
         filter directory (?)
+        
+        Parameters
+        ----------
+        None
+
         """       
         # Scan pyfda.conf for class names / python file names and extract them
         self.parse_conf_file()
@@ -173,13 +177,28 @@ class Tree_Builder(object):
 #==============================================================================
     def parse_conf_file(self):
         """
-        Extract all file names = class names from `dirs.USER_CONF_DIR_FILE` in 
-        section "[Filter Designs}":
+        Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
+        
+        :[Dirs]:
+            Try to find a user directory and store it in ``dirs.USER_DIR``
+                        and ``dirs.USER_DIR_LABEL``. Multiple entries can be 
+                        specified with LABEL PATH, the first valid path is chosen.
+                        Labels have to be unique but are not used yet.
 
-        - Lines that don't begin with '#' are stripped from newline, whitespace
-          and everything after it and returned as a list.
-        - All other lines are discarded
-        - Collect and return valid class / file names as `filt_list_names`.
+        For the other sections, a list of tuples is returned with the elements
+        ``(class, args, dir)`` where "class" is the 
+        class name of the widget, "args" are optional arguments
+        from the config file for the widget and "dir" specifies the directory for 
+        user widgets and None for non-user widgets (yes, separate labels could be
+        used here, but this is not supported yet.):
+        
+        :[Input Widgets] / [User Input Widgets]:
+            Store a list of tuples of (user) input widgets in ``fb.input_widgets_list``            
+            
+        :[Plot Widgets] / [User Plot Widgets]:
+            Store a list of tuples of (user) plot widgets in ``fb.plot_widgets_list``            
+
+        :[Filter Designs]:
 
         Parameters
         ----------
@@ -226,8 +245,10 @@ class Tree_Builder(object):
             # -----------------------------------------------------------------
             # Parsing [Input Widgets] and [User Input Widgets]
             #------------------------------------------------------------------
-            # Return a list of tuples ("class",None) where "class" is the 
-            # class name of a standard input widget:
+            # Return a list of tuples (class, args, dir) where "class" is the 
+            # class name of a standard plotting widget, "args" are optional arguments
+            # from the config file for the widget and "dir" is the directory for 
+            # user widgets and None for non-user widgets:
             wdg_list = conf.items("Input Widgets")
             if len(wdg_list) > 0:
                 fb.input_widgets_list = [(w[0], w[1], "") for w in wdg_list]
@@ -372,7 +393,7 @@ class Tree_Builder(object):
 #==============================================================================
     def dyn_filt_import(self):
         """
-        Try to import from all filter files found by `read_conf_file()`,
+        Try to import from all filter files found by ``parse_conf_file()``,
         auto-detecting available modules / classes:
 
         - The design classes in a module are specified in the module attribute
@@ -391,16 +412,20 @@ class Tree_Builder(object):
 
         filt_list_names
             List with the classes to be imported, contained in the
-            Python files (ending with .py !!) in the file conf_file
+            Python files (ending with .py !!) in the file conf_file, 
+            containing entries (for SUCCESSFUL imports) with:
+
+            {<class name>:{'name':<display name>, 'mod':<full module name>}
+             e.g. 
+
+            .. code-block:: python
+             
+             {'Cheby1':{'name':'Chebychev 1', 
+               'mod':'pyfda.filter_design.cheby1'}
+            }
 
         Returns
         -------
-
-        None, results are stored in the global dict fb.fil_classes,
-        containing entries (for SUCCESSFUL imports) with:
-
-            {<class name>:{'name':<display name>, 'mod':<full module name>}
-             e.g. {'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_design.cheby1'}
 
         """
         fb.fil_classes = {}   # initialize global dict for filter classes
@@ -462,34 +487,36 @@ class Tree_Builder(object):
         """
         Read attributes (ft, rt, rt:fo) from filter class fc)
         Attributes are stored in
-        the design method classes in the format (example from common.py)
+        the design method classes in the format (example from ``common.py``)
 
-        self.ft = 'IIR'
-        self.rt_dict = {
-                 'LP': {'man':{'fo':     ('a','N'),
-                               'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
-                               'fspecs': ('a','F_C'),
-                               'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
-                                               'amp':('u','A_PB','A_SB')})
-                              },
-                       'min':{'fo':     ('d','N'),
-                              'fspecs': ('d','F_C'),
-                              'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
-                                               'amp':('a','A_PB','A_SB')})
-                            }
-                      },
-                'HP': {'man':{'fo':     ('a','N'),
-                              'fspecs': ('a','F_C'),
-                              'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
-                                               'amp':('u','A_SB','A_PB')})
-                             },
-                       'min':{'fo':     ('d','N'),
-                              'fspecs': ('d','F_C'),
-                              'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
-                                               'amp':('a','A_SB','A_PB')})
-                             }
-                      }
-                }
+        .. code-block:: python
+
+            self.ft = 'IIR'
+            self.rt_dict = {
+                     'LP': {'man':{'fo':     ('a','N'),
+                                   'msg':    ('a', r"<br /><b>Note:</b> Read this!"),
+                                   'fspecs': ('a','F_C'),
+                                   'tspecs': ('u', {'frq':('u','F_PB','F_SB'),
+                                                   'amp':('u','A_PB','A_SB')})
+                                  },
+                           'min':{'fo':     ('d','N'),
+                                  'fspecs': ('d','F_C'),
+                                  'tspecs': ('a', {'frq':('a','F_PB','F_SB'),
+                                                   'amp':('a','A_PB','A_SB')})
+                                }
+                          },
+                    'HP': {'man':{'fo':     ('a','N'),
+                                  'fspecs': ('a','F_C'),
+                                  'tspecs': ('u', {'frq':('u','F_SB','F_PB'),
+                                                   'amp':('u','A_SB','A_PB')})
+                                 },
+                           'min':{'fo':     ('d','N'),
+                                  'fspecs': ('d','F_C'),
+                                  'tspecs': ('a', {'frq':('a','F_SB','F_PB'),
+                                                   'amp':('a','A_SB','A_PB')})
+                                 }
+                          }
+                    }
 
         Build a dictionary of all filter combinations with the following hierarchy:
 
@@ -501,7 +528,9 @@ class Tree_Builder(object):
         displayed and whether they are active, unused, disabled or invisible for
         each subwidget:
 
-        'LP':{
+        .. code-block:: python
+        
+            'LP':{
             'IIR':{
                  'Cheby1':{
                      'man':{'fo':     ('a','N'),
@@ -523,10 +552,11 @@ class Tree_Builder(object):
         changing the filter tree.
 
         For a full example, see the default filter tree ``fb.fil_tree`` defined
-        in ``filter_broker.py``.
+        in ``filterbroker.py``.
 
-        Reads
-        -----
+        Parameters
+        ----------
+        None
 
 
         Returns

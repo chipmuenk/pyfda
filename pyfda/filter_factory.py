@@ -8,7 +8,7 @@
 
 """
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
-Importing filterbroker.py runs the module once, defining all module variables
+Importing ``filterbroker.py`` runs the module once, defining all module variables
 which have a global scope like class variables. 
 """
 
@@ -27,7 +27,7 @@ fil_inst = None
 class FilterFactory(object):
     """
     This class implements a filter factory that (re)creates the globally accessible
-    filter instance "fil_inst" from module path and class name, passed as strings.
+    filter instance ``fil_inst`` from module path and class name, passed as strings.
     """
     def __init__(self):
         #--------------------------------------
@@ -38,11 +38,11 @@ class FilterFactory(object):
     def create_fil_inst(self, fc, mod = None):
         # TODO: need to pass both module and class name for more flexibility
         """
-        Create an instance of the filter design class passed as string "fc" 
+        Create an instance of the filter design class passed as a string ``fc`` 
         from the module found in ``fb.fil_classes[fc]``.
-        This dictionary has been collected by filter_tree_builder.py. 
+        This dictionary has been collected by ``tree_builder.py``. 
         
-        The instance can afterwards be referenced as the global ``fil_inst``.
+        The instance can afterwards be globally referenced as ``fil_inst``.
 
     
         Parameters
@@ -53,7 +53,7 @@ class FilterFactory(object):
 
         mod : string (optional, default = None)
             Fully qualified name of the filter module. When not specified, it is
-            read from the global dict ``fb.fil_classes``
+            read from the global dict ``fb.fil_classes[fc]['mod']``
             
         Returns
         -------
@@ -138,11 +138,11 @@ class FilterFactory(object):
 #------------------------------------------------------------------------------      
     def call_fil_method(self, method, fil_dict, fc = None):
         """
-        Instantiate the filter design class passed  as string `fc` with the 
-        globally accessible handle `fil_inst`. If `fc = None`, use the previously
+        Instantiate the filter design class passed  as string ``fc`` with the 
+        globally accessible handle ``fil_inst``. If ``fc = None``, use the previously
         instantiated filter design class. 
 
-        Next, call the method passed as string `method` of the instantiated
+        Next, call the design method passed as string ``method`` of the instantiated
         filter design class.
 
         Parameters
@@ -153,7 +153,7 @@ class FilterFactory(object):
 
         fil_dict : dictionary
             A dictionary with all the filter specs that is passed to the actual
-            filter design routine. This is usually a copy of fb.fil[0]
+            filter design routine. This is usually a copy of ``fb.fil[0]``
             The results of the filter design routine are written back to the same dict.
 
         fc : string (optional, default: None)
@@ -185,7 +185,7 @@ class FilterFactory(object):
 
         The example first creates an instance of the filter class 'cheby1' and 
         then performs the actual filter design by calling the method 'LPmin',
-        passing the global filter dictionary fil[0] as the parameter.
+        passing the global filter dictionary ``fil[0]`` as the parameter.
         """                
         if self.err_code >= 16 or self.err_code < 0:
             self.err_code = 0 #  # clear previous method call error

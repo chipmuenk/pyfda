@@ -31,16 +31,17 @@ class SelectFilter(QWidget):
     """
     Construct and read combo boxes for selecting the filter, consisting of the
     following hierarchy:
-      1. Response Type rt (LP, HP, Hilbert, ...)
-      2. Filter Type ft (IIR, FIR, CIC ...)
-      3. Filter Class (Butterworth, ...)
 
-      Every time a combo box is changed manually, the filter tree for the selected
-      response resp. filter type is read and the combo box(es) further down in
-      the hierarchy are populated according to the available combinations.
+    1. Response Type rt (LP, HP, Hilbert, ...)
+    2. Filter Type ft (IIR, FIR, CIC ...)
+    3. Filter Class (Butterworth, ...)
 
-      sig_tx({'filt_changed'}) is emitted and propagated to input_filter_specs.py
-      where it triggers the recreation of all subwidgets.
+    Every time a combo box is changed manually, the filter tree for the selected
+    response resp. filter type is read and the combo box(es) further down in
+    the hierarchy are populated according to the available combinations.
+
+    sig_tx({'filt_changed'}) is emitted and propagated to input_filter_specs.py
+    where it triggers the recreation of all subwidgets.
     """
     sig_tx = pyqtSignal(object) # outgoing
 

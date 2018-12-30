@@ -10,39 +10,31 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
    
    README
+   manual/index
+   development/index
    api
 
-:mod:`pyfda` -- Main package
-****************************
-.. automodule:: pyfda
-	:members:
-
-:mod:`pyfda.input_widgets`
-==========================
-.. automodule:: pyfda.input_widgets
-	:members:
-	.. class:: InputSpecs
-		:members:
 	
-:mod:`input_widgets.input_filter`
-=================================
-.. automodule:: input_widgets.input_filter
-	:members:	
+I really like the :mod:`threading` module which has the
+:class:`threading.Thread` class.
 
-:mod:`pyfda.input_widgets` -- Input Widgets
-===========================================
-.. automodule:: pyfda.input_widgets.input_specs
- 
-.. autoclass:: InputSpecs
-    :members:
-	
-.. autoclass:: input_specs.InputSpecs
-    :members:
+See https://stackoverflow.com/questions/2701998/sphinx-autodoc-is-not-automatic-enough?rq=1
 
-.. automodule:: plot_widgets
-	:members:
+Here is a link :func:`time.time`.
+
+.. 
+    :mod:`pyfda` -- Main package
+
+
+.. 
+   :class:`pyfda.filter_factory`
+
+.. x automodule:: pyfda
+
+
 
 
 Indices and tables
