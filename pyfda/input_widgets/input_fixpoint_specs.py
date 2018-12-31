@@ -232,22 +232,22 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.cmb_wdg_fixp.clear()
 
-        # wdg = (class_name, args, dir)
+        # wdg = (class_name, dir)
         for wdg in fb.fixpoint_widgets_list:
-            if not wdg[2]:
+            if not wdg[1]:
                 # use standard module
                 pckg_name = 'pyfda'
             else:
                 # check and extract user directory
-                if os.path.isdir(wdg[2]):
-                    pckg_path = os.path.normpath(wdg[2])
+                if os.path.isdir(wdg[1]):
+                    pckg_path = os.path.normpath(wdg[1])
                     # split the path into the dir containing the module and its name
                     user_dir_name, pckg_name = os.path.split(pckg_path)
 
                     if user_dir_name not in sys.path:
                         sys.path.append(user_dir_name)
                 else:
-                    logger.warning("Path {0:s} doesn't exist!".format(wdg[2]))
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
                     continue
             mod_name = pckg_name + '.fixpoint_widgets.' + wdg[0].lower()
             class_name = pckg_name + '.fixpoint_widgets.' + wdg[0]
@@ -565,7 +565,7 @@ class Input_Fixpoint_Specs(QWidget):
 if __name__ == '__main__':
     from ..compat import QApplication
     logging.basicConfig() # setup a basic logger
-    fb.fixpoint_widgets_list = [('DF1','',''), ('DF2','','')]
+    fb.fixpoint_widgets_list = [('DF1',''), ('DF2','')]
     app = QApplication(sys.argv)
     mainw = Input_Fixpoint_Specs(None)
     mainw.show()

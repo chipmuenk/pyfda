@@ -53,20 +53,20 @@ class PlotTabWidgets(QTabWidget):
         #
         # wdg = (class_name, args, dir)
         for wdg in fb.plot_widgets_list:
-            if not wdg[2]:
+            if not wdg[1]:
                 # use standard plot module
                 pckg_name = 'pyfda.plot_widgets'
             else:
                 # check and extract user directory
-                if os.path.isdir(wdg[2]):
-                    pckg_path = os.path.normpath(wdg[2])
+                if os.path.isdir(wdg[1]):
+                    pckg_path = os.path.normpath(wdg[1])
                     # split the path into the dir containing the module and its name
                     user_dir_name, pckg_name = os.path.split(pckg_path)
 
                     if user_dir_name not in sys.path:
                         sys.path.append(user_dir_name)
                 else:
-                    logger.warning("Path {0:s} doesn't exist!".format(wdg[2]))
+                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
                     continue
             mod_name = pckg_name + '.' + wdg[0].lower()
             class_name = pckg_name + '.' + wdg[0]

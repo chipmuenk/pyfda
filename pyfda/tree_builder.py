@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Create the tree dictionaries containing information about filters, 
+Create the tree dictionaries containing information about filters,
 filter implementations, widgets etc. in hierarchical form
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
@@ -98,11 +98,11 @@ class ParseError(Exception):
 class Tree_Builder(object):
     """
     Read the config file and construct dictionary trees with
-    
+
     - all filter combinations
     - valid combinations of filter designs and fixpoint implementations
 
-    
+
     """
 
     def __init__(self):
@@ -123,12 +123,12 @@ class Tree_Builder(object):
 
         This method can also be called when the main app runs to re-read the
         filter directory (?)
-        
+
         Parameters
         ----------
         None
 
-        """       
+        """
         # Scan pyfda.conf for class names / python file names and extract them
         self.parse_conf_file()
 
@@ -178,25 +178,25 @@ class Tree_Builder(object):
     def parse_conf_file(self):
         """
         Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
-        
+
         :[Dirs]:
             Try to find a user directory and store it in ``dirs.USER_DIR``
-                        and ``dirs.USER_DIR_LABEL``. Multiple entries can be 
+                        and ``dirs.USER_DIR_LABEL``. Multiple entries can be
                         specified with LABEL PATH, the first valid path is chosen.
                         Labels have to be unique but are not used yet.
 
         For the other sections, a list of tuples is returned with the elements
-        ``(class, args, dir)`` where "class" is the 
+        ``(class, args, dir)`` where "class" is the
         class name of the widget, "args" are optional arguments
-        from the config file for the widget and "dir" specifies the directory for 
+        from the config file for the widget and "dir" specifies the directory for
         user widgets and None for non-user widgets (yes, separate labels could be
         used here, but this is not supported yet.):
-        
+
         :[Input Widgets] / [User Input Widgets]:
-            Store a list of tuples of (user) input widgets in ``fb.input_widgets_list``            
-            
+            Store a list of tuples of (user) input widgets in ``fb.input_widgets_list``
+
         :[Plot Widgets] / [User Plot Widgets]:
-            Store a list of tuples of (user) plot widgets in ``fb.plot_widgets_list``            
+            Store a list of tuples of (user) plot widgets in ``fb.plot_widgets_list``
 
         :[Filter Designs]:
 
@@ -206,7 +206,7 @@ class Tree_Builder(object):
 
         Returns
         -------
- 
+
         """
         try:
             # Test whether user config file is readable, this is necessary as
@@ -227,145 +227,97 @@ class Tree_Builder(object):
             # -----------------------------------------------------------------
             # Parsing directories and modules [Dirs]
             #------------------------------------------------------------------
-            dirs.USER_DIR = None
-            try:
-                for d in conf.items('Dirs'):
-                    user_dir = os.path.normpath(d[1])
-                    if os.path.exists(user_dir):
-                        dirs.USER_DIR = user_dir
-                        dirs.USER_DIR_LABEL = d[0]
-                        logger.info("User directory: {0}".format(user_dir))
-                        break
-                    else:
-                        logger.warning("Invalid user directory:\n\t'{0}'.".format(user_dir))
-            except (AttributeError, KeyError):
-                logger.info("No user directory specified.")
-                
+            dirs.USER_DIR_LABEL = None  # last valid user label entry (legacy)
+            dirs.USER_DIR = None        # last valid user dir (legacy)
+            dirs.USER_DIRS = {}         # dict with user label : user_dir pairs
+            for section in ['Dirs1','Dirs2']:
+                try:
+                    for d in conf.items(section):
+                        user_dir = os.path.normpath(d[1])
+                        if os.path.exists(user_dir):
+                            try:
+                                dirs.USER_DIRS.update({d[0]:user_dir})
+                                dirs.USER_DIR_LABEL = d[0]
+                                dirs.USER_DIR = user_dir
+                            except TypeError:
+                                logger.warning('Unsuitable key - value pair\n"{0}" - "{1}".'
+                                               .format(d[0],d[1]))
+
+                except (AttributeError, KeyError):
+                    logger.info("No user directory specified.")
+                except configparser.NoSectionError:
+                    logger.info("No section [{0:s}] found.".format(section))
+
+            if dirs.USER_DIR: # use last found directory
+                logger.info("User directory: {0}".format(dirs.USER_DIR))
+            else:
+                logger.warning('No valid user directory found in "{0}.'
+                            .format(dirs.USER_CONF_DIR_FILE))
+
+            logger.info(dirs.USER_DIRS)
 
             # -----------------------------------------------------------------
             # Parsing [Input Widgets] and [User Input Widgets]
             #------------------------------------------------------------------
-            # Return a list of tuples (class, args, dir) where "class" is the 
+            # Return a list of tuples (class, args, dir) where "class" is the
             # class name of a standard plotting widget, "args" are optional arguments
-            # from the config file for the widget and "dir" is the directory for 
+            # from the config file for the widget and "dir" is the directory for
             # user widgets and None for non-user widgets:
-            wdg_list = conf.items("Input Widgets")
-            if len(wdg_list) > 0:
-                fb.input_widgets_list = [(w[0], w[1], "") for w in wdg_list]
-            else:
-                fb.input_widgets_list = []
-                raise configparser.NoOptionError('No entries in [Input Widgets].' )
-            # Append a list of tuples ("user_class","user_dir") where "user_class"
-            # is the class name of a user input widget and "user_dir" is its dir: 
-            if dirs.USER_DIR:
-                user_wdg_dir = os.path.join(dirs.USER_DIR,'input_widgets')
-                if os.path.exists(user_wdg_dir):
-                    try:
-                        user_wdg_list = conf.items("User Input Widgets")
-                        if len(user_wdg_list) > 0: # append user widgets
-                            fb.input_widgets_list +=\
-                                [(w[0], w[1], user_wdg_dir) for w in user_wdg_list]
-                    except configparser.NoSectionError:
-                        pass
-                else:
-                    logger.warning("No user input widget directory:\n\t'{0}'."
-                                   .format(user_wdg_dir))
-            logger.info('Found {0:2d} entries in [(User) Input Widgets].'
-                        .format(len(fb.input_widgets_list)))
+            fb.input_widgets_list = self.parse_conf_section(conf, "Input Widgets")
 
             # -----------------------------------------------------------------
             # Parsing [Plot Widgets] and [User Plot Widgets]
             #------------------------------------------------------------------
-            # Return a list of tuples ("class",args, dir=None) where "class" is the 
+            # Return a list of tuples ("class",dir=None) where "class" is the
             # class name of a standard plotting widget, args are optional arguments
             # from the config file for the widget and dir=None for non-user widgets:
-            wdg_list = conf.items("Plot Widgets")
-            # Add a third empty entry to each tuple
-            if len(wdg_list) > 0:
-                fb.plot_widgets_list = [(w[0], w[1], None) for w in wdg_list]
-            else:
-                fb.plot_widgets_list = []
-            # Append a list of tuples ("user_class", "args", "user_dir") where 
-            # "user_class" is the class name of a user plotting widget, 
-            # args are optional arguments and "user_dir" is the widget dir: 
-            if dirs.USER_DIR:
-                user_wdg_dir = os.path.join(dirs.USER_DIR,'plot_widgets')
-                if os.path.exists(user_wdg_dir):
-                    try:
-                        user_wdg_list = conf.items("User Plot Widgets")
-                        if len(user_wdg_list) > 0:
-                            fb.plot_widgets_list +=\
-                                [(w[0], w[1], user_wdg_dir) for w in user_wdg_list]
-                    except configparser.NoSectionError:
-                        pass
-                else:
-                    logger.warning("No user plot widget directory:\n\t'{0}'."
-                                   .format(user_wdg_dir))
-            logger.info('Found {0:2d} entries in [(User) Plot Widgets].'
-                        .format(len(fb.plot_widgets_list)))
+            fb.plot_widgets_list = self.parse_conf_section(conf, "Plot Widgets")
 
             # -----------------------------------------------------------------
             # Parsing [Filter Designs] and [User Filter Designs]
             #------------------------------------------------------------------
-            # Return a list of tuples ("class",None) where "class" is the 
+            # Return a list of tuples ("class",None) where "class" is the
             # class name of a standard filter design:
-            fb.filter_designs_list = conf.items("Filter Designs")
-            if len(fb.filter_designs_list) == 0:
-                raise configparser.NoOptionError('No entries in [Filter Designs].')
-            # Append a list of tuples ("user_class","user_dir") where "user_class"
-            # is the class name of a user filter design and "user_dir" is its dir: 
-            if dirs.USER_DIR:
-                user_wdg_dir = os.path.join(dirs.USER_DIR, 'filter_designs')
-                if os.path.exists(user_wdg_dir):
-                    try:
-                        user_wdg_list = conf.items("User Input Widgets")
-                        if len(user_wdg_list) > 0:  # append user input widgets
-                            fb.filter_designs_list +=\
-                                [(w[0], user_wdg_dir) for w in user_wdg_list]
-                    except configparser.NoSectionError:
-                        pass
-                else:
-                    logger.warning("No user filter design directory:\n\t'{0}'."
-                                   .format(user_wdg_dir))
-            logger.info('Found {0:2d} entries in [(User) Filter Designs].'
-                        .format(len(fb.filter_designs_list)))
+            fb.filter_designs_list = self.parse_conf_section(conf, "Filter Designs")
 
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
-            # Return a list of tuples ("class",args, dir=None) where "class" is the 
+            # Return a list of tuples ("class",args, dir=None) where "class" is the
             # class name of a standard widget, args are optional arguments
             # from the config file for the widget and dir=None for non-user widgets:
-            try:
-                wdg_list = conf.items("Fixpoint Widgets")
-            
-                # Add a third empty entry to each tuple
-                if len(wdg_list) > 0:
-                    fb.fixpoint_widgets_list = [(w[0], w[1], None) for w in wdg_list]
-                else:
-                    fb.fixpoint_widgets_list = []
-            except configparser.NoSectionError:
-                fb.fixpoint_widgets_list = []
-                logger.warning("No fixpoint widget section in config file.")
+            fb.fixpoint_widgets_list = self.parse_conf_section(conf, "Fixpoint Widgets")
 
-            # Append a list of tuples ("user_class", "args", "user_dir") where 
-            # "user_class" is the class name of a user fixpoint widget, 
-            # args are optional arguments and "user_dir" is the widget dir: 
-            if dirs.USER_DIR:
-                user_wdg_dir = os.path.join(dirs.USER_DIR,'fixpoint_widgets')
-                if os.path.exists(user_wdg_dir):
-                    try:
-                        user_wdg_list = conf.items("User Fixpoint Widgets")
-                        if len(user_wdg_list) > 0:
-                            fb.fixpoint_widgets_list +=\
-                                [(w[0], w[1], user_wdg_dir) for w in user_wdg_list]
-                    except configparser.NoSectionError:
-                        pass
-                else:
-                    logger.warning("No user fixpoint widget directory:\n\t'{0}'."
-                                   .format(user_wdg_dir))
-            logger.info('Found {0:2d} entries in [(User) Fixpoint Widgets].'
-                        .format(len(fb.fixpoint_widgets_list)))
+#            try:
+#                wdg_list = conf.items("Fixpoint Widgets")
+#
+#                # Add a third empty entry to each tuple
+#                if len(wdg_list) > 0:
+#                    fb.fixpoint_widgets_list = [(w[0], w[1], None) for w in wdg_list]
+#                else:
+#                    fb.fixpoint_widgets_list = []
+#            except configparser.NoSectionError:
+#                fb.fixpoint_widgets_list = []
+#                logger.warning("No fixpoint widget section in config file.")
+#
+#            # Append a list of tuples ("user_class", "args", "user_dir") where
+#            # "user_class" is the class name of a user fixpoint widget,
+#            # args are optional arguments and "user_dir" is the widget dir:
+#            if dirs.USER_DIR:
+#                user_wdg_dir = os.path.join(dirs.USER_DIR,'fixpoint_widgets')
+#                if os.path.exists(user_wdg_dir):
+#                    try:
+#                        user_wdg_list = conf.items("User Fixpoint Widgets")
+#                        if len(user_wdg_list) > 0:
+#                            fb.fixpoint_widgets_list +=\
+#                                [(w[0], w[1], user_wdg_dir) for w in user_wdg_list]
+#                    except configparser.NoSectionError:
+#                        pass
+#                else:
+#                    logger.warning("No user fixpoint widget directory:\n\t'{0}'."
+#                                   .format(user_wdg_dir))
+#            logger.info('Found {0:2d} entries in [(User) Fixpoint Widgets].'
+#                        .format(len(fb.fixpoint_widgets_list)))
 
         # ----- Exceptions ----------------------
         except configparser.ParsingError as e:
@@ -391,6 +343,64 @@ class Tree_Builder(object):
             sys.exit()
 
 #==============================================================================
+    def parse_conf_section(self, conf, section, req=True):
+        """
+        Parse ``section`` in ``dirs.USER_CONF_DIR_FILE`` and return a list of
+        tuples with the elements ``(class, dir)`` where "class" is the
+        class name of the widget and "dir" specifies the directory for
+        user widgets and None for standard widgets:
+
+        Parameters
+        ----------
+        conf : instance of config parser
+
+        section : string
+            name of the section to be parsed
+
+        req : boolean
+            when True, section is required: Terminate the program with an error
+            if the section is missing in the config file
+
+        Returns
+        -------
+        list of tuples
+
+        """
+        try:
+            wdg_list = []
+            items_list = conf.items(section) # entries from config file with [name, path]
+
+            if len(items_list) > 0:
+                for i in items_list:
+                    if not i[1]:
+                        wdg_list.append((i[0],i[1])) # standard widget, no dir specified
+                    else:
+                        try:
+                            wdg_list.append((i[0], dirs.USER_DIRS[i[1]]))
+                        except (KeyError, TypeError):
+                            logger.warning('Unknown / unsuitable user label "{0:s}"'
+                                           .format(i[1]))
+            if len(wdg_list) > 0:
+                logger.info('Found {0:2d} entries in [{1:s}].'
+                        .format(len(wdg_list), section))
+            else:
+                if req:
+                    logger.critical('Empty section [{0:s}], aborting.'.format(section))
+                    sys.exit()
+                else:
+                    logger.warning('Empty section [{0:s}].'.format(section))
+
+        except configparser.NoSectionError as e:
+            if req:
+                logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+                sys.exit()
+            else:
+                logger.warning('No section [{0:s}] in config file "{1:s}".'
+                           .format(section, dirs.USER_CONF_DIR_FILE))
+
+        return wdg_list
+
+#==============================================================================
     def dyn_filt_import(self):
         """
         Try to import from all filter files found by ``parse_conf_file()``,
@@ -412,15 +422,15 @@ class Tree_Builder(object):
 
         filt_list_names
             List with the classes to be imported, contained in the
-            Python files (ending with .py !!) in the file conf_file, 
+            Python files (ending with .py !!) in the file conf_file,
             containing entries (for SUCCESSFUL imports) with:
 
             {<class name>:{'name':<display name>, 'mod':<full module name>}
-             e.g. 
+             e.g.
 
             .. code-block:: python
-             
-             {'Cheby1':{'name':'Chebychev 1', 
+
+             {'Cheby1':{'name':'Chebychev 1',
                'mod':'pyfda.filter_design.cheby1'}
             }
 
@@ -529,7 +539,7 @@ class Tree_Builder(object):
         each subwidget:
 
         .. code-block:: python
-        
+
             'LP':{
             'IIR':{
                  'Cheby1':{
