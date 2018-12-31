@@ -179,26 +179,27 @@ class Tree_Builder(object):
         """
         Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
 
-        :[Dirs]:
-            Try to find a user directory and store it in ``dirs.USER_DIR``
-                        and ``dirs.USER_DIR_LABEL``. Multiple entries can be
-                        specified with LABEL PATH, the first valid path is chosen.
-                        Labels have to be unique but are not used yet.
+        :[Dirs1] and [Dirs2]:
+            Try to find user directories and store them in ``dirs.USER_DIRS``
+                        and ``dirs.USER_DIR_LABEL``. 
 
         For the other sections, a list of tuples is returned with the elements
-        ``(class, args, dir)`` where "class" is the
-        class name of the widget, "args" are optional arguments
-        from the config file for the widget and "dir" specifies the directory for
-        user widgets and None for non-user widgets (yes, separate labels could be
-        used here, but this is not supported yet.):
+        ``(class, dir)`` where "class" is the class name of the widget
+        and "dir" specifies the directory for user widgets and None for standard
+        widgets:
 
-        :[Input Widgets] / [User Input Widgets]:
+        :[Input Widgets]:
             Store a list of tuples of (user) input widgets in ``fb.input_widgets_list``
 
-        :[Plot Widgets] / [User Plot Widgets]:
+        :[Plot Widgets]:
             Store a list of tuples of (user) plot widgets in ``fb.plot_widgets_list``
 
         :[Filter Designs]:
+            Store a list of tuples of (user) filter designs in ``fb.filter_designs_list``
+            
+        :[Fixpoint Widgets]:
+            Store a list of tuples of (user) fixpoint widgets in ``fb.fixpoint_widgets_list``
+
 
         Parameters
         ----------
@@ -225,10 +226,10 @@ class Tree_Builder(object):
             logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
                         .format(dirs.USER_CONF_DIR_FILE, str(conf.sections())))
             # -----------------------------------------------------------------
-            # Parsing directories and modules [Dirs]
+            # Parsing directories [Dirs]
             #------------------------------------------------------------------
-            dirs.USER_DIR_LABEL = None  # last valid user label entry (legacy)
-            dirs.USER_DIR = None        # last valid user dir (legacy)
+            #dirs.USER_DIR_LABEL = None  # last valid user label entry (legacy)
+            #dirs.USER_DIR = None        # last valid user dir (legacy)
             dirs.USER_DIRS = {}         # dict with user label : user_dir pairs
             for section in ['Dirs1','Dirs2']:
                 try:
@@ -237,8 +238,8 @@ class Tree_Builder(object):
                         if os.path.exists(user_dir):
                             try:
                                 dirs.USER_DIRS.update({d[0]:user_dir})
-                                dirs.USER_DIR_LABEL = d[0]
-                                dirs.USER_DIR = user_dir
+                                #dirs.USER_DIR_LABEL = d[0]
+                                #dirs.USER_DIR = user_dir
                             except TypeError:
                                 logger.warning('Unsuitable key - value pair\n"{0}" - "{1}".'
                                                .format(d[0],d[1]))
@@ -248,76 +249,32 @@ class Tree_Builder(object):
                 except configparser.NoSectionError:
                     logger.info("No section [{0:s}] found.".format(section))
 
-            if dirs.USER_DIR: # use last found directory
-                logger.info("User directory: {0}".format(dirs.USER_DIR))
+            if dirs.USER_DIRS: # use last found directory
+                logger.info("User directory(s):\n{0}".format(dirs.USER_DIRS))
             else:
                 logger.warning('No valid user directory found in "{0}.'
                             .format(dirs.USER_CONF_DIR_FILE))
 
-            logger.info(dirs.USER_DIRS)
-
             # -----------------------------------------------------------------
-            # Parsing [Input Widgets] and [User Input Widgets]
+            # Parsing [Input Widgets]
             #------------------------------------------------------------------
-            # Return a list of tuples (class, args, dir) where "class" is the
-            # class name of a standard plotting widget, "args" are optional arguments
-            # from the config file for the widget and "dir" is the directory for
-            # user widgets and None for non-user widgets:
             fb.input_widgets_list = self.parse_conf_section(conf, "Input Widgets")
 
             # -----------------------------------------------------------------
-            # Parsing [Plot Widgets] and [User Plot Widgets]
+            # Parsing [Plot Widgets]
             #------------------------------------------------------------------
-            # Return a list of tuples ("class",dir=None) where "class" is the
-            # class name of a standard plotting widget, args are optional arguments
-            # from the config file for the widget and dir=None for non-user widgets:
             fb.plot_widgets_list = self.parse_conf_section(conf, "Plot Widgets")
 
             # -----------------------------------------------------------------
-            # Parsing [Filter Designs] and [User Filter Designs]
+            # Parsing [Filter Designs]
             #------------------------------------------------------------------
-            # Return a list of tuples ("class",None) where "class" is the
-            # class name of a standard filter design:
             fb.filter_designs_list = self.parse_conf_section(conf, "Filter Designs")
 
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
-            # Return a list of tuples ("class",args, dir=None) where "class" is the
-            # class name of a standard widget, args are optional arguments
-            # from the config file for the widget and dir=None for non-user widgets:
             fb.fixpoint_widgets_list = self.parse_conf_section(conf, "Fixpoint Widgets")
 
-#            try:
-#                wdg_list = conf.items("Fixpoint Widgets")
-#
-#                # Add a third empty entry to each tuple
-#                if len(wdg_list) > 0:
-#                    fb.fixpoint_widgets_list = [(w[0], w[1], None) for w in wdg_list]
-#                else:
-#                    fb.fixpoint_widgets_list = []
-#            except configparser.NoSectionError:
-#                fb.fixpoint_widgets_list = []
-#                logger.warning("No fixpoint widget section in config file.")
-#
-#            # Append a list of tuples ("user_class", "args", "user_dir") where
-#            # "user_class" is the class name of a user fixpoint widget,
-#            # args are optional arguments and "user_dir" is the widget dir:
-#            if dirs.USER_DIR:
-#                user_wdg_dir = os.path.join(dirs.USER_DIR,'fixpoint_widgets')
-#                if os.path.exists(user_wdg_dir):
-#                    try:
-#                        user_wdg_list = conf.items("User Fixpoint Widgets")
-#                        if len(user_wdg_list) > 0:
-#                            fb.fixpoint_widgets_list +=\
-#                                [(w[0], w[1], user_wdg_dir) for w in user_wdg_list]
-#                    except configparser.NoSectionError:
-#                        pass
-#                else:
-#                    logger.warning("No user fixpoint widget directory:\n\t'{0}'."
-#                                   .format(user_wdg_dir))
-#            logger.info('Found {0:2d} entries in [(User) Fixpoint Widgets].'
-#                        .format(len(fb.fixpoint_widgets_list)))
 
         # ----- Exceptions ----------------------
         except configparser.ParsingError as e:
@@ -363,7 +320,8 @@ class Tree_Builder(object):
 
         Returns
         -------
-        list of tuples
+        list of tuples containing class name and directory. The latter is none
+        for standard widgets.
 
         """
         try:

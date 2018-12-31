@@ -417,7 +417,7 @@ class Input_Files(QWidget):
                            "<tr><td><b>Config:&emsp;</b></td><td>{2}</td></tr>"
                            "<tr><td><b>User:&emsp;</b></td><td>{3}</td></tr>"
                            "<tr><td><b>Temp:</b></td><td>{4}</td></tr>"\
-                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR, dirs.USER_DIR, dirs.TEMP_DIR))
+                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR, dirs.USER_DIRS, dirs.TEMP_DIR))
          dir_string += ("<br /><th style='font-size:large;'>Logging Files</th>"
                         "<tr><td><b>Config:</b></td><td>{0}</td></tr>"
                         "<tr><td><b>Output:&emsp;</b></td><td>{1}</td></tr>"
