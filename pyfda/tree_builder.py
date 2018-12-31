@@ -304,7 +304,7 @@ class Tree_Builder(object):
         """
         Parse ``section`` in ``dirs.USER_CONF_DIR_FILE`` and return a list of
         tuples with the elements ``(class, dir)`` where "class" is the
-        class name of the widget and "dir" specifies the directory for
+        class name of the widget and "dir" is the directory for
         user widgets and None for standard widgets:
 
         Parameters
@@ -320,8 +320,9 @@ class Tree_Builder(object):
 
         Returns
         -------
-        list of tuples containing class name and directory. The latter is none
-        for standard widgets.
+        list 
+            list of tuples containing class name and directory. The latter is none
+            for standard widgets.
 
         """
         try:
@@ -377,24 +378,19 @@ class Tree_Builder(object):
 
         Parameters
         ----------
-
-        filt_list_names
+        filt_list_names : list
             List with the classes to be imported, contained in the
             Python files (ending with .py !!) in the file conf_file,
             containing entries (for SUCCESSFUL imports) with:
 
-            {<class name>:{'name':<display name>, 'mod':<full module name>}
+            {<class name>:{'name':<display name>, 'mod':<full module name>}}
              e.g.
 
             .. code-block:: python
 
              {'Cheby1':{'name':'Chebychev 1',
                'mod':'pyfda.filter_design.cheby1'}
-            }
-
-        Returns
-        -------
-
+        
         """
         fb.fil_classes = {}   # initialize global dict for filter classes
         num_imports = 0           # number of successful filter module imports
