@@ -27,10 +27,16 @@ project = 'pyfda'
 copyright = '2018, Christian Muenker'
 author = 'Christian Muenker'
 
+# version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
+version_nr = {}
+with open("../../pyfda/version.py") as fp:
+    exec(fp.read(), version_nr)
+
+
 # The short X.Y version
-version = ''
+version = version_nr['__version__'] 
 # The full version, including alpha/beta/rc tags
-release = '0.1.5'
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -50,8 +56,20 @@ extensions = [
     'sphinx.ext.viewcode',
 	'sphinx.ext.napoleon',
 ]
-
-# 'numpydoc',
+# see http://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
+# https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
+# Napoleon default settings
+#napoleon_google_docstring = True
+#napoleon_numpy_docstring = True
+#napoleon_include_init_with_doc = False
+#napoleon_include_private_with_doc = False
+#napoleon_include_special_with_doc = True
+#napoleon_use_admonition_for_examples = False
+#napoleon_use_admonition_for_notes = False
+#napoleon_use_admonition_for_references = False
+#napoleon_use_ivar = False
+#napoleon_use_param = True
+#napoleon_use_rtype = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

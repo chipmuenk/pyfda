@@ -8,8 +8,12 @@
 
 """
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
-Importing filterbroker.py runs the module once, defining all module variables
+Importing `filterbroker.py` runs the module once, defining all module variables
 having a global scope like class variables.
+
+Attributes
+----------
+
 """
 
 from __future__ import division, unicode_literals, print_function, absolute_import

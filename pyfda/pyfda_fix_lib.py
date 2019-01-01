@@ -112,8 +112,8 @@ def dec2csd(dec_val, WF=0):
     """
     Convert the argument `dec_val` to a string in CSD Format.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
 
     dec_val : scalar (integer or real)
               decimal value to be converted to CSD format
@@ -121,9 +121,10 @@ def dec2csd(dec_val, WF=0):
     WF: integer
         number of fractional places. Default is WF = 0 (integer number)
 
-    Returns:
-    --------
-    A string with the CSD value
+    Returns
+    -------
+    string 
+        containing the CSD value
 
     Original author: Harnesser
     https://sourceforge.net/projects/pycsd/
@@ -213,20 +214,20 @@ def csd2dec(csd_str):
 
     `csd_str` has to be an integer CSD number.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
 
     csd_str : string
 
      A string with the CSD value to be converted, consisting of '+', '-', '.'
      and '0' characters.
 
-    Returns:
-    --------
+    Returns
+    -------
     decimal (integer) value of the CSD string
 
-    Examples:
-    ---------
+    Examples
+    --------
 
     +00- = +2³ - 2⁰ = +7
 
@@ -266,16 +267,15 @@ class Fixed(object):
     in the form `Q = WI.WF` where WI and WF are the wordlength of integer resp.
     fractional part; total wordlength is `W = WI + WF + 1` due to the sign bit.
 
-    Examples:
+    Examples
+    --------
       
-        q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} 
+    Define a dictionary with the format options and pass it to the constructor:
+        
+    >>> q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} # or
+    >>> q_obj = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
+    >>> myQ = Fixed(q_obj) 
     
-    or
-
-        q_obj = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
-
-        myQ = Fixed(q_obj) # instantiate fixed-point object, passing the format
-    dictionary to the constructor.
     
     Parameters
     ----------
@@ -322,10 +322,8 @@ class Fixed(object):
     * **'scale'** : Float, the factor between the fixpoint integer representation
                     and its floating point value.
 
-
-
-    Instance Attributes
-    -------------------
+    Attributes
+    ----------
     q_obj : dict
         A copy of the quantization dictionary (see above)
 
@@ -381,17 +379,18 @@ class Fixed(object):
         number of positive overflows
 
 
-    Notes
-    -----
+    Example
+    -------
     class `Fixed()` can be used like Matlabs quantizer object / function from the
     fixpoint toolbox, see (Matlab) 'help round' and 'help quantizer/round' e.g.
 
-    q_dsp = quantizer('fixed', 'round', [16 15], 'wrap'); % Matlab
-    yq = quantize(q_dsp, y)
+    >>> q_dsp = quantizer('fixed', 'round', [16 15], 'wrap'); % Matlab
+    >>> yq = quantize(q_dsp, y)
 
-    q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
-    my_q = Fixed(q_dsp)
-    yq = my_q.fixp(y)
+    >>> q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
+    >>> my_q = Fixed(q_dsp)
+    >>> yq = my_q.fixp(y)
+    
     """
 
     def __init__(self, q_obj):
@@ -527,8 +526,8 @@ class Fixed(object):
             with the same shape as `y`, in the range
             `-2*self.MSB` ... `2*self.MSB-self.LSB`
 
-        Examples:
-        ---------
+        Examples
+        --------
 
         >>> q_obj_a = {'WI':1, 'WF':6, 'ovfl':'sat', 'quant':'round'}
         >>> myQa = Fixed(q_obj_a) # instantiate fixed-point object myQa
@@ -707,15 +706,17 @@ class Fixed(object):
         Return floating point representation for fixpoint scalar `y` given in
         format `frmt`.
 
-        * When input format is float, return unchanged
-        * else:
-            - Remove illegal characters and leading '0's
-            - Count number of fractional places `frc_places` and remove radix point
-            - Calculate decimal, fractional representation `y_dec` of string,
-              using the base and the number of fractional places
-            (- Calculate two's complement for `W` bits for negative bin and hex numbers)
-            - Calculate fixpoint float representation `y_float = fixp(y_dec, scaling='div')`,
-              dividing the result by `scale`.
+        When input format is float, return unchanged. 
+        
+        Else:
+
+        - Remove illegal characters and leading '0's
+        - Count number of fractional places `frc_places` and remove radix point
+        - Calculate decimal, fractional representation `y_dec` of string,
+          using the base and the number of fractional places
+        - Calculate two's complement for `W` bits (only for negative bin and hex numbers)
+        - Calculate fixpoint float representation `y_float = fixp(y_dec, scaling='div')`,
+          dividing the result by `scale`.
 
         Parameters
         ----------

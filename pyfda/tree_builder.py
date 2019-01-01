@@ -525,8 +525,8 @@ class Tree_Builder(object):
 
         Returns
         -------
-
-        fil_tree : filter tree
+        dict
+            filter tree
 
         """
         if not fil_tree:
