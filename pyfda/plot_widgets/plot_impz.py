@@ -175,7 +175,7 @@ class Plot_Impz(QWidget):
 
             except KeyError as e:
                 logger.error('Key {0} missing in "hdl_dict".'.format(e))
-                self.fx_sim = None
+                self.fx_sim = False
 
         if self.isVisible():
             if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
@@ -571,20 +571,22 @@ class Plot_Impz(QWidget):
         fx_max = 1.
         fx_title = ""
         if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
+            WI = WO = 1
             try:
-                logger.warning("HDL_DICT {0}".format(self.hdl_dict))
+                logger.info("hdl_dict = {0}".format(self.hdl_dict))
                 WI = self.hdl_dict['QI']['W']
                 WO = self.hdl_dict['QO']['W']
                 fx_title = "Fixpoint "
+
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
-                WI = WO = 1
+
             except TypeError as e:
                 logger.error("Type error: 'hdl_dict'={0},\n{1}".format(self.hdl_dict, e))
-                WI = WO = 1
+
             except ValueError as e:
                 logger.error("Value error: {0}".format(e))
-                WI = WO = 1
+
 
             if self.ui.chk_fx_scale.isChecked():
                 scale_i = 1 << WI-1
@@ -594,9 +596,8 @@ class Plot_Impz(QWidget):
                 scale_o = 1. / (1 << WO-1)
                 fx_min = -1
                 fx_max = 1 - scale_o
-                
-                
-        logger.info("scale WI:{0} WO:{1}".format(scale_i, scale_o))
+
+            logger.info("scale I:{0} O:{1}".format(scale_i, scale_o))
 
         if self.ui.chk_log.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
