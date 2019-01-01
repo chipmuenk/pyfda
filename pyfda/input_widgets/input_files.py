@@ -401,7 +401,7 @@ class Input_Files(QWidget):
              fb.clipboard.setText(my_string)
 
          info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-         "Version {0} (c) 2013 - 2018 Christian Münker</b><br>"
+         "Version {0} (c) 2013 - 2019 Christian Münker</b><br>"
          "Design, analyze and synthesize digital filters<hr>".format(version.__version__))
 
          versions_string =("<b>Operating System:</b> {0} {1}<br><b>User Name:</b> {2}<br><br>"
