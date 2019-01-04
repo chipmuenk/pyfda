@@ -78,7 +78,20 @@ class Input_Fixpoint_Specs(QWidget):
     def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming in via subwidgets and sig_rx
+		
+		Play PingPong with a stimulus & plot widget:
+		
+		1. ``fx_sim_init()``: Initialize quantization dict ``hdl_dict`` with settings
+			from fixpoint widget.
+		2. ``fx_sim_start()``: Request stimulus by sending 'fx_sim':'get_stimulus'
+		
+		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'set_stimulus'
+			and pass it to HDL object for simulation
+		   
+		4. Send back HDL response to widget via 'fx_sim':'set_response'
+
         """
+		
         logger.debug("Processing {0}: {1}".format(type(dict_sig).__name__, dict_sig))
         if dict_sig['sender'] == __name__:
             logger.debug("Infinite loop detected")
@@ -99,12 +112,6 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fx_sim_start()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
-            # PingPong with a stimulus & plot widget:
-            # 1. Request stimulus by sending 'fx_sim':'get_stimulus'
-            # 2. Receive stimulus from another widget in 'fx_sim':'set_stimulus'
-            #    pass it to HDL object
-            # 3. Calculate  HDL response here
-            # 4. Send back response by sending 'fx_sim':'set_response'
 
                 
 #------------------------------------------------------------------------------
@@ -485,8 +492,8 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_init(self):
         """
-        Initialize fix-point simulation: Send the quantization dict including
-            the filter name
+        Initialize fix-point simulation: Send the quantization dict ``hdl_dict`` including
+            the filter name to the stimulus widget
         """
         # TODO: Filter name missing?
         try:
@@ -502,7 +509,7 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_start(self):
         """
-        Start fix-point simulation: Send the `hdl_dict` containing all quantization
+        Start fix-point simulation: Send the ``hdl_dict`` containing all quantization
         information and request a stimulus signal
         """
         try:
@@ -512,16 +519,17 @@ class Input_Fixpoint_Specs(QWidget):
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:
-            logger.warning("Fixpoint simulation failed:\n{0}".format(e))
+            logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
         return
 
 #------------------------------------------------------------------------------
     def fx_sim_set_stimulus(self, dict_sig):
         """
-        - Get fix-point stimulus from dict_sig
-        - Scale fixpoint response with 2**W (input) and pass it to HDL filter
-        - Calculate the fixpoint response
-        - Send it to the plotting widget
+        - Get fixpoint stimulus from ``dict_sig``
+        - Quantize the stimulus with the selected input quantization settings
+		- Scale it with the input word length, i.e. with 2**W (input)
+        - Pass it to the HDL filter and calculate the fixpoint response
+        - Send the reponse to the plotting widget
         """
         try:
             self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)

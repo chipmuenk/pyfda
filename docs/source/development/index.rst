@@ -1,7 +1,6 @@
 Development
 ===========
 
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -10,7 +9,7 @@ Development
    pyfda_libs
    pyfda_input_widgets
    pyfda_plot_widgets
-
+   pyfda_fixpoint_widgets
 
 
 This part of the documentation describes the features of pyFDA that are relevant for developers.
