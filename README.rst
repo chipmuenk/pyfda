@@ -120,6 +120,13 @@ or upgrade using
 ::
 
     pip install pyfda -U
+	
+or install locally using
+
+::
+	pip install -e <YOUR_PATH_TO_PYFDA>
+	
+where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git.
 
 Starting pyFDA
 --------------

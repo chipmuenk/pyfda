@@ -101,6 +101,12 @@ Otherwise, you can install from PyPI using
 or upgrade using
 
     pip install pyfda -U
+	
+or install locally using
+
+	pip install -e <YOUR_PATH_TO_PYFDA>
+	
+where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git.
 
 ### setup.py   
 You could also download the zip file and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
