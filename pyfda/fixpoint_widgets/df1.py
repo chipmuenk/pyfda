@@ -22,7 +22,7 @@ import pprint
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
-from .filter_iir import FilterIIR 
+#from .filter_iir import FilterIIR 
 #==============================================================================
 
 class DF1(QWidget):
@@ -126,11 +126,11 @@ class DF1(QWidget):
 
         # TODO: remove this - a leftover from an earlier version, needed for old 
         #       implementation of exportHDL
-        self.flt = FilterIIR(b=np.array(fb.fil[0]['ba'][0][0:3]),
-                a=np.array(fb.fil[0]['ba'][1][0:3]),
-                #sos = sos, doesn't work yet
-                word_format=(hdl_dict['QI']['WI'] + hdl_dict['QI']['WF'], 0,
-                             hdl_dict['QI']['WF']))
+#        self.flt = FilterIIR(b=np.array(fb.fil[0]['ba'][0][0:3]),
+#                a=np.array(fb.fil[0]['ba'][1][0:3]),
+#                #sos = sos, doesn't work yet
+#                word_format=(hdl_dict['QI']['WI'] + hdl_dict['QI']['WF'], 0,
+#                             hdl_dict['QI']['WF']))
         #-------------------------------------------------
     
         return hdl_dict
