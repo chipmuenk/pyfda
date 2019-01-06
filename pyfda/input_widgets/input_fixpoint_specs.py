@@ -21,8 +21,6 @@ from ..compat import (Qt, QWidget, QPushButton, QComboBox, QFD, QSplitter, QLabe
 
 import numpy as np
 
-#import matplotlib.pyplot as plt
-
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_lib import qstr, cmp_version
@@ -31,17 +29,19 @@ from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params
 
+
+
 if cmp_version("myhdl", "0.10") >= 0:
     import myhdl
     HAS_MYHDL = True
-
-    fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
-    if not os.path.exists(fil_blocks_path):
-        logger.error("Invalid path {0}".format(fil_blocks_path))
-    else:
-        if fil_blocks_path not in sys.path:
-            sys.path.append(fil_blocks_path)
-        from filter_blocks.fda import FilterFIR, FilterIIR    
+    from pyfda.filter_blocks.fda import FilterFIR, FilterIIR      
+#    fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
+#    if not os.path.exists(fil_blocks_path):
+#        logger.error("Invalid path {0}".format(fil_blocks_path))
+#    else:
+#        if fil_blocks_path not in sys.path:
+#            sys.path.append(fil_blocks_path)
+#        from filter_blocks.fda import FilterFIR, FilterIIR    
 else:
     HAS_MYHDL = False
 

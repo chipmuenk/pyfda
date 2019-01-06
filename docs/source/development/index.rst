@@ -10,6 +10,7 @@ Development
    pyfda_input_widgets
    pyfda_plot_widgets
    pyfda_fixpoint_widgets
+   pyfda_filter_blocks
 
 
 This part of the documentation describes the features of pyFDA that are relevant for developers.

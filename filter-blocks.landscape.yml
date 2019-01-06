@@ -1,0 +1,8 @@
+doc-warnings: yes
+strictness: high
+autodetect: yes
+ignore-patterns:
+    # ignore the unused import (for now) in all __init__.py files
+    - ^__init__.py$
+python-targets:
+  - 3

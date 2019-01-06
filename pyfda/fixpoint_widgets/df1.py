@@ -14,7 +14,7 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-import numpy as np
+#import numpy as np
 
 import pyfda.filterbroker as fb
 import pprint
@@ -22,6 +22,22 @@ import pprint
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
+
+# =============================================================================
+# if cmp_version("myhdl", "0.10") >= 0:
+#     import myhdl
+#     HAS_MYHDL = True
+# 
+#     fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
+#     if not os.path.exists(fil_blocks_path):
+#         logger.error("Invalid path {0}".format(fil_blocks_path))
+#     else:
+#         if fil_blocks_path not in sys.path:
+#             sys.path.append(fil_blocks_path)
+#         from filter_blocks.fda import FilterFIR, FilterIIR    
+# else:
+#     HAS_MYHDL = False
+# =============================================================================
 #from .filter_iir import FilterIIR 
 #==============================================================================
 

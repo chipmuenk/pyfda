@@ -1,0 +1,23 @@
+# http://docs.travis-ci.com/user/workers/container-based-infrastructure/
+sudo: false
+
+language: python
+python:
+  - "3.6"
+
+# command to install dependencies, always using the latest
+# myhdl for the master branch
+install:
+  - pip install . -r requirements.txt
+
+# run the test
+script:
+  - cd tests
+  - coverage run --source=filter_blocks -m py.test
+  - cp .coverage ../
+
+after_success:
+  - coveralls
+
+notifications:
+  email: true
