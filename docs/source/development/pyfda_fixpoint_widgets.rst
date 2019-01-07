@@ -1,7 +1,7 @@
 .. pyfda documentation  
 
-pyfda Fixpoint Widgets - Overview
-=================================
+Package `fixpoint_widgets`
+==========================
 
 This package contains all fixpoint classes, i.e. classes which define filter topologies that can be implemented in hardware. The filter topologies use the order and the coefficients that have been determined by a filter design algorithm from the `pyfda.filter_designs` package. The coefficients have been calculated for a desired filter specification (usually in the frequency domain).
 

@@ -1,16 +1,22 @@
-Introduction
-============
-The `filter-blocks` package provides a classed based API to configure,
-simulate, and convert the various digital circuit discrete filters.
+Package `filter_blocks`
+=======================
+This package provides fixpoint descriptions for various
+filter topologies. The filter blocks can be simulated and converted
+to Verilog and VHDL netlists.
 
+pyfda Filter Blocks - Details
+=============================
 
-```eval_rst
+:class:`pyfda.filter_blocks.fda.FilterFIR`
+------------------------------------------
+
 .. autoclass:: pyfda.filter_blocks.fda.FilterFIR
     :show-inheritance:
-```
+    :members:
 
+:class:`pyfda.filter_blocks.fda.FilterIIR`
+------------------------------------------
 
-```eval_rst
 .. autoclass:: pyfda.filter_blocks.fda.FilterIIR
     :show-inheritance:
-```
+    :members:
