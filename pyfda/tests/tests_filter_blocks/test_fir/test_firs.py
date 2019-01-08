@@ -4,10 +4,10 @@ import numpy as np
 import myhdl as hdl
 from myhdl import Signal, intbv, delay
 
-from filter_blocks.support import Clock, Reset, Global, Samples
-from filter_blocks.testing import DDSine
+from pyfda.filter_blocks.support import Clock, Reset, Global, Samples
+from pyfda.filter_blocks.testing.dds import DDSine
 
-from filter_blocks.fda.fir import FilterFIR
+from pyfda.filter_blocks.fda.fir import FilterFIR
 
 def test_filters(args=None):
     if args is None:

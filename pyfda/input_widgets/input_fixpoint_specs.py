@@ -34,7 +34,8 @@ from pyfda.pyfda_rc import params
 if cmp_version("myhdl", "0.10") >= 0:
     import myhdl
     HAS_MYHDL = True
-    from pyfda.filter_blocks.fda import FilterFIR, FilterIIR      
+    from pyfda.filter_blocks.fda.iir import FilterIIR
+    from pyfda.filter_blocks.fda.fir import FilterFIR    
 #    fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
 #    if not os.path.exists(fil_blocks_path):
 #        logger.error("Invalid path {0}".format(fil_blocks_path))
@@ -460,7 +461,7 @@ class Input_Fixpoint_Specs(QWidget):
             # return '.v' or '.vhd' depending on filetype selection:
             hdl_type = extract_file_ext(qstr(hdl_filter))[0]
             # sanitized dir + filename + suffix. The filename suffix is replaced
-            # by `hdl_tyoe` later.
+            # by `hdl_type` later.
             hdl_file = os.path.normpath(hdl_file)
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
