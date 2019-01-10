@@ -156,8 +156,8 @@ def unichr_23(c):
 
 def unicode_23(string):
     """
-    Parameter
-    ---------
+    Parameters
+    ----------
     string: str
         This is a unicode string under Python 3 and a "normal" string under Python 2.
 
@@ -175,11 +175,11 @@ def unicode_23(string):
 
 def clean_ascii(arg):
     """
-    Remove non-ASCII-characters from `arg` when it is a text type (`six.string_types`).
-    Otherwise, return `arg` unchanged.
+    Remove non-ASCII-characters (outside range 0 ... x7F) from `arg` when it 
+    is a text type (`six.string_types`). Otherwise, return `arg` unchanged.
     
-    Parameter
-    ---------
+    Parameters
+    ----------
     string: str
         This is a unicode string under Python 3 and a "normal" string under Python 2.
 
@@ -188,7 +188,6 @@ def clean_ascii(arg):
     
     A string (whatever that means in Py2 / Py3)
     """
-    # remove all chars except when in the range 0 ... x7F
     if isinstance(arg, six.string_types):
         return re.sub(r'[^\x00-\x7f]',r'', arg)
     else:
@@ -206,14 +205,14 @@ def qstr(text):
     This is first converted from the QVariant container format to a
     QString, next to a "normal" non-unicode string.
 
-    Parameter:
+    Parameters
     ----------
     
     text: QVariant, QString, string or numeric data type that can be converted
       to string
     
-    Returns:
-    --------
+    Returns
+    -------
     
     The current `text` data as a unicode (utf8) string
     """
@@ -251,8 +250,8 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     When evaluation fails or returns `None`, try evaluating `alt_expr`. When this also fails,
     return 0 to avoid errors further downstream.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     expr: string
         String to be evaluated
 
@@ -322,8 +321,6 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     elif sign == 'neg':
         result = -np.abs(result)
     return result
-
-
 
 #------------------------------------------------------------------------------
 
@@ -459,9 +456,9 @@ def cround(x, n_dig = 0):
 
 def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
     """
-    Calculate `|H(z)|` at the complex frequency(ies) `z` (scalar or
+    Calculate `\|H(z)\|` at the complex frequency(ies) `z` (scalar or
     array-like).  The function `H(z)` is given in polynomial form with numerator and
-    denominator. When log = True, `20 log_10 (|H(z)|)` is returned.
+    denominator. When log = True, `20 log_10 (\|H(z)\|)` is returned.
 
     The result is clipped at H_min, H_max; clipping can be disabled by passing
     None as the argument.
@@ -479,7 +476,7 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
     H_min : float, optional
         The minimum value to which the result is clipped (default: 0)
     log : boolean, optional
-        When true, return 20 * log10 (|H(z)|). The clipping limits have to
+        When true, return 20 * log10 (\|H(z)\|). The clipping limits have to
         be given as dB in this case.
     div_by_0 : string, optional
         What to do when division by zero occurs during calculation (default:
@@ -490,7 +487,7 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
     Returns
     -------
     H_mag : float or ndarray
-        The magnitude |`H(z)`| for each value of `z`.
+        The magnitude `\|H(z)\|` for each value of `z`.
     """
 
     try: len(num)
@@ -804,12 +801,8 @@ fs : float (optional, default: fs = 2*pi)
 
 Returns
 -------
-tau_g : ndarray
-    The group delay
-
-
-w : ndarray
-    The angular frequency points where the group delay was computed
+tau_g : ndarray (the group delay)
+w : ndarray, angular frequency points where group delay was computed
 
 Notes
 -----
@@ -1137,20 +1130,20 @@ def fil_save(fil_dict, arg, format_in, sender, convert = True):
     format_in : string
         Specifies how the filter design in 'arg' is passed:
 
-        - 'ba' : Coefficient form: Filter coefficients in FIR format
+        :'ba': Coefficient form: Filter coefficients in FIR format
                  (b, one dimensional) are automatically converted to IIR format (b, a).
 
-        - 'zpk' : Zero / pole / gain format: When only zeroes are specified,
+        :'zpk': Zero / pole / gain format: When only zeroes are specified,
                   poles and gain are added automatically.
 
-        - 'sos' : Second-order sections
+        :'sos': Second-order sections
 
     sender : string
         The name of the method that calculated the filter. This name is stored
         in ``fil_dict`` together with ``format_in``.
 
     convert : boolean
-        When convert = True, convert arg to the other formats.
+        When ``convert = True``, convert arg to the other formats.
     """
 
     if format_in == 'sos':
@@ -1241,21 +1234,23 @@ def fil_convert(fil_dict, format_in):
     """
     Convert between poles / zeros / gain, filter coefficients (polynomes)
     and second-order sections and store all formats not generated by the filter
-    design routine in the passed dictionary 'fil_dict'.
+    design routine in the passed dictionary ``fil_dict``.
 
     Parameters
     ----------
-    fil_dict :  dictionary
-         filter dictionary
+    fil_dict :  dict
+         filter dictionary containing a.o. all formats to be read and written.
 
     format_in :  string or set of strings
+    
          format(s) generated by the filter design routine. Must be one of
-         'sos' : a list of second order sections - all other formats can easily
+         
+         :'sos': a list of second order sections - all other formats can easily
                  be derived from this format
-         'zpk': [z,p,k] where z is the array of zeros, p the array of poles and
+         :'zpk': [z,p,k] where z is the array of zeros, p the array of poles and
              k is a scalar with the gain - the polynomial form can be derived
              from this format quite accurately
-         'ba' : [b, a] where b and a are the polynomial coefficients - finding
+         :'ba': [b, a] where b and a are the polynomial coefficients - finding
                    the roots of the a and b polynomes may fail for higher orders
     """
 
@@ -1266,8 +1261,8 @@ def fil_convert(fil_dict, format_in):
         if (fil_dict['ft'] == 'IIR'):
             chk = np.asarray(fil_dict['sos'])
             chk = np.absolute(chk)
-            nSections = chk.shape[0]
-            for section in range(nSections):
+            n_sections = chk.shape[0]
+            for section in range(n_sections):
                 b1 = chk[section, :3]
                 a1 = chk[section, 3:]
                 if ((np.amin(b1)) < 1e-14 and np.amin(b1) > 0):
@@ -1335,16 +1330,18 @@ def fil_convert(fil_dict, format_in):
 
 def sos2zpk(sos):
     """
-    - Taken from scipy/signal/filter_design.py - edit to eliminate first
+    Taken from scipy/signal/filter_design.py - edit to eliminate first
     order section
 
     Return zeros, poles, and gain of a series of second-order sections
+
     Parameters
     ----------
     sos : array_like
         Array of second-order filter coefficients, must have shape
         ``(n_sections, 6)``. See `sosfilt` for the SOS filter format
         specification.
+
     Returns
     -------
     z : ndarray

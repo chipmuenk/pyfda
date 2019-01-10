@@ -2,6 +2,10 @@
 
 pyfda Libraries
 =============== 
+:mod:`pyfda.pyfda_lib`
+-------------------------------
+.. automodule:: pyfda.pyfda_lib
+	:members:
 
 :mod:`pyfda.pyfda_fix_lib`
 --------------------------
@@ -12,6 +16,5 @@ pyfda Libraries
 -------------------------
 .. automodule:: pyfda.plot_widgets
 	:members:
-
 
 
