@@ -1,5 +1,5 @@
 
-from filter_blocks.fda import FilterFIR
+from pyfda.filter_blocks.fda.fir import FilterFIR
 import numpy as np
 
 

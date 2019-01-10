@@ -3,9 +3,9 @@ import pytest
 import myhdl as hdl
 from myhdl import Signal, intbv, StopSimulation, delay, traceSignals, ResetSignal
 
-from filter_blocks.support import Clock, Reset, Global, Samples
-from filter_blocks.iir import iir_parallel
-from filter_blocks.fda import FilterIIR
+from pyfda.filter_blocks.support import Clock, Reset, Global, Samples
+from pyfda.filter_blocks.iir import iir_parallel
+from pyfda.filter_blocks.fda.iir import FilterIIR
 
 
 # TODO: fix these, they should not be failing!
