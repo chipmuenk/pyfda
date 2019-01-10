@@ -58,7 +58,8 @@ install:
   - popd
     
   - pip install -U pip wheel setuptools
-  - pip install numpy nose six docutils matplotlib myhdl
+  - pip install numpy nose six docutils matplotlib
+  - pip install myhdl --user 
   - pip install -v -U scipy
   - python -V
   
