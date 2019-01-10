@@ -17,6 +17,8 @@ language: python
 global:
   - SETUP_XVFB=True
 
+sudo: required
+
 python:
   - "2.7"
   - "3.5"
