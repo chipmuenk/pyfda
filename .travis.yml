@@ -61,7 +61,7 @@ install:
     
   - pip install -U pip wheel setuptools
   - pip install numpy nose six docutils matplotlib
-  - pip install myhdl --user 
+  - sudo pip install myhdl
   - pip install -v -U scipy
   - python -V
   
