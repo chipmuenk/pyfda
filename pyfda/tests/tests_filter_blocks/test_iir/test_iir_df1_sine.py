@@ -5,7 +5,7 @@ import numpy as np
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 
-from filter_blocks.fda import FilterIIR
+from pyfda.filter_blocks.fda.iir import FilterIIR
 
 
 def fixp_sine(bsc_int, asc_int, B1, L1):
