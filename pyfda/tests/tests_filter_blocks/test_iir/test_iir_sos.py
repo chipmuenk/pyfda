@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
 import numpy as np
 import scipy.signal as signal
