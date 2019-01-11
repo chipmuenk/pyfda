@@ -42,7 +42,9 @@ if cmp_version("myhdl", "0.10") >= 0:
 #    else:
 #        if fil_blocks_path not in sys.path:
 #            sys.path.append(fil_blocks_path)
-#        from filter_blocks.fda import FilterFIR, FilterIIR    
+#        from pyfda.filter_blocks.fda.fir import FilterFIR
+#        from pyfda.filter_blocks.fda.iir import FilterIIR
+
 else:
     HAS_MYHDL = False
 

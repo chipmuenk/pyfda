@@ -14,9 +14,11 @@ language: python
 #	    - PYTHON_VERSION=3.4 USE_QT_API=PyQt5
 #	    - PYTHON_VERSION=3.5 USE_QT_API=PyQt4
 #	    - PYTHON_VERSION=3.5 USE_QT_API=PyQt5
-global:
-  - SETUP_XVFB=True
 
+global:
+#use xvfb (X Virtual Framebuffer) to imitate a display
+  - SETUP_XVFB=True
+ 
 sudo: required
 
 python:
@@ -73,10 +75,11 @@ install:
   - pip install .
 
 before_script:
+#Don’t run xvfb directly, as it does not handle multiple concurrent instances that way.
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start" # use X Virtual Framebuffer to imitate a display
   - sleep 3 # give xvfb some time to start
 
 
-script: nosetests --verbosity=3
+script: nosetests --verbosity=2
 

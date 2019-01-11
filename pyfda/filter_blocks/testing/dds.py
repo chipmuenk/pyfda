@@ -2,7 +2,7 @@
 from math import sin, pi, fmod, cos
 import myhdl as hdl
 from myhdl import intbv, always_seq
-from filter_blocks.support import Samples
+from pyfda.filter_blocks.support import Samples
 
 
 class DDSine(object):

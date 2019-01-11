@@ -12,12 +12,12 @@
 """
 Simulate and convert IIR fixpoint filter block using myHDL
 """
-import numpy as np
+#import numpy as np
 import myhdl as hdl
 from myhdl import Signal, intbv, StopSimulation
 
 from .filter_hw import FilterHardware
-from ..iir import iir_df1, iir_sos
+from ..iir import iir_df1#, iir_sos
 from pyfda.filter_blocks.support import Clock, Reset, Global, Samples
 
 

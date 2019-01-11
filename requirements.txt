@@ -5,6 +5,6 @@ six
 docutils
 nose
 myhdl >= 0.10
-pytest
+# pytest
 # coverage
 # coveralls
