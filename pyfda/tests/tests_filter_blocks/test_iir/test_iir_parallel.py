@@ -40,7 +40,7 @@ def test_iir_api():
 
 
 @pytest.mark.xfail
-def test_iir_par_sim():
+def notest_iir_par_sim(): # this test stalls the test suite
     tb = traceSignals(test_iir_api())
     tb.run_sim()
 
