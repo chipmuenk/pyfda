@@ -1,4 +1,13 @@
-
+# -*- coding: utf-8 -*-
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
+#
+# Taken from https://github.com/sriyash25/filter-blocks
+# (c) Christopher Felton and Sriyash Caculo
 
 import math
 import numpy as np
