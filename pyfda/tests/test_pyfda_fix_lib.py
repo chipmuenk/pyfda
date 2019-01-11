@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jun 14 11:57:19 2017
+#
+# This file is part of the pyFDA project hosted at https://github.com/chipmuenk/pyfda
+#
+# Copyright © pyFDA Project Contributors
+# Licensed under the terms of the MIT License
+# (see file LICENSE in root directory for details)
 
-@author: Christian Muenker
 """
-
+Test suite for the pyfda_fix_lib classes and methods
+"""
 
 import unittest
 import numpy as np
 from pyfda import pyfda_fix_lib as fix_lib
 from pyfda.pyfda_fix_lib import bin2hex, dec2csd, csd2dec
 # TODO: Add test case for complex numbers
+# TODO: test csd2dec, csd2dec_vec
 
 class TestSequenceFunctions(unittest.TestCase):
 
@@ -46,9 +51,22 @@ class TestSequenceFunctions(unittest.TestCase):
         self.myQ.setQobj(q_obj)
         self.assertEqual(q_obj, self.myQ.q_obj)
         # check whether Q : 7.3 is resolved correctly as WI:7, WF: 3
-        q_obj2 = {'Q': '7.3'}
+        q_obj2 = {'Q': '6.2'}
         self.myQ.setQobj(q_obj2)
-        self.assertEqual(q_obj, self.myQ.q_obj)
+        self.assertEqual(q_obj2, self.myQ.q_obj)
+
+        self.myQ.setQobj({'W': 13})
+        self.assertEqual(12, self.myQ.WI)
+        self.assertEqual(0, self.myQ.WF)
+        self.assertEqual('12.0', self.myQ.Q)
+
+
+        # check whether option 'norm' sets the correct scale
+        self.myQ.setQobj({'scale':'norm'})
+        self.assertEqual(2**(-self.myQ.WI), self.myQ.scale)        
+        # check whether option 'int' sets the correct scale
+        self.myQ.setQobj({'scale':'int'})
+        self.assertEqual(1<<self.myQ.WF, self.myQ.scale)        
 
     def test_fix_no_ovfl(self):
         """
