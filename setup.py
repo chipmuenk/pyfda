@@ -21,7 +21,7 @@ with open("pyfda/version.py") as fp:
 setup(
     name = 'pyfda',
     # see PEP440 for versioning information
-    version = version_nr['__version__'],   
+    version = version_nr['__version__'],
     description = ('pyFDA is a python tool with a user-friendly GUI for designing '
                  'and analysing discrete time filters.'),
     long_description = long_description,
@@ -62,7 +62,7 @@ setup(
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
     packages = find_packages(exclude=('contrib', 'docs', 'test')),
-    # Read information from MANIFEST.in    
+    # Read information from MANIFEST.in
     include_package_data = True,
     # add additional data files (= non *.py) for package / subpackages relative
     # to package directory, include 'qrc_resources.py' instead of 'images/icons/*',
@@ -73,7 +73,11 @@ setup(
     ## data_files = [('', ['README.rst']), ('', ['LICENSE'])],
     # Required modules
     install_requires = [
-        'numpy', 'scipy', 'matplotlib', 'docutils'
+        'numpy',
+        'scipy',
+        'matplotlib',
+        'docutils',
+        'myhdl'
         ],
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached terminal:
@@ -91,7 +95,7 @@ setup(
 """
 On non-Windows platforms (using "setup.py install", "setup.py develop",
 or by using EasyInstall), a "pyfdax" script will be installed that opens up
-a terminal and imports "main" from pyfdax.py. 
+a terminal and imports "main" from pyfdax.py.
 main() is called with no arguments, and the return value is passed to sys.exit(), so an errorlevel or message to print
 to stderr could be provided (not implemented yet).
 
