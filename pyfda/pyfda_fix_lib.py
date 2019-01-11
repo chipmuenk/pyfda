@@ -284,14 +284,14 @@ class Fixed(object):
 
     * **'WI'** : integer word length, default: 0
 
-    * **'WF'** : fractional word length; default: 15; WI + WF + 1 = W (1 sign bit)
+    * **'WF'** : fractional word length; default: 15
 
-    * **'W'**  : total word length; WI + WF + 1 = W (1 sign bit). When W is given,
-                 WI = W - 1 and WF = 0, `Q` is overridden.
+    * **'W'**  : total word length; WI + WF + 1 = W (1 sign bit). When WI and / or
+                 W are missing, WI = W - 1 and WF = 0.
 
     * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated
                  to`WI` and `WF` and deleted afterwards. When both `Q` and `WI` / `WF`
-                 are given, `Q` takes precedence
+                 are given, `Q` is ignored
 
     * **'quant'** : Quantization method, optional; default = 'floor'
 
@@ -319,8 +319,14 @@ class Fixed(object):
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
 
-    * **'scale'** : Float, the factor between the fixpoint integer representation
-                    and its floating point value.
+    * **'scale'** : Float or a keyword, the factor between the fixpoint integer 
+            representation and its floating point value. If ``scale`` is a float,
+            this value is used. Alternatively, if:
+                
+                - ``q_obj['scale'] == 'int'``:   scale = 1 << self.WF
+                
+                - ``q_obj['scale'] == 'norm'``:  scale = 2.**(-self.WI)
+
 
     Attributes
     ----------
@@ -332,6 +338,12 @@ class Fixed(object):
 
     WF : integer
         number of fractional bits
+        
+    W : integer
+        total wordlength
+        
+    Q : string
+        quantization format, e.g. '2.13'
         
     quant : string
         Quantization behaviour ('floor', 'round', ...)
@@ -346,11 +358,6 @@ class Fixed(object):
         The factor between integer fixpoint representation and the floating point
         value.
         
-    Additionally, the following attributes can be read:
-
-    W : integer
-        total wordlength
-
     LSB : float
         value of LSB (smallest quantization step)
 
@@ -424,17 +431,6 @@ class Fixed(object):
         q_obj_default = {'WI':0, 'WF':15, 'quant':'round', 'ovfl':'sat',
                          'frmt':'float', 'scale':1}
 
-        # missing key-value pairs are either taken from default dict or from
-        # instance attributes
-        for k in q_obj_default.keys():
-            if k not in q_obj.keys():
-                if not hasattr(self, k):
-                    q_obj[k] = q_obj_default[k]
-                else:
-                    q_obj[k] = getattr(self, k)
-
-        # set default values for parameters if undefined:
-
         if 'WI' in q_obj and 'WF' in q_obj:
             pass # everything's defined already
         elif 'W' in q_obj:
@@ -445,13 +441,27 @@ class Fixed(object):
             q_obj['WI'] = int(Q_str[0])
             q_obj['WF'] = abs(int(Q_str[1]))
 
+        # missing key-value pairs are either taken from default dict or from
+        # instance attributes
+        for k in q_obj_default.keys():
+            if k not in q_obj.keys():
+                if not hasattr(self, k):
+                    q_obj[k] = q_obj_default[k]
+                else:
+                    q_obj[k] = getattr(self, k)
+                    
         # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
         self.WF    = int(abs(q_obj['WF']))
-        self.W     = int(self.WF + self.WI + 1)
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt  = str(q_obj['frmt']).lower()
+        
+        q_obj['W'] = int(self.WF + self.WI + 1)
+        self.W     = q_obj['W']        
+        q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
+
+        
         try:
             self.scale = np.float64(q_obj['scale'])
         except ValueError:
@@ -462,8 +472,6 @@ class Fixed(object):
             else:
                 raise ValueError
                 
-        q_obj['W'] = self.W
-        q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
         self.q_obj = q_obj # store quant. dict in instance
 
         self.LSB = 2. ** -self.WF  # value of LSB
@@ -541,8 +549,8 @@ class Fixed(object):
         >>> # Convert output to same format as input:
         >>> b = np.arange(200, dtype = np.int16)
         >>> btype = np.result_type(b)
-        >>> # MSB = 2**7, LSB = 2**2:
-        >>> q_obj_b = {'WI':7, 'WF':-2, 'ovfl':'wrap', 'quant':'round'}
+        >>> # MSB = 2**7, LSB = 2**(-2):
+        >>> q_obj_b = {'WI':7, 'WF':2, 'ovfl':'wrap', 'quant':'round'}
         >>> myQb = Fixed(q_obj_b) # instantiate fixed-point object myQb
         >>> bq = myQb.fixed(b)
         >>> bq = bq.astype(btype) # restore original variable type
