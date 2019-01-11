@@ -24,9 +24,9 @@ sudo: required
 python:
   - "2.7"
   - "3.5"
+  - "3.6"
 
 before_install:
-      
   - uname -a
   - free -m
   - df -h
@@ -45,7 +45,6 @@ install:
   - pip install -U pip wheel setuptools
   - pip install -r requirements.txt
   #- pip install numpy nose six docutils matplotlib
-  #- sudo pip install myhdl
   #- pip install -v -U scipy
   - python -V
 
@@ -82,4 +81,3 @@ before_script:
 
 
 script: nosetests --verbosity=2
-
