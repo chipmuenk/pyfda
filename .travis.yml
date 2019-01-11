@@ -60,9 +60,10 @@ install:
   - popd
     
   - pip install -U pip wheel setuptools
-  - pip install numpy nose six docutils matplotlib
-  - sudo pip install myhdl
-  - pip install -v -U scipy
+  - pip install -r requirements.txt
+  #- pip install numpy nose six docutils matplotlib
+  #- sudo pip install myhdl
+  #- pip install -v -U scipy
   - python -V
   
   # Builds Complete
