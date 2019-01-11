@@ -40,6 +40,13 @@ before_install:
   - sudo chmod a+rw /builds
 
 install:
+  - pip install -U pip wheel setuptools
+  - pip install -r requirements.txt
+  #- pip install numpy nose six docutils matplotlib
+  #- sudo pip install myhdl
+  #- pip install -v -U scipy
+  - python -V
+
   # Qt4
   - pushd /builds
   
@@ -59,17 +66,10 @@ install:
   - sudo make install
   - popd
     
-  - pip install -U pip wheel setuptools
-  - pip install -r requirements.txt
-  #- pip install numpy nose six docutils matplotlib
-  #- sudo pip install myhdl
-  #- pip install -v -U scipy
-  - python -V
   
   # Builds Complete
   - popd
-  #- pip install -r requirements.txt
-  #- pip install coveralls
+
   - pip install .
 
 before_script:

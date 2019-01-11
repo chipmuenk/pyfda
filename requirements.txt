@@ -4,7 +4,7 @@ matplotlib
 six
 docutils
 nose
-myhdl
+myhdl >= 0.10
 pytest
 # coverage
 # coveralls
