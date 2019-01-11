@@ -123,7 +123,7 @@ def dec2csd(dec_val, WF=0):
 
     Returns
     -------
-    string 
+    string
         containing the CSD value
 
     Original author: Harnesser
@@ -196,7 +196,7 @@ def dec2csd(dec_val, WF=0):
 #        csd_digits.insert(0, '0')
 
     csd_str = "".join(csd_digits)
-    
+
     logger.debug("CSD result = {0}".format(csd_str))
 
 #    if WF > 0:
@@ -269,14 +269,14 @@ class Fixed(object):
 
     Examples
     --------
-      
+
     Define a dictionary with the format options and pass it to the constructor:
-        
+
     >>> q_obj = {'WI':1, 'WF':14, 'ovfl':'sat', 'quant':'round'} # or
     >>> q_obj = {'Q':'1.14', 'ovfl':'none', 'quant':'round'}
-    >>> myQ = Fixed(q_obj) 
-    
-    
+    >>> myQ = Fixed(q_obj)
+
+
     Parameters
     ----------
     q_obj : dict
@@ -319,12 +319,12 @@ class Fixed(object):
       - 'hex'  : hex string, scaled by :math:`2^{WF}`
       - 'csd'  : canonically signed digit string, scaled by :math:`2^{WF}`
 
-    * **'scale'** : Float or a keyword, the factor between the fixpoint integer 
+    * **'scale'** : Float or a keyword, the factor between the fixpoint integer
             representation and its floating point value. If ``scale`` is a float,
             this value is used. Alternatively, if:
-                
+
                 - ``q_obj['scale'] == 'int'``:   scale = 1 << self.WF
-                
+
                 - ``q_obj['scale'] == 'norm'``:  scale = 2.**(-self.WI)
 
 
@@ -338,13 +338,13 @@ class Fixed(object):
 
     WF : integer
         number of fractional bits
-        
+
     W : integer
         total wordlength
-        
+
     Q : string
         quantization format, e.g. '2.13'
-        
+
     quant : string
         Quantization behaviour ('floor', 'round', ...)
 
@@ -357,7 +357,7 @@ class Fixed(object):
     scale : float
         The factor between integer fixpoint representation and the floating point
         value.
-        
+
     LSB : float
         value of LSB (smallest quantization step)
 
@@ -397,7 +397,7 @@ class Fixed(object):
     >>> q_dsp = {'Q':'0.15', 'quant':'round', 'ovfl':'wrap'} # Python
     >>> my_q = Fixed(q_dsp)
     >>> yq = my_q.fixp(y)
-    
+
     """
 
     def __init__(self, q_obj):
@@ -407,7 +407,7 @@ class Fixed(object):
         # test if all passed keys of quantizer object are defined
         self.setQobj(q_obj)
         self.resetN() # initialize overflow-counter
-        
+
         # arguments for regex replacement with illegal characters
         # ^ means "not", | means "or" and \ escapes
         self.FRMT_REGEX = {
@@ -420,8 +420,8 @@ class Fixed(object):
     def setQobj(self, q_obj):
         """
         Analyze quantization dict, complete and transform it if needed and
-        store it as instance attribute. 
-        
+        store it as instance attribute.
+
         Check the docstring of class `Fixed()` for  details.
         """
         for key in q_obj.keys():
@@ -449,20 +449,19 @@ class Fixed(object):
                     q_obj[k] = q_obj_default[k]
                 else:
                     q_obj[k] = getattr(self, k)
-                    
+
         # store parameters as class attributes
         self.WI    = int(q_obj['WI'])
         self.WF    = int(abs(q_obj['WF']))
         self.quant = str(q_obj['quant']).lower()
         self.ovfl  = str(q_obj['ovfl']).lower()
         self.frmt  = str(q_obj['frmt']).lower()
-        
+
         q_obj['W'] = int(self.WF + self.WI + 1)
-        self.W     = q_obj['W']        
+        self.W     = q_obj['W']
         q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
         self.Q     = q_obj['Q']
 
-        
         try:
             self.scale = np.float64(q_obj['scale'])
         except ValueError:
@@ -472,7 +471,7 @@ class Fixed(object):
                 self.scale = 2.**(-self.WI)
             else:
                 raise ValueError
-                
+
         self.q_obj = q_obj # store quant. dict in instance
 
         self.LSB = 2. ** -self.WF  # value of LSB
@@ -519,14 +518,14 @@ class Fixed(object):
 
         scaling: String
             Determine the scaling before and after quantizing / saturation
-            
-            *'mult'* float in, int out: 
+
+            *'mult'* float in, int out:
                 `y` is multiplied by `self.scale` *before* quantizing / saturating
             **'div'**: int in, float out:
-                `y` is divided by `self.scale` *after* quantizing / saturating.                
+                `y` is divided by `self.scale` *after* quantizing / saturating.
             **'multdiv'**: float in, float out (default):
                 both of the above
-             
+
             For all other settings, `y` is transformed unscaled.
 
         Returns
@@ -629,7 +628,7 @@ class Fixed(object):
 
         #======================================================================
         # (3) : QUANTIZATION
-        #       Divide by LSB to obtain an intermediate format where the 
+        #       Divide by LSB to obtain an intermediate format where the
         #       quantization step size = 1.
         #       Next, apply selected quantization method to convert
         #       floating point inputs to "fixpoint integers".
@@ -656,7 +655,7 @@ class Fixed(object):
         logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
         #======================================================================
-        # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a 
+        # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
         #       result in the range MIN = -2*MSB ... + 2*MSB-LSB = MAX
         #=====================================================================
         if   self.ovfl == 'none':
@@ -687,7 +686,7 @@ class Fixed(object):
         # (5) : OUTPUT SCALING
         #       Divide result by `scale` factor when `scaling=='div'`or 'multdiv'
         #       to obtain correct scaling for floats
-        #       - frmt2float() always returns float 
+        #       - frmt2float() always returns float
         #       - input_coeffs when quantizing the coefficients
         #       float2frmt passes on the scaling argument
         #======================================================================
@@ -715,8 +714,8 @@ class Fixed(object):
         Return floating point representation for fixpoint scalar `y` given in
         format `frmt`.
 
-        When input format is float, return unchanged. 
-        
+        When input format is float, return unchanged.
+
         Else:
 
         - Remove illegal characters and leading '0's
@@ -752,7 +751,7 @@ class Fixed(object):
             float_frmt = np.float32
         elif frmt == 'float16':
             float_frmt = np.float16
-            
+
         if frmt == 'float':
             # this handles floats, np scalars + arrays and strings / string arrays
             try:
@@ -825,10 +824,10 @@ class Fixed(object):
                     if frmt == 'hex':
                         raw_str = np.binary_repr(int(raw_str, 16))
                     # discard the upper bits outside the valid range
-                    raw_str = raw_str[int_bits - self.WI - 1:] 
+                    raw_str = raw_str[int_bits - self.WI - 1:]
 
                     # recalculate y_dec for truncated string
-                    y_dec = int(raw_str, 2) / self.base**frc_places 
+                    y_dec = int(raw_str, 2) / self.base**frc_places
 
                     if y_dec == 0: # avoid log2(0) error in code below
                         return 0
@@ -862,7 +861,7 @@ class Fixed(object):
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
 
-        if frmt != "float": 
+        if frmt != "float":
             logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
                          .format(self.MSB, self.scale, raw_str, val_str))
             logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
@@ -887,7 +886,7 @@ class Fixed(object):
 
         Parameters
         ----------
-        y: scalar or array-like 
+        y: scalar or array-like
             y has to be an integer or float decimal number either numeric or in
             string format.
 
