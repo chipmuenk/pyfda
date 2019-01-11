@@ -290,7 +290,7 @@ class Fixed(object):
                  W are missing, WI = W - 1 and WF = 0.
 
     * **'Q'**  : Quantization format as string, e.g. '0.15', it is translated
-                 to`WI` and `WF` and deleted afterwards. When both `Q` and `WI` / `WF`
+                 to`WI` and `WF`. When both `Q` and `WI` / `WF`
                  are given, `Q` is ignored
 
     * **'quant'** : Quantization method, optional; default = 'floor'
@@ -460,6 +460,7 @@ class Fixed(object):
         q_obj['W'] = int(self.WF + self.WI + 1)
         self.W     = q_obj['W']        
         q_obj['Q'] = str(self.WI) + '.' + str(self.WF)
+        self.Q     = q_obj['Q']
 
         
         try:
