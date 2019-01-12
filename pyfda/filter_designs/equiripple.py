@@ -40,7 +40,8 @@ import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_qt_lib import qfilter_warning
-from pyfda.pyfda_lib import fil_save, remezord, round_odd, ceil_even, safe_eval
+from pyfda.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
+from .common import remezord 
 
 __version__ = "2.0"
 

@@ -38,9 +38,9 @@ from importlib import import_module
 import inspect
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import fil_save, remezord, round_odd, safe_eval
+from pyfda.pyfda_lib import fil_save, round_odd, safe_eval
 from pyfda.pyfda_qt_lib import qfilter_warning
-from .common import Common
+from .common import Common, remezord
 
 
 # TODO: Hilbert, differentiator, multiband are missing
