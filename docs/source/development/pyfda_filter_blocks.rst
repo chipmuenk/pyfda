@@ -7,16 +7,16 @@ to Verilog and VHDL netlists.
 pyfda Filter Blocks - Details
 =============================
 
-:class:`pyfda.filter_blocks.fda.FilterFIR`
-------------------------------------------
+:class:`pyfda.filter_blocks.fda.fir.FilterFIR`
+----------------------------------------------
 
-.. autoclass:: pyfda.filter_blocks.fda.FilterFIR
+.. autoclass:: pyfda.filter_blocks.fda.fir.FilterFIR
     :show-inheritance:
     :members:
 
-:class:`pyfda.filter_blocks.fda.FilterIIR`
-------------------------------------------
+:class:`pyfda.filter_blocks.fda.iir.FilterIIR`
+----------------------------------------------
 
-.. autoclass:: pyfda.filter_blocks.fda.FilterIIR
+.. autoclass:: pyfda.filter_blocks.fda.iir.FilterIIR
     :show-inheritance:
     :members:
