@@ -124,9 +124,10 @@ or upgrade using
 or install locally using
 
 ::
+
 	pip install -e <YOUR_PATH_TO_PYFDA>
 	
-where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git.
+where the specified path is the one your `setup.py` sits in. In this case, you need to have a local copy of the pyfda project, preferrably using git. Now you can edit your local copy, test it and e.g. push it to your own git fork.
 
 Starting pyFDA
 --------------

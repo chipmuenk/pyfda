@@ -4,8 +4,8 @@ This package provides fixpoint descriptions for various
 filter topologies. The filter blocks can be simulated and converted
 to Verilog and VHDL netlists.
 
-pyfda Filter Blocks - Details
-=============================
+Filter Blocks - Details
+=======================
 
 :class:`pyfda.filter_blocks.fda.fir.FilterFIR`
 ----------------------------------------------

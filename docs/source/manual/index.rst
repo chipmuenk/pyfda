@@ -1,5 +1,5 @@
-Manual
-======
+User Manual
+===========
 
 This part of the documentation is intended to describe the features of pyFDA that are relevant to a user (i.e. non-developer).
 

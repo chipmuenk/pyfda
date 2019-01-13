@@ -7,7 +7,10 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for plotting |H(f)|, frequency specs and the phase
+The ``Plot_Hf`` class constructs the widget to plot the magnitude
+frequency response \|H(f)\| of the filter either in linear or logarithmic
+scale. Optionally, the magnitude specifications and the phase 
+can be overlayed.
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
@@ -28,7 +31,7 @@ from pyfda.pyfda_lib import calc_Hcomplex
 
 class Plot_Hf(QWidget):
     """
-    Widget for plotting |H(f)|, frequency specs and the phase
+    Widget for plotting \|H(f)\|, frequency specs and the phase
     """
     # incoming, connected in sender widget (locally connected to self.process_signals() )
     sig_rx = pyqtSignal(object)
@@ -476,7 +479,7 @@ class Plot_Hf(QWidget):
 #------------------------------------------------------------------------------
     def draw(self):
         """
-        Re-calculate |H(f)| and draw the figure
+        Re-calculate \|H(f)\| and draw the figure
         """
         self.calc_hf()
         self.update_view()

@@ -24,7 +24,8 @@ import pyfda.filterbroker as fb
 
 class InputTabWidgets(QWidget):
     """
-    Create a tabbed widget for various input subwidgets
+    Create a tabbed widget for all input subwidgets in the list ``fb.input_widgets_list``.
+    This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`
     """
     # signals as class variables (shared between instances if more than one exists)
     # incoming, connected here to individual senders, passed on to process sigmals
