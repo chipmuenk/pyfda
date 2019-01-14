@@ -1,7 +1,7 @@
 .. pyfda development documentation for main routines
 
-pyfda Main Routines
-===================
+Main Routines
+=============
 
 :class:`pyfda.filter_factory.FilterFactory`
 -------------------------------------------
