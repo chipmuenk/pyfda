@@ -1,5 +1,3 @@
-.. pyfda documentation  
-
 Plot Widgets
 ============
 

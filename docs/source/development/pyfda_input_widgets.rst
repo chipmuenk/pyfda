@@ -1,7 +1,7 @@
-.. pyfda documentation  
-
 Input Widgets
 =============
+This package contains the widgets for entering / selecting parameters
+for the filter design.  
 
 :class:`pyfda.input_widgets.input_tab_widgets.InputTabWidgets`
 --------------------------------------------------------------
@@ -16,6 +16,3 @@ Input Widgets
 .. autoclass:: pyfda.input_widgets.select_filter.SelectFilter
     :show-inheritance:
 	:members:
-
-
-
