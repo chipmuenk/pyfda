@@ -26,18 +26,6 @@ Version: 0.1.5
    api
 
 
-.. 
-    :mod:`pyfda` -- Main package
-
-
-.. 
-   :class:`pyfda.filter_factory`
-
-.. x automodule:: pyfda
-
-
-
-
 Indices and tables
 ==================
 

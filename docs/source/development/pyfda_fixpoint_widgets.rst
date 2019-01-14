@@ -1,5 +1,3 @@
-.. pyfda documentation  
-
 Package `fixpoint_widgets`
 ==========================
 
@@ -20,8 +18,6 @@ A myhdl filter instance `self.hdlfilter` of `filter_blocks.fda.FilterFIR` or `fi
 
 are used for bit-true simulations and for generating VHDL or Verilog code for the filter. 
 
-pyfda Fixpoint Widgets - Details
-================================
 
 :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`
 ----------------------------------------------------------------------

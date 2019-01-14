@@ -1,18 +1,6 @@
 Development
 ===========
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-   
-   pyfda_main_routines
-   pyfda_libs
-   pyfda_input_widgets
-   pyfda_plot_widgets
-   pyfda_fixpoint_widgets
-   pyfda_filter_blocks
-
-
 This part of the documentation describes the features of pyFDA that are relevant for developers.
 
 The software is structured as shown in the following figure
@@ -39,11 +27,24 @@ At startup, a dictionary is constructed with information about the filter classe
 
 
 Customization
-~~~~~~~~~~~~~
+-------------
+
+
 
 - Layout and some parameters can be customized with the file
   ``pyfda/pyfda_rc.py`` (within the install directory right now). 
 - Select which widgets and filters will be included, define a user
-  directory for integration of your own widgets in ``<USER_HOME>/.pyfda/pyfda.conf``
-- Control logging behaviour with ``<USER_HOME>/.pyfda/pyfda_log.conf``
+  directory for integration of your own widgets in ``<USER_HOME>/pyfda/pyfda.conf``
+- Control logging behaviour with ``<USER_HOME>/pyfda/pyfda_log.conf``
 
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+   
+   pyfda_main_routines
+   pyfda_libs
+   pyfda_input_widgets
+   pyfda_plot_widgets
+   pyfda_fixpoint_widgets
+   pyfda_filter_blocks
