@@ -11,8 +11,6 @@ to Verilog and VHDL netlists.
     :show-inheritance:
     :members:
 
-
-
 :class:`pyfda.filter_blocks.fda.fir.FilterFIR`
 ----------------------------------------------
 
