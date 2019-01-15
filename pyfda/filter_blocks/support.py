@@ -10,7 +10,7 @@
 # (c) Christopher Felton and Sriyash Caculo
 
 """
-Helper classes and functions
+Helper classes and functions for the generation of myhdl signals
 """
 import numpy as np
 
@@ -19,6 +19,7 @@ from myhdl import Signal, SignalType, ResetSignal, intbv, delay
 
 
 class Clock(SignalType):
+    """ Generate a clock """
     def __init__(self, val=bool(0), frequency=1):
         self.frequency = frequency
         super(Clock, self).__init__(bool(val))
@@ -41,6 +42,7 @@ class Clock(SignalType):
 
 
 class Reset(ResetSignal):
+    """ Generate a reset signal """
     def __init__(self, val=0, active=0, async=True):
         super(Reset, self).__init__(val, active, async)
 
@@ -55,6 +57,7 @@ class Reset(ResetSignal):
 
 
 class Global(object):
+    """ Generate global signals clock, reset, enable """
     def __init__(self, clock, reset):
         self.clock = clock
         self.reset = reset
@@ -63,7 +66,8 @@ class Global(object):
 
 class Samples(object):
     def __init__(self, min, max, word_format = (24, 23, 0), res=0, dtype=intbv, sample_rate=1):
-        """Sample streams, input and output to filters.
+        """
+        Sample streams, input and output to filters.
 
         """
         # @todo: fixed-point support ...
@@ -129,20 +133,30 @@ def check_word_fomat(w):
 
 def Signals(sigtype, num_sigs):
     """ Create a list of signals
-    Arguments:
-        sigtype (bool, intbv): The type to create a Signal from.
-        num_sigs (int): The number of signals to create in the list
-    Returns:
-        sigs: a list of signals all of type `sigtype`
 
-    Creating multiple signals of the same type is common, this
-    function helps facilitate the creation of multiple signals of
+    Arguments
+    ---------
+    sigtype : bool, intbv 
+        The type to create a Signal from.
+    
+    num_sigs : int
+        The number of signals to create in the list
+
+    Returns
+    -------
+    sigs: a list of signals all of type `sigtype`
+
+    Creating multiple signals of the same type is a common requirement.
+    This function facilitates the creation of multiple signals of
     the same type.
+    
+    Example
+    -------
 
-    The following example creates two signals of bool
+    The following example creates two signals of type bool
         >>> enable, timeout = Signals(bool(0), 2)
 
-    The following creates a list-of-signals of 8-bit types
+    The following creates a list of 256 signals, each of 8-bit type
         >>> mem = Signals(intbv(0)[8:], 256)
     """
     assert isinstance(sigtype, (bool, intbv))

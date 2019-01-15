@@ -9,7 +9,11 @@
 """
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
 Importing ``filterbroker.py`` runs the module once, defining all module variables
-which have a global scope like class variables. 
+which have a global scope like class variables and can be imported like
+
+>>> import filter_factory as ff
+>>> myfil = ff.fil_factory
+
 """
 
 from __future__ import division, unicode_literals, print_function, absolute_import
@@ -59,6 +63,7 @@ class FilterFactory(object):
         -------
         
         err_code : integer
+
             :-1: filter design class was instantiated successfully
             
             :0: filter instance exists, no re-instantiation necessary
@@ -237,21 +242,11 @@ class FilterFactory(object):
 
 #------------------------------------------------------------------------------
 fil_factory = FilterFactory()       
-# This *class instance* of FilterFactory can be accessed in other modules using
+# This class instance of FilterFactory can be accessed in other modules using
 # import filter_factory as ff
 # ff.fil_factory. ...
 
-
-###############################################################################
-"""
-See also on data persistence and global variables:
-http://stackoverflow.com/questions/13034496/using-global-variables-between-files-in-python
-http://stackoverflow.com/questions/1977362/how-to-create-module-wide-variables-in-python
-http://pymotw.com/2/articles/data_persistence.html
-
-Alternative approaches for data persistence: Module shelve or pickleshare
-
-"""
+######################################################################
 if __name__ == '__main__':
     print("\nfb.fil_classes\n", fb.fil_classes)
     print("aaa:", fil_factory.create_fil_inst("aaa"),"\n") # class doesn't exist

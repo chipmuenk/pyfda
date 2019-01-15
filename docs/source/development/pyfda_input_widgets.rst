@@ -3,6 +3,8 @@ Input Widgets
 This package contains the widgets for entering / selecting parameters
 for the filter design.  
 
+
+
 :class:`pyfda.input_widgets.input_tab_widgets.InputTabWidgets`
 --------------------------------------------------------------
 

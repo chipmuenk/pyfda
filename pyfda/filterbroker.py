@@ -8,51 +8,65 @@
 
 """
 Dynamic parameters and settings are exchanged via the dictionaries in this file.
-Importing `filterbroker.py` runs the module once, defining all module variables
-having a global scope like class variables.
+Importing ``filterbroker.py`` runs the module once, defining all module variables
+which have a global scope like class variables and can be imported like
+
+>>> import filterbroker as fb
+>>> myfil = fb.fil[0]
+
+The entries in this file are only used as initial / default entries and to
+demonstrate the structure of the global dicts and lists.
+These initial values are also handy for module-level testing where some useful
+settings of the variables is required.
 
 Attributes
 ----------
 
+
+Notes
+-----
+
+Alternative approaches for data persistence could be the packages `shelve` or pickleshare
+More info on data persistence and storing / accessing global variables:
+    
+* http://stackoverflow.com/questions/13034496/using-global-variables-between-files-in-python
+* http://stackoverflow.com/questions/1977362/how-to-create-module-wide-variables-in-python
+* http://pymotw.com/2/articles/data_persistence.html
+* http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
+* http://stackoverflow.com/questions/2447353/getattr-on-a-module
+
 """
 
 from __future__ import division, unicode_literals, print_function, absolute_import
-from collections import defaultdict
 from .frozendict import freeze_hierarchical
 
-# Handle to central clipboard instance
 clipboard = None
+""" Handle to central clipboard instance """
 
-# Project base directory
-base_dir = ""
+base_dir = "" #: Project base directory
 
-# State of filter design: "ok", "changed", "error", "failed"
-design_filt_state = "changed"
-
-# see http://stackoverflow.com/questions/9058305/getting-attributes-of-a-class
-# see http://stackoverflow.com/questions/2447353/getattr-on-a-module
+design_filt_state = "changed" #: State of filter design: "ok", "changed", "error", "failed"
 
 #==============================================================================
-# The entries in this file are only used as initial / default entries and
-# demonstrate the structure of the global dicts and lists.
-# They are also handy for module-level testing.
 
-# The keys of this dictionary are all found class names, the values are the name
-# to be displayed e.g. in the comboboxes and the fully qualified name of the module
-# containing the class
 fil_classes = {# IIR:
-            'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'},
-            'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_design.cheby1'},
-            'Cheby2':{'name':'Chebychev 2', 'mod':'pyfda.filter_design.cheby2'},
-            'Bessel':{'name':'Bessel',      'mod':'pyfda.filter_design.bessel'},
-            'Ellip' :{'name':'Elliptic',    'mod':'pyfda.filter_design.ellip'},
-            'EllipZeroPhz' :{'name':'EllipticZeroPhase',    'mod':'pyfda.filter_design.ellip_zero'},
+            'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_designs.butter'},
+            'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_designs.cheby1'},
+            'Cheby2':{'name':'Chebychev 2', 'mod':'pyfda.filter_designs.cheby2'},
+            'Bessel':{'name':'Bessel',      'mod':'pyfda.filter_designs.bessel'},
+            'Ellip' :{'name':'Elliptic',    'mod':'pyfda.filter_designs.ellip'},
+            'EllipZeroPhz' :{'name':'EllipticZeroPhase',    'mod':'pyfda.filter_designs.ellip_zero'},
 
             # FIR:
-            'Equiripple':{'name':'Equiripple',  'mod':'pyfda.filter_design.equiripple'},
-            'MA'      :{'name':'Moving Average','mod':'pyfda.filter_design.ma'},
-            'Firwin'    :{'name':'Windowed FIR','mod':'pyfda.filter_design.firwin'}
+            'Equiripple':{'name':'Equiripple',  'mod':'pyfda.filter_designs.equiripple'},
+            'MA'      :{'name':'Moving Average','mod':'pyfda.filter_designs.ma'},
+            'Firwin'    :{'name':'Windowed FIR','mod':'pyfda.filter_designs.firwin'}
             }
+"""
+The keys of this dictionary are the names of all found filter classes, the values 
+are the name to be displayed e.g. in the comboboxes and the fully qualified 
+name of the module containing the class.
+"""
 
 # Dictionary describing the available combinations of response types (rt),
 # filter types (ft), design methods (dm) and filter order (fo):

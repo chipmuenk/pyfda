@@ -43,14 +43,19 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
     for error messages, it should not be set when calling the function.
 
     dict1 is modified in place and returned, if this is not intended call the
-    function using ``new_dict = merge_dicts(dict(d1), d2).
+    function using ``new_dict = merge_dicts(dict(d1), d2)``.
 
+    Example
+    -------
     If you need to merge more than two dicts use:
 
-    from functools import reduce   # only for py3
-    reduce(merge, [d1, d2, d3...]) # add / merge all other dicts into d1
+    >>> from functools import reduce   # only for py3
+    >>> reduce(merge, [d1, d2, d3...]) # add / merge all other dicts into d1
 
+    Notes
+    -----
     Taken with some modifications from:
+        
     http://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
     """
     if not(isinstance(d1, dict) and isinstance(d2, dict)):

@@ -7,14 +7,14 @@ to Verilog and VHDL netlists.
 :class:`pyfda.filter_blocks.fda.filter_hw.FilterHardware`
 ---------------------------------------------------------
 
-.. autoclass:: pyfda.filter_blocks.fda.filter_hw.FilterHardware
+.. automodule:: pyfda.filter_blocks.fda.filter_hw
     :show-inheritance:
     :members:
 
 :class:`pyfda.filter_blocks.fda.fir.FilterFIR`
 ----------------------------------------------
 
-.. autoclass:: pyfda.filter_blocks.fda.fir.FilterFIR
+.. automodule:: pyfda.filter_blocks.fda.fir
     :show-inheritance:
     :members:
 
