@@ -24,3 +24,15 @@ to Verilog and VHDL netlists.
 .. autoclass:: pyfda.filter_blocks.fda.iir.FilterIIR
     :show-inheritance:
     :members:
+    
+:class:`pyfda.plot_widgets.plot_hf.Plot_Hf`
+-------------------------------------------
+
+.. autoclass:: pyfda.plot_widgets.plot_hf.Plot_Hf
+	:members:	
+
+:mod:`pyfda.filter_blocks.support`
+----------------------------------
+
+.. automodule:: pyfda.filter_blocks.support
+    :members:
