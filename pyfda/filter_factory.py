@@ -52,10 +52,10 @@ class FilterFactory(object):
         Parameters
         ----------
         
-        fc : string
+        fc : str
             The name of the filter design class to be instantiated (e.g. 'cheby1' or 'equiripple')
 
-        mod : string (optional, default = None)
+        mod : str (optional, default = None)
             Fully qualified name of the filter module. When not specified, it is
             read from the global dict ``fb.fil_classes[fc]['mod']``
             
@@ -64,7 +64,7 @@ class FilterFactory(object):
         
         err_code : integer
 
-            :-1: filter design class was instantiated successfully
+            :\-1: filter design class was instantiated successfully
             
             :0: filter instance exists, no re-instantiation necessary
              
