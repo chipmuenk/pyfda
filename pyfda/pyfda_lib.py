@@ -91,6 +91,29 @@ def cmp_version(mod, version):
     Compare version number of installed module `mod` against string `version` and
     return 1, 0 or -1 if the installed version is greater, equal or less than
     the number in `version`. If `mod` is not installed, return -2.
+
+    Parameters
+    ----------
+
+    mod : string
+        name of the module to be compared
+        
+    version : string
+        version number in the form e.g. "0.1.6"
+
+    Returns
+    -------
+    
+    result : int
+        one of the following error codes:
+         :-2: module is not installed
+         
+         :-1: version of installed module is lower than the specified version
+         
+         :0: version of installed module is equal to specied version
+         
+         :1: version of installed module is higher than specified version
+
     """
     if mod not in VERSION:
         return -2

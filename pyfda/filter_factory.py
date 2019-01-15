@@ -24,9 +24,16 @@ from . import filterbroker as fb
 
 logger = logging.getLogger(__name__)
 
-# Instance of current filter design class (e.g. "cheby1")
-fil_inst = None
 
+fil_inst = None
+"""
+Instance of current filter design class (e.g. "cheby1"), globally accessible
+
+>>> import filter_factory as ff
+>>> ff.fil_factory.create_fil_instance('cheby1') # create instance of dynamic class
+>>> ff.fil_inst.LPmin(fil[0]) # design a filter 
+
+"""
 #------------------------------------------------------------------------------
 class FilterFactory(object):
     """
@@ -62,9 +69,9 @@ class FilterFactory(object):
         Returns
         -------
         
-        err_code : integer
-
-            :\-1: filter design class was instantiated successfully
+        err_code : int
+          one of the following error codes:
+            :-1: filter design class was instantiated successfully
             
             :0: filter instance exists, no re-instantiation necessary
              
@@ -168,10 +175,11 @@ class FilterFactory(object):
         Returns
         -------
         
-        err_code : integer
+        err_code : int
+            one of the following error codes:
              :-1: filter design operation has been cancelled by user
 
-             :00: filter design method exists and is callable
+             :0: filter design method exists and is callable
 
              :16: passed method name is not a string
 
@@ -186,7 +194,7 @@ class FilterFactory(object):
         Examples
         --------
 
-        >>> call_fil_method("LPmin", fc = "cheby1")(fil[0])
+        >>> call_fil_method("LPmin", fil[0], fc="cheby1")
 
         The example first creates an instance of the filter class 'cheby1' and 
         then performs the actual filter design by calling the method 'LPmin',
@@ -241,10 +249,7 @@ class FilterFactory(object):
         return self.err_code
 
 #------------------------------------------------------------------------------
-fil_factory = FilterFactory()       
-# This class instance of FilterFactory can be accessed in other modules using
-# import filter_factory as ff
-# ff.fil_factory. ...
+fil_factory = FilterFactory() #: Class instance of FilterFactory that can be accessed in other modules   
 
 ######################################################################
 if __name__ == '__main__':
