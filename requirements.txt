@@ -1,6 +1,7 @@
 numpy
 scipy
 matplotlib
+PyQt5
 six
 docutils
 nose
