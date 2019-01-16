@@ -15,6 +15,11 @@ Main Routines
 .. automodule:: pyfda.tree_builder
    :members: 
 
+:mod:`pyfda.pyfda_dirs`
+-----------------------
+.. automodule:: pyfda.pyfda_dirs
+    :members:
+
 :mod:`pyfda.pyfda_lib`
 ----------------------
 .. automodule:: pyfda.pyfda_lib

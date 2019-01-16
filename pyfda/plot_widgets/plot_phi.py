@@ -147,7 +147,7 @@ class Plot_Phi(QWidget):
     def draw(self):
         """
         Main entry point:
-        Re-calculate |H(f)| and draw the figure
+        Re-calculate \|H(f)\| and draw the figure
         """
         self.calc_hf()
         self.update_view()
