@@ -2,9 +2,9 @@ Plot Widgets
 ============
 
    
-:mod:`pyfda.plot_widgets`
--------------------------
-.. automodule:: pyfda.plot_widgets
+:mod:`pyfda.plot_widgets.plot_tau_g`
+------------------------------------
+.. automodule:: pyfda.plot_widgets.plot_tau_g
 	:members:
 
 

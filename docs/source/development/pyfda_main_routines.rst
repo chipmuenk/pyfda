@@ -15,6 +15,10 @@ Main Routines
 .. automodule:: pyfda.tree_builder
    :members: 
 
+:mod:`pyfda.pyfda_lib`
+----------------------
+.. automodule:: pyfda.pyfda_lib
+    :members:
 
 :class:`pyfda.filterbroker`
 ---------------------------
