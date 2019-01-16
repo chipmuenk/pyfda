@@ -1,7 +1,11 @@
 Plot Widgets
 ============
 
-   
+:mod:`pyfda.plot_widgets.plot_hf`
+---------------------------------
+.. automodule:: pyfda.plot_widgets.plot_hf
+	:members:	
+
 :mod:`pyfda.plot_widgets.plot_phi`
 ------------------------------------
 .. automodule:: pyfda.plot_widgets.plot_phi
@@ -26,6 +30,4 @@ Plot Widgets
 ------------------------------------
 .. automodule:: pyfda.plot_widgets.plot_3d
 	:members:
-
-
 

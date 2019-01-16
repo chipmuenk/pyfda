@@ -25,12 +25,7 @@ to Verilog and VHDL netlists.
     :show-inheritance:
     :members:
     
-:class:`pyfda.plot_widgets.plot_hf.Plot_Hf`
--------------------------------------------
-
-.. autoclass:: pyfda.plot_widgets.plot_hf.Plot_Hf
-	:members:	
-
+    
 :mod:`pyfda.filter_blocks.support`
 ----------------------------------
 

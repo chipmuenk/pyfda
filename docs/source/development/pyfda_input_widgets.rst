@@ -5,16 +5,50 @@ for the filter design.
 
 
 
-:class:`pyfda.input_widgets.input_tab_widgets.InputTabWidgets`
+:mod:`pyfda.input_widgets.input_tab_widgets`
 --------------------------------------------------------------
 
-.. autoclass:: pyfda.input_widgets.input_tab_widgets.InputTabWidgets
+.. automodule:: pyfda.input_widgets.input_tab_widgets
+	:members:
+	
+:mod:`pyfda.input_widgets.input_specs`
+---------------------------------------
+.. automodule:: pyfda.input_widgets.input_specs
+    :show-inheritance:
 	:members:
 
 
-:class:`pyfda.input_widgets.select_filter.SelectFilter`
--------------------------------------------------------
+:mod:`pyfda.input_widgets.select_filter`
+-----------------------------------------
 
-.. autoclass:: pyfda.input_widgets.select_filter.SelectFilter
+.. automodule:: pyfda.input_widgets.select_filter
+    :show-inheritance:
+	:members:
+	
+:mod:`pyfda.input_widgets.input_coeffs`
+----------------------------------------
+
+.. automodule:: pyfda.input_widgets.input_coeffs
+    :show-inheritance:
+	:members:
+	
+:mod:`pyfda.input_widgets.input_pz`
+------------------------------------
+
+.. automodule:: pyfda.input_widgets.input_pz
+    :show-inheritance:
+	:members:
+
+:mod:`pyfda.input_widgets.input_info`
+-------------------------------------
+
+.. automodule:: pyfda.input_widgets.input_info
+    :show-inheritance:
+	:members:
+	
+:mod:`pyfda.input_widgets.input_files`
+---------------------------------------
+
+.. automodule:: pyfda.input_widgets.input_files
     :show-inheritance:
 	:members:

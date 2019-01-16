@@ -19,10 +19,10 @@ A myhdl filter instance `self.hdlfilter` of `filter_blocks.fda.FilterFIR` or `fi
 are used for bit-true simulations and for generating VHDL or Verilog code for the filter. 
 
 
-:class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`
+:mod:`pyfda.input_widgets.input_fixpoint_specs`
 ----------------------------------------------------------------------
 
-.. autoclass:: pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs
+.. automodule:: pyfda.input_widgets.input_fixpoint_specs
 	:members:
 
 
