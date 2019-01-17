@@ -175,7 +175,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
     """
     Transform table to CSV formatted text and copy to clipboard or file
     
-    Parameters:
+    Parameters
     -----------
     table : object
             Instance of QTableWidget
@@ -187,14 +187,14 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
             Used to get the clipboard instance from the parent class (if copying 
             to clipboard) or to construct a QFileDialog instance (if copying to a file)
             
-    fkey:  string    
+    fkey:  str  
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
             
-    frmt: string
+    frmt: str
            when frmt='float', copy data from model, otherwise from the view 
            using the tables itemDelegate() methods.
            
-    comment: string
+    comment: str
             comment string indicating the type of data to be copied (e.g. 
             "filter coefficients ")
 
@@ -359,16 +359,16 @@ def qtext2table(parent, fkey, comment = ""):
     """
     Copy data from clipboard or file to table
 
-    Parameters:
+    Parameters
     -----------
 
     parent: object
             parent instance, having a QClipboard and / or a QFileDialog instance.
             
-    fkey: string
+    fkey: str
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
     
-    comment: string
+    comment: str
             comment string stating the type of data to be copied (e.g. 
             "filter coefficients ")
 
@@ -395,9 +395,9 @@ def qtext2table(parent, fkey, comment = ""):
 
     Parameters that are 'auto', will be guessed by csv.Sniffer().
 
-    Returns:
+    Returns
     --------
-    numpy array of strings
+    ndarray of str
                 containing table data
     """
 
@@ -424,14 +424,16 @@ def csv2array(f):
     Convert comma-separated values from file or text
     to numpy array, taking into accout the settings of the CSV dict.
 
-    Parameter
-    ---------
+    Parameters
+    ----------
+    
     f: handle to file or file-like object:
         f = io.open(file_name, 'r') or f = io.StringIO(text)
 
     Returns
     -------
-    numpy.array
+    
+    ndarray
     """
     #------------------------------------------------------------------------------
     # Get CSV parameter settings

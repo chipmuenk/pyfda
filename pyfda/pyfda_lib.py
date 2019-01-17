@@ -18,7 +18,7 @@ import struct
 import logging
 logger = logging.getLogger(__name__)
 import numpy as np
-from numpy import pi, log10, arctan
+from numpy import pi, log10
 
 import scipy.signal as sig
 
@@ -34,6 +34,14 @@ from numpy import __version__ as VERSION_NP
 from scipy import __version__ as VERSION_SCI
 from matplotlib import __version__ as VERSION_MPL
 from .compat import QT_VERSION_STR # imports pyQt
+
+__all__ = ['cmp_version', 'mod_version', 
+           'unichr_23', 'unicode_23', 'clean_ascii', 'qstr', 'safe_eval',
+           'dB', 'lin2unit', 'unit2lin', 
+           'cround', 'H_mag', 'cmplx_sort', 'unique_roots', 'impz', 'grpdelay',
+           'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
+           'round_odd', 'round_even', 'ceil_odd', 'floor_odd','ceil_even', 'floor_even',
+           'to_html', 'calc_Hcomplex']
 
 PY32_64 = struct.calcsize("P") * 8 # yields 32 or 64, depending on 32 or 64 bit Python
 
@@ -95,10 +103,10 @@ def cmp_version(mod, version):
     Parameters
     ----------
 
-    mod : string
+    mod : str
         name of the module to be compared
         
-    version : string
+    version : str
         version number in the form e.g. "0.1.6"
 
     Returns
@@ -170,7 +178,7 @@ MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 def unichr_23(c):
     """
     Convert code point value (integer between 1 ... 65536) to one-character unicode string.
-    The reverse operation (`ord(u)`) works the same way in py2 and py3.
+    The reverse operation ``ord(u)`` works the same way in py2 and py3.
     """
     if PY2:
         return unichr(c)
@@ -203,13 +211,13 @@ def clean_ascii(arg):
     
     Parameters
     ----------
-    string: str
+    arg: str
         This is a unicode string under Python 3 and a "normal" string under Python 2.
 
     Returns
     -------
-    
     A string (whatever that means in Py2 / Py3)
+    
     """
     if isinstance(arg, six.string_types):
         return re.sub(r'[^\x00-\x7f]',r'', arg)
@@ -275,16 +283,16 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
     Parameters
     ----------
-    expr: string
+    expr: str
         String to be evaluated
 
-    alt_expr: string
+    alt_expr: str
         String to be evaluated when evaluation of first string fails.
 
-    return_type: string
+    return_type: str
         Type of returned variable ['float' (default) / 'cmplx' / 'int' / '' or 'auto']
 
-    sign: string
+    sign: str
         enforce positive / negative sign of result ['pos' / None (default) / 'neg']
 
     Returns

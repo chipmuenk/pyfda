@@ -3,31 +3,37 @@
 Main Routines
 =============
 
-:class:`pyfda.filter_factory.FilterFactory`
--------------------------------------------
-
-.. automodule:: pyfda.filter_factory
-   :members:
-   
-:class:`pyfda.tree_builder.Tree_Builder`
-----------------------------------------
-
-.. automodule:: pyfda.tree_builder
-   :members: 
-
 :mod:`pyfda.pyfda_dirs`
 -----------------------
 .. automodule:: pyfda.pyfda_dirs
     :members:
+    
+   
+:mod:`pyfda.tree_builder`
+-------------------------
+
+.. automodule:: pyfda.tree_builder
+   :members: 
 
 :mod:`pyfda.pyfda_lib`
 ----------------------
 .. automodule:: pyfda.pyfda_lib
     :members:
+    
 
-:class:`pyfda.filterbroker`
+:mod:`pyfda.filter_factory`
 ---------------------------
+
+.. automodule:: pyfda.filter_factory
+   :members:
+
+:mod:`pyfda.filterbroker`
+-------------------------
+
 .. automodule:: pyfda.filterbroker
    :members: 
 
-
+.. xx :mod:`pyfda.pyfda_io_lib`
+    -------------------------
+    .. automodule:: pyfda.pyfda_io_lib
+    :members:

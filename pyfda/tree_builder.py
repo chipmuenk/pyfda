@@ -34,10 +34,10 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
     Merge the multi-level dictionaries d1 and d2. The ``mode`` flag determines the
     behaviour when the same key is present in both dictionaries:
 
-    * keep1 : keep the entry from dict1
-    * keep2 : keep the entry from dict2
-    * add1  : merge the entries, putting the values from dict2 first (important for lists)
-    * add2  : merge the entries, putting the values from dict1 first (  "  )
+    * :keep1 : keep the entry from dict1
+    * :keep2 : keep the entry from dict2
+    * :add1  : merge the entries, putting the values from dict2 first (important for lists)
+    * :add2  : merge the entries, putting the values from dict1 first (  "  )
 
     The parameter ``path`` is only used for keeping track of the hierarchical structure
     for error messages, it should not be set when calling the function.
@@ -119,12 +119,20 @@ class Tree_Builder(object):
 #==============================================================================
     def init_filters(self):
         """
-        - Extract the names of all Python files in the file specified during
-          instantiation (dirs.USER_CONF_DIR_FILE) and write them to a list
-        - Try to import all python files and return a dict with all file names
-          and corresponding objects (the class needs to have the same name as
-          the file)
-        - Construct a tree with all the filter combinations
+        - ``parse_conf_file()``:  Parse the configuration file ``pyfda.conf`` 
+          (specified in ``dirs.USER_CONF_DIR_FILE``), writing classes and file
+          paths to lists for the individual sections, a.o. to ``fb.filter_designs_list``
+          for the filter design algorithms.
+          
+        - ``dyn_filt_import()`` : Try to import all filter modules and classes 
+          from ``fb.filter_designs_list`` and store successful imports in the
+          dict ``fb.fil_classes`` as {filterName:filterModule}:
+              
+        - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
+           in the global dict ``fb.fil_classes`` and store them in the filter
+            tree dict ``fil_tree`` with the hierarchy
+                                        
+            **rt-ft-fc-fo-subwidget:params** .
 
         This method can also be called when the main app runs to re-read the
         filter directory (?)
@@ -134,19 +142,10 @@ class Tree_Builder(object):
         None
 
         """
-        # Scan pyfda.conf for class names / python file names and extract them
+
         self.parse_conf_file()
 
-        # Try to import all filter modules and classes found in filter_list,
-        # store names and modules in the dict fb.fil_classes as {filterName:filterModule}:
         self.dyn_filt_import()
-
-        """
-        Read attributes (ft, rt, fo) from all valid filter classes (fc)
-        listed in the global dict ``fb.fil_classes`` and store them in a filter
-        tree dict with the hierarchy
-                                        rt-ft-fc-fo-subwidget:params.
-        """
 
         fil_tree = {}
 
@@ -212,6 +211,7 @@ class Tree_Builder(object):
 
         Returns
         -------
+        None
 
         """
         try:
@@ -316,10 +316,10 @@ class Tree_Builder(object):
         ----------
         conf : instance of config parser
 
-        section : string
+        section : str
             name of the section to be parsed
 
-        req : boolean
+        req : bool
             when True, section is required: Terminate the program with an error
             if the section is missing in the config file
 
@@ -379,7 +379,7 @@ class Tree_Builder(object):
           for both class and combo box name.
 
         Filter class, display name and module path are stored in the global
-        dict `fb.fil_classes`.
+        dict ``fb.fil_classes``.
 
         Parameters
         ----------
@@ -388,8 +388,7 @@ class Tree_Builder(object):
             Python files (ending with .py !!) in the file conf_file,
             containing entries (for SUCCESSFUL imports) with:
 
-            {<class name>:{'name':<display name>, 'mod':<full module name>}}
-             e.g.
+            {<class name>:{'name':<display name>, 'mod':<full module name>}} e.g.
 
             .. code-block:: python
 
