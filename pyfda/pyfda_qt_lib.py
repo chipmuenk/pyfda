@@ -52,21 +52,21 @@ def qset_cmb_box(cmb_box, string, data=False, fireSignals=False):
     select the first entry. Signals are blocked during the update of the combobox unless
     `fireSignals` is set `True`.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
 
-    string: string
+    string: str
         The label in the text or data field to be selected. When the string is
         not found, select the first entry of the combo box.
 
-    data: Boolean (default: False)
+    data: bool (default: False)
         Whether the string refers to the data or text fields of the combo box
 
-    fireSignals: Boolean (default: True)
+    fireSignals: bool (default: True)
         When False, fire a signal if the index is changed (useful for GUI testing)
 
-    Returns:
-    --------
+    Returns
+    -------
         The index of the string. When the string was not found in the combo box,
         return index -1.
     """
@@ -122,9 +122,8 @@ def qhline(widget):
     """
     Create a horizontal line
     
-    Parameters:
-    
-    frame: instance of QFrame - not needed?
+    Parameters
+    ----------
     
     widget: widget containing the QFrame to be created
     """
@@ -136,7 +135,7 @@ def qhline(widget):
 #------------------------------------------------------------------------------
 def qget_selected(table, select_all=False, reverse=True):
     """
-    Get selected cells in `table`and return a dictionary with the following keys:
+    Get selected cells in ``table`` and return a dictionary with the following keys:
     
     'idx': indices of selected cells as an unsorted list of tuples
     
@@ -144,11 +143,14 @@ def qget_selected(table, select_all=False, reverse=True):
     
     'cur':  current cell selection as a tuple
 
-    Flags:
+    Parameters
+    ----------
 
-    'select_all' : select all table items and create a list
+    select_all : bool
+        select all table items and create a list when True
 
-    'reverse' : return selected fields upside down
+    reverse : bool
+        return selected fields upside down when True
     """
     if select_all:
         table.selectAll()
