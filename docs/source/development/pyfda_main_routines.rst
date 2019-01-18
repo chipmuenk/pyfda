@@ -29,11 +29,11 @@ Main Routines
 
 :mod:`pyfda.filterbroker`
 -------------------------
-
 .. automodule:: pyfda.filterbroker
    :members: 
 
-.. xx :mod:`pyfda.pyfda_io_lib`
-    -------------------------
-    .. automodule:: pyfda.pyfda_io_lib
+:mod:`pyfda.pyfda_io_lib`
+-------------------------
+
+.. automodule:: pyfda.pyfda_io_lib
     :members:

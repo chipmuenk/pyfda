@@ -86,7 +86,7 @@ class CSV_option_box(QDialog):
         layHHeader = QHBoxLayout()
         layHHeader.addWidget(lblHeader)
         layHHeader.addWidget(self.cmbHeader)
-        
+
         self.radClipboard = QRadioButton("Clipboard", self)
         self.radFile = QRadioButton("File", self)
         self.radClipboard.setChecked(True)
@@ -119,6 +119,10 @@ class CSV_option_box(QDialog):
 
 
     def _store_settings(self):
+        """
+        Store settings of CSV options widget in ``pyfda_rc.params``.
+        """
+
         try:
             params['CSV']['orientation'] =  qget_cmb_box(self.cmbOrientation, data=True)
             params['CSV']['delimiter'] = qget_cmb_box(self.cmbDelimiter, data=True)
@@ -131,7 +135,7 @@ class CSV_option_box(QDialog):
 
     def _load_settings(self):
         """
-        Load settings of all widgets from `pyfda_rc`.
+        Load settings of CSV options widget from ``pyfda_rc.params``.
         """
         try:
             qset_cmb_box(self.cmbDelimiter, params['CSV']['delimiter'], data=True)
@@ -146,17 +150,42 @@ class CSV_option_box(QDialog):
 #------------------------------------------------------------------------------
 def prune_file_ext(file_type):
     """
-    Prune file extension, e.g. '(*.txt)' from file type description returned
-    by QFileDialog
+    Prune file extension, e.g. '(\*.txt)' from file type description returned
+    by QFileDialog. This is achieved with the regular expression
+
+    .. code::
+
+        return = re.sub('\([^\)]+\)', '', file_type)
+
+    Parameters
+    ----------
+    file_type : str
+
+    Returns
+    -------
+    str
+        The pruned file description
+
+    Notes
+    -----
+    Syntax of python regex: ``re.sub(pattern, replacement, string)``
+
+    This returns the string obtained by replacing the leftmost non-overlapping
+    occurrences of ``pattern`` in ``string`` by ``replacement``.
+
+    - '.' means any character
+
+    - '+' means one or more
+
+    - '[^a]' means except for 'a'
+
+    - '([^)]+)' : match '(', gobble up all characters except ')' till ')'
+
+    - '(' must be escaped as '\\\('
+
     """
-    # regular expression: re.sub(pattern, repl, string)
-    #  Return the string obtained by replacing the leftmost non-overlapping
-    #  occurrences of the pattern in string by repl
-    #   '.' means any character
-    #   '+' means one or more
-    #   '[^a]' means except for 'a'
-    # '([^)]+)' : match '(', gobble up all characters except ')' till ')'
-    # '(' must be escaped as '\('
+
+
 
     return re.sub('\([^\)]+\)', '', file_type)
 
@@ -164,65 +193,69 @@ def prune_file_ext(file_type):
 def extract_file_ext(file_type):
     """
     Extract list with file extension(s), e.g. '.vhd' from type description
-    (e.g. 'VHDL (*.vhd)') returned by QFileDialog
+    (e.g. 'VHDL (\*.vhd)') returned by QFileDialog
     """
 
     ext_list = re.findall('\([^\)]+\)', file_type) # extract '(*.txt)'
     return [t.strip('(*)') for t in ext_list] # remove '(*)'
-   
+
 #------------------------------------------------------------------------------
 def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
     """
     Transform table to CSV formatted text and copy to clipboard or file
-    
+
     Parameters
     -----------
     table : object
             Instance of QTableWidget
-            
+
     data:   object
             Instance of the numpy variable containing table data
-            
-    parent: parent class
-            Used to get the clipboard instance from the parent class (if copying 
+
+    parent: object
+            Used to get the clipboard instance from the parent instance (if copying
             to clipboard) or to construct a QFileDialog instance (if copying to a file)
-            
-    fkey:  str  
-            Key for accessing data in *.npz file or Matlab workspace (*.mat)
-            
+
+    fkey:  str
+            Key for accessing data in ``*.npz`` file or Matlab workspace (``*.mat``)
+
     frmt: str
-           when frmt='float', copy data from model, otherwise from the view 
-           using the tables itemDelegate() methods.
-           
+           when ``frmt=='float'``, copy data from model, otherwise from the view
+           using the ``itemDelegate()`` method of the table.
+
     comment: str
-            comment string indicating the type of data to be copied (e.g. 
+            comment string indicating the type of data to be copied (e.g.
             "filter coefficients ")
 
 
-    The following keys from the dict pyfda_lib.params['CSV'] are evaluated:
-         
-    'delimiter' : string (default: <tab>)
-          Character for separating columns
- 
-    'lineterminator' : string (default: As used by the operating system)
-            Character for terminating rows. By default,
+    The following keys from the global dict dict ``params['CSV']`` are evaluated:
+
+    :'delimiter': str (default: "<tab>"),
+          character for separating columns
+
+    :'lineterminator': str (default: As used by the operating system),
+            character for terminating rows. By default,
             the character is selected depending on the operating system:
-            Windows: Carriage return + line feed
-            MacOS  : Carriage return
-            *nix   : Line feed
 
-    'orientation' : string
-            This string determines with which the orientation the table is read.
+            - Windows: Carriage return + line feed
 
-    'header': string (default: 'auto')
-            When `header='on'`, treat first row as a header that will be discarded.
+            - MacOS  : Carriage return
 
-    'clipboard': Boolean (default: True)
-            When 'clipboard' = True, copy data to clipboard, else use a file
+            - \*nix   : Line feed
+
+    :'orientation': str (one of 'auto', 'horiz', 'vert') determining with which
+            orientation the table is read.
+
+    :'header': str (default: 'auto').
+            When ``header='on'``, treat first row as a header that will be discarded.
+
+    :'clipboard': bool (default: True),
+            when ``clipboard = True``, copy data to clipboard, else use a file.
 
     Returns
     -------
-    Nothing, text is exported to clipboard or to file via export_data
+    None
+        Nothing, text is exported to clipboard or to file via ``export_data``
     """
 
     text = ""
@@ -253,7 +286,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
     sel = qget_selected(table, reverse=False)['sel']
 
     #============================================================================
-    # Nothing selected, but cell format is non-float: 
+    # Nothing selected, but cell format is non-float:
     # -> select whole table, copy all cells further down below:
     #============================================================================
     if not np.any(sel) and frmt != 'float':
@@ -262,7 +295,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
     #============================================================================
     # Nothing selected, copy complete table from the model (data) in float format:
     #============================================================================
-    if not np.any(sel): 
+    if not np.any(sel):
         if orientation_horiz: # rows are horizontal
             for c in range(num_cols):
                 if use_header: # add the table header
@@ -317,7 +350,7 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
                     text += table.horizontalHeaderItem(c).text() + delim
                     # cr is added further below
                 text.rstrip(delim)
-                
+
             for r in range(num_rows): # iterate over whole table
                 for c in sel_c:
                     if r in sel[c]: # selected item?
@@ -335,25 +368,25 @@ def qtable2text(table, data, parent, fkey, frmt='float', comment=""):
             logger.error("No clipboard instance defined!")
     else:
         export_data(parent, unicode_23(text), fkey, comment=comment)
-        
+
 #==============================================================================
 #     # Here 'a' is the name of numpy array and 'file' is the variable to write in a file.
 #     ##if you want to write in column:
-# 
-#     for x in np.nditer(a.T, order='C'): 
+#
+#     for x in np.nditer(a.T, order='C'):
 #             file.write(str(x))
 #             file.write("\n")
-# 
-#     ## If you want to write in row: ## 
-# 
+#
+#     ## If you want to write in row: ##
+#
 #     writer= csv.writer(file, delimiter=',')
-#     for x in np.nditer(a.T, order='C'): 
+#     for x in np.nditer(a.T, order='C'):
 #             row.append(str(x))
 #     writer.writerow(row)
-# 
+#
 #==============================================================================
-        
-        
+
+
 #------------------------------------------------------------------------------
 def qtext2table(parent, fkey, comment = ""):
     """
@@ -363,42 +396,45 @@ def qtext2table(parent, fkey, comment = ""):
     -----------
 
     parent: object
-            parent instance, having a QClipboard and / or a QFileDialog instance.
-            
+            parent instance, having a QClipboard and / or a QFileDialog attribute.
+
     fkey: str
             Key for accessing data in *.npz file or Matlab workspace (*.mat)
-    
+
     comment: str
-            comment string stating the type of data to be copied (e.g. 
+            comment string stating the type of data to be copied (e.g.
             "filter coefficients ")
 
-    The following keys from the dict pyfda_lib.params['CSV'] are evaluated:
-                
-    'delimiter' : string (default: <tab>)
-          Character for separating columns
-          
-    'lineterminator' : string (default: As used by the operating system)
-            Character for terminating rows. By default,
-            the character is selected depending on the operating system:
-            Windows: Carriage return + line feed
-            MacOS  : Carriage return
-            *nix   : Line feed
-            
-    'orientation' : string
-            This string determines with which the orientation the table is read.
-            
-    'header': string (default: 'auto')
-            When `header='on'`, treat first row as a header that will be discarded.
-            
-    'clipboard': Boolean (default: True)
-            When 'clipboard' = True, copy data from clipboard, else use a file
 
-    Parameters that are 'auto', will be guessed by csv.Sniffer().
+    The following keys from the global dict ``params['CSV']`` are evaluated:
+
+    :'delimiter': str (default: <tab>), character for separating columns
+
+    :'lineterminator': str (default: As used by the operating system),
+            character for terminating rows. By default,
+            the character is selected depending on the operating system:
+
+            - Windows: Carriage return + line feed
+
+            - MacOS  : Carriage return
+
+            - \*nix   : Line feed
+
+    :'orientation': str (one of 'auto', 'horiz', 'vert') determining with which
+            orientation the table is read.
+
+    :'header': str (**'auto'**, 'on', 'off').
+            When ``header=='on'``, treat first row as a header that will be discarded.
+
+    :'clipboard': bool (default: True).
+            When ``clipboard == True``, copy data from clipboard, else use a file
+
+    Parameters that are 'auto', will be guessed by ``csv.Sniffer()``.
 
     Returns
     --------
     ndarray of str
-                containing table data
+        table data
     """
 
     if params['CSV']['clipboard']: # data from clipboard
@@ -409,7 +445,7 @@ def qtext2table(parent, fkey, comment = ""):
             text = unicode_23(parent.clipboard.text())
             logger.debug("Importing data from clipboard:\n{0}\n{1}".format(np.shape(text), text))
             # pass handle to text and convert to numpy array:
-            data_arr = csv2array(io.StringIO(text)) 
+            data_arr = csv2array(io.StringIO(text))
     else: # data from file
         data_arr = import_data(parent, fkey, comment)
         # pass data as numpy array
@@ -426,21 +462,25 @@ def csv2array(f):
 
     Parameters
     ----------
-    
-    f: handle to file or file-like object:
-        f = io.open(file_name, 'r') or f = io.StringIO(text)
+
+    f: handle to file or file-like object
+        e.g.
+
+        >>> f = io.open(file_name, 'r') # or
+        >>> f = io.StringIO(text)
 
     Returns
     -------
-    
+
     ndarray
+        numpy array containing table data from file or text
     """
     #------------------------------------------------------------------------------
     # Get CSV parameter settings
     #------------------------------------------------------------------------------
     CSV_dict = params['CSV']
     try:
-        header = CSV_dict['header'].lower()       
+        header = CSV_dict['header'].lower()
         if header in {'auto', 'on', 'off'}:
             pass
         else:
@@ -468,12 +508,12 @@ def csv2array(f):
         #------------------------------------------------------------------------------
         if header == 'auto' or tab == 'auto' or cr == 'auto':
         # test the first line for delimiters (of the given selection)
-            dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' ']) 
+            dialect = csv.Sniffer().sniff(f.readline(), delimiters=['\t',';',',', '|', ' '])
             f.seek(0)                               # and reset the file pointer
         else:
             dialect = csv.get_dialect('excel-tab') # fall back, alternatives: 'excel', 'unix'
 
-        if header == "auto":                                  
+        if header == "auto":
             use_header = csv.Sniffer().has_header(f.read(1000)) # True when header detected
             f.seek(0)
 
@@ -507,7 +547,7 @@ def csv2array(f):
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
     #------------------------------------------------
     if use_header:
-        logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2 
+        logger.info("Headers:\n{0}".format(next(data_iter, None))) # py3 and py2
 
     data_list = []
     try:
@@ -525,7 +565,7 @@ def csv2array(f):
             return data_arr.T
         else:
             return data_arr
-            
+
     except (TypeError, ValueError) as e:
         logger.error("{0}\n{1}".format(e, data_list))
         return None
@@ -606,19 +646,20 @@ def import_data(parent, fkey, comment):
 def export_data(parent, data, fkey, comment=""):
     """
     Export coefficients or pole/zero data in various formats
+
     Parameters
     ----------
-    parent: handle to calling instance
+    parent: handle to calling instance for creating file dialog instance
 
-    data: string
-        formatted as CSV data, i.e. rows of elements separated by 'delimiter', 
+    data: str
+        formatted as CSV data, i.e. rows of elements separated by 'delimiter',
         terminated by 'lineterminator'
 
-    fkey: string
-        Key for accessing data in *.npz or Matlab workspace (*.mat) file.
+    fkey: str
+        Key for accessing data in ``*.npz`` or Matlab workspace (``*.mat``) file.
         When fkey == 'ba', exporting to FPGA coefficients format is enabled.
 
-    comment: string
+    comment: str
         comment string stating the type of data to be copied (e.g.
         "filter coefficients ") for user message while opening file
 
@@ -739,7 +780,7 @@ def export_data(parent, data, fkey, comment=""):
 #------------------------------------------------------------------------------
 def export_coe_xilinx(f):
     """
-    Save FIR filter coefficients in Xilinx coefficient format as file '*.coe', specifying
+    Save FIR filter coefficients in Xilinx coefficient format as file '\*.coe', specifying
     the number base and the quantized coefficients (decimal or hex integer).
     """
     qc = fix_lib.Fixed(fb.fil[0]['q_coeff']) # instantiate fixpoint object
@@ -777,9 +818,9 @@ def export_coe_xilinx(f):
 #------------------------------------------------------------------------------
 def export_coe_microsemi(f):
     """
-    Save FIR filter coefficients in Actel coefficient format as file '*.txt'. 
+    Save FIR filter coefficients in Actel coefficient format as file '\*.txt'.
     Coefficients have to be in integer format, the last line has to be empty.
-    For (anti)aymmetric filter only one half of the coefficients must be 
+    For (anti)aymmetric filter only one half of the coefficients must be
     specified?
     """
     qc = fix_lib.Fixed(fb.fil[0]['q_coeff']) # instantiate fixpoint object
@@ -799,11 +840,13 @@ def export_coe_TI(f):
     Save FIR filter coefficients in TI coefficient format
     Coefficient have to be specified by an identifier 'b0 ... b191' followed
     by the coefficient in normalized fractional format, e.g.
-    
-    b0 .053647 
-    b1 -.27485 
+
+    b0 .053647
+    b1 -.27485
     b2 .16497
     ...
+
+    ** not implemented yet **
     """
     pass
 
