@@ -441,6 +441,8 @@ class Input_Files(QWidget):
          
          msg.setWindowTitle("About pyFDA")
          msg.setStandardButtons(QMessageBox.Ok) # | QMessageBox.Cancel
+         # close Message box with close event triggered by "x" icon
+         msg.closeEvent = self.closeEvent 
 
          butClipboard.clicked.connect(lambda: to_clipboard(about_string))
 
