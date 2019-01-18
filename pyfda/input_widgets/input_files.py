@@ -395,7 +395,12 @@ class Input_Files(QWidget):
              """
              Copy version info to clipboard
              """
-             mapping = [ ('<br>','\n'), ('<hr>','\n---------\n'), ('<b>',''), ('</b>','')]
+             mapping = [('<br>','\n'),('<br />','\n'),  ('</tr>','\n'),
+                        ('</th>','\n'), ('</table>','\n'),
+                        ('<hr>','\n---------\n'), 
+                        ('<b>',''),('</b>',''),('<tr>',''), ('<td>',''),('</td>','\t'),
+                        ('<th>',''), ('&emsp;',' '), ('<table>','')
+                        ]
              for k, v in mapping:
                  my_string = my_string.replace(k, v)
              fb.clipboard.setText(my_string)
@@ -404,12 +409,15 @@ class Input_Files(QWidget):
          "Version {0} (c) 2013 - 2019 Christian Münker</b><br>"
          "Design, analyze and synthesize digital filters<hr>".format(version.__version__))
 
-         versions_string =("<b>Operating System:</b> {0} {1}<br><b>User Name:</b> {2}<br><br>"
+         versions_string =("<b>OS:</b> {0} {1}<br><b>User Name:</b> {2}<br>"
                     .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME))
 
-         dir_string = ("<table><th style='font-size:large;'>Imported Modules</th>"
-                           "<tr><td>&nbsp;&emsp;{0}</td></tr>"\
-                           .format( pyfda_lib.mod_version().replace("\n", "<br>&nbsp;&emsp;")))
+#         dir_string = ("<table><th style='font-size:large;'>Imported Modules</th>"
+#                           "<tr><td>&nbsp;&emsp;{0}</td></tr>"\
+#                           .format( pyfda_lib.mod_version().replace("\n", "<br>&nbsp;&emsp;")))
+         
+         dir_string = ("<table><th style='font-size:large;'>Software Versions</th>")
+         dir_string += pyfda_lib.mod_version()
 
          dir_string += ("<table><th style='font-size:large;'>Directories</th>"
                            "<tr><td><b>Home:</b></td><td>{0}</td></tr>"
@@ -418,7 +426,7 @@ class Input_Files(QWidget):
                            "<tr><td><b>User:&emsp;</b></td><td>{3}</td></tr>"
                            "<tr><td><b>Temp:</b></td><td>{4}</td></tr>"\
                         .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR, dirs.USER_DIRS, dirs.TEMP_DIR))
-         dir_string += ("<br /><th style='font-size:large;'>Logging Files</th>"
+         dir_string += ("<th style='font-size:large;'>Logging Files</th>"
                         "<tr><td><b>Config:</b></td><td>{0}</td></tr>"
                         "<tr><td><b>Output:&emsp;</b></td><td>{1}</td></tr>"
                         "</table>"\

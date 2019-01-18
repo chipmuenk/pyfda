@@ -148,12 +148,11 @@ def mod_version(mod = None):
         keys = sorted(list(VERSION.keys()))
         for k in keys:
             if VERSION[k]:
-                v += "\t{0: <11} : {1}\n".format(k, LooseVersion(VERSION[k]))
+                v += "<tr><td><b>{0}&emsp;</b></td><td>{1}</td></tr>".format(k, LooseVersion(VERSION[k]))
             else:
-                v += "\t{0: <11} : missing\n".format(k)
+                v += "<tr><td>{0}</td><td>missing</td></tr>".format(k)
         return v
-
-
+   
 #------------------------------------------------------------------------------
 
 logger.info("Found the following modules:" + "\n" + mod_version())
