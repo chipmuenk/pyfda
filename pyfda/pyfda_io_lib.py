@@ -33,6 +33,11 @@ from .compat import (QLabel, QComboBox, QDialog, QPushButton, QRadioButton,
                      QFD, QHBoxLayout, QVBoxLayout)
 #------------------------------------------------------------------------------
 class CSV_option_box(QDialog):
+    """
+    Create a pop-up widget for setting CSV options. This is needed when storing /
+    reading Comma-Separated Value (CSV) files containing coefficients or poles 
+    and zeros.
+    """
 
     def __init__(self, parent):
         super(CSV_option_box, self).__init__(parent)

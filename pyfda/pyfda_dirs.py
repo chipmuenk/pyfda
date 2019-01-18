@@ -27,11 +27,25 @@ def valid(path):
     return False
 
 def env(name):
-    """Get value for environment variable"""
+    """
+    Get value for environment variable ``name`` from the OS.
+    
+    Parameters
+    ----------
+    name : str
+       environment variable
+       
+    Returns
+    -------
+    str
+      value of environment variable
+    """
     return os.environ.get( name, '' )
 
 def get_home_dir():
-    """Return the user's home directory and name"""
+    """
+    Return the user's home directory and name
+    """
     if OS != "Windows":
     # set home directory from user name for Mac and Linux when started as user or
     # sudo user
@@ -58,7 +72,10 @@ def get_home_dir():
 
 #------------------------------------------------------------------------------ 
 def get_log_dir():
-    """Return the logging directory"""
+    """
+    Try different OS-dependent locations for creating log files and return 
+    the first suitable directory name. Only called once at startup.
+    """
 
      # list of base directories for constructing the logging directory
     log_dirs = ['/var/log/', TEMP_DIR]
@@ -100,20 +117,20 @@ def get_conf_dir():
 OS     = platform.system()
 OS_VER = platform.release()
 
-CONF_FILE = 'pyfda.conf'            # name for general configuration file
-LOG_CONF_FILE = 'pyfda_log.conf'    # name for logging configuration file
+CONF_FILE = 'pyfda.conf'            #: name for general configuration file
+LOG_CONF_FILE = 'pyfda_log.conf'    #: name for logging configuration file
 
 INSTALL_DIR = os.path.dirname(os.path.abspath(__file__)) # dir of this file
 
-TEMP_DIR = tempfile.gettempdir() # Temp directory for constructing logging dir
-USER_DIRS = None # Placeholder for user widgets directory dict, set by treebuilder
+TEMP_DIR = tempfile.gettempdir() #: Temp directory for constructing logging dir
+USER_DIRS = None #: Placeholder for user widgets directory dict, set by treebuilder
 
-HOME_DIR, USER_NAME = get_home_dir()
+HOME_DIR, USER_NAME = get_home_dir() #: Home dir and user name
 
 LOG_DIR  = get_log_dir()
 if LOG_DIR:
     LOG_FILE = 'pyfda_{0}.log'.format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-    # the name of the file can be changed in pyfdax.py
+    #: Name of the log file, can be changed in ``pyfdax.py``
     LOG_DIR_FILE = os.path.join(LOG_DIR, LOG_FILE) 
 else:
     LOG_FILE = None
@@ -121,7 +138,9 @@ else:
     
 CONF_DIR = get_conf_dir()
 USER_CONF_DIR_FILE     = os.path.join(CONF_DIR, CONF_FILE)
+ #: full path name of user configuration file
 USER_LOG_CONF_DIR_FILE = os.path.join(CONF_DIR, LOG_CONF_FILE)
+#: full path name of logging configuration file
 
 if not os.path.isfile(USER_CONF_DIR_FILE):
     # Copy default configuration file to user directory if it doesn't exist
@@ -142,7 +161,7 @@ if not os.path.isfile(USER_LOG_CONF_DIR_FILE):
         print(e)
 
 #------------------------------------------------------------------------------
-# This is the place holder for storing where the last file was saved
-save_dir = HOME_DIR
 
+save_dir = HOME_DIR
+""" Place holder for storing the directory location where the last file was saved"""
 
