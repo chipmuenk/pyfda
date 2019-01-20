@@ -16,19 +16,12 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
 
 *	The two parts can be resized using the handles (red dots).
 
-Specifications
---------------
 
-The figure above features the **Specs** widget where you can select:
-- *response type* (low pass, band pass, ...)
-- *filter type* (IIR for a recursive filter with infinite impulse response or FIR for a transversal filter with finite impulse response)
-- *filter class* (elliptic, ...) allowing you to select 
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
-Features
---------
-
--  **Filter design**
-
+   input_specs
 
 
 Customization
