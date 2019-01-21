@@ -4,6 +4,8 @@
    contain the root `toctree` directive.
    see https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs/
    and https://stackoverflow.com/questions/2701998/sphinx-autodoc-is-not-automatic-enough?rq=1
+   
+   Doc: https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html
    #
    I really like the :mod:`threading` module which has the
    :class:`threading.Thread` class.
