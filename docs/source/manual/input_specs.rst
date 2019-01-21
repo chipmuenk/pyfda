@@ -49,7 +49,7 @@ In DSP, specifications and frequencies are expressed in different ways:
     F = \frac{f}{f_S}  \textrm{ or }\Omega = \frac{2\pi f}{f_S} = 2\pi F
 
 In pyfda, you can enter parameters as absolute frequency :math:`{{f}}`, as
-normalized frequency :math:`{{F}}` w.r.t. to  the sampling frequency :math:`{f_S}`or to the 
+normalized frequency :math:`{{F}}` w.r.t. to  the sampling frequency :math:`{f_S}` or to the 
 Nyquist frequency :math:`f_{Ny} = f_S / 2`:
 
 .. figure:: ../img/manual/pyfda_specs_fs.png
