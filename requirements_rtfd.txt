@@ -1,0 +1,13 @@
+# Requirements for ReadTheDocs.org
+#---------------------------------
+numpy
+scipy
+matplotlib
+PyQt5 # only for readthedocs.org
+six
+docutils
+nose
+myhdl >= 0.10
+# pytest
+# coverage
+# coveralls
