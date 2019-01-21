@@ -18,8 +18,8 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
 
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Contents
 
    input_specs
 
