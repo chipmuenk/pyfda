@@ -22,6 +22,7 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
    :caption: Contents
 
    input_specs
+   fixpoint_specs
 
 
 Customization

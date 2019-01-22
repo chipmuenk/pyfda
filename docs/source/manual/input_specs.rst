@@ -71,8 +71,8 @@ signal.
 
    A signal processing system with multiple sampling frequencies
    
-Developers
+Development
 -----------
 
-More info on this widget can be found under :ref:`dev_input_specs` .
+More info on this widget can be found under :ref:`dev_input_specs`.
 
