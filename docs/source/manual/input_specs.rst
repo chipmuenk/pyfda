@@ -29,8 +29,32 @@ The **order** of the filter, i.e. the number of poles / zeros / delays is
 either specified manually or the minimum order can be estimated for many filter
 algorithms to fulfill a set of given specifications.
 
+
+Frequencies
+------------  
+In DSP, specifications and frequencies are expressed in different ways:
+
+.. math::
+
+    F = \frac{f}{f_S}  \textrm{ or }\Omega = \frac{2\pi f}{f_S} = 2\pi F
+
+In pyfda, you can enter parameters as absolute frequency :math:`{{f}}`, as
+normalized frequency :math:`{{F}}` w.r.t. to  the :ref:`sampling_frequency` 
+:math:`{f_S}` or to the :ref:`nyquist_frequency` :math:`f_{Ny} = f_S / 2`:
+
+.. figure:: ../img/manual/pyfda_specs_fs.png
+   :alt: pyfda displaying normalized frequencies
+   :align: center
+   
+   Displaying normalized frequencies
+
+Background Info
+---------------
+
+.. _sampling_frequency:
+
 Sampling Frequency
----------------------
+~~~~~~~~~~~~~~~~~~~
 One of the most important parameters in a digital signal processing system is 
 the **sampling frequency** :math:`{\pmb{f_S}}`, defining the clock frequency with which 
 the registers (flip-flops) in the system are updated. In a simple DSP system,
@@ -41,25 +65,7 @@ the clock frequency of ADC, digital filter and DAC might be identical:
    :align: center
    
    A simple signal processing system
-   
-In DSP, specifications and frequencies are expressed in different ways:
 
-.. math::
-
-    F = \frac{f}{f_S}  \textrm{ or }\Omega = \frac{2\pi f}{f_S} = 2\pi F
-
-In pyfda, you can enter parameters as absolute frequency :math:`{{f}}`, as
-normalized frequency :math:`{{F}}` w.r.t. to  the sampling frequency :math:`{f_S}` or to the 
-Nyquist frequency :math:`f_{Ny} = f_S / 2`:
-
-.. figure:: ../img/manual/pyfda_specs_fs.png
-   :alt: pyfda displaying normalized frequencies
-   :align: center
-   
-   Displaying normalized frequencies
-
-Background
--------------
 Sometimes it makes sense to change the sampling frequency in the processing system
 e.g. to reduce the sampling rate of an oversampling ADC or to increase the 
 clocking frequency of an DAC to ease and improve reconstruction of the analog
@@ -70,6 +76,14 @@ signal.
    :align: center
 
    A signal processing system with multiple sampling frequencies
+   
+.. _nyquist_frequency:
+
+Nyquist Frequency
+~~~~~~~~~~~~~~~~~~
+
+Aliasing
+~~~~~~~~~~~~~~~~~~
    
 Development
 -----------

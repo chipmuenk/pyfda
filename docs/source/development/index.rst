@@ -3,13 +3,26 @@ Development
 
 This part of the documentation describes the features of pyFDA that are relevant for developers.
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+   
+   pyfda_main_routines
+   pyfda_libs
+   pyfda_input_widgets
+   pyfda_plot_widgets
+   pyfda_filter_blocks
+
+Software Hierarchy
+-------------------
+
 The software is structured as shown in the following figure
 
 .. figure:: ../img/pyfda_dev_classes_overview.png
    :alt: pyfda class structure
    :align: center
 
-   pyfda class structure
+   pyfda hierarchy
 
 Common data is stored in a large dict, the modules communicate via Qt's signal-slot mechanism.
 
@@ -51,13 +64,14 @@ Information is transmitted via the ``sig_tx`` signal:
 
 .. code::
 
-        dict_sig = {'sender':__name__, 'fx_sim':'set_results', 
-                    'fx_results':self.fx_results}            
+        dict_sig = {'sender':__name__, 'fx_sim':'set_results', 'fx_results':self.fx_results}            
         self.sig_tx.emit(dict_sig)
 
  The following keys are used for all widgets: 
 
-* 'sender': 
+* 'sender': Fully qualified name of the sending widget, usually given as ``__name__``.
+       The sender name is needed a.o. to prevent infinite loops which may occur
+       when the rx event is connected to the tx signal.
 
 * 'data_changed'
 
@@ -66,7 +80,8 @@ Information is transmitted via the ``sig_tx`` signal:
 Persistence: Where's the data?
 ------------------------------
 
-At startup, a dictionary is constructed with information about the filter classes and their methods. The central dictionary `fb.dict` is initialized.
+At startup, a dictionary is constructed with information about the filter 
+classes and their methods. The central dictionary ``fb.dict`` is initialized.
 
 
 Customization
@@ -78,13 +93,3 @@ Customization
   directory for integration of your own widgets in ``<USER_HOME>/pyfda/pyfda.conf``
 - Control logging behaviour with ``<USER_HOME>/pyfda/pyfda_log.conf``
 
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Contents:
-   
-   pyfda_main_routines
-   pyfda_libs
-   pyfda_input_widgets
-   pyfda_plot_widgets
-   pyfda_filter_blocks

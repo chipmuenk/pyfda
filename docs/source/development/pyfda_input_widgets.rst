@@ -1,5 +1,5 @@
-Input Widgets
-=============
+Package :mod:`pyfda.input_widgets`
+==================================
 This package contains the widgets for entering / selecting parameters
 for the filter design.
 
@@ -65,7 +65,7 @@ for the filter design.
 
 .. _dev_input_files:
 
-:mod:`pyfda.input_widgets.input_files`
+pyfda.input_widgets.input_files
 ---------------------------------------
 
 .. automodule:: pyfda.input_widgets.input_files
@@ -94,12 +94,12 @@ fixpoint specifications like word lengths and formats for input, output and
 internal structures (like an accumulator) for each class. It also contains a 
 reference to a picture showing the filter topology.
 
-The configuration file `pyfda.conf` lists the fixpoint classes to be used, e.g.
+The configuration file `pyfda.conf` lists the fixpoint classes to be used, e.g. 
 `DF1` and `DF2`. `tree_builder` parses this file and writes all fixpoint modules
 into the list `fb.fixpoint_widgets_list`. The input widget 
 `pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
 with references to all successfully imported fixpoint modules. The currently 
-selected fixpoint widget (e.g.`DF1`) is imported from `pyfda.fixpoint_widgets` 
+selected fixpoint widget (e.g. `DF1`) is imported from `pyfda.fixpoint_widgets` 
 together with the referenced picture.
 
 A myhdl filter instance `self.hdlfilter` of `pyfda.filter_blocks.fda.FilterFIR` or 
