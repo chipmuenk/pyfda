@@ -3,10 +3,11 @@ Package :mod:`pyfda.input_widgets`
 This package contains the widgets for entering / selecting parameters
 for the filter design.
 
+.. currentmodule:: pyfda.input_widgets
 
 .. _dev_input_tab_widgets:
 
-:mod:`pyfda.input_widgets.input_tab_widgets`
+:mod:`input_tab_widgets`
 --------------------------------------------------------------
 
 .. automodule:: pyfda.input_widgets.input_tab_widgets
@@ -56,7 +57,7 @@ for the filter design.
 .. _dev_input_info:
 
 :mod:`pyfda.input_widgets.input_info`
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyfda.input_widgets.input_info
     :show-inheritance:
@@ -66,7 +67,7 @@ for the filter design.
 .. _dev_input_files:
 
 pyfda.input_widgets.input_files
----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyfda.input_widgets.input_files
     :show-inheritance:
@@ -76,7 +77,7 @@ pyfda.input_widgets.input_files
 .. _dev_input_fixpoint_specs:
 
 :mod:`pyfda.input_widgets.input_fixpoint_specs`
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This package contains all fixpoint classes, i.e. classes which define filter 
 topologies that can be implemented in hardware. The filter topologies use the 
@@ -105,8 +106,8 @@ together with the referenced picture.
 A myhdl filter instance `self.hdlfilter` of `pyfda.filter_blocks.fda.FilterFIR` or 
 `pyfda.filter_blocks.fda.FilterIIR` is instantiated as `hdlfilter`.  Its methods 
 
-* `hdlfilter.set_stimulus(self.stim)`
-* `hdlfilter.run_sim()`
+* :func:`pyfda.filter_blocks.fda.FilterIIR.set_stimulus(self.stim)`
+* :ref:`pyfda.filter_blocks.fda.FilterIIR.run_sim()`
 * `self.fx_results = hdlfilter.get_response()`
 * `hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)`
 

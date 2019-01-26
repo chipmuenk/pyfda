@@ -5,21 +5,21 @@ filter topologies. The filter blocks can be simulated and converted
 to Verilog and VHDL netlists.
 
 :class:`pyfda.filter_blocks.fda.filter_hw.FilterHardware`
----------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyfda.filter_blocks.fda.filter_hw
     :show-inheritance:
     :members:
 
 :class:`pyfda.filter_blocks.fda.fir.FilterFIR`
-----------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: pyfda.filter_blocks.fda.fir
     :show-inheritance:
     :members:
 
 :class:`pyfda.filter_blocks.fda.iir.FilterIIR`
-----------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: pyfda.filter_blocks.fda.iir.FilterIIR
     :show-inheritance:
@@ -27,7 +27,6 @@ to Verilog and VHDL netlists.
     
     
 :mod:`pyfda.filter_blocks.support`
-----------------------------------
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. automodule:: pyfda.filter_blocks.support
     :members:
