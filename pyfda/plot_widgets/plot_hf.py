@@ -33,9 +33,8 @@ class Plot_Hf(QWidget):
     """
     Widget for plotting \|H(f)\|, frequency specs and the phase
     """
-    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
-#    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent): 
         super(Plot_Hf, self).__init__(parent)
@@ -131,7 +130,7 @@ class Plot_Hf(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
@@ -144,10 +143,10 @@ class Plot_Hf(QWidget):
         self.chkSpecs.clicked.connect(self.draw)
         self.chkPhase.clicked.connect(self.draw)
 
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
                 
 #------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
+    def process_sig_rx(self, dict_sig=None):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
