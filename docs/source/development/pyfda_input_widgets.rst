@@ -103,13 +103,13 @@ with references to all successfully imported fixpoint modules. The currently
 selected fixpoint widget (e.g. `DF1`) is imported from `pyfda.fixpoint_widgets` 
 together with the referenced picture.
 
-A myhdl filter instance `self.hdlfilter` of `pyfda.filter_blocks.fda.FilterFIR` or 
-`pyfda.filter_blocks.fda.FilterIIR` is instantiated as `hdlfilter`.  Its methods 
+A myhdl filter instance `self.hdlfilter` of :ref:`dev_filter_blocks_filter_fir`
+:ref:`dev_filter_blocks_filter_iir` is instantiated as ``hdlfilter``.  Its methods 
 
-* :func:`pyfda.filter_blocks.fda.FilterIIR.set_stimulus(self.stim)`
-* :ref:`pyfda.filter_blocks.fda.FilterIIR.run_sim()`
-* `self.fx_results = hdlfilter.get_response()`
-* `hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)`
+* ``hdlfilter.set_stimulus(self.stim)``
+* ``hdlfilter.run_sim()``
+* ``self.fx_results = hdlfilter.get_response()``
+* ``hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)``
 
 are used for bit-true simulations and for generating VHDL or Verilog code for the filter. 
 

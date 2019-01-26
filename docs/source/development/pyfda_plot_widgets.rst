@@ -4,6 +4,14 @@ package plot_widgets
 Package providing widgets for plotting various time and frequency dependent filter
 properties
 
+.. _dev_plot_tab_widgets:
+
+:mod:`pyfda.plot_widgets.plot_tab_widgets`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. automodule:: pyfda.plot_widgets.plot_tab_widgets
+	:members:	
+
+
 .. _dev_plot_hf:
 
 :mod:`pyfda.plot_widgets.plot_hf`
