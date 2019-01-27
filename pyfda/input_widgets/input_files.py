@@ -407,8 +407,8 @@ class Input_Files(QWidget):
 
          info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
          "Version {0} (c) 2013 - 2019 Christian Münker</b><br />"
-         "Design, analyze and synthesize digital filters<br />"
-         "Documentation: <a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
+         "Design, analyze and synthesize digital filters. Docs @ "
+         "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
          " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<hr>"\
          .format(version.__version__))
 
