@@ -60,13 +60,36 @@ class Plot_3D(QWidget):
         self.zmax = 4
         self.zmin_dB = -80
         self.cmap_default = 'RdYlBu_r'
-        self.needs_draw = True   # flag whether plot needs to be updated 
-        self.needs_redraw = True # flag whether plot needs to be redrawn
+        self.data_changed = True # flag whether data has changed
+        self.size_changed = True # flag whether widget has been resized
         self.tool_tip = "3D magnitude response |H(z)|"
         self.tab_label = "3D"
 
         self._construct_UI()
 
+#------------------------------------------------------------------------------
+    def process_signals(self, dict_sig=None):
+        """
+        Process signals coming from the navigation toolbar and from ``sig_rx``
+        """
+        logger.debug("Processing {0} | data_changed = {1}, visible = {2}"\
+                     .format(dict_sig, self.data_changed, self.isVisible()))
+        if self.isVisible():
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.data_changed:
+                self.draw()
+                self.data_changed = False
+                self.size_changed = False
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+                    or self.size_changed:
+                self.redraw()
+                self.size_changed = False                
+        else:
+            if 'data_changed' in dict_sig:
+                self.data_changed = True
+            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+                self.size_changed = True
+
+#------------------------------------------------------------------------------
     def _construct_UI(self):
         self.chkLog = QCheckBox("Log.", self)
         self.chkLog.setObjectName("chkLog")
@@ -231,28 +254,6 @@ class Plot_3D(QWidget):
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
         #self.mplwidget.mplToolbar.enable_plot(state = False) # disable initially
-
-#------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
-        """
-        Process signals coming from the navigation toolbar and from sig_rx
-        """
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_draw, self.isVisible()))
-        if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
-                self.draw()
-                self.needs_draw = False
-                self.needs_redraw = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.needs_redraw:
-                self.redraw()
-                self.needs_redraw = False                
-        else:
-            if 'data_changed' in dict_sig:
-                self.needs_draw = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw = True
 
 #------------------------------------------------------------------------------
     def _init_cmb_colormap(self):

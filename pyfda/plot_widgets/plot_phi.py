@@ -24,17 +24,46 @@ from pyfda.pyfda_qt_lib import qget_cmb_box
 
 
 class Plot_Phi(QWidget):
-    # incoming, connected in sender widget (locally connected to self.process_signals() )
+    # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
     sig_rx = pyqtSignal(object)
-#    sig_tx = pyqtSignal(object) # outgoing from process_signals
 
     def __init__(self, parent):
         super(Plot_Phi, self).__init__(parent)
-        self.needs_draw = True
-        self.needs_redraw = True
+        self.data_changed = True
+        self.view_change= True
+        self.size_changed = True
         self.tool_tip = "Phase frequency response"
         self.tab_label = "phi(f)"
         self._construct_UI()
+
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from the navigation toolbar and from sig_rx
+        """
+        logger.debug("Processing {0} | data_changed = {1}, visible = {2}"\
+                     .format(dict_sig, self.data_changed, self.isVisible()))
+        if self.isVisible():
+            if 'data_changed' in dict_sig or 'home' in dict_sig or self.data_changed:
+                self.draw()
+                self.data_changed = False
+                self.view_changed = False
+                self.size_changed = False                
+            elif 'view_changed' in dict_sig:
+                self.update_view()
+                self.view_changed = False                
+                self.size_changed = False
+            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+                or self.size_changed:
+                self.redraw()
+                self.size_changed = False
+        else:
+            if 'data_changed' in dict_sig:
+                self.data_changed = True
+            if 'view_changed' in dict_sig:
+                self.view_changed = True                
+            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+                self.size_changed = True
 
     def _construct_UI(self):
         """
@@ -88,38 +117,14 @@ class Plot_Phi(QWidget):
         #----------------------------------------------------------------------
         # GLOBAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.sig_rx.connect(self.process_signals)
+        self.sig_rx.connect(self.process_sig_rx)
 
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
         self.chkWrap.clicked.connect(self.draw)
         self.cmbUnitsPhi.currentIndexChanged.connect(self.draw)
-        self.mplwidget.mplToolbar.sig_tx.connect(self.process_signals)
-
-#------------------------------------------------------------------------------
-    def process_signals(self, dict_sig=None):
-        """
-        Process signals coming from the navigation toolbar and from sig_rx
-        """
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_draw, self.isVisible()))
-        if self.isVisible():
-            if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
-                self.draw()
-                self.needs_draw = False
-                self.needs_redraw = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                or self.needs_redraw:
-                self.redraw()
-                self.needs_redraw = False
-            elif 'view_changed' in dict_sig:
-                self.update_view()
-        else:
-            if 'data_changed' in dict_sig or 'view_changed' in dict_sig:
-                self.needs_draw = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw = True
+        self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
 
 #------------------------------------------------------------------------------
     def init_axes(self):

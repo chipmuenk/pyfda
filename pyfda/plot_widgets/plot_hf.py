@@ -38,11 +38,43 @@ class Plot_Hf(QWidget):
 
     def __init__(self, parent): 
         super(Plot_Hf, self).__init__(parent)
-        self.needs_draw = True   # flag whether plot needs to be updated
+        self.data_changed = True   # flag whether plot needs to be updated
+        self.ui_changed = True   # flag whether plot needs to be updated        
         self.needs_redraw = True # flag whether plot needs to be redrawn
         self.tool_tip = "Magnitude and phase frequency response"
         self.tab_label = "|H(f)|"
         self._construct_ui()
+
+#------------------------------------------------------------------------------
+    def process_sig_rx(self, dict_sig=None):
+        """
+        Process signals coming from the navigation toolbar and from sig_rx
+        """
+        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
+                     .format(dict_sig, self.data_changed, self.isVisible()))
+        if self.isVisible():
+            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
+                    or 'home' in dict_sig or self.data_changed:
+                self.draw()
+                self.data_changed = False
+                self.view_changed = False
+                self.ui_changed = False
+            if 'view_changed' in dict_sig or self.view_changed:
+                self.update_view()
+                self.view_changed = False
+                self.ui_changed = False               
+            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
+                    or self.ui_changed:
+                self.redraw()
+                self.ui_changed = False
+        else: 
+            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig:
+                self.data_changed = True
+            if 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
+                self.ui_changed = True
+            if 'view_changed' in dict_sig:
+                self.view_changed = True
+
 
     def _construct_ui(self):
         """
@@ -145,32 +177,6 @@ class Plot_Hf(QWidget):
 
         self.mplwidget.mplToolbar.sig_tx.connect(self.process_sig_rx)
                 
-#------------------------------------------------------------------------------
-    def process_sig_rx(self, dict_sig=None):
-        """
-        Process signals coming from the navigation toolbar and from sig_rx
-        """
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
-                     .format(dict_sig, self.needs_draw, self.isVisible()))
-        if self.isVisible():
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig\
-                    or 'home' in dict_sig or self.needs_draw:
-                self.draw()
-                self.needs_draw = False
-                self.needs_redraw = False
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized'\
-                    or self.needs_redraw:
-                self.redraw()
-                self.needs_redraw = False
-            elif 'view_changed' in dict_sig:
-                self.update_view()
-        else:
-            # TODO: draw wouldn't be necessary for 'view_changed', only update view 
-            if 'data_changed' in dict_sig or 'specs_changed' in dict_sig or 'view_changed' in dict_sig:
-                self.needs_draw = True
-            elif 'ui_changed' in dict_sig and dict_sig['ui_changed'] == 'resized':
-                self.needs_redraw = True
-
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
