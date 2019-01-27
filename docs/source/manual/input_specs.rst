@@ -86,7 +86,8 @@ Aliasing
 ~~~~~~~~~~~~~~~~~~
 
 When the sampling frequency is too low, significant information is lost in the 
-process and the signal cannot be reconstructed without errors (forth image in fig_aliasing_). 
+process and the signal cannot be reconstructed without errors (forth image in fig_aliasing_)
+[Smith99]_. 
 
 .. _fig_aliasing:
 
