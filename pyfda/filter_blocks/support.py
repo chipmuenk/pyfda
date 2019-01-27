@@ -19,7 +19,16 @@ from myhdl import Signal, SignalType, ResetSignal, intbv, delay
 
 
 class Clock(SignalType):
-    """ Generate a clock """
+    """ 
+    Generate a clock instance
+    
+    Example
+    -------
+    Generate a clock with a frequency of 50 MHz, starting with '0'
+    
+    >>> clock = Clock(0, frequency=50e6)
+    
+    """
     def __init__(self, val=bool(0), frequency=1):
         self.frequency = frequency
         super(Clock, self).__init__(bool(val))
@@ -42,7 +51,16 @@ class Clock(SignalType):
 
 
 class Reset(ResetSignal):
-    """ Generate a reset signal """
+    """ 
+    Generate a reset signal 
+
+    Example
+    -------
+    Generate a reset signal with a frequency of 50 MHz, starting with '0'
+
+    >>> reset = Reset(1, active=0, async=True)
+    
+    """
     def __init__(self, val=0, active=0, async=True):
         super(Reset, self).__init__(val, active, async)
 
@@ -75,7 +93,7 @@ class Samples(object):
         # The fixed-point word format is described by a tuple, the
         # tuple defines the number of integer bits and fractional bits:
         # (word, int, frac) where: word = int + frac + 1
-        self.word_format = check_word_fomat(word_format)
+        self.word_format = check_word_format(word_format)
         wl, iwl, fwl = word_format
         # imax = 2**(wl-1)
 
@@ -119,7 +137,20 @@ class Samples(object):
         return beh_record
 
 
-def check_word_fomat(w):
+def check_word_format(w):
+    """
+    Check whether specified word format is either ``(W, WI, WF)`` or ``(W, WI)``
+    
+    Arguments
+    ---------
+    w : tuple
+      ``(W, WI, WF)`` or ``(W, WI)``, items need to be integer
+      
+    Returns
+    -------
+    Tuple
+        ``(W, WI, WF)``    
+    """
     if len(w) == 2:
         fwl = w[0] - w[1] - 1
         assert fwl >= 0
@@ -132,7 +163,8 @@ def check_word_fomat(w):
 
 
 def Signals(sigtype, num_sigs):
-    """ Create a list of signals
+    """ 
+    Create a list of myhdl signals, building upon myhdls ``Signal`` (singular)
 
     Arguments
     ---------
@@ -144,7 +176,8 @@ def Signals(sigtype, num_sigs):
 
     Returns
     -------
-    sigs: a list of signals all of type `sigtype`
+    sigs: list
+        a list of signals, all of type ``sigtype``
 
     Creating multiple signals of the same type is a common requirement.
     This function facilitates the creation of multiple signals of
