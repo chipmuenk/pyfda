@@ -121,15 +121,20 @@ as needed.
 :'specs_changed': Filter specifications have changed - this will influence only
     a few widgets like the :ref:`dev_plot_hf` widget that plots the filter specifications
     as an overlay or the :ref:`dev_input_info` widget that compares filter performance
-    to filter specificatiions.
+    to filter specifications.
 
 :'view_changed': When e.g. the range of the frequency axis is changed from 
-    :math:'0 \ldots f_S/2' to :math:`-f_S/2 \ldots f_S/2`, this information can 
-    be propagated with the 'view_changed' key.
+    :math:`0 \ldots f_S/2` to :math:`-f_S/2 \ldots f_S/2`, this information can 
+    be propagated with the ``'view_changed'`` key.
 
-:'ui_changed': Propagate a change of the UI to other widgets, examples are 
-    ``'ui_changed':'csv'`` for a change of CSV import / export options or 
-    ``'ui_changed':'resize'`` when the parent window has been resized.
+:'ui_changed': Propagate a change of the UI to other widgets, examples are:
+
+     - ``'ui_changed':'csv'`` for a change of CSV import / export options
+     
+     - ``'ui_changed':'resize'`` when the parent window has been resized
+    
+     - ``'ui_changed':'tab'`` when a different tab has been selected
+
 
 
 .. _dev_persistence:
