@@ -9,6 +9,8 @@
 """
 Widget for simulating fixpoint filters and
 generating VHDL and Verilog Code
+
+see https://bitbucket.org/cfelton/examples
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os, importlib

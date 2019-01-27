@@ -5,6 +5,7 @@
    see https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs/
    and https://stackoverflow.com/questions/2701998/sphinx-autodoc-is-not-automatic-enough?rq=1
    and https://www.slideshare.net/shimizukawa/sphinx-autodoc-automated-api-documentation-europython-2015-in-bilbao
+   and http://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#python-roles
    
    Doc: https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html
    #
@@ -26,6 +27,7 @@ Version: 0.1.5
    README
    manual/index
    development/index
+   references
    api
 
 
