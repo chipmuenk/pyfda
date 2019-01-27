@@ -406,8 +406,11 @@ class Input_Files(QWidget):
              fb.clipboard.setText(my_string)
 
          info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-         "Version {0} (c) 2013 - 2019 Christian Münker</b><br>"
-         "Design, analyze and synthesize digital filters<hr>".format(version.__version__))
+         "Version {0} (c) 2013 - 2019 Christian Münker</b><br />"
+         "Design, analyze and synthesize digital filters<br />"
+         "Documentation: <a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
+         " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<hr>"\
+         .format(version.__version__))
 
          versions_string =("<b>OS:</b> {0} {1}<br><b>User Name:</b> {2}<br>"
                     .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME))
