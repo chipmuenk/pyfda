@@ -84,6 +84,18 @@ Nyquist Frequency
 
 Aliasing
 ~~~~~~~~~~~~~~~~~~
+
+When the sampling frequency is too low, significant information is lost in the 
+process and the signal cannot be reconstructed without errors (forth image in fig_aliasing_). 
+
+.. _fig_aliasing:
+
+.. figure:: ../img/manual/SMP_aliasing.png
+   :alt: Sampling and aliasing with 4 different sinusoids
+   :align: center
+
+   Sampling with :math:`f_S = 1000` Hz of sinusoids with 4 different frequencies
+
    
 Development
 -----------
