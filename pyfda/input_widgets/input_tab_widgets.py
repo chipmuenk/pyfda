@@ -119,6 +119,12 @@ class InputTabWidgets(QWidget):
         #----------------------------------------------------------------------       
         self.sig_tx.connect(self.sig_rx) # loop back to local inputs
 
+        # When user has selected a different tab, trigger a redraw of current tab
+        tabWidget.currentChanged.connect(self.current_tab_changed)
+        # The following does not work: maybe current scope must be left?
+        # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
+
+
         layVMain = QVBoxLayout()
 
         #setContentsMargins -> number of pixels between frame window border
@@ -135,6 +141,10 @@ class InputTabWidgets(QWidget):
             layVMain.addWidget(tabWidget) # add the tabWidget directly
 
         self.setLayout(layVMain) # set the main layout of the window
+
+#------------------------------------------------------------------------------
+    def current_tab_changed(self):
+        self.sig_tx.emit({'sender':__name__, 'ui_changed':'tab'})
 
 #------------------------------------------------------------------------
 
