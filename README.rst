@@ -94,7 +94,7 @@ conda
 
 If you use the Anaconda distribution, you can install / update pyfda
 from my Anaconda channel
-```Chipmuenk`` <https://anaconda.org/Chipmuenk/pyfda>`__ using
+`Chipmuenk <https://anaconda.org/Chipmuenk/pyfda>`_ using
 
 ::
 
