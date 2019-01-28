@@ -1,16 +1,18 @@
 Input Specs
 ===========
 
-The figure below shows a typical view of the **Specs** tab where you can specify
-the kind of filter to be designed and its specifications in the frequency domain:
+:numref:`fig_specs_input_window` shows a typical view of the **Specs** tab where 
+you can specify the kind of filter to be designed and its specifications in the
+frequency domain:
 
 - **Response type** (low pass, band pass, ...)
 
 - **Filter type** (IIR for a recursive filter with infinite impulse response or 
-    FIR for a non-recursive filter with finite impulse response)
+  FIR for a non-recursive filter with finite impulse response)
     
 - **Filter class** (elliptic, ...) allowing you to select the filter design algorithm
 
+.. _fig_specs_input_window:
 
 .. figure:: ../img/manual/pyfda_specs_FIR_MHz.png
    :alt: Screenshot of specs input window
@@ -31,8 +33,8 @@ either specified manually or the minimum order can be estimated for many filter
 algorithms to fulfill a set of given specifications.
 
 
-Frequencies
-------------  
+Frequency Unit
+-------------- 
 In DSP, specifications and frequencies are expressed in different ways:
 
 .. math::
@@ -41,8 +43,10 @@ In DSP, specifications and frequencies are expressed in different ways:
 
 In pyfda, you can enter parameters as absolute frequency :math:`{{f}}`, as
 normalized frequency :math:`{{F}}` w.r.t. to  the :ref:`sampling_frequency` 
-:math:`{f_S}` or to the :ref:`Nyquist Frequency<nyquist_frequency>` :math:`f_{Ny} = f_S / 2`:
+:math:`{f_S}` or to the :ref:`Nyquist Frequency<nyquist_frequency>` 
+:math:`f_{Ny} = f_S / 2` (:numref:`fig_specs_input_window_norm`):
 
+.. _fig_specs_input_window_norm:
 .. figure:: ../img/manual/pyfda_specs_fs.png
    :alt: pyfda displaying normalized frequencies
    :align: center
@@ -84,7 +88,7 @@ Aliasing and Nyquist Frequency
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the sampling frequency is too low, significant information is lost in the 
-process and the signal cannot be reconstructed without errors (forth image in fig_aliasing_)
+process and the signal cannot be reconstructed without errors (forth image in :numref:`fig_aliasing`)
 [Smith99]_. This effect is called *aliasing*.
 
 .. _fig_aliasing:

@@ -99,7 +99,13 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-
+# Number figures, tables and code-blocks are automatically if they have a caption. 
+# The numref role is enabled. Obeyed so far only by HTML and LaTeX builders. Default is False.
+numfig = True
+numfig_format = {'figure':'Fig. %s',
+                 'table':'Table %s',
+                 'code-block':'Listing %s',
+                 'section':'Section'}
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -114,6 +120,7 @@ html_theme = 'sphinx_rtd_theme' #alabaster'
 # html_theme_options = {}
 
 html_logo = 'img/pyfda_icon.png'
+html_favicon = 'img/pyfda_icon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
