@@ -15,6 +15,7 @@ the kind of filter to be designed and its specifications in the frequency domain
 .. figure:: ../img/manual/pyfda_specs_FIR_MHz.png
    :alt: Screenshot of specs input window
    :align: center
+   :width: 50%
 
    Screenshot of specs input window
 
@@ -40,11 +41,12 @@ In DSP, specifications and frequencies are expressed in different ways:
 
 In pyfda, you can enter parameters as absolute frequency :math:`{{f}}`, as
 normalized frequency :math:`{{F}}` w.r.t. to  the :ref:`sampling_frequency` 
-:math:`{f_S}` or to the :ref:`nyquist_frequency` :math:`f_{Ny} = f_S / 2`:
+:math:`{f_S}` or to the :ref:`Nyquist Frequency<nyquist_frequency>` :math:`f_{Ny} = f_S / 2`:
 
 .. figure:: ../img/manual/pyfda_specs_fs.png
    :alt: pyfda displaying normalized frequencies
    :align: center
+   :width: 50%
    
    Displaying normalized frequencies
 
@@ -77,17 +79,13 @@ signal.
 
    A signal processing system with multiple sampling frequencies
    
-.. _nyquist_frequency:
 
-Nyquist Frequency
-~~~~~~~~~~~~~~~~~~
-
-Aliasing
-~~~~~~~~~~~~~~~~~~
+Aliasing and Nyquist Frequency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the sampling frequency is too low, significant information is lost in the 
 process and the signal cannot be reconstructed without errors (forth image in fig_aliasing_)
-[Smith99]_. 
+[Smith99]_. This effect is called *aliasing*.
 
 .. _fig_aliasing:
 
@@ -96,6 +94,14 @@ process and the signal cannot be reconstructed without errors (forth image in fi
    :align: center
 
    Sampling with :math:`f_S = 1000` Hz of sinusoids with 4 different frequencies
+
+.. _nyquist_frequency:   
+
+When sampling with :math:`f_S`, the maximum signal bandwidth :math:`B` that can
+represented and reconstructed without errors is given by :math:`B < f_S/2 = f_{Ny}`. This 
+is also called the *Nyquist frequency* or *bandwidth* :math:`f_{Ny}`. 
+Some filter design tools and algorithms normalize frequencies w.r.t. to  :math:`f_{Ny}`
+instead of :math:`f_S`.
 
    
 Development
