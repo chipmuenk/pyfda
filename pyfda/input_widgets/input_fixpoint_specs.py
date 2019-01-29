@@ -416,36 +416,13 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
-
+        self.hdlfilter = self.fx_wdg_inst.hdlfilter
+        self.fx_wdg_inst.update_hdl_filter()
         # get a dict with the coefficients and fixpoint settings from fixpoint widget
         self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
         self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
+        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
         self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
-
-
-        b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
-        a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
-
-        # call setup method of filter widget - this is not implemented (yet)
-        # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
-        
-        if fb.fil[0]['ft'] == 'FIR':
-            self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
-            self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
-        elif fb.fil[0]['ft'] == 'IIR':
-            self.hdlfilter = FilterIIR()     # Standard DF1 filter - hdl_dict should be passed here
-            self.hdlfilter.set_coefficients(coeff_b = b, coeff_a = a)  # Coefficients for the filter
-        else:
-            logger.error("Unknown filter type {0}".format(fb.fil[0]['ft']))            
-
-        # pass wordlength for coeffs, input, output
-        self.hdlfilter.set_word_format(
-                (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
-                (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
-                (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
-                )
-
 
 #------------------------------------------------------------------------------
     def exportHDL(self):
@@ -520,7 +497,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Started fixpoint simulation")
             self.setupHDL()
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.hdl_dict}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fx_wdg_inst.hdl_dict}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:
@@ -565,8 +542,6 @@ class Input_Fixpoint_Specs(QWidget):
                     'fx_results':self.fx_results }            
         self.sig_tx.emit(dict_sig)
         
-        #plt.plot(self.fx_results) #plot in pop-up needs to be integrated in the UI
-        #plt.show()
         logger.info("Fixpoint plotting finished")        
             
         return

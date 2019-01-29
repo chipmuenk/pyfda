@@ -7,7 +7,7 @@
 # (see file LICENSE in root directory for details)
 
 """
-Widget for specifying the parameters of a direct-form 1 (DF1) filter
+Widget for specifying the parameters of a direct-form 1 (DF1) IIR filter
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
@@ -23,7 +23,7 @@ from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 import pyfda.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
 
-from pyfda.filter_blocks.fda.fir import FilterFIR    
+from pyfda.filter_blocks.fda.iir import FilterIIR    
 
 # =============================================================================
 # if cmp_version("myhdl", "0.10") >= 0:
@@ -41,19 +41,17 @@ from pyfda.filter_blocks.fda.fir import FilterFIR
 # else:
 #     HAS_MYHDL = False
 # =============================================================================
-#from .filter_iir import FilterIIR 
-#==============================================================================
 
-class FIR_DF1(QWidget):
+class IIR_DF1(QWidget):
     """
     Widget for entering word formats & quantization
     """
     def __init__(self, parent):
-        super(FIR_DF1, self).__init__(parent)
+        super(IIR_DF1, self).__init__(parent)
 
-        self.title = ("<b>Direct-Form 1 (DF1) FIR Filter</b><br />"
-                 "Simple topology.")
-        self.img_name = "df1.png"
+        self.title = ("<b>Direct-Form 1 (DF1) IIR Filter</b><br />"
+                 "Simple topology, not suitable for higher orders.")
+        self.img_name = "iir_df1.png"
 
         self._construct_UI()
         self.construct_hdl_filter()
@@ -62,7 +60,8 @@ class FIR_DF1(QWidget):
 
     def _construct_UI(self):
         """
-        Intitialize the UI and instantiate hdl_filter class
+        Intitialize the UI with widgets for coefficient format and input and 
+        output quantization
         """
         
         lblHBtnsMsg = QLabel("<b>Fixpoint signal / coeff. formats as WI.WF:</b>", self)
@@ -112,29 +111,37 @@ class FIR_DF1(QWidget):
         """
         Construct an instance of the HDL filter object
         """
-        self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
+        self.hdlfilter = FilterIIR()     # Standard DF1 filter - hdl_dict should be passed here
 
 #------------------------------------------------------------------------------
     def update_hdl_filter(self):
         """
-        Update the HDL filter object with new coefficients, quantization settings etc.
+        Update the HDL filter object with new coefficients, quantization settings etc. when
+        
+        - it is constructed
+        
+        - filter design and hence coefficients change
+        
+        - quantization settings are updated in this widget
         """
 
-        # get a dict with the coefficients and fixpoint settings
+        # build the dict with coefficients and fixpoint settings:
         self.hdl_dict = self.get_hdl_dict()
+        # setup input and output quantizers
         self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
         self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
 
-
         b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
+        a = [ int(x) for x in self.hdl_dict['QC']['a']] # convert np.int64 to python int
 
         # call setup method of filter widget - this is not implemented (yet)
         # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
         
-        self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
+        self.hdlfilter.set_coefficients(coeff_b = b, coeff_a = a)  # Coefficients for the filter
 
         # pass wordlength for coeffs, input, output
+        # TODO: directly pass the hdl_dict here:
         self.hdlfilter.set_word_format(
                 (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
                 (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
@@ -156,9 +163,26 @@ class FIR_DF1(QWidget):
 #==============================================================================
     def get_hdl_dict(self):
         """
-        Build the dictionary for passing infos to the filter implementation
-        """
+        Build the dictionary for passing infos to the fixpoint implementation
+        for coefficients, input and output quantization.
         
+        Parameters
+        ----------
+        
+        None
+        
+        Returns
+        -------
+        hdl_dict : dict
+
+           containing the following keys:
+
+               :'QC': dictionary with coefficients quantization settings
+               
+               :'QI': dictionary with input quantizer settings
+               
+               :'QO': dictionary with output quantizer settings
+        """
         # quantized coefficients in decimal format
         hdl_dict = {'QC':self.wdg_w_coeffs.c_dict}
         # parameters for input format
@@ -186,9 +210,9 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = FIR_DF1(None)
+    mainw = IIR_DF1(None)
     mainw.show()
 
     app.exec_()
     
-    # test using "python -m pyfda.fixpoint_widgets.fir_df1"
+    # test using "python -m pyfda.fixpoint_widgets.iir_df1"
