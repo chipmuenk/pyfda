@@ -14,27 +14,29 @@ This part of the documentation describes the features of pyFDA that are relevant
    pyfda_libs
    pyfda_input_widgets
    pyfda_plot_widgets
+   pyfda_fixpoint_widgets
    pyfda_filter_blocks
 
-Software Hierarchy
--------------------
+Software Organization
+----------------------
 
 The software is organized as shown in the following figure
 
 .. figure:: ../img/pyfda_dev_classes_overview.png
    :alt: pyfda class structure
+   :width: 100%
    :align: center
 
-   pyfda hierarchy
+   pyfda organization
 
-**Communication:** The modules communicate via Qt's signal-slot mechanism 
-    (see: :ref:`dev_signalling`).
+**Communication:** 
+    The modules communicate via Qt's signal-slot mechanism (see: :ref:`dev_signalling`).
 
-**Data Persistence:** Common data is stored in dicts that can be accessed globally 
-    (see: :ref:`dev_persistence`).
+**Data Persistence:** 
+    Common data is stored in dicts that can be accessed globally (see: :ref:`dev_persistence`).
 
-**Customization:** The software can be customized via the file ``conf.py`` 
-    (see: :ref:`dev_customization`).
+**Customization:** 
+    The software can be customized via the file ``conf.py`` (see: :ref:`dev_customization`).
 
 .. _dev_signalling:
 
@@ -81,7 +83,7 @@ operations only when the widget is visible and store the need for a redraw in a 
             
         if self.isVisible():
             if 'data_changed' in dict_sig or self.data_changed:
-                self.recalculate_some_data() # this might be computationally intensive ...
+                self.recalculate_some_data() # this may take time ...
                 self.data_changed = False
             if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'new_limits'\
                 or self.view_changed:

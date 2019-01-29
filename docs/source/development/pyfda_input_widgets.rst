@@ -104,7 +104,7 @@ selected fixpoint widget (e.g. `DF1`) is imported from `pyfda.fixpoint_widgets`
 together with the referenced picture.
 
 A myhdl filter instance `self.hdlfilter` of :ref:`dev_filter_blocks_filter_fir`
-:ref:`dev_filter_blocks_filter_iir` is instantiated as ``hdlfilter``.  Its methods 
+or :ref:`dev_filter_blocks_filter_iir` is instantiated as ``hdlfilter``.  Its methods 
 
 * ``hdlfilter.set_stimulus(self.stim)``
 * ``hdlfilter.run_sim()``
