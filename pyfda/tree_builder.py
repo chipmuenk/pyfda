@@ -230,6 +230,34 @@ class Tree_Builder(object):
             conf.read(dirs.USER_CONF_DIR_FILE)
             logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
                         .format(dirs.USER_CONF_DIR_FILE, str(conf.sections())))
+
+            # -----------------------------------------------------------------
+            # Parsing [Common]
+            #------------------------------------------------------------------
+            try:
+                commons = {}
+                items_list = conf.items('Common') # list of entries from section [Common]
+
+            except configparser.NoSectionError:
+                    logger.critical("No section '[Common]' in\n"
+                                    "'{0:s}'\n"
+                                    "You can either edit the file or delete it, in this case " 
+                                    "a new configuration file will be created at restart."\
+                                    .format(dirs.USER_CONF_DIR_FILE))
+                    sys.exit()
+
+            if len(items_list) > 0:
+                for i in items_list:
+                    commons.update({i[0]:i[1]}) # standard widget, no dir specified
+    
+                if not 'version' in commons or int(commons['version']) < 1:
+                    logger.critical("Version {2} of 'pyfda.conf' < {0} or no option 'version' in\n"
+                                    "'{1:s}'\n"
+                                    "Please delete the file and restart pyfdax, " 
+                                    "a new configuration file will be created.".format(1, dirs.USER_CONF_DIR_FILE, commons['version']))
+                    sys.exit()
+            logger.info("commons: {0}\n".format(commons))
+
             # -----------------------------------------------------------------
             # Parsing directories [Dirs]
             #------------------------------------------------------------------
@@ -342,8 +370,9 @@ class Tree_Builder(object):
                         try:
                             wdg_list.append((i[0], dirs.USER_DIRS[i[1]]))
                         except (KeyError, TypeError):
-                            logger.warning('Unknown / unsuitable user label "{0:s}"'
-                                           .format(i[1]))
+                            wdg_list.append((i[0],''))
+                            logger.warning('Unknown / unsuitable user label "{0}"'
+                                           .format((i[0],i[1])))
             if len(wdg_list) > 0:
                 logger.info('Found {0:2d} entries in [{1:s}].'
                         .format(len(wdg_list), section))
