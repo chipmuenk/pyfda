@@ -416,14 +416,16 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
-        self.hdlfilter = self.fx_wdg_inst.hdlfilter
-        self.fx_wdg_inst.update_hdl_filter()
-        # get a dict with the coefficients and fixpoint settings from fixpoint widget
-        self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
-        self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
-        self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
-
+        if self.fx_wdg_found and hasattr(self.fx_wdg_inst,'hdlfilter'):
+            self.hdlfilter = self.fx_wdg_inst.hdlfilter
+            self.fx_wdg_inst.update_hdl_filter()
+            # get a dict with the coefficients and fixpoint settings from fixpoint widget
+            self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
+            self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
+            self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
+            self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
+        else:
+            logger.error("No fixpoint widget or hdlfilter found!")
 #------------------------------------------------------------------------------
     def exportHDL(self):
         """
