@@ -12,9 +12,9 @@ Once you have started up pyFDA, you'll see a screen similar to the following fig
 
 *	**Inputs widgets:** On the left-hand side you see tabs for different input widgets, i.e. where you can enter and modify parameters for the filter to be designed
 
-*	*Plotting widgets* can be selected on the right hand side of the application.
+*	**Plotting widgets** can be selected on the right hand side of the application.
 
-*	The two parts can be resized using the handles (red dots).
+The two parts can be resized using the handles (red dots).
 
 
 .. toctree::

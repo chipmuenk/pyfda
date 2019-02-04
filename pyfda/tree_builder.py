@@ -34,10 +34,13 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
     Merge the multi-level dictionaries d1 and d2. The ``mode`` flag determines the
     behaviour when the same key is present in both dictionaries:
 
-    * :keep1 : keep the entry from dict1
-    * :keep2 : keep the entry from dict2
-    * :add1  : merge the entries, putting the values from dict2 first (important for lists)
-    * :add2  : merge the entries, putting the values from dict1 first (  "  )
+    * :keep1: keep the entry from dict1
+    
+    * :keep2: keep the entry from dict2
+    
+    * :add1: merge the entries, putting the values from dict2 first (important for lists)
+
+    * :add2: merge the entries, putting the values from dict1 first (  "  )
 
     The parameter ``path`` is only used for keeping track of the hierarchical structure
     for error messages, it should not be set when calling the function.
@@ -47,13 +50,15 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
 
     Example
     -------
+    >>> merge_dicts(fil_tree, fil_tree_add, mode='add1')
+
+    Notes
+    -----
     If you need to merge more than two dicts use:
 
     >>> from functools import reduce   # only for py3
     >>> reduce(merge, [d1, d2, d3...]) # add / merge all other dicts into d1
 
-    Notes
-    -----
     Taken with some modifications from:
         
     http://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
@@ -119,27 +124,36 @@ class Tree_Builder(object):
 #==============================================================================
     def init_filters(self):
         """
-        - ``parse_conf_file()``:  Parse the configuration file ``pyfda.conf`` 
+        Run at startup to populate global dictionaries and lists:
+        
+        - :func:`parse_conf_file()`:  Parse the configuration file ``pyfda.conf`` 
           (specified in ``dirs.USER_CONF_DIR_FILE``), writing classes and file
           paths to lists for the individual sections, a.o. to ``fb.filter_designs_list``
           for the filter design algorithms.
           
-        - ``dyn_filt_import()`` : Try to import all filter modules and classes 
+        - :func:`dyn_filt_import()` : Try to import all filter modules and classes 
           from ``fb.filter_designs_list`` and store successful imports in the
           dict ``fb.fil_classes`` as {filterName:filterModule}:
               
         - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
-           in the global dict ``fb.fil_classes`` and store them in the filter
-            tree dict ``fil_tree`` with the hierarchy
+          in the global dict ``fb.fil_classes`` and store them in the filter
+          tree dict ``fil_tree`` with the hierarchy
                                         
             **rt-ft-fc-fo-subwidget:params** .
 
-        This method can also be called when the main app runs to re-read the
-        filter directory (?)
 
         Parameters
         ----------
         None
+        
+        Returns
+        -------
+        None, but populates the following global attributes:
+            
+            - ``fb.fil_tree``:
+                
+            - 
+    
 
         """
 
@@ -185,7 +199,7 @@ class Tree_Builder(object):
 
         :[Dirs1] and [Dirs2]:
             Try to find user directories and store them in ``dirs.USER_DIRS``
-                        and ``dirs.USER_DIR_LABEL``. 
+            and ``dirs.USER_DIR_LABEL``. 
 
         For the other sections, a list of tuples is returned with the elements
         ``(class, dir)`` where "class" is the class name of the widget

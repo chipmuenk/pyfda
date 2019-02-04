@@ -18,7 +18,6 @@ from pyfda.filter_blocks.support import Samples, Signals
 
 
 @hdl.block
-
 def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     """Basic FIR direct-form I filter.
 
