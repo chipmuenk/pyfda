@@ -9,12 +9,12 @@ A fixpoint filter for a given filter design is selected in the widget
 .. currentmodule:: pyfda.fixpoint_widgets
 
 
-.. _dev_fixpoint_fir_df1:
+.. _dev_fixpoint_fir_df:
 
-:mod:`pyfda.fixpoint_widgets.fir_df1`
+:mod:`pyfda.fixpoint_widgets.fir_df`
 ---------------------------------------
 
-.. automodule:: pyfda.fixpoint_widgets.fir_df1
+.. automodule:: pyfda.fixpoint_widgets.fir_df
 	:members:
  
 

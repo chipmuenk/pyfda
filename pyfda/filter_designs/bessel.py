@@ -10,25 +10,32 @@
 Design Bessel filters (LP, HP, BP, BS) with fixed or minimum order, return
 the filter design in zeros, poles, gain (zpk) format
 
-Attention:
 This class is re-instantiated dynamically every time the filter design method
-is selected, calling its __init__ method.
+is selected, reinitializing instance attributes.
 
 API version info:
-    1.0: initial working release
-    1.1: - copy A_PB -> A_PB2 and A_SB -> A_SB2 for BS / BP designs
-         - mark private methods as private
-    1.2: new API using fil_save (enable SOS features)
-    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)
-    1.4: module attribute `filter_classes` contains class name and combo box name
-         instead of class attribute `name`
-         `FRMT` is now a class attribute
-    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+    :1.0: initial working release
+    
+    :1.1: - copy ``A_PB`` -> ``A_PB2`` and ``A_SB -> ``A_SB2`` for BS / BP designs
+    
+          - mark private methods as private
+         
+    :1.2: new API using fil_save (enable SOS features)
+    
+    :1.3: new public methods ``destruct_UI`` and ``construct_UI`` (no longer 
+         called by ``__init__``)
+    
+    :1.4: - module attribute ``filter_classes`` contains class name and combo box name instead of class attribute ``name``
+         
+          - ``FRMT`` is now a class attribute
+         
+    :2.0: Specify the parameters for each subwidget as tuples in a dict where the
          first element controls whether the widget is visible and / or enabled.
-         This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
+         This dict is now called ``self.rt_dict``. When present, the dict ``self.rt_dict_add``
          is read and merged with the first one.
-    2.1: Remove empty methods construct_UI and destruct_UI and attributes 
-         self.wdg and self.hdl
+         
+    :2.1: Remove empty methods ``construct_UI`` and ``destruct_UI`` and attributes 
+         ``self.wdg`` and ``self.hdl``
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -37,11 +44,15 @@ from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 import logging
 logger = logging.getLogger(__name__)
 
-__version__ = "2.0"
+__version__ = "2.1"
 
-filter_classes = {'Bessel':'Bessel'}
+filter_classes = {'Bessel':'Bessel'} #: Class name : displayed name
 
 class Bessel(object):
+    """
+    Design Bessel filters (LP, HP, BP, BS) with fixed or minimum order, return
+    the filter design in zeros, poles, gain (zpk) format
+    """
 
     if SOS_AVAIL:
         FRMT = 'sos' # output format of filter design routines 'zpk' / 'ba' / 'sos'
@@ -50,7 +61,7 @@ class Bessel(object):
 
     def __init__(self):
 
-        self.ft = 'IIR'
+        self.ft = 'IIR' #: filter type
 
         self.rt_dict =  {
             'COM':{'man':{'fo': ('a', 'N'),
@@ -101,7 +112,7 @@ class Bessel(object):
                                            'amp':('a','A_PB','A_SB')})
                         }
                 }
-            }
+            } 
 
         self.info = """
 **Bessel filters**
@@ -131,7 +142,7 @@ For scipy 0.18 and higher, more design options have been implemented
 **Design routines:**
 
 ``scipy.signal.bessel()``, ``scipy.signal.buttord()``
-        """
+        """ #: filter variants
         self.info_doc = []
         self.info_doc.append('bessel()\n========')
         self.info_doc.append(sig.bessel.__doc__)
