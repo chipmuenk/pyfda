@@ -14,7 +14,6 @@ Top level class for fixpoint filter simulation and conversion?
 """
 import numpy as np
 
-
 class FilterHardware(object):
     def __init__(self, b=None, a=None):
         """Top level class. Contains filter parameters

@@ -16,7 +16,6 @@ This part of the documentation describes the features of pyFDA that are relevant
    pyfda_plot_widgets
    pyfda_filter_designs
    pyfda_fixpoint_widgets
-   pyfda_filter_blocks
 
 Software Organization
 ----------------------
