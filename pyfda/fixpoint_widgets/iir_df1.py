@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 #import numpy as np
 
+import math
 import pyfda.filterbroker as fb
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
@@ -23,7 +24,11 @@ from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 import pyfda.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
 
-from pyfda.filter_blocks.fda.iir import FilterIIR    
+import myhdl as hdl
+from myhdl import Signal, intbv, always_seq, StopSimulation
+from .support import Clock, Reset, Global, Samples, Signals
+from .filter_hw import FilterHardware
+  
 
 # =============================================================================
 # if cmp_version("myhdl", "0.10") >= 0:
@@ -204,6 +209,269 @@ class IIR_DF1(QWidget):
     
         return hdl_dict
 
+###############################################################################
+        
+# from pyfda.filter_blocks.fda.iir
+class FilterIIR(FilterHardware):
+    def __init__(self, b = None, a = None):
+        """Contains IIR filter parameters. Parent Class : FilterHardware
+            Args:
+                b (list of int): list of numerator coefficients.
+                a (list of int): list of denominator coefficients.
+                word format (tuple of int): (W, WI, WF)
+                filter_type:
+                filter_form_type:
+                response(list): list of filter output in int format.
+            """
+        super(FilterIIR, self).__init__(b, a)
+        self.filter_type = 'direct_form'
+        self.direct_form_type = 1
+        self.response = []
+
+    def get_response(self):
+        """Return filter output.
+
+        Returns:
+            response(numpy int array) : returns filter output as
+            numpy array
+        """
+        return self.response
+
+    def run_sim(self):
+        """Run filter simulation"""
+
+        testfil = self.filter_block()
+        #testfil.config_sim(trace=True)
+        testfil.run_sim()
+
+    def convert(self, **kwargs):
+        """Convert the HDL description to Verilog and VHDL.
+        """
+        w = self.input_word_format
+        w_out = self.output_word_format
+        omax = 2**(w_out[0]-1)
+        imax = 2**(w[0]-1)
+
+        # small top-level wrapper
+        def filter_iir_top(hdl , clock, reset, x, xdv, y, ydv):
+            sigin = Samples(x.min, x.max, self.input_word_format)
+            sigin.data, sigin.data_valid = x, xdv
+            sigout = Samples(y.min, y.max, self.output_word_format)
+            sigout.data, sigout.data_valid = y, ydv
+            clk = clock
+            rst = reset
+            glbl = Global(clk, rst)
+            
+            # choose appropriate filter
+            iir_hdl = filter_iir
+
+            iir = iir_hdl(
+                glbl, sigin, sigout, self.b, self.a, self.coef_word_format,
+                shared_multiplier=self._shared_multiplier
+            )
+            iir.convert(**kwargs)
+
+        clock = Clock(0, frequency=50e6)
+        reset = Reset(1, active=0, async=True)
+        x = Signal(intbv(0, min=-imax, max=imax))
+        y = Signal(intbv(0, min=-omax, max=omax))
+        xdv, ydv = Signal(bool(0)), Signal(bool(0))
+        
+
+        if self.hdl_target.lower() == 'verilog':
+            filter_iir_top(hdl, clock, reset, x, xdv, y, ydv)
+ 
+        elif self.hdl_target.lower() == 'vhdl':
+            filter_iir_top(hdl, clock, reset, x, xdv, y, ydv)
+        else:
+            raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
+
+    @hdl.block
+    def filter_block(self):
+        """ this elaboration code will select the different structure and implementations"""
+
+        w = self.input_word_format
+        w_out = self.output_word_format
+        
+        ymax = 2**(2*w[0]-1)
+        vmax = 2**(2*w[0])
+        omax = 2**(w_out[0]-1)
+        xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)
+        yt = Samples(min=-omax, max=omax, word_format=self.output_word_format)
+        xt.valid = bool(1)
+        clock = Clock(0, frequency=50e6)
+        reset = Reset(1, active=0, async=True)
+        glbl = Global(clock, reset)
+        tbclk = clock.process()
+        numsample = 0
+        
+        # set numsample 
+        numsample = len(self.sigin)
+        # process to record output in buffer
+        rec_insts = yt.process_record(clock, num_samples=numsample)
+        dfilter = filter_iir
+
+        @hdl.instance
+        def stimulus():
+            """record output in numpy array yt.sample_buffer"""
+            for k in self.sigin:
+                xt.data.next = int(k)
+                xt.valid = bool(1)
+
+                yt.record = True
+                yt.valid = True
+                yield clock.posedge
+                # Collect a sample from each filter
+                yt.record = False
+                yt.valid = False
+
+            self.response = yt.sample_buffer
+
+            raise StopSimulation()
+
+        return hdl.instances()
+
+###############################################################################
+# from filter_blocks.iir.iir_df1.py
+@hdl.block
+def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
+    """Basic FIR direct-form I filter.
+    Ports:
+        glbl (Global): global signals.
+        sigin (SignalBus): input digital signal.
+        sigout (SignalBus): output digitla signal.
+    Args:
+        b (tuple): numerator coefficents.
+        b (tuple): numerator coefficents.
+    Returns:
+        inst (myhdl.Block, list):
+    """
+    assert isinstance(sigin, Samples)
+    assert isinstance(sigout, Samples)
+    assert isinstance(b, tuple)
+    assert isinstance(a, tuple)
+
+    # All the coefficients need to be an `int`
+
+    rb = [isinstance(bb, int) for bb in b]
+    ra = [isinstance(aa, int) for aa in a]
+    assert all(rb)
+    assert all(ra)
+
+    w = sigin.word_format
+    w_out = sigout.word_format
+
+    ymax = 2 ** (w[0] - 1)
+    vmax = 2 ** (2 * w[0])  # top bit is guard bit
+    # max without guard bit. Value at which output will saturate
+
+    N = len(b) - 1
+    clock, reset = glbl.clock, glbl.reset
+    xdv = sigin.valid
+    y, ydv = sigout.data, sigout.valid
+    x, xdv = sigin.data, sigin.valid
+
+
+
+    ######### method 1 for calculating accumulator
+
+    # amax = 2 ** (2 * w[0] - 1)
+
+    # q, qd = w[0], 2 * w[0]  # guard bit not fed back
+    # q = 0 if q < 0 else q
+
+    # # guard bit not passed to output
+    # o, od = 2 * w[0] - w_out[0], 2 * w[0]
+    # o = 0 if o < 0 else o
+    # yacc = Signal(intbv(0, min=-vmax, max=vmax))  # verify the length of this
+
+    #########
+
+
+    ########## method 2 of calculating accumulator size based on fir filter implementation
+
+    acc_bits = w[0] + coef_w[0] + math.floor(math.log(N, 2))
+    #print(acc_bits)
+    amax = 2**(acc_bits-1)
+    od = acc_bits - 1
+    o = acc_bits-w_out[0] - 1
+    o = 0 if o < 0 else o
+    q, qd = acc_bits - w[0] -1 , acc_bits -1
+    q = 0 if q < 0 else q
+
+    yacc = Signal(intbv(0, min=-amax, max=amax))
+
+    ##########
+
+    # Delay elements, list-of-signals
+    ffd = Signals(intbv(0, min=-ymax, max=ymax), N)
+    fbd = Signals(intbv(0, min=-ymax, max=ymax), N)
+    
+
+    dvd = Signal(bool(0))
+    overflow = Signal(bool(0)) 
+    underflow = Signal(bool(0))
+    #print(len(yacc))
+
+    # print(len(yacc))
+
+    @hdl.always(clock.posedge)
+    def beh_direct_form_one():
+        if sigin.valid:
+
+            for i in range(N - 1):
+                ffd[i + 1].next = ffd[i]
+                fbd[i + 1].next = fbd[i]
+
+            ffd[0].next = x
+            fbd[0].next = yacc[qd:q].signed()
+
+    @hdl.always_comb
+    def beh_acc():
+        c = b[0]
+        sop = x * c
+
+
+        for ii in range(N):
+            c = b[ii + 1]  # first element in list in b0
+            d = a[ii + 1]  # first element in list is a0 =1
+            sop = sop + (c * ffd[ii]) - (d * fbd[ii])
+
+        if overflow:
+            yacc.next = amax-1
+
+        if underflow:
+            yacc.next = -amax
+
+        else:
+            yacc.next = sop
+
+
+    @always_seq(clock.posedge, reset=reset)
+    def beh_output():
+        dvd.next = xdv
+        # y.next = yacc[od:o].signed()
+
+        if (yacc[qd] == 1 and yacc[qd - 1] == 1) or (yacc[qd] == 0 and yacc[qd - 1] == 0):
+            ydv.next = dvd
+            y.next = yacc[od:o].signed()
+            overflow = 0
+            underflow = 0
+
+        elif yacc[qd] == 1 and yacc[qd-1] == 0:
+            y.next = -amax
+            ydv.next = dvd
+            underflow = 1
+            print('underflow')
+
+
+        elif yacc[qd] == 0 and yacc[qd - 1] == 1:
+            y.next = amax - 1
+            ydv.next = dvd
+            overflow = 1
+            print('overflow')
+
+    return hdl.instances()
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':

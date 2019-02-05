@@ -31,13 +31,10 @@ from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qget_cmb_box
 from pyfda.pyfda_rc import params
 
-
-
 if cmp_version("myhdl", "0.10") >= 0:
     import myhdl
     HAS_MYHDL = True
-    from pyfda.filter_blocks.fda.iir import FilterIIR
-    from pyfda.filter_blocks.fda.fir import FilterFIR    
+  
 #    fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
 #    if not os.path.exists(fil_blocks_path):
 #        logger.error("Invalid path {0}".format(fil_blocks_path))
@@ -124,8 +121,11 @@ class Input_Fixpoint_Specs(QWidget):
     def _construct_UI(self):
         """
         Intitialize the main GUI, consisting of:
+            
         - an image of the filter topology
-        - the UI for the HDL filter settings
+        
+        - the UI of the fixpoint filter widget
+        
         - and the myHDL interface:
         """
         self.cmb_wdg_fixp = QComboBox(self)
@@ -167,6 +167,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmImg.setLayout(layHImg)
         self.frmImg.setContentsMargins(*params['wdg_margins'])
         self.resize_img()
+#------------------------------------------------------------------------------
+#       myhdl Buttons        
 #------------------------------------------------------------------------------        
         self.butExportHDL = QPushButton(self)
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
@@ -179,7 +181,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.layHBtns = QHBoxLayout()
         self.layHBtns.addWidget(self.butSimFixPoint)
         self.layHBtns.addWidget(self.butExportHDL)
-
+#------------------------------------------------------------------------------
         # This frame encompasses all the buttons
         frmBtns = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
@@ -236,11 +238,14 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def _update_filter_cmb(self):
         """
-        (Re-)Read list of fixpoint filters, try to import them and populate the 
-        corresponding combo box. The list should be updated everytime a new
-        filter design type is selected.
+        (Re-)Read list of available fixpoint filters for a given filter design 
+        every time a new filter design is selected (not fully implemented yet,
+        at the moment a list with *all* filter implementations is read). 
+        
+        Then try to import the fixpoint designs in the list and populate the 
+        fixpoint implementation combo box ``self.cmb_wdg_fixp`` when successfull. 
         """
-        inst_wdg_str = "" # full names of successfully instantiated widgets
+        inst_wdg_str = "" # full names of successfully instantiated widgets for logging
 
         self.cmb_wdg_fixp.clear()
 
@@ -333,17 +338,20 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def _update_fixp_widget(self):
         """
-        This method is called at the initialization of this widget.
-
-        It will also be called in the future every time a new filter design is
-        selected, bringing a new selection of available fixpoint filter
-        implementations (not implemented yet).
+        This method is called at the initialization of this widget and when 
+        a new fixpoint filter implementation is selected in the combo box.
         
-        - Destruct old fixpoint filter widget and instance
+        - Destruct old instance of fixpoint filter widget
+        
         - Import and instantiate new fixpoint filter widget e.g. after changing the 
           filter topology
+          
         - Try to load image for filter topology
+        
         - Update the UI of the widget
+        
+        - Instantiate
+          ``self.hdlfilter = self.fx_wdg_inst.hdlfilter``
         """
         if hasattr(self, "fx_wdg_inst"): # is a fixpoint widget loaded?
             try:
@@ -389,6 +397,13 @@ class Input_Fixpoint_Specs(QWidget):
             self.resize_img()
                 
             self.lblTitle.setText(self.fx_wdg_inst.title)
+            
+            if hasattr(self.fx_wdg_inst,'hdlfilter'):
+                self.hdlfilter = self.fx_wdg_inst.hdlfilter
+                self.fx_wdg_inst.update_hdl_filter()
+                self.setupHDL()
+            else:
+                self.hdlfilter = None
 
         else:
             self.fx_wdg_found = False
@@ -408,13 +423,14 @@ class Input_Fixpoint_Specs(QWidget):
         Currently, this also updates widget UI, should be separated ...
         # TODO
         """
+#        if hasattr(self.fx_wdg_inst, "update_hdl_widget"):
         if hasattr(self.fx_wdg_inst, "update_UI"):
             self.fx_wdg_inst.update_UI()
-
+            # self.fx_wdg_inst.update_hdl_widget()
 #------------------------------------------------------------------------------           
     def info_hdl(self, hdl_dict):
         """
-        Print filter info (not yet implemented yet)
+        Print filter info (not reallly implemented yet)
         """
         print("Filter type :", self.filter_type, "\n"
               "Filter order :", len(self.b), "\n"
@@ -428,13 +444,12 @@ class Input_Fixpoint_Specs(QWidget):
             )
 
 #------------------------------------------------------------------------------
-    def setupHDL(self, file_name = "", dir_name = ""):
+    def setupHDL(self):
         """
         Setup instance of myHDL object with word lengths and coefficients
         """
-        if self.fx_wdg_found and hasattr(self.fx_wdg_inst,'hdlfilter'):
-            self.hdlfilter = self.fx_wdg_inst.hdlfilter
-            self.fx_wdg_inst.update_hdl_filter()
+        if self.fx_wdg_found and self.hdlfilter:
+#            self.fx_wdg_inst.update_hdl_filter()
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
             self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
@@ -509,13 +524,13 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_start(self):
         """
-        Start fix-point simulation: Send the ``hdl_dict`` containing all quantization
-        information and request a stimulus signal
+        Start fix-point simulation: Send the ``hdl_dict`` ((or ``self.fx_wdg_inst.hdl_dict``?!)
+        containing all quantization information and request a stimulus signal
         """
         try:
             logger.info("Started fixpoint simulation")
             self.setupHDL()
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fx_wdg_inst.hdl_dict}
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.hdl_dict}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:
@@ -563,10 +578,8 @@ class Input_Fixpoint_Specs(QWidget):
         logger.info("Fixpoint plotting finished")        
             
         return
-#------------------------------------------------------------------------------
 
-
-#------------------------------------------------------------------------------
+###############################################################################
 
 if __name__ == '__main__':
     from ..compat import QApplication

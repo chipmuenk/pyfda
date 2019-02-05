@@ -96,15 +96,15 @@ internal structures (like an accumulator) for each class. It also contains a
 reference to a picture showing the filter topology.
 
 The configuration file `pyfda.conf` lists the fixpoint classes to be used, e.g. 
-`DF1` and `DF2`. `tree_builder` parses this file and writes all fixpoint modules
+``FIR_DF`` and ``IIR_DF1``. `tree_builder` parses this file and writes all fixpoint modules
 into the list `fb.fixpoint_widgets_list`. The input widget 
 `pyfda.input_widgets.input_fixpoint_specs` constructs a combo box from this list 
 with references to all successfully imported fixpoint modules. The currently 
-selected fixpoint widget (e.g. `DF1`) is imported from `pyfda.fixpoint_widgets` 
+selected fixpoint widget (e.g. `FIR_DF`) is imported from :mod:`pyfda.fixpoint_widgets` 
 together with the referenced picture.
 
-A myhdl filter instance `self.hdlfilter` of :ref:`dev_filter_blocks_filter_fir`
-or :ref:`dev_filter_blocks_filter_iir` is instantiated as ``hdlfilter``.  Its methods 
+A myhdl filter instance `self.hdlfilter` of e.g. :ref:`dev_fixpoint_widgets_fir_df`
+is instantiated as ``hdlfilter``.  Its methods 
 
 * ``hdlfilter.set_stimulus(self.stim)``
 * ``hdlfilter.run_sim()``

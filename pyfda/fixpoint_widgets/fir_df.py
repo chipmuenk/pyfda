@@ -24,26 +24,11 @@ import pyfda.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
 
 import myhdl as hdl
-from myhdl import Signal, intbv, always_seq
-from pyfda.filter_blocks.support import Samples, Signals
+from myhdl import Signal, intbv, always_seq, StopSimulation
+from .support import Clock, Reset, Global, Samples, Signals
+from .filter_hw import FilterHardware
+  
 
-from pyfda.filter_blocks.fda.fir import FilterFIR    
-
-# =============================================================================
-# if cmp_version("myhdl", "0.10") >= 0:
-#     import myhdl
-#     HAS_MYHDL = True
-# 
-#     fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
-#     if not os.path.exists(fil_blocks_path):
-#         logger.error("Invalid path {0}".format(fil_blocks_path))
-#     else:
-#         if fil_blocks_path not in sys.path:
-#             sys.path.append(fil_blocks_path)
-#         from pyfda.filter_blocks.fda.fir import FilterFIR
-#         from pyfda.filter_blocks.fda.iir import FilterIIR    
-# else:
-#     HAS_MYHDL = False
 # =============================================================================
 
 class FIR_DF(QWidget):
@@ -120,6 +105,8 @@ class FIR_DF(QWidget):
 #------------------------------------------------------------------------------
     def update_hdl_filter(self):
         """
+        TODO: move this to the filter class!
+        
         Update the HDL filter object with new coefficients, quantization settings etc. when
         
         - it is constructed
@@ -207,23 +194,150 @@ class FIR_DF(QWidget):
     
         return hdl_dict
     
-#------------------------------------------------------------------------------    
-@hdl.block
+###############################################################################
+        
+class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
+    def __init__(self, b = None, a = None):
+        """Contains FIR filter parameters. Parent Class : FilterHardware
+            Args:
+                b (list of int): list of numerator coefficients.
+                a (list of int): list of denominator coefficients.
+                word format (tuple of int): (W, WI, WF)
+                filter_type:
+                filter_form_type:
+                response (list): list of filter output in int format.
+            """
+        super(FilterFIR, self).__init__(b, a)
+        self.filter_type = 'direct_form'
+        self.direct_form_type = 1
+        self.response = []
 
+
+    def get_response(self):
+        """Return filter output.
+
+        returns:
+            response(numpy int array) : returns filter output as numpy array
+        """
+        return self.response
+
+    def run_sim(self):
+        """Run filter simulation"""
+
+        testfil = self.filter_block()
+        testfil.run_sim()
+
+
+    def convert(self, **kwargs):
+        """Convert the HDL description to Verilog and VHDL.
+        """
+        w = self.input_word_format
+        w_out = self.output_word_format
+        omax = 2**(w_out[0]-1)
+        imax = 2**(w[0]-1)
+
+        # small top-level wrapper
+        def filter_fir_top(hdl , clock, reset, x, xdv, y, ydv):
+            sigin = Samples(x.min, x.max, self.input_word_format)
+            sigin.data, sigin.data_valid = x, xdv
+            sigout = Samples(y.min, y.max, self.output_word_format)
+            sigout.data, sigout.data_valid = y, ydv
+            clk = clock
+            rst = reset
+            glbl = Global(clk, rst)
+            
+            #choose appropriate filter
+            fir_hdl = filter_fir
+
+            fir = fir_hdl(glbl, sigin, sigout, self.b, self.coef_word_format,
+                          shared_multiplier=self._shared_multiplier)
+            
+            fir.convert(**kwargs)
+
+
+        clock = Clock(0, frequency=50e6)
+        reset = Reset(1, active=0, async=True)
+        x = Signal(intbv(0, min=-imax, max=imax))
+        y = Signal(intbv(0, min=-omax, max=omax))
+        xdv, ydv = Signal(bool(0)), Signal(bool(0))
+        
+
+        if self.hdl_target.lower() == 'verilog':
+            filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
+ 
+        elif self.hdl_target.lower() == 'vhdl':
+            filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
+        else:
+            raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
+
+
+    @hdl.block
+    def filter_block(self):
+        """
+        This elaboration code was supposed to select the different structure 
+        and implementations
+        
+        This will be handled by individual classes / blocks now.
+        """
+
+        w = self.input_word_format
+        w_out = self.output_word_format
+        #print(self.input_word_format)
+        #print(self.coef_word_format)
+        ymax = 2**(w[0]-1)
+        vmax = 2**(2*w[0])
+        omax = 2**(w_out[0]-1)
+        xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)
+        yt = Samples(min=-omax, max=omax, word_format=self.output_word_format)
+        #yt = Samples(min=-vmax, max=vmax)
+        xt.valid = bool(1)
+        clock = Clock(0, frequency=50e6)
+        reset = Reset(1, active=0, async=True)
+        glbl = Global(clock, reset)
+        tbclk = clock.process()
+        numsample = 0
+        
+        # set numsample 
+        numsample = len(self.sigin)
+        #process to record output in buffer
+        rec_insts = yt.process_record(clock, num_samples=numsample)
+
+        dfilter = filter_fir
+
+        @hdl.instance
+        def stimulus():
+            "record output in numpy array yt.sample_buffer"
+            for k in self.sigin:
+                xt.data.next = int(k)
+                xt.valid = bool(1)
+
+                yt.record = True
+                yt.valid = True
+                yield clock.posedge
+                #Collect a sample from each filter
+                yt.record = False
+                yt.valid = False
+
+            print(yt.sample_buffer)
+            self.response = yt.sample_buffer
+
+            raise StopSimulation()
+
+        return hdl.instances()
+############################################################################### 
+@hdl.block
 def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
-    """Basic FIR direct-form I filter.
+    """Basic FIR direct-form filter.
 
     Ports:
         glbl (Global): global signals.
         sigin (Samples): input digital signal.
-        sigout (Samples): output digital signal.
+        sigout (Samples): output digitla signal.
 
-    Arguments
-    ---------
+    Args:
         b (tuple): numerator coefficents.
 
-    Returns
-    --------
+    Returns:
         inst (myhdl.Block, list):
     """
     assert isinstance(sigin, Samples)
