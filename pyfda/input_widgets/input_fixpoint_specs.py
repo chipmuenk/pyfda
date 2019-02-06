@@ -29,6 +29,7 @@ from pyfda.pyfda_lib import qstr, cmp_version
 import pyfda.pyfda_fix_lib as fx
 from pyfda.pyfda_io_lib import extract_file_ext
 from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
 if cmp_version("myhdl", "0.10") >= 0:
@@ -122,9 +123,11 @@ class Input_Fixpoint_Specs(QWidget):
         """
         Intitialize the main GUI, consisting of:
             
-        - an image of the filter topology
+        - A combo box to select the filter topology and an image of the filter topology
         
-        - the UI of the fixpoint filter widget
+        - The input quantizer
+        
+        - The UI of the fixpoint filter widget
         
         - and the myHDL interface:
         """
@@ -152,6 +155,34 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle = QFrame(self)
         self.frmTitle.setLayout(layHTitle)
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
+
+#------------------------------------------------------------------------------
+#       Input Quantizer 
+#------------------------------------------------------------------------------        
+        lblHBtnsMsg1 = QLabel("<b>Fixpoint signal / coeff. formats:</b>", self)
+        lblHBtnsMsg2 = QLabel("<b>WI.WF  </b>", self)
+        layHBtnsMsg = QHBoxLayout()
+        layHBtnsMsg.addWidget(lblHBtnsMsg1)
+        layHBtnsMsg.addStretch(1)
+        layHBtnsMsg.addWidget(lblHBtnsMsg2)
+
+        self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X </sub></i>:')
+        self.wdg_q_input = UI_Q(self)
+
+        layVQiWdg = QVBoxLayout()
+
+        layVQiWdg.addLayout(layHBtnsMsg)
+
+        layVQiWdg.addWidget(self.wdg_w_input)
+        layVQiWdg.addWidget(self.wdg_q_input)
+        # This frame encompasses the HDL buttons sim and convert
+        frmQiWdg = QFrame(self)
+        #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+        frmQiWdg.setLayout(layVQiWdg)
+        frmQiWdg.setContentsMargins(*params['wdg_margins'])
+
+#------------------------------------------------------------------------------        
+#       Dynamically updated image of filter topology
 #------------------------------------------------------------------------------        
         self.lbl_img_fixp = QLabel("a", self)
         #self.lbl_img_fixp.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -178,19 +209,18 @@ class Input_Fixpoint_Specs(QWidget):
         self.butSimFixPoint.setToolTip("Simulate filter with fixpoint effects.")
         self.butSimFixPoint.setText("Simulate")
 
-        self.layHBtns = QHBoxLayout()
-        self.layHBtns.addWidget(self.butSimFixPoint)
-        self.layHBtns.addWidget(self.butExportHDL)
-#------------------------------------------------------------------------------
-        # This frame encompasses all the buttons
-        frmBtns = QFrame(self)
+        self.layHHdlBtns = QHBoxLayout()
+        self.layHHdlBtns.addWidget(self.butSimFixPoint)
+        self.layHHdlBtns.addWidget(self.butExportHDL)
+        # This frame encompasses the HDL buttons sim and convert
+        frmHdlBtns = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmBtns.setLayout(self.layHBtns)
-        frmBtns.setContentsMargins(*params['wdg_margins'])
+        frmHdlBtns.setLayout(self.layHHdlBtns)
+        frmHdlBtns.setContentsMargins(*params['wdg_margins'])
 
-    # -------------------------------------------------------------------
-    # Top level layout
-    # -------------------------------------------------------------------
+# -------------------------------------------------------------------
+#       Top level layout
+# -------------------------------------------------------------------
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
         splitter.addWidget(self.frmImg)
@@ -202,8 +232,9 @@ class Input_Fixpoint_Specs(QWidget):
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
+        layVMain.addWidget(frmQiWdg)
         layVMain.addWidget(splitter)
-        layVMain.addWidget(frmBtns)
+        layVMain.addWidget(frmHdlBtns)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
 
