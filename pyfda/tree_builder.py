@@ -31,22 +31,36 @@ from .frozendict import freeze_hierarchical
 #--------------------------------------------------------------------------
 def merge_dicts(d1, d2, path=None, mode='keep1'):
     """
-    Merge the multi-level dictionaries d1 and d2. The ``mode`` flag determines the
-    behaviour when the same key is present in both dictionaries:
+    Merge the hierarchical dictionaries ``d1`` and ``d2``.  The dict ``d1`` is
+    modified in place and returned
 
-    * :keep1: keep the entry from dict1
+    Parameters
+    ---------- 
+    d1 : dict
+        hierarchical dictionary 1
     
-    * :keep2: keep the entry from dict2
+    d2 : dict
+        hierarchical dictionary 2
     
-    * :add1: merge the entries, putting the values from dict2 first (important for lists)
+    mode : str 
+        Select the behaviour when the same key is present in both dictionaries:
+    
+        * :'keep1': keep the entry from ``d1`` (default)
+        
+        * :'keep2': keep the entry from ``d2``
+        
+        * :'add1': merge the entries, putting the values from ``d2`` first (important for lists)
+    
+        * :'add2': merge the entries, putting the values from ``d1`` first (  "  )
 
-    * :add2: merge the entries, putting the values from dict1 first (  "  )
+    path : str
+        internal parameter for keeping track of hierarchy during recursive calls,
+        it should not be set by the user
 
-    The parameter ``path`` is only used for keeping track of the hierarchical structure
-    for error messages, it should not be set when calling the function.
-
-    dict1 is modified in place and returned, if this is not intended call the
-    function using ``new_dict = merge_dicts(dict(d1), d2)``.
+    Returns
+    -------
+    d1 : dict
+        a reference to the first dictionary, merged-in-place.
 
     Example
     -------
@@ -54,6 +68,10 @@ def merge_dicts(d1, d2, path=None, mode='keep1'):
 
     Notes
     -----
+    If you don't want to modify ``d1`` in place, call the function using: 
+    
+    >>> new_dict = merge_dicts(dict(d1), d2)
+    
     If you need to merge more than two dicts use:
 
     >>> from functools import reduce   # only for py3

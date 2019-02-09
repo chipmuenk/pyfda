@@ -114,6 +114,7 @@ def cmp_version(mod, version):
     
     result : int
         one of the following error codes:
+            
          :-2: module is not installed
          
          :-1: version of installed module is lower than the specified version
@@ -186,6 +187,9 @@ def unichr_23(c):
 
 def unicode_23(string):
     """
+    Convert string to unicode string under Python 2.x. Python 3.x uses unicode
+    strings anyway.
+    
     Parameters
     ----------
     string: str
@@ -195,8 +199,6 @@ def unicode_23(string):
     -------
     unicode string
 
-    Convert string to unicode string under Python 2.x. Python 3.x uses unicode
-    strings anyway.
     """
     if PY2:
         return unicode(string)
@@ -296,9 +298,10 @@ def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
 
     Returns
     -------
-    float (default) / complex / int : the evaluated result or 0 when both arguments fail.
+    the evaluated result or 0 when both arguments fail: float (default) / complex / int 
 
-    function attribute `err` contains number of errors that have occurred during
+
+    Function attribute `err` contains number of errors that have occurred during
     evaluation (0 / 1 / 2)
     """
     # convert to str (PY3) resp. unicode (PY2) and remove non-ascii characters
@@ -372,12 +375,16 @@ def lin2unit(lin_value, filt_type, amp_label, unit = 'dB'):
     the strings 'PB' or 'SB' :
 
     - Passband:
-       IIR: A_dB = -20 log10(1 - lin_value)
+        .. math::
+            
+            \\text{IIR:}\quad A_{dB} &= -20 \log_{10}(1 - lin\_value)
 
-       FIR: A_dB =  20 log10((1 + lin_value)/(1 - lin_value))
+            \\text{FIR:}\quad A_{dB} &=  20 \log_{10}\\frac{1 + lin\_value}{1 - lin\_value}
 
     - Stopband:
-        A_dB = -20 log10(lin_value)
+        .. math::
+            
+            A_{dB} = -20 \log_{10}(lin\_value)
 
     Returns the result as a float.
     """
@@ -402,12 +409,15 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
     Convert amplitude specification in dB or W to linear specs:
 
     - Passband:
-       IIR: A_PB_lin = 1 - 10 ** (-unit_value/20)
+        .. math::
+            
+            \\text{IIR:}\quad A_{PB,lin} &= 1 - 10 ^{-unit\_value/20}
 
-       FIR: A_PB_lin = (10 ** (unit_value/20) - 1)/ (10 ** (unit_value/20) + 1)
+            \\text{FIR:}\quad A_{PB,lin} &= \\frac{10 ^ {unit\_value/20} - 1}{10 ^ {unit\_value/20} + 1}
 
     - Stopband:
-       A_SB_lin = -10 ** (-unit_value/20)
+        .. math::
+            A_{SB,lin} = -10 ^ {-unit\_value/20}
 
     Returns the result as a float.
     """
@@ -488,7 +498,7 @@ def H_mag(num, den, z, H_max, H_min = None, log = False, div_by_0 = 'ignore'):
     """
     Calculate `\|H(z)\|` at the complex frequency(ies) `z` (scalar or
     array-like).  The function `H(z)` is given in polynomial form with numerator and
-    denominator. When log = True, `20 log_10 (\|H(z)\|)` is returned.
+    denominator. When ``log == True``, :math:`20 \log_{10} (|H(z)|)` is returned.
 
     The result is clipped at H_min, H_max; clipping can be disabled by passing
     None as the argument.
