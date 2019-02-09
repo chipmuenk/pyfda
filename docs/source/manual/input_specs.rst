@@ -54,6 +54,13 @@ normalized frequency :math:`{{F}}` w.r.t. to  the :ref:`sampling_frequency`
    
    Displaying normalized frequencies
 
+Amplitude Unit
+-------------- 
+Amplitude specification can be entered as V, dB or W; they are converted 
+automatically. Conversion depends on the filter type (IIR vs. FIR) and whether
+pass or stop band are specified. For details see the conversion functions
+:func:`pyfda.pyfda_lib.unit2lin` and :func:`pyfda.pyfda_lib.lin2unit`.
+
 Background Info
 ---------------
 
