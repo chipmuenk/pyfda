@@ -101,7 +101,8 @@ class Input_Fixpoint_Specs(QWidget):
             return
         if 'data_changed' in dict_sig:
             # update hdl_dict when filter has been designed
-            self.update_hdl_dict()
+            # TODO: This needs to be changed
+            self.update_wdg_UI()
         if 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
@@ -254,6 +255,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.sig_resize.connect(self.resize_img)
 
         self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
+
         self.butExportHDL.clicked.connect(self.exportHDL)
         self.butSimFixPoint.clicked.connect(self.fx_sim_start)
         #----------------------------------------------------------------------
@@ -384,6 +386,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Instantiate
           ``self.hdlfilter = self.fx_wdg_inst.hdlfilter``
         """
+        # destruct old fixpoint widget instance
         if hasattr(self, "fx_wdg_inst"): # is a fixpoint widget loaded?
             try:
                 self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
@@ -391,28 +394,30 @@ class Input_Fixpoint_Specs(QWidget):
             except AttributeError as e:
                 logger.error("Could not destruct_UI!\n{0}".format(e))
 
+        # instantiate new fixpoint widget class as self.fx_wdg_inst
+        # which instantiates filter class as self.fx_wdg_inst.hdlfilter
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
-
         if cmb_wdg_fx_cur: # at least one valid hdl widget found
             self.fx_wdg_found = True
             fx_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
             fx_mod = importlib.import_module(fx_mod_name) # get module 
             fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
-            self.fx_wdg_inst = fx_wdg_class(self)
-            self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1)
-           
+            self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
+            self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
+
+            #---- connect signals to fx_wdg_inst ----
             if hasattr(self.fx_wdg_inst, "sig_rx"):
                 self.sig_rx.connect(self.fx_wdg_inst.sig_rx)
             #if hasattr(self.fx_wdg_inst, "sig_tx"):
                 #self.fx_wdg_inst.sig_tx.connect(self.sig_rx)
-        
+
+            #---- instantiate and scale graphic of filter topology ----        
             if not (hasattr(self.fx_wdg_inst, "img_name") and self.fx_wdg_inst.img_name): # is an image name defined?
                 self.fx_wdg_inst.img_name = "no_img.png"
                 # check whether file exists
             file_path = os.path.dirname(fx_mod.__file__) # get path of imported fixpoint widget and 
             img_file = os.path.join(file_path, self.fx_wdg_inst.img_name) # construct full image name from it
             # _, file_extension = os.path.splitext(self.fx_wdg_inst.img_name)
-
             if os.path.exists(img_file):
                 self.img_fixp = QPixmap(img_file)
 #                if file_extension == '.png':
@@ -424,15 +429,15 @@ class Input_Fixpoint_Specs(QWidget):
                 img_file = os.path.join(file_path, "hdl_dummy.png")                
                 self.img_fixp = QPixmap(img_file)
                 #self.lbl_img_fixp.setPixmap(QPixmap(self.img_fixp)) # fixed size
-
             self.resize_img()
                 
             self.lblTitle.setText(self.fx_wdg_inst.title)
             
+            #--- try to reference fixpoint filter instance -----
             if hasattr(self.fx_wdg_inst,'hdlfilter'):
                 self.hdlfilter = self.fx_wdg_inst.hdlfilter
+                self.update_hdl_dict()
                 self.fx_wdg_inst.update_hdl_filter()
-                self.setupHDL()
             else:
                 self.hdlfilter = None
 
@@ -450,9 +455,11 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def update_hdl_dict(self):
         """
-        Update the hdl dictionary when a filter has been designed
-        Currently, this also updates widget UI, should be separated ...
-        # TODO
+        Update the hdl dictionary before simulation / HDL generation starts. It
+        is NOT updated each time one of the relevant widgets changes ("lazy update").
+         This avoids having to connect and disconnect all sorts of signals and slots.
+
+        # TODO: this doesnt work, self.hdl_dict is not read back from self.hdlfilter?
         """
 #        if hasattr(self.fx_wdg_inst, "update_hdl_widget"):
         if hasattr(self.fx_wdg_inst, "update_UI"):
@@ -474,20 +481,17 @@ class Input_Fixpoint_Specs(QWidget):
               "Overflow mode :" "no overflow"
             )
 
-#------------------------------------------------------------------------------
-    def setupHDL(self):
-        """
-        Setup instance of myHDL object with word lengths and coefficients
-        """
-        if self.fx_wdg_found and self.hdlfilter:
-#            self.fx_wdg_inst.update_hdl_filter()
-            # get a dict with the coefficients and fixpoint settings from fixpoint widget
-            self.hdl_dict = self.fx_wdg_inst.get_hdl_dict()
-            self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-            self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
-            self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
-        else:
-            logger.error("No fixpoint widget or hdlfilter found!")
+##------------------------------------------------------------------------------
+#    def setupHDL(self):
+#        """
+#        # TODO: this doesnt work, self.hdl_dict is not read back from self.hdlfilter?
+#        
+#        Setup instance of myHDL object with word lengths and coefficients. This 
+#        is NOT updated each time one of the relevant widgets changes but only 
+#        when simulation / HDL generation starts. This avoids setting up all sort
+#        of signal-slot connections.
+#        """
+#        self.update_hdl_dict()
 #------------------------------------------------------------------------------
     def exportHDL(self):
         """
@@ -527,7 +531,8 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + hdl_type)))
             try:
-                self.setupHDL()
+                self.update_hdl_dict()
+                #self.setupHDL()
                 self.hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
 
                 logger.info("HDL conversion finished!")
@@ -544,7 +549,8 @@ class Input_Fixpoint_Specs(QWidget):
         # TODO: Filter name missing?
         try:
             logger.info("Initialize fixpoint simulation")
-            self.setupHDL()
+            # TODO: only input quantizer needed here:
+            self.update_hdl_dict() # instead of self.setupHDL() 
             dict_sig = {'sender':__name__, 'fx_sim':'set_hdl_dict', 'hdl_dict':self.hdl_dict}
             self.sig_tx.emit(dict_sig)
                         
@@ -560,7 +566,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             logger.info("Started fixpoint simulation")
-            self.setupHDL()
+            self.update_hdl_dict() # instead of self.setupHDL()
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.hdl_dict}
             self.sig_tx.emit(dict_sig)
                         
@@ -574,7 +580,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Get fixpoint stimulus from ``dict_sig``
         - Quantize the stimulus with the selected input quantization settings
 		- Scale it with the input word length, i.e. with 2**W (input)
-        - Pass it to the HDL filter and calculate the fixpoint response
+        - Pass it to the fixpoint filter and calculate the fixpoint response
         - Send the reponse to the plotting widget
         """
         try:
