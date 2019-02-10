@@ -154,7 +154,7 @@ class IIR_DF1(QWidget):
                 )
 
 #------------------------------------------------------------------------------
-    def update_UI(self):
+    def update_UI(self, fxqc_dict):
         """
         Update all parts of the UI that need to be updated when specs have been
         changed outside this class, e.g. coefficients and coefficient wordlength.

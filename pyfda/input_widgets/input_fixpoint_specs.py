@@ -71,6 +71,9 @@ class Input_Fixpoint_Specs(QWidget):
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
                 " simulate it and generate a Verilog / VHDL netlist.</span>")
         self.parent = parent
+        # initialize the dict with the filter quantization settings and coefficients
+        self.fxqc_dict = {'QI':{}, 'QO':{}}
+        
 
         if HAS_MYHDL:
             self._construct_UI()
@@ -181,6 +184,25 @@ class Input_Fixpoint_Specs(QWidget):
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
         frmQiWdg.setLayout(layVQiWdg)
         frmQiWdg.setContentsMargins(*params['wdg_margins'])
+        
+#------------------------------------------------------------------------------
+#       Output Quantizer 
+#------------------------------------------------------------------------------        
+#        self.wdg_w_output = UI_W(self, label='Input Format <i>Q<sub>Y </sub></i>:')
+#        self.wdg_q_output = UI_Q(self)
+#
+#        layVQoWdg = QVBoxLayout()
+#
+#        layVQoWdg.addLayout(layHBtnsMsg)
+#
+#        layVQoWdg.addWidget(self.wdg_w_output)
+#        layVQoWdg.addWidget(self.wdg_q_output)
+#        # This frame encompasses the HDL buttons sim and convert
+#        frmQoWdg = QFrame(self)
+#        #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
+#        frmQoWdg.setLayout(layVQoWdg)
+#        frmQoWdg.setContentsMargins(*params['wdg_margins'])
+
 
 #------------------------------------------------------------------------------        
 #       Dynamically updated image of filter topology
@@ -371,9 +393,10 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def _update_fixp_widget(self):
         """
-        This method is called at the initialization of this widget and when 
-        a new fixpoint filter implementation is selected in the combo box.
-        
+        This method is called at the initialization of the ``input_fixpoint_specs``
+         widget and when  a new fixpoint filter implementation is selected 
+        in the combo box:
+
         - Destruct old instance of fixpoint filter widget
         
         - Import and instantiate new fixpoint filter widget e.g. after changing the 
@@ -404,6 +427,7 @@ class Input_Fixpoint_Specs(QWidget):
             fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
             self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
             self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
+            self.update_wdg_UI() # initialize the fixpoint subwidgets from the fxq_dict
 
             #---- connect signals to fx_wdg_inst ----
             if hasattr(self.fx_wdg_inst, "sig_rx"):
@@ -436,8 +460,8 @@ class Input_Fixpoint_Specs(QWidget):
             #--- try to reference fixpoint filter instance -----
             if hasattr(self.fx_wdg_inst,'hdlfilter'):
                 self.hdlfilter = self.fx_wdg_inst.hdlfilter
-                self.update_hdl_dict()
-                self.fx_wdg_inst.update_hdl_filter()
+                self.update_fxqc_dict()
+                #self.fx_wdg_inst.update_hdl_filter()
             else:
                 self.hdlfilter = None
 
@@ -447,24 +471,47 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def update_wdg_UI(self):
         """
-        Update the fixpoint widget UI when view (i.e. fixpoint coefficient format) 
-        has been changed outside this class and update coefficient dictionary
+        Trigger an update of the fixpoint widget UI when view (i.e. fixpoint 
+        coefficient format) has been changed outside this class. Additionally,
+        pass the fixpoint quantization widget to update / restore other subwidget
+        settings.
         """
         if hasattr(self.fx_wdg_inst, "update_UI"):
-            self.fx_wdg_inst.update_UI()
+            self.fx_wdg_inst.update_UI(self.fxqc_dict)
 #------------------------------------------------------------------------------
-    def update_hdl_dict(self):
+    def update_fxqc_dict(self):
         """
-        Update the hdl dictionary before simulation / HDL generation starts. It
+        Update the fxqc dictionary before simulation / HDL generation starts. It
         is NOT updated each time one of the relevant widgets changes ("lazy update").
          This avoids having to connect and disconnect all sorts of signals and slots.
-
-        # TODO: this doesnt work, self.hdl_dict is not read back from self.hdlfilter?
         """
-#        if hasattr(self.fx_wdg_inst, "update_hdl_widget"):
-        if hasattr(self.fx_wdg_inst, "update_UI"):
-            self.fx_wdg_inst.update_UI()
-            # self.fx_wdg_inst.update_hdl_widget()
+        if self.fx_wdg_found and self.hdlfilter:
+            # get a dict with the coefficients and fixpoint settings from fixpoint widget
+            if hasattr(self.fx_wdg_inst, "get_fxqc_dict"):
+                self.fxqc_dict.update(self.fx_wdg_inst.get_fxqc_dict())
+
+            # update the fxqc_dict with the settings of the input quantizer  
+            self.fxqc_dict.update({'QI':{'WI': self.wdg_w_input.WI,
+                       'WF': self.wdg_w_input.WF,
+                       'W':  self.wdg_w_input.W,
+                       'ovfl': self.wdg_q_input.ovfl,
+                       'quant': self.wdg_q_input.quant
+                       }
+                })
+            # output quantization parameters
+#            self.fxq_dict.update({'QO':{'WI':self.wdg_w_output.WI,
+#                               'WF':self.wdg_w_output.WF,
+#                               'W':self.wdg_w_output.W,
+#                               'ovfl': self.wdg_q_output.ovfl,
+#                               'quant': self.wdg_q_output.quant
+#                               }
+#                        })
+
+            self.q_i = fx.Fixed(self.fxqc_dict['QI']) # setup quantizer for input quantization
+            self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
+            self.q_o = fx.Fixed(self.fxqc_dict['QO']) # setup quantizer for output quantization
+        else:
+            logger.error("No fixpoint widget or hdlfilter found!")
 #------------------------------------------------------------------------------           
     def info_hdl(self, hdl_dict):
         """
@@ -531,8 +578,8 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info('Creating hdl_file "{0}"'.format(
                         os.path.join(hdl_dir_name, hdl_file_name + hdl_type)))
             try:
-                self.update_hdl_dict()
-                #self.setupHDL()
+                self.update_fxqc_dict()
+                self.hdlfilter.setup(self.fxqc_dict)
                 self.hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
 
                 logger.info("HDL conversion finished!")
@@ -551,7 +598,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("Initialize fixpoint simulation")
             # TODO: only input quantizer needed here:
             self.update_hdl_dict() # instead of self.setupHDL() 
-            dict_sig = {'sender':__name__, 'fx_sim':'set_hdl_dict', 'hdl_dict':self.hdl_dict}
+            dict_sig = {'sender':__name__, 'fx_sim':'set_hdl_dict', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:
@@ -566,8 +613,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             logger.info("Started fixpoint simulation")
-            self.update_hdl_dict() # instead of self.setupHDL()
-            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.hdl_dict}
+            self.update_fxqc_dict()
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         
         except myhdl.SimulationError as e:

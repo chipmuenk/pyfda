@@ -13,7 +13,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import sys
 import logging
 logger = logging.getLogger(__name__)
-
+import numpy as np
 import pyfda.filterbroker as fb
 import pyfda.pyfda_fix_lib as fix
 
@@ -68,8 +68,9 @@ def build_coeff_dict(frmt=None):
     # quantize floating point coefficients and convert them to the
     # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF)
     c_dict = {}
-    c_dict.update({'b':list(Q_coeff.float2frmt(b))}) # convert float -> fixp and
-    c_dict.update({'a':list(Q_coeff.float2frmt(a))}) # format it as bin, hex, ...
+    # convert list of float -> dec (int64) -> int, then list to tuple
+    c_dict.update({'b':tuple([bb.item() for bb in Q_coeff.float2frmt(b)])}) # convert float -> fixp and
+    c_dict.update({'a':tuple(Q_coeff.float2frmt(a))}) # format it as bin, hex, ...
     c_dict.update({'WF':Q_coeff.WF}) # read parameters from quantizer instance
     c_dict.update({'WI':Q_coeff.WI}) # and pass them to the coefficient dict
     c_dict.update({'W':Q_coeff.W})
@@ -84,8 +85,8 @@ class UI_W(QWidget):
     Widget for entering integer and fractional bits. The result can be read out
     via the attributes `self.WI`, `self.WF` and `self.W`.
     
-    The constructor accepts a dictionary as an argument. The following default
-    values are used for omitted keys:
+    The constructor accepts a dictionary for initial widget settings.
+    The following keys are defined; default values are used for missing keys:
 
     'label'         : 'WI.WF'                   # widget label
     'lbl_sep'       : '.'                       # label between WI and WF field
@@ -114,7 +115,7 @@ class UI_W(QWidget):
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
                    'enabled':True, 'visible':True, 'fractional':True
-                   }
+                   } #: default values
         for k, v in kwargs.items():
             if k not in dict_ui:
                 logger.warning("Unknown key {0}".format(k))
@@ -187,12 +188,21 @@ class UI_W(QWidget):
         self.W = self.WI + self.WF + 1
         
     #--------------------------------------------------------------------------
-    def load_ui(self):
+    def load_ui(self, w_dict):
         """ 
-        Update the widgets `WI` and `WF` when specs have been changed outside
-        this class.
+        Update the widgets `WI` and `WF` from the dict passed as the argument
         """
-        pass
+        if 'WI' in w_dict:
+            self.WI = safe_eval(w_dict['WI'], self.WI, return_type="int", sign='pos')
+            self.ledWI.setText(qstr(self.WI))
+        else:
+            logger.warning("No key 'WI' in dict!")
+
+        if 'WF' in w_dict:
+            self.WF = safe_eval(w_dict['WF'], self.WF, return_type="int", sign='pos')
+            self.ledWF.setText(qstr(self.WF))
+        else:
+            logger.warning("No key 'WF' in dict!")
 
 #------------------------------------------------------------------------------
 class UI_W_coeffs(UI_W):
@@ -240,6 +250,14 @@ class UI_Q(QWidget):
     """
     Widget for selecting quantization / overflow options. The result can be read out
     via the attributes `self.ovfl` and `self.quant`.
+    
+    The constructor accepts a dictionary for initial widget settings.
+    The following keys are defined; default values are used for missing keys:
+
+    'label_q'  : 'Quant.'                           # widget label
+    'tip_q'    : 'Select the kind of quantization.' # Mouse-over tooltip
+    'enabled'  : True                               # Is widget enabled?
+    'visible'  : True                               # Is widget visible?
     """
 
     def __init__(self, parent, **kwargs):
@@ -254,7 +272,7 @@ class UI_Q(QWidget):
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
                    'cmb_ov':['wrap', 'sat'], 'cur_ov':'wrap',
                    'enabled':True, 'visible':True
-                   }
+                   } #: default widget settings
         for key, val in kwargs.items():
             dict_ui.update({key:val})
         # dict_ui.update(map(kwargs)) # same as above?

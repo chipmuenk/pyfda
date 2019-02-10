@@ -33,17 +33,19 @@ from .filter_hw import FilterHardware
 
 class FIR_DF(QWidget):
     """
-    Widget for entering word formats & quantization
+    Widget for entering word formats & quantization, also instantiates fixpoint
+    filter class :class:`FilterFIR`.
     """
     def __init__(self, parent):
         super(FIR_DF, self).__init__(parent)
 
-        self.title = ("<b>Direct-Form 1 (DF1) FIR Filter</b><br />"
-                 "Simple topology.")
+        self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
+                      "Standard FIR topology.")
         self.img_name = "fir_df.png"
 
         self._construct_UI()
-        self.construct_hdl_filter()
+        # Construct an instance of the HDL filter object
+        self.hdlfilter = FilterFIR()
 
 #------------------------------------------------------------------------------
 
@@ -96,16 +98,76 @@ class FIR_DF(QWidget):
         self.setLayout(layVWdg)
         
 #------------------------------------------------------------------------------
-    def construct_hdl_filter(self):
+    def update_UI(self, fxqc_dict):
         """
-        Construct an instance of the HDL filter object
-        """
-        self.hdlfilter = FilterFIR()     # Standard DF1 filter - hdl_dict should be passed here
+        Update all parts of the UI that need to be updated when specs have been
+        changed outside this class, e.g. coefficients and coefficient wordlength.
+        This also provides the initial setting for the widgets when the filter has
+        been changed.
 
-#------------------------------------------------------------------------------
-    def update_hdl_filter(self):
+        This is called from one level above by 
+        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        TODO: move this to the filter class!
+        if not 'QA' in fxqc_dict:
+            fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet 
+            
+        if not 'QO' in fxqc_dict:
+            fxqc_dict.update({'QO':{}}) # no output settings in dict yet 
+
+            
+        self.wdg_w_coeffs.load_ui() # update coefficient wordlength
+        self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
+        
+        self.wdg_w_output.load_ui(fxqc_dict['QO'])
+        
+#------------------------------------------------------------------------------
+    def get_fxqc_dict(self):
+        """
+        Read out the subwidgets and return a dict with their settings
+        
+        Return a dictionary with infos for the fixpoint implementation
+        concerning coefficients, input and output quantization.
+        
+        Parameters
+        ----------
+        
+        None
+        
+        Returns
+        -------
+        fxqc_dict : dict
+
+           containing the following keys:
+
+               :'QC': dictionary with coefficients quantization settings
+               
+               :'QI': dictionary with input quantizer settings (updated from
+                   :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.)
+               
+               :'QO': dictionary with output quantizer settings (updated from
+                   :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.)
+        
+        
+        """
+        fxqc_dict = {}    
+        self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
+        self.wdg_w_coeffs.load_ui() # update coefficient wordlength
+        
+        fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
+        fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
+                                'WF':self.wdg_w_output.WF,
+                                'W':self.wdg_w_output.W,
+                                'ovfl': self.wdg_q_output.ovfl,
+                                'quant': self.wdg_q_output.quant
+                               }
+                        })
+        
+        return fxqc_dict
+        
+#------------------------------------------------------------------------------
+    def update_hdl_filter(self, fxqc_dict=None):
+        """
+        This is called from :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         
         Update the HDL filter object with new coefficients, quantization settings etc. when
         
@@ -119,8 +181,8 @@ class FIR_DF(QWidget):
         # build the dict with coefficients and fixpoint settings:
         self.hdl_dict = self.get_hdl_dict()
         # setup input and output quantizers
-        self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
+#        self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
+#        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
         self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
 
         b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
@@ -138,75 +200,24 @@ class FIR_DF(QWidget):
                 (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
                 )
 
-#------------------------------------------------------------------------------
-    def update_UI(self):
-        """
-        Update all parts of the UI that need to be updated when specs have been
-        changed outside this class, e.g. coefficients and coefficient wordlength.
-
-        This is called from one level above by 
-        :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
-        """
-        self.wdg_w_coeffs.load_ui() # update coefficient wordlength
-        self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
-
-#==============================================================================
-    def get_hdl_dict(self):
-        """
-        Build the dictionary for passing infos to the fixpoint implementation
-        for coefficients, input and output quantization.
-        
-        Parameters
-        ----------
-        
-        None
-        
-        Returns
-        -------
-        hdl_dict : dict
-
-           containing the following keys:
-
-               :'QC': dictionary with coefficients quantization settings
-               
-               :'QI': dictionary with input quantizer settings
-               
-               :'QO': dictionary with output quantizer settings
-        """
-        # quantized coefficients in decimal format
-        hdl_dict = {'QC':self.wdg_w_coeffs.c_dict}
-        # input quantization parameters
-        hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
-                               'WF':self.wdg_w_input.WF,
-                               'W':self.wdg_w_input.W,
-                               'ovfl': self.wdg_q_input.ovfl,
-                               'quant': self.wdg_q_input.quant
-                               }
-                        })
-        # output quantization parameters
-        hdl_dict.update({'QO':{'WI':self.wdg_w_output.WI,
-                               'WF':self.wdg_w_output.WF,
-                               'W':self.wdg_w_output.W,
-                               'ovfl': self.wdg_q_output.ovfl,
-                               'quant': self.wdg_q_output.quant
-                               }
-                        })
-    
-        return hdl_dict
-    
 ###############################################################################
         
 class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
     def __init__(self, b = None, a = None):
-        """Contains FIR filter parameters. Parent Class : FilterHardware
-            Args:
-                b (list of int): list of numerator coefficients.
-                a (list of int): list of denominator coefficients.
-                word format (tuple of int): (W, WI, WF)
-                filter_type:
-                filter_form_type:
-                response (list): list of filter output in int format.
-            """
+        """
+        Contains FIR filter parameters. Parent Class : FilterHardware
+
+        Arguments
+        ---------
+        
+        b (list of int): list of numerator coefficients.
+        a (list of int): list of denominator coefficients.
+        word format (tuple of int): (W, WI, WF)
+        filter_type:
+        filter_form_type:
+            
+        response (list): list of filter output in int format.
+        """
         super(FilterFIR, self).__init__(b, a)
         self.filter_type = 'direct_form'
         self.direct_form_type = 1
@@ -220,7 +231,27 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
             response(numpy int array) : returns filter output as numpy array
         """
         return self.response
+    
+    def setup(self, fx_dict):
+        """
+        Setup coefficients, word lengths etc.
 
+        Returns
+        -------
+        response(numpy int array) : returns filter output as numpy array
+
+        Args:
+            coef_w (tuple of int): word format (W, WI, WF)
+            input_w (tuple of int): word format (W, WI, WF)
+            output_w (tuple of int): word format (W, WI, WF)
+        """
+        self.coef_word_format  = (fx_dict['QC']['W'], fx_dict['QC']['WI'], fx_dict['QC']['WF'])
+        self.input_word_format = (fx_dict['QI']['W'], fx_dict['QI']['WI'], fx_dict['QI']['WF'])
+        self.output_word_format = (fx_dict['QO']['W'], fx_dict['QO']['WI'], fx_dict['QO']['WF'])
+        
+        self.b = fx_dict['QC']['b']
+        logger.warning("self.b:{0}|{1}".format(type(self.b[1]), self.b[1]))
+        
     def run_sim(self):
         """Run filter simulation"""
 
@@ -245,11 +276,8 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
             clk = clock
             rst = reset
             glbl = Global(clk, rst)
-            
-            #choose appropriate filter
-            fir_hdl = filter_fir
 
-            fir = fir_hdl(glbl, sigin, sigout, self.b, self.coef_word_format,
+            fir = filter_fir(glbl, sigin, sigout, self.b, self.coef_word_format,
                           shared_multiplier=self._shared_multiplier)
             
             fir.convert(**kwargs)
