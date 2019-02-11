@@ -19,7 +19,8 @@ import numpy as np
 
 import pyfda.filterbroker as fb
 from pyfda.pyfda_rc import params
-from pyfda.pyfda_lib import grpdelay
+from scipy.signal import group_delay
+#from pyfda.pyfda_lib import group_delay
 from pyfda.plot_widgets.mpl_widget import MplWidget
 
 # TODO: Anticausal filter have no group delay. But is a filter with
@@ -36,7 +37,7 @@ class Plot_Tau_G(QWidget):
 
     def __init__(self, parent):
         super(Plot_Tau_G, self).__init__(parent)
-        self.verbose = False # suppress warnings
+        self.verbose = True # suppress warnings
         self.needs_draw = True   # flag whether plot needs to be updated
         self.needs_redraw = True # flag whether plot needs to be redrawn
         self.tool_tip = "Group delay"
@@ -52,22 +53,26 @@ class Plot_Tau_G(QWidget):
 
 # =============================================================================
 # #### not needed at the moment ###
-#         self.chkWarnings = QCheckBox("Enable Warnings", self)
-#         self.chkWarnings.setChecked(False)
-#         self.chkWarnings.setToolTip("Print warnings about singular group delay")
+#        self.chkWarnings = QCheckBox("Enable Warnings", self)
+#        self.chkWarnings.setChecked(False)
+#        self.chkWarnings.setToolTip("Print warnings about singular group delay")
 #
-#         layHControls = QHBoxLayout()
-#         layHControls.addStretch(10)
-#         layHControls.addWidget(self.chkWarnings)
-#
-#         # This widget encompasses all control subwidgets:
-#         self.frmControls = QFrame(self)
-#         self.frmControls.setObjectName("frmControls")
-#         self.frmControls.setLayout(layHControls)
-#
+#        self.chkScipy = QCheckBox("Scipy", self)
+#        self.chkScipy.setChecked(False)
+#        self.chkScipy.setToolTip("Use scipy group delay routine")
+#    
+#        layHControls = QHBoxLayout()
+#        layHControls.addStretch(10)
+#        layHControls.addWidget(self.chkWarnings)
+#        layHControls.addWidget(self.chkScipy)
+#    
+#        # This widget encompasses all control subwidgets:
+#        self.frmControls = QFrame(self)
+#        self.frmControls.setObjectName("frmControls")
+#        self.frmControls.setLayout(layHControls)
 # =============================================================================
         self.mplwidget = MplWidget(self)
-#        self.mplwidget.layVMainMpl.addWidget(self.frmControls)
+        #self.mplwidget.layVMainMpl.addWidget(self.frmControls)
         self.mplwidget.layVMainMpl.setContentsMargins(*params['wdg_margins'])
         self.setLayout(self.mplwidget.layVMainMpl)
 
@@ -88,7 +93,7 @@ class Plot_Tau_G(QWidget):
         """
         Process signals coming from the navigation toolbar and from sig_rx
         """
-        logger.debug("Processing {0} | needs_draw = {1}, visible = {2}"\
+        logger.warning("Processing {0} | needs_draw = {1}, visible = {2}"\
                      .format(dict_sig, self.needs_draw, self.isVisible()))
         if self.isVisible():
             if 'data_changed' in dict_sig or 'home' in dict_sig or self.needs_draw:
@@ -126,8 +131,8 @@ class Plot_Tau_G(QWidget):
         aa = fb.fil[0]['ba'][1]
 
         # calculate H_cmplx(W) (complex) for W = 0 ... 2 pi:
-        self.W, self.tau_g = grpdelay(bb, aa, params['N_FFT'], whole = True,
-            verbose = self.verbose) # self.chkWarnings.isChecked())
+        self.W, self.tau_g = group_delay((bb, aa), w=params['N_FFT'], whole = True)
+            #verbose = self.verbose) # self.chkWarnings.isChecked())
 
         # Zero phase filters have no group delay (Causal+AntiCausal)
         if 'baA' in fb.fil[0]:

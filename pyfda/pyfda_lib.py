@@ -807,7 +807,7 @@ Examples
     return hn, td
 
 #==================================================================
-def grpdelay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi, use_scipy = True):
+def group_delay(b, a=1, nfft=512, whole=False, analog=False, verbose=True, fs=2.*pi, use_scipy = True):
 #==================================================================
     """
 Calculate group delay of a discrete time filter, specified by
@@ -967,6 +967,9 @@ Examples
 ##
 ## As a further optimization when nfft>>length(a), the IIR filter (b,a)
 ## is converted to the FIR filter conv(b,fliplr(conj(a))).
+    if use_scipy:
+        w, gd = sig.group_delay((b,a),w=nfft,whole=whole)
+        return w, gd
     if not whole:
         nfft = 2*nfft
 
