@@ -62,7 +62,6 @@ class IIR_DF1(QWidget):
         self.construct_hdl_filter()
 
 #------------------------------------------------------------------------------
-
     def _construct_UI(self):
         """
         Intitialize the UI with widgets for coefficient format and input and 
@@ -78,8 +77,7 @@ class IIR_DF1(QWidget):
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
         self.wdg_w_accu = UI_W(self, label='Accumulator Format <i>Q<sub>A </sub></i>:', WF=30)
         self.wdg_q_accu = UI_Q(self)
-        self.wdg_w_output = UI_W(self, label='Output Format <i>Q<sub>Y </sub></i>:')
-        self.wdg_q_output = UI_Q(self)
+
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
@@ -90,9 +88,6 @@ class IIR_DF1(QWidget):
 
         layVWdg.addWidget(self.wdg_w_accu)
         layVWdg.addWidget(self.wdg_q_accu)
-
-        layVWdg.addWidget(self.wdg_w_output)
-        layVWdg.addWidget(self.wdg_q_output)
 
         layVWdg.addStretch()
 
@@ -176,14 +171,6 @@ class IIR_DF1(QWidget):
         """
         # quantized coefficients in decimal format
         fxqc_dict = {'QC':self.wdg_w_coeffs.c_dict}
-        # parameters for output format
-        fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
-                               'WF':self.wdg_w_output.WF,
-                               'W':self.wdg_w_output.W,
-                               'ovfl': self.wdg_q_output.ovfl,
-                               'quant': self.wdg_q_output.quant
-                               }
-                        })
     
         return fxqc_dict
 

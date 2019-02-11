@@ -105,14 +105,14 @@ class Input_Fixpoint_Specs(QWidget):
         if 'data_changed' in dict_sig:
             # update hdl_dict when filter has been designed
             # TODO: This needs to be changed
-            self.update_wdg_UI()
+            self.wdg_dict2ui()
         if 'filt_changed' in dict_sig:
             # update list of available filter topologies here
             self._update_filter_cmb()
         if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff':
             # update fields in the filter topology widget - wordlength may have
             # been changed
-            self.update_wdg_UI()
+            self.wdg_dict2ui()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
                 self.fx_sim_init()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'start':
@@ -161,7 +161,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 
 #------------------------------------------------------------------------------
-#       Input Quantizer 
+#       Input and Output Quantizer 
 #------------------------------------------------------------------------------        
         lblHBtnsMsg1 = QLabel("<b>Fixpoint signal / coeff. formats:</b>", self)
         lblHBtnsMsg2 = QLabel("<b>WI.WF  </b>", self)
@@ -173,37 +173,22 @@ class Input_Fixpoint_Specs(QWidget):
         self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X </sub></i>:')
         self.wdg_q_input = UI_Q(self)
 
-        layVQiWdg = QVBoxLayout()
+        self.wdg_w_output = UI_W(self, label='Output Format <i>Q<sub>Y </sub></i>:')
+        self.wdg_q_output = UI_Q(self)
 
-        layVQiWdg.addLayout(layHBtnsMsg)
+        layVQioWdg = QVBoxLayout()
+        layVQioWdg.addLayout(layHBtnsMsg)
+        layVQioWdg.addWidget(self.wdg_w_input)
+        layVQioWdg.addWidget(self.wdg_q_input)
+        layVQioWdg.addWidget(self.wdg_w_output)
+        layVQioWdg.addWidget(self.wdg_q_output)
 
-        layVQiWdg.addWidget(self.wdg_w_input)
-        layVQiWdg.addWidget(self.wdg_q_input)
         # This frame encompasses the HDL buttons sim and convert
-        frmQiWdg = QFrame(self)
+        frmQioWdg = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-        frmQiWdg.setLayout(layVQiWdg)
-        frmQiWdg.setContentsMargins(*params['wdg_margins'])
+        frmQioWdg.setLayout(layVQioWdg)
+        frmQioWdg.setContentsMargins(*params['wdg_margins'])
         
-#------------------------------------------------------------------------------
-#       Output Quantizer 
-#------------------------------------------------------------------------------        
-#        self.wdg_w_output = UI_W(self, label='Input Format <i>Q<sub>Y </sub></i>:')
-#        self.wdg_q_output = UI_Q(self)
-#
-#        layVQoWdg = QVBoxLayout()
-#
-#        layVQoWdg.addLayout(layHBtnsMsg)
-#
-#        layVQoWdg.addWidget(self.wdg_w_output)
-#        layVQoWdg.addWidget(self.wdg_q_output)
-#        # This frame encompasses the HDL buttons sim and convert
-#        frmQoWdg = QFrame(self)
-#        #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
-#        frmQoWdg.setLayout(layVQoWdg)
-#        frmQoWdg.setContentsMargins(*params['wdg_margins'])
-
-
 #------------------------------------------------------------------------------        
 #       Dynamically updated image of filter topology
 #------------------------------------------------------------------------------        
@@ -255,7 +240,8 @@ class Input_Fixpoint_Specs(QWidget):
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.frmTitle)
-        layVMain.addWidget(frmQiWdg)
+        layVMain.addWidget(frmQioWdg)
+#        layVMain.addWidget(frmQoWdg)
         layVMain.addWidget(splitter)
         layVMain.addWidget(frmHdlBtns)
         layVMain.addStretch()
@@ -379,7 +365,6 @@ class Input_Fixpoint_Specs(QWidget):
         #img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
         img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
 
-
         self.lbl_img_fixp.setPixmap(QPixmap(img_scaled))
 
 #------------------------------------------------------------------------------
@@ -427,7 +412,7 @@ class Input_Fixpoint_Specs(QWidget):
             fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
             self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
             self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
-            self.update_wdg_UI() # initialize the fixpoint subwidgets from the fxq_dict
+            self.wdg_dict2ui() # initialize the fixpoint subwidgets from the fxq_dict
 
             #---- connect signals to fx_wdg_inst ----
             if hasattr(self.fx_wdg_inst, "sig_rx"):
@@ -469,7 +454,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_wdg_found = False
 
 #------------------------------------------------------------------------------
-    def update_wdg_UI(self):
+    def wdg_dict2ui(self):
         """
         Trigger an update of the fixpoint widget UI when view (i.e. fixpoint 
         coefficient format) has been changed outside this class. Additionally,
@@ -499,13 +484,13 @@ class Input_Fixpoint_Specs(QWidget):
                        }
                 })
             # output quantization parameters
-#            self.fxq_dict.update({'QO':{'WI':self.wdg_w_output.WI,
-#                               'WF':self.wdg_w_output.WF,
-#                               'W':self.wdg_w_output.W,
-#                               'ovfl': self.wdg_q_output.ovfl,
-#                               'quant': self.wdg_q_output.quant
-#                               }
-#                        })
+            self.fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
+                               'WF':self.wdg_w_output.WF,
+                               'W':self.wdg_w_output.W,
+                               'ovfl': self.wdg_q_output.ovfl,
+                               'quant': self.wdg_q_output.quant
+                               }
+                        })
 
             self.q_i = fx.Fixed(self.fxqc_dict['QI']) # setup quantizer for input quantization
             self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format

@@ -64,8 +64,6 @@ class FIR_DF(QWidget):
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
         self.wdg_w_accu = UI_W(self, label='Accumulator Format <i>Q<sub>A </sub></i>:', WF=30)
         self.wdg_q_accu = UI_Q(self)
-        self.wdg_w_output = UI_W(self, label='Output Format <i>Q<sub>Y </sub></i>:')
-        self.wdg_q_output = UI_Q(self)
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
@@ -76,9 +74,6 @@ class FIR_DF(QWidget):
 
         layVWdg.addWidget(self.wdg_w_accu)
         layVWdg.addWidget(self.wdg_q_accu)
-
-        layVWdg.addWidget(self.wdg_w_output)
-        layVWdg.addWidget(self.wdg_q_output)
 
         layVWdg.addStretch()
 
@@ -98,14 +93,10 @@ class FIR_DF(QWidget):
         if not 'QA' in fxqc_dict:
             fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet 
             
-        if not 'QO' in fxqc_dict:
-            fxqc_dict.update({'QO':{}}) # no output settings in dict yet 
-
-            
         self.wdg_w_coeffs.load_ui() # update coefficient wordlength
         self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
         
-        self.wdg_w_output.load_ui(fxqc_dict['QO'])
+        self.wdg_w_accu.load_ui(fxqc_dict['QA'])
         
 #------------------------------------------------------------------------------
     def ui2dict(self):
@@ -131,24 +122,12 @@ class FIR_DF(QWidget):
            containing the following keys:
 
                :'QC': dictionary with coefficients quantization settings
-               
-               :'QO': dictionary with output quantizer settings (updated from
-                   :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.)
-        
-        
+                
         """
         fxqc_dict = {}    
         self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
         self.wdg_w_coeffs.load_ui() # update coefficient wordlength
-        
         fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
-        fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
-                                'WF':self.wdg_w_output.WF,
-                                'W':self.wdg_w_output.W,
-                                'ovfl': self.wdg_q_output.ovfl,
-                                'quant': self.wdg_q_output.quant
-                               }
-                        })
         
         return fxqc_dict
         
