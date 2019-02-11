@@ -54,8 +54,8 @@ def build_coeff_dict(frmt=None):
         - a_fix: np.array
 
     """
-    b = fb.fil[0]['ba'][0] # get coefficients from 
-    a = fb.fil[0]['ba'][1] # filter dict in float form
+    bf = fb.fil[0]['ba'][0] # get coefficients from 
+    af = fb.fil[0]['ba'][1] # filter dict in float form
     # Create a coefficient quantizer instance using the quantization parameters dict
     # collected in `input_widgets/input_coeffs.py` (and stored in the central filter dict)
     Q_coeff = fix.Fixed(fb.fil[0]["q_coeff"])
@@ -68,9 +68,10 @@ def build_coeff_dict(frmt=None):
     # quantize floating point coefficients and convert them to the
     # selected numeric format (hex, bin, dec ...) with the selected scale (WI.WF)
     c_dict = {}
-    # convert list of float -> dec (int64) -> int, then list to tuple
-    c_dict.update({'b':tuple([bb.item() for bb in Q_coeff.float2frmt(b)])}) # convert float -> fixp and
-    c_dict.update({'a':tuple(Q_coeff.float2frmt(a))}) # format it as bin, hex, ...
+    # convert list of float -> dec (np.int64).
+    # item() converts np.int64 -> int 
+    c_dict.update({'b':[b.item() for b in Q_coeff.float2frmt(bf)]}) # convert float -> fixp and
+    c_dict.update({'a':[a.item() for a in Q_coeff.float2frmt(af)]}) # format it as bin, hex, ...
     c_dict.update({'WF':Q_coeff.WF}) # read parameters from quantizer instance
     c_dict.update({'WI':Q_coeff.WI}) # and pass them to the coefficient dict
     c_dict.update({'W':Q_coeff.W})
@@ -358,6 +359,118 @@ class UI_Q_coeffs(UI_Q):
         qset_cmb_box(self.cmbQuant,self.quant)
 
         self.c_dict = build_coeff_dict()
+
+
+class FilterHardware(object):
+    def __init__(self, b=None, a=None):
+        """
+        Helper class with common attributes and methods for all filters
+        
+        Arguments
+        ---------
+        b (list of int): list of numerator coefficients.
+        a (list of int): list of denominator coefficients.
+
+        Attributes
+        ----------
+        coef_word_format (tuple of int): word format (W,WI,WF).
+        n_cascades (int):
+        sigin (numpy int array):
+        nfft (int):
+        hdl_name (str):
+        hdl_directory (str):
+        hdl_target (str):
+        """
+        # numerator coefficient
+        if b is not None:
+            self.b = tuple(b)
+
+        # denominator coefficients
+        if a is not None:
+            self.a = tuple(a)
+
+        # TODO: need a default word format, the coefficient
+        #       can be determined from the coefficients if passed
+        #       use an arbitrary value of the input and output
+        self.coef_word_format = (24, 0, 23)
+        self.input_word_format = (16, 0, 15)
+        self.output_word_format = (16, 0, 15)
+
+        self.n_cascades = 0
+        self.sigin = np.array([])
+        self._shared_multiplier = False
+        self._sample_rate = 1
+        self._clock_frequency = 1
+
+        self.nfft = 1024
+
+        self.hdl_name = 'name'
+        self.hdl_directory = 'directory'
+        self.hdl_target = 'verilog'
+
+        # A reference to the HDL block
+        self.hardware = None
+        
+    def setup(self, fx_dict):
+        """
+        Setup coefficients, word lengths etc.
+
+        Returns
+        -------
+        None
+
+        Arguments
+        ---------
+        fx_dict (dict): dictionary with filter parameters:
+            
+            - coef_w (tuple of int): word format (W, WI, WF)
+            
+            - input_w (tuple of int): word format (W, WI, WF)
+            
+            - output_w (tuple of int): word format (W, WI, WF)
+        """
+        self.coef_word_format  = (fx_dict['QC']['W'], fx_dict['QC']['WI'], fx_dict['QC']['WF'])
+        self.input_word_format = (fx_dict['QI']['W'], fx_dict['QI']['WI'], fx_dict['QI']['WF'])
+        self.output_word_format = (fx_dict['QO']['W'], fx_dict['QO']['WI'], fx_dict['QO']['WF'])
+        
+        self.b = tuple(fx_dict['QC']['b'])
+        self.a = tuple(fx_dict['QC']['a'])
+        if 'sos' in fx_dict['QC']:
+            self.sos =  tuple(fx_dict['QC']['sos'])
+
+
+    def set_coefficients(self, coeff_b = None, coeff_a = None, sos = None):
+        """Set filter coefficients.
+
+        Args:
+            coeff_b (list): list of numerator filter coefficients
+            coeff_a (list): list of denominator filter coefficients
+        """
+        if coeff_b is not None:
+            self.b = tuple(coeff_b)
+
+        if coeff_a is not None:
+            self.a = tuple(coeff_a)
+
+        if sos is not None:
+            self.sos = sos
+
+    def set_stimulus(self, sigin):
+        """Set filter stimulus
+
+        Args:
+            sigin (np array int): numpy array of filter stimulus 
+            bits (int) : no of bits
+        """
+        self.sigin = sigin.tolist()
+
+    def set_cascade(self, n_cascades):
+        """Set number of filter cascades
+
+        Args:
+            n_cascades (int): no of filter sections connected together
+        """
+        self.n_cascades = n_cascades
 
 #==============================================================================
 

@@ -476,8 +476,8 @@ class Input_Fixpoint_Specs(QWidget):
         pass the fixpoint quantization widget to update / restore other subwidget
         settings.
         """
-        if hasattr(self.fx_wdg_inst, "update_UI"):
-            self.fx_wdg_inst.update_UI(self.fxqc_dict)
+        if hasattr(self.fx_wdg_inst, "dict2ui"):
+            self.fx_wdg_inst.dict2ui(self.fxqc_dict)
 #------------------------------------------------------------------------------
     def update_fxqc_dict(self):
         """
@@ -487,8 +487,8 @@ class Input_Fixpoint_Specs(QWidget):
         """
         if self.fx_wdg_found and self.hdlfilter:
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
-            if hasattr(self.fx_wdg_inst, "get_fxqc_dict"):
-                self.fxqc_dict.update(self.fx_wdg_inst.get_fxqc_dict())
+            if hasattr(self.fx_wdg_inst, "ui2dict"):
+                self.fxqc_dict.update(self.fx_wdg_inst.ui2dict())
 
             # update the fxqc_dict with the settings of the input quantizer  
             self.fxqc_dict.update({'QI':{'WI': self.wdg_w_input.WI,

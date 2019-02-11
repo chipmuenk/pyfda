@@ -16,19 +16,23 @@ import numpy as np
 
 class FilterHardware(object):
     def __init__(self, b=None, a=None):
-        """Top level class. Contains filter parameters
-        Args:
-            b (list of int): list of numerator coefficients.
-            a (list of int): list of denominator coefficients.
+        """
+        Helper class with common attributes and methods for all filters
+        
+        Arguments
+        ---------
+        b (list of int): list of numerator coefficients.
+        a (list of int): list of denominator coefficients.
 
-        Attrs:
-            coef_word_format (tuple of int): word format (W,WI,WF).
-            n_cascades (int):
-            sigin (numpy int array):
-            nfft (int):
-            hdl_name (str):
-            hdl_directory (str):
-            hdl_target (str):
+        Attributes
+        ----------
+        coef_word_format (tuple of int): word format (W,WI,WF).
+        n_cascades (int):
+        sigin (numpy int array):
+        nfft (int):
+        hdl_name (str):
+        hdl_directory (str):
+        hdl_target (str):
         """
         # numerator coefficient
         if b is not None:
@@ -59,6 +63,34 @@ class FilterHardware(object):
 
         # A reference to the HDL block
         self.hardware = None
+        
+    def setup(self, fx_dict):
+        """
+        Setup coefficients, word lengths etc.
+
+        Returns
+        -------
+        None
+
+        Arguments
+        ---------
+        fx_dict (dict): dictionary with filter parameters:
+            
+            - coef_w (tuple of int): word format (W, WI, WF)
+            
+            - input_w (tuple of int): word format (W, WI, WF)
+            
+            - output_w (tuple of int): word format (W, WI, WF)
+        """
+        self.coef_word_format  = (fx_dict['QC']['W'], fx_dict['QC']['WI'], fx_dict['QC']['WF'])
+        self.input_word_format = (fx_dict['QI']['W'], fx_dict['QI']['WI'], fx_dict['QI']['WF'])
+        self.output_word_format = (fx_dict['QO']['W'], fx_dict['QO']['WI'], fx_dict['QO']['WF'])
+        
+        self.b = tuple(fx_dict['QC']['b'])
+        self.a = tuple(fx_dict['QC']['a'])
+        if 'sos' in fx_dict['QC']:
+            self.sos =  tuple(fx_dict['QC']['sos'])
+
 
     def set_coefficients(self, coeff_b = None, coeff_a = None, sos = None):
         """Set filter coefficients.
@@ -92,31 +124,3 @@ class FilterHardware(object):
             n_cascades (int): no of filter sections connected together
         """
         self.n_cascades = n_cascades
-
-    def set_word_format(self, coeff_w, input_w, output_w=(24, 0, 23)):
-        """Set word format
-
-        Args:
-            coef_w (tuple of int): word format (W, WI, WF)
-            input_w (tuple of int): word format (W, WI, WF)
-            output_w (tuple of int): word format (W, WI, WF)
-        """
-        self.coef_word_format = coeff_w
-        self.input_word_format = input_w
-        self.output_word_format = output_w
-
-    def get_fixed_coefficients(self):
-        raise NotImplementedError
-
-    def get_single_coefficients(self):
-        raise NotImplementedError
-
-    def convert(self):
-        raise NotImplementedError
-
-    def process(self, glbl, smpi, smpo):
-        raise NotImplementedError
-
-    def filter_instance(self, glbl, smpi, smpo):
-        raise NotImplementedError
-

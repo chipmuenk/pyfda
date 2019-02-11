@@ -54,14 +54,6 @@ class FIR_DF(QWidget):
         Intitialize the UI with widgets for coefficient format and input and 
         output quantization
         """
-        
-        lblHBtnsMsg = QLabel("<b>Fixpoint signal / coeff. formats as WI.WF:</b>", self)
-        self.layHBtnsMsg = QHBoxLayout()
-        self.layHBtnsMsg.addWidget(lblHBtnsMsg)
-
-        self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X </sub></i>:')
-        self.wdg_q_input = UI_Q(self)
-        
         self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
@@ -78,11 +70,6 @@ class FIR_DF(QWidget):
 
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0,0,0,0)
-
-        layVWdg.addLayout(self.layHBtnsMsg)
-
-        layVWdg.addWidget(self.wdg_w_input)
-        layVWdg.addWidget(self.wdg_q_input)
         
         layVWdg.addWidget(self.wdg_w_coeffs)
         layVWdg.addWidget(self.wdg_q_coeffs)
@@ -98,7 +85,7 @@ class FIR_DF(QWidget):
         self.setLayout(layVWdg)
         
 #------------------------------------------------------------------------------
-    def update_UI(self, fxqc_dict):
+    def dict2ui(self, fxqc_dict):
         """
         Update all parts of the UI that need to be updated when specs have been
         changed outside this class, e.g. coefficients and coefficient wordlength.
@@ -121,12 +108,16 @@ class FIR_DF(QWidget):
         self.wdg_w_output.load_ui(fxqc_dict['QO'])
         
 #------------------------------------------------------------------------------
-    def get_fxqc_dict(self):
+    def ui2dict(self):
         """
         Read out the subwidgets and return a dict with their settings
         
         Return a dictionary with infos for the fixpoint implementation
-        concerning coefficients, input and output quantization.
+        concerning coefficients and their quantization format.
+        
+        This dictionary is merged with the input and output quantization settings
+        that are entered in ``input_fixpoint_specs``.
+
         
         Parameters
         ----------
@@ -140,9 +131,6 @@ class FIR_DF(QWidget):
            containing the following keys:
 
                :'QC': dictionary with coefficients quantization settings
-               
-               :'QI': dictionary with input quantizer settings (updated from
-                   :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.)
                
                :'QO': dictionary with output quantizer settings (updated from
                    :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.)
@@ -176,6 +164,8 @@ class FIR_DF(QWidget):
         - filter design and hence coefficients change
         
         - quantization settings are updated in this widget
+        
+        TODO: outdated, check coefficient passing mechanism!
         """
 
         # build the dict with coefficients and fixpoint settings:
@@ -231,27 +221,7 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
             response(numpy int array) : returns filter output as numpy array
         """
         return self.response
-    
-    def setup(self, fx_dict):
-        """
-        Setup coefficients, word lengths etc.
-
-        Returns
-        -------
-        response(numpy int array) : returns filter output as numpy array
-
-        Args:
-            coef_w (tuple of int): word format (W, WI, WF)
-            input_w (tuple of int): word format (W, WI, WF)
-            output_w (tuple of int): word format (W, WI, WF)
-        """
-        self.coef_word_format  = (fx_dict['QC']['W'], fx_dict['QC']['WI'], fx_dict['QC']['WF'])
-        self.input_word_format = (fx_dict['QI']['W'], fx_dict['QI']['WI'], fx_dict['QI']['WF'])
-        self.output_word_format = (fx_dict['QO']['W'], fx_dict['QO']['WI'], fx_dict['QO']['WF'])
-        
-        self.b = fx_dict['QC']['b']
-        logger.warning("self.b:{0}|{1}".format(type(self.b[1]), self.b[1]))
-        
+            
     def run_sim(self):
         """Run filter simulation"""
 

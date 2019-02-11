@@ -67,15 +67,7 @@ class IIR_DF1(QWidget):
         """
         Intitialize the UI with widgets for coefficient format and input and 
         output quantization
-        """
-        
-        lblHBtnsMsg = QLabel("<b>Fixpoint signal / coeff. formats as WI.WF:</b>", self)
-        self.layHBtnsMsg = QHBoxLayout()
-        self.layHBtnsMsg.addWidget(lblHBtnsMsg)
-
-        self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X </sub></i>:')
-        self.wdg_q_input = UI_Q(self)
-        
+        """        
         self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
@@ -92,12 +84,7 @@ class IIR_DF1(QWidget):
 
         layVWdg = QVBoxLayout()
         layVWdg.setContentsMargins(0,0,0,0)
-
-        layVWdg.addLayout(self.layHBtnsMsg)
-
-        layVWdg.addWidget(self.wdg_w_input)
-        layVWdg.addWidget(self.wdg_q_input)
-        
+       
         layVWdg.addWidget(self.wdg_w_coeffs)
         layVWdg.addWidget(self.wdg_q_coeffs)
 
@@ -116,7 +103,7 @@ class IIR_DF1(QWidget):
         """
         Construct an instance of the HDL filter object
         """
-        self.hdlfilter = FilterIIR()     # Standard DF1 filter - hdl_dict should be passed here
+        self.hdlfilter = FilterIIR()     # Standard DF1 filter
 
 #------------------------------------------------------------------------------
     def update_hdl_filter(self):
@@ -129,9 +116,6 @@ class IIR_DF1(QWidget):
         
         - quantization settings are updated in this widget
         """
-
-        # build the dict with coefficients and fixpoint settings:
-        self.hdl_dict = self.get_hdl_dict()
         # setup input and output quantizers
         self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
         self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
@@ -154,7 +138,7 @@ class IIR_DF1(QWidget):
                 )
 
 #------------------------------------------------------------------------------
-    def update_UI(self, fxqc_dict):
+    def dict2ui(self, fxqc_dict):
         """
         Update all parts of the UI that need to be updated when specs have been
         changed outside this class, e.g. coefficients and coefficient wordlength.
@@ -166,10 +150,15 @@ class IIR_DF1(QWidget):
         self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
 
 #==============================================================================
-    def get_hdl_dict(self):
+    def ui2dict(self):
         """
-        Build the dictionary for passing infos to the fixpoint implementation
-        for coefficients, input and output quantization.
+        Read out the subwidgets and return a dict with their settings
+        
+        Return a dictionary with infos for the fixpoint implementation
+        concerning coefficients and their quantization format.
+
+        This dictionary is merged with the input and output quantization settings
+        that are entered in ``input_fixpoint_specs``.
         
         Parameters
         ----------
@@ -178,28 +167,17 @@ class IIR_DF1(QWidget):
         
         Returns
         -------
-        hdl_dict : dict
+        fxqc_dict : dict
 
            containing the following keys:
 
                :'QC': dictionary with coefficients quantization settings
-               
-               :'QI': dictionary with input quantizer settings
-               
-               :'QO': dictionary with output quantizer settings
+
         """
         # quantized coefficients in decimal format
-        hdl_dict = {'QC':self.wdg_w_coeffs.c_dict}
-        # parameters for input format
-        hdl_dict.update({'QI':{'WI':self.wdg_w_input.WI,
-                               'WF':self.wdg_w_input.WF,
-                               'W':self.wdg_w_input.W,
-                               'ovfl': self.wdg_q_input.ovfl,
-                               'quant': self.wdg_q_input.quant
-                               }
-                        })
+        fxqc_dict = {'QC':self.wdg_w_coeffs.c_dict}
         # parameters for output format
-        hdl_dict.update({'QO':{'WI':self.wdg_w_output.WI,
+        fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
                                'WF':self.wdg_w_output.WF,
                                'W':self.wdg_w_output.W,
                                'ovfl': self.wdg_q_output.ovfl,
@@ -207,7 +185,7 @@ class IIR_DF1(QWidget):
                                }
                         })
     
-        return hdl_dict
+        return fxqc_dict
 
 ###############################################################################
         
