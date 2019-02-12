@@ -298,7 +298,8 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
                 yt.record = False
                 yt.valid = False
 
-            print(yt.sample_buffer)
+            logger.warning("samp_bufx : {0}".format(xt.sample_buffer))
+            logger.warning("samp_bufy : {0}".format(yt.sample_buffer))
             self.response = yt.sample_buffer
 
             raise StopSimulation()

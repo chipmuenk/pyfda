@@ -617,13 +617,15 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)
-            logger.info("stim {0}{1}\n{2}".format(type(self.q_i.W), self.q_i.q_obj, self.stim))
+            logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
+                        dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             self.hdlfilter.run_sim()         # Run the simulation
             # Get the response from the simulation in integer
             self.fx_results = self.hdlfilter.get_response()
+            logger.info("\n\n resp {0}\n".format(self.fx_results[0:9]))
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
