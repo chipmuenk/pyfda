@@ -135,42 +135,42 @@ class FIR_DF(QWidget):
         return fxqc_dict
         
 #------------------------------------------------------------------------------
-    def update_hdl_filter(self, fxqc_dict=None):
-        """
-        This is called from :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
-        
-        Update the HDL filter object with new coefficients, quantization settings etc. when
-        
-        - it is constructed
-        
-        - filter design and hence coefficients change
-        
-        - quantization settings are updated in this widget
-        
-        TODO: outdated, check coefficient passing mechanism!
-        """
-
-        # build the dict with coefficients and fixpoint settings:
-        self.hdl_dict = self.get_hdl_dict()
-        # setup input and output quantizers
-#        self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-#        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
-        self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
-
-        b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
-
-        # call setup method of filter widget - this is not implemented (yet)
-        # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
-        
-        self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
-
-        # pass wordlength for coeffs, input, output
-        # TODO: directly pass the hdl_dict here:
-        self.hdlfilter.set_word_format(
-                (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
-                (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
-                (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
-                )
+#    def update_hdl_filter(self, fxqc_dict=None):
+#        """
+#        This is called from :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
+#        
+#        Update the HDL filter object with new coefficients, quantization settings etc. when
+#        
+#        - it is constructed
+#        
+#        - filter design and hence coefficients change
+#        
+#        - quantization settings are updated in this widget
+#        
+#        TODO: outdated, check coefficient passing mechanism!
+#        """
+#
+#        # build the dict with coefficients and fixpoint settings:
+#        self.hdl_dict = self.get_hdl_dict()
+#        # setup input and output quantizers
+##        self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
+##        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
+#        self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
+#
+#        b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
+#
+#        # call setup method of filter widget - this is not implemented (yet)
+#        # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
+#        
+#        self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
+#
+#        # pass wordlength for coeffs, input, output
+#        # TODO: directly pass the hdl_dict here:
+#        self.hdlfilter.set_word_format(
+#                (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
+#                (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
+#                (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
+#                )
 
 ###############################################################################
         
