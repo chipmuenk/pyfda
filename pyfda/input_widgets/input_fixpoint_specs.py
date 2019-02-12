@@ -568,6 +568,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Started fixpoint simulation")
             self.update_fxqc_dict()
+            self.hdlfilter.setup(self.fxqc_dict)   # setup filter instance         
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         
