@@ -147,8 +147,12 @@ class IIR_DF1(QWidget):
         if not 'QC' in fxqc_dict:
             fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 
 
-        self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
+        self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength in ui
         self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
+        
+        self.wdg_w_accu.dict2ui(fxqc_dict['QA']) # update accumulator wordlength in ui
+        self.wdg_q_accu.dict2ui(fxqc_dict['QA']) # update accumulator quantization settings
+
 
 #==============================================================================
     def ui2dict(self):
