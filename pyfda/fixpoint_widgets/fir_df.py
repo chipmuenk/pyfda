@@ -285,6 +285,8 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         #process to record output in buffer
         rec_insts = yt.process_record(clock, num_samples=numsample)
         
+        # was: filter_insts, it seems the assigned name doesn't matter?!
+        _ = filter_fir(glbl, xt, yt, self.b, self.coef_word_format) 
 
         @hdl.instance
         def stimulus():
