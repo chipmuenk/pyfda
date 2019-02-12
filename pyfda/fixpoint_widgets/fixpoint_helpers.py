@@ -106,7 +106,7 @@ class UI_W(QWidget):
     def __init__(self, parent, **kwargs):
         super(UI_W, self).__init__(parent)
         self._construct_UI(**kwargs)
-        self.save_ui()
+        self.ui2dict()
 
     def _construct_UI(self, **kwargs):
         """ Construct widget from default settings, """
@@ -173,23 +173,26 @@ class UI_W(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.ledWI.editingFinished.connect(self.save_ui)
-        self.ledWF.editingFinished.connect(self.save_ui)
+        self.ledWI.editingFinished.connect(self.ui2dict)
+        self.ledWF.editingFinished.connect(self.ui2dict)
 
     #--------------------------------------------------------------------------
-    def save_ui(self):
+    def ui2dict(self): # was: save_ui
         """ 
-        Update the attributes `self.WI` and `self.WF` when one of the QLineEdit
+        Update the attributes `self.WI`, `self.WF` and `self.W` when one of the QLineEdit
         widgets has been edited.
+        
+        Return a dict with the three parameters when called directly
         """
         self.WI = safe_eval(self.ledWI.text(), self.WI, return_type="int", sign='pos')
         self.ledWI.setText(qstr(self.WI))
         self.WF = safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos')
         self.ledWF.setText(qstr(self.WF))
         self.W = self.WI + self.WF + 1
+        return {'WI':self.WI, 'WF':self.WF, 'W':self.W}
         
     #--------------------------------------------------------------------------
-    def load_ui(self, w_dict):
+    def dict2ui(self, w_dict):
         """ 
         Update the widgets `WI` and `WF` from the dict passed as the argument
         """
@@ -211,7 +214,7 @@ class UI_W_coeffs(UI_W):
     Widget for entering word format (integer and fractional bits) for the 
     oefficients. The result can be read out via the attributes `self.WI` and 
     `self.WF`. This class inherits from `UI_WI_WF`, overloading the methods `load_ui()`
-    and `save_ui()` for loading / saving the UI from / to the filter dict.
+    and `ui2dict()` for loading / saving the UI from / to the filter dict.
     """
     def __init__(self, parent, **kwargs):
         super(UI_W_coeffs, self).__init__(parent, **kwargs)
@@ -219,7 +222,7 @@ class UI_W_coeffs(UI_W):
         self.c_dict = build_coeff_dict()
         
     #--------------------------------------------------------------------------
-    def save_ui(self):
+    def ui2dict(self):
         """ 
         Update the attributes `self.WI` and `self.WF` and the filter dict 
         when one of the QLineEdit widgets has been edited.
@@ -231,15 +234,17 @@ class UI_W_coeffs(UI_W):
         fb.fil[0]["q_coeff"].update({'WI':self.WI, 'WF':self.WF})
         self.W = self.WI + self.WF + 1
 
-    def load_ui(self):
+    def dict2ui(self, c_dict=None):
         """ 
         Update the ui and the attributes `self.WI` and `self.WF` from the filter
-        dict. `load_ui()` has to be called when the coefficients or the word
+        dict. `dict2ui()` has to be called when the coefficients or the word
         format has been changed outside the class, e.g. by a new filter design or
         by changing the coefficient format in `input_coeffs.py`.
         """
-        self.WI = fb.fil[0]['q_coeff']['WI']
-        self.WF = fb.fil[0]['q_coeff']['WF']
+        if not c_dict:
+            c_dict = fb.fil[0]['q_coeff']
+        self.WI = c_dict['WI']
+        self.WF = c_dict['WF']
         self.ledWI.setText(qstr(self.WI))
         self.ledWF.setText(qstr(self.WF))
         self.W = self.WI + self.WF + 1
@@ -323,18 +328,18 @@ class UI_Q(QWidget):
         #----------------------------------------------------------------------
         # LOCAL SIGNALS & SLOTs
         #----------------------------------------------------------------------
-        self.cmbOvfl.currentIndexChanged.connect(self.save_ui)
-        self.cmbQuant.currentIndexChanged.connect(self.save_ui)
+        self.cmbOvfl.currentIndexChanged.connect(self.ui2dict)
+        self.cmbQuant.currentIndexChanged.connect(self.ui2dict)
 
     #--------------------------------------------------------------------------
-    def save_ui(self):
+    def ui2dict(self):
         """ Update the attributes `self.ovfl` and `self.quant` from the UI"""
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
 
     #--------------------------------------------------------------------------
-    def load_ui(self):
-        """ Update UI from somewhere """
+    def dict2ui(self, q_dict):
+        """ Update UI from passed dictionary """
         pass
 
 #==============================================================================

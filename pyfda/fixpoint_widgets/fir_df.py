@@ -93,10 +93,13 @@ class FIR_DF(QWidget):
         if not 'QA' in fxqc_dict:
             fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet 
             
-        self.wdg_w_coeffs.load_ui() # update coefficient wordlength
-        self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
+        if not 'QC' in fxqc_dict:
+            fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 
+            
+        self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
+        self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
         
-        self.wdg_w_accu.load_ui(fxqc_dict['QA'])
+        self.wdg_w_accu.dict2ui(fxqc_dict['QA'])
         
 #------------------------------------------------------------------------------
     def ui2dict(self):
@@ -125,9 +128,9 @@ class FIR_DF(QWidget):
                 
         """
         fxqc_dict = {}    
-        self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
-        self.wdg_w_coeffs.load_ui() # update coefficient wordlength
         fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
+        
+        fxqc_dict.update({'QA': self.wdg_w_accu.ui2dict()})
         
         return fxqc_dict
         

@@ -141,8 +141,14 @@ class IIR_DF1(QWidget):
         This is called from one level above by 
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
-        self.wdg_w_coeffs.load_ui() # update coefficient wordlength
-        self.wdg_q_coeffs.load_ui() # update coefficient quantization settings
+        if not 'QA' in fxqc_dict:
+            fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet 
+            
+        if not 'QC' in fxqc_dict:
+            fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 
+
+        self.wdg_w_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient wordlength
+        self.wdg_q_coeffs.dict2ui(fxqc_dict['QC']) # update coefficient quantization settings
 
 #==============================================================================
     def ui2dict(self):
