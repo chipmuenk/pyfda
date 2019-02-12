@@ -27,6 +27,7 @@ import myhdl as hdl
 from myhdl import Signal, intbv, always_seq, StopSimulation
 from .support import Clock, Reset, Global, Samples, Signals
 from .filter_hw import FilterHardware
+#from pyfda.filter_blocks.fda import fir
   
 
 # =============================================================================
@@ -46,7 +47,7 @@ class FIR_DF(QWidget):
         self._construct_UI()
         # Construct an instance of the HDL filter object
         self.hdlfilter = FilterFIR()
-
+        #self.hdlfilter = fir.FilterFIR()
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -208,7 +209,7 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         """Run filter simulation"""
 
         testfil = self.filter_block()
-        testfil.run_sim()
+        testfil.run_sim() # -> myhdl/_block
 
 
     def convert(self, **kwargs):
@@ -258,6 +259,8 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         and implementations
         
         This will be handled by individual classes / blocks now.
+        
+        check myhdl._block
         """
 
         w = self.input_word_format
@@ -281,8 +284,7 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         numsample = len(self.sigin)
         #process to record output in buffer
         rec_insts = yt.process_record(clock, num_samples=numsample)
-
-        dfilter = filter_fir
+        
 
         @hdl.instance
         def stimulus():
@@ -298,7 +300,6 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
                 yt.record = False
                 yt.valid = False
 
-            logger.warning("samp_bufx : {0}".format(xt.sample_buffer))
             logger.warning("samp_bufy : {0}".format(yt.sample_buffer))
             self.response = yt.sample_buffer
 
