@@ -87,8 +87,8 @@ class Input_Fixpoint_Specs(QWidget):
 		
 		Play PingPong with a stimulus & plot widget:
 		
-		1. ``fx_sim_init()``: Initialize quantization dict ``hdl_dict`` with settings
-			from fixpoint widget.
+		(1. ``fx_sim_init()``: Initialize quantization dict ``hdl_dict`` with settings
+			from fixpoint widget.) # currently not implemented
 		2. ``fx_sim_start()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 		
 		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'set_stimulus'
@@ -114,7 +114,7 @@ class Input_Fixpoint_Specs(QWidget):
             # been changed
             self.wdg_dict2ui()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
-                self.fx_sim_init()
+                self.fx_sim_init() # not implemented: what should it do?
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'start':
                 self.fx_sim_start()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
@@ -513,18 +513,6 @@ class Input_Fixpoint_Specs(QWidget):
               "Overflow mode :" "no overflow"
             )
 
-##------------------------------------------------------------------------------
-#    def setupHDL(self):
-#        """
-#        # TODO: this doesnt work, self.hdl_dict is not read back from self.hdlfilter?
-#        
-#        Setup instance of myHDL object with word lengths and coefficients. This 
-#        is NOT updated each time one of the relevant widgets changes but only 
-#        when simulation / HDL generation starts. This avoids setting up all sort
-#        of signal-slot connections.
-#        """
-#        self.update_hdl_dict()
-#------------------------------------------------------------------------------
     def exportHDL(self):
         """
         Synthesize HDL description of filter using myHDL module
@@ -570,25 +558,6 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.info("HDL conversion finished!")
             except (IOError, TypeError) as e:
                 logger.warning(e)
-
-
-#------------------------------------------------------------------------------
-    def fx_sim_init(self):
-        """
-        Initialize fix-point simulation: Send the quantization dict ``fxqc_dict`` including
-            the filter name to the stimulus widget
-        """
-        # TODO: Filter name missing?
-        try:
-            logger.info("Initialize fixpoint simulation")
-            # TODO: only input quantizer needed here:
-            self.update_hdl_dict() # instead of self.setupHDL() 
-            dict_sig = {'sender':__name__, 'fx_sim':'set_hdl_dict', 'hdl_dict':self.fxqc_dict}
-            self.sig_tx.emit(dict_sig)
-                        
-        except myhdl.SimulationError as e:
-            logger.warning("Fixpoint initialization failed:\n{0}".format(e))
-        return
 
 #------------------------------------------------------------------------------
     def fx_sim_start(self):
