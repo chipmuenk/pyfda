@@ -14,6 +14,10 @@ Top level class for fixpoint filter simulation and conversion?
 """
 import numpy as np
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 class FilterHardware(object):
     def __init__(self, b=None, a=None):
         """
@@ -116,6 +120,7 @@ class FilterHardware(object):
             bits (int) : no of bits
         """
         self.sigin = sigin.tolist()
+        logger.warning("set_stimulus : {0}".format(self.sigin))
 
     def set_cascade(self, n_cascades):
         """Set number of filter cascades
