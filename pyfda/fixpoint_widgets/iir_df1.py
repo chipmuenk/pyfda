@@ -186,21 +186,24 @@ class IIR_DF1(QWidget):
 
 ###############################################################################
         
-# from pyfda.filter_blocks.fda.iir
+# was: from pyfda.filter_blocks.fda.iir
 class FilterIIR(FilterHardware):
     def __init__(self, b = None, a = None):
-        """Contains IIR filter parameters. Parent Class : FilterHardware
-            Args:
-                b (list of int): list of numerator coefficients.
-                a (list of int): list of denominator coefficients.
-                word format (tuple of int): (W, WI, WF)
-                filter_type:
-                filter_form_type:
-                response(list): list of filter output in int format.
+        """
+        Contains IIR filter parameters. Parent Class : FilterHardware
+        
+        Arguments
+        ---------
+        b (list of int): list of numerator coefficients.
+        a (list of int): list of denominator coefficients.
+        word format (tuple of int): (W, WI, WF)
+        filter_type:
+        filter_form_type:
+        response(list): list of filter output in int format.
             """
         super(FilterIIR, self).__init__(b, a)
-        self.filter_type = 'direct_form'
-        self.direct_form_type = 1
+        #self.filter_type = 'direct_form'
+        #self.direct_form_type = 1
         self.response = []
 
     def get_response(self):
@@ -263,8 +266,12 @@ class FilterIIR(FilterHardware):
 
     @hdl.block
     def filter_block(self):
-        """ this elaboration code will select the different structure and implementations"""
-
+        """
+        This elaboration code was supposed to select the different structure 
+        and implementations. This will be handled by individual classes / blocks now.
+        
+        Check myhdl._block for how to use attributes etc
+        """
         w = self.input_word_format
         w_out = self.output_word_format
         
@@ -278,15 +285,10 @@ class FilterIIR(FilterHardware):
         reset = Reset(1, active=0, async=True)
         glbl = Global(clock, reset)
         tbclk = clock.process()
-        numsample = 0
         
-        # set numsample 
-        numsample = len(self.sigin)
-        # process to record output in buffer
-        rec_insts = yt.process_record(clock, num_samples=numsample)
+        _t = yt.process_record(clock, num_samples=len(self.sigin)) # was: rec_insts = ...
 
-        filter_insts = filter_iir(glbl, xt, yt, self.b, self.a, self.coef_word_format)
-
+        _ = filter_iir(glbl, xt, yt, self.b, self.a, self.coef_word_format)
 
 
         @hdl.instance
@@ -310,18 +312,23 @@ class FilterIIR(FilterHardware):
         return hdl.instances()
 
 ###############################################################################
-# from filter_blocks.iir.iir_df1.py
+# was: from filter_blocks.iir.iir_df1.py
 @hdl.block
 def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
-    """Basic FIR direct-form I filter.
+    """
+    Basic IIR direct-form I filter.
+    
     Ports:
         glbl (Global): global signals.
         sigin (SignalBus): input digital signal.
-        sigout (SignalBus): output digitla signal.
-    Args:
-        b (tuple): numerator coefficents.
-        b (tuple): numerator coefficents.
-    Returns:
+        sigout (SignalBus): output digital signal.
+
+    Arguments
+    ---------
+        b (tuple): numerator coefficents of type ``int`` (not numpy.int32 etc).
+        a (tuple): denominator coefficents of type ``int`` (not numpy.int32 etc).
+    Returns
+    -------
         inst (myhdl.Block, list):
     """
     assert isinstance(sigin, Samples)
@@ -369,7 +376,7 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     ########## method 2 of calculating accumulator size based on fir filter implementation
 
     acc_bits = w[0] + coef_w[0] + math.floor(math.log(N, 2))
-    #print(acc_bits)
+
     amax = 2**(acc_bits-1)
     od = acc_bits - 1
     o = acc_bits-w_out[0] - 1
@@ -389,9 +396,6 @@ def filter_iir(glbl, sigin, sigout, b, a, coef_w, shared_multiplier=False):
     dvd = Signal(bool(0))
     overflow = Signal(bool(0)) 
     underflow = Signal(bool(0))
-    #print(len(yacc))
-
-    # print(len(yacc))
 
     @hdl.always(clock.posedge)
     def beh_direct_form_one():

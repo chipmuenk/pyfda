@@ -192,8 +192,8 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         response (list): list of filter output in int format.
         """
         super(FilterFIR, self).__init__(b, a)
-        self.filter_type = 'direct_form'
-        self.direct_form_type = 1
+        #self.filter_type = 'direct_form'
+        #self.direct_form_type = 1
         self.response = []
 
 
@@ -256,11 +256,9 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
     def filter_block(self):
         """
         This elaboration code was supposed to select the different structure 
-        and implementations
+        and implementations. This will be handled by individual classes / blocks now.
         
-        This will be handled by individual classes / blocks now.
-        
-        check myhdl._block
+        Check myhdl._block for how to use attributes etc
         """
 
         w = self.input_word_format
@@ -278,15 +276,12 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         reset = Reset(1, active=0, async=True)
         glbl = Global(clock, reset)
         tbclk = clock.process()
-        numsample = 0
         
-        # set numsample 
-        numsample = len(self.sigin)
         #process to record output in buffer
-        rec_insts = yt.process_record(clock, num_samples=numsample)
+        _t = yt.process_record(clock, num_samples=len(self.sigin)) # was: rec_insts = ...
         
         # was: filter_insts, it seems the assigned name doesn't matter?!
-        _ = filter_fir(glbl, xt, yt, self.b, self.coef_word_format) 
+        _ = filter_fir(glbl, xt, yt, self.b, self.coef_word_format) # was: filter_insts = ...
 
         @hdl.instance
         def stimulus():
