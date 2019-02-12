@@ -575,7 +575,7 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_init(self):
         """
-        Initialize fix-point simulation: Send the quantization dict ``hdl_dict`` including
+        Initialize fix-point simulation: Send the quantization dict ``fxqc_dict`` including
             the filter name to the stimulus widget
         """
         # TODO: Filter name missing?
@@ -593,7 +593,7 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_start(self):
         """
-        Start fix-point simulation: Send the ``hdl_dict`` ((or ``self.fx_wdg_inst.hdl_dict``?!)
+        Start fix-point simulation: Send the ``fxqc_dict``
         containing all quantization information and request a stimulus signal
         """
         try:
