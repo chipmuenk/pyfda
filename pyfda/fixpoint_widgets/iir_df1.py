@@ -284,7 +284,10 @@ class FilterIIR(FilterHardware):
         numsample = len(self.sigin)
         # process to record output in buffer
         rec_insts = yt.process_record(clock, num_samples=numsample)
-        dfilter = filter_iir
+
+        filter_insts = filter_iir(glbl, xt, yt, self.b, self.a, self.coef_word_format)
+
+
 
         @hdl.instance
         def stimulus():
