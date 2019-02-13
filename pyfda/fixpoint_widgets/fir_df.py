@@ -186,34 +186,34 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         b (list of int): list of numerator coefficients.
         a (list of int): list of denominator coefficients.
         word format (tuple of int): (W, WI, WF)
-        filter_type:
-        filter_form_type:
             
         response (list): list of filter output in int format.
         """
         super(FilterFIR, self).__init__(b, a)
-        #self.filter_type = 'direct_form'
-        #self.direct_form_type = 1
         self.response = []
 
-
     def get_response(self):
-        """Return filter output.
+        """
+        Return filter output.
 
-        returns:
-            response(numpy int array) : returns filter output as numpy array
+        Returns
+        -------
+        response(numpy int array) : returns filter output as numpy array
         """
         return self.response
             
     def run_sim(self):
-        """Run filter simulation"""
+        """
+        Run filter simulation
+        """
 
         testfil = self.filter_block()
         testfil.run_sim() # -> myhdl/_block
 
 
     def convert(self, **kwargs):
-        """Convert the HDL description to Verilog and VHDL.
+        """
+        Convert the HDL description to Verilog and VHDL.
         """
         w = self.input_word_format
         w_out = self.output_word_format
@@ -235,14 +235,12 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
             
             fir.convert(**kwargs)
 
-
         clock = Clock(0, frequency=50e6)
         reset = Reset(1, active=0, async=True)
         x = Signal(intbv(0, min=-imax, max=imax))
         y = Signal(intbv(0, min=-omax, max=omax))
         xdv, ydv = Signal(bool(0)), Signal(bool(0))
         
-
         if self.hdl_target.lower() == 'verilog':
             filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
  
@@ -261,16 +259,13 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
         Check myhdl._block for how to use attributes etc
         """
 
-        w = self.input_word_format
+        w_in = self.input_word_format
         w_out = self.output_word_format
-        #print(self.input_word_format)
-        #print(self.coef_word_format)
-        ymax = 2**(w[0]-1)
-        vmax = 2**(2*w[0])
-        omax = 2**(w_out[0]-1)
-        xt = Samples(min=-ymax, max=ymax, word_format=self.input_word_format)
+        imax = 1 << (w_in[0]-1)
+        omax = 1 << (w_out[0]-1)
+
+        xt = Samples(min=-imax, max=imax, word_format=self.input_word_format)
         yt = Samples(min=-omax, max=omax, word_format=self.output_word_format)
-        #yt = Samples(min=-vmax, max=vmax)
         xt.valid = bool(1)
         clock = Clock(0, frequency=50e6)
         reset = Reset(1, active=0, async=True)
@@ -306,17 +301,20 @@ class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
 ############################################################################### 
 @hdl.block
 def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
-    """Basic FIR direct-form filter.
+    """
+    Basic FIR direct-form filter.
 
     Ports:
         glbl (Global): global signals.
         sigin (Samples): input digital signal.
-        sigout (Samples): output digitla signal.
+        sigout (Samples): output digital signal.
 
-    Args:
+    Arguments
+    ---------
         b (tuple): numerator coefficents.
 
-    Returns:
+    Returns
+    -------
         inst (myhdl.Block, list):
     """
     assert isinstance(sigin, Samples)
@@ -326,12 +324,12 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     rb = [isinstance(bb, int) for bb in b]
     assert all(rb)
 
-    w = sigin.word_format
+    w_in = sigin.word_format
     w_out = sigout.word_format
     ntaps = len(b)-1
-    ymax = 2 ** (w[0]-1)
-    sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1)
-    acc_bits = w[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2))
+    ymax = 2 ** (w_in[0]-1)
+    sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1) # coefficient area
+    acc_bits = w_in[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2))
     amax = 2**(acc_bits-1)
     qd = acc_bits
     q = acc_bits-w_out[0]
