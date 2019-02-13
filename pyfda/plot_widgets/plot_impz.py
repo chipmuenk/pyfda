@@ -395,10 +395,12 @@ class Plot_Impz(QWidget):
         Split response into imag. and real components `self.y_i` and `self.y_r`
         and set the flag `self.cmplx`.
         """
-        if self.fx_sim and y_fx is not None:
-        # use fixpoint simulation results instead of floating results
-            self.y = np.array(y_fx)
-            qstyle_widget(self.ui.but_run, "normal")
+        if self.fx_sim: # use fixpoint simulation results instead of floating results
+            if y_fx is not None:
+                self.y = np.array(y_fx)
+                qstyle_widget(self.ui.but_run, "normal")
+            else:
+                self.y = None
         else:
             # calculate response self.y_r[n] and self.y_i[n] (for complex case) =====   
             self.bb = np.asarray(fb.fil[0]['ba'][0])
@@ -563,8 +565,13 @@ class Plot_Impz(QWidget):
         """
         (Re-)draw the time domain mplwidget
         """
-        mkfmt_i = 'd'
+        if self.y is None:
+            for ax in self.mplwidget_t.fig.get_axes(): # remove all axes
+                self.mplwidget_t.fig.delaxes(ax)
+            return
 
+        mkfmt_i = 'd'
+        
         self._init_axes_time()
         scale_i = scale_o = 1
         fx_min = -1.

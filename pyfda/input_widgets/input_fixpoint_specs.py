@@ -28,7 +28,7 @@ import pyfda.pyfda_dirs as dirs
 from pyfda.pyfda_lib import qstr, cmp_version
 import pyfda.pyfda_fix_lib as fx
 from pyfda.pyfda_io_lib import extract_file_ext
-from pyfda.pyfda_qt_lib import qget_cmb_box
+from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
@@ -103,7 +103,7 @@ class Input_Fixpoint_Specs(QWidget):
             logger.debug("Infinite loop detected")
             return
         if 'data_changed' in dict_sig:
-            # update hdl_dict when filter has been designed
+            # update hdl_dict when filter has been designed and set RUN button to "changed"
             # TODO: This needs to be changed
             self.wdg_dict2ui()
         if 'filt_changed' in dict_sig:
@@ -111,7 +111,7 @@ class Input_Fixpoint_Specs(QWidget):
             self._update_filter_cmb()
         if 'view_changed' in dict_sig and dict_sig['view_changed'] == 'q_coeff':
             # update fields in the filter topology widget - wordlength may have
-            # been changed
+            # been changed. Also set RUN button to "changed"
             self.wdg_dict2ui()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
                 self.fx_sim_init() # not implemented: what should it do?
@@ -460,9 +460,13 @@ class Input_Fixpoint_Specs(QWidget):
         coefficient format) has been changed outside this class. Additionally,
         pass the fixpoint quantization widget to update / restore other subwidget
         settings.
+        
+        Set the RUN button to "changed".
         """
         if hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(self.fxqc_dict)
+
+        qstyle_widget(self.butSimFixPoint, "changed")
 #------------------------------------------------------------------------------
     def update_fxqc_dict(self):
         """
@@ -580,19 +584,25 @@ class Input_Fixpoint_Specs(QWidget):
     def fx_sim_set_stimulus(self, dict_sig):
         """
         - Get fixpoint stimulus from ``dict_sig``
+        
         - Quantize the stimulus with the selected input quantization settings
-		- Scale it with the input word length, i.e. with 2**W (input)
+        
+		- Scale it with the input word length, i.e. with 2**(W-1) (input) to obtain
+          integer values
+          
         - Pass it to the fixpoint filter and calculate the fixpoint response
+        
         - Send the reponse to the plotting widget
         """
         try:
             self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)
             logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
                         dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
+
             self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
+            self.hdlfilter.run_sim()         # Run the simulation
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
-            self.hdlfilter.run_sim()         # Run the simulation
             # Get the response from the simulation in integer
             self.fx_results = self.hdlfilter.get_response()
             logger.info("\n\n resp {0}\n".format(self.fx_results[0:9]))
@@ -606,15 +616,20 @@ class Input_Fixpoint_Specs(QWidget):
 
         except myhdl.SimulationError as e:
             logger.warning("Simulation failed:\n{0}".format(e))
+            self.fx_results = None
+            qstyle_widget(self.butSimFixPoint, "error")
             return
         except ValueError as e:
             logger.warning("Overflow error {0}".format(e))
+            self.fx_results = None
+            qstyle_widget(self.butSimFixPoint, "error")
             return
 
         logger.info("Fixpoint plotting started")
         dict_sig = {'sender':__name__, 'fx_sim':'set_results', 
                     'fx_results':self.fx_results }            
         self.sig_tx.emit(dict_sig)
+        qstyle_widget(self.butSimFixPoint, "normal")
         
         logger.info("Fixpoint plotting finished")        
             
