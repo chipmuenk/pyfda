@@ -89,7 +89,7 @@ class Input_Fixpoint_Specs(QWidget):
 		
 		(1. ``fx_sim_init()``: Initialize quantization dict ``hdl_dict`` with settings
 			from fixpoint widget.) # currently not implemented
-		2. ``fx_sim_start()``: Request stimulus by sending 'fx_sim':'get_stimulus'
+		2. ``fx_sim_hdl()``: Request stimulus by sending 'fx_sim':'get_stimulus'
 		
 		3. ``fx_sim_set_stimulus()``: Receive stimulus from widget in 'fx_sim':'set_stimulus'
 			and pass it to HDL object for simulation
@@ -116,7 +116,7 @@ class Input_Fixpoint_Specs(QWidget):
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
                 self.fx_sim_init() # not implemented: what should it do?
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'start':
-                self.fx_sim_start()
+                self.fx_sim_hdl()
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
 
@@ -213,12 +213,18 @@ class Input_Fixpoint_Specs(QWidget):
         self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
         self.butExportHDL.setText("Create HDL")
 
-        self.butSimFixPoint = QPushButton(self)
-        self.butSimFixPoint.setToolTip("Simulate filter with fixpoint effects.")
-        self.butSimFixPoint.setText("Simulate")
+        self.butSimHDL = QPushButton(self)
+        self.butSimHDL.setToolTip("Start fixpoint simulation with myHDL description.")
+        self.butSimHDL.setText("Sim. HDL")
+        
+        self.butSimFxPy = QPushButton(self)
+        self.butSimFxPy.setToolTip("Simulate filter with fixpoint effects.")
+        self.butSimFxPy.setText("Sim. FixPy")
+
 
         self.layHHdlBtns = QHBoxLayout()
-        self.layHHdlBtns.addWidget(self.butSimFixPoint)
+        self.layHHdlBtns.addWidget(self.butSimFxPy)
+        self.layHHdlBtns.addWidget(self.butSimHDL)
         self.layHHdlBtns.addWidget(self.butExportHDL)
         # This frame encompasses the HDL buttons sim and convert
         frmHdlBtns = QFrame(self)
@@ -231,8 +237,9 @@ class Input_Fixpoint_Specs(QWidget):
 # -------------------------------------------------------------------
         splitter = QSplitter(self)
         splitter.setOrientation(Qt.Vertical)
-        splitter.addWidget(self.frmImg)
         splitter.addWidget(frmHDL_wdg)
+        splitter.addWidget(self.frmImg)
+
         # setSizes uses absolute pixel values, but can be "misused" by specifying values
         # that are way too large: in this case, the space is distributed according
         # to the _ratio_ of the values:
@@ -242,8 +249,8 @@ class Input_Fixpoint_Specs(QWidget):
         layVMain.addWidget(self.frmTitle)
         layVMain.addWidget(frmQioWdg)
 #        layVMain.addWidget(frmQoWdg)
-        layVMain.addWidget(splitter)
         layVMain.addWidget(frmHdlBtns)
+        layVMain.addWidget(splitter)
         layVMain.addStretch()
         layVMain.setContentsMargins(*params['wdg_margins'])
 
@@ -265,7 +272,8 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_wdg_fixp.currentIndexChanged.connect(self._update_fixp_widget)
 
         self.butExportHDL.clicked.connect(self.exportHDL)
-        self.butSimFixPoint.clicked.connect(self.fx_sim_start)
+        self.butSimHDL.clicked.connect(self.fx_sim_hdl)
+        self.butSimFxPy.clicked.connect(self.fx_sim_py)
         #----------------------------------------------------------------------
         inst_wdg_list = self._update_filter_cmb()
         if len(inst_wdg_list) == 0:
@@ -392,7 +400,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Update the UI of the widget
         
         - Instantiate
-          ``self.hdlfilter = self.fx_wdg_inst.hdlfilter``
+          ``self.hdl_filter_inst = self.fx_wdg_inst.hdlfilter``
         """
         # destruct old fixpoint widget instance
         if hasattr(self, "fx_wdg_inst"): # is a fixpoint widget loaded?
@@ -405,14 +413,14 @@ class Input_Fixpoint_Specs(QWidget):
         # instantiate new fixpoint widget class as self.fx_wdg_inst
         # which instantiates filter class as self.fx_wdg_inst.hdlfilter
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
-        if cmb_wdg_fx_cur: # at least one valid hdl widget found
+        if cmb_wdg_fx_cur: # at least one valid fixpoint widget found
             self.fx_wdg_found = True
             fx_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
             fx_mod = importlib.import_module(fx_mod_name) # get module 
             fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
             self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
             self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
-            self.wdg_dict2ui() # initialize the fixpoint subwidgets from the fxq_dict
+            self.wdg_dict2ui() # initialize the fixpoint subwidgets from the fxqc_dict
 
             #---- connect signals to fx_wdg_inst ----
             if hasattr(self.fx_wdg_inst, "sig_rx"):
@@ -441,17 +449,31 @@ class Input_Fixpoint_Specs(QWidget):
             self.resize_img()
                 
             self.lblTitle.setText(self.fx_wdg_inst.title)
-            
-            #--- try to reference fixpoint filter instance -----
+
+            #--- try to reference Python fixpoint filter instance -----
+            if hasattr(self.fx_wdg_inst,'fxpy_filter'):
+                self.fxpy_filter_inst = self.fx_wdg_inst.fxpy_filter
+                self.butSimFxPy.setEnabled(True)
+            else:
+                self.butSimFxPy.setEnabled(False)
+                
+            #--- try to reference HDL fixpoint filter instance -----
             if hasattr(self.fx_wdg_inst,'hdlfilter'):
-                self.hdlfilter = self.fx_wdg_inst.hdlfilter
+                self.hdl_filter_inst = self.fx_wdg_inst.hdlfilter
+                self.butExportHDL.setEnabled(hasattr(self.fx_wdg_inst.hdlfilter, "convert"))
+                self.butSimHDL.setEnabled(hasattr(self.fx_wdg_inst.hdlfilter, "run_sim"))
                 self.update_fxqc_dict()
                 #self.fx_wdg_inst.update_hdl_filter()
             else:
-                self.hdlfilter = None
+                self.hdl_filter_inst = None
+                self.butSimHDL.setEnabled(False)
+                self.butExportHDL.setEnabled(False)
 
         else:
             self.fx_wdg_found = False
+            self.butSimFxPy.setEnabled(False)
+            self.butSimHDL.setEnabled(False)
+            self.butExportHDL.setEnabled(False)
 
 #------------------------------------------------------------------------------
     def wdg_dict2ui(self):
@@ -466,7 +488,7 @@ class Input_Fixpoint_Specs(QWidget):
         if hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(self.fxqc_dict)
 
-        qstyle_widget(self.butSimFixPoint, "changed")
+        qstyle_widget(self.butSimHDL, "changed")
 #------------------------------------------------------------------------------
     def update_fxqc_dict(self):
         """
@@ -474,7 +496,7 @@ class Input_Fixpoint_Specs(QWidget):
         is NOT updated each time one of the relevant widgets changes ("lazy update").
          This avoids having to connect and disconnect all sorts of signals and slots.
         """
-        if self.fx_wdg_found and self.hdlfilter:
+        if self.fx_wdg_found and self.hdl_filter_inst:
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
                 self.fxqc_dict.update(self.fx_wdg_inst.ui2dict())
@@ -500,7 +522,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
             self.q_o = fx.Fixed(self.fxqc_dict['QO']) # setup quantizer for output quantization
         else:
-            logger.error("No fixpoint widget or hdlfilter found!")
+            logger.error("No fixpoint widget or HDL filter instance found!")
 #------------------------------------------------------------------------------           
     def info_hdl(self, hdl_dict):
         """
@@ -556,23 +578,40 @@ class Input_Fixpoint_Specs(QWidget):
                         os.path.join(hdl_dir_name, hdl_file_name + hdl_type)))
             try:
                 self.update_fxqc_dict()
-                self.hdlfilter.setup(self.fxqc_dict)
-                self.hdlfilter.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
+                self.hdl_filter_inst.setup(self.fxqc_dict)
+                self.hdl_filter_inst.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
 
                 logger.info("HDL conversion finished!")
             except (IOError, TypeError) as e:
                 logger.warning(e)
 
 #------------------------------------------------------------------------------
-    def fx_sim_start(self):
+    def fx_sim_py(self):
         """
         Start fix-point simulation: Send the ``fxqc_dict``
         containing all quantization information and request a stimulus signal
         """
         try:
-            logger.info("Started fixpoint simulation")
+            logger.info("Started myhdl fixpoint simulation")
             self.update_fxqc_dict()
-            self.hdlfilter.setup(self.fxqc_dict)   # setup filter instance         
+            self.fxpyfilter.setup(self.fxqc_dict)   # setup filter instance         
+            dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
+            self.sig_tx.emit(dict_sig)
+                        
+        except AttributeError as e:
+            logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
+        return
+
+#------------------------------------------------------------------------------
+    def fx_sim_hdl(self):
+        """
+        Start fix-point simulation: Send the ``fxqc_dict``
+        containing all quantization information and request a stimulus signal
+        """
+        try:
+            logger.info("Started myhdl fixpoint simulation")
+            self.update_fxqc_dict()
+            self.hdl_filter_inst.setup(self.fxqc_dict)   # setup filter instance         
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         
@@ -599,12 +638,12 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
                         dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
 
-            self.hdlfilter.set_stimulus(self.stim)    # Set the simulation input
-            self.hdlfilter.run_sim()         # Run the simulation
+            self.hdl_filter_inst.set_stimulus(self.stim)    # Set the simulation input
+            self.hdl_filter_inst.run_sim()         # Run the simulation
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             # Get the response from the simulation in integer
-            self.fx_results = self.hdlfilter.get_response()
+            self.fx_results = self.hdl_filter_inst.get_response()
             logger.info("\n\n resp {0}\n".format(self.fx_results[0:9]))
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
@@ -617,19 +656,19 @@ class Input_Fixpoint_Specs(QWidget):
         except myhdl.SimulationError as e:
             logger.warning("Simulation failed:\n{0}".format(e))
             self.fx_results = None
-            qstyle_widget(self.butSimFixPoint, "error")
+            qstyle_widget(self.butSimHDL, "error")
             return
         except ValueError as e:
             logger.warning("Overflow error {0}".format(e))
             self.fx_results = None
-            qstyle_widget(self.butSimFixPoint, "error")
+            qstyle_widget(self.butSimHDL, "error")
             return
 
         logger.info("Fixpoint plotting started")
         dict_sig = {'sender':__name__, 'fx_sim':'set_results', 
                     'fx_results':self.fx_results }            
         self.sig_tx.emit(dict_sig)
-        qstyle_widget(self.butSimFixPoint, "normal")
+        qstyle_widget(self.butSimHDL, "normal")
         
         logger.info("Fixpoint plotting finished")        
             
