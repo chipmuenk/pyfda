@@ -497,7 +497,7 @@ class Plot_Impz(QWidget):
         self.fmt_plot_resp = {'color':'red', 'linewidth':2}
         self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
         self.fmt_mkr_stim = {'color':'green', 'alpha':0.5}
-        self.fmt_mkr_resp = {'color':'blue'}
+        self.fmt_mkr_resp = {'color':'blue', 'alpha':0.5}
         self.fmt_stem_stim = params['mpl_stimuli']
         
         idx = self.tabWidget.currentIndex()
