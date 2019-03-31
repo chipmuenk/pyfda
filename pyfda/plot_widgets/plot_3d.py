@@ -101,18 +101,22 @@ class Plot_3D(QWidget):
         self.chkPolar.setToolTip("Polar coordinate range")
         self.chkPolar.setChecked(False)
 
-        self.lblBottom = QLabel("Bottom =", self)
+        self.lblBottom = QLabel("Bottom:", self)
         self.ledBottom = QLineEdit(self)
         self.ledBottom.setObjectName("ledBottom")
         self.ledBottom.setText(str(self.zmin))
         self.ledBottom.setToolTip("Minimum display value.")
-
+        self.lblBottomdB = QLabel("dB", self)
+        self.lblBottomdB.setVisible(self.chkLog.isChecked())
+        
         self.lblTop = QLabel("Top:", self)
         self.ledTop = QLineEdit(self)
         self.ledTop.setObjectName("ledTop")
         self.ledTop.setText(str(self.zmax))
         self.ledTop.setToolTip("Maximum display value.")
-
+        self.lblTopdB = QLabel("dB", self)
+        self.lblTopdB.setVisible(self.chkLog.isChecked())
+        
         self.chkUC = QCheckBox("UC", self)
         self.chkUC.setObjectName("chkUC")
         self.chkUC.setToolTip("Plot unit circle")
@@ -187,9 +191,11 @@ class Plot_3D(QWidget):
         layGControls.addWidget(self.chkLog, 0, 0)
         layGControls.addWidget(self.chkPolar, 1, 0)
         layGControls.addWidget(self.lblTop, 0, 2)
-        layGControls.addWidget(self.lblBottom, 1, 2)
         layGControls.addWidget(self.ledTop, 0, 4)
+        layGControls.addWidget(self.lblTopdB, 0, 5)        
+        layGControls.addWidget(self.lblBottom, 1, 2)
         layGControls.addWidget(self.ledBottom, 1, 4)
+        layGControls.addWidget(self.lblBottomdB, 1, 5)   
         layGControls.setColumnStretch(5,1)
 
         layGControls.addWidget(self.chkUC, 0, 6)
@@ -371,10 +377,15 @@ class Plot_3D(QWidget):
                 self.ledBottom.setText(str(self.zmin_dB))
                 self.zmax_dB = np.round(20 * log10(self.zmax), 2)
                 self.ledTop.setText(str(self.zmax_dB))
+                self.lblTopdB.setVisible(True)
+                self.lblBottomdB.setVisible(True)
             else:
                 self.ledBottom.setText(str(self.zmin))
                 self.zmax = np.round(10**(self.zmax_dB / 20), 2)
                 self.ledTop.setText(str(self.zmax))
+                self.lblTopdB.setVisible(False)
+                self.lblBottomdB.setVisible(False)
+                
         else: # finishing a lineEdit field triggered the slot
             if self.log:
                 self.zmin_dB = safe_eval(self.ledBottom.text(), self.zmin_dB, return_type='float')
