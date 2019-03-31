@@ -327,12 +327,13 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     w_in = sigin.word_format
     w_out = sigout.word_format
     ntaps = len(b)-1
-    ymax = 2 ** (w_in[0]-1)
+    xmax = 2 ** (w_in[0]-1)
+    ymax = 2 ** (w_out[0]-1)
     sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1) # coefficient area
-    acc_bits = w_in[0] + coef_w[0] + math.ceil(math.log(sum_abs_b, 2))
-    amax = 2**(acc_bits-1)
-    qd = acc_bits
-    q = acc_bits-w_out[0]
+    # S + w_in-1 + w_c-1 + coeff. area
+    acc_wl = w_in[0] + coef_w[0] -1 + math.ceil(math.log(sum_abs_b, 2))
+    amax = 2**(acc_wl-1)
+    q = acc_wl-w_out[0]
 
     if q < 0:
         q = 0
@@ -340,7 +341,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     clock, reset = glbl.clock, glbl.reset
     xdv = sigin.valid
     y, ydv = sigout.data, sigout.valid
-    x = Signal(intbv(0, min=-ymax, max=ymax))
+    x = Signal(intbv(0, min=-xmax, max=xmax))
     # Delay elements, list-of-signals
     ffd = Signals(intbv(0, min=-ymax, max=ymax), ntaps)
     yacc = Signal(intbv(0, min=-amax, max=amax))
@@ -367,7 +368,7 @@ def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
     @always_seq(clock.posedge, reset=reset)
     def beh_output():
         dvd.next = xdv
-        y.next = yacc[qd:q].signed()
+        y.next = yacc[acc_wl:q].signed()
         ydv.next = dvd
 
     return beh_direct_form_one, beh_output
