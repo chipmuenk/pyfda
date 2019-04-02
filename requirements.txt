@@ -3,7 +3,7 @@
 numpy
 scipy
 matplotlib
-# PyQt5 # doesn't work with Travis & Py 2.7
+# PyQt5 # doesn't work with Py 2.7
 six
 docutils
 nose
