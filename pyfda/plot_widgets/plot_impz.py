@@ -447,14 +447,32 @@ class Plot_Impz(QWidget):
         """
         # calculate FFT of stimulus / response
         if self.plt_freq in {"Stimulus", "Both"}:
-            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
-            self.needs_redraw[1] = True
+            if self.x is None or len(self.x) < self.ui.N_end:
+                self.X = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
+                self.needs_redraw[1] = True
+                if self.x is None:
+                    logger.warning("Stimulus is 'None', FFT cannot be calculated.")
+                else:
+                    logger.warning("Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
+                               .format(len(self.x), self.ui.N_end))
+            else:
+                x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+                self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+                self.needs_redraw[1] = True
 
         if self.plt_freq in {"Response", "Both"}:
-            y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
-            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
-            self.needs_redraw[1] = True
+            if self.y is None or len(self.y) < self.ui.N_end:
+                self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
+                self.needs_redraw[1] = True
+                if self.y is None:
+                    logger.warning("Transient response is 'None', FFT cannot be calculated.")
+                else:
+                    logger.warning("Length of transient response is {0} < N = {1}, FFT cannot be calculated."
+                               .format(len(self.y), self.ui.N_end))             
+            else:
+                y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
+                self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
+                self.needs_redraw[1] = True                
 #------------------------------------------------------------------------------
     def update_view(self):
         """
