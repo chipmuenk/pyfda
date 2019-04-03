@@ -512,10 +512,11 @@ class Plot_Impz(QWidget):
         self.load_fs()
         #self.init_axes()
 
-        self.fmt_plot_resp = {'color':'red', 'linewidth':2}
-        self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
-        self.fmt_mkr_stim = {'color':'green', 'alpha':0.5}
-        self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}
+        self.fmt_plot_resp = {'color':'red', 'linewidth':2, 'alpha':0.5}
+        self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}        
+        self.fmt_plot_stim = {'color':'blue', 'linewidth':2, 'alpha':0.5}
+        self.fmt_mkr_stim = {'color':'blue', 'alpha':0.5}
+
         self.fmt_stem_stim = params['mpl_stimuli']
         
         idx = self.tabWidget.currentIndex()
@@ -650,6 +651,7 @@ class Plot_Impz(QWidget):
             self.ax_r.axhline(fx_max,0, 1, color='k', linestyle='--')
             self.ax_r.axhline(fx_min,0, 1, color='k', linestyle='--')
             
+        # --------------- Stimuli plot style ----------------------------------
         plot_stim_dict = self.fmt_plot_stim.copy()
 
         if self.plt_time_stim == "line":
@@ -667,10 +669,11 @@ class Plot_Impz(QWidget):
 
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
                  **plot_stim_dict)
-        if self.ui.chk_marker_stim.isChecked() and self.plt_time_stim != "dots":
+        if self.ui.chk_marker_stim.isChecked() and self.plt_time_stim not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
                  **self.fmt_mkr_stim)
 
+        # --------------- Response plot style ----------------------------------
         plot_resp_dict = self.fmt_plot_resp.copy()
 
         if self.plt_time_resp == "line":
@@ -689,7 +692,8 @@ class Plot_Impz(QWidget):
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
 
-        if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp != "dots":
+
+        if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **self.fmt_mkr_resp)
 

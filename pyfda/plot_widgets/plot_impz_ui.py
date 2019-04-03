@@ -64,7 +64,10 @@ class PlotImpz_UI(QWidget):
         # initial settings for comboboxes
         self.plt_time_stim = "None"
         self.plt_time_resp = "Stem"
-        self.plt_freq = "None"
+        self.plt_freq_stim = "None"
+        self.plt_freq_resp = "Line"
+
+        self.plt_freq = "None" # TODO: kann später weg!
         self.stim = "Pulse"
         self.noise = "None"
         self.window = "Hann"
@@ -145,7 +148,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_stim = QComboBox(self)
         self.cmb_plt_time_stim.addItems(["None","Dots","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
-        self.cmb_plt_time_stim.setToolTip("<span>Choose plot style for stimulus.</span>")
+        self.cmb_plt_time_stim.setToolTip("<span>Choose stimulus plot style.</span>")
 
         self.chk_marker_stim = QCheckBox("*", self)
         self.chk_marker_stim.setChecked(False)
@@ -155,7 +158,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(["None","Dots","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
-        self.cmb_plt_time_resp.setToolTip("<span>Choose plot style for response.</span>")
+        self.cmb_plt_time_resp.setToolTip("<span>Choose response plot style.</span>")
 
         self.chk_marker_resp = QCheckBox("*", self)
         self.chk_marker_resp.setChecked(False)
@@ -210,7 +213,26 @@ class PlotImpz_UI(QWidget):
         qset_cmb_box(self.cmb_plt_freq, self.plt_freq)
         self.cmb_plt_freq.setToolTip("<span>Choose which signals to show in the frequency domain: "
                                  "The stimulus, the filter response or both.</span>")
+        
+        self.lbl_plt_freq_stim = QLabel("Stimulus", self)
+        self.cmb_plt_freq_stim = QComboBox(self)
+        self.cmb_plt_freq_stim.addItems(["None","Dots","Line","Stem", "Step"])       
+        qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
+        self.cmb_plt_freq_stim.setToolTip("<span>Choose stimulus plot style.</span>")
 
+        self.chk_mrk_freq_stim = QCheckBox("*", self)
+        self.chk_mrk_freq_stim.setChecked(False)
+        self.chk_mrk_freq_stim.setToolTip("Use plot markers")
+        
+        self.lbl_plt_freq_resp = QLabel("Response", self)
+        self.cmb_plt_freq_resp = QComboBox(self)
+        self.cmb_plt_freq_resp.addItems(["None","Dots","Line","Stem", "Step"])       
+        qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
+        self.cmb_plt_freq_resp.setToolTip("<span>Choose response plot style.</span>")
+
+        self.chk_mrk_freq_resp = QCheckBox("*", self)
+        self.chk_mrk_freq_resp.setChecked(False)
+        self.chk_mrk_freq_resp.setToolTip("Use plot markers")
         self.chkLogF = QCheckBox("dB", self)
         self.chkLogF.setObjectName("chkLogF")
         self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
@@ -237,6 +259,15 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.lbl_plt_freq)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq)
         layH_ctrl_freq.addStretch(2)
+
+        layH_ctrl_freq.addWidget(self.lbl_plt_freq_resp)
+        layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
+        layH_ctrl_freq.addWidget(self.chk_mrk_freq_resp)        
+        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
+        layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
+        layH_ctrl_freq.addWidget(self.chk_mrk_freq_stim)
+
         layH_ctrl_freq.addWidget(self.chkLogF)
         layH_ctrl_freq.addWidget(self.lblLogBottomF)
         layH_ctrl_freq.addWidget(self.ledLogBottomF)
