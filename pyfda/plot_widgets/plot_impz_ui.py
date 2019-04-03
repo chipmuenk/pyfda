@@ -143,7 +143,7 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         self.lbl_plt_time_stim = QLabel("Stimulus", self)
         self.cmb_plt_time_stim = QComboBox(self)
-        self.cmb_plt_time_stim.addItems(["None","Line","Stem", "Step"])       
+        self.cmb_plt_time_stim.addItems(["None","Dots","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
         self.cmb_plt_time_stim.setToolTip("<span>Choose plot style for stimulus.</span>")
 
@@ -151,9 +151,9 @@ class PlotImpz_UI(QWidget):
         self.chk_marker_stim.setChecked(False)
         self.chk_marker_stim.setToolTip("Use plot markers")
         
-        self.lbl_plt_time_resp = QLabel("Plot Style: Response", self)
+        self.lbl_plt_time_resp = QLabel("Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
-        self.cmb_plt_time_resp.addItems(["None","Line","Stem", "Step"])       
+        self.cmb_plt_time_resp.addItems(["None","Dots","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
         self.cmb_plt_time_resp.setToolTip("<span>Choose plot style for response.</span>")
 

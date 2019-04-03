@@ -515,7 +515,7 @@ class Plot_Impz(QWidget):
         self.fmt_plot_resp = {'color':'red', 'linewidth':2}
         self.fmt_plot_stim = {'color':'green', 'linewidth':2, 'alpha':0.5}
         self.fmt_mkr_stim = {'color':'green', 'alpha':0.5}
-        self.fmt_mkr_resp = {'color':'blue', 'alpha':0.5}
+        self.fmt_mkr_resp = {'color':'red', 'alpha':0.5}
         self.fmt_stem_stim = params['mpl_stimuli']
         
         idx = self.tabWidget.currentIndex()
@@ -553,8 +553,7 @@ class Plot_Impz(QWidget):
         """
         self.plt_time_stim = qget_cmb_box(self.ui.cmb_plt_time_stim, data=False).lower()
         self.plt_time_resp = qget_cmb_box(self.ui.cmb_plt_time_resp, data=False).lower()
-        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"\
-            or self.ui.chk_marker_resp.isChecked() or self.ui.chk_marker_stim.isChecked()
+        plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"
         
         for ax in self.mplwidget_t.fig.get_axes():
             self.mplwidget_t.fig.delaxes(ax) # clear twinned axes if present
@@ -661,16 +660,19 @@ class Plot_Impz(QWidget):
         elif self.plt_time_stim == "step":
             plot_stim_fnc = self.ax_r.plot
             plot_stim_dict.update({'drawstyle':'steps-mid'})
+        elif self.plt_time_stim == "dots":
+            plot_stim_fnc = self.ax_r.scatter
         else:
             plot_stim_fnc = no_plot
 
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
                  **plot_stim_dict)
-        if self.ui.chk_marker_stim.isChecked():
+        if self.ui.chk_marker_stim.isChecked() and self.plt_time_stim != "dots":
             self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
                  **self.fmt_mkr_stim)
 
         plot_resp_dict = self.fmt_plot_resp.copy()
+
         if self.plt_time_resp == "line":
             plot_resp_fnc = self.ax_r.plot
         elif self.plt_time_resp == "stem":
@@ -679,7 +681,7 @@ class Plot_Impz(QWidget):
         elif self.plt_time_resp == "step":
             plot_resp_fnc = self.ax_r.plot
             plot_resp_dict.update({'drawstyle':'steps-mid'})
-        elif self.plt_time_resp == "marker":
+        elif self.plt_time_resp == "dots":
             plot_resp_fnc = self.ax_r.scatter
         else:
             plot_resp_fnc = no_plot
@@ -687,7 +689,7 @@ class Plot_Impz(QWidget):
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
 
-        if self.ui.chk_marker_resp.isChecked():
+        if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp != "dots":
             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **self.fmt_mkr_resp)
 
