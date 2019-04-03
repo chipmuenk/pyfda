@@ -34,6 +34,7 @@ from .plot_impz_ui import PlotImpz_UI
 # TODO: fir fixpoint  scaling is off by 1 bit due to W_c + W_I without -1
 # TODO: Increasing number of data points repeats the previous ones in fixpoint mode
 
+
 class Plot_Impz(QWidget):
     """
     Construct a widget for plotting impulse and general transient responses
@@ -43,6 +44,7 @@ class Plot_Impz(QWidget):
     # outgoing, e.g. when stimulus has been calculated
     sig_tx = pyqtSignal(object)
     
+
     def __init__(self, parent):
         super(Plot_Impz, self).__init__(parent)
 
@@ -53,9 +55,9 @@ class Plot_Impz(QWidget):
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
         
-        self.plt_freq = self.ui.plt_freq
-        self.plt_time_stim = self.ui.plt_time_stim
-        self.plt_time_resp = self.ui.plt_time_resp
+        #self.plt_freq = self.ui.plt_freq
+        #self.plt_time_stim = self.ui.plt_time_stim
+        #self.plt_time_resp = self.ui.plt_time_resp
         self.bottom = self.ui.bottom
 
         self.needs_draw = True   # flag whether plots need to be updated 
@@ -129,7 +131,12 @@ class Plot_Impz(QWidget):
         self.ui.led_log_bottom.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_range.clicked.connect(self.draw_impz_time)
         # --- frequency domain plotting ---
-        self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
+        #self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
+        self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw_impz_freq)
+        self.ui.chk_mrk_freq_resp.clicked.connect(self.draw_impz_freq)
+        self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw_impz_freq)
+        self.ui.chk_mrk_freq_stim.clicked.connect(self.draw_impz_freq)
+        
         # --- stimulus plotting ---
         self.ui.chk_stim_plot.clicked.connect(self.draw_impz_stim)
         self.ui.chk_stems_stim.clicked.connect(self.draw_impz_stim)
@@ -446,7 +453,8 @@ class Plot_Impz(QWidget):
         (Re-)calculate ffts X(f) and Y(f) of stimulus and response
         """
         # calculate FFT of stimulus / response
-        if self.plt_freq in {"Stimulus", "Both"}:
+#        if self.plt_freq in {"Stimulus", "Both"}:
+        if self.plt_freq_stim != "none":
             if self.x is None or len(self.x) < self.ui.N_end:
                 self.X = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
                 self.needs_redraw[1] = True
@@ -460,7 +468,8 @@ class Plot_Impz(QWidget):
                 self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
                 self.needs_redraw[1] = True
 
-        if self.plt_freq in {"Response", "Both"}:
+        if self.plt_freq_resp != "none":
+#        if self.plt_freq in {"Response", "Both"}:
             if self.y is None or len(self.y) < self.ui.N_end:
                 self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
                 self.needs_redraw[1] = True
@@ -579,10 +588,35 @@ class Plot_Impz(QWidget):
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
     
 
+    def plot_fnc(self, plt_style, ax, plt_dict=None):
+        """
+        Return a plot method depending on the parameter `plt_style` (str) 
+        and the axis instance `ax`. An optional `plt_dict` is modified in place.
+        """
+        if plt_dict is None:
+            plt_dict = {}
+        if plt_style == "line":
+            plot_fnc = getattr(ax, "plot")
+        elif plt_style == "stem":
+            plot_fnc = stems
+            plt_dict.update({'ax':ax, 'bottom':self.bottom})
+        elif plt_style == "step":
+            plot_fnc = getattr(ax, "plot")
+            plt_dict.update({'drawstyle':'steps-mid'})
+        elif plt_style == "dots":
+            plot_fnc = getattr(ax, "scatter")
+        elif plt_style == "none":                
+            plot_fnc = no_plot
+        else:
+            plot_fnc = no_plot
+        return plot_fnc
+
+
     def draw_impz_time(self):
         """
         (Re-)draw the time domain mplwidget
         """
+
         if self.y is None:
             for ax in self.mplwidget_t.fig.get_axes(): # remove all axes
                 self.mplwidget_t.fig.delaxes(ax)
@@ -650,22 +684,10 @@ class Plot_Impz(QWidget):
         if self.ui.chk_fx_range.isChecked() and self.fx_sim:
             self.ax_r.axhline(fx_max,0, 1, color='k', linestyle='--')
             self.ax_r.axhline(fx_min,0, 1, color='k', linestyle='--')
-            
+                        
         # --------------- Stimuli plot style ----------------------------------
         plot_stim_dict = self.fmt_plot_stim.copy()
-
-        if self.plt_time_stim == "line":
-            plot_stim_fnc = self.ax_r.plot
-        elif self.plt_time_stim == "stem":
-            plot_stim_fnc = stems
-            plot_stim_dict.update({'ax':self.ax_r, 'bottom':self.bottom})
-        elif self.plt_time_stim == "step":
-            plot_stim_fnc = self.ax_r.plot
-            plot_stim_dict.update({'drawstyle':'steps-mid'})
-        elif self.plt_time_stim == "dots":
-            plot_stim_fnc = self.ax_r.scatter
-        else:
-            plot_stim_fnc = no_plot
+        plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, plot_stim_dict)
 
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
                  **plot_stim_dict)
@@ -675,28 +697,16 @@ class Plot_Impz(QWidget):
 
         # --------------- Response plot style ----------------------------------
         plot_resp_dict = self.fmt_plot_resp.copy()
-
-        if self.plt_time_resp == "line":
-            plot_resp_fnc = self.ax_r.plot
-        elif self.plt_time_resp == "stem":
-            plot_resp_fnc = stems
-            plot_resp_dict.update({'ax':self.ax_r, 'bottom':self.bottom})
-        elif self.plt_time_resp == "step":
-            plot_resp_fnc = self.ax_r.plot
-            plot_resp_dict.update({'drawstyle':'steps-mid'})
-        elif self.plt_time_resp == "dots":
-            plot_resp_fnc = self.ax_r.scatter
-        else:
-            plot_resp_fnc = no_plot
+        plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_r, plot_resp_dict)
             
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
-
 
         if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **self.fmt_mkr_resp)
 
+        # --------------- Complex response ----------------------------------
         if self.cmplx and self.plt_time_resp != "none":
             [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
                 bottom=self.bottom, markerfmt=mkfmt_i, label = '$y_i[n]$')
@@ -737,31 +747,40 @@ class Plot_Impz(QWidget):
         Clear the axes of the frequency domain matplotlib widgets and 
         calculate the fft
         """
-        self.plt_freq = qget_cmb_box(self.ui.cmb_plt_freq, data=False)
+        #self.plt_freq = qget_cmb_box(self.ui.cmb_plt_freq, data=False)
 
-        if self.plt_freq == "None":
+        self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim, data=False).lower()
+        self.plt_freq_resp = qget_cmb_box(self.ui.cmb_plt_freq_resp, data=False).lower()
+        self.plt_freq_disabled = self.plt_freq_stim == "none" and self.plt_freq_resp == "none"
+
+        if self.plt_freq_disabled:
             for ax in self.mplwidget_f.fig.get_axes(): # remove all axes
                 self.mplwidget_f.fig.delaxes(ax) 
-        else:
-            if not hasattr(self, 'ax_fft'):
-                self.ax_fft = self.mplwidget_f.fig.add_subplot(111)
-            else:
-                self.ax_fft.clear()
-            self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
-            self.ax_fft.set_title("FFT of Transient Response")
+            return
+#        #else:
+#        if not hasattr(self, 'ax_fft'):
+#            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)
+#        else:
+#            self.ax_fft.clear()
+        self.ax_fft = self.mplwidget_f.fig.add_subplot(111)        
+        self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
+        self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
+        self.ax_fft.set_title("FFT of Transient Response")
 
-            self.calc_fft()
+        self.calc_fft()
 
     def draw_impz_freq(self):
         """
         (Re-)draw the frequency domain mplwidget
         """
         self._init_axes_freq()
+        plt_response = self.plt_freq_resp != "none" 
+        plt_stimulus = self.plt_freq_stim != "none" 
 
-        if self.plt_freq != "None":
-            plt_response = self.plt_freq in {"Response","Both"}
-            plt_stimulus = self.plt_freq in {"Stimulus","Both"}
+        #if self.plt_freq != "None":
+        if not self.plt_freq_disabled:
+            #plt_response = self.plt_freq in {"Response","Both"}
+            #plt_stimulus = self.plt_freq in {"Stimulus","Both"}
             if plt_response and not plt_stimulus:
                 XY_str = r'$|Y(\mathrm{e}^{\mathrm{j} \Omega})|$'
             elif not plt_response and plt_stimulus:
@@ -817,12 +836,23 @@ class Plot_Impz(QWidget):
                 # plot for F = 0 ... 1
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
+            # --------------- Stimuli plot style ----------------------------------
             handles = []
             labels = []
+
+            plot_stim_dict = self.fmt_plot_stim.copy()
+            plot_stim_fnc = self.plot_fnc(self.plt_freq_stim, self.ax_fft, plot_stim_dict)
+    
             if plt_stimulus:
-                h, = self.ax_fft.plot(F, X, **self.fmt_plot_stim)
-                handles.append(h)
+                plot_stim_fnc(F, X, label='$Stim.$',**plot_stim_dict)
+                #h, = self.ax_fft.plot(F, X, **self.fmt_plot_stim)
+
+                if self.ui.chk_mrk_freq_stim.isChecked() and self.plt_freq_stim not in {"dots","none"}:
+                    self.ax_fft.scatter(F, X, label='$Stim.$', **self.fmt_mkr_stim)
+
+                #handles.append(h)
                 labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
+ 
             if plt_response:
                 h, = self.ax_fft.plot(F, Y, **self.fmt_plot_resp)
                 handles.append(h)

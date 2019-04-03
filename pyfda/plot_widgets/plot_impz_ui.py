@@ -207,12 +207,12 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        self.lbl_plt_freq = QLabel("Show ", self)
-        self.cmb_plt_freq = QComboBox(self)
-        self.cmb_plt_freq.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmb_plt_freq, self.plt_freq)
-        self.cmb_plt_freq.setToolTip("<span>Choose which signals to show in the frequency domain: "
-                                 "The stimulus, the filter response or both.</span>")
+#        self.lbl_plt_freq = QLabel("Show ", self)
+#        self.cmb_plt_freq = QComboBox(self)
+#        self.cmb_plt_freq.addItems(["None","Stimulus","Response", "Both"])
+#        qset_cmb_box(self.cmb_plt_freq, self.plt_freq)
+#        self.cmb_plt_freq.setToolTip("<span>Choose which signals to show in the frequency domain: "
+#                                 "The stimulus, the filter response or both.</span>")
         
         self.lbl_plt_freq_stim = QLabel("Stimulus", self)
         self.cmb_plt_freq_stim = QComboBox(self)
@@ -256,9 +256,9 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.setObjectName("ledWinPar1")
 
         layH_ctrl_freq = QHBoxLayout()
-        layH_ctrl_freq.addWidget(self.lbl_plt_freq)
-        layH_ctrl_freq.addWidget(self.cmb_plt_freq)
-        layH_ctrl_freq.addStretch(2)
+#        layH_ctrl_freq.addWidget(self.lbl_plt_freq)
+#        layH_ctrl_freq.addWidget(self.cmb_plt_freq)
+#        layH_ctrl_freq.addStretch(2)
 
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_resp)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
