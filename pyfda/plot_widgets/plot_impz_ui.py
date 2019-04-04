@@ -48,7 +48,7 @@ class PlotImpz_UI(QWidget):
         # initial settings for lineedit widgets
         self.N_start = 0
         self.N_points = 0
-        self.bottom = -80
+        self.bottom_t = -80
         self.f1 = 0.02
         self.f2 = 0.03
         self.A1 = 1.0
@@ -64,14 +64,16 @@ class PlotImpz_UI(QWidget):
         # initial settings for comboboxes
         self.plt_time_stim = "None"
         self.plt_time_resp = "Stem"
-        self.plt_freq = "None"
+        self.plt_freq_stim = "None"
+        self.plt_freq_resp = "Line"
+
+        self.plt_freq = "None" # TODO: kann später weg!
         self.stim = "Pulse"
         self.noise = "None"
         self.window = "Hann"
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self._log_mode_freq()
         self.update_N() # also updates window function
         self._update_noi()
 
@@ -115,6 +117,12 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_scale.setObjectName("chk_fx_scale")
         self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
         self.chk_fx_scale.setChecked(False)
+        
+        self.chk_stim_options = QCheckBox("Show Stim. Options", self)
+        self.chk_stim_options.setObjectName("chk_stim_options")
+        self.chk_stim_options.setToolTip("<span>Show options for stimulus signal.</span>")
+        self.chk_stim_options.setChecked(True)
+
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.lbl_sim_select)
@@ -129,7 +137,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.but_run)
         layH_ctrl_run.addStretch(2)        
         layH_ctrl_run.addWidget(self.chk_fx_scale)
-
+        layH_ctrl_run.addStretch(2)        
+        layH_ctrl_run.addWidget(self.chk_stim_options)
         layH_ctrl_run.addStretch(10)
 
         #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -145,7 +154,7 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_stim = QComboBox(self)
         self.cmb_plt_time_stim.addItems(["None","Dots","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
-        self.cmb_plt_time_stim.setToolTip("<span>Choose plot style for stimulus.</span>")
+        self.cmb_plt_time_stim.setToolTip("<span>Choose stimulus plot style.</span>")
 
         self.chk_marker_stim = QCheckBox("*", self)
         self.chk_marker_stim.setChecked(False)
@@ -155,22 +164,22 @@ class PlotImpz_UI(QWidget):
         self.cmb_plt_time_resp = QComboBox(self)
         self.cmb_plt_time_resp.addItems(["None","Dots","Line","Stem", "Step"])       
         qset_cmb_box(self.cmb_plt_time_resp, self.plt_time_resp)
-        self.cmb_plt_time_resp.setToolTip("<span>Choose plot style for response.</span>")
+        self.cmb_plt_time_resp.setToolTip("<span>Choose response plot style.</span>")
 
         self.chk_marker_resp = QCheckBox("*", self)
         self.chk_marker_resp.setChecked(False)
         self.chk_marker_resp.setToolTip("Use plot markers")
 
-        self.chk_log = QCheckBox("dB", self)
-        self.chk_log.setObjectName("chkLog")
-        self.chk_log.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chk_log.setChecked(False)
+        self.chk_log_time = QCheckBox("dB", self)
+        self.chk_log_time.setObjectName("chk_log_time")
+        self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chk_log_time.setChecked(False)
 
-        self.lbl_log_bottom = QLabel("Bottom = ", self)
-        self.led_log_bottom = QLineEdit(self)
-        self.led_log_bottom.setText(str(self.bottom))
-        self.led_log_bottom.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbl_dB = QLabel("dB", self)
+        self.lbl_log_bottom_time = QLabel("Bottom = ", self)
+        self.led_log_bottom_time = QLineEdit(self)
+        self.led_log_bottom_time.setText(str(self.bottom_t))
+        self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.lbl_dB_time = QLabel("dB", self)
 
         self.chk_fx_range = QCheckBox("Min/max.", self)
         self.chk_fx_range.setObjectName("chk_fx_range")
@@ -186,11 +195,11 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
         layH_ctrl_time.addWidget(self.chk_marker_stim) 
         layH_ctrl_time.addStretch(2)
-        layH_ctrl_time.addWidget(self.chk_log)
+        layH_ctrl_time.addWidget(self.chk_log_time)
         layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(self.lbl_log_bottom)
-        layH_ctrl_time.addWidget(self.led_log_bottom)
-        layH_ctrl_time.addWidget(self.lbl_dB)
+        layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
+        layH_ctrl_time.addWidget(self.led_log_bottom_time)
+        layH_ctrl_time.addWidget(self.lbl_dB_time)
         layH_ctrl_time.addStretch(2)        
         layH_ctrl_time.addWidget(self.chk_fx_range)
         layH_ctrl_time.addStretch(10)
@@ -204,23 +213,37 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-        self.lbl_plt_freq = QLabel("Show ", self)
-        self.cmb_plt_freq = QComboBox(self)
-        self.cmb_plt_freq.addItems(["None","Stimulus","Response", "Both"])
-        qset_cmb_box(self.cmb_plt_freq, self.plt_freq)
-        self.cmb_plt_freq.setToolTip("<span>Choose which signals to show in the frequency domain: "
-                                 "The stimulus, the filter response or both.</span>")
+        
+        self.lbl_plt_freq_stim = QLabel("Stimulus", self)
+        self.cmb_plt_freq_stim = QComboBox(self)
+        self.cmb_plt_freq_stim.addItems(["None","Dots","Line","Stem", "Step"])       
+        qset_cmb_box(self.cmb_plt_freq_stim, self.plt_freq_stim)
+        self.cmb_plt_freq_stim.setToolTip("<span>Choose stimulus plot style.</span>")
 
-        self.chkLogF = QCheckBox("dB", self)
-        self.chkLogF.setObjectName("chkLogF")
-        self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chkLogF.setChecked(True)
+        self.chk_mrk_freq_stim = QCheckBox("*", self)
+        self.chk_mrk_freq_stim.setChecked(False)
+        self.chk_mrk_freq_stim.setToolTip("Use plot markers")
+        
+        self.lbl_plt_freq_resp = QLabel("Response", self)
+        self.cmb_plt_freq_resp = QComboBox(self)
+        self.cmb_plt_freq_resp.addItems(["None","Dots","Line","Stem", "Step"])       
+        qset_cmb_box(self.cmb_plt_freq_resp, self.plt_freq_resp)
+        self.cmb_plt_freq_resp.setToolTip("<span>Choose response plot style.</span>")
 
-        self.lblLogBottomF = QLabel("Bottom = ", self)
-        self.ledLogBottomF = QLineEdit(self)
-        self.ledLogBottomF.setText(str(self.bottom_f))
-        self.ledLogBottomF.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbldBF = QLabel("dB", self)
+        self.chk_mrk_freq_resp = QCheckBox("*", self)
+        self.chk_mrk_freq_resp.setChecked(False)
+        self.chk_mrk_freq_resp.setToolTip("Use plot markers")
+
+        self.chk_log_freq = QCheckBox("dB", self)
+        self.chk_log_freq.setObjectName("chk_log_freq")
+        self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chk_log_freq.setChecked(True)
+
+        self.lbl_log_bottom_freq = QLabel("Bottom = ", self)
+        self.led_log_bottom_freq = QLineEdit(self)
+        self.led_log_bottom_freq.setText(str(self.bottom_f))
+        self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.lbl_dB_freq = QLabel("dB", self)
 
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
@@ -234,13 +257,18 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.setObjectName("ledWinPar1")
 
         layH_ctrl_freq = QHBoxLayout()
-        layH_ctrl_freq.addWidget(self.lbl_plt_freq)
-        layH_ctrl_freq.addWidget(self.cmb_plt_freq)
-        layH_ctrl_freq.addStretch(2)
-        layH_ctrl_freq.addWidget(self.chkLogF)
-        layH_ctrl_freq.addWidget(self.lblLogBottomF)
-        layH_ctrl_freq.addWidget(self.ledLogBottomF)
-        layH_ctrl_freq.addWidget(self.lbldBF)
+
+        layH_ctrl_freq.addWidget(self.lbl_plt_freq_resp)
+        layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
+        layH_ctrl_freq.addWidget(self.chk_mrk_freq_resp)        
+        layH_ctrl_freq.addStretch(1)
+        layH_ctrl_freq.addWidget(self.lbl_plt_freq_stim)
+        layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
+        layH_ctrl_freq.addWidget(self.chk_mrk_freq_stim)
+
+        layH_ctrl_freq.addWidget(self.chk_log_freq)
+        layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
+        layH_ctrl_freq.addWidget(self.lbl_dB_freq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
@@ -257,22 +285,10 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for stimuli
         # ---------------------------------------------------------------
-        self.chk_stim_plot = QCheckBox("Plot", self)
-        self.chk_stim_plot.setObjectName("chkStimPlot")
-        self.chk_stim_plot.setToolTip("<span>Plot stimulus.</span>")
-        self.chk_stim_plot.setChecked(True)
-
-        self.chk_stems_stim = QCheckBox("Stems", self)
-        self.chk_stems_stim.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
-        self.chk_stems_stim.setChecked(True)
-
-        layV_stim_plot = QVBoxLayout()
-        layV_stim_plot.addWidget(self.chk_stim_plot)
-        layV_stim_plot.addWidget(self.chk_stems_stim)
 
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
+        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine","Rect","Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
 
@@ -354,8 +370,7 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledDC)
         
         layH_ctrl_stim = QHBoxLayout()
-        #layH_ctrl_stim.addWidget(self.chkStimPlot)
-        layH_ctrl_stim.addLayout(layV_stim_plot)
+#        layH_ctrl_stim.addLayout(layV_stim_plot)
         layH_ctrl_stim.addLayout(layVlblCmb)
         layH_ctrl_stim.addLayout(layVCmb)
         layH_ctrl_stim.addStretch(1)
@@ -386,8 +401,8 @@ class PlotImpz_UI(QWidget):
         self.led_N_points.editingFinished.connect(self.update_N)
 
         # --- frequency control ---
-        self.chkLogF.clicked.connect(self._log_mode_freq)
-        self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
+        #self.chkLogF.clicked.connect(self._log_mode_freq)
+        #self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
         # careful! currentIndexChanged passes the current index to _update_win_fft
         self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
         self.ledWinPar1.editingFinished.connect(self._update_win_fft)
@@ -400,38 +415,6 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.editingFinished.connect(self._update_amp2)
         self.ledDC.editingFinished.connect(self._update_DC)
 
-# =============================================================================
-        
-#    def _log_mode_time(self):
-#        """
-#        Select / deselect log. mode for both time domain and update self.bottom
-#        """
-#        log = self.chkLog.isChecked()
-#        self.lbl_log_bottom.setVisible(log)
-#        self.ledLogBottom.setVisible(log)
-#        self.lbl_dB.setVisible(log)
-#        if log:
-#            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom,
-#                                    return_type='float', sign='neg')
-#            self.ledLogBottom.setText(str(self.bottom))
-#            
-#        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
-
-    def _log_mode_freq(self):
-        """
-        Select / deselect log. mode for frequency domain and update self.bottom_f
-        """
-
-        log_f = self.chkLogF.isChecked()
-        self.lblLogBottomF.setVisible(log_f)
-        self.ledLogBottomF.setVisible(log_f)
-        self.lbldBF.setVisible(log_f)
-        if log_f:
-            self.bottom_f = safe_eval(self.ledLogBottomF.text(), self.bottom_f,
-                                    return_type='float', sign='neg')
-            self.ledLogBottomF.setText(str(self.bottom_f))
-
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_freq'})
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""

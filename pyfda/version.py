@@ -10,4 +10,4 @@
 Store the version number here for setup.py and pyfdax.py
 """
 
-__version__ = '0.2.0rc1'
+__version__ = '0.2.0a1'
