@@ -547,6 +547,8 @@ class Plot_Impz(QWidget):
             self.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(), self.bottom_t,
                                     return_type='float', sign='neg')
             self.ui.led_log_bottom_time.setText(str(self.bottom_t))
+        else:
+            self.bottom_t = 0
 
         self.draw_impz()
         
@@ -563,6 +565,8 @@ class Plot_Impz(QWidget):
             self.bottom_f = safe_eval(self.ui.led_log_bottom_freq.text(), self.bottom_f,
                                     return_type='float', sign='neg')
             self.ui.led_log_bottom_freq.setText(str(self.bottom_f))
+        else:
+            self.bottom_f = 0
             
         self.draw_impz()
 
@@ -676,7 +680,6 @@ class Plot_Impz(QWidget):
             fx_min = 20*np.log10(abs(fx_min))
             fx_max = fx_min
         else:
-            self.bottom_t = 0
             x = self.x * scale_i
             y = self.y_r * scale_o
             if self.cmplx:
@@ -844,7 +847,7 @@ class Plot_Impz(QWidget):
                 # plot for F = 0 ... 1
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
 
-            # --------------- Stimuli plot style ----------------------------------
+            # --------------- Plot stimulus and response ----------------------
             labels = []
 
             if plt_stimulus:
