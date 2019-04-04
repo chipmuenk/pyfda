@@ -876,55 +876,6 @@ class Plot_Impz(QWidget):
                     del self.ax_fft_noise
         self.redraw() # redraw currently active mplwidget
 
-    #--------------------------------------------------------------------------      
-#    def _init_axes_stim(self):
-#        """
-#        clear the axes of the stimulus matplotlib widget and (re)draw the plots
-#        """
-#        if not self.ui.chk_stim_plot.isChecked():
-#            self.mplwidget_s.fig.clf()
-#        else:
-#            self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
-#            self.ax_stim.clear() # same as cla()
-#
-#            self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
-#            self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
-#
-#    def draw_impz_stim(self):
-#        """
-#        (Re-)draw the stimulus
-#        """
-#        self._init_axes_stim()
-#
-#        if self.ui.chk_stim_plot.isChecked():
-#            H_str = self.H_str + ' in V'
-#            if self.ui.chk_stems_stim.isChecked(): # stem plot
-#                [ms_s, ss_s, bs_s] = self.ax_stim.stem(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
-#                    label = 'Stim.', **self.fmt_stem_stim)
-#                ms_s.set_mfc(self.fmt_stem_stim['mfc'])
-#                ms_s.set_mec(self.fmt_stem_stim['mec'])
-#                ms_s.set_ms(self.fmt_stem_stim['ms'])
-#                ms_s.set_alpha(self.fmt_stem_stim['alpha'])
-#                for stem in ss_s:
-#                    stem.set_linewidth(self.fmt_stem_stim['lw'])
-#                    stem.set_color(self.fmt_stem_stim['mec'])
-#                    stem.set_alpha(self.fmt_stem_stim['alpha'])
-#                bs_s.set_color(self.fmt_stem_stim['mfc']) # same format
-#                bs_s.set_alpha(self.fmt_stem_stim['alpha'])  # as stem for baseline
-#            else: # line plot
-#                self.ax_stim.plot(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
-#                    label='Stim.', **self.fmt_plot_stim)                
-#            
-#            self.ax_stim.set_title("Stimulus")
-#            self.ax_stim.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
-#            expand_lim(self.ax_stim, 0.02)
-#            self.ax_stim.set_xlabel(fb.fil[0]['plt_tLabel'])
-#            self.ax_stim.set_ylabel(H_str + r'$\rightarrow $')
-#        else:
-#            self._init_axes_stim()
-#
-#        self.redraw() # redraw currently active mplwidget
-
 #------------------------------------------------------------------------------
     def redraw(self):
         """
