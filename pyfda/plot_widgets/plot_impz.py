@@ -681,26 +681,26 @@ class Plot_Impz(QWidget):
             self.ax_r.axhline(fx_max,0, 1, color='k', linestyle='--')
             self.ax_r.axhline(fx_min,0, 1, color='k', linestyle='--')
                         
-        # --------------- Stimuli plot style ----------------------------------
+        # --------------- Stimulus plot ----------------------------------
         plot_stim_dict = self.fmt_plot_stim.copy()
         plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, plot_stim_dict)
 
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$x[n]$',
                  **plot_stim_dict)
+        # Add plot markers, this is way faster than normal stem plotting
         if self.ui.chk_marker_stim.isChecked() and self.plt_time_stim not in {"dots","none"}:
-            self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
-                 **self.fmt_mkr_stim)
+            self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], **self.fmt_mkr_stim)
 
-        # --------------- Response plot style ----------------------------------
+        # --------------- Response plot ----------------------------------
         plot_resp_dict = self.fmt_plot_resp.copy()
         plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_r, plot_resp_dict)
             
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
-
+        # Add plot markers, this is way faster than normal stem plotting
         if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
-            self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
-                 **self.fmt_mkr_resp)
+            self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], **self.fmt_mkr_resp)
+
         self.ax_r.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.5)
 
         # --------------- Complex response ----------------------------------
@@ -846,18 +846,26 @@ class Plot_Impz(QWidget):
                 #h, = self.ax_fft.plot(F, X, **self.fmt_plot_stim)
 
                 if self.ui.chk_mrk_freq_stim.isChecked() and self.plt_freq_stim not in {"dots","none"}:
-                    self.ax_fft.scatter(F, X, label='$Stim.$', **self.fmt_mkr_stim)
+                    self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
 
-                #handles.append(h)
                 labels.append("$P_X$ = {0:.3g} {1}".format(self.Px, unit_P))
  
             if plt_response:
-                h, = self.ax_fft.plot(F, Y, **self.fmt_plot_resp)
-                handles.append(h)
+                plot_resp_dict = self.fmt_plot_resp.copy()
+                plot_resp_fnc = self.plot_fnc(self.plt_freq_resp, self.ax_fft, plot_resp_dict)
+                
+                #h, = self.ax_fft.plot(F, Y, **self.fmt_plot_resp)
+                plot_resp_fnc(F, Y, label='$Resp.$',**plot_resp_dict)
+                #h, = self.ax_fft.plot(F, X, **self.fmt_plot_stim)
+
+                if self.ui.chk_mrk_freq_resp.isChecked() and self.plt_freq_resp not in {"dots","none"}:
+                    self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
+                
                 labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
                 
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
+            handles = self.ax_fft.get_lines()            
             handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
             self.ax_fft.legend(handles, labels, loc='best', fontsize = 'small',
                                fancybox=True, framealpha=0.5)
