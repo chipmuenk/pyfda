@@ -22,7 +22,6 @@ global:
 sudo: required
 
 python:
-  - "2.7"
   - "3.5"
   - "3.6"
 
@@ -35,7 +34,7 @@ before_install:
   - sudo mkdir -p /downloads
   - sudo chmod a+rw /downloads
   - curl -L https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.2/sip-4.19.2.tar.gz  -o /downloads/sip.tar.gz 
-  - curl -L https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12/PyQt4_gpl_x11-4.12.tar.gz -o /downloads/pyqt4.tar.gz
+#  - curl -L https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12/PyQt4_gpl_x11-4.12.tar.gz -o /downloads/pyqt4.tar.gz
 
   # Builds directory 
   - sudo mkdir -p /builds
@@ -49,7 +48,7 @@ install:
   - python -V
 
   # Qt4
-  - pushd /builds
+#  - pushd /builds
   
   # SIP
   - tar xzf /downloads/sip.tar.gz --keep-newer-files
@@ -60,12 +59,12 @@ install:
   - popd
    
   # PyQt4
-  - tar xzf /downloads/pyqt4.tar.gz --keep-newer-files
-  - pushd PyQt4_gpl_x11-4.12 # .tar
-  - python configure.py -c --confirm-license --no-designer-plugin -e QtCore -e QtGui -e QtTest
-  - make
-  - sudo make install
-  - popd
+ # - tar xzf /downloads/pyqt4.tar.gz --keep-newer-files
+ # - pushd PyQt4_gpl_x11-4.12 # .tar
+ # - python configure.py -c --confirm-license --no-designer-plugin -e QtCore -e QtGui -e QtTest
+ # - make
+ # - sudo make install
+ # - popd
     
   
   # Builds Complete
