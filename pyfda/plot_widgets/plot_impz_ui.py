@@ -48,7 +48,7 @@ class PlotImpz_UI(QWidget):
         # initial settings for lineedit widgets
         self.N_start = 0
         self.N_points = 0
-        self.bottom = -80
+        self.bottom_t = -80
         self.f1 = 0.02
         self.f2 = 0.03
         self.A1 = 1.0
@@ -74,7 +74,7 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-        self._log_mode_freq()
+        # self._log_mode_freq()
         self.update_N() # also updates window function
         self._update_noi()
 
@@ -164,16 +164,16 @@ class PlotImpz_UI(QWidget):
         self.chk_marker_resp.setChecked(False)
         self.chk_marker_resp.setToolTip("Use plot markers")
 
-        self.chk_log = QCheckBox("dB", self)
-        self.chk_log.setObjectName("chkLog")
-        self.chk_log.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chk_log.setChecked(False)
+        self.chk_log_time = QCheckBox("dB", self)
+        self.chk_log_time.setObjectName("chk_log_time")
+        self.chk_log_time.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chk_log_time.setChecked(False)
 
-        self.lbl_log_bottom = QLabel("Bottom = ", self)
-        self.led_log_bottom = QLineEdit(self)
-        self.led_log_bottom.setText(str(self.bottom))
-        self.led_log_bottom.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbl_dB = QLabel("dB", self)
+        self.lbl_log_bottom_time = QLabel("Bottom = ", self)
+        self.led_log_bottom_time = QLineEdit(self)
+        self.led_log_bottom_time.setText(str(self.bottom_t))
+        self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.lbl_dB_time = QLabel("dB", self)
 
         self.chk_fx_range = QCheckBox("Min/max.", self)
         self.chk_fx_range.setObjectName("chk_fx_range")
@@ -189,11 +189,11 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.cmb_plt_time_stim)
         layH_ctrl_time.addWidget(self.chk_marker_stim) 
         layH_ctrl_time.addStretch(2)
-        layH_ctrl_time.addWidget(self.chk_log)
+        layH_ctrl_time.addWidget(self.chk_log_time)
         layH_ctrl_time.addStretch(1)
-        layH_ctrl_time.addWidget(self.lbl_log_bottom)
-        layH_ctrl_time.addWidget(self.led_log_bottom)
-        layH_ctrl_time.addWidget(self.lbl_dB)
+        layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
+        layH_ctrl_time.addWidget(self.led_log_bottom_time)
+        layH_ctrl_time.addWidget(self.lbl_dB_time)
         layH_ctrl_time.addStretch(2)        
         layH_ctrl_time.addWidget(self.chk_fx_range)
         layH_ctrl_time.addStretch(10)
@@ -233,16 +233,16 @@ class PlotImpz_UI(QWidget):
         self.chk_mrk_freq_resp = QCheckBox("*", self)
         self.chk_mrk_freq_resp.setChecked(False)
         self.chk_mrk_freq_resp.setToolTip("Use plot markers")
-        self.chkLogF = QCheckBox("dB", self)
-        self.chkLogF.setObjectName("chkLogF")
-        self.chkLogF.setToolTip("<span>Logarithmic scale for y-axis.</span>")
-        self.chkLogF.setChecked(True)
+        self.chk_log_freq = QCheckBox("dB", self)
+        self.chk_log_freq.setObjectName("chk_log_freq")
+        self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
+        self.chk_log_freq.setChecked(True)
 
-        self.lblLogBottomF = QLabel("Bottom = ", self)
-        self.ledLogBottomF = QLineEdit(self)
-        self.ledLogBottomF.setText(str(self.bottom_f))
-        self.ledLogBottomF.setToolTip("<span>Minimum display value for log. scale.</span>")
-        self.lbldBF = QLabel("dB", self)
+        self.lbl_log_bottom_freq = QLabel("Bottom = ", self)
+        self.led_log_bottom_freq = QLineEdit(self)
+        self.led_log_bottom_freq.setText(str(self.bottom_f))
+        self.led_log_bottom_freq.setToolTip("<span>Minimum display value for log. scale.</span>")
+        self.lbl_dB_freq = QLabel("dB", self)
 
         self.lbl_win_fft = QLabel("Window: ", self)
         self.cmb_win_fft = QComboBox(self)
@@ -256,9 +256,6 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1.setObjectName("ledWinPar1")
 
         layH_ctrl_freq = QHBoxLayout()
-#        layH_ctrl_freq.addWidget(self.lbl_plt_freq)
-#        layH_ctrl_freq.addWidget(self.cmb_plt_freq)
-#        layH_ctrl_freq.addStretch(2)
 
         layH_ctrl_freq.addWidget(self.lbl_plt_freq_resp)
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_resp)
@@ -268,10 +265,10 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.cmb_plt_freq_stim)
         layH_ctrl_freq.addWidget(self.chk_mrk_freq_stim)
 
-        layH_ctrl_freq.addWidget(self.chkLogF)
-        layH_ctrl_freq.addWidget(self.lblLogBottomF)
-        layH_ctrl_freq.addWidget(self.ledLogBottomF)
-        layH_ctrl_freq.addWidget(self.lbldBF)
+        layH_ctrl_freq.addWidget(self.chk_log_freq)
+        layH_ctrl_freq.addWidget(self.lbl_log_bottom_time)
+        layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
+        layH_ctrl_freq.addWidget(self.lbl_dB_freq)
         layH_ctrl_freq.addStretch(2)
         layH_ctrl_freq.addWidget(self.lbl_win_fft)
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
@@ -288,18 +285,6 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for stimuli
         # ---------------------------------------------------------------
-#        self.chk_stim_plot = QCheckBox("Plot", self)
-#        self.chk_stim_plot.setObjectName("chkStimPlot")
-#        self.chk_stim_plot.setToolTip("<span>Plot stimulus.</span>")
-#        self.chk_stim_plot.setChecked(True)
-#
-#        self.chk_stems_stim = QCheckBox("Stems", self)
-#        self.chk_stems_stim.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
-#        self.chk_stems_stim.setChecked(True)
-#
-#        layV_stim_plot = QVBoxLayout()
-#        layV_stim_plot.addWidget(self.chk_stim_plot)
-#        layV_stim_plot.addWidget(self.chk_stems_stim)
 
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
@@ -416,8 +401,8 @@ class PlotImpz_UI(QWidget):
         self.led_N_points.editingFinished.connect(self.update_N)
 
         # --- frequency control ---
-        self.chkLogF.clicked.connect(self._log_mode_freq)
-        self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
+        #self.chkLogF.clicked.connect(self._log_mode_freq)
+        #self.ledLogBottomF.editingFinished.connect(self._log_mode_freq)
         # careful! currentIndexChanged passes the current index to _update_win_fft
         self.cmb_win_fft.currentIndexChanged.connect(self._update_win_fft)
         self.ledWinPar1.editingFinished.connect(self._update_win_fft)
@@ -447,21 +432,21 @@ class PlotImpz_UI(QWidget):
 #            
 #        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
 
-    def _log_mode_freq(self):
-        """
-        Select / deselect log. mode for frequency domain and update self.bottom_f
-        """
-
-        log_f = self.chkLogF.isChecked()
-        self.lblLogBottomF.setVisible(log_f)
-        self.ledLogBottomF.setVisible(log_f)
-        self.lbldBF.setVisible(log_f)
-        if log_f:
-            self.bottom_f = safe_eval(self.ledLogBottomF.text(), self.bottom_f,
-                                    return_type='float', sign='neg')
-            self.ledLogBottomF.setText(str(self.bottom_f))
-
-        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_freq'})
+#    def _log_mode_freq(self):
+#        """
+#        Select / deselect log. mode for frequency domain and update self.bottom_f
+#        """
+#
+#        log_f = self.chkLogF.isChecked()
+#        self.lblLogBottomF.setVisible(log_f)
+#        self.ledLogBottomF.setVisible(log_f)
+#        self.lbldBF.setVisible(log_f)
+#        if log_f:
+#            self.bottom_f = safe_eval(self.ledLogBottomF.text(), self.bottom_f,
+#                                    return_type='float', sign='neg')
+#            self.ledLogBottomF.setText(str(self.bottom_f))
+#
+#        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_freq'})
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
