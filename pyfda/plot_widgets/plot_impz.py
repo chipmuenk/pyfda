@@ -70,6 +70,7 @@ class Plot_Impz(QWidget):
         #--------------------------------------------
         # initialize routines and settings
         self._log_mode_time()
+        self._log_mode_freq()
         self.fx_select()    # initialize fixpoint or float simulation    
         self.draw() # initial calculation and drawing
 
@@ -562,7 +563,7 @@ class Plot_Impz(QWidget):
             self.bottom_f = safe_eval(self.ui.led_log_bottom_freq.text(), self.bottom_f,
                                     return_type='float', sign='neg')
             self.ui.led_log_bottom_freq.setText(str(self.bottom_f))
-
+            
         self.draw_impz()
 
     def plot_fnc(self, plt_style, ax, plt_dict=None, bottom=0):
@@ -598,7 +599,8 @@ class Plot_Impz(QWidget):
         plt_time = self.plt_time_resp != "none" or self.plt_time_stim != "none"
         
         for ax in self.mplwidget_t.fig.get_axes():
-            self.mplwidget_t.fig.delaxes(ax) # also clear twinned axes if present
+            self.mplwidget_t.fig.clf() # clear figure but don't delete axes
+            #self.mplwidget_t.fig.delaxes(ax) # also clear twinned axes if present
             
         if plt_time:
             num_subplots = 1 + (self.cmplx and self.plt_time_resp != "none")
@@ -760,19 +762,28 @@ class Plot_Impz(QWidget):
         self.plt_freq_stim = qget_cmb_box(self.ui.cmb_plt_freq_stim, data=False).lower()
         self.plt_freq_resp = qget_cmb_box(self.ui.cmb_plt_freq_resp, data=False).lower()
         self.plt_freq_disabled = self.plt_freq_stim == "none" and self.plt_freq_resp == "none"
+       
+        logger.warning("Axes{0}-{1}".format(len(self.mplwidget_f.fig.get_axes()), self.mplwidget_f.fig.get_axes()))
+        
+        if not self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 2:
+            self.mplwidget_f.fig.clear() # get rid of second axis when returning from log mode by clearing all
 
-        for ax in self.mplwidget_f.fig.get_axes(): # remove all axes
-            self.mplwidget_f.fig.delaxes(ax) 
-        #return
-#        #else:
-#        if not hasattr(self, 'ax_fft'):
-#            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)
-#        else:
-#            self.ax_fft.clear()
-        self.ax_fft = self.mplwidget_f.fig.add_subplot(111)        
-        self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
-        self.ax_fft.set_title("FFT of Transient Response")
+        if len(self.mplwidget_f.fig.get_axes()) == 0: # empty figure, no axes
+            self.ax_fft = self.mplwidget_f.fig.add_subplot(111)        
+            self.ax_fft.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax_fft.get_yaxis().tick_left() # remove axis ticks right
+            self.ax_fft.set_title("FFT of Transient Response")
+
+        logger.warning("Axes{0}-{1}".format(len(self.mplwidget_f.fig.get_axes()), self.mplwidget_f.fig.get_axes()))
+            
+        for ax in self.mplwidget_f.fig.get_axes(): # clear but don't delete all axes
+            ax.cla()
+
+        if self.ui.chk_log_freq.isChecked() and len(self.mplwidget_f.fig.get_axes()) == 1:
+            # create second axis scaled for noise power scale if it doesn't exist
+            self.ax_fft_noise = self.ax_fft.twinx()
+            self.ax_fft_noise.is_twin = True
+            #self.ax_fft_noise.clear()
 
         self.calc_fft()
 
@@ -850,7 +861,6 @@ class Plot_Impz(QWidget):
     
             if plt_stimulus:
                 plot_stim_fnc(F, X, label='$Stim.$',**plot_stim_dict)
-                #h, = self.ax_fft.plot(F, X, **self.fmt_plot_stim)
 
                 if self.ui.chk_mrk_freq_stim.isChecked() and self.plt_freq_stim not in {"dots","none"}:
                     self.ax_fft.scatter(F, X, **self.fmt_mkr_stim)
@@ -883,19 +893,19 @@ class Plot_Impz(QWidget):
 
             if self.ui.chk_log_freq.isChecked():
                 # create second axis scaled for noise power scale if it doesn't exist
-                if not hasattr(self, 'ax_fft_noise'):
-                    self.ax_fft_noise = self.ax_fft.twinx()
-                    self.ax_fft_noise.is_twin = True
-                self.ax_fft_noise.clear()
+#                if not hasattr(self, 'ax_fft_noise'):
+#                    self.ax_fft_noise = self.ax_fft.twinx()
+#                    self.ax_fft_noise.is_twin = True
+#                self.ax_fft_noise.clear()
 
                 corr = 10*np.log10(self.ui.N / self.ui.nenbw) 
                 mn, mx = self.ax_fft.get_ylim()
                 self.ax_fft_noise.set_ylim(mn+corr, mx+corr)
                 self.ax_fft_noise.set_ylabel(r'$P_N$ in dBW')
-            else:
-                if hasattr(self, 'ax_fft_noise'): # remove twin axes
-                    self.mplwidget_f.fig.delaxes(self.ax_fft_noise)
-                    del self.ax_fft_noise
+#            else:
+#                if hasattr(self, 'ax_fft_noise'): # remove twin axes
+#                    self.mplwidget_f.fig.delaxes(self.ax_fft_noise)
+#                    del self.ax_fft_noise
         self.redraw() # redraw currently active mplwidget
 
 #------------------------------------------------------------------------------
