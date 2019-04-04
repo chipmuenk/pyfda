@@ -685,7 +685,7 @@ class Plot_Impz(QWidget):
         plot_stim_dict = self.fmt_plot_stim.copy()
         plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, plot_stim_dict)
 
-        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
+        plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$x[n]$',
                  **plot_stim_dict)
         if self.ui.chk_marker_stim.isChecked() and self.plt_time_stim not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$Stim.$',
@@ -701,6 +701,7 @@ class Plot_Impz(QWidget):
         if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **self.fmt_mkr_resp)
+        self.ax_r.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.5)
 
         # --------------- Complex response ----------------------------------
         if self.cmplx and self.plt_time_resp != "none":
@@ -720,6 +721,7 @@ class Plot_Impz(QWidget):
         self.ax_r.set_title(fx_title + self.title_str)
         self.ax_r.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
         expand_lim(self.ax_r, 0.02)
+        
 
         if self.ACTIVE_3D: # not implemented / tested yet
             # plotting the stems
