@@ -874,8 +874,12 @@ class Plot_Impz(QWidget):
                 
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
-            handles = self.ax_fft.get_lines()            
-            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0))
+
+            # collect all plot objects, hope that the order isn't messed up and add two dummy handles
+            # for the NENBW and the CGAIN labels
+            handles = self.ax_fft.get_lines()    
+            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0, alpha=0))
+            handles.append(mpl_patches.Rectangle((0, 0), 1, 1, fc="white",ec="white", lw=0, alpha=0))
             self.ax_fft.legend(handles, labels, loc='best', fontsize = 'small',
                                fancybox=True, framealpha=0.5)
             
