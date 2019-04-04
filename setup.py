@@ -71,7 +71,6 @@ setup(
     ## data_files = [('', ['README.rst']), ('', ['LICENSE'])],
     # Required modules
     install_requires = [
-	'python_version >= 3.3',
         'numpy',
         'scipy',
         'matplotlib',
