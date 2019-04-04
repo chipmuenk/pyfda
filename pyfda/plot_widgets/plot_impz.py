@@ -338,6 +338,11 @@ class Plot_Impz(QWidget):
             self.x[0] = self.ui.A1 # create dirac impulse as input signal
             self.title_str = r'Impulse Response'
             self.H_str = r'$h[n]$' # default
+            
+        elif self.ui.stim == "None":
+            self.x = np.zeros(self.ui.N_end)
+            self.title_str = r'Zero Input'
+            self.H_str = r'$h_0[n]$' # default
 
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function

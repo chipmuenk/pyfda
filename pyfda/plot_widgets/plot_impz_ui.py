@@ -303,7 +303,7 @@ class PlotImpz_UI(QWidget):
 
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
-        self.cmbStimulus.addItems(["Pulse","Step","StepErr", "Cos", "Sine", "Rect", "Saw"])
+        self.cmbStimulus.addItems(["None","Pulse","Step","StepErr","Cos","Sine","Rect","Saw"])
         self.cmbStimulus.setToolTip("Select stimulus type.")
         qset_cmb_box(self.cmbStimulus, self.stim)
 
