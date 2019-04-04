@@ -51,8 +51,6 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
@@ -73,11 +71,13 @@ setup(
     ## data_files = [('', ['README.rst']), ('', ['LICENSE'])],
     # Required modules
     install_requires = [
+	'python_version >= 3.3',
         'numpy',
         'scipy',
         'matplotlib',
+	'pyqt5',
         'docutils',
-        'myhdl'
+        'myhdl >= 0.1.0'
         ],
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached terminal:
