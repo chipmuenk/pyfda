@@ -93,10 +93,6 @@ class Plot_Impz(QWidget):
         self.mplwidget_f.setObjectName("mplwidget_f1")
         self.mplwidget_f.layVMainMpl.addWidget(self.ui.wdg_ctrl_freq)
         self.mplwidget_f.layVMainMpl.setContentsMargins(*params['wdg_margins'])
-        # MplWidget for stimulus plots
-        self.mplwidget_s = MplWidget(self)
-        self.mplwidget_s.layVMainMpl.addWidget(self.ui.wdg_ctrl_stim)
-        self.mplwidget_s.layVMainMpl.setContentsMargins(*params['wdg_margins'])
 
         #----------------------------------------------------------------------
         # Tabbed layout with vertical tabs
@@ -104,13 +100,13 @@ class Plot_Impz(QWidget):
         self.tabWidget = QTabWidget(self)
         self.tabWidget.addTab(self.mplwidget_t, "Time")
         self.tabWidget.addTab(self.mplwidget_f, "Frequency")
-        self.tabWidget.addTab(self.mplwidget_s, "Stimuli")
         # list with tabWidgets
-        self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f", "mplwidget_s"]
+        self.tab_mplwidgets = ["mplwidget_t", "mplwidget_f"]
         self.tabWidget.setTabPosition(QTabWidget.West)
 
         layVMain = QVBoxLayout()
         layVMain.addWidget(self.tabWidget)
+        layVMain.addWidget(self.ui.wdg_ctrl_stim)
         layVMain.addWidget(self.ui.wdg_ctrl_run)
         layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
 
@@ -137,17 +133,12 @@ class Plot_Impz(QWidget):
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw_impz_freq)
         self.ui.chk_mrk_freq_stim.clicked.connect(self.draw_impz_freq)
         
-        # --- stimulus plotting ---
-        self.ui.chk_stim_plot.clicked.connect(self.draw_impz_stim)
-        self.ui.chk_stems_stim.clicked.connect(self.draw_impz_stim)
-
         # frequency widgets require special handling as they are scaled with f_s
         self.ui.ledFreq1.installEventFilter(self)
         self.ui.ledFreq2.installEventFilter(self)
 
         self.mplwidget_t.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         self.mplwidget_f.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
-        self.mplwidget_s.mplToolbar.sig_tx.connect(self.process_sig_rx) # connect to toolbar
         
         # When user has selected a different tab, trigger a draw (incl. maybe recalc) of current tab
         self.tabWidget.currentChanged.connect(self.draw) # passes number of active tab
@@ -533,8 +524,8 @@ class Plot_Impz(QWidget):
             self.draw_impz_time()
         elif idx == 1:
             self.draw_impz_freq()
-        elif idx == 2:
-            self.draw_impz_stim()
+#        elif idx == 2:
+#            self.draw_impz_stim()
         else:
             logger.error("Index {0} out of range!".format(idx))
 
@@ -886,53 +877,53 @@ class Plot_Impz(QWidget):
         self.redraw() # redraw currently active mplwidget
 
     #--------------------------------------------------------------------------      
-    def _init_axes_stim(self):
-        """
-        clear the axes of the stimulus matplotlib widget and (re)draw the plots
-        """
-        if not self.ui.chk_stim_plot.isChecked():
-            self.mplwidget_s.fig.clf()
-        else:
-            self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
-            self.ax_stim.clear() # same as cla()
-
-            self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
-
-    def draw_impz_stim(self):
-        """
-        (Re-)draw the stimulus
-        """
-        self._init_axes_stim()
-
-        if self.ui.chk_stim_plot.isChecked():
-            H_str = self.H_str + ' in V'
-            if self.ui.chk_stems_stim.isChecked(): # stem plot
-                [ms_s, ss_s, bs_s] = self.ax_stim.stem(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
-                    label = 'Stim.', **self.fmt_stem_stim)
-                ms_s.set_mfc(self.fmt_stem_stim['mfc'])
-                ms_s.set_mec(self.fmt_stem_stim['mec'])
-                ms_s.set_ms(self.fmt_stem_stim['ms'])
-                ms_s.set_alpha(self.fmt_stem_stim['alpha'])
-                for stem in ss_s:
-                    stem.set_linewidth(self.fmt_stem_stim['lw'])
-                    stem.set_color(self.fmt_stem_stim['mec'])
-                    stem.set_alpha(self.fmt_stem_stim['alpha'])
-                bs_s.set_color(self.fmt_stem_stim['mfc']) # same format
-                bs_s.set_alpha(self.fmt_stem_stim['alpha'])  # as stem for baseline
-            else: # line plot
-                self.ax_stim.plot(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
-                    label='Stim.', **self.fmt_plot_stim)                
-            
-            self.ax_stim.set_title("Stimulus")
-            self.ax_stim.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
-            expand_lim(self.ax_stim, 0.02)
-            self.ax_stim.set_xlabel(fb.fil[0]['plt_tLabel'])
-            self.ax_stim.set_ylabel(H_str + r'$\rightarrow $')
-        else:
-            self._init_axes_stim()
-
-        self.redraw() # redraw currently active mplwidget
+#    def _init_axes_stim(self):
+#        """
+#        clear the axes of the stimulus matplotlib widget and (re)draw the plots
+#        """
+#        if not self.ui.chk_stim_plot.isChecked():
+#            self.mplwidget_s.fig.clf()
+#        else:
+#            self.ax_stim = self.mplwidget_s.fig.add_subplot(111)    
+#            self.ax_stim.clear() # same as cla()
+#
+#            self.ax_stim.get_xaxis().tick_bottom() # remove axis ticks on top
+#            self.ax_stim.get_yaxis().tick_left() # remove axis ticks right
+#
+#    def draw_impz_stim(self):
+#        """
+#        (Re-)draw the stimulus
+#        """
+#        self._init_axes_stim()
+#
+#        if self.ui.chk_stim_plot.isChecked():
+#            H_str = self.H_str + ' in V'
+#            if self.ui.chk_stems_stim.isChecked(): # stem plot
+#                [ms_s, ss_s, bs_s] = self.ax_stim.stem(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
+#                    label = 'Stim.', **self.fmt_stem_stim)
+#                ms_s.set_mfc(self.fmt_stem_stim['mfc'])
+#                ms_s.set_mec(self.fmt_stem_stim['mec'])
+#                ms_s.set_ms(self.fmt_stem_stim['ms'])
+#                ms_s.set_alpha(self.fmt_stem_stim['alpha'])
+#                for stem in ss_s:
+#                    stem.set_linewidth(self.fmt_stem_stim['lw'])
+#                    stem.set_color(self.fmt_stem_stim['mec'])
+#                    stem.set_alpha(self.fmt_stem_stim['alpha'])
+#                bs_s.set_color(self.fmt_stem_stim['mfc']) # same format
+#                bs_s.set_alpha(self.fmt_stem_stim['alpha'])  # as stem for baseline
+#            else: # line plot
+#                self.ax_stim.plot(self.t[self.ui.N_start:], self.x[self.ui.N_start:], 
+#                    label='Stim.', **self.fmt_plot_stim)                
+#            
+#            self.ax_stim.set_title("Stimulus")
+#            self.ax_stim.set_xlim([self.t[self.ui.N_start],self.t[self.ui.N_end-1]])
+#            expand_lim(self.ax_stim, 0.02)
+#            self.ax_stim.set_xlabel(fb.fil[0]['plt_tLabel'])
+#            self.ax_stim.set_ylabel(H_str + r'$\rightarrow $')
+#        else:
+#            self._init_axes_stim()
+#
+#        self.redraw() # redraw currently active mplwidget
 
 #------------------------------------------------------------------------------
     def redraw(self):
@@ -947,7 +938,6 @@ class Plot_Impz(QWidget):
         self.needs_redraw[idx] = False
 #        self.mplwidget_t.redraw()
 #        self.mplwidget_f.redraw()
-#        self.mplwidget_s.redraw()
 
 #------------------------------------------------------------------------------
 

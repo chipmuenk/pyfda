@@ -288,18 +288,18 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for stimuli
         # ---------------------------------------------------------------
-        self.chk_stim_plot = QCheckBox("Plot", self)
-        self.chk_stim_plot.setObjectName("chkStimPlot")
-        self.chk_stim_plot.setToolTip("<span>Plot stimulus.</span>")
-        self.chk_stim_plot.setChecked(True)
-
-        self.chk_stems_stim = QCheckBox("Stems", self)
-        self.chk_stems_stim.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
-        self.chk_stems_stim.setChecked(True)
-
-        layV_stim_plot = QVBoxLayout()
-        layV_stim_plot.addWidget(self.chk_stim_plot)
-        layV_stim_plot.addWidget(self.chk_stems_stim)
+#        self.chk_stim_plot = QCheckBox("Plot", self)
+#        self.chk_stim_plot.setObjectName("chkStimPlot")
+#        self.chk_stim_plot.setToolTip("<span>Plot stimulus.</span>")
+#        self.chk_stim_plot.setChecked(True)
+#
+#        self.chk_stems_stim = QCheckBox("Stems", self)
+#        self.chk_stems_stim.setToolTip("<span>Stem plot (slow when number of data points is large).</span>")
+#        self.chk_stems_stim.setChecked(True)
+#
+#        layV_stim_plot = QVBoxLayout()
+#        layV_stim_plot.addWidget(self.chk_stim_plot)
+#        layV_stim_plot.addWidget(self.chk_stems_stim)
 
         self.lblStimulus = QLabel("Stimulus: ", self)
         self.cmbStimulus = QComboBox(self)
@@ -385,8 +385,7 @@ class PlotImpz_UI(QWidget):
         layVledNoiDC.addWidget(self.ledDC)
         
         layH_ctrl_stim = QHBoxLayout()
-        #layH_ctrl_stim.addWidget(self.chkStimPlot)
-        layH_ctrl_stim.addLayout(layV_stim_plot)
+#        layH_ctrl_stim.addLayout(layV_stim_plot)
         layH_ctrl_stim.addLayout(layVlblCmb)
         layH_ctrl_stim.addLayout(layVCmb)
         layH_ctrl_stim.addStretch(1)
