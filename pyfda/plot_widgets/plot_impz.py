@@ -553,6 +553,31 @@ class Plot_Impz(QWidget):
         # TODO: draw() really needed?
         self.draw_impz()
 
+    def plot_fnc(self, plt_style, ax, plt_dict=None):
+        """
+        Return a plot method depending on the parameter `plt_style` (str) 
+        and the axis instance `ax`. An optional `plt_dict` is modified in place.
+        """
+        if plt_dict is None:
+            plt_dict = {}
+        if plt_style == "line":
+            plot_fnc = getattr(ax, "plot")
+        elif plt_style == "stem":
+            plot_fnc = stems
+            plt_dict.update({'ax':ax, 'bottom':self.bottom})
+        elif plt_style == "step":
+            plot_fnc = getattr(ax, "plot")
+            plt_dict.update({'drawstyle':'steps-mid'})
+        elif plt_style == "dots":
+            plot_fnc = getattr(ax, "scatter")
+        elif plt_style == "none":                
+            plot_fnc = no_plot
+        else:
+            plot_fnc = no_plot
+        return plot_fnc
+
+
+
     def _init_axes_time(self):
         """
         Clear the axes of the time domain matplotlib widgets and (re)draw the plots.
@@ -582,31 +607,6 @@ class Plot_Impz(QWidget):
     
             if self.ACTIVE_3D: # not implemented / tested yet
                 self.ax3d = self.mplwidget_t.fig.add_subplot(111, projection='3d')
-    
-
-    def plot_fnc(self, plt_style, ax, plt_dict=None):
-        """
-        Return a plot method depending on the parameter `plt_style` (str) 
-        and the axis instance `ax`. An optional `plt_dict` is modified in place.
-        """
-        if plt_dict is None:
-            plt_dict = {}
-        if plt_style == "line":
-            plot_fnc = getattr(ax, "plot")
-        elif plt_style == "stem":
-            plot_fnc = stems
-            plt_dict.update({'ax':ax, 'bottom':self.bottom})
-        elif plt_style == "step":
-            plot_fnc = getattr(ax, "plot")
-            plt_dict.update({'drawstyle':'steps-mid'})
-        elif plt_style == "dots":
-            plot_fnc = getattr(ax, "scatter")
-        elif plt_style == "none":                
-            plot_fnc = no_plot
-        else:
-            plot_fnc = no_plot
-        return plot_fnc
-
 
     def draw_impz_time(self):
         """
