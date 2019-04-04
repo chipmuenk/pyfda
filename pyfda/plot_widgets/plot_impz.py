@@ -59,7 +59,7 @@ class Plot_Impz(QWidget):
         self.bottom_f = self.ui.bottom_f
 
         self.needs_draw = True   # flag whether plots need to be updated 
-        self.needs_redraw = [True] * 3 # flag which plot needs to be redrawn
+        self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
         self.fx_sim = False # initial setting for fixpoint simulation
         self.tool_tip = "Impulse and transient response"
         self.tab_label = "h[n]"
@@ -117,6 +117,7 @@ class Plot_Impz(QWidget):
         self.ui.cmb_sim_select.currentIndexChanged.connect(self.fx_select)
         self.ui.but_run.clicked.connect(self.fx_run)
         self.ui.chk_fx_scale.clicked.connect(self.draw_impz_time)
+        self.ui.chk_stim_options.clicked.connect(self._show_stim_options)
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
         self.ui.chk_marker_resp.clicked.connect(self.draw_impz_time)
@@ -126,7 +127,6 @@ class Plot_Impz(QWidget):
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_range.clicked.connect(self.draw_impz_time)
         # --- frequency domain plotting ---
-        #self.ui.cmb_plt_freq.currentIndexChanged.connect(self.draw_impz_freq)
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw_impz_freq)
         self.ui.chk_mrk_freq_resp.clicked.connect(self.draw_impz_freq)
         self.ui.cmb_plt_freq_stim.currentIndexChanged.connect(self.draw_impz_freq)
@@ -281,6 +281,13 @@ class Plot_Impz(QWidget):
                 str(params['FMT'].format(self.f1 * fb.fil[0]['f_S'])))
             self.ui.ledFreq2.setText(
                 str(params['FMT'].format(self.f2 * fb.fil[0]['f_S'])))
+#-------------------------------------------------------------        
+    def _show_stim_options(self):
+        """
+        Hide / show panel with stimulus options
+        """
+        self.ui.wdg_ctrl_stim.setVisible(self.ui.chk_stim_options.isChecked())
+
 
 # =============================================================================
     def fx_select(self):
@@ -342,12 +349,12 @@ class Plot_Impz(QWidget):
             
         elif self.ui.stim == "None":
             self.x = np.zeros(self.ui.N_end)
-            self.title_str = r'Zero Input'
+            self.title_str = r'System Response to Zero Input'
             self.H_str = r'$h_0[n]$' # default
 
         elif self.ui.stim == "Step":
             self.x = self.ui.A1 * np.ones(self.ui.N_end) # create step function
-            self.title_str = r'Filter Step Response'
+            self.title_str = r'Step Response'
             self.H_str = r'$h_{\epsilon}[n]$'
             
         elif self.ui.stim == "StepErr":
@@ -358,23 +365,23 @@ class Plot_Impz(QWidget):
         elif self.ui.stim == "Cos":
             self.x = self.ui.A1 * np.cos(2 * np.pi * self.n * self.f1) +\
                 self.ui.A2 * np.cos(2 * np.pi * self.n * self.f2 + self.ui.phi2)
-            self.title_str = r'Filter Response to Cosine Signal'
+            self.title_str = r'System Response to Cosine Signal'
             self.H_str = r'$y[n]$'
                 
         elif self.ui.stim == "Sine":
             self.x = self.ui.A1 * np.sin(2 * np.pi * self.n * self.f1 + self.ui.phi1) +\
                 self.ui.A2 * np.sin(2 * np.pi * self.n * self.f2 + self.ui.phi2)
-            self.title_str = r'Filter Response to Sinusoidal Signal'
+            self.title_str = r'System Response to Sinusoidal Signal'
             self.H_str = r'$y[n]$'
             
         elif self.ui.stim == "Rect":
             self.x = self.ui.A1 * np.sign(np.sin(2 * np.pi * self.n * self.f1))
-            self.title_str = r'Filter Response to Rect. Signal'
+            self.title_str = r'System Response to Rect. Signal'
             self.H_str = r'$y[n]$'
 
         elif self.ui.stim == "Saw":
             self.x = self.ui.A1 * sig.sawtooth(self.n * self.f1 * 2*np.pi)
-            self.title_str = r'Filter Response to Sawtooth Signal'
+            self.title_str = r'System Response to Sawtooth Signal'
             self.H_str = r'$y[n]$'
 
         else:
@@ -384,12 +391,19 @@ class Plot_Impz(QWidget):
         # Add noise to stimulus
         if self.ui.noise == "gauss":
             self.x[self.ui.N_start:] += self.ui.noi * np.random.randn(self.ui.N)
+            self.title_str += r' w/ Gaussian Noise'           
         elif self.ui.noise == "uniform":
             self.x[self.ui.N_start:] += self.ui.noi * (np.random.rand(self.ui.N)-0.5)
+            self.title_str += r' w/ Uniform Noise' 
         # Add DC to stimulus when visible / enabled
         if self.ui.ledDC.isVisible:
             self.x += self.ui.DC
-        self.needs_redraw[:] = [True] * 3
+            if self.ui.DC != 0:
+                self.title_str += r' and DC'
+        
+        if self.fx_sim:
+            self.title_str = r'$Fixpoint$ ' + self.title_str         
+        self.needs_redraw[:] = [True] * 2
         
 #------------------------------------------------------------------------------
     def calc_response(self, y_fx = None):
@@ -449,36 +463,34 @@ class Plot_Impz(QWidget):
         """
         (Re-)calculate ffts X(f) and Y(f) of stimulus and response
         """
+   #if self.plt_freq_resp != "none":
         # calculate FFT of stimulus / response
-#        if self.plt_freq in {"Stimulus", "Both"}:
-        if self.plt_freq_stim != "none":
-            if self.x is None or len(self.x) < self.ui.N_end:
-                self.X = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
-                self.needs_redraw[1] = True
-                if self.x is None:
-                    logger.warning("Stimulus is 'None', FFT cannot be calculated.")
-                else:
-                    logger.warning("Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
-                               .format(len(self.x), self.ui.N_end))
+        if self.x is None or len(self.x) < self.ui.N_end:
+            self.X = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
+            self.needs_redraw[1] = True
+            if self.x is None:
+                logger.warning("Stimulus is 'None', FFT cannot be calculated.")
             else:
-                x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
-                self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
-                self.needs_redraw[1] = True
+                logger.warning("Length of stimulus is {0} < N = {1}, FFT cannot be calculated."
+                           .format(len(self.x), self.ui.N_end))
+        else:
+            x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
+            self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
+            self.needs_redraw[1] = True
 
-        if self.plt_freq_resp != "none":
-#        if self.plt_freq in {"Response", "Both"}:
-            if self.y is None or len(self.y) < self.ui.N_end:
-                self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
-                self.needs_redraw[1] = True
-                if self.y is None:
-                    logger.warning("Transient response is 'None', FFT cannot be calculated.")
-                else:
-                    logger.warning("Length of transient response is {0} < N = {1}, FFT cannot be calculated."
-                               .format(len(self.y), self.ui.N_end))             
+    #if self.plt_freq_resp != "none":
+        if self.y is None or len(self.y) < self.ui.N_end:
+            self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
+            self.needs_redraw[1] = True
+            if self.y is None:
+                logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
-                y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
-                self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
-                self.needs_redraw[1] = True                
+                logger.warning("Length of transient response is {0} < N = {1}, FFT cannot be calculated."
+                           .format(len(self.y), self.ui.N_end))             
+        else:
+            y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
+            self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
+            self.needs_redraw[1] = True                
 #------------------------------------------------------------------------------
     def update_view(self):
         """
@@ -646,7 +658,6 @@ class Plot_Impz(QWidget):
                 logger.info("hdl_dict = {0}".format(self.hdl_dict))
                 WI = self.hdl_dict['QI']['W']
                 WO = self.hdl_dict['QO']['W']
-                fx_title = "Fixpoint "
 
             except AttributeError as e:
                 logger.error("Attribute error: {0}".format(e))
@@ -886,6 +897,7 @@ class Plot_Impz(QWidget):
             self.ax_fft.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax_fft.set_ylabel(XY_str)
             self.ax_fft.set_xlim(fb.fil[0]['freqSpecsRange'])
+            self.ax_fft.set_title(self.title_str)
 
             if self.ui.chk_log_freq.isChecked():
                 # scale second axis for noise power 

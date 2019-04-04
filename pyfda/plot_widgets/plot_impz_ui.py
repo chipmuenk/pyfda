@@ -74,7 +74,6 @@ class PlotImpz_UI(QWidget):
 
         self._construct_UI()
         self._enable_stim_widgets()
-        # self._log_mode_freq()
         self.update_N() # also updates window function
         self._update_noi()
 
@@ -118,6 +117,12 @@ class PlotImpz_UI(QWidget):
         self.chk_fx_scale.setObjectName("chk_fx_scale")
         self.chk_fx_scale.setToolTip("<span>Display data with integer (fixpoint) scale.</span>")
         self.chk_fx_scale.setChecked(False)
+        
+        self.chk_stim_options = QCheckBox("Show Stim. Options", self)
+        self.chk_stim_options.setObjectName("chk_stim_options")
+        self.chk_stim_options.setToolTip("<span>Show options for stimulus signal.</span>")
+        self.chk_stim_options.setChecked(True)
+
 
         layH_ctrl_run = QHBoxLayout()
         layH_ctrl_run.addWidget(self.lbl_sim_select)
@@ -132,7 +137,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_run.addWidget(self.but_run)
         layH_ctrl_run.addStretch(2)        
         layH_ctrl_run.addWidget(self.chk_fx_scale)
-
+        layH_ctrl_run.addStretch(2)        
+        layH_ctrl_run.addWidget(self.chk_stim_options)
         layH_ctrl_run.addStretch(10)
 
         #layH_ctrl_run.setContentsMargins(*params['wdg_margins'])
@@ -207,12 +213,6 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
         # Controls for frequency domain
         # ---------------------------------------------------------------
-#        self.lbl_plt_freq = QLabel("Show ", self)
-#        self.cmb_plt_freq = QComboBox(self)
-#        self.cmb_plt_freq.addItems(["None","Stimulus","Response", "Both"])
-#        qset_cmb_box(self.cmb_plt_freq, self.plt_freq)
-#        self.cmb_plt_freq.setToolTip("<span>Choose which signals to show in the frequency domain: "
-#                                 "The stimulus, the filter response or both.</span>")
         
         self.lbl_plt_freq_stim = QLabel("Stimulus", self)
         self.cmb_plt_freq_stim = QComboBox(self)
@@ -233,6 +233,7 @@ class PlotImpz_UI(QWidget):
         self.chk_mrk_freq_resp = QCheckBox("*", self)
         self.chk_mrk_freq_resp.setChecked(False)
         self.chk_mrk_freq_resp.setToolTip("Use plot markers")
+
         self.chk_log_freq = QCheckBox("dB", self)
         self.chk_log_freq.setObjectName("chk_log_freq")
         self.chk_log_freq.setToolTip("<span>Logarithmic scale for y-axis.</span>")
@@ -266,7 +267,6 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.chk_mrk_freq_stim)
 
         layH_ctrl_freq.addWidget(self.chk_log_freq)
-        layH_ctrl_freq.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.lbl_dB_freq)
         layH_ctrl_freq.addStretch(2)
@@ -415,38 +415,6 @@ class PlotImpz_UI(QWidget):
         self.ledAmp2.editingFinished.connect(self._update_amp2)
         self.ledDC.editingFinished.connect(self._update_DC)
 
-# =============================================================================
-        
-#    def _log_mode_time(self):
-#        """
-#        Select / deselect log. mode for both time domain and update self.bottom
-#        """
-#        log = self.chkLog.isChecked()
-#        self.lbl_log_bottom.setVisible(log)
-#        self.ledLogBottom.setVisible(log)
-#        self.lbl_dB.setVisible(log)
-#        if log:
-#            self.bottom = safe_eval(self.ledLogBottom.text(), self.bottom,
-#                                    return_type='float', sign='neg')
-#            self.ledLogBottom.setText(str(self.bottom))
-#            
-#        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_time'})
-
-#    def _log_mode_freq(self):
-#        """
-#        Select / deselect log. mode for frequency domain and update self.bottom_f
-#        """
-#
-#        log_f = self.chkLogF.isChecked()
-#        self.lblLogBottomF.setVisible(log_f)
-#        self.ledLogBottomF.setVisible(log_f)
-#        self.lbldBF.setVisible(log_f)
-#        if log_f:
-#            self.bottom_f = safe_eval(self.ledLogBottomF.text(), self.bottom_f,
-#                                    return_type='float', sign='neg')
-#            self.ledLogBottomF.setText(str(self.bottom_f))
-#
-#        self.sig_tx.emit({'sender':__name__, 'view_changed':'log_freq'})
 
     def _enable_stim_widgets(self):
         """ Enable / disable widgets depending on the selected stimulus"""
