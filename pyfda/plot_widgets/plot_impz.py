@@ -730,15 +730,27 @@ class Plot_Impz(QWidget):
 
         # --------------- Complex response ----------------------------------
         if self.cmplx and self.plt_time_resp != "none":
-            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
-                bottom=self.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
-            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
+            #plot_resp_dict = self.fmt_plot_resp.copy()
+            plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i, plot_resp_dict, self.bottom_t)
+                
+            plot_resp_fnc(self.t[self.ui.N_start:], y_i[self.ui.N_start:], label='$y_i[n]$',
+                     **plot_resp_dict)
+            # Add plot markers, this is way faster than normal stem plotting
+            if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
+                self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:], 
+                                  **self.fmt_mkr_resp) #markerfmt=mkfmt_i, 
+
+#            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
+#                bottom=self.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
+#            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
             # is shorter but imports matplotlib, set property directly instead:
             [label.set_visible(False) for label in self.ax_r.get_xticklabels()]
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
+            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_i.set_ylabel(H_i_str + r'$\rightarrow $')
+            self.ax_i.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.5)            
         else:
             self.ax_r.set_xlabel(fb.fil[0]['plt_tLabel'])
             self.ax_r.set_ylabel(H_str + r'$\rightarrow $')
