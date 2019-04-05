@@ -918,7 +918,8 @@ class Plot_Impz(QWidget):
                 labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
 
             if self.ui.chk_win_freq.isChecked():
-                self.ax_fft.plot(F, Win, c="gray", label="win")#self.ui.window_type
+                self.ax_fft.plot(F, Win, c="gray", label="win")
+                labels.append("{0}".format(self.ui.window_type))
 
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
