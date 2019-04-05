@@ -120,9 +120,9 @@ class Plot_Impz(QWidget):
         self.ui.chk_stim_options.clicked.connect(self._show_stim_options)
         # --- time domain plotting ---
         self.ui.cmb_plt_time_resp.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.chk_marker_resp.clicked.connect(self.draw_impz_time)
+        self.ui.chk_mrk_time_resp.clicked.connect(self.draw_impz_time)
         self.ui.cmb_plt_time_stim.currentIndexChanged.connect(self.draw_impz_time)
-        self.ui.chk_marker_stim.clicked.connect(self.draw_impz_time)
+        self.ui.chk_mrk_time_stim.clicked.connect(self.draw_impz_time)
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_range.clicked.connect(self.draw_impz_time)
@@ -718,7 +718,7 @@ class Plot_Impz(QWidget):
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$x[n]$',
                  **plot_stim_dict)
         # Add plot markers, this is way faster than normal stem plotting
-        if self.ui.chk_marker_stim.isChecked() and self.plt_time_stim not in {"dots","none"}:
+        if self.ui.chk_mrk_time_stim.isChecked() and self.plt_time_stim not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], x[self.ui.N_start:], **self.fmt_mkr_stim)
 
         # --------------- Response plot ----------------------------------
@@ -728,7 +728,7 @@ class Plot_Impz(QWidget):
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
         # Add plot markers, this is way faster than normal stem plotting
-        if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
+        if self.ui.chk_mrk_time_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], **self.fmt_mkr_resp)
 
         # --------------- Window plot ----------------------------------
@@ -745,7 +745,7 @@ class Plot_Impz(QWidget):
             plot_resp_fnc(self.t[self.ui.N_start:], y_i[self.ui.N_start:], label='$y_i[n]$',
                      **plot_resp_dict)
             # Add plot markers, this is way faster than normal stem plotting
-            if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
+            if self.ui.chk_mrk_time_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
                 self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:], 
                                   marker=mkfmt_i, **self.fmt_mkr_resp)
 
