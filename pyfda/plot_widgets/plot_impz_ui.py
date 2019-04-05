@@ -180,6 +180,11 @@ class PlotImpz_UI(QWidget):
         self.led_log_bottom_time.setText(str(self.bottom_t))
         self.led_log_bottom_time.setToolTip("<span>Minimum display value for log. scale.</span>")
         self.lbl_dB_time = QLabel("dB", self)
+        
+        self.chk_win_time = QCheckBox("Show Window", self)
+        self.chk_win_time.setObjectName("chk_win_time")
+        self.chk_win_time.setToolTip("<span>Show windowing function.</span>")
+        self.chk_win_time.setChecked(False)
 
         self.chk_fx_range = QCheckBox("Min/max.", self)
         self.chk_fx_range.setObjectName("chk_fx_range")
@@ -200,6 +205,8 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time.addWidget(self.lbl_log_bottom_time)
         layH_ctrl_time.addWidget(self.led_log_bottom_time)
         layH_ctrl_time.addWidget(self.lbl_dB_time)
+        layH_ctrl_time.addStretch(1)
+        layH_ctrl_time.addWidget(self.chk_win_time)        
         layH_ctrl_time.addStretch(2)        
         layH_ctrl_time.addWidget(self.chk_fx_range)
         layH_ctrl_time.addStretch(10)
@@ -255,6 +262,11 @@ class PlotImpz_UI(QWidget):
         self.ledWinPar1 = QLineEdit(self)
         self.ledWinPar1.setText("1")
         self.ledWinPar1.setObjectName("ledWinPar1")
+        
+        self.chk_win_freq = QCheckBox("Show Window", self)
+        self.chk_win_freq.setObjectName("chk_win_freq")
+        self.chk_win_freq.setToolTip("<span>Show windowing function.</span>")
+        self.chk_win_freq.setChecked(False)
 
         layH_ctrl_freq = QHBoxLayout()
 
@@ -274,6 +286,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.cmb_win_fft)
         layH_ctrl_freq.addWidget(self.lblWinPar1)
         layH_ctrl_freq.addWidget(self.ledWinPar1)
+        layH_ctrl_freq.addWidget(self.chk_win_freq)        
         layH_ctrl_freq.addStretch(10)
 
         #layH_ctrl_freq.setContentsMargins(*params['wdg_margins'])

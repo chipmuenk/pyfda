@@ -126,6 +126,7 @@ class Plot_Impz(QWidget):
         self.ui.chk_log_time.clicked.connect(self._log_mode_time)
         self.ui.led_log_bottom_time.editingFinished.connect(self._log_mode_time)
         self.ui.chk_fx_range.clicked.connect(self.draw_impz_time)
+        self.ui.chk_win_time.clicked.connect(self.draw_impz_time)
         # --- frequency domain plotting ---
         self.ui.cmb_plt_freq_resp.currentIndexChanged.connect(self.draw_impz_freq)
         self.ui.chk_mrk_freq_resp.clicked.connect(self.draw_impz_freq)
@@ -133,6 +134,7 @@ class Plot_Impz(QWidget):
         self.ui.chk_mrk_freq_stim.clicked.connect(self.draw_impz_freq)
         self.ui.chk_log_freq.clicked.connect(self._log_mode_freq)
         self.ui.led_log_bottom_freq.editingFinished.connect(self._log_mode_freq)
+        self.ui.chk_win_freq.clicked.connect(self.draw_impz_freq)
         
         # frequency widgets require special handling as they are scaled with f_s
         self.ui.ledFreq1.installEventFilter(self)
@@ -467,7 +469,6 @@ class Plot_Impz(QWidget):
         # calculate FFT of stimulus / response
         if self.x is None or len(self.x) < self.ui.N_end:
             self.X = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
-            self.needs_redraw[1] = True
             if self.x is None:
                 logger.warning("Stimulus is 'None', FFT cannot be calculated.")
             else:
@@ -476,12 +477,10 @@ class Plot_Impz(QWidget):
         else:
             x_win = self.x[self.ui.N_start:self.ui.N_end] * self.ui.win
             self.X = np.abs(np.fft.fft(x_win)) / self.ui.N
-            self.needs_redraw[1] = True
 
     #if self.plt_freq_resp != "none":
         if self.y is None or len(self.y) < self.ui.N_end:
             self.Y = np.zeros(self.ui.N_end-self.ui.N_start) # dummy result
-            self.needs_redraw[1] = True
             if self.y is None:
                 logger.warning("Transient response is 'None', FFT cannot be calculated.")
             else:
@@ -490,7 +489,11 @@ class Plot_Impz(QWidget):
         else:
             y_win = self.y[self.ui.N_start:self.ui.N_end] * self.ui.win
             self.Y = np.abs(np.fft.fft(y_win)) / self.ui.N
-            self.needs_redraw[1] = True                
+            
+        if self.ui.chk_win_freq.isChecked():
+            self.Win = np.abs(np.fft.fft(self.ui.win)) / self.ui.N
+
+        self.needs_redraw[1] = True                
 #------------------------------------------------------------------------------
     def update_view(self):
         """
@@ -684,6 +687,7 @@ class Plot_Impz(QWidget):
             H_str = '$|$' + self.H_str + '$|$ in dBV'
             x = np.maximum(20 * np.log10(abs(self.x * scale_i)), self.bottom_t)
             y = np.maximum(20 * np.log10(abs(self.y_r * scale_o)), self.bottom_t)
+            win = np.maximum(20 * np.log10(abs(self.ui.win)), self.bottom_t)
             if self.cmplx:
                 y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.bottom_t)
                 H_i_str = r'$|\Im\{$' + self.H_str + '$\}|$' + ' in dBV'
@@ -693,6 +697,7 @@ class Plot_Impz(QWidget):
         else:
             x = self.x * scale_i
             y = self.y_r * scale_o
+            win = self.ui.win
             if self.cmplx:
                 y_i = self.y_i * scale_o
             
@@ -726,6 +731,10 @@ class Plot_Impz(QWidget):
         if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
             self.ax_r.scatter(self.t[self.ui.N_start:], y[self.ui.N_start:], **self.fmt_mkr_resp)
 
+        # --------------- Window plot ----------------------------------
+        if self.ui.chk_win_time.isChecked():
+            self.ax_r.plot(win, c="gray", label=self.ui.window_type)
+
         self.ax_r.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.5)
 
         # --------------- Complex response ----------------------------------
@@ -738,7 +747,7 @@ class Plot_Impz(QWidget):
             # Add plot markers, this is way faster than normal stem plotting
             if self.ui.chk_marker_resp.isChecked() and self.plt_time_resp not in {"dots","none"}:
                 self.ax_i.scatter(self.t[self.ui.N_start:], y_i[self.ui.N_start:], 
-                                  **self.fmt_mkr_resp) #markerfmt=mkfmt_i, 
+                                  marker=mkfmt_i, **self.fmt_mkr_resp)
 
 #            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
 #                bottom=self.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
@@ -834,6 +843,11 @@ class Plot_Impz(QWidget):
                 if fb.fil[0]['freqSpecsRangeType'] == 'half':
                     Y[1:] = 2 * Y[1:] # correct for single-sided spectrum (except DC)
 
+            if self.ui.chk_win_freq.isChecked():
+                Win = self.Win.copy()/np.sqrt(2) # enforce deep copy and convert to RMS
+                if fb.fil[0]['freqSpecsRangeType'] == 'half':
+                    Win[1:] = 2 * Win[1:] # correct for single-sided spectrum (except DC)
+
             if self.ui.chk_log_freq.isChecked():
                 unit = unit_P = "dBW"
                 unit_nenbw = "dB"
@@ -844,6 +858,8 @@ class Plot_Impz(QWidget):
                 if plt_response:
                     Y = np.maximum(20 * np.log10(Y), self.ui.bottom_f)
                     self.Py = 10*np.log10(self.Py)
+                if self.ui.chk_win_freq.isChecked():
+                    Win = np.maximum(20 * np.log10(Win), self.ui.bottom_f)
             else:
                 unit = "Vrms"
                 unit_P = "W"
@@ -858,14 +874,20 @@ class Plot_Impz(QWidget):
                     Y = np.fft.fftshift(Y)
                 if plt_stimulus:
                     X = np.fft.fftshift(X)
+                if self.ui.chk_win_freq.isChecked():
+                    Win = np.fft.fftshift(Win)
                 F = np.fft.fftshift(F)
+                
             elif fb.fil[0]['freqSpecsRangeType'] == 'half':
                 # only use the first half of X, Y and F
                 if plt_response:
                     Y = Y[0:self.ui.N//2]
                 if plt_stimulus:
                     X = X[0:self.ui.N//2]
+                if self.ui.chk_win_freq.isChecked():
+                    Win = Win[0:self.ui.N//2]
                 F = F[0:self.ui.N//2]
+                
             else: # fb.fil[0]['freqSpecsRangeType'] == 'whole'
                 # plot for F = 0 ... 1
                 F = np.fft.fftshift(F) + fb.fil[0]['f_S']/2.
@@ -894,7 +916,10 @@ class Plot_Impz(QWidget):
                     self.ax_fft.scatter(F, Y, **self.fmt_mkr_resp)
                 
                 labels.append("$P_Y$ = {0:.3g} {1}".format(self.Py, unit_P))
-                
+
+            if self.ui.chk_win_freq.isChecked():
+                self.ax_fft.plot(F, Win, c="gray", label="win")#self.ui.window_type
+
             labels.append("$NENBW$ = {0:.4g} {1}".format(nenbw, unit_nenbw))
             labels.append("$CGAIN$  = {0:.4g}".format(self.ui.scale))
 
