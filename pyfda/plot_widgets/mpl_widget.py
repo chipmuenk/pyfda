@@ -47,7 +47,7 @@ def stems(x, y, ax=None, label=None, **kwargs):
     """
     # pop the 'bottom' key-value pair from the dict, provide default value 0
     bottom=kwargs.pop('bottom', 0) 
-    ax.axhline(bottom, x[0], x[-1], **kwargs)
+    ax.axhline(bottom, **kwargs)
     ax.vlines(x, y, bottom, label=label, **kwargs)
     # ax.set_ylim([1.05*y.min(), 1.05*y.max()])
 
