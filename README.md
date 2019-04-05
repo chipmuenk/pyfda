@@ -52,20 +52,24 @@ Optional libraries:
 
 Initial release 
 
-### Release 0.2 (planned for Aug. 2018)
+### Release 0.2a1 (Apr. 5th 2019)
 
 * **Rework of signal-slot connections**
     * Clearer structure: only one RX / TX signal connection per widget
     * More flexibility: transport dicts or lists via the signals
-* **HDL synthesis**
-    * Use a templating engine or myHDL to generate synthesizable VHDL / Verilog netlists for basic filter topologies
-    * Fixpoint simulation results in pyFDA widgets
+    * Much improved modularity - new functionality can be easily added
+* **HDL synthesis (very raw with LOTS of bugs)**
+    * Use myHDL to generate synthesizable VHDL / Verilog netlists for basic filter topologies and do fixpoint simulation (plots are displayed in pyFDA widgets)
+    * When myHDL is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
+    * **Attention:** When installing pyFDA with conda, myHDL needs to be installed separately with pip (not available via conda). myHDL     0.1.0 doesn't work with Python 3.7, you either need to go back to Python 3.6 or install bleeding edge myHDL. 
 * **Didactic improvements**
+  * Improved display of transient response and FFT of transient response
   * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
   * Apply filter on audio files (in the h[n] widget) to hear the filtering effect
 * **Documentation using Sphinx / ReadTheDocs**
+  Could be more and better ... but hey, it's a start!
 
-### Release 1.0 (planned for end of 2018)
+### Release 1.0 (planned for some time in the not so near future)
 
 * **Filter Manager**
   * Store multiple designs in one filter dict
