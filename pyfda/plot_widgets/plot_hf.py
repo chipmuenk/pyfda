@@ -182,11 +182,12 @@ class Plot_Hf(QWidget):
         """
         Initialize and clear the axes
         """
-#        self.ax = self.mplwidget.ax
-        self.ax = self.mplwidget.fig.add_subplot(111)
+        if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
+            self.ax = self.mplwidget.fig.add_subplot(111)
+            self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
+            self.ax.get_yaxis().tick_left() # remove axis ticks right
+
         self.ax.clear()
-        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-        self.ax.get_yaxis().tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
     def plot_spec_limits(self, ax):
@@ -603,9 +604,9 @@ class Plot_Hf(QWidget):
             self.ax.set_xlim(f_lim)
             self.ax.set_ylim(A_lim)
 
-            self.ax.set_title(r'Magnitude Frequency Response')
             self.ax.set_xlabel(fb.fil[0]['plt_fLabel'])
             self.ax.set_ylabel(H_str)
+            self.ax.set_title(r'Magnitude Frequency Response')            
 
         self.redraw()
         
