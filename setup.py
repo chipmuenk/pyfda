@@ -74,7 +74,6 @@ setup(
         'numpy',
         'scipy',
         'matplotlib',
-	'pyqt5',
         'docutils',
         ],
     #'myhdl >= 0.1.0'
