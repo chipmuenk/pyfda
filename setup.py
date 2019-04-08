@@ -76,8 +76,10 @@ setup(
         'matplotlib',
 	'pyqt5',
         'docutils',
-        'myhdl >= 0.1.0'
         ],
+    #'myhdl >= 0.1.0'
+    # doesn't work with py3.7
+
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached terminal:
     entry_points = {
