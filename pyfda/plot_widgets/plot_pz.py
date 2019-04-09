@@ -148,13 +148,9 @@ class Plot_PZ(QWidget):
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
-        Initialize and clear the axes
+        Initialize and clear the axes (this is only run once)
         """
-        if self.chkHf.isChecked():
-            self.ax = self.mplwidget.fig.add_subplot(111)
-        else:
-            self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax.clear()
+        self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
         self.ax.get_yaxis().tick_left() # remove axis ticks right
 
