@@ -4,7 +4,7 @@ numpy
 scipy
 matplotlib
 # PyQt5 # doesn't work with Py 2.7
-pyqt5
+# pyqt5
 six
 docutils
 nose
