@@ -184,8 +184,8 @@ class Plot_Hf(QWidget):
         """
         if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
             self.ax = self.mplwidget.fig.add_subplot(111)
-            self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
-            self.ax.get_yaxis().tick_left() # remove axis ticks right
+        self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
+        self.ax.get_yaxis().tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
     def plot_spec_limits(self, ax):
