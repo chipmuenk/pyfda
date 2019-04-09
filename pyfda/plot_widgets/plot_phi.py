@@ -129,16 +129,15 @@ class Plot_Phi(QWidget):
 #------------------------------------------------------------------------------
     def init_axes(self):
         """
-        Initialize and clear the axes
+        Initialize and clear the axes - this is only called once
         """
-#        self.ax = self.mplwidget.ax
-        self.ax = self.mplwidget.fig.add_subplot(111)
-        self.ax.clear()
+        if len(self.mplwidget.fig.get_axes()) == 0: # empty figure, no axes
+            self.ax = self.mplwidget.fig.add_subplot(111)
         self.ax.get_xaxis().tick_bottom() # remove axis ticks on top
         self.ax.get_yaxis().tick_left() # remove axis ticks right
 
 #------------------------------------------------------------------------------
-    def calc_hf(self):
+    def calc_resp(self):
         """
         (Re-)Calculate the complex frequency response H(f)
         """
@@ -154,7 +153,7 @@ class Plot_Phi(QWidget):
         Main entry point:
         Re-calculate \|H(f)\| and draw the figure
         """
-        self.calc_hf()
+        self.calc_resp()
         self.update_view()
 
 #------------------------------------------------------------------------------
