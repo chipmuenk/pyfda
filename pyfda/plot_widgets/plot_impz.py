@@ -733,7 +733,7 @@ class Plot_Impz(QWidget):
 
         # --------------- Window plot ----------------------------------
         if self.ui.chk_win_time.isChecked():
-            self.ax_r.plot(win, c="gray", label=self.ui.window_type)
+            self.ax_r.plot(self.t[self.ui.N_start:], win, c="gray", label=self.ui.window_type)
 
         self.ax_r.legend(loc='best', fontsize = 'small', fancybox=True, framealpha=0.5)
 
