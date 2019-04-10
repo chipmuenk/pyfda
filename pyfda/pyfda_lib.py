@@ -68,9 +68,9 @@ except ImportError:
 
 try:
     from myhdl import __version__ as VERSION_HDL
-    VERSION.update({'myhdl': VERSION_HDL})
-except ImportError:
-    pass
+except (ImportError,SyntaxError):
+    VERSION_HDL = None
+VERSION.update({'myhdl': VERSION_HDL})
 
 try:
     from docutils import __version__ as VERSION_DOCUTILS

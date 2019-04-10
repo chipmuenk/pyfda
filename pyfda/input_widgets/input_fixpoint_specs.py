@@ -32,24 +32,13 @@ from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
-if cmp_version("myhdl", "0.10") >= 0:
+# check whether myhdl >= 0.10 is installed. BUT version 0.10 is incompatible
+# with Python 3.7, it is not installed. 
+if cmp_version("myhdl", "0.10") >= 0: # suitable combination of Py and myhdl found
     import myhdl
     HAS_MYHDL = True
-  
-#    fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
-#    if not os.path.exists(fil_blocks_path):
-#        logger.error("Invalid path {0}".format(fil_blocks_path))
-#    else:
-#        if fil_blocks_path not in sys.path:
-#            sys.path.append(fil_blocks_path)
-#        from pyfda.filter_blocks.fda.fir import FilterFIR
-#        from pyfda.filter_blocks.fda.iir import FilterIIR
-
 else:
     HAS_MYHDL = False
-
-# see C. Feltons "FPGA IIR Lowpass Direct Form I Filter Generator"
-#                 @ http://www.dsprelated.com/showcode/211.php
 
 #------------------------------------------------------------------------------
 
