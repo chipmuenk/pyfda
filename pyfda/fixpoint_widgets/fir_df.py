@@ -175,7 +175,7 @@ class FIR_DF(QWidget):
 
 ###############################################################################
         
-class FilterFIR(FilterHardware): # from filter_blocks.fda.fir
+class FilterFIR(FilterHardware):
     def __init__(self, b = None, a = None):
         """
         Contains FIR filter parameters. Parent Class : FilterHardware
