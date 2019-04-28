@@ -1,0 +1,117 @@
+From 73510a041297f65a2495de13e8bf1665f3bd6ab0 Mon Sep 17 00:00:00 2001
+From: Unknown <martin.marmsoler@gmail.com>
+Date: Sun, 28 Apr 2019 10:26:19 +0200
+Subject: [PATCH] add flatpak and desktop file
+
+---
+ ressource/mime/applications/pyFDA.desktop | 12 ++++
+ ressource/pyFDA.appdata.xml               | 78 +++++++++++++++++++++++
+ 2 files changed, 90 insertions(+)
+ create mode 100644 ressource/mime/applications/pyFDA.desktop
+ create mode 100644 ressource/pyFDA.appdata.xml
+
+diff --git a/ressource/mime/applications/pyFDA.desktop b/ressource/mime/applications/pyFDA.desktop
+new file mode 100644
+index 00000000..d4437bea
+--- /dev/null
++++ b/ressource/mime/applications/pyFDA.desktop
+@@ -0,0 +1,12 @@
++[Desktop Entry]
++Encoding=UTF-8
++Name=pyFDA
++Comment=Python Filter Design Analysis Tool
++Exec=pyfdax
++StartupWMClass=pyfdax
++Icon=com.github.chipmuenk.pyFDA
++Terminal=false
++Type=Application
++Categories=Development;
++X-Desktop-File-Install-Version=0.1
++Name[de_DE]=pyFDA
+diff --git a/ressource/pyFDA.appdata.xml b/ressource/pyFDA.appdata.xml
+new file mode 100644
+index 00000000..ab1645ec
+--- /dev/null
++++ b/ressource/pyFDA.appdata.xml
+@@ -0,0 +1,78 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<component type="desktop-application">
++  <id>com.github.chipmuenk.pyFDA</id>
++  <metadata_license>FSFAP</metadata_license>
++  <project_license>OSMC-PL 1.2</project_license>
++  <name>pyFDA</name>
++  <summary>Python Filter Design Analysis Tool</summary>
++
++  <description>
++    <p>Features:</p>
++    <ul>
++      <li></li>
++    </ul>
++  </description>
++
++  <launchable type="desktop-id">com.github.chipmuenk.pyFDA.desktop</launchable>
++
++  <screenshots>
++    <screenshot type="default">
++      <caption>The main view</caption>
++        <image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyFDA_screenshot_3.png</image>
++		<image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyFDA_screenshot_3d_4.PNG</image>
++		<image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyFDA_screenshot_hn.PNG</image>
++		<image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyfda_scr_shot_baq_impz.PNG</image>
++		<image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyFDA_screenshot_3d_3.PNG</image>
++		<image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyFDA_screenshot_PZ.PNG</image>
++		<image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyFDA_screenshot_spec_error.PNG</image>
++		<image>https://raw.githubusercontent.com/chipmuenk/pyFDA/develop/img/pyfda_scr_shot_3d5_info.PNG</image>
++    </screenshot>
++  </screenshots>
++
++  <url type="homepage">https://github.com/chipmuenk/pyFDA</url>
++
++  <provides>
++    <binary>pyfdax</binary>
++    <id>com.github.chipmuenk.pyFDA</id>
++  </provides>
++
++  <releases>
++    <release version="2018.03.23" date="2018-03-23">
++      <description>
++        <p>Initial Flathub release</p>
++      </description>
++    </release>
++  </releases>
++
++ <content_rating type="oars-1.1">
++    <content_attribute id="violence-cartoon">none</content_attribute>
++    <content_attribute id="violence-fantasy">none</content_attribute>
++    <content_attribute id="violence-realistic">none</content_attribute>
++    <content_attribute id="violence-bloodshed">none</content_attribute>
++    <content_attribute id="violence-sexual">none</content_attribute>
++    <content_attribute id="violence-desecration">none</content_attribute>
++    <content_attribute id="violence-slavery">none</content_attribute>
++    <content_attribute id="violence-worship">none</content_attribute>
++    <content_attribute id="drugs-alcohol">none</content_attribute>
++    <content_attribute id="drugs-narcotics">none</content_attribute>
++    <content_attribute id="drugs-tobacco">none</content_attribute>
++    <content_attribute id="sex-nudity">none</content_attribute>
++    <content_attribute id="sex-themes">none</content_attribute>
++    <content_attribute id="sex-homosexuality">none</content_attribute>
++    <content_attribute id="sex-prostitution">none</content_attribute>
++    <content_attribute id="sex-adultery">none</content_attribute>
++    <content_attribute id="sex-appearance">none</content_attribute>
++    <content_attribute id="language-profanity">none</content_attribute>
++    <content_attribute id="language-humor">none</content_attribute>
++    <content_attribute id="language-discrimination">none</content_attribute>
++    <content_attribute id="social-chat">none</content_attribute>
++    <content_attribute id="social-info">none</content_attribute>
++    <content_attribute id="social-audio">none</content_attribute>
++    <content_attribute id="social-location">none</content_attribute>
++    <content_attribute id="social-contacts">none</content_attribute>
++    <content_attribute id="money-purchasing">none</content_attribute>
++    <content_attribute id="money-gambling">none</content_attribute>
++  </content_rating>
++  
++</component>
++
+-- 
+2.21.0
+
