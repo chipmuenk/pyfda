@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=pyFDA
+Comment=Python Filter Design Analysis Tool
+Exec=pyfdax
+StartupWMClass=pyfdax
+Icon=com.github.chipmuenk.pyFDA
+Terminal=false
+Type=Application
+Categories=Development;
+X-Desktop-File-Install-Version=0.1
+Name[de_DE]=pyFDA
