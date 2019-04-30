@@ -9,7 +9,59 @@
   <description>
     <p>Features:</p>
     <ul>
-      <li></li>
+    	<li> <b>Filter design</b>
+			<ul>
+				<li><b>Design methods:</b> Equiripple, Firwin, Moving Average, Bessel, Butterworth, Elliptic, Chebychev 1 and 2 (from scipy.signal and custom methods)</li>
+				<li><b>Second-Order Sections</b> are used in the filter design when available for more robust filter design and analysis</li>
+				<li><b>Remember all specifications</b> when changing filter design methods</li>				
+				<li><b>Fine-tune</b> manually the filter order and corner frequencies calculated by minimum order algorithms</li>
+				<li><b>Compare filter designs</b> for a given set of specifications and different design methods</li>
+				<li><b>Filter coefficients and poles / zeroes</b> can be displayed, edited and quantized in various formats</li>
+			</ul>
+		</li>
+
+		<li> <b>Clearly structured User Interface</b>
+			<ul>
+				<li>only widgets needed for the currently selected design method are visible</li>
+				<li>enhanced matplotlib NavigationToolbar (nicer icons, additional functions)</li>
+				<li>display help files (own / Python docstrings) as rich text</li>				
+				<li>tooltips for all control and entry widgets</li>
+			</ul>
+		</li>
+
+		<li> <b>Common interface for all filter design methods</b>
+			<ul>
+				<li>specify frequencies as absolute values or normalized to sampling or Nyquist frequency</li>
+				<li>specify ripple and attenuations in dB, as voltage or as power ratios</li>
+				<li>enter expressions like exp(-pi/4 * 1j) with the help of the library simpleeval (included in source files)</li>				
+			</ul>
+		</li>
+
+		<li> <b>Graphical Analyses</b>
+			<ul>
+				<li>Magnitude response (lin / power / log) with optional display of specification bands, phase and an inset plot</li>
+				<li>Phase response (wrapped / unwrapped)</li>
+				<li>Group delay</li>
+				<li>Pole / Zero plot</li>
+				<li>Impulse response and step response (lin / log)</li>
+				<li>3D-Plots (|H(f)|, mesh, surface, contour) with optional pole / zero display</li>				
+			</ul>
+		</li>
+
+		<li> <b>Modular architecture</b>, facilitating the implementation of new filter design and analysis methods 
+			<ul>
+				<li>Filter design files not only contain the actual algorithm but also dictionaries specifying which parameters and standard widgets have to be displayed in the GUI.</li>
+				<li>Special widgets needed by design methods (e.g. for choosing the window type in Firwin) are included in the filter design file, not in the main program</li>			
+			</ul>
+		</li>
+
+		<li> <b>Saving and loading</b>
+			<ul>
+				<li>Save and load filter designs in pickled and in numpy's NPZ-format</li>
+				<li>Export and import coefficients and poles/zeros as comma-separated values (CSV), in numpy's NPY- and NPZ-formats, in Excel (R) or in Matlab (R) workspace format</li>
+				<li>Export coefficients in FPGA vendor specific formats like Xilinx (R) COE-format</li>				
+			</ul>
+		</li>
     </ul>
   </description>
 
