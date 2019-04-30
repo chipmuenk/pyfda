@@ -1,7 +1,7 @@
 {
   "app-id": "com.github.chipmuenk.pyFDA",
   "runtime": "org.kde.Platform",
-  "runtime-version": "5.10",
+  "runtime-version": "5.12",
   "sdk": "org.kde.Sdk",
   "command": "pyfdax",
   "finish-args": [
@@ -19,60 +19,60 @@
     "modules": [
 		{
 		    "name": "PyQt5",
-		    "cleanup": ["/bin/sip", "/include", "/lib/python3.5/site-packages/*.pyi"],
+		    "cleanup": ["/bin/sip", "/include", "/lib/python3.7/site-packages/*.pyi"],
 		    "config-opts": ["--disable-static", "--enable-x11"],
 		    "buildsystem": "simple",
 		    "build-commands": [
-		        "python3 configure.py --confirm-license --no-docstrings --assume-shared --no-sip-files --no-qml-plugin --no-tools --no-qsci-api -d ${FLATPAK_DEST}/lib/python3.5/site-packages --sip=${FLATPAK_DEST}/bin/sip --sip-incdir=${FLATPAK_DEST}/include --stubsdir=${FLATPAK_DEST}/lib/python3.5/site-packages --disable=QtSensors --disable=QtWebEngine --disable=QtQuick --disable=QtQml --disable=QtWebChannel --disable=QtWebEngineCore --disable=QWebEngineWidgets --disable=QtQuickWidgets --disable=QtSql --disable=QtXmlPatterns --disable=QtMultimedia --disable=QtMultimediaWidgets --disable=QtLocation --disable=QtDesigner --disable=QtBluetooth --disable=QtWebKit --disable=QtWebKitWidgets --disable=QtNfc --disable=QtPositioning",
+		        "python3 configure.py --confirm-license --no-docstrings --assume-shared --no-sip-files --no-qml-plugin --no-tools --no-qsci-api -d ${FLATPAK_DEST}/lib/python3.7/site-packages --sip=${FLATPAK_DEST}/bin/sip --sip-incdir=${FLATPAK_DEST}/include --stubsdir=${FLATPAK_DEST}/lib/python3.7/site-packages --disable=QtSensors --disable=QtWebEngine --disable=QtQuick --disable=QtQml --disable=QtWebChannel --disable=QtWebEngineCore --disable=QWebEngineWidgets --disable=QtQuickWidgets --disable=QtSql --disable=QtXmlPatterns --disable=QtMultimedia --disable=QtMultimediaWidgets --disable=QtLocation --disable=QtDesigner --disable=QtBluetooth --disable=QtWebKit --disable=QtWebKitWidgets --disable=QtNfc --disable=QtPositioning",
 		        "make -j $(nproc)",
 		        "make install"
 		    ],
 		    "sources": [{
 		        "type": "archive",
-		        "url": "https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.10.1/PyQt5_gpl-5.10.1.tar.gz",
-		        "sha256": "9932e971e825ece4ea08f84ad95017837fa8f3f29c6b0496985fa1093661e9ef"
+		        "url": "https://www.riverbankcomputing.com/static/Downloads/PyQt5/5.12.1/PyQt5_gpl-5.12.1.tar.gz",
+		        "sha256": "3718ce847d824090fd5f95ff3f13847ee75c2507368d4cbaeb48338f506e59bf"
 		    }],
 		    "modules": [{
 		        "name": "sip",
 		        "buildsystem": "simple",
 		        "build-commands": [
-		            "python3 configure.py -b ${FLATPAK_DEST}/bin -d ${FLATPAK_DEST}/lib/python3.5/site-packages -e ${FLATPAK_DEST}/include -v ${FLATPAK_DEST}/share/sip --stubsdir=${FLATPAK_DEST}/lib/python3.5/site-packages",
+		            "python3 configure.py -b ${FLATPAK_DEST}/bin -d ${FLATPAK_DEST}/lib/python3.7/site-packages -e ${FLATPAK_DEST}/include -v ${FLATPAK_DEST}/share/sip --stubsdir=${FLATPAK_DEST}/lib/python3.7/site-packages",
 		            "make",
 		            "make install"
 		        ],
 		        "sources": [{
 		            "type": "archive",
-		            "url": "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz",
-		            "sha256": "7eaf7a2ea7d4d38a56dd6d2506574464bddf7cf284c960801679942377c297bc"
+		            "url": "https://www.riverbankcomputing.com/static/Downloads/sip/4.19.16/sip-4.19.16.tar.gz",
+		            "sha256": "184c790d58e9527fc6bdac2bbf8638f3d1b41dea922cad8eb83172b4ba70c620"
 		        }]
 		    }]
 		},
-		{
-			"name": "numpy",
+		{ /* seems to be a bug in PyQt5 that this package will not installed */
+			"name": "PyQt5-sip",
 			"buildsystem": "simple",
 			"build-commands": [
-				"pip3 install --prefix=/app --no-deps numpy-1.16.3-cp35-cp35m-manylinux1_x86_64.whl"
+				"pip3 install --prefix=/app --no-deps PyQt5_sip-4.19.15-cp37-cp37m-manylinux1_x86_64.whl"
 			],
 			"sources": [
 				{
 					"type": "file",
-					"url": "https://files.pythonhosted.org/packages/f6/f3/cc6c6745347c1e997cc3e58390584a250b8e22b6dfc45414a7d69a3df016/numpy-1.16.3-cp35-cp35m-manylinux1_x86_64.whl",
-					"sha256": "771147e654e8b95eea1293174a94f34e2e77d5729ad44aefb62fbf8a79747a15"
+					"url": "https://files.pythonhosted.org/packages/2e/ee/c6efd28dcb65e990411be50a46c9757f12202df94cfee73689223bbc2cf0/PyQt5_sip-4.19.15-cp37-cp37m-manylinux1_x86_64.whl",
+					"sha256": "31a59f76168df007b480b9382256c20f8898c642e1394df2990559f0f6389f66"
 				}
 				
 			]
 		},
 		{
-			"name": "six",
+			"name": "numpy",
 			"buildsystem": "simple",
 			"build-commands": [
-				"pip3 install --prefix=/app --no-deps six-1.12.0-py2.py3-none-any.whl"
+				"pip3 install --prefix=/app --no-deps numpy-1.16.3-cp37-cp37m-manylinux1_x86_64.whl"
 			],
 			"sources": [
 				{
 					"type": "file",
-					"url": "https://files.pythonhosted.org/packages/73/fb/00a976f728d0d1fecfe898238ce23f502a721c0ac0ecfedb80e0d88c64e9/six-1.12.0-py2.py3-none-any.whl",
-					"sha256": "3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c"
+					"url": "https://files.pythonhosted.org/packages/bb/76/24e9f32c78e6f6fb26cf2596b428f393bf015b63459468119f282f70a7fd/numpy-1.16.3-cp37-cp37m-manylinux1_x86_64.whl",
+					"sha256": "5a8f021c70e6206c317974c93eaaf9bc2b56295b6b1cacccf88846e44a1f33fc"
 				}
 				
 			]
@@ -96,13 +96,13 @@
 			"name": "matplotlib",
 			"buildsystem": "simple",
 			"build-commands": [
-				"pip3 install --prefix=/app --no-deps matplotlib-3.0.3-cp35-cp35m-manylinux1_x86_64.whl"
+				"pip3 install --prefix=/app --no-deps matplotlib-3.0.3-cp37-cp37m-manylinux1_x86_64.whl"
 			],
 			"sources": [
 				{
 					"type": "file",
-					"url": "https://files.pythonhosted.org/packages/89/61/465fb3bfba684b0f53b5c4829c3c89e86e6fe9fdcdfda93e38f1788090f0/matplotlib-3.0.3-cp35-cp35m-manylinux1_x86_64.whl",
-					"sha256": "63e498067d32d627111cd1162cae1621f1221f9d4c6a9745dd7233f29de581b6"
+					"url": "https://files.pythonhosted.org/packages/83/2a/e47bbd9396af32376863a426baed62d9bf3091f81defd1fe81c5f33b11a3/matplotlib-3.0.3-cp37-cp37m-manylinux1_x86_64.whl",
+					"sha256": "4d4250bf508dd07cca3b43888097f873cadb66eec6ac63dbbfb798798ec07af2"
 				}
 				
 			]
@@ -141,13 +141,13 @@
 			"name": "scipy",
 			"buildsystem": "simple",
 			"build-commands": [
-				"pip3 install --prefix=/app --no-deps scipy-1.2.1-cp35-cp35m-manylinux1_x86_64.whl"
+				"pip3 install --prefix=/app --no-deps scipy-1.2.1-cp37-cp37m-manylinux1_x86_64.whl"
 			],
 			"sources": [
 				{
 					"type": "file",
-					"url": "https://files.pythonhosted.org/packages/f0/30/526bee2ce18c066f9ff13ba89603f6c2b96c9fd406b57a21a7ba14bf5679/scipy-1.2.1-cp35-cp35m-manylinux1_x86_64.whl",
-					"sha256": "281a34da34a5e0de42d26aed692ab710141cad9d5d218b20643a9cb538ace976"
+					"url": "https://files.pythonhosted.org/packages/3e/7e/5cee36eee5b3194687232f6150a89a38f784883c612db7f4da2ab190980d/scipy-1.2.1-cp37-cp37m-manylinux1_x86_64.whl",
+					"sha256": "870fd401ec7b64a895cff8e206ee16569158db00254b2f7157b4c9a5db72c722"
 				}
 				
 			]
@@ -156,13 +156,13 @@
 			"name": "kiwisolver",
 			"buildsystem": "simple",
 			"build-commands": [
-				"pip3 install --prefix=/app --no-deps kiwisolver-1.1.0-cp35-cp35m-manylinux1_x86_64.whl"
+				"pip3 install --prefix=/app --no-deps kiwisolver-1.1.0-cp37-cp37m-manylinux1_x86_64.whl"
 			],
 			"sources": [
 				{
 					"type": "file",
-					"url": "https://files.pythonhosted.org/packages/ee/18/4cd2e84c6aff0c6a50479118083d20b9e676e5175a913c0ea76d700fc244/kiwisolver-1.1.0-cp35-cp35m-manylinux1_x86_64.whl",
-					"sha256": "e3a21a720791712ed721c7b95d433e036134de6f18c77dbe96119eaf7aa08004"
+					"url": "https://files.pythonhosted.org/packages/93/f8/518fb0bb89860eea6ff1b96483fbd9236d5ee991485d0f3eceff1770f654/kiwisolver-1.1.0-cp37-cp37m-manylinux1_x86_64.whl",
+					"sha256": "a0c0a9f06872330d0dd31b45607197caab3c22777600e88031bfe66799e70bb0"
 				}
 				
 			]
@@ -210,7 +210,7 @@
 			"sources": [
 				{
 					"type": "git",
-					"tag": "v0.1.5",
+					"branch": "develop",
 					"url": "https://github.com/chipmuenk/pyFDA.git"
 				}
 			]
