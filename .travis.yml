@@ -17,11 +17,10 @@ before_install:
   - free -m
   - df -h
   - ulimit -a
-  
+  # Creat downloads directory with suitable access rights
   - sudo mkdir -p /downloads
   - sudo chmod a+rw /downloads
   - curl -L https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.2/sip-4.19.2.tar.gz  -o /downloads/sip.tar.gz 
-
   # Builds directory 
   - sudo mkdir -p /builds
   - sudo chmod a+rw /builds
