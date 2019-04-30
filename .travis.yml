@@ -10,6 +10,7 @@ sudo: required
 python:
   - "3.5"
   - "3.6"
+  - "3.7"
 
 before_install:
   - uname -a
@@ -20,7 +21,6 @@ before_install:
   - sudo mkdir -p /downloads
   - sudo chmod a+rw /downloads
   - curl -L https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.2/sip-4.19.2.tar.gz  -o /downloads/sip.tar.gz 
-#  - curl -L https://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-4.12/PyQt4_gpl_x11-4.12.tar.gz -o /downloads/pyqt4.tar.gz
 
   # Builds directory 
   - sudo mkdir -p /builds
@@ -29,12 +29,7 @@ before_install:
 install:
   - pip install -U pip wheel setuptools
   - pip install -r requirements.txt
-  #- pip install numpy nose six docutils matplotlib
-  #- pip install -v -U scipy
   - python -V
-
-  # Qt4
-#  - pushd /builds
   
   # SIP
   - tar xzf /downloads/sip.tar.gz --keep-newer-files
@@ -43,26 +38,9 @@ install:
   - make
   - sudo make install
   - popd
-   
-  # PyQt4
- # - tar xzf /downloads/pyqt4.tar.gz --keep-newer-files
- # - pushd PyQt4_gpl_x11-4.12 # .tar
- # - python configure.py -c --confirm-license --no-designer-plugin -e QtCore -e QtGui -e QtTest
- # - make
- # - sudo make install
- # - popd
-    
-  
-  # Builds Complete
-#  - popd
 
   - pip install .
 
-# before_script:
-  # #Don’t run xvfb directly, as it does not handle multiple concurrent instances that way.
-  # - "export DISPLAY=:99.0"
-  # - "sh -e /etc/init.d/xvfb start" # use X Virtual Framebuffer to imitate a display
-  # - sleep 3 # give xvfb some time to start
 services: 
   - xvfb
 
