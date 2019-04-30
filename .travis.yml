@@ -1,20 +1,6 @@
 language: python
 # adapted from https://github.com/GriMel/Kindleo/blob/master/.travis.yml
 
-# see also: http://qosvn.physik.uni-ulm.de/trac/qudi/browser/.travis.yml?rev=4d902d3b6464ef2bb22aa535358537b57b382518
-#env:
-#	  global:
-#     - SETUP_XVFB=True
-#	    - CONDA_CHANNELS="qttesting"
-#	    - CONDA_DEPENDENCIES="jedi jupyter lxml matplotlib numpy openssl pip pygments pyparsing python-dateutil pyzmq scipy sip six tornado traitlets"
-#	    - PIP_DEPENDENCIES="fysom gitpython hdf5storage lmfit pydaqmx pyvisa pyvisa-py qtpy rpyc ruamel.yaml smmap spidev i2cdev"
-#	
-#	  matrix:
-#	    - PYTHON_VERSION=3.4 USE_QT_API=PyQt4
-#	    - PYTHON_VERSION=3.4 USE_QT_API=PyQt5
-#	    - PYTHON_VERSION=3.5 USE_QT_API=PyQt4
-#	    - PYTHON_VERSION=3.5 USE_QT_API=PyQt5
-
 global:
 #use xvfb (X Virtual Framebuffer) to imitate a display
   - SETUP_XVFB=True
@@ -72,11 +58,12 @@ install:
 
   - pip install .
 
-before_script:
-#Don’t run xvfb directly, as it does not handle multiple concurrent instances that way.
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start" # use X Virtual Framebuffer to imitate a display
-  - sleep 3 # give xvfb some time to start
-
+# before_script:
+  # #Don’t run xvfb directly, as it does not handle multiple concurrent instances that way.
+  # - "export DISPLAY=:99.0"
+  # - "sh -e /etc/init.d/xvfb start" # use X Virtual Framebuffer to imitate a display
+  # - sleep 3 # give xvfb some time to start
+services: 
+  - xvfb
 
 script: nosetests --verbosity=2
