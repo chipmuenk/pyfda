@@ -40,6 +40,11 @@ if cmp_version("myhdl", "0.10") >= 0: # suitable combination of Py and myhdl fou
 else:
     HAS_MYHDL = False
 
+if cmp_version("migen", "0.1") >= -1: # currently, version cannot be determined
+    import migen
+    HAS_MIGEN = True
+else:
+    HAS_MIGEN = False
 #------------------------------------------------------------------------------
 
 class Input_Fixpoint_Specs(QWidget):

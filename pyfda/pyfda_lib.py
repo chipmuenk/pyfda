@@ -73,6 +73,13 @@ except (ImportError,SyntaxError):
 VERSION.update({'myhdl': VERSION_HDL})
 
 try:
+    import migen
+    VERSION_MIGEN = "installed"
+except (ImportError,SyntaxError):
+    VERSION_MIGEN = None
+VERSION.update({'migen': VERSION_MIGEN})
+
+try:
     from docutils import __version__ as VERSION_DOCUTILS
     VERSION.update({'docutils': VERSION_DOCUTILS})
 except ImportError:
@@ -124,14 +131,19 @@ def cmp_version(mod, version):
          :1: version of installed module is higher than specified version
 
     """
-    if mod not in VERSION:
-        return -2
-    elif LooseVersion(VERSION[mod]) > LooseVersion(version):
-        return 1
-    elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
-        return 0
-    else:
+    try:
+        if mod not in VERSION or not VERSION[mod]:
+            return -2
+        elif LooseVersion(VERSION[mod]) > LooseVersion(version):
+            return 1
+        elif  LooseVersion(VERSION[mod]) == LooseVersion(version):
+            return 0
+        else:
+            return -1
+    except TypeError:
+        logger.warning("Version number of {0} could not be determined.".format(mod))
         return -1
+        
 
 def mod_version(mod = None):
     """
