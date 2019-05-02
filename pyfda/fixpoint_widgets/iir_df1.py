@@ -28,24 +28,6 @@ import myhdl as hdl
 from myhdl import Signal, intbv, always_seq, StopSimulation
 from .support import Clock, Reset, Global, Samples, Signals
 from .filter_hw import FilterHardware
-  
-
-# =============================================================================
-# if cmp_version("myhdl", "0.10") >= 0:
-#     import myhdl
-#     HAS_MYHDL = True
-# 
-#     fil_blocks_path = os.path.abspath(os.path.join(dirs.INSTALL_DIR, '../../filter-blocks'))
-#     if not os.path.exists(fil_blocks_path):
-#         logger.error("Invalid path {0}".format(fil_blocks_path))
-#     else:
-#         if fil_blocks_path not in sys.path:
-#             sys.path.append(fil_blocks_path)
-#         from pyfda.filter_blocks.fda.fir import FilterFIR
-#         from pyfda.filter_blocks.fda.iir import FilterIIR    
-# else:
-#     HAS_MYHDL = False
-# =============================================================================
 
 class IIR_DF1(QWidget):
     """
