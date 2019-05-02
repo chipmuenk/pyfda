@@ -14,10 +14,7 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os, sys, six
 from pprint import pformat
 import importlib
-if sys.version_info > (3,): # True for Python 3
-    import configparser
-else:
-    import ConfigParser as configparser
+import configparser # only py3
 
 import logging
 logger = logging.getLogger(__name__)
@@ -258,7 +255,7 @@ class Tree_Builder(object):
             # Set it to function str()
             conf.optionxform = str
             # Allow interpolation across sections, ${Dirs:dir1}
-            # conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
+            conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
             conf.read(dirs.USER_CONF_DIR_FILE)
             logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
                         .format(dirs.USER_CONF_DIR_FILE, str(conf.sections())))
@@ -267,7 +264,7 @@ class Tree_Builder(object):
             # Parsing [Common]
             #------------------------------------------------------------------
             try:
-                commons = {}
+                self.commons = {}
                 items_list = conf.items('Common') # list of entries from section [Common]
 
             except configparser.NoSectionError:
@@ -280,15 +277,15 @@ class Tree_Builder(object):
 
             if len(items_list) > 0:
                 for i in items_list:
-                    commons.update({i[0]:i[1]}) # standard widget, no dir specified
+                    self.commons.update({i[0]:i[1]}) # key:value (can also be a list)
     
-                if not 'version' in commons or int(commons['version']) < 1:
+                if not 'version' in self.commons or int(self.commons['version']) < 1:
                     logger.critical("Version {2} of 'pyfda.conf' < {0} or no option 'version' in\n"
                                     "'{1:s}'\n"
                                     "Please delete the file and restart pyfdax, " 
-                                    "a new configuration file will be created.".format(1, dirs.USER_CONF_DIR_FILE, commons['version']))
+                                    "a new configuration file will be created.".format(1, dirs.USER_CONF_DIR_FILE, self.commons['version']))
                     sys.exit()
-            logger.info("commons: {0}\n".format(commons))
+            logger.info("commons: {0}\n".format(self.commons))
 
             # -----------------------------------------------------------------
             # Parsing directories [Dirs]
@@ -350,6 +347,9 @@ class Tree_Builder(object):
             logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
             sys.exit()
             # configparser.NoOptionError
+        except configparser.InterpolationMissingOptionError as e:
+            # catch unresolvable interpolations like ${wrongSection:wrongOption}
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))            
         except configparser.DuplicateSectionError as e:
             logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
         except configparser.Error as e:
@@ -396,16 +396,18 @@ class Tree_Builder(object):
 
             if len(items_list) > 0:
                 for i in items_list:
-                    if not i[1]:
-                        wdg_list.append((i[0],i[1])) # standard widget, no dir specified
-                    else:
-                        try:
-                            wdg_list.append((i[0], dirs.USER_DIRS[i[1]]))
-                        except (KeyError, TypeError):
-                            wdg_list.append((i[0],''))
-                            logger.warning('Unknown / unsuitable user label "{0}"'
-                                           .format((i[0],i[1])))
-            if len(wdg_list) > 0:
+                    wdg_list.append((i[0],i[1])) # when i[1] is empty (standard widget), None is appended
+#                    if not i[1]:   
+#                        wdg_list.append((i[0],i[1])) # standard widget, no dir specified
+#                    else:
+#                        logger.warning(i[1], type(i[1]))                        
+#                        try:
+#                            wdg_list.append((i[0], i[1])) # could be: dirs.USER_DIRS[i[1]]
+#                        except (KeyError, TypeError):
+#                            wdg_list.append((i[0],''))
+#                            logger.warning('Unknown / unsuitable user label "{0}"'
+#                                           .format((i[0],i[1])))
+#            if len(wdg_list) > 0:
                 logger.info('Found {0:2d} entries in [{1:s}].'
                         .format(len(wdg_list), section))
             else:
