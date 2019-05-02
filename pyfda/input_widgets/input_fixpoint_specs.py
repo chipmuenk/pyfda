@@ -69,7 +69,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.fxqc_dict = {'QI':{}, 'QO':{}}
         
 
-        if HAS_MYHDL:
+        if HAS_MYHDL:# or HAS_MIGEN:
             self._construct_UI()
         else:
             self.state = "deactivated" # "invisible", "disabled"
