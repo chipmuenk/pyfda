@@ -152,15 +152,6 @@ class PlotImpz_UI(QWidget):
         # ---------------------------------------------------------------
 
         lbl_plt_time_title = QLabel("<b>Time: Show</b>", self)
-        self.lbl_plt_time_stim = QLabel("Stimulus", self)
-        self.cmb_plt_time_stim = QComboBox(self)
-        self.cmb_plt_time_stim.addItems(["None","Dots","Line","Stem", "Step"])       
-        qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
-        self.cmb_plt_time_stim.setToolTip("<span>Choose stimulus plot style.</span>")
-
-        self.chk_mrk_time_stim = QCheckBox("*", self)
-        self.chk_mrk_time_stim.setChecked(False)
-        self.chk_mrk_time_stim.setToolTip("Use plot markers")
         
         self.lbl_plt_time_resp = QLabel("Response", self)
         self.cmb_plt_time_resp = QComboBox(self)
@@ -171,6 +162,16 @@ class PlotImpz_UI(QWidget):
         self.chk_mrk_time_resp = QCheckBox("*", self)
         self.chk_mrk_time_resp.setChecked(False)
         self.chk_mrk_time_resp.setToolTip("Use plot markers")
+        
+        self.lbl_plt_time_stim = QLabel("Stimulus", self)
+        self.cmb_plt_time_stim = QComboBox(self)
+        self.cmb_plt_time_stim.addItems(["None","Dots","Line","Stem", "Step"])       
+        qset_cmb_box(self.cmb_plt_time_stim, self.plt_time_stim)
+        self.cmb_plt_time_stim.setToolTip("<span>Choose stimulus plot style.</span>")
+
+        self.chk_mrk_time_stim = QCheckBox("*", self)
+        self.chk_mrk_time_stim.setChecked(False)
+        self.chk_mrk_time_stim.setToolTip("Use plot markers")
 
         self.chk_log_time = QCheckBox("dB", self)
         self.chk_log_time.setObjectName("chk_log_time")
@@ -196,6 +197,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_time = QHBoxLayout()
         layH_ctrl_time.addWidget(lbl_plt_time_title)
         layH_ctrl_time.addStretch(1)
+        layH_ctrl_time.addWidget(self.lbl_plt_time_resp)
         layH_ctrl_time.addWidget(self.cmb_plt_time_resp)
         layH_ctrl_time.addWidget(self.chk_mrk_time_resp)        
         layH_ctrl_time.addStretch(1)
@@ -285,6 +287,7 @@ class PlotImpz_UI(QWidget):
         layH_ctrl_freq.addWidget(self.chk_mrk_freq_stim)
 
         layH_ctrl_freq.addWidget(self.chk_log_freq)
+        layH_ctrl_freq.addWidget(self.lbl_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.led_log_bottom_freq)
         layH_ctrl_freq.addWidget(self.lbl_dB_freq)
         layH_ctrl_freq.addStretch(2)
@@ -619,10 +622,23 @@ def main():
     from ..compat import QApplication
 
     app = QApplication(sys.argv)
+    
     mainw = PlotImpz_UI(None)
+    layVMain = QVBoxLayout()
+    layVMain.addWidget(mainw.wdg_ctrl_time)
+    layVMain.addWidget(mainw.wdg_ctrl_freq)    
+    layVMain.addWidget(mainw.wdg_ctrl_stim)
+    layVMain.addWidget(mainw.wdg_ctrl_run)
+    layVMain.setContentsMargins(*params['wdg_margins'])#(left, top, right, bottom)
+
+    mainw.setLayout(layVMain)
+
+
     app.setActiveWindow(mainw)
     mainw.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
+
+    # module test using python -m pyfda.plot_widgets.plot_impz_ui

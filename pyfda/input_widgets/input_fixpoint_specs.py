@@ -40,6 +40,11 @@ if cmp_version("myhdl", "0.10") >= 0: # suitable combination of Py and myhdl fou
 else:
     HAS_MYHDL = False
 
+if cmp_version("migen", "0.1") >= -1: # currently, version cannot be determined
+    import migen
+    HAS_MIGEN = True
+else:
+    HAS_MIGEN = False
 #------------------------------------------------------------------------------
 
 class Input_Fixpoint_Specs(QWidget):
@@ -64,7 +69,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.fxqc_dict = {'QI':{}, 'QO':{}}
         
 
-        if HAS_MYHDL:
+        if HAS_MYHDL:# or HAS_MIGEN:
             self._construct_UI()
         else:
             self.state = "deactivated" # "invisible", "disabled"
