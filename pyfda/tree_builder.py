@@ -14,10 +14,8 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import os, sys, six
 from pprint import pformat
 import importlib
-if sys.version_info > (3,): # True for Python 3
-    import configparser
-else:
-    import ConfigParser as configparser
+import configparser
+import argparse
 
 import logging
 logger = logging.getLogger(__name__)
@@ -246,6 +244,8 @@ class Tree_Builder(object):
         None
 
         """
+        argparser = argparse.ArgumentParser()
+        CONF_VERSION = 1
         try:
             # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
@@ -266,27 +266,27 @@ class Tree_Builder(object):
             # -----------------------------------------------------------------
             # Parsing [Common]
             #------------------------------------------------------------------
-            try:
-                commons = {}
-                items_list = conf.items('Common') # list of entries from section [Common]
+            commons = {}
+            items_list = conf.items('Common') # list of entries from section [Common]
 
-            except configparser.NoSectionError:
-                    logger.critical("No section '[Common]' in\n"
-                                    "'{0:s}'\n"
-                                    "You can either edit the file or delete it, in this case " 
-                                    "a new configuration file will be created at restart."\
-                                    .format(dirs.USER_CONF_DIR_FILE))
-                    sys.exit()
+#            except configparser.NoSectionError:
+#                    logger.critical("No section '[Common]' in\n"
+#                                    "'{0:s}'\n"
+#                                    "You can either edit the file or delete it, in this case " 
+#                                    "a new configuration file will be created at restart."\
+#                                    .format(dirs.USER_CONF_DIR_FILE))
+#                    sys.exit()
 
             if len(items_list) > 0:
                 for i in items_list:
                     commons.update({i[0]:i[1]}) # standard widget, no dir specified
     
-                if not 'version' in commons or int(commons['version']) < 1:
-                    logger.critical("Version {2} of 'pyfda.conf' < {0} or no option 'version' in\n"
-                                    "'{1:s}'\n"
-                                    "Please delete the file and restart pyfdax, " 
-                                    "a new configuration file will be created.".format(1, dirs.USER_CONF_DIR_FILE, commons['version']))
+                if not 'version' in commons or int(commons['version']) != CONF_VERSION:
+                    logger.critical("\nConfig file '{1:s}'\n has the wrong version (required: V{0}).\n"
+                                    "You can either\n- [a]bort pyFDA and edit the file\n"
+                                    "- or [c]ontiue: A backup of the origial file will be created in the same directory\n" 
+                                    "and a new configuration file will be created."
+                                    .format(CONF_VERSION, dirs.USER_CONF_DIR_FILE))
                     sys.exit()
             logger.info("commons: {0}\n".format(commons))
 
@@ -355,10 +355,8 @@ class Tree_Builder(object):
         except configparser.Error as e:
             logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
             sys.exit()
-
-# Py3 only?
-#        except configparser.DuplicateOptionError as e:
-#            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+        except configparser.DuplicateOptionError as e:
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
 
         except IOError as e:
             logger.critical('{0}'.format(e))
