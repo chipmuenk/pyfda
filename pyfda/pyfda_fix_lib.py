@@ -572,18 +572,21 @@ class Fixed(object):
             over_pos = over_neg = np.zeros(y.shape, dtype = bool)
             self.ovr_flag = np.zeros(y.shape, dtype = int)
 
-            if np.issubdtype(y.dtype, np.number):
-                pass
+            if np.issubdtype(y.dtype, np.number): # numpy number type
+                self.N += y.size
             elif y.dtype.kind in {'U', 'S'}: # string or unicode
                 try:
                     y = y.astype(np.float64) # try to convert to float
+                    self.N += y.size
                 except (TypeError, ValueError):
                     try:
                         np.char.replace(y, ' ', '') # remove all whitespace
                         y = y.astype(complex) # try to convert to complex
+                        self.N += y.size * 2
                     except (TypeError, ValueError) as e: # try converting elements recursively
                         y = list(map(lambda y_scalar:
                             self.fixp(y_scalar, scaling=scaling), y))
+                        self.N += y.size
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
                              "cannot convert to float.".format(y, y.dtype))
@@ -609,6 +612,7 @@ class Fixed(object):
                         y = 0.0
             over_pos = over_neg = yq = 0
             self.ovr_flag = 0
+            self.N += 1
 
         # convert pseudo-complex (imag = 0) and complex values to real
         y = np.real_if_close(y)
@@ -701,7 +705,8 @@ class Fixed(object):
 
 #------------------------------------------------------------------------------
     def resetN(self):
-        """ Reset overflow-counters of Fixed object"""
+        """ Reset counter and overflow-counters of Fixed object"""
+        self.N = 0
         self.N_points = 0
         self.N_over = 0
         self.N_over_neg = 0
