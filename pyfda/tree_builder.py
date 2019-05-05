@@ -11,7 +11,7 @@ Create the tree dictionaries containing information about filters,
 filter implementations, widgets etc. in hierarchical form
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import os, sys, six
+import os, sys, six, re
 from pprint import pformat
 import importlib
 import configparser # only py3
@@ -266,27 +266,42 @@ class Tree_Builder(object):
             # Parsing [Common]
             #------------------------------------------------------------------
             self.commons = {}
+            self.user_dirs = []
             items_list = conf.items('Common') # list of entries from section [Common]
-
-#            except configparser.NoSectionError:
-#                    logger.critical("No section '[Common]' in\n"
-#                                    "'{0:s}'\n"
-#                                    "You can either edit the file or delete it, in this case " 
-#                                    "a new configuration file will be created at restart."\
-#                                    .format(dirs.USER_CONF_DIR_FILE))
-#                    sys.exit()
 
             if len(items_list) > 0:
                 for i in items_list:
                     self.commons.update({i[0]:i[1]}) # key:value (can also be a list)
-    
+
+                logger.info("Tree 1: \nCommons: {0}".format(self.commons))    
+
                 if not 'version' in self.commons or int(self.commons['version']) != CONF_VERSION:
                     logger.critical("\nConfig file '{1:s}'\n has the wrong version (required: V{0}).\n"
-                                    "You can either\n- [a]bort pyFDA and edit the file\n"
-                                    "- or [c]ontiue: A backup of the origial file will be created in the same directory\n" 
-                                    "and a new configuration file will be created."
+                                    "You can either edit the file or delete it, in this case " 
+                                    "a new configuration file will be created at restart."\
                                     .format(CONF_VERSION, dirs.USER_CONF_DIR_FILE))
                     sys.exit()
+
+                
+                if 'user_dirs' in self.commons:
+                    # strip unwanted chars at beginning and end
+                    user_dirs = self.commons['user_dirs'].strip(' \t\n\r[]{}"')
+                    user_dirs = re.sub('["\'\[\]\{\}]','',user_dirs).replace(',','').split('\n')
+                    # TODO: re.split('; |, |\n|\r',user_dirs)
+                    #logger.warning("\nCommons.Dirs: {1}-{2}-{0}".format(user_dirs, 
+                    #               type(user_dirs), len(user_dirs)))
+                    for d in user_dirs:
+                        d = os.path.normpath(d)
+                        #logger.warning("\ndd: {0}{1}".format(os.path.isdir("D:\Daten\design\python\git\pyfda\pyfda\widget_templates"),d))                        
+                        if os.path.isdir(d):
+                            self.user_dirs.append(d)
+                        else:
+                            logger.warning("User directory doesn't exist:\n{0}".format(d))
+                            if d not in sys.path:
+                                sys.path.append(d)
+                                logger.warning("Tree 2: Sys.Path = {0}".format(sys.path))
+                # TODO: copy self.user_dirs to dir.USER_DIRS or simply update sys.path
+                    
             logger.info("commons: {0}\n".format(self.commons))
 
             # -----------------------------------------------------------------
@@ -397,17 +412,7 @@ class Tree_Builder(object):
             if len(items_list) > 0:
                 for i in items_list:
                     wdg_list.append((i[0],i[1])) # when i[1] is empty (standard widget), None is appended
-#                    if not i[1]:   
-#                        wdg_list.append((i[0],i[1])) # standard widget, no dir specified
-#                    else:
-#                        logger.warning(i[1], type(i[1]))                        
-#                        try:
-#                            wdg_list.append((i[0], i[1])) # could be: dirs.USER_DIRS[i[1]]
-#                        except (KeyError, TypeError):
-#                            wdg_list.append((i[0],''))
-#                            logger.warning('Unknown / unsuitable user label "{0}"'
-#                                           .format((i[0],i[1])))
-#            if len(wdg_list) > 0:
+
                 logger.info('Found {0:2d} entries in [{1:s}].'
                         .format(len(wdg_list), section))
             else:
