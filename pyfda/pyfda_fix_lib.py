@@ -584,8 +584,8 @@ class Fixed(object):
                         y = y.astype(complex) # try to convert to complex
                         self.N += y.size * 2
                     except (TypeError, ValueError) as e: # try converting elements recursively
-                        y = np.asarray(map(lambda y_scalar:
-                            self.fixp(y_scalar, scaling=scaling), y)) # was: list()
+                        y = np.asarray(list(map(lambda y_scalar:
+                            self.fixp(y_scalar, scaling=scaling), y))) # was: list()
                         self.N += y.size
             else:
                 logger.error("Argument '{0}' is of type '{1}',\n"
