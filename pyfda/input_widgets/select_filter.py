@@ -79,7 +79,8 @@ class SelectFilter(QWidget):
         self.cmbFilterType = QComboBox(self)
         self.cmbFilterType.setObjectName("comboFilterType")
         self.cmbFilterType.setToolTip(
-          "<span>Select the filter type (recursive (Infinite Impulse Response), nonRecursive (Finite IR).</span>")
+          "<span>Choose filter type, either recursive (Infinite Impulse Response) "
+          "or transversal (Finite Impulse Response).</span>")
         self.cmbFilterClass = QComboBox(self)
         self.cmbFilterClass.setObjectName("comboFilterClass")
         self.cmbFilterClass.setToolTip("Select the filter design class.")
