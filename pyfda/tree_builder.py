@@ -295,13 +295,14 @@ class Tree_Builder(object):
                         #logger.warning("\ndd: {0}{1}".format(os.path.isdir("D:\Daten\design\python\git\pyfda\pyfda\widget_templates"),d))                        
                         if os.path.isdir(d):
                             self.user_dirs.append(d)
-                        else:
-                            logger.warning("User directory doesn't exist:\n{0}".format(d))
                             if d not in sys.path:
                                 sys.path.append(d)
-                                logger.warning("Tree 2: Sys.Path = {0}".format(sys.path))
                 # TODO: copy self.user_dirs to dir.USER_DIRS or simply update sys.path
+                        else:
+                            logger.warning("User directory doesn't exist:\n{0}".format(d))
                     
+            logger.warning("Tree 2: Sys.Path = {0}".format(sys.path))
+
             logger.info("commons: {0}\n".format(self.commons))
 
             # -----------------------------------------------------------------
@@ -310,23 +311,23 @@ class Tree_Builder(object):
             #dirs.USER_DIR_LABEL = None  # last valid user label entry (legacy)
             #dirs.USER_DIR = None        # last valid user dir (legacy)
             dirs.USER_DIRS = {}         # dict with user label : user_dir pairs
-            for section in ['Dirs1','Dirs2']:
-                try:
-                    for d in conf.items(section):
-                        user_dir = os.path.normpath(d[1])
-                        if os.path.exists(user_dir):
-                            try:
-                                dirs.USER_DIRS.update({d[0]:user_dir})
-                                #dirs.USER_DIR_LABEL = d[0]
-                                #dirs.USER_DIR = user_dir
-                            except TypeError:
-                                logger.warning('Unsuitable key - value pair\n"{0}" - "{1}".'
-                                               .format(d[0],d[1]))
-
-                except (AttributeError, KeyError):
-                    logger.info("No user directory specified.")
-                except configparser.NoSectionError:
-                    logger.info("No section [{0:s}] found.".format(section))
+#            for section in ['Dirs1','Dirs2']:
+#                try:
+#                    for d in conf.items(section):
+#                        user_dir = os.path.normpath(d[1])
+#                        if os.path.exists(user_dir):
+#                            try:
+#                                dirs.USER_DIRS.update({d[0]:user_dir})
+#                                #dirs.USER_DIR_LABEL = d[0]
+#                                #dirs.USER_DIR = user_dir
+#                            except TypeError:
+#                                logger.warning('Unsuitable key - value pair\n"{0}" - "{1}".'
+#                                               .format(d[0],d[1]))
+#
+#                except (AttributeError, KeyError):
+#                    logger.info("No user directory specified.")
+#                except configparser.NoSectionError:
+#                    logger.info("No section [{0:s}] found.".format(section))
 
             if dirs.USER_DIRS: # use last found directory
                 logger.info("User directory(s):\n{0}".format(dirs.USER_DIRS))
@@ -479,7 +480,7 @@ class Tree_Builder(object):
                     # check type of module attribute 'filter_classes'
                     if isinstance(mod.filter_classes, dict): # dict {class name : combo box name}
                         fdict = mod.filter_classes
-                    elif isinstance(mod.filter_classes, six.string_types): # String, convert to dict
+                    elif isinstance(mod.filter_classes, str):#six.string_types): # String, convert to dict
                         fdict = {mod.filter_classes:mod.filter_classes}
                     else:
                         logger.warning("Skipping module '%s', its attribute 'filter_classes' has the wrong type '%s'."
