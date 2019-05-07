@@ -37,6 +37,7 @@ class Myplot(QWidget):
 if __name__ == '__main__':
 
     from ..compat import QApplication
+    import sys
     app = QApplication(sys.argv)
     mainw = Myplot(None)
 

@@ -11,7 +11,7 @@ Create the tree dictionaries containing information about filters,
 filter implementations, widgets etc. in hierarchical form
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
-import os, sys, six, re
+import os, sys, re
 from pprint import pformat
 import importlib
 import configparser # only py3
@@ -212,14 +212,12 @@ class Tree_Builder(object):
         """
         Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
 
-        :[Dirs1] and [Dirs2]:
+        :[Commons]:
             Try to find user directories and store them in ``dirs.USER_DIRS``
-            and ``dirs.USER_DIR_LABEL``. 
 
         For the other sections, a list of tuples is returned with the elements
-        ``(class, dir)`` where "class" is the class name of the widget
-        and "dir" specifies the directory for user widgets and None for standard
-        widgets:
+        ``(class, opt)`` where "class" is the class name of the widget
+        and "opt" specifies options:
 
         :[Input Widgets]:
             Store a list of tuples of (user) input widgets in ``fb.input_widgets_list``
@@ -273,7 +271,7 @@ class Tree_Builder(object):
                 for i in items_list:
                     self.commons.update({i[0]:i[1]}) # key:value (can also be a list)
 
-                logger.info("Tree 1: \nCommons: {0}".format(self.commons))    
+                logger.info("[Commons:] {0}\n".format(self.commons))
 
                 if not 'version' in self.commons or int(self.commons['version']) != CONF_VERSION:
                     logger.critical("\nConfig file '{1:s}'\n has the wrong version (required: V{0}).\n"
@@ -281,59 +279,27 @@ class Tree_Builder(object):
                                     "a new configuration file will be created at restart."\
                                     .format(CONF_VERSION, dirs.USER_CONF_DIR_FILE))
                     sys.exit()
-
                 
                 if 'user_dirs' in self.commons:
                     # strip unwanted chars at beginning and end
                     user_dirs = self.commons['user_dirs'].strip(' \t\n\r[]{}"')
                     user_dirs = re.sub('["\'\[\]\{\}]','',user_dirs).replace(',','').split('\n')
                     # TODO: re.split('; |, |\n|\r',user_dirs)
-                    #logger.warning("\nCommons.Dirs: {1}-{2}-{0}".format(user_dirs, 
-                    #               type(user_dirs), len(user_dirs)))
                     for d in user_dirs:
                         d = os.path.normpath(d)
                         #logger.warning("\ndd: {0}{1}".format(os.path.isdir("D:\Daten\design\python\git\pyfda\pyfda\widget_templates"),d))                        
                         if os.path.isdir(d):
-                            self.user_dirs.append(d)
+                            dirs.USER_DIRS.append(d)
                             if d not in sys.path:
                                 sys.path.append(d)
-                # TODO: copy self.user_dirs to dir.USER_DIRS or simply update sys.path
                         else:
                             logger.warning("User directory doesn't exist:\n{0}".format(d))
                     
-            logger.warning("Tree 2: Sys.Path = {0}".format(sys.path))
-
-            logger.info("commons: {0}\n".format(self.commons))
-
-            # -----------------------------------------------------------------
-            # Parsing directories [Dirs]
-            #------------------------------------------------------------------
-            #dirs.USER_DIR_LABEL = None  # last valid user label entry (legacy)
-            #dirs.USER_DIR = None        # last valid user dir (legacy)
-            dirs.USER_DIRS = {}         # dict with user label : user_dir pairs
-#            for section in ['Dirs1','Dirs2']:
-#                try:
-#                    for d in conf.items(section):
-#                        user_dir = os.path.normpath(d[1])
-#                        if os.path.exists(user_dir):
-#                            try:
-#                                dirs.USER_DIRS.update({d[0]:user_dir})
-#                                #dirs.USER_DIR_LABEL = d[0]
-#                                #dirs.USER_DIR = user_dir
-#                            except TypeError:
-#                                logger.warning('Unsuitable key - value pair\n"{0}" - "{1}".'
-#                                               .format(d[0],d[1]))
-#
-#                except (AttributeError, KeyError):
-#                    logger.info("No user directory specified.")
-#                except configparser.NoSectionError:
-#                    logger.info("No section [{0:s}] found.".format(section))
-
-            if dirs.USER_DIRS: # use last found directory
-                logger.info("User directory(s):\n{0}".format(dirs.USER_DIRS))
-            else:
-                logger.warning('No valid user directory found in "{0}.'
-                            .format(dirs.USER_CONF_DIR_FILE))
+                if dirs.USER_DIRS: 
+                    logger.info("User directory(s):\n{0}".format(dirs.USER_DIRS))
+                else:
+                    logger.warning('No valid user directory found in "{0}.'
+                                .format(dirs.USER_CONF_DIR_FILE))
 
             # -----------------------------------------------------------------
             # Parsing [Input Widgets]

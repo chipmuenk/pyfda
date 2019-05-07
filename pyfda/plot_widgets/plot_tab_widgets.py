@@ -56,29 +56,24 @@ class PlotTabWidgets(QTabWidget):
         n_wdg = 0 # number and ...
         inst_wdg_str = "" # ... full names of successfully instantiated plot widgets
         #
-        # wdg = (class_name, args, dir)
+        pckg_names = ['pyfda.plot_widgets.', '', 'plot_widgets.'] # search in that order
         for wdg in fb.plot_widgets_list:
-            if not wdg[1]:
-                # use standard plot module
-                pckg_name = 'pyfda.plot_widgets'
-            else:
-                # check and extract user directory
-                if os.path.isdir(wdg[1]):
-                    pckg_path = os.path.normpath(wdg[1])
-                    # split the path into the dir containing the module and its name
-                    user_dir_name, pckg_name = os.path.split(pckg_path)
-
-                    if user_dir_name not in sys.path:
-                        sys.path.append(user_dir_name)
-                else:
-                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
+            pckg_name = None
+            for p in pckg_names:
+                try:  # Try to import the module from the different packages
+                    mod_name = class_name = p + wdg[0].lower() # TODO
+                    mod = importlib.import_module(mod_name)
+                    pckg_name = p
+                    break
+                except ImportError:
                     continue
-            mod_name = pckg_name + '.' + wdg[0].lower()
-            class_name = pckg_name + '.' + wdg[0]
-
-            try:  # Try to import the module from the package ...
-                mod = importlib.import_module(mod_name)
-                # get the class belonging to wdg[0] ...
+            if pckg_name is None:
+                logger.warning('Module "{0}" could not be imported.\n'\
+                                      .format(wdg[0].lower()))
+                fb.plot_widgets_list.remove(wdg)
+                break
+                
+            try:  # Try to instantiate the class belonging to wdg[0] ...
                 wdg_class = getattr(mod, wdg[0])
                 # and instantiate it
                 inst = wdg_class(self)
@@ -95,11 +90,6 @@ class PlotTabWidgets(QTabWidget):
 
                 n_wdg += 1 # successfully instantiated one more widget
                 inst_wdg_str += '\t' + class_name + '\n'
-
-            except ImportError as e:
-                logger.warning('Module "{0}" could not be imported.\n{1}'\
-                               .format(mod_name, e))
-                continue
 
             except AttributeError as e:
                 logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
