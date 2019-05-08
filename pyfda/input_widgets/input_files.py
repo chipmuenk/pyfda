@@ -140,7 +140,7 @@ class Input_Files(QWidget):
             file_name = os.path.splitext(file_name)[0] + file_type
 
             file_type_err = False
-            fb.fil[1] = fb.fil[0].copy() # backup filter dict 
+            fb.fil[1] = fb.fil[0].copy() # backup filter dict
             try:
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.npz':
@@ -148,7 +148,7 @@ class Input_Files(QWidget):
                         if not pyfda_lib.PY3:
                             a = np.load(f) # returns an instance of class NpzFile
                         else:
-                            # What encoding to use when reading Py2 strings. Only 
+                            # What encoding to use when reading Py2 strings. Only
                             # needed for loading py2 generated pickled files on py3.
                             # fix_imports will try to map old py2 names to new py3
                             # names when unpickling.
@@ -180,7 +180,7 @@ class Input_Files(QWidget):
                                 fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
                             if fb.fil[0][k] == None:
                                 logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))
-                            
+
                         logger.info('Loaded filter "{0}"'.format(file_name))
                          # emit signal -> InputTabWidgets.load_all:
                         self.sig_tx.emit({"sender":__name__, 'data_changed': 'filter_loaded'})
@@ -385,79 +385,84 @@ class Input_Files(QWidget):
 
             except IOError as e:
                 logger.error('Failed saving "{0}"!\n{1}'.format(file_name, e))
-                
+
 #------------------------------------------------------------------------------
     def about_window(self):
-         """
-         Display an "About" window with copyright and version infos
-         """
-         def to_clipboard(my_string):
-             """
-             Copy version info to clipboard
-             """
-             mapping = [('<br>','\n'),('<br />','\n'),  ('</tr>','\n'),
-                        ('</th>','\n'), ('</table>','\n'),
-                        ('<hr>','\n---------\n'), 
-                        ('<b>',''),('</b>',''),('<tr>',''), ('<td>',''),('</td>','\t'),
-                        ('<th>',''), ('&emsp;',' '), ('<table>','')
-                        ]
-             for k, v in mapping:
-                 my_string = my_string.replace(k, v)
-             fb.clipboard.setText(my_string)
+        """
+        Display an "About" window with copyright and version infos
+        """
+        def to_clipboard(my_string):
+            """
+            Copy version info to clipboard
+            """
+            mapping = [('<br>','\n'),('<br />','\n'),  ('</tr>','\n'),
+                       ('</th>','\n'), ('</table>','\n'),
+                       ('<hr>','\n---------\n'),
+                       ('<b>',''),('</b>',''),('<tr>',''), ('<td>',''),('</td>','\t'),
+                       ('<th>',''), ('&emsp;',' '), ('<table>','')
+                       ]
+            for k, v in mapping:
+                my_string = my_string.replace(k, v)
+            fb.clipboard.setText(my_string)
 
-         info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
-         "Version {0} (c) 2013 - 2019 Christian Münker</b><br />"
-         "Design, analyze and synthesize digital filters. Docs @ "
-         "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
-         " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<hr>"\
-         .format(version.__version__))
+        user_dirs_str = ""
+        if dirs.USER_DIRS:
+            for d in dirs.USER_DIRS:
+                user_dirs_str += d + '\n'
 
-         versions_string =("<b>OS:</b> {0} {1}<br><b>User Name:</b> {2}<br>"
+        info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
+        "Version {0} (c) 2013 - 2019 Christian Münker</b><br />"
+        "Design, analyze and synthesize digital filters. Docs @ "
+        "<a href=https://pyfda.rtfd.org>pyfda.rtfd.org</a>"
+        " (<a href=https://media.readthedocs.org/pdf/pyfda/latest/pyfda.pdf>pdf</a>)<hr>"\
+        .format(version.__version__))
+
+        versions_string =("<b>OS:</b> {0} {1}<br><b>User Name:</b> {2}<br>"
                     .format(dirs.OS, dirs.OS_VER, dirs.USER_NAME))
 
 #         dir_string = ("<table><th style='font-size:large;'>Imported Modules</th>"
 #                           "<tr><td>&nbsp;&emsp;{0}</td></tr>"\
 #                           .format( pyfda_lib.mod_version().replace("\n", "<br>&nbsp;&emsp;")))
-         
-         dir_string = ("<table><th style='font-size:large;'>Software Versions</th>")
-         dir_string += pyfda_lib.mod_version()
 
-         dir_string += ("<table><th style='font-size:large;'>Directories</th>"
-                           "<tr><td><b>Home:</b></td><td>{0}</td></tr>"
-                           "<tr><td><b>Install:&emsp;</b></td><td>{1}</td></tr>"
-                           "<tr><td><b>Config:&emsp;</b></td><td>{2}</td></tr>"
-                           "<tr><td><b>User:&emsp;</b></td><td>{3}</td></tr>"
-                           "<tr><td><b>Temp:</b></td><td>{4}</td></tr>"\
-                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR, dirs.USER_DIRS, dirs.TEMP_DIR))
-         dir_string += ("<th style='font-size:large;'>Logging Files</th>"
+        dir_string = ("<table><th style='font-size:large;'>Software Versions</th>")
+        dir_string += pyfda_lib.mod_version()
+
+        dir_string += ("<table><th style='font-size:large;'>Directories</th>"
+                        "<tr><td><b>Home:</b></td><td>{0}</td></tr>"
+                        "<tr><td><b>Install:&emsp;</b></td><td>{1}</td></tr>"
+                         "<tr><td><b>Config:&emsp;</b></td><td>{2}</td></tr>"
+                         "<tr><td><b>User:&emsp;</b></td><td>{3}</td></tr>"
+                         "<tr><td><b>Temp:</b></td><td>{4}</td></tr>"\
+                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR, user_dirs_str, dirs.TEMP_DIR))
+        dir_string += ("<th style='font-size:large;'>Logging Files</th>"
                         "<tr><td><b>Config:</b></td><td>{0}</td></tr>"
                         "<tr><td><b>Output:&emsp;</b></td><td>{1}</td></tr>"
                         "</table>"\
                        .format(dirs.USER_LOG_CONF_DIR_FILE, dirs.LOG_DIR_FILE))
 
-         about_string = info_string + versions_string + dir_string
+        about_string = info_string + versions_string + dir_string
 
-         #msg = QMessageBox.about(self, "About pyFDA", info_string)
-         butClipboard = QPushButton(self)
-         butClipboard.setIcon(QIcon(':/clipboard.svg'))
-         butClipboard.setToolTip("Copy text to clipboard.")
-         # butClipboard.adjustSize()
-         # butClipboard.setFixedSize(self.checkLayout.sizeHint())
-         msg = QMessageBox(self)
-         msg.setIconPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(32, Qt.SmoothTransformation))
-         msg.addButton(butClipboard, QMessageBox.ActionRole)
-         msg.setText(about_string)
-         # msg.setInformativeText("This is additional information")
-         #msg.setDetailedText(versions_string) # adds a button that opens another textwindow
-         
-         msg.setWindowTitle("About pyFDA")
-         msg.setStandardButtons(QMessageBox.Ok) # | QMessageBox.Cancel
-         # close Message box with close event triggered by "x" icon
-         msg.closeEvent = self.closeEvent 
+        #msg = QMessageBox.about(self, "About pyFDA", info_string)
+        butClipboard = QPushButton(self)
+        butClipboard.setIcon(QIcon(':/clipboard.svg'))
+        butClipboard.setToolTip("Copy text to clipboard.")
+        # butClipboard.adjustSize()
+        # butClipboard.setFixedSize(self.checkLayout.sizeHint())
+        msg = QMessageBox(self)
+        msg.setIconPixmap(QPixmap(':/pyfda_icon.svg').scaledToHeight(32, Qt.SmoothTransformation))
+        msg.addButton(butClipboard, QMessageBox.ActionRole)
+        msg.setText(about_string)
+        # msg.setInformativeText("This is additional information")
+        #msg.setDetailedText(versions_string) # adds a button that opens another textwindow
 
-         butClipboard.clicked.connect(lambda: to_clipboard(about_string))
+        msg.setWindowTitle("About pyFDA")
+        msg.setStandardButtons(QMessageBox.Ok) # | QMessageBox.Cancel
+        # close Message box with close event triggered by "x" icon
+        msg.closeEvent = self.closeEvent
 
-         retval = msg.exec_()
+        butClipboard.clicked.connect(lambda: to_clipboard(about_string))
+
+        retval = msg.exec_()
 
 
 #------------------------------------------------------------------------------
