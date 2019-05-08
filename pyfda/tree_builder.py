@@ -293,12 +293,12 @@ class Tree_Builder(object):
                             if d not in sys.path:
                                 sys.path.append(d)
                         else:
-                            logger.warning("User directory doesn't exist:\n{0}".format(d))
+                            logger.warning("User directory doesn't exist:\n{0}\n".format(d))
                     
                 if dirs.USER_DIRS: 
-                    logger.info("User directory(s):\n{0}".format(dirs.USER_DIRS))
+                    logger.info("User directory(s):\n{0}\n".format(dirs.USER_DIRS))
                 else:
-                    logger.warning('No valid user directory found in "{0}.'
+                    logger.warning('No valid user directory found in "{0}\n.'
                                 .format(dirs.USER_CONF_DIR_FILE))
 
             # -----------------------------------------------------------------
@@ -333,7 +333,8 @@ class Tree_Builder(object):
             # configparser.NoOptionError
         except configparser.InterpolationMissingOptionError as e:
             # catch unresolvable interpolations like ${wrongSection:wrongOption}
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))            
+            # Attention: This terminates parse_conf_section() without result!
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE)) 
         except configparser.DuplicateSectionError as e:
             logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
         except configparser.Error as e:
@@ -375,7 +376,7 @@ class Tree_Builder(object):
         try:
             wdg_list = []
             items_list = conf.items(section) # entries from config file with [name, path]
-
+                
             if len(items_list) > 0:
                 for i in items_list:
                     wdg_list.append((i[0],i[1])) # when i[1] is empty (standard widget), None is appended
@@ -396,6 +397,7 @@ class Tree_Builder(object):
             else:
                 logger.warning('No section [{0:s}] in config file "{1:s}".'
                            .format(section, dirs.USER_CONF_DIR_FILE))
+                
 
         return wdg_list
 
@@ -446,7 +448,7 @@ class Tree_Builder(object):
                     # check type of module attribute 'filter_classes'
                     if isinstance(mod.filter_classes, dict): # dict {class name : combo box name}
                         fdict = mod.filter_classes
-                    elif isinstance(mod.filter_classes, str):#six.string_types): # String, convert to dict
+                    elif isinstance(mod.filter_classes, str): # String, convert to dict
                         fdict = {mod.filter_classes:mod.filter_classes}
                     else:
                         logger.warning("Skipping module '%s', its attribute 'filter_classes' has the wrong type '%s'."
