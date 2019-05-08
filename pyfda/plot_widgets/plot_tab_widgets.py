@@ -16,7 +16,6 @@ from __future__ import print_function, division, unicode_literals, absolute_impo
 import logging
 logger = logging.getLogger(__name__)
 
-import os, sys
 import importlib
 from ..compat import QTabWidget, QVBoxLayout, QEvent, QtCore, pyqtSignal
 
@@ -61,45 +60,44 @@ class PlotTabWidgets(QTabWidget):
             pckg_name = None
             for p in pckg_names:
                 try:  # Try to import the module from the different packages
-                    mod_name = class_name = p + wdg[0].lower() # TODO
+                    mod_name = p + wdg[0].lower() # TODO
                     mod = importlib.import_module(mod_name)
                     pckg_name = p
-                    break
+                    break #-> successful import, break out of pckg_names loop
                 except ImportError:
-                    continue
+                    continue # unsuccessful, try next package
             if pckg_name is None:
                 logger.warning('Module "{0}" could not be imported.\n'\
                                       .format(wdg[0].lower()))
-                fb.plot_widgets_list.remove(wdg)
-                break
+                continue # no suitable package, try next widget
                 
-            try:  # Try to instantiate the class belonging to wdg[0] ...
+            if hasattr(mod, wdg[0]):
                 wdg_class = getattr(mod, wdg[0])
                 # and instantiate it
                 inst = wdg_class(self)
-                if hasattr(inst, 'tab_label'):
-                    tabWidget.addTab(inst, inst.tab_label)
-                else:
-                    tabWidget.addTab(inst, "not set")
-                if hasattr(inst, 'tool_tip'):
-                    tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
-                if hasattr(inst, 'sig_tx'):
-                    inst.sig_tx.connect(self.sig_tx)
-                if hasattr(inst, 'sig_rx'):
-                    self.sig_rx.connect(inst.sig_rx)
+            else:
+                logger.warning('Class "{0}" could not be imported from {1} .'\
+                           .format(wdg[0], mod_name))
+                continue # unsuccessful, try next widget
+                
+            if hasattr(inst, 'tab_label'):
+                tabWidget.addTab(inst, inst.tab_label)
+            else:
+                tabWidget.addTab(inst, "not set")
+            if hasattr(inst, 'tool_tip'):
+                tabWidget.setTabToolTip(n_wdg, inst.tool_tip)
+            if hasattr(inst, 'sig_tx'):
+                inst.sig_tx.connect(self.sig_tx)
+            if hasattr(inst, 'sig_rx'):
+                self.sig_rx.connect(inst.sig_rx)
 
-                n_wdg += 1 # successfully instantiated one more widget
-                inst_wdg_str += '\t' + class_name + '\n'
-
-            except AttributeError as e:
-                logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
-                               .format(wdg[0], pckg_name, e))
-                continue
+            n_wdg += 1 # successfully instantiated one more widget
+            inst_wdg_str += '\t' + mod_name + "." + wdg[0] + '\n'
 
         if len(inst_wdg_str) == 0:
             logger.warning("No plotting widgets found!")
         else:
-            logger.info("Imported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
+            logger.info("\nImported {0:d} plotting classes:\n{1}".format(n_wdg, inst_wdg_str))
         #----------------------------------------------------------------------
         layVMain = QVBoxLayout()
         layVMain.addWidget(tabWidget)
