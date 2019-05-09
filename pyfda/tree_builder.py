@@ -286,7 +286,7 @@ class Tree_Builder(object):
                     user_dirs = re.sub('["\'\[\]\{\}]','',user_dirs).replace(',','').split('\n')
                     # TODO: re.split('; |, |\n|\r',user_dirs)
                     for d in user_dirs:
-                        d = os.path.normpath(d)
+                        d = os.path.abspath(os.path.normpath(d))
                         #logger.warning("\ndd: {0}{1}".format(os.path.isdir("D:\Daten\design\python\git\pyfda\pyfda\widget_templates"),d))                        
                         if os.path.isdir(d):
                             dirs.USER_DIRS.append(d)
