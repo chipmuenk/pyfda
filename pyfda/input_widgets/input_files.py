@@ -408,7 +408,7 @@ class Input_Files(QWidget):
         user_dirs_str = ""
         if dirs.USER_DIRS:
             for d in dirs.USER_DIRS:
-                user_dirs_str += d + '\n'
+                user_dirs_str += d + '<br />'
 
         info_string = ("<b><a href=https://www.github.com/chipmuenk/pyfda>pyfda</a> "
         "Version {0} (c) 2013 - 2019 Christian Münker</b><br />"
@@ -433,7 +433,8 @@ class Input_Files(QWidget):
                          "<tr><td><b>Config:&emsp;</b></td><td>{2}</td></tr>"
                          "<tr><td><b>User:&emsp;</b></td><td>{3}</td></tr>"
                          "<tr><td><b>Temp:</b></td><td>{4}</td></tr>"\
-                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR, user_dirs_str, dirs.TEMP_DIR))
+                        .format( dirs.HOME_DIR, dirs.INSTALL_DIR, dirs.CONF_DIR,
+                                user_dirs_str[:-6], dirs.TEMP_DIR))
         dir_string += ("<th style='font-size:large;'>Logging Files</th>"
                         "<tr><td><b>Config:</b></td><td>{0}</td></tr>"
                         "<tr><td><b>Output:&emsp;</b></td><td>{1}</td></tr>"
