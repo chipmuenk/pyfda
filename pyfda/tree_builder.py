@@ -321,6 +321,7 @@ class Tree_Builder(object):
             #------------------------------------------------------------------
             fb.fixpoint_widgets_list = self.parse_conf_section(conf, "Fixpoint Widgets")
 
+            logger.warning("\n\nfixpoint_widgets: \n{0}".format(fb.fixpoint_widgets_list))
 
         # ----- Exceptions ----------------------
         except configparser.ParsingError as e:
