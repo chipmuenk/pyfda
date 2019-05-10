@@ -283,8 +283,8 @@ class Tree_Builder(object):
                 if 'user_dirs' in self.commons:
                     # strip unwanted chars at beginning and end
                     user_dirs = self.commons['user_dirs'].strip(' \t\n\r[]{}"')
-                    user_dirs = re.sub('["\'\[\]\{\}]','',user_dirs).replace(',','').split('\n')
-                    # TODO: re.split('; |, |\n|\r',user_dirs)
+                    user_dirs = re.sub('["\'\[\]\{\}]','',user_dirs)#.replace(',','')#.split('\n')
+                    user_dirs = re.split('; |, |\n|\r',user_dirs) # TODO: move to pars_conf_ ...
                     for d in user_dirs:
                         d = os.path.abspath(os.path.normpath(d))
                         #logger.warning("\ndd: {0}{1}".format(os.path.isdir("D:\Daten\design\python\git\pyfda\pyfda\widget_templates"),d))                        
@@ -380,7 +380,15 @@ class Tree_Builder(object):
                 
             if len(items_list) > 0:
                 for i in items_list:
-                    wdg_list.append((i[0],i[1])) # when i[1] is empty (standard widget), None is appended
+                    # sanitize value and convert to a list, split at \n and ,
+                    val = i[1].strip(' \t\n\r[]"')
+                    val = re.sub('["\'\[\]\{\}]','', val)#.replace(',','')#.split('\n')
+                    val = re.split('; |, |\n|\r', val) # TODO
+
+                    #wdg_list.append((i[0],i[1])) # when i[1] is empty (standard widget), None is appended
+                    wdg_list.append((i[0],val)) # when i[1] is empty (standard widget), None is appended
+
+
 
                 logger.info('Found {0:2d} entries in [{1:s}].'
                         .format(len(wdg_list), section))
@@ -398,7 +406,6 @@ class Tree_Builder(object):
             else:
                 logger.warning('No section [{0:s}] in config file "{1:s}".'
                            .format(section, dirs.USER_CONF_DIR_FILE))
-                
 
         return wdg_list
 
@@ -439,8 +446,10 @@ class Tree_Builder(object):
         imported_fil_classes = "" # names of successful filter module imports
 
         for filt_mod in fb.filter_designs_list:
-            if not filt_mod[1]: # standard filter directory / module
+            if not filt_mod[1] or len(filt_mod[1][0]) == 0: # standard filter directory / module
                 module_name = 'pyfda.filter_designs' + '.' + filt_mod[0]
+                # module_name = filt_mod[0] #TODO: import module path earlier
+
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
                 mod = importlib.import_module(module_name)
