@@ -48,13 +48,12 @@ class InputTabWidgets(QWidget):
 
         n_wdg = 0 # number and ... 
         inst_wdg_str = "" # ... full names of successfully instantiated widgets
-
         pckg_names = ['pyfda.input_widgets.', '', 'input_widgets.'] # search in that order
-        for wdg in fb.input_widgets_list:
+        for wdg in fb.input_widgets_dict:
             pckg_name = None
             for p in pckg_names:
                 try:  # Try to import the module from the different packages
-                    mod_name = p + wdg[0].lower() # TODO
+                    mod_name = p + wdg.lower() # TODO
                     mod = importlib.import_module(mod_name)
                     pckg_name = p
                     break #-> successful import, break out of pckg_names loop
@@ -62,47 +61,17 @@ class InputTabWidgets(QWidget):
                     continue # unsuccessful, try next package
             if pckg_name is None:
                 logger.warning('Module "{0}" could not be imported.\n'\
-                                      .format(wdg[0].lower()))
+                                      .format(wdg.lower()))
                 continue # no suitable package, try next widget
                 
-            if hasattr(mod, wdg[0]):
-                wdg_class = getattr(mod, wdg[0])
+            if hasattr(mod, wdg):
+                wdg_class = getattr(mod, wdg)
                 # and instantiate it
                 inst = wdg_class(self)
             else:
                 logger.warning('Class "{0}" could not be imported from {1} .'\
-                           .format(wdg[0], mod_name))
+                           .format(wdg, mod_name))
                 continue # unsuccessful, try next widget
-
-# =============================================================================
-#         #
-#         # wdg = (class_name, dir)
-#         for wdg in fb.input_widgets_list:
-#             if not wdg[1]:
-#                 # dir is empty, use standard input widgets package
-#                 pckg_name = 'pyfda.input_widgets'
-#             else:
-#                 # check and extract user directory
-#                 if os.path.isdir(wdg[1]):
-#                     pckg_path = os.path.normpath(wdg[1])
-#                     # split the path into the dir containing the module and its name
-#                     user_dir_name, pckg_name = os.path.split(pckg_path)
-# 
-#                     if user_dir_name not in sys.path:
-#                         sys.path.append(user_dir_name)
-#                 else:
-#                     logger.warning("Path {0:s} doesn't exist!".format(wdg[2]))
-#                     continue
-#             mod_name = pckg_name + '.' + wdg[0].lower()
-#             class_name = pckg_name + '.' + wdg[0]
-#
-#             try:  # Try to import the module from the package ...
-#                 mod = importlib.import_module(mod_name)
-#                 # get the class belonging to wdg[0] ...
-#                 wdg_class = getattr(mod, wdg[0])
-#                 # and instantiate it
-#                 inst = wdg_class(self)
-# =============================================================================
 
             if hasattr(inst, "state") and inst.state == "deactivated":
                 continue # with next widget
@@ -118,18 +87,8 @@ class InputTabWidgets(QWidget):
                 self.sig_rx.connect(inst.sig_rx)
 
             n_wdg += 1 # successfully instantiated one more widget
-            inst_wdg_str += '\t' + mod_name + "." + wdg[0] + '\n'
-# =============================================================================
-#             except ImportError as e:
-#                 logger.warning('Module "{0}" could not be imported.\n{1}'\
-#                                .format(mod_name, e))
-#                 continue
-#             except AttributeError as e:
-#                 logger.warning('Module "{0}" could not be imported from {1}.\n{2}'\
-#                                .format(wdg[0], pckg_name, e))
-#                 continue
-# 
-# =============================================================================
+            inst_wdg_str += '\t' + mod_name + "." + wdg + '\n'
+
         if len(inst_wdg_str) == 0:
             logger.critical("No input widgets found!")
             sys.exit()
@@ -153,7 +112,6 @@ class InputTabWidgets(QWidget):
         tabWidget.currentChanged.connect(self.current_tab_changed)
         # The following does not work: maybe current scope must be left?
         # tabWidget.currentChanged.connect(tabWidget.currentWidget().redraw)
-
 
         layVMain = QVBoxLayout()
 

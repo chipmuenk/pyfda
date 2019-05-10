@@ -39,8 +39,8 @@ class PlotTabWidgets(QTabWidget):
         """
         Initialize UI with tabbed subwidgets and connect the signals of all
         subwidgets.
-        This is done by dynamically instantiating each widget from the list
-        `fb.plot_widget_list` in the module `wdg_dir`. Try to:
+        This is done by dynamically instantiating each widget from the dict
+        `fb.plot_widget_dict` in one of the packages in `pckg_names`. Try to:
 
         - connect `sig_tx` and `sig_rx`
 
@@ -56,11 +56,11 @@ class PlotTabWidgets(QTabWidget):
         inst_wdg_str = "" # ... full names of successfully instantiated plot widgets
         #
         pckg_names = ['pyfda.plot_widgets.', '', 'plot_widgets.'] # search in that order
-        for wdg in fb.plot_widgets_list:
+        for wdg in fb.plot_widgets_dict:
             pckg_name = None
             for p in pckg_names:
                 try:  # Try to import the module from the different packages
-                    mod_name = p + wdg[0].lower() # TODO
+                    mod_name = p + wdg.lower() # TODO
                     mod = importlib.import_module(mod_name)
                     pckg_name = p
                     break #-> successful import, break out of pckg_names loop
@@ -68,16 +68,16 @@ class PlotTabWidgets(QTabWidget):
                     continue # unsuccessful, try next package
             if pckg_name is None:
                 logger.warning('Module "{0}" could not be imported.\n'\
-                                      .format(wdg[0].lower()))
+                                      .format(wdg.lower()))
                 continue # no suitable package, try next widget
                 
-            if hasattr(mod, wdg[0]):
-                wdg_class = getattr(mod, wdg[0])
+            if hasattr(mod, wdg):
+                wdg_class = getattr(mod, wdg)
                 # and instantiate it
                 inst = wdg_class(self)
             else:
                 logger.warning('Class "{0}" could not be imported from {1} .'\
-                           .format(wdg[0], mod_name))
+                           .format(wdg, mod_name))
                 continue # unsuccessful, try next widget
                 
             if hasattr(inst, 'tab_label'):
@@ -92,7 +92,7 @@ class PlotTabWidgets(QTabWidget):
                 self.sig_rx.connect(inst.sig_rx)
 
             n_wdg += 1 # successfully instantiated one more widget
-            inst_wdg_str += '\t' + mod_name + "." + wdg[0] + '\n'
+            inst_wdg_str += '\t' + mod_name + "." + wdg + '\n'
 
         if len(inst_wdg_str) == 0:
             logger.warning("No plotting widgets found!")

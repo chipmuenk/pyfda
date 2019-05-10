@@ -12,6 +12,7 @@ filter implementations, widgets etc. in hierarchical form
 """
 from __future__ import print_function, division, unicode_literals, absolute_import
 import os, sys, re
+from collections import OrderedDict
 from pprint import pformat
 import importlib
 import configparser # only py3
@@ -249,7 +250,9 @@ class Tree_Builder(object):
             if not os.access(dirs.USER_CONF_DIR_FILE, os.R_OK):
                 raise IOError('Config file "{0}" cannot be read.'.format(dirs.USER_CONF_DIR_FILE))
 
+            # -----------------------------------------------------------------
             # setup an instance of config parser, allow  keys without value
+            # -----------------------------------------------------------------
             conf = configparser.ConfigParser(allow_no_value=True)
             # preserve case of parsed options by overriding optionxform():
             # Set it to function str()
@@ -263,89 +266,61 @@ class Tree_Builder(object):
             # -----------------------------------------------------------------
             # Parsing [Common]
             #------------------------------------------------------------------
-            self.commons = {}
-            self.user_dirs = []
-            items_list = conf.items('Common') # list of entries from section [Common]
+            self.commons = self.parse_conf_section(conf, "Common")
+            # logger.info("[Commons:] {0}\n".format(self.commons))
 
-            if len(items_list) > 0:
-                for i in items_list:
-                    self.commons.update({i[0]:i[1]}) # key:value (can also be a list)
-
-                logger.info("[Commons:] {0}\n".format(self.commons))
-
-                if not 'version' in self.commons or int(self.commons['version']) != CONF_VERSION:
-                    logger.critical("\nConfig file '{1:s}'\n has the wrong version (required: V{0}).\n"
-                                    "You can either edit the file or delete it, in this case " 
-                                    "a new configuration file will be created at restart."\
-                                    .format(CONF_VERSION, dirs.USER_CONF_DIR_FILE))
-                    sys.exit()
+            if not 'version' in self.commons or int(self.commons['version'][0]) != CONF_VERSION:
+                logger.critical("\nConfig file '{0:s}'\n has the wrong version '{2}' "
+                                "(required: '{1}').\n"
+                                "You can either edit the file or delete it, in this case " 
+                                "a new configuration file will be created at restart."\
+                                .format(dirs.USER_CONF_DIR_FILE, CONF_VERSION, int(self.commons['version'])))
+                sys.exit()
+            
+            if 'user_dirs' in self.commons:
+                for d in self.commons['user_dirs']:
+                    d = os.path.abspath(os.path.normpath(d))
+                    if os.path.isdir(d):
+                        dirs.USER_DIRS.append(d)
+                        if d not in sys.path:
+                            sys.path.append(d)
+                    else:
+                        logger.warning("User directory doesn't exist:\n{0}\n".format(d))
                 
-                if 'user_dirs' in self.commons:
-                    # strip unwanted chars at beginning and end
-                    user_dirs = self.commons['user_dirs'].strip(' \t\n\r[]{}"')
-                    user_dirs = re.sub('["\'\[\]\{\}]','',user_dirs)#.replace(',','')#.split('\n')
-                    user_dirs = re.split('; |, |\n|\r',user_dirs) # TODO: move to pars_conf_ ...
-                    for d in user_dirs:
-                        d = os.path.abspath(os.path.normpath(d))
-                        #logger.warning("\ndd: {0}{1}".format(os.path.isdir("D:\Daten\design\python\git\pyfda\pyfda\widget_templates"),d))                        
-                        if os.path.isdir(d):
-                            dirs.USER_DIRS.append(d)
-                            if d not in sys.path:
-                                sys.path.append(d)
-                        else:
-                            logger.warning("User directory doesn't exist:\n{0}\n".format(d))
-                    
-                if dirs.USER_DIRS: 
-                    logger.info("User directory(s):\n{0}\n".format(dirs.USER_DIRS))
-                else:
-                    logger.warning('No valid user directory found in "{0}\n.'
-                                .format(dirs.USER_CONF_DIR_FILE))
+            if dirs.USER_DIRS: 
+                logger.info("User directory(s):\n{0}\n".format(dirs.USER_DIRS))
+            else:
+                logger.warning('No valid user directory found in "{0}\n.'
+                            .format(dirs.USER_CONF_DIR_FILE))
 
             # -----------------------------------------------------------------
             # Parsing [Input Widgets]
             #------------------------------------------------------------------
-            fb.input_widgets_list = self.parse_conf_section(conf, "Input Widgets")
+            fb.input_widgets_dict = self.parse_conf_section(conf, "Input Widgets")
 
             # -----------------------------------------------------------------
             # Parsing [Plot Widgets]
             #------------------------------------------------------------------
-            fb.plot_widgets_list = self.parse_conf_section(conf, "Plot Widgets")
+            fb.plot_widgets_dict = self.parse_conf_section(conf, "Plot Widgets")
 
             # -----------------------------------------------------------------
             # Parsing [Filter Designs]
             #------------------------------------------------------------------
-            fb.filter_designs_list = self.parse_conf_section(conf, "Filter Designs")
+            fb.filter_designs_dict = self.parse_conf_section(conf, "Filter Designs")
 
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
-            fb.fixpoint_widgets_list = self.parse_conf_section(conf, "Fixpoint Widgets")
-
-            logger.warning("\n\nfixpoint_widgets: \n{0}".format(fb.fixpoint_widgets_list))
+            fb.fixpoint_widgets_dict = self.parse_conf_section(conf, "Fixpoint Widgets")
+            #logger.info("Fixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
 
         # ----- Exceptions ----------------------
         except configparser.ParsingError as e:
             logger.critical('Parsing Error in config file "{0}:\n{1}".'
                             .format(dirs.USER_CONF_DIR_FILE,e))
             sys.exit()
-        except configparser.NoSectionError as e:
-            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
-            sys.exit()
-            # configparser.NoOptionError
-        except configparser.InterpolationMissingOptionError as e:
-            # catch unresolvable interpolations like ${wrongSection:wrongOption}
-            # Attention: This terminates parse_conf_section() without result!
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE)) 
-        except configparser.DuplicateSectionError as e:
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
         except configparser.Error as e:
             logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
-            sys.exit()
-        except configparser.DuplicateOptionError as e:
-            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
-
-        except IOError as e:
-            logger.critical('{0}'.format(e))
             sys.exit()
 
 #==============================================================================
@@ -369,29 +344,26 @@ class Tree_Builder(object):
 
         Returns
         -------
-        list 
-            list of tuples containing class name and directory. The latter is none
+        dict 
+            dict of tuples containing class name and options. The latter is none
             for standard widgets.
 
         """
         try:
-            wdg_list = []
+            wdg_dict = OrderedDict()
             items_list = conf.items(section) # entries from config file with [name, path]
                 
             if len(items_list) > 0:
                 for i in items_list:
                     # sanitize value and convert to a list, split at \n and ,
                     val = i[1].strip(' \t\n\r[]"')
-                    val = re.sub('["\'\[\]\{\}]','', val)#.replace(',','')#.split('\n')
+                    val = re.sub('["\'\[\]\{\}]','', val)
                     val = re.split('; |, |\n|\r', val) # TODO
 
-                    #wdg_list.append((i[0],i[1])) # when i[1] is empty (standard widget), None is appended
-                    wdg_list.append((i[0],val)) # when i[1] is empty (standard widget), None is appended
-
-
+                    wdg_dict.update({i[0]:val})
 
                 logger.info('Found {0:2d} entries in [{1:s}].'
-                        .format(len(wdg_list), section))
+                        .format(len(wdg_dict), section))
             else:
                 if req:
                     logger.critical('Empty section [{0:s}], aborting.'.format(section))
@@ -406,8 +378,19 @@ class Tree_Builder(object):
             else:
                 logger.warning('No section [{0:s}] in config file "{1:s}".'
                            .format(section, dirs.USER_CONF_DIR_FILE))
+            # configparser.NoOptionError
+        except configparser.DuplicateOptionError as e:
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
 
-        return wdg_list
+        except configparser.InterpolationMissingOptionError as e:
+            # catch unresolvable interpolations like ${wrongSection:wrongOption}
+            # Attention: This terminates  current section() without result!
+            logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE)) 
+        except configparser.DuplicateSectionError as e:
+            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            sys.exit()
+
+        return wdg_dict
 
 #==============================================================================
     def dyn_filt_import(self):
@@ -428,8 +411,8 @@ class Tree_Builder(object):
 
         Parameters
         ----------
-        filt_list_names : list
-            List with the classes to be imported, contained in the
+        fb.fil_classes : dict
+            Dict with the classes to be imported, contained in the
             Python files (ending with .py !!) in the file conf_file,
             containing entries (for SUCCESSFUL imports) with:
 
@@ -445,10 +428,11 @@ class Tree_Builder(object):
         num_imports = 0           # number of successful filter module imports
         imported_fil_classes = "" # names of successful filter module imports
 
-        for filt_mod in fb.filter_designs_list:
-            if not filt_mod[1] or len(filt_mod[1][0]) == 0: # standard filter directory / module
-                module_name = 'pyfda.filter_designs' + '.' + filt_mod[0]
-                # module_name = filt_mod[0] #TODO: import module path earlier
+        for filt_mod in fb.filter_designs_dict: # iterate over dict keys
+#            if not filt_mod[1] or len(filt_mod[1][0]) == 0: # standard filter directory / module
+#                module_name = 'pyfda.filter_designs' + '.' + filt_mod[0]
+            if len(fb.filter_designs_dict[filt_mod]) < 2:
+                module_name = 'pyfda.filter_designs' + '.' + filt_mod
 
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
@@ -488,7 +472,7 @@ class Tree_Builder(object):
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
 
                     num_imports += 1
-                    imported_fil_classes += "\t" + filt_mod[0] + "."+ fc + "\n"
+                    imported_fil_classes += "\t" + filt_mod + "."+ fc + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")

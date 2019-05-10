@@ -237,11 +237,11 @@ for k in fil_init:
 # parsed in filter_tree_builder.
 #------------------------------------------------------------------------------
 
-input_widgets_list = [] 
+input_widgets_dict = {} 
 
-plot_widgets_list = []
+plot_widgets_dict = {}
 
-filter_designs_list = []
+filter_designs_dict = {}
 
-fixpoint_widgets_list = []
+fixpoint_widgets_dict = {}
 
