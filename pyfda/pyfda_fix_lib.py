@@ -869,7 +869,7 @@ class Fixed(object):
         else:
             logger.error('Unknown output format "%s"!'.format(frmt))
 
-        if frmt != "float":
+        #if frmt != "float":
             # logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
             #             .format(self.MSB, self.scale, raw_str, val_str))
             # logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
