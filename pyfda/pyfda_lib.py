@@ -260,6 +260,8 @@ def qstr(text):
     
     The current `text` data as a unicode (utf8) string
     """
+    return str(text)# tjos should be sufficient for Python 3 ?!
+
     text_type = str(type(text)).lower()
 
     if "qstring" in text_type:

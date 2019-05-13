@@ -11,19 +11,22 @@ Fixpoint library for converting numpy scalars and arrays to quantized
 numpy values and formatting reals in various formats
 """
 #===========================================================================
-from __future__ import division, print_function, unicode_literals
-
 import re
 import logging
 logger = logging.getLogger(__name__)
 
 import numpy as np
-from pyfda.pyfda_lib import qstr
+# from pyfda.pyfda_lib import qstr
 
 # TODO: Absolute value for WI is taken, no negative WI specifications possible
 # TODO: Vecorization for hex / csd functions (frmt2float)
 
-__version__ = 0.5
+__version__ = 0.6
+
+def qstr(text):
+    """ carefully replace qstr() function - only needed for Py2 compatibility """
+    return str(text)
+
 
 def bin2hex(bin_str, WI=0):
     """
@@ -139,7 +142,7 @@ def dec2csd(dec_val, WF=0):
     else:
         k = int(np.ceil(np.log2(np.abs(dec_val) * 1.5)))
 
-    logger.debug("CSD: Converting {0:f} to {1:d}.{2:d} format".format(dec_val, k, WF))
+    # logger.debug("CSD: Converting {0:f} to {1:d}.{2:d} format".format(dec_val, k, WF))
 
     # Initialize CSD calculation
     csd_digits = []
@@ -197,7 +200,7 @@ def dec2csd(dec_val, WF=0):
 
     csd_str = "".join(csd_digits)
 
-    logger.debug("CSD result = {0}".format(csd_str))
+    # logger.debug("CSD result = {0}".format(csd_str))
 
 #    if WF > 0:
 #        csd_str = csd_str[:-WF] + "." + csd_str[-WF:]
@@ -234,7 +237,7 @@ def csd2dec(csd_str):
     -0+0 = -2³ + 2¹ = -6
 
     """
-    logger.debug("Converting: {0}".format(csd_str))
+    # logger.debug("Converting: {0}".format(csd_str))
 
     # Intialize calculation, start with the MSB (integer)
     msb_power = len(csd_str)-1 #
@@ -252,8 +255,8 @@ def csd2dec(csd_str):
         # else
         #    ... all other values are ignored
 
-        logger.debug('  "{0:s}" (QI = {1:d}); 2**{2:d} = {3}; Num={4:f}'.format(
-                csd_str[ii], len(csd_str), msb_power-ii, power_of_two, dec_val))
+        # logger.debug('  "{0:s}" (QI = {1:d}); 2**{2:d} = {3}; Num={4:f}'.format(
+        #        csd_str[ii], len(csd_str), msb_power-ii, power_of_two, dec_val))
 
     return dec_val
 
@@ -656,7 +659,7 @@ class Fixed(object):
             raise Exception('Unknown Requantization type "%s"!'%(self.quant))
 
         yq = yq * self.LSB
-        logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
+        # logger.debug("y_in={0} | y={1} | yq={2}".format(y_in, y, yq))
 
         #======================================================================
         # (4) : Handle Overflow / saturation w.r.t. to the MSB, returning a
@@ -790,7 +793,7 @@ class Fixed(object):
 
                 raw_str = val_str.replace('.','') # join integer and fractional part
 
-                logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
+                # logger.debug("y={0}, val_str={1}, raw_str={2} ".format(y, val_str, raw_str))
             else:
                 return 0.0
 
@@ -851,8 +854,8 @@ class Fixed(object):
                 logger.warning(e)
                 y_dec = y_float = None
 
-            logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
-            logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
+            # logger.debug("MSB={0} | LSB={1} | scale={2}".format(self.MSB, self.LSB, self.scale))
+            # logger.debug("y_in={0} | y_dec={1}".format(y, y_dec))
         # ----
         elif frmt == 'csd':
             # - Glue integer and fractional part to a string without radix point
@@ -867,9 +870,9 @@ class Fixed(object):
             logger.error('Unknown output format "%s"!'.format(frmt))
 
         if frmt != "float":
-            logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
-                         .format(self.MSB, self.scale, raw_str, val_str))
-            logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
+            # logger.debug("MSB={0:g} |  scale={1:g} | raw_str={2} | val_str={3}"\
+            #             .format(self.MSB, self.scale, raw_str, val_str))
+            # logger.debug("y={0} | y_dec = {1} | y_float={2}".format(y, y_dec, y_float))
 
 
         if y_float is not None:
