@@ -10,8 +10,7 @@
 Create the tree dictionaries containing information about filters,
 filter implementations, widgets etc. in hierarchical form
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
-import os, sys, re
+import os, sys, re, ast
 from collections import OrderedDict
 from pprint import pformat
 import importlib
@@ -315,6 +314,9 @@ class Tree_Builder(object):
             #logger.info("Fixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
 
         # ----- Exceptions ----------------------
+        except configparser.DuplicateSectionError as e:
+            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
+            sys.exit()
         except configparser.ParsingError as e:
             logger.critical('Parsing Error in config file "{0}:\n{1}".'
                             .format(dirs.USER_CONF_DIR_FILE,e))
@@ -357,8 +359,17 @@ class Tree_Builder(object):
                 for i in items_list:
                     # sanitize value and convert to a list, split at \n and ,
                     val = i[1].strip(' \t\n\r[]"')
-                    val = re.sub('["\'\[\]\{\}]','', val)
-                    val = re.split('; |, |\n|\r', val) # TODO
+                    if len(i[1]) == 0:
+                        pass
+                    elif i[1][0] == '{': # try to parse dict
+                        try:
+                            val = ast.literal_eval(val)
+                        except SyntaxError as e:
+                            logger.warning("Syntax Error in config file\n{0}".format(e) )
+                            val = ""
+                    else:
+                        val = re.sub('["\'\[\]]','', val)
+                        val = re.split('; |, |\n|,\n|\r', val) # TODO: Test
 
                     wdg_dict.update({i[0]:val})
 
@@ -386,9 +397,6 @@ class Tree_Builder(object):
             # catch unresolvable interpolations like ${wrongSection:wrongOption}
             # Attention: This terminates  current section() without result!
             logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE)) 
-        except configparser.DuplicateSectionError as e:
-            logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
-            sys.exit()
 
         return wdg_dict
 
