@@ -478,17 +478,13 @@ class Tree_Builder(object):
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
                     if 'opt' in fb.filter_designs_dict[filt_mod]: # does the filter have option(s)?
                         filt_opt = fb.filter_designs_dict[filt_mod].pop('opt')
-                    else:
-                        filt_opt = ""
-                    
-                if type(filt_opt) == dict and 'fix' in filt_opt:
-                    opt_fix = filt_opt.pop('fix')
-                    if len(opt_fix) > 0:
-                        logger.info("FixOpt :{0} - {1}".format(len(opt_fix), opt_fix))
-                        fb.fil_classes[fc].update({'fix':opt_fix})
-                if len(filt_opt) > 0:
-                    fb.fil_classes[fc].update({'opt':filt_opt})
-                    
+                        if type(filt_opt) == dict and 'fix' in filt_opt:
+                            opt_fix = filt_opt.pop('fix')
+                            if len(opt_fix) > 0:
+                                fb.fil_classes[fc].update({'fix':opt_fix})
+                        if len(filt_opt) > 0:
+                            fb.fil_classes[fc].update({'opt':filt_opt})
+
                 logger.info("FilterOpt : {0}".format(fb.fil_classes[fc]))
 
                 num_imports += 1
