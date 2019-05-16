@@ -266,7 +266,6 @@ class Tree_Builder(object):
             # Parsing [Common]
             #------------------------------------------------------------------
             self.commons = self.parse_conf_section(conf, "Common")
-            # logger.info("[Commons:] {0}\n".format(self.commons))
 
             if not 'version' in self.commons or int(self.commons['version'][0]) != CONF_VERSION:
                 logger.critical("\nConfig file '{0:s}'\n has the wrong version '{2}' "
@@ -328,10 +327,10 @@ class Tree_Builder(object):
 #==============================================================================
     def parse_conf_section(self, conf, section, req=True):
         """
-        Parse ``section`` in ``dirs.USER_CONF_DIR_FILE`` and return a list of
-        tuples with the elements ``(class, dir)`` where "class" is the
-        class name of the widget and "dir" is the directory for
-        user widgets and None for standard widgets:
+        Parse ``section`` in config file `conf` and return an OrderedDict
+        with the elements ``{key:{'opt':<OPTION>}}`` where `key` and <OPTION>
+        have been read from the config file. <OPTION> has been sanitized and 
+        converted to a list or a dict.
 
         Parameters
         ----------
@@ -347,8 +346,7 @@ class Tree_Builder(object):
         Returns
         -------
         dict 
-            dict of tuples containing class name and options. The latter is none
-            for standard widgets.
+            dict with the 
 
         """
         try:
@@ -360,10 +358,12 @@ class Tree_Builder(object):
                     # sanitize value and convert to a list, split at \n and ,
                     val = i[1].strip(' \t\n\r[]"')
                     if len(i[1]) == 0:
-                        pass
+                        val = ""
                     elif i[1][0] == '{': # try to parse dict
                         try:
+                            logger.info("\ndict: {0}\n".format(val))
                             val = ast.literal_eval(val)
+                            val = {'opt':val}
                         except SyntaxError as e:
                             logger.warning("Syntax Error in config file\n{0}".format(e) )
                             val = ""
@@ -407,29 +407,29 @@ class Tree_Builder(object):
         auto-detecting available modules / classes:
 
         - The design classes in a module are specified in the module attribute
-          ``filter_classes`` as a dictionary ``{"Cheby":"Chebychev 1"}`` where the
-          key is the class name in the module and the value the corresponding name
+          ``filter_classes`` as a dictionary, e.g. ``{"Cheby":"Chebychev 1"}`` where
+          the key is the class name in the module and the value the corresponding name
           for display.
 
         - When ``filter_classes`` is a string, use the string
           for both class and combo box name.
 
-        Filter class, display name and module path are stored in the global
-        dict ``fb.fil_classes``.
+        Returns
+        -------
 
-        Parameters
-        ----------
-        fb.fil_classes : dict
-            Dict with the classes to be imported, contained in the
-            Python files (ending with .py !!) in the file conf_file,
-            containing entries (for SUCCESSFUL imports) with:
+        None
+        
+        ... but filter class, display name and module path are stored in the global
+        dict ``fb.fil_classes`` where each entry (if the import of the class had 
+        been successful) has the form
+        
+        {<class name>:{'name':<display name>, 'mod':<full module name>}} e.g.
 
-            {<class name>:{'name':<display name>, 'mod':<full module name>}} e.g.
-
-            .. code-block:: python
+        .. code-block:: python
 
              {'Cheby1':{'name':'Chebychev 1',
-               'mod':'pyfda.filter_design.cheby1'}
+              'mod':'pyfda.filter_design.cheby1',
+              'opt': {'fix': 'IIR_cascade'}}
         
         """
         fb.fil_classes = {}   # initialize global dict for filter classes
@@ -437,11 +437,8 @@ class Tree_Builder(object):
         imported_fil_classes = "" # names of successful filter module imports
 
         for filt_mod in fb.filter_designs_dict: # iterate over dict keys
-#            if not filt_mod[1] or len(filt_mod[1][0]) == 0: # standard filter directory / module
-#                module_name = 'pyfda.filter_designs' + '.' + filt_mod[0]
-            if len(fb.filter_designs_dict[filt_mod]) < 2:
-                module_name = 'pyfda.filter_designs' + '.' + filt_mod
-
+            module_name = 'pyfda.filter_designs' + '.' + filt_mod # TODO: user_dirs!
+ 
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
                 mod = importlib.import_module(module_name)
@@ -449,7 +446,7 @@ class Tree_Builder(object):
                 if hasattr(mod, 'filter_classes'):
                     # check type of module attribute 'filter_classes'
                     if isinstance(mod.filter_classes, dict): # dict {class name : combo box name}
-                        fdict = mod.filter_classes
+                        fdict = mod.filter_classes # one or more filter classes in one file
                     elif isinstance(mod.filter_classes, str): # String, convert to dict
                         fdict = {mod.filter_classes:mod.filter_classes}
                     else:
@@ -473,14 +470,29 @@ class Tree_Builder(object):
                     logger.warning("Skipping filter class '%s', it doesn't exist in module '%s'." %(fc, module_name))
                     continue # continue with next entry in fdict
                 else:
-                    fb.fil_classes.update({fc:{'name':fdict[fc],'mod':module_name}})
+                    fb.fil_classes.update({fc:{'name':fdict[fc],  # Class name
+                                               'mod':module_name}})        # list with fixpoint implementations
                     # when module + class import was successful, add a new entry
                     # to the dict with the class name as key and display name and
-                    # and fully qualified module path as values, e.g.
+                    # fully qualified module path as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
+                    if 'opt' in fb.filter_designs_dict[filt_mod]: # does the filter have option(s)?
+                        filt_opt = fb.filter_designs_dict[filt_mod].pop('opt')
+                    else:
+                        filt_opt = ""
+                    
+                if type(filt_opt) == dict and 'fix' in filt_opt:
+                    opt_fix = filt_opt.pop('fix')
+                    if len(opt_fix) > 0:
+                        logger.info("FixOpt :{0} - {1}".format(len(opt_fix), opt_fix))
+                        fb.fil_classes[fc].update({'fix':opt_fix})
+                if len(filt_opt) > 0:
+                    fb.fil_classes[fc].update({'opt':filt_opt})
+                    
+                logger.info("FilterOpt : {0}".format(fb.fil_classes[fc]))
 
-                    num_imports += 1
-                    imported_fil_classes += "\t" + filt_mod + "."+ fc + "\n"
+                num_imports += 1
+                imported_fil_classes += "\t" + filt_mod + "."+ fc + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
