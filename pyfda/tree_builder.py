@@ -403,8 +403,11 @@ class Tree_Builder(object):
 #==============================================================================
     def dyn_filt_import(self):
         """
-        Try to import from all filter files found by ``parse_conf_file()``,
-        auto-detecting available modules / classes:
+        - Parse filter section of config file using ``parse_conf_file()`, obtaining
+          a list of python files containing filter classes
+        - Try to dynamically import the filter modules (= files), checking their
+          module level attribute `filter_classes` for contained classes.
+        - Try to import the filter classes
 
         - The design classes in a module are specified in the module attribute
           ``filter_classes`` as a dictionary, e.g. ``{"Cheby":"Chebychev 1"}`` where
@@ -416,7 +419,6 @@ class Tree_Builder(object):
 
         Returns
         -------
-
         None
         
         ... but filter class, display name and module path are stored in the global
@@ -429,7 +431,8 @@ class Tree_Builder(object):
 
              {'Cheby1':{'name':'Chebychev 1',
               'mod':'pyfda.filter_design.cheby1',
-              'opt': {'fix': 'IIR_cascade'}}
+              'fix': 'IIR_cascade',
+              'opt': ["option1", "option2"]}
         
         """
         fb.fil_classes = {}   # initialize global dict for filter classes
