@@ -174,7 +174,9 @@ class Tree_Builder(object):
 
         self.parse_conf_file()
 
-        self.dyn_filt_import()
+        self.build_filter_dict()
+        
+        #self.rad_fixpoint_filters()
 
         fil_tree = {}
 
@@ -310,7 +312,7 @@ class Tree_Builder(object):
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
             fb.fixpoint_widgets_dict = self.parse_conf_section(conf, "Fixpoint Widgets")
-            #logger.info("Fixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
+            logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
@@ -328,7 +330,7 @@ class Tree_Builder(object):
     def parse_conf_section(self, conf, section, req=True):
         """
         Parse ``section`` in config file `conf` and return an OrderedDict
-        with the elements ``{key:{'opt':<OPTION>}}`` where `key` and <OPTION>
+        with the elements ``{key:<OPTION>}`` where `key` and <OPTION>
         have been read from the config file. <OPTION> has been sanitized and 
         converted to a list or a dict.
 
@@ -345,12 +347,11 @@ class Tree_Builder(object):
 
         Returns
         -------
-        dict 
-            dict with the 
-
+        section_dict : dict 
+            Dict with the keys of the config files and corresponding values
         """
         try:
-            wdg_dict = OrderedDict()
+            section_dict = OrderedDict()
             items_list = conf.items(section) # entries from config file with [name, path]
                 
             if len(items_list) > 0:
@@ -359,11 +360,10 @@ class Tree_Builder(object):
                     val = i[1].strip(' \t\n\r[]"')
                     if len(i[1]) == 0:
                         val = ""
-                    elif i[1][0] == '{': # try to parse dict
+                    elif i[1][0] == '{': # try to convert to dict
                         try:
                             logger.info("\ndict: {0}\n".format(val))
                             val = ast.literal_eval(val)
-                            val = {'opt':val}
                         except SyntaxError as e:
                             logger.warning("Syntax Error in config file\n{0}".format(e) )
                             val = ""
@@ -371,10 +371,10 @@ class Tree_Builder(object):
                         val = re.sub('["\'\[\]]','', val)
                         val = re.split('; |, |\n|,\n|\r', val) # TODO: Test
 
-                    wdg_dict.update({i[0]:val})
+                    section_dict.update({i[0]:val})
 
                 logger.info('Found {0:2d} entries in [{1:s}].'
-                        .format(len(wdg_dict), section))
+                        .format(len(section_dict), section))
             else:
                 if req:
                     logger.critical('Empty section [{0:s}], aborting.'.format(section))
@@ -398,24 +398,23 @@ class Tree_Builder(object):
             # Attention: This terminates  current section() without result!
             logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE)) 
 
-        return wdg_dict
+        return section_dict
 
 #==============================================================================
-    def dyn_filt_import(self):
+    def build_filter_dict(self):
         """
-        - Parse filter section of config file using ``parse_conf_file()`, obtaining
-          a list of python files containing filter classes
-        - Try to dynamically import the filter modules (= files), checking their
-          module level attribute `filter_classes` for contained classes.
-        - Try to import the filter classes
+        - Try to dynamically import the filter modules (= files) in the global
+          `fb.filter_classes_dict`, reading their module level attribute 
+          `filter_classes` for contained classes.
 
-        - The design classes in a module are specified in the module attribute
-          ``filter_classes`` as a dictionary, e.g. ``{"Cheby":"Chebychev 1"}`` where
+          ``filter_classes`` is a dictionary, e.g. ``{"Cheby":"Chebychev 1"}`` where
           the key is the class name in the module and the value the corresponding name
           for display.
 
         - When ``filter_classes`` is a string, use the string
           for both class and combo box name.
+          
+        - Try to import the filter classes
 
         Returns
         -------
@@ -436,8 +435,8 @@ class Tree_Builder(object):
         
         """
         fb.fil_classes = {}   # initialize global dict for filter classes
-        num_imports = 0           # number of successful filter module imports
-        imported_fil_classes = "" # names of successful filter module imports
+        num_imports = 0       # number of successful module imports
+        imported_classes = "" # names of successful module imports
 
         for filt_mod in fb.filter_designs_dict: # iterate over dict keys
             module_name = 'pyfda.filter_designs' + '.' + filt_mod # TODO: user_dirs!
@@ -479,26 +478,33 @@ class Tree_Builder(object):
                     # to the dict with the class name as key and display name and
                     # fully qualified module path as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
-                    if 'opt' in fb.filter_designs_dict[filt_mod]: # does the filter have option(s)?
-                        filt_opt = fb.filter_designs_dict[filt_mod].pop('opt')
-                        if type(filt_opt) == dict and 'fix' in filt_opt:
-                            opt_fix = filt_opt.pop('fix')
-                            if len(opt_fix) > 0:
-                                fb.fil_classes[fc].update({'fix':opt_fix})
-                        if len(filt_opt) > 0:
-                            fb.fil_classes[fc].update({'opt':filt_opt})
+                    keys = {k for k,val in fb.fixpoint_widgets_dict.items() if fc in val}
+                    logger.info("fx_keys:{0}|{1}".format(keys, fc))
+
+                    if type(fb.filter_designs_dict[filt_mod]) == dict: # does the filter have option(s)?
+                        fb.fil_classes[fc].update(fb.filter_designs_dict[filt_mod])
 
                 logger.info("FilterOpt : {0}".format(fb.fil_classes[fc]))
 
                 num_imports += 1
-                imported_fil_classes += "\t" + filt_mod + "."+ fc + "\n"
+                imported_classes += "\t" + filt_mod + "."+ fc + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
             sys.exit("No filter class could be imported - shutting down.")
         else:
             logger.info("Imported {0:d} filter classes:\n{1:s}"\
-                    .format(num_imports, imported_fil_classes))
+                    .format(num_imports, imported_classes))
+            
+    def build_fx_widget_dict(self):
+        for k in fb.fixpoint_widgets_dict:
+            pass
+        # keys = { key for key,value in dd.items() if value=='value' }
+        # keys = [ key for key,value in dd.items() if value=='value' ]
+ #           if 
+            
+    # fb.fixpoint_widgets_dict = self.parse_conf_section(conf, "Fixpoint Widgets")
+
 
 #==============================================================================
     def build_fil_tree(self, fc, rt_dict, fil_tree = None):
