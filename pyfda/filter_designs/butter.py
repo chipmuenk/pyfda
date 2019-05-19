@@ -41,7 +41,7 @@ from pyfda.pyfda_qt_lib import qfilter_warning
 
 __version__ = "2.2"
 
-filter_classes = {'Butter':'Butterworth'}
+classes = {'Butter':'Butterworth'}
 
 class Butter(object):
 
