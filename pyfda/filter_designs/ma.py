@@ -29,8 +29,9 @@ API version info:
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
     2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+    
+   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 
 import logging
 logger = logging.getLogger(__name__)
@@ -44,9 +45,9 @@ import pyfda.filterbroker as fb
 from pyfda.pyfda_lib import fil_save, fil_convert, ceil_odd, safe_eval
 from pyfda.pyfda_qt_lib import qfilter_warning
 
-__version__ = "2.0"
+__version__ = "2.2"
 
-filter_classes = {'MA':'Moving Average'}   
+classes = {'MA':'Moving Average'} #: Dict containing class name : display name  
          
 class MA(QWidget):
         

@@ -29,9 +29,9 @@ API version info:
          is read and merged with the first one.
     2.1: Remove empty methods construct_UI and destruct_UI and attributes 
          self.wdg and self.hdl
+         
+   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility 
 """
-
-from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import ellipord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
@@ -39,9 +39,9 @@ from pyfda.pyfda_qt_lib import qfilter_warning
 
 from .common import Common
 
-__version__ = "2.0"
+__version__ = "2.2"
 
-filter_classes = {'Ellip':'Elliptic'}
+classes = {'Ellip':'Elliptic'} #: Dict containing class name : display name
     
 class Ellip(object):
 

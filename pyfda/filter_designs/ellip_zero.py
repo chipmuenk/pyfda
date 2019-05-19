@@ -16,7 +16,12 @@ is selected, calling its __init__ method.
 
 API version info:
     2.0: initial working release
+    
     2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+
+   :2.2: Rename `filter_classes` -> `classes`    
+    
+    
 """
 from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
@@ -32,9 +37,9 @@ from ..compat import (QWidget, QFrame, pyqtSignal,
 import logging
 logger = logging.getLogger(__name__)
 
-__version__ = "2.0"
+__version__ = "2.2"
 
-filter_classes = {'EllipZeroPhz':'EllipZeroPhz'}
+classes = {'EllipZeroPhz':'EllipZeroPhz'} #: Dict containing class name : display name
 
 class EllipZeroPhz(QWidget):
 

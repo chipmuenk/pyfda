@@ -16,27 +16,33 @@ This class is re-instantiated dynamically everytime the filter design method
 is selected, calling the __init__ method.
 
 API version info:   
-    1.0: initial working release
-    1.1: mark private methods as private
-    1.2: new API using fil_save
-    1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
-    1.4: module attribute `filter_classes` contains class name and combo box name
+    :1.0: initial working release
+    
+    :1.1: mark private methods as private
+    
+    :1.2: new API using fil_save
+    
+    :1.3: new public methods destruct_UI + construct_UI (no longer called by __init__)    
+
+    :1.4: module attribute `filter_classes` contains class name and combo box name
          instead of class attribute `name`
-    2.0: Specify the parameters for each subwidget as tuples in a dict where the
+
+    :2.0: Specify the parameters for each subwidget as tuples in a dict where the
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-    2.1: Remove empty methods construct_UI and destruct_UI and attributes 
-         self.wdg and self.hdl
-"""
 
-from __future__ import print_function, division, unicode_literals
+    :2.1: Remove empty methods construct_UI and destruct_UI and attributes 
+         self.wdg and self.hdl
+    
+    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
+"""
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
 
-__version__ = "2.0"
+__version__ = "2.2"
 
-filter_classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'}
+classes = {'Manual_FIR':'Manual', 'Manual_IIR':'Manual'} #: Dict containing class name : display name
 
 FRMT = 'ba' # default output format of filter design routines 'zpk' / 'ba' / 'sos'
 

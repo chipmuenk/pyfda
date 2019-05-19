@@ -36,17 +36,18 @@ API version info:
          
     :2.1: Remove empty methods ``construct_UI`` and ``destruct_UI`` and attributes 
          ``self.wdg`` and ``self.hdl``
+         
+    :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
 """
-from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 from scipy.signal import buttord
 from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
 import logging
 logger = logging.getLogger(__name__)
 
-__version__ = "2.1"
+__version__ = "2.2"
 
-filter_classes = {'Bessel':'Bessel'} #: Class name : displayed name
+classes = {'Bessel':'Bessel'} #: Dict containing class name : display name
 
 class Bessel(object):
     """

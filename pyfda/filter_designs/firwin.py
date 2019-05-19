@@ -26,12 +26,13 @@ API version info:
          first element controls whether the widget is visible and / or enabled.
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
-"""
-from __future__ import print_function, division, unicode_literals
 
+    2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+    
+   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
+"""
 from ..compat import (Qt, QWidget, QLabel, QLineEdit, pyqtSignal, QComboBox,
                       QVBoxLayout, QGridLayout)
-
 import numpy as np
 import scipy.signal as sig
 from importlib import import_module
@@ -42,7 +43,6 @@ from pyfda.pyfda_lib import fil_save, round_odd, safe_eval
 from pyfda.pyfda_qt_lib import qfilter_warning
 from .common import Common, remezord
 
-
 # TODO: Hilbert, differentiator, multiband are missing
 # TODO: Use kaiserord, kaiser_beta & kaiser_atten to calculate params for 
 #       kaiser window
@@ -51,9 +51,9 @@ from .common import Common, remezord
 #       Automatic switching to Kaiser / Hermann?
 # TODO: Parameters for windows are not stored in fil_dict?
 
-__version__ = "2.0"
+__version__ = "2.2"
 
-filter_classes = {'Firwin':'Windowed FIR'}
+classes = {'Firwin':'Windowed FIR'} #: Dict containing class name : display name
 
 class Firwin(QWidget):
 

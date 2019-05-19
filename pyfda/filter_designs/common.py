@@ -5,7 +5,6 @@
 # Copyright © pyFDA Project Contributors
 # Licensed under the terms of the MIT License
 # (see file LICENSE in root directory for details)
-# -*- coding: utf-8 -*-
 
 """
 Common settings and some helper functions for filter design

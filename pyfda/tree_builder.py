@@ -405,13 +405,13 @@ class Tree_Builder(object):
         """
         - Try to dynamically import the filter modules (= files) in the global
           `fb.filter_classes_dict`, reading their module level attribute 
-          `filter_classes` for contained classes.
+          `classes` for contained classes.
 
-          ``filter_classes`` is a dictionary, e.g. ``{"Cheby":"Chebychev 1"}`` where
+          `classes` is a dictionary, e.g. `{"Cheby":"Chebychev 1"}` where
           the key is the class name in the module and the value the corresponding name
           for display.
 
-        - When ``filter_classes`` is a string, use the string
+        - When `classes` is a string, use the string
           for both class and combo box name.
           
         - Try to import the filter classes
@@ -445,19 +445,19 @@ class Tree_Builder(object):
                 ################################################
                 mod = importlib.import_module(module_name)
                 ################################################
-                if hasattr(mod, 'filter_classes'):
-                    # check type of module attribute 'filter_classes'
-                    if isinstance(mod.filter_classes, dict): # dict {class name : combo box name}
-                        fdict = mod.filter_classes # one or more filter classes in one file
-                    elif isinstance(mod.filter_classes, str): # String, convert to dict
-                        fdict = {mod.filter_classes:mod.filter_classes}
+                if hasattr(mod, 'classes'):
+                    # check type of module attribute 'classes'
+                    if isinstance(mod.classes, dict): # dict {class name : combo box name}
+                        fdict = mod.classes # one or more filter classes in one file
+                    elif isinstance(mod.classes, str): # String, convert to dict
+                        fdict = {mod.classes:mod.classes}
                     else:
-                        logger.warning("Skipping module '%s', its attribute 'filter_classes' has the wrong type '%s'."
-                        %(str(filt_mod), str(type(mod.filter_classes).__name__)))
+                        logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
+                        %(str(filt_mod), str(type(mod.classes).__name__)))
                         continue # with next entry in filt_list_names
                 else:
-                    # no filter_class attribute, use the module name as fallback:
-                    logger.warning('Skipping filter module "%s" due to missing attribute "filter_classes".', filt_mod)
+                    # no classes attribute - skip this entry
+                    logger.warning('Skipping filter module "%s" due to missing attribute "classes".', filt_mod)
                     continue
 
             except ImportError as e:

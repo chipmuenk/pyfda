@@ -27,9 +27,9 @@ API version info:
          This dict is now called self.rt_dict. When present, the dict self.rt_dict_add
          is read and merged with the first one.
     2.1: Remove method destruct_UI and attributes self.wdg and self.hdl
+    
+   :2.2: Rename `filter_classes` -> `classes`, remove Py2 compatibility  
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -43,9 +43,9 @@ from pyfda.pyfda_qt_lib import qfilter_warning
 from pyfda.pyfda_lib import fil_save, round_odd, ceil_even, safe_eval
 from .common import remezord 
 
-__version__ = "2.0"
+__version__ = "2.2"
 
-filter_classes = {'Equiripple':'Equiripple'}
+classes = {'Equiripple':'Equiripple'} #: Dict containing class name : display name
 
 class Equiripple(QWidget):
 
