@@ -438,8 +438,8 @@ class Tree_Builder(object):
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
 
-        for filt_mod in fb.filter_designs_dict: # iterate over dict keys
-            module_name = 'pyfda.filter_designs' + '.' + filt_mod # TODO: user_dirs!
+        for file_name in fb.filter_designs_dict: # iterate over dict keys
+            module_name = 'pyfda.filter_designs' + '.' + file_name # TODO: user_dirs!
  
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
@@ -448,31 +448,31 @@ class Tree_Builder(object):
                 if hasattr(mod, 'classes'):
                     # check type of module attribute 'classes'
                     if isinstance(mod.classes, dict): # dict {class name : combo box name}
-                        fdict = mod.classes # one or more filter classes in one file
+                        classes_dict = mod.classes # one or more filter classes in one file
                     elif isinstance(mod.classes, str): # String, convert to dict
-                        fdict = {mod.classes:mod.classes}
+                        classes_dict = {mod.classes:mod.classes}
                     else:
                         logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
-                        %(str(filt_mod), str(type(mod.classes).__name__)))
+                        %(str(file_name), str(type(mod.classes).__name__)))
                         continue # with next entry in filt_list_names
                 else:
                     # no classes attribute - skip this entry
-                    logger.warning('Skipping filter module "%s" due to missing attribute "classes".', filt_mod)
+                    logger.warning('Skipping filter module "%s" due to missing attribute "classes".', file_name)
                     continue
 
             except ImportError as e:
-                logger.warning('Filter module "{0}" could not be imported.\n{1}'.format(filt_mod, e))
+                logger.warning('Filter module "{0}" could not be imported.\n{1}'.format(file_name, e))
                 continue
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
             # Now, try to instantiate an instance ff.fil_inst() of filter class fc
-            for fc in fdict:
+            for fc in classes_dict:
                 if not hasattr(mod, fc): # class fc doesn't exist in filter module
                     logger.warning("Skipping filter class '%s', it doesn't exist in module '%s'." %(fc, module_name))
-                    continue # continue with next entry in fdict
+                    continue # continue with next entry in classes_dict
                 else:
-                    fb.fil_classes.update({fc:{'name':fdict[fc],  # Class name
+                    fb.fil_classes.update({fc:{'name':classes_dict[fc],  # Class name
                                                'mod':module_name}})        # list with fixpoint implementations
                     # when module + class import was successful, add a new entry
                     # to the dict with the class name as key and display name and
@@ -481,13 +481,12 @@ class Tree_Builder(object):
                     keys = {k for k,val in fb.fixpoint_widgets_dict.items() if fc in val}
                     logger.info("fx_keys:{0}|{1}".format(keys, fc))
 
-                    if type(fb.filter_designs_dict[filt_mod]) == dict: # does the filter have option(s)?
-                        fb.fil_classes[fc].update(fb.filter_designs_dict[filt_mod])
+                    if type(fb.filter_designs_dict[file_name]) == dict: # does the filter have option(s)?
+                        fb.fil_classes[fc].update(fb.filter_designs_dict[file_name])
 
-                logger.info("FilterOpt : {0}".format(fb.fil_classes[fc]))
-
+                # logger.info("FilterOpt : {0}".format(fb.fil_classes[fc]))
                 num_imports += 1
-                imported_classes += "\t" + filt_mod + "."+ fc + "\n"
+                imported_classes += "\t" + file_name + "."+ fc + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
