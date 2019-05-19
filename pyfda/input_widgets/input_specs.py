@@ -10,10 +10,7 @@
 Widget stacking all subwidgets for filter specification and design. The actual
 filter design is started here as well.
 """
-
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
-#from pprint import pformat
 import logging
 logger = logging.getLogger(__name__)
 
@@ -28,6 +25,7 @@ from pyfda.pyfda_rc import params
 from pyfda.input_widgets import (select_filter, amplitude_specs,
                                  freq_specs, freq_units,
                                  weight_specs, target_specs)
+classes = {'Input_Specs':'Specs'} #: Dict containing class name : display name
 
 class Input_Specs(QWidget):
     """

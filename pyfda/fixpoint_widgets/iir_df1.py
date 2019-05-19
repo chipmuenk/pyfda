@@ -9,12 +9,9 @@
 """
 Widget for specifying the parameters of a direct-form 1 (DF1) IIR filter
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import logging
 logger = logging.getLogger(__name__)
-
-#import numpy as np
 
 import math
 import pyfda.filterbroker as fb
@@ -28,6 +25,8 @@ import myhdl as hdl
 from myhdl import Signal, intbv, always_seq, StopSimulation
 from .support import Clock, Reset, Global, Samples, Signals
 from .filter_hw import FilterHardware
+
+classes = {'IIR_DF1':'DF1'} #: Dict containing class name : display name
 
 class IIR_DF1(QWidget):
     """

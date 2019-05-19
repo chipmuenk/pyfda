@@ -9,7 +9,6 @@
 """
 Widget for plotting impulse and general transient responses
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
@@ -34,6 +33,7 @@ from .plot_impz_ui import PlotImpz_UI
 # TODO: fir fixpoint  scaling is off by 1 bit due to W_c + W_I without -1
 # TODO: Increasing number of data points repeats the previous ones in fixpoint mode
 
+classes = {'Plot_Impz':'h[n]'} #: Dict containing class name : display name
 
 class Plot_Impz(QWidget):
     """

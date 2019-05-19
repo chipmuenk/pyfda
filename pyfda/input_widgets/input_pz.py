@@ -9,7 +9,6 @@
 """
 Widget for displaying and modifying filter Poles and Zeros
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
@@ -28,12 +27,13 @@ import numpy as np
 from scipy.signal import freqz, zpk2tf
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
-from pyfda.pyfda_lib import qstr, fil_save, safe_eval, unichr_23
+from pyfda.pyfda_lib import qstr, fil_save, safe_eval
 
 from pyfda.pyfda_rc import params
 
 from .input_pz_ui import Input_PZ_UI
 
+classes = {'Input_PZ':'P/Z'} #: Dict containing class name : display name
 
 class ItemDelegate(QStyledItemDelegate):
     """
@@ -188,8 +188,7 @@ class Input_PZ(QWidget):
         self.ui_changed = True # initialize flag: ui for csv options has been changed
 
         self.Hmax_last = 1  # initial setting for maximum gain
-        self.angle_char = "<" # "∠" may give problems with some encodings
-        self.angle_char = unichr_23(int('2220', 16))
+        self.angle_char = "\u2220"
         
         self.tab_label = "P/Z"
         self.tool_tip = "Display and edit filter poles and zeros."

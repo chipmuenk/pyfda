@@ -9,7 +9,6 @@
 """
 Widget for displaying infos about filter and filter design method and debugging infos as well
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import pprint
 import textwrap
@@ -35,6 +34,8 @@ if mod_version('docutils') is not None:
     HAS_DOCUTILS = True
 else:
     HAS_DOCUTILS = False
+    
+classes = {'Input_Info':'Info'} #: Dict containing class name : display name
 
 class Input_Info(QWidget):
     """

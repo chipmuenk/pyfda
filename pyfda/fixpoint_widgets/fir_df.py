@@ -9,12 +9,10 @@
 """
 Widget for specifying the parameters of a direct-form DF1 FIR filter
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import logging
 logger = logging.getLogger(__name__)
 
-#import numpy as np
 import math
 import pyfda.filterbroker as fb
 
@@ -27,8 +25,8 @@ import myhdl as hdl
 from myhdl import Signal, intbv, always_seq, StopSimulation
 from .support import Clock, Reset, Global, Samples, Signals
 from .filter_hw import FilterHardware
-#from pyfda.filter_blocks.fda import fir
-  
+
+classes = {'FIR_DF1':'DF'} #: Dict containing class name : display name
 
 # =============================================================================
 

@@ -8,7 +8,6 @@
 """
 Widget for plotting phase frequency response phi(f)
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
@@ -22,6 +21,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from pyfda.pyfda_lib import calc_Hcomplex
 from pyfda.pyfda_qt_lib import qget_cmb_box
 
+classes = {'Plot_Phi':'\u03C6(f)'} #: Dict containing class name : display name
 
 class Plot_Phi(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )
@@ -33,7 +33,7 @@ class Plot_Phi(QWidget):
         self.view_change= True
         self.size_changed = True
         self.tool_tip = "Phase frequency response"
-        self.tab_label = "phi(f)"
+        self.tab_label = "\u03C6(f)" # phi(f)
         self._construct_UI()
 
 #------------------------------------------------------------------------------

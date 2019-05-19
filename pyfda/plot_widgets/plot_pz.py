@@ -9,13 +9,11 @@
 """
 Widget for plotting poles and zeros
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
 from ..compat import (QWidget, QLabel, QCheckBox, QFrame, QDial, QHBoxLayout,
                       pyqtSlot, pyqtSignal)
-
 import numpy as np
 import scipy.signal as sig
 
@@ -27,6 +25,7 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 
 from  matplotlib import patches
 
+classes = {'Plot_PZ':'P / Z'} #: Dict containing class name : display name
 
 class Plot_PZ(QWidget):
     # incoming, connected in sender widget (locally connected to self.process_sig_rx() )

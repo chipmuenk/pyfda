@@ -12,7 +12,6 @@ generating VHDL and Verilog Code
 
 see https://bitbucket.org/cfelton/examples
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys, os, importlib
 import logging
 logger = logging.getLogger(__name__)
@@ -46,6 +45,8 @@ if cmp_version("migen", "0.1") >= -1: # currently, version cannot be determined
 else:
     HAS_MIGEN = False
 #------------------------------------------------------------------------------
+
+classes = {'Input_Fixpoint_Specs':'Fixpoint'} #: Dict containing class name : display name
 
 class Input_Fixpoint_Specs(QWidget):
     """

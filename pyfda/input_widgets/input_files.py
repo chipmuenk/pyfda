@@ -9,7 +9,6 @@
 """
 Widget for exporting / importing and saving / loading filter data
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import os, io
 import logging
 logger = logging.getLogger(__name__)
@@ -53,6 +52,7 @@ else:
 #else:
 #    XLRD = True
 
+classes = {'Input_Files':'Files'} #: Dict containing class name : display name
 
 class Input_Files(QWidget):
     """

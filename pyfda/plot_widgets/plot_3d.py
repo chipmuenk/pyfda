@@ -9,7 +9,6 @@
 """
 Widget for plotting \|H(z)\| in 3D
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
@@ -30,6 +29,8 @@ from pyfda.plot_widgets.mpl_widget import MplWidget
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm # Colormap
 from matplotlib.colors import LightSource
+
+classes = {'Plot_3D':'3D'} #: Dict containing class name : display name
 
 #http://docs.enthought.com/mayavi/mayavi/mlab_running_scripts.html#running-mlab-scripts
 #http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html

@@ -9,8 +9,6 @@
 """
 Widget for displaying and modifying filter coefficients
 """
-
-from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 
@@ -19,7 +17,6 @@ import sys
 from ..compat import (Qt, QtCore, QWidget, QLineEdit, QApplication,
                       QIcon, QSize, QTableWidget, QTableWidgetItem, QVBoxLayout,
                       pyqtSignal, QStyledItemDelegate, QColor, QBrush)
-
 import numpy as np
 
 import pyfda.filterbroker as fb # importing filterbroker initializes all its globals
@@ -44,6 +41,8 @@ from .input_coeffs_ui import Input_Coeffs_UI
 #       http://www.ue.eti.pg.gda.pl/~wrona/lab_dsp/cw05/matlab/Help1.pdf
 
 # TODO: convert to a proper Model-View-Architecture using QTableView?
+
+classes = {'Input_Coeffs':'b,a'} #: Dict containing class name : display name
 
 class ItemDelegate(QStyledItemDelegate):
     """
