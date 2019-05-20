@@ -174,7 +174,7 @@ class Tree_Builder(object):
 
         self.parse_conf_file()
 
-        self.build_filter_dict()
+        self.build_filter_dict(fb.filter_designs_dict)
         
         #self.rad_fixpoint_filters()
 
@@ -401,7 +401,7 @@ class Tree_Builder(object):
         return section_dict
 
 #==============================================================================
-    def build_filter_dict(self):
+    def build_filter_dict(self, section_dict):
         """
         - Try to dynamically import the filter modules (= files) in the global
           `fb.filter_classes_dict`, reading their module level attribute 
@@ -415,7 +415,14 @@ class Tree_Builder(object):
           for both class and combo box name.
           
         - Try to import the filter classes
-
+        
+        Parameters
+        ----------
+        section_dict : dict
+        
+        Dictionary with the module filenames from a section in the configuration 
+        file and their options as parsed by `self.parse_conf_section'.
+        
         Returns
         -------
         None
@@ -438,7 +445,7 @@ class Tree_Builder(object):
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
 
-        for file_name in fb.filter_designs_dict: # iterate over dict keys
+        for file_name in section_dict: # iterate over dict keys
             module_name = 'pyfda.filter_designs' + '.' + file_name # TODO: user_dirs!
  
             try:  # Try to import the module from the  package and get a handle:
@@ -481,8 +488,8 @@ class Tree_Builder(object):
                     keys = {k for k,val in fb.fixpoint_widgets_dict.items() if fc in val}
                     logger.info("fx_keys:{0}|{1}".format(keys, fc))
 
-                    if type(fb.filter_designs_dict[file_name]) == dict: # does the filter have option(s)?
-                        fb.fil_classes[fc].update(fb.filter_designs_dict[file_name])
+                    if type(section_dict[file_name]) == dict: # does the filter have option(s)?
+                        fb.fil_classes[fc].update(section_dict[file_name])
 
                 # logger.info("FilterOpt : {0}".format(fb.fil_classes[fc]))
                 num_imports += 1
