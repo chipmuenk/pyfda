@@ -197,9 +197,13 @@ class FreqSpecs(QWidget):
 
         f_range = " (0 &lt; <i>f</i> &lt; <i>f<sub>S </sub></i>/2)"
         for i in range(num_new_labels):
-            # Update ALL labels and corresponding values 
-            self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
-            
+            # Update ALL labels and corresponding values
+            if fb.fil[0]['freq_specs_unit'] in {"f_S", "f_Ny"}:
+                self.qlabels[i].setText(to_html(new_labels[i], frmt='bi'))
+            else: # convert 'F' to 'f' for frequencies in Hz
+                self.qlabels[i].setText(to_html(new_labels[i][0].lower()\
+                            + new_labels[i][1:], frmt='bi'))
+           
             self.qlineedit[i].setText(str(fb.fil[0][new_labels[i]]))
             self.qlineedit[i].setObjectName(new_labels[i])  # update ID
             qstyle_widget(self.qlineedit[i], state)
