@@ -445,7 +445,7 @@ class Tree_Builder(object):
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
 
-        for file_name in section_dict: # iterate over dict keys
+        for file_name in section_dict: # iterate over dict keys found in config file
             module_name = 'pyfda.filter_designs' + '.' + file_name # TODO: user_dirs!
  
             try:  # Try to import the module from the  package and get a handle:
@@ -473,27 +473,27 @@ class Tree_Builder(object):
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
-            # Now, try to instantiate an instance ff.fil_inst() of filter class fc
-            for fc in classes_dict:
-                if not hasattr(mod, fc): # class fc doesn't exist in filter module
-                    logger.warning("Skipping filter class '%s', it doesn't exist in module '%s'." %(fc, module_name))
+            # Now, check whether class `c` is part of module `mod`
+            for c in classes_dict:
+                if not hasattr(mod, c): # class c doesn't exist in filter module
+                    logger.warning("Skipping filter class '{0}', it doesn't exist in module '{1}'.".format(c, module_name))
                     continue # continue with next entry in classes_dict
                 else:
-                    fb.fil_classes.update({fc:{'name':classes_dict[fc],  # Class name
-                                               'mod':module_name}})        # list with fixpoint implementations
+                    fb.fil_classes.update({c:{'name':classes_dict[c],  # Class name
+                                               'mod':module_name}})    # list with fixpoint implementations
                     # when module + class import was successful, add a new entry
                     # to the dict with the class name as key and display name and
                     # fully qualified module path as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
-                    keys = {k for k,val in fb.fixpoint_widgets_dict.items() if fc in val}
-                    logger.info("fx_keys:{0}|{1}".format(keys, fc))
+                    keys = {k for k,val in fb.fixpoint_widgets_dict.items() if c in val}
+                    logger.info("fx_keys:{0}|{1}".format(keys, c))
 
                     if type(section_dict[file_name]) == dict: # does the filter have option(s)?
-                        fb.fil_classes[fc].update(section_dict[file_name])
+                        fb.fil_classes[c].update(section_dict[file_name])
 
-                # logger.info("FilterOpt : {0}".format(fb.fil_classes[fc]))
+                # logger.info("FilterOpt : {0}".format(fb.fil_classes[c]))
                 num_imports += 1
-                imported_classes += "\t" + file_name + "."+ fc + "\n"
+                imported_classes += "\t" + file_name + "."+ c + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
