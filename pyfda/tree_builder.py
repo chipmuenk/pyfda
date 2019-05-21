@@ -168,15 +168,15 @@ class Tree_Builder(object):
             - ``fb.fil_tree``:
                 
             - 
-    
-
         """
 
         self.parse_conf_file()
 
-        self.build_filter_dict(fb.filter_designs_dict)
+        fb.fil_classes = self.build_class_dict(fb.filter_designs_dict)
         
-        #self.rad_fixpoint_filters()
+        for c in fb.fil_classes:
+            keys = {k for k,val in fb.fixpoint_widgets_dict.items() if c in val}
+            logger.info("fx_keys:{0}|{1}".format(keys, c))
 
         fil_tree = {}
 
@@ -347,11 +347,11 @@ class Tree_Builder(object):
 
         Returns
         -------
-        section_dict : dict 
+        section_conf_dict : dict 
             Dict with the keys of the config files and corresponding values
         """
         try:
-            section_dict = OrderedDict()
+            section_conf_dict = OrderedDict()
             items_list = conf.items(section) # entries from config file with [name, path]
                 
             if len(items_list) > 0:
@@ -371,10 +371,10 @@ class Tree_Builder(object):
                         val = re.sub('["\'\[\]]','', val)
                         val = re.split('; |, |\n|,\n|\r', val) # TODO: Test
 
-                    section_dict.update({i[0]:val})
+                    section_conf_dict.update({i[0]:val})
 
                 logger.info('Found {0:2d} entries in [{1:s}].'
-                        .format(len(section_dict), section))
+                        .format(len(section_conf_dict), section))
             else:
                 if req:
                     logger.critical('Empty section [{0:s}], aborting.'.format(section))
@@ -398,38 +398,39 @@ class Tree_Builder(object):
             # Attention: This terminates  current section() without result!
             logger.warning('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE)) 
 
-        return section_dict
+        return section_conf_dict
 
 #==============================================================================
-    def build_filter_dict(self, section_dict):
+    def build_class_dict(self, section_conf_dict):
         """
-        - Try to dynamically import the filter modules (= files) in the global
-          `fb.filter_classes_dict`, reading their module level attribute 
-          `classes` for contained classes.
+        - Try to dynamically import the filter modules (= files) passed as
+          `section_conf_dict`, reading their module level attribute 
+          `classes` with classes contained in the module.
 
           `classes` is a dictionary, e.g. `{"Cheby":"Chebychev 1"}` where
-          the key is the class name in the module and the value the corresponding name
-          for display.
+          the key is the class name in the module and the value the corresponding
+          display name (used for the combo box).
 
         - When `classes` is a string, use the string
-          for both class and combo box name.
+          for both class and display name.
           
         - Try to import the filter classes
         
         Parameters
         ----------
-        section_dict : dict
+        section_conf_dict : dict
         
         Dictionary with the module filenames from a section in the configuration 
         file and their options as parsed by `self.parse_conf_section'.
         
         Returns
         -------
-        None
+        classes_dict : dict
         
-        ... but filter class, display name and module path are stored in the global
-        dict ``fb.fil_classes`` where each entry (if the import of the class had 
-        been successful) has the form
+        A dictionary with the classes as keys; values are dicts which define 
+        the options (like display name, module path, fixpoint implementations etc).
+        
+        Each entry has the form e.g.
         
         {<class name>:{'name':<display name>, 'mod':<full module name>}} e.g.
 
@@ -441,59 +442,59 @@ class Tree_Builder(object):
               'opt': ["option1", "option2"]}
         
         """
-        fb.fil_classes = {}   # initialize global dict for filter classes
+        classes_dict = {}   # initialize dict for filter classes
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
 
-        for file_name in section_dict: # iterate over dict keys found in config file
-            module_name = 'pyfda.filter_designs' + '.' + file_name # TODO: user_dirs!
- 
+        for mod_name in section_conf_dict: # iterate over dict keys found in config file
+            mod_fq_name = 'pyfda.filter_designs' + '.' + mod_name # fully qualified module name (fqn)
+            # TODO: user_dirs! 
             try:  # Try to import the module from the  package and get a handle:
                 ################################################
-                mod = importlib.import_module(module_name)
+                mod = importlib.import_module(mod_fq_name)
                 ################################################
                 if hasattr(mod, 'classes'):
                     # check type of module attribute 'classes'
+                    logger.warning(mod.classes)
                     if isinstance(mod.classes, dict): # dict {class name : combo box name}
-                        classes_dict = mod.classes # one or more filter classes in one file
+                        mod_dict = mod.classes # one or more filter classes in one file
                     elif isinstance(mod.classes, str): # String, convert to dict
-                        classes_dict = {mod.classes:mod.classes}
+                        mod_dict = {mod.classes:mod.classes}
                     else:
                         logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
-                        %(str(file_name), str(type(mod.classes).__name__)))
+                        %(str(mod_name), str(type(mod.classes).__name__)))
                         continue # with next entry in filt_list_names
                 else:
                     # no classes attribute - skip this entry
-                    logger.warning('Skipping filter module "%s" due to missing attribute "classes".', file_name)
+                    logger.warning('Skipping filter module "%s" due to missing attribute "classes".', mod_name)
                     continue
 
             except ImportError as e:
-                logger.warning('Filter module "{0}" could not be imported.\n{1}'.format(file_name, e))
+                logger.warning('Filter module "{0}" could not be imported.\n{1}'.format(mod_name, e))
                 continue
             except Exception as e:
                 logger.warning("Unexpected error during module import:\n{0}".format(e))
                 continue
             # Now, check whether class `c` is part of module `mod`
-            for c in classes_dict:
+            for c in mod_dict:
                 if not hasattr(mod, c): # class c doesn't exist in filter module
-                    logger.warning("Skipping filter class '{0}', it doesn't exist in module '{1}'.".format(c, module_name))
+                    logger.warning("Skipping filter class '{0}', it doesn't exist in module '{1}'."\
+                                   .format(c, mod_fq_name))
                     continue # continue with next entry in classes_dict
                 else:
-                    fb.fil_classes.update({c:{'name':classes_dict[c],  # Class name
-                                               'mod':module_name}})    # list with fixpoint implementations
+                    classes_dict.update({c:{'name':mod_dict[c],  # Class name
+                                            'mod':mod_fq_name}}) # list with fixpoint implementations
                     # when module + class import was successful, add a new entry
                     # to the dict with the class name as key and display name and
-                    # fully qualified module path as values, e.g.
+                    # fully qualified module name as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
-                    keys = {k for k,val in fb.fixpoint_widgets_dict.items() if c in val}
-                    logger.info("fx_keys:{0}|{1}".format(keys, c))
 
-                    if type(section_dict[file_name]) == dict: # does the filter have option(s)?
-                        fb.fil_classes[c].update(section_dict[file_name])
+                    if type(section_conf_dict[mod_name]) == dict: # does the filter have option(s)?
+                        classes_dict[c].update(section_conf_dict[mod_name])
 
-                # logger.info("FilterOpt : {0}".format(fb.fil_classes[c]))
+                # logger.info("FilterOpt : {0}".format(classes_dict[c]))
                 num_imports += 1
-                imported_classes += "\t" + file_name + "."+ c + "\n"
+                imported_classes += "\t" + mod_name + "."+ c + "\n"
 
         if num_imports < 1:
             logger.critical("No filter class could be imported - shutting down.")
@@ -501,7 +502,11 @@ class Tree_Builder(object):
         else:
             logger.info("Imported {0:d} filter classes:\n{1:s}"\
                     .format(num_imports, imported_classes))
+        return classes_dict
             
+#==============================================================================
+
+
     def build_fx_widget_dict(self):
         for k in fb.fixpoint_widgets_dict:
             pass
