@@ -172,11 +172,6 @@ class Tree_Builder(object):
 
         self.parse_conf_file()
 
-        fb.fil_classes = self.build_class_dict(fb.filter_designs_dict)
-        
-        for c in fb.fil_classes:
-            keys = {k for k,val in fb.fixpoint_widgets_dict.items() if c in val}
-            logger.info("fx_keys:{0}|{1}".format(keys, c))
 
         fil_tree = {}
 
@@ -308,11 +303,20 @@ class Tree_Builder(object):
             #------------------------------------------------------------------
             fb.filter_designs_dict = self.parse_conf_section(conf, "Filter Designs")
 
+            fb.fil_classes = self.build_class_dict(fb.filter_designs_dict, "filter_designs")
+        
+
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
             fb.fixpoint_widgets_dict = self.parse_conf_section(conf, "Fixpoint Widgets")
             logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
+            fb.fix_classes = self.build_class_dict(fb.fixpoint_widgets_dict, "fixpoint_widgets")
+            logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fix_classes))
+            for c in fb.fil_classes:
+                keys = {k for k,val in fb.fixpoint_widgets_dict.items() if c in val}
+                logger.info("fx_keys:{0}|{1}".format(keys, c))
+
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
@@ -401,27 +405,31 @@ class Tree_Builder(object):
         return section_conf_dict
 
 #==============================================================================
-    def build_class_dict(self, section_conf_dict):
+    def build_class_dict(self, section_conf_dict, subpackage=""):
         """
-        - Try to dynamically import the filter modules (= files) passed as
+        - Try to dynamically import the modules (= files) passed as
           `section_conf_dict`, reading their module level attribute 
-          `classes` with classes contained in the module.
+          `classes` listing classes contained in the module.
 
           `classes` is a dictionary, e.g. `{"Cheby":"Chebychev 1"}` where
           the key is the class name in the module and the value the corresponding
           display name (used for the combo box).
 
-        - When `classes` is a string, use the string
+        - When `classes` is a string or a list, use the string resp. the list items
           for both class and display name.
           
         - Try to import the filter classes
         
         Parameters
         ----------
-        section_conf_dict : dict
+        section_conf_dict: dict
+            Dictionary with the module filenames from a section in the configuration 
+            file and their options as parsed by `self.parse_conf_section'.
         
-        Dictionary with the module filenames from a section in the configuration 
-        file and their options as parsed by `self.parse_conf_section'.
+        subpackage: str
+            Name of the subpackage containing the module to be imported. Module
+            names are prepended successively with
+            `['pyfda.' + subpackage + '.', '', subpackage + '.']`
         
         Returns
         -------
@@ -442,39 +450,54 @@ class Tree_Builder(object):
               'opt': ["option1", "option2"]}
         
         """
-        classes_dict = {}   # initialize dict for filter classes
+        classes_dict = {}     # initialize dict for filter classes
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
-
+        pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.'] # search in that order
+        
         for mod_name in section_conf_dict: # iterate over dict keys found in config file
-            mod_fq_name = 'pyfda.filter_designs' + '.' + mod_name # fully qualified module name (fqn)
-            # TODO: user_dirs! 
-            try:  # Try to import the module from the  package and get a handle:
-                ################################################
-                mod = importlib.import_module(mod_fq_name)
-                ################################################
-                if hasattr(mod, 'classes'):
-                    # check type of module attribute 'classes'
-                    logger.warning(mod.classes)
-                    if isinstance(mod.classes, dict): # dict {class name : combo box name}
-                        mod_dict = mod.classes # one or more filter classes in one file
-                    elif isinstance(mod.classes, str): # String, convert to dict
-                        mod_dict = {mod.classes:mod.classes}
-                    else:
-                        logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
-                        %(str(mod_name), str(type(mod.classes).__name__)))
-                        continue # with next entry in filt_list_names
-                else:
-                    # no classes attribute - skip this entry
-                    logger.warning('Skipping filter module "%s" due to missing attribute "classes".', mod_name)
-                    continue
+         
+            for p in pckg_names:
+                try:  # Try to import the module from the package list above
+                    mod_fq_name = p + mod_name # fully qualified module name (fqn)
+                    # Try to import the module from the  package and get a handle:
+                    mod = importlib.import_module(mod_fq_name)
+                    break #-> successful import, break out of pckg_names loop
+                except ImportError:
+                    mod_fq_name = None
+                    continue # module not found, try next package
+                except Exception as e:
+                    logger.warning('Error during import of "{0}":\n{1}'.format(mod_fq_name, e))
+                    mod_fq_name = None
+                    continue # Some other error ocurred during import, try next package
 
-            except ImportError as e:
-                logger.warning('Filter module "{0}" could not be imported.\n{1}'.format(mod_name, e))
+            if not mod_fq_name:
                 continue
-            except Exception as e:
-                logger.warning("Unexpected error during module import:\n{0}".format(e))
+
+            # import the module from the  package and get a handle:
+            ################################################
+            #mod = importlib.import_module(mod_fq_name)
+            ################################################
+
+            if hasattr(mod, 'classes'):
+                # check type of module attribute 'classes', try to convert to dict
+                logger.warning(mod.classes)
+                if isinstance(mod.classes, dict): # dict {class name : combo box name}
+                    mod_dict = mod.classes # one or more filter classes in one file
+                elif isinstance(mod.classes, str): # String, create a dict with the
+                    mod_dict = {mod.classes:mod.classes} # string as both key and value
+                elif isinstance(mod.classes, list): # list, create a dict with list items
+                    mod_dict = {l:l for l in list}  # as both key and value 
+                else:
+                    logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
+                    %(str(mod_name), str(type(mod.classes).__name__)))
+                    continue # with next entry in section_conf_dict
+                logger.warning("MOD_DICT: {0}".format(mod_dict))
+            else:
+                # no `classes` attribute - skip entry
+                logger.warning('Skipping module "{0}" due to missing attribute "classes".'.format(mod_name))
                 continue
+
             # Now, check whether class `c` is part of module `mod`
             for c in mod_dict:
                 if not hasattr(mod, c): # class c doesn't exist in filter module
@@ -483,22 +506,21 @@ class Tree_Builder(object):
                     continue # continue with next entry in classes_dict
                 else:
                     classes_dict.update({c:{'name':mod_dict[c],  # Class name
-                                            'mod':mod_fq_name}}) # list with fixpoint implementations
+                                            'mod':mod_fq_name}}) # fully qualified module name
                     # when module + class import was successful, add a new entry
                     # to the dict with the class name as key and display name and
                     # fully qualified module name as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
 
-                    if type(section_conf_dict[mod_name]) == dict: # does the filter have option(s)?
+                    if type(section_conf_dict[mod_name]) == dict: # does the filter have further option(s)?
                         classes_dict[c].update(section_conf_dict[mod_name])
 
-                # logger.info("FilterOpt : {0}".format(classes_dict[c]))
+                # logger.info("Opt : {0}".format(classes_dict[c]))
                 num_imports += 1
                 imported_classes += "\t" + mod_name + "."+ c + "\n"
 
         if num_imports < 1:
-            logger.critical("No filter class could be imported - shutting down.")
-            sys.exit("No filter class could be imported - shutting down.")
+            logger.warning("No class could be imported.")
         else:
             logger.info("Imported {0:d} filter classes:\n{1:s}"\
                     .format(num_imports, imported_classes))
