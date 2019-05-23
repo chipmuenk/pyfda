@@ -232,17 +232,9 @@ for k in fil_init:
     fil[0].update({k:fil_init[k]})
 
 # -----------------------------------------------------------------------------
-# List with plot widget class names found in the main configuration file,
-# parsed in filter_tree_builder.
-#------------------------------------------------------------------------------
-
-input_widgets_dict = {} 
-
-plot_widgets_dict = {}
-
-filter_designs_dict = {}
-
-fixpoint_widgets_dict = {}
+# Dicts with class names found in the main configuration file,
+# parsed in `tree_builder.build_class_dict()`
+#------------------------------------------------------------------------------ 
 
 plot_classes = OrderedDict()
 input_classes = OrderedDict()
