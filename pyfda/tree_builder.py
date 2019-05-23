@@ -172,7 +172,6 @@ class Tree_Builder(object):
 
         self.parse_conf_file()
 
-
         fil_tree = {}
 
         for fc in fb.fil_classes:  # iterate over all previously found filter classes fc
@@ -291,28 +290,22 @@ class Tree_Builder(object):
             # -----------------------------------------------------------------
             # Parsing [Input Widgets]
             #------------------------------------------------------------------
-            fb.input_widgets_dict = self.parse_conf_section("Input Widgets")
-            fb.input_classes = self.build_class_dict(fb.input_widgets_dict, "input_widgets")
+            fb.input_classes = self.build_class_dict("Input Widgets", "input_widgets")
             # -----------------------------------------------------------------
             # Parsing [Plot Widgets]
             #------------------------------------------------------------------
-            fb.plot_widgets_dict = self.parse_conf_section("Plot Widgets")
-            fb.plot_classes = self.build_class_dict(fb.plot_widgets_dict, "plot_widgets")
+            fb.plot_classes = self.build_class_dict("Plot Widgets", "plot_widgets")
             # -----------------------------------------------------------------
             # Parsing [Filter Designs]
             #------------------------------------------------------------------
-            fb.filter_designs_dict = self.parse_conf_section("Filter Designs")
-            fb.filter_classes = self.build_class_dict(fb.filter_designs_dict, "filter_designs")
-        
+            fb.filter_classes = self.build_class_dict("Filter Designs", "filter_designs")
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
-            fb.fixpoint_widgets_dict = self.parse_conf_section("Fixpoint Widgets")
-            logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
-            fb.fixpoint_classes = self.build_class_dict(fb.fixpoint_widgets_dict, "fixpoint_widgets")
+            fb.fixpoint_classes = self.build_class_dict("Fixpoint Widgets", "fixpoint_widgets")
             logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_classes))
             for c in fb.filter_classes:
-                keys = {k for k,val in fb.fixpoint_widgets_dict.items() if c in val}
+                keys = {k for k,val in fb.fixpoint_classes.items() if c in val}
                 logger.info("fx_keys:{0}|{1}".format(keys, c))
 
 
@@ -329,7 +322,7 @@ class Tree_Builder(object):
             sys.exit()
 
 #==============================================================================
-    def parse_conf_section(self, section, subpackage="", req=True):
+    def parse_conf_section(self, section):
         """
         Parse ``section`` in config file `conf` and return an OrderedDict
         with the elements ``{key:<OPTION>}`` where `key` and <OPTION>
@@ -338,19 +331,13 @@ class Tree_Builder(object):
 
         Parameters
         ----------
-        conf : instance of config parser
-
         section : str
             name of the section to be parsed
-
-        req : bool
-            when True, section is required: Terminate the program with an error
-            if the section is missing in the config file
 
         Returns
         -------
         section_conf_dict : dict 
-            Dict with the keys of the config files and corresponding values
+            Ordered dict with the keys of the config files and corresponding values
         """
         try:
             section_conf_dict = OrderedDict()
@@ -364,7 +351,7 @@ class Tree_Builder(object):
                         val = ""
                     elif i[1][0] == '{': # try to convert to dict
                         try:
-                            logger.info("\ndict: {0}\n".format(val))
+                            logger.info("\n{0} dict: {1}\n".format(i[0],val))
                             val = ast.literal_eval(val)
                         except SyntaxError as e:
                             logger.warning("Syntax Error in config file\n{0}".format(e) )
@@ -378,18 +365,10 @@ class Tree_Builder(object):
                 logger.info('Found {0:2d} entries in [{1:s}].'
                         .format(len(section_conf_dict), section))
             else:
-                if req:
-                    logger.critical('Empty section [{0:s}], aborting.'.format(section))
-                    sys.exit()
-                else:
-                    logger.warning('Empty section [{0:s}].'.format(section))
+                logger.warning('Empty section [{0:s}].'.format(section))
 
-        except configparser.NoSectionError as e:
-            if req:
-                logger.critical('{0} in config file "{1}".'.format(e, dirs.USER_CONF_DIR_FILE))
-                sys.exit()
-            else:
-                logger.warning('No section [{0:s}] in config file "{1:s}".'
+        except configparser.NoSectionError:
+            logger.warning('No section [{0:s}] in config file "{1:s}".'
                            .format(section, dirs.USER_CONF_DIR_FILE))
             # configparser.NoOptionError
         except configparser.DuplicateOptionError as e:
@@ -403,11 +382,11 @@ class Tree_Builder(object):
         return section_conf_dict
 
 #==============================================================================
-    def build_class_dict(self, section_conf_dict, subpackage=""):
+    def build_class_dict(self, section, subpackage=""):
         """
-        - Try to dynamically import the modules (= files) passed as
-          `section_conf_dict`, reading their module level attribute 
-          `classes` listing classes contained in the module.
+        - Try to dynamically import the modules (= files) parsed in `section`
+          reading their module level attribute `classes` with classes contained 
+          in the module.
 
           `classes` is a dictionary, e.g. `{"Cheby":"Chebychev 1"}` where
           the key is the class name in the module and the value the corresponding
@@ -420,9 +399,9 @@ class Tree_Builder(object):
         
         Parameters
         ----------
-        section_conf_dict: dict
-            Dictionary with the module filenames from a section in the configuration 
-            file and their options as parsed by `self.parse_conf_section'.
+        section: str
+            Name of the section in the configuration file to be parsed by
+            `self.parse_conf_section'.
         
         subpackage: str
             Name of the subpackage containing the module to be imported. Module
@@ -446,20 +425,22 @@ class Tree_Builder(object):
               'mod':'pyfda.filter_design.cheby1',
               'fix': 'IIR_cascade',
               'opt': ["option1", "option2"]}
-        
         """
-        classes_dict = {}     # initialize dict for filter classes
+        classes_dict = OrderedDict()     # dict for filter classes
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
         pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.'] # search in that order
         
+        section_conf_dict = self.parse_conf_section(section)
+        
         for mod_name in section_conf_dict: # iterate over dict keys found in config file
-         
             for p in pckg_names:
                 try:  # Try to import the module from the package list above
                     mod_fq_name = p + mod_name # fully qualified module name (fqn)
                     # Try to import the module from the  package and get a handle:
+                    ################################################
                     mod = importlib.import_module(mod_fq_name)
+                    ################################################
                     break #-> successful import, break out of pckg_names loop
                 except ImportError:
                     mod_fq_name = None
@@ -473,14 +454,8 @@ class Tree_Builder(object):
                 logger.warning('Module "{0}" could not be imported.'.format(mod_name))
                 continue
 
-            # import the module from the  package and get a handle:
-            ################################################
-            #mod = importlib.import_module(mod_fq_name)
-            ################################################
-
             if hasattr(mod, 'classes'):
                 # check type of module attribute 'classes', try to convert to dict
-                logger.warning(mod.classes)
                 if isinstance(mod.classes, dict): # dict {class name : combo box name}
                     mod_dict = mod.classes # one or more filter classes in one file
                 elif isinstance(mod.classes, str): # String, create a dict with the
@@ -491,7 +466,7 @@ class Tree_Builder(object):
                     logger.warning("Skipping module '%s', its attribute 'classes' has the wrong type '%s'."
                     %(str(mod_name), str(type(mod.classes).__name__)))
                     continue # with next entry in section_conf_dict
-                logger.warning("MOD_DICT: {0}".format(mod_dict))
+                #logger.info("MOD_DICT: {0}".format(mod_dict))
             else:
                 # no `classes` attribute - skip entry
                 logger.warning('Skipping module "{0}" due to missing attribute "classes".'.format(mod_name))
@@ -507,8 +482,8 @@ class Tree_Builder(object):
                     classes_dict.update({c:{'name':mod_dict[c],  # Class name
                                             'mod':mod_fq_name}}) # fully qualified module name
                     # when module + class import was successful, add a new entry
-                    # to the dict with the class name as key and display name and
-                    # fully qualified module name as values, e.g.
+                    # to the dict with the class name as key and a dict containing 
+                    # "name":display name and "mod":fully qualified module name as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
 
                     if type(section_conf_dict[mod_name]) == dict: # does the filter have further option(s)?
