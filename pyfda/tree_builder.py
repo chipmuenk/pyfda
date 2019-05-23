@@ -249,20 +249,20 @@ class Tree_Builder(object):
             # -----------------------------------------------------------------
             # setup an instance of config parser, allow  keys without value
             # -----------------------------------------------------------------
-            conf = configparser.ConfigParser(allow_no_value=True)
+            self.conf = configparser.ConfigParser(allow_no_value=True)
             # preserve case of parsed options by overriding optionxform():
             # Set it to function str()
-            conf.optionxform = str
+            self.conf.optionxform = str
             # Allow interpolation across sections, ${Dirs:dir1}
-            conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
-            conf.read(dirs.USER_CONF_DIR_FILE)
+            self.conf._interpolation = configparser.ExtendedInterpolation() # PY3 only
+            self.conf.read(dirs.USER_CONF_DIR_FILE)
             logger.info('Parsing config file\n\t"{0}"\n\t\twith sections:\n\t{1}'
-                        .format(dirs.USER_CONF_DIR_FILE, str(conf.sections())))
+                        .format(dirs.USER_CONF_DIR_FILE, str(self.conf.sections())))
 
             # -----------------------------------------------------------------
             # Parsing [Common]
             #------------------------------------------------------------------
-            self.commons = self.parse_conf_section(conf, "Common")
+            self.commons = self.parse_conf_section("Common")
 
             if not 'version' in self.commons or int(self.commons['version'][0]) != CONF_VERSION:
                 logger.critical("\nConfig file '{0:s}'\n has the wrong version '{2}' "
@@ -291,23 +291,23 @@ class Tree_Builder(object):
             # -----------------------------------------------------------------
             # Parsing [Input Widgets]
             #------------------------------------------------------------------
-            fb.input_widgets_dict = self.parse_conf_section(conf, "Input Widgets")
+            fb.input_widgets_dict = self.parse_conf_section("Input Widgets")
             fb.input_classes = self.build_class_dict(fb.input_widgets_dict, "input_widgets")
             # -----------------------------------------------------------------
             # Parsing [Plot Widgets]
             #------------------------------------------------------------------
-            fb.plot_widgets_dict = self.parse_conf_section(conf, "Plot Widgets")
+            fb.plot_widgets_dict = self.parse_conf_section("Plot Widgets")
             fb.plot_classes = self.build_class_dict(fb.plot_widgets_dict, "plot_widgets")
             # -----------------------------------------------------------------
             # Parsing [Filter Designs]
             #------------------------------------------------------------------
-            fb.filter_designs_dict = self.parse_conf_section(conf, "Filter Designs")
+            fb.filter_designs_dict = self.parse_conf_section("Filter Designs")
             fb.filter_classes = self.build_class_dict(fb.filter_designs_dict, "filter_designs")
         
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
-            fb.fixpoint_widgets_dict = self.parse_conf_section(conf, "Fixpoint Widgets")
+            fb.fixpoint_widgets_dict = self.parse_conf_section("Fixpoint Widgets")
             logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
             fb.fixpoint_classes = self.build_class_dict(fb.fixpoint_widgets_dict, "fixpoint_widgets")
             logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_classes))
@@ -329,7 +329,7 @@ class Tree_Builder(object):
             sys.exit()
 
 #==============================================================================
-    def parse_conf_section(self, conf, section, req=True):
+    def parse_conf_section(self, section, subpackage="", req=True):
         """
         Parse ``section`` in config file `conf` and return an OrderedDict
         with the elements ``{key:<OPTION>}`` where `key` and <OPTION>
@@ -354,7 +354,7 @@ class Tree_Builder(object):
         """
         try:
             section_conf_dict = OrderedDict()
-            items_list = conf.items(section) # entries from config file with [name, path]
+            items_list = self.conf.items(section) # entries from config file with [name, path]
                 
             if len(items_list) > 0:
                 for i in items_list:
