@@ -292,28 +292,26 @@ class Tree_Builder(object):
             # Parsing [Input Widgets]
             #------------------------------------------------------------------
             fb.input_widgets_dict = self.parse_conf_section(conf, "Input Widgets")
-
+            fb.input_classes = self.build_class_dict(fb.input_widgets_dict, "input_widgets")
             # -----------------------------------------------------------------
             # Parsing [Plot Widgets]
             #------------------------------------------------------------------
             fb.plot_widgets_dict = self.parse_conf_section(conf, "Plot Widgets")
-
+            fb.plot_classes = self.build_class_dict(fb.plot_widgets_dict, "plot_widgets")
             # -----------------------------------------------------------------
             # Parsing [Filter Designs]
             #------------------------------------------------------------------
             fb.filter_designs_dict = self.parse_conf_section(conf, "Filter Designs")
-
-            fb.fil_classes = self.build_class_dict(fb.filter_designs_dict, "filter_designs")
+            fb.filter_classes = self.build_class_dict(fb.filter_designs_dict, "filter_designs")
         
-
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
             fb.fixpoint_widgets_dict = self.parse_conf_section(conf, "Fixpoint Widgets")
             logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_widgets_dict))
-            fb.fix_classes = self.build_class_dict(fb.fixpoint_widgets_dict, "fixpoint_widgets")
-            logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fix_classes))
-            for c in fb.fil_classes:
+            fb.fixpoint_classes = self.build_class_dict(fb.fixpoint_widgets_dict, "fixpoint_widgets")
+            logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_classes))
+            for c in fb.filter_classes:
                 keys = {k for k,val in fb.fixpoint_widgets_dict.items() if c in val}
                 logger.info("fx_keys:{0}|{1}".format(keys, c))
 
@@ -472,6 +470,7 @@ class Tree_Builder(object):
                     continue # Some other error ocurred during import, try next package
 
             if not mod_fq_name:
+                logger.warning('Module "{0}" could not be imported.'.format(mod_name))
                 continue
 
             # import the module from the  package and get a handle:

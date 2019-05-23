@@ -36,8 +36,7 @@ More info on data persistence and storing / accessing global variables:
 * http://stackoverflow.com/questions/2447353/getattr-on-a-module
 
 """
-
-from __future__ import division, unicode_literals, print_function, absolute_import
+from collections import OrderedDict
 from .frozendict import freeze_hierarchical
 
 clipboard = None
@@ -245,3 +244,7 @@ filter_designs_dict = {}
 
 fixpoint_widgets_dict = {}
 
+plot_classes = OrderedDict()
+input_classes = OrderedDict()
+filter_classes = OrderedDict()
+fixpoint_classes = OrderedDict()
