@@ -47,8 +47,17 @@ base_dir = "" #: Project base directory
 design_filt_state = "changed" #: State of filter design: "ok", "changed", "error", "failed"
 
 #==============================================================================
+# -----------------------------------------------------------------------------
+# Dicts with class names found in the main configuration file,
+# parsed in `tree_builder.build_class_dict()`. Those initial definitions
+# are only meant as examples, they are overwritten during the initialization.
+#------------------------------------------------------------------------------ 
 
-fil_classes = {# IIR:
+plot_classes = OrderedDict()
+input_classes = OrderedDict()
+fixpoint_classes = OrderedDict()
+
+filter_classes = {# IIR:
             'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_designs.butter'},
             'Cheby1':{'name':'Chebychev 1', 'mod':'pyfda.filter_designs.cheby1'},
             'Cheby2':{'name':'Chebychev 2', 'mod':'pyfda.filter_designs.cheby2'},
@@ -231,12 +240,4 @@ fil[0] = {}
 for k in fil_init:
     fil[0].update({k:fil_init[k]})
 
-# -----------------------------------------------------------------------------
-# Dicts with class names found in the main configuration file,
-# parsed in `tree_builder.build_class_dict()`
-#------------------------------------------------------------------------------ 
 
-plot_classes = OrderedDict()
-input_classes = OrderedDict()
-filter_classes = OrderedDict()
-fixpoint_classes = OrderedDict()

@@ -174,13 +174,13 @@ class Tree_Builder(object):
 
         fil_tree = {}
 
-        for fc in fb.fil_classes:  # iterate over all previously found filter classes fc
+        for fc in fb.filter_classes:  # iterate over all previously found filter classes fc
 
             # instantiate a global instance ff.fil_inst() of filter class fc
             err_code = ff.fil_factory.create_fil_inst(fc)
             if err_code > 0:
                 logger.warning('Skipping filter class "{0:s}" due to import error {1:d}'.format(fc, err_code))
-                continue # continue with next entry in fb.fil_classes
+                continue # continue with next entry in fb.filter_classes
 
             # add attributes from dict to fil_tree for filter class fc
             fil_tree = self.build_fil_tree(fc, ff.fil_inst.rt_dict, fil_tree)
