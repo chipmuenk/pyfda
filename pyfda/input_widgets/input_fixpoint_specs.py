@@ -294,7 +294,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_wdg_fixp.clear()
 
         # wdg = (class_name, dir)
-        for wdg in fb.fixpoint_widgets_list:
+        for wdg in fb.fixpoint_classes:
             if not wdg[1]:
                 # use standard module
                 pckg_name = 'pyfda'
@@ -674,7 +674,7 @@ class Input_Fixpoint_Specs(QWidget):
 if __name__ == '__main__':
     from ..compat import QApplication
     logging.basicConfig() # setup a basic logger
-    fb.fixpoint_widgets_list = [('DF1',''), ('DF2','')]
+    fb.fixpoint_classes = [('DF1',''), ('DF2','')]
     app = QApplication(sys.argv)
     mainw = Input_Fixpoint_Specs(None)
     mainw.show()
