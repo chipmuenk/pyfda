@@ -70,11 +70,10 @@ class Input_Fixpoint_Specs(QWidget):
         self.fxqc_dict = {'QI':{}, 'QO':{}}
         
 
-        if HAS_MYHDL:# or HAS_MIGEN:
+        if HAS_MYHDL or HAS_MIGEN:
             self._construct_UI()
         else:
             self.state = "deactivated" # "invisible", "disabled"
-
 #------------------------------------------------------------------------------
     def process_sig_rx(self, dict_sig=None):
         """
@@ -270,12 +269,12 @@ class Input_Fixpoint_Specs(QWidget):
         self.butSimHDL.clicked.connect(self.fx_sim_hdl)
         self.butSimFxPy.clicked.connect(self.fx_sim_py)
         #----------------------------------------------------------------------
-        inst_wdg_list = self._update_filter_cmb()
-        if len(inst_wdg_list) == 0:
-            logger.warning("No fixpoint filters found!")
-        else:
-            logger.info("Imported {0:d} fixpoint filters:\n{1}"
-                        .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
+#        inst_wdg_list = self._update_filter_cmb()
+#        if len(inst_wdg_list) == 0:
+#            logger.warning("No fixpoint filters found!")
+#        else:
+#            logger.info("Imported {0:d} fixpoint filters:\n{1}"
+#                        .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
 
         self._update_fixp_widget()
 
@@ -292,41 +291,54 @@ class Input_Fixpoint_Specs(QWidget):
         inst_wdg_str = "" # full names of successfully instantiated widgets for logging
 
         self.cmb_wdg_fixp.clear()
-
-        # wdg = (class_name, dir)
-        for wdg in fb.fixpoint_classes:
-            if not wdg[1]:
-                # use standard module
-                pckg_name = 'pyfda'
-            else:
-                # check and extract user directory
-                if os.path.isdir(wdg[1]):
-                    pckg_path = os.path.normpath(wdg[1])
-                    # split the path into the dir containing the module and its name
-                    user_dir_name, pckg_name = os.path.split(pckg_path)
-
-                    if user_dir_name not in sys.path:
-                        sys.path.append(user_dir_name)
-                else:
-                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
+        fc = fb.fil[0]['fc']
+        if 'fix' in fb.filter_classes[fc]:
+            for wdg in fb.filter_classes[fc]['fix']:
+                try:
+                    mod_name = fb.fixpoint_classes[wdg]['mod']
+                    name = fb.fixpoint_classes[wdg]['name']
+                    self.cmb_wdg_fixp.addItem(wdg, mod_name)
+                except AttributeError as e:
+                    logger.warning('Widget "{0}":\n{1}'.format(wdg,e))
                     continue
-            mod_name = pckg_name + '.fixpoint_widgets.' + wdg[0].lower()
-            class_name = pckg_name + '.fixpoint_widgets.' + wdg[0]
+                except Exception as e:
+                    logger.warning(e)
+                    continue
 
-            try:  # Try to import the module from the  package ...
-                mod = importlib.import_module(mod_name)
-                # get the class belonging to wdg[0] ...
-                _ = getattr(mod, wdg[0]) # try to resolve the class       
-                # everything worked fine, add it to the combo box:
-                self.cmb_wdg_fixp.addItem(wdg[0], mod_name)
-                
-                inst_wdg_str += '\t' + class_name + '\n'
-
-            except ImportError:
-                logger.warning('Could not import module "{0}"!'.format(mod_name))
-                continue
-            except AttributeError:
-                logger.warning('No attribute / class "{0}" in"{1}"'.format(wdg[0], mod_name))
+#        # wdg = (class_name, dir)
+#        for wdg in fb.fixpoint_classes:
+#            if not wdg[1]:
+#                # use standard module
+#                pckg_name = 'pyfda'
+#            else:
+#                # check and extract user directory
+#                if os.path.isdir(wdg[1]):
+#                    pckg_path = os.path.normpath(wdg[1])
+#                    # split the path into the dir containing the module and its name
+#                    user_dir_name, pckg_name = os.path.split(pckg_path)
+#
+#                    if user_dir_name not in sys.path:
+#                        sys.path.append(user_dir_name)
+#                else:
+#                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
+#                    continue
+#            mod_name = pckg_name + '.fixpoint_widgets.' + wdg[0].lower()
+#            class_name = pckg_name + '.fixpoint_widgets.' + wdg[0]
+#
+#            try:  # Try to import the module from the  package ...
+#                mod = importlib.import_module(mod_name)
+#                # get the class belonging to wdg[0] ...
+#                _ = getattr(mod, wdg[0]) # try to resolve the class       
+#                # everything worked fine, add it to the combo box:
+#                self.cmb_wdg_fixp.addItem(wdg[0], mod_name)
+#                
+#                inst_wdg_str += '\t' + class_name + '\n'
+#
+#            except ImportError:
+#                logger.warning('Could not import module "{0}"!'.format(mod_name))
+#                continue
+#            except AttributeError:
+#                logger.warning('No attribute / class "{0}" in"{1}"'.format(wdg[0], mod_name))
         return inst_wdg_str
         
 #------------------------------------------------------------------------------
@@ -674,7 +686,8 @@ class Input_Fixpoint_Specs(QWidget):
 if __name__ == '__main__':
     from ..compat import QApplication
     logging.basicConfig() # setup a basic logger
-    fb.fixpoint_classes = [('DF1',''), ('DF2','')]
+    fb.fixpoint_classes = {{'DF1':''}, {'DF2':''}}
+    fb.filter_classes = {'Bessel':{}, 'Equiripple':{'fix':'DF1'}}
     app = QApplication(sys.argv)
     mainw = Input_Fixpoint_Specs(None)
     mainw.show()
