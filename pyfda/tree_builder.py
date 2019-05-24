@@ -313,19 +313,29 @@ class Tree_Builder(object):
             fb.fixpoint_classes = self.build_class_dict("Fixpoint Widgets", "fixpoint_widgets")
             logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_classes))
 
+            # First check whether fixpoint options of the filter designs are 
+            # valid fixpoint classes by comparing them to the verified items of
+            # fb.fixpoint_classes:
+            for c in fb.filter_classes:
+                if 'fix' in fb.filter_classes[c]:
+                    for w in fb.filter_classes[c]['fix']:
+                        if w not in fb.fixpoint_classes:
+                            logger.warning('Removing invalid fixpoint module\n\t"{0}" for filter class "{1}".'\
+                                           .format(w,c))
+                            fb.filter_classes[c]['fix'].remove(w)
             # merge fb.filter_classes info "filter class":[fx_class1, fx_class2]
             # and fb.fixpoint_classes info "fixpoint class":[fil_class1, fil_class2]
             # into the fb.filter_classes dict
-            for c in fb.filter_classes:
-                # collect all fixpoint widgets (keys in fb.fixpoint_classes) with
-                # class name c as a value in a set
-                keys = {k for k,val in fb.fixpoint_classes.items() if c in val['opt']}
-                if len(keys) > 0:
+
+                # collect all fixpoint widgets (keys in fb.fixpoint_classes) which
+                # have the class name c as a value
+                fix_wdg = {k for k,val in fb.fixpoint_classes.items() if c in val['opt']}
+                if len(fix_wdg) > 0:
                     if 'fix' in fb.filter_classes[c]:
                         #... and merge it with the fixpoint options of class c
-                        keys = keys.union(fb.filter_classes[c]['fix'])
+                        fix_wdg = fix_wdg.union(fb.filter_classes[c]['fix'])
 
-                    fb.filter_classes[c].update({'fix':list(keys)})
+                    fb.filter_classes[c].update({'fix':list(fix_wdg)})
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
