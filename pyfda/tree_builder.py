@@ -141,17 +141,18 @@ class Tree_Builder(object):
         """
         Run at startup to populate global dictionaries and lists:
         
-        - :func:`parse_conf_file()`:  Parse the configuration file ``pyfda.conf`` 
-          (specified in ``dirs.USER_CONF_DIR_FILE``), writing classes and file
-          paths to lists for the individual sections, a.o. to ``fb.filter_designs_list``
-          for the filter design algorithms.
-          
-        - :func:`dyn_filt_import()` : Try to import all filter modules and classes 
-          from ``fb.filter_designs_list`` and store successful imports in the
-          dict ``fb.fil_classes`` as {filterName:filterModule}:
+        - :func:`parse_conf_file()`:  Parse the configuration file `pyfda.conf` 
+          (specified in ``dirs.USER_CONF_DIR_FILE``) using :func:`build_class_dict()`
+          which calls :func:`parse_conf_section()`: Try to find and import the
+          modules specified in the corresponding sections  there; extract and 
+          import the classes defined in each module and give back an OrderedDict
+          containing successfully imported classes with their options 
+          (like fully qualified module names, display name, associated fixpoint 
+          widgets etc.). Information for each  section is stored in globally 
+          accessible OrderdDicts like`fb.filter_classes`.
               
         - Read attributes (`ft`, `rt`, `fo`) from all valid filter classes (`fc`)
-          in the global dict ``fb.fil_classes`` and store them in the filter
+          in the global dict ``fb.filter_classes`` and store them in the filter
           tree dict ``fil_tree`` with the hierarchy
                                         
             **rt-ft-fc-fo-subwidget:params** .
@@ -165,9 +166,8 @@ class Tree_Builder(object):
         -------
         None, but populates the following global attributes:
             
-            - ``fb.fil_tree``:
+            - `fb.fil_tree` :
                 
-            - 
         """
 
         self.parse_conf_file()
@@ -209,23 +209,23 @@ class Tree_Builder(object):
         Parse the file ``dirs.USER_CONF_DIR_FILE`` with the following sections
 
         :[Commons]:
-            Try to find user directories and store them in ``dirs.USER_DIRS``
+            Try to find user directories; if they exist add them to 
+            `dirs.USER_DIRS` and `sys.path`
 
-        For the other sections, a list of tuples is returned with the elements
-        ``(class, opt)`` where "class" is the class name of the widget
-        and "opt" specifies options:
+        For the other sections, OrderedDicts are returned with the class names
+        as keys and dictionaries with options as values.
 
         :[Input Widgets]:
-            Store a list of tuples of (user) input widgets in ``fb.input_widgets_list``
+            Store (user) input widgets in `fb.input_dict`
 
         :[Plot Widgets]:
-            Store a list of tuples of (user) plot widgets in ``fb.plot_widgets_list``
+            Store (user) plot widgets in `fb.plot_dict`
 
         :[Filter Designs]:
-            Store a list of tuples of (user) filter designs in ``fb.filter_designs_list``
+            Store (user) filter designs in `fb.filter_dict`
             
         :[Fixpoint Widgets]:
-            Store a list of tuples of (user) fixpoint widgets in ``fb.fixpoint_widgets_list``
+            Store (user) fixpoint widgets in `fb.fixpoint_dict`
 
 
         Parameters
@@ -299,15 +299,33 @@ class Tree_Builder(object):
             # Parsing [Filter Designs]
             #------------------------------------------------------------------
             fb.filter_classes = self.build_class_dict("Filter Designs", "filter_designs")
+            # currently, option "opt" can only be an association with a fixpoint
+            # widget, so replace key "opt" by key "fix":
+            # Convert to list in any case
+            for c in fb.filter_classes:
+                if 'opt' in fb.filter_classes[c]:
+                    fb.filter_classes[c]['fix'] = fb.filter_classes[c].pop('opt')
+                if 'fix' in fb.filter_classes[c] and type(fb.filter_classes[c]['fix']) == str:
+                    fb.filter_classes[c]['fix'] = fb.filter_classes[c]['fix'].split(',')
             # -----------------------------------------------------------------
             # Parsing [Fixpoint Filters]
             #------------------------------------------------------------------
             fb.fixpoint_classes = self.build_class_dict("Fixpoint Widgets", "fixpoint_widgets")
             logger.info("\nFixpoint_widgets: \n{0}\n".format(fb.fixpoint_classes))
-            for c in fb.filter_classes:
-                keys = {k for k,val in fb.fixpoint_classes.items() if c in val}
-                logger.info("fx_keys:{0}|{1}".format(keys, c))
 
+            # merge fb.filter_classes info "filter class":[fx_class1, fx_class2]
+            # and fb.fixpoint_classes info "fixpoint class":[fil_class1, fil_class2]
+            # into the fb.filter_classes dict
+            for c in fb.filter_classes:
+                # collect all fixpoint widgets (keys in fb.fixpoint_classes) with
+                # class name c as a value in a set
+                keys = {k for k,val in fb.fixpoint_classes.items() if c in val['opt']}
+                if len(keys) > 0:
+                    if 'fix' in fb.filter_classes[c]:
+                        #... and merge it with the fixpoint options of class c
+                        keys = keys.union(fb.filter_classes[c]['fix'])
+
+                    fb.filter_classes[c].update({'fix':list(keys)})
 
         # ----- Exceptions ----------------------
         except configparser.DuplicateSectionError as e:
@@ -426,7 +444,7 @@ class Tree_Builder(object):
               'fix': 'IIR_cascade',
               'opt': ["option1", "option2"]}
         """
-        classes_dict = OrderedDict()     # dict for filter classes
+        classes_dict = OrderedDict() # dict for all successfully imported classes
         num_imports = 0       # number of successful module imports
         imported_classes = "" # names of successful module imports
         pckg_names = ['pyfda.'+subpackage+'.', '', subpackage+'.'] # search in that order
@@ -474,20 +492,28 @@ class Tree_Builder(object):
 
             # Now, check whether class `c` is part of module `mod`
             for c in mod_dict:
-                if not hasattr(mod, c): # class c doesn't exist in filter module
+                if not hasattr(mod, c): # class c doesn't exist in module
                     logger.warning("Skipping filter class '{0}', it doesn't exist in module '{1}'."\
                                    .format(c, mod_fq_name))
                     continue # continue with next entry in classes_dict
                 else:
                     classes_dict.update({c:{'name':mod_dict[c],  # Class name
-                                            'mod':mod_fq_name}}) # fully qualified module name
+                                            'mod':mod_fq_name}}) # Fully qualified module name
                     # when module + class import was successful, add a new entry
                     # to the dict with the class name as key and a dict containing 
                     # "name":display name and "mod":fully qualified module name as values, e.g.
                     # 'Butter':{'name':'Butterworth', 'mod':'pyfda.filter_design.butter'}
 
-                    if type(section_conf_dict[mod_name]) == dict: # does the filter have further option(s)?
-                        classes_dict[c].update(section_conf_dict[mod_name])
+                    # check whether options have been defined in the config file
+                    opt = section_conf_dict[mod_name]
+                    if opt:
+                        if type(opt) == dict: 
+                            classes_dict[c].update(opt)
+                        elif type(opt) in {str, list}: # create dict {'opt':<OPTION>}
+                            classes_dict[c].update({"opt":opt})
+                        else:
+                            logger.warning('Class "{0}" option data type "{1}" not understood:\n "{2}"'\
+                                           .format(c, type(opt).__name__, opt))
 
                 # logger.info("Opt : {0}".format(classes_dict[c]))
                 num_imports += 1
@@ -499,19 +525,6 @@ class Tree_Builder(object):
             logger.info("Imported {0:d} filter classes:\n{1:s}"\
                     .format(num_imports, imported_classes))
         return classes_dict
-            
-#==============================================================================
-
-
-    def build_fx_widget_dict(self):
-        for k in fb.fixpoint_widgets_dict:
-            pass
-        # keys = { key for key,value in dd.items() if value=='value' }
-        # keys = [ key for key,value in dd.items() if value=='value' ]
- #           if 
-            
-    # fb.fixpoint_widgets_dict = self.parse_conf_section(conf, "Fixpoint Widgets")
-
 
 #==============================================================================
     def build_fil_tree(self, fc, rt_dict, fil_tree = None):
