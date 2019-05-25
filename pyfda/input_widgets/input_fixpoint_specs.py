@@ -269,12 +269,12 @@ class Input_Fixpoint_Specs(QWidget):
         self.butSimHDL.clicked.connect(self.fx_sim_hdl)
         self.butSimFxPy.clicked.connect(self.fx_sim_py)
         #----------------------------------------------------------------------
-#        inst_wdg_list = self._update_filter_cmb()
-#        if len(inst_wdg_list) == 0:
-#            logger.warning("No fixpoint filters found!")
-#        else:
-#            logger.info("Imported {0:d} fixpoint filters:\n{1}"
-#                        .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
+        inst_wdg_list = self._update_filter_cmb()
+        if len(inst_wdg_list) == 0:
+            logger.warning("No fixpoint filters found!")
+        else:
+            logger.info("\n\nImported {0:d} fixpoint filters:\n{1}"
+                        .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
 
         self._update_fixp_widget()
 
@@ -282,11 +282,10 @@ class Input_Fixpoint_Specs(QWidget):
     def _update_filter_cmb(self):
         """
         (Re-)Read list of available fixpoint filters for a given filter design 
-        every time a new filter design is selected (not fully implemented yet,
-        at the moment a list with *all* filter implementations is read). 
+        every time a new filter design is selected. 
         
         Then try to import the fixpoint designs in the list and populate the 
-        fixpoint implementation combo box ``self.cmb_wdg_fixp`` when successfull. 
+        fixpoint implementation combo box `self.cmb_wdg_fixp` when successfull. 
         """
         inst_wdg_str = "" # full names of successfully instantiated widgets for logging
 
@@ -298,6 +297,7 @@ class Input_Fixpoint_Specs(QWidget):
                     mod_name = fb.fixpoint_classes[wdg]['mod']
                     name = fb.fixpoint_classes[wdg]['name']
                     self.cmb_wdg_fixp.addItem(wdg, mod_name)
+                    inst_wdg_str += wdg + ' : ' + mod_name + '\n'
                 except AttributeError as e:
                     logger.warning('Widget "{0}":\n{1}'.format(wdg,e))
                     continue
@@ -586,7 +586,7 @@ class Input_Fixpoint_Specs(QWidget):
             try:
                 self.update_fxqc_dict()
                 self.hdl_filter_inst.setup(self.fxqc_dict)
-                self.hdl_filter_inst.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
+                code = self.hdl_filter_inst.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
 
                 logger.info("HDL conversion finished!")
             except (IOError, TypeError) as e:
@@ -660,13 +660,13 @@ class Input_Fixpoint_Specs(QWidget):
 #            # kill simulation after some idle time, also add a button for this
 #            self.timer_id.timeout.connect(self.kill_sim)
 
-        except myhdl.SimulationError as e:
-            logger.warning("Simulation failed:\n{0}".format(e))
+        except ValueError as e:
+            logger.warning("Overflow error {0}".format(e))
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return
-        except ValueError as e:
-            logger.warning("Overflow error {0}".format(e))
+        except Exception as e:
+            logger.warning("Simulation failed:\n{0}".format(e))
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return
