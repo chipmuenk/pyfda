@@ -305,40 +305,6 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.warning(e)
                     continue
 
-#        # wdg = (class_name, dir)
-#        for wdg in fb.fixpoint_classes:
-#            if not wdg[1]:
-#                # use standard module
-#                pckg_name = 'pyfda'
-#            else:
-#                # check and extract user directory
-#                if os.path.isdir(wdg[1]):
-#                    pckg_path = os.path.normpath(wdg[1])
-#                    # split the path into the dir containing the module and its name
-#                    user_dir_name, pckg_name = os.path.split(pckg_path)
-#
-#                    if user_dir_name not in sys.path:
-#                        sys.path.append(user_dir_name)
-#                else:
-#                    logger.warning("Path {0:s} doesn't exist!".format(wdg[1]))
-#                    continue
-#            mod_name = pckg_name + '.fixpoint_widgets.' + wdg[0].lower()
-#            class_name = pckg_name + '.fixpoint_widgets.' + wdg[0]
-#
-#            try:  # Try to import the module from the  package ...
-#                mod = importlib.import_module(mod_name)
-#                # get the class belonging to wdg[0] ...
-#                _ = getattr(mod, wdg[0]) # try to resolve the class       
-#                # everything worked fine, add it to the combo box:
-#                self.cmb_wdg_fixp.addItem(wdg[0], mod_name)
-#                
-#                inst_wdg_str += '\t' + class_name + '\n'
-#
-#            except ImportError:
-#                logger.warning('Could not import module "{0}"!'.format(mod_name))
-#                continue
-#            except AttributeError:
-#                logger.warning('No attribute / class "{0}" in"{1}"'.format(wdg[0], mod_name))
         return inst_wdg_str
         
 #------------------------------------------------------------------------------
