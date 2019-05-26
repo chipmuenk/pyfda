@@ -186,15 +186,15 @@ class FIR(Module):
         """
         return self.response
             
-    def set_stimulus(self, stimulus, outputs):
+    def run_sim(self, stimulus):
         """
-        Run filter simulation
+        Pass stimuli and run filter simulation
         """
         self.response = []
         for x in stimulus:
             #v = 0.1*cos(2*pi*frequency*cycle)
-            yield FIR_DF.hdlfilter.i.eq(x)
-            self.response.append((yield FIR_DF.hdlfilter.o))
+            yield self.i.eq(x)
+            self.response.append((yield self.o))
             yield
             
     def convert(self, **kwargs):
