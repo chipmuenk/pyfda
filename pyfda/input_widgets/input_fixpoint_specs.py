@@ -611,8 +611,8 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
                         dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
 
-            self.hdl_filter_inst.set_stimulus(self.stim)    # Set the simulation input
-            self.hdl_filter_inst.run_sim()         # Run the simulation
+            #self.hdl_filter_inst.set_stimulus(self.stim)    # Set the simulation input
+            self.hdl_filter_inst.run_sim(self.stim)         # Run the simulation
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             # Get the response from the simulation in integer
