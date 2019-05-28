@@ -24,9 +24,9 @@ API version info:
     
 """
 import scipy.signal as sig
-import numpy as np
+from numpy import conj, sqrt, sum, zeros
 from scipy.signal import ellipord
-from pyfda.pyfda_lib import fil_save, SOS_AVAIL, lin2unit
+from pyfda.pyfda_lib import fil_save, lin2unit
 from pyfda.pyfda_qt_lib import qfilter_warning
 
 from .common import Common
@@ -167,11 +167,11 @@ to be complex (no real values).
         # take square roots of amp specs so resulting squared
         # filter will meet specifications
         if (ampPB < ampSB):
-            ampSB = np.sqrt(ampPB)
-            ampPB = np.sqrt(1+ampPB)-1
+            ampSB = sqrt(ampPB)
+            ampPB = sqrt(1+ampPB)-1
         else:
-            ampPB = np.sqrt(1+ampSB)-1
-            ampSB = np.sqrt(ampSB)
+            ampPB = sqrt(1+ampSB)-1
+            ampSB = sqrt(ampSB)
         self.A_PB = lin2unit(ampPB, 'IIR', 'A_PB', unit='dB')
         self.A_SB = lin2unit(ampSB, 'IIR', 'A_SB', unit='dB')
         #logger.warning("design with "+str(self.A_PB)+","+str(self.A_SB))
@@ -190,7 +190,7 @@ to be complex (no real values).
 
         # now compute residual vector
         cone = complex(1.,0.)
-        residues = np.zeros(norder, complex)
+        residues = zeros(norder, complex)
         for i in range(norder):
             residues[i] =  k * (diff[i] / p[i])
             for j in range(norder):
@@ -230,17 +230,17 @@ to be complex (no real values).
 #       Anticausal poles have conjugate-reciprocal symmetry
 #       Starting anticausal residues are conjugates (adjusted below)
 
-        pA = np.conj(1./p)   # antiCausal poles
-        zA = np.conj(z)      # antiCausal zeros (store reciprocal)
-        rA = np.conj(r)      # antiCausal residues (to start)
-        rC = np.zeros(nn, complex)
+        pA = conj(1./p)   # antiCausal poles
+        zA = conj(z)      # antiCausal zeros (store reciprocal)
+        rA = conj(r)      # antiCausal residues (to start)
+        rC = zeros(nn, complex)
 
 #       Adjust residues. Causal part first.
         for j in range(nn):
 
 #           Evaluate the anticausal filter at each causal pole
             tmpx = rA / (1. - p[j]/pA)
-            ztmp = g + np.sum(tmpx)
+            ztmp = g + sum(tmpx)
 
 #           Adjust residue
             rC[j] = r[j]*ztmp
@@ -249,16 +249,16 @@ to be complex (no real values).
 #        r3 = np.conj(r2)
 
 #       Compute the constant term
-        dc2 = (g + np.sum(r))*g - np.sum(rC)
+        dc2 = (g + sum(r))*g - sum(rC)
 
 #       Populate output (2nn elements)
         gn = dc2.real
 
 #       Drop complex poles/residues in LHP, keep only UHP
 
-        pA = np.conj(p)  #store AntiCasual pole (reciprocal)
-        p0 = np.zeros(int(nn/2), complex)
-        r0 = np.zeros(int(nn/2), complex)
+        pA = conj(p)  #store AntiCasual pole (reciprocal)
+        p0 = zeros(int(nn/2), complex)
+        r0 = zeros(int(nn/2), complex)
         cnt = 0
         for j in range(nn):
             if (p[j].imag > 0.0):
