@@ -772,7 +772,7 @@ class Input_PZ(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, 'zpk', comment="poles / zeros ")
-        if data_str == -1: # file operation has been aborted
+        if data_str is None: # file operation has been aborted
             return
         
         conv = self.frmt2cmplx # routine for converting to cartesian coordinates

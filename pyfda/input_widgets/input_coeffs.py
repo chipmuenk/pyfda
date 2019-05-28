@@ -604,7 +604,7 @@ class Input_Coeffs(QWidget):
         # TODO: More checks for swapped row <-> col, single values, wrong data type ...
         """
         data_str = qtext2table(self, 'ba', comment="filter coefficients ")
-        if data_str == -1: # file operation has been aborted
+        if data_str is None: # file operation has been aborted or some other error
             return
 
         logger.debug("importing data: dim - shape = {0} - {1} - {2}\n{3}"\

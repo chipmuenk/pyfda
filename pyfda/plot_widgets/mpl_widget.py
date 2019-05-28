@@ -329,9 +329,6 @@ class MplToolbar(NavigationToolbar):
             labelAction = self.addWidget(self.locLabel)
             labelAction.setVisible(True)
 
-        # reference holder for subplots_adjust window
-        self.adj_window = None
-
     if figureoptions is not None:
         def edit_parameters(self):
             allaxes = self.canvas.figure.get_axes()

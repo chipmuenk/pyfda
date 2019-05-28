@@ -454,7 +454,8 @@ def qtext2table(parent, fkey, comment = ""):
         data_arr = import_data(parent, fkey, comment)
         # pass data as numpy array
         logger.debug("Imported data from file. shape = {0}\n{1}".format(np.shape(data_arr), data_arr))
-
+        if type(data_arr) == int and data_arr == -1: # file operation cancelled
+            data_arr = None
     return data_arr
 
 
@@ -545,7 +546,7 @@ def csv2array(f):
     logger.info("using delimiter {0}, terminator {1} and quotechar {2}"\
                 .format(repr(delimiter), repr(lineterminator), repr(quotechar)))
     logger.info("using header '{0}'".format(use_header))
-    logger.info("Type of passed text is '{0}'".format(type(f)))
+    logger.info("Type of passed text is '{0}'".format(f.__class__.__name__))
     #------------------------------------------------
     # finally, create iterator from csv data
     data_iter = csv.reader(f, dialect=dialect, delimiter=delimiter, lineterminator=lineterminator) # returns an iterator
@@ -571,7 +572,7 @@ def csv2array(f):
             return data_arr
 
     except (TypeError, ValueError) as e:
-        logger.error("{0}\n{1}".format(e, data_list))
+        logger.error("{0}\nFormat = {1}\n{2}".format(e, np.shape(data_arr), data_list))
         return None
 
 #------------------------------------------------------------------------------
