@@ -359,27 +359,26 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def _update_fixp_widget(self):
         """
-        This method is called at the initialization of the ``input_fixpoint_specs``
-         widget and when  a new fixpoint filter implementation is selected 
-        in the combo box:
+        This method is called at the initialization of the widget and when
+        a new fixpoint filter implementation is selected from the combo box:
 
         - Destruct old instance of fixpoint filter widget
-        
+
         - Import and instantiate new fixpoint filter widget e.g. after changing the 
           filter topology
-          
+
         - Try to load image for filter topology
-        
+
         - Update the UI of the widget
-        
-        - Instantiate
-          ``self.hdl_filter_inst = self.fx_wdg_inst.hdlfilter``
+
+        - Instantiate  `self.hdl_filter_inst = self.fx_wdg_inst.hdlfilter`
         """
         # destruct old fixpoint widget instance
         if hasattr(self, "fx_wdg_inst"): # is a fixpoint widget loaded?
             try:
                 self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
                 self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
+                #self.fx_wdg_inst = None # Delete python wrapper
             except AttributeError as e:
                 logger.error("Could not destruct_UI!\n{0}".format(e))
 
@@ -416,7 +415,7 @@ class Input_Fixpoint_Specs(QWidget):
 #                    self.img_fixp = QtSvg.QSvgWidget(img_file)
             else:
                 logger.warning("Image file {0} doesn't exist.".format(img_file))
-                img_file = os.path.join(file_path, "hdl_dummy.png")                
+                img_file = os.path.join(file_path, "no_img.png")                
                 self.img_fixp = QPixmap(img_file)
                 #self.lbl_img_fixp.setPixmap(QPixmap(self.img_fixp)) # fixed size
             self.resize_img()
@@ -447,6 +446,8 @@ class Input_Fixpoint_Specs(QWidget):
             self.butSimFxPy.setEnabled(False)
             self.butSimHDL.setEnabled(False)
             self.butExportHDL.setEnabled(False)
+            self.img_fixp = QPixmap("no_fx_filter.png")
+            self.resize_img()
 
 #------------------------------------------------------------------------------
     def wdg_dict2ui(self):
@@ -458,7 +459,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         Set the RUN button to "changed".
         """
-        if hasattr(self.fx_wdg_inst, "dict2ui"):
+        if hasattr(self, "fx_wdg_inst") and hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(self.fxqc_dict)
 
         qstyle_widget(self.butSimHDL, "changed")
