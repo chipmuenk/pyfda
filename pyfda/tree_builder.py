@@ -264,11 +264,11 @@ class Tree_Builder(object):
             self.commons = self.parse_conf_section("Common")
 
             if not 'version' in self.commons or int(self.commons['version'][0]) != CONF_VERSION:
-                logger.critical("\nConfig file '{0:s}'\n has the wrong version '{2}' "
+                logger.critical("Config file\n\t'{0:s}'\n\thas the wrong version '{2}' "
                                 "(required: '{1}').\n"
-                                "You can either edit the file or delete it, in this case " 
+                                "\tYou can either edit the file or delete it.\n\tWhen deleted, " 
                                 "a new configuration file will be created at restart."\
-                                .format(dirs.USER_CONF_DIR_FILE, CONF_VERSION, int(self.commons['version'])))
+                                .format(dirs.USER_CONF_DIR_FILE, CONF_VERSION, int(self.commons['version'][0])))
                 sys.exit()
             
             if 'user_dirs' in self.commons:
