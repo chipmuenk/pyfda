@@ -31,7 +31,7 @@ class Delay1(QWidget):
         self.title = ("<b>Unit Delay</b><br />"
                  "Just a delay with quantization for testing fixpoint quantization,"
                  "simulation and HDL generation.")
-        self.img_name = "df1.png"
+        self.img_name = "delay.png"
 
         self._construct_UI()
 
