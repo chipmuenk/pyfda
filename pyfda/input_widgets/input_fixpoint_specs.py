@@ -374,7 +374,7 @@ class Input_Fixpoint_Specs(QWidget):
         - Instantiate  `self.hdl_filter_inst = self.fx_wdg_inst.hdlfilter`
         """
         # destruct old fixpoint widget instance
-        if hasattr(self, "fx_wdg_inst"): # is a fixpoint widget loaded?
+        if hasattr(self, "fx_wdg_inst") and self.fx_wdg_inst is not None: # is a fixpoint widget loaded?
             try:
                 self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
                 self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
@@ -448,6 +448,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.butExportHDL.setEnabled(False)
             self.img_fixp = QPixmap("no_fx_filter.png")
             self.resize_img()
+            self.fx_wdg_inst = None
 
 #------------------------------------------------------------------------------
     def wdg_dict2ui(self):
@@ -459,7 +460,7 @@ class Input_Fixpoint_Specs(QWidget):
         
         Set the RUN button to "changed".
         """
-        if hasattr(self, "fx_wdg_inst") and hasattr(self.fx_wdg_inst, "dict2ui"):
+        if self.fx_wdg_found and hasattr(self.fx_wdg_inst, "dict2ui"):
             self.fx_wdg_inst.dict2ui(self.fxqc_dict)
 
         qstyle_widget(self.butSimHDL, "changed")
