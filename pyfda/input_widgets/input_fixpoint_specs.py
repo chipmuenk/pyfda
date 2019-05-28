@@ -378,7 +378,6 @@ class Input_Fixpoint_Specs(QWidget):
             try:
                 self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
                 self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
-                #self.fx_wdg_inst = None # Delete python wrapper
             except AttributeError as e:
                 logger.error("Could not destruct_UI!\n{0}".format(e))
 
