@@ -273,7 +273,7 @@ class Input_Fixpoint_Specs(QWidget):
         if len(inst_wdg_list) == 0:
             logger.warning("No fixpoint filters found!")
         else:
-            logger.info("\n\nImported {0:d} fixpoint filters:\n{1}"
+            logger.info("Imported {0:d} fixpoint filters:\n{1}"
                         .format(len(inst_wdg_list.split("\n"))-1, inst_wdg_list))
 
         self._update_fixp_widget()
@@ -297,7 +297,7 @@ class Input_Fixpoint_Specs(QWidget):
                     mod_name = fb.fixpoint_classes[wdg]['mod']
                     name = fb.fixpoint_classes[wdg]['name']
                     self.cmb_wdg_fixp.addItem(wdg, mod_name)
-                    inst_wdg_str += wdg + ' : ' + mod_name + '\n'
+                    inst_wdg_str += '\t' + wdg + ' : ' + mod_name + '\n'
                 except AttributeError as e:
                     logger.warning('Widget "{0}":\n{1}'.format(wdg,e))
                     continue
