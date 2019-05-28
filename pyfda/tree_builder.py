@@ -279,10 +279,10 @@ class Tree_Builder(object):
                         if d not in sys.path:
                             sys.path.append(d)
                     else:
-                        logger.warning("User directory doesn't exist:\n{0}\n".format(d))
+                        logger.warning("User directory doesn't exist:\n\t{0}\n".format(d))
                 
             if dirs.USER_DIRS: 
-                logger.info("User directory(s):\n{0}\n".format(dirs.USER_DIRS))
+                logger.info("User directory(s):\n\t{0}\n".format(dirs.USER_DIRS))
             else:
                 logger.warning('No valid user directory found in "{0}\n.'
                             .format(dirs.USER_CONF_DIR_FILE))
@@ -379,7 +379,6 @@ class Tree_Builder(object):
                         val = ""
                     elif i[1][0] == '{': # try to convert to dict
                         try:
-                            logger.info("\n{0} dict: {1}\n".format(i[0],val))
                             val = ast.literal_eval(val)
                         except SyntaxError as e:
                             logger.warning("Syntax Error in config file\n{0}".format(e) )
