@@ -238,7 +238,7 @@ class Tree_Builder(object):
 
         """
 
-        CONF_VERSION = 1
+        CONF_VERSION = 2
         try:
             # Test whether user config file is readable, this is necessary as
             # configParser quietly fails when the file doesn't exist
