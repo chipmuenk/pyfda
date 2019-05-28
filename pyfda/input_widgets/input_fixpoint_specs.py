@@ -447,6 +447,10 @@ class Input_Fixpoint_Specs(QWidget):
             self.butSimFxPy.setEnabled(False)
             self.butSimHDL.setEnabled(False)
             self.butExportHDL.setEnabled(False)
+            img_file = "hdl_dummy.png"# os.path.join(file_path, "hdl_dummy.png")                
+            self.img_fixp = QPixmap(img_file)
+                #self.lbl_img_fixp.setPixmap(QPixmap(self.img_fixp)) # fixed size
+            self.resize_img()
 
 #------------------------------------------------------------------------------
     def wdg_dict2ui(self):
