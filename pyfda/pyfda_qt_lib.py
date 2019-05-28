@@ -10,7 +10,6 @@
 Library with various helper functions for Qt widgets
 """
 
-from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
 

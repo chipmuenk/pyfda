@@ -9,7 +9,6 @@
 """
 Subwidget for entering frequency specifications
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import logging
 logger = logging.getLogger(__name__)

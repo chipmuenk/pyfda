@@ -10,7 +10,6 @@
 Library with various general functions and variables needed by the pyfda routines
 """
 
-from __future__ import division, print_function
 import os, re
 import sys, time
 import six
@@ -36,9 +35,9 @@ from matplotlib import __version__ as VERSION_MPL
 from .compat import QT_VERSION_STR # imports pyQt
 
 __all__ = ['cmp_version', 'mod_version', 
-           'unichr_23', 'unicode_23', 'clean_ascii', 'qstr', 'safe_eval',
+           'unicode_23', 'clean_ascii', 'qstr', 'safe_eval',
            'dB', 'lin2unit', 'unit2lin', 
-           'cround', 'H_mag', 'cmplx_sort', 'unique_roots', 'impz', 'grpdelay',
+           'cround', 'H_mag', 'cmplx_sort', 'unique_roots', 'impz',
            'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
            'round_odd', 'round_even', 'ceil_odd', 'floor_odd','ceil_even', 'floor_even',
            'to_html', 'calc_Hcomplex']
@@ -97,8 +96,6 @@ try:
 except ImportError:
     pass
 
-PY3 = six.PY3 # sys.version_info > (3,) # True for Python 3
-PY2 = six.PY2
 CRLF = os.linesep # Windows: "\r\n", Mac OS: "\r", *nix: "\n"
 
 def cmp_version(mod, version):
@@ -187,15 +184,6 @@ MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 ###############################################################################
 #### Py2/3 functions ########################################################
 
-def unichr_23(c):
-    """
-    Convert code point value (integer between 1 ... 65536) to one-character unicode string.
-    The reverse operation ``ord(u)`` works the same way in py2 and py3.
-    """
-    if PY2:
-        return unichr(c)
-    else:
-        return chr(c)
 
 def unicode_23(string):
     """
@@ -212,15 +200,13 @@ def unicode_23(string):
     unicode string
 
     """
-    if PY2:
-        return unicode(string)
-    else:
-        return string
+
+    return string
 
 def clean_ascii(arg):
     """
     Remove non-ASCII-characters (outside range 0 ... x7F) from `arg` when it 
-    is a text type (`six.string_types`). Otherwise, return `arg` unchanged.
+    is a `str`. Otherwise, return `arg` unchanged.
     
     Parameters
     ----------
@@ -228,11 +214,11 @@ def clean_ascii(arg):
         This is a unicode string under Python 3 and a "normal" string under Python 2.
 
     Returns
-    -------
-    A string (whatever that means in Py2 / Py3)
+    ------- 
+    A string, cleaned from Non-ASCII characters
     
     """
-    if isinstance(arg, six.string_types):
+    if isinstance(arg, str):
         return re.sub(r'[^\x00-\x7f]',r'', arg)
     else:
         return arg
@@ -269,7 +255,6 @@ def qstr(text):
         #string = str(text)
         # Convert QString -> Utf8
         string = text.toUtf8()
-#    elif not isinstance(text, six.text_type):
     elif "qvariant" in text_type:
         # Python 2: convert QVariant -> QString
         string = text.toString()
@@ -280,11 +265,8 @@ def qstr(text):
     else:
         # `text` is numeric or of type str
         string = str(text)
-        
-    if PY2:
-        return unicode(string, 'utf8')
-    else:
-        return str(string) # convert QString -> str
+
+    return str(string) # convert QString -> str
 
 
 ###############################################################################
@@ -450,7 +432,7 @@ def unit2lin(unit_value, filt_type, amp_label, unit = 'dB'):
             else: # stopband
                 lin_value = 10.**(-unit_value / 20)
 
-        except OverflowError as e:
+        except OverflowError:
             msg += "way "
             lin_value = 10 # definitely too large, will be limited in next section
 

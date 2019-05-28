@@ -23,7 +23,6 @@ API version info:
     
     
 """
-from __future__ import print_function, division, unicode_literals
 import scipy.signal as sig
 import numpy as np
 from scipy.signal import ellipord

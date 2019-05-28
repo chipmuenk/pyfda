@@ -6,8 +6,6 @@
 #
 # (c) 2015 Christian Muenker
 #===========================================================================
-from __future__ import division, print_function, unicode_literals # v3line15
-
 import numpy as np
 import numpy.random as rnd
 

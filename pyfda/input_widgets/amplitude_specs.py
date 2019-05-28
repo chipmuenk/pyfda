@@ -5,7 +5,6 @@ Widget for entering amplitude specifications
 Author: Christian Münker
 """
 
-from __future__ import print_function, division, unicode_literals
 import sys
 import logging
 logger = logging.getLogger(__name__)

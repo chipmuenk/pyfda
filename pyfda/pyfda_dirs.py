@@ -12,7 +12,6 @@ Upon import, all the variables are set.
 This is imported first by pyfdax.
 """
 
-from __future__ import print_function
 import os
 import shutil
 import platform

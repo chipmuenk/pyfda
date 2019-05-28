@@ -11,7 +11,6 @@ Library with classes and functions for file and text IO
 """
 # TODO: import data from files doesn't update FIR / IIR and data changed
 
-from __future__ import division, print_function
 import logging
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,6 @@
 """
 Widget for entering weight specifications
 """
-from __future__ import print_function, division, unicode_literals
 import sys
 import logging
 logger = logging.getLogger(__name__)

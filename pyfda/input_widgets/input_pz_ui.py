@@ -10,7 +10,6 @@
 """
 Create the UI for the FilterPZ class
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import logging
 logger = logging.getLogger(__name__)
 

@@ -145,14 +145,13 @@ class Input_Files(QWidget):
                 with io.open(file_name, 'rb') as f:
                     if file_type == '.npz':
                         # http://stackoverflow.com/questions/22661764/storing-a-dict-with-np-savez-gives-unexpected-result
-                        if not pyfda_lib.PY3:
-                            a = np.load(f) # returns an instance of class NpzFile
-                        else:
-                            # What encoding to use when reading Py2 strings. Only
-                            # needed for loading py2 generated pickled files on py3.
-                            # fix_imports will try to map old py2 names to new py3
-                            # names when unpickling.
-                            a = np.load(f, fix_imports=True, encoding='bytes') # array containing dict, dtype 'object'
+
+                        # What encoding to use when reading Py2 strings. Only
+                        # needed for loading py2 generated pickled files on py3.
+                        # fix_imports will try to map old py2 names to new py3
+                        # names when unpickling.
+                        a = np.load(f, fix_imports=True, encoding='bytes') # array containing dict, dtype 'object'
+                        
                         logger.debug("Entries in {0}:\n{1}".format(file_name, a.files))
                         for key in sorted(a):
                             logger.debug("key: {0}|{1}|{2}|{3}".format(key, type(key).__name__, type(a[key]).__name__, a[key]))
@@ -164,11 +163,8 @@ class Input_Files(QWidget):
                                 # array objects are converted to list first
                                 fb.fil[0][key] = a[key].tolist()
                     elif file_type == '.pkl':
-                        if not pyfda_lib.PY3:
-                            fb.fil[0] = pickle.load(f)
-                        else:
                         # this only works for python >= 3.3
-                            fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
+                        fb.fil[0] = pickle.load(f, fix_imports=True, encoding='bytes')
                     else:
                         logger.error('Unknown file type "{0}"'.format(file_type))
                         file_type_err = True
@@ -176,7 +172,7 @@ class Input_Files(QWidget):
                         # sanitize values in filter dictionary, keys are ok by now
                         for k in fb.fil[0]:
                              # Bytes need to be decoded for py3 to be used as keys later on
-                            if pyfda_lib.PY3 and type(fb.fil[0][k]) == bytes:
+                            if type(fb.fil[0][k]) == bytes:
                                 fb.fil[0][k] = fb.fil[0][k].decode('utf-8')
                             if fb.fil[0][k] == None:
                                 logger.warning("Entry fb.fil[0][{0}] is empty!".format(k))

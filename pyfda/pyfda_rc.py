@@ -17,7 +17,6 @@ Importing pyfda_rc runs the module once, defining all module variables
 which are global (similar to class variables).
 """
 
-from __future__ import division, unicode_literals, absolute_import
 from pyfda import qrc_resources # contains all icons
 import logging
 logger = logging.getLogger(__name__)

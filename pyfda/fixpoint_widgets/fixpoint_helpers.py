@@ -9,7 +9,6 @@
 """
 Helper classes and functions for generating and simulating fixpoint filters
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import logging
 logger = logging.getLogger(__name__)

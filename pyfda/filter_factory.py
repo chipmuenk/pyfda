@@ -16,10 +16,8 @@ which have a global scope like class variables and can be imported like
 
 """
 
-from __future__ import division, unicode_literals, print_function, absolute_import
 import importlib
 import logging
-import six
 from . import filterbroker as fb
 
 logger = logging.getLogger(__name__)
@@ -211,8 +209,8 @@ class FilterFactory(object):
         if self.err_code > 0:
             err_string = "Filter design class could not be instantiated, see previous error message."
             
-        # Test whether 'method' is a string or unicode type under Py2 and Py3:
-        elif not isinstance(method, six.string_types):
+        # Test whether 'method' is a string (Py3):
+        elif not isinstance(method, str):
             err_string = "Method name '{0}' is not a string.".format(method)
             self.err_code = 16
             

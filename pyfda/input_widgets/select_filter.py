@@ -12,7 +12,6 @@ Subwidget for selecting the filter, consisting of combo boxes for:
 - Filter Type (IIR, FIR, CIC ...)
 - Filter Class (Butterworth, ...)
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import logging
 logger = logging.getLogger(__name__)

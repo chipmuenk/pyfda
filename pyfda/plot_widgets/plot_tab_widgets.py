@@ -11,8 +11,6 @@ Create a tabbed widget for all plot subwidgets in the list ``fb.plot_widgets_lis
 This list is compiled at startup in :class:`pyfda.tree_builder.Tree_Builder`, it is
 kept as a module variable in :mod:`pyfda.filterbroker`.
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
-
 import logging
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,6 @@
 """
 Widget template, demonstrating sig_rx / sig_tx mechanism and text output 
 """
-from __future__ import print_function, division, unicode_literals, absolute_import
 import sys
 import pprint
 import logging

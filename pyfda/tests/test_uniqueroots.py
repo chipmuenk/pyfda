@@ -7,8 +7,6 @@
 #  under test)
 # (c) 2015 Christian Muenker
 #===========================================================================
-from __future__ import (division, print_function, unicode_literals,
-                        absolute_import)
 if __name__ == "__main__":
     import sys, os
     __cwd__ = os.path.dirname(os.path.abspath(__file__))

@@ -10,7 +10,6 @@
 Construct a widget consisting of a matplotlib canvas and an improved Navigation
 toolbar.
 """
-from __future__ import print_function, division, unicode_literals
 import logging
 logger = logging.getLogger(__name__)
 
@@ -361,7 +360,7 @@ class MplToolbar(NavigationToolbar):
                 item, ok = QInputDialog.getItem(
                     self, 'Customize', 'Select axes:', titles, 0, False)
                 if ok:
-                    axes = allaxes[titles.index(six.text_type(item))]
+                    axes = allaxes[titles.index(str(item))]
                 else:
                     return
 
