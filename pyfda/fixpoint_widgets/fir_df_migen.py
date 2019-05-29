@@ -146,9 +146,7 @@ class FIR_DF(QWidget):
         if not fxqc_dict:
             fxqc_dict = {'QI':{'W':16}, 'QC':{'b':[18,3,0,-3,-18]}} # create dummy dict
 
-        logger.warning(fxqc_dict)
         self.hdlfilter = FIR(fxqc_dict) # construct HDL filter instance
-
 #------------------------------------------------------------------------------
     def get_response(self):
         """
@@ -197,13 +195,7 @@ class FIR_DF(QWidget):
         inputs = []
         response = []
         
-        testbench = self.fir_tb_stim(stimulus, inputs, response)
-#        for x in stimulus:
-#            #v = 0.1*cos(2*pi*frequency*cycle)
-#            yield self.i.eq(x)
-#            logger.error(x)
-#            self.response.append((yield self.o))
-#            yield  
+        testbench = self.fir_tb_stim(stimulus, inputs, response) 
             
         run_simulation(self.hdlfilter, testbench)
         
