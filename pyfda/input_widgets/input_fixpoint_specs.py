@@ -641,11 +641,11 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return
-#        except Exception as e:
-#            logger.warning("Simulation failed:\n{0}".format(e))
-#            self.fx_results = None
-#            qstyle_widget(self.butSimHDL, "error")
-#            return
+        except Exception as e:
+            logger.warning("Simulation failed:\n{0}".format(e))
+            self.fx_results = None
+            qstyle_widget(self.butSimHDL, "error")
+            return
 
         logger.info("Fixpoint plotting started")
         dict_sig = {'sender':__name__, 'fx_sim':'set_results', 
