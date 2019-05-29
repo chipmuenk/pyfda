@@ -1494,6 +1494,14 @@ def to_html(text, frmt=None):
     # '(' must be escaped as '\('
 
     # mappings text -> HTML formatted logging messages
+
+    if frmt == 'log':
+        # only in logging messages replace e.g. in <class> the angled brackets
+        # by HTML code
+        mapping = [ ('<','&lt;'), ('>','&gt;')]
+        for k,v in mapping:
+            text = text.replace(k,v)
+    
     mapping = [ ('< ','&lt;'), ('> ','&gt;'), ('\n','<br />'),
                 ('[  DEBUG]','<b>[  DEBUG]</b>'),
                 ('[   INFO]','<b style="color:darkgreen;">[   INFO]</b>'),
@@ -1513,7 +1521,6 @@ def to_html(text, frmt=None):
 
     if frmt != 'log': # this is a label, not a logger message
         html = re.sub(r'([a-zA-Z])_(\w+)', r'\1<sub>\2</sub>', html)
-
     #(^|\s+)(\w{1})_(\w*)  # check for line start or one or more whitespaces
     # Replace group using $1$2<sub>$3</sub> (Py RegEx: \1\2<sub>\3</sub>)
 
