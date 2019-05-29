@@ -12,7 +12,7 @@ generating VHDL and Verilog Code
 
 see https://bitbucket.org/cfelton/examples
 """
-import sys, os, importlib
+import sys, os, io, importlib
 import logging
 logger = logging.getLogger(__name__)
 
@@ -362,16 +362,17 @@ class Input_Fixpoint_Specs(QWidget):
         This method is called at the initialization of the widget and when
         a new fixpoint filter implementation is selected from the combo box:
 
-        - Destruct old instance of fixpoint filter widget
+        - Destruct old instance of fixpoint filter widget `self.fx_wdg_inst`
 
         - Import and instantiate new fixpoint filter widget e.g. after changing the 
-          filter topology
+          filter topology as 
 
         - Try to load image for filter topology
 
         - Update the UI of the widget
 
-        - Instantiate  `self.hdl_filter_inst = self.fx_wdg_inst.hdlfilter`
+        - Try to instantiate HDL filter as `self.fx_wdg_inst.hdlfilter` with 
+            dummy data
         """
         # destruct old fixpoint widget instance
         if hasattr(self, "fx_wdg_inst") and self.fx_wdg_inst is not None: # is a fixpoint widget loaded?
@@ -382,7 +383,6 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.error("Could not destruct_UI!\n{0}".format(e))
 
         # instantiate new fixpoint widget class as self.fx_wdg_inst
-        # which instantiates filter class as self.fx_wdg_inst.hdlfilter
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
         if cmb_wdg_fx_cur: # at least one valid fixpoint widget found
             self.fx_wdg_found = True
@@ -428,15 +428,12 @@ class Input_Fixpoint_Specs(QWidget):
             else:
                 self.butSimFxPy.setEnabled(False)
                 
-            #--- try to reference HDL fixpoint filter instance -----
+            #--- Check whether fixpoint widget contains HDL filters -----
             if hasattr(self.fx_wdg_inst,'hdlfilter'):
-                self.hdl_filter_inst = self.fx_wdg_inst.hdlfilter
-                self.butExportHDL.setEnabled(hasattr(self.fx_wdg_inst.hdlfilter, "convert"))
-                self.butSimHDL.setEnabled(hasattr(self.fx_wdg_inst.hdlfilter, "run_sim"))
+                self.butExportHDL.setEnabled(hasattr(self.fx_wdg_inst, "to_verilog"))
+                self.butSimHDL.setEnabled(hasattr(self.fx_wdg_inst, "run_sim"))
                 self.update_fxqc_dict()
-                #self.fx_wdg_inst.update_hdl_filter()
             else:
-                self.hdl_filter_inst = None
                 self.butSimHDL.setEnabled(False)
                 self.butExportHDL.setEnabled(False)
 
@@ -470,7 +467,7 @@ class Input_Fixpoint_Specs(QWidget):
         is NOT updated each time one of the relevant widgets changes ("lazy update").
          This avoids having to connect and disconnect all sorts of signals and slots.
         """
-        if self.fx_wdg_found and self.hdl_filter_inst:
+        if self.fx_wdg_found:
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
                 self.fxqc_dict.update(self.fx_wdg_inst.ui2dict())
@@ -496,7 +493,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
             self.q_o = fx.Fixed(self.fxqc_dict['QO']) # setup quantizer for output quantization
         else:
-            logger.error("No fixpoint widget or HDL filter instance found!")
+            logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           
     def info_hdl(self, hdl_dict):
         """
@@ -519,7 +516,7 @@ class Input_Fixpoint_Specs(QWidget):
         """
         dlg = QFD(self) # instantiate file dialog object
 
-        file_types = "Verilog (*.v);;VHDL (*.vhd)"
+        file_types = "Verilog (*.v)"
 
         hdl_file, hdl_filter = dlg.getSaveFileName_(
                 caption="Save HDL as", directory=dirs.save_dir,
@@ -530,30 +527,38 @@ class Input_Fixpoint_Specs(QWidget):
             # return '.v' or '.vhd' depending on filetype selection:
             hdl_type = extract_file_ext(qstr(hdl_filter))[0]
             # sanitized dir + filename + suffix. The filename suffix is replaced
-            # by `hdl_type` later.
+            # by `v` later.
             hdl_file = os.path.normpath(hdl_file)
             hdl_dir_name = os.path.dirname(hdl_file) # extract the directory path
             if not os.path.isdir(hdl_dir_name): # create directory if it doesn't exist
                 os.mkdir(hdl_dir_name)
             dirs.save_dir = hdl_dir_name # make this directory the new default / base dir
+            hdl_file_name = os.path.join(hdl_dir_name, 
+                                os.path.splitext(os.path.basename(hdl_file))[0]+ ".v")
 
-            # remove the suffix from the filename:
-            hdl_file_name = os.path.splitext(os.path.basename(hdl_file))[0]
-
-            if hdl_type == '.vhd':
-                hdl = 'VHDL'
-            elif hdl_type == '.v':
-                hdl = 'Verilog'
-            else:
-                logger.error('Unknown file extension "{0}", cancelling.'.format(hdl_type))
-                return
-
+# =============================================================================
+#             # remove the suffix from the filename:
+# 
+#             if hdl_type == '.vhd':
+#                 hdl = 'VHDL'
+#             elif hdl_type == '.v':
+#                 hdl = 'Verilog'
+#             else:
+#                 logger.error('Unknown file extension "{0}", cancelling.'.format(hdl_type))
+#                 return
+# 
+# =============================================================================
             logger.info('Creating hdl_file "{0}"'.format(
-                        os.path.join(hdl_dir_name, hdl_file_name + hdl_type)))
+                        os.path.join(hdl_dir_name, hdl_file_name)))
             try:
                 self.update_fxqc_dict()
-                self.hdl_filter_inst.setup(self.fxqc_dict)
-                code = self.hdl_filter_inst.convert(hdl=hdl, name=hdl_file_name, path=hdl_dir_name)
+                self.fx_wdg_inst.construct_hdlfilter(self.fxqc_dict)
+                code = self.fx_wdg_inst.to_verilog(self.fxqc_dict)
+                
+                logger.info(str(code))
+                
+                with io.open(hdl_file_name, 'w', encoding="utf8") as f:
+                    f.write(str(code))
 
                 logger.info("HDL conversion finished!")
             except (IOError, TypeError) as e:
@@ -583,13 +588,13 @@ class Input_Fixpoint_Specs(QWidget):
         containing all quantization information and request a stimulus signal
         """
         try:
-            logger.info("Started myhdl fixpoint simulation")
+            logger.info("Started HDL fixpoint simulation")
             self.update_fxqc_dict()
-            self.hdl_filter_inst.setup(self.fxqc_dict)   # setup filter instance         
+            self.fx_wdg_inst.construct_hdlfilter(self.fxqc_dict)   # setup filter instance         
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         
-        except myhdl.SimulationError as e:
+        except Exception as e:
             logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
         return
 
@@ -612,13 +617,17 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
                         dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
 
-            #self.hdl_filter_inst.set_stimulus(self.stim)    # Set the simulation input
-            self.hdl_filter_inst.run_sim(self.stim)         # Run the simulation
+            #self.fx_wdg_inst.set_stimulus(self.stim)    # Set the simulation input
+            self.fx_wdg_inst.run_sim(self.stim)         # Run the simulation
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             # Get the response from the simulation in integer
-            self.fx_results = self.hdl_filter_inst.get_response()
-            logger.info("\n\n resp {0}\n".format(self.fx_results[0:9]))
+            self.fx_results = list(self.fx_wdg_inst.get_response()) # run generator
+            if len(self.fx_results) == 0:
+                logger.warning("Fixpoint simulation returned empty results!")
+            else:
+                logger.info("\n\n resp {0}\n"\
+                            .format(self.fx_results[0:max(len(self.fx_results),9)]))
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot

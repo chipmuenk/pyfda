@@ -13,7 +13,6 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-import math
 import pyfda.filterbroker as fb
 
 from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
@@ -27,13 +26,12 @@ from operator import add
 
 from math import cos, pi
 #from scipy import signal
-#import matplotlib.pyplot as plt
 
-from migen import *
+from migen import Signal, Module, run_simulation
 from migen.fhdl import verilog
 ################################
 
-classes = {'FIR_DF':'DF'} #: Dict containing class name : display name
+classes = {'FIR_DF':'DF'} #: Dict containing widget class name : display name
 
 # =============================================================================
 
@@ -51,7 +49,7 @@ class FIR_DF(QWidget):
 
         self._construct_UI()
         # Construct an instance of the HDL filter object
-        self.construct_hdl_filter()
+        self.construct_hdlfilter() # construct instance self.hdlfilter with dummy data
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -140,20 +138,56 @@ class FIR_DF(QWidget):
         return fxqc_dict
     
 #------------------------------------------------------------------------------
-    def construct_hdl_filter(self):
+    def construct_hdlfilter(self, fxqc_dict=None):
         """
-        Construct an instance of the HDL filter object
+        Construct an instance of the HDL filter object using the settings from
+        the quantizer dict
         """
-        #b = self.hdl_dict['QC']['b']
-        self.hdlfilter = FIR()     # Standard DF1 filter - hdl_dict should be passed here
+        if not fxqc_dict:
+            fxqc_dict = {'QI':{'W':16}, 'QC':{'b':[18,3,0,-3,-18]}} # create dummy dict
 
+        logger.warning(fxqc_dict)
+        self.hdlfilter = FIR(fxqc_dict) # construct HDL filter instance
 
+#------------------------------------------------------------------------------
+    def get_response(self):
+        """
+        Return filter output.
+
+        Returns
+        -------
+        response(numpy int array) : returns filter output as numpy array
+        """
+        return self.response
+
+#------------------------------------------------------------------------------
+    def to_verilog(self, fxqc_dict):
+        """
+        Convert the HDL description to Verilog
+        """
+        return verilog.convert(self.hdlfilter,
+                               ios={self.hdlfilter.i, self.hdlfilter.o}) 
+
+#------------------------------------------------------------------------------           
+    def run_sim(self, stimulus):
+        """
+        Pass stimuli and run filter simulation, see 
+        https://reconfig.io/2018/05/hello_world_migen
+        https://github.com/m-labs/migen/blob/master/examples/sim/fir.py        
+        """
+        self.response = []
+        for x in stimulus:
+            #v = 0.1*cos(2*pi*frequency*cycle)
+            yield self.i.eq(x)
+            logger.error(x)
+            self.response.append((yield self.o))
+            yield      
 ###############################################################################
 # A synthesizable FIR filter.
 class FIR(Module):
-    def __init__(self, coef=[12,14,16], wsize=16):
-        self.coef = coef
-        self.wsize = wsize
+    def __init__(self, fxqc_dict):
+        self.coef = fxqc_dict['QC']['b']
+        self.wsize = fxqc_dict['QI']['W']
         self.i = Signal((self.wsize, True))
         self.o = Signal((self.wsize, True))
         self.response = []
@@ -171,67 +205,6 @@ class FIR(Module):
         sum_full = Signal((2*self.wsize-1, True))
         self.sync += sum_full.eq(reduce(add, muls))
         self.comb += self.o.eq(sum_full >> self.wsize-1)
-        
-    def setup(self, fx_dict):
-        logger.warning("fx_dict = {0}".format(fx_dict))
-
-
-    def get_response(self):
-        """
-        Return filter output.
-
-        Returns
-        -------
-        response(numpy int array) : returns filter output as numpy array
-        """
-        return self.response
-            
-    def run_sim(self, stimulus):
-        """
-        Pass stimuli and run filter simulation
-        """
-        self.response = []
-        for x in stimulus:
-            #v = 0.1*cos(2*pi*frequency*cycle)
-            yield self.i.eq(x)
-            self.response.append((yield self.o))
-            yield
-            
-    def convert(self, **kwargs):
-        """
-        Convert the HDL description to Verilog or VHDL.
-        """
-        fir = FIR()
-        if True:
-            logger.info(verilog.convert(fir, ios={fir.i, fir.o}))       
-        else:
-            raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
-
-
-# A test bench for our FIR filter.
-# Generates a sine wave at the input and records the output.
-def fir_tb(dut, frequency, inputs, outputs):
-    f = 2**(dut.wsize - 1)
-    for cycle in range(200):
-        v = 0.1*cos(2*pi*frequency*cycle)
-        yield dut.i.eq(int(f*v))
-        inputs.append(v)
-        outputs.append((yield dut.o)/f)
-        yield
-
-def convert(self, **kwargs):
-    """
-    Convert the HDL description to Verilog and VHDL.
-    """
-    fir = FIR(self.b)
-    print(verilog.convert(fir, ios={fir.i, fir.o}))       
-    if self.hdl_target.lower() == 'verilog':
-        filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
- 
-    elif self.hdl_target.lower() == 'vhdl':
-        filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
-    else:
-        raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
 
 #------------------------------------------------------------------------------
 
@@ -244,4 +217,4 @@ if __name__ == '__main__':
 
     app.exec_()
     
-    # test using "python -m pyfda.fixpoint_widgets.fir_df1"
+    # test using "python -m pyfda.fixpoint_widgets.fir_df_migen"
