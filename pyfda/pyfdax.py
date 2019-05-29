@@ -11,7 +11,6 @@ Mainwindow for the pyFDA app
 """
 import sys, os
 
-#from sip import setdestroyonexit
 import logging
 import logging.config
 logger = logging.getLogger(__name__)
@@ -46,6 +45,8 @@ class DynFileHandler(logging.FileHandler):
         if not os.path.isabs(filename): # path to logging file given in config_file?
             dirs.LOG_DIR_FILE = os.path.join(dirs.LOG_DIR, filename) # no, use default dir
         logging.FileHandler.__init__(self, dirs.LOG_DIR_FILE, mode, encoding)
+        
+# TODO: coloured logger: https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 
 class XStream(QtCore.QObject):
     """
@@ -316,5 +317,4 @@ def main():
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-#    setdestroyonexit(False) # don't call the C++ destructor of wrapped instances
     main()
