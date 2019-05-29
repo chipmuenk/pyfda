@@ -613,16 +613,16 @@ class Input_Fixpoint_Specs(QWidget):
         - Send the reponse to the plotting widget
         """
         try:
-            self.stim = self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)
+            self.stim = np.round(self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)).astype(int)
             logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
                         dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
 
             #self.fx_wdg_inst.set_stimulus(self.stim)    # Set the simulation input
-            self.fx_wdg_inst.run_sim(self.stim)         # Run the simulation
+            self.fx_results=self.fx_wdg_inst.run_sim(self.stim)         # Run the simulation
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
 
             # Get the response from the simulation in integer
-            self.fx_results = list(self.fx_wdg_inst.get_response()) # run generator
+            #self.fx_results = list(self.fx_wdg_inst.get_response()) # run generator
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
@@ -641,11 +641,11 @@ class Input_Fixpoint_Specs(QWidget):
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return
-        except Exception as e:
-            logger.warning("Simulation failed:\n{0}".format(e))
-            self.fx_results = None
-            qstyle_widget(self.butSimHDL, "error")
-            return
+#        except Exception as e:
+#            logger.warning("Simulation failed:\n{0}".format(e))
+#            self.fx_results = None
+#            qstyle_widget(self.butSimHDL, "error")
+#            return
 
         logger.info("Fixpoint plotting started")
         dict_sig = {'sender':__name__, 'fx_sim':'set_results', 

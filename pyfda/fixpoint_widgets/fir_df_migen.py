@@ -168,6 +168,25 @@ class FIR_DF(QWidget):
         return verilog.convert(self.hdlfilter,
                                ios={self.hdlfilter.i, self.hdlfilter.o}) 
 
+    def fir_tb_stim(self, stimulus, inputs, outputs):
+        """ use stimulus list from widget as input to filter """
+        for x in stimulus:
+            yield self.hdlfilter.i.eq(int(x)) # pass one stimulus value to filter
+            inputs.append(x) # and append it to input list
+            outputs.append((yield self.hdlfilter.o)) # append filter output to output list
+            yield # ??
+
+
+    def fir_tb_sin(self, stimulus, inputs, outputs):
+        """ sinusoidal test signal """
+        f = 2**(self.hdlfilter.wsize - 1)
+        for t in range(len(stimulus)):
+            v = 0.1*cos(2*pi*0.1*t)
+            yield self.hdlfilter.i.eq(int(f*v))
+            inputs.append(v)
+            outputs.append((yield self.hdlfilter.o))
+            yield
+
 #------------------------------------------------------------------------------           
     def run_sim(self, stimulus):
         """
@@ -175,13 +194,20 @@ class FIR_DF(QWidget):
         https://reconfig.io/2018/05/hello_world_migen
         https://github.com/m-labs/migen/blob/master/examples/sim/fir.py        
         """
-        self.response = []
-        for x in stimulus:
-            #v = 0.1*cos(2*pi*frequency*cycle)
-            yield self.i.eq(x)
-            logger.error(x)
-            self.response.append((yield self.o))
-            yield      
+        inputs = []
+        response = []
+        
+        testbench = self.fir_tb_stim(stimulus, inputs, response)
+#        for x in stimulus:
+#            #v = 0.1*cos(2*pi*frequency*cycle)
+#            yield self.i.eq(x)
+#            logger.error(x)
+#            self.response.append((yield self.o))
+#            yield  
+            
+        run_simulation(self.hdlfilter, testbench)
+        
+        return response
 ###############################################################################
 # A synthesizable FIR filter.
 class FIR(Module):
