@@ -31,14 +31,6 @@ from pyfda.pyfda_qt_lib import qget_cmb_box, qstyle_widget
 from pyfda.fixpoint_widgets.fixpoint_helpers import UI_W, UI_Q
 from pyfda.pyfda_rc import params
 
-# check whether myhdl >= 0.10 is installed. BUT version 0.10 is incompatible
-# with Python 3.7, it is not installed. 
-if cmp_version("myhdl", "0.10") >= 0: # suitable combination of Py and myhdl found
-    import myhdl
-    HAS_MYHDL = True
-else:
-    HAS_MYHDL = False
-
 if cmp_version("migen", "0.1") >= -1: # currently, version cannot be determined
     import migen
     HAS_MIGEN = True
@@ -70,7 +62,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.fxqc_dict = {'QI':{}, 'QO':{}}
         
 
-        if HAS_MYHDL or HAS_MIGEN:
+        if HAS_MIGEN:
             self._construct_UI()
         else:
             self.state = "deactivated" # "invisible", "disabled"
@@ -114,20 +106,19 @@ class Input_Fixpoint_Specs(QWidget):
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'set_stimulus':
                 self.fx_sim_set_stimulus(dict_sig)
 
-                
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
         """
         Intitialize the main GUI, consisting of:
             
-        - A combo box to select the filter topology and an image of the filter topology
+        - A combo box to select the filter topology with an image of the filter topology
         
         - The input quantizer
         
         - The UI of the fixpoint filter widget
         
-        - and the myHDL interface:
+        - Simulation and export buttons
         """
         self.cmb_wdg_fixp = QComboBox(self)
         self.cmb_wdg_fixp.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -201,14 +192,14 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmImg.setContentsMargins(*params['wdg_margins'])
         self.resize_img()
 #------------------------------------------------------------------------------
-#       myhdl Buttons        
+#       Simulation and export Buttons        
 #------------------------------------------------------------------------------        
         self.butExportHDL = QPushButton(self)
-        self.butExportHDL.setToolTip("Create VHDL and Verilog files.")
+        self.butExportHDL.setToolTip("Export fixpoint filter in Verilog format.")
         self.butExportHDL.setText("Create HDL")
 
         self.butSimHDL = QPushButton(self)
-        self.butSimHDL.setToolTip("Start fixpoint simulation with myHDL description.")
+        self.butSimHDL.setToolTip("Start migen fixpoint simulation.")
         self.butSimHDL.setText("Sim. HDL")
         
         self.butSimFxPy = QPushButton(self)
@@ -347,14 +338,6 @@ class Input_Fixpoint_Specs(QWidget):
         img_scaled = self.img_fixp.scaledToHeight(max_h, Qt.SmoothTransformation)
 
         self.lbl_img_fixp.setPixmap(QPixmap(img_scaled))
-
-#------------------------------------------------------------------------------
-    def update_all(self):
-        """
-        Import new module and update UI after changing the filter topology
-        """
-        self._construct_dyn_widget()
-        self.update_UI()
 
 #------------------------------------------------------------------------------
     def _update_fixp_widget(self):
@@ -497,22 +480,14 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------           
     def info_hdl(self, hdl_dict):
         """
-        Print filter info (not reallly implemented yet)
+        Print filter info (not implemented yet)
         """
-        print("Filter type :", self.filter_type, "\n"
-              "Filter order :", len(self.b), "\n"
-              "Arithmatic :", "fixed", "\n"
-              "Coefficient format :", self.coef_word_format ,"\n"
-              "Input format :", self.input_word_format ,"\n"
-              "Accumulator size :", "\n"
-              "Output format :", self.output_word_format ,"\n"
-              "Round mode :", "no rounding", "\n"
-              "Overflow mode :" "no overflow"
-            )
-
+        if hasattr(self.fx_wdg_inst, "hdlfilter") and hasattr(self.fx_wdg_inst, "info"):
+            pass
+            
     def exportHDL(self):
         """
-        Synthesize HDL description of filter using myHDL module
+        Synthesize HDL description of filter
         """
         dlg = QFD(self) # instantiate file dialog object
 
@@ -571,7 +546,7 @@ class Input_Fixpoint_Specs(QWidget):
         containing all quantization information and request a stimulus signal
         """
         try:
-            logger.info("Started myhdl fixpoint simulation")
+            logger.info("Started python fixpoint simulation")
             self.update_fxqc_dict()
             self.fxpyfilter.setup(self.fxqc_dict)   # setup filter instance         
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
@@ -601,7 +576,7 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def fx_sim_set_stimulus(self, dict_sig):
         """
-        - Get fixpoint stimulus from ``dict_sig``
+        - Get fixpoint stimulus from `dict_sig`
         
         - Quantize the stimulus with the selected input quantization settings
         
@@ -617,12 +592,10 @@ class Input_Fixpoint_Specs(QWidget):
             logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
                         dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
 
-            #self.fx_wdg_inst.set_stimulus(self.stim)    # Set the simulation input
-            self.fx_results=self.fx_wdg_inst.run_sim(self.stim)         # Run the simulation
+            # Get the response from the simulation as  integer values
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
+            self.fx_results=self.fx_wdg_inst.run_sim(self.stim)         # Run the simulation
 
-            # Get the response from the simulation in integer
-            #self.fx_results = list(self.fx_wdg_inst.get_response()) # run generator
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
