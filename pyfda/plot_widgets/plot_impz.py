@@ -172,7 +172,7 @@ class Plot_Impz(QWidget):
                                       'fx_stimulus':self.x})
                 elif dict_sig['fx_sim'] == 'set_results':
                     logger.info("Received fixpoint results.")
-                    self.fx_set_results(dict_sig) # plot fx simulation results 
+                    self.fx_get_results(dict_sig) # plot fx simulation results 
 
             except KeyError as e:
                 logger.error('Key {0} missing in "hdl_dict".'.format(e))
@@ -317,14 +317,14 @@ class Plot_Impz(QWidget):
 
     def fx_set_hdl_dict(self, dict_sig):
         """
-        Set quantization dict
+        Set local quantization dict
         """
         try:
             self.hdl_dict = dict_sig['hdl_dict']
         except (KeyError, ValueError) as e:
             logger.warning(e)
             
-    def fx_set_results(self, dict_sig):
+    def fx_get_results(self, dict_sig):
         """
         Get simulation results from `dict_sig` and transfer them to plotting
         routine.
