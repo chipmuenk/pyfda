@@ -13,20 +13,25 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-import math
 import pyfda.filterbroker as fb
 
-from ..compat import QWidget, QLabel, QVBoxLayout, QHBoxLayout
+from ..compat import QWidget, QVBoxLayout
 
-import pyfda.pyfda_fix_lib as fx
+#import pyfda.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
 
-import myhdl as hdl
-from myhdl import Signal, intbv, always_seq, StopSimulation
-from .support import Clock, Reset, Global, Samples, Signals
-from .filter_hw import FilterHardware
+#####################
+from functools import reduce
+from operator import add
 
-classes = {'FIR_DF1':'DF'} #: Dict containing class name : display name
+from math import cos, pi
+#from scipy import signal
+
+from migen import Signal, Module, run_simulation
+from migen.fhdl import verilog
+################################
+
+classes = {'FIR_DF':'DF'} #: Dict containing widget class name : display name
 
 # =============================================================================
 
@@ -44,8 +49,7 @@ class FIR_DF(QWidget):
 
         self._construct_UI()
         # Construct an instance of the HDL filter object
-        self.hdlfilter = FilterFIR()
-        #self.hdlfilter = fir.FilterFIR()
+        self.construct_hdlfilter() # construct instance self.hdlfilter with dummy data
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -132,64 +136,20 @@ class FIR_DF(QWidget):
         fxqc_dict.update({'QA': self.wdg_w_accu.ui2dict()})
         
         return fxqc_dict
-        
+    
 #------------------------------------------------------------------------------
-#    def update_hdl_filter(self, fxqc_dict=None):
-#        """
-#        This is called from :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
-#        
-#        Update the HDL filter object with new coefficients, quantization settings etc. when
-#        
-#        - it is constructed
-#        
-#        - filter design and hence coefficients change
-#        
-#        - quantization settings are updated in this widget
-#        
-#        TODO: outdated, check coefficient passing mechanism!
-#        """
-#
-#        # build the dict with coefficients and fixpoint settings:
-#        self.hdl_dict = self.get_hdl_dict()
-#        # setup input and output quantizers
-##        self.q_i = fx.Fixed(self.hdl_dict['QI']) # setup quantizer for input quantization
-##        self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # use integer decimal format
-#        self.q_o = fx.Fixed(self.hdl_dict['QO']) # setup quantizer for output quantization
-#
-#        b = [ int(x) for x in self.hdl_dict['QC']['b']] # convert np.int64 to python int
-#
-#        # call setup method of filter widget - this is not implemented (yet)
-#        # self.fx_wdg_inst.setup_HDL(self.hdl_dict)
-#        
-#        self.hdlfilter.set_coefficients(coeff_b = b)  # Coefficients for the filter
-#
-#        # pass wordlength for coeffs, input, output
-#        # TODO: directly pass the hdl_dict here:
-#        self.hdlfilter.set_word_format(
-#                (self.hdl_dict['QC']['W'], self.hdl_dict['QC']['WI'], self.hdl_dict['QC']['WF']),
-#                (self.hdl_dict['QI']['W'], self.hdl_dict['QI']['WI'], self.hdl_dict['QI']['WF']),
-#                (self.hdl_dict['QO']['W'], self.hdl_dict['QO']['WI'], self.hdl_dict['QO']['WF'])
-#                )
-
-###############################################################################
-        
-class FilterFIR(FilterHardware):
-    def __init__(self, b = None, a = None):
+    def construct_hdlfilter(self, fxqc_dict=None):
         """
-        Contains FIR filter parameters. Parent Class : FilterHardware
-
-        Arguments
-        ---------
-        
-        b (list of int): list of numerator coefficients.
-        a (list of int): list of denominator coefficients.
-        word format (tuple of int): (W, WI, WF)
-            
-        response (list): list of filter output in int format.
+        Construct an instance of the HDL filter object using the settings from
+        the quantizer dict
         """
-        super(FilterFIR, self).__init__(b, a)
-        self.response = []
+        # TODO: This is clumsy, dict should contain all keys by default
+        if not fxqc_dict:
+            fxqc_dict = {'QI':{'W':16}, 'QC':{'b':[18,3,0,-3,-18]}, 
+                         'QO':{'W':16}, 'QA':{'W':16}} # create dummy dict
 
+        self.hdlfilter = FIR(fxqc_dict) # construct HDL filter instance
+#------------------------------------------------------------------------------
     def get_response(self):
         """
         Return filter output.
@@ -199,177 +159,79 @@ class FilterFIR(FilterHardware):
         response(numpy int array) : returns filter output as numpy array
         """
         return self.response
-            
-    def run_sim(self):
+
+#------------------------------------------------------------------------------
+    def to_verilog(self, fxqc_dict):
         """
-        Run filter simulation
+        Convert the HDL description to Verilog
         """
+        return verilog.convert(self.hdlfilter,
+                               ios={self.hdlfilter.i, self.hdlfilter.o}) 
 
-        testfil = self.filter_block()
-        testfil.run_sim() # -> myhdl/_block
+    def fir_tb_stim(self, stimulus, inputs, outputs):
+        """ use stimulus list from widget as input to filter """
+        for x in stimulus:
+            yield self.hdlfilter.i.eq(int(x)) # pass one stimulus value to filter
+            inputs.append(x) # and append it to input list
+            outputs.append((yield self.hdlfilter.o)) # append filter output to output list
+            yield # ??
 
 
-    def convert(self, **kwargs):
+    def fir_tb_sin(self, stimulus, inputs, outputs):
+        """ sinusoidal test signal """
+        f = 2**(self.hdlfilter.wsize - 1)
+        for t in range(len(stimulus)):
+            v = 0.1*cos(2*pi*0.1*t)
+            yield self.hdlfilter.i.eq(int(f*v))
+            inputs.append(v)
+            outputs.append((yield self.hdlfilter.o))
+            yield
+
+#------------------------------------------------------------------------------           
+    def run_sim(self, stimulus):
         """
-        Convert the HDL description to Verilog and VHDL.
+        Pass stimuli and run filter simulation, see 
+        https://reconfig.io/2018/05/hello_world_migen
+        https://github.com/m-labs/migen/blob/master/examples/sim/fir.py        
         """
-        w = self.input_word_format
-        w_out = self.output_word_format
-        omax = 2**(w_out[0]-1)
-        imax = 2**(w[0]-1)
-
-        # small top-level wrapper
-        def filter_fir_top(hdl , clock, reset, x, xdv, y, ydv):
-            sigin = Samples(x.min, x.max, self.input_word_format)
-            sigin.data, sigin.data_valid = x, xdv
-            sigout = Samples(y.min, y.max, self.output_word_format)
-            sigout.data, sigout.data_valid = y, ydv
-            clk = clock
-            rst = reset
-            glbl = Global(clk, rst)
-
-            fir = filter_fir(glbl, sigin, sigout, self.b, self.coef_word_format,
-                          shared_multiplier=self._shared_multiplier)
-            
-            fir.convert(**kwargs)
-
-        clock = Clock(0, frequency=50e6)
-        reset = Reset(1, active=0, async=True)
-        x = Signal(intbv(0, min=-imax, max=imax))
-        y = Signal(intbv(0, min=-omax, max=omax))
-        xdv, ydv = Signal(bool(0)), Signal(bool(0))
+        inputs = []
+        response = []
         
-        if self.hdl_target.lower() == 'verilog':
-            filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
- 
-        elif self.hdl_target.lower() == 'vhdl':
-            filter_fir_top(hdl, clock, reset, x, xdv, y, ydv)
+        testbench = self.fir_tb_stim(stimulus, inputs, response) 
+            
+        run_simulation(self.hdlfilter, testbench)
+        
+        return response
+###############################################################################
+# A synthesizable FIR filter.
+class FIR(Module):
+    def __init__(self, fxqc_dict):
+        logger.warning(fxqc_dict)
+        if 'QC' in fxqc_dict and 'W' in fxqc_dict['QC']: # coeff. format  
+            self.wsize_c = fxqc_dict['QC']['W']
         else:
-            raise ValueError('incorrect target HDL {}'.format(self.hdl_target))
-
-
-    @hdl.block
-    def filter_block(self):
-        """
-        This elaboration code was supposed to select the different structure 
-        and implementations. This will be handled by individual classes / blocks now.
+            self.wsize_c = 16
+            logger.warning("Key 'fxqc_dict['QC']['W']' undefined, using default value.")
+        self.coef    = fxqc_dict['QC']['b'] # list with coefficients
+        self.wsize_i = fxqc_dict['QI']['W'] # input format
+        self.wsize_o = fxqc_dict['QO']['W'] # output format
+        self.wsize_a = fxqc_dict['QA']['W'] # accumulator format
         
-        Check myhdl._block for how to use attributes etc
-        """
+        self.i = Signal((self.wsize_i, True)) # input signal
+        self.o = Signal((self.wsize_o, True)) # output signal
+        self.response = []
 
-        w_in = self.input_word_format
-        w_out = self.output_word_format
-        imax = 1 << (w_in[0]-1)
-        omax = 1 << (w_out[0]-1)
-
-        xt = Samples(min=-imax, max=imax, word_format=self.input_word_format)
-        yt = Samples(min=-omax, max=omax, word_format=self.output_word_format)
-        xt.valid = bool(1)
-        clock = Clock(0, frequency=50e6)
-        reset = Reset(1, active=0, async=True)
-        glbl = Global(clock, reset)
-        tbclk = clock.process()
-        
-        #process to record output in buffer
-        _t = yt.process_record(clock, num_samples=len(self.sigin)) # was: rec_insts = ...
-        
-        # was: filter_insts, it seems the assigned name doesn't matter?!
-        _ = filter_fir(glbl, xt, yt, self.b, self.coef_word_format) # was: filter_insts = ...
-
-        @hdl.instance
-        def stimulus():
-            "record output in numpy array yt.sample_buffer"
-            for k in self.sigin:
-                xt.data.next = int(k)
-                xt.valid = bool(1)
-
-                yt.record = True
-                yt.valid = True
-                yield clock.posedge
-                #Collect a sample from each filter
-                yt.record = False
-                yt.valid = False
-
-            logger.warning("samp_bufy : {0}".format(yt.sample_buffer))
-            self.response = yt.sample_buffer
-
-            raise StopSimulation()
-
-        return hdl.instances()
-############################################################################### 
-@hdl.block
-def filter_fir(glbl, sigin, sigout, b, coef_w, shared_multiplier=False):
-    """
-    Basic FIR direct-form filter.
-
-    Ports:
-        glbl (Global): global signals.
-        sigin (Samples): input digital signal.
-        sigout (Samples): output digital signal.
-
-    Arguments
-    ---------
-        b (tuple): numerator coefficents.
-
-    Returns
-    -------
-        inst (myhdl.Block, list):
-    """
-    assert isinstance(sigin, Samples)
-    assert isinstance(sigout, Samples)
-    assert isinstance(b, tuple)
-    # All the coefficients need to be an `int`
-    rb = [isinstance(bb, int) for bb in b]
-    assert all(rb)
-
-    w_in = sigin.word_format
-    w_out = sigout.word_format
-    ntaps = len(b)-1
-    xmax = 2 ** (w_in[0]-1)
-    ymax = 2 ** (w_out[0]-1)
-    sum_abs_b = (sum([abs(x) for x in b]))/2.**(coef_w[0]-1) # coefficient area
-    # S + w_in-1 + w_c-1 + coeff. area
-    acc_wl = w_in[0] + coef_w[0] -1 + math.ceil(math.log(sum_abs_b, 2))
-    amax = 2**(acc_wl-1)
-    q = acc_wl-w_out[0]
-
-    if q < 0:
-        q = 0
-
-    clock, reset = glbl.clock, glbl.reset
-    xdv = sigin.valid
-    y, ydv = sigout.data, sigout.valid
-    x = Signal(intbv(0, min=-xmax, max=xmax))
-    # Delay elements, list-of-signals
-    ffd = Signals(intbv(0, min=-ymax, max=ymax), ntaps)
-    yacc = Signal(intbv(0, min=-amax, max=amax))
-    dvd = Signal(bool(0))
-
-    @hdl.always(clock.posedge)
-    def beh_direct_form_one():
-        if sigin.valid:
-            x.next = sigin.data
-
-            for i in range(ntaps-1):
-                ffd[i+1].next = ffd[i]
-
-            ffd[0].next = x
-            # sum-of-products loop
-            c = b[0]
-            sop = x * c
-
-            for ii in range(ntaps):
-                c = b[ii+1]
-                sop = sop + (c * ffd[ii])
-            yacc.next = sop
-
-    @always_seq(clock.posedge, reset=reset)
-    def beh_output():
-        dvd.next = xdv
-        y.next = yacc[acc_wl:q].signed()
-        ydv.next = dvd
-
-    return beh_direct_form_one, beh_output
+        ###
+        muls = []
+        src = self.i
+        for c in self.coef:
+            sreg = Signal((self.wsize_i, True)) # registers for input signal 
+            self.sync += sreg.eq(src)
+            src = sreg
+            muls.append(c*sreg)
+        sum_full = Signal((self.wsize_a, True))
+        self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
+        self.comb += self.o.eq(sum_full >> (self.wsize_a-self.wsize_o)) # rescale for output width
 
 #------------------------------------------------------------------------------
 
@@ -382,4 +244,4 @@ if __name__ == '__main__':
 
     app.exec_()
     
-    # test using "python -m pyfda.fixpoint_widgets.fir_df1"
+    # test using "python -m pyfda.fixpoint_widgets.fir_df_migen"
