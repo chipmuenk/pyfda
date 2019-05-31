@@ -4,10 +4,8 @@ numpy
 scipy
 matplotlib
 pyqt5
-six
 docutils
 nose
-myhdl >= 0.10
 # pytest
 # coverage
 # coveralls
