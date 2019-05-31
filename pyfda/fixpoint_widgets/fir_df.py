@@ -143,11 +143,6 @@ class FIR_DF(QWidget):
         Construct an instance of the HDL filter object using the settings from
         the quantizer dict
         """
-        # TODO: This is clumsy, dict should contain all keys by default
-        if not fxqc_dict:
-            fxqc_dict = {'QI':{'W':16}, 'QC':{'b':[18,3,0,-3,-18]}, 
-                         'QO':{'W':16}, 'QA':{'W':16}} # create dummy dict
-
         self.hdlfilter = FIR(fxqc_dict) # construct HDL filter instance
 #------------------------------------------------------------------------------
     def get_response(self):
@@ -207,31 +202,37 @@ class FIR_DF(QWidget):
 class FIR(Module):
     def __init__(self, fxqc_dict):
         logger.debug(fxqc_dict)
-        if 'QC' in fxqc_dict and 'W' in fxqc_dict['QC']: # coeff. format  
-            self.wsize_c = fxqc_dict['QC']['W']
-        else:
-            self.wsize_c = 16
-            logger.warning("Key 'fxqc_dict['QC']['W']' undefined, using default value.")
-        self.coef    = fxqc_dict['QC']['b'] # list with coefficients
-        self.wsize_i = fxqc_dict['QI']['W'] # input format
-        self.wsize_o = fxqc_dict['QO']['W'] # output format
-        self.wsize_a = fxqc_dict['QA']['W'] # accumulator format
+        par = {}
+           # new Key , Key 1 und 2 in fxqc_dict, default value
+        par_list = [['WI', 'QI','W', 16],
+                    ['WO', 'QO','W', 16],
+                    ['WA', 'QA','W', 31],
+                    ['WC', 'QC','W', 16],
+                    ['b',  'QC','b', [1,1,1]]
+                    ]
+        #Automatic : par['WA'] = par['WC'] + par['WI'] =- 1
+        for l in par_list:
+            try:
+                par[l[0]] = fxqc_dict[l[1]][l[2]]
+            except (KeyError, TypeError) as e:
+                logger.warning("Error [{0}][{1}]:\n{2}".format(l[1],l[2],e))
+                par[l[0]] = l[3]
         
-        self.i = Signal((self.wsize_i, True)) # input signal
-        self.o = Signal((self.wsize_o, True)) # output signal
+        self.i = Signal((par['WI'], True)) # input signal
+        self.o = Signal((par['WO'], True)) # output signal
         self.response = []
 
         ###
         muls = []
         src = self.i
-        for c in self.coef:
-            sreg = Signal((self.wsize_i, True)) # registers for input signal 
+        for c in par['b']:
+            sreg = Signal((par['WI'], True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
             muls.append(c*sreg)
-        sum_full = Signal((self.wsize_a, True))
+        sum_full = Signal((par['WA'], True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
-        self.comb += self.o.eq(sum_full >> (self.wsize_a-self.wsize_o)) # rescale for output width
+        self.comb += self.o.eq(sum_full >> (par['WA']-par['WO'])) # rescale for output width
 
 #------------------------------------------------------------------------------
 
