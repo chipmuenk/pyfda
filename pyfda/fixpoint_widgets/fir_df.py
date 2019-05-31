@@ -206,7 +206,7 @@ class FIR_DF(QWidget):
 # A synthesizable FIR filter.
 class FIR(Module):
     def __init__(self, fxqc_dict):
-        logger.warning(fxqc_dict)
+        logger.debug(fxqc_dict)
         if 'QC' in fxqc_dict and 'W' in fxqc_dict['QC']: # coeff. format  
             self.wsize_c = fxqc_dict['QC']['W']
         else:

@@ -609,8 +609,9 @@ class Input_Fixpoint_Specs(QWidget):
         """
         try:
             self.stim = np.round(self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)).astype(int)
-            logger.info("\n\n stim W={0}|q={1}\nstim:{2}\nstimq:{3}\n".format(self.q_i.W, self.q_i.q_obj, 
-                        dict_sig['fx_stimulus'][0:9], self.stim[0:9]))
+            logger.info("\n Stim:{0}\nFX stim:{1}\n".format( 
+                        dict_sig['fx_stimulus'][0:max(len(dict_sig['fx_stimulus']),9)],
+                        self.stim[0:max(len(self.stim),9)]))
 
             # Get the response from the simulation as  integer values
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
@@ -619,7 +620,7 @@ class Input_Fixpoint_Specs(QWidget):
             if len(self.fx_results) == 0:
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
-                logger.info("\n\n resp {0}\n"\
+                logger.info("FX response: {0}\n"\
                             .format(self.fx_results[0:max(len(self.fx_results),9)]))
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
@@ -640,13 +641,13 @@ class Input_Fixpoint_Specs(QWidget):
             qstyle_widget(self.butSimHDL, "error")
             return
 
-        logger.info("Fixpoint plotting started")
+        logger.debug("Sending fixpoint results")
         dict_sig = {'sender':__name__, 'fx_sim':'set_results', 
                     'fx_results':self.fx_results }            
         self.sig_tx.emit(dict_sig)
         qstyle_widget(self.butSimHDL, "normal")
         
-        logger.info("Fixpoint plotting finished")        
+        logger.debug("Fixpoint plotting finished")        
             
         return
 

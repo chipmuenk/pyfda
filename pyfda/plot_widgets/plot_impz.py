@@ -658,7 +658,7 @@ class Plot_Impz(QWidget):
         if self.fx_sim: # fixpoint simulation enabled -> scale stimulus and response
             WI = WO = 1
             try:
-                logger.info("hdl_dict = {0}".format(self.hdl_dict))
+                logger.debug("hdl_dict = {0}".format(self.hdl_dict))
                 WI = self.hdl_dict['QI']['W']
                 WO = self.hdl_dict['QO']['W']
 
