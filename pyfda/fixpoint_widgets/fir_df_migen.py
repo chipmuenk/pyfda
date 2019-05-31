@@ -143,8 +143,10 @@ class FIR_DF(QWidget):
         Construct an instance of the HDL filter object using the settings from
         the quantizer dict
         """
+        # TODO: This is clumsy, dict should contain all keys by default
         if not fxqc_dict:
-            fxqc_dict = {'QI':{'W':16}, 'QC':{'b':[18,3,0,-3,-18]}} # create dummy dict
+            fxqc_dict = {'QI':{'W':16}, 'QC':{'b':[18,3,0,-3,-18]}, 
+                         'QO':{'W':16}, 'QA':{'W':16}} # create dummy dict
 
         self.hdlfilter = FIR(fxqc_dict) # construct HDL filter instance
 #------------------------------------------------------------------------------
@@ -204,25 +206,32 @@ class FIR_DF(QWidget):
 # A synthesizable FIR filter.
 class FIR(Module):
     def __init__(self, fxqc_dict):
-        self.coef = fxqc_dict['QC']['b']
-        self.wsize = fxqc_dict['QI']['W']
-        self.i = Signal((self.wsize, True))
-        self.o = Signal((self.wsize, True))
+        logger.warning(fxqc_dict)
+        if 'QC' in fxqc_dict and 'W' in fxqc_dict['QC']: # coeff. format  
+            self.wsize_c = fxqc_dict['QC']['W']
+        else:
+            self.wsize_c = 16
+            logger.warning("Key 'fxqc_dict['QC']['W']' undefined, using default value.")
+        self.coef    = fxqc_dict['QC']['b'] # list with coefficients
+        self.wsize_i = fxqc_dict['QI']['W'] # input format
+        self.wsize_o = fxqc_dict['QO']['W'] # output format
+        self.wsize_a = fxqc_dict['QA']['W'] # accumulator format
+        
+        self.i = Signal((self.wsize_i, True)) # input signal
+        self.o = Signal((self.wsize_o, True)) # output signal
         self.response = []
 
         ###
         muls = []
         src = self.i
         for c in self.coef:
-            sreg = Signal((self.wsize, True))
+            sreg = Signal((self.wsize_i, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
-            #c_fp = int(c*2**(self.wsize - 1))
-            c_fp = c
-            muls.append(c_fp*sreg)
-        sum_full = Signal((2*self.wsize-1, True))
-        self.sync += sum_full.eq(reduce(add, muls))
-        self.comb += self.o.eq(sum_full >> self.wsize-1)
+            muls.append(c*sreg)
+        sum_full = Signal((self.wsize_a, True))
+        self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
+        self.comb += self.o.eq(sum_full >> (self.wsize_a-self.wsize_o)) # rescale for output width
 
 #------------------------------------------------------------------------------
 
