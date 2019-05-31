@@ -374,13 +374,27 @@ class Input_Fixpoint_Specs(QWidget):
         - Try to instantiate HDL filter as `self.fx_wdg_inst.hdlfilter` with 
             dummy data
         """
+
+        def _disable_fx_wdg(self):
+
+            if hasattr(self, "fx_wdg_inst") and self.fx_wdg_inst is not None: # is a fixpoint widget loaded?
+                try:
+                    self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
+                    self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
+                except AttributeError as e:
+                    logger.error("Could not destruct_UI!\n{0}".format(e))
+
+            self.fx_wdg_found = False
+            self.butSimFxPy.setEnabled(False)
+            self.butSimHDL.setEnabled(False)
+            self.butExportHDL.setEnabled(False)
+            self.img_fixp = QPixmap("no_fx_filter.png")
+            self.resize_img()
+            self.lblTitle.setText("")
+            self.fx_wdg_inst = None
+            
         # destruct old fixpoint widget instance
-        if hasattr(self, "fx_wdg_inst") and self.fx_wdg_inst is not None: # is a fixpoint widget loaded?
-            try:
-                self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
-                self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
-            except AttributeError as e:
-                logger.error("Could not destruct_UI!\n{0}".format(e))
+        _disable_fx_wdg(self)
 
         # instantiate new fixpoint widget class as self.fx_wdg_inst
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
@@ -391,6 +405,17 @@ class Input_Fixpoint_Specs(QWidget):
             fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
             self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
             self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
+
+# Doesn't work at the moment, combo box becomes inaccessible        
+#            try:
+#                self.fx_wdg_inst = fx_wdg_class(self) # instantiate the widget
+#                self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
+#            except KeyError as e:
+#                logger.warning('Key Error {0} in fixpoint filter \n{1}'\
+#                               .format(e, fx_mod_name + "." + cmb_wdg_fx_cur))
+#                _disable_fx_wdg(self)
+#                return
+            
             self.wdg_dict2ui() # initialize the fixpoint subwidgets from the fxqc_dict
 
             #---- connect signals to fx_wdg_inst ----
@@ -418,7 +443,8 @@ class Input_Fixpoint_Specs(QWidget):
                 self.img_fixp = QPixmap(img_file)
                 #self.lbl_img_fixp.setPixmap(QPixmap(self.img_fixp)) # fixed size
             self.resize_img()
-                
+
+            #---- set title and description for filter                      
             self.lblTitle.setText(self.fx_wdg_inst.title)
 
             #--- try to reference Python fixpoint filter instance -----
@@ -438,13 +464,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.butExportHDL.setEnabled(False)
 
         else:
-            self.fx_wdg_found = False
-            self.butSimFxPy.setEnabled(False)
-            self.butSimHDL.setEnabled(False)
-            self.butExportHDL.setEnabled(False)
-            self.img_fixp = QPixmap("no_fx_filter.png")
-            self.resize_img()
-            self.fx_wdg_inst = None
+            _disable_fx_wdg(self)
 
 #------------------------------------------------------------------------------
     def wdg_dict2ui(self):
@@ -594,7 +614,7 @@ class Input_Fixpoint_Specs(QWidget):
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         
-        except Exception as e:
+        except  ValueError as e: # exception
             logger.warning("Fixpoint stimulus generation failed:\n{0}".format(e))
         return
 
