@@ -66,12 +66,6 @@ except ImportError:
     pass
 
 try:
-    from myhdl import __version__ as VERSION_HDL
-except (ImportError,SyntaxError):
-    VERSION_HDL = None
-VERSION.update({'myhdl': VERSION_HDL})
-
-try:
     import migen
     VERSION_MIGEN = "installed"
 except (ImportError,SyntaxError):
