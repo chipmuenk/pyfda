@@ -40,19 +40,19 @@ class FIR_DF(QWidget):
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
     """
-    def __init__(self, parent):
+    def __init__(self, parent, fxqc_dict={}):
         super(FIR_DF, self).__init__(parent)
 
         self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
                       "Standard FIR topology.")
         self.img_name = "fir_df.png"
 
-        self._construct_UI()
+        self._construct_UI(fxqc_dict)
         # Construct an instance of the HDL filter object
         self.construct_hdlfilter() # construct instance self.hdlfilter with dummy data
 #------------------------------------------------------------------------------
 
-    def _construct_UI(self):
+    def _construct_UI(self, fxqc_dict):
         """
         Intitialize the UI with widgets for coefficient format and input and 
         output quantization
@@ -65,8 +65,9 @@ class FIR_DF(QWidget):
         self.wdg_q_coeffs = UI_Q_coeffs(self, enabled=False,
                                         cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
-        self.wdg_w_accu = UI_W(self, label='Accumulator Format <i>Q<sub>A </sub></i>:', WF=30)
-        self.wdg_q_accu = UI_Q(self)
+        self.wdg_w_accu = UI_W(self, fxqc_dict['QA'],
+                               label='Accumulator Format <i>Q<sub>A </sub></i>:', WF=30)
+        self.wdg_q_accu = UI_Q(self, fxqc_dict['QA'])
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
