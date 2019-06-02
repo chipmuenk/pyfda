@@ -240,4 +240,11 @@ fil[0] = {}
 for k in fil_init:
     fil[0].update({k:fil_init[k]})
 
+# Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
+fxqc_dict =\
+    {'QI': {'WI':0, 'WF':15, 'W':16, 'ovfl':'sat',  'quant':'round'},
+     'QO': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
+     'QA': {'WI':0, 'WF':30, 'W':31, 'ovfl':'wrap', 'quant':'floor'},
+     'QC': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
+        } #: default values
 
