@@ -145,18 +145,18 @@ class FIR_DF(QWidget):
         """
         self.hdlfilter = FIR(fxqc_dict) # construct HDL filter instance
 #------------------------------------------------------------------------------
-    def get_response(self):
-        """
-        Return filter output.
-
-        Returns
-        -------
-        response(numpy int array) : returns filter output as numpy array
-        """
-        return self.response
-
+#    def get_response(self):
+#        """
+#        Return filter output.
+#
+#        Returns
+#        -------
+#        response(numpy int array) : returns filter output as numpy array
+#        """
+#        return self.response
+#
 #------------------------------------------------------------------------------
-    def to_verilog(self, fxqc_dict):
+    def to_verilog(self):
         """
         Convert the HDL description to Verilog
         """
