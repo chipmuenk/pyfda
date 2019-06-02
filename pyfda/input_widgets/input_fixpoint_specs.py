@@ -59,9 +59,9 @@ class Input_Fixpoint_Specs(QWidget):
                 " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
         # initialize the dict with the filter quantization settings and coefficients
-        self.fxqc_dict = {'QI':{}, 'QO':{}}
+        # from the filterbroker (fb) default by creating a reference to it
+        self.fxqc_dict = fb.fil[0]['fxqc_dict']
         
-
         if HAS_MIGEN:
             self._construct_UI()
         else:
@@ -155,11 +155,13 @@ class Input_Fixpoint_Specs(QWidget):
         layHBtnsMsg.addStretch(1)
         layHBtnsMsg.addWidget(lblHBtnsMsg2)
 
-        self.wdg_w_input = UI_W(self, label='Input Format <i>Q<sub>X </sub></i>:')
-        self.wdg_q_input = UI_Q(self)
+        self.wdg_w_input = UI_W(self, q_dict = self.fxqc_dict['QI'],
+                                label='Input Format <i>Q<sub>X </sub></i>:')
+        self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'])
 
-        self.wdg_w_output = UI_W(self, label='Output Format <i>Q<sub>Y </sub></i>:')
-        self.wdg_q_output = UI_Q(self)
+        self.wdg_w_output = UI_W(self, q_dict = self.fxqc_dict['QO'],
+                                 label='Output Format <i>Q<sub>Y </sub></i>:')
+        self.wdg_q_output = UI_Q(self, q_dict = self.fxqc_dict['QO'])
 
         layVQioWdg = QVBoxLayout()
         layVQioWdg.addLayout(layHBtnsMsg)

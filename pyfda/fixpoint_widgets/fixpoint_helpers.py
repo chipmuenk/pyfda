@@ -102,13 +102,15 @@ class UI_W(QWidget):
     'fractional'    : True                      # Display WF, otherwise WF=0
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, q_dict = {}, **kwargs):
         super(UI_W, self).__init__(parent)
-        self._construct_UI(**kwargs)
+        self._construct_UI(q_dict, **kwargs)
         self.ui2dict()
 
-    def _construct_UI(self, **kwargs):
-        """ Construct widget from default settings, """
+    def _construct_UI(self, q_dict, **kwargs):
+        """ 
+        Construct widget from quantization dict, individual settings and
+        the default dict below """
 
         # default settings
         dict_ui = {'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
@@ -116,6 +118,9 @@ class UI_W(QWidget):
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
                    'enabled':True, 'visible':True, 'fractional':True
                    } #: default values
+
+        dict_ui.update(q_dict)
+            
         for k, v in kwargs.items():
             if k not in dict_ui:
                 logger.warning("Unknown key {0}".format(k))
@@ -214,11 +219,11 @@ class UI_W_coeffs(UI_W):
     """
     Widget for entering word format (integer and fractional bits) for the 
     oefficients. The result can be read out via the attributes `self.WI` and 
-    `self.WF`. This class inherits from `UI_WI_WF`, overloading the methods `load_ui()`
+    `self.WF`. This class inherits from `UI_W`, overloading the methods `dict2ui())`
     and `ui2dict()` for loading / saving the UI from / to the filter dict.
     """
-    def __init__(self, parent, **kwargs):
-        super(UI_W_coeffs, self).__init__(parent, **kwargs)
+    def __init__(self, parent, q_dict={}, **kwargs):
+        super(UI_W_coeffs, self).__init__(parent, q_dict, **kwargs)
         # __init__ method of parent is used, additionally initialize coefficient dict
         self.c_dict = build_coeff_dict()
         
@@ -270,11 +275,11 @@ class UI_Q(QWidget):
     'visible'  : True                               # Is widget visible?
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, q_dict={}, **kwargs):
         super(UI_Q, self).__init__(parent)
-        self._construct_UI(**kwargs)
+        self._construct_UI(q_dict, **kwargs)
 
-    def _construct_UI(self, **kwargs):
+    def _construct_UI(self, q_dict, **kwargs):
         """ Construct widget """
 
         dict_ui = {'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
@@ -283,6 +288,12 @@ class UI_Q(QWidget):
                    'cmb_ov':['wrap', 'sat'], 'cur_ov':'wrap',
                    'enabled':True, 'visible':True
                    } #: default widget settings
+
+        if 'quant' in q_dict and q_dict['quant'] in dict_ui['cmb_q']:
+            dict_ui['cur_q'] = q_dict['quant']
+        if 'ovfl' in q_dict and q_dict['ovfl'] in dict_ui['cmb_ov']:
+            dict_ui['cur_ov'] = q_dict['ovfl']
+            
         for key, val in kwargs.items():
             dict_ui.update({key:val})
         # dict_ui.update(map(kwargs)) # same as above?

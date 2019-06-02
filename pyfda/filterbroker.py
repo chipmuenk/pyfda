@@ -209,6 +209,14 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             # causal zeros/poles/gain
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
+            'fxqc_dict':
+                {'QI': {'WI':2, 'WF':12, 'W':16, 'ovfl':'sat',  'quant':'round'},
+                 'QO': {'WI':3, 'WF':18, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
+                 'QA': {'WI':0, 'WF':30, 'W':31, 'ovfl':'wrap', 'quant':'floor'},
+                 'QC': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor',
+                        'b':[1,1,1], 'a': [1,0.1,0]}
+                 },
+
             'q_coeff':{'WI':0, 'WF': 15,
                        'quant': 'round', 'ovfl': 'sat', 'frmt':'float', 'scale': 1},
             'sos': [],
@@ -241,10 +249,4 @@ for k in fil_init:
     fil[0].update({k:fil_init[k]})
 
 # Define dictionary with default settings for  FiXpoint Quantization and Coefficients:
-fxqc_dict =\
-    {'QI': {'WI':0, 'WF':15, 'W':16, 'ovfl':'sat',  'quant':'round'},
-     'QO': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
-     'QA': {'WI':0, 'WF':30, 'W':31, 'ovfl':'wrap', 'quant':'floor'},
-     'QC': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
-        } #: default values
 
