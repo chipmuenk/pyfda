@@ -56,7 +56,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.tab_label = 'Fixpoint'
         self.tool_tip = ("<span>Select a fixpoint implementation for the filter,"
-                " simulate it and generate a Verilog / VHDL netlist.</span>")
+                " simulate it or generate a Verilog netlist.</span>")
         self.parent = parent
         # initialize the dict with the filter quantization settings and coefficients
         self.fxqc_dict = {'QI':{}, 'QO':{}}
@@ -542,7 +542,7 @@ class Input_Fixpoint_Specs(QWidget):
             try:
                 self.update_fxqc_dict()
                 self.fx_wdg_inst.construct_hdlfilter(self.fxqc_dict)
-                code = self.fx_wdg_inst.to_verilog(self.fxqc_dict)
+                code = self.fx_wdg_inst.to_verilog()
                 
                 logger.info(str(code))
                 
