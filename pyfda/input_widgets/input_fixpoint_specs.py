@@ -367,7 +367,7 @@ class Input_Fixpoint_Specs(QWidget):
                     self.layHWdg.removeWidget(self.fx_wdg_inst) # remove widget from layout
                     self.fx_wdg_inst.deleteLater() # delete QWidget when scope has been left
                 except AttributeError as e:
-                    logger.error("Could not destruct_UI!\n{0}".format(e))
+                    logger.error("Destructing UI failed!\n{0}".format(e))
 
             self.fx_wdg_found = False
             self.butSimFxPy.setEnabled(False)
