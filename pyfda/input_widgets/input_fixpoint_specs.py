@@ -498,12 +498,6 @@ class Input_Fixpoint_Specs(QWidget):
         else:
             logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           
-    def info_hdl(self, hdl_dict):
-        """
-        Print filter info (not implemented yet)
-        """
-        if hasattr(self.fx_wdg_inst, "hdlfilter") and hasattr(self.fx_wdg_inst, "info"):
-            pass
             
     def exportHDL(self):
         """
@@ -611,7 +605,7 @@ class Input_Fixpoint_Specs(QWidget):
             self.stim = np.round(self.q_i.fixp(dict_sig['fx_stimulus']) * (1 << self.q_i.W-1)).astype(int)
             logger.info("\n Stim:{0}\nFX stim:{1}\n".format( 
                         dict_sig['fx_stimulus'][0:max(len(dict_sig['fx_stimulus']),9)],
-                        self.stim[0:max(len(self.stim),9)]))
+                        self.stim[0:min(len(self.stim),9)]))
 
             # Get the response from the simulation as  integer values
             logger.info("Start fixpoint simulation with stimulus from {0}.".format(dict_sig['sender']))
@@ -621,7 +615,7 @@ class Input_Fixpoint_Specs(QWidget):
                 logger.warning("Fixpoint simulation returned empty results!")
             else:
                 logger.info("FX response: {0}\n"\
-                            .format(self.fx_results[0:max(len(self.fx_results),9)]))
+                            .format(self.fx_results[0:min(len(self.fx_results),9)]))
             #TODO: fixed point / integer to float conversion?
             #TODO: color push-button to show state of simulation
             #TODO: add QTimer single shot
