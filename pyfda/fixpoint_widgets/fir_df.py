@@ -31,28 +31,30 @@ from migen import Signal, Module, run_simulation
 from migen.fhdl import verilog
 ################################
 
-classes = {'FIR_DF':'DF'} #: Dict containing widget class name : display name
+classes = {'FIR_DF_wdg':'FIR_DF'} #: Dict containing widget class name : display name
 
 # =============================================================================
 
-class FIR_DF(QWidget):
+class FIR_DF_wdg(QWidget):
     """
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
     """
     def __init__(self, parent, fxqc_dict={}):
-        super(FIR_DF, self).__init__(parent)
+        super(FIR_DF_wdg, self).__init__(parent)
 
         self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
                       "Standard FIR topology.")
         self.img_name = "fir_df.png"
 
-        self._construct_UI(fxqc_dict)
+        self.fxqc_dict = fb.fil[0]['fxqc']
+        
+        self._construct_UI()
         # Construct an instance of the HDL filter object
         self.construct_hdlfilter() # construct instance self.hdlfilter with dummy data
 #------------------------------------------------------------------------------
 
-    def _construct_UI(self, fxqc_dict):
+    def _construct_UI(self):
         """
         Intitialize the UI with widgets for coefficient format and input and 
         output quantization
@@ -65,9 +67,9 @@ class FIR_DF(QWidget):
         self.wdg_q_coeffs = UI_Q_coeffs(self, enabled=False,
                                         cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
-        self.wdg_w_accu = UI_W(self, fxqc_dict['QA'],
+        self.wdg_w_accu = UI_W(self, self.fxqc_dict['QA'],
                                label='Accumulator Format <i>Q<sub>A </sub></i>:', WF=30)
-        self.wdg_q_accu = UI_Q(self, fxqc_dict['QA'])
+        self.wdg_q_accu = UI_Q(self, self.fxqc_dict['QA'])
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
@@ -139,23 +141,12 @@ class FIR_DF(QWidget):
         return fxqc_dict
     
 #------------------------------------------------------------------------------
-    def construct_hdlfilter(self, fxqc_dict=None):
+    def construct_hdlfilter(self):
         """
         Construct an instance of the HDL filter object using the settings from
         the quantizer dict
         """
-        self.hdlfilter = FIR(fxqc_dict) # construct HDL filter instance
-#------------------------------------------------------------------------------
-#    def get_response(self):
-#        """
-#        Return filter output.
-#
-#        Returns
-#        -------
-#        response(numpy int array) : returns filter output as numpy array
-#        """
-#        return self.response
-#
+        self.hdlfilter = FIR() # construct HDL filter instance
 #------------------------------------------------------------------------------
     def to_verilog(self):
         """
@@ -201,40 +192,41 @@ class FIR_DF(QWidget):
 ###############################################################################
 # A synthesizable FIR filter.
 class FIR(Module):
-    def __init__(self, fxqc_dict):
-        logger.debug(fxqc_dict)
+    def __init__(self):
+        p = fb.fil[0]['fxqc']
+        logger.debug(p)
         # -------------- Get generics -----------------------------------------
-        par = {}
-           # new Key , Key 1 und 2 in fxqc_dict, default value
-        par_list = [['WI', 'QI','W', 16],
-                    ['WO', 'QO','W', 16],
-                    ['WA', 'QA','W', 31],
-                    ['WC', 'QC','W', 16],
-                    ['b',  'QC','b', [1,1,1]]
-                    ]
-        #Automatic : par['WA'] = par['WC'] + par['WI'] =- 1
-        for l in par_list:
-            try:
-                par[l[0]] = fxqc_dict[l[1]][l[2]]
-            except (KeyError, TypeError) as e:
-                logger.warning("Error [{0}][{1}]:\n{2}".format(l[1],l[2],e))
-                par[l[0]] = l[3]
+#        p = {}
+#           # new Key , Key 1 und 2 in fxqc_dict, default value
+#        p_list = [['WI', 'QI','W', 16],
+#                    ['WO', 'QO','W', 16],
+#                    ['WA', 'QA','W', 31],
+#                    ['WC', 'QC','W', 16],
+#                    ['b',  'QC','b', [1,1,1]]
+#                    ]
+        #Automatic : p['WA'] = p['WC'] + p['WI'] =- 1
+#        for l in p_list:
+#            try:
+#                p[l[0]] = fxqc_dict[l[1]][l[2]]
+#            except (KeyError, TypeError) as e:
+#                logger.warning("Error [{0}][{1}]:\n{2}".format(l[1],l[2],e))
+#                p[l[0]] = l[3]
         # ------------- Define I/Os -------------------------------------------
-        self.i = Signal((par['WI'], True)) # input signal
-        self.o = Signal((par['WO'], True)) # output signal
+        self.i = Signal((p['QI']['W'], True)) # input signal
+        self.o = Signal((p['QO']['W'], True)) # output signal
         self.response = []
 
         ###
         muls = []
         src = self.i
-        for c in par['b']:
-            sreg = Signal((par['WI'], True)) # registers for input signal 
+        for c in p['QC']['b']:
+            sreg = Signal((p['QI']['W'], True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
             muls.append(c*sreg)
-        sum_full = Signal((par['WA'], True))
+        sum_full = Signal((p['QA']['W'], True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
-        self.comb += self.o.eq(sum_full >> (par['WA']-par['WO'])) # rescale for output width
+        self.comb += self.o.eq(sum_full >> (p['QA']['W']-p['QO']['W'])) # rescale for output width
 
 #------------------------------------------------------------------------------
 
@@ -242,7 +234,7 @@ if __name__ == '__main__':
 
     from ..compat import QApplication
     app = QApplication(sys.argv)
-    mainw = FIR_DF(None)
+    mainw = FIR_DF_wdg(None)
     mainw.show()
 
     app.exec_()

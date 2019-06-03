@@ -60,7 +60,7 @@ class Input_Fixpoint_Specs(QWidget):
         self.parent = parent
         # initialize the dict with the filter quantization settings and coefficients
         # from the filterbroker (fb) default by creating a reference to it
-        self.fxqc_dict = fb.fil[0]['fxqc_dict']
+        self.fxqc_dict = fb.fil[0]['fxqc']
         
         if HAS_MIGEN:
             self._construct_UI()
@@ -545,7 +545,7 @@ class Input_Fixpoint_Specs(QWidget):
                         os.path.join(hdl_dir_name, hdl_file_name)))
             try:
                 self.update_fxqc_dict()
-                self.fx_wdg_inst.construct_hdlfilter(self.fxqc_dict)
+                self.fx_wdg_inst.construct_hdlfilter()
                 code = self.fx_wdg_inst.to_verilog()
                 
                 logger.info(str(code))
@@ -583,7 +583,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Started HDL fixpoint simulation")
             self.update_fxqc_dict()
-            self.fx_wdg_inst.construct_hdlfilter(self.fxqc_dict)   # setup filter instance         
+            self.fx_wdg_inst.construct_hdlfilter()   # setup filter instance         
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         

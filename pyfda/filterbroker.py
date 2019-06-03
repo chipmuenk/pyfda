@@ -209,7 +209,7 @@ fil_init = {'rt':'LP', 'ft':'FIR', 'fc':'equiripple', 'fo':'man',
             # causal zeros/poles/gain
             'zpk':([-0.5 + 3**0.5/2.j, -0.5 - 3**0.5/2.j],
                    [(2./3)**0.5 * 1j, -(2./3)**0.5 * 1j], 1),
-            'fxqc_dict':
+            'fxqc':
                 {'QI': {'WI':0, 'WF':15, 'W':16, 'ovfl':'sat',  'quant':'round'},
                  'QO': {'WI':0, 'WF':15, 'W':16, 'ovfl':'wrap', 'quant':'floor'},
                  'QA': {'WI':0, 'WF':30, 'W':31, 'ovfl':'wrap', 'quant':'floor'},
