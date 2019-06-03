@@ -69,7 +69,7 @@ or upgrade using
 	
 or install locally using
 
-	pip install -e <YOUR_PATH_TO_PYFDA>
+    pip install -e <YOUR_PATH_TO_PYFDA>
 	
 where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git.
 
@@ -99,7 +99,12 @@ All individual files from pyFDA can be run using e.g.
    
 ### Customization
 
-The layout and some default paths can be customized using the file `pyfda/pyfda_rc.py`.
+The location of the following two configuration files (copied to user space) can be checked via the tab `Files -> About`:
+
+- Logging verbosity can be controlled via the file `pyfda_log.conf` 
+- Widgets and filters can be enabled / disabled via the file `pyfda.conf`. You can also define one or more user directories containing your own widgets and / or filters.
+
+Layout and some default paths can be customized using the file `pyfda/pyfda_rc.py`, at the moment you have to edit that file at its original location.
 
 ### The following features are currently implemented:
 
@@ -139,8 +144,7 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 * **Show-off:** Demonstrate that Python is a potent tool for digital signal processing applications as well. The interfaces for textual filter design routines are a nightmare: linear vs. logarithmic specs, frequencies normalized w.r.t. to sampling or Nyquist frequency, -3 dB vs. -6 dB vs. band-edge frequencies ... (This is due to the different backgrounds and the history of filter design algorithms and not Python-specific.)
 * **Fixpoint filter design for uCs:** Recursive filters have become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable e.g. for uCs.
 * **Fixpoint filter design for FPGAs**: Especially on low-budget FPGAs, multipliers are expensive. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.
-* **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [myHDL](http://myhdl.org) can automate both design and verification.
-
+* **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [migen](https://github.com/m-labs/migen) allows to describe and test fixpoint behaviour within the python ecosystem. providing easy stimulus generation and plotting in time and frequency domain. When everythin works fine, the filter can be exported as synthesizable Verilog code.
 ## Release History / Roadmap
 
 ### Release 0.1 (Jan. 1st 2018)
@@ -153,13 +157,18 @@ Initial release
     * Clearer structure: only one RX / TX signal connection per widget
     * More flexibility: transport dicts or lists via the signals
     * Much improved modularity - new functionality can be easily added
+    
+* **Reorganization of configuration files**
+    * Specify module names instead of class names for widgets, class names are defined in the modules 
+    * More flexibility in defining user directories
+    * List suitable fixpoint implementations for each filter design as well as the other way around
+    
 * **HDL synthesis (beta status, expect bugs)**
     * Use migen to generate synthesizable Verilog netlists for basic filter topologies and do fixpoint simulation 
     * When migen is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
 * **Didactic improvements**
   * Improved display of transient response and FFT of transient response
   * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
-  * Apply filter on audio files (in the h[n] widget) to hear the filtering effect
 * **Documentation using Sphinx / ReadTheDocs**
   Could be more and better ... but hey, it's a start!
 
@@ -170,6 +179,8 @@ Initial release
   * Compare multiple designs in plots
 * **Filter coefficients and poles / zeros**
   * Display and edit second-order sections (SOS) in PZ editor
+  
+* Apply filter on audio files (in the impz widget) to hear the filtering effect
 
 ### Following releases
 * Add a tracking cursor
