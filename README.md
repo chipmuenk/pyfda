@@ -10,7 +10,7 @@ pyFDA
 [![Travis-CI](https://travis-ci.org/chipmuenk/pyFDA.svg?branch=master)](https://travis-ci.org/chipmuenk/pyFDA)
 [![ReadTheDocs](https://readthedocs.org/projects/pyfda/badge/?version=latest)](https://readthedocs.org/projects/pyfda/?badge=latest)
 
-pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. The capability for generating Verilog and VHDL code for the designed and quantized filters will be added in the next release.
+pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete time filters. When the migen module ist installed, fixpoint implementations (for some filter types) can be simulated and exported as synthesizable Verilog netlists.
 
 ![Screenshot](img/pyFDA_screenshot_3.png)
 
