@@ -203,6 +203,7 @@ class FIR_DF(QWidget):
 class FIR(Module):
     def __init__(self, fxqc_dict):
         logger.debug(fxqc_dict)
+        # -------------- Get generics -----------------------------------------
         par = {}
            # new Key , Key 1 und 2 in fxqc_dict, default value
         par_list = [['WI', 'QI','W', 16],
@@ -218,7 +219,7 @@ class FIR(Module):
             except (KeyError, TypeError) as e:
                 logger.warning("Error [{0}][{1}]:\n{2}".format(l[1],l[2],e))
                 par[l[0]] = l[3]
-        
+        # ------------- Define I/Os -------------------------------------------
         self.i = Signal((par['WI'], True)) # input signal
         self.o = Signal((par['WO'], True)) # output signal
         self.response = []
