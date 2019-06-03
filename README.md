@@ -34,57 +34,18 @@ pyFDA is a GUI based tool in Python / Qt for analysing and designing discrete ti
 
 ## Prerequisites
 
-* Python versions: **2.7** or **3.3 ... 3.6**
+* Python versions: **3.3 ... 3.7**
 * All operating systems - there should be no OS specific requirements.
 * Libraries:
-  * **(Py)Qt4** or **(Py)Qt5**. When both libraries are installed, PyQt5 is used.
+  * **(Py)Qt5**
   * **numpy**
   * **scipy**
-  * **matplotlib**
+  * **matplotlib**: **2.0** or higher
 
 Optional libraries:
+* **migen** for fixpoint simulation and Verilog export. When missing, the "Fixpoint" tab is hidden
 * **docutils** for rich text in documentation
 * **xlwt** and / or **XlsxWriter** for exporting filter coefficients as *.xls(x) files
-
-## Release History / Roadmap
-
-### Release 0.1 (Jan. 1st 2018)
-
-Initial release 
-
-### Release 0.2a1 (Apr. 5th 2019)
-
-* **Rework of signal-slot connections**
-    * Clearer structure: only one RX / TX signal connection per widget
-    * More flexibility: transport dicts or lists via the signals
-    * Much improved modularity - new functionality can be easily added
-* **HDL synthesis (very raw with LOTS of bugs)**
-    * Use myHDL to generate synthesizable VHDL / Verilog netlists for basic filter topologies and do fixpoint simulation (plots are displayed in pyFDA widgets)
-    * When myHDL is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
-    * **Attention:** When installing pyFDA with conda, myHDL needs to be installed separately with pip (not available via conda). myHDL     0.1.0 doesn't work with Python 3.7, you either need to go back to Python 3.6 or install bleeding edge myHDL. 
-* **Didactic improvements**
-  * Improved display of transient response and FFT of transient response
-  * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
-  * Apply filter on audio files (in the h[n] widget) to hear the filtering effect
-* **Documentation using Sphinx / ReadTheDocs**
-  Could be more and better ... but hey, it's a start!
-
-### Release 1.0 (planned for some time in the not so near future)
-
-* **Filter Manager**
-  * Store multiple designs in one filter dict
-  * Compare multiple designs in plots
-* **Filter coefficients and poles / zeros**
-  * Display and edit second-order sections (SOS) in PZ editor
-
-### Following releases
-* Add a tracking cursor
-* Graphical modification of poles / zeros
-* Export of filter properties as PDF / HTML files
-* Design, analysis and export of filters as second-order sections
-* Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
-* Export of Python filter objects
-* Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
 
 ## Installing and Starting pyFDA
 There is only one version of pyfda for all supported operating systems, Python and Qt versions. As there are no binaries included, you can simply install from the source.
@@ -179,3 +140,42 @@ The layout and some default paths can be customized using the file `pyfda/pyfda_
 * **Fixpoint filter design for uCs:** Recursive filters have become a niche for experts. Convenient design and simulation support (round-off noise, stability under different quantization options and topologies) could attract more designers to these filters that are easier on hardware resources and much more suitable e.g. for uCs.
 * **Fixpoint filter design for FPGAs**: Especially on low-budget FPGAs, multipliers are expensive. However, there are no good tools for designing and analyzing filters requiring a limited number of multipliers (or none at all) like CIC-, LDI- or Sigma-Delta based designs.
 * **HDL filter implementation:** Implementing a fixpoint filter in VHDL / Verilog without errors requires some experience, verifying the correct performance in a digital design environment with very limited frequency domain simulation options is even harder. The Python module [myHDL](http://myhdl.org) can automate both design and verification.
+
+## Release History / Roadmap
+
+### Release 0.1 (Jan. 1st 2018)
+
+Initial release 
+
+### Release 0.2b1 (May 2019)
+
+* **Rework of signal-slot connections**
+    * Clearer structure: only one RX / TX signal connection per widget
+    * More flexibility: transport dicts or lists via the signals
+    * Much improved modularity - new functionality can be easily added
+* **HDL synthesis (beta status, expect bugs)**
+    * Use migen to generate synthesizable Verilog netlists for basic filter topologies and do fixpoint simulation 
+    * When migen is missing on your system, pyFDA will start without the fixpoint tab but otherwise fully functional
+* **Didactic improvements**
+  * Improved display of transient response and FFT of transient response
+  * Display poles / zeros in the magnitude frequency response to ease understanding the relationship
+  * Apply filter on audio files (in the h[n] widget) to hear the filtering effect
+* **Documentation using Sphinx / ReadTheDocs**
+  Could be more and better ... but hey, it's a start!
+
+### Release 1.0 (planned for some time in the not so near future)
+
+* **Filter Manager**
+  * Store multiple designs in one filter dict
+  * Compare multiple designs in plots
+* **Filter coefficients and poles / zeros**
+  * Display and edit second-order sections (SOS) in PZ editor
+
+### Following releases
+* Add a tracking cursor
+* Graphical modification of poles / zeros
+* Export of filter properties as PDF / HTML files
+* Design, analysis and export of filters as second-order sections
+* Multiplier-free filter designs (CIC, GCIC, LDI, SigmaDelta-Filters, ...)
+* Export of Python filter objects
+* Analysis of different fixpoint filter topologies (direct form, cascaded form, parallel form, ...) concerning overflow and quantization noise
