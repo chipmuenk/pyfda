@@ -6,11 +6,9 @@ from os import path
 
 # @todo: WIP see https://packaging.python.org/en/latest/index.html
 
-
 here = path.abspath(path.dirname(__file__))
-
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README_PYPI.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 # version_nr contains ... well ... the version in the form  __version__ = '0.1b10'
@@ -24,6 +22,7 @@ setup(
     version = version_nr['__version__'],
     description = ('pyFDA is a python tool with a user-friendly GUI for designing '
                  'and analysing discrete time filters.'),
+    long_description_content_type='text/markdown',
     long_description = long_description,
     keywords = ["digital", "discrete time", "filter design", "IIR", "FIR", "GUI"],
     url = 'https://github.com/chipmuenk/pyFDA',
@@ -56,6 +55,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     # automatically find top-level package and sub-packages input_widgets,
     # plot_widgets etc.:
@@ -75,9 +75,8 @@ setup(
         'scipy',
         'matplotlib',
         'docutils',
+        'migen'
         ],
-    #'myhdl >= 0.1.0'
-    # doesn't work with py3.7
 
     # link the executable pyfdax to running the python function main() in the
     # pyfdax module, with and without an attached terminal:
@@ -106,4 +105,3 @@ alongside a set of pyfdax.py and pyfdax_no_term.pyw files. The .exe wrappers fin
 and execute the right version of Python to run the .py or .pyw file.
 """
 # http://locallyoptimal.com/blog/2014/03/14/executable-python-scripts-via-entry-points/
-
