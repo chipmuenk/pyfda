@@ -195,7 +195,6 @@ class FIR_DF_wdg(QWidget):
 class FIR(Module):
     def __init__(self):
         p = fb.fil[0]['fxqc']
-        logger.debug(p)
         # -------------- Get generics -----------------------------------------
 #        p = {}
 #           # new Key , Key 1 und 2 in fxqc_dict, default value
@@ -215,6 +214,8 @@ class FIR(Module):
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((p['QI']['W'], True)) # input signal
         self.o = Signal((p['QO']['W'], True)) # output signal
+        ovfl_o = p['QO']['ovfl']
+        quant_o = p['QO']['quant']
         self.response = []
 
         ###
