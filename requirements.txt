@@ -6,6 +6,7 @@ matplotlib
 pyqt5
 docutils
 nose
+migen
 # pytest
 # coverage
 # coveralls
