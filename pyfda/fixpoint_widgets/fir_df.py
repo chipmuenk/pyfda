@@ -40,7 +40,7 @@ class FIR_DF_wdg(QWidget):
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
     """
-    def __init__(self, parent, fxqc_dict={}):
+    def __init__(self, parent):
         super(FIR_DF_wdg, self).__init__(parent)
 
         self.title = ("<b>Direct-Form (DF) FIR Filter</b><br />"
@@ -154,6 +154,7 @@ class FIR_DF_wdg(QWidget):
         """
         return verilog.convert(self.hdlfilter,
                                ios={self.hdlfilter.i, self.hdlfilter.o}) 
+#------------------------------------------------------------------------------
 
     def fir_tb_stim(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """

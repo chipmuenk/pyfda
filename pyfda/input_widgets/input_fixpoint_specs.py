@@ -389,7 +389,7 @@ class Input_Fixpoint_Specs(QWidget):
             fx_mod = importlib.import_module(fx_mod_name) # get module 
             fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            self.fx_wdg_inst = fx_wdg_class(self, self.fxqc_dict) # instantiate the widget
+            self.fx_wdg_inst = fx_wdg_class(self) # instantiate the fixpoint widget
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.layHWdg.addWidget(self.fx_wdg_inst, stretch=1) # and add it to layout
 
