@@ -285,14 +285,15 @@ class Input_Fixpoint_Specs(QWidget):
         self.cmb_wdg_fixp.clear()
         fc = fb.fil[0]['fc']
         if 'fix' in fb.filter_classes[fc]:
-            for wdg in fb.filter_classes[fc]['fix']:
+            for class_name in fb.filter_classes[fc]['fix']: # get class name
                 try:
-                    mod_name = fb.fixpoint_classes[wdg]['mod']
-                    name = fb.fixpoint_classes[wdg]['name']
-                    self.cmb_wdg_fixp.addItem(wdg, mod_name)
-                    inst_wdg_str += '\t' + wdg + ' : ' + mod_name + '\n'
+                    # construct module + class name
+                    mod_class_name = fb.fixpoint_classes[class_name]['mod'] + '.' + class_name
+                    disp_name = fb.fixpoint_classes[class_name]['name'] # # and display name
+                    self.cmb_wdg_fixp.addItem(disp_name, mod_class_name)
+                    inst_wdg_str += '\t' + class_name + ' : ' + mod_class_name + '\n'
                 except AttributeError as e:
-                    logger.warning('Widget "{0}":\n{1}'.format(wdg,e))
+                    logger.warning('Widget "{0}":\n{1}'.format(class_name,e))
                     continue
                 except Exception as e:
                     logger.warning(e)
@@ -385,9 +386,10 @@ class Input_Fixpoint_Specs(QWidget):
         cmb_wdg_fx_cur = qget_cmb_box(self.cmb_wdg_fixp, data=False)
         if cmb_wdg_fx_cur: # at least one valid fixpoint widget found
             self.fx_wdg_found = True
-            fx_mod_name = qget_cmb_box(self.cmb_wdg_fixp, data=True) # module name and path
-            fx_mod = importlib.import_module(fx_mod_name) # get module 
-            fx_wdg_class = getattr(fx_mod, cmb_wdg_fx_cur) # get class
+            # get list [module name and path, class name]
+            fx_mod_class_name = qget_cmb_box(self.cmb_wdg_fixp, data=True).rsplit('.',1)
+            fx_mod = importlib.import_module(fx_mod_class_name[0]) # get module 
+            fx_wdg_class = getattr(fx_mod, fx_mod_class_name[1]) # get class
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             self.fx_wdg_inst = fx_wdg_class(self) # instantiate the fixpoint widget
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
