@@ -41,7 +41,7 @@ class Delay_wdg(QWidget):
 
         self._construct_UI()
         # Construct an instance of the HDL filter object
-        #self.construct_hdl_filter()
+        self.construct_hdlfilter()
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -77,6 +77,40 @@ class Delay_wdg(QWidget):
         the quantizer dict
         """
         self.hdlfilter = Delay() # construct HDL filter instance
+#------------------------------------------------------------------------------
+    def to_verilog(self):
+        """
+        Convert the HDL description to Verilog
+        """
+        return verilog.convert(self.hdlfilter,
+                               ios={self.hdlfilter.i, self.hdlfilter.o}) 
+#------------------------------------------------------------------------------
+
+    def fir_tb_stim(self, stimulus, inputs, outputs):
+        """ use stimulus list from widget as input to filter """
+        for x in stimulus:
+            yield self.hdlfilter.i.eq(int(x)) # pass one stimulus value to filter
+            inputs.append(x) # and append it to input list
+            outputs.append((yield self.hdlfilter.o)) # append filter output to output list
+            yield # ??
+
+
+#------------------------------------------------------------------------------           
+    def run_sim(self, stimulus):
+        """
+        Pass stimuli and run filter simulation, see 
+        https://reconfig.io/2018/05/hello_world_migen
+        https://github.com/m-labs/migen/blob/master/examples/sim/fir.py        
+        """
+        inputs = []
+        response = []
+        
+        testbench = self.fir_tb_stim(stimulus, inputs, response) 
+            
+        run_simulation(self.hdlfilter, testbench)
+        
+        return response
+###############################################################################
 
 ###############################################################################
 # A synthesizable FIR filter.
@@ -89,6 +123,14 @@ class Delay(Module):
         self.i = Signal((p['QI']['W'], True)) # input signal
         self.o = Signal((p['QO']['W'], True)) # output signal
         self.response = []
+
+        src = self.i
+        for c in range(3):
+            sreg = Signal((p['QI']['W'], True)) # registers for input signal 
+            self.sync += sreg.eq(src)
+            src = sreg
+#        sum_full = Signal((p['QA']['W'], True))
+        self.comb += self.o.eq(sreg >> (p['QI']['W']-p['QO']['W'])) # rescale for output width
 
 #------------------------------------------------------------------------------
 
