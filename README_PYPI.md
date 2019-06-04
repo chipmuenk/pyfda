@@ -29,50 +29,50 @@ There is only one version of pyfda for all supported operating systems, Python a
 ### conda
 If you use the Anaconda distribution, you can install / update pyfda from my Anaconda channel [`Chipmuenk`](https://anaconda.org/Chipmuenk/pyfda) using
 
-    >> conda install -c Chipmuenk pyfda
+    > conda install -c Chipmuenk pyfda
 
 resp.
 
-    >> conda update  -c Chipmuenk pyfda
+    > conda update  -c Chipmuenk pyfda
 
 ### pip
 Otherwise, you can install from PyPI using
 
-    >> pip install pyfda
+    > pip install pyfda
 
 or upgrade using
 
-    >> pip install pyfda -U
+    > pip install pyfda -U
 	
 or install locally using
 
-    >> pip install -e <YOUR_PATH_TO_PYFDA>
+    > pip install -e <YOUR_PATH_TO_PYFDA>
 	
 where the specified path points to `pyfda.setup.py` but without including `setup.py`. In this case, you need to have a local copy of the pyfda project, preferrably using git.
 
 ### setup.py   
 You could also download the zip file from Github and extract it to a directory of your choice. Install it either to your `<python>/Lib/site-packages` subdirectory using
 
-    >> python setup.py install
+    > python setup.py install
 
 or just create a link to where you have copied the python source files (for testing / development) using
 
-    >> python setup.py develop
+    > python setup.py develop
 
 ### Starting pyFDA
 In any case, the start script `pyfdax` has been created in `<python>/Scripts` which should be in your path. So, simply start pyfda using
 
-    >> pyfdax
+    > pyfdax
 
 For development and debugging, you can also run pyFDA using
 
     In [1]: %run -m pyfda.pyfdax # IPython or
-    >> python -m pyfda.pyfdax    # plain python interpreter
+    > python -m pyfda.pyfdax    # plain python interpreter
     
 All individual files from pyFDA can be run using e.g.
 
     In [2]: %run -m pyfda.input_widgets.input_pz    # IPython or 
-    >> python -m pyfda.input_widgets.input_pz       # plain python interpreter
+    > python -m pyfda.input_widgets.input_pz       # plain python interpreter
    
 ### Customization
 
