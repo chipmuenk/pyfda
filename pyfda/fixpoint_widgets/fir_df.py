@@ -27,7 +27,7 @@ from operator import add
 from math import cos, pi
 #from scipy import signal
 
-from migen import Signal, Module, run_simulation
+from migen import Signal, Module, If, run_simulation
 from migen.fhdl import verilog
 ################################
 
@@ -155,7 +155,6 @@ class FIR_DF_wdg(QWidget):
         return verilog.convert(self.hdlfilter,
                                ios={self.hdlfilter.i, self.hdlfilter.o}) 
 #------------------------------------------------------------------------------
-
     def fir_tb_stim(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """
         for x in stimulus:
@@ -175,6 +174,7 @@ class FIR_DF_wdg(QWidget):
             outputs.append((yield self.hdlfilter.o))
             yield
 
+
 #------------------------------------------------------------------------------           
     def run_sim(self, stimulus):
         """
@@ -182,6 +182,7 @@ class FIR_DF_wdg(QWidget):
         https://reconfig.io/2018/05/hello_world_migen
         https://github.com/m-labs/migen/blob/master/examples/sim/fir.py        
         """
+    
         inputs = []
         response = []
         
@@ -214,6 +215,8 @@ class FIR(Module):
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((p['QI']['W'], True)) # input signal
         self.o = Signal((p['QO']['W'], True)) # output signal
+        MIN_o = - 1 << (p['QO']['W'] - 1)
+        MAX_o = -MIN_o - 1
         ovfl_o = p['QO']['ovfl']
         quant_o = p['QO']['quant']
         self.response = []
@@ -228,7 +231,18 @@ class FIR(Module):
             muls.append(c*sreg)
         sum_full = Signal((p['QA']['W'], True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
-        self.comb += self.o.eq(sum_full >> (p['QA']['W']-p['QO']['W'])) # rescale for output width
+        if ovfl_o == 'wrap':
+            self.comb += self.o.eq(sum_full >> (p['QA']['W']-p['QO']['W'])) # rescale for output width
+        else:
+            self.comb += \
+                If(sum_full < MIN_o,
+                    self.o.eq(MIN_o)
+                ).Elif(sum_full > MAX_o,
+                    self.o.eq(MAX_o)
+                ).Else(self.o.eq(sum_full >> (p['QA']['W']-p['QO']['W']))
+                )
+            
+
 
 #------------------------------------------------------------------------------
 
