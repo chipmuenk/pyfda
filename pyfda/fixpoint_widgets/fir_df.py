@@ -68,8 +68,10 @@ class FIR_DF_wdg(QWidget):
                                         cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
         self.wdg_w_accu = UI_W(self, self.fxqc_dict['QA'],
-                               label='Accumulator Format <i>Q<sub>A </sub></i>:', WF=30)
-        self.wdg_q_accu = UI_Q(self, self.fxqc_dict['QA'])
+                               label='Accumulator Width <i>W<sub>A </sub></i>:',
+                               WI=30, fractional=False)
+        self.ui2dict()
+        #self.wdg_q_accu = UI_Q(self, self.fxqc_dict['QA'])
 #------------------------------------------------------------------------------
 
         layVWdg = QVBoxLayout()
@@ -79,7 +81,6 @@ class FIR_DF_wdg(QWidget):
         layVWdg.addWidget(self.wdg_q_coeffs)
 
         layVWdg.addWidget(self.wdg_w_accu)
-        layVWdg.addWidget(self.wdg_q_accu)
 
         layVWdg.addStretch()
 
@@ -213,36 +214,43 @@ class FIR(Module):
 #                logger.warning("Error [{0}][{1}]:\n{2}".format(l[1],l[2],e))
 #                p[l[0]] = l[3]
         # ------------- Define I/Os -------------------------------------------
-        self.i = Signal((p['QI']['W'], True)) # input signal
-        self.o = Signal((p['QO']['W'], True)) # output signal
-        MIN_o = - 1 << (p['QO']['W'] - 1)
-        MAX_o = -MIN_o - 1
         ovfl_o = p['QO']['ovfl']
         quant_o = p['QO']['quant']
+
+        WI = p['QI']['W']
+        WO = p['QO']['W']
+        # saturation logic doesn't make much sense with a FIR filter, this is 
+        # just for demonstration
+        if ovfl_o == 'wrap':
+            WA = p['QA']['W']
+        else:
+            WA = p['QA']['W'] + 1 # add one guard bit
+        self.i = Signal((WI, True)) # input signal
+        self.o = Signal((WO, True)) # output signal
+        MIN_o = - 1 << (WO - 1)
+        MAX_o = -MIN_o - 1
         self.response = []
 
         ###
         muls = []
         src = self.i
         for c in p['QC']['b']:
-            sreg = Signal((p['QI']['W'], True)) # registers for input signal 
+            sreg = Signal((WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
             muls.append(c*sreg)
-        sum_full = Signal((p['QA']['W'], True))
+        sum_full = Signal((WA, True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
         if ovfl_o == 'wrap':
-            self.comb += self.o.eq(sum_full >> (p['QA']['W']-p['QO']['W'])) # rescale for output width
+            self.comb += self.o.eq(sum_full >> (WA-WO)) # rescale for output width
         else:
             self.comb += \
-                If(sum_full < MIN_o,
+                If(sum_full[WA-2:] == 0b01,
                     self.o.eq(MIN_o)
-                ).Elif(sum_full > MAX_o,
+                ).Elif(sum_full[WA-2:] == 0b10,
                     self.o.eq(MAX_o)
-                ).Else(self.o.eq(sum_full >> (p['QA']['W']-p['QO']['W']))
+                ).Else(self.o.eq(sum_full >> (WA-WO-1))
                 )
-            
-
 
 #------------------------------------------------------------------------------
 
