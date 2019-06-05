@@ -371,7 +371,7 @@ class Input_Fixpoint_Specs(QWidget):
                     logger.error("Destructing UI failed!\n{0}".format(e))
 
             self.fx_wdg_found = False
-            self.butSimFxPy.setEnabled(False)
+            self.butSimFxPy.setVisible(False)
             self.butSimHDL.setEnabled(False)
             self.butExportHDL.setEnabled(False)
             self.img_fixp = QPixmap("no_fx_filter.png")
@@ -441,7 +441,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fxpy_filter_inst = self.fx_wdg_inst.fxpy_filter
                 self.butSimFxPy.setEnabled(True)
             else:
-                self.butSimFxPy.setEnabled(False)
+                self.butSimFxPy.setVisible(False)
                 
             #--- Check whether fixpoint widget contains HDL filters -----
             if hasattr(self.fx_wdg_inst,'hdlfilter'):
