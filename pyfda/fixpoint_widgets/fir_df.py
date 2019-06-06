@@ -245,9 +245,9 @@ class FIR(Module):
             self.comb += self.o.eq(sum_full >> (WA-WO)) # rescale for output width
         else:
             self.comb += \
-                If(sum_full[WA-2:] == 0b01,
+                If(sum_full[WA-2:] == 0b10,
                     self.o.eq(MIN_o)
-                ).Elif(sum_full[WA-2:] == 0b10,
+                ).Elif(sum_full[WA-2:] == 0b01,
                     self.o.eq(MAX_o)
                 ).Else(self.o.eq(sum_full >> (WA-WO-1))
                 )
