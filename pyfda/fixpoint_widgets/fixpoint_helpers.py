@@ -17,7 +17,8 @@ import pyfda.filterbroker as fb
 import pyfda.pyfda_fix_lib as fix
 
 from ..compat import (QWidget, QLabel, QLineEdit, QComboBox,
-                      QVBoxLayout, QHBoxLayout, QFrame)
+                      QVBoxLayout, QHBoxLayout, QFrame,
+                      pyqtSignal)
 
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
@@ -101,6 +102,10 @@ class UI_W(QWidget):
     'visible'       : True                      # Is widget visible?
     'fractional'    : True                      # Display WF, otherwise WF=0
     """
+    # incoming, 
+    #sig_rx = pyqtSignal(object)
+    # outcgoing
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, q_dict = {}, **kwargs):
         super(UI_W, self).__init__(parent)
@@ -195,7 +200,12 @@ class UI_W(QWidget):
         self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos'))
         self.ledWF.setText(qstr(self.WF))
         self.W = int(self.WI + self.WF + 1)
+    
+        dict_sig = {'sender':__name__, 'fixp_changed':''}
+        self.sig_tx.emit(dict_sig)
+
         return {'WI':self.WI, 'WF':self.WF, 'W':self.W}
+
         
     #--------------------------------------------------------------------------
     def dict2ui(self, w_dict):
@@ -274,6 +284,10 @@ class UI_Q(QWidget):
     'enabled'  : True                               # Is widget enabled?
     'visible'  : True                               # Is widget visible?
     """
+    # incoming, 
+    #sig_rx = pyqtSignal(object)
+    # outcgoing
+    sig_tx = pyqtSignal(object)
 
     def __init__(self, parent, q_dict={}, **kwargs):
         super(UI_Q, self).__init__(parent)
@@ -351,6 +365,10 @@ class UI_Q(QWidget):
         """ Update the attributes `self.ovfl` and `self.quant` from the UI"""
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
+        
+        dict_sig = {'sender':__name__, 'fixp_changed':''}
+        self.sig_tx.emit(dict_sig)
+
 
     #--------------------------------------------------------------------------
     def dict2ui(self, q_dict):

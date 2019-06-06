@@ -99,6 +99,11 @@ class Input_Fixpoint_Specs(QWidget):
             # update fields in the filter topology widget - wordlength may have
             # been changed. Also set RUN button to "changed"
             self.wdg_dict2ui()
+        if 'fixp_changed' in dict_sig:
+            # fixpoint settings have been changed somewhere, 
+            # Also set RUN button to "changed"
+            self.wdg_dict2ui()
+
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'init':
                 self.fx_sim_init() # not implemented: what should it do?
         if 'fx_sim' in dict_sig and dict_sig['fx_sim'] == 'start':
@@ -157,11 +162,17 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_w_input = UI_W(self, q_dict = self.fxqc_dict['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:')
+        self.wdg_w_input.sig_tx.connect(self.process_sig_rx)
+        
         self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'])
-
+        self.wdg_q_input.sig_tx.connect(self.process_sig_rx)
+        
         self.wdg_w_output = UI_W(self, q_dict = self.fxqc_dict['QO'],
                                  label='Output Format <i>Q<sub>Y </sub></i>:')
+        self.wdg_w_output.sig_tx.connect(self.sig_rx)
+
         self.wdg_q_output = UI_Q(self, q_dict = self.fxqc_dict['QO'])
+        self.wdg_q_output.sig_tx.connect(self.sig_rx)
 
         layVQioWdg = QVBoxLayout()
         layVQioWdg.addLayout(layHBtnsMsg)
@@ -169,7 +180,7 @@ class Input_Fixpoint_Specs(QWidget):
         layVQioWdg.addWidget(self.wdg_q_input)
         layVQioWdg.addWidget(self.wdg_w_output)
         layVQioWdg.addWidget(self.wdg_q_output)
-
+        
         # This frame encompasses the HDL buttons sim and convert
         frmQioWdg = QFrame(self)
         #frmBtns.setFrameStyle(QFrame.StyledPanel|QFrame.Sunken)
@@ -410,8 +421,8 @@ class Input_Fixpoint_Specs(QWidget):
             #---- connect signals to fx_wdg_inst ----
             if hasattr(self.fx_wdg_inst, "sig_rx"):
                 self.sig_rx.connect(self.fx_wdg_inst.sig_rx)
-            #if hasattr(self.fx_wdg_inst, "sig_tx"):
-                #self.fx_wdg_inst.sig_tx.connect(self.sig_rx)
+            if hasattr(self.fx_wdg_inst, "sig_tx"):
+                self.fx_wdg_inst.sig_tx.connect(self.sig_rx)
 
             #---- instantiate and scale graphic of filter topology ----        
             if not (hasattr(self.fx_wdg_inst, "img_name") and self.fx_wdg_inst.img_name): # is an image name defined?
