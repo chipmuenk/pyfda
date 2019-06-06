@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
 
-from ..compat import QWidget, QVBoxLayout
+from ..compat import QWidget, QVBoxLayout, pyqtSignal
 
 #import pyfda.pyfda_fix_lib as fx
 from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
@@ -40,6 +40,12 @@ class FIR_DF_wdg(QWidget):
     Widget for entering word formats & quantization, also instantiates fixpoint
     filter class :class:`FilterFIR`.
     """
+    # incoming, 
+    #sig_rx = pyqtSignal(object)
+    # outcgoing
+    #sig_tx = pyqtSignal(object)
+
+
     def __init__(self, parent):
         super(FIR_DF_wdg, self).__init__(parent)
 
