@@ -109,22 +109,23 @@ class UI_W(QWidget):
 
     def __init__(self, parent, q_dict = {}, **kwargs):
         super(UI_W, self).__init__(parent)
-        self._construct_UI(q_dict, **kwargs)
+        self.q_dict = q_dict
+        self._construct_UI(**kwargs)
         self.ui2dict()
 
-    def _construct_UI(self, q_dict, **kwargs):
+    def _construct_UI(self, **kwargs):
         """ 
         Construct widget from quantization dict, individual settings and
         the default dict below """
 
         # default settings
-        dict_ui = {'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
+        dict_ui = {'label':'WI.WF', 'id':None, 'lbl_sep':'.', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
                    'enabled':True, 'visible':True, 'fractional':True
                    } #: default values
 
-        dict_ui.update(q_dict)
+        dict_ui.update(self.q_dict)
             
         for k, v in kwargs.items():
             if k not in dict_ui:
@@ -204,6 +205,7 @@ class UI_W(QWidget):
         dict_sig = {'sender':__name__, 'fixp_changed':''}
         self.sig_tx.emit(dict_sig)
 
+        self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})
         return {'WI':self.WI, 'WF':self.WF, 'W':self.W}
 
         
@@ -276,9 +278,13 @@ class UI_Q(QWidget):
     Widget for selecting quantization / overflow options. The result can be read out
     via the attributes `self.ovfl` and `self.quant`.
     
-    The constructor accepts a dictionary for initial widget settings.
+    The constructor accepts a reference to the quantization dictionary for
+    initial widget settings and for (re-)storing values.
+    
     The following keys are defined; default values are used for missing keys:
 
+    'fx_key'   : None                               # Key for accessing fxqc_dict,
+                                                    # e.g. q_dict[fx_key]['WI'] = 15
     'label_q'  : 'Quant.'                           # widget label
     'tip_q'    : 'Select the kind of quantization.' # Mouse-over tooltip
     'enabled'  : True                               # Is widget enabled?
@@ -291,22 +297,23 @@ class UI_Q(QWidget):
 
     def __init__(self, parent, q_dict={}, **kwargs):
         super(UI_Q, self).__init__(parent)
-        self._construct_UI(q_dict, **kwargs)
+        self.q_dict = q_dict
+        self._construct_UI(**kwargs)
 
-    def _construct_UI(self, q_dict, **kwargs):
+    def _construct_UI(self, **kwargs):
         """ Construct widget """
 
-        dict_ui = {'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
+        dict_ui = {'fx_key': None, 'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
                    'cmb_q':['round', 'fix', 'floor'], 'cur_q':'round',
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
                    'cmb_ov':['wrap', 'sat'], 'cur_ov':'wrap',
                    'enabled':True, 'visible':True
                    } #: default widget settings
 
-        if 'quant' in q_dict and q_dict['quant'] in dict_ui['cmb_q']:
-            dict_ui['cur_q'] = q_dict['quant']
-        if 'ovfl' in q_dict and q_dict['ovfl'] in dict_ui['cmb_ov']:
-            dict_ui['cur_ov'] = q_dict['ovfl']
+        if 'quant' in self.q_dict and self.q_dict['quant'] in dict_ui['cmb_q']:
+            dict_ui['cur_q'] = self.q_dict['quant']
+        if 'ovfl' in self.q_dict and self.q_dict['ovfl'] in dict_ui['cmb_ov']:
+            dict_ui['cur_ov'] = self.q_dict['ovfl']
             
         for key, val in kwargs.items():
             dict_ui.update({key:val})
@@ -365,6 +372,9 @@ class UI_Q(QWidget):
         """ Update the attributes `self.ovfl` and `self.quant` from the UI"""
         self.ovfl = self.cmbOvfl.currentText()
         self.quant = self.cmbQuant.currentText()
+        
+        self.q_dict.update({'ovfl': self.cmbOvfl.currentText(),
+                            'quant': self.cmbQuant.currentText()})
         
         dict_sig = {'sender':__name__, 'fixp_changed':''}
         self.sig_tx.emit(dict_sig)

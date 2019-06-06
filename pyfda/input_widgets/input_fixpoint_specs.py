@@ -151,7 +151,9 @@ class Input_Fixpoint_Specs(QWidget):
         self.frmTitle.setContentsMargins(*params['wdg_margins'])
 
 #------------------------------------------------------------------------------
-#       Input and Output Quantizer 
+#       Input and Output Quantizer
+#       - instantiate widgets for input and output quantizer
+#       - pass the quantization (sub-?) dictionary to the constructor     
 #------------------------------------------------------------------------------        
         lblHBtnsMsg1 = QLabel("<b>Fixpoint signal / coeff. formats:</b>", self)
         lblHBtnsMsg2 = QLabel("<b>WI.WF  </b>", self)
@@ -493,21 +495,21 @@ class Input_Fixpoint_Specs(QWidget):
                 self.fxqc_dict.update(self.fx_wdg_inst.ui2dict())
 
             # update the fxqc_dict with the settings of the input quantizer  
-            self.fxqc_dict.update({'QI':{'WI': self.wdg_w_input.WI,
-                       'WF': self.wdg_w_input.WF,
-                       'W':  self.wdg_w_input.W,
-                       'ovfl': self.wdg_q_input.ovfl,
-                       'quant': self.wdg_q_input.quant
-                       }
-                })
-            # output quantization parameters
-            self.fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
-                               'WF':self.wdg_w_output.WF,
-                               'W':self.wdg_w_output.W,
-                               'ovfl': self.wdg_q_output.ovfl,
-                               'quant': self.wdg_q_output.quant
-                               }
-                        })
+#            self.fxqc_dict.update({'QI':{'WI': self.wdg_w_input.WI,
+#                       'WF': self.wdg_w_input.WF,
+#                       'W':  self.wdg_w_input.W,
+#                       'ovfl': self.wdg_q_input.ovfl,
+#                       'quant': self.wdg_q_input.quant
+#                       }
+#                })
+#            # output quantization parameters
+#            self.fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
+#                               'WF':self.wdg_w_output.WF,
+#                               'W':self.wdg_w_output.W,
+#                               'ovfl': self.wdg_q_output.ovfl,
+#                               'quant': self.wdg_q_output.quant
+#                               }
+#                        })
 
             self.q_i = fx.Fixed(self.fxqc_dict['QI']) # setup quantizer for input quantization
             self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
