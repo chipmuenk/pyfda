@@ -35,7 +35,7 @@ from matplotlib import __version__ as VERSION_MPL
 from .compat import QT_VERSION_STR # imports pyQt
 
 __all__ = ['cmp_version', 'mod_version', 
-           'unicode_23', 'clean_ascii', 'qstr', 'safe_eval',
+           'set_dict_defaults', 'clean_ascii', 'qstr', 'safe_eval',
            'dB', 'lin2unit', 'unit2lin', 
            'cround', 'H_mag', 'cmplx_sort', 'unique_roots', 'impz',
            'expand_lim', 'format_ticks', 'fil_save', 'fil_convert', 'sos2zpk',
@@ -246,6 +246,19 @@ def qstr(text):
 
 ###############################################################################
 #### General functions ########################################################
+
+def set_dict_defaults(d, default_dict):
+    """
+    Add the key:value pairs of `default_dict` to dictionary `d` for all missing
+    keys
+    """
+    if d is None or d == {}:
+        d = default_dict
+    else:
+        for k,v in default_dict.items():
+            if not k in d:
+                d[k] = v
+#------------------------------------------------------------------------------
 
 def safe_eval(expr, alt_expr=0, return_type="float", sign=None):
     """
