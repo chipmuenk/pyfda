@@ -178,25 +178,6 @@ MAX_FSB_AMP = 0.45  # min stop band attenuation FIR
 ###############################################################################
 #### Py2/3 functions ########################################################
 
-
-def unicode_23(string):
-    """
-    Convert string to unicode string under Python 2.x. Python 3.x uses unicode
-    strings anyway.
-    
-    Parameters
-    ----------
-    string: str
-        This is a unicode string under Python 3 and a "normal" string under Python 2.
-
-    Returns
-    -------
-    unicode string
-
-    """
-
-    return string
-
 def clean_ascii(arg):
     """
     Remove non-ASCII-characters (outside range 0 ... x7F) from `arg` when it 
