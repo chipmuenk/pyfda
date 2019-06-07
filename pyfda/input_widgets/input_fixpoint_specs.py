@@ -164,10 +164,10 @@ class Input_Fixpoint_Specs(QWidget):
 
         self.wdg_w_input = UI_W(self, q_dict = self.fxqc_dict['QI'],
                                 label='Input Format <i>Q<sub>X </sub></i>:')
-        self.wdg_w_input.sig_tx.connect(self.process_sig_rx)
+        self.wdg_w_input.sig_tx.connect(self.sig_rx)
         
         self.wdg_q_input = UI_Q(self, q_dict = self.fxqc_dict['QI'])
-        self.wdg_q_input.sig_tx.connect(self.process_sig_rx)
+        self.wdg_q_input.sig_tx.connect(self.sig_rx)
         
         self.wdg_w_output = UI_W(self, q_dict = self.fxqc_dict['QO'],
                                  label='Output Format <i>Q<sub>Y </sub></i>:')
@@ -485,35 +485,17 @@ class Input_Fixpoint_Specs(QWidget):
 #------------------------------------------------------------------------------
     def update_fxqc_dict(self):
         """
-        Update the fxqc dictionary before simulation / HDL generation starts. It
-        is NOT updated each time one of the relevant widgets changes ("lazy update").
-         This avoids having to connect and disconnect all sorts of signals and slots.
+        Update the fxqc dictionary before simulation / HDL generation starts.
         """
         if self.fx_wdg_found:
             # get a dict with the coefficients and fixpoint settings from fixpoint widget
             if hasattr(self.fx_wdg_inst, "ui2dict"):
                 self.fxqc_dict.update(self.fx_wdg_inst.ui2dict())
 
-            # update the fxqc_dict with the settings of the input quantizer  
-#            self.fxqc_dict.update({'QI':{'WI': self.wdg_w_input.WI,
-#                       'WF': self.wdg_w_input.WF,
-#                       'W':  self.wdg_w_input.W,
-#                       'ovfl': self.wdg_q_input.ovfl,
-#                       'quant': self.wdg_q_input.quant
-#                       }
-#                })
-#            # output quantization parameters
-#            self.fxqc_dict.update({'QO':{'WI':self.wdg_w_output.WI,
-#                               'WF':self.wdg_w_output.WF,
-#                               'W':self.wdg_w_output.W,
-#                               'ovfl': self.wdg_q_output.ovfl,
-#                               'quant': self.wdg_q_output.quant
-#                               }
-#                        })
-
             self.q_i = fx.Fixed(self.fxqc_dict['QI']) # setup quantizer for input quantization
             self.q_i.setQobj({'frmt':'dec'})#, 'scale':'int'}) # always use integer decimal format
             self.q_o = fx.Fixed(self.fxqc_dict['QO']) # setup quantizer for output quantization
+            # TODO:  is the output quantizer really needed? Isn't it part of the migen implementation?
         else:
             logger.error("No fixpoint widget found!")
 #------------------------------------------------------------------------------           

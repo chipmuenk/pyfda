@@ -107,9 +107,10 @@ class UI_W(QWidget):
     # outcgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, q_dict = {}, **kwargs):
+    def __init__(self, parent, q_dict, **kwargs):
         super(UI_W, self).__init__(parent)
         self.q_dict = q_dict
+        logger.warning(self.q_dict)
         self._construct_UI(**kwargs)
         self.ui2dict()
 
@@ -119,13 +120,14 @@ class UI_W(QWidget):
         the default dict below """
 
         # default settings
-        dict_ui = {'label':'WI.WF', 'id':None, 'lbl_sep':'.', 'max_led_width':30,
+        dict_ui = {'label':'WI.WF', 'lbl_sep':'.', 'max_led_width':30,
                    'WI':0, 'WI_len':2, 'tip_WI':'Number of integer bits',
                    'WF':15,'WF_len':2, 'tip_WF':'Number of fractional bits',
                    'enabled':True, 'visible':True, 'fractional':True
                    } #: default values
 
-        dict_ui.update(self.q_dict)
+        if self.q_dict:
+            dict_ui.update(self.q_dict)
             
         for k, v in kwargs.items():
             if k not in dict_ui:
@@ -138,6 +140,11 @@ class UI_W(QWidget):
             dict_ui['WF'] = 0
         self.WI = dict_ui['WI']
         self.WF = dict_ui['WF']
+        self.W = int(self.WI + self.WF + 1)
+        if self.q_dict:
+            self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})
+        else:
+            self.q_dict = {'WI':self.WI, 'WF':self.WF, 'W':self.W}
 
         lblW = QLabel(to_html(dict_ui['label'], frmt='bi'), self)
         self.ledWI = QLineEdit(self)
@@ -201,13 +208,11 @@ class UI_W(QWidget):
         self.WF = int(safe_eval(self.ledWF.text(), self.WF, return_type="int", sign='pos'))
         self.ledWF.setText(qstr(self.WF))
         self.W = int(self.WI + self.WF + 1)
-    
-        dict_sig = {'sender':__name__, 'fixp_changed':''}
-        self.sig_tx.emit(dict_sig)
 
         self.q_dict.update({'WI':self.WI, 'WF':self.WF, 'W':self.W})
-        return {'WI':self.WI, 'WF':self.WF, 'W':self.W}
-
+        
+        dict_sig = {'sender':__name__, 'fixp_changed':''}
+        self.sig_tx.emit(dict_sig)
         
     #--------------------------------------------------------------------------
     def dict2ui(self, w_dict):
@@ -234,7 +239,7 @@ class UI_W_coeffs(UI_W):
     `self.WF`. This class inherits from `UI_W`, overloading the methods `dict2ui())`
     and `ui2dict()` for loading / saving the UI from / to the filter dict.
     """
-    def __init__(self, parent, q_dict={}, **kwargs):
+    def __init__(self, parent, q_dict, **kwargs):
         super(UI_W_coeffs, self).__init__(parent, q_dict, **kwargs)
         # __init__ method of parent is used, additionally initialize coefficient dict
         self.c_dict = build_coeff_dict()
@@ -255,7 +260,7 @@ class UI_W_coeffs(UI_W):
         fb.fil[0]["q_coeff"].update({'WI':self.WI, 'WF':self.WF})
         self.W = int(self.WI + self.WF + 1)
 
-    def dict2ui(self, c_dict=None):
+    def dict2ui(self, c_dict):
         """ 
         Update the ui and the attributes `self.WI` and `self.WF` from the filter
         dict. `dict2ui()` has to be called when the coefficients or the word
@@ -283,8 +288,6 @@ class UI_Q(QWidget):
     
     The following keys are defined; default values are used for missing keys:
 
-    'fx_key'   : None                               # Key for accessing fxqc_dict,
-                                                    # e.g. q_dict[fx_key]['WI'] = 15
     'label_q'  : 'Quant.'                           # widget label
     'tip_q'    : 'Select the kind of quantization.' # Mouse-over tooltip
     'enabled'  : True                               # Is widget enabled?
@@ -295,7 +298,7 @@ class UI_Q(QWidget):
     # outcgoing
     sig_tx = pyqtSignal(object)
 
-    def __init__(self, parent, q_dict={}, **kwargs):
+    def __init__(self, parent, q_dict, **kwargs):
         super(UI_Q, self).__init__(parent)
         self.q_dict = q_dict
         self._construct_UI(**kwargs)
@@ -303,7 +306,7 @@ class UI_Q(QWidget):
     def _construct_UI(self, **kwargs):
         """ Construct widget """
 
-        dict_ui = {'fx_key': None, 'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
+        dict_ui = {'label_q':'Quant.', 'tip_q':'Select the kind of quantization.',
                    'cmb_q':['round', 'fix', 'floor'], 'cur_q':'round',
                    'label_ov':'Ovfl.', 'tip_ov':'Select overflow behaviour.',
                    'cmb_ov':['wrap', 'sat'], 'cur_ov':'wrap',
@@ -379,7 +382,6 @@ class UI_Q(QWidget):
         dict_sig = {'sender':__name__, 'fixp_changed':''}
         self.sig_tx.emit(dict_sig)
 
-
     #--------------------------------------------------------------------------
     def dict2ui(self, q_dict):
         """ Update UI from passed dictionary """
@@ -392,8 +394,8 @@ class UI_Q_coeffs(UI_Q):
     via the attributes `self.ovfl` and `self.quant`. This class inherits from `UI_Q`,
     overloading the method `load_ui()` for updating the UI from the filter dict.
     """
-    def __init__(self, parent, **kwargs):
-        super(UI_Q_coeffs, self).__init__(parent, **kwargs)
+    def __init__(self, parent, q_dict, **kwargs):
+        super(UI_Q_coeffs, self).__init__(parent, q_dict, **kwargs)
 
         # __init__ method of parent is used, additionally initialize coefficient dict
         self.c_dict = build_coeff_dict()

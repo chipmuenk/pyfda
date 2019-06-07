@@ -14,6 +14,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import pyfda.filterbroker as fb
+from pyfda.pyfda_lib import set_dict_defaults
 
 from ..compat import QWidget, QVBoxLayout, pyqtSignal
 
@@ -41,9 +42,9 @@ class FIR_DF_wdg(QWidget):
     filter class :class:`FilterFIR`.
     """
     # incoming, 
-    #sig_rx = pyqtSignal(object)
+    sig_rx = pyqtSignal(object)
     # outcgoing
-    #sig_tx = pyqtSignal(object)
+    sig_tx = pyqtSignal(object)
 
 
     def __init__(self, parent):
@@ -65,18 +66,25 @@ class FIR_DF_wdg(QWidget):
         Intitialize the UI with widgets for coefficient format and input and 
         output quantization
         """
-        self.wdg_w_coeffs = UI_W_coeffs(self, label='Coefficient Format:', enabled=False,
+        if not 'QA' in self.fxqc_dict:
+            self.fxqc_dict['QA'] = {}
+        set_dict_defaults(self.fxqc_dict['QA'], 
+                          {'WI':30, 'WF':0, 'W':31, 'ovfl':'wrap', 'quant':'floor'})
+        
+        self.wdg_w_coeffs = UI_W_coeffs(self, fb.fil[0]['q_coeff'],
+                                        label='Coefficient Format:',
                                         tip_WI='Number of integer bits - edit in the "b,a" tab',
                                         tip_WF='Number of fractional bits - edit in the "b,a" tab',
                                         WI = fb.fil[0]['q_coeff']['WI'],
                                         WF = fb.fil[0]['q_coeff']['WF'])
-        self.wdg_q_coeffs = UI_Q_coeffs(self, enabled=False,
+        self.wdg_q_coeffs = UI_Q_coeffs(self, fb.fil[0]['q_coeff'],
                                         cur_ov=fb.fil[0]['q_coeff']['ovfl'], 
                                         cur_q=fb.fil[0]['q_coeff']['quant'])
         self.wdg_w_accu = UI_W(self, self.fxqc_dict['QA'],
                                label='Accumulator Width <i>W<sub>A </sub></i>:',
-                               WI=30, fractional=False)
-        self.ui2dict()
+                               fractional=False)
+        self.wdg_w_accu.sig_tx.connect(self.sig_tx)       
+
         #self.wdg_q_accu = UI_Q(self, self.fxqc_dict['QA'])
 #------------------------------------------------------------------------------
 
@@ -85,6 +93,7 @@ class FIR_DF_wdg(QWidget):
         
         layVWdg.addWidget(self.wdg_w_coeffs)
         layVWdg.addWidget(self.wdg_q_coeffs)
+        self.fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
 
         layVWdg.addWidget(self.wdg_w_accu)
 
@@ -104,7 +113,10 @@ class FIR_DF_wdg(QWidget):
         :class:`pyfda.input_widgets.input_fixpoint_specs.Input_Fixpoint_Specs`.
         """
         if not 'QA' in fxqc_dict:
-            fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet 
+            fxqc_dict.update({'QA':{}}) # no accumulator settings in dict yet
+            logger.warning("empty QA")
+        else:
+            logger.warning("QA:{0}".format(fxqc_dict['QA']))
             
         if not 'QC' in fxqc_dict:
             fxqc_dict.update({'QC':{}}) # no coefficient settings in dict yet 
@@ -140,10 +152,8 @@ class FIR_DF_wdg(QWidget):
                :'QC': dictionary with coefficients quantization settings
                 
         """
-        fxqc_dict = {}    
-        fxqc_dict.update({'QC':self.wdg_w_coeffs.c_dict})
-        
-        fxqc_dict.update({'QA': self.wdg_w_accu.ui2dict()})
+   
+        fxqc_dict = {'QC':self.wdg_w_coeffs.c_dict}
         
         return fxqc_dict
     
