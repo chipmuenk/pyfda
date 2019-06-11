@@ -86,7 +86,7 @@ class Delay_wdg(QWidget):
                                ios={self.hdlfilter.i, self.hdlfilter.o}) 
 #------------------------------------------------------------------------------
 
-    def fir_tb_stim(self, stimulus, inputs, outputs):
+    def tb_hdlfilter(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """
         for x in stimulus:
             yield self.hdlfilter.i.eq(int(x)) # pass one stimulus value to filter
@@ -105,7 +105,7 @@ class Delay_wdg(QWidget):
         inputs = []
         response = []
         
-        testbench = self.fir_tb_stim(stimulus, inputs, response) 
+        testbench = self.tb_hdlfilter(stimulus, inputs, response) 
             
         run_simulation(self.hdlfilter, testbench)
         
@@ -117,20 +117,25 @@ class Delay_wdg(QWidget):
 class Delay(Module):
     def __init__(self):
         p = fb.fil[0]['fxqc']
-        logger.debug(p)
-
         # ------------- Define I/Os -------------------------------------------
-        self.i = Signal((p['QI']['W'], True)) # input signal
-        self.o = Signal((p['QO']['W'], True)) # output signal
+        ovfl_o = p['QO']['ovfl']
+        quant_o = p['QO']['quant']
+
+        WI = p['QI']['W']
+        WO = p['QO']['W']
+        N = len(p['QC']['b']) - 1 # number of coefficients = Order + 1
+        # ------------- Define I/Os -------------------------------------------
+        self.i = Signal((WI, True)) # input signal
+        self.o = Signal((WO, True)) # output signal
         self.response = []
 
         src = self.i
-        for c in range(3):
-            sreg = Signal((p['QI']['W'], True)) # registers for input signal 
+        for c in range(N):
+            sreg = Signal((WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
 #        sum_full = Signal((p['QA']['W'], True))
-        self.comb += self.o.eq(sreg >> (p['QI']['W']-p['QO']['W'])) # rescale for output width
+        self.comb += self.o.eq(sreg >> (WI-WO)) # rescale for output width
 
 #------------------------------------------------------------------------------
 

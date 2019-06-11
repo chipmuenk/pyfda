@@ -172,7 +172,7 @@ class FIR_DF_wdg(QWidget):
         return verilog.convert(self.hdlfilter,
                                ios={self.hdlfilter.i, self.hdlfilter.o}) 
 #------------------------------------------------------------------------------
-    def fir_tb_stim(self, stimulus, inputs, outputs):
+    def tb_hdlfilter(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """
         for x in stimulus:
             yield self.hdlfilter.i.eq(int(x)) # pass one stimulus value to filter
@@ -203,7 +203,7 @@ class FIR_DF_wdg(QWidget):
         inputs = []
         response = []
         
-        testbench = self.fir_tb_stim(stimulus, inputs, response) 
+        testbench = self.tb_hdlfilter(stimulus, inputs, response) 
             
         run_simulation(self.hdlfilter, testbench)
         
