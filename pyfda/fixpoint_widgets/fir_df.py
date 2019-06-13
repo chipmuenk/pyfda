@@ -232,18 +232,19 @@ class FIR(Module):
         # ------------- Define I/Os -------------------------------------------
         ovfl_o = p['QO']['ovfl']
         quant_o = p['QO']['quant']
+        logger.warning(quant_o)
 
-        WI = p['QI']['W']
-        WO = p['QO']['W']
+        self.WI = p['QI']['W']
+        self.WO = p['QO']['W']
         # saturation logic doesn't make much sense with a FIR filter, this is 
         # just for demonstration
         if ovfl_o == 'wrap':
             WA = p['QA']['W']
         else:
             WA = p['QA']['W'] + 1 # add one guard bit
-        self.i = Signal((WI, True)) # input signal
-        self.o = Signal((WO, True)) # output signal
-        MIN_o = - 1 << (WO - 1)
+        self.i = Signal((self.WI, True)) # input signal
+        self.o = Signal((self.WO, True)) # output signal
+        MIN_o = - 1 << (self.WO - 1)
         MAX_o = -MIN_o - 1
         self.response = []
 
@@ -251,21 +252,26 @@ class FIR(Module):
         muls = []
         src = self.i
         for c in p['QC']['b']:
-            sreg = Signal((WI, True)) # registers for input signal 
+            sreg = Signal((self.WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
             muls.append(c*sreg)
         sum_full = Signal((WA, True))
+        sum_full_q = Signal((WA, True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
+        if quant_o == 'round':
+            self.comb += sum_full_q.eq(sum_full + (1 << (self.WO - 1)))
+        else:
+            self.comb += sum_full_q.eq(sum_full)        
         if ovfl_o == 'wrap':
-            self.comb += self.o.eq(sum_full >> (WA-WO)) # rescale for output width
+            self.comb += self.o.eq(sum_full >> (WA-self.WO)) # rescale for output width
         else:
             self.comb += \
                 If(sum_full[WA-2:] == 0b10,
                     self.o.eq(MIN_o)
                 ).Elif(sum_full[WA-2:] == 0b01,
                     self.o.eq(MAX_o)
-                ).Else(self.o.eq(sum_full >> (WA-WO-1))
+                ).Else(self.o.eq(sum_full >> (WA-self.WO-1))
                 )
 
 #------------------------------------------------------------------------------
