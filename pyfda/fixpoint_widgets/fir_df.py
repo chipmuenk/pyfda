@@ -277,14 +277,14 @@ class FIR(Module):
         else:
             self.comb += sum_full_q.eq(sum_full)        
         if ovfl_o == 'wrap':
-            self.comb += self.o.eq(sum_full >> (WA-self.WO)) # rescale for output width
+            self.comb += self.o.eq(sum_full_q >> (WA-self.WO)) # rescale for output width
         else:
             self.comb += \
-                If(sum_full[WA-2:] == 0b10,
+                If(sum_full_q[WA-2:] == 0b10,
                     self.o.eq(MIN_o)
-                ).Elif(sum_full[WA-2:] == 0b01,
+                ).Elif(sum_full_q[WA-2:] == 0b01,
                     self.o.eq(MAX_o)
-                ).Else(self.o.eq(sum_full >> (WA-self.WO-1))
+                ).Else(self.o.eq(sum_full_q >> (WA-self.WO-1))
                 )
 
 #------------------------------------------------------------------------------
