@@ -18,7 +18,7 @@ import pyfda.filterbroker as fb
 from ..compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
 
 #from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
-from migen import Signal, Module, run_simulation
+from migen import Signal, Module, If, run_simulation
 from migen.fhdl import verilog
 ################################
 
@@ -121,20 +121,71 @@ class Delay(Module):
         ovfl_o = p['QO']['ovfl']
         quant_o = p['QO']['quant']
 
-        WI = p['QI']['W']
-        WO = p['QO']['W']
+        self.WI = p['QI']['W']
+        self.WO = p['QO']['W']
         N = len(p['QC']['b']) - 1 # number of coefficients = Order + 1
         # ------------- Define I/Os -------------------------------------------
-        self.i = Signal((WI, True)) # input signal
-        self.o = Signal((WO, True)) # output signal
+        self.i = Signal((self.WI, True)) # input signal
+        self.o = Signal((self.WO, True)) # output signal
+        MIN_o = - 1 << (self.WO - 1)
+        MAX_o = -MIN_o - 1
 
         src = self.i
         for c in range(N):
-            sreg = Signal((WI, True)) # registers for input signal 
+            sreg = Signal((self.WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
 #        sum_full = Signal((p['QA']['W'], True))
-        self.comb += self.o.eq(sreg >> (WI-WO)) # rescale for output width
+#        self.comb += self.o.eq(sreg >> (WI-WO)) # rescale for output width
+
+#        delayed = Signal((self.WI, True))
+#        delayed_q = Signal((self.WI, True))
+#        if quant_o == 'round':
+#            self.comb += delayed_q.eq(delayed + (1 << (self.WO - 1)))
+#        else:
+#            self.comb += delayed_q.eq(delayed)        
+#        if ovfl_o == 'wrap':
+#            self.comb += self.o.eq(delayed_q >> (self.WI-self.WO)) # rescale for output width
+#        else:
+#            self.comb += \
+#                If(delayed_q[self.WO-2:] == 0b10,
+#                    self.o.eq(MIN_o)
+#                ).Elif(delayed_q[self.WO-2:] == 0b01,
+#                    self.o.eq(MAX_o)
+#                ).Else(self.o.eq(delayed_q >> (self.WI-self.WO-1))
+#                )
+#
+#        self.comb += self.o.eq(self.i) # rescale for output width
+            
+        self.comb += self.o.eq(self.test(self.i))
+        
+    def test(self, sig_in):
+        MIN_o = - 1 << (self.WO - 1) 
+        sig_o = Signal((self.WO, True))
+        self.comb += sig_o.eq(sig_in)
+        return sig_o
+
+    def sat_quant(self, sig_in, quant_o, ovfl_o):
+        MIN_o = - 1 << (self.WO - 1)
+        MAX_o = -MIN_o - 1
+
+        sig_in_q = Signal((self.WI, True))
+        sig_o = Signal((self.WO, True))
+        if quant_o == 'round':
+            self.comb += sig_in_q.eq(sig_in + (1 << (self.WO - 1)))
+        else:
+            self.comb += sig_in_q.eq(sig_in)        
+        if ovfl_o == 'wrap':
+            self.comb += sig_o.eq(sig_in_q >> (self.WI-self.WO)) # rescale for output width
+        else:
+            self.comb += \
+                If(sig_o[self.WO-2:] == 0b10,
+                    sig_o.eq(MIN_o)
+                ).Elif(sig_o[self.WO-2:] == 0b01,
+                    sig_o.eq(MAX_o)
+                ).Else(sig_o.eq(sig_in_q >> (self.WI-self.WO-1))
+                )
+        return sig_o
 
 #------------------------------------------------------------------------------
 
