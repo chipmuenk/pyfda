@@ -127,7 +127,6 @@ class Delay(Module):
         # ------------- Define I/Os -------------------------------------------
         self.i = Signal((WI, True)) # input signal
         self.o = Signal((WO, True)) # output signal
-        self.response = []
 
         src = self.i
         for c in range(N):

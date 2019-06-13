@@ -259,7 +259,6 @@ class FIR(Module):
         self.o = Signal((self.WO, True)) # output signal
         MIN_o = - 1 << (self.WO - 1)
         MAX_o = -MIN_o - 1
-        self.response = []
 
         ###
         muls = []
