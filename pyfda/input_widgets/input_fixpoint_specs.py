@@ -370,7 +370,7 @@ class Input_Fixpoint_Specs(QWidget):
 
         - Update the UI of the widget
 
-        - Try to instantiate HDL filter as `self.fx_wdg_inst.hdlfilter` with 
+        - Try to instantiate HDL filter as `self.fx_wdg_inst.fixp_filter` with 
             dummy data
         """
 
@@ -457,7 +457,7 @@ class Input_Fixpoint_Specs(QWidget):
                 self.butSimFxPy.setVisible(False)
                 
             #--- Check whether fixpoint widget contains HDL filters -----
-            if hasattr(self.fx_wdg_inst,'hdlfilter'):
+            if hasattr(self.fx_wdg_inst,'fixp_filter'):
                 self.butExportHDL.setEnabled(hasattr(self.fx_wdg_inst, "to_verilog"))
                 self.butSimHDL.setEnabled(hasattr(self.fx_wdg_inst, "run_sim"))
                 self.update_fxqc_dict()
@@ -542,7 +542,7 @@ class Input_Fixpoint_Specs(QWidget):
                         os.path.join(hdl_dir_name, hdl_file_name)))
             try:
                 self.update_fxqc_dict()
-                self.fx_wdg_inst.construct_hdlfilter()
+                self.fx_wdg_inst.construct_fixp_filter()
                 code = self.fx_wdg_inst.to_verilog()
                 
                 logger.info(str(code))
@@ -580,7 +580,7 @@ class Input_Fixpoint_Specs(QWidget):
         try:
             logger.info("Started HDL fixpoint simulation")
             self.update_fxqc_dict()
-            self.fx_wdg_inst.construct_hdlfilter()   # setup filter instance         
+            self.fx_wdg_inst.construct_fixp_filter()   # setup filter instance         
             dict_sig = {'sender':__name__, 'fx_sim':'get_stimulus', 'hdl_dict':self.fxqc_dict}
             self.sig_tx.emit(dict_sig)
                         
@@ -626,7 +626,7 @@ class Input_Fixpoint_Specs(QWidget):
 #            self.timer_id.timeout.connect(self.kill_sim)
 
         except ValueError as e:
-            logger.warning("Overflow error {0}".format(e))
+            logger.warning("Simulator error {0}".format(e))
             self.fx_results = None
             qstyle_widget(self.butSimHDL, "error")
             return

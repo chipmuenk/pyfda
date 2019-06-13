@@ -41,7 +41,7 @@ class Delay_wdg(QWidget):
 
         self._construct_UI()
         # Construct an instance of the HDL filter object
-        self.construct_hdlfilter()
+        self.construct_fixp_filter()
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -71,27 +71,27 @@ class Delay_wdg(QWidget):
 #
 #        self.setLayout(layVWdg)
 #------------------------------------------------------------------------------
-    def construct_hdlfilter(self):
+    def construct_fixp_filter(self):
         """
         Construct an instance of the HDL filter object using the settings from
         the quantizer dict
         """
-        self.hdlfilter = Delay() # construct HDL filter instance
+        self.fixp_filter = Delay() # construct HDL filter instance
 #------------------------------------------------------------------------------
     def to_verilog(self):
         """
         Convert the HDL description to Verilog
         """
-        return verilog.convert(self.hdlfilter,
-                               ios={self.hdlfilter.i, self.hdlfilter.o}) 
+        return verilog.convert(self.fixp_filter,
+                               ios={self.fixp_filter.i, self.fixp_filter.o}) 
 #------------------------------------------------------------------------------
 
-    def tb_hdlfilter(self, stimulus, inputs, outputs):
+    def tb_wdg_stim(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """
         for x in stimulus:
-            yield self.hdlfilter.i.eq(int(x)) # pass one stimulus value to filter
+            yield self.fixp_filter.i.eq(int(x)) # pass one stimulus value to filter
             inputs.append(x) # and append it to input list
-            outputs.append((yield self.hdlfilter.o)) # append filter output to output list
+            outputs.append((yield self.fixp_filter.o)) # append filter output to output list
             yield # ??
 
 
@@ -105,9 +105,9 @@ class Delay_wdg(QWidget):
         inputs = []
         response = []
         
-        testbench = self.tb_hdlfilter(stimulus, inputs, response) 
+        testbench = self.tb_wdg_stim(stimulus, inputs, response) 
             
-        run_simulation(self.hdlfilter, testbench)
+        run_simulation(self.fixp_filter, testbench)
         
         return response
 ###############################################################################

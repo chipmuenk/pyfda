@@ -58,7 +58,7 @@ class FIR_DF_wdg(QWidget):
         
         self._construct_UI()
         # Construct an instance of the HDL filter object
-        self.construct_hdlfilter() # construct instance self.hdlfilter with dummy data
+        self.construct_fixp_filter() # construct instance self.hdlfilter with dummy data
 #------------------------------------------------------------------------------
 
     def _construct_UI(self):
@@ -158,39 +158,52 @@ class FIR_DF_wdg(QWidget):
         return fxqc_dict
     
 #------------------------------------------------------------------------------
-    def construct_hdlfilter(self):
+    def construct_fixp_filter(self):
         """
-        Construct an instance of the HDL filter object using the settings from
+        Construct an instance of the fixpoint filter object using the settings from
         the quantizer dict
         """
-        self.hdlfilter = FIR() # construct HDL filter instance
+        self.fixp_filter = FIR()
 #------------------------------------------------------------------------------
     def to_verilog(self):
         """
-        Convert the HDL description to Verilog
+        Convert the migen description to Verilog
         """
-        return verilog.convert(self.hdlfilter,
-                               ios={self.hdlfilter.i, self.hdlfilter.o}) 
+        return verilog.convert(self.fixp_filter,
+                               ios={self.fixp_filter.i, self.fixp_filter.o}) 
 #------------------------------------------------------------------------------
-    def tb_hdlfilter(self, stimulus, inputs, outputs):
+    def tb_wdg_stim(self, stimulus, inputs, outputs):
         """ use stimulus list from widget as input to filter """
         for x in stimulus:
-            yield self.hdlfilter.i.eq(int(x)) # pass one stimulus value to filter
+            yield self.fixp_filter.i.eq(int(x)) # pass one stimulus value to filter
             inputs.append(x) # and append it to input list
-            outputs.append((yield self.hdlfilter.o)) # append filter output to output list
+            outputs.append((yield self.fixp_filter.o)) # append filter output to output list
             yield # ??
 
-
-    def fir_tb_sin(self, stimulus, inputs, outputs):
-        """ sinusoidal test signal """
-        f = 2**(self.hdlfilter.wsize - 1)
+    def tb_pulse(self, stimulus, inputs, outputs):
+        """ unit pulse stimulus signal """
+        fscale = 2**(self.fixp_filter.WI - 1)-1
         for t in range(len(stimulus)):
-            v = 0.1*cos(2*pi*0.1*t)
-            yield self.hdlfilter.i.eq(int(f*v))
+            #v = 0.1*cos(2*pi*0.1*t)*fscale
+            if t == 0:
+                v = fscale
+            else:
+                v = 0
+            yield self.fixp_filter.i.eq(int(v))
             inputs.append(v)
-            outputs.append((yield self.hdlfilter.o))
+            outputs.append((yield self.fixp_filter.o))
             yield
 
+
+    def tb_cos(self, stimulus, inputs, outputs):
+        """ cosine test signal """
+        fscale = 2**(self.fixp_filter.WI - 1)-1
+        for t in range(len(stimulus)):
+            v = 0.1*cos(2*pi*0.1*t)*fscale
+            yield self.fixp_filter.i.eq(int(v))
+            inputs.append(v)
+            outputs.append((yield self.fixp_filter.o))
+            yield
 
 #------------------------------------------------------------------------------           
     def run_sim(self, stimulus):
@@ -203,9 +216,9 @@ class FIR_DF_wdg(QWidget):
         inputs = []
         response = []
         
-        testbench = self.tb_hdlfilter(stimulus, inputs, response) 
+        testbench = self.tb_wdg_stim(stimulus, inputs, response) 
             
-        run_simulation(self.hdlfilter, testbench)
+        run_simulation(self.fixp_filter, testbench)
         
         return response
 ###############################################################################
