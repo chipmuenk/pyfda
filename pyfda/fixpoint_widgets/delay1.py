@@ -135,55 +135,34 @@ class Delay(Module):
             sreg = Signal((self.WI, True)) # registers for input signal 
             self.sync += sreg.eq(src)
             src = sreg
-#        sum_full = Signal((p['QA']['W'], True))
-#        self.comb += self.o.eq(sreg >> (WI-WO)) # rescale for output width
 
-#        delayed = Signal((self.WI, True))
-#        delayed_q = Signal((self.WI, True))
-#        if quant_o == 'round':
-#            self.comb += delayed_q.eq(delayed + (1 << (self.WO - 1)))
-#        else:
-#            self.comb += delayed_q.eq(delayed)        
-#        if ovfl_o == 'wrap':
-#            self.comb += self.o.eq(delayed_q >> (self.WI-self.WO)) # rescale for output width
-#        else:
-#            self.comb += \
-#                If(delayed_q[self.WO-2:] == 0b10,
-#                    self.o.eq(MIN_o)
-#                ).Elif(delayed_q[self.WO-2:] == 0b01,
-#                    self.o.eq(MAX_o)
-#                ).Else(self.o.eq(delayed_q >> (self.WI-self.WO-1))
-#                )
-#
-#        self.comb += self.o.eq(self.i) # rescale for output width
-            
-        self.comb += self.o.eq(self.test(self.i))
-        
-    def test(self, sig_in):
-        MIN_o = - 1 << (self.WO - 1) 
-        sig_o = Signal((self.WO, True))
-        self.comb += sig_o.eq(sig_in)
-        return sig_o
+        # rescale for output width
+        self.comb += self.o.eq(self.rescale(self.i, self.WO, quant_o, ovfl_o))
 
-    def sat_quant(self, sig_in, quant_o, ovfl_o):
-        MIN_o = - 1 << (self.WO - 1)
+    def rescale(self, sig_i, WO, quant=None, ovfl=None):
+        """
+        Change word length of input signal `sig_in` to `WO` bits, using the 
+        rounding and saturation methods specified by `quant` and `ovfl`.
+        """
+        WI = sig_i.nbits
+        MIN_o = - 1 << (WO - 1)
         MAX_o = -MIN_o - 1
 
-        sig_in_q = Signal((self.WI, True))
-        sig_o = Signal((self.WO, True))
-        if quant_o == 'round':
-            self.comb += sig_in_q.eq(sig_in + (1 << (self.WO - 1)))
+        sig_i_q = Signal((self.WI, True))
+        sig_o = Signal((WO, True))
+        if quant == 'round':
+            self.comb += sig_i_q.eq(sig_i + (1 << (WO - 1)))
         else:
-            self.comb += sig_in_q.eq(sig_in)        
-        if ovfl_o == 'wrap':
-            self.comb += sig_o.eq(sig_in_q >> (self.WI-self.WO)) # rescale for output width
+            self.comb += sig_i_q.eq(sig_i)        
+        if ovfl == 'wrap':
+            self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
         else:
             self.comb += \
                 If(sig_o[self.WO-2:] == 0b10,
                     sig_o.eq(MIN_o)
-                ).Elif(sig_o[self.WO-2:] == 0b01,
+                ).Elif(sig_o[WO-2:] == 0b01,
                     sig_o.eq(MAX_o)
-                ).Else(sig_o.eq(sig_in_q >> (self.WI-self.WO-1))
+                ).Else(sig_o.eq(sig_i_q >> (WI-WO-1))
                 )
         return sig_o
 
