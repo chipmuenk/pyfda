@@ -46,31 +46,33 @@ def rescale(mod, sig_i, WO, quant=None, ovfl=None):
     # max. resp. min, output values
     MIN_o = - 1 << (WO - 1)
     MAX_o = -MIN_o - 1
-
-    sig_i_q = Signal((WI, True))
+    if ovfl == "sat":
+        sig_i_q = Signal((WI+1, True))
+    else:
+        sig_i_q = Signal((WI, True))
     sig_o = Signal((WO, True))
     if quant == 'round' and dW > 0:
         mod.comb += sig_i_q.eq(sig_i + (1 << (dW - 1)))
     else:
         mod.comb += sig_i_q.eq(sig_i)        
-    if ovfl == 'wrap':
-        if dW >= 0: # WI >= WO, shift left
-            mod.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
-        else:
-            mod.comb += sig_o.eq(sig_i_q << -dW)
-        #self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
-    else:
+    if ovfl == 'sat':
         if dW > 0:
             mod.comb += \
-                If(sig_i_q[WO-2:] == 0b10,
+                If(sig_i_q[WO-1:] == 0b10,
                     sig_o.eq(MIN_o)
-                ).Elif(sig_i_q[WO-2:] == 0b01,
+                ).Elif(sig_i_q[WO-1:] == 0b01,
                     sig_o.eq(MAX_o)
                 ).Else(sig_o.eq(sig_i_q >> (dW-1))
                 )
         else:
             mod.comb += sig_o.eq(sig_i_q >> -dW)
             
+    else: # wrap around
+        if dW >= 0: # WI >= WO, shift left
+            mod.comb += sig_o.eq(sig_i_q >> dW) # rescale for output width
+        else:
+            mod.comb += sig_o.eq(sig_i_q << -dW)
+        #self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
     return sig_o
 
 
