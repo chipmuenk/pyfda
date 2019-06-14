@@ -55,8 +55,6 @@ class Plot_Impz(QWidget):
         self.f1 = self.ui.f1
         self.f2 = self.ui.f2
         
-        self.bottom_t = self.ui.bottom_t
-
         self.needs_draw = True   # flag whether plots need to be updated 
         self.needs_redraw = [True] * 2 # flag which plot needs to be redrawn
         self.fx_sim = False # initial setting for fixpoint simulation
@@ -551,18 +549,18 @@ class Plot_Impz(QWidget):
         #================ Plotting routine time domain =========================
     def _log_mode_time(self):
         """
-        Select / deselect log. mode for time domain and update self.bottom_t
+        Select / deselect log. mode for time domain and update self.ui.bottom_t
         """
         log = self.ui.chk_log_time.isChecked()
         self.ui.lbl_log_bottom_time.setVisible(log)
         self.ui.led_log_bottom_time.setVisible(log)
         self.ui.lbl_dB_time.setVisible(log)
         if log:
-            self.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(), self.bottom_t,
-                                    return_type='float', sign='neg')
-            self.ui.led_log_bottom_time.setText(str(self.bottom_t))
+            self.ui.bottom_t = safe_eval(self.ui.led_log_bottom_time.text(),
+                                         self.ui.bottom_t, return_type='float', sign='neg')
+            self.ui.led_log_bottom_time.setText(str(self.ui.bottom_t))
         else:
-            self.bottom_t = 0
+            self.ui.bottom_t = 0
 
         self.draw_impz()
         
@@ -685,11 +683,11 @@ class Plot_Impz(QWidget):
 
         if self.ui.chk_log_time.isChecked(): # log. scale for stimulus / response time domain
             H_str = '$|$' + self.H_str + '$|$ in dBV'
-            x = np.maximum(20 * np.log10(abs(self.x * scale_i)), self.bottom_t)
-            y = np.maximum(20 * np.log10(abs(self.y_r * scale_o)), self.bottom_t)
-            win = np.maximum(20 * np.log10(abs(self.ui.win)), self.bottom_t)
+            x = np.maximum(20 * np.log10(abs(self.x * scale_i)), self.ui.bottom_t)
+            y = np.maximum(20 * np.log10(abs(self.y_r * scale_o)), self.ui.bottom_t)
+            win = np.maximum(20 * np.log10(abs(self.ui.win)), self.ui.bottom_t)
             if self.cmplx:
-                y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.bottom_t)
+                y_i = np.maximum(20 * np.log10(abs(self.y_i)), self.ui.bottom_t)
                 H_i_str = r'$|\Im\{$' + self.H_str + '$\}|$' + ' in dBV'
                 H_str =   r'$|\Re\{$' + self.H_str + '$\}|$' + ' in dBV'
             fx_min = 20*np.log10(abs(fx_min))
@@ -713,7 +711,8 @@ class Plot_Impz(QWidget):
                         
         # --------------- Stimulus plot ----------------------------------
         plot_stim_dict = self.fmt_plot_stim.copy()
-        plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, plot_stim_dict, self.bottom_t)
+        plot_stim_fnc = self.plot_fnc(self.plt_time_stim, self.ax_r, 
+                                      plot_stim_dict, self.ui.bottom_t)
 
         plot_stim_fnc(self.t[self.ui.N_start:], x[self.ui.N_start:], label='$x[n]$',
                  **plot_stim_dict)
@@ -723,7 +722,8 @@ class Plot_Impz(QWidget):
 
         # --------------- Response plot ----------------------------------
         plot_resp_dict = self.fmt_plot_resp.copy()
-        plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_r, plot_resp_dict, self.bottom_t)
+        plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_r, 
+                                      plot_resp_dict, self.ui.bottom_t)
             
         plot_resp_fnc(self.t[self.ui.N_start:], y[self.ui.N_start:], label='$y[n]$',
                  **plot_resp_dict)
@@ -740,7 +740,8 @@ class Plot_Impz(QWidget):
         # --------------- Complex response ----------------------------------
         if self.cmplx and self.plt_time_resp != "none":
             #plot_resp_dict = self.fmt_plot_resp.copy()
-            plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i, plot_resp_dict, self.bottom_t)
+            plot_resp_fnc = self.plot_fnc(self.plt_time_resp, self.ax_i,
+                                          plot_resp_dict, self.ui.bottom_t)
                 
             plot_resp_fnc(self.t[self.ui.N_start:], y_i[self.ui.N_start:], label='$y_i[n]$',
                      **plot_resp_dict)
@@ -750,7 +751,7 @@ class Plot_Impz(QWidget):
                                   marker=mkfmt_i, **self.fmt_mkr_resp)
 
 #            [ml_i, sl_i, bl_i] = self.ax_i.stem(self.t[self.ui.N_start:], y_i[self.ui.N_start:],
-#                bottom=self.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
+#                bottom=self.ui.bottom_t, markerfmt=mkfmt_i, label = '$y_i[n]$')
 #            self.ax_i.set_xlabel(fb.fil[0]['plt_tLabel'])
             # self.ax_r.get_xaxis().set_ticklabels([]) # removes both xticklabels
             # plt.setp(ax_r.get_xticklabels(), visible=False) 
