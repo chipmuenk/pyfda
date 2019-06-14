@@ -20,9 +20,39 @@ from ..compat import (QWidget, QLabel, QLineEdit, QComboBox,
                       QVBoxLayout, QHBoxLayout, QFrame,
                       pyqtSignal)
 
+from migen import Signal, If
+
 from pyfda.pyfda_qt_lib import qget_cmb_box, qset_cmb_box
 from pyfda.pyfda_rc import params
 from pyfda.pyfda_lib import qstr, safe_eval, to_html
+
+
+def rescale(self, sig_i, WO, quant=None, ovfl=None):
+    """
+    Change word length of input signal `sig_in` to `WO` bits, using the 
+    rounding and saturation methods specified by `quant` and `ovfl`.
+    """
+    WI = sig_i.nbits
+    MIN_o = - 1 << (WO - 1)
+    MAX_o = -MIN_o - 1
+
+    sig_i_q = Signal((WI, True))
+    sig_o = Signal((WO, True))
+    if quant == 'round':
+        self.comb += sig_i_q.eq(sig_i + (1 << (WO - 1)))
+    else:
+        self.comb += sig_i_q.eq(sig_i)        
+    if ovfl == 'wrap':
+        self.comb += sig_o.eq(sig_i_q >> (WI-WO)) # rescale for output width
+    else:
+        self.comb += \
+            If(sig_o[self.WO-2:] == 0b10,
+                sig_o.eq(MIN_o)
+            ).Elif(sig_o[WO-2:] == 0b01,
+                sig_o.eq(MAX_o)
+            ).Else(sig_o.eq(sig_i_q >> (WI-WO-1))
+            )
+    return sig_o
 
 
 def build_coeff_dict(frmt=None):

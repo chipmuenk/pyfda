@@ -19,7 +19,7 @@ from pyfda.pyfda_lib import set_dict_defaults
 from ..compat import QWidget, QVBoxLayout, pyqtSignal
 
 #import pyfda.pyfda_fix_lib as fx
-from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
+from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs, rescale
 
 #####################
 from functools import reduce
@@ -269,23 +269,24 @@ class FIR(Module):
             src = sreg
             muls.append(c*sreg)
         sum_full = Signal((WA, True))
-        sum_full_q = Signal((WA, True))
+#        sum_full_q = Signal((WA, True))
         self.sync += sum_full.eq(reduce(add, muls)) # sum of multiplication products
-        if quant_o == 'round':
-            self.comb += sum_full_q.eq(sum_full + (1 << (self.WO - 1)))
-        else:
-            self.comb += sum_full_q.eq(sum_full)        
-        if ovfl_o == 'wrap':
-            self.comb += self.o.eq(sum_full_q >> (WA-self.WO)) # rescale for output width
-        else:
-            self.comb += \
-                If(sum_full_q[WA-2:] == 0b10,
-                    self.o.eq(MIN_o)
-                ).Elif(sum_full_q[WA-2:] == 0b01,
-                    self.o.eq(MAX_o)
-                ).Else(self.o.eq(sum_full_q >> (WA-self.WO-1))
-                )
-
+#        if quant_o == 'round':
+#            self.comb += sum_full_q.eq(sum_full + (1 << (self.WO - 1)))
+#        else:
+#            self.comb += sum_full_q.eq(sum_full)        
+#        if ovfl_o == 'wrap':
+#            self.comb += self.o.eq(sum_full_q >> (WA-self.WO)) # rescale for output width
+#        else:
+#            self.comb += \
+#                If(sum_full_q[WA-2:] == 0b10,
+#                    self.o.eq(MIN_o)
+#                ).Elif(sum_full_q[WA-2:] == 0b01,
+#                    self.o.eq(MAX_o)
+#                ).Else(self.o.eq(sum_full_q >> (WA-self.WO-1))
+#                )
+        # rescale for output width
+        self.comb += self.o.eq(rescale(self, sum_full, self.WO, quant_o, ovfl_o))
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':

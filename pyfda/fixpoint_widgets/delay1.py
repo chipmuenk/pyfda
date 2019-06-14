@@ -17,7 +17,7 @@ import pyfda.filterbroker as fb
 
 from ..compat import QWidget#, QLabel, QVBoxLayout, QHBoxLayout
 
-#from .fixpoint_helpers import UI_W, UI_W_coeffs, UI_Q, UI_Q_coeffs
+from .fixpoint_helpers import rescale
 from migen import Signal, Module, If, run_simulation
 from migen.fhdl import verilog
 ################################
@@ -137,7 +137,7 @@ class Delay(Module):
             src = sreg
 
         # rescale for output width
-        self.comb += self.o.eq(self.rescale(self.i, self.WO, quant_o, ovfl_o))
+        self.comb += self.o.eq(rescale(self, self.i, self.WO, quant_o, ovfl_o))
 
     def rescale(self, sig_i, WO, quant=None, ovfl=None):
         """
@@ -148,7 +148,7 @@ class Delay(Module):
         MIN_o = - 1 << (WO - 1)
         MAX_o = -MIN_o - 1
 
-        sig_i_q = Signal((self.WI, True))
+        sig_i_q = Signal((WI, True))
         sig_o = Signal((WO, True))
         if quant == 'round':
             self.comb += sig_i_q.eq(sig_i + (1 << (WO - 1)))
